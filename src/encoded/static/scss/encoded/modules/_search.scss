@@ -42,14 +42,14 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 			.top-row,
 			.col-date,
 			.col-main {
-				@extend .text-ellipsis-container;
+				@include text-truncate();
 			}
 
 			.top-row {
 				display: flex;
 				justify-content: space-between;
 				.col-topleft {
-					@extend .text-ellipsis-container;
+					@include text-truncate();
 				}
 			}
 			.top-row,
@@ -93,6 +93,7 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 	
 	&[data-field="status"] {
 		> .inner {
+			i.status-indicator-dot,
 			i.item-status-indicator-dot {
 				margin-left: 4px;
 				margin-right: 2px;
@@ -281,8 +282,8 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 				
 					.facets-body {
 						max-height: 90vh;
-						// 86 = 40 nav + 46 facet-list-header + 70px footer & bottom margin
-						max-height: calc(100vh - 137px);
+						// 86 = 40 nav + 52 facet-list-header + 50px footer
+						max-height: calc(100vh - 142px);
 						overflow-y: auto;
 						overflow-x: hidden;
 	
@@ -348,8 +349,10 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 		}
 	}
 
-	.result-table-detail-container .result-table-detail {
-		padding-left: 57px;
+	.result-table-detail-container {
+		.result-table-detail {
+			padding-left: 57px;
+		}
 	}
 
 }

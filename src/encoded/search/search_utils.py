@@ -100,6 +100,7 @@ def find_nested_path(field, es_mapping):
     :return: path for nested query or None
     """
     location = es_mapping
+    possible_nested_paths = []
     path = []
     for cursor in field.split('.'):
         if cursor == 'raw':  # if we get to this point we're definitely at a leaf and should stop
@@ -109,12 +110,13 @@ def find_nested_path(field, es_mapping):
                 return None
             location = location['properties']  # else move location forward, but do not add it to the PATH
         if cursor not in location:  # if we still don't see our 'level', we are not a nested field
-            break
+            break   # accumulated path will be discarded (not added to possible_nested_paths)
         location = location[cursor]
         path.append(cursor)
-        if location.get('type', None) == 'nested':
-            return '.'.join(path)
-    return None
+        if location.get('type', None) == 'nested':  # this could be a path
+            possible_nested_paths.append('.'.join(path))
+    # the last path added is the closest in proximity to the field and thus is correct
+    return possible_nested_paths[-1] if possible_nested_paths else None
 
 
 def is_schema_field(field):
@@ -260,8 +262,9 @@ def get_es_mapping(es, es_index):
     if '*' in es_index or ',' in es_index:  # no type=nested searches can be done on * or multi-index
         return {}
     else:
-        item_type = list(es.indices.get(es_index)[es_index]['mappings'].keys())[0]  # no other way to get it
-        return es.indices.get(es_index)[es_index]['mappings'][item_type]['properties']
+        index = es.indices.get(es_index)
+        item_type = list(index[es_index]['mappings'].keys())[0]
+        return index[es_index]['mappings'][item_type]['properties']
 
 
 def get_search_fields(request, doc_types):

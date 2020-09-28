@@ -15,6 +15,7 @@ from snovault import (
     AbstractCollection,
     TYPES,
     COLLECTIONS,
+    STORAGE
 )
 from snovault.elasticsearch import ELASTIC_SEARCH
 from snovault.elasticsearch.create_mapping import determine_if_is_date_field
@@ -81,6 +82,19 @@ class SearchBuilder:
         self.search_session_id = None
         self.string_query = None
 
+    def _get_es_mapping_if_necessary(self):
+        """ Looks in the registry to see if the single doc_type mapping is cached in the registry, which it
+            should be - thus saving us some time from external API calls at the expense of application memory.
+        """
+        if len(self.doc_types) == 1:  # extract mapping from storage if we're searching on a single doc type
+            item_type_snake_case = ''.join(['_' + c.lower() if c.isupper() else c for c in self.doc_types[0]]).lstrip('_')
+            mappings = self.request.registry[STORAGE].read.mappings.get()
+            if self.es_index in mappings:
+                return mappings[self.es_index]['mappings'][item_type_snake_case]['properties']
+            else:  # new item was added after last cache update, get directly via API
+                return get_es_mapping(self.es, self.es_index)
+        return {}
+
     def _bootstrap_query(self, search_type=None, return_generator=False, forced_type='Search',
                          custom_aggregations=None):
         """ Helper method that will bootstrap metadata necessary for building a search query. """
@@ -97,8 +111,9 @@ class SearchBuilder:
         self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
         self.prepared_terms = self.prepare_search_term(self.request)
 
-        # Outside API Calls
-        self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)  # mapping for the item type we are searching
+        # Can potentially make an outside API call, but ideally is cached
+        # Only needed if searching on a single item type
+        self.item_type_es_mapping = self._get_es_mapping_if_necessary()
 
     @property
     def forced_type_token(self):
@@ -307,13 +322,22 @@ class SearchBuilder:
         """
         if (len(self.doc_types) == 1) and 'Item' not in self.doc_types:
             search_term = 'search-info-header.' + self.doc_types[0]
+            # XXX: this could be cached application side as well
             static_section = self.request.registry['collections']['StaticSection'].get(search_term)
-            if static_section and hasattr(static_section.model, 'source'):
+            if static_section and hasattr(static_section.model, 'source'):  # extract from ES structure
                 item = static_section.model.source['object']
                 self.response['search_header'] = {}
-                self.response['search_header']['content'] = item['content']
+                self.response['search_header']['content'] = item.get('content', 'Content Missing')
                 self.response['search_header']['title'] = item.get('title', item['display_title'])
-                self.response['search_header']['filetype'] = item['filetype']
+                self.response['search_header']['filetype'] = item.get('filetype', 'No filetype')
+            elif static_section and hasattr(static_section.model, 'data'):  # extract form DB structure
+                item = static_section.upgrade_properties()
+                self.response['search_header'] = {}
+                self.response['search_header']['content'] = item.get('body', 'Content Missing')
+                self.response['search_header']['title'] = item.get('title', 'No title')
+                self.response['search_header']['filetype'] = item.get('filetype', 'No filetype')
+            else:
+                pass  # no static header found
 
     def set_pagination(self):
         """
@@ -883,12 +907,6 @@ class SearchBuilder:
                         # If @type or display_title etc. column defined in schema, then override defaults.
                         for prop in schema_columns[name]:
                             columns[name][prop] = schema_columns[name][prop]
-                    # Add description from field schema, if none otherwise.
-                    if not columns[name].get('description'):
-                        field_schema = schema_for_field(name, self.request, self.doc_types)
-                        if field_schema:
-                            if field_schema.get('description') is not None:
-                                columns[name]['description'] = field_schema['description']
 
         # Add status column, if not present, at end.
         if 'status' not in columns:

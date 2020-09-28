@@ -1,6 +1,8 @@
 
 /**********************************************************
 		Common static page components & styles
+		These extend _typography.scss somewhat
+		to increase margins around headings.
 ***********************************************************/
 
 
@@ -28,7 +30,7 @@
 	h2 {
 		font-weight: 400;
 		margin-top: 30px;
-		margin-bottom: 15px;
+		margin-bottom: 20px;
 	}
 
 	&:first-child {
@@ -38,8 +40,8 @@
 	}
 
 	h3 {
-		margin-top: 25px;
-    	margin-bottom: 15px;
+		margin-top: 30px;
+    	margin-bottom: 20px;
 	}
 
 	h4 {

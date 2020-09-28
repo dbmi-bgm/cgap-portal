@@ -455,7 +455,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
         console.log("id from graph", indvId, genID);
 
         const indvLink = (
-            <div className={`${genID ? "text-ellipsis-container" : ""}`}>
+            <div className={`${genID ? "text-truncate" : ""}`}>
                 { isProband ? <span className="font-weight-bold d-block">Proband</span> : null}
                 { (role && role !== "proband") ? <span className="d-block font-weight-semibold text-capitalize">{role}</span> : null}
                 { genID ? <span className="text-serif text-small gen-identifier d-block text-center">{ genID }</span>: null}
@@ -577,7 +577,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 });
 
                 colVal = (
-                    <div className="qcs-container text-ellipsis-container">
+                    <div className="qcs-container text-truncate">
                         { renderArr }
                     </div>
                 );
@@ -587,7 +587,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
 
                 if (allFileObjects === true) {
                     console.log("exts, allFileObjects,", allFileObjects);
-                    colVal = <div className="qcs-container text-ellipsis-container"><i className="icon icon-arrow-alt-circle-down fas"></i> Included in VCF </div>;
+                    colVal = <div className="qcs-container text-truncate"><i className="icon icon-arrow-alt-circle-down fas"></i> Included in VCF </div>;
                 } else {
                     const extensions = Object.keys(allFileObjects);
                     console.log("exts, extensions,", extensions);
@@ -599,7 +599,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                     });
 
                     colVal = (
-                        <div className="qcs-container text-ellipsis-container">
+                        <div className="qcs-container text-truncate">
                             { renderArr.length > 0 ? renderArr : '-' }
                         </div>
                     );
@@ -646,7 +646,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                         });
 
                         colVal = (
-                            <div className="qcs-container text-ellipsis-container">
+                            <div className="qcs-container text-truncate">
                                 { renderArr.length > 0 ? renderArr : '-' }
                             </div>
                         );

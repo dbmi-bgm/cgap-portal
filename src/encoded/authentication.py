@@ -1,8 +1,6 @@
 import base64
 import os
 from operator import itemgetter
-from datetime import datetime
-import time
 import jwt
 from base64 import b64decode
 
@@ -213,9 +211,11 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         for identity in payload.get('identities', []): # if auth0 decoded
             if identity.get('connection', '') in ['partners', 'hms-it']:
                 return True
+
+        # XXX: Refactor to use regex? Also should potentially be data-driven?
         if 'partners' in payload.get('sub', ''):
             return True
-        elif 'hms.harvard' in payload.get('sub', ''):
+        elif 'harvard.edu' in payload.get('sub', ''):
             return True
         elif payload.get('email_verified'):
             return True
@@ -258,27 +258,6 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
 
         print("didn't get email or email is not verified")
         return None
-
-
-# def get_jwt(request):
-#     token = None
-#     try:
-#         # ensure this is a jwt token not basic auth:
-#         auth_type = request.headers['Authorization'][:6]
-#         if auth_type.strip().lower() == 'bearer':
-#             token = request.headers['Authorization'][7:]
-#     except (ValueError, TypeError, KeyError):
-#         pass
-#
-#     if not token and request.method in ('GET', 'HEAD'):
-#         # Only grab this if is a GET request, not a transactional request to help mitigate CSRF attacks.
-#         # See: https://en.wikipedia.org/wiki/Cross-site_request_forgery#Cookie-to-header_token
-#         # The way our JS grabs and sticks JWT into Authorization header is somewhat analogous to above approach.
-#         # TODO: Ensure our `Access-Control-Allow-Origin` response headers are appropriate (more for CGAP).
-#         # TODO: Get a security audit done.
-#         token = request.cookies.get('jwtToken')
-#
-#     return token
 
 
 def get_jwt(request):

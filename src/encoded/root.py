@@ -106,6 +106,7 @@ def health_check(config):
             "indexer": settings.get("indexer"),
             "index_server": settings.get("index_server"),
             "load_data": settings.get('load_test_data'),
+            "metadata_bundles_bucket": settings.get('metadata_bundles_bucket'),
             "namespace": settings.get('indexer.namespace'),
             "processed_file_bucket": settings.get('file_wfout_bucket'),
             'project_version': settings.get('encoded_version'),

@@ -343,6 +343,7 @@
         "inheritance_modes": {
             "title": "Inheritance Modes",
             "type": "array",
+            "extended_description" : "src/encoded/docs/extended_description_VariantSample_inheritance_mode.html",
             "items": {
                 "type": "string"
             }
@@ -480,64 +481,63 @@
         }
     },
     "columns": {
-        "AF": {
-            "title": "VAF",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 21
+        "display_title": {
+            "title": "Position",
+            "sort_fields" : [
+                { "field" : "variant.display_title", "title" : "Variant Display Title" },
+                { "field" : "variant.dbsnp_rs_number", "title": "dbSNP RS Number" }
+            ]
         },
         "DP": {
-            "title": "Coverage",
+            "title": "Coverage, VAF",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 20
+            "order": 20,
+            "sort_fields": [
+                { "field" : "DP", "title" : "Coverage" },
+                { "field" : "AF", "title": "VAF" }
+            ]
         },
-        "GT": {
+        "associated_genotype_labels.proband_genotype_label": {
             "title": "Genotype",
-            "order": 30
-        },
-        "bam_snapshot": {
-            "title": "Genome Snapshot",
-            "order": 81
-        },
-        "variant.clinvar_variationid": {
-            "title": "Clinvar ID",
-            "order": 70
-        },
-        "variant.dbsnp_rs_number": {
-            "title": "dbSNP ID",
-            "order": 11
-        },
-        "variant.display_title": {
-            "title": "Variant"
+            "order": 21,
+            "sort_fields": [
+                { "field" : "associated_genotype_labels.proband_genotype_label", "title": "Proband GT" },
+                { "field" : "associated_genotype_labels.mother_genotype_label", "title": "Mother GT" },
+                { "field": "associated_genotype_labels.father_genotype_label", "title": "Father GT" }
+            ]
         },
         "variant.genes.genes_ensg.display_title": {
-            "title": "Gene",
-            "order": 40
+            "title": "Gene Transcript",
+            "order": 25
+        },
+        "variant.genes.genes_most_severe_hgvsc": {
+            "title": "Variant",
+            "order": 27,
+            "sort_fields": [
+                { "field": "variant.genes.genes.most_severe_hgvsc", "title": "Most Severe HGVSC" }
+            ]
         },
         "variant.genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
-            "order": 51
-        },
-        "variant.genes.genes_most_severe_hgvsc": {
-            "title": "Coding Sequence",
-            "order": 50
-        },
-        "variant.genes.genes_most_severe_transcript": {
-            "title": "Transcript",
-            "order": 41
+            "order": 28,
+            "sort_fields": [
+                { "fields": "variant.genes.genes_most_severe_consequence.coding_effect", "title": "Coding Effect" }
+            ]
         },
         "variant.gnomad_af": {
-            "title": "GnomAD Alt Allele Frequency",
+            "title": "GnomAD",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 60
         },
-        "variant.max_pop_af_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "stats",
-            "number_step": "any",
+        "variant.cadd_phred": {
+            "title": "Predictors",
             "order": 61
+        },
+        "bam_snapshot": {
+            "title": "Genome Snapshot",
+            "order": 81
         }
     },
     "facets": {
@@ -591,8 +591,7 @@
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
-            "order": 15,
-            "grouping": "Genotype"
+            "order": 15
         },
         "novoPP": {
             "title": "novoCaller PP",

@@ -1,0 +1,2134 @@
+{
+  "sample_processing" : {
+    "mappings" : {
+      "sample_processing" : {
+        "dynamic_templates" : [
+          {
+            "template_principals_allowed" : {
+              "path_match" : "principals_allowed.*",
+              "mapping" : {
+                "ignore_above" : 512,
+                "index" : true,
+                "type" : "keyword"
+              }
+            }
+          },
+          {
+            "template_unique_keys" : {
+              "path_match" : "unique_keys.*",
+              "mapping" : {
+                "ignore_above" : 512,
+                "index" : true,
+                "type" : "keyword"
+              }
+            }
+          },
+          {
+            "template_links" : {
+              "path_match" : "links.*",
+              "mapping" : {
+                "ignore_above" : 512,
+                "index" : true,
+                "type" : "keyword"
+              }
+            }
+          }
+        ],
+        "properties" : {
+          "aggregated_items" : {
+            "type" : "object"
+          },
+          "embedded" : {
+            "dynamic" : "false",
+            "properties" : {
+              "@id" : {
+                "type" : "text",
+                "fields" : {
+                  "lower_case_sort" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512,
+                    "normalizer" : "case_insensitive"
+                  },
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                },
+                "copy_to" : [
+                  "full_text"
+                ]
+              },
+              "@type" : {
+                "type" : "text",
+                "fields" : {
+                  "lower_case_sort" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512,
+                    "normalizer" : "case_insensitive"
+                  },
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                },
+                "copy_to" : [
+                  "full_text"
+                ]
+              },
+              "aliases" : {
+                "type" : "text",
+                "fields" : {
+                  "lower_case_sort" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512,
+                    "normalizer" : "case_insensitive"
+                  },
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                },
+                "copy_to" : [
+                  "full_text"
+                ]
+              },
+              "analysis_type" : {
+                "type" : "text",
+                "fields" : {
+                  "lower_case_sort" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512,
+                    "normalizer" : "case_insensitive"
+                  },
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                },
+                "copy_to" : [
+                  "full_text"
+                ]
+              },
+              "cases" : {
+                "type" : "nested",
+                "properties" : {
+                  "@id" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "@type" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "display_title" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "principals_allowed" : {
+                    "properties" : {
+                      "edit" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "view" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "uuid" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "completed_processes" : {
+                "type" : "text",
+                "fields" : {
+                  "lower_case_sort" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512,
+                    "normalizer" : "case_insensitive"
+                  },
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                },
+                "copy_to" : [
+                  "full_text"
+                ]
+              },
+              "date_created" : {
+                "type" : "date",
+                "fields" : {
+                  "lower_case_sort" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512,
+                    "normalizer" : "case_insensitive"
+                  },
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                },
+                "format" : "date_optional_time"
+              },
+              "display_title" : {
+                "type" : "text",
+                "fields" : {
+                  "lower_case_sort" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512,
+                    "normalizer" : "case_insensitive"
+                  },
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                },
+                "copy_to" : [
+                  "full_text"
+                ]
+              },
+              "families" : {
+                "type" : "nested",
+                "properties" : {
+                  "@id" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "@type" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "display_title" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "principals_allowed" : {
+                    "properties" : {
+                      "edit" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "view" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "uuid" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "institution" : {
+                "properties" : {
+                  "@id" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "@type" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "display_title" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "principals_allowed" : {
+                    "properties" : {
+                      "edit" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "view" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "uuid" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "last_modified" : {
+                "properties" : {
+                  "date_modified" : {
+                    "type" : "date",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "format" : "date_optional_time"
+                  },
+                  "modified_by" : {
+                    "properties" : {
+                      "@id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "@type" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "display_title" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "principals_allowed" : {
+                        "properties" : {
+                          "edit" : {
+                            "type" : "text",
+                            "fields" : {
+                              "lower_case_sort" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512,
+                                "normalizer" : "case_insensitive"
+                              },
+                              "raw" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512
+                              }
+                            },
+                            "copy_to" : [
+                              "full_text"
+                            ]
+                          },
+                          "view" : {
+                            "type" : "text",
+                            "fields" : {
+                              "lower_case_sort" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512,
+                                "normalizer" : "case_insensitive"
+                              },
+                              "raw" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512
+                              }
+                            },
+                            "copy_to" : [
+                              "full_text"
+                            ]
+                          }
+                        }
+                      },
+                      "uuid" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "principals_allowed" : {
+                "properties" : {
+                  "edit" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "view" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "processed_files" : {
+                "type" : "nested",
+                "properties" : {
+                  "@id" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "@type" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "accession" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "display_title" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "principals_allowed" : {
+                    "properties" : {
+                      "edit" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "view" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "uuid" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "project" : {
+                "properties" : {
+                  "@id" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "@type" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "display_title" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "principals_allowed" : {
+                    "properties" : {
+                      "edit" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "view" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "uuid" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "sample_processed_files" : {
+                "type" : "nested",
+                "properties" : {
+                  "processed_files" : {
+                    "type" : "nested",
+                    "properties" : {
+                      "@id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "@type" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "display_title" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "principals_allowed" : {
+                        "properties" : {
+                          "edit" : {
+                            "type" : "text",
+                            "fields" : {
+                              "lower_case_sort" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512,
+                                "normalizer" : "case_insensitive"
+                              },
+                              "raw" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512
+                              }
+                            },
+                            "copy_to" : [
+                              "full_text"
+                            ]
+                          },
+                          "view" : {
+                            "type" : "text",
+                            "fields" : {
+                              "lower_case_sort" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512,
+                                "normalizer" : "case_insensitive"
+                              },
+                              "raw" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512
+                              }
+                            },
+                            "copy_to" : [
+                              "full_text"
+                            ]
+                          }
+                        }
+                      },
+                      "uuid" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "sample" : {
+                    "properties" : {
+                      "@id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "@type" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "display_title" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "principals_allowed" : {
+                        "properties" : {
+                          "edit" : {
+                            "type" : "text",
+                            "fields" : {
+                              "lower_case_sort" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512,
+                                "normalizer" : "case_insensitive"
+                              },
+                              "raw" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512
+                              }
+                            },
+                            "copy_to" : [
+                              "full_text"
+                            ]
+                          },
+                          "view" : {
+                            "type" : "text",
+                            "fields" : {
+                              "lower_case_sort" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512,
+                                "normalizer" : "case_insensitive"
+                              },
+                              "raw" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512
+                              }
+                            },
+                            "copy_to" : [
+                              "full_text"
+                            ]
+                          }
+                        }
+                      },
+                      "uuid" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "samples" : {
+                "type" : "nested",
+                "properties" : {
+                  "@id" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "@type" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "completed_processes" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "display_title" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "principals_allowed" : {
+                    "properties" : {
+                      "edit" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "view" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "processed_files" : {
+                    "type" : "nested",
+                    "properties" : {
+                      "@id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "@type" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "display_title" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "principals_allowed" : {
+                        "properties" : {
+                          "edit" : {
+                            "type" : "text",
+                            "fields" : {
+                              "lower_case_sort" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512,
+                                "normalizer" : "case_insensitive"
+                              },
+                              "raw" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512
+                              }
+                            },
+                            "copy_to" : [
+                              "full_text"
+                            ]
+                          },
+                          "view" : {
+                            "type" : "text",
+                            "fields" : {
+                              "lower_case_sort" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512,
+                                "normalizer" : "case_insensitive"
+                              },
+                              "raw" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512
+                              }
+                            },
+                            "copy_to" : [
+                              "full_text"
+                            ]
+                          }
+                        }
+                      },
+                      "uuid" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "uuid" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "samples_pedigree" : {
+                "type" : "nested",
+                "properties" : {
+                  "association" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "individual" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "parents" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "relationship" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "sample_accession" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "sample_name" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "sex" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "schema_version" : {
+                "type" : "text",
+                "fields" : {
+                  "lower_case_sort" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512,
+                    "normalizer" : "case_insensitive"
+                  },
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                },
+                "copy_to" : [
+                  "full_text"
+                ]
+              },
+              "static_content" : {
+                "type" : "nested",
+                "properties" : {
+                  "content" : {
+                    "properties" : {
+                      "@id" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "@type" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "content" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "display_title" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "principals_allowed" : {
+                        "properties" : {
+                          "edit" : {
+                            "type" : "text",
+                            "fields" : {
+                              "lower_case_sort" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512,
+                                "normalizer" : "case_insensitive"
+                              },
+                              "raw" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512
+                              }
+                            },
+                            "copy_to" : [
+                              "full_text"
+                            ]
+                          },
+                          "view" : {
+                            "type" : "text",
+                            "fields" : {
+                              "lower_case_sort" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512,
+                                "normalizer" : "case_insensitive"
+                              },
+                              "raw" : {
+                                "type" : "keyword",
+                                "ignore_above" : 512
+                              }
+                            },
+                            "copy_to" : [
+                              "full_text"
+                            ]
+                          }
+                        }
+                      },
+                      "uuid" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "description" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "location" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "static_headers" : {
+                "type" : "nested",
+                "properties" : {
+                  "@id" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "@type" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "display_title" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "principals_allowed" : {
+                    "properties" : {
+                      "edit" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "view" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "uuid" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "status" : {
+                "type" : "text",
+                "fields" : {
+                  "lower_case_sort" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512,
+                    "normalizer" : "case_insensitive"
+                  },
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                },
+                "copy_to" : [
+                  "full_text"
+                ]
+              },
+              "submitted_by" : {
+                "properties" : {
+                  "@id" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "@type" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "display_title" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  },
+                  "principals_allowed" : {
+                    "properties" : {
+                      "edit" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      },
+                      "view" : {
+                        "type" : "text",
+                        "fields" : {
+                          "lower_case_sort" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512,
+                            "normalizer" : "case_insensitive"
+                          },
+                          "raw" : {
+                            "type" : "keyword",
+                            "ignore_above" : 512
+                          }
+                        },
+                        "copy_to" : [
+                          "full_text"
+                        ]
+                      }
+                    }
+                  },
+                  "uuid" : {
+                    "type" : "text",
+                    "fields" : {
+                      "lower_case_sort" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512,
+                        "normalizer" : "case_insensitive"
+                      },
+                      "raw" : {
+                        "type" : "keyword",
+                        "ignore_above" : 512
+                      }
+                    },
+                    "copy_to" : [
+                      "full_text"
+                    ]
+                  }
+                }
+              },
+              "uuid" : {
+                "type" : "text",
+                "fields" : {
+                  "lower_case_sort" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512,
+                    "normalizer" : "case_insensitive"
+                  },
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                },
+                "copy_to" : [
+                  "full_text"
+                ]
+              }
+            }
+          },
+          "full_text" : {
+            "type" : "text",
+            "analyzer" : "snovault_index_analyzer",
+            "search_analyzer" : "snovault_search_analyzer"
+          },
+          "indexing_stats" : {
+            "properties" : {
+              "aggregated_items" : {
+                "type" : "float"
+              },
+              "embedded_view" : {
+                "type" : "float"
+              },
+              "object_view" : {
+                "type" : "float"
+              },
+              "paths" : {
+                "type" : "float"
+              },
+              "rev_links" : {
+                "type" : "float"
+              },
+              "total_indexing_view" : {
+                "type" : "float"
+              },
+              "unique_keys" : {
+                "type" : "float"
+              },
+              "upgrade_properties" : {
+                "type" : "float"
+              },
+              "validation" : {
+                "type" : "float"
+              }
+            }
+          },
+          "item_type" : {
+            "type" : "keyword",
+            "copy_to" : [
+              "full_text"
+            ],
+            "ignore_above" : 512
+          },
+          "linked_uuids_embedded" : {
+            "properties" : {
+              "sid" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              },
+              "uuid" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              }
+            }
+          },
+          "linked_uuids_object" : {
+            "properties" : {
+              "sid" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              },
+              "uuid" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              }
+            }
+          },
+          "links" : {
+            "properties" : {
+              "families" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              },
+              "institution" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              },
+              "last_modified~modified_by" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              },
+              "processed_files" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              },
+              "project" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              },
+              "samples" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              },
+              "submitted_by" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              }
+            }
+          },
+          "max_sid" : {
+            "type" : "keyword",
+            "ignore_above" : 512
+          },
+          "object" : {
+            "type" : "object",
+            "enabled" : false
+          },
+          "paths" : {
+            "type" : "keyword",
+            "ignore_above" : 512
+          },
+          "principals_allowed" : {
+            "properties" : {
+              "edit" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              },
+              "view" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              }
+            }
+          },
+          "properties" : {
+            "type" : "object",
+            "enabled" : false
+          },
+          "propsheets" : {
+            "type" : "object",
+            "enabled" : false
+          },
+          "rev_link_names" : {
+            "properties" : {
+              "case" : {
+                "type" : "text",
+                "fields" : {
+                  "keyword" : {
+                    "type" : "keyword",
+                    "ignore_above" : 256
+                  }
+                }
+              },
+              "name" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              },
+              "uuids" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              }
+            }
+          },
+          "rev_linked_to_me" : {
+            "type" : "keyword",
+            "ignore_above" : 512
+          },
+          "sid" : {
+            "type" : "keyword",
+            "ignore_above" : 512
+          },
+          "unique_keys" : {
+            "properties" : {
+              "alias" : {
+                "type" : "keyword",
+                "ignore_above" : 512
+              }
+            }
+          },
+          "uuid" : {
+            "type" : "keyword",
+            "ignore_above" : 512
+          },
+          "validation_errors" : {
+            "properties" : {
+              "description" : {
+                "type" : "text",
+                "fields" : {
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                }
+              },
+              "location" : {
+                "type" : "text",
+                "fields" : {
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                }
+              },
+              "name" : {
+                "type" : "text",
+                "fields" : {
+                  "raw" : {
+                    "type" : "keyword",
+                    "ignore_above" : 512
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

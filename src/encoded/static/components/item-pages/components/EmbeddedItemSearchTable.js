@@ -54,6 +54,8 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
             filterFacetFxn, hideFacets,
             filterColumnFxn, hideColumns,
             renderDetailPane,
+            onClearFiltersVirtual,
+            isClearFiltersBtnVisible,
             rowHeight = 90 // Keep in sync w CSS
         } = this.props;
         const { totalCount } = this.state;
@@ -67,12 +69,12 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
         const passProps = {
             facets, columns, columnExtensionMap, searchHref, session,
             schemas, renderDetailPane, defaultOpenIndices, maxHeight,
-            rowHeight,
+            rowHeight, onClearFiltersVirtual, isClearFiltersBtnVisible,
             filterFacetFxn, hideFacets,
             filterColumnFxn, hideColumns,
             onLoad: this.getCountCallback,
             termTransformFxn: Term.toName,
-            separateSingleTermFacets: false
+            separateSingleTermFacets: false,
         };
 
         /** @deprecated - Should just pass down to embeddedTableHeader once `title` instances that depend on totalCount are migrated */

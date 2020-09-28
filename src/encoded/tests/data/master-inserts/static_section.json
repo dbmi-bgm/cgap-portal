@@ -27,5 +27,27 @@
         "file" : "/src/encoded/static/data/embedded-search-table-demo.jsx",
         "section_type" : "Page Section",
         "status" : "current"
+    },
+    {
+        "name": "help.portal_ontology_usage.content",
+        "uuid": "76a1471a-a9cd-4192-a965-470e241308e3",
+        "status": "current",
+        "aliases": [
+            "hms-dbmi:ont_in_portal"
+        ],
+        "file": "/docs/public/help/ontologies_in_cgap.md",
+        "options": {
+            "collapsible": false,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "date_created": "2019-11-12T16:54:29.059996+00:00",
+        "section_type": "Page Section",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267227777",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:46:08.189582+00:00"
+        },
+        "schema_version": "2"
     }
 ]

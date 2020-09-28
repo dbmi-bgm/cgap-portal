@@ -1,4 +1,5 @@
 import json
+import os
 import boto3
 import pytz
 import datetime
@@ -94,6 +95,46 @@ def build_variant_display_title(chrom, pos, ref, alt, sep='>'):
     )
 
 
+def load_extended_descriptions_in_schemas(schema_object, depth=0):
+    '''
+    MODIFIES SCHEMA_OBJECT **IN PLACE** RECURSIVELY
+    :param schema_object: A dictionary of any type that might have 'extended_description', 'properties', or 'items.properties'. Should be an Item schema initially.
+    :param depth: Don't supply this. Used to check/optimize at depth=0 where schema_object is root of schema.
+    TODO:
+        Maybe reuse and/or move somewhere more global/easy-to-import-from?
+        Maybe in base.py?
+    '''
+
+    if depth == 0:
+        # Root of Item schema, no extended_description here, but maybe facets or columns
+        # have own extended_description to load also.
+        if "properties" in schema_object:
+            load_extended_descriptions_in_schemas(schema_object["properties"], depth + 1)
+        if "facets" in schema_object:
+            load_extended_descriptions_in_schemas(schema_object["facets"], depth + 1)
+        if "columns" in schema_object:
+            load_extended_descriptions_in_schemas(schema_object["columns"], depth + 1)
+
+        return schema_object
+
+    for field_name, field_schema in schema_object.items():
+        if "extended_description" in field_schema:
+            if field_schema["extended_description"][-5:] == ".html":
+                html_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../..", field_schema["extended_description"])
+                with open(html_file_path) as open_file:
+                    field_schema["extended_description"] = "".join([ l.strip() for l in open_file.readlines() ])
+
+        # Applicable only to "properties" of Item schema, not columns or facets:
+        if "type" in field_schema:
+            if field_schema["type"] == "object" and "properties" in field_schema:
+                load_extended_descriptions_in_schemas(field_schema["properties"], depth + 1)
+                continue
+
+            if field_schema["type"] == "array" and "items" in field_schema and field_schema["items"]["type"] == "object" and "properties" in field_schema["items"]:
+                load_extended_descriptions_in_schemas(field_schema["items"]["properties"], depth + 1)
+                continue
+
+
 @collection(
     name='variants',
     properties={
@@ -150,7 +191,7 @@ class VariantSample(Item):
     """Class for variant samples."""
 
     item_type = 'variant_sample'
-    schema = load_schema('encoded:schemas/variant_sample.json')
+    schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant_sample.json'))
     embedded_list = build_variant_sample_embedded_list()
 
     @classmethod
@@ -270,7 +311,7 @@ class VariantSample(Item):
             }
         }
     })
-    def associated_genotype_labels(self, CALL_INFO, samplegeno=None, genotype_labels=None):
+    def associated_genotype_labels(self, variant, CALL_INFO, samplegeno=None, genotype_labels=None):
         """ Builds the above sub-embedded object so we can search on the genotype labels """
 
         possible_keys = ['proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
@@ -289,7 +330,12 @@ class VariantSample(Item):
         def infer_key_from_role(role):
             return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
 
-        if not genotype_labels or not samplegeno:
+        # variant always starts with chr* where * is the chrom we are looking for
+        def extract_chrom_from_variant(v):
+            return v[3]
+
+        # drop if there are no genotype labels or no samplegeno field or this is a mitochondrial variant
+        if not genotype_labels or not samplegeno or extract_chrom_from_variant(variant) == 'M':
             return None
 
         new_labels = {}
