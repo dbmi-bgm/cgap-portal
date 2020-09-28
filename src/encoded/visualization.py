@@ -123,9 +123,11 @@ def get_higlass_viewconf(context, request):
             "viewconfig": None
         }   
 
+    # Overview
     higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
     higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large 
 
+    # Details
     higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
     higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small 
 
