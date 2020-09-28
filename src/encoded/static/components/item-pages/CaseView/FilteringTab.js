@@ -11,6 +11,7 @@ import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { DisplayTitleColumnWrapper, DisplayTitleColumnDefault } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
 const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ hgvsc }){
     // Memoized on the 1 prop it receives which is dependency for its calculation.
@@ -37,7 +38,7 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
         // Generates new object `columnExtensionMap` only if `originalColExtMap` changes (if ever)
         return {
             ...originalColExtMap, // Copy in existing vals but overwrite display_title.render
-            display_title : {
+            "display_title" : {
                 ...originalColExtMap.display_title,
                 render: function(result, parentProps){
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
@@ -48,7 +49,8 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                     );
                 }
             },
-            DP : { // Coverage, VAF column
+            // TODO? We could potentially move some of these definitions into EmbeddedItemSearchTable.defaultProps.columnExtensionMap
+            "DP" : { // Coverage, VAF column
                 render: function(result, props) {
                     const { DP = null, AF = null } = result;
                     const rows = [
@@ -273,15 +275,33 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     } = context || {};
 
     // TODO POST request w multiple of these filter_blocks, for now just first 1 is populated and used.
-    const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
-    const searchHrefAppend = (
-        initial_search_href_filter_addon +
-        (initial_search_href_filter_addon && currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "")
-    );
 
-    const initialSearchHref = "/search/?type=VariantSample" + (searchHrefAppend ? "&" + searchHrefAppend : "") + "&sort=date_created";
+    let searchHrefInitial = "/search/?type=VariantSample"; initial_search_href_filter_addon;
+    searchHrefInitial += initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "";
+    searchHrefInitial += "&sort=date_created";
+
+    const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
+    const searchHrefWithCurrentFilter = searchHrefInitial + (currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "");
+
     // Hide facets that are ones used to initially narrow down results to those related to this case.
-    const hideFacets = !initial_search_href_filter_addon ? null : Object.keys(queryString.parse(initial_search_href_filter_addon));
+    const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible } = useMemo(function(){
+        const onClearFiltersVirtual = function(virtualNavigateFxn, callback) {
+            // By default, EmbeddedSearchItemView will reset to props.searchHref.
+            // We override with searchHrefInitial.
+            return virtualNavigateFxn(searchHrefInitial, {}, callback);
+        };
+        const isClearFiltersBtnVisible = function(virtualHref){
+            // Re-use same algo for determining if is visible, but compare virtualhref
+            // against searchHrefInitial (without the current filter(s)) rather than
+            // `props.searchHref` which contains the current filters.
+            return VirtualHrefController.isClearFiltersBtnVisible(virtualHref, searchHrefInitial);
+        };
+        let hideFacets = null;
+        if (initial_search_href_filter_addon) {
+            hideFacets = Object.keys(queryString.parse(initial_search_href_filter_addon));
+        }
+        return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible };
+    }, [ context ]);
 
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
@@ -294,7 +314,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             <h1 className="mb-0 mt-0">
                 { caseDisplayTitle }: <span className="text-300">Variant Filtering and Technical Review</span>
             </h1>
-            <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session }} searchHref={initialSearchHref} title={
+            <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible }} searchHref={searchHrefWithCurrentFilter} title={
                 <FilteringTabSubtitle caseItem={context} />
             } key={"session:" + session} />
         </React.Fragment>
