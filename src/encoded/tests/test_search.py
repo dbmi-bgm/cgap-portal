@@ -634,6 +634,8 @@ def sample_processing_mapping():
     ('embedded.date_created', None),
     ('embedded.cases', 'embedded.cases'),  # not meaningful but should still work
     ('embedded.cases.@id', 'embedded.cases'),
+    ('embedded.cases.principals_allowed.edit', 'embedded.cases'),
+    ('embedded.families.display_title', 'embedded.families'),
     ('embedded.samples.processed_files.display_title', 'embedded.samples.processed_files')
 ])
 def test_find_nested_path(sample_processing_mapping, field, nested_path):
