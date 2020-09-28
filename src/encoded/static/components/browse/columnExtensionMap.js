@@ -3,7 +3,7 @@
 import React from 'react';
 import _ from 'underscore';
 
-import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { itemUtil } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/object';
 import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { basicColumnExtensionMap,
@@ -28,6 +28,9 @@ export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 12
  * Another thought - it's unlikely that the props passed to this component will _ever_ change, I think.
  * Maybe we could have something like 'shouldComponentUpdate(){ return false; }` to prevent it from ever even
  * attempting to compare props for performance gain (since many table cells).
+ *
+ * Colors are bound to 'data-status' attribute values in SCSS to statuses, so we re-use those here rather than 
+ * creating separate 'color map' for this, and override tooltip with custom value.
  */
 const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
     const {
@@ -44,7 +47,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                 <span className="col-topleft">
                     { topLeft }
                 </span>
-                <i className="item-status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />
+                <i className="status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />
             </div>
             <h4 className="col-main">
                 { mainTitle || "-" }
@@ -89,16 +92,32 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
         '@id' : caseHref,
         display_title = null,
         accession = null,
-        status = null,
         date_created: date = null,
-        case_title = null
+        case_title = null,
+        individual = null,
+        family = null,
+        sample_processing = null
     } = result;
 
     const mainTitle = accession && case_title ? case_title : display_title;
 
+    const { uuid: indvID = null } = individual || {};
+    const { uuid: familyID = null } = family || {};
+    const { uuid: spID = null } = sample_processing || {};
+
+    let status = null;
+    let statusTip = null;
+    if (indvID && familyID && spID) {
+        status = "complete";
+        statusTip = "Case, Individual, Family and Sample Processing are created with required fields.";
+    } else {
+        status = "incomplete";
+        statusTip = "Case exists, but some linked item is missing: Family, Individual, or Sample Processing.";
+    }
+
     return (
         <a href={caseHref} className="adv-block-link w-100 title-block d-flex flex-column" data-tip={tooltip} data-delay-show={750}>
-            <MultiLevelColumn {...{ mainTitle, date, status }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
+            <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
         </a>
     );
 });
@@ -161,7 +180,6 @@ export const columnExtensionMap = {
             const {
                 display_title: mainTitle = null,
                 accession = null,
-                status = null,
                 last_modified : { date_modified: date = null } = {}
             } = report || {};
 
@@ -169,11 +187,10 @@ export const columnExtensionMap = {
                 return null;
             }
 
-            // May appear in other non-Case results, where advanced column will look strange, so check and use default rendering otherwise
             const showAccessionSeparately = accession !== mainTitle;
             return (
                 <a href={resultHref} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status }} dateTitle="Last Modified:" topLeft={showAccessionSeparately ? <span className="accession">{ accession }</span> : null} />
+                    <MultiLevelColumn {...{ mainTitle, date, status: "not implemented", statusTip: "Not Implemented" }} dateTitle="Last Modified:" topLeft={showAccessionSeparately ? <span className="accession">{ accession }</span> : null} />
                 </a>
             );
         }
@@ -185,14 +202,24 @@ export const columnExtensionMap = {
             const {
                 '@id' : atId = null,
                 accession = null,
-                status = null,
                 date_created: date = null,
-                family_id: mainTitle = null
+                family_id: mainTitle = null,
+                uuid = null
             } = family;
+
+            let status = null;
+            let statusTip = null;
+            if (uuid && mainTitle) {
+                status = "complete";
+                statusTip = "Family is created with required fields.";
+            } else {
+                status = "incomplete";
+                statusTip = "Family exists, but some field is missing: uuid or family_id.";
+            }
 
             return (
                 <a href={atId} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status }} dateTitle="Last Modified:" topLeft={<span className="accession">{ accession }</span>} />
+                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Last Modified:" topLeft={<span className="accession">{ accession }</span>} />
                 </a>
             );
         }
@@ -207,16 +234,26 @@ export const columnExtensionMap = {
                 '@id' : atId = null,
                 display_title = null,
                 accession = null,
-                status = null,
                 date_created: date = null,
-                individual_id = null
+                individual_id = null,
+                uuid = null
             } = individual;
 
             const mainTitle = individual_id ? individual_id : display_title;
 
+            let status = null;
+            let statusTip = null;
+            if (uuid && individual_id) {
+                status = "complete";
+                statusTip = "Individual is created with required fields.";
+            } else {
+                status = "incomplete";
+                statusTip = "Individual exists, but some field is missing: uuid or individual_id.";
+            }
+
             return (
                 <a href={atId} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
+                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
                 </a>
             );
         }
@@ -229,14 +266,31 @@ export const columnExtensionMap = {
             const {
                 workup_type: mainTitle = null,
                 sequencing_date: date = null,
-                completed_processes = []
-            } = sample;
-            const complProcLen = completed_processes.length;
+                files = []
+            } = sample || {};
 
-            // We have colors bound to 'data-status' attribute values in SCSS to statuses, so we'll just
-            // re-use one of those here rather than creating separate 'color map' for this.
-            // And override tooltip.
-            // TODO move into reusable func if after while we keep statusTip etc sample between this and sample_processing.analysis_type
+            let status = null;
+            let statusTip = null;
+
+            let fastqPresent = false;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const { '@type': [type] } = file || {};
+                if (type === "FileFastq") {
+                    fastqPresent = true;
+                    break;
+                }
+            }
+
+            if (fastqPresent) {
+                statusTip = "Fastq file(s) uploaded";
+                status = "complete";
+            } else {
+                statusTip = "No fastq files";
+                status = "incomplete";
+            }
+
+            /** @DEPRECATED as of 9/16/20 -- keeping here until confirmation new tips will stay.
             let status, statusTip;
             if (complProcLen > 0){
                 status = "released";
@@ -249,6 +303,7 @@ export const columnExtensionMap = {
                 status = "uploading";
                 statusTip = "This sample/case has no completed processes yet";
             }
+            */
 
             return (
                 <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
@@ -260,30 +315,49 @@ export const columnExtensionMap = {
     /** "Bioinformatics" column title */
     'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
-            const { '@id' : resultHrefPath, sample_processing = null } = result;
+            const { '@id' : resultHrefPath, sample = null, sample_processing = null } = result;
             if (!sample_processing) return null; // Unsure if possible, but fallback to null / '-' in case so (not showing datetitle etc)
             const {
                 analysis_type: mainTitle = null,
-                last_modified: { date_modified: date = null } = {},
-                completed_processes = [] // This is a list of _string_ values such as ["WGS_partI_V11", ..]
+                last_modified: { date_modified: date = null } = {}
             } = sample_processing;
-            const complProcLen = completed_processes.length;
+            const {
+                files = [],
+                processed_files = []
+            } = sample || {};
 
-            // We have colors bound to 'data-status' attribute values in SCSS to statuses, so we'll just
-            // re-use one of those here rather than creating separate 'color map' for this.
-            // And override tooltip.
-            // TODO move into reusable func if after while we keep statusTip etc sample between this and sample_processing.analysis_type
-            let status, statusTip;
-            if (complProcLen > 0){
-                status = "released";
-                if (complProcLen === 1) {
-                    statusTip = `Process <span class="text-600">${completed_processes[0]}</span> has completed`;
+            let status = null;
+            let statusTip = null;
+
+            // Ensure fastQs exist
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const { uuid = null, status: fileStatus = null } = file;
+                if (!uuid || fileStatus === "uploading" || fileStatus === "upload_failed" || !fileStatus) {
+                    statusTip = "No fastq files";
+                    status = "not started";
+                    break;
                 } else {
-                    statusTip = `This sample/case has <strong>${complProcLen}</strong> completed processes`;
+                    statusTip = "Fastq file(s) uploaded";
+                    status = "in progress";
                 }
-            } else {
-                status = "uploading";
-                statusTip = "This sample/case has no completed processes yet";
+            }
+
+            // If fastQs are present...
+            if (status === "in progress") {
+                // Check if VCFs have been ingested & if QCs passed
+                for (let j = 0; j < processed_files.length; j++) {
+                    const procFile = processed_files[j];
+                    const { file_ingestion_status: ingestionStatus = null, file_format = null } = procFile || {};
+                    const { file_format: fileType } = file_format || {};
+                    if ((fileType === "vcf_gz" || fileType === "gvcf_gz")
+                        && ingestionStatus === "Ingested") {
+                        statusTip = "Variants are ingested";
+                        status = "complete";
+
+                        // TODO: Add QC status from overall QC status once implemented
+                    } // Else, not VCF or not yet ingested, ignore
+                }
             }
 
             // Unlikely to show in non-Case item results, so didn't add Case filter
@@ -298,11 +372,21 @@ export const columnExtensionMap = {
     'sample.specimen_type': {
         'render' : function renderSampleColumn(result, parentProps){
             const { sample = null } = result;
-            const { '@id': sampleId, accession, status, specimen_type: mainTitle, specimen_collection_date: date } = sample || {};
+            const { uuid = null, bam_sample_id = null, '@id': sampleId, accession, specimen_type: mainTitle, specimen_collection_date: date } = sample || {};
             // Unlikely to show in non-Case item results, so didn't add Case filter
+
+            let status = null;
+            let statusTip = null;
+            if (uuid && bam_sample_id) {
+                status = "complete";
+                statusTip = "Sample is created with required fields.";
+            } else {
+                status = "incomplete";
+                statusTip = "Sample exists, but some field is missing: uuid or bam_sample_id.";
+            }
             return (
                 <a href={sampleId} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status }} dateTitle="Collected:" topLeft={<span className="accession">{ accession }</span>} />
+                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Collected:" topLeft={<span className="accession">{ accession }</span>} />
                 </a>);
         }
     },

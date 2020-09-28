@@ -29,11 +29,11 @@ const auth0Options = {
         icon: '/static/img/exported-logo-no-stroke.svg',
         primaryColor: '#1b75b9'
     },
-    allowedConnections: ['partners', 'hms-it'],
+    allowedConnections: ['partners', 'hms-it', 'bch'],
     defaultEnterpriseConnection: 'partners',
     languageDictionary: {
         title: 'Log In',
-        emailInputPlaceholder: 'Partners or Harvard Email',
+        emailInputPlaceholder: 'Partners or Harvard/BCH Email',
         databaseEnterpriseAlternativeLoginInstructions: 'or login via Partners'
     }
 };
@@ -130,7 +130,7 @@ function UserActionsMenu(props){
 
     const introBlock = (
         <BigDropdownIntroductionWrapper titleIcon="user fas" className="mb-0 border-0" {...{ windowWidth, windowHeight }}>
-            <h4 className="mb-0 mt-0 text-ellipsis-container">
+            <h4 className="mb-0 mt-0 text-truncate">
                 <a href={viewProfileURL}>
                     { introTitle }
                 </a>
