@@ -1068,7 +1068,6 @@ class SearchBuilder:
         """
         self._build_query()
         es_results = self.execute_search()
-        import pdb; pdb.set_trace()
         self.format_results(es_results)
         return self.get_response()
 
