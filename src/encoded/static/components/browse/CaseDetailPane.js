@@ -87,7 +87,7 @@ class FamilySection extends React.Component {
         this.state = {
             open: false,
         };
-        this.onToggle = _.throttle(this.onToggle.bind(this), 600, { 'trailing' : false });
+        this.onToggle = _.throttle(this.onToggle.bind(this), 750, { 'trailing' : false });
     }
 
     onToggle() {
@@ -95,29 +95,26 @@ class FamilySection extends React.Component {
         this.setState({ open: !open });
     }
 
-    innerTabContents() {
-        const { containerWidth, family, result, minimumWidth, paddingWidth } = this.props;
-        return (
-            <FamilyReportStackedTable
-                result={result} family={family} preventExpand={false}
-                width={containerWidth ? (Math.max(containerWidth - paddingWidth, minimumWidth) /* account for padding of pane */) : null}
-                fadeIn={false} collapseLongLists
-            />
-        );
-    }
-
     render() {
         const { open } = this.state;
-        const { family } = this.props;
+        const { family, result, containerWidth, minimumWidth, paddingWidth } = this.props;
         return (
             <div className="family-table-section">
                 <h4 className="pane-section-title" onClick={this.onToggle}>
-                    <i className={"toggle-open-icon icon icon-fw fas icon-" + (open ? 'minus' : 'plus')} />
-                    {family.display_title}: <span className="text-200 font-italic">Family &amp; Report History</span>
+                    <div className="col-auto pr-0">
+                        <i className={"toggle-open-icon icon icon-fw fas icon-" + (open ? 'minus' : 'plus')} />
+                    </div>
+                    <div className="col">
+                        { family.display_title }: <span className="text-200 font-italic">Family &amp; Report History</span>
+                    </div>
                 </h4>
-                {
-                    open ? this.innerTabContents() : null
-                }
+                { open ? (
+                    <FamilyReportStackedTable
+                        {...{ result, family }} preventExpand={false}
+                        width={containerWidth ? (Math.max(containerWidth - paddingWidth, minimumWidth) /* account for padding of pane */) : null}
+                        fadeIn={false} collapseLongLists
+                    />
+                ) : null }
             </div>
         );
     }

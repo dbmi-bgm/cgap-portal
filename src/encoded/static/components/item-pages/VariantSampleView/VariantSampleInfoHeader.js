@@ -38,7 +38,7 @@ export function VariantSampleInfoHeader(props) {
                     { caseID ?
                         <div className="inner-card-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
                             <div className="info-header-title">
-                                <h4 className="text-ellipsis-container">Case ID</h4>
+                                <h4 className="text-truncate">Case ID</h4>
                             </div>
                             <div className="info-body flex-grow-1 d-flex align-items-center">
                                 <h4 className="text-400 text-center w-100">{ caseID }</h4>
@@ -190,27 +190,27 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
 
 
-            <div className="col col-xl-5">
+            <div className="col-5 col-lg-12 col-xl-5">
 
                 {/* We could make these below into reusable component later once know this what we want fo sure */}
 
                 <div className="row mb-03">
-                    <div className="col-12 col-xl-6">
+                    <div className="col-12 col-lg-4 col-xl-6">
                         <label htmlFor="calculated_transcript_location" className="mb-0">Location:</label>
                     </div>
-                    <div className="col-12 col-xl" id="calculated_transcript_location">
+                    <div className="col-12 col-lg" id="calculated_transcript_location">
                         { transcriptLocation }
                     </div>
                 </div>
 
                 <div className="row mb-03">
-                    <div className="col-12 col-xl-6">
+                    <div className="col-12 col-lg-4 col-xl-6">
                         <label htmlFor="variant.transcript.vep_consequence.coding_effect" className="mb-0"
                             data-tip={getTipForField("transcript.vep_consequence.coding_effect")}>
                             Coding Effect:
                         </label>
                     </div>
-                    <div className="col-12 col-xl" id="variant.transcript.vep_consequence.coding_effect">
+                    <div className="col-12 col-lg" id="variant.transcript.vep_consequence.coding_effect">
                         { consequenceCodingEffect }
                     </div>
                 </div>
@@ -219,12 +219,12 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
 
 
-            <div className="col col-xl-7">
+            <div className="col-7 col-lg-12 col-xl-7">
 
                 {/* We could make these below into reusable component later once know this what we want fo sure */}
 
                 <div className="row mb-03">
-                    <div className="col-12 col-xl-3">
+                    <div className="col-12 col-lg-4 col-xl-3">
                         <label htmlFor="variant.transcript.vep_gene.display_title" className="mb-0" data-tip={getTipForField("transcript.vep_gene")}>
                             Gene:
                         </label>
@@ -234,25 +234,25 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
                             * May or may not be preferable depending on value content/type/label-size.
                             * Will consider consistency more after.
                             */}
-                    <div className="col-12 col-xl" id="variant.transcript.vep_gene.display_title">
+                    <div className="col-12 col-lg" id="variant.transcript.vep_gene.display_title">
                         { currentGeneDisplayTitle || <em>None selected</em> }
                     </div>
                 </div>
 
                 <div className="row mb-03">
-                    <div className="col-12 col-xl-3">
+                    <div className="col-12 col-lg-4 col-xl-3">
                         <label htmlFor="vep_hgvsc" className="mb-0" data-tip={getTipForField("transcript.vep_hgvsc")}>cDNA:</label>
                     </div>
-                    <div className="col-12 col-xl-auto" id="variant.transcript.vep_hgvsc">
+                    <div className="col-12 col-lg-auto" id="variant.transcript.vep_hgvsc">
                         { vep_hgvsc }
                     </div>
                 </div>
 
                 <div className="row mb-03">
-                    <div className="col-12 col-xl-3">
+                    <div className="col-12 col-lg-4 col-xl-3">
                         <label htmlFor="vep_hgvsp" className="mb-0" data-tip={getTipForField("transcript.vep_hgvsp")}>AA / AA:</label>
                     </div>
-                    <div className="col-12 col-xl" id="variant.transcript.vep_hgvsp">
+                    <div className="col-12 col-lg" id="variant.transcript.vep_hgvsp">
                         { vep_hgvsp }
                     </div>
                 </div>
