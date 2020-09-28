@@ -18,23 +18,23 @@ from .base import (
     # TODO: Maybe collect all these permission styles into a single file, give them symbolic names,
     #       and permit only the symbolic names to be used in each situation so we can curate a full inventory of modes.
     #       -kmp 26-Jul-2020
-    ALLOW_SUBMITTER_ADD,
+    ALLOW_PROJECT_MEMBER_ADD_ACL,
 )
-from .institution import (
-    ONLY_ADMIN_VIEW,
+from .base import (
+    ONLY_ADMIN_VIEW_ACL,
 )
 from ..util import (
     debuglog, subrequest_item_creation, beanstalk_env_from_registry, create_empty_s3_file, s3_output_stream
 )
 from ..ingestion.common import metadata_bundles_bucket, get_parameter
 
-ALLOW_SUBMITTER_VIEW = (
+ALLOW_SUBMITTER_VIEW_ACL = (
     # TODO: There is an issue here where we want a logged in user remotely only to view this
     #       but if we are proxying for them internall we want to be able to view OR edit.
     #       There is never reason for a user outside the system to update this status. -kmp 26-Jul-2020
     []  # Special additional permissions might go here.
-    + ALLOW_SUBMITTER_ADD  # Is this right? See note above.
-    + ONLY_ADMIN_VIEW      # Slightly misleading name. Allows admins to edit, too, actually. But only they can view.
+    + ALLOW_PROJECT_MEMBER_ADD_ACL  # Is this right? See note above.
+    + ONLY_ADMIN_VIEW_ACL     # Slightly misleading name. Allows admins to edit, too, actually. But only they can view.
 )
 
 
@@ -166,7 +166,7 @@ class SubmissionFolio:
 
 @collection(
     name='ingestion-submissions',
-    acl=ALLOW_SUBMITTER_VIEW,
+    acl=ALLOW_SUBMITTER_VIEW_ACL,
     unique_key='object_name',
     properties={
         'title': 'Ingestion Submissions',
