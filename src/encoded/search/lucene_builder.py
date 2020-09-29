@@ -573,6 +573,7 @@ class LuceneBuilder:
         """ Modifies facet_filters in place to remove the active_filter if it matches
             the given query field.
         """
+        # XXX: Split into another method?
         if BOOL in active_filter and SHOULD in active_filter[BOOL]:
             # handle No value case
             inner_bool = None
@@ -593,7 +594,7 @@ class LuceneBuilder:
             if compare_field == query_field and query_field != 'embedded.@type.raw':
                 facet_filters[filter_type].remove(active_filter)
 
-        if TERMS in active_filter:
+        elif TERMS in active_filter:
             # there should only be one key here
             for compare_field in active_filter[TERMS].keys():
                 # remove filter for a given field for that facet
@@ -643,7 +644,7 @@ class LuceneBuilder:
                                             if field == query_field:
                                                 facet_filters[filter_type].remove(active_filter)
                                     else:
-                                        raise Exception  # XXX: determine if this case needs handling
+                                        raise ValueError  # XXX: determine if this case needs handling
 
     @classmethod
     def generate_filters_for_terms_agg_from_search_filters(cls, query_field, search_filters, string_query):
