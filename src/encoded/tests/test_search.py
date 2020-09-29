@@ -828,10 +828,10 @@ class TestNestedSearch(object):
         self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 3)
 
         # selecting a different facet can affect the aggregation if it just so happens to eliminate
-        # possibilites in other fields - this has always been the case
-        facets_that_should_show_all_options = testapp.get(
+        # possibilities in other fields - this has always been the case
+        facets_that_shows_limited_options = testapp.get(
             '/search/?type=Variant&hg19.hg19_pos=11780388').json['facets']
-        self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 1)
+        self.verify_facet(facets_that_shows_limited_options, 'hg19.hg19_hgvsg', 1)
 
 
     def test_search_nested_exists_query(self, testapp):
