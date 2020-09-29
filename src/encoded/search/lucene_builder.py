@@ -569,7 +569,84 @@ class LuceneBuilder:
         return search, final_filters
 
     @staticmethod
-    def generate_filters_for_terms_agg_from_search_filters(query_field, search_filters, string_query):
+    def remove_from_active_filters(facet_filters, query_field, active_filter, filter_type):
+        """ Modifies facet_filters in place to remove the active_filter if it matches
+            the given query field.
+        """
+        if BOOL in active_filter and SHOULD in active_filter[BOOL]:
+            # handle No value case
+            inner_bool = None
+            inner_should = active_filter.get(BOOL).get(SHOULD, [])
+            for or_term in inner_should:
+                # this may be naive, but assume first non-terms
+                # filter is the No value query
+                if TERMS in or_term:
+                    continue
+                else:
+                    inner_bool = or_term
+                    break
+            if EXISTS in inner_bool:
+                compare_field = inner_bool[EXISTS].get(FIELD)
+            else:
+                # attempt to get the field from the alternative No value syntax
+                compare_field = inner_bool.get(BOOL, {}).get(MUST_NOT, {}).get(EXISTS, {}).get(FIELD)
+            if compare_field == query_field and query_field != 'embedded.@type.raw':
+                facet_filters[filter_type].remove(active_filter)
+
+        if TERMS in active_filter:
+            # there should only be one key here
+            for compare_field in active_filter[TERMS].keys():
+                # remove filter for a given field for that facet
+                # skip this for type facet (field = 'type')
+                # since we always want to include that filter.
+                if compare_field == query_field and query_field != 'embedded.@type.raw':
+                    facet_filters[filter_type].remove(active_filter)
+
+        elif RANGE in active_filter:
+            for compare_field in active_filter[RANGE].keys():
+                # Do same as for terms
+                if compare_field == query_field:
+                    facet_filters[filter_type].remove(active_filter)
+
+        # Nested must be handled as well
+        elif NESTED in active_filter:
+            nested_sub_query = active_filter[NESTED][QUERY]
+
+            # For No value searches
+            if EXISTS in nested_sub_query:
+                field = nested_sub_query.get(EXISTS, {}).get(FIELD)
+                if field == query_field:
+                    facet_filters[filter_type].remove(active_filter)
+
+            # For all other searches
+            elif BOOL in nested_sub_query:
+                for inner_filter_type in [MUST, MUST_NOT]:
+                    for nested_option in nested_sub_query[BOOL].get(inner_filter_type, []):
+
+                        # For structure like this:
+                        #   {'bool': {'must': [{'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.12185956del'}]
+                        try:
+                            for field in nested_option.get(MATCH, {}).keys():  # should only be one per block
+                                if field == query_field:
+                                    facet_filters[filter_type].remove(active_filter)
+
+                        # For structure like this:
+                        #   {'bool': {'must': {'bool': {'should':
+                        #       [{'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.12185956del'}},
+                        #       {'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.11901816A>T'}}]}}}}
+                        except AttributeError:  # nested_option is not a dictionary, so drill further down
+                            inner_bool = nested_sub_query[BOOL].get(inner_filter_type, {})
+                            if SHOULD in inner_bool:
+                                for inner_query in inner_bool[SHOULD]:
+                                    if MATCH in inner_query:
+                                        for field in inner_query.get(MATCH, {}).keys():  # should be only one per block
+                                            if field == query_field:
+                                                facet_filters[filter_type].remove(active_filter)
+                                    else:
+                                        raise Exception  # XXX: determine if this case needs handling
+
+    @classmethod
+    def generate_filters_for_terms_agg_from_search_filters(cls, query_field, search_filters, string_query):
         """
         We add a copy of our filters to each facet, minus that of
         facet's field itself so that we can get term counts for other terms filters.
@@ -579,59 +656,23 @@ class LuceneBuilder:
         biosource_type filter in place.
         Handle 'must' and 'must_not' filters separately
 
-        Note: At this point no nested work has been done, so formatting into this intermediary state is okay
-              and is in fact necessary for later work to handle nested to function correctly.
-
         :param query_field: field terms agg is on
         :param search_filters: intermediary format prior to any valid lucene representing the search_filters
                                from the front-end
         :param string_query: query string if provided
         :return: Copy of search_filters, minus filter for current query_field (if one set).
         """
-        facet_filters = deepcopy(search_filters['bool'])
+        facet_filters = deepcopy(search_filters[BOOL])
 
-        for filter_type in ['must', 'must_not']:
+        for filter_type in [MUST, MUST_NOT]:
             # active_filter => e.g. { 'terms' : { 'embedded.@type.raw': ['ExperimentSetReplicate'] } }
-            for active_filter in search_filters['bool'][filter_type]:
-                if 'bool' in active_filter and 'should' in active_filter['bool']:
-                    # handle No value case
-                    inner_bool = None
-                    inner_should = active_filter.get('bool').get('should', [])
-                    for or_term in inner_should:
-                        # this may be naive, but assume first non-terms
-                        # filter is the No value quqery
-                        if 'terms' in or_term:
-                            continue
-                        else:
-                            inner_bool = or_term
-                            break
-                    if 'exists' in inner_bool:
-                        compare_field = inner_bool['exists'].get('field')
-                    else:
-                        # attempt to get the field from the alternative No value syntax
-                        compare_field = inner_bool.get('bool', {}).get('must_not', {}).get('exists', {}).get('field')
-                    if compare_field == query_field and query_field != 'embedded.@type.raw':
-                        facet_filters[filter_type].remove(active_filter)
-
-                if 'terms' in active_filter:
-                    # there should only be one key here
-                    for compare_field in active_filter['terms'].keys():
-                        # remove filter for a given field for that facet
-                        # skip this for type facet (field = 'type')
-                        # since we always want to include that filter.
-                        if compare_field == query_field and query_field != 'embedded.@type.raw':
-                            facet_filters[filter_type].remove(active_filter)
-
-                elif 'range' in active_filter:
-                    for compare_field in active_filter['range'].keys():
-                        # Do same as for terms
-                        if compare_field == query_field:
-                            facet_filters[filter_type].remove(active_filter)
+            for active_filter in search_filters[BOOL][filter_type]:
+                cls.remove_from_active_filters(facet_filters, query_field, active_filter, filter_type)
 
         # add the string_query, if present, to the bool term with facet_filters
-        if string_query and string_query['must']:
+        if string_query and string_query[MUST]:
             # combine statements within 'must' for each
-            facet_filters['must'].append(string_query['must'])
+            facet_filters[MUST].append(string_query[MUST])
 
         return facet_filters
 
