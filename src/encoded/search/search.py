@@ -801,6 +801,13 @@ class SearchBuilder:
                     # Used for fields on which can do range filter on, to provide min + max bounds
                     for k in aggregations[full_agg_name]['primary_agg'].keys():
                         result_facet[k] = aggregations[full_agg_name]['primary_agg'][k]
+
+                # nested stats aggregations have a second "layer" for reverse_nested
+                elif facet['aggregation_type'] == 'nested:stats':
+                    result_facet['total'] = aggregations[full_agg_name]['primary_agg']['doc_count']
+                    for k in aggregations[full_agg_name]['primary_agg']['primary_agg'].keys():
+                        result_facet[k] = aggregations[full_agg_name]['primary_agg']['primary_agg'][k]
+
                 else:  # 'terms' assumed.
 
                     # Shift the bucket location
@@ -831,10 +838,15 @@ class SearchBuilder:
 
                 if len(aggregations[full_agg_name].keys()) > 2:
                     result_facet['extra_aggs'] = {k: v for k, v in aggregations[full_agg_name].items() if
-                                                  k not in ('doc_count', "primary_agg")}
+                                                  k not in ('doc_count', 'primary_agg')}
 
             result.append(result_facet)
 
+        # TODO ALEX: Client will reject 'nested:stats' so overwritten here
+        for facet in result:
+            for k, v in facet.items():
+                if k == 'aggregation_type' and v == 'nested:stats':
+                    facet[k] = 'stats'
         return result
 
     @staticmethod

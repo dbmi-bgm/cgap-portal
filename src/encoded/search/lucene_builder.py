@@ -729,7 +729,7 @@ class LuceneBuilder:
         """
         aggs_ptr = search.aggs['all_items']
         for agg in aggs_ptr:
-            if NESTED in agg:
+            if NESTED in agg and 'stats' not in agg:  # stats aggs are already correct
                 (search.aggs['all_items'][agg]  # create a sub-bucket, preserving the boolean qualifiers
                  .bucket('primary_agg',
                          'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
@@ -778,17 +778,38 @@ class LuceneBuilder:
                             facet["number_step"] = "any"
                 facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
                                                                                        string_query)
-
-                aggs[facet['aggregation_type'] + ":" + agg_name] = {
-                    AGGS: {
-                        'primary_agg': {
-                            'stats': {
-                                'field': query_field
+                # stats aggregations could be nested too
+                if nested_path:
+                    facet['aggregation_type'] = 'nested:stats'
+                    aggs[facet['aggregation_type'] + ':' + agg_name] = {
+                        AGGS: {
+                            'primary_agg': {
+                                NESTED: {
+                                    PATH: nested_path
+                                },
+                                AGGS: {
+                                    'primary_agg': {
+                                        'stats': {
+                                            'field': query_field
+                                        }
+                                    }
+                                }
                             }
-                        }
-                    },
-                    FILTER: {BOOL: facet_filters}
-                }
+                        },
+                        FILTER: {BOOL: facet_filters}
+                    }
+
+                else:
+                    aggs[facet['aggregation_type'] + ":" + agg_name] = {
+                        AGGS: {
+                            'primary_agg': {
+                                'stats': {
+                                    'field': query_field
+                                }
+                            }
+                        },
+                        FILTER: {BOOL: facet_filters}
+                    }
 
             else:
                 if nested_path:
