@@ -842,11 +842,14 @@ class SearchBuilder:
 
             result.append(result_facet)
 
-        # TODO ALEX: Client will reject 'nested:stats' so overwritten here
+        # TODO ALEX: Client will reject 'nested:stats' so overwritten here.
+        #            Ideally, the client should accept 'stats', 'terms', 'nested:terms', 'nested:stats',
+        #            and just treat the nested aggs exactly the same.
         for facet in result:
             for k, v in facet.items():
                 if k == 'aggregation_type' and v == 'nested:stats':
                     facet[k] = 'stats'
+                    break
         return result
 
     @staticmethod
