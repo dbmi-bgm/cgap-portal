@@ -833,7 +833,6 @@ class TestNestedSearch(object):
             '/search/?type=Variant&hg19.hg19_pos=11780388').json['facets']
         self.verify_facet(facets_that_shows_limited_options, 'hg19.hg19_hgvsg', 1)
 
-
     def test_search_nested_exists_query(self, testapp):
         """ Tests doing a !=No+value search on a nested sub-field. """
         testapp.get('/search/?type=SampleProcessing&samples.uuid!=No+value', status=404)

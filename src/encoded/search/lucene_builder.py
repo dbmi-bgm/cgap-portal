@@ -668,7 +668,9 @@ class LuceneBuilder:
         for filter_type in [MUST, MUST_NOT]:
             # active_filter => e.g. { 'terms' : { 'embedded.@type.raw': ['ExperimentSetReplicate'] } }
             for active_filter in search_filters[BOOL][filter_type]:
+                #import pdb; pdb.set_trace()
                 cls.remove_from_active_filters(facet_filters, query_field, active_filter, filter_type)
+                #import pdb; pdb.set_trace()
 
         # add the string_query, if present, to the bool term with facet_filters
         if string_query and string_query[MUST]:
