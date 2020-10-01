@@ -33,7 +33,7 @@ STATUSES = [
 
 # institution, project and user fixtures
 @pytest.fixture
-def institution(testapp):
+def bwh_institution(testapp):
     item = {
         'name': 'bwh',
         'title': 'Brigham and Womens Hospital',
@@ -86,12 +86,12 @@ def admin_user(testapp):
 
 
 @pytest.fixture
-def udn_user(testapp, institution, udn_project):
+def udn_user(testapp, bwh_institution, udn_project):
     item = {
         'first_name': 'UDN',
         'last_name': 'user',
         'email': 'udnuser@example.org',
-        'institution': institution['name'],
+        'institution': bwh_institution['name'],
         'project_roles': [{'project': udn_project['@id']}],
         'status': 'current'
     }
@@ -101,12 +101,12 @@ def udn_user(testapp, institution, udn_project):
 
 
 @pytest.fixture
-def multi_project_user(testapp, institution, bgm_project, udn_project):
+def multi_project_user(testapp, bwh_institution, bgm_project, udn_project):
     item = {
         'first_name': 'Multi Project',
         'last_name': 'user',
         'email': 'multiuser@example.org',
-        'institution': institution['name'],
+        'institution': bwh_institution['name'],
         'project_roles': [{'project': bgm_project['@id']}, {'project': udn_project['@id']}],
         'status': 'current'
     }
@@ -116,12 +116,12 @@ def multi_project_user(testapp, institution, bgm_project, udn_project):
 
 
 @pytest.fixture
-def no_project_user(testapp, institution, bgm_project, udn_project):
+def no_project_user(testapp, bwh_institution, bgm_project, udn_project):
     item = {
         'first_name': 'No Project',
         'last_name': 'user',
         'email': 'noproject@example.org',
-        'institution': institution['name'],
+        'institution': bwh_institution['name'],
         'status': 'current'
     }
     # User @@object view has keys omitted.
@@ -130,7 +130,7 @@ def no_project_user(testapp, institution, bgm_project, udn_project):
 
 
 @pytest.fixture
-def deleted_user(testapp, institution, bgm_project):
+def deleted_user(testapp, bwh_institution, bgm_project):
     item = {
         'first_name': 'Deleted',
         'last_name': 'BGM User',
@@ -195,12 +195,12 @@ def all_testapps(admin_testapp, bgm_user_testapp, udn_user_testapp,
 
 # Item fixtures
 @pytest.fixture
-def simple_bgm_file_item(institution, bgm_project, file_formats):
+def simple_bgm_file_item(bwh_institution, bgm_project, file_formats):
     # using file as it has all the statuses
     return {
         'uuid': '3413218c-3d86-498b-a0a2-9a406638e777',
         'file_format': file_formats.get('fastq').get('@id'),
-        'institution': institution['@id'],
+        'institution': bwh_institution['@id'],
         'project': bgm_project['@id'],
         'read_length': 50,
         'status': 'uploaded',  # avoid s3 upload codepath
@@ -208,10 +208,10 @@ def simple_bgm_file_item(institution, bgm_project, file_formats):
 
 
 @pytest.fixture
-def simple_doc_item(institution, bgm_project):
+def simple_doc_item(bwh_institution, bgm_project):
     # using file as it has all the statuses
     return {
-        'institution': institution['@id'],
+        'institution': bwh_institution['@id'],
         'project': bgm_project['@id'],
         'description': 'test document'
     }
@@ -374,20 +374,22 @@ def test_authenticated_user_wo_project_can_only_see_shared(
     assert no_project_user_testapp.get(fitem['@id'], status=expres)
 
 
-@pytest.mark.parametrize('project_name, status, expres', list(zip(['core-project', 'bgm-project', 'udn-project'] * 7, STATUSES * 3, [403] * 21)))
+@pytest.mark.parametrize('project_name, status', list(zip(['core-project', 'bgm-project', 'udn-project'] * 7, STATUSES * 3)))
 def test_deleted_user_has_no_access(
         testapp, deleted_user_testapp, simple_bgm_file_item, projects_by_name,
-        project_name, status, expres):
+        project_name, status):
+    expres = 403
     del simple_bgm_file_item['uuid']
     simple_bgm_file_item['status'] = status
     fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
     assert deleted_user_testapp.get(fitem['@id'], status=expres)
 
 
-@pytest.mark.parametrize('project_name, status, expres', list(zip(['core-project', 'bgm-project', 'udn-project'] * 7, STATUSES * 3, [403] * 21)))
+@pytest.mark.parametrize('project_name, status', list(zip(['core-project', 'bgm-project', 'udn-project'] * 7, STATUSES * 3)))
 def test_anonymous_user_has_no_access(
         testapp, anontestapp, simple_bgm_file_item, projects_by_name,
-        project_name, status, expres):
+        project_name, status):
+    expres = 403
     del simple_bgm_file_item['uuid']
     simple_bgm_file_item['status'] = status
     fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]

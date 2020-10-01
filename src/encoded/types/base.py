@@ -294,10 +294,9 @@ class Item(snovault.Item):
             # add institution_member as well
             inst_member = 'institution.%s' % properties['institution']
             roles[inst_member] = 'role.institution_member'
-        """ to avoid conflation of the project used for attribution of the User ITEM
-            from the project(s) specified in the project_roles specifying project_editor
-            role - instead of using 'bare' project
-        """
+            # to avoid conflation of the project used for attribution of the User ITEM
+            # from the project(s) specified in the project_roles specifying project_editor
+            # role - instead of using 'bare' project
         if 'project' in properties:
             project_editors = 'editor_for.%s' % properties['project']
             roles[project_editors] = 'role.project_editor'

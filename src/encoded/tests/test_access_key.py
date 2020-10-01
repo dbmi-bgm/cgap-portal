@@ -65,8 +65,6 @@ def test_access_key_principals(anontestapp, execute_counter, access_key, bgm_use
         res = anontestapp.get('/@@testing-user', headers=headers)
 
     assert res.json['authenticated_userid'] == 'accesskey.' + access_key['access_key_id']
-    print(sorted(res.json['effective_principals']))
-    ['accesskey.PN3T2CYW', 'editor_for.5c5cd272-bf03-490b-9ea2-b8596d82509d', 'group.project_editor', 'institution.a0616669-de80-4782-bf20-f6fe76c05fb5', 'system.Authenticated', 'system.Everyone', 'userid.36ea889d-f9cd-42ce-936b-5b438a9f0e25']
     assert sorted(res.json['effective_principals']) == [
         'accesskey.%s' % access_key['access_key_id'],
         'editor_for.%s' % bgm_project['uuid'],
