@@ -26,7 +26,7 @@
         "status": "shared",
         "uuid": "a4b98709-25fe-48a4-afde-8f886b57abc9",
         "workup_type": "WGS",
-        "specimen_type": "blood",
+        "specimen_type": "peripheral blood",
         "requisition_type": "BioBank",
         "date_requisition_received": "2020-01-01",
         "indication": "cervical cancer",
