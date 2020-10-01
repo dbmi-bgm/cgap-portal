@@ -12,7 +12,7 @@ from .search_utils import (
     QueryConstructionException,
     COMMON_EXCLUDED_URI_PARAMS, QUERY, FILTER, MUST, MUST_NOT, BOOL, MATCH, SHOULD,
     EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED,
-    schema_for_field, get_query_field
+    schema_for_field, get_query_field, search_log,
 )
 
 
@@ -563,8 +563,8 @@ class LuceneBuilder:
         try:
             search.update_from_dict(prev_search)
         except Exception as e:  # not ideal, but important to catch at this stage no matter what it is
-            log.error('SEARCH: exception encountered when converting raw lucene params to elasticsearch_dsl,'
-                      'search: %s\n error: %s' % (prev_search, str(e)))
+            search_log(log_handler=log, msg='Exception encountered when converting raw lucene params to '
+                                            'elasticsearch_dsl, search: %s\n error: %s' % (prev_search, str(e)))
             raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
         return search, final_filters
 
@@ -655,7 +655,11 @@ class LuceneBuilder:
                                                                  filter_type):
                                             break
                                 else:
-                                    raise ValueError  # XXX: determine if this case needs handling
+                                    search_log(log_handler=log, msg='Encountered a unexpected nested structure in '
+                                                                    'query: %s' % inner_query)
+                    else:
+                        search_log(log_handler=log, msg='Encountered a unexpected nested structure at top level: %s'
+                                                        % nested_sub_query[BOOL])
 
     @classmethod
     def _remove_from_active_filters(cls, facet_filters, query_field, active_filter, filter_type):
@@ -927,15 +931,16 @@ class LuceneBuilder:
                                     found = True
                                     break
         except QueryConstructionException:
-            log.error('SEARCH: Detected URL query param manipulation, principals_allowed.view was'
-                      ' modified from %s to %s' % (request.effective_principals,
-                                                  effective_principals_on_query))
+            search_log(log_handler=log, msg='Detected URL query param manipulation, principals_allowed.view was'
+                                            ' modified from %s to %s' % (request.effective_principals,
+                                                                         effective_principals_on_query))
             raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
         except KeyError:
-            log.error('SEARCH: Malformed query detected while checking for principals_allowed')
+            search_log(log_handler=log, msg='Malformed query detected while checking for principals_allowed')
             raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
         if not found:
-            log.error('SEARCH: Did not locate principals_allowed.view on search query body: %s' % search_dict)
+            search_log(log_handler=log, msg='Did not locate principals_allowed.view on search query body: %s'
+                                            % search_dict)
             raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
 
     @classmethod
