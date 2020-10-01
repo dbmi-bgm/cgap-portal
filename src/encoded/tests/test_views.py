@@ -253,12 +253,15 @@ def test_post_duplicate_uuid(testapp, disorder):
 
 
 def test_user_effective_principals(submitter, institution, anontestapp, execute_counter):
+    """ Not sure what is meant by effective_principals.  There is now a conditional in group_finder
+        that if the user has any project_roles.project they will get a group.project_editor so perhaps
+        we need another test with a different user who has project_roles to test this
+    """
     email = submitter['email']
     with execute_counter.expect(1):
         res = anontestapp.get('/@@testing-user',
                               extra_environ={'REMOTE_USER': str(email)})
     assert sorted(res.json['effective_principals']) == [
-        'group.project_editor',
         'remoteuser.encode_submitter@example.org',
         'system.Authenticated',
         'system.Everyone',

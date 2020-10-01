@@ -50,8 +50,9 @@
             "type": "array",
             "permission": "restricted_fields",
             "items": {
-                "title": "Project-Role",
+                "title": "Project and Role",
                 "type": "object",
+                "additionalProperties": false,
                 "required": ["project"],
                 "properties": {
                     "project": {
@@ -103,16 +104,6 @@
             "title": "Job Title",
             "type": "string",
             "comment": "Can be user supplied - purely informational",
-            "suggested_enum": [
-                "clinician",
-                "scientist",
-                "developer",
-                "director",
-                "project member",
-                "patient",
-                "other",
-                "unknown"
-            ],
             "lookup": 41
         },
         "role": {

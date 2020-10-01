@@ -168,22 +168,6 @@ static_content_embed_list = [
     "static_content.content.filetype"
 ]
 
-# lab_award_attribution_embed_list = [
-#     "award.project",
-#     "award.center_title",
-#     "lab.city",
-#     "lab.state",
-#     "lab.country",
-#     "lab.postal_code",
-#     "lab.city",
-#     "lab.display_title",
-#     "lab.url",
-#     "lab.correspondence",                                # Not a real linkTo - temp workaround
-#     "contributing_labs.correspondence",                  # Not a real linkTo - temp workaround
-#     "submitted_by.timezone",
-#     "submitted_by.job_title"
-# ]
-
 
 class AbstractCollection(snovault.AbstractCollection):
     """smth."""

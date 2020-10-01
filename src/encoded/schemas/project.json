@@ -84,8 +84,7 @@
         },
         "pi": {
             "title": "Project Lead",
-            "description": "Lead Investigator of the project.",
-            "comment": "See user.json for available identifiers.",
+            "description": "The leader of the project.",
             "type": "string",
             "lookup": 80,
             "linkTo": "User"
