@@ -31,7 +31,7 @@ def row_dict():
         'analysis id': '999',
         'report required': 'Y',
         'specimen id': '3464467',
-        'specimen type': 'blood',
+        'specimen type': 'saliva',
         'workup type': 'WGS'
     }
 

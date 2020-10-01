@@ -43,7 +43,9 @@
             "label": "specimen",
             "lookup": 20,
             "suggested_enum": [
-                "blood",
+                "peripheral blood",
+                "cord blood",
+                "plasma",
                 "saliva"
             ]
         },
