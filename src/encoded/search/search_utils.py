@@ -75,6 +75,20 @@ class QueryConstructionException(SearchException):
 # Functions
 
 
+def search_log(*, log_handler, msg, error=True):
+    """ Utility function intended to prepend SEARCH to all log messages. All log messages originating
+        in search code should use this method to log.
+
+        :param log_handler: log handler to use
+        :param msg: msg to log
+        :param error: whether or not to log to error log. Default True, otherwise goes to DEBUG
+    """
+    if error:
+        log_handler.error('SEARCH: ' + msg)
+    else:
+        log_handler.debug('SEARCH: ' + msg)
+
+
 def convert_search_to_dictionary(search):
     """ Converts the given search to a dictionary. Useful in mocking queries from dictionaries in testing.
 
