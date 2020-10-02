@@ -107,7 +107,7 @@
             "lookup": 41
         },
         "role": {
-            "title": "RETIRED FIELD",
+            "title": "role (RETIRED FIELD)",
             "type": "string",
             "comment": "This used to be the property equivalent to job_title - rather than upgrade will just move the info"
         },
