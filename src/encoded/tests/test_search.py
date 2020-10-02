@@ -818,20 +818,20 @@ class TestNestedSearch(object):
             the set of possible results has been reduced by the search.
         """
         facets = testapp.get('/search/?type=Variant').json['facets']
-        self.verify_facet(facets, 'hg19.hg19_chrom', 1)
-        self.verify_facet(facets, 'hg19.hg19_pos', 3)
+        self.verify_facet(facets, 'hg19.hg19_chrom', 1)  # 1 option for chrom
+        self.verify_facet(facets, 'hg19.hg19_pos', 3)  # 3 options for pos, hgvsg
         self.verify_facet(facets, 'hg19.hg19_hgvsg', 3)
 
         # selecting a facet in search does not affect the cardinality of the aggregation on that facet (alone)
         facets_that_should_show_all_options = testapp.get(
             '/search/?type=Variant&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json['facets']
-        self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 3)
+        self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 3)  # still 3 options
 
         # selecting a different facet can affect the aggregation if it just so happens to eliminate
         # possibilities in other fields - this has always been the case
         facets_that_shows_limited_options = testapp.get(
             '/search/?type=Variant&hg19.hg19_pos=11780388').json['facets']
-        self.verify_facet(facets_that_shows_limited_options, 'hg19.hg19_hgvsg', 1)
+        self.verify_facet(facets_that_shows_limited_options, 'hg19.hg19_hgvsg', 1)  # reduced to only 1 option
 
     def test_search_nested_exists_query(self, testapp):
         """ Tests doing a !=No+value search on a nested sub-field. """
