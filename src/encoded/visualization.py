@@ -97,7 +97,9 @@ def get_higlass_viewconf(context, request):
     """ Add multiple files to the given Higlass view config.
     Args:
         request(obj): Http request object. Assumes request's request is JSON and contains these keys:
-            viewconfig_uuid(str)       : UUID of the viewconf
+            viewconfig_uuid(str) : UUID of the viewconf
+            variant_pos_abs(int) : Center of the viewconf in abs genome coordinates
+            
     Returns:
         A dictionary.
             success(bool)       : Boolean indicating success.
