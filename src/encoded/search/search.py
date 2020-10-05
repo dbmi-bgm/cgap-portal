@@ -89,7 +89,7 @@ class SearchBuilder:
         if len(self.doc_types) == 1:  # extract mapping from storage if we're searching on a single doc type
             item_type_snake_case = ''.join(['_' + c.lower() if c.isupper() else c for c in self.doc_types[0]]).lstrip('_')
             mappings = self.request.registry[STORAGE].read.mappings.get()
-            if self.es_index in mappings:
+            if self.es_index in mappings and item_type_snake_case in self.es_index:
                 return mappings[self.es_index]['mappings'][item_type_snake_case]['properties']
             else:  # new item was added after last cache update, get directly via API
                 return get_es_mapping(self.es, self.es_index)
@@ -801,6 +801,13 @@ class SearchBuilder:
                     # Used for fields on which can do range filter on, to provide min + max bounds
                     for k in aggregations[full_agg_name]['primary_agg'].keys():
                         result_facet[k] = aggregations[full_agg_name]['primary_agg'][k]
+
+                # nested stats aggregations have a second "layer" for reverse_nested
+                elif facet['aggregation_type'] == 'nested:stats':
+                    result_facet['total'] = aggregations[full_agg_name]['primary_agg']['doc_count']
+                    for k in aggregations[full_agg_name]['primary_agg']['primary_agg'].keys():
+                        result_facet[k] = aggregations[full_agg_name]['primary_agg']['primary_agg'][k]
+
                 else:  # 'terms' assumed.
 
                     # Shift the bucket location
@@ -831,10 +838,18 @@ class SearchBuilder:
 
                 if len(aggregations[full_agg_name].keys()) > 2:
                     result_facet['extra_aggs'] = {k: v for k, v in aggregations[full_agg_name].items() if
-                                                  k not in ('doc_count', "primary_agg")}
+                                                  k not in ('doc_count', 'primary_agg')}
 
             result.append(result_facet)
 
+        # TODO ALEX: Client will reject 'nested:stats' so overwritten here.
+        #            Ideally, the client should accept 'stats', 'terms', 'nested:terms', 'nested:stats',
+        #            and just treat the nested aggs exactly the same.
+        for facet in result:
+            for k, v in facet.items():
+                if k == 'aggregation_type' and v == 'nested:stats':
+                    facet[k] = 'stats'
+                    break
         return result
 
     @staticmethod
