@@ -7,6 +7,7 @@ import url from 'url';
 
 import { console, layout, navigate, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
+import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
 import { PedigreeVizView } from './../../viz/PedigreeViz';
 import DefaultItemView from './../DefaultItemView';
@@ -612,7 +613,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                         : null }
                 </div>
                 <div className="col-sm-4">{/* 4,769,578 */}
-                    { (msaStats.totalVariants && msaStats.totalVariants.value) || "" }
+                    { (msaStats.totalVariants && msaStats.totalVariants.value) ? decorateNumberWithCommas(msaStats.totalVariants.value): "" }
                 </div>
             </div>
             <div className="row qc-summary">
@@ -660,7 +661,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                         : null }
                 </div>
                 <div className="col-sm-4"> {/* Ex. 1,273 */}
-                    { (msaStats.filteredVariants && msaStats.filteredVariants.value) || "" }
+                    { (msaStats.filteredVariants && msaStats.filteredVariants.value) ? decorateNumberWithCommas(msaStats.filteredVariants.value) : "" }
                 </div>
             </div>
         </>
