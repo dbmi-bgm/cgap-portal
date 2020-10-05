@@ -80,8 +80,7 @@ export class EmbeddedItemSearchTable extends React.PureComponent {
         /** @deprecated - Should just pass down to embeddedTableHeader once `title` instances that depend on totalCount are migrated */
         const showTitle = !title ? null
             : React.isValidElement(title) ? (
-                typeof title.type === "string" ? title
-                    : React.cloneElement(title, { totalCount })
+                typeof title.type === "string" ? title : React.cloneElement(title, { totalCount })
             ) : title;
 
         const showChildren = React.isValidElement(children) && typeof children.type !== "string" ?

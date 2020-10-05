@@ -45,7 +45,7 @@
                 "value": "A201"
             }
         ],
-        "specimen_type": "blood",
+        "specimen_type": "peripheral blood",
         "date_transported": "2019-03-07",
         "sequence_id": "BAE2201",
         "other_specimen_ids": [
@@ -101,7 +101,7 @@
                 "value": "A202"
             }
         ],
-        "specimen_type": "blood",
+        "specimen_type": "peripheral blood",
         "date_transported": "2019-03-07",
         "sequence_id": "BAE2202",
         "other_specimen_ids": [
@@ -157,7 +157,7 @@
                 "value": "A203"
             }
         ],
-        "specimen_type": "blood",
+        "specimen_type": "peripheral blood",
         "date_transported": "2019-03-07",
         "sequence_id": "BAE2203",
         "other_specimen_ids": [
