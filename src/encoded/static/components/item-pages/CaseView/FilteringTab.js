@@ -56,8 +56,8 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                 render: function(result, props) {
                     const { DP = null, AF = null } = result;
                     const rows = [
-                        <span key="DP" className="d-block text-truncate">{DP || "-"}</span>,
-                        <span key="AF" className="d-block text-truncate">{AF || "-"}</span>
+                        <span key="DP" data-tip="Coverage" className="d-block text-truncate">{DP || "-"}</span>,
+                        <span key="AF" data-tip="VAF" className="d-block text-truncate">{AF || "-"}</span>
                     ];
                     return <StackedRowColumn rowKey="Coverage, AF Row" className="text-center" {...{ rows }}/>;
                 }
@@ -84,13 +84,17 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
             "variant.genes.genes_ensg.display_title": { // Gene Transcript column
                 widthMap: { 'lg' : 155, 'md' : 140, 'sm' : 130 },
                 render: function(result, props) {
-                    const { variant : { genes : [firstGene = null] = [] } = {} } = result;
-                    const { genes_ensg: { display_title = null } = {}, genes_most_severe_transcript = null } = firstGene || {};
+                    const { variant : { genes = [] } = {} } = result;
 
-                    if (firstGene) {
+                    const geneTitles = genes.map((geneItem) => {
+                        const { genes_ensg: { display_title = null } = {} } = geneItem || {};
+                        return display_title;
+                    });
+                    if (genes.length > 0) {
+                        const { genes_most_severe_transcript = null } = genes[0] || {};
                         const rows = [
-                            <span key="genes_ensg" className="font-italic d-block text-truncate">{ display_title} </span>,
-                            <span key="genes_severe_transcript" className="font-italic d-block text-truncate">{ genes_most_severe_transcript}</span>
+                            <span key="genes_ensg" className="font-italic d-block text-truncate">{ geneTitles.length > 1 ? geneTitles.join() : geneTitles } </span>,
+                            <span data-tip="Most Severe Transcript" key="genes_severe_transcript" className="font-italic d-block text-truncate">{ genes_most_severe_transcript}</span>
                         ];
                         return <StackedRowColumn rowKey="genes_data" className="text-center" {...{ rows }} />;
                     }
