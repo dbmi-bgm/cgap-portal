@@ -81,6 +81,7 @@ class SearchBuilder:
         self.facets = None
         self.search_session_id = None
         self.string_query = None
+        self.facet_order_overrides = {}
 
     def _get_es_mapping_if_necessary(self):
         """ Looks in the registry to see if the single doc_type mapping is cached in the registry, which it
@@ -361,12 +362,14 @@ class SearchBuilder:
     def build_type_filters(self):
         """
         Set the type filters for the search. If no doc_types, default to Item.
+        This also sets the facet filter override
         """
         if not self.doc_types:
-            doc_types = ['Item']
+            self.doc_types = ['Item']
         else:
             for item_type in self.doc_types:
                 ti = self.types[item_type]
+                self.facet_order_overrides.update(ti.factory.FACET_ORDER_OVERRIDE)
                 qs = urlencode([
                     (k.encode('utf-8'), v.encode('utf-8'))
                     for k, v in self.request.normalized_params.items() if
@@ -1046,6 +1049,18 @@ class SearchBuilder:
             self.request.response.set_cookie('searchSessionID',
                                              self.search_session_id)
 
+    def _sort_custom_facets(self):
+        """ Applies custom sort to facets
+            XXX: document how this works
+        """
+        if 'facets' in self.response:
+            for entry in self.response['facets']:
+                field = entry.get('field')
+                if field in self.facet_order_overrides:
+                    field_terms_override_order = self.facet_order_overrides[field]
+                    unsorted_terms = entry.get('terms', [])
+                    entry['terms'] = sorted(unsorted_terms, key=lambda d: field_terms_override_order.get(d['key'], 101))
+
     def get_response(self):
         """ Gets the response for this search, setting 404 status if necessary. """
         if not self.response:
@@ -1063,6 +1078,9 @@ class SearchBuilder:
         if self.request.__parent__ is not None or self.return_generator:
             if self.return_generator:
                 return self.response['@graph']
+
+        # apply custom facet filtering
+        self._sort_custom_facets()
 
         # otherwise just hand off response
         return self.response
