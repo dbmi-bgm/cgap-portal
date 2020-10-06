@@ -26,7 +26,7 @@
                   "contents": [
                       {
                           "filetype": "beddb",
-                          "server": "http://higlass.io/api/v1",
+                          "server": "https://higlass.io/api/v1",
                           "tilesetUid": "P0PLbQMwTYGy-5uPIQid7A",
                           "uid": "FocNIVsfRVWMRzfmHfncsQ",
                           "type": "gene-annotations",
