@@ -1058,7 +1058,7 @@ class SearchBuilder:
 
             Specify a 2-tiered dictionary mapping field names to dictionaries of key -> weight
             mappings that allow us to sort generally like this:
-                sorted(unsorted_terms, key=lambda d: field_terms_override_order.get(d['key'], 101))
+                sorted(unsorted_terms, key=lambda d: field_terms_override_order.get(d['key'], default))
             ex:
             {
                 {
@@ -1081,16 +1081,15 @@ class SearchBuilder:
                     }
                 }
             When faceting on the 'name' field, the ordering now will always be Will -> Bob -> Alice -> anything else
-            regardless of the actual facet counts.
+            regardless of the actual facet counts. Note that if no default is specified weight 101
+            will be assigned (MAX_FACET_COUNTS + 1).
         """
-        default = MAX_FACET_COUNTS + 1  # sane default
         if 'facets' in self.response:
             for entry in self.response['facets']:
                 field = entry.get('field')
                 if field in self.facet_order_overrides:
                     field_terms_override_order = self.facet_order_overrides[field]
-                    if '_default' in field_terms_override_order:
-                        default = field_terms_override_order['_default']
+                    default = field_terms_override_order.get('_default', MAX_FACET_COUNTS + 1)
                     unsorted_terms = entry.get('terms', [])
                     entry['terms'] = sorted(unsorted_terms, key=lambda d: field_terms_override_order.get(d['key'],
                                                                                                          default))
