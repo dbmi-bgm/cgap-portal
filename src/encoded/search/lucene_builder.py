@@ -121,20 +121,18 @@ class LuceneBuilder:
                 must_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_terms')
                 must_not_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_not_terms')
 
-                # XXX: BREAKING ES 6 CHANGE
-                # MUST -> MUST_NOT EXISTS does not work?
-                # Have to use EXISTS under MUST_NOT
+                # XXX: In ES6, MUST -> MUST_NOT EXISTS does not work - have to use EXISTS under MUST_NOT
+                # This means you cannot search on field=value or field DNE
                 if filters['add_no_value'] is True:  # when searching on 'No Value'
-                    should_arr = [must_terms] if must_terms else []
+                    should_arr = [must_not_terms] if must_not_terms else []
                     should_arr.append({BOOL: {MUST: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
                     must_not_filters_nested.append((query_field, should_arr))
-                elif filters['add_no_value'] is False:  # when not searching on 'No Value'
+                    if must_terms: must_filters_nested.append((query_field, must_terms))
+                else:  # when not searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
                     should_arr.append({EXISTS: {FIELD: query_field}})   # field=value OR field EXISTS
                     must_filters_nested.append((query_field, should_arr))
-                else:
-                    if must_terms: must_filters_nested.append((query_field, must_terms))
-                if must_not_terms: must_not_filters_nested.append((query_field, must_not_terms))
+                    if must_not_terms: must_not_filters_nested.append((query_field, must_not_terms))
 
             # if we are not nested, handle this with 'terms' query like usual
             else:
@@ -265,17 +263,27 @@ class LuceneBuilder:
                     if len(query) == 1:
                         query = query[0]
 
-                    else:  # query with different query types ie: searching on No Value (exists) OR field=value (match)
-                        final_filters[BOOL][key].append({
-                            NESTED: {
-                                PATH: nested_path,
-                                QUERY: {
-                                    BOOL: {
-                                        SHOULD: q[BOOL][MUST] for q in query
+                    # query with different query types ie: searching on No Value (exists) OR field=value (match)
+                    # note that this kind of query is nonsense because of our query structure (always gives no results)
+                    else:
+                        inner_query = []
+                        for _q in query:
+                            inner = _q[BOOL].get(key, [])
+                            if isinstance(inner, list):
+                                inner_query += inner
+                            else:
+                                inner_query.append(inner)
+                        if inner_query:
+                            final_filters[BOOL][key].append({
+                                NESTED: {
+                                    PATH: nested_path,
+                                    QUERY: {
+                                        BOOL: {
+                                            SHOULD: inner_query
+                                        }
                                     }
                                 }
-                            }
-                        })
+                            })
                         break
 
                 # if there is no boolean clause in this sub-query, add it directly to final_filters
@@ -647,9 +655,6 @@ class LuceneBuilder:
     def _check_and_remove_nested(cls, facet_filters, active_filter, query_field, filter_type):
         """ Helper function for _remove_from_active_filters that handles filter removal for nested query """
         nested_sub_query = active_filter[NESTED][QUERY]
-
-        # if 'consequence' in query_field:
-        #     import pdb; pdb.set_trace()
 
         # For No value searches
         if EXISTS in nested_sub_query:
