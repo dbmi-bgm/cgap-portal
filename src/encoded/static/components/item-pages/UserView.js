@@ -3,7 +3,7 @@
 
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import Modal from 'react-bootstrap/esm/Modal';
@@ -303,9 +303,9 @@ const AccessKeyTable = React.memo(function AccessKeyTable({ accessKeys, onDelete
 
     if (typeof accessKeys === 'undefined' || !accessKeys.length){
         return (
-            <div className="no-access-keys">
-                <hr/><span>No access keys set.</span>
-            </div>
+            <h5 className="no-access-keys text-400 px-3 my-0 pt-16 text-secondary text-center">
+                No access keys set
+            </h5>
         );
     }
 
@@ -494,19 +494,19 @@ function ProfileContactFields(props){
             schemas={schemas} href={href}>
 
             <EditableField label="Email" labelID="email" placeholder="name@example.com" fallbackText="No email address" fieldType="email" disabled={true}>
-                <ProfileContactFieldsIcon icon="envelope far" />&nbsp; <a href={'mailto:' + email}>{ email }</a>
+                <ProfileContactFieldsIcon icon="envelope far" /><span className="text-secondary">{ email }</span>
             </EditableField>
 
             <EditableField label="Phone" labelID="phone1" placeholder="17775551234 x47" fallbackText="No phone number" fieldType="phone">
-                <ProfileContactFieldsIcon icon="phone fas" />&nbsp; { phone1 }
+                <ProfileContactFieldsIcon icon="phone fas" />{ phone1 }
             </EditableField>
 
             <EditableField label="Fax" labelID="fax" placeholder="17775554321" fallbackText="No fax number" fieldType="phone">
-                <ProfileContactFieldsIcon icon="fax fas" />&nbsp; { fax }
+                <ProfileContactFieldsIcon icon="fax fas" />{ fax }
             </EditableField>
 
             <EditableField label="Skype" labelID="skype" fallbackText="No skype ID" fieldType="username">
-                <ProfileContactFieldsIcon icon="skype fab" />&nbsp; { skype }
+                <ProfileContactFieldsIcon icon="skype fab" />{ skype }
             </EditableField>
 
         </FieldSet>
@@ -514,7 +514,7 @@ function ProfileContactFields(props){
 }
 
 function ProfileContactFieldsIcon({ icon }){
-    return <i className={"visible-lg-inline icon icon-fw icon-" + icon }/>;
+    return <i className={"visible-lg-inline icon icon-fw mr-07 icon-" + icon }/>;
 }
 
 
@@ -523,8 +523,34 @@ function ProfileContactFieldsIcon({ icon }){
 
 
 
-function ProfileWorkFields({ user }){
-    return null;
+const ProfileWorkFields = React.memo(function ProfileWorkFields({ user }){
+    const { project_roles = [] } = user;
+
+    const renderedRoles = project_roles.map(function({ role, project }, index){
+        const roleProjectID = "project-" + index;
+        const roleRoleID = "project-role-" + index;
+        return (
+            <li className="list-group-item" key={index}>
+                <div className="row project">
+                    <div className="col-md-3 text-left text-md-right">
+                        <label htmlFor={roleProjectID} className="text-500">Project</label>
+                    </div>
+                    <div id={roleProjectID} className="col-md-9 value text-500">
+                        { object.itemUtil.generateLink(project) }
+                    </div>
+                </div>
+                <div className="row role">
+                    <div className="col-md-3 text-left text-md-right">
+                        <label htmlFor={roleRoleID} className="text-500">Role</label>
+                    </div>
+                    <div id={roleRoleID} className="col-md-9 value text-500">
+                        { role }
+                    </div>
+                </div>
+            </li>
+        );
+    });
+
     return (
         <div className="card h-100">
             <div className="card-header">
@@ -533,200 +559,17 @@ function ProfileWorkFields({ user }){
                     Organizations
                 </h3>
             </div>
-            <div className="card-body">
-                <div className="row field-entry lab">
-                    <div className="col-md-3 text-left text-md-right">
-                        <label htmlFor="lab">Primary Lab</label>
-                    </div>
-                    <div id="lab" className="col-md-9 value text-500">
-                        { labTitle }
-                    </div>
-                </div>
-                <div className="row field-entry role">
-                    <div className="col-md-3 text-left text-md-right">
-                        <label htmlFor="role">Role</label>
-                    </div>
-                    <div id="role" className="col-md-9 value">
-                        { role || <span className="not-set">No Job Title</span> }
-                    </div>
-                </div>
-            </div>
+            <ul className="list-group list-group-flush">
+                { renderedRoles }
+            </ul>
         </div>
     );
-}
-
-
-/**
- * Renders out the lab and awards fields for user, which are not editable.
- * Uses AJAX to fetch details for fields which are not embedded.
- *
- * @private
- * @type {Component}
- */
-
-class ProfileWorkFields2 extends React.PureComponent {
-
-    /**
-    * Get list of all awards (unique) from list of labs.
-    * ToDo : Migrate somewhere more static-cy.
-    *
-    * @param {Item[]} labDetails - Array of lab objects with embedded award details.
-    * @return {Item[]} List of all unique awards in labs.
-    */
-    static getAwardsList(labDetails){
-
-        if (!labDetails || !Array.isArray(labDetails) || labDetails.length === 0){
-            return [];
-        }
-
-        // Awards are embedded within labs, so we get full details.
-        var awardsList = [];
-
-        function addAwardToList(award){
-            if (!award || typeof award['@id'] !== 'string' || _.pluck(awardsList, '@id').indexOf(award['@id']) > -1) return;
-            awardsList.push(award);
-        }
-
-        _.forEach(labDetails, function(lab){
-            if (!lab || !lab.awards || !Array.isArray(lab.awards) || lab.awards.length === 0) return;
-            _.forEach(lab.awards, addAwardToList);
-        });
-
-        return awardsList;
-    }
-
-    constructor(props){
-        super(props);
-        this.updateAwardsList = this.updateAwardsList.bind(this);
-        this.render = this.render.bind(this);
-        this.state = {
-            'awards_list' : []
-        };
-
-        if (props.user && props.user.lab && props.user.lab.awards){
-            this.state.awards_list = props.user.lab.awards.slice(0);
-        }
-    }
-
-    /**
-     * Update state.awards_list with award details from list of lab details.
-     *
-     * @param {Item[]} labDetails - Array of lab objects with embedded award details.
-     * @returns {void} Nothing.
-     */
-    updateAwardsList(labDetails){
-
-        if (!labDetails || !Array.isArray(labDetails) || labDetails.length === 0){
-            return;
-        }
-
-        this.setState(function({ awards_list = [] }){
-            // As of React 16 we can return null in setState func to cancel out of state update.
-            const nextAwardsList      = awards_list.slice(0);
-            const nextAwardsListIDs   = new Set(_.map(nextAwardsList, object.atIdFromObject));
-            const newAwards           = ProfileWorkFields.getAwardsList(labDetails);
-
-            for (var i = 0; i < newAwards.length; i++){
-                const award   = newAwards[i];
-                const awardID = award && object.atIdFromObject(award);
-                if (!awardID) continue; // Error ?
-                if (!nextAwardsListIDs.has(awardID)) nextAwardsList.push(award);
-            }
-
-            if (nextAwardsList.length > (awards_list || []).length){
-                return { 'awards_list' : nextAwardsList };
-            } else {
-                return null;
-            }
-
-        });
-    }
-
-
-    render(){
-        const { user, containerClassName } = this.props;
-        const { submits_for = [], lab, pending_lab, role } = user;
-        const { awards_list: awards } = this.state;
-
-        let labTitle = <span className="not-set">No Labs</span>;
-        const pendingLabText = "Will be verified in the next few business days"; // Default
-
-        if (lab){
-            labTitle = object.itemUtil.generateLink(lab);
-        } else if (pending_lab && object.itemUtil.isAnItem(pending_lab)){
-            // Might occur later... currently not embedded.
-            labTitle = <span>{ object.itemUtil.generateLink(pending_lab) } <em data-tip={pendingLabText}>(pending)</em></span>;
-        } else if (pending_lab && typeof pending_lab === 'string'){
-            labTitle = <span className="text-400">{ pendingLabText }</span>;
-        }
-
-        // THESE FIELDS ARE NOT EDITABLE.
-        // To be modified by admins, potentially w/ exception of 'Primary Lab' (e.g. select from submits_for list).
-        return (
-            <div className="card h-100">
-                <div className="card-header">
-                    <h3 className="text-300 block-title">
-                        <i className="icon icon-users fas icon-fw mr-12" />
-                        Organizations
-                    </h3>
-                </div>
-                <div className="card-body">
-                    <div className="row field-entry lab">
-                        <div className="col-md-3 text-left text-md-right">
-                            <label htmlFor="lab">Primary Lab</label>
-                        </div>
-                        <div id="lab" className="col-md-9 value text-500">
-                            { labTitle }
-                        </div>
-                    </div>
-                    <div className="row field-entry role">
-                        <div className="col-md-3 text-left text-md-right">
-                            <label htmlFor="role">Role</label>
-                        </div>
-                        <div id="role" className="col-md-9 value">
-                            { role || <span className="not-set">No Job Title</span> }
-                        </div>
-                    </div>
-                    {/*
-                    <div className="row field-entry submits_for">
-                        <div className="col-md-3 text-left text-md-right">
-                            <label htmlFor="submits_for">Submits For</label>
-                        </div>
-                        <div className="col-md-9 value text-500">
-                            <FormattedInfoBlock.List
-                                renderItem={object.itemUtil.generateLink}
-                                endpoints={_.filter(_.map(submits_for, object.itemUtil.atId))}
-                                propertyName="submits_for"
-                                fallbackMsg="Not submitting for any organizations"
-                                ajaxCallback={this.updateAwardsList}
-                            />
-                        </div>
-                    </div>
-                    <div className="row field-entry awards">
-                        <div className="col-md-3 text-left text-md-right">
-                            <label htmlFor="awards">Awards</label>
-                        </div>
-                        <div className="col-md-9 value text-500">
-                            <FormattedInfoBlock.List
-                                details={awards}
-                                renderItem={object.linkFromItem}
-                                propertyName="awards"
-                                fallbackMsg="No awards"
-                                loading={false}
-                            />
-                        </div>
-                    </div>
-                    */}
-                </div>
-            </div>
-        );
-    }
-
-}
+});
 
 
 export function ImpersonateUserForm({ updateUserInfo }) {
 
+    const inputFieldRef = useRef(null);
     /**
      * Handler for Impersonate User submit button/action.
      * Performs AJAX request to '/impersonate-user' endpoint then saves returned JWT
@@ -737,8 +580,9 @@ export function ImpersonateUserForm({ updateUserInfo }) {
     const onSubmit = useMemo(function(){
         return function(e){
             e.preventDefault();
-            const { value: userid = "" } = e.target;
+            const { value: userid = "" } = inputFieldRef.current;
             if (userid.length === 0){
+                console.warn("No userid supplied", e);
                 return;
             }
             const url = "/impersonate-user";
@@ -777,7 +621,7 @@ export function ImpersonateUserForm({ updateUserInfo }) {
             <div className="row">
                 <div className="col-12 col-lg-6">
                     <form onSubmit={onSubmit}>
-                        <input type="text" className="mt-08 form-control" placeholder="Enter an email to impersonate..." />
+                        <input type="text" className="mt-08 form-control" placeholder="Enter an email to impersonate..." ref={inputFieldRef} />
                         <button type="submit" className="btn btn-primary btn-md mt-15">
                             <i className="icon icon-fw icon-user icon-user-ninja fas"/>&nbsp; Impersonate
                         </button>
