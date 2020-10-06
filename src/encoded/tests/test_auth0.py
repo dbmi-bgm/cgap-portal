@@ -148,7 +148,7 @@ def test_get_jwt_falls_back_to_cookie_too(fake_request):
     assert jwt == 'test_token'
 
 
-@pytest.mark.parametrize('request_method',  ['HEAD', 'GET', 'POST', 'PATCH'])
+@pytest.mark.parametrize('request_method', ['HEAD', 'GET', 'POST', 'PATCH'])
 def test_get_jwt_falls_back_to_cookie_for_any_method(fake_request, request_method):
     req = DummyRequest(headers={'Authorization': 'Basic not_the_droids_you_are_looking_for'},
                        cookies={'jwtToken': 'r2d2_and_c3po'})
@@ -237,7 +237,7 @@ def test_404_keeps_auth_info(testapp, anontestapp, headers,
         assert res.headers.get('X-User-Info', None) is not None
     except Exception as e:
         if os.environ.get('TRAVIS', False):
-            print("this don't work on travis do to access issues to Auth-0")
+            print("This does not work on travis due to Auth0 access issues")
         else:
             raise e
 
@@ -273,10 +273,6 @@ def test_404_keeps_auth_info(testapp, anontestapp, headers,
 def test_jwt_is_stateless_so_doesnt_actually_need_login(testapp, anontestapp, auth0_4dn_user_token,
                                                         auth0_4dn_user_profile, headers):
     # Create a user with the proper email
-    """ I'm not sure what this test is supposed to be testing - @graph in res2 is no longer empty so
-        I really have no clue as to how this should work and if code changes outside of the test are
-        required???
-    """
     url = '/users/'
     email = auth0_4dn_user_profile['email']
     item = {
@@ -293,10 +289,6 @@ def test_jwt_is_stateless_so_doesnt_actually_need_login(testapp, anontestapp, au
 
 def test_jwt_works_without_keys(testapp, anontestapp, auth0_4dn_user_token,
                                 auth0_4dn_user_profile, headers):
-    """ I'm not sure what this test is supposed to be testing - @graph in res2 is no longer empty so
-        I really have no clue as to how this should work and if code changes outside of the test are
-        required???
-    """
     # Create a user with the proper email
 
     url = '/users/'
