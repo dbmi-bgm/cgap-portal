@@ -681,7 +681,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     } = context;
 
     const {
-        original_pedigree: { display_title: pedFileName } = {},
+        // original_pedigree: { display_title: pedFileName } = {},
         display_title: familyDisplayTitle
     } = family;
     const onClick = useMemo(function(){
@@ -696,7 +696,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const title = (
         <h4 data-family-index={0} className="pb-0 p-2 mb-0 d-inline-block w-100">
             <span className="font-italic text-500">{ familyDisplayTitle }</span>
-            { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
+            {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
             <button type="button" className="btn btn-sm btn-primary pull-right" data-tip="Click to view the provenance graph for the most up-to-date annotated VCF" onClick={onClick}>
                 <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-1 small" />
                 View <span className="text-500">Provenance Graph</span>
