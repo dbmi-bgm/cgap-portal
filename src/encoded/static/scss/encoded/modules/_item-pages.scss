@@ -550,68 +550,93 @@ h3.submission-subtitle {
 
 /*** Status Color Styles & Indicators ***/
 
+// TODO: Move to more common/utility-like place.
+
 @mixin statusColorStyles {
-	&[data-status="released"]:before,
+
+	// Green
 	&[data-status="current"]:before,
-	&[data-status="uploaded"]:before,
-	&[data-status="published"]:before,
-	&[data-status="complete"]:before {
+	&[data-status="shared"]:before,
+	&[data-status="released"]:before,
+	&[data-status="uploaded"]:before,		// Applicable to Files
+	&[data-status="public"]:before,			// Applicable to Pages & UserContent
+	&[data-status="benign"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="protective"]:before,		// Applicable to ClinVar Clinical Significance
+	&[data-status="complete"]:before {		// Applicable to WorkflowRun.run_status
 		color: #fff;
 		background-color: #308756;
 	}
 
-	&[data-status="revoked"]:before,
-	&[data-status="obsolete"]:before,
-	&[data-status="restricted"]:before {
-		color: #fff;
-		background-color: #812423;
-	}
-
-	&[data-status="deleted"]:before,
-	&[data-status="upload failed"]:before,
-	&[data-status="failed"]:before {
-		color: #fff;
-		background-color: #a90d0b;
-	}
-
-	&[data-status="replaced"]:before,
-	&[data-status="planned"]:before,
-	&[data-status="to be uplodaded by workflow"]:before {
-		color: #fff;
-		background-color: #47419a;
-	}
-
-	&[data-status="in review by lab"]:before,
-	&[data-status="in review"]:before,
-	&[data-status="submission in progress"]:before,
-	&[data-status="uploading"]:before,
-	&[data-status="draft"]:before,
-	&[data-status="incomplete"]:before, 
-	&[data-status="in progress"]:before {
-		color: #fff;
-		background-color: #d8bd22;
-	}
-
+	// Greener Yellow
 	&[data-status="released to project"]:before {
 		color: #fff;
 		background-color: #397855;
 	}
 
-	&[data-status="released to lab"]:before {
+	// Green-Yellow
+	&[data-status="released to institution"]:before,
+	&[data-status="in public review"]:before,
+	&[data-status="uploading"]:before,						// Applicable to Files
+	&[data-status="likely benign"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="likely benign"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="output_files_transferring"]:before,		// Applicable to WorkflowRun.run_status
+	&[data-status="output_file_transfer_finished"]:before {	// Applicable to WorkflowRun.run_status
 		color: #fff;
 		background-color: #80921c;
 	}
 
-	&[data-status="unspecified"]:before,
-	&[data-status="archived"]:before,
-	&[data-status="archived to project"]:before,
-	&[data-status="not implemented"]:before,
-	&[data-status="not started"]:before {
+	// Yellow
+	&[data-status="in review"]:before,
+	&[data-status="uncertain significance"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="associaton"]:before,						// Applicable to ClinVar Clinical Significance
+	&[data-status="started"]:before, 						// Applicable to WorkflowRun.run_status
+	&[data-status="running"]:before { 						// Applicable to WorkflowRun.run_status
+		color: #fff;
+		background-color: #d8bd22;
+	}
+
+	// Maroon/dark-red
+	&[data-status="replaced"]:before,
+	&[data-status="inactive"]:before,
+	&[data-status="revoked"]:before,						// Applicable to Users
+	&[data-status="probable-pathogenic"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="affects"]:before,						// Applicable to ClinVar Clinical Significance
+	&[data-status="restricted"]:before {					// Deprecated?
+		color: #fff;
+		background-color: #812423;
+	}
+
+	// Bright Red
+	&[data-status="deleted"]:before,
+	&[data-status="upload failed"]:before,
+	&[data-status="risk factor"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="pathogenic"]:before,						// Applicable to ClinVar Clinical Significance
+	&[data-status="error"]:before {							// Applicable to WorkflowRun.run_status
+		color: #fff;
+		background-color: #a90d0b;
+	}
+
+	// Purple
+	&[data-status="other"]:before, 							// Applicable to ClinVar Clinical Significance
+	&[data-status="started"]:before, 						// Applicable to WorkflowRun.run_status
+	&[data-status="running"]:before, 						// Applicable to WorkflowRun.run_status
+	&[data-status="to be uplodaded by workflow"]:before {	// Applicable to Files
+		color: #fff;
+		background-color: #47419a;
+	}
+
+	
+	// Gray (unused?) (used to be for 'archived')
+	&[data-status="obsolete"]:before,
+	&[data-status="not provided"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="unspecified"]:before,					// Deprecated? Fallback for lack of status in some cases?
+	&[data-status="not implemented"]:before {				// Deprecated? Fallback for lack of status in some cases?
 		color: #fff;
 		background-color: #7b7b7b;
 		//display: none;
 	}
 }
+
 
 i.status-indicator-dot {
 	display: inline-block;

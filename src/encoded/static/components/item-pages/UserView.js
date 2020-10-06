@@ -50,8 +50,10 @@ class SyncedAccessKeyTable extends React.PureComponent {
             'groups' : PropTypes.array,
             'status' : PropTypes.string,
             'timezone' : PropTypes.string,
-            'role' : PropTypes.string,
-            'submits_for' : PropTypes.array
+            'project_roles': PropTypes.shape({
+                'role' : PropTypes.string,
+                'project' : PropTypes.object
+            })
         })
     };
 

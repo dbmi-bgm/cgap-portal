@@ -29,7 +29,7 @@ export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 12
  * Maybe we could have something like 'shouldComponentUpdate(){ return false; }` to prevent it from ever even
  * attempting to compare props for performance gain (since many table cells).
  *
- * Colors are bound to 'data-status' attribute values in SCSS to statuses, so we re-use those here rather than 
+ * Colors are bound to 'data-status' attribute values in SCSS to statuses, so we re-use those here rather than
  * creating separate 'color map' for this, and override tooltip with custom value.
  */
 const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
@@ -444,7 +444,7 @@ export const columnExtensionMap = {
             const statusFormatted = Schemas.Term.toName('status', result.status);
             return (
                 <React.Fragment>
-                    <i className="item-status-indicator-dot mr-07" data-status={result.status}/>
+                    <i className="status-indicator-dot mr-07" data-status={result.status}/>
                     <span className="value">{ statusFormatted }</span>
                 </React.Fragment>
             );

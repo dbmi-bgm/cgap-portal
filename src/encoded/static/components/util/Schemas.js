@@ -47,7 +47,7 @@ export const Term = {
                 if (allowJSXOutput){
                     return (
                         <React.Fragment>
-                            <i className="item-status-indicator-dot mr-07" data-status={term} />
+                            <i className="status-indicator-dot mr-07" data-status={term} />
                             { capitalizeSentence(term) }
                         </React.Fragment>
                     );
