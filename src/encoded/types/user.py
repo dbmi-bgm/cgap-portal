@@ -61,7 +61,10 @@ class User(Item):
     item_type = 'user'
     schema = load_schema('encoded:schemas/user.json')
     embedded_list = [
+        'project_roles.role',
         'project_roles.project.name',
+        'project_roles.project.description',
+        'project_roles.project.pi',
     ]
 
     STATUS_ACL = {
