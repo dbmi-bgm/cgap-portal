@@ -362,14 +362,18 @@ class SearchBuilder:
     def build_type_filters(self):
         """
         Set the type filters for the search. If no doc_types, default to Item.
-        This also sets the facet filter override
+        This also sets the facet filter override, allowing you to apply custom facet ordering
+        by specifying the FACET_ORDER_OVERRIDE field on the type definition. See VariantSample
+        or _sort_custom_facets for examples.
         """
         if not self.doc_types:
             self.doc_types = ['Item']
         else:
             for item_type in self.doc_types:
                 ti = self.types[item_type]
-                self.facet_order_overrides.update(ti.factory.FACET_ORDER_OVERRIDE)
+                if hasattr(ti, 'factory'):  # if not abstract
+                    self.facet_order_overrides.update(getattr(ti.factory, 'FACET_ORDER_OVERRIDE', {}))
+
                 qs = urlencode([
                     (k.encode('utf-8'), v.encode('utf-8'))
                     for k, v in self.request.normalized_params.items() if
@@ -1050,8 +1054,32 @@ class SearchBuilder:
                                              self.search_session_id)
 
     def _sort_custom_facets(self):
-        """ Applies custom sort to facets
-            XXX: document how this works
+        """ Applies custom sort to facets based on a dictionary provided on the type definition
+
+            Specify a 2-tiered dictionary mapping field names to dictionaries of key -> weight
+            mappings - allowing us to sort generally like this:
+                sorted(unsorted_terms, key=lambda d: field_terms_override_order.get(d['key'], 101))
+            ex:
+            {
+                {
+                    facet_field_name: {
+                        key1: weight,
+                        key2: weight,
+                        key3: weight
+                    }
+                }
+            }
+            If you had field name and wanted to force a facet ordering, you
+            could add this to the type definition:
+                FACET_ORDER_OVERRIDE = {
+                    'name': {
+                        'Will': 1,
+                        'Bob': 2,
+                        'Alice': 3,
+                    }
+                }
+            When faceting on the 'name' field, the ordering now will always be Will -> Bob -> Alice
+            regardless of the actual facet counts.
         """
         if 'facets' in self.response:
             for entry in self.response['facets']:
