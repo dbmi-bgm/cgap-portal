@@ -264,12 +264,19 @@ class LuceneBuilder:
                 if type(query) == list:
                     if len(query) == 1:
                         query = query[0]
-                    else:
-                        raise QueryConstructionException(
-                            query_type='nested',
-                            func='handle_nested_filters',
-                            msg='Malformed entry on query field: %s' % query
-                        )
+
+                    else:  # query with different query types ie: searching on No Value (exists) OR field=value (match)
+                        final_filters[BOOL][key].append({
+                            NESTED: {
+                                PATH: nested_path,
+                                QUERY: {
+                                    BOOL: {
+                                        SHOULD: q[BOOL][MUST] for q in query
+                                    }
+                                }
+                            }
+                        })
+                        break
 
                 # if there is no boolean clause in this sub-query, add it directly to final_filters
                 # otherwise continue logic below
@@ -620,9 +627,29 @@ class LuceneBuilder:
             cls._check_and_remove(compare_field, facet_filters, active_filter, query_field, filter_type)
 
     @classmethod
+    def _inspect_should_for_match(cls, query_options, facet_filters, active_filter, query_field,
+                                  filter_type):
+        removed = False
+        for inner_query in query_options:
+            if removed:
+                break
+            if MATCH in inner_query:
+                for field in inner_query.get(MATCH, {}).keys():  # should be only one per block
+                    if cls._check_and_remove(field, facet_filters, active_filter, query_field,
+                                             filter_type):
+                        removed = True
+                        break
+            else:
+                search_log(log_handler=log, msg='Encountered a unexpected nested structure in '
+                                                'query: %s' % inner_query)
+
+    @classmethod
     def _check_and_remove_nested(cls, facet_filters, active_filter, query_field, filter_type):
         """ Helper function for _remove_from_active_filters that handles filter removal for nested query """
         nested_sub_query = active_filter[NESTED][QUERY]
+
+        # if 'consequence' in query_field:
+        #     import pdb; pdb.set_trace()
 
         # For No value searches
         if EXISTS in nested_sub_query:
@@ -648,15 +675,19 @@ class LuceneBuilder:
                     elif isinstance(nested_option, str):
                         inner_bool = nested_sub_query[BOOL].get(inner_filter_type, {})
                         if SHOULD in inner_bool:
-                            for inner_query in inner_bool[SHOULD]:
-                                if MATCH in inner_query:
-                                    for field in inner_query.get(MATCH, {}).keys():  # should be only one per block
-                                        if cls._check_and_remove(field, facet_filters, active_filter, query_field,
-                                                                 filter_type):
-                                            break
-                                else:
-                                    search_log(log_handler=log, msg='Encountered a unexpected nested structure in '
-                                                                    'query: %s' % inner_query)
+                            cls._inspect_should_for_match(inner_bool[SHOULD], facet_filters, active_filter,
+                                                          query_field, filter_type)
+
+                        # For structure like this:
+                        # {'bool': {'should': [
+                        #    {'match': {'embedded.variant.genes.genes_most_severe_consequence.impact.raw': 'MODIFIER'}},
+                        #    {'match': {'embedded.variant.genes.genes_most_severe_consequence.impact.raw': 'LOW'}}]}}
+                        elif BOOL in inner_bool:
+                            inner_inner_bool = inner_bool[BOOL]
+                            if SHOULD in inner_inner_bool:
+                                cls._inspect_should_for_match(inner_inner_bool[SHOULD], facet_filters, active_filter,
+                                                              query_field, filter_type)
+
                     else:
                         search_log(log_handler=log, msg='Encountered a unexpected nested structure at top level: %s'
                                                         % nested_sub_query[BOOL])
