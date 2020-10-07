@@ -275,8 +275,8 @@ class Family(Item):
             "p-f-s": "brother", "p-m-s": "brother",
             "p-f-d": "sister", "p-m-d": "sister",
             "p-f-c": "sibling", "p-m-c": "sibling",
-            "p-d-m": "co-parent", "p-s-m": "co-parent", "p-c-m": "co-parent",
-            "p-d-f": "co-parent", "p-s-f": "co-parent", "p-c-f": "co-parent",
+            "p-d-m": "wife", "p-s-m": "wife", "p-c-m": "wife",
+            "p-d-f": "husband", "p-s-f": "husband", "p-c-f": "husband",
         }
         # list of dictionary for assigning roles to members of given set of roles
         # roles : the input roles to be extended
