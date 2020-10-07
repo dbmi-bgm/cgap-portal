@@ -679,17 +679,15 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         sample: caseSample = null,
         vcf_file: vcf = null
     } = context;
+    const { "@id": vcfAtId = null } = vcf || {};
 
     const {
         // original_pedigree: { display_title: pedFileName } = {},
         display_title: familyDisplayTitle
     } = family;
     const onClick = useMemo(function(){
-        const { "@id": atId } = vcf || {};
         return function(evt){
-            if (atId) {
-                navigate(`${atId}#provenance`, { replace: true });
-            }
+            navigate(`${vcfAtId}#provenance`, { replace: true });
         };
     }, []);
 
@@ -697,7 +695,9 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         <h4 data-family-index={0} className="pb-0 p-2 mb-0 d-inline-block w-100">
             <span className="font-italic text-500">{ familyDisplayTitle }</span>
             {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
-            <button type="button" className="btn btn-sm btn-primary pull-right" data-tip="Click to view the provenance graph for the most up-to-date annotated VCF" onClick={onClick}>
+            <button type="button" className="btn btn-sm btn-primary pull-right"
+                data-tip="Click to view the provenance graph for the most up-to-date annotated VCF"
+                onClick={onClick} disabled={(!vcfAtId)}>
                 <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-1 small" />
                 View <span className="text-500">Provenance Graph</span>
             </button>
