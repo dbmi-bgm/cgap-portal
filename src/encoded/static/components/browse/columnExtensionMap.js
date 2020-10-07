@@ -315,55 +315,11 @@ export const columnExtensionMap = {
     /** "Bioinformatics" column title */
     'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
-            const { '@id' : resultHrefPath, sample = null, sample_processing = null } = result;
-            if (!sample_processing) return null; // Unsure if possible, but fallback to null / '-' in case so (not showing datetitle etc)
-            const {
-                analysis_type: mainTitle = null,
-                last_modified: { date_modified: date = null } = {}
-            } = sample_processing;
-            const {
-                files = [],
-                processed_files = []
-            } = sample || {};
-
-            let status = null;
-            let statusTip = null;
-
-            // Ensure fastQs exist
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const { uuid = null, status: fileStatus = null } = file;
-                if (!uuid || fileStatus === "uploading" || fileStatus === "upload_failed" || !fileStatus) {
-                    statusTip = "No fastq files";
-                    status = "not started";
-                    break;
-                } else {
-                    statusTip = "Fastq file(s) uploaded";
-                    status = "running";
-                }
-            }
-
-            // If fastQs are present...
-            if (status === "running") {
-                // Check if VCFs have been ingested & if QCs passed
-                for (let j = 0; j < processed_files.length; j++) {
-                    const procFile = processed_files[j];
-                    const { file_ingestion_status: ingestionStatus = null, file_format = null } = procFile || {};
-                    const { file_format: fileType } = file_format || {};
-                    if ((fileType === "vcf_gz" || fileType === "gvcf_gz")
-                        && ingestionStatus === "Ingested") {
-                        statusTip = "Variants are ingested";
-                        status = "complete";
-
-                        // TODO: Add QC status from overall QC status once implemented
-                    } // Else, not VCF or not yet ingested, ignore
-                }
-            }
-
-            // Unlikely to show in non-Case item results, so didn't add Case filter
+            const { '@id' : resultHrefPath, sample_processing = null } = result;
+            if (!resultHrefPath || !sample_processing) return null; // Fallback to null / '-' in case so (not showing datetitle etc)
             return (
                 <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Last Update:" />
+                    <BiosampleMultiLevelColumn result={result} />
                 </a>
             );
         }
@@ -484,3 +440,55 @@ export const columnExtensionMap = {
     }
 };
 
+
+const BiosampleMultiLevelColumn = React.memo(function BiosampleMultiLevelColumn({ result }){
+    const { sample, sample_processing } = result;
+    const {
+        analysis_type: mainTitle = null,
+        last_modified: { date_modified: date = null } = {}
+    } = sample_processing;
+    const {
+        files = [],
+        processed_files = []
+    } = sample || {};
+
+    const filesLen = files.length;
+
+    let status = null;
+    let statusTip = null;
+
+    // Ensure fastQs exist
+    if (filesLen > 0) {
+        statusTip = "Fastq file(s) uploaded";
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const { uuid = null, status: fileStatus = null } = file;
+            if (!uuid || fileStatus === "uploading" || fileStatus === "upload_failed" || !fileStatus) {
+                statusTip = "No fastq files";
+                status = "not started";
+                break;
+            }
+        }
+    }
+
+    // If fastQs are present... // TODO: memoize this.
+    if (filesLen > 0 && status === null) {
+        // Check if VCFs have been ingested & if QCs passed
+        for (let j = 0; j < processed_files.length; j++) {
+            const procFile = processed_files[j];
+            const { file_ingestion_status: ingestionStatus = null, file_format = null } = procFile || {};
+            const { file_format: fileType } = file_format || {};
+            if ((fileType === "vcf_gz" || fileType === "gvcf_gz") && ingestionStatus === "Ingested") {
+                statusTip = "Variants are ingested";
+                status = "complete";
+                // TODO: Add QC status from overall QC status once implemented
+            } else {
+                // No VCF or not yet ingested, ignore.
+                status = "running";
+            }
+        }
+    }
+
+    // Unlikely to show in non-Case item results, so didn't add Case filter
+    return <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Last Update:" />;
+});
