@@ -555,50 +555,50 @@ h3.submission-subtitle {
 @mixin statusColorStyles {
 
 	// Green
-	&[data-status="current"]:before,
-	&[data-status="shared"]:before,
-	&[data-status="released"]:before,
-	&[data-status="uploaded"]:before,		// Applicable to Files
-	&[data-status="public"]:before,			// Applicable to Pages & UserContent
-	&[data-status="benign"]:before,			// Applicable to ClinVar Clinical Significance
-	&[data-status="protective"]:before,		// Applicable to ClinVar Clinical Significance
-	&[data-status="complete"]:before {		// Applicable to WorkflowRun.run_status
+	&[data-status="current"]:before,						// Applicable to Item.status
+	&[data-status="shared"]:before,							// Applicable to Item.status
+	&[data-status="released"]:before,						// Applicable to Item.status
+	&[data-status="uploaded"]:before,						// Applicable to File.status
+	&[data-status="public"]:before,							// Applicable to Pages & UserContent
+	&[data-status="complete"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
+	&[data-status="benign"]:before,							// Applicable to ClinVar Clinical Significance
+	&[data-status="protective"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #308756;
 	}
 
 	// Greener Yellow
-	&[data-status="released to project"]:before {
+	&[data-status="released to project"]:before {			// Applicable to Item.status
 		color: #fff;
 		background-color: #397855;
 	}
 
 	// Green-Yellow
-	&[data-status="released to institution"]:before,
-	&[data-status="in public review"]:before,
-	&[data-status="uploading"]:before,						// Applicable to Files
-	&[data-status="likely benign"]:before,					// Applicable to ClinVar Clinical Significance
-	&[data-status="likely benign"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="released to institution"]:before,		// Applicable to Item.status
+	&[data-status="in public review"]:before,				// Applicable to Item.status
+	&[data-status="uploading"]:before,						// Applicable to File.status
 	&[data-status="output_files_transferring"]:before,		// Applicable to WorkflowRun.run_status
-	&[data-status="output_file_transfer_finished"]:before {	// Applicable to WorkflowRun.run_status
+	&[data-status="output_file_transfer_finished"]:before,	// Applicable to WorkflowRun.run_status
+	&[data-status="likely benign"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #80921c;
 	}
 
 	// Yellow
-	&[data-status="in review"]:before,
-	&[data-status="uncertain significance"]:before,			// Applicable to ClinVar Clinical Significance
-	&[data-status="associaton"]:before,						// Applicable to ClinVar Clinical Significance
+	&[data-status="in review"]:before,						// Applicable to Item.status
 	&[data-status="started"]:before, 						// Applicable to WorkflowRun.run_status
-	&[data-status="running"]:before { 						// Applicable to WorkflowRun.run_status
+	&[data-status="running"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
+	&[data-status="incomplete"]:before, 					// Applicable to columnExtensionMap columns
+	&[data-status="uncertain significance"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="associaton"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #d8bd22;
 	}
 
 	// Maroon/dark-red
-	&[data-status="replaced"]:before,
-	&[data-status="inactive"]:before,
-	&[data-status="revoked"]:before,						// Applicable to Users
+	&[data-status="replaced"]:before,						// Applicable to Item.status
+	&[data-status="inactive"]:before,						// Applicable to Item.status
+	&[data-status="revoked"]:before,						// Applicable to User.status
 	&[data-status="probable-pathogenic"]:before,			// Applicable to ClinVar Clinical Significance
 	&[data-status="affects"]:before,						// Applicable to ClinVar Clinical Significance
 	&[data-status="restricted"]:before {					// Deprecated?
@@ -607,30 +607,29 @@ h3.submission-subtitle {
 	}
 
 	// Bright Red
-	&[data-status="deleted"]:before,
-	&[data-status="upload failed"]:before,
+	&[data-status="deleted"]:before,						// Applicable to Item.status
+	&[data-status="upload failed"]:before,					// Applicable to File.status
+	&[data-status="error"]:before,							// Applicable to WorkflowRun.run_status + columnExtensionMap columns
 	&[data-status="risk factor"]:before,					// Applicable to ClinVar Clinical Significance
-	&[data-status="pathogenic"]:before,						// Applicable to ClinVar Clinical Significance
-	&[data-status="error"]:before {							// Applicable to WorkflowRun.run_status
+	&[data-status="pathogenic"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #a90d0b;
 	}
 
 	// Purple
-	&[data-status="other"]:before, 							// Applicable to ClinVar Clinical Significance
-	&[data-status="started"]:before, 						// Applicable to WorkflowRun.run_status
-	&[data-status="running"]:before, 						// Applicable to WorkflowRun.run_status
-	&[data-status="to be uplodaded by workflow"]:before {	// Applicable to Files
+	&[data-status="to be uplodaded by workflow"]:before,	// Applicable to File.status
+	&[data-status="other"]:before {							// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #47419a;
 	}
 
 	
 	// Gray (unused?) (used to be for 'archived')
-	&[data-status="obsolete"]:before,
+	&[data-status="obsolete"]:before,						// Applicable to Item.status
+	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
+	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
 	&[data-status="not provided"]:before,					// Applicable to ClinVar Clinical Significance
-	&[data-status="unspecified"]:before,					// Deprecated? Fallback for lack of status in some cases?
-	&[data-status="not implemented"]:before {				// Deprecated? Fallback for lack of status in some cases?
+	&[data-status="unspecified"]:before {					// Deprecated? Fallback for lack of status in some cases?
 		color: #fff;
 		background-color: #7b7b7b;
 		//display: none;

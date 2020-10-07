@@ -15,6 +15,7 @@ import { EditableField, FieldSet } from '@hms-dbmi-bgm/shared-portal-components/
 
 import { store } from './../../store';
 import { OnlyTitle, PageTitleContainer, pageTitleViews } from './../PageTitleSection';
+import { Term } from './../util/Schemas';
 
 // eslint-disable-next-line no-unused-vars
 import { Item } from './../util/typedefs';
@@ -546,7 +547,7 @@ const ProfileWorkFields = React.memo(function ProfileWorkFields({ user }){
                         <label htmlFor={roleRoleID} className="text-500">Role</label>
                     </div>
                     <div id={roleRoleID} className="col-md-9 value text-500">
-                        { role }
+                        { Term.toName("project_roles.role", role) }
                     </div>
                 </div>
             </li>

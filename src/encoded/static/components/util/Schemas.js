@@ -68,6 +68,8 @@ export const Term = {
                 //}
                 return term;
 
+            /** Fields that are lowercase with underscores but could be ~ proper nouns otherwise */
+            case "project_roles.project": // Related to User (hardcoded enum field)
             case "gene_biotype":
                 if (typeof term !== 'string') return term;
                 return term.split("_").map(capitalize).join(" ");
@@ -124,7 +126,7 @@ export const Term = {
                     name = parseInt(term);
                 }
                 if (typeof name === 'number' && !isNaN(name)){
-                    name = bytesToLargerUnit(name);
+                    return bytesToLargerUnit(name);
                 } else {
                     name = null;
                 }

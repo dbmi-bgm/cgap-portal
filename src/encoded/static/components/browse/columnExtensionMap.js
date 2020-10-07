@@ -339,12 +339,12 @@ export const columnExtensionMap = {
                     break;
                 } else {
                     statusTip = "Fastq file(s) uploaded";
-                    status = "in progress";
+                    status = "running";
                 }
             }
 
             // If fastQs are present...
-            if (status === "in progress") {
+            if (status === "running") {
                 // Check if VCFs have been ingested & if QCs passed
                 for (let j = 0; j < processed_files.length; j++) {
                     const procFile = processed_files[j];
