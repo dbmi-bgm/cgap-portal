@@ -508,7 +508,7 @@
             ]
         },
         "variant.genes.genes_ensg.display_title": {
-            "title": "Gene Transcript",
+            "title": "Gene, Transcript",
             "order": 25,
             "sort_fields": [
                 { "field": "variant.genes.genes_ensg.display_title", "title": "Gene" },
