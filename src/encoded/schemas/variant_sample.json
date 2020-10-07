@@ -509,31 +509,41 @@
         },
         "variant.genes.genes_ensg.display_title": {
             "title": "Gene Transcript",
-            "order": 25
+            "order": 25,
+            "sort_fields": [
+                { "field": "variant.genes.genes_ensg.display_title", "title": "Gene" },
+                { "field": "variant.genes.genes_most_severe_transcript", "title": "Most Severe Transcript" }
+            ]
         },
         "variant.genes.genes_most_severe_hgvsc": {
             "title": "Variant",
-            "order": 27,
-            "sort_fields": [
-                { "field": "variant.genes.genes.most_severe_hgvsc", "title": "Most Severe HGVSC" }
-            ]
+            "order": 27
         },
         "variant.genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
             "order": 28,
             "sort_fields": [
-                { "fields": "variant.genes.genes_most_severe_consequence.coding_effect", "title": "Coding Effect" }
+                { "field": "variant.genes.genes_most_severe_consequence.coding_effect", "title": "Coding Effect" }
             ]
         },
         "variant.gnomad_af": {
             "title": "GnomAD",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 60
+            "order": 60,
+            "sort_fields": [
+                { "field": "variant.gnomad_af", "title": "Gnomad AF" },
+                { "field": "variant.max_pop_af_af_popmax", "title": "Gnomad AF Population Max" }
+            ]
         },
         "variant.cadd_phred": {
             "title": "Predictors",
-            "order": 61
+            "order": 61,
+            "sort_fields": [
+                { "field": "variant.cadd_phred", "title": "Cadd Phred Score" },
+                { "field": "variant.spliceai_maxds", "title": "SpliceAI Max DS"},
+                { "field": "variant.conservation_phylop100", "title": "PhyloP 100 Score"}
+            ]
         },
         "bam_snapshot": {
             "title": "Genome Snapshot",
