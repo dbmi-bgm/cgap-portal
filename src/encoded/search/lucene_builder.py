@@ -269,7 +269,10 @@ class LuceneBuilder:
                     else:
                         inner_query = []
                         for _q in query:
-                            inner = _q[BOOL].get(key, [])
+                            if BOOL in _q:
+                                inner = _q[BOOL].get(key, [])
+                            else:
+                                inner = _q
                             if isinstance(inner, list):
                                 inner_query += inner
                             else:
@@ -280,12 +283,12 @@ class LuceneBuilder:
                                     PATH: nested_path,
                                     QUERY: {
                                         BOOL: {
-                                            SHOULD: inner_query
+                                            MUST: inner_query
                                         }
                                     }
                                 }
                             })
-                        break
+                        continue
 
                 # if there is no boolean clause in this sub-query, add it directly to final_filters
                 # otherwise continue logic below
