@@ -15,6 +15,7 @@ from pyramid.httpexceptions import (
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
 from ..util import resolve_file_path
+from ..inheritance_mode import InheritanceMode
 from snovault import (
     calculated_property,
     collection,
@@ -193,6 +194,34 @@ class VariantSample(Item):
     item_type = 'variant_sample'
     schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant_sample.json'))
     embedded_list = build_variant_sample_embedded_list()
+    FACET_ORDER_OVERRIDE = {
+        'inheritance_modes': {
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_STRONG: 1,  # de novo (strong)
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_MEDIUM: 2,  # de novo (medium)
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_WEAK: 3,  # de novo (weak)
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_CHRXY: 4,  # de novo (chrXY) XXX: no GATK?
+            InheritanceMode.INHMODE_LABEL_RECESSIVE: 5,  # Recessive
+            'Compound Het (Phased/strong_pair)': 6,  # cmphet all auto-generated, see compute_cmphet_inheritance_modes
+            'Compound Het (Phased/medium_pair)': 7,
+            'Compound Het (Phased/weak_pair)': 8,
+            'Compound Het (Unphased/strong_pair)': 9,
+            'Compound Het (Unphased/medium_pair)': 10,
+            'Compound Het (Unphased/weak_pair)': 11,
+            InheritanceMode.INHMODE_LABEL_LOH: 12,  # Loss of Heterozygousity
+            InheritanceMode.INHMODE_DOMINANT_MOTHER: 13,  # Dominant (maternal)
+            InheritanceMode.INHMODE_DOMINANT_FATHER: 14,  # Dominant (paternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER: 15,  # X-linked recessive (Maternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER: 16,  # X-linked dominant (Maternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER: 17,  # X-linked dominant (Paternal)
+            InheritanceMode.INHMODE_LABEL_Y_LINKED: 18,  # Y-linked dominant
+            InheritanceMode.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT: 19,  # Low relevance, homozygous in a parent
+            InheritanceMode.INHMODE_LABEL_NONE_MN: 20,  # Low relevance, multiallelic site family
+            InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 21,  # Low relevance, present in both parent(s)
+            InheritanceMode.INHMODE_LABEL_NONE_DOT: 22,  # Low relevance, missing call(s) in family
+            InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 23,  # Low relevance, mismatching chrXY genotype(s)
+            '_default': 1000  # arbitrary large number
+        }
+    }
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):

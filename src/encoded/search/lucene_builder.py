@@ -12,7 +12,8 @@ from .search_utils import (
     QueryConstructionException,
     COMMON_EXCLUDED_URI_PARAMS, QUERY, FILTER, MUST, MUST_NOT, BOOL, MATCH, SHOULD,
     EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED,
-    schema_for_field, get_query_field, search_log,
+    schema_for_field, get_query_field, search_log, MAX_FACET_COUNTS,
+
 )
 
 
@@ -771,7 +772,7 @@ class LuceneBuilder:
                  .bucket('primary_agg',
                          'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
                  .bucket('primary_agg',
-                         Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value'))
+                         Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=MAX_FACET_COUNTS, missing='No value'))
                  .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
 
     @classmethod
@@ -858,7 +859,7 @@ class LuceneBuilder:
                                                                                        string_query)
                 term_aggregation = {
                     TERMS: {
-                        'size': 100,
+                        'size': MAX_FACET_COUNTS,
                         # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
                         'field': query_field,
                         'missing': facet.get("missing_value_replacement", "No value")
