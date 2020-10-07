@@ -461,6 +461,7 @@ export const columnExtensionMap = {
         }
     },
     'bam_snapshot': {
+        'noSort' : true,
         'render' : function(result, props) {
             const { bam_snapshot = null, uuid = null } = result;
             if (bam_snapshot) {

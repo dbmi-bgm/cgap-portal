@@ -102,6 +102,7 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                 }
             },
             "variant.genes.genes_most_severe_hgvsc": { // Variant column
+                noSort: true,
                 widthMap: { 'lg' : 120, 'md' : 110, 'sm' : 95 },
                 render: function(result, props) {
                     const { variant : { genes : [firstGene = null] = [] } = {} } = result;
