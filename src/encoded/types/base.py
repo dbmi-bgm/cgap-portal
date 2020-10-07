@@ -280,6 +280,7 @@ class Item(snovault.Item):
         'inactive': ALLOW_INSTITUTION_MEMBER_VIEW,
         'deleted': DELETED
     }
+    FACET_ORDER_OVERRIDE = {}  # empty by default
 
     # Items of these statuses are filtered out from rev links
     filtered_rev_statuses = ('deleted', 'replaced')
@@ -517,5 +518,5 @@ def item_edit(context, request, render=None):
     return sno_item_edit(context, request, render)
 
 
-    
+
 
