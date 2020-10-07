@@ -27,7 +27,7 @@ from .lucene_builder import LuceneBuilder
 from .search_utils import (
     find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
     execute_search, make_search_subreq,
-    NESTED, COMMON_EXCLUDED_URI_PARAMS,
+    NESTED, COMMON_EXCLUDED_URI_PARAMS, MAX_FACET_COUNTS
 )
 
 
@@ -81,6 +81,7 @@ class SearchBuilder:
         self.facets = None
         self.search_session_id = None
         self.string_query = None
+        self.facet_order_overrides = {}
 
     def _get_es_mapping_if_necessary(self):
         """ Looks in the registry to see if the single doc_type mapping is cached in the registry, which it
@@ -361,12 +362,18 @@ class SearchBuilder:
     def build_type_filters(self):
         """
         Set the type filters for the search. If no doc_types, default to Item.
+        This also sets the facet filter override, allowing you to apply custom facet ordering
+        by specifying the FACET_ORDER_OVERRIDE field on the type definition. See VariantSample
+        or _sort_custom_facets for examples.
         """
         if not self.doc_types:
-            doc_types = ['Item']
+            self.doc_types = ['Item']
         else:
             for item_type in self.doc_types:
                 ti = self.types[item_type]
+                if hasattr(ti, 'factory'):  # if not abstract
+                    self.facet_order_overrides.update(getattr(ti.factory, 'FACET_ORDER_OVERRIDE', {}))
+
                 qs = urlencode([
                     (k.encode('utf-8'), v.encode('utf-8'))
                     for k, v in self.request.normalized_params.items() if
@@ -1046,6 +1053,47 @@ class SearchBuilder:
             self.request.response.set_cookie('searchSessionID',
                                              self.search_session_id)
 
+    def _sort_custom_facets(self):
+        """ Applies custom sort to facets based on a dictionary provided on the type definition
+
+            Specify a 2-tiered dictionary mapping field names to dictionaries of key -> weight
+            mappings that allow us to sort generally like this:
+                sorted(unsorted_terms, key=lambda d: field_terms_override_order.get(d['key'], default))
+            ex:
+            {
+                {
+                    facet_field_name: {
+                        key1: weight,
+                        key2: weight,
+                        key3: weight
+                        '_default': default_weight
+                    }
+                }
+            }
+            If you had field name and wanted to force a facet ordering, you
+            could add this to the type definition:
+                FACET_ORDER_OVERRIDE = {
+                    'name': {
+                        'Will': 1,
+                        'Bob': 2,
+                        'Alice': 3,
+                        '_default': 4,
+                    }
+                }
+            When faceting on the 'name' field, the ordering now will always be Will -> Bob -> Alice -> anything else
+            regardless of the actual facet counts. Note that if no default is specified weight 101
+            will be assigned (MAX_FACET_COUNTS + 1).
+        """
+        if 'facets' in self.response:
+            for entry in self.response['facets']:
+                field = entry.get('field')
+                if field in self.facet_order_overrides:
+                    field_terms_override_order = self.facet_order_overrides[field]
+                    default = field_terms_override_order.get('_default', MAX_FACET_COUNTS + 1)
+                    unsorted_terms = entry.get('terms', [])
+                    entry['terms'] = sorted(unsorted_terms, key=lambda d: field_terms_override_order.get(d['key'],
+                                                                                                         default))
+
     def get_response(self):
         """ Gets the response for this search, setting 404 status if necessary. """
         if not self.response:
@@ -1063,6 +1111,9 @@ class SearchBuilder:
         if self.request.__parent__ is not None or self.return_generator:
             if self.return_generator:
                 return self.response['@graph']
+
+        # apply custom facet filtering
+        self._sort_custom_facets()
 
         # otherwise just hand off response
         return self.response

@@ -249,6 +249,7 @@ class Item(snovault.Item):
         # everyone view - restrict to specific items via schema
         'public': ALLOW_EVERYONE_VIEW_ACL
     }
+    FACET_ORDER_OVERRIDE = {}  # empty by default
 
     # Items of these statuses are filtered out from rev links
     filtered_rev_statuses = ('deleted')
@@ -467,7 +468,6 @@ def collection_add(context, request, render=None):
     return sno_collection_add(context, request, render)
 
 
-
 @view_config(context=Item, permission='edit', request_method='PUT',
              validators=[validate_item_content_put])
 @view_config(context=Item, permission='edit', request_method='PATCH',
@@ -480,7 +480,7 @@ def collection_add(context, request, render=None):
              request_param=['validate=false'])
 @view_config(context=Item, permission='index', request_method='GET',
              validators=[validate_item_content_in_place],
-            request_param=['check_only=true'])
+             request_param=['check_only=true'])
 @debug_log
 def item_edit(context, request, render=None):
     # This works
