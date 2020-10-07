@@ -41,6 +41,7 @@ from ..server_defaults import get_userid, add_last_modified
 
 
 # Item acls
+# TODO (C4-332): consolidate all acls into one place - i.e. their own file
 ONLY_ADMIN_VIEW_ACL = [
     (Allow, 'group.admin', ['view', 'edit']),
     (Allow, 'group.read-only-admin', ['view']),
@@ -279,7 +280,7 @@ class Item(snovault.Item):
         # Don't finalize to avoid validation here.
         properties = self.upgrade_properties().copy()
         status = properties.get('status')
-        return self.STATUS_ACL.get(status, ALLOW_PROJECT_MEMBER_EDIT_ACL)
+        return self.STATUS_ACL.get(status, ONLY_ADMIN_VIEW_ACL)
 
     def __ac_local_roles__(self):
         """Adds additional information allowing access of the Item based on

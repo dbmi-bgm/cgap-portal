@@ -64,6 +64,7 @@ class User(Item):
         'project_roles.project.name',
     ]
 
+    # TODO (C4-332): consolidate all acls into once place
     STATUS_ACL = {
         'current': ONLY_OWNER_VIEW_PROFILE_ACL,
         'deleted': DELETED_USER_ACL,

@@ -9,27 +9,28 @@ from ..types.institution import Institution
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 
-"""List of basic statuses for testing access to Items
+"""Set up  of basic statuses for testing access to Items
     statuses in this list have a mapping to an ACL
-    with the exception of 'uploaded' that acts as a standin for all non-ACL
+    with the exception of 'upload failed' that acts as a standin for all non-ACL
     mapped statuses and defaults to the admin only ACL
 
     NOTE: 'public' applies to only certain Items - specified in status enum
     and give public access so is tested separately
 """
-STATUSES = [
-    # viewable by authenticated
-    "shared",
-    "obsolete",
-    # viewable by project member
-    "current",
-    "inactive",
-    "in review",
-    # kind of special admin-only
-    "deleted",
-    # special file status case due to redirect
-    "replaced"
-]
+# viewable by authenticated
+SHARED = "shared"
+OBSOLETE = "obsolete"
+# viewable by project member
+CURRENT = "current"
+INACTIVE = "inactive"
+IN_REVIEW = "in review"
+# kind of special admin-only
+DELETED = "deleted"
+# special file status case due to redirect
+REPLACED = "replaced"
+# no staus_acl mapping so default to admin only
+UPLOAD_FAILED = "upload failed"
+STATUSES = [SHARED, OBSOLETE, CURRENT, INACTIVE, IN_REVIEW, DELETED, REPLACED, UPLOAD_FAILED]
 
 # institution, project and user fixtures
 @pytest.fixture
@@ -217,6 +218,13 @@ def simple_doc_item(bwh_institution, bgm_project):
     }
 
 
+def status_map_items(status2resp):
+    statuses = set(STATUSES)
+    to_test = set(status2resp.keys())
+    assert statuses == to_test, ("Mismatch between statuses expected {} and those in the test {}".format(statuses, to_test))
+    return status2resp.items()
+
+
 @pytest.fixture
 def simple_bgm_file(testapp, simple_bgm_file_item):
     return testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
@@ -243,7 +251,12 @@ def test_admin_can_patch_item_all_stati(admin_testapp, simple_bgm_file, status):
     assert res['status'] == status
 
 
-@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [200, 200, 200, 200, 200, 403, 404])))
+@pytest.mark.parametrize('status, expres', status_map_items(
+    {
+        SHARED: 200, OBSOLETE: 200, CURRENT: 200, INACTIVE: 200, IN_REVIEW: 200,
+        DELETED: 403, REPLACED: 404, UPLOAD_FAILED: 403
+    }
+))
 def test_bgm_user_can_access_ok_stati_but_not_others_for_bgm_project_item(
         testapp, bgm_user_testapp, simple_bgm_file, status, expres):
     testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
@@ -254,9 +267,8 @@ def test_bgm_user_can_access_ok_stati_but_not_others_for_bgm_project_item(
         assert res['status'] == 'error'  # because get fails
 
 
-""" Testing project-based posting - non-admin users can only post items that are attributed to the projects that
-    they are part of
-"""
+# Testing project-based posting - non-admin users can only post items that are attributed to the projects that
+# they are part of
 
 
 def test_bgm_user_can_post_bgm_item(bgm_user_testapp, simple_doc_item):
@@ -278,14 +290,24 @@ def test_udn_user_can_post_udn_item(udn_user_testapp, udn_project, simple_doc_it
     assert udn_user_testapp.post_json('/document', simple_doc_item, status=201)
 
 
-@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [403, 403, 200, 403, 200, 403, 404])))
+@pytest.mark.parametrize('status, expres', status_map_items(
+    {
+        SHARED: 403, OBSOLETE: 403, CURRENT: 200, INACTIVE: 403, IN_REVIEW: 200,
+        DELETED: 403, REPLACED: 404, UPLOAD_FAILED: 403
+    }
+))
 def test_bgm_user_can_only_patch_current_or_in_review_item(testapp, bgm_user_testapp, simple_bgm_file, status, expres):
     # want bgm user to only be able to patch items linked to their project with current status
     testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
     assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=expres)
 
 
-@pytest.mark.parametrize('status, expres', list(zip(STATUSES, [200, 200, 403, 403, 403, 403, 404])))
+@pytest.mark.parametrize('status, expres', status_map_items(
+    {
+        SHARED: 200, OBSOLETE: 200, CURRENT: 403, INACTIVE: 403, IN_REVIEW: 403,
+        DELETED: 403, REPLACED: 404, UPLOAD_FAILED: 403
+    }
+))
 def test_udn_user_cannot_access_bgm_item_unless_shared(testapp, udn_user_testapp, simple_bgm_file, status, expres):
     testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
     assert udn_user_testapp.get(simple_bgm_file['@id'], status=expres)
