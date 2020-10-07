@@ -471,8 +471,9 @@ const BiosampleMultiLevelColumn = React.memo(function BiosampleMultiLevelColumn(
         }
     }
 
-    // If fastQs are present... // TODO: memoize this.
+    // If fastQs are present...
     if (filesLen > 0 && status === null) {
+        status = "running";
         // Check if VCFs have been ingested & if QCs passed
         for (let j = 0; j < processed_files.length; j++) {
             const procFile = processed_files[j];
@@ -481,11 +482,10 @@ const BiosampleMultiLevelColumn = React.memo(function BiosampleMultiLevelColumn(
             if ((fileType === "vcf_gz" || fileType === "gvcf_gz") && ingestionStatus === "Ingested") {
                 statusTip = "Variants are ingested";
                 status = "complete";
+                break;
                 // TODO: Add QC status from overall QC status once implemented
-            } else {
-                // No VCF or not yet ingested, ignore.
-                status = "running";
-            }
+            } // Else no VCF or not yet ingested, ignore.
+
         }
     }
 
