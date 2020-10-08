@@ -63,13 +63,11 @@ def test_access_key_principals(anontestapp, execute_counter, access_key, bgm_use
     headers = {'Authorization': auth_header(access_key)}
     with execute_counter.expect(2):
         res = anontestapp.get('/@@testing-user', headers=headers)
-
     assert res.json['authenticated_userid'] == 'accesskey.' + access_key['access_key_id']
     assert sorted(res.json['effective_principals']) == [
         'accesskey.%s' % access_key['access_key_id'],
         'editor_for.%s' % bgm_project['uuid'],
         'group.project_editor',
-        'institution.%s' % institution['uuid'],
         'system.Authenticated',
         'system.Everyone',
         'userid.%s' % bgm_user['uuid'],
