@@ -63,13 +63,22 @@ def udn_project(testapp):
     return testapp.post_json('/project', item).json['@graph'][0]
 
 
+BGM_PROJECT = 'bgm-project'
+CORE_PROJECT = 'core-project'
+UDN_PROJECT = 'udn-project'
+TEST_PROJECT_NAMES = [BGM_PROJECT, CORE_PROJECT, UDN_PROJECT]
+
+
 @pytest.fixture
 def projects_by_name(core_project, bgm_project, udn_project):
-    return {
+    proj_by_name = {
         core_project.get('name'): core_project,
         bgm_project.get('name'): bgm_project,
         udn_project.get('name'): udn_project
     }
+    # test to make sure all names in fixtures are as expected
+    assert all([name in TEST_PROJECT_NAMES for name in proj_by_name])
+    return proj_by_name
 
 
 @pytest.fixture
@@ -323,27 +332,30 @@ def test_udn_user_cannot_patch_bgm_item(testapp, udn_user_testapp, simple_bgm_fi
 
 
 @pytest.mark.parametrize('project_name, status, expres', [
-    ('core-project', 'shared', 200),
-    ('core-project', 'obsolete', 200),
-    ('core-project', 'current', 403),
-    ('core-project', 'inactive', 403),
-    ('core-project', 'in review', 403),
-    ('core-project', 'deleted', 403),
-    ('core-project', 'replaced', 403),
-    ('bgm-project', 'shared', 200),
-    ('bgm-project', 'obsolete', 200),
-    ('bgm-project', 'current', 200),
-    ('bgm-project', 'inactive', 200),
-    ('bgm-project', 'in review', 200),
-    ('bgm-project', 'deleted', 403),
-    ('bgm-project', 'replaced', 403),
-    ('udn-project', 'shared', 200),
-    ('udn-project', 'obsolete', 200),
-    ('udn-project', 'current', 200),
-    ('udn-project', 'inactive', 200),
-    ('udn-project', 'in review', 200),
-    ('udn-project', 'deleted', 403),
-    ('udn-project', 'replaced', 403),
+    (CORE_PROJECT, SHARED, 200),
+    (CORE_PROJECT, OBSOLETE, 200),
+    (CORE_PROJECT, CURRENT, 403),
+    (CORE_PROJECT, INACTIVE, 403),
+    (CORE_PROJECT, IN_REVIEW, 403),
+    (CORE_PROJECT, DELETED, 403),
+    (CORE_PROJECT, REPLACED, 403),
+    (CORE_PROJECT, UPLOAD_FAILED, 403),
+    (BGM_PROJECT, SHARED, 200),
+    (BGM_PROJECT, OBSOLETE, 200),
+    (BGM_PROJECT, CURRENT, 200),
+    (BGM_PROJECT, INACTIVE, 200),
+    (BGM_PROJECT, IN_REVIEW, 200),
+    (BGM_PROJECT, DELETED, 403),
+    (BGM_PROJECT, REPLACED, 403),
+    (BGM_PROJECT, UPLOAD_FAILED, 403),
+    (UDN_PROJECT, SHARED, 200),
+    (UDN_PROJECT, OBSOLETE, 200),
+    (UDN_PROJECT, CURRENT, 200),
+    (UDN_PROJECT, INACTIVE, 200),
+    (UDN_PROJECT, IN_REVIEW, 200),
+    (UDN_PROJECT, DELETED, 403),
+    (UDN_PROJECT, REPLACED, 403),
+    (UDN_PROJECT, UPLOAD_FAILED, 403)
 ])
 def test_multi_proj_user_can_access_items_w_ok_status_from_multi_projects(
         testapp, multi_project_user_testapp, simple_bgm_file_item,
@@ -355,36 +367,39 @@ def test_multi_proj_user_can_access_items_w_ok_status_from_multi_projects(
     assert multi_project_user_testapp.get(fitem['@id'], status=expres)
 
 
-@pytest.mark.parametrize('project_name', ['core-project', 'bgm-project', 'udn-project'])
+@pytest.mark.parametrize('project_name', [CORE_PROJECT, BGM_PROJECT, UDN_PROJECT])
 def test_project_users_can_access_shared_items_from_any_project(
         testapp, bgm_user_testapp, simple_bgm_file, projects_by_name, project_name):
     testapp.patch_json(
-        simple_bgm_file['@id'], {'status': 'shared', 'project': projects_by_name.get(project_name).get('@id')}, status=200)
+        simple_bgm_file['@id'], {'status': SHARED, 'project': projects_by_name.get(project_name).get('@id')}, status=200)
     assert bgm_user_testapp.get(simple_bgm_file['@id'], status=200)
 
 
 @pytest.mark.parametrize('project_name, status, expres', [
-    ('core-project', 'shared', 200),
-    ('core-project', 'obsolete', 200),
-    ('core-project', 'current', 403),
-    ('core-project', 'inactive', 403),
-    ('core-project', 'in review', 403),
-    ('core-project', 'deleted', 403),
-    ('core-project', 'replaced', 403),
-    ('bgm-project', 'shared', 200),
-    ('bgm-project', 'obsolete', 200),
-    ('bgm-project', 'current', 403),
-    ('bgm-project', 'inactive', 403),
-    ('bgm-project', 'in review', 403),
-    ('bgm-project', 'deleted', 403),
-    ('bgm-project', 'replaced', 403),
-    ('udn-project', 'shared', 200),
-    ('udn-project', 'obsolete', 200),
-    ('udn-project', 'current', 403),
-    ('udn-project', 'inactive', 403),
-    ('udn-project', 'in review', 403),
-    ('udn-project', 'deleted', 403),
-    ('udn-project', 'replaced', 403),
+    (CORE_PROJECT, SHARED, 200),
+    (CORE_PROJECT, OBSOLETE, 200),
+    (CORE_PROJECT, CURRENT, 403),
+    (CORE_PROJECT, INACTIVE, 403),
+    (CORE_PROJECT, IN_REVIEW, 403),
+    (CORE_PROJECT, DELETED, 403),
+    (CORE_PROJECT, REPLACED, 403),
+    (CORE_PROJECT, UPLOAD_FAILED, 403),
+    (BGM_PROJECT, SHARED, 200),
+    (BGM_PROJECT, OBSOLETE, 200),
+    (BGM_PROJECT, CURRENT, 403),
+    (BGM_PROJECT, INACTIVE, 403),
+    (BGM_PROJECT, IN_REVIEW, 403),
+    (BGM_PROJECT, DELETED, 403),
+    (BGM_PROJECT, REPLACED, 403),
+    (BGM_PROJECT, UPLOAD_FAILED, 403),
+    (UDN_PROJECT, SHARED, 200),
+    (UDN_PROJECT, OBSOLETE, 200),
+    (UDN_PROJECT, CURRENT, 403),
+    (UDN_PROJECT, INACTIVE, 403),
+    (UDN_PROJECT, IN_REVIEW, 403),
+    (UDN_PROJECT, DELETED, 403),
+    (UDN_PROJECT, REPLACED, 403),
+    (UDN_PROJECT, UPLOAD_FAILED, 403)
 ])
 def test_authenticated_user_wo_project_can_only_see_shared(
         testapp, no_project_user_testapp, simple_bgm_file_item, projects_by_name,
@@ -396,7 +411,13 @@ def test_authenticated_user_wo_project_can_only_see_shared(
     assert no_project_user_testapp.get(fitem['@id'], status=expres)
 
 
-@pytest.mark.parametrize('project_name, status', list(zip(['core-project', 'bgm-project', 'udn-project'] * 7, STATUSES * 3)))
+def project_status_params():
+    # returns a list of tuples with all pairing combinations of test project names and status
+    # used to parameterize permission tests that all have the same expected response
+    return list(zip(TEST_PROJECT_NAMES * len(STATUSES), STATUSES * len(TEST_PROJECT_NAMES)))
+
+
+@pytest.mark.parametrize('project_name, status', project_status_params())
 def test_deleted_user_has_no_access(
         testapp, deleted_user_testapp, simple_bgm_file_item, projects_by_name,
         project_name, status):
@@ -407,7 +428,7 @@ def test_deleted_user_has_no_access(
     assert deleted_user_testapp.get(fitem['@id'], status=expres)
 
 
-@pytest.mark.parametrize('project_name, status', list(zip(['core-project', 'bgm-project', 'udn-project'] * 7, STATUSES * 3)))
+@pytest.mark.parametrize('project_name, status', project_status_params())
 def test_anonymous_user_has_no_access(
         testapp, anontestapp, simple_bgm_file_item, projects_by_name,
         project_name, status):
