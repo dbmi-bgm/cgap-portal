@@ -677,26 +677,30 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         display_title: caseDisplayTitle,
         family = null,
         sample_processing: sampleProcessing = null,
-        sample: caseSample = null
+        sample: caseSample = null,
+        vcf_file: vcf = null
     } = context;
+    const { "@id": vcfAtId = null } = vcf || {};
 
     const {
-        original_pedigree: { display_title: pedFileName } = {},
+        // original_pedigree: { display_title: pedFileName } = {},
         display_title: familyDisplayTitle
     } = family;
     const onClick = useMemo(function(){
         return function(evt){
-            navigate("#pedigree", { skipRequest: true, replace: true });
+            navigate(`${vcfAtId}#provenance`, { replace: true });
         };
     }, []);
 
     const title = (
         <h4 data-family-index={0} className="pb-0 p-2 mb-0 d-inline-block w-100">
             <span className="font-italic text-500">{ familyDisplayTitle }</span>
-            { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null }
-            <button type="button" className="btn btn-sm btn-primary pull-right" data-tip="Click to view this family in the Pedigree Visualization tab" onClick={onClick}>
-                <i className="icon icon-fw icon-sitemap fas mr-1 small" />
-                View Pedigree in Separate Tab
+            {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
+            <button type="button" className="btn btn-sm btn-primary pull-right"
+                data-tip="Click to view the provenance graph for the most up-to-date annotated VCF"
+                onClick={onClick} disabled={(!vcfAtId)}>
+                <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-1 small" />
+                View <span className="text-500">Provenance Graph</span>
             </button>
         </h4>
     );

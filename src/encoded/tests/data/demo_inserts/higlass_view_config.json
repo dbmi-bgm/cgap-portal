@@ -3,17 +3,10 @@
       "viewconfig":{
         "editable":true,
         "zoomFixed":false,
-        "trackSourceServers":[
-          "https://cgap-higlass.com/api/v1"
-        ],
         "exportViewUrl":"/api/v1/viewconfs",
+        "trackSourceServers": ["https://cgap-higlass.com/api/v1"],
         "views":[
           {
-            "uid":"aa",
-            "initialXDomain":[
-              594954043.6728096,
-              2673883060.323411
-            ],
             "autocompleteSource":"/api/v1/suggest/?d=OHJakQICQD6gTD7skx4EWA&",
             "genomePositionSearchBox":{
               "autocompleteServer":"https://cgap-higlass.com/api/v1",
@@ -23,6 +16,91 @@
               "visible":true
             },
             "chromInfoPath":"//s3.amazonaws.com/pkerp/data/hg38/chromSizes.tsv",
+            "tracks": {
+              "top": [
+                {
+                  "type": "combined",
+                  "uid": "FkGY-Yv9T8avNXljXklukw",
+                  "height": 55,
+                  "width": 568,
+                  "contents": [
+                      {
+                          "filetype": "beddb",
+                          "server": "https://higlass.io/api/v1",
+                          "tilesetUid": "P0PLbQMwTYGy-5uPIQid7A",
+                          "uid": "FocNIVsfRVWMRzfmHfncsQ",
+                          "type": "gene-annotations",
+                          "options": {
+                              "fontSize": 10,
+                              "labelColor": "black",
+                              "labelBackgroundColor": "#ffffff",
+                              "labelPosition": "hidden",
+                              "labelLeftMargin": 0,
+                              "labelRightMargin": 0,
+                              "labelTopMargin": 0,
+                              "labelBottomMargin": 0,
+                              "minHeight": 24,
+                              "plusStrandColor": "#8a8ccf",
+                              "minusStrandColor": "#e8727a",
+                              "trackBorderWidth": 0,
+                              "trackBorderColor": "black",
+                              "showMousePosition": false,
+                              "mousePositionColor": "#000000",
+                              "geneAnnotationHeight": 12,
+                              "geneLabelPosition": "outside",
+                              "geneStrandSpacing": 2,
+                              "name": "Gene Annotations (hg38)"
+                          },
+                          "width": 568,
+                          "height": 55
+                      },
+                      {
+                          "uid": "d6KeVfkNSmq_YNj_rWJgBA",
+                          "type": "viewport-projection-horizontal",
+                          "fromViewUid": "ab",
+                          "options": {
+                          "projectionFillColor": "#777",
+                          "projectionStrokeColor": "#777",
+                          "projectionFillOpacity": 0.3,
+                          "projectionStrokeOpacity": 0.7,
+                          "strokeWidth": 1
+                          },
+                          "width": 568,
+                          "height": 55
+                      }
+                  ],
+                  "options": {}
+                }
+              ],
+              "left": [],
+              "center": [],
+              "right": [],
+              "bottom": [],
+              "whole": [],
+              "gallery": []
+            },
+            "initialXDomain": [
+              594954043.6728096,
+              2673883060.323411
+            ],
+            "initialYDomain": [
+              -2681117714.2684245,
+              -2681117686.505896
+            ],
+            "layout": {
+              "w": 12,
+              "h": 2,
+              "x": 0,
+              "y": 0
+            },
+            "uid": "aa"
+          },
+          {
+            "uid":"ab",
+            "initialXDomain":[
+              594954043.6728096,
+              2673883060.323411
+            ],
             "tracks":{
               "top":[
                 {
@@ -66,12 +144,12 @@
                     "barBorderColor":"white",
                     "sortLargestOnTop":true,
                     "extendedPreloading":false,
-                    "colorScale":[
-                      "#007FFF",
-                      "#e8e500",
-                      "#008000",
-                      "#FF0038",
-                      "#800080",
+                    "colorScale": [
+                      "#2c7bb6",
+                      "#abd9e9",
+                      "#f2f2b1",
+                      "#fdae61",
+                      "#808080",
                       "#DCDCDC"
                     ]
                   },
@@ -79,17 +157,9 @@
                   "height":25
                 },
                 {
-                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "emptytrack_transcripts",
                   "type": "empty",
-                  "options": {
-                    "color": "#808080",
-                    "stroke": "#ffffff",
-                    "fontSize": 14,
-                    "fontIsLeftAligned": false,
-                    "showMousePosition": false,
-                    "mousePositionColor": "#000000"
-                  },
+                  "options": {},
                   "width": 568,
                   "height": 10
                 },
@@ -143,17 +213,9 @@
                   "height": 134
                 },
                 {
-                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "emptytrack_clinvar",
                   "type": "empty",
-                  "options": {
-                    "color": "#808080",
-                    "stroke": "#ffffff",
-                    "fontSize": 14,
-                    "fontIsLeftAligned": false,
-                    "showMousePosition": false,
-                    "mousePositionColor": "#000000"
-                  },
+                  "options": {},
                   "width": 568,
                   "height": 10
                 },
@@ -185,17 +247,9 @@
                   }
                 },
                 {
-                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "emptytrack_orthologs",
                   "type": "empty",
-                  "options": {
-                    "color": "#808080",
-                    "stroke": "#ffffff",
-                    "fontSize": 14,
-                    "fontIsLeftAligned": false,
-                    "showMousePosition": false,
-                    "mousePositionColor": "#000000"
-                  },
+                  "options": {},
                   "width": 568,
                   "height": 10
                 },
@@ -217,17 +271,9 @@
                   "height": 20
                 },
                 {
-                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "emptytrack_orthologs2",
                   "type": "empty",
-                  "options": {
-                    "color": "#808080",
-                    "stroke": "#ffffff",
-                    "fontSize": 14,
-                    "fontIsLeftAligned": false,
-                    "showMousePosition": false,
-                    "mousePositionColor": "#000000"
-                  },
+                  "options": {},
                   "width": 568,
                   "height": 7
                 },
@@ -265,17 +311,9 @@
                   }
                 },
                 {
-                  "server": "https://cgap-higlass.com/api/v1",
                   "uid": "emptytrack",
                   "type": "empty",
-                  "options": {
-                    "color": "#808080",
-                    "stroke": "#ffffff",
-                    "fontSize": 14,
-                    "fontIsLeftAligned": false,
-                    "showMousePosition": false,
-                    "mousePositionColor": "#000000"
-                  },
+                  "options": {},
                   "width": 568,
                   "height": 20
                 }
@@ -322,9 +360,7 @@
               "w":12,
               "h":12,
               "x":0,
-              "y":0,
-              "moved":false,
-              "static":false
+              "y":0
             },
             "initialYDomain":[
               655540254.4718345,
@@ -357,7 +393,7 @@
           }
         }
       },
-      "name": "higlass-default-vewconf",
+      "name": "higlass-default-viewconf",
       "title": "Default CGAP hg38 viewconf",
       "genome_assembly": "GRCh38",
       "uuid": "00000000-1111-0000-1111-000000000000",
