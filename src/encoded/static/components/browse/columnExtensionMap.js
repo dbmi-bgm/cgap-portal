@@ -316,10 +316,11 @@ export const columnExtensionMap = {
     'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
             const { '@id' : resultHrefPath, sample_processing = null } = result;
-            if (!resultHrefPath || !sample_processing) return null; // Fallback to null / '-' in case so (not showing datetitle etc)
+            if (!sample_processing) return null; // Fallback to null / '-' in case so (not showing datetitle etc)
+
             return (
                 <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
-                    <BiosampleMultiLevelColumn result={result} />
+                    <BioinformaticsMultiLevelColumn result={result} />
                 </a>
             );
         }
@@ -423,11 +424,12 @@ export const columnExtensionMap = {
         }
     },
     'bam_snapshot': {
+        'noSort' : true,
         'render' : function(result, props) {
             const { bam_snapshot = null, uuid = null } = result;
             if (bam_snapshot) {
                 return (
-                    <div className="mx-auto">
+                    <div className="mx-auto text-truncate">
                         <a target="_blank" rel="noreferrer" href={`/${uuid}/@@download`}>
                             View BAM Snapshot
                         </a>
@@ -441,15 +443,15 @@ export const columnExtensionMap = {
 };
 
 
-const BiosampleMultiLevelColumn = React.memo(function BiosampleMultiLevelColumn({ result }){
-    const { sample, sample_processing } = result;
+const BioinformaticsMultiLevelColumn = React.memo(function BioinformaticsMultiLevelColumn({ result }){
+    const { sample, sample_processing, vcf_file } = result;
     const {
         analysis_type: mainTitle = null,
         last_modified: { date_modified: date = null } = {}
     } = sample_processing;
     const {
         files = [],
-        processed_files = []
+        /* processed_files = [] */
     } = sample || {};
 
     const filesLen = files.length;
@@ -471,23 +473,17 @@ const BiosampleMultiLevelColumn = React.memo(function BiosampleMultiLevelColumn(
         }
     }
 
-    // If fastQs are present...
+    // If fastQs are present... check if ingested
     if (filesLen > 0 && status === null) {
         status = "running";
-        // Check if VCFs have been ingested & if QCs passed
-        for (let j = 0; j < processed_files.length; j++) {
-            const procFile = processed_files[j];
-            const { file_ingestion_status: ingestionStatus = null, file_format = null } = procFile || {};
-            const { file_format: fileType } = file_format || {};
-            if ((fileType === "vcf_gz" || fileType === "gvcf_gz") && ingestionStatus === "Ingested") {
-                statusTip = "Variants are ingested";
-                status = "complete";
-                break;
-                // TODO: Add QC status from overall QC status once implemented
-            } // Else no VCF or not yet ingested, ignore.
-
+        const { file_ingestion_status: ingestionStatus = null } = vcf_file || {};
+        if (ingestionStatus === "Ingested") {
+            statusTip = "Variants are ingested";
+            status = "complete";
         }
     }
+
+    // Check if overall QCs passed (not yet implemented) -- to add later
 
     // Unlikely to show in non-Case item results, so didn't add Case filter
     return <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Last Update:" />;
