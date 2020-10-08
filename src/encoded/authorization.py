@@ -15,6 +15,7 @@ def groupfinder(login, request):
         20-09-08 changed permission model requires import of Authenticated
         is that kosher
     """
+    # TODO (C4-332): Consolidate permissions all in one perms.py file once this all stabilizes.
     if namespace == 'remoteuser':
         if localname in ['EMBED', 'INDEXER']:
             return []
@@ -55,11 +56,6 @@ def groupfinder(login, request):
         return None
 
     principals = ['userid.%s' % user.uuid]
-
-    # not currently used for access
-    institution = user_properties.get('institution')
-    if institution:
-        principals.append('institution.%s' % institution)
 
     # first pass implementation uses project to give view access only - will need to be
     # be modified when different user roles can provide different levels of access

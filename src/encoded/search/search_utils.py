@@ -46,6 +46,7 @@ COMMON_EXCLUDED_URI_PARAMS = [
     'mode', 'redirected_from', 'datastore', 'referrer',
     'currentAction'
 ]
+MAX_FACET_COUNTS = 100
 
 
 # Exception Classes

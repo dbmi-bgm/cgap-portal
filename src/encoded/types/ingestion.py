@@ -18,6 +18,7 @@ from .base import (
     # TODO: Maybe collect all these permission styles into a single file, give them symbolic names,
     #       and permit only the symbolic names to be used in each situation so we can curate a full inventory of modes.
     #       -kmp 26-Jul-2020
+    # Ticket C4-332
     ALLOW_PROJECT_MEMBER_ADD_ACL,
 )
 from .base import (
@@ -153,10 +154,11 @@ class SubmissionFolio:
             submission.patch_item(
                 errors=["%s: %s" % (e.__class__.__name__, e)],
                 processing_status={
-                "state": "done",
-                "outcome": "error",
-                "progress": "incomplete"
-            })
+                    "state": "done",
+                    "outcome": "error",
+                    "progress": "incomplete"
+                }
+            )
 
         with s3_output_stream(submission.s3_client,
                               bucket=submission.bucket,
