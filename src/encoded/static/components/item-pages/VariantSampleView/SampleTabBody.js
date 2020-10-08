@@ -98,6 +98,36 @@ export function SampleTabBody(props){
     );
 }
 
+/**
+ * Returns an object with shortened genotypes: one with number of base pairs, one without
+ * @param {*} fullGT Full genotype (ex. AGAGAATTCCACTCACATCG)
+ * @param {*} n Number of base pairs to show on either side of the shortening (if "n=2", shortGT would look like "AG...TC")
+ */
+function shortenGT(fullGT, n) {
+    let gtObj = {};
+
+    // Only calculate shortened values if fullGT is longer than 10 characters
+    if (fullGT.length > 10) {
+        // Calculate shortened versions of GTs
+        const firstN = fullGT.substring(0, n);
+        const middle = fullGT.substring(n, fullGT.length - n);
+        const lastN = fullGT.substring(fullGT.length - n, fullGT.length);
+        const shortGT = `${firstN}...${lastN}`;
+        const bpGT = `${firstN}...${middle.length}bp...${lastN}`;
+
+        // // Determine if to use ...BP... shortened version or normal shortened version
+        // if (!shortGTDupTester[shortGT]) {
+        //     shortGTDupTester[shortGT] = true;
+        // } else {
+        //     shortGTDupPresent = true;
+        // }
+
+        gtObj = { fullGT, shortGT, bpGT };
+    } else {
+        gtObj = { fullGT };
+    }
+    return gtObj;
+}
 
 function CoverageTableRow(props) {
     const {
@@ -143,6 +173,10 @@ const CoverageTable = React.memo(function CoverageTable({ samplegeno = [], genot
     const mapGTToShortenedTitles = {};
     const shortGTDupTester = {};
 
+    // Add shortened ref to titlemap
+    const refShortened = shortenGT(varRef, 2);
+    mapGTToShortenedTitles[varRef] = refShortened;
+
     let samplegenolen;
 
     // Populate ID->Coverage map with genotype label information
@@ -183,26 +217,14 @@ const CoverageTable = React.memo(function CoverageTable({ samplegeno = [], genot
 
                     // Populate mapGTToShortenedTitles mapping
                     if (!mapGTToShortenedTitles.hasOwnProperty(fullGT)) {
-                        let gtObj;
-                        const n = 2; // Number of bp to show on either end when shortened
-        
-                        if (fullGT.length > 10) { // Calculate shortened versions of GTs
-                            const firstN = fullGT.substring(0, n);
-                            const middle = fullGT.substring(n, fullGT.length - n);
-                            const lastN = fullGT.substring(fullGT.length - n, fullGT.length);
-                            const shortGT = `${firstN}...${lastN}`;
-                            const bpGT = `${firstN}...${middle.length}bp...${lastN}`;
-        
-                            // Determine if to use ...BP... shortened version or normal shortened version
-                            if (!shortGTDupTester[shortGT]) {
-                                shortGTDupTester[shortGT] = true;
-                            } else {
-                                shortGTDupPresent = true;
-                            }
-        
-                            gtObj = { fullGT, shortGT, bpGT };
+                        const gtObj = shortenGT(fullGT, 2);
+                        const { shortGT = null } = gtObj;
+
+                        // Determine if to use ...BP... shortened version or normal shortened version
+                        if (!shortGTDupTester[shortGT]) {
+                            shortGTDupTester[shortGT] = true;
                         } else {
-                            gtObj = { fullGT };
+                            shortGTDupPresent = true;
                         }
 
                         mapGTToShortenedTitles[fullGT] = gtObj;
@@ -257,7 +279,8 @@ const CoverageTable = React.memo(function CoverageTable({ samplegeno = [], genot
             if (!mapNumgtToGT[i]) {
                 // if it's ref, just use ref placeholder to replace
                 if (i === 0) {
-                    refAndAltCols.push(<th key={i} className="text-left">Ref ({varRef})</th>);
+                    const { bpGT = null, shortGT = null } = shortenGT(varRef, 2);
+                    refAndAltCols.push(<th key={i} data-Tip={varRef} className="text-left">Ref ({bpGT || shortGT || varRef})</th>);
                 } else { // apply placeholder name to empty alt column
                     refAndAltCols.push(<th key={i} className="text-left">Alt (#{emptyColCount})</th>);
                     emptyColCount++;
