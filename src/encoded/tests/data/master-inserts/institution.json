@@ -1,7 +1,8 @@
 [
     {
-        "address2": "10 Schattuck Street",
+        "title": "HMS DBMI",
         "address1": "Biomedical Bioinfomatics",
+        "address2": "10 Schattuck Street",
         "city": "Boston",
         "country": "USA",
         "fax": "000-000-0000",
@@ -11,46 +12,67 @@
         "pi": "dvuzman@research.bwh.harvard.edu",
         "postal_code": "02115",
         "state": "MA",
-        "title": "HMS DBMI",
         "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "contact_persons" : [
+        "contact_persons": [
             "dvuzman@research.bwh.harvard.edu"
-        ]
+        ],
+        "date_created": "2019-08-05T13:54:32.731853+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:46:07.889118+00:00"
+        },
+        "schema_version": "1"
     },
     {
-        "address2": "75 Francis Street",
+        "title": "BWH",
+        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
         "address1": "Brigham and Women's Hospital",
+        "address2": "75 Francis Street",
         "city": "Boston",
+        "state": "MA",
         "country": "USA",
         "fax": "000-000-0000",
         "name": "bwh",
         "phone1": "000-000-0000",
         "phone2": "000-000-0000",
-        "pi": "jkrier@bwh.harvard.edu",
+        "pi": "986b362f-4eb6-4a9c-8173-3acba722bba1",
         "postal_code": "02115",
-        "state": "MA",
-        "title": "BWH",
-        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
-        "contact_persons" : [
-            "jkrier@bwh.harvard.edu"
-        ]
+        "contact_persons": [
+            "986b362f-4eb6-4a9c-8173-3acba722bba1"
+        ],
+        "date_created": "2019-11-05T22:07:47.847438+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:13:42.454429+00:00"
+        },
+        "schema_version": "1"
     },
+
     {
-        "address2": "300 Longwood Avenue",
+        "title": "BCH",
+        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765",
         "address1": "Boston Children's Hospital",
+        "address2": "300 Longwood Avenue",
         "city": "Boston",
+        "state": "MA",
         "country": "USA",
         "fax": "000-000-0000",
         "name": "bch",
         "phone1": "000-000-0000",
         "phone2": "000-000-0000",
-        "pi": "dvuzman@research.bwh.harvard.edu",
+        "pi": "986b362f-4eb6-4a9c-8173-3ab267307e4b",
         "postal_code": "02115",
-        "state": "MA",
-        "title": "BCH",
-        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765",
         "contact_persons": [
-            "dvuzman@research.bwh.harvard.edu"
-        ]
+            "986b362f-4eb6-4a9c-8173-3ab267307e4b"
+        ],
+        "date_created": "2019-11-19T17:15:25.667903+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267226992",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267226992",
+            "date_modified": "2019-11-19T17:15:25.672470+00:00"
+        },
+        "schema_version": "1"
     }
 ]

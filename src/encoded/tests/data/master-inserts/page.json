@@ -8,8 +8,16 @@
             "442c8aa0-dc6c-43d7-814a-854af460b009",
             "442c8aa0-dc6c-43d7-814a-854af460b010"
         ],
+        "date_created": "2019-11-05T22:07:47.917824+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:46:08.867339+00:00"
+        },
+        "schema_version": "3",
         "table-of-contents": {
-            "enabled": false
+            "enabled": false,
+            "header-depth": 4
         }
     },
     {
@@ -17,7 +25,9 @@
         "uuid": "dc5305dc-9b1c-461e-872d-6810d98e6fa5",
         "title": "Ontology Usage",
         "status": "released",
-        "aliases": ["hdmi-dbmi:ontology_help_usage"],
+        "aliases": [
+            "hms-dbmi:ontology_help_page"
+        ],
         "content": [
             "76a1471a-a9cd-4192-a965-470e241308e3"
         ],

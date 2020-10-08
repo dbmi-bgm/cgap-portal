@@ -1,32 +1,56 @@
 [
     {
-        "name" : "about.introduction",
-        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b008",
-        "status" : "released",
-        "file" : "/src/encoded/static/data/about/introduction.html"
+        "name": "about.introduction",
+        "uuid": "442c8aa0-dc6c-43d7-814a-854af460b008",
+        "status": "released",
+        "file": "/src/encoded/static/data/about/introduction.html",
+        "date_created": "2019-11-05T22:07:50.307227+00:00",
+        "section_type": "Page Section",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:46:08.535047+00:00"
+        },
+        "schema_version": "2"
     },
     {
-        "name" : "about.dcic",
-        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b009",
-        "title" : "Team",
-        "status" : "released",
-        "file" : "/src/encoded/static/data/about/dcic.html"
+        "name": "about.dcic",
+        "uuid": "442c8aa0-dc6c-43d7-814a-854af460b009",
+        "title": "Team",
+        "status": "released",
+        "file": "/src/encoded/static/data/about/dcic.html",
+        "date_created": "2019-11-05T22:07:50.435896+00:00",
+        "section_type": "Page Section",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:46:08.425783+00:00"
+        },
+        "schema_version": "2"
     },
     {
-        "name" : "about.acknowledgements",
-        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b010",
-        "title" : "Acknowledgements",
-        "status" : "released",
-        "file" : "/src/encoded/static/data/about/acknowledgements.html"
+        "name": "about.acknowledgements",
+        "uuid": "442c8aa0-dc6c-43d7-814a-854af460b010",
+        "title": "Acknowledgements",
+        "status": "released",
+        "file": "/src/encoded/static/data/about/acknowledgements.html",
+        "date_created": "2019-11-05T22:07:50.549414+00:00",
+        "section_type": "Page Section",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:46:08.288947+00:00"
+        },
+        "schema_version": "2"
     },
     {
-        "title" : "Embedded Search Table Examples",
-        "description" : "Check out these examples",
-        "name" : "demos.embedded-search-table",
-        "uuid" : "4570c6b5-dad9-4f34-b366-9895b461334d",
-        "file" : "/src/encoded/static/data/embedded-search-table-demo.jsx",
-        "section_type" : "Page Section",
-        "status" : "released"
+        "title": "Embedded Search Table Examples",
+        "description": "Check out these examples",
+        "name": "demos.embedded-search-table",
+        "uuid": "4570c6b5-dad9-4f34-b366-9895b461334d",
+        "file": "/src/encoded/static/data/embedded-search-table-demo.jsx",
+        "section_type": "Page Section",
+        "status": "released"
     },
     {
         "name": "help.portal_ontology_usage.content",
@@ -37,6 +61,7 @@
         ],
         "file": "/docs/public/help/ontologies_in_cgap.md",
         "options": {
+            "filetype": "md",
             "collapsible": false,
             "default_open": true
         },

@@ -1,177 +1,699 @@
 [
     {
-        "uuid": "03d0cb0f-7e54-4ae6-9dfb-9b4538464f33",
-        "phenotype_name": "Abnormal cellular phenotype",
-        "hpo_id": "HP:0025354",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0025354",
-        "is_slim_for": "Phenotypic abnormality"
+        "hpo_id": "HP:0002664",
+        "dbxrefs": [
+            "UMLS:C0006826",
+            "MSH:D009369",
+            "SNOMEDCT_US:108369006",
+            "UMLS:C0027651",
+            "SNOMEDCT_US:363346000",
+            "NCIT:C3262"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002664",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Tumour",
+            "Neoplasia",
+            "Oncological abnormality",
+            "Tumor"
+        ],
+        "definition": "An organ or organ-system abnormality that consists of uncontrolled autonomous cell-proliferation which can occur in any part of the body as a benign or malignant neoplasm (tumour).",
+        "slim_terms": [
+            "fb8289f6-f6b5-4dc3-b6de-b48421732c33"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:24.317711+00:00",
+        "phenotype_name": "Neoplasm",
+        "schema_version": "1",
+        "alternative_ids": [
+            "HP:0003008",
+            "HP:0006741"
+        ],
+        "uuid": "fb8289f6-f6b5-4dc3-b6de-b48421732c33"
     },
     {
-        "uuid": "d50c4b56-115c-4bca-87f5-55e44b6090db",
-        "phenotype_name": "Abnormality of blood and blood-forming tissues",
-        "hpo_id": "HP:0001871",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001871",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "98183cac-3ee4-4c49-bc0a-2c555f58fef8",
-        "phenotype_name": "Abnormality of connective tissue",
-        "hpo_id": "HP:0003549",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0003549",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "16c0b141-183d-42cd-80f1-8080434d51af",
-        "phenotype_name": "Abnormality of head or neck",
-        "hpo_id": "HP:0000152",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000152",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "8259ddf6-021f-4dae-83a6-3f01cb116148",
-        "phenotype_name": "Abnormality of limbs",
-        "hpo_id": "HP:0040064",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0040064",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "82ddd4b7-23de-4d36-931d-e2e115334f26",
-        "phenotype_name": "Abnormality of metabolism/homeostasis",
-        "hpo_id": "HP:0001939",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001939",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "06b60443-b613-4f2a-a8b5-65695d98c38e",
-        "phenotype_name": "Abnormality of prenatal development or birth",
-        "hpo_id": "HP:0001197",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001197",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "f6415a2d-87a0-4705-9f1e-7bd9d147b44c",
-        "phenotype_name": "Abnormality of the breast",
         "hpo_id": "HP:0000769",
+        "dbxrefs": [
+            "UMLS:C4025829"
+        ],
         "hpo_url": "http://purl.obolibrary.org/obo/HP_0000769",
-        "is_slim_for": "Phenotypic abnormality"
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Abnormality of the breast"
+        ],
+        "definition": "An abnormality of the breast.",
+        "slim_terms": [
+            "f6415a2d-87a0-4705-9f1e-7bd9d147b44c"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:22.751377+00:00",
+        "phenotype_name": "Abnormality of the breast",
+        "schema_version": "1",
+        "uuid": "f6415a2d-87a0-4705-9f1e-7bd9d147b44c"
     },
     {
-        "uuid": "7690f700-985b-41c2-9082-8a46a5b08499",
-        "phenotype_name": "Abnormality of the cardiovascular system",
-        "hpo_id": "HP:0001626",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001626",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "48457466-b970-43f2-80b8-8ad98bb5636e",
-        "phenotype_name": "Abnormality of the digestive system",
-        "hpo_id": "HP:0025031",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0025031",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "ac3ff33f-b57a-4054-b158-4e669afe5816",
-        "phenotype_name": "Abnormality of the ear",
-        "hpo_id": "HP:0000598",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000598",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "2a0ccce5-5edf-4777-910a-cacd3c71c5f6",
-        "phenotype_name": "Abnormality of the endocrine system",
-        "hpo_id": "HP:0000818",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000818",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "c4c52a02-6cb0-4b86-8667-aca3666e7d65",
-        "phenotype_name": "Abnormality of the eye",
-        "hpo_id": "HP:0000478",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000478",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "d4bf685e-87a2-4642-8a9d-0e6916e1f673",
-        "phenotype_name": "Abnormality of the genitourinary system",
-        "hpo_id": "HP:0000119",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000119",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "304c1c04-7e26-495c-8b8a-ee3c423cea78",
-        "phenotype_name": "Abnormality of the immune system",
-        "hpo_id": "HP:0002715",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002715",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "5972e88f-f1e9-42b2-a130-2bb1adb13c5e",
-        "phenotype_name": "Abnormality of the integument",
-        "hpo_id": "HP:0001574",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001574",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "4d5c05c1-ebf6-421f-a96a-9e0053a632d0",
-        "phenotype_name": "Abnormality of the musculature",
-        "hpo_id": "HP:0003011",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0003011",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c",
-        "phenotype_name": "Abnormality of the nervous system",
-        "hpo_id": "HP:0000707",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000707",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "22f67013-0d5a-4fec-935e-94cec7d76d9a",
-        "phenotype_name": "Abnormality of the respiratory system",
-        "hpo_id": "HP:0002086",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002086",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "1262c802-99bc-4d04-a2b4-910115662bdd",
-        "phenotype_name": "Abnormality of the skeletal system",
-        "hpo_id": "HP:0000924",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000924",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "1f22c582-837a-49fb-8740-ab52d6301e60",
-        "phenotype_name": "Abnormality of the thoracic cavity",
-        "hpo_id": "HP:0045027",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0045027",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "4acd1d7c-185d-4cc9-a5ae-ab449874a31f",
-        "phenotype_name": "Abnormality of the voice",
-        "hpo_id": "HP:0001608",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001608",
-        "is_slim_for": "Phenotypic abnormality"
-    },
-    {
-        "uuid": "e0e450de-57e0-4cfb-b757-19b704142e8e",
-        "phenotype_name": "Constitutional symptom",
         "hpo_id": "HP:0025142",
         "hpo_url": "http://purl.obolibrary.org/obo/HP_0025142",
-        "is_slim_for": "Phenotypic abnormality"
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "definition": "A symptom or manifestation indicating a systemic or general effect of a disease and that may affect the general well-being or status of an individual.",
+        "slim_terms": [
+            "e0e450de-57e0-4cfb-b757-19b704142e8e"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:24.170367+00:00",
+        "phenotype_name": "Constitutional symptom",
+        "schema_version": "1",
+        "uuid": "e0e450de-57e0-4cfb-b757-19b704142e8e"
     },
     {
-        "uuid": "52e7ecc7-3379-4f79-945d-ae8372efe354",
-        "phenotype_name": "Growth abnormality",
+        "hpo_id": "HP:0001871",
+        "dbxrefs": [
+            "SNOMEDCT_US:191124002",
+            "MSH:D006402",
+            "SNOMEDCT_US:34093004",
+            "UMLS:C0018939",
+            "UMLS:C0850715",
+            "UMLS:C4020864"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001871",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Hematological abnormality",
+            "Abnormality of blood and blood-forming tissues",
+            "Abnormality of the hematopoietic system"
+        ],
+        "definition": "An abnormality of the hematopoietic system.",
+        "slim_terms": [
+            "d50c4b56-115c-4bca-87f5-55e44b6090db"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:22.226825+00:00",
+        "phenotype_name": "Abnormality of blood and blood-forming tissues",
+        "schema_version": "1",
+        "alternative_ids": [
+            "HP:0003135"
+        ],
+        "uuid": "d50c4b56-115c-4bca-87f5-55e44b6090db"
+    },
+    {
+        "hpo_id": "HP:0000119",
+        "dbxrefs": [
+            "UMLS:C0042063",
+            "SNOMEDCT_US:287085006",
+            "SNOMEDCT_US:42030000",
+            "UMLS:C4020895",
+            "UMLS:C0080276",
+            "MSH:D014564"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000119",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Urogenital anomalies",
+            "Genitourinary tract malformation",
+            "Urogenital abnormalities",
+            "Genitourinary tract anomalies",
+            "Genitourinary abnormality",
+            "Abnormality of the GU system"
+        ],
+        "definition": "The presence of any abnormality of the genitourinary system.",
+        "slim_terms": [
+            "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-09-04T16:37:37.165583+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:25.848249+00:00"
+        },
+        "phenotype_name": "Abnormality of the genitourinary system",
+        "schema_version": "1",
+        "alternative_ids": [
+            "HP:0008658",
+            "HP:0008713",
+            "HP:0008704",
+            "HP:0008688"
+        ],
+        "uuid": "d4bf685e-87a2-4642-8a9d-0e6916e1f673"
+    },
+    {
+        "hpo_id": "HP:0000707",
+        "dbxrefs": [
+            "MSH:D009421",
+            "UMLS:C0497552",
+            "SNOMEDCT_US:88425004"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000707",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Abnormality of the nervous system",
+            "Neurologic abnormalities",
+            "Neurological abnormality"
+        ],
+        "definition": "An abnormality of the nervous system.",
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-09-04T16:37:37.529566+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:18.199354+00:00"
+        },
+        "phenotype_name": "Abnormality of the nervous system",
+        "schema_version": "1",
+        "alternative_ids": [
+            "HP:0001333",
+            "HP:0006987"
+        ],
+        "uuid": "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+    },
+    {
+        "hpo_id": "HP:0000478",
+        "dbxrefs": [
+            "UMLS:C0015397",
+            "MSH:D005124",
+            "UMLS:C0015393",
+            "MSH:D005128",
+            "SNOMEDCT_US:371409005",
+            "SNOMEDCT_US:371405004",
+            "SNOMEDCT_US:19416009"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000478",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Abnormality of the eye",
+            "Abnormal eye"
+        ],
+        "definition": "Any abnormality of the eye, including location, spacing, and intraocular abnormalities.",
+        "slim_terms": [
+            "c4c52a02-6cb0-4b86-8667-aca3666e7d65"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:23.194888+00:00",
+        "phenotype_name": "Abnormality of the eye",
+        "schema_version": "1",
+        "uuid": "c4c52a02-6cb0-4b86-8667-aca3666e7d65"
+    },
+    {
+        "hpo_id": "HP:0000598",
+        "dbxrefs": [
+            "UMLS:C0266589",
+            "SNOMEDCT_US:275259005"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000598",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Abnormality of the ear",
+            "Ear anomaly"
+        ],
+        "definition": "An abnormality of the ear.",
+        "slim_terms": [
+            "ac3ff33f-b57a-4054-b158-4e669afe5816"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-09-04T16:37:36.922880+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:24.395891+00:00"
+        },
+        "phenotype_name": "Abnormality of the ear",
+        "schema_version": "1",
+        "uuid": "ac3ff33f-b57a-4054-b158-4e669afe5816"
+    },
+    {
+        "hpo_id": "HP:0003549",
+        "dbxrefs": [
+            "UMLS:C4025596"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0003549",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "definition": "Any abnormality of the soft tissues, including both connective tissue (tendons, ligaments, fascia, fibrous tissues, and fat).",
+        "slim_terms": [
+            "98183cac-3ee4-4c49-bc0a-2c555f58fef8"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:22.300786+00:00",
+        "phenotype_name": "Abnormality of connective tissue",
+        "schema_version": "1",
+        "uuid": "98183cac-3ee4-4c49-bc0a-2c555f58fef8"
+    },
+    {
+        "hpo_id": "HP:0001939",
+        "dbxrefs": [
+            "UMLS:C4021768"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001939",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Metabolism abnormality",
+            "Laboratory abnormality"
+        ],
+        "slim_terms": [
+            "82ddd4b7-23de-4d36-931d-e2e115334f26"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-09-04T16:37:36.475518+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:22.560175+00:00"
+        },
+        "phenotype_name": "Abnormality of metabolism/homeostasis",
+        "schema_version": "1",
+        "alternative_ids": [
+            "HP:0004355",
+            "HP:0002146",
+            "HP:0004367"
+        ],
+        "uuid": "82ddd4b7-23de-4d36-931d-e2e115334f26"
+    },
+    {
+        "hpo_id": "HP:0040064",
+        "dbxrefs": [
+            "SNOMEDCT_US:445144002",
+            "UMLS:C4073131",
+            "UMLS:C0239337"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0040064",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Abnormality of limbs",
+            "Abnormal limbs",
+            "Limb anomaly"
+        ],
+        "slim_terms": [
+            "8259ddf6-021f-4dae-83a6-3f01cb116148"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:22.448896+00:00",
+        "phenotype_name": "Abnormality of limbs",
+        "schema_version": "1",
+        "uuid": "8259ddf6-021f-4dae-83a6-3f01cb116148"
+    },
+    {
+        "hpo_id": "HP:0001626",
+        "dbxrefs": [
+            "SNOMEDCT_US:49601007",
+            "MSH:D018376",
+            "UMLS:C0007222",
+            "MSH:D002318",
+            "UMLS:C0243050"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001626",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Cardiovascular abnormality",
+            "Cardiac anomaly",
+            "Abnormality of the cardiovascular system"
+        ],
+        "definition": "Any abnormality of the cardiovascular system.",
+        "slim_terms": [
+            "7690f700-985b-41c2-9082-8a46a5b08499"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-09-04T16:37:36.702121+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:24.555957+00:00"
+        },
+        "phenotype_name": "Abnormality of the cardiovascular system",
+        "schema_version": "1",
+        "uuid": "7690f700-985b-41c2-9082-8a46a5b08499"
+    },
+    {
+        "hpo_id": "HP:0001574",
+        "dbxrefs": [
+            "UMLS:C4025761"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001574",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "definition": "An abnormality of the integument, which consists of the skin and the superficial fascia.",
+        "slim_terms": [
+            "5972e88f-f1e9-42b2-a130-2bb1adb13c5e"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:23.465886+00:00",
+        "phenotype_name": "Abnormality of the integument",
+        "schema_version": "1",
+        "uuid": "5972e88f-f1e9-42b2-a130-2bb1adb13c5e"
+    },
+    {
         "hpo_id": "HP:0001507",
+        "dbxrefs": [
+            "UMLS:C0262361"
+        ],
         "hpo_url": "http://purl.obolibrary.org/obo/HP_0001507",
-        "is_slim_for": "Phenotypic abnormality"
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Growth issue",
+            "Abnormal growth",
+            "Growth abnormality"
+        ],
+        "slim_terms": [
+            "52e7ecc7-3379-4f79-945d-ae8372efe354"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:24.244123+00:00",
+        "phenotype_name": "Growth abnormality",
+        "schema_version": "1",
+        "alternative_ids": [
+            "HP:0008904"
+        ],
+        "uuid": "52e7ecc7-3379-4f79-945d-ae8372efe354"
     },
     {
-        "uuid": "fb8289f6-f6b5-4dc3-b6de-b48421732c33",
-        "phenotype_name": "Neoplasm",
-        "hpo_id": "HP:0002664",
-        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002664",
-        "is_slim_for": "Phenotypic abnormality"
+        "hpo_id": "HP:0003011",
+        "dbxrefs": [
+            "UMLS:C4021745"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0003011",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Muscular abnormality"
+        ],
+        "definition": "Abnormality originating in one or more muscles, i.e., of the set of muscles of body.",
+        "slim_terms": [
+            "4d5c05c1-ebf6-421f-a96a-9e0053a632d0"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:23.592492+00:00",
+        "phenotype_name": "Abnormality of the musculature",
+        "schema_version": "1",
+        "alternative_ids": [
+            "HP:0040290",
+            "HP:0003708",
+            "HP:0003197"
+        ],
+        "uuid": "4d5c05c1-ebf6-421f-a96a-9e0053a632d0"
+    },
+    {
+        "hpo_id": "HP:0001608",
+        "dbxrefs": [
+            "UMLS:C4021776"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001608",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Voice abnormality",
+            "Abnormality of the voice"
+        ],
+        "slim_terms": [
+            "4acd1d7c-185d-4cc9-a5ae-ab449874a31f"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:24.094285+00:00",
+        "phenotype_name": "Abnormality of the voice",
+        "schema_version": "1",
+        "uuid": "4acd1d7c-185d-4cc9-a5ae-ab449874a31f"
+    },
+    {
+        "hpo_id": "HP:0025031",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0025031",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "slim_terms": [
+            "48457466-b970-43f2-80b8-8ad98bb5636e"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:22.972856+00:00",
+        "phenotype_name": "Abnormality of the digestive system",
+        "schema_version": "1",
+        "uuid": "48457466-b970-43f2-80b8-8ad98bb5636e"
+    },
+    {
+        "hpo_id": "HP:0002715",
+        "dbxrefs": [
+            "UMLS:C4021753"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002715",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Immunological abnormality",
+            "Abnormality of the immune system"
+        ],
+        "definition": "An abnormality of the immune system.",
+        "slim_terms": [
+            "304c1c04-7e26-495c-8b8a-ee3c423cea78"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-09-04T16:37:37.306593+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:25.361385+00:00"
+        },
+        "phenotype_name": "Abnormality of the immune system",
+        "schema_version": "1",
+        "alternative_ids": [
+            "HP:0003257",
+            "HP:0010986",
+            "HP:0003346"
+        ],
+        "uuid": "304c1c04-7e26-495c-8b8a-ee3c423cea78"
+    },
+    {
+        "hpo_id": "HP:0000818",
+        "dbxrefs": [
+            "MSH:D004700",
+            "UMLS:C4025823",
+            "SNOMEDCT_US:362969004",
+            "UMLS:C0014130"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000818",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "definition": "An abnormality of the endocrine system.",
+        "slim_terms": [
+            "2a0ccce5-5edf-4777-910a-cacd3c71c5f6"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-09-04T16:37:36.991191+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:21.061435+00:00"
+        },
+        "phenotype_name": "Abnormality of the endocrine system",
+        "schema_version": "1",
+        "uuid": "2a0ccce5-5edf-4777-910a-cacd3c71c5f6"
+    },
+    {
+        "hpo_id": "HP:0002086",
+        "dbxrefs": [
+            "UMLS:C4018871"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002086",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Respiratory abnormality"
+        ],
+        "definition": "An abnormality of the respiratory system, which include the airways, lungs, and the respiratory muscles.",
+        "slim_terms": [
+            "22f67013-0d5a-4fec-935e-94cec7d76d9a"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-09-04T16:37:37.611715+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:23.226521+00:00"
+        },
+        "phenotype_name": "Abnormality of the respiratory system",
+        "schema_version": "1",
+        "uuid": "22f67013-0d5a-4fec-935e-94cec7d76d9a"
+    },
+    {
+        "hpo_id": "HP:0045027",
+        "dbxrefs": [
+            "UMLS:C4022394"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0045027",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "slim_terms": [
+            "1f22c582-837a-49fb-8740-ab52d6301e60"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:24.016965+00:00",
+        "phenotype_name": "Abnormality of the thoracic cavity",
+        "schema_version": "1",
+        "uuid": "1f22c582-837a-49fb-8740-ab52d6301e60"
+    },
+    {
+        "hpo_id": "HP:0000152",
+        "dbxrefs": [
+            "UMLS:C4021817"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000152",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Abnormality of head or neck",
+            "Head and neck abnormality"
+        ],
+        "definition": "An abnormality of head and neck.",
+        "slim_terms": [
+            "16c0b141-183d-42cd-80f1-8080434d51af"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-09-04T16:37:36.295874+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:21.678673+00:00"
+        },
+        "phenotype_name": "Abnormality of head or neck",
+        "schema_version": "1",
+        "uuid": "16c0b141-183d-42cd-80f1-8080434d51af"
+    },
+    {
+        "hpo_id": "HP:0000924",
+        "dbxrefs": [
+            "UMLS:C4021790"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000924",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Skeletal anomalies",
+            "Abnormality of the skeletal system",
+            "Skeletal abnormalities"
+        ],
+        "definition": "An abnormality of the skeletal system.",
+        "slim_terms": [
+            "1262c802-99bc-4d04-a2b4-910115662bdd"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-09-04T16:37:37.711620+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:23.568454+00:00"
+        },
+        "phenotype_name": "Abnormality of the skeletal system",
+        "schema_version": "1",
+        "uuid": "1262c802-99bc-4d04-a2b4-910115662bdd"
+    },
+    {
+        "hpo_id": "HP:0001197",
+        "dbxrefs": [
+            "UMLS:C4025797"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001197",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "synonyms": [
+            "Abnormality of prenatal development or birth"
+        ],
+        "definition": "An abnormality of the fetus or the birth of the fetus, excluding structural abnormalities.",
+        "slim_terms": [
+            "06b60443-b613-4f2a-a8b5-65695d98c38e"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:22.600079+00:00",
+        "phenotype_name": "Abnormality of prenatal development or birth",
+        "schema_version": "1",
+        "uuid": "06b60443-b613-4f2a-a8b5-65695d98c38e"
+    },
+    {
+        "hpo_id": "HP:0025354",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0025354",
+        "parents": [
+            "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+        ],
+        "definition": "An anomaly of cellular morphology or physiology.",
+        "slim_terms": [
+            "03d0cb0f-7e54-4ae6-9dfb-9b4538464f33"
+        ],
+        "is_slim_for": "Phenotypic abnormality",
+        "date_created": "2019-11-12T17:13:22.153627+00:00",
+        "phenotype_name": "Abnormal cellular phenotype",
+        "schema_version": "1",
+        "uuid": "03d0cb0f-7e54-4ae6-9dfb-9b4538464f33"
+    },
+    {
+        "hpo_id": "HP:0000118",
+        "dbxrefs": [
+            "UMLS:C4021819"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000118",
+        "parents": [
+            "e92fe95e-7da0-436b-8266-533e34296c8e"
+        ],
+        "synonyms": [
+            "Organ abnormality"
+        ],
+        "definition": "A phenotypic abnormality.",
+        "date_created": "2019-09-04T20:35:25.899416+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:23.442804+00:00"
+        },
+        "phenotype_name": "Phenotypic abnormality",
+        "schema_version": "1",
+        "uuid": "1a0130d3-7f46-4a56-a57b-f89fbafe5fd1"
+    },
+    {
+        "hpo_id": "HP:0000001",
+        "dbxrefs": [
+            "UMLS:C0444868"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000001",
+        "date_created": "2019-09-04T20:35:13.223089+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:16:26.815629+00:00"
+        },
+        "phenotype_name": "All",
+        "schema_version": "1",
+        "uuid": "e92fe95e-7da0-436b-8266-533e34296c8e"
     }
 ]
