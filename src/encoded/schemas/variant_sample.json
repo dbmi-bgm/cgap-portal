@@ -488,52 +488,62 @@
                 { "field" : "variant.dbsnp_rs_number", "title": "dbSNP RS Number" }
             ]
         },
-        "DP": {
-            "title": "Coverage, VAF",
-            "aggregation_type": "stats",
-            "number_step": 1,
+        "variant.genes.genes_ensg.display_title": {
+            "title": "Gene, Transcript",
             "order": 20,
             "sort_fields": [
-                { "field" : "DP", "title" : "Coverage" },
-                { "field" : "AF", "title": "VAF" }
+                { "field": "variant.genes.genes_ensg.display_title", "title": "Gene" },
+                { "field": "variant.genes.genes_most_severe_transcript", "title": "Most Severe Transcript" }
+            ]
+        },
+        "variant.genes.genes_most_severe_hgvsc": {
+            "title": "Variant",
+            "order": 25
+        },
+        "variant.genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 30,
+            "sort_fields": [
+                { "field": "variant.genes.genes_most_severe_consequence.coding_effect", "title": "Coding Effect" }
+            ]
+        },
+        "variant.gnomad_af": {
+            "title": "gnomAD",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 35,
+            "sort_fields": [
+                { "field": "variant.gnomad_af", "title": "gnomad AF" },
+                { "field": "variant.max_pop_af_af_popmax", "title": "gnomad AF Population Max" }
+            ]
+        },
+        "variant.cadd_phred": {
+            "title": "Predictors",
+            "order": 40,
+            "sort_fields": [
+                { "field": "variant.cadd_phred", "title": "Cadd Phred Score" },
+                { "field": "variant.spliceai_maxds", "title": "SpliceAI Max DS"},
+                { "field": "variant.conservation_phylop100", "title": "PhyloP 100 Score"}
             ]
         },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Genotype",
-            "order": 21,
+            "order": 45,
             "sort_fields": [
                 { "field" : "associated_genotype_labels.proband_genotype_label", "title": "Proband GT" },
                 { "field" : "associated_genotype_labels.mother_genotype_label", "title": "Mother GT" },
                 { "field": "associated_genotype_labels.father_genotype_label", "title": "Father GT" }
             ]
         },
-        "variant.genes.genes_ensg.display_title": {
-            "title": "Gene Transcript",
-            "order": 25
-        },
-        "variant.genes.genes_most_severe_hgvsc": {
-            "title": "Variant",
-            "order": 27,
-            "sort_fields": [
-                { "field": "variant.genes.genes.most_severe_hgvsc", "title": "Most Severe HGVSC" }
-            ]
-        },
-        "variant.genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 28,
-            "sort_fields": [
-                { "fields": "variant.genes.genes_most_severe_consequence.coding_effect", "title": "Coding Effect" }
-            ]
-        },
-        "variant.gnomad_af": {
-            "title": "GnomAD",
+        "DP": {
+            "title": "Coverage, VAF",
             "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 60
-        },
-        "variant.cadd_phred": {
-            "title": "Predictors",
-            "order": 61
+            "number_step": 1,
+            "order": 50,
+            "sort_fields": [
+                { "field" : "DP", "title" : "Coverage" },
+                { "field" : "AF", "title": "VAF" }
+            ]
         },
         "bam_snapshot": {
             "title": "Genome Snapshot",

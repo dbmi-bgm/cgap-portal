@@ -17,6 +17,7 @@
         { "$ref": "mixins.json#/documents" },
         { "$ref": "mixins.json#/attribution" },
         { "$ref": "mixins.json#/static_embeds" },
+        { "$ref": "mixins.json#/tags" },
         { "$ref": "mixins.json#/accession" }
     ],
     "mixinFacets" : [
