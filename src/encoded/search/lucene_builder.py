@@ -119,6 +119,12 @@ class LuceneBuilder:
                         continue
 
                 # Build must/must_not sub-queries
+                # Example:
+                # {'bool': {'must': {'bool':
+                #   {'should': [{'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.12185956del'}},
+                #               {'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.11901816A>T'}}
+                #               ]}}}}
+                # This is a "normal" query that we must convert to a "nested" sub-query on nested_path
                 must_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_terms')
                 must_not_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_not_terms')
 
@@ -264,8 +270,12 @@ class LuceneBuilder:
                     if len(query) == 1:
                         query = query[0]
 
-                    # query with different query types ie: searching on No Value (exists) OR field=value (match)
-                    # note that this kind of query is nonsense because of our query structure (always gives no results)
+                    # Handle queries with different query types ie: exists + match
+                    # Note: this kind of query will always return no results when combined with No value,
+                    # since the truth values are computed in separate clauses (in ES6). This limitation is
+                    # not ideal but needs a more well thought out solution.
+                    # TODO: refactor nested into normal query building step (not post-pass)
+                    # (always gives no results)
                     else:
                         inner_query = []
                         for _q in query:
@@ -639,18 +649,17 @@ class LuceneBuilder:
             cls._check_and_remove(compare_field, facet_filters, active_filter, query_field, filter_type)
 
     @classmethod
-    def _inspect_should_for_match(cls, query_options, facet_filters, active_filter, query_field,
-                                  filter_type):
-        removed = False
+    def _check_and_remove_match_from_should(cls, query_options, facet_filters, active_filter, query_field,
+                                            filter_type):
+        """ Helper function that searches a MATCH query for the given query_field, removing the
+            active filter if found.
+        """
         for inner_query in query_options:
-            if removed:
-                break
             if MATCH in inner_query:
                 for field in inner_query.get(MATCH, {}).keys():  # should be only one per block
                     if cls._check_and_remove(field, facet_filters, active_filter, query_field,
                                              filter_type):
-                        removed = True
-                        break
+                        return
             else:
                 search_log(log_handler=log, msg='Encountered a unexpected nested structure in '
                                                 'query: %s' % inner_query)
@@ -684,8 +693,8 @@ class LuceneBuilder:
                     elif isinstance(nested_option, str):
                         inner_bool = nested_sub_query[BOOL].get(inner_filter_type, {})
                         if SHOULD in inner_bool:
-                            cls._inspect_should_for_match(inner_bool[SHOULD], facet_filters, active_filter,
-                                                          query_field, filter_type)
+                            cls._check_and_remove_match_from_should(inner_bool[SHOULD], facet_filters, active_filter,
+                                                                    query_field, filter_type)
 
                         # For structure like this:
                         # {'bool': {'should': [
@@ -694,8 +703,8 @@ class LuceneBuilder:
                         elif BOOL in inner_bool:
                             inner_inner_bool = inner_bool[BOOL]
                             if SHOULD in inner_inner_bool:
-                                cls._inspect_should_for_match(inner_inner_bool[SHOULD], facet_filters, active_filter,
-                                                              query_field, filter_type)
+                                cls._check_and_remove_match_from_should(inner_inner_bool[SHOULD], facet_filters, active_filter,
+                                                                        query_field, filter_type)
 
                     else:
                         search_log(log_handler=log, msg='Encountered a unexpected nested structure at top level: %s'
