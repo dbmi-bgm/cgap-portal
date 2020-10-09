@@ -2885,6 +2885,7 @@
             "type": "array",
             "items": {
                 "title": "hg19 Coordinates",
+                "nested_enabled": true,
                 "type": "object",
                 "properties": {
                     "hg19_hgvsg": {
