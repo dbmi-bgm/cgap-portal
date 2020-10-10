@@ -315,7 +315,7 @@ export const columnExtensionMap = {
     /** "Bioinformatics" column title */
     'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
-            const { '@id' : resultHrefPath, sample = null, sample_processing = null } = result;
+            const { '@id' : resultHrefPath, sample = null, sample_processing = null, vcf_file = null } = result;
             if (!sample_processing) return null; // Unsure if possible, but fallback to null / '-' in case so (not showing datetitle etc)
             const {
                 analysis_type: mainTitle = null,
@@ -323,7 +323,7 @@ export const columnExtensionMap = {
             } = sample_processing;
             const {
                 files = [],
-                processed_files = []
+                // processed_files = []
             } = sample || {};
 
             let status = null;
@@ -343,22 +343,16 @@ export const columnExtensionMap = {
                 }
             }
 
-            // If fastQs are present...
+            // If fastQs are present... check if ingested
             if (status === "in progress") {
-                // Check if VCFs have been ingested & if QCs passed
-                for (let j = 0; j < processed_files.length; j++) {
-                    const procFile = processed_files[j];
-                    const { file_ingestion_status: ingestionStatus = null, file_format = null } = procFile || {};
-                    const { file_format: fileType } = file_format || {};
-                    if ((fileType === "vcf_gz" || fileType === "gvcf_gz")
-                        && ingestionStatus === "Ingested") {
-                        statusTip = "Variants are ingested";
-                        status = "complete";
-
-                        // TODO: Add QC status from overall QC status once implemented
-                    } // Else, not VCF or not yet ingested, ignore
+                const { file_ingestion_status: ingestionStatus = null } = vcf_file || {};
+                if (ingestionStatus && ingestionStatus === "Ingested") {
+                    statusTip = "Variants are ingested";
+                    status = "complete";
                 }
             }
+
+            // Check if overall QCs passed (not yet implemented) -- to add later
 
             // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
@@ -467,11 +461,12 @@ export const columnExtensionMap = {
         }
     },
     'bam_snapshot': {
+        'noSort' : true,
         'render' : function(result, props) {
             const { bam_snapshot = null, uuid = null } = result;
             if (bam_snapshot) {
                 return (
-                    <div className="mx-auto">
+                    <div className="mx-auto text-truncate">
                         <a target="_blank" rel="noreferrer" href={`/${uuid}/@@download`}>
                             View BAM Snapshot
                         </a>

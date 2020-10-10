@@ -169,7 +169,6 @@ class Case(Item):
         "sample.files.status",
         "sample.completed_processes",
         "sample.processed_files.file_format.file_format",
-        "sample.processed_files.file_ingestion_status",
         "sample.processed_files.quality_metric.quality_metric_summary.sample",
         "sample.processed_files.quality_metric.quality_metric_summary.title",
         "sample.processed_files.quality_metric.quality_metric_summary.value",
@@ -219,7 +218,8 @@ class Case(Item):
         "active_filterset.filter_blocks.flags_applied",
         "active_filterset.flags",
         "cohort.filter_set.*",
-        "project.name"
+        "project.name",
+        "vcf_file.file_ingestion_status"
     ]
 
     @calculated_property(schema={
