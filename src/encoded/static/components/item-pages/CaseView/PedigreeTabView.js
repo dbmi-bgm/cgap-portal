@@ -101,16 +101,12 @@ export function usePhenotypicFeatureStrings(currFamily){
                 selectedDiseaseOrder[diseaseStr] = idx;
             });
 
-            return gatherPhenotypicFeatureItems(currFamily).sort(function({ display_title: a }, { display_title: b }){
-                if (typeof selectedDiseaseOrder[a] === "number" && typeof selectedDiseaseOrder[b] !== "number") {
-                    return -1;
-                }
-                if (typeof selectedDiseaseOrder[a] !== "number" && typeof selectedDiseaseOrder[b] === "number") {
-                    return 1;
-                }
-                if (typeof selectedDiseaseOrder[a] === "number" && typeof selectedDiseaseOrder[b] === "number") {
-                    return selectedDiseaseOrder[a] - selectedDiseaseOrder[b];
-                }
+            return gatherPhenotypicFeatureItems(currFamily).sort(function({ display_title: titleA }, { display_title: titleB }){
+                const a = selectedDiseaseOrder[titleA];
+                const b = selectedDiseaseOrder[titleB];
+                if (typeof a === "number" && typeof b !== "number") return -1;
+                if (typeof a !== "number" && typeof b === "number") return 1;
+                if (typeof a === "number" && typeof b === "number") return a - b;
                 return 0;
             });
         },
