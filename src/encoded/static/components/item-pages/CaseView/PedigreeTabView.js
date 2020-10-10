@@ -97,6 +97,7 @@ export function usePhenotypicFeatureStrings(currFamily){
         function(){
             const selectedDiseaseOrder = {};
             contextPhenotypicFeatureStrings.forEach(function(diseaseStr, idx){
+                // Normally is 1-based ordering for these but doesn't matter here as just for sorting availableDiseases.
                 selectedDiseaseOrder[diseaseStr] = idx;
             });
 
@@ -245,10 +246,11 @@ const SelectDiseasesDropdown = React.memo(function SelectDiseasesDropdown(props)
         return null;
     }
 
-    // `selectedDiseases` is passed down to PedigreeViz and assigned data-disease-index by order of its contents.
+    // `selectedDiseases` is passed down to PedigreeViz and assigned data-disease-index by array order.
     // So we must do same here for consistency.
     const selectedMap = {};
     selectedDiseases.forEach(function(sD, index){
+        // Ordering of `data-disease-index` (and color assignments) start from 1; +1 selectedDisease index.
         selectedMap[sD] = index + 1;
     });
 
