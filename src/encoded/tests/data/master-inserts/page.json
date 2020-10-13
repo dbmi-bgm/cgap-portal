@@ -16,7 +16,7 @@
         "name": "help/portal_ontology_usage",
         "uuid": "dc5305dc-9b1c-461e-872d-6810d98e6fa5",
         "title": "Ontology Usage",
-        "status": "shared",
+        "status": "current",
         "aliases": ["hdmi-dbmi:ontology_help_usage"],
         "content": [
             "76a1471a-a9cd-4192-a965-470e241308e3"

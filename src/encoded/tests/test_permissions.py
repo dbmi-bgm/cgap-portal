@@ -461,11 +461,6 @@ def test_public_item_wo_project_cannot_be_patched_by_project_member(bgm_user_tes
     assert bgm_user_testapp.patch_json(public_static_section['@id'], {'name': name2patch}, status=403)
 
 
-""" The current permissions behavior is to allow a project user to create an item of that type but if status
-    is public then project members cannot patch - is this the desired behavior?
-"""
-
-
 def test_public_item_w_project_cannot_be_patched_by_project_member(testapp, bgm_user_testapp, bgm_project, public_static_section):
     testapp.patch_json(public_static_section['@id'], {'project': bgm_project['@id']}, status=200)
     name2patch = 'patch name'
