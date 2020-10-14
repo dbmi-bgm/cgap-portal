@@ -47,11 +47,12 @@ ABBREVS = {
     'p': 'proband',
     'mth': 'mother',
     'fth': 'father',
-    'sf': 'sibling'
+    'sf': 'sibling',
+    'full sibling': 'sibling'
 }
 
 
-RELATIONS = ['proband', 'mother', 'father', 'sibling', 'brother', 'sister']
+RELATIONS = ['proband', 'mother', 'father', 'sibling', 'full sibling', 'brother', 'sister']
 
 REQUIRED_COLUMNS = ['individual id', 'relation to proband', 'report required', 'analysis id', 'specimen id']
 
@@ -186,6 +187,12 @@ def replace_cell_contents(info_dict, field, **kwargs):
         info_dict[field] = kwargs[existing]
 
 
+def remove_spaces_in_id(id_value):
+    if not id_value:
+        return None
+    return id_value.replace(' ', '_')
+
+
 class MetadataItem:
     """
     class for single DB-item-worth of json
@@ -211,11 +218,11 @@ class SubmissionRow:
         self.row = idx
         self.errors = []
         if not self.found_missing_values():
-            self.indiv_alias = '{}:individual-{}'.format(project, row['individual id'])
+            self.indiv_alias = '{}:individual-{}'.format(project, remove_spaces_in_id(row['individual id']))
             self.fam_alias = family_alias
-            self.sample_alias = '{}:sample-{}'.format(project, row['specimen id'])
-            self.analysis_alias = '{}:analysis-{}'.format(project, row['analysis id'])
-            self.case_name = row.get('unique analysis id')
+            self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(row['specimen id']))
+            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row['analysis id']))
+            self.case_name = remove_spaces_in_id(row.get('unique analysis id'))
             self.report_required = False
             self.individual = self.extract_individual_metadata()
             self.family = self.extract_family_metadata()
@@ -244,7 +251,7 @@ class SubmissionRow:
         info = map_fields(self.metadata, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
         other_id_col = get_column_name(self.metadata, ['other id', 'other individual id'])
         if self.metadata.get(other_id_col):  # for 'other_id' sub-embedded object
-            other_id = {'id': self.metadata[other_id_col], 'id_source': self.institution}
+            other_id = {'id': remove_spaces_in_id(self.metadata[other_id_col]), 'id_source': self.institution}
             if self.metadata.get('other individual id type'):
                 other_id['id_source'] = self.metadata['other individual id source']
             else:
@@ -271,13 +278,13 @@ class SubmissionRow:
         if not info['family_id']:
             alias = self.project + ":" + self.fam_alias if ':' not in self.fam_alias else self.fam_alias
             info['family_id'] = alias[alias.index(':') + 1:]
-        valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
+        # valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
         relation_found = False
-        for relation in valid_relations:
+        for relation in RELATIONS:
             if self.metadata.get('relation to proband', '').lower().startswith(relation):
                 relation_found = True
-                if relation in ['brother', 'sister', 'sibling']:
-                    info[relation] = [self.indiv_alias]
+                if relation in ['full sibling', 'sibling', 'brother', 'sister']:
+                    info[relation.split()[-1]] = [self.indiv_alias]
                 else:
                     info[relation] = self.indiv_alias
                 break
@@ -598,7 +605,7 @@ class SubmissionMetadata:
         """
         if all(field in row_item.metadata for field in ['analysis id', 'unique analysis id', 'specimen id']):
             key = '{}-{}'.format(row_item.metadata['analysis id'], row_item.metadata['specimen id'])
-            self.case_names[key] = (row_item.metadata['unique analysis id'], row_item.fam_alias)
+            self.case_names[key] = (remove_spaces_in_id(row_item.metadata['unique analysis id']), row_item.fam_alias)
 
     def add_individual_relations(self):
         """
@@ -898,6 +905,7 @@ def validate_all_items(virtualapp, json_data):
                     alias_dict[alias] = db_result['@id']
                     db_results[alias] = db_result
             for alias in json_data[itemtype]:
+                print(alias)
                 data = json_data[itemtype][alias].copy()
                 row = data.get('row')
                 if row:
