@@ -223,7 +223,6 @@ class SubmissionRow:
             self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(row['specimen id']))
             self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row['analysis id']))
             self.case_name = remove_spaces_in_id(row.get('unique analysis id'))
-            self.report_required = False
             self.individual = self.extract_individual_metadata()
             self.family = self.extract_family_metadata()
             self.sample, self.analysis = self.extract_sample_metadata()
@@ -278,7 +277,6 @@ class SubmissionRow:
         if not info['family_id']:
             alias = self.project + ":" + self.fam_alias if ':' not in self.fam_alias else self.fam_alias
             info['family_id'] = alias[alias.index(':') + 1:]
-        # valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
         relation_found = False
         for relation in RELATIONS:
             if self.metadata.get('relation to proband', '').lower().startswith(relation):
@@ -291,7 +289,7 @@ class SubmissionRow:
         if not relation_found:
             msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
                 self.row, self.metadata.get('relation to proband'), self.metadata.get('individual id'),
-                ', '.join(valid_relations)
+                ', '.join(RELATIONS)
             )
             self.errors.append(msg)
         return MetadataItem(info, self.row, 'family')
@@ -331,8 +329,6 @@ class SubmissionRow:
             'samples': [self.sample_alias],
             'families': [self.fam_alias]
         }
-        if self.metadata.get('report required').lower().startswith('y'):
-            self.report_required = True
         return (MetadataItem(info, self.row, 'sample'),
                 MetadataItem(new_sp_item, self.row, 'sample_processing'))
 
@@ -511,7 +507,6 @@ class SubmissionMetadata:
                 if key not in previous[item.alias]:
                     previous[item.alias][key] = item.metadata[key]
 
-    #def extract_family_metadata(idx, row, items, indiv_alias, fam_alias):
     def add_family_metadata(self, idx, family, individual):
         """
         Looks at 'family' metadata from SubmissionRow object. Adds family to SubmissionMetadata
@@ -570,10 +565,11 @@ class SubmissionMetadata:
             for sample in v['samples']:
                 case_id = '{}-{}'.format(analysis_id, self.samples[sample].get('specimen_accession', ''))
                 name = False
+                case_name = case_id
                 if case_id in self.case_names and self.case_names[case_id][0]:
                     name = True
-                    case_id = self.case_names[case_id][0]
-                case_alias = '{}:case-{}'.format(self.project, case_id)
+                    case_name = self.case_names[case_id][0]
+                case_alias = '{}:case-{}'.format(self.project, case_name)
                 try:
                     indiv = [ikey for ikey, ival in self.individuals.items() if sample in ival.get('samples', [])][0]
                 except IndexError:
@@ -584,14 +580,16 @@ class SubmissionMetadata:
                         case_info['family'] = fam
                         break
                 if name:
-                    case_info['case_id'] = case_id
-                if sample in self.reports_req:
+                    case_info['case_id'] = case_name
+                # if report is True for that particular case, create report item
+                if case_id in self.case_names and self.case_names[case_id][2]:
                     report_alias = case_alias.replace('case', 'report')
                     report_info = {'aliases': [report_alias]}
                     if indiv:
-                        report_info['description'] = ('Analysis Report for Individual ID {}'
-                                                      ' (Analysis {})'.format(self.individuals[indiv]['individual_id'], analysis_id)
-                                                        )
+                        report_info['description'] = (
+                            'Analysis Report for Individual ID {}'
+                            ' (Analysis {})'.format(self.individuals[indiv]['individual_id'], analysis_id)
+                        )
                     else:
                         report_info['description'] = 'Analysis Report for Case ID {}'.format(case_id)
                     case_info['report'] = report_alias
@@ -603,9 +601,13 @@ class SubmissionMetadata:
         Creates a dictionary linking analysis ID and specimen ID combination to the Case name
         indicated in the spreadsheet.
         """
-        if all(field in row_item.metadata for field in ['analysis id', 'unique analysis id', 'specimen id']):
+        if all(field in row_item.metadata for field in ['analysis id', 'specimen id']):
             key = '{}-{}'.format(row_item.metadata['analysis id'], row_item.metadata['specimen id'])
-            self.case_names[key] = (remove_spaces_in_id(row_item.metadata['unique analysis id']), row_item.fam_alias)
+            if row_item.metadata.get('report required', '').lower().startswith('y'):
+                report = True
+            else:
+                report = False
+            self.case_names[key] = (remove_spaces_in_id(row_item.metadata.get('unique analysis id')), row_item.fam_alias, report)
 
     def add_individual_relations(self):
         """
@@ -648,8 +650,6 @@ class SubmissionMetadata:
                     self.add_metadata_single_item(item)
                 self.add_family_metadata(processed_row.row, processed_row.family, processed_row.individual)
                 self.add_sample_processing(processed_row.analysis, processed_row.metadata.get('analysis id'))
-                if processed_row.report_required:
-                    self.reports_req.append(processed_row.sample_alias)
                 self.add_case_info(processed_row)
                 self.errors.extend(processed_row.errors)
             except AttributeError:
@@ -905,7 +905,6 @@ def validate_all_items(virtualapp, json_data):
                     alias_dict[alias] = db_result['@id']
                     db_results[alias] = db_result
             for alias in json_data[itemtype]:
-                print(alias)
                 data = json_data[itemtype][alias].copy()
                 row = data.get('row')
                 if row:
