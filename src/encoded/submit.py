@@ -51,8 +51,9 @@ ABBREVS = {
     'full sibling': 'sibling'
 }
 
+SIBLINGS = ['sibling', 'brother', 'sister', 'full sibling', 'full brother', 'full sister']
 
-RELATIONS = ['proband', 'mother', 'father', 'sibling', 'full sibling', 'brother', 'sister']
+RELATIONS = SIBLINGS + ['proband', 'mother', 'father']
 
 REQUIRED_COLUMNS = ['individual id', 'relation to proband', 'report required', 'analysis id', 'specimen id']
 
@@ -281,7 +282,7 @@ class SubmissionRow:
         for relation in RELATIONS:
             if self.metadata.get('relation to proband', '').lower().startswith(relation):
                 relation_found = True
-                if relation in ['full sibling', 'sibling', 'brother', 'sister']:
+                if relation in SIBLINGS:
                     info[relation.split()[-1]] = [self.indiv_alias]
                 else:
                     info[relation] = self.indiv_alias
@@ -619,7 +620,7 @@ class SubmissionMetadata:
                 if family.get(parent):
                     if family.get('proband'):
                         self.individuals[family['proband']][parent] = family[parent]
-                    for term in ['sibling', 'brother', 'sister']:
+                    for term in SIBLINGS:
                         if family.get(term):
                             for sibling in family[term]:
                                 self.individuals[sibling][parent] = family[parent]
