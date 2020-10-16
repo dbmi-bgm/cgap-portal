@@ -51,11 +51,23 @@ ABBREVS = {
     'full sibling': 'sibling'
 }
 
-SIBLINGS = ['sibling', 'brother', 'sister', 'full sibling', 'full brother', 'full sister']
+# SS at end refers to spreadsheet, to distinguish from prop names in schema if we need
+# vars for those at any point.
+INDIV_ID_SS = 'individual id'
+SAMPLE_ID_SS = 'specimen id'
+ANALYSIS_ID_SS = 'analysis id'
+RELATION_SS = 'relation to proband'
+REPORT_REQ_SS = 'report required'
+
+REQUIRED_CASE_COLS = [ANALYSIS_ID_SS, SAMPLE_ID_SS]
+REQUIRED_COLUMNS =  REQUIRED_CASE_COLS + [INDIV_ID_SS, RELATION_SS, REPORT_REQ_SS]
+
+# half-siblings not currently supported, because pedigree info is needed to know
+# which parent is shared. Can come back to this after pedigree processing is integrated.
+SIBLINGS = ['sibling', 'brother', 'sister',
+            'full sibling', 'full brother', 'full sister']
 
 RELATIONS = SIBLINGS + ['proband', 'mother', 'father']
-
-REQUIRED_COLUMNS = ['individual id', 'relation to proband', 'report required', 'analysis id', 'specimen id']
 
 POST_ORDER = [
     'file_fastq', 'file_processed', 'sample', 'individual',
@@ -219,10 +231,10 @@ class SubmissionRow:
         self.row = idx
         self.errors = []
         if not self.found_missing_values():
-            self.indiv_alias = '{}:individual-{}'.format(project, remove_spaces_in_id(row['individual id']))
+            self.indiv_alias = '{}:individual-{}'.format(project, remove_spaces_in_id(row[INDIV_ID_SS]))
             self.fam_alias = family_alias
-            self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(row['specimen id']))
-            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row['analysis id']))
+            self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(row[SAMPLE_ID_SS]))
+            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row[ANALYSIS_ID_SS]))
             self.case_name = remove_spaces_in_id(row.get('unique analysis id'))
             self.individual = self.extract_individual_metadata()
             self.family = self.extract_family_metadata()
@@ -280,16 +292,16 @@ class SubmissionRow:
             info['family_id'] = alias[alias.index(':') + 1:]
         relation_found = False
         for relation in RELATIONS:
-            if self.metadata.get('relation to proband', '').lower().startswith(relation):
+            if self.metadata.get(RELATION_SS, '').lower().startswith(relation):
                 relation_found = True
                 if relation in SIBLINGS:
-                    info[relation.split()[-1]] = [self.indiv_alias]
+                    info['sibling'] = [self.indiv_alias]
                 else:
                     info[relation] = self.indiv_alias
                 break
         if not relation_found:
             msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
-                self.row, self.metadata.get('relation to proband'), self.metadata.get('individual id'),
+                self.row, self.metadata.get(RELATION_SS), self.metadata.get(INDIV_ID_SS),
                 ', '.join(RELATIONS)
             )
             self.errors.append(msg)
@@ -418,10 +430,10 @@ class SubmissionMetadata:
         self.institution = institution.get('name')
         self.institution_atid = institution.get('@id')
         self.counter = counter
-        self.proband_rows = [row for row in rows if row.get('relation to proband').lower() == 'proband']
+        self.proband_rows = [row for row in rows if row.get(RELATION_SS).lower() == 'proband']
         self.family_dict = {
-            row.get('analysis id'): '{}:family-{}'.format(
-                self.project, row.get('individual id')
+            row.get(ANALYSIS_ID_SS): '{}:family-{}'.format(
+                self.project, row.get(INDIV_ID_SS)
             ) for row in self.proband_rows
         }
         self.metadata = []
@@ -471,10 +483,10 @@ class SubmissionMetadata:
         analysis_relations = {}
         analysis_types = {}
         for row in self.rows:
-            analysis_relations.setdefault(row.get('analysis id'), [[], []])
-            analysis_relations[row.get('analysis id')][0].append(row.get('relation to proband', '').lower())
+            analysis_relations.setdefault(row.get(ANALYSIS_ID_SS), [[], []])
+            analysis_relations[row.get(ANALYSIS_ID_SS)][0].append(row.get(RELATION_SS, '').lower())
             workup_col = get_column_name(row, ['test requested', 'workup type'])
-            analysis_relations[row.get('analysis id')][1].append(row.get(workup_col, '').upper())
+            analysis_relations[row.get(ANALYSIS_ID_SS)][1].append(row.get(workup_col, '').upper())
             # dict now has format {analysis id: (relations list, workup types list)}
         for k, v in analysis_relations.items():
             workups = list(set(v[1]))
@@ -522,9 +534,9 @@ class SubmissionMetadata:
             for relation in RELATIONS:
                 if family.metadata.get(relation):
                     if relation in self.families[family.alias]:
-                        if relation in ['brother', 'sister', 'sibling']:
+                        if relation in SIBLINGS:
                             if individual.alias not in self.families[family.alias][relation]:
-                                self.families[family.alias][relation].extend(family.metadata[relation])
+                                self.families[family.alias]['sibling'].extend(family.metadata[relation])
                         elif self.families[family.alias][relation] != individual.alias:
                             msg = ('Row {} - Multiple values for relation "{}" in family {}'
                                    ' found in spreadsheet'.format(idx, relation, family.metadata['family_id']))
@@ -625,7 +637,7 @@ class SubmissionMetadata:
                             for sibling in family[term]:
                                 self.individuals[sibling][parent] = family[parent]
                     del family[parent]
-            for term in ['sibling', 'brother', 'sister']:
+            for term in SIBLINGS:
                 if family.get(term):
                     del family[term]
 
