@@ -600,8 +600,8 @@ class SubmissionMetadata:
                     report_info = {'aliases': [report_alias]}
                     if indiv:
                         report_info['description'] = (
-                            'Analysis Report for Individual ID {}'
-                            ' (Analysis {})'.format(self.individuals[indiv]['individual_id'], analysis_id)
+                            'Analysis Report for Individual ID {} (Analysis {})'
+                            .format(self.individuals[indiv]['individual_id'], analysis_id)
                         )
                     else:
                         report_info['description'] = 'Analysis Report for Case ID {}'.format(case_id)
@@ -614,8 +614,9 @@ class SubmissionMetadata:
         Creates a dictionary linking analysis ID and specimen ID combination to the Case name
         indicated in the spreadsheet.
         """
-        if all(field in row_item.metadata for field in ['analysis id', 'specimen id']):
-            key = '{}-{}'.format(row_item.metadata['analysis id'], row_item.metadata['specimen id'])
+        if all(field in row_item.metadata
+               for field in REQUIRED_CASE_COLS):
+            key = '{}-{}'.format(row_item.metadata[ANALYSIS_ID_SS], row_item.metadata[SAMPLE_ID_SS])
             if row_item.metadata.get('report required', '').lower().startswith('y'):
                 report = True
             else:
