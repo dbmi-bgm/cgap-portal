@@ -790,10 +790,19 @@ class TestNestedSearch(object):
                     '&hg19.hg19_hgvsg=No+value', status=404)
 
     def test_search_nested_with_non_nested_fields(self, workbook, testapp):
-        """ Tests that combining a nested search with a non-nested one works in any order """
+        """ Tests that combining a nested search with a non-nested one works in any order
+            NOTE: this test used to be broken due to incorrect behavior with No+value.
+            It is assumed that if you are selecting on a facet positively or negatively that
+            you only want to consider items that have the field defined. Previously we would not enforce
+            this and have queries like this match variants that do not have an hg19 field.
+        """
+        testapp.get('/search/?type=Variant'
+                    '&hg19.hg19_pos!=11720331'
+                    '&POS=88832', status=404)
+        testapp.get('/search/?type=Variant'
+                    '&POS=88832&hg19.hg19_pos!=11720331', status=404)
         res = testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_pos!=11720331'
-                          '&POS=88832').follow().json
+                          '&POS=88832&hg19.hg19_pos!=11720331&hg19.hg19_pos=No+value').follow().json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
 

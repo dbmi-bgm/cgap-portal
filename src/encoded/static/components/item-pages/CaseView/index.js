@@ -66,7 +66,7 @@ export default class CaseView extends DefaultItemView {
      */
     getControllers(){
         return [
-            CurrentFamilyController,
+            CurrentFamilyController, // <- This passes down props.currFamily into PedigreeTabViewOptionsController. Could possibly change to just use context.family now.
             PedigreeTabViewOptionsController
         ];
     }

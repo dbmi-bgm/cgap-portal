@@ -5,7 +5,6 @@
         "description": "Core Project for all items that are in general use",
         "status": "current",
         "name": "hms-dbmi",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "date_created": "2020-07-15T02:26:28.509115+00:00"
     },
     {
@@ -15,7 +14,6 @@
         "status": "current",
         "name": "brigham-genomic-medicine",
         "aliases": ["hms-dbmi:BGM"],
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "date_created": "2020-07-21T17:19:17.058289+00:00"
     }
 ]

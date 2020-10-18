@@ -119,23 +119,27 @@ class LuceneBuilder:
                         continue
 
                 # Build must/must_not sub-queries
+                # Example:
+                # {'bool': {'must': {'bool':
+                #   {'should': [{'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.12185956del'}},
+                #               {'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.11901816A>T'}}
+                #               ]}}}}
+                # This is a "normal" query that we must convert to a "nested" sub-query on nested_path
                 must_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_terms')
                 must_not_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_not_terms')
 
-                # XXX: BREAKING ES 6 CHANGE
-                # MUST -> MUST_NOT EXISTS does not work?
-                # Have to use EXISTS under MUST_NOT
+                # XXX: In ES6, MUST -> MUST_NOT EXISTS does not work - have to use EXISTS under MUST_NOT
+                # This means you cannot search on field=value or field DNE
                 if filters['add_no_value'] is True:  # when searching on 'No Value'
-                    should_arr = [must_terms] if must_terms else []
+                    should_arr = [must_not_terms] if must_not_terms else []
                     should_arr.append({BOOL: {MUST: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
                     must_not_filters_nested.append((query_field, should_arr))
-                elif filters['add_no_value'] is False:  # when not searching on 'No Value'
+                    if must_terms: must_filters_nested.append((query_field, must_terms))
+                else:  # when not searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
                     should_arr.append({EXISTS: {FIELD: query_field}})   # field=value OR field EXISTS
                     must_filters_nested.append((query_field, should_arr))
-                else:
-                    if must_terms: must_filters_nested.append((query_field, must_terms))
-                if must_not_terms: must_not_filters_nested.append((query_field, must_not_terms))
+                    if must_not_terms: must_not_filters_nested.append((query_field, must_not_terms))
 
             # if we are not nested, handle this with 'terms' query like usual
             else:
@@ -265,12 +269,36 @@ class LuceneBuilder:
                 if type(query) == list:
                     if len(query) == 1:
                         query = query[0]
+
+                    # Handle queries with different query types ie: exists + match
+                    # Note: this kind of query will always return no results when combined with No value,
+                    # since the truth values are computed in separate clauses (in ES6). This limitation is
+                    # not ideal but needs a more well thought out solution.
+                    # TODO: refactor nested into normal query building step (not post-pass)
+                    # (always gives no results)
                     else:
-                        raise QueryConstructionException(
-                            query_type='nested',
-                            func='handle_nested_filters',
-                            msg='Malformed entry on query field: %s' % query
-                        )
+                        inner_query = []
+                        for _q in query:
+                            if BOOL in _q:
+                                inner = _q[BOOL].get(key, [])
+                            else:
+                                inner = _q
+                            if isinstance(inner, list):
+                                inner_query += inner
+                            else:
+                                inner_query.append(inner)
+                        if inner_query:
+                            final_filters[BOOL][key].append({
+                                NESTED: {
+                                    PATH: nested_path,
+                                    QUERY: {
+                                        BOOL: {
+                                            MUST: inner_query
+                                        }
+                                    }
+                                }
+                            })
+                        continue
 
                 # if there is no boolean clause in this sub-query, add it directly to final_filters
                 # otherwise continue logic below
@@ -621,6 +649,22 @@ class LuceneBuilder:
             cls._check_and_remove(compare_field, facet_filters, active_filter, query_field, filter_type)
 
     @classmethod
+    def _check_and_remove_match_from_should(cls, query_options, facet_filters, active_filter, query_field,
+                                            filter_type):
+        """ Helper function that searches a MATCH query for the given query_field, removing the
+            active filter if found.
+        """
+        for inner_query in query_options:
+            if MATCH in inner_query:
+                for field in inner_query.get(MATCH, {}).keys():  # should be only one per block
+                    if cls._check_and_remove(field, facet_filters, active_filter, query_field,
+                                             filter_type):
+                        return
+            else:
+                search_log(log_handler=log, msg='Encountered a unexpected nested structure in '
+                                                'query: %s' % inner_query)
+
+    @classmethod
     def _check_and_remove_nested(cls, facet_filters, active_filter, query_field, filter_type):
         """ Helper function for _remove_from_active_filters that handles filter removal for nested query """
         nested_sub_query = active_filter[NESTED][QUERY]
@@ -649,15 +693,19 @@ class LuceneBuilder:
                     elif isinstance(nested_option, str):
                         inner_bool = nested_sub_query[BOOL].get(inner_filter_type, {})
                         if SHOULD in inner_bool:
-                            for inner_query in inner_bool[SHOULD]:
-                                if MATCH in inner_query:
-                                    for field in inner_query.get(MATCH, {}).keys():  # should be only one per block
-                                        if cls._check_and_remove(field, facet_filters, active_filter, query_field,
-                                                                 filter_type):
-                                            break
-                                else:
-                                    search_log(log_handler=log, msg='Encountered a unexpected nested structure in '
-                                                                    'query: %s' % inner_query)
+                            cls._check_and_remove_match_from_should(inner_bool[SHOULD], facet_filters, active_filter,
+                                                                    query_field, filter_type)
+
+                        # For structure like this:
+                        # {'bool': {'should': [
+                        #    {'match': {'embedded.variant.genes.genes_most_severe_consequence.impact.raw': 'MODIFIER'}},
+                        #    {'match': {'embedded.variant.genes.genes_most_severe_consequence.impact.raw': 'LOW'}}]}}
+                        elif BOOL in inner_bool:
+                            inner_inner_bool = inner_bool[BOOL]
+                            if SHOULD in inner_inner_bool:
+                                cls._check_and_remove_match_from_should(inner_inner_bool[SHOULD], facet_filters, active_filter,
+                                                                        query_field, filter_type)
+
                     else:
                         search_log(log_handler=log, msg='Encountered a unexpected nested structure at top level: %s'
                                                         % nested_sub_query[BOOL])
