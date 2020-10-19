@@ -546,6 +546,10 @@ class IngestionListener:
                 debuglog("Deleted messages")
                 break
 
+    def set_status(self, uuid, status):
+        """ Sets the file_ingestion_status of the given uuid """
+        self.vapp.patch_json('/' + uuid, {'file_ingestion_status': status})
+
     @staticmethod
     def build_variant_link(variant):
         """ This function takes a variant record and returns the corresponding UUID of this variant
@@ -748,7 +752,7 @@ class IngestionListener:
 
                 # gunzip content, pass to parser, post variants/variant_samples
                 # patch in progress status
-                self.vapp.patch_json('/' + uuid, {'file_ingestion_status': STATUS_IN_PROGRESS})
+                self.set_status(uuid, STATUS_IN_PROGRESS)
                 decoded_content = gunzip_content(raw_content)
                 log.info('Got decoded content: %s' % decoded_content[:20])
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
@@ -759,9 +763,9 @@ class IngestionListener:
                 if error > 0:
                     log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
                               'as ingested.' % uuid)
-                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': STATUS_ERROR})
+                    self.set_status(uuid, STATUS_ERROR)
                 else:
-                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': STATUS_INGESTED})
+                    self.set_status(uuid, STATUS_INGESTED)
 
                 # report results in error_log regardless of status
                 msg = ('INGESTION_REPORT:\n'
