@@ -629,10 +629,11 @@ class SubmissionMetadata:
         if all(field in row_item.metadata
                for field in REQUIRED_CASE_COLS):
             key = '{}-{}'.format(row_item.metadata[ANALYSIS_ID_SS], row_item.metadata[SAMPLE_ID_SS])
+            case_id_col = get_column_name(row_item.metadata, ['unique analysis id', 'case id'])
             self.case_names[key] = {
-                'case id': remove_spaces_in_id(row_item.metadata.get('unique analysis id')),
+                'case id': remove_spaces_in_id(row_item.metadata.get(case_id_col)),
                 'family': row_item.fam_alias,
-                'report req': is_yes_value(row_item.metadata.get('report required', ''))
+                'report req': is_yes_value(row_item.metadata.get(REPORT_REQ_SS, ''))
             }
 
     def add_individual_relations(self):
