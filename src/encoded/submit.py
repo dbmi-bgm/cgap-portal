@@ -576,12 +576,12 @@ class SubmissionMetadata:
         for k, v in self.sample_processings.items():
             analysis_id = k[k.index('analysis-')+9:]
             for sample in v['samples']:
-                case_id = '{}-{}'.format(analysis_id, self.samples[sample].get('specimen_accession', ''))
+                case_key = '{}-{}'.format(analysis_id, self.samples[sample].get('specimen_accession', ''))
                 name = False
-                case_name = case_id
-                if case_id in self.case_names and self.case_names[case_id][0]:
+                case_name = case_key
+                if case_key in self.case_names and self.case_names[case_key]['case id']:
                     name = True
-                    case_name = self.case_names[case_id][0]
+                    case_name = self.case_names[case_key]['case id']
                 case_alias = '{}:case-{}'.format(self.project, case_name)
                 try:
                     indiv = [ikey for ikey, ival in self.individuals.items() if sample in ival.get('samples', [])][0]
@@ -592,10 +592,10 @@ class SubmissionMetadata:
                     if fam in self.families and indiv in self.families[fam]['members']:
                         case_info['family'] = fam
                         break
-                if name:
+                if name:  # 'case_id' prop only added if explicitly present in spreadsheet
                     case_info['case_id'] = case_name
                 # if report is True for that particular case, create report item
-                if case_id in self.case_names and self.case_names[case_id][2]:
+                if case_key in self.case_names and self.case_names[case_key]['report req']:
                     report_alias = case_alias.replace('case', 'report')
                     report_info = {'aliases': [report_alias]}
                     if indiv:
@@ -604,7 +604,7 @@ class SubmissionMetadata:
                             .format(self.individuals[indiv]['individual_id'], analysis_id)
                         )
                     else:
-                        report_info['description'] = 'Analysis Report for Case ID {}'.format(case_id)
+                        report_info['description'] = 'Analysis Report for Case {}'.format(case_name)
                     case_info['report'] = report_alias
                     self.reports[report_alias] = report_info
                 self.cases[case_alias] = case_info
@@ -621,7 +621,11 @@ class SubmissionMetadata:
                 report = True
             else:
                 report = False
-            self.case_names[key] = (remove_spaces_in_id(row_item.metadata.get('unique analysis id')), row_item.fam_alias, report)
+            self.case_names[key] = {
+                'case id': remove_spaces_in_id(row_item.metadata.get('unique analysis id')),
+                'family': row_item.fam_alias,
+                'report req': report
+            }
 
     def add_individual_relations(self):
         """
