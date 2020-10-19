@@ -55,6 +55,7 @@
                 "N/A",
                 "Waiting",
                 "Queued",
+                "In progress",
                 "Ingested",
                 "Ingestion disabled",
                 "Error"

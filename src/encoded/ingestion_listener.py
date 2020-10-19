@@ -47,6 +47,7 @@ STATUS_QUEUED = 'Queued'
 STATUS_INGESTED = 'Ingested'
 STATUS_DISABLED = 'Ingestion disabled'
 STATUS_ERROR = 'Error'
+STATUS_IN_PROGRESS = 'In progress'
 CGAP_CORE_PROJECT = '/projects/cgap-core'
 CGAP_CORE_INSTITUTION = '/institutions/hms-dbmi/'
 
@@ -746,6 +747,8 @@ class IngestionListener:
                     continue
 
                 # gunzip content, pass to parser, post variants/variant_samples
+                # patch in progress status
+                self.vapp.patch_json('/' + uuid, {'file_ingestion_status': STATUS_IN_PROGRESS})
                 decoded_content = gunzip_content(raw_content)
                 log.info('Got decoded content: %s' % decoded_content[:20])
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
