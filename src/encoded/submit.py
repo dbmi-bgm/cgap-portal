@@ -47,8 +47,7 @@ ABBREVS = {
     'p': 'proband',
     'mth': 'mother',
     'fth': 'father',
-    'sf': 'sibling',
-    'full sibling': 'sibling'
+    'sf': 'sibling'
 }
 
 YES_VALS = ['y', 'yes']
