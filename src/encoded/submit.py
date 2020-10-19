@@ -65,6 +65,7 @@ REQUIRED_COLUMNS =  REQUIRED_CASE_COLS + [SS_INDIVIDUAL_ID, SS_RELATION, SS_REPO
 
 # half-siblings not currently supported, because pedigree info is needed to know
 # which parent is shared. Can come back to this after pedigree processing is integrated.
+SIBLING_LABEL = 'sibling'
 SIBLINGS = ['sibling', 'brother', 'sister',
             'full sibling', 'full brother', 'full sister']
 
@@ -207,15 +208,13 @@ def remove_spaces_in_id(id_value):
     return id_value.replace(' ', '_')
 
 
-def is_yes_value(str_value, yes_vals=None):
+def is_yes_value(str_value):
     """
     Determines whether the value of a field means 'yes'.
     """
     if not isinstance(str_value, str):
         return False
     if str_value.lower() in YES_VALS:
-        return True
-    elif yes_vals and str_value.lower() in yes_vals:
         return True
     return False
 
@@ -311,7 +310,7 @@ class SubmissionRow:
             if self.metadata.get(SS_RELATION, '').lower().startswith(relation):
                 relation_found = True
                 if relation in SIBLINGS:
-                    info['sibling'] = [self.indiv_alias]
+                    info[SIBLING_LABEL] = [self.indiv_alias]
                 else:
                     info[relation] = self.indiv_alias
                 break
@@ -552,7 +551,7 @@ class SubmissionMetadata:
                     if relation in self.families[family.alias]:
                         if relation in SIBLINGS:
                             if individual.alias not in self.families[family.alias][relation]:
-                                self.families[family.alias]['sibling'].extend(family.metadata[relation])
+                                self.families[family.alias][SIBLING_LABEL].extend(family.metadata[relation])
                         elif self.families[family.alias][relation] != individual.alias:
                             msg = ('Row {} - Multiple values for relation "{}" in family {}'
                                    ' found in spreadsheet'.format(idx, relation, family.metadata['family_id']))
