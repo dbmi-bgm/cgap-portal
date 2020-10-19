@@ -51,6 +51,8 @@ ABBREVS = {
     'full sibling': 'sibling'
 }
 
+YES_VALS = ['y', 'yes']
+
 # SS at end refers to spreadsheet, to distinguish from prop names in schema if we need
 # vars for those at any point.
 INDIV_ID_SS = 'individual id'
@@ -204,6 +206,17 @@ def remove_spaces_in_id(id_value):
     if not id_value:
         return None
     return id_value.replace(' ', '_')
+
+
+def is_yes_value(str_value, yes_vals=YES_VALS):
+    """
+    Determines whether the value of a field means 'yes'.
+    """
+    if not isinstance(str_value, str):
+        return False
+    if str_value.lower() in yes_vals:
+        return True
+    return False
 
 
 class MetadataItem:
@@ -617,14 +630,10 @@ class SubmissionMetadata:
         if all(field in row_item.metadata
                for field in REQUIRED_CASE_COLS):
             key = '{}-{}'.format(row_item.metadata[ANALYSIS_ID_SS], row_item.metadata[SAMPLE_ID_SS])
-            if row_item.metadata.get('report required', '').lower().startswith('y'):
-                report = True
-            else:
-                report = False
             self.case_names[key] = {
                 'case id': remove_spaces_in_id(row_item.metadata.get('unique analysis id')),
                 'family': row_item.fam_alias,
-                'report req': report
+                'report req': is_yes_value(row_item.metadata.get('report required', ''))
             }
 
     def add_individual_relations(self):
