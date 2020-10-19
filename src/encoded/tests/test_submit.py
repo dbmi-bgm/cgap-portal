@@ -413,7 +413,7 @@ class TestSubmissionMetadata:
         row_dict['unique analysis id'] = case_id
         submission = SubmissionMetadata([row_dict], project, institution)
         key = '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id'])
-        assert submission.case_names.get(key)['case id'] == case_id
+        assert submission.case_info.get(key)['case id'] == case_id
 
     def test_add_individual_relations(self, big_family_rows, project, institution):
         """
