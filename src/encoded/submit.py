@@ -50,10 +50,26 @@ ABBREVS = {
     'sf': 'sibling'
 }
 
+YES_VALS = ['y', 'yes']
 
-RELATIONS = ['proband', 'mother', 'father', 'sibling', 'brother', 'sister']
+# SS at end refers to spreadsheet, to distinguish from prop names in schema if we need
+# vars for those at any point.
+SS_INDIVIDUAL_ID = 'individual id'
+SS_SPECIMEN_ID = 'specimen id'
+SS_ANALYSIS_ID = 'analysis id'
+SS_RELATION = 'relation to proband'
+SS_REPORT_REQUIRED = 'report required'
 
-REQUIRED_COLUMNS = ['individual id', 'relation to proband', 'report required', 'analysis id', 'specimen id']
+REQUIRED_CASE_COLS = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
+REQUIRED_COLUMNS =  REQUIRED_CASE_COLS + [SS_INDIVIDUAL_ID, SS_RELATION, SS_REPORT_REQUIRED]
+
+# half-siblings not currently supported, because pedigree info is needed to know
+# which parent is shared. Can come back to this after pedigree processing is integrated.
+SIBLING_LABEL = 'sibling'
+SIBLINGS = ['sibling', 'brother', 'sister',
+            'full sibling', 'full brother', 'full sister']
+
+RELATIONS = SIBLINGS + ['proband', 'mother', 'father']
 
 POST_ORDER = [
     'file_fastq', 'file_processed', 'sample', 'individual',
@@ -186,6 +202,23 @@ def replace_cell_contents(info_dict, field, **kwargs):
         info_dict[field] = kwargs[existing]
 
 
+def remove_spaces_in_id(id_value):
+    if not id_value:
+        return None
+    return id_value.replace(' ', '_')
+
+
+def is_yes_value(str_value):
+    """
+    Determines whether the value of a field means 'yes'.
+    """
+    if not isinstance(str_value, str):
+        return False
+    if str_value.lower() in YES_VALS:
+        return True
+    return False
+
+
 class MetadataItem:
     """
     class for single DB-item-worth of json
@@ -211,12 +244,13 @@ class SubmissionRow:
         self.row = idx
         self.errors = []
         if not self.found_missing_values():
-            self.indiv_alias = '{}:individual-{}'.format(project, row['individual id'])
+            self.indiv_alias = '{}:individual-{}'.format(
+                project, remove_spaces_in_id(row[SS_INDIVIDUAL_ID])
+            )
             self.fam_alias = family_alias
-            self.sample_alias = '{}:sample-{}'.format(project, row['specimen id'])
-            self.analysis_alias = '{}:analysis-{}'.format(project, row['analysis id'])
-            self.case_name = row.get('unique analysis id')
-            self.report_required = False
+            self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(row[SS_SPECIMEN_ID]))
+            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row[SS_ANALYSIS_ID]))
+            self.case_name = remove_spaces_in_id(row.get('unique analysis id'))
             self.individual = self.extract_individual_metadata()
             self.family = self.extract_family_metadata()
             self.sample, self.analysis = self.extract_sample_metadata()
@@ -244,7 +278,7 @@ class SubmissionRow:
         info = map_fields(self.metadata, info, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
         other_id_col = get_column_name(self.metadata, ['other id', 'other individual id'])
         if self.metadata.get(other_id_col):  # for 'other_id' sub-embedded object
-            other_id = {'id': self.metadata[other_id_col], 'id_source': self.institution}
+            other_id = {'id': remove_spaces_in_id(self.metadata[other_id_col]), 'id_source': self.institution}
             if self.metadata.get('other individual id type'):
                 other_id['id_source'] = self.metadata['other individual id source']
             else:
@@ -271,20 +305,19 @@ class SubmissionRow:
         if not info['family_id']:
             alias = self.project + ":" + self.fam_alias if ':' not in self.fam_alias else self.fam_alias
             info['family_id'] = alias[alias.index(':') + 1:]
-        valid_relations = ['proband', 'mother', 'father', 'brother', 'sister', 'sibling']
         relation_found = False
-        for relation in valid_relations:
-            if self.metadata.get('relation to proband', '').lower().startswith(relation):
+        for relation in RELATIONS:
+            if self.metadata.get(SS_RELATION, '').lower().startswith(relation):
                 relation_found = True
-                if relation in ['brother', 'sister', 'sibling']:
-                    info[relation] = [self.indiv_alias]
+                if relation in SIBLINGS:
+                    info[SIBLING_LABEL] = [self.indiv_alias]
                 else:
                     info[relation] = self.indiv_alias
                 break
         if not relation_found:
             msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
-                self.row, self.metadata.get('relation to proband'), self.metadata.get('individual id'),
-                ', '.join(valid_relations)
+                self.row, self.metadata.get(SS_RELATION), self.metadata.get(SS_INDIVIDUAL_ID),
+                ', '.join(RELATIONS)
             )
             self.errors.append(msg)
         return MetadataItem(info, self.row, 'family')
@@ -324,8 +357,6 @@ class SubmissionRow:
             'samples': [self.sample_alias],
             'families': [self.fam_alias]
         }
-        if self.metadata.get('report required').lower().startswith('y'):
-            self.report_required = True
         return (MetadataItem(info, self.row, 'sample'),
                 MetadataItem(new_sp_item, self.row, 'sample_processing'))
 
@@ -414,10 +445,10 @@ class SubmissionMetadata:
         self.institution = institution.get('name')
         self.institution_atid = institution.get('@id')
         self.counter = counter
-        self.proband_rows = [row for row in rows if row.get('relation to proband').lower() == 'proband']
+        self.proband_rows = [row for row in rows if row.get(SS_RELATION).lower() == 'proband']
         self.family_dict = {
-            row.get('analysis id'): '{}:family-{}'.format(
-                self.project, row.get('individual id')
+            row.get(SS_ANALYSIS_ID): '{}:family-{}'.format(
+                self.project, row.get(SS_INDIVIDUAL_ID)
             ) for row in self.proband_rows
         }
         self.metadata = []
@@ -432,7 +463,7 @@ class SubmissionMetadata:
         self.reports_req = []
         self.errors = []
         self.analysis_types = self.get_analysis_types()
-        self.case_names = {}
+        self.case_info = {}
         self.json_out = {}
         self.itemtype_dict = {
             'individual': self.individuals,
@@ -467,10 +498,10 @@ class SubmissionMetadata:
         analysis_relations = {}
         analysis_types = {}
         for row in self.rows:
-            analysis_relations.setdefault(row.get('analysis id'), [[], []])
-            analysis_relations[row.get('analysis id')][0].append(row.get('relation to proband', '').lower())
+            analysis_relations.setdefault(row.get(SS_ANALYSIS_ID), [[], []])
+            analysis_relations[row.get(SS_ANALYSIS_ID)][0].append(row.get(SS_RELATION, '').lower())
             workup_col = get_column_name(row, ['test requested', 'workup type'])
-            analysis_relations[row.get('analysis id')][1].append(row.get(workup_col, '').upper())
+            analysis_relations[row.get(SS_ANALYSIS_ID)][1].append(row.get(workup_col, '').upper())
             # dict now has format {analysis id: (relations list, workup types list)}
         for k, v in analysis_relations.items():
             workups = list(set(v[1]))
@@ -504,7 +535,6 @@ class SubmissionMetadata:
                 if key not in previous[item.alias]:
                     previous[item.alias][key] = item.metadata[key]
 
-    #def extract_family_metadata(idx, row, items, indiv_alias, fam_alias):
     def add_family_metadata(self, idx, family, individual):
         """
         Looks at 'family' metadata from SubmissionRow object. Adds family to SubmissionMetadata
@@ -519,9 +549,9 @@ class SubmissionMetadata:
             for relation in RELATIONS:
                 if family.metadata.get(relation):
                     if relation in self.families[family.alias]:
-                        if relation in ['brother', 'sister', 'sibling']:
+                        if relation in SIBLINGS:
                             if individual.alias not in self.families[family.alias][relation]:
-                                self.families[family.alias][relation].extend(family.metadata[relation])
+                                self.families[family.alias][SIBLING_LABEL].extend(family.metadata[relation])
                         elif self.families[family.alias][relation] != individual.alias:
                             msg = ('Row {} - Multiple values for relation "{}" in family {}'
                                    ' found in spreadsheet'.format(idx, relation, family.metadata['family_id']))
@@ -561,12 +591,13 @@ class SubmissionMetadata:
         for k, v in self.sample_processings.items():
             analysis_id = k[k.index('analysis-')+9:]
             for sample in v['samples']:
-                case_id = '{}-{}'.format(analysis_id, self.samples[sample].get('specimen_accession', ''))
+                case_key = '{}-{}'.format(analysis_id, self.samples[sample].get('specimen_accession', ''))
                 name = False
-                if case_id in self.case_names and self.case_names[case_id][0]:
+                case_name = case_key
+                if case_key in self.case_info and self.case_info[case_key]['case id']:
                     name = True
-                    case_id = self.case_names[case_id][0]
-                case_alias = '{}:case-{}'.format(self.project, case_id)
+                    case_name = self.case_info[case_key]['case id']
+                case_alias = '{}:case-{}'.format(self.project, case_name)
                 try:
                     indiv = [ikey for ikey, ival in self.individuals.items() if sample in ival.get('samples', [])][0]
                 except IndexError:
@@ -576,17 +607,19 @@ class SubmissionMetadata:
                     if fam in self.families and indiv in self.families[fam]['members']:
                         case_info['family'] = fam
                         break
-                if name:
-                    case_info['case_id'] = case_id
-                if sample in self.reports_req:
+                if name:  # 'case_id' prop only added if explicitly present in spreadsheet
+                    case_info['case_id'] = case_name
+                # if report is True for that particular case, create report item
+                if case_key in self.case_info and self.case_info[case_key]['report req']:
                     report_alias = case_alias.replace('case', 'report')
                     report_info = {'aliases': [report_alias]}
                     if indiv:
-                        report_info['description'] = ('Analysis Report for Individual ID {}'
-                                                      ' (Analysis {})'.format(self.individuals[indiv]['individual_id'], analysis_id)
-                                                        )
+                        report_info['description'] = (
+                            'Analysis Report for Individual ID {} (Analysis {})'
+                            .format(self.individuals[indiv]['individual_id'], analysis_id)
+                        )
                     else:
-                        report_info['description'] = 'Analysis Report for Case ID {}'.format(case_id)
+                        report_info['description'] = 'Analysis Report for Case {}'.format(case_name)
                     case_info['report'] = report_alias
                     self.reports[report_alias] = report_info
                 self.cases[case_alias] = case_info
@@ -596,9 +629,15 @@ class SubmissionMetadata:
         Creates a dictionary linking analysis ID and specimen ID combination to the Case name
         indicated in the spreadsheet.
         """
-        if all(field in row_item.metadata for field in ['analysis id', 'unique analysis id', 'specimen id']):
-            key = '{}-{}'.format(row_item.metadata['analysis id'], row_item.metadata['specimen id'])
-            self.case_names[key] = (row_item.metadata['unique analysis id'], row_item.fam_alias)
+        if all(field in row_item.metadata
+               for field in REQUIRED_CASE_COLS):
+            key = '{}-{}'.format(row_item.metadata[SS_ANALYSIS_ID], row_item.metadata[SS_SPECIMEN_ID])
+            case_id_col = get_column_name(row_item.metadata, ['unique analysis id', 'case id'])
+            self.case_info[key] = {
+                'case id': remove_spaces_in_id(row_item.metadata.get(case_id_col)),
+                'family': row_item.fam_alias,
+                'report req': is_yes_value(row_item.metadata.get(SS_REPORT_REQUIRED, ''))
+            }
 
     def add_individual_relations(self):
         """
@@ -610,12 +649,12 @@ class SubmissionMetadata:
                 if family.get(parent):
                     if family.get('proband'):
                         self.individuals[family['proband']][parent] = family[parent]
-                    for term in ['sibling', 'brother', 'sister']:
+                    for term in SIBLINGS:
                         if family.get(term):
                             for sibling in family[term]:
                                 self.individuals[sibling][parent] = family[parent]
                     del family[parent]
-            for term in ['sibling', 'brother', 'sister']:
+            for term in SIBLINGS:
                 if family.get(term):
                     del family[term]
 
@@ -641,8 +680,6 @@ class SubmissionMetadata:
                     self.add_metadata_single_item(item)
                 self.add_family_metadata(processed_row.row, processed_row.family, processed_row.individual)
                 self.add_sample_processing(processed_row.analysis, processed_row.metadata.get('analysis id'))
-                if processed_row.report_required:
-                    self.reports_req.append(processed_row.sample_alias)
                 self.add_case_info(processed_row)
                 self.errors.extend(processed_row.errors)
             except AttributeError:
