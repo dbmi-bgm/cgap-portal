@@ -443,7 +443,6 @@ class TestSubmissionMetadata:
         assert len(example_rows_obj.reports) == 2
 
     def test_create_json_out(self, example_rows_obj, project, institution):
-        """tests that all expected items are present in final json as well as project and institution fields"""
         assert all(key in example_rows_obj.json_out for key in
                    ['individual', 'family', 'sample', 'sample_processing', 'case', 'report'])
         for key, val in example_rows_obj.json_out.items():
