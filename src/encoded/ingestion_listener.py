@@ -46,6 +46,8 @@ VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
 STATUS_QUEUED = 'Queued'
 STATUS_INGESTED = 'Ingested'
 STATUS_DISABLED = 'Ingestion disabled'
+STATUS_ERROR = 'Error'
+STATUS_IN_PROGRESS = 'In progress'
 CGAP_CORE_PROJECT = '/projects/cgap-core'
 CGAP_CORE_INSTITUTION = '/institutions/hms-dbmi/'
 
@@ -214,6 +216,7 @@ def verify_vcf_file_status_is_not_ingested(request, uuid):
     if isinstance(resp, HTTPMovedPermanently):  # if we hit a redirect, follow it
         subreq = Request.blank(resp.location, **kwargs)
         resp = request.invoke_subrequest(subreq, use_tweens=True)
+    log.error('VCF File Meta: %s' % resp.json)
     if resp.json.get('file_ingestion_status', None) == STATUS_INGESTED:
         return False
     return True
@@ -543,6 +546,10 @@ class IngestionListener:
                 debuglog("Deleted messages")
                 break
 
+    def set_status(self, uuid, status):
+        """ Sets the file_ingestion_status of the given uuid """
+        self.vapp.patch_json('/' + uuid, {'file_ingestion_status': status})
+
     @staticmethod
     def build_variant_link(variant):
         """ This function takes a variant record and returns the corresponding UUID of this variant
@@ -649,7 +656,7 @@ class IngestionListener:
         """
         success, error = 0, 0
         vs_project, vs_institution, file_accession = (file_meta['project']['uuid'], file_meta['institution']['uuid'],
-                                                file_meta['accession'])
+                                                      file_meta['accession'])
         sample_relations = self.extract_sample_relations(file_accession)
         for idx, record in enumerate(parser):
             log.info('Attempting parse on record %s' % record)
@@ -744,6 +751,8 @@ class IngestionListener:
                     continue
 
                 # gunzip content, pass to parser, post variants/variant_samples
+                # patch in progress status
+                self.set_status(uuid, STATUS_IN_PROGRESS)
                 decoded_content = gunzip_content(raw_content)
                 log.info('Got decoded content: %s' % decoded_content[:20])
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
@@ -754,8 +763,9 @@ class IngestionListener:
                 if error > 0:
                     log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
                               'as ingested.' % uuid)
+                    self.set_status(uuid, STATUS_ERROR)
                 else:
-                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': STATUS_INGESTED})
+                    self.set_status(uuid, STATUS_INGESTED)
 
                 # report results in error_log regardless of status
                 msg = ('INGESTION_REPORT:\n'
