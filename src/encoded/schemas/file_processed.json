@@ -55,8 +55,10 @@
                 "N/A",
                 "Waiting",
                 "Queued",
+                "In progress",
                 "Ingested",
-                "Ingestion disabled"
+                "Ingestion disabled",
+                "Error"
             ]
         },
         "file_classification": {
