@@ -870,7 +870,7 @@ i.status-indicator-dot {
 /** JSON Tree Wrapper (e.g. fallback view) **/
 
 .json-tree-wrapper {
-	border-radius: $border-radius-large;
+	border-radius: $border-radius-lg;
 	overflow: hidden;
 	> ul {
 		padding: 8px 16px 16px !important;
@@ -1687,7 +1687,8 @@ $download-button-width : 100px;
 
 
 /**********************************************************
-			Processing Summary Table (CaseView > Bioinfo Tab)
+	Processing Summary Table (CaseView > Bioinfo Tab)
+	Move into own file?
 **********************************************************/
 
 .item-page-container {
@@ -2046,7 +2047,7 @@ $download-button-width : 100px;
 				background-color: #ffffff;
 				margin-bottom: 20px;
 				padding: 20px;
-				border-radius: $border-radius-large;
+				border-radius: $border-radius-lg;
 				box-shadow: 0 1px 5px #0002;
 				border-color: #d6d6d6;
 
@@ -2252,6 +2253,17 @@ $download-button-width : 100px;
 
 	}
 
+}
+
+
+/**********************************************************
+	CaseView -> FilterSetUI
+**********************************************************/
+
+.filterset-outer-container {
+	border: 1px solid #999;
+	background-color: $gray-300; // TODO CHANGE
+	border-radius: $border-radius-lg;
 }
 
 

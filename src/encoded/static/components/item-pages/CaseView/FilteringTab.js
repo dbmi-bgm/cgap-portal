@@ -12,6 +12,7 @@ import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { DisplayTitleColumnWrapper, DisplayTitleColumnDefault } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
+import { FilteringTableFilterSetUI } from './FilteringTableFilterSetUI';
 
 const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ hgvsc }){
     // Memoized on the 1 prop it receives which is dependency for its calculation.
@@ -280,12 +281,13 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     const {
         display_title: caseDisplayTitle,
         initial_search_href_filter_addon = "",
-        active_filterset: {
-            "@id" : activeFilterSetID,
-            display_title: activeFilterSetTitle,
-            filter_blocks = []
-        } = {}
+        active_filterset = null
     } = context || {};
+    const {
+        "@id" : activeFilterSetID,
+        display_title: activeFilterSetTitle,
+        filter_blocks = []
+    } = active_filterset || {};
 
     // TODO POST request w multiple of these filter_blocks, for now just first 1 is populated and used.
 
@@ -298,21 +300,25 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     // Hide facets that are ones used to initially narrow down results to those related to this case.
     const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible } = useMemo(function(){
+
         const onClearFiltersVirtual = function(virtualNavigateFxn, callback) {
             // By default, EmbeddedSearchItemView will reset to props.searchHref.
             // We override with searchHrefInitial.
             return virtualNavigateFxn(searchHrefInitial, {}, callback);
         };
+
         const isClearFiltersBtnVisible = function(virtualHref){
             // Re-use same algo for determining if is visible, but compare virtualhref
             // against searchHrefInitial (without the current filter(s)) rather than
             // `props.searchHref` which contains the current filters.
             return VirtualHrefController.isClearFiltersBtnVisible(virtualHref, searchHrefInitial);
         };
+
         let hideFacets = null;
         if (initial_search_href_filter_addon) {
             hideFacets = Object.keys(queryString.parse(initial_search_href_filter_addon));
         }
+
         return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible };
     }, [ context ]);
 
@@ -327,18 +333,24 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             <h1 className="mb-0 mt-0">
                 { caseDisplayTitle }: <span className="text-300">Variant Filtering and Technical Review</span>
             </h1>
-            <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible }} searchHref={searchHrefWithCurrentFilter} title={
-                <FilteringTabSubtitle caseItem={context} />
-            } key={"session:" + session} />
+            <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible }}
+                searchHref={searchHrefWithCurrentFilter}
+                aboveTableComponent={<FilteringTableFilterSetUI filterSet={active_filterset} caseItem={context} />}
+                title={
+                    <FilteringTabSubtitle caseItem={context} />
+                } key={"session:" + session} />
         </React.Fragment>
     );
 });
 
-/** Inherits props from EmbeddedItemSearchTable -> EmbeddedSearchView -> VirtualHrefController */
+/**
+ * Inherits props from EmbeddedItemSearchTable -> EmbeddedSearchView -> VirtualHrefController
+ * @deprecated
+ * @todo Probably create FilterSetController component to handle state of this and such and have it wrap the table/at-same-level-or-higher-than-FilteringTab
+ */
 export function FilteringTabSubtitle(props){
     const {
-        totalCount,
-        context: searchContext,
+        context: { total: totalCount = 0 } = {},
         href: searchHref,
         caseItem
     } = props;
@@ -354,7 +366,6 @@ export function FilteringTabSubtitle(props){
             "@id" : caseInstitutionID
         }
     } = caseItem;
-
     const [ isLoading, setIsLoading ] = useState(false);
     // From `state.lastFilterSetSaved` we use only non linkTo properties from it so doesn't matter if frame=object vs frame=page for it.
     const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || null);
@@ -488,6 +499,8 @@ export function FilteringTabSubtitle(props){
     //     lastFilterSetSaved, '\n',
     // );
 
+    console.log("TTTT", props);
+
     let btnPrepend = null;
     let btnDisabled = !differsFromCurrentFilterSet || isLoading; // TODO: maybe inform also via 'edit this FilterSet' and 'add any new FilterSet' actions/permissions.
     let notYetReIndexed = false; // Not yet used. Should auto-update upon refresh of context
@@ -525,10 +538,12 @@ export function FilteringTabSubtitle(props){
     // or other testing framework.
     return (
         <div className="d-flex flex-column flex-lg-row mt-1 mb-2 align-items-start justify-content-between">
-            <h5 className="text-300 mt-0 mb-0">
-                <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
-                Variants found
-            </h5>
+            {///*
+                <h5 className="text-300 mt-0 mb-0">
+                    <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
+                    Variants found
+                </h5>
+            /**/}
             <h5 className="text-300 mt-0 mb-0">
                 <div className="btn-group" role="group" aria-label="FilterSet Controls">
                     { btnPrepend }
@@ -544,3 +559,6 @@ export function FilteringTabSubtitle(props){
         </div>
     );
 }
+
+
+
