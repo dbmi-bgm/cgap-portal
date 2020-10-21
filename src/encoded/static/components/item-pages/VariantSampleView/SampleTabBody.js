@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
+import { ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 export function SampleTabBody(props){
     const { context = null, schemas } = props;
@@ -14,10 +15,12 @@ export function SampleTabBody(props){
         FS: strandFisherScore = null,
         novoPP = null,
         uuid = null,
-        cmphet = [],
+        cmphet: cmphetArr = [],
         samplegeno = [],
         genotype_labels: genotypeLabels = [],
-        variant = null
+        variant = null,
+        CALL_INFO = null,
+        file = null
     } = context || {};
 
     const { REF: varRef = null } = variant;
@@ -89,7 +92,7 @@ export function SampleTabBody(props){
                             <h5>DeNovo</h5>
                             <DeNovoTable {...{ novoPP, getTipForField }}/>
                             <h5 className="mt-2">Compound Heterozygous</h5>
-                            <CompoundHetTable {...{ cmphet }} />
+                            <CompoundHetTableWrapper {...{ cmphetArr, CALL_INFO, file }} />
                         </div>
                     </div>
                 </div>
@@ -400,11 +403,24 @@ DeNovoTable.propTypes = {
 };
 
 function CompoundHetTable(props) {
-    const { cmphet } = props;
+    const { cmphetArr } = props;
 
-    if (cmphet.length === 0) {
+    if (cmphetArr.length === 0) {
         return <span className="font-italic">No other variants on the same gene have passed the CGAP filter for rare exonic or splicing variants or clinvar variants.</span>;
     }
+
+    function loadStatus(loadstatus) {
+        switch (loadstatus) {
+            case "error":
+                // TODO: tooltip broken; need to rework to account for the weirdness with the tooltip handlers getting unhooked
+                return <span data-tip="An error occurred while pulling this data. Reload page to try again."><i className="icon icon-exclamation-triangle fas text-warning mr-05"/> Error</span>;
+            case "loading":
+                return <i className="icon icon-fw icon-circle-notch icon-spin fas"/>;
+            default:
+                return loadstatus;
+        }
+    }
+
     return (
         <table className="w-100">
             <thead>
@@ -415,10 +431,12 @@ function CompoundHetTable(props) {
                     <th className="text-left">Impact</th>
                     <th className="text-left">Transcript</th>
                     <th className="text-left">Impact Transcript</th>
+                    <th data-tip="Location on worst effect transcript" className="text-left">Location</th>
+                    <th data-tip="Coding effect on worst effect transcript" className="text-left">Coding Effect</th>
                 </tr>
             </thead>
             <tbody>
-                { cmphet.map((obj, i) => {
+                { cmphetArr.map((obj, i) => {
                     const {
                         comhet_mate_variant: variant = null,
                         comhet_phase: phase = null,
@@ -426,6 +444,9 @@ function CompoundHetTable(props) {
                         comhet_impact_gene: impactGene = null,
                         comhet_transcript: transcript = null,
                         comhet_impact_transcript: impactTranscript = null,
+                        href = null,
+                        location = null,
+                        coding_effect = null
                     } = obj;
 
                     // Stopgap until comhet transcript type update complete (handles array & string)
@@ -442,7 +463,9 @@ function CompoundHetTable(props) {
 
                     return (
                         <tr key={i}>
-                            <td className="text-600 text-left">{ variant }</td>
+                            <td className="text-600 text-left">
+                                { href ? <a href={href}>{variant}</a> : variant }
+                            </td>
                             <td className="text-left">{ phase }</td>
                             <td className="text-left">{ gene }</td>
                             <td className="text-left">{ impactGene }</td>
@@ -455,6 +478,8 @@ function CompoundHetTable(props) {
                                 }) }
                             </td>
                             <td className="text-left">{ impactTranscript }</td>
+                            <td className="text-left">{ loadStatus(location) }</td>
+                            <td className="text-left">{ loadStatus(coding_effect) }</td>
                         </tr>
                     );
                 })}
@@ -464,5 +489,147 @@ function CompoundHetTable(props) {
 }
 CompoundHetTable.propTypes = {
     getTipForField: PropTypes.func,
-    cmphet: PropTypes.array
+    cmphetArr: PropTypes.array
+};
+
+
+class CompoundHetTableWrapper extends React.Component {
+    constructor(props) {
+        super();
+
+        // Derive initial state from cmphetArr prop
+        const { cmphetArr = [] } = props;
+        const initialState = [];
+        cmphetArr.forEach((cmphet) => {
+            const cmphetCopy = { ...cmphet };
+            cmphetCopy["location"] = "loading";
+            cmphetCopy["coding_effect"] = "loading";
+            initialState.push(cmphetCopy);
+        });
+
+        this.state = {
+            cmphetArr: initialState
+        };
+
+        this.getMateData = this.getMateData.bind(this);
+        this.constructGetMatesQuery = this.constructGetMatesQuery.bind(this);
+    }
+
+    componentDidMount() {
+        // start doing ajax requests to pull in data for each mate
+        this.getMateData();
+    }
+
+    constructGetMatesQuery() {
+        const { file, CALL_INFO } = this.props;
+        const { cmphetArr } = this.state;
+
+        let queryString = `/search/?type=VariantSample&file=${file}&CALL_INFO=${CALL_INFO}`;
+
+        // Populate with variant titles
+        cmphetArr.forEach((cmphet) => {
+            const {
+                comhet_mate_variant: variant = null,
+            } = cmphet;
+            queryString += ("&variant.display_title=" + variant);
+        });
+        return encodeURI(queryString);
+    }
+
+    getMateData() {
+        const { cmphetArr = [] } = this.state;
+        const encodedQueryString = this.constructGetMatesQuery();
+
+        // Request variant mates
+        return ajax.promise(encodedQueryString, 'GET', {})
+            .then((response) => {
+                console.log("getMateData response", response); // for testing
+                // Pull href from graph and add to state
+                const newState = []; // update each object in state with href
+
+                if (response.status && response.status !== 'success'){
+                    throw res;
+                }
+
+                if (response['@graph'] && response['@graph'].length > 0) { // request succeeded and provided results
+                    const variantToStateIndexMap = {};
+                    const variantToGeneMap = {};
+
+                    // create copies of each state object
+                    cmphetArr.forEach((cmphet, i) => {
+                        const { comhet_mate_variant: variant, comhet_gene: gene } = cmphet;
+                        const cmphetCopy = { ...cmphet };
+                        variantToStateIndexMap[variant] = i;
+                        newState.push(cmphetCopy);
+
+                        // add associated gene to map
+                        variantToGeneMap[variant] = gene;
+                    });
+
+                    // update each state object with link data
+                    response['@graph'].forEach((svObj) => {
+                        const { "@id": svAtId = null, variant = null } = svObj;
+                        const { display_title: variantTitle = null, genes = null } = variant || {};
+                        if (variantToStateIndexMap[variantTitle] != undefined) {
+                            const stateIndex = variantToStateIndexMap[variantTitle];
+                            newState[stateIndex]["href"] = svAtId;
+
+                            // if there's an associated gene for this comphet, find it's location and coding effect
+                            genes.forEach((gene) => {
+                                const {
+                                    genes_most_severe_consequence = null,
+                                    genes_ensg = null
+                                } = gene || {};
+
+                                const { "@id": geneAtId = "" } = genes_ensg;
+                                const thisGene = geneAtId.split("/")[2];
+
+                                const associatedGene = variantToGeneMap[variantTitle];
+                                if (thisGene === associatedGene) {
+                                    const { location = null, coding_effect = null } = genes_most_severe_consequence || {};
+
+                                    newState[stateIndex]["location"] = location;
+                                    newState[stateIndex]["coding_effect"] = coding_effect;
+                                }
+                            });
+                        }
+                    });
+
+                    // Update state with links, then go ahead and pull/populate with gene data
+                    this.setState({ cmphetArr : newState });
+                } else {
+                    // No results... update to stop loading
+                    const newState = [];
+                    cmphetArr.forEach((cmphet) => {
+                        const cmphetCopy = { ...cmphet };
+                        cmphetCopy["location"] = null;
+                        cmphetCopy["coding_effect"] = null;
+                        newState.push(cmphetCopy);
+                    });
+                    this.setState({ cmphetArr : newState });
+                }
+            })
+            .catch((error) => {
+                console.log("Error occurred", error);
+                // Update to stop loading, replace with a load-failed indicator
+                const newState = [];
+                cmphetArr.forEach((cmphet) => {
+                    const cmphetCopy = { ...cmphet };
+                    cmphetCopy["location"] =  "error";
+                    cmphetCopy["coding_effect"] =  "error";
+                    newState.push(cmphetCopy);
+                });
+                this.setState({ cmphetArr : newState });
+            });
+    }
+
+    render() {
+        const { cmphetArr = [] } = this.state;
+        return <CompoundHetTable {...{ cmphetArr }} />;
+    }
+}
+CompoundHetTableWrapper.propTypes = {
+    CALL_INFO: PropTypes.string,
+    file: PropTypes.string,
+    cmphetArr: PropTypes.array
 };
