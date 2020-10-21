@@ -417,7 +417,7 @@ function CompoundHetTable(props) {
             case "loading":
                 return <i className="icon icon-fw icon-circle-notch icon-spin fas"/>;
             default:
-                return loadstatus;
+                return loadstatus || "-";
         }
     }
 
