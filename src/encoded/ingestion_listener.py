@@ -499,7 +499,7 @@ class IngestionListener:
                             (self.vapp, _queue_manager, _update_status))
         self.queue_manager = IngestionQueueManager(registry) if not _queue_manager else _queue_manager
         self.update_status = _update_status
-        self.first_error = None
+        self.first_error_message = None
 
     @staticmethod
     def should_remain_online(override=None):
@@ -553,11 +553,11 @@ class IngestionListener:
 
     def set_error(self, uuid):
         """ Sets the file_ingestion_error field of the given uuid """
-        if self.first_error is None:
+        if self.first_error_message is None:
             log.error('Tried to set error message but no message was set!')
             return
-        self._patch_value(uuid, 'file_ingestion_error', self.first_error)
-        self.first_error = None  # reset this field
+        self._patch_value(uuid, 'file_ingestion_error', self.first_error_message)
+        self.first_error_message = None  # reset this field
 
     def set_status(self, uuid, status):
         """ Sets the file_ingestion_status of the given uuid """
@@ -682,8 +682,8 @@ class IngestionListener:
                 success += 1
             except Exception as e:  # ANNOTATION spec validation error, recoverable
                 log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))
-                if self.first_error is None:
-                    self.first_error = str(e)
+                if not self.first_error_message:
+                    self.first_error_message = str(e)
                 error += 1
 
         return success, error
@@ -779,7 +779,7 @@ class IngestionListener:
                     log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
                               'as ingested.' % uuid)
                     self.set_status(uuid, STATUS_ERROR)
-                    self.set_error(uuid, self.first_error)
+                    self.set_error(uuid, self.first_error_message)
                 else:
                     self.set_status(uuid, STATUS_INGESTED)
 
