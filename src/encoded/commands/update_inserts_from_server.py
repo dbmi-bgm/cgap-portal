@@ -68,7 +68,7 @@ def main():
                         help="destination file in inserts dir to write to")
     parser.add_argument('--item-type', action='append', default=[],
                         help="item type, e.g. file_fastq. Defaults to all types")
-    parser.add_argument('--ignore-field', action='append', default=[],
+    parser.add_argument('--ignore-field', action='append', default=["submitted_by", "date_created", "last_modified", "schema_version"],
                         help='field name to ignore when running expand_es_metadata')
     parser.add_argument('--from-search', help='query passed to search_metadata to find uuids')
 
@@ -84,6 +84,14 @@ def main():
     inserts_path = '/'.join([inserts_location, args.dest])
 
     local_inserts, item_uuids = read_local_inserts_dir(args.dest, inserts_path, args.item_type)
+
+    # Used to preserve order of existing inserts in folder(s), if any.
+    local_inserts_ordering_map = {}
+    for item_type, local_inserts_for_type in local_inserts.items():
+        for insrt_index, insrt_uuid in enumerate(local_inserts_for_type):
+            # Duplicate insrt_indx between different item types are OK and present.
+            # local_inserts_ordering_map is shallow.
+            local_inserts_ordering_map[insrt_uuid] = insrt_index
 
     # add uuids from the input search result, if present
     if args.from_search:
@@ -137,13 +145,17 @@ def main():
     # now we need to update the server inserts with contents from local inserts
     # so that existing information is not lost
     for item_type in svr_inserts:
-        # remove items specified by skip uuids
         if skip_uuids:
-            svr_inserts[item_type] = [insrt for insrt in svr_inserts[item_type]
-                                      if insrt['uuid'] not in skip_uuids]
+            # remove items specified by skip uuids
+            svr_inserts[item_type] = [
+                insrt for insrt in svr_inserts[item_type]
+                if insrt['uuid'] not in skip_uuids
+            ]
+        svr_inserts[item_type].sort(key=lambda insrt: local_inserts_ordering_map.get(insrt["uuid"], 99999) )
         for item_uuid in local_inserts.get(item_type, {}):
             if item_uuid not in svr_uuids and item_uuid not in skip_uuids:
                 svr_inserts[item_type].append(local_inserts[item_type][item_uuid])
+
     dump_results_to_json(svr_inserts, inserts_path)
     logger.info('update_inserts: Successfully wrote to %s' % inserts_path)
     for item_type in svr_inserts:
