@@ -588,6 +588,7 @@ h3.submission-subtitle {
 	&[data-status="in review"]:before,						// Applicable to Item.status
 	&[data-status="started"]:before, 						// Applicable to WorkflowRun.run_status
 	&[data-status="running"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
+	&[data-status="in progress"]:before, 					// Applicable to columnExtensionMap columns
 	&[data-status="incomplete"]:before, 					// Applicable to columnExtensionMap columns
 	&[data-status="uncertain significance"]:before,			// Applicable to ClinVar Clinical Significance
 	&[data-status="associaton"]:before {					// Applicable to ClinVar Clinical Significance
