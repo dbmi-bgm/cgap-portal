@@ -499,7 +499,6 @@ export function FilteringTabSubtitle(props){
     //     lastFilterSetSaved, '\n',
     // );
 
-    console.log("TTTT", props);
 
     let btnPrepend = null;
     let btnDisabled = !differsFromCurrentFilterSet || isLoading; // TODO: maybe inform also via 'edit this FilterSet' and 'add any new FilterSet' actions/permissions.

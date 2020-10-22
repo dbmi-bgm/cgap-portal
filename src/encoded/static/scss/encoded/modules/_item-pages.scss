@@ -2261,9 +2261,60 @@ $download-button-width : 100px;
 **********************************************************/
 
 .filterset-outer-container {
-	border: 1px solid #999;
-	background-color: $gray-300; // TODO CHANGE
+	// TODO CHANGE
+	// border: 1px solid #999;
+	background-color: desaturate(lighten($primary-dark, 40%), 25%);// #b4c8d8; // $gray-300;
 	border-radius: $border-radius-lg;
+
+	.blocks-container {
+		.filterset-block {
+			border-radius: $border-radius-lg;
+			background-color: desaturate(lighten($primary, 50%), 15%); // #dce4f5; // TODO: Codify somewhere
+
+
+			.filter-query-viz-blocks {
+				
+				.field-block {
+					position: relative;
+
+					.value-blocks {
+						.value-block {
+							border-radius: $border-radius-lg;
+							padding: 4px 5px;
+							background-color: #fff;
+							position: relative;
+							&:not(:first-child) {
+								margin-left: 7px;
+								&:before {
+									content: "|";
+									transform: scale3d(0.75, 0.75, 0.75);
+									left: -5px;
+									position: absolute;
+								}
+							}
+						}
+					}
+					.field-name {
+						font-size: .9em;
+					}
+
+					&:not(:first-child) {
+						// THESE VALUES ARE DEPENDENT ON OUR FONT-CHOICES
+						margin-left: 12px;
+						&:before {
+							content: "&";
+							transform: scale3d(0.75, 0.75, 0.75);
+							left: -11px;
+							padding-top: 4px;
+							position: absolute;
+						}
+					}
+
+				}
+			}
+
+		}
+	}
 }
 
 
