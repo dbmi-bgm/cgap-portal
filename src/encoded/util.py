@@ -292,7 +292,7 @@ def beanstalk_env_from_registry(registry):
 def check_user_is_logged_in(request):
     """ Raises HTTPForbidden if the request did not come from a logged in user. """
     for principal in request.effective_principals:
-        if principal.startswith('userid.'):
+        if principal.startswith('userid.') or principal == 'group.admin':  # allow if not logged in OR has admin
             break
     else:
         raise HTTPForbidden(title="Not logged in.")
