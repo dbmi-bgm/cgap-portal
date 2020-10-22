@@ -938,6 +938,7 @@
             "items": {
                 "title": "Gene",
                 "type": "object",
+                "enable_nested": true,
                 "properties": {
                     "genes_ensg": {
                         "title": "Gene",
@@ -2885,7 +2886,7 @@
             "type": "array",
             "items": {
                 "title": "hg19 Coordinates",
-                "nested_enabled": true,
+                "enable_nested": true,
                 "type": "object",
                 "properties": {
                     "hg19_hgvsg": {
