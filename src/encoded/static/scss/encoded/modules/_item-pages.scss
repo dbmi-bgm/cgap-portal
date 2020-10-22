@@ -2258,6 +2258,8 @@ $download-button-width : 100px;
 
 /**********************************************************
 	CaseView -> FilterSetUI
+	N.B. Some of the dimensions, i.e. padding top of ampersand,
+	are dependent on font-size/face that we use.
 **********************************************************/
 
 .filterset-outer-container {
@@ -2280,9 +2282,11 @@ $download-button-width : 100px;
 					.value-blocks {
 						.value-block {
 							border-radius: $border-radius-lg;
-							padding: 4px 5px;
+							padding: 6px 10px;
 							background-color: #fff;
 							position: relative;
+							box-shadow: 0 2px 8px -3px #000;
+							white-space: nowrap;
 							&:not(:first-child) {
 								margin-left: 7px;
 								&:before {
@@ -2294,20 +2298,33 @@ $download-button-width : 100px;
 							}
 						}
 					}
+
 					.field-name {
-						font-size: .9em;
+						position: relative;
+						padding-top: 5px;
+						font-size: .925em;
+						&:before {
+							content: " ";
+							position: absolute;
+							top: 0px;
+							height: 5px;
+							border: 1px solid #444;
+							left: -3px;
+							right: -3px;
+							border-top: none;
+						}
 					}
 
-					&:not(:first-child) {
-						// THESE VALUES ARE DEPENDENT ON OUR FONT-CHOICES
-						margin-left: 12px;
-						&:before {
+					&:not(:last-child) {
+						margin-right: 15px;
+						&:after {
 							content: "&";
 							transform: scale3d(0.75, 0.75, 0.75);
-							left: -11px;
-							padding-top: 4px;
+							right: -12px;
+							top: 10px;
 							position: absolute;
 						}
+
 					}
 
 				}

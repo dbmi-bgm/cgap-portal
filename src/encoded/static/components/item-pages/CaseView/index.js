@@ -5,10 +5,11 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
 
-import { console, layout, navigate, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, navigate, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
+import { responsiveGridState } from './../../util/layout';
 import { PedigreeVizView } from './../../viz/PedigreeViz';
 import DefaultItemView from './../DefaultItemView';
 import { TabPaneErrorBoundary } from './../components/TabView';
@@ -182,7 +183,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         );
     }
 
-    const rgs = layout.responsiveGridState(windowWidth);
+    const rgs = responsiveGridState(windowWidth);
     let pedWidth;
     let pedBlock = (
         <div className="d-none d-lg-block pedigree-placeholder flex-fill" onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
