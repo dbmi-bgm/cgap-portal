@@ -9,7 +9,7 @@ from unittest import mock
 from dcicutils.qa_utils import ControlledTime, ignored
 from ..util import (
     debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, get_trusted_email,
-    full_class_name,
+    full_class_name, check_user_is_logged_in
 )
 from .. import util as util_module
 
@@ -245,3 +245,19 @@ def test_get_trusted_email():
     # TODO: This needs unit testing.
     ignored(get_trusted_email)
 
+
+@pytest.mark.parametrize('principals, allow', [
+    (['role1', 'role2'], False),
+    (['role1', 'userid.uuid'], True)
+])
+def test_check_user_is_logged_in(principals, allow):
+    """ Simple test that ensures the logged in check is working as expected """
+    class MockRequest:
+        def __init__(self, principals):
+            self.effective_principals = principals
+    req = MockRequest(principals)
+    if allow:
+        check_user_is_logged_in(req)
+    else:
+        with pytest.raises(pyramid.httpexceptions.HTTPForbidden):
+            check_user_is_logged_in(req)
