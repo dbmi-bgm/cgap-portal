@@ -61,6 +61,11 @@
                 "Error"
             ]
         },
+        "file_ingestion_error": {
+            "title": "Ingestion Error Report",
+            "description": "This field is set when an error occurred in ingestion with the first error encountered",
+            "type": "string"
+        },
         "file_classification": {
             "title": "General Classification",
             "type": "string",
