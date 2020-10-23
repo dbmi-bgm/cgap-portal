@@ -2272,7 +2272,22 @@ $download-button-width : 100px;
 		.filterset-block {
 			border-radius: $border-radius-lg;
 			background-color: desaturate(lighten($primary, 50%), 15%); // #dce4f5; // TODO: Codify somewhere
+			border: 3px solid transparent;
+			transition: border-color .5s, background-color .5s;
 
+			&.selected {
+				border-color: $primary-dark;
+				background-color: lighten($primary, 50%);
+			}
+
+			.title-controls-row {
+				i.icon.clickable {
+					opacity: 0.5;
+					&:hover {
+						opacity: 1;
+					}
+				}
+			}
 
 			.filter-query-viz-blocks {
 				

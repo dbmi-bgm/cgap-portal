@@ -1,6 +1,7 @@
 'use strict';
 
 import React, { useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import _ from 'underscore';
 import url from 'url';
 import queryString from 'query-string';
@@ -92,7 +93,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
     render(){
         const {
-            filterSet = null,
+            currFilterSet: filterSet = null,
             context: { // Current Search Response (not that of this filterSet, necessarily)
                 total: totalCount,
                 facets = null
@@ -100,7 +101,10 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             caseItem: {
                 display_title: caseTitle = null,
             } = {},
-            hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions
+            hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
+
+            // From FilterSetController:
+            addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx
         } = this.props;
         const { bodyOpen, bodyMounted } = this.state;
 
@@ -110,7 +114,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const {
             '@id': filterSetID,
             error: fsError = null,
-            display_title: fsTitle = null
+            title: fsTitle = null
         } = filterSet || {};
 
         // Too long:
@@ -129,7 +133,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                     <FilterSetUIHeader {...{ filterSet, bodyOpen }} toggleOpen={this.toggleOpen} />
                     <Collapse in={bodyOpen}>
                         <div className="filterset-blocks-container">
-                            { bodyMounted ? <FilterSetUIBlocks {...{ filterSet, facetDict }} /> : null }
+                            { bodyMounted ? (
+                                <FilterSetUIBlocks {...{ filterSet, facetDict, addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx }} />
+                            ) : null }
                         </div>
                     </Collapse>
                 </div>
@@ -149,10 +155,11 @@ function FilterSetUIHeader({ filterSet, toggleOpen, bodyOpen }){
     const {
         '@id': filterSetID,
         error: fsError = null,
-        display_title: fsTitle = null
+        title: fsTitle = null,
+        display_title: fsDisplayTitle = null
     } = filterSet || {};
 
-    let title = fsTitle;
+    let title = fsTitle || fsDisplayTitle;
 
     if (fsError && !filterSetID) {
         // No view permission
@@ -167,6 +174,7 @@ function FilterSetUIHeader({ filterSet, toggleOpen, bodyOpen }){
 
     if (!filterSet) {
         // Might not be an issue if later in FilterSetController we init a temp empty 1.
+        // Update: Currently not an issue, will remove soon/later..
         title = <em>Not Yet Created</em>;
     }
 
@@ -188,7 +196,7 @@ function FilterSetUIHeader({ filterSet, toggleOpen, bodyOpen }){
 /** Renders the Blocks */
 
 const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
-    const { filterSet, facetDict } = props;
+    const { filterSet, facetDict, addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx } = props;
     const {
         "@id" : filterSetID,
         filter_blocks = []
@@ -202,11 +210,20 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         );
     }
 
+    function onAddBtnClick(e){
+        e.stopPropagation();
+        // Todo: consider passing in new filterblock definition
+        // that has query set to current search URL (minus ~`hideFacets`?)
+        addNewFilterBlock();
+    }
+
     return (
         <div className="blocks-container px-3 pb-16">
             { filter_blocks.map(function(fb, index){
-                return <FilterBlock filterBlock={fb} key={index} facetDict={facetDict} />;
+                const selected = selectedFilterBlockIdx !== null && selectedFilterBlockIdx === index;
+                return <FilterBlock filterBlock={fb} index={index} key={index} {...{ facetDict, selected, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx }} />;
             }) }
+            <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick}>Add New Filter Block</button>
         </div>
     );
 });
@@ -214,35 +231,74 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
 
 const FilterBlock = React.memo(function FilterBlock(props){
     const {
+        index,
         filterBlock: {
             query: filterStrQuery,
             name: filterName
         },
+        selected = false,
+        removeFilterBlockAtIdx,
+        setNameOfFilterBlockAtIdx,
         facetDict
     } = props;
 
-    const qs = queryString.parse(filterStrQuery);
-    Object.keys(qs).forEach(function(k){ // Standardize vals into arrays (w. len 1 if needed).
-        if (Array.isArray(qs[k])) return;
-        qs[k] = [ qs[k] ];
-    });
+    const [ editingTitle, setIsEditingTitle ] = useState(false);
+
+    function onRemoveClick(e){
+        e.stopPropagation();
+        if (filterStrQuery) {
+            const confirmation = window.confirm("Are you sure you want to delete this filter block? It still has some values.");
+            if (!confirmation) return false;
+        }
+        removeFilterBlockAtIdx(index);
+    }
+
+    let title = null;
+    if (editingTitle) {
+        title = (
+            <form className="d-flex align-items-center mb-0" action="#case-info.filtering" onSubmit={function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                setIsEditingTitle(false);
+                const formElem = e.target;
+                const inputElem = formElem.children[0];
+                setNameOfFilterBlockAtIdx(index, inputElem.value);
+            }}>
+                <input type="text" name="filterName" className="form-control" defaultValue={filterName} />
+                <button type="reset" className="btn btn-sm btn-outline-dark ml-08" onClick={function(e){
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setIsEditingTitle(false);
+                }}>
+                    <i className="icon icon-fw icon-times fas" />
+                </button>
+                <button type="submit" className="btn btn-sm btn-outline-success ml-08"><i className="icon icon-fw icon-check fas" /></button>
+            </form>
+        );
+    } else {
+        title = (
+            <React.Fragment>
+                <i className="icon icon-times-circle fas mr-1 clickable" onClick={onRemoveClick} />
+                { filterName || <span className="text-secondary">No Name</span> }
+                <i className="icon icon-pencil-alt fas ml-1 clickable" onClick={function(){ setIsEditingTitle(true); }} />
+            </React.Fragment>
+        );
+    }
 
     return (
-        <div className="filterset-block">
-            <div className="row px-2 pt-08 pb-05">
+        <div className={"filterset-block mb-16" + (selected ? " selected" : "")}>
+            <div className="row px-2 py-1 title-controls-row">
                 <div className="col">
-                    <i className="icon icon-times-circle fas mr-1" />
-                    { filterName || <span className="text-secondary">No Name</span> }
-                    <i className="icon icon-pencil-alt fas ml-1" />
+                    
+                    { title }
                 </div>
             </div>
-            {/* <pre className="mb-0">{ JSON.stringify(qs, null, 4) }</pre> */}
-            <QueryBlocks {...{ filterStrQuery, facetDict }} />
+            <FieldBlocks {...{ filterStrQuery, facetDict }} />
         </div>
     );
 });
 
-function QueryBlocks({ filterStrQuery, facetDict }) {
+const FieldBlocks = React.memo(function FieldBlocks({ filterStrQuery, facetDict }) {
 
     // Taken from SPC/RangeFacet
     function formatRangeVal(field, rangeVal){
@@ -327,7 +383,6 @@ function QueryBlocks({ filterStrQuery, facetDict }) {
     });
 
     const fields = Object.keys(qs);
-    const fieldsLen = fields.length;
     const blocks = fields.sort(function(fA, fB){
         // Sort keys by schema.facet.order, if any.
         const fsA = facetDict[fA];
@@ -354,7 +409,7 @@ function QueryBlocks({ filterStrQuery, facetDict }) {
             { blocks }
         </div>
     );
-}
+});
 
 function FieldBlock({ field, terms, facetDict, index }){
 
@@ -400,6 +455,8 @@ function FieldBlock({ field, terms, facetDict, index }){
 }
 
 /**
+ * Meant to be used to wrap a FilteringTableFilterSetUI
+ *
  * @todo
  * This will eventually replace some of logic in FilteringTab.js > FilteringTabSubtitle
  * While other stuff (calculation of if changed vs current search response filters etc)
@@ -407,27 +464,145 @@ function FieldBlock({ field, terms, facetDict, index }){
  */
 export class FilterSetController extends React.PureComponent {
 
+    static propTypes = {
+        "initialFilterSetItem" : PropTypes.shape({
+            "@id" : PropTypes.string, // Is required if originally existed, else free to be null.
+            "uuid" : PropTypes.string, // Is required if originally existed, else free to be null.
+            "title" : PropTypes.string.isRequired,
+            "search_type" : PropTypes.oneOf(["VariantSample", "Variant", "Case"]),
+            "filter_blocks" : PropTypes.arrayOf(PropTypes.shape({
+                "query" : PropTypes.string,
+                "name" : PropTypes.string.isRequired
+            }))
+        }),
+        "children" : PropTypes.element.isRequired
+    };
+
+    //static defaultProps = {
+        // Might be needed for future for like 'create new' button, but likely to be defined elsewhere maybe (outside of this component)
+        // "blankFilterSetItem" : {
+        //     "title" : "New FilterSet",
+        //     "search_type": "VariantSample",
+        //     "filter_blocks" : [
+        //         { "query" : "" }
+        //     ]
+        // }
+    //};
+
     constructor(props) {
         super(props);
-        const { caseItem } = this.props;
-        const { active_filterset } = caseItem || {};
+        this.addNewFilterBlock = _.throttle(this.addNewFilterBlock.bind(this), 750, { trailing: false });
+        this.selectFilterBlockIdx = _.throttle(this.selectFilterBlockIdx.bind(this), 1500, { trailing: false });
+        this.removeFilterBlockAtIdx = this.removeFilterBlockAtIdx.bind(this);
+        this.setNameOfFilterBlockAtIdx = this.setNameOfFilterBlockAtIdx.bind(this);
+        const { initialFilterSetItem } = this.props;
+        const { "@id" : fsID } = initialFilterSetItem;
 
         this.state = {
-            "lastSavedFilterSet" : active_filterset || null,
-            "currFilterSet": active_filterset || null
+            "currFilterSet" : { ...initialFilterSetItem },
+            // todo: maybe change to allow multiple in future?
+            "selectedFilterBlockIdx" : 0, // null,
+            // "lastSavedFilterSet" : fsID ? initialFilterSetItem : null // might move elsewhere to like FilterSetUIBlocks
         };
     }
 
-    render(){
-        const { children } = this.props;
-        const passProps = { // TODO
+    // Maybe todo (depending on if can realistically occur): componentDidUpdate { if initialFilterSetItem changed, reset state }
 
+    addNewFilterBlock(newFilterBlock = null, cb){
+        this.setState(function({ currFilterSet: pastFS }){
+            const { filter_blocks = [] } = pastFS;
+            const nextFB = filter_blocks.slice();
+            let { name, query } = newFilterBlock || {};
+            if (!name) {
+                // Generate new name
+                const highestAutoCount = nextFB.reduce(function(m, { name = "" }){
+                    const match = name.match(/^(New Filter Block )(\d+)/);
+                    if (!match || !match[2]) return m;
+                    return Math.max(m, parseInt(match[2]));
+                }, 0);
+                name = "New Filter Block " + (highestAutoCount + 1);
+            }
+            if (!query) {
+                query = "";
+            }
+            nextFB.push({ name, query });
+            return {
+                "currFilterSet": {
+                    ...pastFS,
+                    "filter_blocks" : nextFB
+                },
+                "selectedFilterBlockIdx" : nextFB.length - 1
+            };
+        }, cb);
+    }
+
+    removeFilterBlockAtIdx(idx, cb){
+        this.setState(function({ currFilterSet: pastFS, selectedFilterBlockIdx }){
+            const { filter_blocks = [] } = pastFS;
+            const nextFB = filter_blocks.slice();
+            nextFB.splice(idx, 1);
+
+            if (selectedFilterBlockIdx !== null) {
+                // Unset or shift it down if needed
+                if (selectedFilterBlockIdx === idx) {
+                    selectedFilterBlockIdx = null;
+                } else if (selectedFilterBlockIdx > idx) {
+                    selectedFilterBlockIdx = selectedFilterBlockIdx - 1;
+                }
+            }
+            return {
+                "currFilterSet": {
+                    ...pastFS,
+                    "filter_blocks" : nextFB
+                },
+                selectedFilterBlockIdx
+            };
+        }, cb);
+    }
+
+    setNameOfFilterBlockAtIdx(idx, newName, cb){
+        this.setState(function({ currFilterSet: pastFS }){
+            const { filter_blocks = [] } = pastFS;
+            const nextFB = filter_blocks.slice();
+            const nextBlock = { ...nextFB[idx] };
+            nextBlock.name = newName;
+            nextFB[idx] = nextBlock;
+            return {
+                "currFilterSet": {
+                    ...pastFS,
+                    "filter_blocks" : nextFB
+                }
+            };
+        }, cb);
+    }
+
+    selectFilterBlockIdx(index = null){
+        this.setState(function({ selectedFilterBlockIdx: pastIdx }){
+            if (index !== null && pastIdx === index) {
+                // Clear it.
+                return { "selectedFilterBlockIdx" : null };
+            }
+            return { "selectedFilterBlockIdx" : index };
+        });
+    }
+
+    render(){
+        const { children, ...remainingProps } = this.props;
+        const { currFilterSet, selectedFilterBlockIdx, lastSavedFilterSet } = this.state;
+        const passProps = { // TODO
+            ...remainingProps,
+            currFilterSet,
+            selectedFilterBlockIdx,
+            addNewFilterBlock: this.addNewFilterBlock,
+            removeFilterBlockAtIdx: this.removeFilterBlockAtIdx,
+            selectFilterBlockIdx: this.selectFilterBlockIdx,
+            setNameOfFilterBlockAtIdx: this.setNameOfFilterBlockAtIdx
         };
         return React.Children.map(children, (child)=>{
-            if (!React.isValidElement(child)) {
+            if (!React.isValidElement(child)) { // String or something
                 return child;
             }
-            if (typeof child.type === "string") {
+            if (typeof child.type === "string") { // Normal element (a, div, etc)
                 return child;
             }
             return React.cloneElement(child, passProps);

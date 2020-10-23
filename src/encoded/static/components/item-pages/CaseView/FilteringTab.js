@@ -12,7 +12,7 @@ import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { DisplayTitleColumnWrapper, DisplayTitleColumnDefault } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
-import { FilteringTableFilterSetUI } from './FilteringTableFilterSetUI';
+import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
 
 const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ hgvsc }){
     // Memoized on the 1 prop it receives which is dependency for its calculation.
@@ -280,6 +280,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     const { context = null, windowHeight, session = false } = props;
     const {
         display_title: caseDisplayTitle,
+        accession: caseAccession,
         initial_search_href_filter_addon = "",
         active_filterset = null
     } = context || {};
@@ -299,7 +300,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     const searchHrefWithCurrentFilter = searchHrefInitial + (currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "");
 
     // Hide facets that are ones used to initially narrow down results to those related to this case.
-    const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible } = useMemo(function(){
+    const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem } = useMemo(function(){
 
         const onClearFiltersVirtual = function(virtualNavigateFxn, callback) {
             // By default, EmbeddedSearchItemView will reset to props.searchHref.
@@ -319,7 +320,20 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             hideFacets = Object.keys(queryString.parse(initial_search_href_filter_addon));
         }
 
-        return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible };
+        const blankFilterSetItem = {
+            // Lack of "@id" will imply is a brand new FilterSet Item.
+            "title" : "New FilterSet for Case " + caseAccession,
+            "created_in_case_accession" : caseAccession,
+            "search_type": "VariantSample",
+            "filter_blocks" : [
+                {
+                    "name" : "New Filter Block 1",
+                    "query" : ""
+                }
+            ]
+        };
+
+        return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem };
     }, [ context ]);
 
     // This maxHeight is stylistic and dependent on our view design/style
@@ -335,7 +349,11 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             </h1>
             <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible }}
                 searchHref={searchHrefWithCurrentFilter}
-                aboveTableComponent={<FilteringTableFilterSetUI filterSet={active_filterset} caseItem={context} />}
+                aboveTableComponent={
+                    <FilterSetController excludeFacets={hideFacets} initialFilterSetItem={active_filterset || blankFilterSetItem}>
+                        <FilteringTableFilterSetUI filterSet={active_filterset} caseItem={context} />
+                    </FilterSetController>
+                }
                 title={
                     <FilteringTabSubtitle caseItem={context} />
                 } key={"session:" + session} />
