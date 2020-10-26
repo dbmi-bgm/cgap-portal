@@ -140,8 +140,12 @@ class SampleProcessing(Item):
                 "relationship": {
                     "title": "Relationship",
                     "type": "string"
+                },
+                "bam_location": {
+                    "title": "Bam File Location",
+                    "type": "string"
                     }
-                }
+            }
             }
         })
     def samples_pedigree(self, request, families=None, samples=None):
@@ -183,6 +187,7 @@ class SampleProcessing(Item):
                 "parents": [],
                 "relationship": "",
                 "sex": "",
+                # "bam_location": "" optional, add if exists
                 # "association": ""  optional, add if exists
             }
             mem_infos = [i for i in all_props if a_sample in i.get('samples', [])]
@@ -190,6 +195,24 @@ class SampleProcessing(Item):
                 continue
             mem_info = mem_infos[0]
             sample_info = get_item_or_none(request, a_sample, 'samples')
+
+            # find the bam file
+            sample_processed_files = sample_info.get('processed_files', [])
+            sample_bam_file = ''
+            # no info about file formats on object frame of sample
+            # cycle through files and check the format
+            for a_file in sample_processed_files:
+                file_info = get_item_or_none(request, a_file, 'files-processed')
+                if not file_info:
+                    continue
+                # if format is bam, record the upload key and exit loop
+                if file_info.get('file_format') == "/file-formats/bam/":
+                    sample_bam_file = file_info.get('upload_key', '')
+                    break
+            # if bam file location was found, add it to temp
+            if sample_bam_file:
+                temp['bam_location'] = sample_bam_file
+
             # fetch the calculated relation info
             relation_infos = [i for i in relations if i['individual'] == mem_info['accession']]
             # fill in temp dict
