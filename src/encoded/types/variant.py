@@ -239,9 +239,11 @@ class VariantSample(Item):
         "type": "string"
     })
     def display_title(self, request, CALL_INFO, variant=None):
-        variant = get_item_or_none(request, variant, 'Variant')
+        variant = get_item_or_none(request, variant, 'Variant', frame='raw')
+        variant_display_title = build_variant_display_title(variant['CHROM'], variant['POS'],
+                                                            variant['REF'], variant['ALT'])
         if variant:
-            return CALL_INFO + ':' + variant['display_title']  # HG002:chr1:504A>T
+            return CALL_INFO + ':' + variant_display_title  # HG002:chr1:504A>T
         return CALL_INFO
 
     @calculated_property(schema={
@@ -287,7 +289,9 @@ class VariantSample(Item):
         "type": "string"
     })
     def bam_snapshot(self, request, file, variant):
-        variant_props = get_item_or_none(request, variant, 'Variant')
+        variant_props = get_item_or_none(request, variant, 'Variant', frame='raw')
+        if variant_props is None:
+            raise RuntimeError('Got none for something that definitely exists')
         file_path = '%s/bamsnap/chr%s:%s.png' % (  # file = accession of associated VCF file
             file, variant_props['CHROM'], variant_props['POS']
         )
