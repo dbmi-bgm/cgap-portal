@@ -2269,6 +2269,7 @@ $download-button-width : 100px;
 	border-radius: $border-radius-lg;
 
 	.blocks-container {
+
 		.filterset-block {
 			border-radius: $border-radius-lg;
 			background-color: desaturate(lighten($primary, 50%), 15%); // #dce4f5; // TODO: Codify somewhere
@@ -2278,6 +2279,13 @@ $download-button-width : 100px;
 			&.selected {
 				border-color: $primary-dark;
 				background-color: lighten($primary, 50%);
+			}
+
+			&[data-duplicate-query="true"] {
+				background-color: desaturate(lighten($danger, 50%), 10%);
+				&.selected {
+					border-color: desaturate(lighten($danger, 10%), 10%);
+				}
 			}
 
 			.title-controls-row {
@@ -2302,12 +2310,17 @@ $download-button-width : 100px;
 							position: relative;
 							box-shadow: 0 2px 8px -3px #000;
 							white-space: nowrap;
-							&:not(:first-child) {
-								margin-left: 7px;
-								&:before {
-									content: "|";
-									transform: scale3d(0.75, 0.75, 0.75);
-									left: -5px;
+							margin: 3px 0;
+							&:not(:last-child) {
+								margin-right: 7px;
+								&:after {
+									content: "";
+									height: 16px;
+									top: 10px;
+									top: calc(50% - 8px);
+									border-right: 1px solid $gray-700;
+									//transform: scale3d(0.75, 0.75, 0.75);
+									right: -4px;
 									position: absolute;
 								}
 							}
@@ -2321,11 +2334,11 @@ $download-button-width : 100px;
 						&:before {
 							content: " ";
 							position: absolute;
-							top: 0px;
+							top: -2px;
 							height: 5px;
 							border: 1px solid #444;
-							left: -3px;
-							right: -3px;
+							left: -4px;
+							right: -4px;
 							border-top: none;
 						}
 					}
@@ -2337,6 +2350,7 @@ $download-button-width : 100px;
 							transform: scale3d(0.75, 0.75, 0.75);
 							right: -12px;
 							top: 10px;
+							top: calc(50% - 24px);
 							position: absolute;
 						}
 

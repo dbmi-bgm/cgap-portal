@@ -292,7 +292,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     // TODO POST request w multiple of these filter_blocks, for now just first 1 is populated and used.
 
-    let searchHrefInitial = "/search/?type=VariantSample"; initial_search_href_filter_addon;
+    let searchHrefInitial = "/search/?type=VariantSample";
     searchHrefInitial += initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "";
     searchHrefInitial += "&sort=date_created";
 
@@ -315,13 +315,13 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             return VirtualHrefController.isClearFiltersBtnVisible(virtualHref, searchHrefInitial);
         };
 
-        let hideFacets = null;
+        let hideFacets = ["type", "validation_errors.name"];
         if (initial_search_href_filter_addon) {
-            hideFacets = Object.keys(queryString.parse(initial_search_href_filter_addon));
+            hideFacets = hideFacets.concat(Object.keys(queryString.parse(initial_search_href_filter_addon)));
         }
 
         const blankFilterSetItem = {
-            // Lack of "@id" will imply is a brand new FilterSet Item.
+            // Lack of "@id" (& "uuid", "accession") will imply is a brand new FilterSet Item.
             "title" : "New FilterSet for Case " + caseAccession,
             "created_in_case_accession" : caseAccession,
             "search_type": "VariantSample",
@@ -335,6 +335,9 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
         return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem };
     }, [ context ]);
+
+    // We might have { error: "no view permissions" } on our filterset, so check @id instead of just active_filterset.
+    const initialFilterSetItem = activeFilterSetID ? active_filterset : blankFilterSetItem;
 
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
@@ -350,8 +353,8 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible }}
                 searchHref={searchHrefWithCurrentFilter}
                 aboveTableComponent={
-                    <FilterSetController excludeFacets={hideFacets} initialFilterSetItem={active_filterset || blankFilterSetItem}>
-                        <FilteringTableFilterSetUI filterSet={active_filterset} caseItem={context} />
+                    <FilterSetController searchHrefBase={searchHrefInitial} excludeFacets={hideFacets} initialFilterSetItem={initialFilterSetItem}>
+                        <FilteringTableFilterSetUI caseItem={context} />
                     </FilterSetController>
                 }
                 title={
