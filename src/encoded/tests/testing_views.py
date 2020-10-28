@@ -281,3 +281,44 @@ def testing_retry(context, request):
         'attempt': request.environ['_attempt'],
         'detached': inspect(model).detached,
     }
+
+
+@collection('testing-hidden-facets')
+class TestingHiddenFacets(Item):
+    """ Collection designed to test searching with hidden facets. """
+    item_type = 'testing_hidden_facets'
+    schema = {
+        'type': 'object',
+        'properties': {
+            'first_name': {
+                'type': 'string'
+            },
+            'last_name': {
+                'type': 'string'
+            },
+            'sid': {
+                'type': 'integer'
+            },
+            'unfaceted_string': {
+                'type': 'string'
+            },
+            'unfaceted_integer': {
+                'type': 'integer'
+            }
+        },
+        'facets': {
+            'first_name': {
+                'title': 'First Name'
+            },
+            'last_name': {
+                'default_hidden': True,
+                'title': 'Last Name'
+            },
+            'sid': {
+                'default_hidden': True,
+                'title': 'SID',
+                'aggregation_type': 'stats',
+                'number_step': 1
+            }
+        }
+    }

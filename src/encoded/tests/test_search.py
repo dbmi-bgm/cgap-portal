@@ -855,3 +855,47 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 1)
         res = testapp.get('/search/?type=Variant&hg19!=No+value').follow().json
         self.assert_length_is_expected(res, 3)
+
+
+@pytest.fixture(scope='session')
+def hidden_facet_data_one():
+    return {
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'sid': 1,
+        'unfaceted_string': 'hello',
+        'unfaceted_integer': 123
+    }
+
+
+@pytest.fixture(scope='session')
+def hidden_facet_data_two():
+    return {
+        'first_name': 'Boston',
+        'last_name': 'Bruins',
+        'sid': 2,
+        'unfaceted_string': 'world',
+        'unfaceted_integer': 456
+    }
+
+
+@pytest.fixture(scope='module')  # TODO consider this further...
+def hidden_facet_test_data(testapp, hidden_facet_data_one, hidden_facet_data_two):
+    testapp.post_json('/TestingHiddenFacets', hidden_facet_data_one, status=201)
+    testapp.post_json('/TestingHiddenFacets', hidden_facet_data_two, status=201)
+    testapp.post_json('/index', {'record': False})
+
+
+class TestSearchHiddenAndAdditionalFacets:
+    DEFAULT_FACETS = ['first_name', 'validation_errors.name']
+    DEFAULT_HIDDEN_FACETS = ['last_name', 'sid']
+    ADDITIONAL_FACETS = ['unfaceted_string', 'unfaceted_integer']
+
+    def test_default_hidden_facets_dont_show(self, testapp, hidden_facet_test_data):
+        facets = testapp.get('/search/?type=TestingHiddenFacets').json['facets']
+        for facet in facets:
+            assert facet['field'] in self.DEFAULT_FACETS
+
+    def test_one_additional_facet(self, testapp, hidden_facet_test_data):
+        """ TODO: implement me and more """
+        pass

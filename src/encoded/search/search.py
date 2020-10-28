@@ -55,6 +55,7 @@ class SearchBuilder:
         API itself. Search is by far our most complicated API, thus there is a lot of state.
     """
     DEFAULT_SEARCH_FRAME = 'embedded'
+    DEFAULT_HIDDEN = 'default_hidden'
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):
@@ -786,10 +787,15 @@ class SearchBuilder:
         aggregations = es_results['aggregations']['all_items']
         used_facets = set()
 
+        # TODO add additional_facets here?
+
         # Sort facets by order (ascending).
         # If no order is provided, assume 0 to
         # retain order of non-explicitly ordered facets
         for field, facet in sorted(self.facets, key=lambda fct: fct[1].get('order', 10000)):
+            if facet.get(self.DEFAULT_HIDDEN, False):  # skip if specified
+                continue
+
             result_facet = {
                 'field': field,
                 'title': facet.get('title', field),
