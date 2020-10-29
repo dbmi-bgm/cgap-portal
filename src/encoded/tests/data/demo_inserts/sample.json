@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "completed_processes": [
             "WGS_partI_V11"
@@ -56,7 +56,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "completed_processes": [
             "WGS_partI_V11"
@@ -112,7 +112,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "completed_processes": [
             "WGS_partI_V11"

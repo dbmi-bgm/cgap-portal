@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -18,7 +18,7 @@
         "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -37,7 +37,7 @@
         "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",

@@ -4,37 +4,68 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [ "email", "first_name", "last_name"],
-    "identifyingProperties": ["uuid", "email", "aliases", "role"],
+    "identifyingProperties": ["uuid", "email", "aliases"],
     "additionalProperties": false,
     "mixinProperties": [
         { "$ref": "mixins.json#/schema_version" },
         { "$ref": "mixins.json#/uuid" },
         { "$ref": "mixins.json#/aliases" },
         { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/attribution" }
+        { "$ref": "mixins.json#/modified" }
     ],
     "properties": {
         "schema_version": {
             "default": "1"
         },
         "status": {
-            "default": "current"
+            "title": "Status",
+            "type": "string",
+            "default": "current",
+            "permission": "restricted_fields",
+            "enum": [
+                "current",
+                "deleted",
+                "inactive",
+                "revoked"
+            ]
+        },
+        "institution": {
+            "title": "Institution",
+             "description": "Institution of whomever created this User Item in the system.",
+             "exclude_from": ["FFedit-create"],
+             "type": "string",
+             "linkTo": "Institution"
+        },
+        "project": {
+            "title": "Project",
+            "description": "Project of whomever created this User Item in the system.",
+            "comment": "The value of this property determines who can potentially edit the User",
+            "exclude_from": ["FFedit-create"],
+            "type": "string",
+            "linkTo": "Project"
         },
         "project_roles": {
-            "title": "User Roles for Projects",
-            "description": "Role of user for each project he/she is part of",
+            "title": "Projects and Roles",
+            "description": "Projects that a User is part of and the role(s) within that Project a User has",
             "type": "array",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "items": {
-                "title": "User Role",
+                "title": "Project and Role",
                 "type": "object",
+                "additionalProperties": false,
+                "required": ["project"],
                 "properties": {
+                    "project": {
+                        "title": "Project",
+                        "description": "Values here are used to authorize view and edit permissions of other Items in the database - eventually in combination with role",
+                        "type": "string",
+                        "linkTo": "Project"
+                    },
                     "role": {
                         "title": "Role",
-                        "description": "The role of the user.",
+                        "description": "The role of the user in the project.",
                         "type": "string",
+                        "default": "unknown",
                         "enum": [
                             "clinician",
                             "scientist",
@@ -45,27 +76,8 @@
                             "other",
                             "unknown"
                         ]
-                    },
-                    "project": {
-                        "title": "Project",
-                        "type": "string",
-                        "linkTo": "Project"
                     }
                 }
-            }
-        },
-        "submits_for": {
-            "title": "Submits for",
-            "description": "Institutions user is authorized to submit data for.",
-            "type": "array",
-            "permission": "import_items",
-            "lookup": 70,
-            "uniqueItems": true,
-            "notes": "This property is obsolete, and should be taken out with next permission implementation",
-            "items": {
-                "description": "An institution user is authorized to submit for.",
-                "type": "string",
-                "linkTo": "Institution"
             }
         },
         "email": {
@@ -88,40 +100,25 @@
             "type": "string",
             "lookup": 40
         },
-        "role": {
-            "title": "Role",
-            "description": "The role of the user.",
+        "job_title": {
+            "title": "Job Title",
             "type": "string",
-            "permission": "import_items",
-            "enum": [
-                "clinician",
-                "scientist",
-                "developer",
-                "director",
-                "project_member",
-                "patient",
-                "other",
-                "unknown"
-            ],
+            "comment": "Can be user supplied - purely informational",
             "lookup": 41
         },
-        "authorized_cohorts":{
-            "title": "Authorized Cohorts",
-            "description": "Cohorts this user is authorized to view or edit, depending on role",
-            "type": "array",
-            "items": {
-                "title": "Cohorts",
-                "type": "string",
-                "linkTo": "Cohort"
-            }
+        "role": {
+            "title": "role (RETIRED FIELD)",
+            "type": "string",
+            "comment": "This used to be the property equivalent to job_title - rather than upgrade will just move the info"
         },
         "groups": {
             "title": "Groups",
             "description": "Additional access control groups",
+            "note": "USE WITH CAUTION - currently how we add admin access to a user",
             "type": "array",
             "lookup": 80,
             "uniqueItems": true,
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "items": {
                 "type": "string"
             }
@@ -145,15 +142,13 @@
             "title": "Alternate phone number",
             "description": "The user's secondary phone number (with country code).",
             "type": "string",
-            "format": "phone",
-            "exclude_from": ["submit4dn"]
+            "format": "phone"
         },
         "fax": {
             "title": "Fax number",
             "description": "A FAX number for the user (with country code).",
             "type": "string",
-            "format": "phone",
-            "exclude_from": ["submit4dn"]
+            "format": "phone"
         },
         "skype": {
             "title": "Skype ID",
@@ -177,11 +172,11 @@
             "title": "Pending Institution",
             "description": "Non-linkTo identifier of an institution this user wants associate with",
             "type": "string",
-            "permission": "import_items"
+            "permission": "restricted_fields"
         },
         "was_unauthorized": {
             "title": "Was Unauthorized",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "description": "Flag that is True if user was created with create-unauthorized-user endpoint",
             "type": "boolean"
         }
@@ -189,9 +184,6 @@
     "facets" : {
         "institution.display_title" : {
             "title" : "Institution"
-        },
-        "submits_for.display_title" : {
-            "title" : "Submits for Institution"
         }
     }
 }

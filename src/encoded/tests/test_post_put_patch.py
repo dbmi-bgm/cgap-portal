@@ -323,14 +323,14 @@ def test_patch_delete_fields_bad_param(content, testapp):
     assert 'bad_fieldname' not in res.json['@graph'][0]
 
 
-def test_patch_delete_fields_import_items_admin(link_targets, testapp):
+def test_patch_delete_fields_restricted_fields_admin(link_targets, testapp):
     res = testapp.post_json(COLLECTION_URL, item_with_link[0], status=201)
     url = res.location
     assert res.json['@graph'][0]['protected_link']
     res = testapp.patch_json(url + "?delete_fields=protected_link", {}, status=200)
 
 
-def test_patch_delete_fields_import_items_submitter(content, testapp, submitter_testapp):
+def test_patch_delete_fields_restricted_fields_submitter(content, testapp, submitter_testapp):
     """
     Since the deleted protected field has a default value in the schema, there
     are two cases for this test:
@@ -352,7 +352,7 @@ def test_patch_delete_fields_import_items_submitter(content, testapp, submitter_
     res_errors = res2.json['errors']
     assert len(res_errors) == 2
     assert res_errors[0]['name'] == "Schema: protected"
-    assert res_errors[0]['description'] == "permission 'import_items' required"
+    assert res_errors[0]['description'] == "permission 'restricted_fields' required"
     assert res_errors[1]['name'] == 'delete_fields'
     assert res_errors[1]['description'] == 'Error deleting fields'
 

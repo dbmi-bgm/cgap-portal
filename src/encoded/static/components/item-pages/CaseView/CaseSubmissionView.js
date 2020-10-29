@@ -20,6 +20,8 @@ import { PageTitleContainer, OnlyTitle, TitleAndSubtitleUnder, pageTitleViews } 
 import { Schemas } from './../../util';
 
 
+// NOT CURRENTLY USED, MAY BE REINTRODUCED IN FUTURE
+
 
 export default class CaseSubmissionView extends React.PureComponent {
 
@@ -193,14 +195,15 @@ function PanelSelectionMenu(props){
     );
 }
 
-
+// NOT CURRENTLY USED, MAY BE REINTRODUCED IN FUTURE
 class PanelOne extends React.PureComponent {
 
+    // OUTDATED - WE NOW HAVE PROJECT_ROLES
     static flatFieldsFromUser(user){
         const {
             institution = {},
             project = {},
-            submits_for = []
+            submits_for = [] // OUTDATED - WE NOW HAVE PROJECT_ROLES
         } = user || {};
         const initState = {
             "institutionID": institution['@id'] || null,
@@ -209,10 +212,10 @@ class PanelOne extends React.PureComponent {
             "projectTitle": project.display_title || null
         };
         if (!initState.institutionID){
-            for (let i = 0; i < submits_for.length; i++){
-                if (!submits_for[i]['@id']) continue;
-                initState.institutionID = submits_for[i]['@id'] || null;
-                initState.institutionTitle = submits_for[i].display_title || null;
+            for (let i = 0; i < submits_for.length; i++){                           // OUTDATED - WE NOW HAVE PROJECT_ROLES
+                if (!submits_for[i]['@id']) continue;                               // OUTDATED - WE NOW HAVE PROJECT_ROLES
+                initState.institutionID = submits_for[i]['@id'] || null;            // OUTDATED - WE NOW HAVE PROJECT_ROLES
+                initState.institutionTitle = submits_for[i].display_title || null;  // OUTDATED - WE NOW HAVE PROJECT_ROLES
                 break;
             }
         }
@@ -758,7 +761,7 @@ class PanelThree extends React.PureComponent {
         /** Status Field */
         const statusTitle = (
             <React.Fragment>
-                <i className="item-status-indicator-dot mr-1" data-status={status}/>
+                <i className="status-indicator-dot mr-1" data-status={status}/>
                 { Schemas.Term.toName("status", status) }
             </React.Fragment>
         );
@@ -766,7 +769,7 @@ class PanelThree extends React.PureComponent {
         const statusOpts = statusFieldSchema.enum.map(function(statusOpt){
             return (
                 <DropdownItem key={statusOpt} eventKey={statusOpt}>
-                    <i className="item-status-indicator-dot mr-1" data-status={statusOpt}/>
+                    <i className="status-indicator-dot mr-1" data-status={statusOpt}/>
                     { Schemas.Term.toName("status", statusOpt) }
                 </DropdownItem>
             );

@@ -36,7 +36,7 @@
         "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "666e24391f38e5ad4a77fb3f9d3908d2",
         "uuid": "f573cbeb-036c-4348-bed7-27a108126d09",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -68,7 +68,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "64edf0ddaf7bc44e5d535876a092bfc4",
         "uuid": "f50655c9-e3ad-4110-8c56-5ad905b2cddc",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -131,7 +131,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "55a2cabddcb84c0c62ea351e3b3b9c73",
         "uuid": "93f9cefb-c30e-4b03-8e2b-3215a72c5dd9",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -163,7 +163,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "6a8a54c8b58ae40eb9f757162bc42028",
         "uuid": "82b54421-d76d-4383-b49b-607d68cd703e",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -194,7 +194,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "8b52af755e590346cc6970f079237075",
         "uuid": "7966b49e-8c78-4df7-9433-c2548be23088",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -225,7 +225,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "7f0e6099c861c3a74471b0e812789350",
         "uuid": "14ca4678-05a9-48b7-b225-374dee54cccb",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -256,7 +256,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "6ed3a4ee7eb9841381d14998f14a8c57",
         "uuid": "eca5a9ac-f00a-4279-aab9-3f4ed17015c9",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -275,7 +275,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "6d3df9b0367a26b9b1668b09c04dd9b6",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "ea43a01e-03a6-4ac5-a3fd-2a922bb2adf4",
@@ -304,7 +304,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "bc27c82a5ad50715cd971977c95a6d63",
         "uuid": "d87b2ea0-d0d3-4e4b-84e5-e32ee572ae96",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -353,7 +353,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "1939cb0962905f37a35c036c6a77b9aa",
         "uuid": "bafedc46-753b-409a-a76f-cdc3a3065e7d",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -372,7 +372,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "afd08ff92f1e4d03ee587ab761aa12e9",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "b3eea806-3f55-4a8c-b7f7-3438bb4ac1b3",
@@ -401,7 +401,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "ce914caa3496734c4f22f7c47bd7c967",
         "uuid": "afd716d4-714f-4df3-80be-014269c2821d",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -420,7 +420,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "18fb102f310e31976d20af163871442b",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "74423e1f-010f-4989-b2d3-b5e92b0e85e0",
@@ -450,7 +450,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "64c8af6ebbeef5d4e34a4c785b9db24a",
         "uuid": "6577ba40-57ef-40c7-95cb-1557718d3005",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -469,7 +469,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "7caba51f510310cfa10deed703879cc0",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "620ce445-fc71-4f65-b429-353e9ed02d2c",
@@ -498,7 +498,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "c56f001811b5eb9bd789a929aadb268d",
         "uuid": "61703fbc-4024-4d5d-8ba7-4ebcbd43f528",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -516,7 +516,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "bbadcd21bd2e324dcbbebfafcc3be188",
         "uuid": "3e51d717-bc6f-444d-98dd-fca2a60df2be",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -534,7 +534,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "0a510c37fa471e357f77020c93b5a246",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "2a4ca6dd-611b-4961-8e52-4ee297c682ff",
@@ -563,7 +563,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "b92a1218f6b5ec5c33a359d4f9fcae90",
         "uuid": "20c51c3c-c242-4489-8f5d-2bfe33ee7552",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -582,7 +582,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "092228ff3617b2e6997d56d25c54d008",
         "uuid": "2005cb42-9613-4e9a-931c-22be0b5af1e1",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -600,7 +600,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "584e99bfa282f9c3c9f1daabfcad14de",
         "uuid": "ec82bb3f-a033-4889-9872-14cd948e155b",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -619,7 +619,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "2f2e9f420ccb4f55a6815e7aed2cf0fe",
         "uuid": "eb793b65-fa13-4d17-931e-267abf10ccc2",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -638,7 +638,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "1a9970ce38f9b1eb31397a5f530e16e4",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "9bd2426c-06b6-4e90-a67f-6727bf1b359f",
@@ -668,7 +668,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "bb040a0cef358a9d84abf663e46490b4",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "77953507-7be8-4d78-a50e-97ddab7e1c13",
@@ -702,7 +702,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "b4ef620c997f44b1f9102dd69f4aea67",
         "uuid": "76696a96-ffbf-47d6-9f04-3ce233ddb4cb",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -721,7 +721,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "ad333b8c1d9f2ca07862fc62f2567972",
         "uuid": "74085ab7-de6e-4a90-8b58-a4394d010609",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -740,7 +740,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "20fcf4f4ff5a94a53dd53628d52bdede",
         "uuid": "6744d4c8-a0a2-4619-ada4-1f68991fb994",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -789,7 +789,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "44165cbd7695318f2a970a86cb86e7a8",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "475ee0a6-609c-4ee4-8636-3b180d4a730f",
@@ -818,7 +818,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "c81461eb000df318b6278a0ef30955b0",
         "uuid": "3999a31d-d15d-433e-8bdf-88150fbfcbd4",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
@@ -837,7 +837,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "d7966fb41b633e6cce234173e48d97a5",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "340c57ac-0c62-43ee-8758-c7c6e78eaeda",
@@ -867,7 +867,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "b4dfc1ae5716a6ba41a2ef3cf845206c",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "b8473e3e-31c5-4e8c-b35e-3873ec83a449",
@@ -883,7 +883,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "a2e14c502a3935ccec689cd61bea43dd",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "4191d2e2-a518-448f-8fd5-0c7e134e225f",
@@ -929,7 +929,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "00ffe8369c83fcad7a3c6888e2b7ef14",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "20004873-b672-4d84-a7c1-7fd5c0407519",
@@ -949,7 +949,7 @@
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "8af84fd571b95012127d3f0f2c98a279",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "1625a872-1546-42f7-9689-b77fa0d1d25f",

@@ -684,7 +684,7 @@ class Workflow(Item):
         "title": "Newer Versions",
         "description": "Newer versions of this workflow",
         "type": "array",
-        "exclude_from": ["submit4dn", "FFedit-create"],
+        "exclude_from": ["FFedit-create"],
         "items": {
             "title": "Newer versions",
             "type": ["string", "object"],

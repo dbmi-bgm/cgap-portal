@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "ff3031d93792f4cbb86af44055efd903",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "297c872a-5b6b-4fc3-83d3-f4a853f8805c",
@@ -20,7 +20,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "cfbbd30794f8d36bd8084a05eceeef6d",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "filename": "GAPFIBGEOI72.txt",
@@ -87,7 +87,7 @@
         "file_version_date": "2020-08-07"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
@@ -143,7 +143,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "a1d504ee-a313-4064-b6ae-65fed9738980",
@@ -161,7 +161,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "8ed35691-0af4-467a-adbc-81eb088549f0",
@@ -190,7 +190,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
@@ -228,7 +228,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "55ac5044-f927-4df7-afa2-bf713764ee57",
@@ -257,7 +257,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "f75084416a858cddaf0e373936314d65",
         "file_version": "0.4.4",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",

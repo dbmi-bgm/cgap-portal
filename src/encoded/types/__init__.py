@@ -19,10 +19,10 @@ from .base import (
     Item,
     get_item_or_none,
     set_namekey_from_title,
-    ALLOW_OWNER_EDIT,
-    ALLOW_CURRENT,
-    DELETED,
-    ONLY_ADMIN_VIEW
+    # ALLOW_OWNER_EDIT,
+    # ALLOW_CURRENT,
+    DELETED_ACL,
+    ONLY_ADMIN_VIEW_ACL
 )
 
 
@@ -125,6 +125,9 @@ class Document(ItemWithAttachment, Item):
             return attachment.get('download')
         return Item.display_title(self)
 
+    class Collection(Item.Collection):
+        pass
+
 
 @collection(
     name='file-formats',
@@ -164,9 +167,9 @@ class TrackingItem(Item):
     embedded_list = []
     STATUS_ACL = Item.STATUS_ACL.copy()
     STATUS_ACL.update({
-        'released': ALLOW_OWNER_EDIT + ALLOW_CURRENT,
-        'deleted': ALLOW_OWNER_EDIT + DELETED,
-        'draft': ALLOW_OWNER_EDIT + ONLY_ADMIN_VIEW,
+        'released': ONLY_ADMIN_VIEW_ACL,
+        'deleted': DELETED_ACL,
+        'draft': ONLY_ADMIN_VIEW_ACL
     })
 
     @classmethod
