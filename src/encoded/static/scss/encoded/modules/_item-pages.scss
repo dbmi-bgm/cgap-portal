@@ -2284,7 +2284,7 @@ $download-button-width : 100px;
 			&[data-duplicate-query="true"] {
 				background-color: desaturate(lighten($danger, 50%), 10%);
 				&.selected {
-					border-color: desaturate(lighten($danger, 10%), 10%);
+					border-color: desaturate(lighten($danger, 10%), 20%);
 				}
 			}
 
@@ -2305,12 +2305,14 @@ $download-button-width : 100px;
 					.value-blocks {
 						.value-block {
 							border-radius: $border-radius-lg;
-							padding: 6px 10px;
+							padding: 5px 10px;
 							background-color: #fff;
 							position: relative;
 							box-shadow: 0 2px 8px -3px #000;
 							white-space: nowrap;
 							margin: 3px 0;
+							flex-grow: 1;
+							text-align: center;
 							&:not(:last-child) {
 								margin-right: 7px;
 								&:after {

@@ -9,6 +9,7 @@ from .search import SearchBuilder
 from .lucene_builder import LuceneBuilder
 from .search_utils import execute_search
 from ..types.filter_set import FLAGS, FILTER_BLOCKS
+import os
 
 
 def includeme(config):
@@ -39,7 +40,7 @@ class CompoundSearchBuilder:
         :param parent_request: parent_request who possesses permissions
         :param sub_request: request who requires the permissions of the parent request
         """
-        sub_request.environ['REMOTE_USER'] = parent_request.environ['REMOTE_USER']
+        sub_request.environ['REMOTE_USER'] = parent_request.environ.get('REMOTE_USER')
         sub_request.__parent__ = None  # XXX: set parent request (is None *always* correct?) -Will
         sub_request.registry = parent_request.registry  # transfer registry as well
 

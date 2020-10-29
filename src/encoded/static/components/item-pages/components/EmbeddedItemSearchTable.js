@@ -21,6 +21,7 @@ import { EmbeddedSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/co
 export function EmbeddedItemSearchTable (props){
     const {
         embeddedTableHeader: propEmbeddedTableHeader,
+        embeddedTableFooter,
         /** @deprecated in favor of embeddedTableHeader */
         title,
         children,
@@ -51,8 +52,9 @@ export function EmbeddedItemSearchTable (props){
         facets, columns, columnExtensionMap, searchHref, session,
         schemas, renderDetailPane, defaultOpenIndices, maxHeight,
         rowHeight, onClearFiltersVirtual, isClearFiltersBtnVisible,
-        aboveTableComponent, aboveFacetListComponent, embeddedTableHeader,
-        // TODO: belowTableComponent, belowFacetListComponent, embeddedTableFooter
+        aboveTableComponent, aboveFacetListComponent,
+        embeddedTableHeader, embeddedTableFooter,
+        // TODO: belowTableComponent, belowFacetListComponent,
         filterFacetFxn, hideFacets,
         filterColumnFxn, hideColumns,
         onLoad,

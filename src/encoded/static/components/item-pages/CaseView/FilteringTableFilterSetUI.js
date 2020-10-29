@@ -74,8 +74,14 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             return true;
         }
 
-        // Turns out this works good -
-        return !_.isEqual(savedFilterSet, currFilterSet);
+        // Eventually can add 'status' to this as well, if UI to edit it added.
+        const fieldsToCompare = ["filter_blocks", "title", "flags"];
+
+        return !_.isEqual(
+            // Skip over comparing fields that differ between frame=embed and frame=raw
+            _.pick(savedFilterSet, ...fieldsToCompare),
+            _.pick(currFilterSet, ...fieldsToCompare)
+        );
     }
 
     /**
@@ -110,6 +116,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const { caseItem } = props;
         const { active_filterset = null } = caseItem;
         this.toggleOpen = _.throttle(this.toggleOpen.bind(this), 750);
+        this.saveFilterSet = _.throttle(this.saveFilterSet.bind(this), 1500);
 
         this.memoized = {
             buildFacetDictionary: memoize(FilteringTableFilterSetUI.buildFacetDictionary, function(newArgs, lastArgs){
@@ -129,21 +136,23 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         this.state = {
             "bodyOpen": false,
             "bodyMounted": false, // Is set to true for 750ms after closing to help keep contents visible until collapsed.
-            "lastSavedFilterSet" : active_filterset
+            "lastSavedFilterSet": active_filterset,
+            "isSavingFilterSet": false
         };
     }
 
-    componentDidUpdate({ currFilterSet: pastFilterSet }){
-        const { currFilterSet } = this.props;
-        if (pastFilterSet !== currFilterSet) {
-            ReactTooltip.rebuild();
+    componentDidUpdate(pastProps, pastState){
+        const { currFilterSet: pastFilterSet, selectedFilterBlockIdx: pastSelectedIdx } = pastProps;
+        const { bodyOpen: pastBodyOpen } = pastState;
+        const { currFilterSet, selectedFilterBlockIdx } = this.props;
+        const { bodyOpen } = this.props;
+        if (pastFilterSet !== currFilterSet || selectedFilterBlockIdx !== pastSelectedIdx || (bodyOpen && !pastBodyOpen)) {
+            setTimeout(ReactTooltip.rebuild, 0);
         }
     }
 
     toggleOpen(evt){
-        evt.stopPropagation();
-        evt.preventDefault();
-        this.setState(function({ bodyOpen: exstOpen, reallyOpen }){
+        this.setState(function({ bodyOpen: exstOpen }){
             const bodyOpen = !exstOpen;
             return { bodyOpen, bodyMounted: true };
         }, () => {
@@ -156,6 +165,99 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         });
     }
 
+    saveFilterSet(){
+        const { currFilterSet: filterSet, caseItem } = this.props;
+        const { lastSavedFilterSet } = this.state;
+        const {
+            "@id": caseAtID,
+            project: {
+                "@id": caseProjectID
+            } = {},
+            institution: {
+                "@id" : caseInstitutionID
+            } = {}
+        } = caseItem;
+        const { "@id": existingFilterSetID } = lastSavedFilterSet || {};
+
+        // No error handling (e.g. lastSavedFilterSet not having view permissions for) done here as assumed inaccessible.
+
+        /**
+         * Remove any calculated or linkTo things from PATCH/POST payload.
+         * linkTos must be transformed to UUIDs before POST as well.
+         * Hardcoded here since UI is pretty specific to it.
+         */
+        const fieldsToKeepPrePatch = ["title", "filter_blocks", "search_type", "flags", "created_in_case_accession", "uuid", "status"];
+
+
+        const patchFilterSet = () => {
+            ajax.load(existingFilterSetID, (res) => {
+                const { "@graph" : [ existingFilterSetItem ] } = res;
+                this.setState({
+                    "lastSavedFilterSet": existingFilterSetItem,
+                    "isSavingFilterSet": false
+                });
+                // callback(existingFilterSetItem);
+            }, "PATCH", (err) => {
+                console.error("Error PATCHing existing FilterSet", err);
+                Alerts.queue({
+                    "title" : "Error PATCHing existing FilterSet",
+                    "message" : JSON.stringify(err),
+                    "style" : "danger"
+                });
+                this.setState({ "isSavingFilterSet" : false });
+            }, JSON.stringify(
+                _.pick(filterSet, ...fieldsToKeepPrePatch)
+            ));
+        };
+
+        const createFilterSet = () => {
+            const payload = _.pick(filterSet, ...fieldsToKeepPrePatch);
+            // `institution` & `project` are set only upon create.
+            payload.institution = caseInstitutionID;
+            payload.project = caseProjectID;
+            ajax.load("/filter-sets/", (res) => {
+                const { "@graph" : [ newFilterSetItemRes ] } = res;
+                const { uuid: nextFilterSetUUID } = newFilterSetItemRes;
+
+                // Next, patch caseItem.active_filterset
+                console.info("Setting 'active_filterset'", newFilterSetItemRes);
+                ajax.load(caseAtID, (casePatchResponse) => {
+                    console.info("PATCHed Case Item", casePatchResponse);
+                    this.setState({
+                        "lastSavedFilterSet": newFilterSetItemRes,
+                        "isSavingFilterSet": false
+                    });
+                }, "PATCH", (err) => {
+                    console.error("Error PATCHing Case", err);
+                    Alerts.queue({
+                        "title" : "Error PATCHing Case",
+                        "message" : JSON.stringify(err),
+                        "style" : "danger"
+                    });
+                    this.setState({ "isSavingFilterSet" : false });
+                }, JSON.stringify({ "active_filterset" : nextFilterSetUUID }));
+
+            }, "POST", (err) => {
+                console.error("Error POSTing new FilterSet", err);
+                Alerts.queue({
+                    "title" : "Error POSTing new FilterSet",
+                    "message" : JSON.stringify(err),
+                    "style" : "danger"
+                });
+                this.setState({ "isSavingFilterSet" : false });
+            }, JSON.stringify(payload));
+        };
+
+        this.setState({ "isSavingFilterSet" : true }, function(){
+            if (existingFilterSetID) {
+                patchFilterSet();
+            } else {
+                createFilterSet();
+            }
+        });
+
+    }
+
 
     render(){
         const {
@@ -164,15 +266,14 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
 
             // From FilteringTab:
-            caseItem: {
-                display_title: caseTitle = null,
-            } = {},
-            excludeFacets = [],
+            caseItem,
 
             // From FilterSetController:
             currFilterSet: filterSet = null,
+            excludeFacets,
             cachedCounts = {},
-            addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx
+            addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx,
+            setNameOfFilterBlockAtIdx, setTitleOfFilterSet
         } = this.props;
         const { total: totalCount, facets = null } = searchContext || {};
         const {
@@ -181,26 +282,19 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             error: fsError = null,
             title: fsTitle = null
         } = filterSet || {};
-        const { bodyOpen, bodyMounted, lastSavedFilterSet } = this.state;
+        const { bodyOpen, bodyMounted, lastSavedFilterSet, isSavingFilterSet } = this.state;
 
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
         const facetDict = this.memoized.buildFacetDictionary(facets, excludeFacets);
         const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, filterSet);
         const { duplicateQueryIndices, duplicateNameIndices } = this.memoized.findDuplicateBlocks(filter_blocks);
 
-        // Too long:
-        // const headerTitle = (
-        //     fsTitle ? (caseTitle ? caseTitle + " - " : "") + fsTitle
-        //         : null // Todo: some fallback maybe
+        // console.log(
+        //     'FILTERSETUIPROPS',
+        //     this.props,
+        //     hasFilterSetChanged,
+        //     cachedCounts
         // );
-
-
-        console.log(
-            'FILTERSETUIPROPS',
-            this.props,
-            hasFilterSetChanged,
-            cachedCounts
-        );
 
         let body = null;
         if (bodyMounted) {
@@ -215,8 +309,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         return (
             // TODO Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
             <div className="above-variantsample-table-ui">
-                <div className="filterset-outer-container rounded">
-                    <FilterSetUIHeader {...{ filterSet, bodyOpen }} toggleOpen={this.toggleOpen} />
+                <div className="filterset-outer-container">
+                    <FilterSetUIHeader {...{ filterSet, bodyOpen, caseItem, duplicateQueryIndices, duplicateNameIndices, hasFilterSetChanged, isSavingFilterSet, setTitleOfFilterSet }}
+                        toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
                     <Collapse in={bodyOpen}>
                         <div className="filterset-blocks-container">
                             { body }
@@ -235,7 +330,13 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
 }
 
-function FilterSetUIHeader({ filterSet, toggleOpen, bodyOpen }){
+function FilterSetUIHeader(props){
+    const {
+        filterSet, caseItem,
+        toggleOpen, bodyOpen, hasFilterSetChanged, duplicateQueryIndices, duplicateNameIndices,
+        saveFilterSet, isSavingFilterSet, setTitleOfFilterSet
+    } = props;
+    const { actions: ctxActions = [] } = caseItem || {};
     const {
         '@id': filterSetID,
         error: fsError = null,
@@ -243,10 +344,22 @@ function FilterSetUIHeader({ filterSet, toggleOpen, bodyOpen }){
         display_title: fsDisplayTitle = null
     } = filterSet || {};
 
-    let title = fsTitle || fsDisplayTitle;
+    const haveEditPermission = useMemo(function(){
+        return _.findWhere(ctxActions, { "name" : "edit" });
+    }, [ ctxActions ]);
+
+    const [ isEditingTitle, setIsEditingTitle ] = useState(false);
+
+    function onEditClick(e){
+        e.stopPropagation();
+        e.preventDefault();
+        setIsEditingTitle(true);
+    }
 
     if (fsError && !filterSetID) {
-        // No view permission
+        // No view permission - shouldn't occur anymore since would get blankFilterSetItem in FilteringTab as initialFilterSetItem
+        // but kept in case need to handle such case in future.
+        // TODO: Add analytics here (?).
         return (
             <div className="px-3 py-3">
                 <h4 className="text-400 my-0">
@@ -256,26 +369,72 @@ function FilterSetUIHeader({ filterSet, toggleOpen, bodyOpen }){
         );
     }
 
-    if (!filterSet) {
-        // Might not be an issue if later in FilterSetController we init a temp empty 1.
-        // Update: Currently not an issue, will remove soon/later..
-        title = <em>Not Yet Created</em>;
+
+    let titleBlock = null;
+    if (isEditingTitle) {
+        titleBlock = (
+            <form className="d-flex align-items-center mb-0" action="#case-info.filtering" onSubmit={function(e){
+                e.stopPropagation();
+                e.preventDefault();
+                setIsEditingTitle(false);
+                const formElem = e.target;
+                const inputElem = formElem.children[0];
+                setTitleOfFilterSet(inputElem.value);
+            }}>
+                <input type="text" name="filterName" className="form-control" defaultValue={fsTitle || fsDisplayTitle} />
+                <button type="reset" className="btn btn-sm btn-outline-dark ml-08" onClick={function(e){
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setIsEditingTitle(false);
+                }}>
+                    <i className="icon icon-fw icon-times fas" />
+                </button>
+                <button type="submit" className="btn btn-sm btn-outline-success ml-08"><i className="icon icon-fw icon-check fas" /></button>
+            </form>
+        );
+    } else {
+        titleBlock = (
+            <h4 className="text-400 clickable my-0 d-inline-block" onClick={toggleOpen}>
+                <i className={"small icon icon-fw fas mr-07 icon-" + (bodyOpen ? "minus" : "plus")} />
+                { fsTitle || fsDisplayTitle || <em>No Title Set</em> }
+                { bodyOpen ? <i className="icon icon-pencil-alt fas ml-1 clickable small text-secondary" onClick={onEditClick} /> : null }
+            </h4>
+        );
     }
 
+    const haveDuplicateQueries = _.keys(duplicateQueryIndices).length > 0;
+    const haveDuplicateNames = _.keys(duplicateNameIndices) > 0;
+
+    const editBtnDisabled = !bodyOpen || !hasFilterSetChanged || !haveEditPermission || haveDuplicateQueries || haveDuplicateNames || isSavingFilterSet;
+
+    function onSaveBtnClick(e){
+        e.stopPropagation();
+        if (editBtnDisabled) {
+            // Report analytics maybe.
+            return false;
+        }
+        saveFilterSet();
+    }
+
+    // todo if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
     return (
         <div className="row align-items-center px-3 py-3">
-            <div className="col">
-                <h4 className="text-400 clickable my-0" onClick={toggleOpen}>
-                    <i className={"small icon icon-fw fas mr-07 icon-" + (bodyOpen ? "minus" : "plus")} />
-                    { title }
-                </h4>
-            </div>
+            <div className="col">{ titleBlock }</div>
             <div className="col-auto">
-                if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
+                { haveDuplicateQueries || haveDuplicateNames ?
+                    <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-secondary"
+                        data-tip={`Filter blocks with duplicate ${haveDuplicateQueries ? "queries" : "names"} exist below`} />
+                    : null }
+                <button type="button" className="btn btn-primary" disabled={editBtnDisabled} onClick={onSaveBtnClick}>
+                    { isSavingFilterSet ?
+                        <i className="icon icon-spin icon-circle-notch fas" />
+                        : "Save Current Filter Set" }
+                </button>
             </div>
         </div>
     );
 }
+
 
 /** Renders the Blocks */
 
@@ -284,35 +443,42 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         filterSet, facetDict,
         addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
         cachedCounts, duplicateQueryIndices, duplicateNameIndices } = props;
-    const {
-        "@id" : filterSetID,
-        filter_blocks = []
-    } = filterSet || {};
-
-    if (filter_blocks.length === 0) {
-        return (
-            <div className="py-3 px-2">
-                <h4>No Blocks Defined</h4>
-            </div>
-        );
-    }
+    const { filter_blocks = [], query = "" } = filterSet || {};
+    const { query: currentBlockQuery = null } = (typeof selectedFilterBlockIdx === "number" && filter_blocks[selectedFilterBlockIdx]) || {};
 
     function onAddBtnClick(e){
         e.stopPropagation();
-        // Todo: consider passing in new filterblock definition
-        // that has query set to current search URL (minus ~`hideFacets`?)
         addNewFilterBlock();
+    }
+
+    function onCopyBtnClick(e){
+        e.stopPropagation();
+        addNewFilterBlock({ "query" : currentBlockQuery });
     }
 
     const commonProps = { facetDict, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, duplicateQueryIndices, duplicateNameIndices, cachedCounts };
 
     return (
         <div className="blocks-container px-3 pb-16">
-            { filter_blocks.map(function(fb, index){
+            { filter_blocks.length > 0 ? filter_blocks.map(function(fb, index){
                 const selected = selectedFilterBlockIdx !== null && selectedFilterBlockIdx === index;
                 return <FilterBlock {...commonProps} filterBlock={fb} index={index} key={index} selected={selected} />;
-            }) }
-            <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick}>Add New Filter Block</button>
+            }) : (
+                <div className="py-3 px-3">
+                    <h4 className="text-400 text-center my-0">No Blocks Defined</h4>
+                </div>
+            ) }
+            <div className="btn-group" role="group" aria-label="Basic example">
+                <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
+                    <i className="icon icon-fw icon-plus fas mr-1" />
+                    Add New Filter Block
+                </button>
+                { currentBlockQuery ?
+                    <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} data-tip="Copy currently-selected filter block">
+                        <i className="icon icon-fw icon-clone far mr" />
+                    </button>
+                    : null }
+            </div>
         </div>
     );
 });
@@ -343,6 +509,12 @@ const FilterBlock = React.memo(function FilterBlock(props){
     const isDuplicateName = typeof duplicateNameIndices[index] === "number";
 
     const [ isEditingTitle, setIsEditingTitle ] = useState(false);
+
+    function onEditClick(e){
+        e.stopPropagation();
+        e.preventDefault();
+        setIsEditingTitle(true);
+    }
 
     function onRemoveClick(e){
         e.stopPropagation();
@@ -393,7 +565,7 @@ const FilterBlock = React.memo(function FilterBlock(props){
                 <span className={titleCls} data-tip={isDuplicateName ? "Duplicate title of filter block #" + (duplicateNameIndices[index] + 1) : null}>
                     { filterName || <em>No Name</em> }
                 </span>
-                <i className="icon icon-pencil-alt fas ml-1 clickable" onClick={function(){ setIsEditingTitle(true); }} />
+                <i className="icon icon-pencil-alt fas ml-1 clickable" onClick={onEditClick} />
             </React.Fragment>
         );
     }
@@ -401,7 +573,7 @@ const FilterBlock = React.memo(function FilterBlock(props){
     return (
         <div className={"filterset-block clickable mb-16" + (selected ? " selected" : "") + (!isEditingTitle ? " clickable" : "")}
             onClick={!isEditingTitle ? onSelectClick : null} data-duplicate-query={isDuplicateQuery} data-tip={isDuplicateQuery ? "Duplicate query of filter block #" + (duplicateQueryIndices[index] + 1) : null}>
-            <div className="row px-2 py-1 title-controls-row">
+            <div className="row px-2 pt-08 pb-04 title-controls-row">
                 <div className="col">
                     { title }
                 </div>
@@ -416,6 +588,14 @@ const FilterBlock = React.memo(function FilterBlock(props){
 
 const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict }) {
     const { query: filterStrQuery } = filterBlock;
+
+    if (!filterStrQuery) {
+        return (
+            <div className="py-1 px-2">
+                <em>No Filters Selected</em>
+            </div>
+        );
+    }
 
     // Taken from SPC/RangeFacet
     function formatRangeVal(field, rangeVal){
@@ -467,7 +647,7 @@ const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict }) 
             } else {
                 removedRangeFacetAppendage = true;
                 v = v.map(function(rangeVal, i){
-                    return <span key={i}><i className="icon icon-fw icon-greater-than-equal fas"/>{ formatRangeVal(field, rangeVal) }</span>;
+                    return <span key={i}><i className="icon icon-fw icon-greater-than-equal small fas mr-08"/>{ formatRangeVal(field, rangeVal) }</span>;
                 });
             }
 
@@ -479,7 +659,7 @@ const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict }) 
             } else {
                 removedRangeFacetAppendage = true;
                 v = v.map(function(rangeVal, i){
-                    return <span key={i}><i className="icon icon-fw icon-less-than-equal fas"/>{ formatRangeVal(field, rangeVal) }</span>;
+                    return <span key={i}><i className="icon icon-fw icon-less-than-equal fas small mr-08"/>{ formatRangeVal(field, rangeVal) }</span>;
                 });
             }
         }
@@ -591,7 +771,8 @@ export class FilterSetController extends React.PureComponent {
                 "term" : PropTypes.string.isRequired
             }))
         }),
-        "searchHrefBase" : PropTypes.string.isRequired
+        "searchHrefBase" : PropTypes.string.isRequired,
+        "navigate" : PropTypes.func.isRequired
     };
 
     static defaultProps = {
@@ -698,10 +879,15 @@ export class FilterSetController extends React.PureComponent {
 
     constructor(props) {
         super(props);
+        this.navigateToCurrentBlock = this.navigateToCurrentBlock.bind(this);
+        // Throttled since usually don't want to add that many so fast..
         this.addNewFilterBlock = _.throttle(this.addNewFilterBlock.bind(this), 750, { trailing: false });
-        this.selectFilterBlockIdx = _.throttle(this.selectFilterBlockIdx.bind(this), 1500, { trailing: false });
-        this.removeFilterBlockAtIdx = this.removeFilterBlockAtIdx.bind(this);
+        // Throttled, but func itself throttles/prevents-update if still loading last-selected search results.
+        this.selectFilterBlockIdx = _.throttle(this.selectFilterBlockIdx.bind(this), 250, { trailing: false });
+        // Throttled to prevent accidental double-clicks.
+        this.removeFilterBlockAtIdx =  _.throttle(this.removeFilterBlockAtIdx.bind(this), 250, { trailing: false });
         this.setNameOfFilterBlockAtIdx = this.setNameOfFilterBlockAtIdx.bind(this);
+        this.setTitleOfFilterSet = this.setTitleOfFilterSet.bind(this);
         const { initialFilterSetItem } = this.props;
         const { "@id" : fsID } = initialFilterSetItem;
 
@@ -717,7 +903,7 @@ export class FilterSetController extends React.PureComponent {
 
     // Maybe todo (depending on if can realistically occur): componentDidUpdate { if initialFilterSetItem changed, reset state }
 
-    addNewFilterBlock(newFilterBlock = null, cb){
+    addNewFilterBlock(newFilterBlock = null){
         this.setState(function({ currFilterSet: pastFS }){
             const { filter_blocks = [] } = pastFS;
             const nextFB = filter_blocks.slice();
@@ -740,9 +926,10 @@ export class FilterSetController extends React.PureComponent {
                     ...pastFS,
                     "filter_blocks" : nextFB
                 },
-                "selectedFilterBlockIdx" : nextFB.length - 1
+                "selectedFilterBlockIdx" : nextFB.length - 1,
+                "isSettingFilterBlockIdx" : true
             };
-        }, cb);
+        }, this.navigateToCurrentBlock);
     }
 
     removeFilterBlockAtIdx(idx, cb){
@@ -785,6 +972,79 @@ export class FilterSetController extends React.PureComponent {
         }, cb);
     }
 
+    setTitleOfFilterSet(newTitle) {
+        this.setState(function({ currFilterSet }){
+            const nextFilterSet = { ...currFilterSet };
+            nextFilterSet.title = newTitle;
+            return { "currFilterSet": nextFilterSet };
+        });
+    }
+
+    /** Used as callback by `this.selectFilterBlockIdx` & `this.addNewFilterBlock` */
+    navigateToCurrentBlock(){
+        const { navigate: virtualNavigate, searchHrefBase, context: searchContext } = this.props; // props.navigate passed down in from SPC EmbeddedSearchView VirtualHrefController
+        const { selectedFilterBlockIdx, currFilterSet } = this.state;
+
+
+        if (selectedFilterBlockIdx === null) {
+            // Didn't set an index - todo: use POST / combo search
+            const {
+                filter_blocks,
+                search_type = "VariantSample"
+            } = currFilterSet;
+
+            let global_flags = url.parse(searchHrefBase, false).search;
+            if (global_flags) {
+                global_flags = global_flags.slice(1); // .replace("&sort=date_created", "");
+            }
+
+            // We create our own names for flags & flags_applied here rather
+            // than using filterSet.flags since filterSet.flags might potentially
+            // be populated from other places; idk...
+            const virtualCompoundFilterSet = {
+                search_type,
+                global_flags,
+                "intersect" : false,
+                // "flags": [
+                //     {
+                //         "name": "CurrentFilterSet",
+                //         "query": global_flags
+                //     }
+                // ],
+                "filter_blocks": filter_blocks.map(function({ query }){
+                    return {
+                        query,
+                        "flags_applied": [] // ["CurrentFilterSet"]
+                    };
+                })
+            };
+
+            console.log("WILL USE virtualCompoundFilterSet", global_flags, virtualCompoundFilterSet);
+
+            virtualNavigate(virtualCompoundFilterSet, null, (res)=>{
+                this.setState({ "isSettingFilterBlockIdx": false });
+            });
+
+            return;
+        } else {
+            const { "@id": currHref = null } = searchContext || {};
+            const currFilterSetQuery = currFilterSet.filter_blocks[selectedFilterBlockIdx].query;
+            const nextSearchHref = searchHrefBase + (currFilterSetQuery ? "&" + currFilterSetQuery : "");
+
+            // Compares full hrefs, incl searchHrefBase params
+            const haveSearchParamsChanged = !currHref || !_.isEqual(url.parse(nextSearchHref, true).query, url.parse(currHref, true).query);
+
+            if (haveSearchParamsChanged) {
+                virtualNavigate(nextSearchHref, null, (res)=>{
+                    this.setState({ "isSettingFilterBlockIdx": false });
+                });
+            } else {
+                this.setState({ "isSettingFilterBlockIdx": false });
+            }
+
+        }
+    }
+
     selectFilterBlockIdx(index = null){
         this.setState(function({ selectedFilterBlockIdx: pastIdx, isSettingFilterBlockIdx }){
             if (isSettingFilterBlockIdx) return; // Another update in progress already.
@@ -799,40 +1059,14 @@ export class FilterSetController extends React.PureComponent {
                 "selectedFilterBlockIdx" : index,
                 "isSettingFilterBlockIdx" : true
             };
-        }, () => {
-            const { navigate: virtualNavigate, searchHrefBase, context: searchContext } = this.props; // props.navigate passed down in from SPC EmbeddedSearchView VirtualHrefController
-            const { selectedFilterBlockIdx, currFilterSet } = this.state;
-            if (selectedFilterBlockIdx === null) {
-                // Didn't set an index - todo: use POST / combo search
-                return;
-            }
-
-            const { "@id": currHref = null } = searchContext || {};
-            const currFilterSetQuery = currFilterSet.filter_blocks[selectedFilterBlockIdx].query;
-            const nextSearchHref = searchHrefBase + "&" + currFilterSetQuery;
-
-            // Compares full hrefs, incl searchHrefBase params
-            const haveSearchParamsChanged = !currHref || !_.isEqual(url.parse(nextSearchHref, true).query, url.parse(currHref, true).query);
-
-            if (haveSearchParamsChanged) {
-                virtualNavigate(nextSearchHref, null, (res)=>{
-                    this.setState({ "isSettingFilterBlockIdx": false });
-                });
-            } else {
-                this.setState({ "isSettingFilterBlockIdx": false });
-            }
-        });
+        }, this.navigateToCurrentBlock);
     }
 
     render(){
-        const {
-            children,
-            initialFilterSetItem,
-            ...remainingProps
-        } = this.props;
+        const { children, initialFilterSetItem, ...passProps } = this.props;
         const { currFilterSet, selectedFilterBlockIdx, cachedCounts, isSettingFilterBlockIdx } = this.state;
-        const passProps = { // TODO
-            ...remainingProps,
+        const childProps = {
+            ...passProps,
             currFilterSet,
             selectedFilterBlockIdx,
             isSettingFilterBlockIdx,
@@ -840,10 +1074,11 @@ export class FilterSetController extends React.PureComponent {
             addNewFilterBlock: this.addNewFilterBlock,
             removeFilterBlockAtIdx: this.removeFilterBlockAtIdx,
             selectFilterBlockIdx: this.selectFilterBlockIdx,
-            setNameOfFilterBlockAtIdx: this.setNameOfFilterBlockAtIdx
+            setNameOfFilterBlockAtIdx: this.setNameOfFilterBlockAtIdx,
+            setTitleOfFilterSet: this.setTitleOfFilterSet
         };
 
-        console.log('FilterSetController Props', this.props);
+        // console.log('FilterSetController Props', this.props);
 
         return React.Children.map(children, (child)=>{
             if (!React.isValidElement(child)) { // String or something
@@ -852,7 +1087,7 @@ export class FilterSetController extends React.PureComponent {
             if (typeof child.type === "string") { // Normal element (a, div, etc)
                 return child;
             }
-            return React.cloneElement(child, passProps);
+            return React.cloneElement(child, childProps);
         });
     }
 
