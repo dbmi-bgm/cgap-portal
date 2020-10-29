@@ -56,6 +56,7 @@ class SearchBuilder:
     """
     DEFAULT_SEARCH_FRAME = 'embedded'
     DEFAULT_HIDDEN = 'default_hidden'
+    ADDITIONAL_FACETS = 'additional_facets'
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):
@@ -112,6 +113,7 @@ class SearchBuilder:
         self.search_base = self.normalize_query(self.request, self.types, self.doc_types)
         self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
         self.prepared_terms = self.prepare_search_term(self.request)
+        self.additional_facets = self.request.normalized_params.getall(self.ADDITIONAL_FACETS)
 
         # Can potentially make an outside API call, but ideally is cached
         # Only needed if searching on a single item type
@@ -170,8 +172,7 @@ class SearchBuilder:
             search_types.append("ItemSearchResults")
         return search_types
 
-    @staticmethod
-    def normalize_query(request, types, doc_types):
+    def normalize_query(self, request, types, doc_types):
         """
         Normalize the query by calculating and setting request.normalized_params
         (a webob MultiDict) that is derived from custom query rules and also
@@ -254,11 +255,10 @@ class SearchBuilder:
         ])
         return qs
 
-    @staticmethod
-    def prepare_search_term(request):
+    def prepare_search_term(self, request):
         """
         Prepares search terms by making a dictionary where the keys are fields and the values are arrays
-        of query strings. This is an intermediary format  which will be modified when constructing the
+        of query strings. This is an intermediary format which will be modified when constructing the
         actual search query.
 
         Ignore certain keywords, such as type, format, and field
@@ -268,7 +268,8 @@ class SearchBuilder:
         """
         prepared_terms = {}
         for field, val in request.normalized_params.items():
-            if field.startswith('validation_errors') or field.startswith('aggregated_items'):
+            if field.startswith('validation_errors') or field.startswith('aggregated_items') or \
+                    field == self.ADDITIONAL_FACETS:
                 continue
             elif field == 'q':  # searched string has field 'q'
                 # people shouldn't provide multiple queries, but if they do,
@@ -613,13 +614,43 @@ class SearchBuilder:
             ('validation_errors.name', {'title': 'Validation Errors', 'order': 999})
         ]
 
+        # add extra facets to append_facets
+        current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
+        for extra_facet in self.additional_facets:
+            if 'facets' in current_type_schema:
+                if extra_facet in current_type_schema['facets']:
+                    append_facets.append((extra_facet, current_type_schema['facets'][extra_facet]))
+                    continue
+
+            # not specified as facet - infer range vs. term based on field in schema
+            field_definition = current_type_schema['properties'].get(extra_facet)
+            if not field_definition:  # if not on schema, infer "terms"
+                append_facets.append((
+                    extra_facet, {'title': extra_facet.title()}
+                ))
+            else:
+                t = field_definition.get('type', None)
+                if not t:
+                    log.error('Encountered an additional facet that has no type! %s' % field_definition)
+                if t != 'string':  # if not string infer stats
+                    append_facets.append((
+                        extra_facet, {
+                            'title': field_definition.get('title', extra_facet.title()),
+                            'aggregation_type': 'stats',
+                            'number_step': 'any'
+                        }
+                    ))
+                else:  # infer terms
+                    append_facets.append((
+                        extra_facet, {'title': extra_facet.title()}
+                    ))
+
         # hold disabled facets from schema; we also want to remove these from the prepared_terms facets
         disabled_facets = []
 
         # Add facets from schema if one Item type is defined.
         # Also, conditionally add extra appendable facets if relevant for type from schema.
         if len(self.doc_types) == 1 and self.doc_types[0] != 'Item':
-            current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
             if 'facets' in current_type_schema:
                 schema_facets = OrderedDict(current_type_schema['facets'])
                 for schema_facet in schema_facets.items():
@@ -786,8 +817,6 @@ class SearchBuilder:
 
         aggregations = es_results['aggregations']['all_items']
         used_facets = set()
-
-        # TODO add additional_facets here?
 
         # Sort facets by order (ascending).
         # If no order is provided, assume 0 to
