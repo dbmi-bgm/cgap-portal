@@ -24,7 +24,7 @@
             "title": "Status",
             "type": "string",
             "default": "current",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "enum": [
                 "current",
                 "revoked",
@@ -39,13 +39,14 @@
             "type": "string",
             "lookup": 20,
             "uniqueKey": true,
-            "permission": "import_items"
+            "permission": "restricted_fields",
+            "pattern": "^[A-Za-z0-9\\-]+$"
         },
         "title": {
             "title": "Title",
             "description": "A title for the instituion.",
             "type": "string",
-            "permission": "import_items"
+            "permission": "restricted_fields"
         },
         "description": {
             "title": "Description",
@@ -83,22 +84,9 @@
             "format": "uri",
             "lookup": 70
         },
-        "viewing_group": {
-            "title": "View access group",
-            "description": "The group that determines which set of data the user has permission to view.",
-            "type": "string",
-            "lookup": 100,
-            "enum": [
-                "4DN",
-                "Not 4DN",
-                "NOFIC",
-                "CvDC"
-            ]
-        },
         "pi": {
-            "title": "P.I.",
-            "description": "Principle Investigator of the project.",
-            "comment": "See user.json for available identifiers.",
+            "title": "Project Lead",
+            "description": "The leader of the project.",
             "type": "string",
             "lookup": 80,
             "linkTo": "User"

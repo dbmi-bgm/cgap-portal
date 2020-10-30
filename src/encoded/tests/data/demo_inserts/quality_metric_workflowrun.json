@@ -11,7 +11,7 @@
         "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/IUaYtGHleFep.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:37.927636+00:00",
@@ -22,7 +22,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/d1qxts7ocvmB.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:38.475012+00:00",
@@ -33,7 +33,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/acHLQnkcfO56.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:38.720021+00:00",
@@ -44,7 +44,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/su1Sh4OHWDqs.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:38.951193+00:00",
@@ -66,7 +66,7 @@
         "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/StJeQXDNiWTh.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:40.172226+00:00",
@@ -77,7 +77,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/0wDKO96gWF1G.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:40.690864+00:00",
@@ -88,7 +88,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/ehRReyKHgZ9D.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:41.449460+00:00",
@@ -99,7 +99,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/FcLHXpEiCw8z.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:41.726009+00:00",
@@ -110,7 +110,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/xF7QaNPdhfEL.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:44.015428+00:00",
@@ -121,7 +121,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/xIq2opXzDxXx.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:44.305331+00:00",
@@ -143,7 +143,7 @@
         "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/HmRURzR41O8A.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:45.505057+00:00",
@@ -154,7 +154,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/7P0XuCQXo9wb.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:45.772538+00:00",
@@ -165,7 +165,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/q0LiYmsspk3F.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:46.578142+00:00",
@@ -176,7 +176,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/ongMzQuBtE0L.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:48.449821+00:00",
@@ -187,7 +187,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/ertlS7dzW8Z9.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:48.685760+00:00",
@@ -209,7 +209,7 @@
         "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/kICwowuPUtWB.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:52.524690+00:00",
@@ -220,7 +220,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/k7GRt9129OdD.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:49.267519+00:00",
@@ -231,7 +231,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/EF1VE1n9fjHD.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:49.558066+00:00",
@@ -242,7 +242,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/P5qfQvKEs8Bx.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:49.827723+00:00",
@@ -253,7 +253,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/yb9Z9bXaN5SC.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:50.105439+00:00",
@@ -264,7 +264,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/0D6ZBfqd9RHo.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:50.378370+00:00",
@@ -275,7 +275,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/t0os9WZyPeg5.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:50.923994+00:00",
@@ -286,7 +286,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/vsYpcoKqr3uD.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:51.402981+00:00",
@@ -297,7 +297,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/OEhQxbjQ0XwH.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:51.943731+00:00",
@@ -308,7 +308,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/gG8tIL7XpgO2.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:52.289530+00:00",
@@ -330,7 +330,7 @@
         "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/bYv18wa1NtmR.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:53.648772+00:00",
@@ -341,7 +341,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/OSwnZiTnh5pL.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:54.751638+00:00",
@@ -352,7 +352,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/qxgV9QHsr42g.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:53.894573+00:00",
@@ -363,7 +363,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/EwEwzwgc5WXq.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:54.150659+00:00",
@@ -374,7 +374,7 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
     },
     {
-        "status": "released",
+        "status": "shared",
         "url": "https://tibanna-output.s3.amazonaws.com/rRxmD8DokUEv.metrics/metrics.html",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:54.505045+00:00",

@@ -1,4 +1,5 @@
 from snovault import COLLECTIONS
+from pyramid.security import Authenticated
 
 
 def groupfinder(login, request):
@@ -9,6 +10,12 @@ def groupfinder(login, request):
 
     collections = request.registry[COLLECTIONS]
 
+    """ At least part of this stanza seems mainly for testing purposes
+        should the testing bits be refactored elsewhere???
+        20-09-08 changed permission model requires import of Authenticated
+        is that kosher
+    """
+    # TODO (C4-332): Consolidate permissions all in one perms.py file once this all stabilizes.
     if namespace == 'remoteuser':
         if localname in ['EMBED', 'INDEXER']:
             return []
@@ -17,7 +24,7 @@ def groupfinder(login, request):
         elif localname in ['TEST_SUBMITTER']:
             return ['group.submitter']
         elif localname in ['TEST_AUTHENTICATED']:
-            return ['viewing_group.ENCODE']
+            return [Authenticated]
 
     if namespace in ('mailto', 'remoteuser', 'auth0'):
         users = collections.by_item_type['user']
@@ -45,28 +52,19 @@ def groupfinder(login, request):
 
     user_properties = user.properties
 
-    if user_properties.get('status') in ('deleted', 'revoked'):
+    if user_properties.get('status') in ('deleted'):
         return None
 
     principals = ['userid.%s' % user.uuid]
-    institution = user_properties.get('institution')
-    if institution:
-        principals.append('institution.%s' % institution)
 
-    project = user_properties.get('project')
-    if project:
-        principals.append('project.%s' % project)
-
-    submits_for = user_properties.get('submits_for', [])
-    principals.extend('institution.%s' % inst_uuid for inst_uuid in submits_for)
-    principals.extend('submits_for.%s' % inst_uuid for inst_uuid in submits_for)
-    if submits_for:
-        principals.append('group.submitter')
-
-    # user role. should always be present
-    user_role = user_properties.get('role')
-    if user_role:
-        principals.append('user_role.%s' % user_role)
+    # first pass implementation uses project to give view access only - will need to be
+    # be modified when different user roles can provide different levels of access
+    # and users can belong to different project
+    # project_roles is a list of embedded objects with 'project' property required
+    project_roles = user_properties.get('project_roles', [])
+    if project_roles:
+        principals.append('group.project_editor')
+    principals.extend('editor_for.{}'.format(pr.get('project')) for pr in project_roles)
 
     groups = user_properties.get('groups', [])
     principals.extend('group.%s' % group for group in groups)

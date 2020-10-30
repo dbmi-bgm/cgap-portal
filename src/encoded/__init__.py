@@ -17,7 +17,7 @@ from dcicutils.ff_utils import get_health_page
 from sentry_sdk.integrations.pyramid import PyramidIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from pyramid.config import Configurator
-from pyramid_localroles import LocalRolesAuthorizationPolicy
+from .local_roles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
 from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
 from snovault.elasticsearch import APP_FACTORY

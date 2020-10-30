@@ -25,54 +25,54 @@ from .base import Item
 logging.getLogger('boto3').setLevel(logging.INFO)
 log = logging.getLogger(__name__)
 
-ONLY_ADMIN_VIEW_DETAILS = [
+""" In order to allow a user to add an access key they need to at
+    least see their basic profile info and the access_key table
+"""
+
+ONLY_ADMIN_VIEW_USER_DETAILS_ACL = [
     (Allow, 'group.admin', ['view', 'view_details', 'edit']),
-    (Allow, 'group.read-only-admin', ['view', 'view_details']),
     (Allow, 'remoteuser.INDEXER', ['view']),
     (Allow, 'remoteuser.EMBED', ['view']),
     (Deny, Everyone, ['view', 'view_details', 'edit']),
 ]
 
-SUBMITTER_CREATE = []
-
-ONLY_OWNER_EDIT = [
+ONLY_OWNER_VIEW_PROFILE_ACL = [
     (Allow, 'role.owner', 'view'),
-    (Allow, 'role.owner', 'edit'),
-    (Allow, 'role.owner', 'view_details')
-] + ONLY_ADMIN_VIEW_DETAILS
+    # (Allow, 'role.owner', 'edit'),
+    # (Allow, 'role.owner', 'view_details'),
+] + ONLY_ADMIN_VIEW_USER_DETAILS_ACL
 
-USER_ALLOW_CURRENT = [
-    (Allow, Everyone, 'view'),
-] + ONLY_ADMIN_VIEW_DETAILS
-
-USER_DELETED = [
+DELETED_USER_ACL = [
     (Deny, Everyone, 'visible_for_edit')
-] + ONLY_ADMIN_VIEW_DETAILS
+] + ONLY_ADMIN_VIEW_USER_DETAILS_ACL
 
 
 @collection(
     name='users',
     unique_key='user:email',
     properties={
-        'title': '4D Nucleome Users',
-        'description': 'Listing of current 4D Nucleome DCIC users',
+        'title': 'CGAP Users',
+        'description': 'Listing of current CGAP users',
     },
-    acl=[])
+)
 class User(Item):
     """The user class."""
 
     item_type = 'user'
     schema = load_schema('encoded:schemas/user.json')
     embedded_list = [
+        'project_roles.role',
         'project_roles.project.name',
-        'submits_for.name',
-        'submits_for.display_title'
+        'project_roles.project.description',
+        'project_roles.project.pi',
     ]
 
+    # TODO (C4-332): consolidate all acls into once place
     STATUS_ACL = {
-        'current': ONLY_OWNER_EDIT,
-        'deleted': USER_DELETED,
-        'replaced': USER_DELETED
+        'current': ONLY_OWNER_VIEW_PROFILE_ACL,
+        'deleted': DELETED_USER_ACL,
+        'revoked': DELETED_USER_ACL,
+        'inactive': ONLY_OWNER_VIEW_PROFILE_ACL,
     }
 
     @calculated_property(schema={

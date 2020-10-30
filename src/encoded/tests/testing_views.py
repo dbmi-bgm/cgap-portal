@@ -184,7 +184,7 @@ class TestingPostPutPatch(Item):
                 "description": "",
                 "type": "string",
                 "format": "uuid",
-                "permission": "import_items",
+                "permission": "restricted_fields",
                 "requestMethod": "POST",
             },
             'required': {
@@ -202,14 +202,14 @@ class TestingPostPutPatch(Item):
                 # This should be allowed on PUT so long as value is the same
                 'type': 'string',
                 'default': 'protected default',
-                'permission': 'import_items',
+                'permission': 'restricted_fields',
             },
             'protected_link': {
                 # This should be allowed on PUT so long as the linked uuid is
                 # the same
                 'type': 'string',
                 'linkTo': 'TestingLinkTarget',
-                'permission': 'import_items',
+                'permission': 'restricted_fields',
             },
             'field_no_default': {
                 'type': 'string',

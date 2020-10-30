@@ -24,6 +24,9 @@
         "schema_version": {
             "default": "1"
         },
+        "status": {
+            "default": "shared"
+        },
         "var_conseq_name" : {
             "title" : "Sequence Ontology Style Name of the Variant Consequence",
             "type" : "string"

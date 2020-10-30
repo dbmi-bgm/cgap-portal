@@ -19,6 +19,20 @@
         "schema_version": {
             "default": "2"
         },
+        "status": {
+            "title": "Status",
+            "type": "string",
+            "permission": "restricted_fields",
+            "default": "current",
+            "enum": [
+                "public",
+                "shared",
+                "current",
+                "inactive",
+                "in review",
+                "deleted"
+            ]
+        },
         "body":{
             "title": "Raw Body",
             "type": "string",
@@ -38,7 +52,6 @@
             "title": "Section Type",
             "type": "string",
             "description": "What this section is used for. Defaults to 'Page Section'.",
-            "permission" : "import_items",
             "default": "Page Section",
             "enum" : [
                 "Page Section",

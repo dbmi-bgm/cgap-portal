@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "f7ac2c5f-9203-49fa-b918-cede02bf46f7",
         "name": "vcf-tools",
@@ -16,7 +16,7 @@
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "5d53e128-a0ac-4582-8281-89e349793e3a",
@@ -32,7 +32,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "d390c8ec-e62a-46ab-8ff5-1111196aaea6",
@@ -48,7 +48,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "76479248-09d2-48e5-9ab3-94c167e51cc6",
         "name": "mutanno",
@@ -64,7 +64,7 @@
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "5a0b864e-dc16-4484-bcf3-c64e35a25df9",
         "name": "granite",
@@ -80,7 +80,7 @@
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "4ae88fb4-23f2-4939-8852-4644069d14d9",
@@ -96,7 +96,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "42adeb1b-c46c-4ba8-b191-56036ddcd544",
@@ -112,7 +112,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "3f2d3b0e-0365-4212-9468-c16ad9531c4d",
@@ -128,7 +128,7 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "1d28b7b8-1033-492f-8a1a-d4ac5b1ab55e",
         "name": "mutanno",
@@ -144,7 +144,7 @@
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "d7ac4c75-e133-4a8e-a19e-b7e87873cc16",
         "name": "add-readgroups",
@@ -160,7 +160,7 @@
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "8d4ca59b-750b-4c22-8a34-c5d4e795b8ad",
         "name": "granite",
@@ -176,7 +176,7 @@
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "586cef39-6505-4bf6-920a-4b26a500d210",

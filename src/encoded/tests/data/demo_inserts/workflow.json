@@ -224,7 +224,7 @@
         "name": "workflow_mutanno-annot-check_v15"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_gatk-CombineGVCFs",
@@ -561,7 +561,7 @@
         "name": "workflow_granite-comHet-check_v15"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_bwa-mem_no_unzip-check",
@@ -788,7 +788,7 @@
         "cwl_directory_url": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v11/cwl"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_mutanno-annot-check",
@@ -1005,7 +1005,7 @@
         "name": "workflow_mutanno-annot-check_v13"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_gatk-HaplotypeCaller",
@@ -1188,7 +1188,7 @@
         "name": "workflow_gatk-HaplotypeCaller_v13"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_granite-mpileupCounts",
@@ -1369,7 +1369,7 @@
         "name": "workflow_granite-mpileupCounts_v14"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_gatk-ApplyBQSR-check",
@@ -1624,7 +1624,7 @@
         "name": "workflow_gatk-ApplyBQSR-check_v13"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_mutanno-annot-check",
@@ -1847,7 +1847,7 @@
         "name": "workflow_mutanno-annot-check_v14"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_gatk-GenotypeGVCFs-check",
@@ -2072,7 +2072,7 @@
         "name": "workflow_gatk-GenotypeGVCFs-check_v13"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_granite-novoCaller-rck-check",
@@ -2259,7 +2259,7 @@
         "name": "workflow_granite-novoCaller-rck-check_v14"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_granite-mpileupCounts",
@@ -2402,7 +2402,7 @@
         "name": "workflow_granite-mpileupCounts_v13"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_mutanno-micro-annot-check",
@@ -2606,7 +2606,7 @@
         "name": "workflow_mutanno-micro-annot-check_v14"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_gatk-HaplotypeCaller",
@@ -2783,7 +2783,7 @@
         "name": "workflow_gatk-HaplotypeCaller_v10"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_gatk-GenotypeGVCFs-check",
@@ -2983,7 +2983,7 @@
         "name": "workflow_gatk-GenotypeGVCFs-check_v10"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_granite-rckTar",
@@ -3071,7 +3071,7 @@
         "name": "workflow_granite-rckTar_v13"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_sort-bam-check",
@@ -3268,7 +3268,7 @@
         "name": "workflow_sort-bam-check_v13"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_granite-comHet-check",
@@ -3454,7 +3454,7 @@
         "name": "workflow_granite-comHet-check_v14"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_gatk-BaseRecalibrator",
@@ -3600,7 +3600,7 @@
         "name": "workflow_gatk-BaseRecalibrator_v13"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_add-readgroups-check",
@@ -3798,7 +3798,7 @@
         "name": "workflow_add-readgroups-check_v11"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_granite-filtering-check",
@@ -4052,7 +4052,7 @@
         "name": "workflow_granite-filtering-check_v14"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_picard-MarkDuplicates-check",
@@ -4303,7 +4303,7 @@
         "cwl_directory_url": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v11/cwl"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_add-readgroups-check",
@@ -4497,7 +4497,7 @@
         "cwl_directory_url": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v9/cwl"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_granite-novoCaller-rck-check",
@@ -4748,7 +4748,7 @@
         "name": "workflow_granite-novoCaller-rck-check_v13"
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "cwl_pointer": "",
         "app_name": "workflow_mutanno-micro-annot-check",
