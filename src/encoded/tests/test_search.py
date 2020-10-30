@@ -864,7 +864,9 @@ def hidden_facet_data_one():
         'last_name': 'Doe',
         'sid': 1,
         'unfaceted_string': 'hello',
-        'unfaceted_integer': 123
+        'unfaceted_integer': 123,
+        'disabled_string': 'orange',
+        'disabled_integer': 789,
     }
 
 
@@ -875,7 +877,9 @@ def hidden_facet_data_two():
         'last_name': 'Bruins',
         'sid': 2,
         'unfaceted_string': 'world',
-        'unfaceted_integer': 456
+        'unfaceted_integer': 456,
+        'disabled_string': 'apple',
+        'disabled_integer': 101112,
     }
 
 
@@ -893,19 +897,20 @@ class TestSearchHiddenAndAdditionalFacets:
     DEFAULT_FACETS = ['first_name', 'validation_errors.name']
     DEFAULT_HIDDEN_FACETS = ['last_name', 'sid']
     ADDITIONAL_FACETS = ['unfaceted_string', 'unfaceted_integer']
+    DISABLED_FACETS = ['disabled_string', 'disabled_integer']
 
     def test_search_default_hidden_facets_dont_show(self, testapp, hidden_facet_test_data):
         facets = testapp.get('/search/?type=TestingHiddenFacets').json['facets']
-        for facet in facets:
-            assert facet['field'] in self.DEFAULT_FACETS
+        actual = [facet['field'] for facet in facets]
+        assert self.DEFAULT_FACETS == sorted(actual)
 
     @pytest.mark.parametrize('facet', ADDITIONAL_FACETS)
     def test_search_one_additional_facet(self, testapp, hidden_facet_test_data, facet):
         """ Tests that specifying each of the 'additional' facets works correctly """
         facets = testapp.get('/search/?type=TestingHiddenFacets&additional_facets=%s' % facet).json['facets']
         expected = self.DEFAULT_FACETS + [facet]
-        for facet in facets:
-            assert facet['field'] in expected
+        actual = [facet['field'] for facet in facets]
+        assert sorted(expected) == sorted(actual)
 
     def test_search_multiple_additional_facets(self, testapp, hidden_facet_test_data):
         """ Tests that enabling multiple additional facets works """
@@ -921,14 +926,14 @@ class TestSearchHiddenAndAdditionalFacets:
                 assert facet['aggregation_type'] == 'terms'
 
     @pytest.mark.parametrize('facet', DEFAULT_HIDDEN_FACETS)
-    def test_search_one_additional_hidden_facet(self, testapp, hidden_facet_test_data, facet):
+    def test_search_one_additional_default_hidden_facet(self, testapp, hidden_facet_test_data, facet):
         """ Tests that passing default_hidden facets to additional_facets works correctly """
         facets = testapp.get('/search/?type=TestingHiddenFacets&additional_facets=%s' % facet).json['facets']
         expected = self.DEFAULT_FACETS + [facet]
-        for facet in facets:
-            assert facet['field'] in expected
+        actual = [facet['field'] for facet in facets]
+        assert sorted(expected) == sorted(actual)
 
-    def test_search_multiple_additional_hidden_facets(self, testapp, hidden_facet_test_data):
+    def test_search_multiple_additional_default_hidden_facets(self, testapp, hidden_facet_test_data):
         """ Tests that passing multiple hidden_facets as additionals works correctly """
         facets = testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facets=last_name'
@@ -945,15 +950,42 @@ class TestSearchHiddenAndAdditionalFacets:
         ['last_name', 'unfaceted_integer'],  # second slot holds number field
         ['unfaceted_string', 'sid']
     ])
-    def test_search_mixing_additional_and_hidden(self, testapp, hidden_facet_test_data, _facets):
+    def test_search_mixing_additional_and_default_hidden(self, testapp, hidden_facet_test_data, _facets):
         """ Tests that we can mix additional_facets with those both on and off schema """
         facets = testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facets=%s'
                              '&additional_facets=%s' % (_facets[0], _facets[1])).json['facets']
         expected = self.DEFAULT_FACETS + _facets
+        actual = [facet['field'] for facet in facets]
+        assert sorted(expected) == sorted(actual)
         for facet in facets:
-            assert facet['field'] in expected
             if facet['field'] == _facets[1]:  # second slot holds number field
                 assert facet['aggregation_type'] == 'stats'
             else:
                 assert facet['aggregation_type'] == 'terms'
+
+    @pytest.mark.parametrize('_facet', DISABLED_FACETS)
+    def test_search_disabled_overrides_additional(self, testapp, hidden_facet_test_data, _facet):
+        """ Hidden facets should NEVER be faceted on """
+        facets = testapp.get('/search/?type=TestingHiddenFacets&additional_facets=%s' % _facet).json['facets']
+        field_names = [facet['field'] for facet in facets]
+        assert _facet not in field_names  # always hidden should not be here, even if specified
+
+    @pytest.mark.parametrize('_facets', [
+        ('last_name', 'unfaceted_integer', 'disabled_integer'),  # default_hidden second
+        ('sid', 'unfaceted_string', 'disabled_string')  # disabled always last
+    ])
+    def test_search_additional_mixing_disabled_default_hidden(self, testapp, hidden_facet_test_data, _facets):
+        """ Tests that supplying multiple additional facets combined with hidden still respects the
+            hidden restriction. """
+        facets = testapp.get('/search/?type=TestingHiddenFacets'
+                             '&additional_facets=%s'
+                             '&additional_facets=%s' 
+                             '&additional_facets=%s' % (_facets[0], _facets[1], _facets[2])).json['facets']
+        expected = self.DEFAULT_FACETS + [_facets[0], _facets[1]]  # first two should show
+        actual = [facet['field'] for facet in facets]
+        assert sorted(expected) == sorted(actual)
+
+    def test_search_additional_object_facets(self, testapp, hidden_facet_test_data):
+        """ TODO Tests that specifying an object field as an additional_facet works correctly """
+        pass

@@ -285,7 +285,8 @@ def testing_retry(context, request):
 
 @collection('testing-hidden-facets')
 class TestingHiddenFacets(Item):
-    """ Collection designed to test searching with hidden facets. """
+    """ Collection designed to test searching with hidden facets. Yes this is large, but this is a complex feature
+        with many possible cases. """
     item_type = 'testing_hidden_facets'
     schema = {
         'type': 'object',
@@ -304,6 +305,41 @@ class TestingHiddenFacets(Item):
             },
             'unfaceted_integer': {
                 'type': 'integer'
+            },
+            'disabled_string': {
+                'type': 'string',
+            },
+            'disabled_integer': {
+                'type': 'integer',
+            },
+            'unfaceted_object': {
+                'type': 'object',
+                'properties': {
+                    'mother': {
+                        'type': 'string'
+                    },
+                    'father': {
+                        'type': 'string'
+                    }
+                }
+            },
+            'unfaceted_array_of_objects': {
+                'type': 'array',
+                'enable_nested': True,
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'fruit': {
+                            'type': 'string'
+                        },
+                        'color': {
+                            'type': 'string'
+                        },
+                        'uid': {
+                            'type': 'integer'
+                        }
+                    }
+                }
             }
         },
         'facets': {
@@ -319,6 +355,12 @@ class TestingHiddenFacets(Item):
                 'title': 'SID',
                 'aggregation_type': 'stats',
                 'number_step': 1
+            },
+            'disabled_string': {
+                'disabled': True
+            },
+            'disabled_integer': {
+                'disabled': True
             }
         }
     }
