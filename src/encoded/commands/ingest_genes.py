@@ -49,6 +49,7 @@ class GeneIngestion(object):
         else:
             _iter = self.genes_to_ingest
         for gene in _iter:
+            gene['status'] = 'shared'  # default gene status to shared, so visible to everyone
             if project:
                 gene['project'] = project
             if institution:
