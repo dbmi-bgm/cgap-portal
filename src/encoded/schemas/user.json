@@ -106,11 +106,6 @@
             "comment": "Can be user supplied - purely informational",
             "lookup": 41
         },
-        "role": {
-            "title": "role (RETIRED FIELD)",
-            "type": "string",
-            "comment": "This used to be the property equivalent to job_title - rather than upgrade will just move the info"
-        },
         "groups": {
             "title": "Groups",
             "description": "Additional access control groups",
