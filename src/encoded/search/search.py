@@ -581,6 +581,53 @@ class SearchBuilder:
             self.response['sort'] = result_sort
             self.search = self.search.sort(sort)
 
+    def _initialize_additional_facets(self, append_facets, current_type_schema):
+        """ Helper function for below method that handles additional_facets URL param
+
+            :param append_facets: list to add additional_facets to
+            :param current_type_schema: schema of the item we are faceting on
+        """
+        aggregation_type = 'terms'
+        for extra_facet in self.additional_facets:
+
+            # determine if nested
+            if self.item_type_es_mapping and find_nested_path(extra_facet, self.item_type_es_mapping):
+                aggregation_type = 'nested'  # handle nested
+
+            # check if defined in facets
+            if 'facets' in current_type_schema:
+                if extra_facet in current_type_schema['facets']:
+                    if not current_type_schema['facets'][extra_facet].get('disabled', False):
+                        append_facets.append((extra_facet, current_type_schema['facets'][extra_facet]))
+                    continue  # if we found the facet, always continue from here
+
+            # not specified as facet - infer range vs. term based on schema
+            field_definition = schema_for_field(extra_facet, self.request, self.doc_types)
+            if not field_definition:  # if not on schema, try "terms"
+                append_facets.append((
+                    extra_facet, {'title': extra_facet.title()}
+                ))
+            else:
+                t = field_definition.get('type', None)
+                if not t:
+                    log.error('Encountered an additional facet that has no type! %s' % field_definition)
+                    continue  # drop this facet
+
+                # terms for string
+                if t == 'string':
+                    append_facets.append((
+                        extra_facet, {'title': extra_facet.title(), 'aggregation_type': aggregation_type}
+                    ))
+                else:  # try stats
+                    aggregation_type = 'stats'
+                    append_facets.append((
+                        extra_facet, {
+                            'title': field_definition.get('title', extra_facet.title()),
+                            'aggregation_type': aggregation_type,
+                            'number_step': 'any'
+                        }
+                    ))
+
     def initialize_facets(self):
         """
         Initialize the facets used for the search. If searching across multiple
@@ -614,44 +661,8 @@ class SearchBuilder:
             ('validation_errors.name', {'title': 'Validation Errors', 'order': 999})
         ]
 
-        # add extra facets to append_facets
         current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
-        aggregation_type = 'terms'
-        for extra_facet in self.additional_facets:
-            if self.item_type_es_mapping and find_nested_path(extra_facet, self.item_type_es_mapping):
-                aggregation_type = 'nested'  # handle nested
-            if 'facets' in current_type_schema:
-                if extra_facet in current_type_schema['facets']:
-                    if not current_type_schema['facets'][extra_facet].get('disabled', False):
-                        append_facets.append((extra_facet, current_type_schema['facets'][extra_facet]))
-                    continue  # if we found the facet, always continue from here
-
-            # not specified as facet - infer range vs. term based on field in schema
-            field_definition = current_type_schema['properties'].get(extra_facet)
-            if not field_definition:  # if not on schema, try "terms"
-                append_facets.append((
-                    extra_facet, {'title': extra_facet.title()}
-                ))
-            else:
-                t = field_definition.get('type', None)
-                if not t:
-                    log.error('Encountered an additional facet that has no type! %s' % field_definition)
-                    continue  # drop this facet
-
-                # based on type
-                if t == 'string':  # terms for string
-                    append_facets.append((
-                        extra_facet, {'title': extra_facet.title(), 'aggregation_type': aggregation_type}
-                    ))
-                else:  # try stats
-                    aggregation_type = 'stats'
-                    append_facets.append((
-                        extra_facet, {
-                            'title': field_definition.get('title', extra_facet.title()),
-                            'aggregation_type': aggregation_type,
-                            'number_step': 'any'
-                        }
-                    ))
+        self._initialize_additional_facets(append_facets, current_type_schema)
 
         # hold disabled facets from schema; we also want to remove these from the prepared_terms facets
         disabled_facets = []

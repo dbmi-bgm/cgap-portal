@@ -859,6 +859,7 @@ class TestNestedSearch(object):
 
 @pytest.fixture(scope='session')
 def hidden_facet_data_one():
+    """ Sample TestingHiddenFacets object we are going to facet on """
     return {
         'first_name': 'John',
         'last_name': 'Doe',
@@ -867,11 +868,16 @@ def hidden_facet_data_one():
         'unfaceted_integer': 123,
         'disabled_string': 'orange',
         'disabled_integer': 789,
+        'unfaceted_object': {
+            'mother': 'Anne',
+            'father': 'Bob'
+        },
     }
 
 
 @pytest.fixture(scope='session')
 def hidden_facet_data_two():
+    """ A second sample TestingHiddenFacets object we are going to facet on """
     return {
         'first_name': 'Boston',
         'last_name': 'Bruins',
@@ -880,6 +886,10 @@ def hidden_facet_data_two():
         'unfaceted_integer': 456,
         'disabled_string': 'apple',
         'disabled_integer': 101112,
+        'unfaceted_object': {
+            'mother': 'Candice',
+            'father': 'Doug'
+        }
     }
 
 
@@ -986,6 +996,14 @@ class TestSearchHiddenAndAdditionalFacets:
         actual = [facet['field'] for facet in facets]
         assert sorted(expected) == sorted(actual)
 
-    def test_search_additional_object_facets(self, testapp, hidden_facet_test_data):
-        """ TODO Tests that specifying an object field as an additional_facet works correctly """
-        pass
+    @pytest.mark.parametrize('_facet', [
+        'unfaceted_object.mother',
+        'unfaceted_object.father'
+    ])
+    def test_search_additional_object_facets(self, testapp, hidden_facet_test_data, _facet):
+        """ Tests that specifying an object field as an additional_facet works correctly """
+        facets = testapp.get('/search/?type=TestingHiddenFacets'
+                             '&additional_facets=%s' % _facet).json['facets']
+        expected = self.DEFAULT_FACETS + [_facet]
+        actual = [facet['field'] for facet in facets]
+        assert sorted(expected) == sorted(actual)
