@@ -353,6 +353,9 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // Overrides default 400px.
     const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 445) : undefined;
 
+    // Table re-initializes upon change of key so we use it refresh table based on session.
+    const searchTableKey = "session:" + session;
+
     return (
         <React.Fragment>
             <h1 className="mb-24 mt-0">
@@ -366,7 +369,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
                     <FilterSetController {...{ searchHrefBase, initialFilterSetItem }} excludeFacets={hideFacets}>
                         <FilteringTableFilterSetUI caseItem={context} />
                     </FilterSetController>
-                } key={"session:" + session} />
+                } key={searchTableKey} />
         </React.Fragment>
     );
 });

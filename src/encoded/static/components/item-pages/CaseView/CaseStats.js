@@ -80,15 +80,12 @@ export const CaseStats = React.memo(function CaseStats(props){
     );
 });
 
-export const PatientInfo = React.memo(function PatientInfo(props) {
+export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) {
+    const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
+    const { individual = null } = caseItem || {};
     const {
-        caseItem = null
-    } = props || {};
-
-    const { '@id': atId, case_title = null, individual = null } = caseItem || {};
-    const {
-        accession = null,
-        sex = null,
+        accession = fallbackElem,
+        sex = fallbackElem,
         age = null, age_units = null,
         status = null,
         date_created = null,
@@ -97,7 +94,7 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
     // TODO later maybe use card footer Bootstrap component if such exists.
 
     return (
-        <>
+        <React.Fragment>
             <div className="card-text mb-1">
                 <label className="mb-0">CGAP Individual ID:</label> { accession }
             </div>
@@ -105,15 +102,15 @@ export const PatientInfo = React.memo(function PatientInfo(props) {
                 <label className="mb-0">Sex:</label> { sex }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Age: </label> { age && age_units ? `${age} ${age_units}(s)` : null }
+                <label className="mb-0">Age: </label> { age && age_units ? `${age} ${age_units}(s)` : fallbackElem }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Status:</label> &nbsp;{ Schemas.Term.toName("status", status, true) }
+                <label className="mb-0">Status:</label> &nbsp;{ Schemas.Term.toName("status", status, true) || fallbackElem }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : null }
+                <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : fallbackElem }
             </div>
-        </>
+        </React.Fragment>
     );
 });
 

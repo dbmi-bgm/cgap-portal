@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "3.4.5"
+version = "4.0.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -75,7 +75,6 @@ pycparser = "2.14"
 PyJWT = "1.5.3"
 pyparsing = "2.1.1"
 pyramid = "1.10.4"
-pyramid-localroles = ">=0.1,<1"
 pyramid-multiauth = "0.8.0"
 pyramid-retry = "1.0"
 pyramid-tm = "2.2.1"

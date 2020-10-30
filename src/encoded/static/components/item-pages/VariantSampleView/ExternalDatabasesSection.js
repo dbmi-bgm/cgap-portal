@@ -138,12 +138,12 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
 
         return (
             <div className="row mb-03" key={fieldName}>
-                <div className="col-12 col-xl">
+                <div className="col-12 col-lg">
                     <label className="mb-0 black-label" htmlFor={"external_resource_for_" + fieldName} data-tip={schemaDescription}>
                         { schemaTitle || fieldName }
                     </label>
                 </div>
-                <div className="col-12 col-xl-auto">
+                <div className="col-12 col-lg-auto">
                     { val }
                 </div>
             </div>

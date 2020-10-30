@@ -48,6 +48,9 @@
     "description": "Schema for variants",
     "id": "/profiles/variant.json",
     "properties": {
+        "status": {
+            "default": "shared"
+        },
         "ALT": {
             "title": "Alt",
             "field_name": "ALT",

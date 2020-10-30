@@ -35,7 +35,7 @@
             "title": "File Type",
             "description": "The type of file based on the information in the file.",
             "default": "reads",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "enum": [
                 "WGS reads",
                 "WES reads",
@@ -49,13 +49,13 @@
             "title": "General Classification",
             "type": "string",
             "default": "raw file",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "enum": [
                 "raw file"
               ]
         },
         "extra_files": {
-            "exclude_from": ["submit4dn", "FFedit-create"]
+            "exclude_from": ["FFedit-create"]
         },
         "read_length": {
             "title": "Sequencing Read Length (bp)",

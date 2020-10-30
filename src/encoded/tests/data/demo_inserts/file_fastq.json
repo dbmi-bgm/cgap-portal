@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "9a56e823d677181e9d44afd6fbd67dc3",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "reads",
@@ -27,7 +27,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "ce3e825c3891b8e7d6978e2a304770f5",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "reads",
@@ -54,7 +54,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "762a7580d2858af4bd52febebe6bf425",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "reads",
@@ -81,7 +81,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "6b759c2f261d04eee7b002a7b66b4390",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "reads",
@@ -108,7 +108,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "8570baaa20acf6b5769de7f61cc2853c",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "reads",
@@ -135,7 +135,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "md5sum": "4e1bc057d2f4b15105c6b447061deb1e",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "file_type": "reads",
