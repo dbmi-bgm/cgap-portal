@@ -208,6 +208,7 @@ class Case(Item):
         "sample_processing.sample_processed_files.processed_files.last_modified.*",
         "sample_processing.sample_processed_files.sample.accession",
         "sample_processing.completed_processes",
+        "sample_processing.samples_pedigree.*",
         "report.last_modified.*",
         "report.status",
         "report.accession",
@@ -219,7 +220,8 @@ class Case(Item):
         "active_filterset.flags",
         "cohort.filter_set.*",
         "project.name",
-        "vcf_file.file_ingestion_status"
+        "vcf_file.file_ingestion_status",
+        "vcf_file.accession",
     ]
 
     @calculated_property(schema={
