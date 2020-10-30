@@ -50,6 +50,7 @@ STATUS_ERROR = 'Error'
 STATUS_IN_PROGRESS = 'In progress'
 CGAP_CORE_PROJECT = '/projects/cgap-core'
 CGAP_CORE_INSTITUTION = '/institutions/hms-dbmi/'
+SHARED = 'shared'
 
 
 def includeme(config):
@@ -577,6 +578,7 @@ class IngestionListener:
         variant = parser.create_variant_from_record(record)
         variant['project'] = project
         variant['institution'] = institution
+        variant['status'] = SHARED  # default variant status to shared, so visible to everyone
         parser.format_variant_sub_embedded_objects(variant)
         try:
             self.vapp.post_json('/variant', variant, status=201)
