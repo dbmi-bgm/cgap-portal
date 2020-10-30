@@ -995,7 +995,7 @@ export class FilterSetController extends React.PureComponent {
 
             let global_flags = url.parse(searchHrefBase, false).search;
             if (global_flags) {
-                global_flags = global_flags.slice(1); // .replace("&sort=date_created", "");
+                global_flags = global_flags.slice(1); // .replace("&sort=date_created", "").replace("type=VariantSample&", "");
             }
 
             // We create our own names for flags & flags_applied here rather
@@ -1032,7 +1032,10 @@ export class FilterSetController extends React.PureComponent {
             const nextSearchHref = searchHrefBase + (currFilterSetQuery ? "&" + currFilterSetQuery : "");
 
             // Compares full hrefs, incl searchHrefBase params
-            const haveSearchParamsChanged = !currHref || !_.isEqual(url.parse(nextSearchHref, true).query, url.parse(currHref, true).query);
+            const haveSearchParamsChanged = !currHref || !_.isEqual(
+                url.parse(nextSearchHref, true).query,
+                url.parse(currHref, true).query
+            );
 
             if (haveSearchParamsChanged) {
                 virtualNavigate(nextSearchHref, null, (res)=>{

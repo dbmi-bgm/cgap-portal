@@ -3,11 +3,13 @@ import urllib
 from pyramid.view import view_config
 from pyramid.request import Request
 from pyramid.httpexceptions import HTTPBadRequest
+from snovault import TYPES
 from snovault.util import debug_log
+from snovault.embed import make_subrequest
 from ..types.base import get_item_or_none
 from .search import SearchBuilder
 from .lucene_builder import LuceneBuilder
-from .search_utils import execute_search
+from .search_utils import execute_search, build_initial_columns
 from ..types.filter_set import FLAGS, FILTER_BLOCKS
 import os
 
@@ -40,9 +42,13 @@ class CompoundSearchBuilder:
         :param parent_request: parent_request who possesses permissions
         :param sub_request: request who requires the permissions of the parent request
         """
-        sub_request.environ['REMOTE_USER'] = parent_request.environ.get('REMOTE_USER')
+        # sub_request.environ = env  # copy back in
         sub_request.__parent__ = None  # XXX: set parent request (is None *always* correct?) -Will
         sub_request.registry = parent_request.registry  # transfer registry as well
+        if hasattr(parent_request, "context"):
+            sub_request.context = parent_request.context
+        else:
+            sub_request.context = None
 
     @classmethod
     def build_subreq_from_single_query(cls, request, query, route='/search/', from_=0, to=10):
@@ -56,9 +62,18 @@ class CompoundSearchBuilder:
         :param to: how many results to returning, index starting at from_
         :return: new Request
         """
+
+        #env = parent_request.environ.copy()  # copy parent request
+        #env['PATH_INFO'] = sub_request.environ['PATH_INFO']  # override what it does
+        #env['QUERY_STRING'] = sub_request.environ['QUERY_STRING']
+
         if '?' not in query:  # do some sanitization
             query = '?' + query
-        subreq = Request.blank(route + '%s&from=%s&limit=%s' % (query, from_, to))
+        # subreq = Request.blank(route + '%s&from=%s&limit=%s' % (query, from_, to))
+
+        subreq = make_subrequest(request, route + '%s&from=%s&limit=%s' % (query, from_, to), "GET")
+        subreq.headers['Accept'] = 'application/json'
+
         cls.transfer_request_permissions(request, subreq)  # VERY IMPORTANT - Will
         return subreq
 
@@ -79,7 +94,7 @@ class CompoundSearchBuilder:
         return merge_query_strings(qstring1, qstring2)
 
     @staticmethod
-    def format_filter_set_results(request, es_results, return_generator=False):
+    def format_filter_set_results(request, es_results, filter_set, return_generator=False):
         """ Formats es_results from filter_set into a dictionary containing total and @graph,
             setting status on the request if needed.
 
@@ -90,19 +105,16 @@ class CompoundSearchBuilder:
         """
         # if this is a subrequest/gen request, return '@graph' directly
         if request.__parent__ is not None or return_generator:
-            return es_results['hits']['hits']
+            return [ hit['_source']['embedded'] for hit in es_results['hits']['hits'] ]
 
-        elif es_results['hits']['total'] == 0:
+        if es_results['hits']['total'] == 0:
             request.response.status_code = 404  # see google webmaster doc on why
-            return {
-                'total': 0,
-                '@graph': []
-            }
-        else:
-            return {
-                'total': es_results['hits']['total'],
-                '@graph': es_results['hits']['hits']
-            }
+
+        return {
+            "total": es_results['hits'].get("total", 0),
+            "@graph": [ hit['_source']['embedded'] for hit in es_results['hits'].get("hits", []) ],
+            "columns": build_initial_columns([ request.registry[TYPES][filter_set["search_type"]].schema ])
+        }
 
     @staticmethod
     def invoke_search(context, request, subreq, return_generator=False):
@@ -219,7 +231,7 @@ class CompoundSearchBuilder:
             compound_subreq = cls.build_subreq_from_single_query(request, ('?type=' + t))
             search = SearchBuilder.from_search(context, compound_subreq, compound_query, from_=from_, size=to)
             es_results = execute_search(compound_subreq, search.search)
-            return cls.format_filter_set_results(request, es_results, return_generator)
+            return cls.format_filter_set_results(request, es_results, filter_set, return_generator)
 
     @classmethod
     def validate_flag(cls, flag):
@@ -338,12 +350,21 @@ def compound_search(context, request):
     body = json.loads(request.body)
     filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, body)
     intersect = True if body.get('intersect', False) else False
+    if filter_set.get("search_type") not in request.registry[TYPES]["FilterSet"].schema["properties"]["search_type"]["enum"]:
+        raise HTTPBadRequest("Passed bad search_type body param: " + filter_set.get("search_type"))
     from_ = body.get('from', 0)
     limit = body.get('limit', 25)
     return_generator = body.get('return_generator', False)
     global_flags = body.get('global_flags', None)
     if from_ < 0 or limit < 0:
         raise HTTPBadRequest('Passed bad from, to request body params: %s, %s' % (from_, limit))
-    return CompoundSearchBuilder.execute_filter_set(context, request, filter_set, from_=from_, to=limit,
-                                                    global_flags=global_flags, return_generator=return_generator,
-                                                    intersect=intersect)
+    return CompoundSearchBuilder.execute_filter_set(
+        context,
+        request,
+        filter_set,
+        from_=from_,
+        to=limit,
+        global_flags=global_flags,
+        return_generator=return_generator,
+        intersect=intersect,
+    )

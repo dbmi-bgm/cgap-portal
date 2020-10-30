@@ -26,7 +26,7 @@ from snovault.typeinfo import AbstractTypeInfo
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
     find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
-    execute_search, make_search_subreq,
+    execute_search, make_search_subreq, build_initial_columns,
     NESTED, COMMON_EXCLUDED_URI_PARAMS, MAX_FACET_COUNTS
 )
 
@@ -105,9 +105,15 @@ class SearchBuilder:
         self.principals = self.request.effective_principals  # permissions to apply to this search
 
         # Initialized via outside function call
-        self.schemas = [self.types[item_type].schema for item_type in self.doc_types]  # schemas for doc_types
+        # schemas for doc_types
+        self.schemas = [
+            self.types[item_type].schema
+            for item_type in self.doc_types
+        ]
+        # item_type hierarchy we are searching on
         self.search_types = self.build_search_types(self.types, self.doc_types) + [
-            self.forced_type]  # item_type hierarchy we are searching on
+            self.forced_type
+        ]
         self.search_base = self.normalize_query(self.request, self.types, self.doc_types)
         self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
         self.prepared_terms = self.prepare_search_term(self.request)
@@ -890,6 +896,12 @@ class SearchBuilder:
             the front-end. If this functionality is needed outside of general search, this
             method should be moved to search_utils.py.
         """
+
+        columns = build_initial_columns(self.schemas)
+
+        if self.request.normalized_params.get('currentAction') in ('selection', 'multiselect'):
+            return columns
+
         any_abstract_types = 'Item' in self.doc_types
         if not any_abstract_types:  # Check explictly-defined types to see if any are abstract.
             type_infos = [self.request.registry[TYPES][t] for t in self.doc_types if t != 'Item']
@@ -899,16 +911,9 @@ class SearchBuilder:
                     any_abstract_types = True
                     break
 
-        columns = OrderedDict()
-
-        # Add title column, at beginning always
-        columns['display_title'] = {
-            "title": "Title",
-            "order": -1000
-        }
 
         # Add type column if any abstract types in search
-        if any_abstract_types and self.request.normalized_params.get('currentAction') != 'selection':
+        if any_abstract_types:
             columns['@type'] = {
                 "title": "Item Type",
                 "colTitle": "Type",
@@ -918,33 +923,6 @@ class SearchBuilder:
                 # "default_hidden": request.normalized_params.get('currentAction') == 'selection'
             }
 
-        for schema in self.schemas:
-            if 'columns' in schema:
-                schema_columns = OrderedDict(schema['columns'])
-                # Add all columns defined in schema
-                for name, obj in schema_columns.items():
-                    if name not in columns:
-                        columns[name] = obj
-                    else:
-                        # If @type or display_title etc. column defined in schema, then override defaults.
-                        for prop in schema_columns[name]:
-                            columns[name][prop] = schema_columns[name][prop]
-
-        # Add status column, if not present, at end.
-        if 'status' not in columns:
-            columns['status'] = {
-                "title": "Status",
-                "default_hidden": True,
-                "order": 980
-            }
-        # Add date column, if not present, at end.
-        if 'date_created' not in columns:
-            columns['date_created'] = {
-                "title": "Date Created",
-                "colTitle": "Created",
-                "default_hidden": True,
-                "order": 1000
-            }
         return columns
 
     def _format_results(self, hits):
