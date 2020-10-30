@@ -872,6 +872,18 @@ def hidden_facet_data_one():
             'mother': 'Anne',
             'father': 'Bob'
         },
+        'unfaceted_array_of_objects': [
+            {
+                'fruit': 'orange',
+                'color': 'orange',
+                'uid': 1
+            },
+            {
+                'fruit': 'banana',
+                'color': 'yellow',
+                'uid': 2
+            },
+        ]
     }
 
 
@@ -889,7 +901,19 @@ def hidden_facet_data_two():
         'unfaceted_object': {
             'mother': 'Candice',
             'father': 'Doug'
-        }
+        },
+        'unfaceted_array_of_objects': [
+            {
+                'fruit': 'blueberry',
+                'color': 'blue',
+                'uid': 3
+            },
+            {
+                'fruit': 'mango',
+                'color': 'yellow',
+                'uid': 4
+            },
+        ]
     }
 
 
@@ -1007,3 +1031,25 @@ class TestSearchHiddenAndAdditionalFacets:
         expected = self.DEFAULT_FACETS + [_facet]
         actual = [facet['field'] for facet in facets]
         assert sorted(expected) == sorted(actual)
+
+    @pytest.mark.parametrize('_facet, n_expected', [
+        ('unfaceted_array_of_objects.fruit', 4),
+        ('unfaceted_array_of_objects.color', 3),
+        ('unfaceted_array_of_objects.uid', 2.5)  # stats avg
+    ])
+    def test_search_additional_nested_facets(self, testapp, hidden_facet_test_data, _facet, n_expected):
+        """ Tests that specifying an array of object field mapped with nested as an additional_facet
+            works correctly. """
+        [desired_facet] = [facet for facet in testapp.get('/search/?type=TestingHiddenFacets'
+                                                          '&additional_facets=%s' % _facet).json['facets']
+                           if facet['field'] == _facet]
+        if 'terms' in desired_facet:
+            assert len(desired_facet['terms']) == n_expected
+        else:
+            assert desired_facet['avg'] == n_expected
+
+    def test_search_additional_non_nested_facets(self):
+        pass  # implement me
+
+    def test_search_additional_facets_workbook(self):
+        pass  # "integrated" test implement me
