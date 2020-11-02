@@ -5,7 +5,7 @@
             "title": "Schema Version",
             "internal_comment":  "Do not submit, value is assigned by the server. The version of the JSON schema that the server uses to validate the object. Schema version indicates generation of schema used to save version to to enable upgrade steps to work. Individual schemas should set the default.",
             "type": "string",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "pattern": "^\\d+(\\.\\d+)*$",
             "requestMethod": []
         }
@@ -15,9 +15,9 @@
             "title": "UUID",
             "type": "string",
             "format": "uuid",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "serverDefault": "uuid4",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "requestMethod": "POST"
         }
     },
@@ -26,10 +26,10 @@
             "title": "Accession",
             "description": "A unique identifier to be used to reference the object.",
             "internal_comment": "Only admins are allowed to set or update this value.",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "type": "string",
             "format": "accession",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "serverDefault": "accession"
         },
         "alternate_accessions": {
@@ -38,12 +38,11 @@
             "type": "array",
             "lookup": 1000,
             "internal_comment":"Only admins are allowed to set or update this value.",
-            "exclude_from": ["submit4dn"],
             "items": {
                 "title": "Alternate Accession",
                 "description": "An accession previously assigned to an object that has been merged with this object.",
                 "type": "string",
-                "permission": "import_items",
+                "permission": "restricted_fields",
                 "format": "accession"
             }
         }
@@ -69,21 +68,21 @@
     "status": {
         "status": {
             "title": "Status",
-            "exclude_from": ["submit4dn"],
             "type": "string",
             "default": "in review",
-            "permission": "import_items",
+            "permission": "restricted_fields",
+            "note": "The last 4 statuses will be retired once items with those stati are patched to the appropriate one",
             "enum": [
+                "shared",
+                "obsolete",
                 "current",
+                "inactive",
+                "in review",
+                "deleted",
                 "released",
-                "replaced",
                 "released to project",
                 "released to institution",
-                "in public review",
-                "in review",
-                "obsolete",
-                "inactive",
-                "deleted"
+                "in public review"
             ]
         }
     },
@@ -92,30 +91,30 @@
             "rdfs:subPropertyOf": "dc:created",
             "title": "Date Created",
             "lookup": 1000,
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "type": "string",
             "anyOf": [
                 {"format": "date-time"},
                 {"format": "date"}
             ],
             "serverDefault": "now",
-            "permission": "import_items"
+            "permission": "restricted_fields"
         },
         "submitted_by": {
             "rdfs:subPropertyOf": "dc:creator",
             "title": "Submitted By",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "type": "string",
             "linkTo": "User",
             "lookup": 1000,
             "serverDefault": "userid",
-            "permission": "import_items"
+            "permission": "restricted_fields"
         }
     },
     "modified": {
         "last_modified": {
             "title": "Last Modified",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "type": "object",
             "additionalProperties": false,
             "lookup": 1000,
@@ -128,14 +127,14 @@
                         {"format": "date-time"},
                         {"format": "date"}
                     ],
-                    "permission": "import_items"
+                    "permission": "restricted_fields"
                 },
                 "modified_by": {
                     "title": "Modified by",
                     "description": "Do not submit, value is assigned by the server. The user that modfied the object.",
                     "type": "string",
                     "linkTo": "User",
-                    "permission": "import_items"
+                    "permission": "restricted_fields"
                 }
             }
         }
@@ -144,18 +143,15 @@
         "institution": {
             "title": "Institution",
              "description": "Institution associated with the submission.",
-             "exclude_from": ["submit4dn"],
-             "permission": "import_items",
              "type": "string",
-             "linkTo": "Institution",
-             "linkSubmitsFor": true
+             "exclude_from": ["FFedit-create"],
+             "linkTo": "Institution"
         },
         "project": {
             "title": "Project",
             "description": "Project associated with the submission.",
-            "exclude_from": ["submit4dn"],
-            "permission": "import_items",
             "type": "string",
+            "exclude_from": ["FFedit-create"],
             "linkTo": "Project"
         }
     },
@@ -164,7 +160,7 @@
             "title": "Notes",
             "description": "Internal notes.",
             "type": "string",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "elasticsearch_mapping_index_type": {
                 "title": "Field mapping index type",
                 "description": "Defines one of three types of indexing available",
@@ -304,7 +300,6 @@
             "type": "array",
             "lookup": 1000,
             "uniqueItems": true,
-            "exclude_from" : ["submit4dn"],
             "ff_flag": "clear clone",
             "items": {
                 "title": "Tag",
@@ -319,8 +314,7 @@
             "description": "Array of linkTos for static sections to be displayed at the top of an item page",
             "type": "array",
             "uniqueItems": true,
-            "permission": "import_items",
-            "exclude_from" : ["submit4dn"],
+            "permission": "restricted_fields",
             "items": {
                 "title": "Static Header",
                 "description": "Static section displayed at the top of an item page",
@@ -333,8 +327,7 @@
             "description": "Array of objects containing linkTo UserContent and 'position' to be placed on Item view(s).",
             "type": "array",
             "uniqueItems": true,
-            "permission": "import_items",
-            "exclude_from" : ["submit4dn"],
+            "permission": "restricted_fields",
             "items": {
                 "title" : "Static Content Definition",
                 "description" : "Link to UserContent Item plus location.",
@@ -376,7 +369,7 @@
             "description": "Additional, archived or preliminary processed filesets that are derived from files in this experiment set.",
             "type": "array",
             "lookup": 410,
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "items": {
                 "title": "Supplementary Processed Filesets",
                 "description": "Fileset metadata",

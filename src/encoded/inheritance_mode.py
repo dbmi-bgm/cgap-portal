@@ -347,7 +347,7 @@ class InheritanceMode:
             cmphet = variant_sample.get("cmphet")
             novoPP = variant_sample.get("novoPP", -1)
         except Exception as e:
-            log.error('Was not able to extract inheritance modes - the required fields do not exist!'
+            log.info('Was not able to extract inheritance modes - the required fields do not exist!'
                       '\n%s\n%s\n%s' % (sample_geno, variant_sample, e))
             return {}
 

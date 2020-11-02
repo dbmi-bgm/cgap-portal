@@ -150,7 +150,7 @@ def example_rows():
         {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father',
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '3'},
         {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband',
-         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
+         'report required': 'N', 'workup type': 'WGS', 'specimen id': '1'},
         {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband',
          'report required': 'Y', 'workup type': 'WES', 'specimen id': '5'},
         {'individual id': '546', 'analysis id': '3333', 'relation to proband': 'mother',
@@ -169,7 +169,7 @@ def big_family_rows():
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '3'},
         {'individual id': '546', 'analysis id': '1111', 'relation to proband': 'sister',
          'report required': 'Y', 'workup type': 'WGS', 'specimen id': '4'},
-        {'individual id': '555', 'analysis id': '1111', 'relation to proband': 'brother',
+        {'individual id': '555', 'analysis id': '1111', 'relation to proband': 'full brother 1',
          'report required': 'Y', 'workup type': 'WGS', 'specimen id': '5'}
     ]
 
@@ -413,7 +413,7 @@ class TestSubmissionMetadata:
         row_dict['unique analysis id'] = case_id
         submission = SubmissionMetadata([row_dict], project, institution)
         key = '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id'])
-        assert submission.case_names.get(key)[0] == case_id
+        assert submission.case_info.get(key)['case id'] == case_id
 
     def test_add_individual_relations(self, big_family_rows, project, institution):
         """
@@ -440,11 +440,13 @@ class TestSubmissionMetadata:
         assert len(example_rows_obj.samples) == 5
         assert len(example_rows_obj.sample_processings) == 3
         assert len(example_rows_obj.cases) == 6
-        assert len(example_rows_obj.reports) == 3
+        assert len(example_rows_obj.reports) == 2
 
     def test_create_json_out(self, example_rows_obj, project, institution):
-        """tests that all expected items are present in final json as well as project and institution fields"""
-        assert all(example_rows_obj.json_out[key] for key in ['individual', 'family', 'sample', 'sample_processing', 'case', 'report'])
+        """tests that all expected items are present in final json as well as
+        project and institution fields"""
+        assert all(key in example_rows_obj.json_out for key in
+                   ['individual', 'family', 'sample', 'sample_processing', 'case', 'report'])
         for key, val in example_rows_obj.json_out.items():
             if key != 'errors':
                 for val2 in val.values():

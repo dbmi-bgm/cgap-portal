@@ -17,11 +17,15 @@
         { "$ref": "mixins.json#/dbxrefs" },
         { "$ref": "mixins.json#/alternative_ids" },
         { "$ref": "mixins.json#/static_embeds" },
+        { "$ref": "mixins.json#/tags" },
         { "$ref": "mixins.json#/attribution" }
     ],
     "properties": {
         "schema_version": {
             "default": "1"
+        },
+        "status": {
+            "default": "shared"
         },
         "var_conseq_name" : {
             "title" : "Sequence Ontology Style Name of the Variant Consequence",

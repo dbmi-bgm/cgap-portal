@@ -322,6 +322,9 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // Overrides default 400px.
     const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 445) : undefined;
 
+    // Table re-initializes upon change of key so we use it refresh table based on session.
+    const searchTableKey = "session:" + session;
+
     return (
         <React.Fragment>
             <h1 className="mb-0 mt-0">
@@ -329,7 +332,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             </h1>
             <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible }} searchHref={searchHrefWithCurrentFilter} title={
                 <FilteringTabSubtitle caseItem={context} />
-            } key={"session:" + session} />
+            } key={searchTableKey} />
         </React.Fragment>
     );
 });
@@ -356,7 +359,9 @@ export function FilteringTabSubtitle(props){
     } = caseItem;
 
     const [ isLoading, setIsLoading ] = useState(false);
+
     // From `state.lastFilterSetSaved` we use only non linkTo properties from it so doesn't matter if frame=object vs frame=page for it.
+    // TODO: reduxStore.dispatch({ ...context, active_filterset: })
     const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || null);
 
     // See https://reactjs.org/docs/hooks-faq.html#how-do-i-implement-getderivedstatefromprops
