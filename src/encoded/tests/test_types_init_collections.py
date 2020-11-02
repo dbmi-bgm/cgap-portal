@@ -50,7 +50,7 @@ def test_document_display_title_wo_attachment(testapp, protocol_data):
 @pytest.fixture
 def google_analytics_tracking_data():
     return {
-        "status": "released",
+        "status": "shared",
         "tracking_type": "google_analytics",
         "google_analytics": {
             "reports": {
@@ -104,7 +104,7 @@ def google_analytics(testapp, google_analytics_tracking_data):
 @pytest.fixture
 def download_tracking_item_data():
     return {
-        "status": "released",
+        "status": "shared",
         "tracking_type": "download_tracking",
         "download_tracking": {
             "geo_country": "NL",
