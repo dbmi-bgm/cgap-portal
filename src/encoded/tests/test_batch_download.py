@@ -23,7 +23,7 @@ pytestmark = [pytest.mark.indexing]
 #     assert lines[1].split(b'\t') == [
 #         b'/experiments/ENCSR000AAL/', b'ENCSR000AAL', b'RNA-seq', b'RNA-seq',
 #         b'', b'K562', b'RNA Evaluation K562 Small Total RNA-seq from Gingeras',
-#         b'Thomas Gingeras, CSHL', b'ENCODE', b'released', b'',
+#         b'Thomas Gingeras, CSHL', b'ENCODE', b'shared', b'',
 #         b'', b'', b'', b'', b'', b'', b'', b'', b'',
 #         b'', b'', b'', b'', b'', b'', b''
 #     ]
