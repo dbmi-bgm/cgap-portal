@@ -80,6 +80,12 @@
                 }
             }
         },
+        "user_institution": {
+            "title": "User's Institution",
+            "description": "The primary institution the user is associated with",
+            "type": "string",
+            "linkTo": "Institution"
+        },
         "email": {
             "title": "Account Email",
             "description": "Email used to log in to the 4DN Portal.",
