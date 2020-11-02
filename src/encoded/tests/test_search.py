@@ -933,6 +933,19 @@ class TestSearchHiddenAndAdditionalFacets:
     ADDITIONAL_FACETS = ['unfaceted_string', 'unfaceted_integer']
     DISABLED_FACETS = ['disabled_string', 'disabled_integer']
 
+    @staticmethod
+    def check_and_verify_result(facets, desired_facet, number_expected):
+        """ Helper method for later tests that checks terms count and average. """
+        for facet in facets:
+            field = facet['field']
+            if field == desired_facet and 'terms' in facet:
+                assert len(facet['terms']) == number_expected
+            elif field == facet and 'avg' in facet:
+                assert facet['avg'] == number_expected
+            else:
+                continue
+            break
+
     def test_search_default_hidden_facets_dont_show(self, testapp, hidden_facet_test_data):
         facets = testapp.get('/search/?type=TestingHiddenFacets').json['facets']
         actual = [facet['field'] for facet in facets]
@@ -1048,8 +1061,54 @@ class TestSearchHiddenAndAdditionalFacets:
         else:
             assert desired_facet['avg'] == n_expected
 
-    def test_search_additional_non_nested_facets(self):
-        pass  # implement me
+    @pytest.fixture
+    def many_non_nested_facets(self, testapp, hidden_facet_test_data):
+        return testapp.get('/search/?type=TestingHiddenFacets'  
+                           '&additional_facets=non_nested_array_of_objects.fruit'
+                           '&additional_facets=non_nested_array_of_objects.color'
+                           '&additional_facets=non_nested_array_of_objects.uid').json['facets']
 
-    def test_search_additional_facets_workbook(self):
-        pass  # "integrated" test implement me
+    @pytest.mark.parametrize('_facet, n_expected', [
+        ('unfaceted_array_of_objects.fruit', 4),
+        ('unfaceted_array_of_objects.color', 3),
+        ('unfaceted_array_of_objects.uid', 2.5)  # stats avg
+    ])
+    def test_search_additional_non_nested_facets(self, many_non_nested_facets, _facet, n_expected):
+        """ Tests trying to facet on an array of objects field that is not nested, requesting
+            all at the same time.
+        """
+        self.check_and_verify_result(many_non_nested_facets, _facet, n_expected)
+
+    @pytest.mark.parametrize('_facet, n_expected', [
+        ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
+        ('hg19.hg19_chrom', 1),
+        ('hg19.hg19_hgvsg', 3),
+        ('REF', 3)
+    ])
+    def test_search_additional_facets_workbook(self, testapp, workbook, _facet, n_expected):
+        """ Tests using additional facets with workbook inserts (using Variant) """
+        variant_facets = testapp.get('/search/?type=Variant&additional_facets=%s' % _facet).json['facets']
+        self.check_and_verify_result(variant_facets, _facet, n_expected)
+
+    @pytest.fixture(scope='module')
+    def variant_facets(self, testapp, workbook):
+        return testapp.get('/search/?type=Variant'
+                           '&additional_facets=hg19.hg19_pos'
+                           '&additional_facets=hg19.hg19_chrom'
+                           '&additional_facets=hg19.hg19_hgvsg'
+                           '&additional_facets=REF').json['facets']
+
+    @pytest.mark.parametrize('_facet, n_expected', [
+        ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
+        ('hg19.hg19_chrom', 1),
+        ('hg19.hg19_hgvsg', 3),
+        ('REF', 3)
+    ])
+    def test_search_additional_facets_workbook_multiple(self, testapp, workbook, _facet, n_expected):
+        """ Does all 4 extra aggregations above, checking the resulting facets for correctness """
+        res = testapp.get('/search/?type=Variant'
+                           '&additional_facets=hg19.hg19_pos'
+                           '&additional_facets=hg19.hg19_chrom'
+                           '&additional_facets=hg19.hg19_hgvsg'
+                           '&additional_facets=REF').json['facets']
+        self.check_and_verify_result(res, _facet, n_expected)

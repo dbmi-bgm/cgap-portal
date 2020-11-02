@@ -364,3 +364,24 @@ class TestingHiddenFacets(Item):
             }
         }
     }
+
+    @calculated_property(schema={
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'properties': {
+                'fruit': {
+                    'type': 'string'
+                },
+                'color': {
+                    'type': 'string'
+                },
+                'uid': {
+                    'type': 'integer'
+                }
+            }
+        }
+    })
+    def non_nested_array_of_objects(self, unfaceted_array_of_objects):
+        """ Non-nested view of the unfaceted_array_of_objects field """
+        return unfaceted_array_of_objects

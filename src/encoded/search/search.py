@@ -587,8 +587,8 @@ class SearchBuilder:
             :param append_facets: list to add additional_facets to
             :param current_type_schema: schema of the item we are faceting on
         """
-        aggregation_type = 'terms'
         for extra_facet in self.additional_facets:
+            aggregation_type = 'terms'  # default
 
             # determine if nested
             if self.item_type_es_mapping and find_nested_path(extra_facet, self.item_type_es_mapping):
