@@ -181,7 +181,7 @@ def test_put_object_editing_child_does_not_work(content_with_child, testapp):
     edit = {
         'reverse': [{
             '@id': content_with_child['child'],
-            'status': 'released',
+            'status': 'shared',
         }]
     }
     # cannot submit 'reverse' calc property
@@ -201,7 +201,7 @@ def test_post_object_with_child(content_with_child, testapp):
     """
     edit = {
         'reverse': [
-            {'status': 'released'}
+            {'status': 'shared'}
         ]
     }
     res = testapp.post_json('/testing-link-targets', edit, status=422).json
