@@ -139,14 +139,14 @@
             "title": "Institution",
              "description": "Institution associated with the submission.",
              "type": "string",
-             "exclude_from": ["FFedit-create"],
+             "permission": "restricted_fields",
              "linkTo": "Institution"
         },
         "project": {
             "title": "Project",
             "description": "Project associated with the submission.",
             "type": "string",
-            "exclude_from": ["FFedit-create"],
+            "permission": "restricted_fields",
             "linkTo": "Project"
         }
     },
