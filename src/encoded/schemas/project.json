@@ -12,6 +12,7 @@
         { "$ref": "mixins.json#/submitted" },
         { "$ref": "mixins.json#/modified" },
         { "$ref": "mixins.json#/tags" },
+        { "$ref": "mixins.json#/status" },
         { "$ref": "mixins.json#/static_embeds" }
     ],
     "type": "object",
@@ -20,18 +21,7 @@
             "default": "1"
         },
         "status": {
-            "title": "Status",
-            "type": "string",
-            "default": "shared",
-            "permission": "restricted_fields",
-            "enum": [
-                "shared",
-                "current",
-                "revoked",
-                "deleted",
-                "replaced",
-                "inactive"
-            ]
+            "default": "shared"
         },
         "name": {
             "title": "Name",
