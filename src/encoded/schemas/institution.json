@@ -21,12 +21,14 @@
         "status": {
             "title": "Status",
             "type": "string",
-            "default": "current",
             "permission": "restricted_fields",
+            "default": "shared",
             "enum": [
+                "shared",
                 "current",
-                "obsolete",
+                "revoked",
                 "deleted",
+                "replaced",
                 "inactive"
             ]
         },
