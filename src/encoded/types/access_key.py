@@ -10,8 +10,8 @@ from pyramid.security import (
 from pyramid.settings import asbool
 from .base import (
     Item,
-    DELETED,
-    ONLY_ADMIN_VIEW,
+    DELETED_ACL,
+    ONLY_ADMIN_VIEW_ACL,
 )
 from ..authentication import (
     generate_password,
@@ -55,8 +55,8 @@ class AccessKey(Item):
     embedded_list = []
 
     STATUS_ACL = {
-        'current': [(Allow, 'role.owner', ['view', 'edit'])] + ONLY_ADMIN_VIEW,
-        'deleted': DELETED,
+        'current': [(Allow, 'role.owner', ['view', 'edit'])] + ONLY_ADMIN_VIEW_ACL,
+        'deleted': DELETED_ACL,
     }
 
     def __ac_local_roles__(self):

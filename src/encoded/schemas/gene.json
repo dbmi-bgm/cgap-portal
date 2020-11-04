@@ -45,6 +45,9 @@
     "description": "Schema for Genes",
     "id": "/profiles/gene.json",
     "properties": {
+        "status": {
+            "default": "shared"
+        },
         "alias_name": {
             "title": "Alias gene name",
             "type": "array",

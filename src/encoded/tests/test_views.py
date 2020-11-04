@@ -252,19 +252,35 @@ def test_post_duplicate_uuid(testapp, disorder):
     testapp.post_json('/disorder', item, status=409)
 
 
-def test_user_effective_principals(submitter, institution, anontestapp, execute_counter):
+def test_user_effective_principals(submitter, anontestapp, execute_counter):
+    """ Testing that authorized.group_finder adds the correct principals to non-project User.
+    """
     email = submitter['email']
     with execute_counter.expect(1):
         res = anontestapp.get('/@@testing-user',
                               extra_environ={'REMOTE_USER': str(email)})
     assert sorted(res.json['effective_principals']) == [
-    'group.submitter',
-    'institution.%s' % institution['uuid'],
-    'remoteuser.encode_submitter@example.org',
-    'submits_for.%s' % institution['uuid'],
-    'system.Authenticated',
-    'system.Everyone',
-    'userid.%s' % submitter['uuid']]
+        'remoteuser.encode_submitter@example.org',
+        'system.Authenticated',
+        'system.Everyone',
+        'userid.%s' % submitter['uuid']]
+
+
+def test_bgm_project_user_effective_principals(bgm_user, bgm_project, anontestapp, execute_counter):
+    """ Testing that authorized.group_finder adds the correct principals to project User.
+    """
+    bgmuser_email = bgm_user.get('email')
+    with execute_counter.expect(1):
+        res = anontestapp.get('/@@testing-user',
+                              extra_environ={'REMOTE_USER': str(bgmuser_email)})
+        assert sorted(res.json['effective_principals']) == [
+            'editor_for.{}'.format(bgm_project.get('uuid')),
+            'group.project_editor',
+            'remoteuser.{}'.format(bgmuser_email),
+            'system.Authenticated',
+            'system.Everyone',
+            'userid.{}'.format(bgm_user.get('uuid'))
+        ]
 
 
 def test_jsonld_context(testapp):

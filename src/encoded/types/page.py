@@ -198,10 +198,11 @@ class Page(Item):
     schema = load_schema('encoded:schemas/page.json')
     embedded_list = ['content.*']
 
-    STATUS_ACL = StaticSection.STATUS_ACL
+    # STATUS_ACL = StaticSection.STATUS_ACL
 
     class Collection(Item.Collection):
         pass
+
 
 for field in ['display_title', 'name', 'description', 'content.name']:
     Page.embedded_list = Page.embedded_list + [

@@ -21,12 +21,14 @@
         "status": {
             "title": "Status",
             "type": "string",
-            "default": "released",
-            "enum" : [
-                "released",
-                "released to project",
-                "released to institution",
-                "draft",
+            "permission": "restricted_fields",
+            "default": "current",
+            "enum": [
+                "public",
+                "shared",
+                "current",
+                "inactive",
+                "in review",
                 "deleted"
             ],
             "lookup" : 55

@@ -268,7 +268,7 @@ def test_convert2raw(embedded_item_dict, raw_item_dict):
     # this is not really testing much as the mocked return value is what is being
     # checked so no way to know if fields are really being stripped as expected
     # first add some fields that should be ignored when getting raw form
-    embedded_item_dict['status'] = 'released'
+    embedded_item_dict['status'] = 'shared'
     embedded_item_dict['date_created'] = "2020-03-03T20:08:10.690526+00:00"
     embedded_item_dict['institution'] = '/institution/bwh'
     embedded_item_dict["principals_allowed"] = {"view": ["system.Everyone"], "edit": ["group.admin"]}

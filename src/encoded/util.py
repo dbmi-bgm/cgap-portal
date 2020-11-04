@@ -8,7 +8,7 @@ import tempfile
 
 from dcicutils.misc_utils import check_true
 from io import BytesIO
-from pyramid.httpexceptions import HTTPUnprocessableEntity
+from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden
 from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
@@ -287,3 +287,12 @@ def beanstalk_env_from_request(request):
 
 def beanstalk_env_from_registry(registry):
     return registry.settings.get('env.name')
+
+
+def check_user_is_logged_in(request):
+    """ Raises HTTPForbidden if the request did not come from a logged in user. """
+    for principal in request.effective_principals:
+        if principal.startswith('userid.') or principal == 'group.admin':  # allow if not logged in OR has admin
+            break
+    else:
+        raise HTTPForbidden(title="Not logged in.")
