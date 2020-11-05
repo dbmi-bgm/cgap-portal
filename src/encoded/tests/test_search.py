@@ -917,7 +917,7 @@ def hidden_facet_data_two():
     }
 
 
-@pytest.fixture(scope='module')  # TODO consider this further...
+@pytest.fixture(scope='module')  # XXX: consider scope further - Will 11/5/2020
 def hidden_facet_test_data(testapp, hidden_facet_data_one, hidden_facet_data_two):
     testapp.post_json('/TestingHiddenFacets', hidden_facet_data_one, status=201)
     testapp.post_json('/TestingHiddenFacets', hidden_facet_data_two, status=201)
@@ -946,18 +946,22 @@ class TestSearchHiddenAndAdditionalFacets:
                 continue
             break
 
+    @staticmethod
+    def assert_facet_set_equal(expected, facets):
+        """ Takes list of expect results and raw facet response and checks that they
+            are identical. """
+        assert sorted(expected) == sorted([facet['field'] for facet in facets])
+
     def test_search_default_hidden_facets_dont_show(self, testapp, hidden_facet_test_data):
         facets = testapp.get('/search/?type=TestingHiddenFacets').json['facets']
-        actual = [facet['field'] for facet in facets]
-        assert self.DEFAULT_FACETS == sorted(actual)
+        self.assert_facet_set_equal(self.DEFAULT_FACETS, facets)
 
     @pytest.mark.parametrize('facet', ADDITIONAL_FACETS)
     def test_search_one_additional_facet(self, testapp, hidden_facet_test_data, facet):
         """ Tests that specifying each of the 'additional' facets works correctly """
         facets = testapp.get('/search/?type=TestingHiddenFacets&additional_facets=%s' % facet).json['facets']
         expected = self.DEFAULT_FACETS + [facet]
-        actual = [facet['field'] for facet in facets]
-        assert sorted(expected) == sorted(actual)
+        self.assert_facet_set_equal(expected, facets)
 
     def test_search_multiple_additional_facets(self, testapp, hidden_facet_test_data):
         """ Tests that enabling multiple additional facets works """
@@ -965,11 +969,11 @@ class TestSearchHiddenAndAdditionalFacets:
                              '&additional_facets=unfaceted_string'
                              '&additional_facets=unfaceted_integer').json['facets']
         expected = self.DEFAULT_FACETS + self.ADDITIONAL_FACETS
-        for facet in facets:
-            assert facet['field'] in expected
+        self.assert_facet_set_equal(expected, facets)
+        for facet in facets:  # verify facet type
             if facet['field'] == 'unfaceted_integer':
                 assert facet['aggregation_type'] == 'stats'
-            else:
+            else:  # facet['field'] == 'unfaceted_string'
                 assert facet['aggregation_type'] == 'terms'
 
     @pytest.mark.parametrize('facet', DEFAULT_HIDDEN_FACETS)
@@ -977,8 +981,7 @@ class TestSearchHiddenAndAdditionalFacets:
         """ Tests that passing default_hidden facets to additional_facets works correctly """
         facets = testapp.get('/search/?type=TestingHiddenFacets&additional_facets=%s' % facet).json['facets']
         expected = self.DEFAULT_FACETS + [facet]
-        actual = [facet['field'] for facet in facets]
-        assert sorted(expected) == sorted(actual)
+        self.assert_facet_set_equal(expected, facets)
 
     def test_search_multiple_additional_default_hidden_facets(self, testapp, hidden_facet_test_data):
         """ Tests that passing multiple hidden_facets as additionals works correctly """
@@ -986,8 +989,8 @@ class TestSearchHiddenAndAdditionalFacets:
                              '&additional_facets=last_name'
                              '&additional_facets=sid').json['facets']
         expected = self.DEFAULT_FACETS + self.DEFAULT_HIDDEN_FACETS
+        self.assert_facet_set_equal(expected, facets)
         for facet in facets:
-            assert facet['field'] in expected
             if facet['field'] == 'sid':
                 assert facet['aggregation_type'] == 'stats'
             else:
@@ -1003,8 +1006,7 @@ class TestSearchHiddenAndAdditionalFacets:
                              '&additional_facets=%s'
                              '&additional_facets=%s' % (_facets[0], _facets[1])).json['facets']
         expected = self.DEFAULT_FACETS + _facets
-        actual = [facet['field'] for facet in facets]
-        assert sorted(expected) == sorted(actual)
+        self.assert_facet_set_equal(expected, facets)
         for facet in facets:
             if facet['field'] == _facets[1]:  # second slot holds number field
                 assert facet['aggregation_type'] == 'stats'
@@ -1030,8 +1032,7 @@ class TestSearchHiddenAndAdditionalFacets:
                              '&additional_facets=%s' 
                              '&additional_facets=%s' % (_facets[0], _facets[1], _facets[2])).json['facets']
         expected = self.DEFAULT_FACETS + [_facets[0], _facets[1]]  # first two should show
-        actual = [facet['field'] for facet in facets]
-        assert sorted(expected) == sorted(actual)
+        self.assert_facet_set_equal(expected, facets)
 
     @pytest.mark.parametrize('_facet', [
         'unfaceted_object.mother',
@@ -1042,8 +1043,7 @@ class TestSearchHiddenAndAdditionalFacets:
         facets = testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facets=%s' % _facet).json['facets']
         expected = self.DEFAULT_FACETS + [_facet]
-        actual = [facet['field'] for facet in facets]
-        assert sorted(expected) == sorted(actual)
+        self.assert_facet_set_equal(expected, facets)
 
     @pytest.mark.parametrize('_facet, n_expected', [
         ('unfaceted_array_of_objects.fruit', 4),

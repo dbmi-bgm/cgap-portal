@@ -814,7 +814,7 @@ class LuceneBuilder:
         :param es_mapping: mapping of this item
         """
         aggs_ptr = search.aggs['all_items']
-        nested_identifier = NESTED + ':'  # nested:field vs. terms:field/stats:field
+        nested_identifier = NESTED + ':'  # nested:field vs. terms:field/stats:field vs. stats:field_nested_name
         for agg in aggs_ptr:
             if nested_identifier in agg and 'stats' not in agg:  # stats aggs are already correct
                 (search.aggs['all_items'][agg]  # create a sub-bucket, preserving the boolean qualifiers

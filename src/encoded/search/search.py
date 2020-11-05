@@ -268,8 +268,9 @@ class SearchBuilder:
         """
         prepared_terms = {}
         for field, val in request.normalized_params.items():
-            if field.startswith('validation_errors') or field.startswith('aggregated_items') or \
-                    field == self.ADDITIONAL_FACETS:
+            if (field.startswith('validation_errors') or
+                    field.startswith('aggregated_items') or
+                    field == self.ADDITIONAL_FACETS):
                 continue
             elif field == 'q':  # searched string has field 'q'
                 # people shouldn't provide multiple queries, but if they do,
@@ -581,10 +582,10 @@ class SearchBuilder:
             self.response['sort'] = result_sort
             self.search = self.search.sort(sort)
 
-    def _initialize_additional_facets(self, append_facets, current_type_schema):
+    def _initialize_additional_facets(self, facets_so_far, current_type_schema):
         """ Helper function for below method that handles additional_facets URL param
 
-            :param append_facets: list to add additional_facets to
+            :param facets_so_far: list to add additional_facets to
             :param current_type_schema: schema of the item we are faceting on
         """
         for extra_facet in self.additional_facets:
@@ -596,15 +597,16 @@ class SearchBuilder:
 
             # check if defined in facets
             if 'facets' in current_type_schema:
-                if extra_facet in current_type_schema['facets']:
-                    if not current_type_schema['facets'][extra_facet].get('disabled', False):
-                        append_facets.append((extra_facet, current_type_schema['facets'][extra_facet]))
+                schema_facets = current_type_schema['facets']
+                if extra_facet in schema_facets:
+                    if not schema_facets[extra_facet].get('disabled', False):
+                        facets_so_far.append((extra_facet, schema_facets[extra_facet]))
                     continue  # if we found the facet, always continue from here
 
             # not specified as facet - infer range vs. term based on schema
             field_definition = schema_for_field(extra_facet, self.request, self.doc_types)
             if not field_definition:  # if not on schema, try "terms"
-                append_facets.append((
+                facets_so_far.append((
                     extra_facet, {'title': extra_facet.title()}
                 ))
             else:
@@ -615,12 +617,12 @@ class SearchBuilder:
 
                 # terms for string
                 if t == 'string':
-                    append_facets.append((
+                    facets_so_far.append((
                         extra_facet, {'title': extra_facet.title(), 'aggregation_type': aggregation_type}
                     ))
                 else:  # try stats
                     aggregation_type = 'stats'
-                    append_facets.append((
+                    facets_so_far.append((
                         extra_facet, {
                             'title': field_definition.get('title', extra_facet.title()),
                             'aggregation_type': aggregation_type,
