@@ -29,11 +29,11 @@ const auth0Options = {
         icon: '/static/img/exported-logo-no-stroke.svg',
         primaryColor: '#1b75b9'
     },
-    allowedConnections: ['partners', 'hms-it', 'bch'],
+    allowedConnections: ['partners', 'hms-it', 'bch', 'google-oauth2'],
     defaultEnterpriseConnection: 'partners',
     languageDictionary: {
         title: 'Log In',
-        emailInputPlaceholder: 'Partners or Harvard/BCH Email',
+        emailInputPlaceholder: 'Partners, Harvard/BCH Email or Google',
         databaseEnterpriseAlternativeLoginInstructions: 'or login via Partners'
     }
 };
