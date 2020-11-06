@@ -56,7 +56,7 @@ class SearchBuilder:
     """
     DEFAULT_SEARCH_FRAME = 'embedded'
     DEFAULT_HIDDEN = 'default_hidden'
-    ADDITIONAL_FACETS = 'additional_facets'
+    ADDITIONAL_FACETS = 'additional_facet'
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):

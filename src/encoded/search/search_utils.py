@@ -44,7 +44,7 @@ ELASTIC_SEARCH_QUERY_KEYWORDS = [
 COMMON_EXCLUDED_URI_PARAMS = [
     'frame', 'format', 'limit', 'sort', 'from', 'field',
     'mode', 'redirected_from', 'datastore', 'referrer',
-    'currentAction', 'additional_facets'
+    'currentAction', 'additional_facet'
 ]
 MAX_FACET_COUNTS = 100
 
