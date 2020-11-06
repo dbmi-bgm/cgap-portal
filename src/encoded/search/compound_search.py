@@ -9,7 +9,7 @@ from snovault.embed import make_subrequest
 from ..types.base import get_item_or_none
 from .search import SearchBuilder
 from .lucene_builder import LuceneBuilder
-from .search_utils import execute_search, build_initial_columns
+from .search_utils import execute_search, build_initial_columns, build_sort_dicts, make_search_subreq
 from ..types.filter_set import FLAGS, FILTER_BLOCKS
 import os
 
@@ -42,13 +42,9 @@ class CompoundSearchBuilder:
         :param parent_request: parent_request who possesses permissions
         :param sub_request: request who requires the permissions of the parent request
         """
-        # sub_request.environ = env  # copy back in
-        sub_request.__parent__ = None  # XXX: set parent request (is None *always* correct?) -Will
-        sub_request.registry = parent_request.registry  # transfer registry as well
-        if hasattr(parent_request, "context"):
-            sub_request.context = parent_request.context
-        else:
-            sub_request.context = None
+        # XXX: set parent request (is None *always* correct?) -Will
+        # XXX: unsure -Alex
+        sub_request.__parent__ = None
 
     @classmethod
     def build_subreq_from_single_query(cls, request, query, route='/search/', from_=0, to=10):
@@ -63,15 +59,10 @@ class CompoundSearchBuilder:
         :return: new Request
         """
 
-        #env = parent_request.environ.copy()  # copy parent request
-        #env['PATH_INFO'] = sub_request.environ['PATH_INFO']  # override what it does
-        #env['QUERY_STRING'] = sub_request.environ['QUERY_STRING']
-
         if '?' not in query:  # do some sanitization
             query = '?' + query
-        # subreq = Request.blank(route + '%s&from=%s&limit=%s' % (query, from_, to))
 
-        subreq = make_subrequest(request, route + '%s&from=%s&limit=%s' % (query, from_, to), "GET")
+        subreq = make_search_subreq(request, route + '%s&from=%s&limit=%s' % (query, from_, to))
         subreq.headers['Accept'] = 'application/json'
 
         cls.transfer_request_permissions(request, subreq)  # VERY IMPORTANT - Will
@@ -94,7 +85,7 @@ class CompoundSearchBuilder:
         return merge_query_strings(qstring1, qstring2)
 
     @staticmethod
-    def format_filter_set_results(request, es_results, filter_set, return_generator=False):
+    def format_filter_set_results(request, es_results, filter_set, result_sort, return_generator=False):
         """ Formats es_results from filter_set into a dictionary containing total and @graph,
             setting status on the request if needed.
 
@@ -110,10 +101,16 @@ class CompoundSearchBuilder:
         if es_results['hits']['total'] == 0:
             request.response.status_code = 404  # see google webmaster doc on why
 
+        #with open("./test.txt", "w") as fp:
+        #    json.dump(es_results, fp, indent=4)
+
         return {
+            # "@id": "/compound_search", # Not necessary from UI atm but considering adding for semantics
+            # "@type": ["SearchResults"], # Not necessary from UI atm but considering adding for semantics
             "total": es_results['hits'].get("total", 0),
             "@graph": [ hit['_source']['embedded'] for hit in es_results['hits'].get("hits", []) ],
-            "columns": build_initial_columns([ request.registry[TYPES][filter_set["search_type"]].schema ])
+            "columns": build_initial_columns([ request.registry[TYPES][filter_set[CompoundSearchBuilder.TYPE]].schema ]),
+            "sort": result_sort
         }
 
     @staticmethod
@@ -162,6 +159,7 @@ class CompoundSearchBuilder:
         """
         filter_blocks = filter_set.get(FILTER_BLOCKS, [])
         flags = filter_set.get(FLAGS, None)
+        doc_type = filter_set.get(CompoundSearchBuilder.TYPE)
         t = filter_set.get(cls.TYPE, 'Item')  # if type not set, attempt to search on item
         type_flag = 'type=%s' % t
 
@@ -227,11 +225,22 @@ class CompoundSearchBuilder:
                 sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
                 sub_queries.append(sub_query)
 
+
             compound_query = LuceneBuilder.compound_search(sub_queries, intersect=intersect)
             compound_subreq = cls.build_subreq_from_single_query(request, ('?type=' + t))
+
+            requested_sorts = filter_set.get("sort", [])
+            if not requested_sorts and global_flags:
+                requested_sorts = urllib.parse.parse_qs(global_flags).get("sort", [])
+            sort, result_sort = build_sort_dicts(requested_sorts, request, [ doc_type ])
+
             search = SearchBuilder.from_search(context, compound_subreq, compound_query, from_=from_, size=to)
+            search.search.sort(sort)
+
+            # print('AAAA1', requested_sorts, search, '\n\n', compound_subreq, '\n\n', compound_query, sort, result_sort)
+
             es_results = execute_search(compound_subreq, search.search)
-            return cls.format_filter_set_results(request, es_results, filter_set, return_generator)
+            return cls.format_filter_set_results(request, es_results, filter_set, result_sort, return_generator)
 
     @classmethod
     def validate_flag(cls, flag):
@@ -350,8 +359,8 @@ def compound_search(context, request):
     body = json.loads(request.body)
     filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, body)
     intersect = True if body.get('intersect', False) else False
-    if filter_set.get("search_type") not in request.registry[TYPES]["FilterSet"].schema["properties"]["search_type"]["enum"]:
-        raise HTTPBadRequest("Passed bad search_type body param: " + filter_set.get("search_type"))
+    if filter_set.get(CompoundSearchBuilder.TYPE) not in request.registry[TYPES]["FilterSet"].schema["properties"][CompoundSearchBuilder.TYPE]["enum"]:
+        raise HTTPBadRequest("Passed bad {} body param: {}".format(CompoundSearchBuilder.TYPE, filter_set.get(CompoundSearchBuilder.TYPE)))
     from_ = body.get('from', 0)
     limit = body.get('limit', 25)
     return_generator = body.get('return_generator', False)

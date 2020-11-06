@@ -29,6 +29,7 @@ export function EmbeddedItemSearchTable (props){
         session, schemas: propSchemas,
         defaultOpenIndices, maxHeight,
         columns, columnExtensionMap,
+        // May not be present which prevents VirtualHrefController from navigating upon mount. Useful if want to init with filterSet search or in other place.
         searchHref,
         aboveTableComponent,
         aboveFacetListComponent,
@@ -40,10 +41,6 @@ export function EmbeddedItemSearchTable (props){
         onLoad,
         rowHeight = 90 // Keep in sync w CSS
     } = props;
-
-    if (typeof searchHref !== "string") {
-        throw new Error("Expected a string 'searchHref'");
-    }
 
     const schemas = propSchemas || getSchemas() || null; // We might not have this e.g. in placeholders in StaticSections
     const embeddedTableHeader = propEmbeddedTableHeader || title; // Receives props from VirtualHrefController state

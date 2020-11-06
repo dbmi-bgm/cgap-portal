@@ -284,20 +284,16 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         initial_search_href_filter_addon = "",
         active_filterset = null,
     } = context || {};
-    const {
-        "@id" : activeFilterSetID,
-        display_title: activeFilterSetTitle,
-        filter_blocks = []
-    } = active_filterset || {};
 
-    // TODO POST request w multiple of these filter_blocks, for now just first 1 is populated and used.
+    const {  "@id" : activeFilterSetID = null } = active_filterset || {};
 
     let searchHrefBase = "/search/?type=VariantSample";
     searchHrefBase += initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "";
-    searchHrefBase += "&sort=date_created";
+    searchHrefBase += "&sort=-date_created";
 
-    const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
-    const searchHrefWithCurrentFilter = searchHrefBase + (currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "");
+    // DEPRECATED - we no longer have filter_blocks present initially.
+    // const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
+    // const searchHrefWithCurrentFilter = searchHrefBase + (currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "");
 
     // Hide facets that are ones used to initially narrow down results to those related to this case.
     const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem } = useMemo(function(){
@@ -344,9 +340,6 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem };
     }, [ context ]);
 
-    // We might have { error: "no view permissions" } on our filterset, so check @id instead of just active_filterset.
-    const initialFilterSetItem = activeFilterSetID ? active_filterset : blankFilterSetItem;
-
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
     // 405px offset likely would need to be changed if we change height of tab nav, tab title area, etc.
@@ -356,20 +349,29 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // Table re-initializes upon change of key so we use it refresh table based on session.
     const searchTableKey = "session:" + session;
 
+    // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
+    // regardless of how much Case embeds.
+    const embeddedTableHeader = activeFilterSetID ? (
+        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
+            <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets}>
+                <FilteringTableFilterSetUI caseItem={context} />
+            </FilterSetController>
+        </ajax.FetchedItem>
+    ) : (
+        // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
+        // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
+        <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+            <FilteringTableFilterSetUI caseItem={context} />
+        </FilterSetController>
+    );
+
     return (
         <React.Fragment>
             <h1 className="mb-24 mt-0">
                 { caseDisplayTitle }: <span className="text-300">Variant Filtering and Technical Review</span>
             </h1>
-            <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible }}
-                searchHref={searchHrefWithCurrentFilter}
-                aboveTableComponent={
-                    // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
-                    // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-                    <FilterSetController {...{ searchHrefBase, initialFilterSetItem }} excludeFacets={hideFacets}>
-                        <FilteringTableFilterSetUI caseItem={context} />
-                    </FilterSetController>
-                } key={searchTableKey} />
+            <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader }}
+                key={searchTableKey} />
         </React.Fragment>
     );
 });

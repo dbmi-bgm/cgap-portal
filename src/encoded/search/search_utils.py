@@ -412,3 +412,89 @@ def build_initial_columns(used_type_schemas):
         }
 
     return columns
+
+
+
+def build_sort_dicts(requested_sorts, request, doc_types=[], text_search=None):
+    '''
+    `text_search` not applicable for compound filtersets atm.. afaik... maybe we handle it later.
+    '''
+
+    sort = OrderedDict()
+    result_sort = OrderedDict()
+
+    if len(doc_types) == 1:
+        type_schema = request.registry[TYPES][doc_types[0]].schema
+    else:
+        type_schema = None
+
+    def add_to_sort_dict(requested_sort):
+        if requested_sort.startswith('-'):
+            name = requested_sort[1:]
+            order = 'desc'
+        else:
+            name = requested_sort
+            order = 'asc'
+
+        sort_schema = schema_for_field(name, request, doc_types)
+
+        if sort_schema:
+            sort_type = sort_schema.get('type')
+        else:
+            sort_type = 'string'
+
+        # ES type != schema types
+        if sort_type == 'integer':
+            sort['embedded.' + name] = result_sort[name] = {
+                'order': order,
+                'unmapped_type': 'long',
+                'missing': '_last'
+            }
+        elif sort_type == 'number':
+            sort['embedded.' + name] = result_sort[name] = {
+                'order': order,
+                'unmapped_type': 'float',
+                'missing': '_last'
+            }
+        elif sort_schema and determine_if_is_date_field(name, sort_schema):
+            sort['embedded.' + name + '.raw'] = result_sort[name] = {
+                'order': order,
+                'unmapped_type': 'date',
+                'missing': '_last'
+            }
+        else:
+            # fallback case, applies to all string type:string fields
+            sort['embedded.' + name + '.lower_case_sort'] = result_sort[name] = {
+                'order': order,
+                'unmapped_type': 'keyword',
+                'missing': '_last'
+            }
+
+
+    # Prefer sort order specified in request, if any
+    if requested_sorts:
+        for rs in requested_sorts:
+            add_to_sort_dict(rs)
+
+    # Otherwise we use a default sort only when there's no text search to be ranked
+    if not sort and (text_search == '*' or not text_search):
+        # If searching for a single type, look for sort options in its schema
+        if type_schema:
+            if 'sort_by' in type_schema:
+                for k, v in type_schema['sort_by'].items():
+                    # Should always sort on raw field rather than analyzed field
+                    # OR search on lower_case_sort for case insensitive results
+                    sort['embedded.' + k + '.lower_case_sort'] = result_sort[k] = v
+        # Default is most recent first, then alphabetical by label
+        if not sort:
+            sort['embedded.date_created.raw'] = result_sort['date_created'] = {
+                'order': 'desc',
+                'unmapped_type': 'keyword',
+            }
+            sort['embedded.label.raw'] = result_sort['label'] = {
+                'order': 'asc',
+                'missing': '_last',
+                'unmapped_type': 'keyword',
+            }
+
+    return (sort, result_sort)

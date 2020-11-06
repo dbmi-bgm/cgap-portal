@@ -15,12 +15,8 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { getSchemaProperty } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/schema-transforms';
 
-import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
-import { DisplayTitleColumnWrapper, DisplayTitleColumnDefault } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
-import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
-import { get as getSchemas } from './../../util/Schemas';
 import { Schemas } from '../../util';
 
 
@@ -70,11 +66,36 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
     }
 
     static hasFilterSetChanged(savedFilterSet = null, currFilterSet = null) {
+
         if (!savedFilterSet && currFilterSet) {
-            return true;
+            // If is just initialized, then skip, even if new names/title.
+            const { filter_blocks: currFilterBlocks = [] } = currFilterSet;
+            if (currFilterBlocks.length > 1) {
+                return true;
+            }
+            if (currFilterBlocks[0].query || currFilterBlocks[0].name.slice(0, 16) !== "New Filter Block" ) {
+                return true;
+            }
+            return false;
+        }
+
+        if (!savedFilterSet && !currFilterSet) {
+            return false;
+        }
+
+        if (savedFilterSet && !currFilterSet) {
+            // Probably means is still loading currFilterSet,
+            // will NOT be counted as new/changed filterset.
+            return false;
         }
 
         // Eventually can add 'status' to this as well, if UI to edit it added.
+        // In part we limit fields greatly because of differences between
+        // @@embedded and other potential representations (i.e. @@object returned
+        // on PATCH/POST).
+        // Could be expanded/simplified if we get @@embedded back on PATCH/POST and
+        // maybe AJAX in initial filter set (w all fields, not just those embedded
+        // on Case Item.)
         const fieldsToCompare = ["filter_blocks", "title", "flags"];
 
         return !_.isEqual(
@@ -113,8 +134,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
     constructor(props){
         super(props);
-        const { caseItem } = props;
-        const { active_filterset = null } = caseItem;
+        const { currFilterSet: filterSet } = props;
         this.toggleOpen = _.throttle(this.toggleOpen.bind(this), 750);
         this.saveFilterSet = _.throttle(this.saveFilterSet.bind(this), 1500);
 
@@ -136,7 +156,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         this.state = {
             "bodyOpen": false,
             "bodyMounted": false, // Is set to true for 750ms after closing to help keep contents visible until collapsed.
-            "lastSavedFilterSet": active_filterset,
+            // DEPRECATED: active_filterset is likely to lack some.. stuff..
+            "lastSavedFilterSet": (filterSet && filterSet['@id']) ? filterSet : null, // active_filterset,
             "isSavingFilterSet": false
         };
     }
@@ -146,6 +167,14 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const { bodyOpen: pastBodyOpen } = pastState;
         const { currFilterSet, selectedFilterBlockIdx } = this.props;
         const { bodyOpen } = this.props;
+
+        if (currFilterSet && !pastFilterSet) {
+            // This should only occur upon initialization, as otherwise even a blank/unsaved filterset would be present.
+            if (currFilterSet["@id"]) {
+                this.setState({ "lastSavedFilterSet": currFilterSet });
+            }
+        }
+
         if (pastFilterSet !== currFilterSet || selectedFilterBlockIdx !== pastSelectedIdx || (bodyOpen && !pastBodyOpen)) {
             setTimeout(ReactTooltip.rebuild, 0);
         }
@@ -154,12 +183,12 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
     toggleOpen(evt){
         this.setState(function({ bodyOpen: exstOpen }){
             const bodyOpen = !exstOpen;
-            return { bodyOpen, bodyMounted: true };
+            return { bodyOpen, "bodyMounted": true };
         }, () => {
             const { bodyOpen } = this.state;
             if (!bodyOpen) {
                 setTimeout(()=>{
-                    this.setState({ bodyMounted: false });
+                    this.setState({ "bodyMounted": false });
                 }, 700);
             }
         });
@@ -177,12 +206,15 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 "@id" : caseInstitutionID
             } = {}
         } = caseItem;
+
         const { "@id": existingFilterSetID } = lastSavedFilterSet || {};
 
-        // No error handling (e.g. lastSavedFilterSet not having view permissions for) done here as assumed inaccessible.
+        // No error handling (e.g. lastSavedFilterSet not having view permissions for) done here
+        // as assumed `saveFilterSet` inaccessible if no permission, etc.
 
         /**
-         * Remove any calculated or linkTo things from PATCH/POST payload.
+         * IMPORTANT:
+         * We remove any calculated or linkTo things from PATCH/POST payload.
          * linkTos must be transformed to UUIDs before POST as well.
          * Hardcoded here since UI is pretty specific to it.
          */
@@ -273,14 +305,15 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             excludeFacets,
             cachedCounts = {},
             addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx,
-            setNameOfFilterBlockAtIdx, setTitleOfFilterSet
+            setNameOfFilterBlockAtIdx, setTitleOfFilterSet, isSettingFilterBlockIdx,
+
+            // From ajax.FetchedItem
+            isFetchingInitialFilterSetItem = false
         } = this.props;
         const { total: totalCount, facets = null } = searchContext || {};
         const {
             '@id': filterSetID,
-            filter_blocks = [],
-            error: fsError = null,
-            title: fsTitle = null
+            filter_blocks = []
         } = filterSet || {};
         const { bodyOpen, bodyMounted, lastSavedFilterSet, isSavingFilterSet } = this.state;
 
@@ -288,6 +321,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const facetDict = this.memoized.buildFacetDictionary(facets, excludeFacets);
         const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, filterSet);
         const { duplicateQueryIndices, duplicateNameIndices } = this.memoized.findDuplicateBlocks(filter_blocks);
+        const { name: currentFilterBlockName = null } = (typeof selectedFilterBlockIdx === "number" && filter_blocks[selectedFilterBlockIdx]) || {};
 
         // console.log(
         //     'FILTERSETUIPROPS',
@@ -296,22 +330,26 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         //     cachedCounts
         // );
 
+        const headerProps = {
+            filterSet, bodyOpen, caseItem, duplicateQueryIndices, duplicateNameIndices, hasFilterSetChanged, isSavingFilterSet,
+            setTitleOfFilterSet, isFetchingInitialFilterSetItem
+        };
+
         let body = null;
         if (bodyMounted) {
             const bodyProps = {
                 filterSet, facetDict, excludeFacets, searchContext,
                 addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
-                cachedCounts, duplicateQueryIndices, duplicateNameIndices
+                cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx
             };
-            body =  <FilterSetUIBlocks {...bodyProps} />;
+            body = <FilterSetUIBlocks {...bodyProps} />;
         }
 
         return (
             // TODO Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
             <div className="above-variantsample-table-ui">
                 <div className="filterset-outer-container">
-                    <FilterSetUIHeader {...{ filterSet, bodyOpen, caseItem, duplicateQueryIndices, duplicateNameIndices, hasFilterSetChanged, isSavingFilterSet, setTitleOfFilterSet }}
-                        toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
+                    <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
                     <Collapse in={bodyOpen}>
                         <div className="filterset-blocks-container">
                             { body }
@@ -321,7 +359,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
                     panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
                     <h4 className="text-400 col my-0">
-                        <span className="text-600">{ totalCount }</span> Variant Matches
+                        <span className="text-600">{ totalCount }</span> Variant Matches for { currentFilterBlockName ? <em>{ currentFilterBlockName }</em> : "Compound Filter" }
                     </h4>
                 </AboveTableControlsBase>
             </div>
@@ -334,7 +372,7 @@ function FilterSetUIHeader(props){
     const {
         filterSet, caseItem,
         toggleOpen, bodyOpen, hasFilterSetChanged, duplicateQueryIndices, duplicateNameIndices,
-        saveFilterSet, isSavingFilterSet, setTitleOfFilterSet
+        saveFilterSet, isSavingFilterSet, setTitleOfFilterSet, isFetchingInitialFilterSetItem = false
     } = props;
     const { actions: ctxActions = [] } = caseItem || {};
     const {
@@ -371,7 +409,14 @@ function FilterSetUIHeader(props){
 
 
     let titleBlock = null;
-    if (isEditingTitle) {
+    if (isFetchingInitialFilterSetItem) {
+        titleBlock = (
+            <h4 className="text-400 my-0 d-inline-block">
+                <i className="small icon icon-fw fas mr-07 icon-circle-notch icon-spin" />
+                <em>Loading Filter Set</em>
+            </h4>
+        );
+    } else if (isEditingTitle) {
         titleBlock = (
             <form className="d-flex align-items-center mb-0" action="#case-info.filtering" onSubmit={function(e){
                 e.stopPropagation();
@@ -405,7 +450,7 @@ function FilterSetUIHeader(props){
     const haveDuplicateQueries = _.keys(duplicateQueryIndices).length > 0;
     const haveDuplicateNames = _.keys(duplicateNameIndices) > 0;
 
-    const editBtnDisabled = !bodyOpen || !hasFilterSetChanged || !haveEditPermission || haveDuplicateQueries || haveDuplicateNames || isSavingFilterSet;
+    const editBtnDisabled = !bodyOpen || !hasFilterSetChanged || !haveEditPermission || haveDuplicateQueries || haveDuplicateNames || isSavingFilterSet || !filterSet;
 
     function onSaveBtnClick(e){
         e.stopPropagation();
@@ -442,7 +487,7 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
     const {
         filterSet, facetDict,
         addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
-        cachedCounts, duplicateQueryIndices, duplicateNameIndices } = props;
+        cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx } = props;
     const { filter_blocks = [], query = "" } = filterSet || {};
     const { query: currentBlockQuery = null } = (typeof selectedFilterBlockIdx === "number" && filter_blocks[selectedFilterBlockIdx]) || {};
 
@@ -456,7 +501,10 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         addNewFilterBlock({ "query" : currentBlockQuery });
     }
 
-    const commonProps = { facetDict, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, duplicateQueryIndices, duplicateNameIndices, cachedCounts };
+    const commonProps = {
+        facetDict, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, isSettingFilterBlockIdx,
+        duplicateQueryIndices, duplicateNameIndices, cachedCounts
+    };
 
     return (
         <div className="blocks-container px-3 pb-16">
@@ -488,12 +536,12 @@ const FilterBlock = React.memo(function FilterBlock(props){
     const {
         index,
         filterBlock,
-        filter_blocks,
         selected = false,
         // searchContext,
         removeFilterBlockAtIdx,
         setNameOfFilterBlockAtIdx,
         selectFilterBlockIdx,
+        isSettingFilterBlockIdx,
         facetDict,
         duplicateQueryIndices,
         duplicateNameIndices,
@@ -532,8 +580,12 @@ const FilterBlock = React.memo(function FilterBlock(props){
     }
 
 
+    if (isEditingTitle && isSettingFilterBlockIdx) {
+        setIsEditingTitle(false);
+    }
+
     let title = null;
-    if (isEditingTitle) {
+    if (isEditingTitle && !isSettingFilterBlockIdx) {
         title = (
             <form className="d-flex align-items-center mb-0" action="#case-info.filtering" onSubmit={function(e){
                 e.stopPropagation();
@@ -561,8 +613,8 @@ const FilterBlock = React.memo(function FilterBlock(props){
 
         title = (
             <React.Fragment>
-                <i className="icon icon-times-circle fas mr-1 clickable" onClick={onRemoveClick} />
-                <span className={titleCls} data-tip={isDuplicateName ? "Duplicate title of filter block #" + (duplicateNameIndices[index] + 1) : null}>
+                <i className={"icon fas mr-1 icon-" + ((selected && isSettingFilterBlockIdx) ? "circle-notch icon-spin" : "times-circle clickable")} onClick={onRemoveClick} />
+                <span className={"text-600" + titleCls} data-tip={isDuplicateName ? "Duplicate title of filter block #" + (duplicateNameIndices[index] + 1) : null}>
                     { filterName || <em>No Name</em> }
                 </span>
                 <i className="icon icon-pencil-alt fas ml-1 clickable" onClick={onEditClick} />
@@ -581,12 +633,12 @@ const FilterBlock = React.memo(function FilterBlock(props){
                     { cachedCounts[index] }
                 </div>
             </div>
-            <FieldBlocks {...{ filterBlock, facetDict }} />
+            <FieldBlocks {...{ filterBlock, facetDict, selected }} />
         </div>
     );
 });
 
-const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict }) {
+const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict, selected }) {
     const { query: filterStrQuery } = filterBlock;
 
     if (!filterStrQuery) {
@@ -597,104 +649,110 @@ const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict }) 
         );
     }
 
-    // Taken from SPC/RangeFacet
-    function formatRangeVal(field, rangeVal){
-        const fieldFacet = facetDict[field];
-        const { field_type } = fieldFacet;
 
-        if (field_type === "date") {
-            return <LocalizedTime timestamp={value} localize={false} />;
-        }
-        if (field_type === "number"){
-            rangeVal = parseFloat(rangeVal);
-        }
+    const { correctedQuery, sortedFields } = useMemo(function(){
 
-        let valToShow = Schemas.Term.toName(field, rangeVal, false);
-        if (typeof valToShow === "number") {
-            const absVal = Math.abs(valToShow);
-            if (absVal.toString().length <= 7){
-                // Else is too long and will go thru toPrecision or toExponential.
-                if (absVal >= 1000) {
-                    valToShow = decorateNumberWithCommas(valToShow);
+        // Taken from SPC/RangeFacet roughly (maybe in future can be pulled out/reusable SPC func)
+        function formatRangeVal(field, rangeVal){
+            const fieldFacet = facetDict[field];
+            const { field_type } = fieldFacet;
+
+            if (field_type === "date") {
+                return <LocalizedTime timestamp={value} localize={false} />;
+            }
+            if (field_type === "number"){
+                rangeVal = parseFloat(rangeVal);
+            }
+
+            let valToShow = Schemas.Term.toName(field, rangeVal, false);
+            if (typeof valToShow === "number") {
+                const absVal = Math.abs(valToShow);
+                if (absVal.toString().length <= 7){
+                    // Else is too long and will go thru toPrecision or toExponential.
+                    if (absVal >= 1000) {
+                        valToShow = decorateNumberWithCommas(valToShow);
+                    } else {
+                        // keep valToShow
+                    }
                 } else {
-                    // keep valToShow
+                    valToShow = valToShow.toExponential(3);
                 }
-            } else {
-                valToShow = valToShow.toExponential(3);
-            }
-        } // else is assumed to be valid JSX already
-        return valToShow;
-    }
-
-    const origQs = queryString.parse(filterStrQuery);
-    const qs = {};
-    Object.keys(origQs).forEach(function(k){
-
-        // Standardize vals into arrays (w. len 1 if needed).
-        let v = origQs[k];
-        if (!Array.isArray(v)) {
-            v = [v];
+            } // else is assumed to be valid JSX already
+            return valToShow;
         }
 
-        // Remove .from or .to if needed, confirm aggregation_type === stats, and transform/merge values
-        let field = k;
-        let removedRangeFacetAppendage = false;
-        if (k.slice(-5) === ".from"){
-            field = k.slice(0, -5);
-            if (!facetDict[field] || typeof facetDict[field].aggregation_type !== "string"){
-                field = k;
-                console.error("Attempted to remove 'from' from field but couldn't succeed", field, facetDict);
-            } else {
-                removedRangeFacetAppendage = true;
-                v = v.map(function(rangeVal, i){
-                    return <span key={i}><i className="icon icon-fw icon-greater-than-equal small fas mr-08"/>{ formatRangeVal(field, rangeVal) }</span>;
+        const origQs = queryString.parse(filterStrQuery);
+        const qs = {};
+        Object.keys(origQs).forEach(function(k){
+
+            // Standardize vals into arrays (w. len 1 if needed).
+            let v = origQs[k];
+            if (!Array.isArray(v)) {
+                v = [v];
+            }
+
+            // Remove .from or .to if needed, confirm aggregation_type === stats, and transform/merge values
+            let field = k;
+            let removedRangeFacetAppendage = false;
+            if (k.slice(-5) === ".from"){
+                field = k.slice(0, -5);
+                if (!facetDict[field] || typeof facetDict[field].aggregation_type !== "string"){
+                    field = k;
+                    console.error("Attempted to remove 'from' from field but couldn't succeed", field, facetDict);
+                } else {
+                    removedRangeFacetAppendage = true;
+                    v = v.map(function(rangeVal, i){
+                        return <span key={i}><i className="icon icon-fw icon-greater-than-equal small fas mr-08"/>{ formatRangeVal(field, rangeVal) }</span>;
+                    });
+                }
+
+            } else if (k.slice(-3) === ".to") {
+                field = k.slice(0, -3);
+                if (!facetDict[field] || typeof facetDict[field].aggregation_type !== "string"){
+                    field = k;
+                    console.error("Attempted to remove 'to' from field but couldn't succeed", field, facetDict);
+                } else {
+                    removedRangeFacetAppendage = true;
+                    v = v.map(function(rangeVal, i){
+                        return <span key={i}><i className="icon icon-fw icon-less-than-equal fas small mr-08"/>{ formatRangeVal(field, rangeVal) }</span>;
+                    });
+                }
+            }
+
+            if (!removedRangeFacetAppendage) {
+                // If not range facet, transform vals to proper names.
+                v = v.map(function(termVal){
+                    return Schemas.Term.toName(field, termVal);
                 });
             }
 
-        } else if (k.slice(-3) === ".to") {
-            field = k.slice(0, -3);
-            if (!facetDict[field] || typeof facetDict[field].aggregation_type !== "string"){
-                field = k;
-                console.error("Attempted to remove 'to' from field but couldn't succeed", field, facetDict);
+            // Merge, e.g. if a from and a to
+            if (typeof qs[field] !== "undefined") {
+                qs[field] = qs[field].concat(v);
             } else {
-                removedRangeFacetAppendage = true;
-                v = v.map(function(rangeVal, i){
-                    return <span key={i}><i className="icon icon-fw icon-less-than-equal fas small mr-08"/>{ formatRangeVal(field, rangeVal) }</span>;
-                });
+                qs[field] = v;
             }
-        }
+        });
 
-        if (!removedRangeFacetAppendage) {
-            // If not range facet, transform vals to proper names.
-            v = v.map(function(termVal){
-                return Schemas.Term.toName(field, termVal);
-            });
-        }
+        const sortedFields = Object.keys(qs).sort(function(fA, fB){
+            // Sort keys by schema.facet.order, if any.
+            const fsA = facetDict[fA];
+            const fsB = facetDict[fB];
+            if (fsA && !fsB) return -1;
+            if (!fsA && fsB) return 1;
+            if (!fsA && !fsB) return 0;
+            return (fsA.order || 10000) - (fsB.order || 10000);
+        });
 
-        // Merge, e.g. if a from and a to
-        if (typeof qs[field] !== "undefined") {
-            qs[field] = qs[field].concat(v);
-        } else {
-            qs[field] = v;
-        }
-    });
+        return { sortedFields, "correctedQuery" : qs, };
+    }, [ filterBlock, facetDict ]);
 
-    const fields = Object.keys(qs);
-    const blocks = fields.sort(function(fA, fB){
-        // Sort keys by schema.facet.order, if any.
-        const fsA = facetDict[fA];
-        const fsB = facetDict[fB];
-        if (fsA && !fsB) return -1;
-        if (!fsA && fsB) return 1;
-        if (!fsA && !fsB) return 0;
-        return (fsA.order || 10000) - (fsB.order || 10000);
-    }).map(function(field, index){
-        return <FieldBlock terms={qs[field]} field={field} key={field} facetDict={facetDict} />;
-    });
 
     return (
         <div className="d-flex flex-wrap filter-query-viz-blocks px-2">
-            { blocks }
+            { sortedFields.map(function(field, index){
+                return <FieldBlock terms={correctedQuery[field]} field={field} key={field} facetDict={facetDict} />;
+            }) }
         </div>
     );
 });
@@ -742,13 +800,10 @@ function FieldBlock({ field, terms, facetDict, index }){
     );
 }
 
+
+
 /**
  * Meant to be used to wrap a FilteringTableFilterSetUI
- *
- * @todo
- * This will eventually replace some of logic in FilteringTab.js > FilteringTabSubtitle
- * While other stuff (calculation of if changed vs current search response filters etc)
- * will be in FilterSetUIBlocks or its children.
  */
 export class FilterSetController extends React.PureComponent {
 
@@ -772,12 +827,16 @@ export class FilterSetController extends React.PureComponent {
             }))
         }),
         "searchHrefBase" : PropTypes.string.isRequired,
-        "navigate" : PropTypes.func.isRequired
+        "navigate" : PropTypes.func.isRequired,
+        "initialSelectedFilterBlockIdx" : PropTypes.number,
+        "isFetchingInitialFilterSetItem" : PropTypes.bool
     };
 
     static defaultProps = {
-        "searchHrefBase" : "/search/?type=VariantSample&sort=date_created",
-        "excludeFacets" : ["type"]
+        "searchHrefBase" : "/search/?type=VariantSample&sort=-date_created",
+        "excludeFacets" : ["type"],
+        /** `searchHrefBase` [+ `initialFilterSetItem.filter_blocks[initialSelectedFilterBlockIdx]`] must match initial search table query. */
+        "initialSelectedFilterBlockIdx" : null
         // Might be needed for future for like 'create new' button, but likely to be defined elsewhere maybe (outside of this component)
         // "blankFilterSetItem" : {
         //     "title" : "New FilterSet",
@@ -790,16 +849,21 @@ export class FilterSetController extends React.PureComponent {
 
     /**
      * Update state.currFilterSet.filter_blocks[selectedFilterBlockIdx].query from search response if needed.
+     * (unless amid some other update or amid initialization)
      *
      * @todo Maybe move to componentDidUpdate or something...
      */
     static getDerivedStateFromProps(props, state) {
         const { context: searchContext, excludeFacets } = props;
         const { currFilterSet, selectedFilterBlockIdx, isSettingFilterBlockIdx, cachedCounts: lastCachedCounts } = state;
+
+        // Update state.currFilterSet with filters from response, unless amid some other update.
+
         if (!searchContext){
             // Don't update from blank.
             return null;
         }
+
         if (selectedFilterBlockIdx === null || isSettingFilterBlockIdx){
             return null;
         }
@@ -873,8 +937,18 @@ export class FilterSetController extends React.PureComponent {
             "query" : nextQuery
         };
 
-
         return { "currFilterSet": nextCurrFilterSet, "cachedCounts": nextCachedCounts };
+    }
+
+    static resetState(props){
+        const { initialFilterSetItem, initialSelectedFilterBlockIdx = null } = props;
+        return {
+            "currFilterSet" : initialFilterSetItem ? { ...initialFilterSetItem } : null,
+            // todo: maybe change to allow multiple in future?
+            "selectedFilterBlockIdx" : initialSelectedFilterBlockIdx,
+            "isSettingFilterBlockIdx" : false,
+            "cachedCounts" : {} // Using indices as keys here, but keeping as object (keys are strings)
+        };
     }
 
     constructor(props) {
@@ -888,20 +962,42 @@ export class FilterSetController extends React.PureComponent {
         this.removeFilterBlockAtIdx =  _.throttle(this.removeFilterBlockAtIdx.bind(this), 250, { trailing: false });
         this.setNameOfFilterBlockAtIdx = this.setNameOfFilterBlockAtIdx.bind(this);
         this.setTitleOfFilterSet = this.setTitleOfFilterSet.bind(this);
-        const { initialFilterSetItem } = this.props;
-        const { "@id" : fsID } = initialFilterSetItem;
 
-        this.state = {
-            "currFilterSet" : { ...initialFilterSetItem },
-            // todo: maybe change to allow multiple in future?
-            "selectedFilterBlockIdx" : 0, // null,
-            "isSettingFilterBlockIdx" : false,
-            "cachedCounts" : {} // Using indices as keys here, but keeping as object (keys are strings)
-            // "lastSavedFilterSet" : fsID ? initialFilterSetItem : null // might move elsewhere to like FilterSetUIBlocks
-        };
+        this.state = FilterSetController.resetState(this.props);
     }
 
-    // Maybe todo (depending on if can realistically occur): componentDidUpdate { if initialFilterSetItem changed, reset state }
+    componentDidMount(){
+        this.navigateToCurrentBlock();
+    }
+
+    componentDidUpdate(pastProps, pastState){
+        const { initialFilterSetItem, context: searchContext, excludeFacets } = this.props;
+        const { currFilterSet, selectedFilterBlockIdx, isSettingFilterBlockIdx, cachedCounts: lastCachedCounts } = this.state;
+        const { initialFilterSetItem: pastInitialFilterSet, context: pastSearchContext } = pastProps;
+
+        if (initialFilterSetItem !== pastInitialFilterSet) {
+            this.setState(FilterSetController.resetState(this.props), this.navigateToCurrentBlock);
+        }
+
+        // Just some debugging stuff.
+        if (console.isDebugging()){
+            var key;
+            for (key in this.props) {
+                // eslint-disable-next-line react/destructuring-assignment
+                if (this.props[key] !== pastProps[key]) {
+                    console.log('FSUI changed props: %s', key, pastProps[key], this.props[key]);
+                }
+            }
+
+            for (key in this.state) {
+                // eslint-disable-next-line react/destructuring-assignment
+                if (this.state[key] !== pastState[key]) {
+                    console.log('FSUI changed state: %s', key);
+                }
+            }
+        }
+
+    }
 
     addNewFilterBlock(newFilterBlock = null){
         this.setState(function({ currFilterSet: pastFS }){
@@ -932,7 +1028,7 @@ export class FilterSetController extends React.PureComponent {
         }, this.navigateToCurrentBlock);
     }
 
-    removeFilterBlockAtIdx(idx, cb){
+    removeFilterBlockAtIdx(idx){
         this.setState(function({ currFilterSet: pastFS, selectedFilterBlockIdx }){
             const { filter_blocks = [] } = pastFS;
             const nextFB = filter_blocks.slice();
@@ -953,7 +1049,7 @@ export class FilterSetController extends React.PureComponent {
                 },
                 selectedFilterBlockIdx
             };
-        }, cb);
+        }, this.navigateToCurrentBlock);
     }
 
     setNameOfFilterBlockAtIdx(idx, newName, cb){
@@ -985,6 +1081,13 @@ export class FilterSetController extends React.PureComponent {
         const { navigate: virtualNavigate, searchHrefBase, context: searchContext } = this.props; // props.navigate passed down in from SPC EmbeddedSearchView VirtualHrefController
         const { selectedFilterBlockIdx, currFilterSet } = this.state;
 
+
+        console.info("navigate to current block", this.props, this.state);
+
+        if (!currFilterSet) {
+            console.error("No current filterset to navigate to. Fine if expected (i.e. initial filterset item still being fetched).");
+            return null;
+        }
 
         if (selectedFilterBlockIdx === null) {
             // Didn't set an index - todo: use POST / combo search

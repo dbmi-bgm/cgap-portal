@@ -26,8 +26,8 @@ from snovault.typeinfo import AbstractTypeInfo
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
     find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
-    execute_search, make_search_subreq, build_initial_columns,
-    NESTED, COMMON_EXCLUDED_URI_PARAMS, MAX_FACET_COUNTS
+    execute_search, make_search_subreq, build_initial_columns, build_sort_dicts,
+    NESTED, COMMON_EXCLUDED_URI_PARAMS, MAX_FACET_COUNTS,
 )
 
 
@@ -137,7 +137,11 @@ class SearchBuilder:
         :param size: number of documents to return
         :return:
         """
-        result = cls(context, request, skip_bootstrap=True)  # bypass bootstrap
+        result = cls(context, request, skip_bootstrap=True)  # bypass (most of) bootstrap
+        # The below didn't work, I guess no request params.. which makes sense..
+        #result.search_base = result.normalize_query(request, result.types, result.doc_types)
+        #result.prepared_terms = result.prepare_search_term(request)
+        #result.set_sort_order()
         result.from_ = from_
         result.to = size  # execute_search will apply pagination
         result.search.update_from_dict(search)  # parse compound query
@@ -494,83 +498,14 @@ class SearchBuilder:
 
         ES5: simply pass in the sort OrderedDict into search.sort
         """
-        sort = OrderedDict()
-        result_sort = OrderedDict()
-        if len(self.doc_types) == 1:
-            type_schema = self.types[self.doc_types[0]].schema
-        else:
-            type_schema = None
-
-        def add_to_sort_dict(requested_sort):
-            if requested_sort.startswith('-'):
-                name = requested_sort[1:]
-                order = 'desc'
-            else:
-                name = requested_sort
-                order = 'asc'
-            sort_schema = schema_for_field(name, self.request, self.doc_types)
-
-            if sort_schema:
-                sort_type = sort_schema.get('type')
-            else:
-                sort_type = 'string'
-
-            # ES type != schema types
-            if sort_type == 'integer':
-                sort['embedded.' + name] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'long',
-                    'missing': '_last'
-                }
-            elif sort_type == 'number':
-                sort['embedded.' + name] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'float',
-                    'missing': '_last'
-                }
-            elif sort_schema and determine_if_is_date_field(name, sort_schema):
-                sort['embedded.' + name + '.raw'] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'date',
-                    'missing': '_last'
-                }
-            else:
-                # fallback case, applies to all string type:string fields
-                sort['embedded.' + name + '.lower_case_sort'] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'keyword',
-                    'missing': '_last'
-                }
 
         # Prefer sort order specified in request, if any
         requested_sorts = self.request.normalized_params.getall('sort')
-        if requested_sorts:
-            for rs in requested_sorts:
-                add_to_sort_dict(rs)
-
         text_search = self.prepared_terms.get('q')
+        sort, result_sort = build_sort_dicts(requested_sorts, self.request, self.doc_types, text_search)
 
         # Otherwise we use a default sort only when there's no text search to be ranked
-        if not sort and (text_search == '*' or not text_search):
-            # If searching for a single type, look for sort options in its schema
-            if type_schema:
-                if 'sort_by' in type_schema:
-                    for k, v in type_schema['sort_by'].items():
-                        # Should always sort on raw field rather than analyzed field
-                        # OR search on lower_case_sort for case insensitive results
-                        sort['embedded.' + k + '.lower_case_sort'] = result_sort[k] = v
-            # Default is most recent first, then alphabetical by label
-            if not sort:
-                sort['embedded.date_created.raw'] = result_sort['date_created'] = {
-                    'order': 'desc',
-                    'unmapped_type': 'keyword',
-                }
-                sort['embedded.label.raw'] = result_sort['label'] = {
-                    'order': 'asc',
-                    'missing': '_last',
-                    'unmapped_type': 'keyword',
-                }
-        elif not sort and text_search and text_search != '*':
+        if not sort and text_search and text_search != '*':
             self.search = self.search.sort(
                 # Multi-level sort. See http://www.elastic.co/guide/en/elasticsearch/guide/current/_sorting.html#_multilevel_sorting & https://stackoverflow.com/questions/46458803/python-elasticsearch-dsl-sorting-with-multiple-fields
                 {'_score': {"order": "desc"}},
