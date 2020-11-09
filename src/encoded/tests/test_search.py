@@ -1112,3 +1112,26 @@ class TestSearchHiddenAndAdditionalFacets:
                            '&additional_facet=hg19.hg19_hgvsg'
                            '&additional_facet=REF').json['facets']
         self.check_and_verify_result(res, _facet, n_expected)
+
+
+@pytest.fixture(scope='session')
+def bucket_range_data_raw():
+    """ 10 objects with a numerical field we will bucket on """
+    return [{
+        'special_integer': i
+    } for i in range(10)]
+
+
+@pytest.fixture(scope='module')  # XXX: consider scope further - Will 11/5/2020
+def bucket_range_data(testapp, bucket_range_data_raw):
+    for entry in bucket_range_data_raw:
+        testapp.post_json('/TestingBucketRangeFacets', entry, status=201)
+    testapp.post_json('/index', {'record': False})
+
+
+class TestSearchBucketRangeFacets:
+    """ Class that encapsulates tests for BucketRanges """
+
+    def test_search_bucket_range_simple(self, testapp, bucket_range_data):
+        """ Does a simple bucket-range facet """
+        pass  # implement me!

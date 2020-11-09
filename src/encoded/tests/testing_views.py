@@ -385,3 +385,27 @@ class TestingHiddenFacets(Item):
     def non_nested_array_of_objects(self, unfaceted_array_of_objects):
         """ Non-nested view of the unfaceted_array_of_objects field """
         return unfaceted_array_of_objects
+
+
+@collection('testing-bucket-range-facets')
+class TestingBucketRangeFacets(Item):
+    """ Collection for testing BucketRange facets. """
+    item_type = 'testing_bucket_range_facets'
+    schema = {
+        'type': 'object',
+        'properties': {
+            'special_integer': {
+                'type': 'integer'
+            }
+        },
+        'facets': {
+            'special_integer': {
+                'title': 'Special Integer',
+                'aggregation_type': 'bucket-range',
+                'ranges': [
+                    {'from': 0, 'to': 5},
+                    {'from': 5, 'to': 10}
+                ]
+            }
+        }
+    }
