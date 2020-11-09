@@ -1,0 +1,61 @@
+{
+    "title": "Interpretation Note",
+    "description": "Note containing interpretation of a VariantSample, Variant, or Gene",
+    "id": "/profiles/interpretation_note.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": ["institution", "project"],
+    "identifyingProperties": ["uuid", "aliases"],
+    "additionalProperties": false,
+    "mixinProperties": [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/aliases" },
+        { "$ref": "mixins.json#/attribution" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/tags" },
+        { "$ref": "note.json#/properties" }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "status": {
+            "default": "draft"
+        },
+        "version": {
+            "title": "Version",
+            "type": "string",
+            "description": "Version of this particular note"
+        },
+        "classification": {
+            "title": "Classification",
+            "description": "Significance classification indicated by this note",
+            "type": "string",
+            "enum": [
+                "benign",
+                "likely benign",
+                "VUS",
+                "likely pathogenic",
+                "pathogenic"
+            ]
+        },
+        "conclusion": {
+            "title": "Conclusion",
+            "description": "concluding statement summarizing this interpretation",
+            "type": "string"
+        }
+    },
+    "facets": {
+        "classification": {
+            "title": "Classification"
+        }
+    },
+    "columns": {
+        "classification": {
+            "title": "Classification"
+        }
+    }
+}

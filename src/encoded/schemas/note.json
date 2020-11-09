@@ -1,0 +1,29 @@
+{
+    "title" : "Note",
+    "description": "Schema for note items",
+    "id": "/profiles/note.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [ "project", "institution"],
+    "additionalProperties": false,
+    "identifyingProperties": ["uuid", "aliases"],
+    "properties": {
+        "note_text": {
+            "title": "Note Text",
+            "type": "string",
+            "description": "The text of the note for this item"
+        },
+        "variant_id": {
+            "title": "Variant ID",
+            "description": "identifier for the variant in the knowledgebase this note is related to",
+            "type": "string"
+        },
+        "gene_id": {
+            "title": "Gene ID",
+            "description": "identifier for the gene in the knowledgebase this note is related to",
+            "type": "string"
+        }
+    },
+    "facets": {},
+    "columns": {}
+}
