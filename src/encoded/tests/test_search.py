@@ -1134,4 +1134,5 @@ class TestSearchBucketRangeFacets:
 
     def test_search_bucket_range_simple(self, testapp, bucket_range_data):
         """ Does a simple bucket-range facet """
-        pass  # implement me!
+        res = testapp.get('/search/?type=TestingBucketRangeFacets')
+        #import pdb; pdb.set_trace()

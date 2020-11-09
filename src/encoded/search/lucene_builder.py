@@ -825,6 +825,118 @@ class LuceneBuilder:
                  .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
 
     @classmethod
+    def _build_stats_aggregation(cls, field, facet, field_schema, query_field, search_filters, string_query,
+                                 nested_path, aggs, agg_name):
+        """ Helper for build_facets that builds the stats aggregations """
+        is_date_field = field_schema and determine_if_is_date_field(field, field_schema)
+        is_numerical_field = field_schema and field_schema['type'] in ("integer", "float", "number")
+        if is_date_field:
+            facet['field_type'] = 'date'
+        elif is_numerical_field:
+            facet["field_type"] = field_schema['type'] or "number"
+            if "number_step" not in facet:
+                if "number_step" in field_schema:
+                    facet["number_step"] = field_schema['number_step']
+                elif facet["field_type"] == "integer":
+                    facet["number_step"] = 1
+                else:  # Default
+                    facet["number_step"] = "any"
+        facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
+                                                                               string_query)
+        # stats aggregations could be nested too
+        if nested_path:
+            facet['aggregation_type'] = 'nested:stats'
+            aggs[facet['aggregation_type'] + ':' + agg_name] = {
+                AGGS: {
+                    'primary_agg': {
+                        NESTED: {
+                            PATH: nested_path
+                        },
+                        AGGS: {
+                            'primary_agg': {
+                                'stats': {
+                                    'field': query_field
+                                }
+                            }
+                        }
+                    }
+                },
+                FILTER: {BOOL: facet_filters}
+            }
+
+        else:
+            aggs[facet['aggregation_type'] + ":" + agg_name] = {
+                AGGS: {
+                    'primary_agg': {
+                        'stats': {
+                            'field': query_field
+                        }
+                    }
+                },
+                FILTER: {BOOL: facet_filters}
+            }
+
+    @classmethod
+    def _build_range_aggregation(cls, facet, query_field, nested_path, aggs, agg_name):
+        """ Helper function for build_facets that builds range aggregations """
+        if nested_path:
+            facet['aggregation_type'] = 'nested:range'
+            nested_bucket_range_field = facet['aggregation_type'] + ':' + agg_name
+            aggs[nested_bucket_range_field] = {
+                AGGS: {
+                    'primary_agg': {
+                        NESTED: {
+                            PATH: nested_path
+                        },
+                        AGGS: {
+                            'primary_agg': {
+                                RANGE: {
+                                    FIELD: query_field,
+                                    'ranges': facet['ranges']
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+        else:
+            facet['aggregation_type'] = RANGE
+            range_field = facet['aggregation_type'] + ':' + agg_name
+            aggs[range_field] = {
+                    RANGE: {
+                        FIELD: query_field,
+                        'ranges': facet['ranges']
+                    }
+            }
+
+    @classmethod
+    def _build_terms_aggregation(cls, facet, query_field, nested_path, search_filters, string_query, aggs, agg_name):
+        """ Helper function for build_facets that builds terms aggregations (which are later fixed
+        to account for nested) """
+        if nested_path:
+            facet['aggregation_type'] = NESTED
+        else:
+            facet['aggregation_type'] = TERMS
+
+        facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
+                                                                               string_query)
+        term_aggregation = {
+            TERMS: {
+                'size': MAX_FACET_COUNTS,
+                # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
+                'field': query_field,
+                'missing': facet.get("missing_value_replacement", "No value")
+            }
+        }
+        aggs[facet['aggregation_type'] + ":" + agg_name] = {
+            AGGS: {
+                'primary_agg': term_aggregation
+            },
+            FILTER: {BOOL: facet_filters},
+        }
+
+    @classmethod
     def build_facets(cls, search, facets, search_filters, string_query, request, doc_types,
                      custom_aggregations=None, size=25, from_=0, es_mapping=None):
         """
@@ -843,83 +955,24 @@ class LuceneBuilder:
         aggs = OrderedDict()
         for field, facet in facets:  # E.g. 'type','experimentset_type','experiments_in_set.award.project', ...
             field_schema = schema_for_field(field, request, doc_types, should_log=True)
-            is_date_field = field_schema and determine_if_is_date_field(field, field_schema)
-            is_numerical_field = field_schema and field_schema['type'] in ("integer", "float", "number")
             query_field = get_query_field(field, facet)
             nested_path = find_nested_path(query_field, es_mapping)
 
-            ## Create the aggregation itself, extend facet with info to pass down to front-end
+            # Build the aggregation based on it's type - stats, bucket-range or terms
             agg_name = field.replace('.', '-')
-            if facet.get('aggregation_type') == 'stats':
+            facet_type = facet.get('aggregation_type')
+            if facet_type == 'stats':
+                cls._build_stats_aggregation(field, facet, field_schema, query_field, search_filters, string_query,
+                                             nested_path, aggs, agg_name)
 
-                if is_date_field:
-                    facet['field_type'] = 'date'
-                elif is_numerical_field:
-                    facet["field_type"] = field_schema['type'] or "number"
-                    if "number_step" not in facet:
-                        if "number_step" in field_schema:
-                            facet["number_step"] = field_schema['number_step']
-                        elif facet["field_type"] == "integer":
-                            facet["number_step"] = 1
-                        else:  # Default
-                            facet["number_step"] = "any"
-                facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
-                                                                                       string_query)
-                # stats aggregations could be nested too
-                if nested_path:
-                    facet['aggregation_type'] = 'nested:stats'
-                    aggs[facet['aggregation_type'] + ':' + agg_name] = {
-                        AGGS: {
-                            'primary_agg': {
-                                NESTED: {
-                                    PATH: nested_path
-                                },
-                                AGGS: {
-                                    'primary_agg': {
-                                        'stats': {
-                                            'field': query_field
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        FILTER: {BOOL: facet_filters}
-                    }
-
-                else:
-                    aggs[facet['aggregation_type'] + ":" + agg_name] = {
-                        AGGS: {
-                            'primary_agg': {
-                                'stats': {
-                                    'field': query_field
-                                }
-                            }
-                        },
-                        FILTER: {BOOL: facet_filters}
-                    }
+            elif facet_type == 'bucket-range':  # should be constant
+                # XXX: should these counts be global ie: no filter block?
+                cls._build_range_aggregation(facet, query_field, nested_path, aggs, agg_name)
 
             else:
-                if nested_path:
-                    facet['aggregation_type'] = NESTED
-                else:
-                    facet['aggregation_type'] = TERMS
+                cls._build_terms_aggregation(facet, query_field, nested_path, search_filters, string_query,
+                                             aggs, agg_name)
 
-                facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
-                                                                                       string_query)
-                term_aggregation = {
-                    TERMS: {
-                        'size': MAX_FACET_COUNTS,
-                        # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
-                        'field': query_field,
-                        'missing': facet.get("missing_value_replacement", "No value")
-                    }
-                }
-                aggs[facet['aggregation_type'] + ":" + agg_name] = {
-                    AGGS: {
-                        'primary_agg': term_aggregation
-                    },
-                    FILTER: {BOOL: facet_filters},
-                }
 
             # Update facet with title, description from field_schema, if missing.
             if facet.get('title') is None and field_schema and 'title' in field_schema:
