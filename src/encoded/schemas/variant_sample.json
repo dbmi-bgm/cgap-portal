@@ -579,6 +579,17 @@
             "order": 11,
             "grouping": "Variant Quality"
         },
+        "AD_alt": {
+            "aggregation_type": "stats",
+            "grouping": "Variant Quality",
+            "number_step": 1,
+            "ranges": [
+                { "from": "0", "to": "4" },
+                { "from": "4", "to": "9" },
+                { "from": "10", "to": "19" },
+                { "from": "20" }
+            ]
+        },
         "associated_genotype_labels.father_genotype_label": {
             "title": "Father Genotype",
             "order": 14,
@@ -608,7 +619,12 @@
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 16,
-            "grouping": "Genotype"
+            "grouping": "Genotype",
+            "ranges": [
+                { "to": "0.1" },
+                { "from": "0.1", "to": "0.09" },
+                { "from": "0.09", "to": "1" }
+            ]
         },
         "variant.CHROM": {
             "title": "Chromosome",
@@ -639,7 +655,14 @@
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 22,
-            "grouping": "Conservation"
+            "grouping": "Conservation",
+            "ranges": [
+                { "from": "-20", "to": "-3" },
+                { "from": "-3", "to": "-2" },
+                { "from": "-2", "to": "2" },
+                { "from": "2", "to": "3" },
+                { "from": "3", "to": "10"}
+            ]
         },
         "variant.cytoband_cytoband": {
             "title": "Cytoband",
@@ -720,7 +743,12 @@
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 18,
-            "grouping": "Population Frequency"
+            "grouping": "Population Frequency",
+            "ranges": [
+                { "from": "0", "to": "0.001" },
+                { "from": "0.001", "to": "0.01" },
+                { "from": "0.01", "to": "1" }
+            ]
         },
         "variant.gnomad_an": {
             "title": "GnomAD Total Allele Number",
@@ -741,7 +769,12 @@
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 19,
-            "grouping": "Population Frequency"
+            "grouping": "Population Frequency",
+            "ranges": [
+                { "from": "0", "to": "0.001" },
+                { "from": "0.001", "to": "0.01" },
+                { "from": "0.01", "to": "1" }
+            ]
         },
         "variant.mutanno_variant_class": {
             "title": "Variant Type",
