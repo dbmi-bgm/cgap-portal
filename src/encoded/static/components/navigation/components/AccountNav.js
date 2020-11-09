@@ -33,8 +33,8 @@ const auth0Options = {
     defaultEnterpriseConnection: 'partners',
     languageDictionary: {
         title: 'Log In',
-        emailInputPlaceholder: 'Partners, Harvard/BCH Email or Google',
-        databaseEnterpriseAlternativeLoginInstructions: 'or login via Partners'
+        emailInputPlaceholder: 'Partners, Harvard/BCH Email',
+        databaseEnterpriseAlternativeLoginInstructions: 'or login via Email'
     }
 };
 
