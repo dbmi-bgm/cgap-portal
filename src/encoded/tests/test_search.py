@@ -1200,6 +1200,6 @@ class TestSearchBucketRangeFacets:
                 for bucket in facet['buckets']:
                     assert bucket['doc_count'] == 10  # selecting has no effect when combined with range
 
-    def test_search_bucket_range_workbook(self):
+    def test_search_bucket_range_workbook(self, testapp, workbook):
         # TODO: write me!
         pass

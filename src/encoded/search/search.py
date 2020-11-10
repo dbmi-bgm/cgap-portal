@@ -892,7 +892,7 @@ class SearchBuilder:
                     if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == NESTED:
                         continue
 
-                    # if we are nested, apply fix + replace (only for terms
+                    # if we are nested, apply fix + replace (only for terms)
                     if facet['aggregation_type'] == NESTED:
                         self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
 
@@ -914,9 +914,15 @@ class SearchBuilder:
         #            and just treat the nested aggs exactly the same.
         for facet in result:
             for k, v in facet.items():
-                if k == 'aggregation_type' and v == 'nested:stats':
-                    facet[k] = 'stats'
-                    break
+                if k == 'aggregation_type':
+                    override = None
+                    if v == 'nested:stats':
+                        override = 'stats'
+                    elif v == 'nested:range':
+                        override = 'range'
+                    if override is not None:
+                        facet[k] = override
+                        break
         return result
 
     @staticmethod
