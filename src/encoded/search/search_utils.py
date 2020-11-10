@@ -220,7 +220,8 @@ def get_query_field(field, facet):
         return 'embedded.@type.raw'
     elif not is_schema_field(field):
         return field + '.raw'
-    elif facet.get('aggregation_type') in ('stats', 'date_histogram', 'histogram', 'range', 'bucket-range'):
+    elif facet.get('aggregation_type') in ('stats', 'nested:stats', 'date_histogram', 'histogram', 'range',
+                                           'nested:range'):
         return 'embedded.' + field
     else:
         return 'embedded.' + field + '.raw'

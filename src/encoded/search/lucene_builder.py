@@ -821,7 +821,7 @@ class LuceneBuilder:
         aggs_ptr = search.aggs['all_items']
         nested_identifier = NESTED + ':'  # nested:field vs. terms:field/stats:field vs. stats:field_nested_name
         for agg in aggs_ptr:
-            if nested_identifier in agg and 'stats' not in agg:  # stats aggs are already correct
+            if nested_identifier in agg and 'stats' not in agg and 'range' not in agg:  # stats aggs are already correct
                 (search.aggs['all_items'][agg]  # create a sub-bucket, preserving the boolean qualifiers
                  .bucket('primary_agg',
                          'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
@@ -924,7 +924,7 @@ class LuceneBuilder:
             }
 
     @classmethod
-    def _build_terms_aggregation(cls, facet, query_field, nested_path, search_filters, string_query, aggs, agg_name):
+    def _build_terms_aggregation(cls, facet, query_field, search_filters, string_query, nested_path, aggs, agg_name):
         """ Helper function for build_facets that builds terms aggregations (which are later fixed
         to account for nested) """
         if nested_path:
@@ -971,21 +971,18 @@ class LuceneBuilder:
             query_field = get_query_field(field, facet)
             nested_path = find_nested_path(query_field, es_mapping)
 
-            # Build the aggregation based on it's type - stats, bucket-range or terms
+            # Build the aggregation based on it's type - stats, range or terms
             agg_name = field.replace('.', '-')
             facet_type = facet.get('aggregation_type')
-            if facet_type == 'stats':
+            if facet_type in ['stats', 'nested:stats']:
                 cls._build_stats_aggregation(field, facet, field_schema, query_field, search_filters, string_query,
                                              nested_path, aggs, agg_name)
-
-            elif facet_type == 'bucket-range':  # should be constant
-                cls._build_range_aggregation(facet, query_field, nested_path, search_filters, string_query,
+            elif facet_type in ['range', 'nested:range']:
+                cls._build_range_aggregation(facet, query_field, search_filters, string_query, nested_path,
                                              aggs, agg_name)
-
-            else:
-                cls._build_terms_aggregation(facet, query_field, nested_path, search_filters, string_query,
+            else:  # assume terms
+                cls._build_terms_aggregation(facet, query_field, search_filters, string_query, nested_path,
                                              aggs, agg_name)
-
 
             # Update facet with title, description from field_schema, if missing.
             if facet.get('title') is None and field_schema and 'title' in field_schema:

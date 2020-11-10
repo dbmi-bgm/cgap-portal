@@ -396,12 +396,51 @@ class TestingBucketRangeFacets(Item):
         'properties': {
             'special_integer': {
                 'type': 'integer'
+            },
+            'special_object_that_holds_integer': {
+                'type': 'object',
+                'properties': {
+                    'embedded_integer': {
+                        'type': 'integer'
+                    }
+                }
+            },
+            'array_of_objects_that_holds_integer': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'enable_nested': True,
+                    'properties': {
+                        'embedded_identifier': {
+                            'type': 'string'
+                        },
+                        'embedded_integer': {
+                            'type': 'integer'
+                        }
+                    }
+                }
             }
         },
         'facets': {
             'special_integer': {
                 'title': 'Special Integer',
-                'aggregation_type': 'bucket-range',
+                'aggregation_type': 'range',
+                'ranges': [
+                    {'from': 0, 'to': 5},
+                    {'from': 5, 'to': 10}
+                ]
+            },
+            'special_object_that_holds_integer.embedded_integer': {
+                'title': 'Single Object Embedded Integer',
+                'aggregation_type': 'range',
+                'ranges': [
+                    {'from': 0, 'to': 5},
+                    {'from': 5, 'to': 10}
+                ]
+            },
+            'array_of_objects_that_holds_integer.embedded_integer': {
+                'title': 'Array of Objects Embedded Integer',
+                'aggregation_type': 'range',
                 'ranges': [
                     {'from': 0, 'to': 5},
                     {'from': 5, 'to': 10}
