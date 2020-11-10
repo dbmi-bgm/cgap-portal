@@ -50,6 +50,7 @@ STATUS_ERROR = 'Error'
 STATUS_IN_PROGRESS = 'In progress'
 CGAP_CORE_PROJECT = '/projects/cgap-core'
 CGAP_CORE_INSTITUTION = '/institutions/hms-dbmi/'
+SHARED = 'shared'
 
 
 def includeme(config):
@@ -312,7 +313,7 @@ class IngestionQueueManager:
         self.queue_attrs = {
             self.queue_name: {
                 'DelaySeconds': '1',  # messages initially invisible for 1 sec
-                'VisibilityTimeout': '600',  # 10 mins
+                'VisibilityTimeout': '10800',  # 3 hours
                 'MessageRetentionPeriod': '604800',  # 7 days, in seconds
                 'ReceiveMessageWaitTimeSeconds': '5',  # 5 seconds of long polling
             }
@@ -577,6 +578,7 @@ class IngestionListener:
         variant = parser.create_variant_from_record(record)
         variant['project'] = project
         variant['institution'] = institution
+        variant['status'] = SHARED  # default variant status to shared, so visible to everyone
         parser.format_variant_sub_embedded_objects(variant)
         try:
             self.vapp.post_json('/variant', variant, status=201)
@@ -779,7 +781,7 @@ class IngestionListener:
                     log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
                               'as ingested.' % uuid)
                     self.set_status(uuid, STATUS_ERROR)
-                    self.set_error(uuid, self.first_error_message)
+                    self.set_error(uuid)
                 else:
                     self.set_status(uuid, STATUS_INGESTED)
 

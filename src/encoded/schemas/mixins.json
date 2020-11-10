@@ -71,18 +71,13 @@
             "type": "string",
             "default": "in review",
             "permission": "restricted_fields",
-            "note": "The last 4 statuses will be retired once items with those stati are patched to the appropriate one",
             "enum": [
                 "shared",
                 "obsolete",
                 "current",
                 "inactive",
                 "in review",
-                "deleted",
-                "released",
-                "released to project",
-                "released to institution",
-                "in public review"
+                "deleted"
             ]
         }
     },

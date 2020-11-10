@@ -83,6 +83,7 @@ const render = function (AppComponent, body, res) {
     }
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.removeHeader("X-Request-JWT");
     //var duration = process.hrtime(start);
     //res.setHeader('X-React-duration', duration[0] * 1e6 + (duration[1] / 1000 | 0));
     return new Buffer('<!DOCTYPE html>\n' + markup);

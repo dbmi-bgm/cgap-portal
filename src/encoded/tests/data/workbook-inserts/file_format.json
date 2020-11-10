@@ -12,7 +12,7 @@
     },
     {
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "description": "vcf, compressed",
         "valid_item_types": [
             "FileReference",

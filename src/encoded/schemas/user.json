@@ -80,6 +80,12 @@
                 }
             }
         },
+        "user_institution": {
+            "title": "User's Institution",
+            "description": "The primary institution the user is associated with",
+            "type": "string",
+            "linkTo": "Institution"
+        },
         "email": {
             "title": "Account Email",
             "description": "Email used to log in to the 4DN Portal.",
@@ -105,11 +111,6 @@
             "type": "string",
             "comment": "Can be user supplied - purely informational",
             "lookup": 41
-        },
-        "role": {
-            "title": "role (RETIRED FIELD)",
-            "type": "string",
-            "comment": "This used to be the property equivalent to job_title - rather than upgrade will just move the info"
         },
         "groups": {
             "title": "Groups",

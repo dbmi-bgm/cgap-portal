@@ -157,8 +157,9 @@ export class PedigreeTabViewBody extends React.PureComponent {
     }
 
     renderDetailPane(pedigreeVizProps){
-        const { session, href, context } = this.props;
-        return <PedigreeDetailPane {...pedigreeVizProps} {...{ session, href, context }} />;
+        const { session, href, context, schemas } = this.props;
+        const { Individual : indvSchema = null, Document: docSchema = null, Image: imageSchema = null } = schemas || {};
+        return <PedigreeDetailPane {...pedigreeVizProps} {...{ session, href, context, indvSchema, docSchema, imageSchema }} />;
     }
 
     render(){

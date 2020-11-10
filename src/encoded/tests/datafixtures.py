@@ -185,7 +185,7 @@ def female_individual_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_001",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -197,7 +197,7 @@ def grandpa_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_002",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -209,7 +209,7 @@ def mother_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_003",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -221,7 +221,7 @@ def father_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_004",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -233,7 +233,7 @@ def uncle_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_005",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -245,7 +245,7 @@ def child_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_006",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -257,7 +257,7 @@ def cousin_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_007",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -269,7 +269,7 @@ def sister_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_008",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -281,7 +281,7 @@ def brother_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_009",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -297,7 +297,7 @@ def female_individual(testapp, project, institution, female_individual_sample):
         'project': project['@id'],
         'institution': institution['@id'],
         "sex": "F",
-        "status": "released"
+        "status": "shared"
         # "uuid": "44d24e3f-bc5b-469a-8500-7ebd728f8ed5"
     }
     return testapp.post_json('/individual', item).json['@graph'][0]
@@ -313,7 +313,7 @@ def grandpa(testapp, project, institution, grandpa_sample):
         'project': project['@id'],
         'institution': institution['@id'],
         "sex": "M",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/individual', item).json['@graph'][0]
 
@@ -861,25 +861,25 @@ def rel_disorders():
     return [
         {
             'disorder_id': 'MONDO:0400005',
-            'status': 'released',
+            'status': 'shared',
             'disorder_name': 'refeeding syndrome',
             'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0400005',
         },
         {
             'disorder_id': 'MONDO:0400004',
-            'status': 'released',
+            'status': 'shared',
             'disorder_name': 'phrynoderma',
             'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0400004',
         },
         {
             'disorder_id': 'MONDO:0300000',
-            'status': 'released',
+            'status': 'shared',
             'disorder_name': 'SSR3-CDG',
             'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0300000',
         },
         {
             'disorder_id': 'MONDO:0200000',
-            'status': 'released',
+            'status': 'shared',
             'disorder_name': 'uterine ligament adenosarcoma',
             'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0200000'
         }
@@ -909,27 +909,27 @@ def phenotypes():
     return [
         {
             'hpo_id': 'HP:0001507',
-            'status': 'released',
+            'status': 'shared',
             'phenotype_name': 'growth abnormality',
             'hpo_url': 'http://purl.obolibrary.org/obo/HP_00001507',
             'is_slim_for': 'Phenotype abnormality'
         },
         {
             'hpo_id': 'HP:0040064',
-            'status': 'released',
+            'status': 'shared',
             'phenotype_name': 'Abnormality of limbs',
             'hpo_url': 'http://purl.obolibrary.org/obo/HP_0040064',
             'is_slim_for': 'Phenotype abnormality'
         },
         {
             'hpo_id': 'HP:3000008',
-            'status': 'released',
+            'status': 'shared',
             'phenotype_name': 'Abnormality of mylohyoid muscle',
             'hpo_url': 'http://purl.obolibrary.org/obo/HP_3000008'
         },
         {
             'hpo_id': 'HP:0010708',
-            'status': 'released',
+            'status': 'shared',
             'phenotype_name': '1-5 finger syndactyly',
             'hpo_url': 'http://purl.obolibrary.org/obo/HP_0010708'
         }
