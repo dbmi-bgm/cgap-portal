@@ -675,7 +675,7 @@ class SearchBuilder:
             if 'facets' in current_type_schema:
                 schema_facets = OrderedDict(current_type_schema['facets'])
                 for schema_facet in schema_facets.items():
-                    if schema_facet[1].get('disabled', False):
+                    if schema_facet[1].get('disabled', False) or schema_facet[1].get(self.DEFAULT_HIDDEN, False):
                         disabled_facets.append(schema_facet[0])
                         continue  # Skip disabled facets.
                     facets.append(schema_facet)
@@ -876,6 +876,7 @@ class SearchBuilder:
                     if 'buckets' not in bucket_location:  # account for nested structure
                         bucket_location = bucket_location['primary_agg']
                     result_facet['buckets'] = bucket_location['buckets']
+                    del result_facet['ranges']  # already in 'buckets' field
 
                 else:  # assume 'terms'
 

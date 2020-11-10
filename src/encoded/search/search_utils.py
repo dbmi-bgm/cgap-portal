@@ -32,6 +32,7 @@ NESTED = 'nested'
 PATH = 'path'
 TERMS = 'terms'
 RANGE = 'range'
+STATS = 'stats'
 AGGS = 'aggs'
 REVERSE_NESTED = 'reverse_nested'
 # just for book-keeping/readability but is 'unused' for now

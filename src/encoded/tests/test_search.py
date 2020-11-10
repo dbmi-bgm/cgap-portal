@@ -1201,5 +1201,5 @@ class TestSearchBucketRangeFacets:
                     assert bucket['doc_count'] == 10  # selecting has no effect when combined with range
 
     def test_search_bucket_range_workbook(self, testapp, workbook):
-        # TODO: write me!
+        # TODO: write me once some bucket-range aggregations are defined on schemas for workbook inserts
         pass

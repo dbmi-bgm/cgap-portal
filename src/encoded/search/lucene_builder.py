@@ -11,7 +11,7 @@ from .search_utils import (
     find_nested_path, convert_search_to_dictionary,
     QueryConstructionException,
     COMMON_EXCLUDED_URI_PARAMS, QUERY, FILTER, MUST, MUST_NOT, BOOL, MATCH, SHOULD,
-    EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED,
+    EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED, STATS,
     schema_for_field, get_query_field, search_log, MAX_FACET_COUNTS,
 
 )
@@ -821,7 +821,7 @@ class LuceneBuilder:
         aggs_ptr = search.aggs['all_items']
         nested_identifier = NESTED + ':'  # nested:field vs. terms:field/stats:field vs. stats:field_nested_name
         for agg in aggs_ptr:
-            if nested_identifier in agg and 'stats' not in agg and 'range' not in agg:  # stats aggs are already correct
+            if nested_identifier in agg and STATS not in agg and RANGE not in agg:  # stats aggs are already correct
                 (search.aggs['all_items'][agg]  # create a sub-bucket, preserving the boolean qualifiers
                  .bucket('primary_agg',
                          'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
@@ -859,7 +859,7 @@ class LuceneBuilder:
                         },
                         AGGS: {
                             'primary_agg': {
-                                'stats': {
+                                STATS: {
                                     'field': query_field
                                 }
                             }
@@ -873,7 +873,7 @@ class LuceneBuilder:
             aggs[facet['aggregation_type'] + ":" + agg_name] = {
                 AGGS: {
                     'primary_agg': {
-                        'stats': {
+                        STATS: {
                             'field': query_field
                         }
                     }
