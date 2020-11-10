@@ -442,8 +442,8 @@ class TestingBucketRangeFacets(Item):
                 'title': 'Array of Objects Embedded Integer',
                 'aggregation_type': 'range',
                 'ranges': [
-                    {'from': 0, 'to': 5},
-                    {'from': 5, 'to': 10}
+                    {'from': 0, 'to': 5, 'label': 'Low'},
+                    {'from': 5, 'to': 10, 'label': 'High'}
                 ]
             }
         }

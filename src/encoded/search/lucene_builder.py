@@ -829,6 +829,18 @@ class LuceneBuilder:
                          Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=MAX_FACET_COUNTS, missing='No value'))
                  .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
 
+    @staticmethod
+    def _build_nested_aggregation(sub_query, nested_path):
+        """ Helper function for below methods that builds a nested aggregation. """
+        return {
+            NESTED: {
+                PATH: nested_path
+            },
+            AGGS: {
+                'primary_agg': sub_query
+            }
+        }
+
     @classmethod
     def _build_stats_aggregation(cls, field, facet, field_schema, query_field, search_filters, string_query,
                                  nested_path, aggs, agg_name):
@@ -849,22 +861,16 @@ class LuceneBuilder:
         facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
                                                                                string_query)
         # stats aggregations could be nested too
+        stats_agg = {
+            STATS: {
+                'field': query_field
+            }
+        }
         if nested_path:
             facet['aggregation_type'] = 'nested:stats'
             aggs[facet['aggregation_type'] + ':' + agg_name] = {
                 AGGS: {
-                    'primary_agg': {
-                        NESTED: {
-                            PATH: nested_path
-                        },
-                        AGGS: {
-                            'primary_agg': {
-                                STATS: {
-                                    'field': query_field
-                                }
-                            }
-                        }
-                    }
+                    'primary_agg': cls._build_nested_aggregation(stats_agg, nested_path)
                 },
                 FILTER: facet_filters
             }
@@ -872,11 +878,7 @@ class LuceneBuilder:
         else:
             aggs[facet['aggregation_type'] + ":" + agg_name] = {
                 AGGS: {
-                    'primary_agg': {
-                        STATS: {
-                            'field': query_field
-                        }
-                    }
+                    'primary_agg': stats_agg
                 },
                 FILTER: facet_filters
             }
@@ -886,24 +888,19 @@ class LuceneBuilder:
         """ Helper function for build_facets that builds range aggregations """
         facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
                                                                                string_query)
+        ranges = [{k: v for k, v in r.items() if k in ['from', 'to']} for r in facet['ranges']]
+        range_agg = {
+            RANGE: {
+                FIELD: query_field,
+                'ranges': ranges
+            }
+        }
         if nested_path:
             facet['aggregation_type'] = 'nested:range'
             nested_bucket_range_field = facet['aggregation_type'] + ':' + agg_name
             aggs[nested_bucket_range_field] = {
                 AGGS: {
-                    'primary_agg': {
-                        NESTED: {
-                            PATH: nested_path
-                        },
-                        AGGS: {
-                            'primary_agg': {
-                                RANGE: {
-                                    FIELD: query_field,
-                                    'ranges': facet['ranges']
-                                }
-                            }
-                        }
-                    }
+                    'primary_agg': cls._build_nested_aggregation(range_agg, nested_path)
                 },
                 FILTER: facet_filters
             }
@@ -913,12 +910,7 @@ class LuceneBuilder:
             range_field = facet['aggregation_type'] + ':' + agg_name
             aggs[range_field] = {
                 AGGS: {
-                    'primary_agg': {
-                        RANGE: {
-                                FIELD: query_field,
-                                'ranges': facet['ranges']
-                            }
-                        }
+                    'primary_agg': range_agg
                 },
                 FILTER: facet_filters
             }

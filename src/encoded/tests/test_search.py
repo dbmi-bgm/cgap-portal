@@ -1143,33 +1143,40 @@ def bucket_range_data(testapp, bucket_range_data_raw):
 
 
 class TestSearchBucketRangeFacets:
-    """ Class that encapsulates tests for BucketRanges
-        TODO: refactor some re-used code """
+    """ Class that encapsulates tests for BucketRanges """
+
+    @staticmethod
+    def verify_facet_counts(facets, expected_fields, expected_cardinality, expected_count):
+        """ Checks for given expected facets, checking bucket cardinality and document count
+            Note that the actual range properties are trivial (we are not testing elasticsearch)
+        """
+        for facet in facets:
+            if facet['field'] in expected_fields:
+                assert len(facet['ranges']) == expected_cardinality
+                for bucket in facet['ranges']:
+                    assert bucket['doc_count'] == expected_count
+
+    @staticmethod
+    def select_facet(facets, facet_name):
+        result = None
+        for facet in facets:
+            if facet['field'] == facet_name:
+                result = facet
+                break
+        return result
 
     @pytest.fixture(scope='module')
     def bucket_range_facet_result(self, testapp, bucket_range_data):
         return testapp.get('/search/?type=TestingBucketRangeFacets').json['facets']
 
-    def test_search_bucket_range_simple(self, bucket_range_facet_result):
+    @pytest.mark.parametrize('expected_fields, expected_counts', [
+        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 5),
+        (['array_of_objects_that_holds_integer.embedded_integer'], 10)
+    ])
+    def test_search_bucket_range_simple(self, bucket_range_facet_result, expected_fields, expected_counts):
         """ Tests searching a collection of documents with varying integer field types that
             have the same distribution - all of which should give the same results. """
-        facets = bucket_range_facet_result
-        for facet in facets:
-            if facet['field'] in ['special_integer', 'special_object_that_holds_integer.embedded_integer']:
-                assert len(facet['ranges']) == 2
-                assert len(facet['buckets']) == 2
-                for bucket in facet['buckets']:
-                    assert bucket['doc_count'] == 5  # even split
-
-    def test_search_bucket_range_nested(self, bucket_range_facet_result):
-        """ Tests that bucket-range facets work correctly with nested """
-        facets = bucket_range_facet_result
-        for facet in facets:
-            if facet['field'] == 'array_of_objects_that_holds_integer.embedded_integer':
-                assert len(facet['ranges']) == 2
-                assert len(facet['buckets']) == 2
-                for bucket in facet['buckets']:
-                    assert bucket['doc_count'] == 10  # all documents should match both buckets
+        self.verify_facet_counts(bucket_range_facet_result, expected_fields, 2, expected_counts)
 
     @pytest.mark.parametrize('identifier', [
         'reverse', 'forward'
@@ -1177,28 +1184,24 @@ class TestSearchBucketRangeFacets:
     def test_search_bucket_range_nested_qualifier(self, testapp, bucket_range_data, identifier):
         """ Tests aggregating on a nested field while selecting for a field within the nested object. """
         res = testapp.get('/search/?type=TestingBucketRangeFacets'
-                          '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json
-        for facet in res['facets']:
-            if facet['field'] == 'array_of_objects_that_holds_integer.embedded_integer':
-                assert len(facet['ranges']) == 2
-                assert len(facet['buckets']) == 2
-                for bucket in facet['buckets']:
-                    assert bucket['doc_count'] == 10  # all documents should match both buckets
+                          '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
+        self.verify_facet_counts(res, ['array_of_objects_that_holds_integer.embedded_integer'],
+                                 2, 10)
 
     @pytest.mark.parametrize('identifier', [
         'reverse', 'forward'
     ])
     def test_search_bucket_range_nested_qualifier(self, testapp, bucket_range_data, identifier):
-        """ Tests aggregating on a nested field while selecting for a field within the nested object. """
+        """ Tests aggregating on a nested field while selecting for a field within the nested object (no change). """
         res = testapp.get('/search/?type=TestingBucketRangeFacets'
                           '&array_of_objects_that_holds_integer.embedded_integer.from=6'
-                          '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json
-        for facet in res['facets']:
-            if facet['field'] == 'array_of_objects_that_holds_integer.embedded_integer':
-                assert len(facet['ranges']) == 2
-                assert len(facet['buckets']) == 2
-                for bucket in facet['buckets']:
-                    assert bucket['doc_count'] == 10  # selecting has no effect when combined with range
+                          '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
+        self.verify_facet_counts(res, ['array_of_objects_that_holds_integer.embedded_integer'],
+                                 2, 10)
+        facet_with_labels = self.select_facet(res, 'array_of_objects_that_holds_integer.embedded_integer')
+        for r in facet_with_labels['ranges']:
+            assert 'label' in r
+            assert r['label'] in ['Low', 'High']
 
     def test_search_bucket_range_workbook(self, testapp, workbook):
         # TODO: write me once some bucket-range aggregations are defined on schemas for workbook inserts

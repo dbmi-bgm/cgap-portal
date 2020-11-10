@@ -875,8 +875,16 @@ class SearchBuilder:
                     bucket_location = aggregations[full_agg_name]['primary_agg']
                     if 'buckets' not in bucket_location:  # account for nested structure
                         bucket_location = bucket_location['primary_agg']
-                    result_facet['buckets'] = bucket_location['buckets']
-                    del result_facet['ranges']  # already in 'buckets' field
+
+                    # TODO - refactor ?
+                    # merge bucket labels from ranges into buckets
+                    for r in result_facet['ranges']:
+                        for b in bucket_location['buckets']:
+
+                            # if ranges match we found our bucket, propagate doc_count into 'ranges' field
+                            if (r.get('from', -1) == b.get('from', -1)) and (r.get('to', -1) == b.get('to', -1)):
+                                r['doc_count'] = b['doc_count']
+                                break
 
                 else:  # assume 'terms'
 
