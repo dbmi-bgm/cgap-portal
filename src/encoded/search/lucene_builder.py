@@ -751,6 +751,11 @@ class LuceneBuilder:
         :param string_query: query string if provided
         :return: Copy of search_filters, minus filter for current query_field (if one set).
         """
+        if not search_filters or BOOL not in search_filters:
+            return {
+                'match_all': {}
+            }
+
         facet_filters = deepcopy(search_filters[BOOL])
 
         for filter_type in [MUST, MUST_NOT]:
@@ -763,7 +768,7 @@ class LuceneBuilder:
             # combine statements within 'must' for each
             facet_filters[MUST].append(string_query[MUST])
 
-        return facet_filters
+        return {BOOL: facet_filters}
 
     @staticmethod
     def set_additional_aggregations(search_as_dict, request, doc_types, extra_aggregations=None):
@@ -861,7 +866,7 @@ class LuceneBuilder:
                         }
                     }
                 },
-                FILTER: {BOOL: facet_filters}
+                FILTER: facet_filters
             }
 
         else:
@@ -873,12 +878,14 @@ class LuceneBuilder:
                         }
                     }
                 },
-                FILTER: {BOOL: facet_filters}
+                FILTER: facet_filters
             }
 
     @classmethod
-    def _build_range_aggregation(cls, facet, query_field, nested_path, aggs, agg_name):
+    def _build_range_aggregation(cls, facet, query_field, search_filters, string_query, nested_path, aggs, agg_name):
         """ Helper function for build_facets that builds range aggregations """
+        facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
+                                                                               string_query)
         if nested_path:
             facet['aggregation_type'] = 'nested:range'
             nested_bucket_range_field = facet['aggregation_type'] + ':' + agg_name
@@ -897,17 +904,23 @@ class LuceneBuilder:
                             }
                         }
                     }
-                }
+                },
+                FILTER: facet_filters
             }
 
         else:
             facet['aggregation_type'] = RANGE
             range_field = facet['aggregation_type'] + ':' + agg_name
             aggs[range_field] = {
-                    RANGE: {
-                        FIELD: query_field,
-                        'ranges': facet['ranges']
-                    }
+                AGGS: {
+                    'primary_agg': {
+                        RANGE: {
+                                FIELD: query_field,
+                                'ranges': facet['ranges']
+                            }
+                        }
+                },
+                FILTER: facet_filters
             }
 
     @classmethod
@@ -933,7 +946,7 @@ class LuceneBuilder:
             AGGS: {
                 'primary_agg': term_aggregation
             },
-            FILTER: {BOOL: facet_filters},
+            FILTER: facet_filters,
         }
 
     @classmethod
@@ -966,8 +979,8 @@ class LuceneBuilder:
                                              nested_path, aggs, agg_name)
 
             elif facet_type == 'bucket-range':  # should be constant
-                # XXX: should these counts be global ie: no filter block?
-                cls._build_range_aggregation(facet, query_field, nested_path, aggs, agg_name)
+                cls._build_range_aggregation(facet, query_field, nested_path, search_filters, string_query,
+                                             aggs, agg_name)
 
             else:
                 cls._build_terms_aggregation(facet, query_field, nested_path, search_filters, string_query,

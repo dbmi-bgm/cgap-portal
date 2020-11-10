@@ -1133,6 +1133,12 @@ class TestSearchBucketRangeFacets:
     """ Class that encapsulates tests for BucketRanges """
 
     def test_search_bucket_range_simple(self, testapp, bucket_range_data):
-        """ Does a simple bucket-range facet """
-        res = testapp.get('/search/?type=TestingBucketRangeFacets')
-        #import pdb; pdb.set_trace()
+        """ Does a simple bucket-range facet on the special_integer field, which contains evenly
+            distributed integers from 1-10 """
+        facets = testapp.get('/search/?type=TestingBucketRangeFacets').json['facets']
+        for facet in facets:
+            if facet['field'] == 'special_integer':
+                assert len(facet['ranges']) == 2
+                assert len(facet['buckets']) == 2
+                for bucket in facet['buckets']:
+                    assert bucket['doc_count'] == 5  # even split

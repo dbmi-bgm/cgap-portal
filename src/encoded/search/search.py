@@ -763,7 +763,6 @@ class SearchBuilder:
                 existing_facet_index = used_facets.index(ap_facet[0])
                 if facets[existing_facet_index][1].get('title') in (None, facets[existing_facet_index][0]):
                     facets[existing_facet_index][1]['title'] = ap_facet[1]['title']
-
         return facets
 
     def assure_session_id(self):
@@ -871,7 +870,14 @@ class SearchBuilder:
                     for k in aggregations[full_agg_name]['primary_agg']['primary_agg'].keys():
                         result_facet[k] = aggregations[full_agg_name]['primary_agg']['primary_agg'][k]
 
-                else:  # 'terms' assumed.
+                elif facet['aggregation_type'] in ['range', 'nested:range']:
+                    # Shift the bucket location
+                    bucket_location = aggregations[full_agg_name]['primary_agg']
+                    if 'buckets' not in bucket_location:  # account for nested structure
+                        bucket_location = bucket_location['primary_agg']
+                    result_facet['buckets'] = bucket_location['buckets']
+
+                else:  # assume 'terms'
 
                     # Shift the bucket location
                     bucket_location = aggregations[full_agg_name]['primary_agg']
@@ -886,15 +892,13 @@ class SearchBuilder:
                     if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == NESTED:
                         continue
 
-                    # if we are nested, apply fix + replace
+                    # if we are nested, apply fix + replace (only for terms
                     if facet['aggregation_type'] == NESTED:
                         self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
 
                     # Re-add buckets under 'terms' AFTER we have fixed the doc_counts
                     result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
 
-                    # Default - terms, range, or histogram buckets. Buckets may not be present
-                    result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
                     # Choosing to show facets with one term for summary info on search it provides
                     if len(result_facet.get('terms', [])) < 1:
                         continue
