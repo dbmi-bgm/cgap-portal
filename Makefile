@@ -41,6 +41,9 @@ build-after-poetry:  # continuation of build after poetry install
 	make moto-setup
 	make npm-setup
 	python setup_eb.py develop
+	@echo "Cleaning any unwanted .dist-info files..."
+	@if [ -n "${VIRTUAL_ENV}" ]; then rm -rf ${VIRTUAL_ENV}/lib/python3.6/site-packages/encoded-[0-9][.][0-9]*.dist-info; else echo "Not in a virtual env."; fi
+	@echo "Done cleaning any unwanted .dist-info files."
 
 build-dev:  # same as build, but sets up locust as well
 	make build
