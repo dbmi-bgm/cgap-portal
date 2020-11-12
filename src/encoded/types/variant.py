@@ -76,7 +76,9 @@ def build_variant_sample_embedded_list():
         :returns: list of embeds from 'variant' linkTo
     """
     embedded_list = [
-        "cmphet.*"
+        "cmphet.*",
+        "variant_sample_list.created_for_case",
+        "interpretation.classification"
     ]
     with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
@@ -193,6 +195,7 @@ class VariantSample(Item):
 
     item_type = 'variant_sample'
     schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant_sample.json'))
+    rev = {'variant_sample_lists': ('VariantSampleList', 'variant_samples')}
     embedded_list = build_variant_sample_embedded_list()
     FACET_ORDER_OVERRIDE = {
         'inheritance_modes': {
@@ -245,6 +248,17 @@ class VariantSample(Item):
         if variant:
             return CALL_INFO + ':' + variant_display_title  # HG002:chr1:504A>T
         return CALL_INFO
+
+    @calculated_property(schema={
+        "title": "Variant Sample List",
+        "description": "The list containing this variant sample",
+        "type": "string",
+        "linkTo": "VariantSampleList"
+    })
+    def variant_sample_list(self, request):
+        result = self.rev_link_atids(request, "variant_sample_lists")
+        if result:
+            return result[0]  # expected one list per case
 
     @calculated_property(schema={
         "title": "AD_REF",
@@ -384,6 +398,20 @@ class VariantSample(Item):
                 new_labels[role_key] = ' '.join(label)  # just in case
 
         return new_labels
+
+
+@collection(
+    name='variant-sample-lists',
+    properties={
+        'title': 'Variant Sample Lists',
+        'description': 'Collection of all variant sample lists'
+    })
+class VariantSampleList(Item):
+    """ VariantSampleList class """
+
+    item_type = 'variant_sample_list'
+    schema = load_schema('encoded:schemas/variant_sample_list.json')
+    embedded_list = []
 
 
 @view_config(name='download', context=VariantSample, request_method='GET',
