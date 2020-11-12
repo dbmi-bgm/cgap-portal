@@ -101,9 +101,6 @@ class CompoundSearchBuilder:
         if es_results['hits']['total'] == 0:
             request.response.status_code = 404  # see google webmaster doc on why
 
-        #with open("./test.txt", "w") as fp:
-        #    json.dump(es_results, fp, indent=4)
-
         return {
             # "@id": "/compound_search", # Not necessary from UI atm but considering adding for semantics
             # "@type": ["SearchResults"], # Not necessary from UI atm but considering adding for semantics
@@ -232,14 +229,13 @@ class CompoundSearchBuilder:
             requested_sorts = filter_set.get("sort", [])
             if not requested_sorts and global_flags:
                 requested_sorts = urllib.parse.parse_qs(global_flags).get("sort", [])
+
             sort, result_sort = build_sort_dicts(requested_sorts, request, [ doc_type ])
 
-            search = SearchBuilder.from_search(context, compound_subreq, compound_query, from_=from_, size=to)
-            search.search.sort(sort)
+            search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query, from_=from_, size=to)
+            search_dsl = search_builder_instance.search.sort(sort)
 
-            # print('AAAA1', requested_sorts, search, '\n\n', compound_subreq, '\n\n', compound_query, sort, result_sort)
-
-            es_results = execute_search(compound_subreq, search.search)
+            es_results = execute_search(compound_subreq, search_dsl)
             return cls.format_filter_set_results(request, es_results, filter_set, result_sort, return_generator)
 
     @classmethod
