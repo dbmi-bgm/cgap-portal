@@ -474,6 +474,15 @@
         "schema_version": {
             "default": "1"
         },
+        "interpretation": {
+            "title": "Interpretation Notes",
+            "type": "array",
+            "items": {
+                "title": "Interpretation Note",
+                "type": "string",
+                "linkTo": "NoteInterpretation"
+            }
+        },
         "variant": {
             "title": "Variant",
             "type": "string",

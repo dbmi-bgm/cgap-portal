@@ -27,8 +27,9 @@
             "description": "VariantSample items saved to this list",
             "type": "array",
             "items": {
-                "title": "Variant Sample ID",
-                "type": "string"
+                "title": "Variant Sample",
+                "type": "string",
+                "linkTo": "VariantSample"
             }
         },
         "created_for_case": {

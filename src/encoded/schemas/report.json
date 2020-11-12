@@ -28,6 +28,27 @@
             "title": "Description",
             "description": "Description of the report",
             "type": "string"
+        },
+        "variant_samples": {
+            "title": "Variant Samples",
+            "description": "The variant samples included in this report",
+            "type": "array",
+            "items": {
+                "title": "Variant Sample",
+                "description": "A variant sample included in this report",
+                "type": "string",
+                "linkTo": "VariantSample"
+            }
+        },
+        "extra_notes": {
+            "title": "Additional Notes",
+            "description": "Notes for this report that are not attached to the Variant Samples",
+            "type": "array",
+            "items": {
+                "title": "Extra Note",
+                "type": "string",
+                "linkTo": "NoteStandard"
+            }
         }
     }
 }

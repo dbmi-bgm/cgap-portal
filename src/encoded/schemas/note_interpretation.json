@@ -1,7 +1,7 @@
 {
     "title": "Interpretation Note",
     "description": "Note containing interpretation of a VariantSample, Variant, or Gene",
-    "id": "/profiles/interpretation_note.json",
+    "id": "/profiles/note_interpretation.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": ["institution", "project"],
@@ -41,6 +41,14 @@
                 "likely pathogenic",
                 "pathogenic"
             ]
+        },
+        "acmg_guidelines": {
+            "title": "ACMG Guidelines Invoked",
+            "type": "array",
+            "items": {
+                "title": "ACMG Guideline",
+                "type": "string"
+            }
         },
         "conclusion": {
             "title": "Conclusion",
