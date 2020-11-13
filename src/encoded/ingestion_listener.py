@@ -31,6 +31,8 @@ from .ingestion.common import register_path_content_type, metadata_bundles_bucke
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .inheritance_mode import InheritanceMode
+from .server_defaults import add_last_modified
+from .loadxl import LOADXL_USER_UUID
 from .types.ingestion import SubmissionFolio
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 from .util import (
@@ -580,6 +582,7 @@ class IngestionListener:
         variant['institution'] = institution
         variant['status'] = SHARED  # default variant status to shared, so visible to everyone
         parser.format_variant_sub_embedded_objects(variant)
+        add_last_modified(variant, userid=LOADXL_USER_UUID)
         try:
             self.vapp.post_json('/variant', variant, status=201)
         except Exception:  # XXX: HTTPConflict is thrown and should be caught but does not work
@@ -623,7 +626,7 @@ class IngestionListener:
                 variant_name = sample['variant']
                 chrom = variant_name[variant_name.index('chr') + 3]  # find chr* and get *
                 sample.update(InheritanceMode.compute_inheritance_modes(sample, chrom=chrom))
-
+                add_last_modified(variant, userid=LOADXL_USER_UUID)
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
                 log.error('Encountered exception posting variant_sample: %s' % e)
