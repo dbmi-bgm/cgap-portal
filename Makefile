@@ -1,15 +1,28 @@
 clean:  # clear node modules, eggs, npm build stuff
+	make clean-python-caches
+	make clean-npm-caches
+
+clean-python-caches:
 	rm -rf src/*.egg-info/
-	rm -rf node_modules eggs
+	rm -rf eggs
+	rm -rf develop
+	rm -rf develop-eggs
+
+clean-npm-caches:
+	make clean-node-modules
 	rm -rf .sass-cache
 	rm -f src/encoded/static/css/*.css
 	rm -f src/encoded/static/build/*.js
 	rm -f src/encoded/static/build/*.html
-	rm -rf develop
-	rm -rf develop-eggs
+
+clean-node-modules:
+	rm -rf node_modules
 
 aws-ip-ranges:
 	curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
+
+npm-setup-if-needed:  # sets up npm only if not already set up
+	if [ ! -d "node_modules" ]; then make npm-setup; fi
 
 npm-setup:  # runs all front-end setup
 	npm ci
@@ -32,14 +45,30 @@ macbuild:  # builds for Catalina
 	make macpoetry-install
 	make build-after-poetry
 
+macbuild-full:  # rebuilds for Catalina, addressing zlib possibly being in an alternate location.
+	make clean-node-modules  # This effectively assures that 'make npm-setup' will need to run.
+	make macbuild
+
+remacbuild:
+	make clean  # Among other things, this assures 'make npm-setup' will run, but it also does other cleanup.
+	make macbuild
+
 build:  # builds
 	make configure
 	poetry install
 	make build-after-poetry
 
+build-full:  # rebuilds for Catalina, addressing zlib possibly being in an alternate location.
+	make clean-node-modules  # This effectively assures that 'make npm-setup' will need to run.
+	make build
+
+rebuild:
+	make clean  # Among other things, this assures 'make npm-setup' will run, but it also does other cleanup.
+	make build
+
 build-after-poetry:  # continuation of build after poetry install
 	make moto-setup
-	make npm-setup
+	make npm-setup-if-needed
 	python setup_eb.py develop
 	make fix-dist-info
 
