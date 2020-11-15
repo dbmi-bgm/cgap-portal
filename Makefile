@@ -40,31 +40,31 @@ configure:  # does any pre-requisite installs
 	pip install --upgrade pip
 	pip install poetry==1.0.10  # pinned to avoid build problems we cannot fix in pyproject.toml
 
-macbuild:  # builds for Catalina
-	make configure
-	make macpoetry-install
-	make build-after-poetry
-
-macbuild-full:  # rebuilds for Catalina, addressing zlib possibly being in an alternate location.
-	make clean-node-modules  # This effectively assures that 'make npm-setup' will need to run.
-	make macbuild
-
-remacbuild:
-	make clean  # Among other things, this assures 'make npm-setup' will run, but it also does other cleanup.
-	make macbuild
-
 build:  # builds
 	make configure
 	poetry install
 	make build-after-poetry
 
-build-full:  # rebuilds for Catalina, addressing zlib possibly being in an alternate location.
-	make clean-node-modules  # This effectively assures that 'make npm-setup' will need to run.
-	make build
+macbuild:  # builds for Catalina
+	make configure
+	make macpoetry-install
+	make build-after-poetry
 
 rebuild:
 	make clean  # Among other things, this assures 'make npm-setup' will run, but it also does other cleanup.
 	make build
+
+macrebuild:
+	make clean  # Among other things, this assures 'make npm-setup' will run, but it also does other cleanup.
+	make macbuild
+
+build-full:  # rebuilds for Catalina, addressing zlib possibly being in an alternate location.
+	make clean-node-modules  # This effectively assures that 'make npm-setup' will need to run.
+	make build
+
+macbuild-full:  # rebuilds for Catalina, addressing zlib possibly being in an alternate location.
+	make clean-node-modules  # This effectively assures that 'make npm-setup' will need to run.
+	make macbuild
 
 build-after-poetry:  # continuation of build after poetry install
 	make moto-setup
