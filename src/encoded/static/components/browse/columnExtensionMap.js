@@ -275,8 +275,10 @@ export const columnExtensionMap = {
             let fastqPresent = false;
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                const { '@type': [type] } = file || {};
-                if (type === "FileFastq") {
+                const { uuid = null, '@type': [type], status: fileStatus = null } = file || {};
+                if (type === "FileFastq" &&
+                    (uuid && fileStatus && fileStatus !== "uploading" && fileStatus !== "upload_failed")
+                ) {
                     fastqPresent = true;
                     break;
                 }
