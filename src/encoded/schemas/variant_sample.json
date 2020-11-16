@@ -591,17 +591,6 @@
             "order": 11,
             "grouping": "Variant Quality"
         },
-        "AD_alt": {
-            "aggregation_type": "stats",
-            "grouping": "Variant Quality",
-            "number_step": 1,
-            "ranges": [
-                { "from": "0", "to": "4" },
-                { "from": "4", "to": "9" },
-                { "from": "10", "to": "19" },
-                { "from": "20" }
-            ]
-        },
         "associated_genotype_labels.father_genotype_label": {
             "title": "Father Genotype",
             "order": 14,
@@ -628,14 +617,13 @@
         },
         "novoPP": {
             "title": "novoCaller PP",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
             "number_step": "any",
             "order": 16,
             "grouping": "Genotype",
             "ranges": [
-                { "to": "0.1" },
-                { "from": "0.1", "to": "0.09" },
-                { "from": "0.09", "to": "1" }
+                { "from": "0.1", "to": "0.9", "label": "de novo candidate (weak)" },
+                { "from": "0.9", "to": "1", "label": "de novo candidate (strong)" }
             ]
         },
         "variant.CHROM": {
@@ -664,16 +652,16 @@
         },
         "variant.conservation_phylop100": {
             "title": "PhyloP (100 Vertabrates)",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
             "number_step": "any",
             "order": 22,
             "grouping": "Conservation",
             "ranges": [
-                { "from": "-20", "to": "-3" },
-                { "from": "-3", "to": "-2" },
-                { "from": "-2", "to": "2" },
-                { "from": "2", "to": "3" },
-                { "from": "3", "to": "10"}
+                { "from": "-20", "to": "-3", "label": "strong positive selection" },
+                { "from": "-3", "to": "-2", "label": "positive selection" },
+                { "from": "-2", "to": "2", "label": "low selection" },
+                { "from": "2", "to": "3", "label": "conserved" },
+                { "from": "3", "to": "10", "label": "highly conserved"}
             ]
         },
         "variant.cytoband_cytoband": {
@@ -752,14 +740,15 @@
         },
         "variant.gnomad_af": {
             "title": "GnomAD Alt Allele Frequency",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
             "number_step": "any",
             "order": 18,
             "grouping": "Population Frequency",
             "ranges": [
-                { "from": "0", "to": "0.001" },
-                { "from": "0.001", "to": "0.01" },
-                { "from": "0.01", "to": "1" }
+                { "from": "0", "to": "0", "label": "unobserved" }, 
+                { "from": "0", "to": "0.001", "label": "ultra-rare" },
+                { "from": "0.001", "to": "0.01", "label": "rare" },
+                { "from": "0.01", "to": "1", "label": "common" }
             ]
         },
         "variant.gnomad_an": {
@@ -778,14 +767,15 @@
         },
         "variant.max_pop_af_af_popmax": {
             "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
             "number_step": "any",
             "order": 19,
             "grouping": "Population Frequency",
             "ranges": [
-                { "from": "0", "to": "0.001" },
-                { "from": "0.001", "to": "0.01" },
-                { "from": "0.01", "to": "1" }
+                { "from": "0", "to": "0", "label": "unobserved" }, 
+                { "from": "0", "to": "0.001", "label": "ultra-rare" },
+                { "from": "0.001", "to": "0.01", "label": "rare" },
+                { "from": "0.01", "to": "1", "label": "common" }
             ]
         },
         "variant.mutanno_variant_class": {
