@@ -58,6 +58,9 @@ function toggleSelectedDiseaseCallable(selectedDiseases, availableDiseases, setS
  * Grabs phenotypic features from context and uses as initial `selectedDiseases`
  * state.
  *
+ * `selectedDiseases` is an array whose order will determine its 'data-disease-index',
+ * to which colors are mapped to in CSS stylesheet.
+ *
  * @todo (lower priority) React hook or functional equivalent of:
  *     ```
  *     componentDidUpdate(pastProps){
@@ -81,16 +84,37 @@ function toggleSelectedDiseaseCallable(selectedDiseases, availableDiseases, setS
  */
 export function usePhenotypicFeatureStrings(currFamily){
     const { family_phenotypic_features } = currFamily;
+    // Initially-visible things
     const contextPhenotypicFeatureStrings = useMemo(function(){
         return getPhenotypicFeatureStrings(family_phenotypic_features);
     }, [ family_phenotypic_features ]);
+
+    // Set as selectedDiseases
     const [ selectedDiseases, setSelectedDiseases ] = useState(contextPhenotypicFeatureStrings);
+
+    // All diseases present in family
     const availableDiseases = useMemo(
         function(){
-            return gatherPhenotypicFeatureItems(currFamily);
+            const selectedDiseaseOrder = {};
+            contextPhenotypicFeatureStrings.forEach(function(diseaseStr, idx){
+                // Normally is 1-based ordering for these but doesn't matter here as just for sorting availableDiseases.
+                selectedDiseaseOrder[diseaseStr] = idx;
+            });
+
+            return gatherPhenotypicFeatureItems(currFamily).sort(function({ display_title: titleA }, { display_title: titleB }){
+                const a = selectedDiseaseOrder[titleA];
+                const b = selectedDiseaseOrder[titleB];
+                if (typeof a === "number" && typeof b !== "number") return -1;
+                if (typeof a !== "number" && typeof b === "number") return 1;
+                if (typeof a === "number" && typeof b === "number") return a - b;
+                return 0;
+            });
         },
-        [ currFamily ]
+        // Though this could change as selectedDiseases changes, we only care about "initial" order and don't want to re-sort each time
+        // that selected diseases changes, just first time is rendered.
+        [ currFamily, contextPhenotypicFeatureStrings ]
     );
+
     const onToggleSelectedDisease = useCallback( // `useMemo` & `useCallback` hooks are almost equivalent exc. for param signatures
         function(evt){
             const diseaseStr = evt.target.getAttribute("name");
@@ -99,6 +123,7 @@ export function usePhenotypicFeatureStrings(currFamily){
         },
         [ selectedDiseases, availableDiseases, setSelectedDiseases ]
     );
+
     return {
         selectedDiseases,
         setSelectedDiseases, // Potentially exclude ?
@@ -179,7 +204,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                     <CollapsibleItemViewButtonToolbar windowWidth={windowWidth}>
                         {/* <ColorAllDiseasesCheckbox checked={showAllDiseases} onChange={this.handleToggleCheckbox} /> */}
                         <UniqueIdentifiersCheckbox checked={!showOrderBasedName} onChange={onTogglePedigreeOptionCheckbox} />
-                        <SelectDiseasesDropdown {...{ selectedDiseases, availableDiseases }} onChange={onToggleSelectedDisease} />
+                        <SelectDiseasesDropdown {...{ selectedDiseases, availableDiseases, onToggleSelectedDisease }} />
                         {/* <ShowAsDiseasesDropdown onSelect={setShowAsDiseases} showAsDiseases={showAsDiseases}  /> */}
                         {/* <FamilySelectionDropdown {...{ families, currentFamilyIdx: pedigreeFamiliesIdx }} onSelect={onFamilySelect} /> */}
                         <PedigreeFullScreenBtn />
@@ -187,7 +212,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                 </h3>
             </div>
             <hr className="tab-section-title-horiz-divider"/>
-            <PedigreeTabViewBody {...pedigreeTabViewBodyProps} />
+            <PedigreeTabViewBody {...pedigreeTabViewBodyProps} {...{ schemas }} />
         </div>
     );
 });
@@ -210,29 +235,33 @@ const SelectDiseasesDropdown = React.memo(function SelectDiseasesDropdown(props)
     const {
         availableDiseases = [],
         selectedDiseases = [],
-        onChange,
+        onToggleSelectedDisease,
         title = "Select Case Phenotypic Features",
     } = props;
     if (availableDiseases.length === 0) {
         return null;
     }
+
+    // `selectedDiseases` is passed down to PedigreeViz and assigned data-disease-index by array order.
+    // So we must do same here for consistency.
     const selectedMap = {};
-    selectedDiseases.forEach(function(sD){
-        selectedMap[sD] = true;
+    selectedDiseases.forEach(function(sD, index){
+        // Ordering of `data-disease-index` (and color assignments) start from 1; +1 selectedDisease index.
+        selectedMap[sD] = index + 1;
     });
-    let diseaseIndexCounter = 0;
+
     const optionItems = availableDiseases.map(function(aD){
-        const { display_title: title, '@id' : id } = aD;
-        const checked = selectedMap[title];
-        let diseaseIndex; // undefined
-        if (checked){
-            diseaseIndexCounter++;
-            diseaseIndex = diseaseIndexCounter;
-        }
+        const {
+            display_title: title,
+            '@id': id
+        } = aD;
+        const diseaseIndex = selectedMap[title] || null;
+        const checked = !!(diseaseIndex);
+
         return (
             <div className="disease-option" key={id}>
                 <Checkbox checked={checked}
-                    onChange={onChange} name={title}
+                    onChange={onToggleSelectedDisease} name={title}
                     className="text-400">
                     <span className="align-middle text-400">{ title }</span>
                 </Checkbox>

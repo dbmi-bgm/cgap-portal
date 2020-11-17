@@ -194,17 +194,15 @@ table.matrix {
 			margin-top: 12px;
 			margin-bottom: 12px;
 			cursor: pointer;
+			display: flex;
+			align-items: center;
 
 			i.icon {
 				font-size: 0.875rem;
-				margin-right: 3px;
 				position: relative;
 				top: -1px;
 				&.toggle-open-icon {
 					cursor: pointer;
-					margin-right: 6px;
-					padding: 2px 0;
-					margin-left: 8px;
 					opacity: 0.66;
 				}
 			}

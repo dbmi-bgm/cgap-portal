@@ -2,7 +2,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "d1adcf9d-ed11-4f43-a7a6-a4149f2ae8f2",
         "var_conseq_name" : "transcript_ablation",
         "var_conseq_id" : "SO:0001893",
@@ -14,7 +14,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "fed5c87b-7aaa-4b6a-a6e5-3b821c2078a9",
         "var_conseq_name" : "inframe_insertion",
         "var_conseq_id" : "SO:0001821",
@@ -26,7 +26,7 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "4222bb1b-557e-4e61-80cc-73f58f7166ae",
         "var_conseq_name" : "regulatory_region_amplification",
         "var_conseq_id" : "SO:0001891",

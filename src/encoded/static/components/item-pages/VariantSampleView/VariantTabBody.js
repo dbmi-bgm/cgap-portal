@@ -298,13 +298,13 @@ function ClinVarSubmissionEntry({ submission, index = 0 }){
     } = submission;
 
     const interpretation = clinvar_submission_interpretation || fallbackElem;
-    const fakeStatusValue = clinvar_submission_interpretation ? ClinVarSubmissionEntry.interpretationStatusMap[clinvar_submission_interpretation.toLowerCase()] || null : null;
+    const fakeStatusValue = clinvar_submission_interpretation ? clinvar_submission_interpretation.toLowerCase() : null;
 
     return (
         <div className={"my-1 border rounded p-1" + (index % 2 === 0 ? " bg-light" : "")}>
             <div className="row align-items-center text-small">
                 <div className="col-3" data-field="clinvar_submission_interpretation">
-                    <i className="item-status-indicator-dot mr-07 ml-05" data-status={fakeStatusValue} />
+                    <i className="status-indicator-dot mr-07 ml-05" data-status={fakeStatusValue} />
                     { interpretation }
                 </div>
                 <div className="col-2">
@@ -320,13 +320,6 @@ function ClinVarSubmissionEntry({ submission, index = 0 }){
         </div>
     );
 }
-// We re-use color definitions for Item.status to color our interpretation status icon.
-ClinVarSubmissionEntry.interpretationStatusMap = {
-    "risk factor" : "deleted", // red
-    "benign" : "released", // green
-    "likely benign" : "released", // green
-    "uncertain significance" : "in review" // yellow
-};
 
 function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;

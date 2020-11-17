@@ -50,12 +50,13 @@ from ..authentication import session_properties
 from ..search.search import make_search_subreq
 from .base import (
     Item,
-    ALLOW_SUBMITTER_ADD,
     get_item_or_none,
     collection_add,
     item_edit,
+    PROJECT_MEMBER_CREATE_ACL,
     # lab_award_attribution_embed_list,
 )
+from ..util import check_user_is_logged_in
 
 
 logging.getLogger('boto3').setLevel(logging.CRITICAL)
@@ -148,7 +149,7 @@ def property_closure(request, propname, root_uuid):
 @abstract_collection(
     name='files',
     unique_key='accession',
-    acl=ALLOW_SUBMITTER_ADD,
+    acl=PROJECT_MEMBER_CREATE_ACL,
     properties={
         'title': 'Files',
         'description': 'Listing of Files',
@@ -710,6 +711,8 @@ def is_file_to_download(properties, file_format, expected_filename=None):
              permission='view', subpath_segments=[0, 1])
 def download(context, request):
     """ File download route. Generates a pre-signed S3 URL for the object that expires eventually. """
+    check_user_is_logged_in(request)
+
     # first check for restricted status
     try:
         user_props = session_properties(context, request)

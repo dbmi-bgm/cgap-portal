@@ -1,4 +1,5 @@
 import json
+import os
 import boto3
 import pytz
 import datetime
@@ -14,6 +15,7 @@ from pyramid.httpexceptions import (
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
 from ..util import resolve_file_path
+from ..inheritance_mode import InheritanceMode
 from snovault import (
     calculated_property,
     collection,
@@ -94,6 +96,46 @@ def build_variant_display_title(chrom, pos, ref, alt, sep='>'):
     )
 
 
+def load_extended_descriptions_in_schemas(schema_object, depth=0):
+    '''
+    MODIFIES SCHEMA_OBJECT **IN PLACE** RECURSIVELY
+    :param schema_object: A dictionary of any type that might have 'extended_description', 'properties', or 'items.properties'. Should be an Item schema initially.
+    :param depth: Don't supply this. Used to check/optimize at depth=0 where schema_object is root of schema.
+    TODO:
+        Maybe reuse and/or move somewhere more global/easy-to-import-from?
+        Maybe in base.py?
+    '''
+
+    if depth == 0:
+        # Root of Item schema, no extended_description here, but maybe facets or columns
+        # have own extended_description to load also.
+        if "properties" in schema_object:
+            load_extended_descriptions_in_schemas(schema_object["properties"], depth + 1)
+        if "facets" in schema_object:
+            load_extended_descriptions_in_schemas(schema_object["facets"], depth + 1)
+        if "columns" in schema_object:
+            load_extended_descriptions_in_schemas(schema_object["columns"], depth + 1)
+
+        return schema_object
+
+    for field_name, field_schema in schema_object.items():
+        if "extended_description" in field_schema:
+            if field_schema["extended_description"][-5:] == ".html":
+                html_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../..", field_schema["extended_description"])
+                with open(html_file_path) as open_file:
+                    field_schema["extended_description"] = "".join([ l.strip() for l in open_file.readlines() ])
+
+        # Applicable only to "properties" of Item schema, not columns or facets:
+        if "type" in field_schema:
+            if field_schema["type"] == "object" and "properties" in field_schema:
+                load_extended_descriptions_in_schemas(field_schema["properties"], depth + 1)
+                continue
+
+            if field_schema["type"] == "array" and "items" in field_schema and field_schema["items"]["type"] == "object" and "properties" in field_schema["items"]:
+                load_extended_descriptions_in_schemas(field_schema["items"]["properties"], depth + 1)
+                continue
+
+
 @collection(
     name='variants',
     properties={
@@ -150,8 +192,36 @@ class VariantSample(Item):
     """Class for variant samples."""
 
     item_type = 'variant_sample'
-    schema = load_schema('encoded:schemas/variant_sample.json')
+    schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant_sample.json'))
     embedded_list = build_variant_sample_embedded_list()
+    FACET_ORDER_OVERRIDE = {
+        'inheritance_modes': {
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_STRONG: 1,  # de novo (strong)
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_MEDIUM: 2,  # de novo (medium)
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_WEAK: 3,  # de novo (weak)
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_CHRXY: 4,  # de novo (chrXY) XXX: no GATK?
+            InheritanceMode.INHMODE_LABEL_RECESSIVE: 5,  # Recessive
+            'Compound Het (Phased/strong_pair)': 6,  # cmphet all auto-generated, see compute_cmphet_inheritance_modes
+            'Compound Het (Phased/medium_pair)': 7,
+            'Compound Het (Phased/weak_pair)': 8,
+            'Compound Het (Unphased/strong_pair)': 9,
+            'Compound Het (Unphased/medium_pair)': 10,
+            'Compound Het (Unphased/weak_pair)': 11,
+            InheritanceMode.INHMODE_LABEL_LOH: 12,  # Loss of Heterozygousity
+            InheritanceMode.INHMODE_DOMINANT_MOTHER: 13,  # Dominant (maternal)
+            InheritanceMode.INHMODE_DOMINANT_FATHER: 14,  # Dominant (paternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER: 15,  # X-linked recessive (Maternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER: 16,  # X-linked dominant (Maternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER: 17,  # X-linked dominant (Paternal)
+            InheritanceMode.INHMODE_LABEL_Y_LINKED: 18,  # Y-linked dominant
+            InheritanceMode.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT: 19,  # Low relevance, homozygous in a parent
+            InheritanceMode.INHMODE_LABEL_NONE_MN: 20,  # Low relevance, multiallelic site family
+            InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 21,  # Low relevance, present in both parent(s)
+            InheritanceMode.INHMODE_LABEL_NONE_DOT: 22,  # Low relevance, missing call(s) in family
+            InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 23,  # Low relevance, mismatching chrXY genotype(s)
+            '_default': 1000  # arbitrary large number
+        }
+    }
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
@@ -169,9 +239,11 @@ class VariantSample(Item):
         "type": "string"
     })
     def display_title(self, request, CALL_INFO, variant=None):
-        variant = get_item_or_none(request, variant, 'Variant')
+        variant = get_item_or_none(request, variant, 'Variant', frame='raw')
+        variant_display_title = build_variant_display_title(variant['CHROM'], variant['POS'],
+                                                            variant['REF'], variant['ALT'])
         if variant:
-            return CALL_INFO + ':' + variant['display_title']  # HG002:chr1:504A>T
+            return CALL_INFO + ':' + variant_display_title  # HG002:chr1:504A>T
         return CALL_INFO
 
     @calculated_property(schema={
@@ -217,7 +289,9 @@ class VariantSample(Item):
         "type": "string"
     })
     def bam_snapshot(self, request, file, variant):
-        variant_props = get_item_or_none(request, variant, 'Variant')
+        variant_props = get_item_or_none(request, variant, 'Variant', frame='raw')
+        if variant_props is None:
+            raise RuntimeError('Got none for something that definitely exists')
         file_path = '%s/bamsnap/chr%s:%s.png' % (  # file = accession of associated VCF file
             file, variant_props['CHROM'], variant_props['POS']
         )

@@ -11,5 +11,28 @@
         "table-of-contents": {
             "enabled": false
         }
+    },
+    {
+        "name": "help/portal_ontology_usage",
+        "uuid": "dc5305dc-9b1c-461e-872d-6810d98e6fa5",
+        "title": "Ontology Usage",
+        "status": "current",
+        "aliases": ["hdmi-dbmi:ontology_help_usage"],
+        "content": [
+            "76a1471a-a9cd-4192-a965-470e241308e3"
+        ],
+        "date_created": "2019-11-12T16:55:50.515197+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267227777",
+        "last_modified": {
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
+            "date_modified": "2019-11-12T21:46:08.653083+00:00"
+        },
+        "schema_version": "3",
+        "table-of-contents": {
+            "enabled": true,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
+        }
     }
 ]

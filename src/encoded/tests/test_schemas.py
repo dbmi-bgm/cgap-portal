@@ -256,9 +256,9 @@ def verify_mixins(loaded_schema, master_mixins):
                 assert mixin_field[key] == schema_field[key]
 
 
-def test_linkTo_saves_uuid(root, submitter, institution):
-    item = root['users'][submitter['uuid']]
-    assert item.properties['submits_for'] == [institution['uuid']]
+def test_linkTo_saves_uuid(root, bgm_user, institution):
+    item = root['users'][bgm_user['uuid']]
+    assert item.properties['institution'] == institution['uuid']
 
 
 def test_mixinProperties():

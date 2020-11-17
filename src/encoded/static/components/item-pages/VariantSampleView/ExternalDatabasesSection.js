@@ -62,7 +62,11 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
     }
 
     const externalDatabaseSchemaFields = externalDatabaseFieldnames.map(function(fieldName){
-        const propertySchema = schemaTransforms.getSchemaProperty(fieldName, schemas, itemType); // We get .items from this if array field. Might change in future.
+        let propertySchema = schemaTransforms.getSchemaProperty(fieldName, schemas, itemType);
+        // (Might change in future:) We get .items from this if array field since link & such defined in it.
+        if (propertySchema && propertySchema.items) {
+            propertySchema = propertySchema.items;
+        }
         return [ fieldName, propertySchema ];
     }).filter(function(f){
         // Filter out fields which don't exist in schema yet.
@@ -134,12 +138,12 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
 
         return (
             <div className="row mb-03" key={fieldName}>
-                <div className="col-12 col-xl">
+                <div className="col-12 col-lg">
                     <label className="mb-0 black-label" htmlFor={"external_resource_for_" + fieldName} data-tip={schemaDescription}>
                         { schemaTitle || fieldName }
                     </label>
                 </div>
-                <div className="col-12 col-xl-auto">
+                <div className="col-12 col-lg-auto">
                     { val }
                 </div>
             </div>

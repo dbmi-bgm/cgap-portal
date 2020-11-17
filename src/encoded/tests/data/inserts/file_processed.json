@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "uuid": "10002377-49e5-4c33-afab-9ec90d65faf3",
         "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "accession": "GAPFIFYGNO9R",
@@ -10,7 +10,7 @@
         "submitted_by": "koray_kirli@hms.harvard.edu"
     },
     {
-        "status": "released",
+        "status": "shared",
         "uuid": "10002377-49e5-4c33-afab-9ec90d65faa1",
         "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "accession": "GAPFIFYGNO1A",
@@ -20,7 +20,7 @@
         "submitted_by": "koray_kirli@hms.harvard.edu"
     },
     {
-        "status": "released",
+        "status": "shared",
         "uuid": "10002377-49e5-4c33-afab-9ec90d65faa2",
         "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "accession": "GAPFIFYGNO2B",
@@ -30,7 +30,7 @@
         "submitted_by": "koray_kirli@hms.harvard.edu"
     },
     {
-        "status": "released",
+        "status": "shared",
         "uuid": "10002377-49e5-4c33-afab-9ec90d65faa3",
         "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "accession": "GAPFIFYGNO3C",

@@ -26,7 +26,6 @@
             "ff_flag": "second round",
             "type": "string",
             "pattern": "^[\\w+=,.@-]*$",
-            "exclude_from": ["submit4dn"],
             "comment": "ultimately uploaded filename will be uuid/accession, but filename with no directory will be store in metadata as passed in"
         },
         "file_format": {
@@ -75,7 +74,7 @@
             "description": "The md5sum of the file being transferred.",
             "comment": "This can vary for files of same content gzipped at different times",
             "type": "string",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "ff_flag":"clear edit",
             "format": "hex"
         },
@@ -84,13 +83,13 @@
             "description": "The MD5sum of the uncompressed file.",
             "comment": "This is only relavant for gzipped files.",
             "type": "string",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "format": "hex",
             "uniqueKey": "file:content_md5sum"
         },
         "file_size": {
             "title": "File Size",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "description": "Size of file on disk.",
             "comment": "File size is specified in bytes - presumably this can be a calculated property as well",
             "type": "integer"
@@ -115,19 +114,19 @@
                     "href": {
                         "title": "Download URL",
                         "type": "string",
-                        "exclude_from": ["submit4dn", "FFedit-create"]
+                        "exclude_from": ["FFedit-create"]
                     },
                     "md5sum": {
                         "title": "MD5sum",
                         "description": "The md5sum of the extra file.",
                         "type": "string",
-                        "exclude_from": ["submit4dn", "FFedit-create"],
+                        "exclude_from": ["FFedit-create"],
                         "ff_flag":"clear edit",
                         "format": "hex"
                     },
                     "file_size": {
                         "title": "File Size",
-                        "exclude_from": ["submit4dn", "FFedit-create"],
+                        "exclude_from": ["FFedit-create"],
                         "description": "Size of file of the extra file.",
                         "comment": "File size is specified in bytes",
                         "type": "integer"
@@ -142,11 +141,8 @@
                             "upload failed",
                             "to be uploaded by workflow",
                             "current",
-                            "released",
+                            "shared",
                             "replaced",
-                            "released to project",
-                            "released to institution",
-                            "in public review",
                             "in review",
                             "obsolete",
                             "inactive",
@@ -191,7 +187,7 @@
         },
         "restricted": {
             "title": "Is Restricted File",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "description": "A flag to indicate whether this file is subject to restricted access",
             "type": "boolean"
         },
@@ -199,19 +195,15 @@
             "title": "Status",
             "type": "string",
             "default": "uploading",
-            "permission": "import_items",
-            "exclude_from": ["submit4dn"],
+            "permission": "restricted_fields",
             "enum" : [
                 "uploading",
                 "uploaded",
                 "upload failed",
                 "to be uploaded by workflow",
                 "current",
-                "released",
+                "shared",
                 "replaced",
-                "released to project",
-                "released to institution",
-                "in public review",
                 "in review",
                 "obsolete",
                 "inactive",
@@ -223,7 +215,7 @@
             "type": "string",
             "title": "Quality Metric",
             "description": "The associated QC reports",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "linkTo": "QualityMetric"
         },
         "quality_metric_summary": {
@@ -263,49 +255,49 @@
         "override_lab_name": {
             "description": "The lab that did the experiment if not the attributed Lab from whence this file",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_experiment_type": {
             "description": "The type of experiment to which this file is associated",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_biosource_name": {
             "description": "The name of the cell line or tissue sample for this track",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_assay_info": {
             "description": "Information that helps distinguish the assay eg. ChIP-seq target or repliseq phase",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_replicate_info": {
             "description": "Information on which replicate this file belongs",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_experiment_bucket": {
             "description": "Where does a file sit in an experiment or set",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_dataset": {
             "description": "What dataset does the file belong to",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_condition": {
             "description": "What condition distinguishes the members of a dataset",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         }
     },

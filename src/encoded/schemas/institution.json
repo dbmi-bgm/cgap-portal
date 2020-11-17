@@ -12,6 +12,7 @@
         { "$ref": "mixins.json#/aliases" },
         { "$ref": "mixins.json#/submitted" },
         { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/status" },
         { "$ref": "mixins.json#/static_embeds" }
     ],
     "properties": {
@@ -19,30 +20,21 @@
             "default": "1"
         },
         "status": {
-            "title": "Status",
-            "type": "string",
-            "default": "current",
-            "permission": "import_items",
-            "enum": [
-                "current",
-                "obsolete",
-                "deleted",
-                "inactive"
-            ]
+            "default": "shared"
         },
         "name": {
             "title": "Name",
             "description": "A unique name for the institution.",
             "type": "string",
-            "uniqueKey": "institution:name",
-            "permission": "import_items"
+            "uniqueKey": true,
+            "permission": "restricted_fields",
+            "pattern": "^[A-Za-z0-9\\-]+$"
         },
         "title": {
             "title": "Title",
             "description": "A unique title for the instituion.",
             "type": "string",
-            "uniqueKey": "institution:name",
-            "permission": "import_items"
+            "permission": "restricted_fields"
         },
         "pi": {
             "title": "P.I.",

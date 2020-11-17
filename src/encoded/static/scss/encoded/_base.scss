@@ -1,6 +1,10 @@
 
 
-/* CGAP-Theme-Specific Variables */
+/*************************************************************
+ ************ CGAP-Brand-Specific Variables & Config *********
+ *************************************************************/
+ 
+/* Some may overwrite Bootstrap variables */
 /* (some might be deprecated or carried over from ENCODE/4DN) */
 
 $mainThemeColor: 			#ffffff; /* i.e. the background color ..for now */
@@ -34,18 +38,20 @@ $line-height-base: 1.475; // Default: 1.5. Customized for source sans pro fit
 $dropdown-link-hover-bg: #ddd;
 
 
-/* TabBar stuff for Item Pages, and maybe some similar places */
-$tabbar-bg-color : #ececec !default;
-$tabbar-text-color : #333 !default;
-$tabbar-text-active-color: #000 !default;
-$tabbar-bg-active-color: #fff !default;
-// If override this, check e.g. CaseView Pedigree Tab height dimensioning (JS) since this 46px is accounted for in calculations
-$tabbar-height: 46px;
+
 
 
 /*****************************/
 /**** Bootstrap Variables ****/
 /*****************************/
+
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1500px        // < xl is overridden from default of 1200px; others are Bootstrap v4 defaults
+);
 
 $border-radius-base:                        3px;
 $border-radius-large:                       4px;
@@ -121,11 +127,33 @@ $card-bg: #fff;
 $card-inner-border-radius: 3px;
 $card-border-color: rgba(0,0,0,0.08); // Lighter
 
+/* Header Font Sizes */
+
+$h1-font-size: 2.6rem;
+$h2-font-size: 2.1rem;
+$h3-font-size: 1.7rem;
+$h4-font-size: 1.3rem;
+$h5-font-size: 1rem;
+$h6-font-size: 0.85rem;
+
 /****************************/
 /** FontAwesome Icon Stuff **/
 /****************************/
+
 $fa-font-path: "/static/font/fontawesome5.9" !default;
 $fa-font-size-base: $font-size-base;
 $fa-css-prefix: icon;
 
 $fa-font-family: 'Font Awesome 5 Free';
+
+
+/**************************************************************
+ * TabBar stuff for Item Pages, and maybe some similar places *
+ **************************************************************/
+
+$tabbar-bg-color : #ececec !default;
+$tabbar-text-color : #333 !default;
+$tabbar-text-active-color: #000 !default;
+$tabbar-bg-active-color: #fff !default;
+// If override this, check e.g. CaseView Pedigree Tab height dimensioning (JS) since this 46px is accounted for in calculations
+$tabbar-height: 46px;

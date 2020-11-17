@@ -41,7 +41,8 @@ from ..server_defaults import get_userid, add_last_modified
 
 
 # Item acls
-ONLY_ADMIN_VIEW = [
+# TODO (C4-332): consolidate all acls into one place - i.e. their own file
+ONLY_ADMIN_VIEW_ACL = [
     (Allow, 'group.admin', ['view', 'edit']),
     (Allow, 'group.read-only-admin', ['view']),
     (Allow, 'remoteuser.INDEXER', ['view']),
@@ -49,54 +50,42 @@ ONLY_ADMIN_VIEW = [
     (Deny, Everyone, ['view', 'edit'])
 ]
 
-# This acl allows item creation; it is easily overwritten in lab and user,
-# as these items should not be available for creation
-SUBMITTER_CREATE = [
-    (Allow, 'group.submitter', 'create')
+""" This acl allows item creation; it should be overwritten with an empty
+    list in Item types a project member user should not be able to create
+    likely worthwhile to review and set it up in the opposite way as there
+    will probably be more items than a regular user shouldn't create
+    this gets added to the Collection class __init__
+"""
+PROJECT_MEMBER_CREATE_ACL = [
+    (Allow, 'group.project_editor', 'add'),
+    (Allow, 'group.project_editor', 'create'),
 ]
 
-ALLOW_OWNER_EDIT = [
-    (Allow, 'role.owner', ['edit', 'view', 'view_details']),
-]
-
-ALLOW_EVERYONE_VIEW = [
+# this is for pages that should be visible to public
+ALLOW_EVERYONE_VIEW_ACL = [
     (Allow, Everyone, 'view'),
-] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
+] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
-ALLOW_PROJECT_MEMBER_VIEW = [
-    (Allow, 'role.project_member', 'view'),
-] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
+# view for shared items - add a status for common cgap items
+# not sure if we want project members to have create on these?
+ALLOW_AUTHENTICATED_VIEW_ACL = [
+    (Allow, Authenticated, 'view'),
+] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
-# institutions are more general than projects
-ALLOW_INSTITUTION_MEMBER_VIEW = [
-    (Allow, 'role.institution_member', 'view'),
-] + ALLOW_PROJECT_MEMBER_VIEW
+ALLOW_PROJECT_MEMBER_EDIT_ACL = [
+    (Allow, 'role.project_editor', ['view', 'edit']),
+] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
-ALLOW_INSTITUTION_MEMBER_EDIT = [
-    (Allow, 'role.institution_submitter', 'edit'),
-] + ALLOW_INSTITUTION_MEMBER_VIEW
 
-ALLOW_CURRENT_AND_SUBMITTER_EDIT = [
-    (Allow, Everyone, 'view'),
-    (Allow, 'role.institution_submitter', 'edit'),
-] + ONLY_ADMIN_VIEW + SUBMITTER_CREATE
+ALLOW_PROJECT_MEMBER_VIEW_ACL = [
+    (Allow, 'role.project_editor', 'view'),
+] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
-ALLOW_CURRENT = ALLOW_EVERYONE_VIEW
-
-DELETED = [
+DELETED_ACL = [
     (Deny, Everyone, 'visible_for_edit')
-] + ONLY_ADMIN_VIEW
+] + ONLY_ADMIN_VIEW_ACL
 
-# Collection acls
-ALLOW_SUBMITTER_ADD = [
-    (Allow, 'group.submitter', 'add'),
-]
-
-ALLOW_ANY_USER_ADD = [
-    (Allow, Authenticated, 'add'),
-] + ALLOW_EVERYONE_VIEW
-
-
+ALLOW_PROJECT_MEMBER_ADD_ACL = PROJECT_MEMBER_CREATE_ACL
 
 
 def get_item_or_none(request, value, itype=None, frame='object'):
@@ -180,22 +169,6 @@ static_content_embed_list = [
     "static_content.content.filetype"
 ]
 
-# lab_award_attribution_embed_list = [
-#     "award.project",
-#     "award.center_title",
-#     "lab.city",
-#     "lab.state",
-#     "lab.country",
-#     "lab.postal_code",
-#     "lab.city",
-#     "lab.display_title",
-#     "lab.url",
-#     "lab.correspondence",                                # Not a real linkTo - temp workaround
-#     "contributing_labs.correspondence",                  # Not a real linkTo - temp workaround
-#     "submitted_by.timezone",
-#     "submitted_by.job_title"
-# ]
-
 
 class AbstractCollection(snovault.AbstractCollection):
     """smth."""
@@ -248,12 +221,9 @@ class Collection(snovault.Collection, AbstractCollection):
         if hasattr(self, '__acl__'):
             return
 
-        # If no ACLs are defined for collection, allow submitter add/create
-        # if the collection schema includes 'institution'
-        # collections should be setup after all types are registered.
-        # Don't access type_info.schema here as that precaches calculated schema too early.
-        if 'institution' in self.type_info.factory.schema['properties']:
-            self.__acl__ = ALLOW_SUBMITTER_ADD
+        # If no ACLs are defined for collection, allow project members to create
+        if 'project' in self.type_info.factory.schema['properties']:
+            self.__acl__ = ALLOW_PROJECT_MEMBER_ADD_ACL
 
 
 @snovault.abstract_collection(
@@ -269,22 +239,24 @@ class Item(snovault.Item):
     Collection = Collection
     STATUS_ACL = {
         # standard_status
-        'current': ALLOW_CURRENT,
-        'released': ALLOW_CURRENT,
-        'replaced': ALLOW_CURRENT,
-        'released to project': ALLOW_PROJECT_MEMBER_VIEW,
-        'released to institution': ALLOW_INSTITUTION_MEMBER_VIEW,
-        'in public review': ALLOW_CURRENT_AND_SUBMITTER_EDIT,
-        'in review': ALLOW_INSTITUTION_MEMBER_EDIT,
-        'obsolete': DELETED,
-        'inactive': ALLOW_INSTITUTION_MEMBER_VIEW,
-        'deleted': DELETED
+        'shared': ALLOW_AUTHENTICATED_VIEW_ACL,
+        'obsolete': ALLOW_AUTHENTICATED_VIEW_ACL,
+        'current': ALLOW_PROJECT_MEMBER_EDIT_ACL,
+        'inactive': ALLOW_PROJECT_MEMBER_VIEW_ACL,
+        'in review': ALLOW_PROJECT_MEMBER_EDIT_ACL,
+        'uploaded': ALLOW_PROJECT_MEMBER_EDIT_ACL,
+        'uploading': ALLOW_PROJECT_MEMBER_EDIT_ACL,
+        'deleted': DELETED_ACL,
+        'replaced': ONLY_ADMIN_VIEW_ACL,
+        # everyone view - restrict to specific items via schema
+        'public': ALLOW_EVERYONE_VIEW_ACL
     }
+    FACET_ORDER_OVERRIDE = {}  # empty by default
 
     # Items of these statuses are filtered out from rev links
-    filtered_rev_statuses = ('deleted', 'replaced')
+    filtered_rev_statuses = ('deleted')
 
-    # Default embed list for all 4DN Items
+    # Default embed list for all CGAP Items
     embedded_list = static_content_embed_list
 
     def __init__(self, registry, models):
@@ -302,30 +274,35 @@ class Item(snovault.Item):
         return properties.get(self.name_key, None) or self.uuid
 
     def __acl__(self):
-        """smth."""
+        """This sets the ACL for the item based on mapping of status to ACL.
+           If there is no status or the status is not included in the STATUS_ACL
+           lookup then the access is set to admin only
+        """
         # Don't finalize to avoid validation here.
         properties = self.upgrade_properties().copy()
         status = properties.get('status')
-        return self.STATUS_ACL.get(status, ALLOW_INSTITUTION_MEMBER_EDIT)
+        return self.STATUS_ACL.get(status, ONLY_ADMIN_VIEW_ACL)
 
     def __ac_local_roles__(self):
-        """this creates roles based on properties of the object being accessed"""
+        """Adds additional information allowing access of the Item based on
+           properties of the Item - currently most important is Project.
+           eg. ITEM.__ac_local_roles = {
+                    institution.uuid: role.institution_member,
+                    project.uuid: role.project_member
+                }
+          """
         roles = {}
         properties = self.upgrade_properties()
         if 'institution' in properties:
-            inst_submitters = 'submits_for.%s' % properties['institution']
-            roles[inst_submitters] = 'role.institution_submitter'
             # add institution_member as well
             inst_member = 'institution.%s' % properties['institution']
             roles[inst_member] = 'role.institution_member'
+            # to avoid conflation of the project used for attribution of the User ITEM
+            # from the project(s) specified in the project_roles specifying project_editor
+            # role - instead of using 'bare' project
         if 'project' in properties:
-            proj_group_members = 'project.%s' % properties['project']
-            roles[proj_group_members] = 'role.project_member'
-
-        # This emulates __ac_local_roles__ of User.py (role.owner)
-        if 'submitted_by' in properties:
-            submitter = 'userid.%s' % properties['submitted_by']
-            roles[submitter] = 'role.owner'
+            project_editors = 'editor_for.%s' % properties['project']
+            roles[project_editors] = 'role.project_editor'
         return roles
 
     def add_accession_to_title(self, title):
@@ -433,7 +410,6 @@ def edit(context, request):
 
 @snovault.calculated_property(context=Item, category='action')
 def create(context, request):
-    """If the user submits for any institution, allow them to create"""
     if request.has_permission('create'):
         return {
             'name': 'create',
@@ -441,7 +417,6 @@ def create(context, request):
             'profile': '/profiles/{ti.name}.json'.format(ti=context.type_info),
             'href': '{item_uri}?currentAction=create'.format(item_uri=request.resource_path(context)),
         }
-
 
 
 @view_config(
@@ -465,14 +440,14 @@ def collection_add(context, request, render=None):
     # project_needed = False
     # data = request.json
     # schema = context.type_info.schema
-
+    #
     # required_properties = schema.get("required", [])
     # if "institution" in required_properties and "institution" not in data:
     #     institution_needed = True
-
+    #
     # if "project" in required_properties and "project" not in data:
     #     project_needed = True
-
+    #
     # if request.authenticated_userid and (institution_needed or project_needed):
     #     namespace, userid = request.authenticated_userid.split(".", 1)
     #     user_item = get_item_or_none(request, userid, itype="/users/", frame="object")
@@ -481,10 +456,10 @@ def collection_add(context, request, render=None):
     #         new_data["institution"] = user_item["institution"]
     #     if project_needed and "project" in user_item:
     #         new_data["project"] = user_item["project"]
-
+    #
     #     # Override initial JSON body of request (hacky? better way?)
     #     setattr(request, "json", new_data)
-
+    #
     # # Perform validation that would occur otherwise
     # validate_item_content_post(context, request)
     # if request.errors:
@@ -492,9 +467,7 @@ def collection_add(context, request, render=None):
     #         json={'errors': request.errors},
     #         content_type='application/json'
     #     )
-
     return sno_collection_add(context, request, render)
-
 
 
 @view_config(context=Item, permission='edit', request_method='PUT',
@@ -509,13 +482,9 @@ def collection_add(context, request, render=None):
              request_param=['validate=false'])
 @view_config(context=Item, permission='index', request_method='GET',
              validators=[validate_item_content_in_place],
-            request_param=['check_only=true'])
+             request_param=['check_only=true'])
 @debug_log
 def item_edit(context, request, render=None):
     # This works
     # Probably don't need to extend re: institution + project since if editing, assuming these have previously existed.
     return sno_item_edit(context, request, render)
-
-
-    
-

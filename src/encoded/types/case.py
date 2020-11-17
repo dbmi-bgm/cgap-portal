@@ -158,14 +158,17 @@ class Case(Item):
         "individual.samples.files.quality_metric.status",
         "individual.samples.completed_processes",
         "individual.families.uuid",
-        "sample.*",
         "sample.accession",
-        "sample.library_info",
-        "sample.workup_type",
-        "sample.accession",
-        "sample.last_modified.*",
+        "sample.bam_sample_id",
+        "sample.specimen_type",
         "sample.specimen_collection_date",
         "sample.sequencing_date",
+        "sample.workup_type",
+        "sample.library_info",
+        "sample.last_modified.*",
+        "sample.files.status",
+        "sample.completed_processes",
+        "sample.processed_files.file_format.file_format",
         "sample.processed_files.quality_metric.quality_metric_summary.sample",
         "sample.processed_files.quality_metric.quality_metric_summary.title",
         "sample.processed_files.quality_metric.quality_metric_summary.value",
@@ -215,7 +218,8 @@ class Case(Item):
         "active_filterset.filter_blocks.flags_applied",
         "active_filterset.flags",
         "cohort.filter_set.*",
-        "project.name"
+        "project.name",
+        "vcf_file.file_ingestion_status"
     ]
 
     @calculated_property(schema={

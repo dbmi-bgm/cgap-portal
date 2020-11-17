@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "f84f1922-7f4e-4afc-922f-bec620969bf1",
@@ -16,7 +16,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "dd1ef82d-da5e-4680-bd5c-cf471a87eb5b",
@@ -31,7 +31,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "d7fd1020-ae85-41a9-a45d-c66285efa996",
@@ -50,7 +50,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
@@ -69,7 +69,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
@@ -85,7 +85,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
@@ -103,7 +103,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "d13d06c1-218e-4f61-aaf0-91f226248b3c",
@@ -118,7 +118,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "other_allowed_extensions": [
@@ -137,7 +137,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "c0a56f31-d1af-4b88-9041-57b0830eeb8a",
@@ -152,7 +152,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "b01ee86e-b2c7-4725-81d7-798718674485",
@@ -167,7 +167,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
@@ -185,7 +185,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "a112ef25-bd5d-44c1-824a-d5c6156db0a4",
@@ -200,7 +200,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "813b0001-5f3f-4e28-9203-4cdf261e19c4",
@@ -221,7 +221,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
@@ -240,7 +240,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
@@ -259,7 +259,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "fcc2647d-301b-4888-8d9d-83ea4270309c",
@@ -278,7 +278,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "fb728bb4-bc56-46d5-8df5-a05562826b9a",
@@ -293,7 +293,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "d243d800-96b6-4b0a-a0ff-fc81be438365",
@@ -311,7 +311,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "c55ace88-3289-49b0-a67a-c046e1004e5a",
@@ -327,7 +327,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "8db70ed6-0121-4fe1-a72e-d91dc5aa6cd3",
@@ -342,7 +342,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "7373ca48-0b3e-467b-967a-80870846f89b",
@@ -357,7 +357,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "4ed9f7e0-2b2f-4aca-9533-a0a652b43442",
@@ -372,7 +372,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
@@ -391,7 +391,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "11f2fc36-9a65-4d60-9365-d8ff241df4f7",
@@ -406,7 +406,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "106199e5-5a85-4817-9a55-7b31698e1fda",
@@ -421,7 +421,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "f66af4df-c107-44f0-bc94-227f1b4ccf72",
@@ -437,7 +437,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "ec96f95a-cf13-4633-ab0d-c4a5138bbe0b",
@@ -453,7 +453,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "1c7dc723-811c-4fcf-b8e5-d5e17a2013f7",
@@ -469,7 +469,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "4c04f6de-89a7-4477-8dc4-811b50c67401",

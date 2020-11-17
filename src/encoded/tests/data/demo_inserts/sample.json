@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "completed_processes": [
             "WGS_partI_V11"
@@ -45,7 +45,7 @@
                 "value": "A201"
             }
         ],
-        "specimen_type": "blood",
+        "specimen_type": "peripheral blood",
         "date_transported": "2019-03-07",
         "sequence_id": "BAE2201",
         "other_specimen_ids": [
@@ -56,7 +56,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "completed_processes": [
             "WGS_partI_V11"
@@ -101,7 +101,7 @@
                 "value": "A202"
             }
         ],
-        "specimen_type": "blood",
+        "specimen_type": "peripheral blood",
         "date_transported": "2019-03-07",
         "sequence_id": "BAE2202",
         "other_specimen_ids": [
@@ -112,7 +112,7 @@
         ]
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "completed_processes": [
             "WGS_partI_V11"
@@ -157,7 +157,7 @@
                 "value": "A203"
             }
         ],
-        "specimen_type": "blood",
+        "specimen_type": "peripheral blood",
         "date_transported": "2019-03-07",
         "sequence_id": "BAE2203",
         "other_specimen_ids": [
