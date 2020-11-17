@@ -163,9 +163,13 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
-        const { currFilterSet: pastFilterSet, selectedFilterBlockIdx: pastSelectedIdx } = pastProps;
+        const {
+            currFilterSet: pastFilterSet,
+            selectedFilterBlockIdx: pastSelectedIdx,
+            cachedCounts: pastCachedCounts
+        } = pastProps;
         const { bodyOpen: pastBodyOpen } = pastState;
-        const { currFilterSet, selectedFilterBlockIdx } = this.props;
+        const { currFilterSet, selectedFilterBlockIdx, cachedCounts } = this.props;
         const { bodyOpen } = this.props;
 
         if (currFilterSet && !pastFilterSet) {
@@ -175,7 +179,12 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             }
         }
 
-        if (pastFilterSet !== currFilterSet || selectedFilterBlockIdx !== pastSelectedIdx || (bodyOpen && !pastBodyOpen)) {
+        if ( // Rebuild tooltips after stuff that affects tooltips changes.
+            pastFilterSet !== currFilterSet || // If FilterSet changes, then some tips likely for it do as well, esp re: validation/duplicate-queries.
+            selectedFilterBlockIdx !== pastSelectedIdx ||
+            (bodyOpen && !pastBodyOpen) || // `data-tip` elems not visible until body mounted in DOM
+            cachedCounts !== pastCachedCounts // Tooltip on filterblocks' counts indicator, if present.
+        ) {
             setTimeout(ReactTooltip.rebuild, 0);
         }
     }
@@ -553,8 +562,20 @@ const FilterBlock = React.memo(function FilterBlock(props){
         name: filterName
     } = filterBlock;
 
-    const isDuplicateQuery = typeof duplicateQueryIndices[index] === "number";
-    const isDuplicateName = typeof duplicateNameIndices[index] === "number";
+    const cachedCount = cachedCounts[index];
+
+    /**
+     * The following 3 assignments are memoized since string comparisons are slower than object
+     * reference and integer comparisons.
+     * Also, `duplicateQueryIndices` etc. are objects (not arrays), but for insertion & lookup,
+     * integer key (`index`) is auto-cast to string in both instances, so works fine. Just
+     * keep in mind if do `Object.keys(duplicateQueryIndices)` or similar at any point, that
+     * would get back list of strings (not ints) and need to compare `parseInt(key) === index`,
+     * if ever necessary.
+     */
+    const isDuplicateQuery = useMemo(function(){ return typeof duplicateQueryIndices[index] === "number"; }, [ duplicateQueryIndices, index ]);
+    const isDuplicateName = useMemo(function(){ return typeof duplicateNameIndices[index] === "number"; }, [ duplicateNameIndices, index ]);
+    const countExists = useMemo(function(){ return typeof cachedCount=== "number"; }, [ cachedCounts, index ]);
 
     const [ isEditingTitle, setIsEditingTitle ] = useState(false);
 
@@ -613,7 +634,8 @@ const FilterBlock = React.memo(function FilterBlock(props){
 
         title = (
             <React.Fragment>
-                <i className={"icon fas mr-1 icon-" + ((selected && isSettingFilterBlockIdx) ? "circle-notch icon-spin" : "times-circle clickable")} onClick={onRemoveClick} />
+                <i className={"icon fas mr-1 icon-" + ((selected && isSettingFilterBlockIdx) ? "circle-notch icon-spin" : "times-circle clickable")}
+                    onClick={onRemoveClick} data-tip="Remove this filter block" />
                 <span className={"text-600" + titleCls} data-tip={isDuplicateName ? "Duplicate title of filter block #" + (duplicateNameIndices[index] + 1) : null}>
                     { filterName || <em>No Name</em> }
                 </span>
@@ -630,7 +652,9 @@ const FilterBlock = React.memo(function FilterBlock(props){
                     { title }
                 </div>
                 <div className="col-auto">
-                    { cachedCounts[index] }
+                    <div className="cached-counts-value" data-count-exists={countExists} data-tip={countExists ? cachedCount + " results found for this filter block." : null}>
+                        { cachedCount }
+                    </div>
                 </div>
             </div>
             <FieldBlocks {...{ filterBlock, facetDict, selected }} />

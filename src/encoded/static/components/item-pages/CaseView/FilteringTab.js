@@ -351,6 +351,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
+    console.log("FILTERTAB", activeFilterSetID);
     const embeddedTableHeader = activeFilterSetID ? (
         <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
             <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets}>
@@ -360,7 +361,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     ) : (
         // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
         // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+        <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem} initialSelectedFilterBlockIdx={0}>
             <FilteringTableFilterSetUI caseItem={context} />
         </FilterSetController>
     );

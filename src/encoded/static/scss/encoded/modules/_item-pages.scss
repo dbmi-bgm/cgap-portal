@@ -2299,7 +2299,10 @@ $download-button-width : 100px;
 			border-radius: $border-radius-lg;
 			background-color: desaturate(lighten($primary, 50%), 15%); // #dce4f5; // TODO: Codify somewhere
 			border: 3px solid transparent;
-			transition: border-color .5s, background-color .5s;
+			// border-color: desaturate(lighten($primary-dark, 40%), 25%); /* Same as .filterset-outer-container background-color */
+			// margin: 0 -3px; /* Subtract border-width to align left + right unselected edges properly w. other UI elements */
+			/* transition: border-color .5s, background-color .5s; */
+			box-shadow: 0 1px 6px -3px black;
 
 			&.selected {
 				border-color: $primary-dark;
@@ -2314,12 +2317,28 @@ $download-button-width : 100px;
 			}
 
 			.title-controls-row {
+
 				i.icon.clickable {
 					opacity: 0.5;
 					&:hover {
 						opacity: 1;
 					}
 				}
+
+				.cached-counts-value {
+					height: 24px;
+					line-height: 20px;
+					min-width: 24px;
+					border: 2px solid transparent;
+					padding: 0 3px;
+					text-align: center;
+					font-size: 0.75em;
+					border-radius: 50%;
+					&[data-count-exists="true"] {
+						border-color: #0005;
+					}
+				}
+
 			}
 
 			.filter-query-viz-blocks {
