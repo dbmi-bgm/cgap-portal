@@ -112,7 +112,8 @@ serverPlugins.push(new webpack.DefinePlugin({
 }));
 
 
-if (env === 'development'){ // Skip for dev-quick
+if (env === 'development'){
+    // Skip for `npm run dev-quick` (`env === "quick"`) since takes a while
     webPlugins.push(
         new BundleAnalyzerPlugin({
             "analyzerMode" : "static",

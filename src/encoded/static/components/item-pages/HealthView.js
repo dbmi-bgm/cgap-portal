@@ -10,6 +10,7 @@ import _ from 'underscore';
 import { ajax, layout, navigate, JWT, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { ItemDetailList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/ItemDetailList';
 import { Term } from './../util/Schemas';
+import { PackageLockLoader } from './../util/package-lock-loader';
 
 /**
  * Fallback content_view for pages which are not specifically 'Items.
@@ -110,6 +111,10 @@ export default class HealthView extends React.PureComponent {
                 title : "Snovault Version",
                 description : "Software version of dcicsnovault being used."
             },
+            'spc_version': {
+                title : "Shared Portal Components Version",
+                description : "Software version of shared-portal-components package being used."
+            },
             'system_bucket' : {
                 title : 'System Bucket',
                 description : "Name of S3 Bucket used for system data."
@@ -149,7 +154,7 @@ export default class HealthView extends React.PureComponent {
         this.setState({ 'mounted' : true });
     }
 
-    /** We only allow this to be called manually, and if are admin, to minimize load on ES */	
+    /** We only allow this to be called manually, and if are admin, to minimize load on ES */
     getCounts(){
         this.setState({
             'db_es_total' : "loading...",
@@ -173,20 +178,22 @@ export default class HealthView extends React.PureComponent {
     render() {
         const { context, schemas, session, windowWidth, href, keyTitleDescriptionMapConfig, keyTitleDescriptionMapCounts, excludedKeys } = this.props;
         const { db_es_compare, db_es_total, mounted } = this.state;
-        const { title: ctxTitle, description } = context;	
-        const notYetLoaded = (db_es_compare === null && db_es_total === null);	
-        const title = typeof ctxTitle === "string" ? ctxTitle : memoizedUrlParse(href).path;
+        const { description } = context;
+        const notYetLoaded = (db_es_compare === null && db_es_total === null);
         const width = layout.gridContainerWidth(windowWidth);
 
         return (
             <div className="view-item container" id="content">
-                <hr/>
-                <h3 className="text-400 mb-2 mt-3">Configuration</h3>
-    
-                {typeof context.description == "string" ? <p className="description">{context.description}</p> : null}
 
-                <ItemDetailList {...{ excludedKeys, context }} hideButtons keyTitleDescriptionMap={keyTitleDescriptionMapConfig}
-                    termTransformFxn={HealthView.termTransformFxn} />
+                <hr/>
+
+                <h3 className="text-400 mb-2 mt-3">Configuration</h3>
+
+                { typeof description === "string" ? <p className="description">{ description }</p> : null }
+
+                <PackageLockLoader>
+                    <DetailListBody {...{ excludedKeys, context }} keyTitleDescriptionMap={keyTitleDescriptionMapConfig} termTransformFxn={HealthView.termTransformFxn} />
+                </PackageLockLoader>
 
                 <DatabaseCountsInfo {...{ notYetLoaded, excludedKeys, schemas, db_es_compare, db_es_total, session, mounted, context, width, keyTitleDescriptionMapCounts }}
                     getCounts={this.getCounts} />
@@ -196,6 +203,32 @@ export default class HealthView extends React.PureComponent {
             </div>
         );
     }
+}
+
+/** Extend context to include shared-portal-components version */
+function DetailListBody({ context: propContext, packageLockJson = null, ...passProps }){
+
+    // extend context to include shared-portal-components version
+    let spcVersionUsed = null;
+
+    if (packageLockJson) {
+        const { dependencies: { '@hms-dbmi-bgm/shared-portal-components': { version: spcVersion = null, from: spcFrom } = {} } } = packageLockJson || {};
+        if (spcFrom && spcFrom.indexOf('#') > -1) { // e.g. github:4dn-dcic/shared-portal-components#0.0.2.70
+            [ spcVersionUsed ] = spcFrom.split('#').splice(-1);
+        } else {
+            spcVersionUsed = spcVersion || "-";
+        }
+    } else {
+        // Assume is still loading
+        // TODO: Maybe allow ItemDetailList to handle JSX values so can throw in spinning indicator icon here.
+        spcVersionUsed = "-";
+    }
+
+    const context = { ...propContext, "spc_version": spcVersionUsed };
+
+    return (
+        <ItemDetailList {...passProps} {...{ context }} hideButtons  />
+    );
 }
 
 const DatabaseCountsInfo = React.memo(function DatabaseCountsInfo(props){
@@ -254,6 +287,10 @@ const DatabaseCountsInfo = React.memo(function DatabaseCountsInfo(props){
 /**
  * This is a React wrapper around a D3 visualization.
  * It is not super performant but is used on a single page, so should be OK / low-priority.
+ *
+ * DO NOT USE THIS AS AN EXAMPLE OF A GOOD REACT + D3 INTEGRATION. THIS IS SIMPLEST INTEGRATION,
+ * NOT CLOSE TO BEING MOST PERFORMANT ONE. BEST (+ more work) WOULD BE TO LET REACT RENDER EVERYTHING
+ * TO THE DOM AND LET D3 ONLY CALCULATE DIMENSIONS.
  */
 class HealthChart extends React.PureComponent {
 
@@ -261,13 +298,17 @@ class HealthChart extends React.PureComponent {
         if (!es_compare || typeof es_compare !== 'object') return null;
         return {
             'name' : 'Indexing Status',
-            'children' : _.filter(_.map(_.pairs(es_compare), function(pair){
-                var itemType = pair[0];
+            'children' : _.filter(_.map(_.pairs(es_compare), function([ itemType, compareString ]){
                 if (itemType === 'ontology_term') return null;
-                var compareString = pair[1];
-                var dbCount = parseInt(compareString.slice(4));
-                var esCount = parseInt(compareString.slice(11 + (dbCount + '').length));
-                return { 'name' : itemType, 'children' : [{ 'name' : 'Indexed', 'size' : esCount }, { 'name' : 'Left to Index', 'size' : dbCount - esCount } ] };
+                const dbCount = parseInt(compareString.slice(4));
+                const esCount = parseInt(compareString.slice(11 + (dbCount + '').length));
+                return {
+                    'name': itemType,
+                    'children': [
+                        { 'name': 'Indexed', 'size': esCount },
+                        { 'name': 'Left to Index', 'size': dbCount - esCount }
+                    ]
+                };
             }))
         };
     }
@@ -297,30 +338,41 @@ class HealthChart extends React.PureComponent {
     }
 
     transitionSize(){
-        if (!this.props.mounted) return null;
-        var svg = this.svgRef && this.svgRef.current && d3.select(this.svgRef.current);
+        const { mounted } = this.props;
+        if (!mounted) return null;
+        const svg = this.svgRef && this.svgRef.current && d3.select(this.svgRef.current);
         svg.selectAll('g').transition()
             .duration(750)
-            .attr('transform', function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
-            .attr("data-tip", function(d){ return '<span class="text-500">' + d.parent.data.name + "</span><br/>" + d.data.size + ' Items (' + (parseInt((d.data.size / (d.parent.value || 1)) * 10000) / 100) + '%)<br/>Status: ' + d.data.name; })
+            .attr('transform', function(d) {
+                return "translate(" + d.x0 + "," + d.y0 + ")";
+            })
+            .attr("data-tip", function(d){
+                return '<span class="text-500">' + d.parent.data.name + "</span><br/>" + d.data.size + ' Items (' + (parseInt((d.data.size / (d.parent.value || 1)) * 10000) / 100) + '%)<br/>Status: ' + d.data.name;
+            })
             .select("rect")
-            .attr("width", function(d) { return d.x1 - d.x0; })
-            .attr("height", function(d) { return d.y1 - d.y0; });
+            .attr("width", function(d) {
+                return d.x1 - d.x0;
+            })
+            .attr("height", function(d) {
+                return d.y1 - d.y0;
+            });
     }
 
     drawTreeMap(){
-        var { width, height, mounted } = this.props;
-
-        var dataToShow = HealthChart.es_compare_to_d3_hierarchy(this.props.db_es_compare);
+        const { width, height, mounted, db_es_compare } = this.props;
+        const dataToShow = HealthChart.es_compare_to_d3_hierarchy(db_es_compare);
 
         if (!dataToShow || !mounted) return null;
 
-        var svg = this.svgRef && this.svgRef.current && d3.select(this.svgRef.current),
-            fader = function(color) { return d3.interpolateRgb(color, "#fff")(0.2); },
-            colorFallback = d3.scaleOrdinal(d3.schemeCategory10.map(fader));
+        const svg = this.svgRef && this.svgRef.current && d3.select(this.svgRef.current);
+        function fader(color) {
+            return d3.interpolateRgb(color, "#fff")(0.2);
+        }
+
+        const colorFallback = d3.scaleOrdinal(d3.schemeCategory10.map(fader));
 
         function colorStatus(origColor, status){
-            var d3Color;
+            let d3Color;
             if (['deleted', 'Left to Index'].indexOf(status) > -1){
                 d3Color = d3.color(origColor);
                 return d3Color.darker(1);
@@ -339,28 +391,28 @@ class HealthChart extends React.PureComponent {
             return origColor;
         }
 
-        var treemap = d3.treemap()
+        const treemap = d3.treemap()
             .tile(d3.treemapResquarify)
             .size([width, height])
             .round(true)
             .paddingInner(1);
 
-        var root = d3.hierarchy(dataToShow)
+        const root = d3.hierarchy(dataToShow)
             .eachBefore(function(d) {d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.name; })
             .sum(function(d){ return d.size; })
             .sort(function(a, b) { return b.height - a.height || b.value - a.value; });
 
         treemap(root);
 
-        var cell = svg.selectAll("g").data(root.leaves(), function(n){
+        const cell = svg.selectAll("g").data(root.leaves(), function(n){
             return n.data.id;
         });
 
         cell.exit().remove();
 
-        var enteringCells = cell.enter();
+        const enteringCells = cell.enter();
 
-        var enteringCellGroups = enteringCells.append("g")
+        const enteringCellGroups = enteringCells.append("g")
             .attr('class', 'treemap-rect-elem')
             .attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
             .attr("data-tip", function(d){ return '<span class="text-500">' + d.parent.data.name + "</span><br/>" + d.data.size + ' Items (' + (parseInt((d.data.size / (d.parent.value || 1)) * 10000) / 100) + '%)<br/>Status: ' + d.data.name; })
@@ -393,7 +445,7 @@ class HealthChart extends React.PureComponent {
     }
 
     render(){
-        var { width, height, mounted } = this.props;
+        const { width, height, mounted } = this.props;
 
         if (!mounted) return null;
 
