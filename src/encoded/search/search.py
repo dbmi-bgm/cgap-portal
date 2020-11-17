@@ -57,6 +57,7 @@ class SearchBuilder:
     DEFAULT_SEARCH_FRAME = 'embedded'
     DEFAULT_HIDDEN = 'default_hidden'
     ADDITIONAL_FACETS = 'additional_facet'
+    MISSING = object()
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):
@@ -882,7 +883,8 @@ class SearchBuilder:
                         for b in bucket_location['buckets']:
 
                             # if ranges match we found our bucket, propagate doc_count into 'ranges' field
-                            if (r.get('from', -1) == b.get('from', -1)) and (r.get('to', -1) == b.get('to', -1)):
+                            if (r.get('from', self.MISSING) == b.get('from', self.MISSING) and
+                                    r.get('to', self.MISSING) == b.get('to', self.MISSING)):
                                 r['doc_count'] = b['doc_count']
                                 break
 
@@ -929,6 +931,8 @@ class SearchBuilder:
                         override = 'stats'
                     elif v == 'nested:range':
                         override = 'range'
+
+                    # apply override
                     if override is not None:
                         facet[k] = override
                         break
