@@ -846,8 +846,8 @@ class LuceneBuilder:
         }
 
     @classmethod
-    def _build_stats_aggregation(cls, field, facet, field_schema, query_field, search_filters, string_query,
-                                 nested_path, aggs, agg_name):
+    def _add_stats_aggregation(cls, field, facet, field_schema, query_field, search_filters, string_query,
+                               nested_path, aggs, agg_name):
         """ Builds a stats aggregation, adding it to the given aggs.
 
             :param field: raw field name we are searching on (ex: AF)
@@ -1003,8 +1003,8 @@ class LuceneBuilder:
             agg_name = field.replace('.', '-')
             facet_type = facet.get('aggregation_type')
             if facet_type in ['stats', 'nested:stats']:
-                cls._build_stats_aggregation(field, facet, field_schema, query_field, search_filters, string_query,
-                                             nested_path, aggs, agg_name)
+                cls._add_stats_aggregation(field, facet, field_schema, query_field, search_filters, string_query,
+                                           nested_path, aggs, agg_name)
             elif facet_type in ['range', 'nested:range']:
                 cls._add_range_aggregation(facet, query_field, search_filters, string_query, nested_path,
                                              aggs, agg_name)
