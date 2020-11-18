@@ -3,7 +3,6 @@ const webpack = require('webpack');
 const env = process.env.NODE_ENV;
 const TerserPlugin = require('terser-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const fs = require('fs');
 
 const PATHS = {
     "static": path.resolve(__dirname, 'src/encoded/static'),
@@ -175,7 +174,8 @@ module.exports = [
         resolve: {
             ...resolve,
             alias: {
-                'higlass-dependencies': path.resolve(__dirname, "./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js")
+                'higlass-dependencies': path.resolve(__dirname, "./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js"),
+                'package-lock.json': path.resolve(__dirname, "./package-lock.json"),
             },
             /**
              * From Webpack CLI:
@@ -209,29 +209,35 @@ module.exports = [
         node: {
             __dirname: true,
         },
-        externals: [ // Anything which is not to be used server-side may be excluded
-            //'higlass-dependencies',
+        externals: [
+            // Anything which is not to be used server-side may be excluded
+            // Anything that generates an extra bundle should be excluded from
+            // server-side build since it might overwrite web bundle's code-split bundles.
+            // But probably some way to append/change name of these chunks in this config.
             {
                 'd3': 'd3',
-                'dagre-d3': 'dagre-d3',
                 '@babel/register': '@babel/register',
                 'higlass-dependencies': 'empty-module',
-                //'higlass/dist/hglib' : '{HiGlassComponent:{}}',
-                // 'higlass-register': 'higlass-register',
-                // 'higlass-sequence': 'higlass-sequence',
-                // 'higlass-transcripts': 'higlass-transcripts',
-                // 'higlass-clinvar': 'higlass-clinvar',
-                // 'higlass-text': 'higlass-text',
-                // 'higlass-orthologs': 'higlass-orthologs',
-                // 'higlass-multivec': 'higlass-multivec',
-                'auth0-lock': 'auth0-lock',
-                'aws-sdk': 'aws-sdk',
-                //'./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js' : './src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js'
-            },
-            //'d3',
-            //'dagre-d3',
-            //'@babel/register', // avoid bundling babel transpiler, which is not used at runtime
-            //'./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js',
+                // These remaining /higlass/ defs aren't really necessary
+                // but probably speed up build a little bit.
+                'higlass/dist/hglib' : 'empty-module',
+                'higlass-register': 'empty-module',
+                'higlass-sequence': 'empty-module',
+                'higlass-transcripts': 'empty-module',
+                'higlass-clinvar': 'empty-module',
+                'higlass-text': 'empty-module',
+                'higlass-orthologs': 'empty-module',
+                'higlass-multivec': 'empty-module',
+                'auth0-lock': 'empty-module',
+                'aws-sdk': 'empty-module',
+                'package-lock.json': 'empty-module',
+                // Below - prevent some stuff in SPC from being bundled in.
+                // These keys are literally matched against the string values, not actual path contents, hence why is "../util/aws".. it exactly what within SPC/SubmissionView.js
+                // We can clean up and change to 'aws-utils' in here in future as well and alias it to spc/utils/aws. But this needs to be synchronized with SPC and 4DN.
+                // We could have some 'ssr-externals.json' file in SPC (letting it define its own, per own version) and merge it into here.
+                // 'aws-utils': 'empty-module',
+                '../util/aws': 'empty-module'
+            }
         ],
         output: {
             path: PATHS.build,

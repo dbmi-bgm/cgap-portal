@@ -3,7 +3,8 @@ module.exports = function(api){
     api.cache(true);
     return {
         "presets" : [
-            [ "@babel/preset-env", { "exclude": ["proposal-dynamic-import"] } ],
+            // We don't need to convert import/export statements.
+            [ "@babel/preset-env", { "modules": false } ],
             "@babel/preset-react",
         ],
         "plugins": [

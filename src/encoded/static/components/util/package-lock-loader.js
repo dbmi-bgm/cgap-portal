@@ -13,7 +13,7 @@ export function PackageLockLoader({ children }){
         if (isLoaded) return;
         import(
             /* webpackChunkName: "package-lock-json" */
-            './../../../../../package-lock.json'
+            'package-lock.json'
         ).then(({ default: packageLockJson }) =>{
             loadedPackageLockJson = packageLockJson;
             setLoaded(true);
