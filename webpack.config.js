@@ -44,7 +44,7 @@ const rules = [
         test: /\.js$/,
         loader: 'string-replace-loader',
         enforce: 'pre',
-        query: {
+        options: {
             search: '@jsx',
             replace: 'jsx',
         }
@@ -81,7 +81,6 @@ const optimization = {
         //})
         new TerserPlugin({
             parallel: true,
-            sourceMap: true,
             terserOptions:{
                 compress: true,
                 mangle: true,
@@ -161,11 +160,11 @@ module.exports = [
         },
         // https://github.com/hapijs/joi/issues/665
         // stub modules on client side depended on by joi (a dependency of jwt)
-        node: {
-            net: "empty",
-            tls: "empty",
-            dns: "empty",
-        },
+        // node: {
+        //     net: "empty",
+        //     tls: "empty",
+        //     dns: "empty",
+        // },
         externals: [
             { 'xmlhttprequest' : '{XMLHttpRequest:XMLHttpRequest}' }
         ],
@@ -173,7 +172,27 @@ module.exports = [
             rules: rules
         },
         optimization: optimization,
-        resolve : resolve,
+        resolve: {
+            ...resolve,
+            alias: {
+                'higlass-dependencies': path.resolve(__dirname, "./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js")
+            },
+            /**
+             * From Webpack CLI:
+             * webpack < 5 used to include polyfills for node.js core modules by default.
+             * This is no longer the case. Verify if you need this module and configure a polyfill for it.
+             * If you want to include a polyfill, you need to:
+             *   - add a fallback 'resolve.fallback: { "zlib": require.resolve("browserify-zlib") }'
+             *   - install 'browserify-zlib'
+             * If you don't want to include a polyfill, you can use an empty module like this:
+             *   resolve.fallback: { "zlib": false }
+             */
+            // fallback: {
+            //     "zlib": false
+            //      TODO: Upgrade to webpack v5.
+            //      TODO: polyfill some, update some to other libs, & exclude rest
+            // }
+        },
         //resolveLoader : resolve,
         devtool: devTool,
         plugins: webPlugins
@@ -191,19 +210,28 @@ module.exports = [
             __dirname: true,
         },
         externals: [ // Anything which is not to be used server-side may be excluded
-            'brace',
-            'brace/mode/json',
-            'brace/theme/solarized_light',
-            'd3',
-            'dagre-d3',
-            '@babel/register', // avoid bundling babel transpiler, which is not used at runtime
-            { 'higlass/dist/hglib' : '{HiGlassComponent:{}}' },
-            'higlass',
-            'higlass-register',
-            'higlass-multivec',
-            'auth0-lock',
-            'aws-sdk',
-            'src/encoded/static/components/utils/aws'
+            //'higlass-dependencies',
+            {
+                'd3': 'd3',
+                'dagre-d3': 'dagre-d3',
+                '@babel/register': '@babel/register',
+                'higlass-dependencies': 'empty-module',
+                //'higlass/dist/hglib' : '{HiGlassComponent:{}}',
+                // 'higlass-register': 'higlass-register',
+                // 'higlass-sequence': 'higlass-sequence',
+                // 'higlass-transcripts': 'higlass-transcripts',
+                // 'higlass-clinvar': 'higlass-clinvar',
+                // 'higlass-text': 'higlass-text',
+                // 'higlass-orthologs': 'higlass-orthologs',
+                // 'higlass-multivec': 'higlass-multivec',
+                'auth0-lock': 'auth0-lock',
+                'aws-sdk': 'aws-sdk',
+                //'./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js' : './src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js'
+            },
+            //'d3',
+            //'dagre-d3',
+            //'@babel/register', // avoid bundling babel transpiler, which is not used at runtime
+            //'./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js',
         ],
         output: {
             path: PATHS.build,
@@ -212,12 +240,15 @@ module.exports = [
             chunkFilename: chunkFilename,
         },
         module: {
-            rules: rules.concat([
-                { parser: { requireEnsure: false } }
-            ])
+            rules
         },
         optimization: optimization,
-        resolve : resolve,
+        resolve: {
+            ...resolve,
+            // fallback: {
+            //     "zlib": false
+            // }
+        },
         //resolveLoader : resolve,
         devtool: devTool, // No way to debug/log serverside JS currently, so may as well speed up builds for now.
         plugins: serverPlugins

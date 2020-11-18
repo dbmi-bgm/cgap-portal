@@ -3,7 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import { console, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, object, ajax, isServerSide } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { requestAnimationFrame } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 import { PackageLockLoader } from './../../../util/package-lock-loader';
 
@@ -44,9 +44,11 @@ export function HiGlassLoadingIndicator(props) {
     );
 }
 
-/** Loaded upon componentDidMount; HiGlassComponent is not supported server-side. */
-let HiGlassComponent = null;
-let higlassRegister = null;
+let higlassDependencies = null;
+
+// /** Loaded upon componentDidMount; HiGlassComponent is not supported server-side. */
+// let HiGlassComponent = null;
+// let higlassRegister = null;
 
 export class HiGlassPlainContainer extends React.PureComponent {
 
@@ -115,20 +117,17 @@ export class HiGlassPlainContainer extends React.PureComponent {
         };
 
         setTimeout(()=>{ // Allow tab CSS transition to finish (the render afterwards lags browser a little bit).
-            if (!HiGlassComponent) {
+
+            if (!higlassDependencies) {
                 window.fetch = window.fetch || ajax.fetchPolyfill; // Browser compatibility polyfill
 
                 // Load in HiGlass libraries as separate JS file due to large size.
-                // @see https://webpack.js.org/api/module-methods/#requireensure
-                // TODO figure out how to use import() syntax to load multiple dependencies, to keep HiGlass working.
-                require.ensure(['higlass/dist/hglib', 'higlass-register'], (require) => {
-                    HiGlassComponent = require('higlass/dist/hglib').HiGlassComponent;
-                    higlassRegister = require('higlass-register').default;
-                    const SequenceTrack = require('higlass-sequence/es/SequenceTrack').default;
-                    const TranscriptsTrack = require('higlass-transcripts/es/TranscriptsTrack').default;
-                    const ClinvarTrack = require('higlass-clinvar/es/ClinvarTrack').default;
-                    const TextTrack = require('higlass-text/es/TextTrack').default;
-                    const OrthologsTrack = require('higlass-orthologs/es/OrthologsTrack').default;
+                import(
+                    /* webpackChunkName: "higlass-dependencies" */
+                    'higlass-dependencies'
+                ).then((loadedDeps) =>{
+                    higlassDependencies = loadedDeps;
+                    const { higlassRegister, SequenceTrack, TranscriptsTrack, ClinvarTrack, TextTrack, OrthologsTrack } = higlassDependencies;
 
                     higlassRegister({
                         name: 'SequenceTrack',
@@ -157,7 +156,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
                     });
 
                     finish();
-                }, "higlass-utils-bundle");
+                });
 
             } else {
                 finish();
@@ -217,6 +216,7 @@ const HiGlassPlainContainerBody = React.forwardRef(function HiGlassPlainContaine
     const { viewConfig, options, hasRuntimeError, disabled, isValidating, mounted, higlassInitialized, width, height, mountCount, placeholder, style, className, packageLockJson } = props;
     const outerKey = "mount-number-" + mountCount;
     const { dependencies: { higlass : { version: higlassVersionUsed = null } = {} } = {} } = packageLockJson || {};
+    const { HiGlassComponent } = higlassDependencies || {};
 
     let hiGlassInstance = null;
 
