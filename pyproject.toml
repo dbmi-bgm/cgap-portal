@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "4.2.6"
+version = "4.3.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -42,7 +42,7 @@ certifi = ">=2020.11.8"
 chardet = "3.0.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
-dcicsnovault = "^4.0.12"
+dcicsnovault = "4.1.0"
 dcicutils = "^1.4.0"
 docutils = "0.12"
 elasticsearch = "6.4.0"
@@ -63,10 +63,10 @@ numpy = "1.19.1" # negspy needs it
 passlib = "1.6.5"
 PasteDeploy = "1.5.2"
 pbkdf2 = "1.3"
-Pillow = "3.1.1"  # Higher version might be causing a problem
+Pillow = "^6.2.2"  # 6.x.x should work for CGAP -Will 11/18/2020 
 plaster = "1.0"
 plaster-pastedeploy = "0.6"
-psutil = "^4.3.0"
+psutil = "^5.6.6"
 psycopg2-binary = "2.7.7"
 py = "1.4.31"
 pyasn1 = "0.1.9"
