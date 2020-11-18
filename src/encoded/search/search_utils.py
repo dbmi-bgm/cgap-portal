@@ -33,6 +33,7 @@ NESTED = 'nested'
 PATH = 'path'
 TERMS = 'terms'
 RANGE = 'range'
+STATS = 'stats'
 AGGS = 'aggs'
 REVERSE_NESTED = 'reverse_nested'
 # just for book-keeping/readability but is 'unused' for now
@@ -48,6 +49,9 @@ COMMON_EXCLUDED_URI_PARAMS = [
     'currentAction', 'additional_facet'
 ]
 MAX_FACET_COUNTS = 100
+RAW_FIELD_AGGREGATIONS = [
+    'stats', 'nested:stats', 'date_histogram', 'histogram', 'range', 'nested:range',
+]
 
 
 # Exception Classes
@@ -221,7 +225,7 @@ def get_query_field(field, facet):
         return 'embedded.@type.raw'
     elif not is_schema_field(field):
         return field + '.raw'
-    elif facet.get('aggregation_type') in ('stats', 'date_histogram', 'histogram', 'range'):
+    elif facet.get('aggregation_type') in RAW_FIELD_AGGREGATIONS:
         return 'embedded.' + field
     else:
         return 'embedded.' + field + '.raw'

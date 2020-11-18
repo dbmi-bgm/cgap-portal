@@ -57,6 +57,7 @@ class SearchBuilder:
     DEFAULT_SEARCH_FRAME = 'embedded'
     DEFAULT_HIDDEN = 'default_hidden'
     ADDITIONAL_FACETS = 'additional_facet'
+    MISSING = object()
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):
@@ -616,7 +617,7 @@ class SearchBuilder:
             if 'facets' in current_type_schema:
                 schema_facets = OrderedDict(current_type_schema['facets'])
                 for schema_facet in schema_facets.items():
-                    if schema_facet[1].get('disabled', False):
+                    if schema_facet[1].get('disabled', False) or schema_facet[1].get(self.DEFAULT_HIDDEN, False):
                         disabled_facets.append(schema_facet[0])
                         continue  # Skip disabled facets.
                     facets.append(schema_facet)
@@ -704,7 +705,6 @@ class SearchBuilder:
                 existing_facet_index = used_facets.index(ap_facet[0])
                 if facets[existing_facet_index][1].get('title') in (None, facets[existing_facet_index][0]):
                     facets[existing_facet_index][1]['title'] = ap_facet[1]['title']
-
         return facets
 
     def assure_session_id(self):
@@ -812,7 +812,24 @@ class SearchBuilder:
                     for k in aggregations[full_agg_name]['primary_agg']['primary_agg'].keys():
                         result_facet[k] = aggregations[full_agg_name]['primary_agg']['primary_agg'][k]
 
-                else:  # 'terms' assumed.
+                elif facet['aggregation_type'] in ['range', 'nested:range']:
+                    # Shift the bucket location
+                    bucket_location = aggregations[full_agg_name]['primary_agg']
+                    if 'buckets' not in bucket_location:  # account for nested structure
+                        bucket_location = bucket_location['primary_agg']
+
+                    # TODO - refactor ?
+                    # merge bucket labels from ranges into buckets
+                    for r in result_facet['ranges']:
+                        for b in bucket_location['buckets']:
+
+                            # if ranges match we found our bucket, propagate doc_count into 'ranges' field
+                            if (r.get('from', self.MISSING) == b.get('from', self.MISSING) and
+                                    r.get('to', self.MISSING) == b.get('to', self.MISSING)):
+                                r['doc_count'] = b['doc_count']
+                                break
+
+                else:  # assume 'terms'
 
                     # Shift the bucket location
                     bucket_location = aggregations[full_agg_name]['primary_agg']
@@ -827,15 +844,13 @@ class SearchBuilder:
                     if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == NESTED:
                         continue
 
-                    # if we are nested, apply fix + replace
+                    # if we are nested, apply fix + replace (only for terms)
                     if facet['aggregation_type'] == NESTED:
                         self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
 
                     # Re-add buckets under 'terms' AFTER we have fixed the doc_counts
                     result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
 
-                    # Default - terms, range, or histogram buckets. Buckets may not be present
-                    result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
                     # Choosing to show facets with one term for summary info on search it provides
                     if len(result_facet.get('terms', [])) < 1:
                         continue
@@ -851,9 +866,17 @@ class SearchBuilder:
         #            and just treat the nested aggs exactly the same.
         for facet in result:
             for k, v in facet.items():
-                if k == 'aggregation_type' and v == 'nested:stats':
-                    facet[k] = 'stats'
-                    break
+                if k == 'aggregation_type':
+                    override = None
+                    if v == 'nested:stats':
+                        override = 'stats'
+                    elif v == 'nested:range':
+                        override = 'range'
+
+                    # apply override
+                    if override is not None:
+                        facet[k] = override
+                        break
         return result
 
     @staticmethod
