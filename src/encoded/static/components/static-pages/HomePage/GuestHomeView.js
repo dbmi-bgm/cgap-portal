@@ -25,9 +25,9 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                 </div>
             </div>
             <div className="container home-content-area" id="content">
-                <div className="row">
+                <div className="row mb-2">
                     <div className="col-xs-12 col-md-4">
-                        <h4 className="text-400 mb-15 mt-25">Discover Novel Pathogenic Variants</h4>
+                        <h4 className="text-400 mb-15 mt-25">Discover <br/>Novel Pathogenic Variants</h4>
                         <div style={{
                             width: "100%",
                             height: "100px",
@@ -41,7 +41,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                         </p>
                     </div>
                     <div className="col-xs-12 col-md-4">
-                        <h4 className="text-400 mb-15 mt-25">Collaborate in the Clinic or the Lab</h4>
+                        <h4 className="text-400 mb-15 mt-25">Collaborate <br/>in the Clinic or the Lab</h4>
                         <div style={{
                             width: "100%",
                             height: "100px",
@@ -51,7 +51,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                         }} />
                         <p style={{ marginTop: "1rem" }}>
                             Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                            dolore <strong>CLIA-compatible workflow</strong> eu fugiat nulla pariatur.
+                            dolore <strong>CLIA-compatible workflow</strong> eu fugiat pariatur.
                         </p>
                     </div>
                     <div className="col-xs-12 col-md-4 pull-right">
