@@ -48,6 +48,9 @@ COMMON_EXCLUDED_URI_PARAMS = [
     'currentAction', 'additional_facet'
 ]
 MAX_FACET_COUNTS = 100
+RAW_FIELD_AGGREGATIONS = [
+    'stats', 'nested:stats', 'date_histogram', 'histogram', 'range', 'nested:range',
+]
 
 
 # Exception Classes
@@ -221,8 +224,7 @@ def get_query_field(field, facet):
         return 'embedded.@type.raw'
     elif not is_schema_field(field):
         return field + '.raw'
-    elif facet.get('aggregation_type') in ('stats', 'nested:stats', 'date_histogram', 'histogram', 'range',
-                                           'nested:range'):
+    elif facet.get('aggregation_type') in RAW_FIELD_AGGREGATIONS:
         return 'embedded.' + field
     else:
         return 'embedded.' + field + '.raw'
@@ -328,6 +330,8 @@ def execute_search(request, search):
     err_exp = None
     es_results = None
     try:
+        # set timeout
+        search = search.params(request_timeout=30)
         es_results = search.execute().to_dict()
     except ConnectionTimeout:
         err_exp = 'The search failed due to a timeout. Please try a different query.'
