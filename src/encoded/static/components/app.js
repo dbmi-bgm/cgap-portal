@@ -170,6 +170,7 @@ export default class App extends React.PureComponent {
 
         // Save navigate fxn and other req'd stuffs to GLOBAL navigate obj.
         // So that we may call it from anywhere if necessary without passing through props.
+        navigate.initializeFromApp(this);
         navigate.setNavigateFunction(this.navigate);
         navigate.registerCallbackFunction(Alerts.updateCurrentAlertsTitleMap.bind(this, null));
 
