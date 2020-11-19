@@ -396,8 +396,7 @@ def build_initial_columns(used_type_schemas):
                     columns[name] = obj
                 else:
                     # If @type or display_title etc. column defined in schema, then override defaults.
-                    for prop in schema_columns[name]:
-                        columns[name][prop] = schema_columns[name][prop]
+                    columns[name].update(schema_columns[name])
 
     # Add status column, if not present, at end.
     if 'status' not in columns:
@@ -406,6 +405,7 @@ def build_initial_columns(used_type_schemas):
             "default_hidden": True,
             "order": 980
         }
+
     # Add date column, if not present, at end.
     if 'date_created' not in columns:
         columns['date_created'] = {

@@ -333,10 +333,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const { name: currentFilterBlockName = null } = (typeof selectedFilterBlockIdx === "number" && filter_blocks[selectedFilterBlockIdx]) || {};
 
         // console.log(
-        //     'FILTERSETUIPROPS',
-        //     this.props,
-        //     hasFilterSetChanged,
-        //     cachedCounts
+        //     'FilteringTableFilterSetUI Props',
+        //     this.props
         // );
 
         const headerProps = {
@@ -1009,14 +1007,14 @@ export class FilterSetController extends React.PureComponent {
             for (key in this.props) {
                 // eslint-disable-next-line react/destructuring-assignment
                 if (this.props[key] !== pastProps[key]) {
-                    console.log('FSUI changed props: %s', key, pastProps[key], this.props[key]);
+                    console.log('FilterSetController changed props: %s', key, pastProps[key], this.props[key]);
                 }
             }
 
             for (key in this.state) {
                 // eslint-disable-next-line react/destructuring-assignment
                 if (this.state[key] !== pastState[key]) {
-                    console.log('FSUI changed state: %s', key);
+                    console.log('FilterSetController changed state: %s', key);
                 }
             }
         }
