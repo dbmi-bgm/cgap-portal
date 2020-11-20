@@ -142,10 +142,6 @@ class SearchBuilder:
         :return:
         """
         result = cls(context, request, skip_bootstrap=True)  # bypass (most of) bootstrap
-        # The below didn't work, I guess no request params.. which makes sense..
-        #result.search_base = result.normalize_query(request, result.types, result.doc_types)
-        #result.prepared_terms = result.prepare_search_term(request)
-        #result.set_sort_order()
         result.from_ = from_
         result.to = size  # execute_search will apply pagination
         result.search.update_from_dict(search)  # parse compound query
