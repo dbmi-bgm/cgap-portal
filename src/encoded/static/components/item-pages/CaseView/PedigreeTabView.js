@@ -212,7 +212,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                 </h3>
             </div>
             <hr className="tab-section-title-horiz-divider"/>
-            <PedigreeTabViewBody {...pedigreeTabViewBodyProps} />
+            <PedigreeTabViewBody {...pedigreeTabViewBodyProps} {...{ schemas }} />
         </div>
     );
 });

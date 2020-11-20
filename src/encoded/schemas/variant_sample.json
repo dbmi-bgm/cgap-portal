@@ -560,6 +560,18 @@
         }
     },
     "facets": {
+        "AD_ALT": {
+            "title": "Allelic Depth (Alt)",
+            "aggregation_type": "range",
+            "default_hidden": true,
+            "order": 8,
+            "ranges": [
+                {"from": 1, "to": 4, "label": "Very Low"},
+                {"from": 5, "to": 9, "label": "Low"},
+                {"from": 10, "to": 19, "label": "Medium"},
+                {"from": 20, "label": "High"}
+            ]
+        },
         "AF": {
             "title": "VAF",
             "aggregation_type": "stats",

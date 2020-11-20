@@ -20,7 +20,7 @@ export class FileWrapper extends React.PureComponent {
         const { properties = {} } = indvSchema || {};
         // Isolate the field/property names of linkTos with type Document or Image
         const allProperties = _.keys(properties);
-        const relevantFields = [];
+        const relevantFields = []; // If need to bundle more properties, see https://github.com/dbmi-bgm/cgap-portal/pull/236 for potential implementation notes
 
         allProperties.forEach(function(property){
             const propertyFields = properties[property];
@@ -39,7 +39,6 @@ export class FileWrapper extends React.PureComponent {
                 relevantFields.push({ [property]: items["linkTo"] });
             }
         });
-        console.log("relevantFields", relevantFields);
         return relevantFields;
     }
 
