@@ -40,6 +40,9 @@
             "$ref": "mixins.json#/notes"
         },
         {
+            "$ref": "mixins.json#/interpretations"
+        },
+        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],

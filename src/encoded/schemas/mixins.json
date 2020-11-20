@@ -273,6 +273,19 @@
             }
         }
     },
+    "interpretations": {
+        "interpretations": {
+            "title": "Interpretations",
+            "description": "Interpretation connected to this item",
+            "comment": "For VariantSample, Variant, or Gene",
+            "type": "array",
+            "items": {
+                "title": "Interpretation",
+                "type": "string",
+                "linkTo": "NoteInterpretation"
+            }
+        }
+    },
     "alternative_ids": {
         "alternative_ids": {
             "title": "Alternative identifiers",
