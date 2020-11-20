@@ -9,7 +9,7 @@ from snovault.embed import make_subrequest
 from ..types.base import get_item_or_none
 from .search import SearchBuilder
 from .lucene_builder import LuceneBuilder
-from .search_utils import execute_search, build_initial_columns, build_sort_dicts, make_search_subreq
+from .search_utils import execute_search, build_sort_dicts, make_search_subreq
 from ..types.filter_set import FLAGS, FILTER_BLOCKS
 import os
 
@@ -106,7 +106,7 @@ class CompoundSearchBuilder:
             # "@type": ["SearchResults"], # Not necessary from UI atm but considering adding for semantics
             "total": es_results['hits'].get("total", 0),
             "@graph": [ hit['_source']['embedded'] for hit in es_results['hits'].get("hits", []) ],
-            "columns": build_initial_columns([ request.registry[TYPES][filter_set[CompoundSearchBuilder.TYPE]].schema ]),
+            "columns": SearchBuilder.build_initial_columns([ request.registry[TYPES][filter_set[CompoundSearchBuilder.TYPE]].schema ]),
             "sort": result_sort
         }
 

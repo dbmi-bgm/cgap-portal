@@ -26,7 +26,7 @@ from snovault.typeinfo import AbstractTypeInfo
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
     find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
-    execute_search, make_search_subreq, build_initial_columns, build_sort_dicts,
+    execute_search, make_search_subreq, build_sort_dicts,
     NESTED, COMMON_EXCLUDED_URI_PARAMS, MAX_FACET_COUNTS,
 )
 
@@ -905,13 +905,54 @@ class SearchBuilder:
         else:
             return None
 
+    @staticmethod
+    def build_initial_columns(used_type_schemas):
+        
+        columns = OrderedDict()
+
+        # Add title column, at beginning always
+        columns['display_title'] = {
+            "title": "Title",
+            "order": -1000
+        }
+
+        for schema in used_type_schemas:
+            if 'columns' in schema:
+                schema_columns = OrderedDict(schema['columns'])
+                # Add all columns defined in schema
+                for name, obj in schema_columns.items():
+                    if name not in columns:
+                        columns[name] = obj
+                    else:
+                        # If @type or display_title etc. column defined in schema, then override defaults.
+                        columns[name].update(schema_columns[name])
+
+        # Add status column, if not present, at end.
+        if 'status' not in columns:
+            columns['status'] = {
+                "title": "Status",
+                "default_hidden": True,
+                "order": 980
+            }
+
+        # Add date column, if not present, at end.
+        if 'date_created' not in columns:
+            columns['date_created'] = {
+                "title": "Date Created",
+                "colTitle": "Created",
+                "default_hidden": True,
+                "order": 1000
+            }
+
+        return columns
+
     def build_table_columns(self):
         """ Constructs an ordered dictionary of column information to be rendered by
             the front-end. If this functionality is needed outside of general search, this
             method should be moved to search_utils.py.
         """
 
-        columns = build_initial_columns(self.schemas)
+        columns = SearchBuilder.build_initial_columns(self.schemas)
 
         if self.request.normalized_params.get('currentAction') in ('selection', 'multiselect'):
             return columns

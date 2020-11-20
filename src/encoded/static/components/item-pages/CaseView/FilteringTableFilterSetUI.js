@@ -21,10 +21,11 @@ import { Schemas } from '../../util';
 
 
 /**
- * @todo Maybe will be renamed if resuable
+ * @todo Convert this file into directory, since has grown to large-ish size.
+ * @todo Maybe will be renamed if reusable
  * @todo
- *      Maybe check if new caseItem.active_filterset then update state.lastSavedFilterSet via getDerivedStateFromProps or componentDidUpdate or something
- *      Not relevant for long time until/unless maybe entire Case gets refreshed re: websockets or something...
+ * Maybe check if new caseItem.active_filterset then update state.lastSavedFilterSet via getDerivedStateFromProps or componentDidUpdate or something
+ * Not relevant for long time until/unless maybe entire Case gets refreshed re: websockets or something...
  */
 export class FilteringTableFilterSetUI extends React.PureComponent {
 
@@ -993,15 +994,14 @@ export class FilterSetController extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
-        const { initialFilterSetItem, context: searchContext, excludeFacets } = this.props;
-        const { currFilterSet, selectedFilterBlockIdx, isSettingFilterBlockIdx, cachedCounts: lastCachedCounts } = this.state;
-        const { initialFilterSetItem: pastInitialFilterSet, context: pastSearchContext } = pastProps;
+        const { initialFilterSetItem } = this.props;
+        const { initialFilterSetItem: pastInitialFilterSet } = pastProps;
 
         if (initialFilterSetItem !== pastInitialFilterSet) {
             this.setState(FilterSetController.resetState(this.props), this.navigateToCurrentBlock);
         }
 
-        // Just some debugging stuff.
+        // Just some debugging for dev environments.
         if (console.isDebugging()){
             var key;
             for (key in this.props) {
@@ -1014,7 +1014,7 @@ export class FilterSetController extends React.PureComponent {
             for (key in this.state) {
                 // eslint-disable-next-line react/destructuring-assignment
                 if (this.state[key] !== pastState[key]) {
-                    console.log('FilterSetController changed state: %s', key);
+                    console.log('FilterSetController changed state: %s', key, pastState[key], this.state[key]);
                 }
             }
         }
