@@ -13,6 +13,11 @@
             "type": "string",
             "description": "The text of the note for this item"
         },
+        "variant_sample_id": {
+            "title": "Variant Sample ID",
+            "description": "identifier for the variant sample this note is related to",
+            "type": "string"
+        },
         "variant_id": {
             "title": "Variant ID",
             "description": "identifier for the variant in the knowledgebase this note is related to",
