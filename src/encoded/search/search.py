@@ -132,7 +132,7 @@ class SearchBuilder:
         return self.forced_type.lower()
 
     @classmethod
-    def from_search(cls, context, request, search, from_=0, size=10):
+    def from_search(cls, context, request, search):
         """ Builds a SearchBuilder object with a pre-built search by skipping the bootstrap
             initialization and setting self.search directly.
 
@@ -142,8 +142,6 @@ class SearchBuilder:
         :return:
         """
         result = cls(context, request, skip_bootstrap=True)  # bypass (most of) bootstrap
-        result.from_ = from_
-        result.to = size  # execute_search will apply pagination
         result.search.update_from_dict(search)  # parse compound query
         return result
 

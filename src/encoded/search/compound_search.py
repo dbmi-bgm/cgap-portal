@@ -72,17 +72,21 @@ class CompoundSearchBuilder:
     def combine_query_strings(qstring1, qstring2):
         """ Builds a single URL query from the given flags and blocks.
 
-        :param flags: flags, usually ? prefixed
-        :param block: blocks to add to it
+        :param qstring1: flags, usually ? prefixed
+        :param qstring2: blocks to add to it
         :return: combined query
         """
-        def query_str_to_dict(x):
-            return dict(urllib.parse.parse_qsl(x.lstrip('?'), keep_blank_values=True))
 
-        def merge_query_strings(x, y):
-            return urllib.parse.urlencode(dict(query_str_to_dict(x), **query_str_to_dict(y)))
+        dict_to_merge_into = dict(urllib.parse.parse_qs(qstring1.lstrip('?'), keep_blank_values=True))
+        dict_with_more_vals = dict(urllib.parse.parse_qs(qstring2.lstrip('?'), keep_blank_values=True))
 
-        return merge_query_strings(qstring1, qstring2)
+        for k, v in dict_with_more_vals.items():
+            if k in dict_to_merge_into:
+                dict_to_merge_into[k] += v
+            else: 
+                dict_to_merge_into[k] = v
+
+        return urllib.parse.urlencode(dict_to_merge_into, doseq=True)
 
     @staticmethod
     def format_filter_set_results(request, es_results, filter_set, result_sort, return_generator=False):
@@ -232,10 +236,11 @@ class CompoundSearchBuilder:
 
             sort, result_sort = build_sort_dicts(requested_sorts, request, [ doc_type ])
 
-            search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query, from_=from_, size=to)
+            search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query)
             search_dsl = search_builder_instance.search.sort(sort)
+            sized_search_dsl = search_dsl[from_ : from_ + to]
 
-            es_results = execute_search(compound_subreq, search_dsl)
+            es_results = execute_search(compound_subreq, sized_search_dsl)
             return cls.format_filter_set_results(request, es_results, filter_set, result_sort, return_generator)
 
     @classmethod
