@@ -42,9 +42,9 @@ class NoteStandard(Note):
         "description": "Individual's Identifier",
         "type": "string"
     })
-    def display_title(self, request):
+    def display_title(self, date_created):
         try:
-            type_date = "Note from " + properties.get("date_created", None)[:10]
+            type_date = "Note from " + date_created[:10]
             return type_date
         # last resort, use uuid
         except Exception:
@@ -69,9 +69,9 @@ class NoteInterpretation(Note):
         "description": "Individual's Identifier",
         "type": "string"
     })
-    def display_title(self, request):
+    def display_title(self, date_created):
         try:
-            type_date = "Interpretation from " + properties.get("date_created", None)[:10]
+            type_date = "Interpretation from " + date_created[:10]
             return type_date
         # last resort, use uuid
         except Exception:
