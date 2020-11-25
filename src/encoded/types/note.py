@@ -37,6 +37,19 @@ class NoteStandard(Note):
     schema = load_schema('encoded:schemas/note_standard.json')
     embedded_list = Note.embedded_list
 
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "Individual's Identifier",
+        "type": "string"
+    })
+    def display_title(self, request):
+        try:
+            type_date = "Note from " + properties.get("date_created", None)[:10]
+            return type_date
+        # last resort, use uuid
+        except Exception:
+            return properties.get('uuid', None)
+
 
 @collection(
     name='notes-interpretation',
@@ -50,3 +63,16 @@ class NoteInterpretation(Note):
     item_type = 'note_interpretation'
     schema = load_schema('encoded:schemas/note_interpretation.json')
     embedded_list = Note.embedded_list
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "Individual's Identifier",
+        "type": "string"
+    })
+    def display_title(self, request):
+        try:
+            type_date = "Interpretation from " + properties.get("date_created", None)[:10]
+            return type_date
+        # last resort, use uuid
+        except Exception:
+            return properties.get('uuid', None)

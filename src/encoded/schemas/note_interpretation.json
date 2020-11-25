@@ -27,6 +27,12 @@
             "type": "string",
             "description": "Version of this particular note"
         },
+        "previous_note": {
+            "title": "Previous Note",
+            "description": "If not version 1, the previous note this is modified from",
+            "type": "string",
+            "linkTo": "NoteInterpretation"
+        },
         "classification": {
             "title": "Classification",
             "description": "Significance classification indicated by this note",
