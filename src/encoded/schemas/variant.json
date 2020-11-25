@@ -4163,6 +4163,10 @@
             "number_step": "any",
             "order": 27,
             "grouping": "Splice Predictors"
+        },
+        "interpretations.classification": {
+            "title": "Classification",
+            "order": 100
         }
     },
     "columns": {
@@ -4201,6 +4205,10 @@
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 61
+        },
+        "interpretations.classification": {
+            "title": "Classification",
+            "order": 100
         }
     }
 }
