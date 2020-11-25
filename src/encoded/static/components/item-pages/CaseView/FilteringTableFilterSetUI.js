@@ -35,8 +35,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
      * @param {string[]} excludeFacets - List of field names to be excluded from this UI.
      * @returns {Object.<string, { field: string, title: string, description: string, grouping: string, order: number, aggregation_type: string, field_type: string, EXCLUDED: boolean }>} Dictionary of facet/field-info from schemas+response.
      */
-    static buildFacetDictionary(facets = null, excludeFacets = null){
-        if (!Array.isArray(facets)) return {};
+    static buildFacetDictionary(facets = null, schemas = null, excludeFacets = null){
+
         const excluded = {};
         if (Array.isArray(excludeFacets)) {
             excludeFacets.forEach(function(fieldName){
@@ -45,13 +45,16 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         }
 
         const dict = {};
-        facets.forEach(function(facetFields){
+
+        function saveFacetToDict(facetFields){
             const {
                 field,
                 title, description,
                 grouping, order,
-                aggregation_type, field_type
+                aggregation_type = "terms",
+                field_type
             } = facetFields;
+
             // We might get duplicate for some reason, leave first since more likely to have title.
             if (dict[field]) {
                 return;
@@ -62,7 +65,21 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 aggregation_type, field_type,
                 EXCLUDED: excluded[field] || false
             };
-        });
+        }
+
+        if (Array.isArray(facets)) {
+            facets.forEach(saveFacetToDict);
+        } else if (schemas) {
+            // Fallback for when we launch on compound search / filterset (no context.facets yet available).
+            // Somewhat fragile, maybe we can move calculation of aggregation_type from search.py/_initialize_facets
+            // into same place in code where schemas are augmented to included calculated properties before being served from
+            // /profiles/ endpoint to allow us to definitively just use the single schemas (instead of context.facets, as well)
+            Object.keys(schemas["VariantSample"].facets).forEach(function(field){
+                const facetFields = { ...schemas["VariantSample"].facets[field], field };
+                return saveFacetToDict(facetFields);
+            });
+        }
+
         return dict;
     }
 
@@ -141,14 +158,14 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         this.memoized = {
             buildFacetDictionary: memoize(FilteringTableFilterSetUI.buildFacetDictionary, function(newArgs, lastArgs){
-                const [ nextFacets ] = newArgs;
-                const [ lastFacets ] = lastArgs;
+                const [ nextFacets, nextSchemas ] = newArgs;
+                const [ lastFacets, lastSchemas ] = lastArgs;
                 // In this component we only want the titles and aggregation_types of facets, not their aggregations,
                 // so we recalculate only if we never calculated them before.
-                if (!lastFacets && nextFacets) {
-                    return false;
+                if ((!lastFacets && nextFacets) || (!lastSchemas && nextSchemas)) {
+                    return false; // 'is not equal'
                 }
-                return true;
+                return true; // 'is equal'
             }),
             hasFilterSetChanged: memoize(FilteringTableFilterSetUI.hasFilterSetChanged),
             findDuplicateBlocks: memoize(FilteringTableFilterSetUI.findDuplicateBlocks)
@@ -308,7 +325,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
 
             // From FilteringTab:
-            caseItem,
+            caseItem, schemas,
 
             // From FilterSetController:
             currFilterSet: filterSet = null,
@@ -328,7 +345,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const { bodyOpen, bodyMounted, lastSavedFilterSet, isSavingFilterSet } = this.state;
 
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
-        const facetDict = this.memoized.buildFacetDictionary(facets, excludeFacets);
+        const facetDict = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets);
         const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, filterSet);
         const { duplicateQueryIndices, duplicateNameIndices } = this.memoized.findDuplicateBlocks(filter_blocks);
         const { name: currentFilterBlockName = null } = (typeof selectedFilterBlockIdx === "number" && filter_blocks[selectedFilterBlockIdx]) || {};
@@ -346,9 +363,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         let body = null;
         if (bodyMounted) {
             const bodyProps = {
-                filterSet, facetDict, excludeFacets, searchContext,
+                filterSet, facetDict, excludeFacets, searchContext, schemas,
                 addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
-                cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx
+                cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx,
             };
             body = <FilterSetUIBlocks {...bodyProps} />;
         }
@@ -495,7 +512,9 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
     const {
         filterSet, facetDict,
         addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
-        cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx } = props;
+        cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx,
+        schemas
+    } = props;
     const { filter_blocks = [], query = "" } = filterSet || {};
     const { query: currentBlockQuery = null } = (typeof selectedFilterBlockIdx === "number" && filter_blocks[selectedFilterBlockIdx]) || {};
 
@@ -511,7 +530,7 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
 
     const commonProps = {
         facetDict, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, isSettingFilterBlockIdx,
-        duplicateQueryIndices, duplicateNameIndices, cachedCounts
+        duplicateQueryIndices, duplicateNameIndices, cachedCounts, schemas
     };
 
     return (
@@ -553,7 +572,8 @@ const FilterBlock = React.memo(function FilterBlock(props){
         facetDict,
         duplicateQueryIndices,
         duplicateNameIndices,
-        cachedCounts
+        cachedCounts,
+        schemas
     } = props;
 
     const {
@@ -656,12 +676,12 @@ const FilterBlock = React.memo(function FilterBlock(props){
                     </div>
                 </div>
             </div>
-            <FieldBlocks {...{ filterBlock, facetDict, selected }} />
+            <FieldBlocks {...{ filterBlock, facetDict, schemas }} />
         </div>
     );
 });
 
-const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict, selected }) {
+function FieldBlocks({ filterBlock, facetDict, schemas }) {
     const { query: filterStrQuery } = filterBlock;
 
     if (!filterStrQuery) {
@@ -720,6 +740,8 @@ const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict, se
             if (k.slice(-5) === ".from"){
                 field = k.slice(0, -5);
                 if (!facetDict[field] || typeof facetDict[field].aggregation_type !== "string"){
+                    // We might remove check of aggregation_type here since might not be present if being gotten from schemas.
+                    // Becomes slightly risky, if there's embedded linkto with field 'from' or 'to'.
                     field = k;
                     console.error("Attempted to remove 'from' from field but couldn't succeed", field, facetDict);
                 } else {
@@ -732,6 +754,8 @@ const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict, se
             } else if (k.slice(-3) === ".to") {
                 field = k.slice(0, -3);
                 if (!facetDict[field] || typeof facetDict[field].aggregation_type !== "string"){
+                    // We might remove check of aggregation_type here since might not be present if being gotten from schemas.
+                    // Becomes slightly risky, if there's embedded linkto with field 'from' or 'to'.
                     field = k;
                     console.error("Attempted to remove 'to' from field but couldn't succeed", field, facetDict);
                 } else {
@@ -774,13 +798,13 @@ const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict, se
     return (
         <div className="d-flex flex-wrap filter-query-viz-blocks px-2">
             { sortedFields.map(function(field, index){
-                return <FieldBlock terms={correctedQuery[field]} field={field} key={field} facetDict={facetDict} />;
+                return <FieldBlock {...{ field, facetDict, schemas }} terms={correctedQuery[field]} key={field} />;
             }) }
         </div>
     );
-});
+}
 
-function FieldBlock({ field, terms, facetDict, index }){
+function FieldBlock({ field, terms, facetDict, schemas }){
 
     const fieldFacet = facetDict[field];
     const {
@@ -794,7 +818,9 @@ function FieldBlock({ field, terms, facetDict, index }){
     //     // TODO: Show single > or < or something.
     // }
 
-    const fieldSchema = getSchemaProperty(field, Schemas.get(), "VariantSample");
+    console.log("SCHEMAS", facetDict, field, { ...schemas }, getSchemaProperty(field, schemas, "VariantSample"));
+
+    const fieldSchema = getSchemaProperty(field, schemas, "VariantSample");
     const {
         // Used primarily as fallback, we expect/hope for fieldFacet to be present/used primarily instead.
         title: fieldTitle = null,
