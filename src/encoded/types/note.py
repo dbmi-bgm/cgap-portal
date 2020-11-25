@@ -35,6 +35,7 @@ class NoteStandard(Note):
 
     item_type = 'note_standard'
     schema = load_schema('encoded:schemas/note_standard.json')
+    embedded_list = Note.embedded_list
 
 
 @collection(
@@ -48,3 +49,4 @@ class NoteInterpretation(Note):
 
     item_type = 'note_interpretation'
     schema = load_schema('encoded:schemas/note_interpretation.json')
+    embedded_list = Note.embedded_list
