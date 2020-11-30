@@ -35,11 +35,10 @@ class NoteStandard(Note):
 
     item_type = 'note_standard'
     schema = load_schema('encoded:schemas/note_standard.json')
-    embedded_list = Note.embedded_list
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "Individual's Identifier",
+        "description": "Note's display title",
         "type": "string"
     })
     def display_title(self, date_created):
@@ -62,11 +61,10 @@ class NoteInterpretation(Note):
 
     item_type = 'note_interpretation'
     schema = load_schema('encoded:schemas/note_interpretation.json')
-    embedded_list = Note.embedded_list
 
     @calculated_property(schema={
         "title": "Display Title",
-        "description": "Individual's Identifier",
+        "description": "Note's display title",
         "type": "string"
     })
     def display_title(self, date_created):
