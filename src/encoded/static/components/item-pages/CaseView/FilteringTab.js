@@ -277,7 +277,7 @@ export function filterQueryByQuery(query1, query2){
 
 
 export const FilteringTab = React.memo(function FilteringTab(props) {
-    const { context = null, windowHeight, session = false } = props;
+    const { context = null, windowHeight, session = false, schemas } = props;
     const {
         display_title: caseDisplayTitle,
         accession: caseAccession,
@@ -351,11 +351,10 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
-    console.log("FILTERTAB", activeFilterSetID);
     const embeddedTableHeader = activeFilterSetID ? (
         <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
             <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets}>
-                <FilteringTableFilterSetUI caseItem={context} />
+                <FilteringTableFilterSetUI caseItem={context} schemas={schemas} />
             </FilterSetController>
         </ajax.FetchedItem>
     ) : (

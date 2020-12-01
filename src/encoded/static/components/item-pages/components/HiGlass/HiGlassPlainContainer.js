@@ -212,6 +212,8 @@ export class HiGlassPlainContainer extends React.PureComponent {
 
 
 
+
+
 const HiGlassPlainContainerBody = React.forwardRef(function HiGlassPlainContainerBody(props, ref){
     const { viewConfig, options, hasRuntimeError, disabled, isValidating, mounted, higlassInitialized, width, height, mountCount, placeholder, style, className, packageLockJson } = props;
     const outerKey = "mount-number-" + mountCount;
@@ -259,6 +261,7 @@ const HiGlassPlainContainerBody = React.forwardRef(function HiGlassPlainContaine
             </div>
         );
     }
+
 
     /**
      * TODO: Some state + UI functions to make higlass view full screen.

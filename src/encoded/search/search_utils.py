@@ -331,6 +331,8 @@ def execute_search(request, search):
     err_exp = None
     es_results = None
     try:
+        # set timeout
+        search = search.params(request_timeout=30)
         es_results = search.execute().to_dict()
     except ConnectionTimeout:
         err_exp = 'The search failed due to a timeout. Please try a different query.'
@@ -376,47 +378,6 @@ def is_numerical_field(field_schema):
 def is_date_field(field, field_schema):
     """ Helper method that determines if field_schema is  """
     return determine_if_is_date_field(field, field_schema)
-
-def build_initial_columns(used_type_schemas):
-    
-    columns = OrderedDict()
-
-    # Add title column, at beginning always
-    columns['display_title'] = {
-        "title": "Title",
-        "order": -1000
-    }
-
-    for schema in used_type_schemas:
-        if 'columns' in schema:
-            schema_columns = OrderedDict(schema['columns'])
-            # Add all columns defined in schema
-            for name, obj in schema_columns.items():
-                if name not in columns:
-                    columns[name] = obj
-                else:
-                    # If @type or display_title etc. column defined in schema, then override defaults.
-                    for prop in schema_columns[name]:
-                        columns[name][prop] = schema_columns[name][prop]
-
-    # Add status column, if not present, at end.
-    if 'status' not in columns:
-        columns['status'] = {
-            "title": "Status",
-            "default_hidden": True,
-            "order": 980
-        }
-    # Add date column, if not present, at end.
-    if 'date_created' not in columns:
-        columns['date_created'] = {
-            "title": "Date Created",
-            "colTitle": "Created",
-            "default_hidden": True,
-            "order": 1000
-        }
-
-    return columns
-
 
 
 def build_sort_dicts(requested_sorts, request, doc_types=[], text_search=None):

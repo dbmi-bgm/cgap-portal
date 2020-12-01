@@ -2323,6 +2323,10 @@ $download-button-width : 100px;
 					&:hover {
 						opacity: 1;
 					}
+					&.disabled {
+						opacity: 0.3;
+						cursor: not-allowed;
+					}
 				}
 
 				.cached-counts-value {

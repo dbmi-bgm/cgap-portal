@@ -21,10 +21,11 @@ import { Schemas } from '../../util';
 
 
 /**
- * @todo Maybe will be renamed if resuable
+ * @todo Convert this file into directory, since has grown to large-ish size.
+ * @todo Maybe will be renamed if reusable
  * @todo
- *      Maybe check if new caseItem.active_filterset then update state.lastSavedFilterSet via getDerivedStateFromProps or componentDidUpdate or something
- *      Not relevant for long time until/unless maybe entire Case gets refreshed re: websockets or something...
+ * Maybe check if new caseItem.active_filterset then update state.lastSavedFilterSet via getDerivedStateFromProps or componentDidUpdate or something
+ * Not relevant for long time until/unless maybe entire Case gets refreshed re: websockets or something...
  */
 export class FilteringTableFilterSetUI extends React.PureComponent {
 
@@ -34,8 +35,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
      * @param {string[]} excludeFacets - List of field names to be excluded from this UI.
      * @returns {Object.<string, { field: string, title: string, description: string, grouping: string, order: number, aggregation_type: string, field_type: string, EXCLUDED: boolean }>} Dictionary of facet/field-info from schemas+response.
      */
-    static buildFacetDictionary(facets = null, excludeFacets = null){
-        if (!Array.isArray(facets)) return {};
+    static buildFacetDictionary(facets = null, schemas = null, excludeFacets = null){
+
         const excluded = {};
         if (Array.isArray(excludeFacets)) {
             excludeFacets.forEach(function(fieldName){
@@ -44,13 +45,16 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         }
 
         const dict = {};
-        facets.forEach(function(facetFields){
+
+        function saveFacetToDict(facetFields){
             const {
                 field,
                 title, description,
                 grouping, order,
-                aggregation_type, field_type
+                aggregation_type = "terms",
+                field_type
             } = facetFields;
+
             // We might get duplicate for some reason, leave first since more likely to have title.
             if (dict[field]) {
                 return;
@@ -61,7 +65,21 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 aggregation_type, field_type,
                 EXCLUDED: excluded[field] || false
             };
-        });
+        }
+
+        if (Array.isArray(facets)) {
+            facets.forEach(saveFacetToDict);
+        } else if (schemas) {
+            // Fallback for when we launch on compound search / filterset (no context.facets yet available).
+            // Somewhat fragile, maybe we can move calculation of aggregation_type from search.py/_initialize_facets
+            // into same place in code where schemas are augmented to included calculated properties before being served from
+            // /profiles/ endpoint to allow us to definitively just use the single schemas (instead of context.facets, as well)
+            Object.keys(schemas["VariantSample"].facets).forEach(function(field){
+                const facetFields = { ...schemas["VariantSample"].facets[field], field };
+                return saveFacetToDict(facetFields);
+            });
+        }
+
         return dict;
     }
 
@@ -134,28 +152,28 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
     constructor(props){
         super(props);
-        const { currFilterSet: filterSet } = props;
+        const { currFilterSet: filterSet, defaultOpen = true } = props;
         this.toggleOpen = _.throttle(this.toggleOpen.bind(this), 750);
         this.saveFilterSet = _.throttle(this.saveFilterSet.bind(this), 1500);
 
         this.memoized = {
             buildFacetDictionary: memoize(FilteringTableFilterSetUI.buildFacetDictionary, function(newArgs, lastArgs){
-                const [ nextFacets ] = newArgs;
-                const [ lastFacets ] = lastArgs;
+                const [ nextFacets, nextSchemas ] = newArgs;
+                const [ lastFacets, lastSchemas ] = lastArgs;
                 // In this component we only want the titles and aggregation_types of facets, not their aggregations,
                 // so we recalculate only if we never calculated them before.
-                if (!lastFacets && nextFacets) {
-                    return false;
+                if ((!lastFacets && nextFacets) || (!lastSchemas && nextSchemas)) {
+                    return false; // 'is not equal'
                 }
-                return true;
+                return true; // 'is equal'
             }),
             hasFilterSetChanged: memoize(FilteringTableFilterSetUI.hasFilterSetChanged),
             findDuplicateBlocks: memoize(FilteringTableFilterSetUI.findDuplicateBlocks)
         };
 
         this.state = {
-            "bodyOpen": false,
-            "bodyMounted": false, // Is set to true for 750ms after closing to help keep contents visible until collapsed.
+            "bodyOpen": defaultOpen,
+            "bodyMounted": defaultOpen, // Is set to true for 750ms after closing to help keep contents visible until collapsed.
             // DEPRECATED: active_filterset is likely to lack some.. stuff..
             "lastSavedFilterSet": (filterSet && filterSet['@id']) ? filterSet : null, // active_filterset,
             "isSavingFilterSet": false
@@ -307,7 +325,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
 
             // From FilteringTab:
-            caseItem,
+            caseItem, schemas,
 
             // From FilterSetController:
             currFilterSet: filterSet = null,
@@ -327,16 +345,14 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const { bodyOpen, bodyMounted, lastSavedFilterSet, isSavingFilterSet } = this.state;
 
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
-        const facetDict = this.memoized.buildFacetDictionary(facets, excludeFacets);
+        const facetDict = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets);
         const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, filterSet);
         const { duplicateQueryIndices, duplicateNameIndices } = this.memoized.findDuplicateBlocks(filter_blocks);
         const { name: currentFilterBlockName = null } = (typeof selectedFilterBlockIdx === "number" && filter_blocks[selectedFilterBlockIdx]) || {};
 
         // console.log(
-        //     'FILTERSETUIPROPS',
-        //     this.props,
-        //     hasFilterSetChanged,
-        //     cachedCounts
+        //     'FilteringTableFilterSetUI Props',
+        //     this.props
         // );
 
         const headerProps = {
@@ -347,9 +363,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         let body = null;
         if (bodyMounted) {
             const bodyProps = {
-                filterSet, facetDict, excludeFacets, searchContext,
+                filterSet, facetDict, excludeFacets, searchContext, schemas, isFetchingInitialFilterSetItem,
                 addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
-                cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx
+                cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx,
             };
             body = <FilterSetUIBlocks {...bodyProps} />;
         }
@@ -496,9 +512,12 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
     const {
         filterSet, facetDict,
         addNewFilterBlock, selectedFilterBlockIdx, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
-        cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx } = props;
+        cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
+        schemas
+    } = props;
     const { filter_blocks = [], query = "" } = filterSet || {};
     const { query: currentBlockQuery = null } = (typeof selectedFilterBlockIdx === "number" && filter_blocks[selectedFilterBlockIdx]) || {};
+    const filterBlockLen = filter_blocks.length;
 
     function onAddBtnClick(e){
         e.stopPropagation();
@@ -511,18 +530,20 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
     }
 
     const commonProps = {
-        facetDict, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, isSettingFilterBlockIdx,
-        duplicateQueryIndices, duplicateNameIndices, cachedCounts
+        facetDict, filterBlockLen, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, isSettingFilterBlockIdx,
+        duplicateQueryIndices, duplicateNameIndices, cachedCounts, schemas
     };
 
     return (
         <div className="blocks-container px-3 pb-16">
-            { filter_blocks.length > 0 ? filter_blocks.map(function(fb, index){
+            { filterBlockLen > 0 ? filter_blocks.map(function(fb, index){
                 const selected = selectedFilterBlockIdx !== null && selectedFilterBlockIdx === index;
                 return <FilterBlock {...commonProps} filterBlock={fb} index={index} key={index} selected={selected} />;
-            }) : (
+            }) : isFetchingInitialFilterSetItem ? (
+                <DummyLoadingFilterBlock/>
+            ) : (
                 <div className="py-3 px-3">
-                    <h4 className="text-400 text-center my-0">No Blocks Defined</h4>
+                    <h4 className="text-400 text-center text-danger my-0">No Blocks Defined</h4>
                 </div>
             ) }
             <div className="btn-group" role="group" aria-label="Basic example">
@@ -532,12 +553,30 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
                 </button>
                 { currentBlockQuery ?
                     <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} data-tip="Copy currently-selected filter block">
-                        <i className="icon icon-fw icon-clone far mr" />
+                        <i className="icon icon-fw icon-clone far" />
                     </button>
                     : null }
             </div>
         </div>
     );
+});
+
+
+const DummyLoadingFilterBlock = React.memo(function DummyLoadingFilterBlock(){
+    // dummyObject & filterBlock, though are objects which wouldn't === each other in prop comparisons, are not emitted from a useMemo since entire component is memoized and doesn't receive any [changes in] props.
+    const dummyObject = {};
+    const filterBlock = { "query" : "", "name" : <em>Please wait...</em> };
+    const passProps = {
+        filterBlock,
+        filterBlockLen: 1,
+        index: 0,
+        selected: false,
+        isSettingFilterBlockIdx: true,
+        cachedCounts: dummyObject,
+        duplicateQueryIndices: dummyObject,
+        duplicateNameIndices: dummyObject
+    };
+    return <FilterBlock {...passProps} />;
 });
 
 
@@ -554,7 +593,9 @@ const FilterBlock = React.memo(function FilterBlock(props){
         facetDict,
         duplicateQueryIndices,
         duplicateNameIndices,
-        cachedCounts
+        cachedCounts,
+        filterBlockLen,
+        schemas
     } = props;
 
     const {
@@ -575,7 +616,7 @@ const FilterBlock = React.memo(function FilterBlock(props){
      */
     const isDuplicateQuery = useMemo(function(){ return typeof duplicateQueryIndices[index] === "number"; }, [ duplicateQueryIndices, index ]);
     const isDuplicateName = useMemo(function(){ return typeof duplicateNameIndices[index] === "number"; }, [ duplicateNameIndices, index ]);
-    const countExists = useMemo(function(){ return typeof cachedCount=== "number"; }, [ cachedCounts, index ]);
+    const countExists = useMemo(function(){ return typeof cachedCount === "number"; }, [ cachedCounts, index ]);
 
     const [ isEditingTitle, setIsEditingTitle ] = useState(false);
 
@@ -608,7 +649,7 @@ const FilterBlock = React.memo(function FilterBlock(props){
     let title = null;
     if (isEditingTitle && !isSettingFilterBlockIdx) {
         title = (
-            <form className="d-flex align-items-center mb-0" action="#case-info.filtering" onSubmit={function(e){
+            <form className="w-100 d-flex align-items-center mb-0" action="#case-info.filtering" onSubmit={function(e){
                 e.stopPropagation();
                 e.preventDefault();
                 setIsEditingTitle(false);
@@ -628,18 +669,27 @@ const FilterBlock = React.memo(function FilterBlock(props){
             </form>
         );
     } else {
-        const titleCls = isDuplicateName ? "text-danger"
-            : !filterName ? "text-secondary"
-                : "";
+        const deleteIconCls = (
+            "icon fas mr-07 icon-"
+            + ((selected && isSettingFilterBlockIdx) ? "circle-notch icon-spin" : "times-circle clickable")
+            + (filterBlockLen > 1 ? "" : " disabled")
+        );
+        const titleCls = "text-small" + (
+            isDuplicateName ? " text-danger"
+                : !filterName ? " text-secondary"
+                    : ""
+        );
 
         title = (
             <React.Fragment>
-                <i className={"icon fas mr-1 icon-" + ((selected && isSettingFilterBlockIdx) ? "circle-notch icon-spin" : "times-circle clickable")}
-                    onClick={onRemoveClick} data-tip="Remove this filter block" />
-                <span className={"text-600" + titleCls} data-tip={isDuplicateName ? "Duplicate title of filter block #" + (duplicateNameIndices[index] + 1) : null}>
+                <i className={deleteIconCls} onClick={filterBlockLen > 1 ? onRemoveClick : null} data-tip={filterBlockLen > 1 ? "Remove this filter block" : "Can't delete last filter block"} />
+                <span className={titleCls} data-tip={isDuplicateName ? "Duplicate title of filter block #" + (duplicateNameIndices[index] + 1) : null}>
                     { filterName || <em>No Name</em> }
                 </span>
-                <i className="icon icon-pencil-alt fas ml-1 clickable" onClick={onEditClick} />
+                { typeof filterName === "string" ?
+                    // Prevent [attempts at] editing of JSX/non-string 'filterName' values. Should only occur for hardcoded-UI stuff like DummyLoadingFilterBlock
+                    <i className="icon icon-pencil-alt fas ml-1 clickable text-smaller" onClick={onEditClick} />
+                    : null }
             </React.Fragment>
         );
     }
@@ -648,7 +698,7 @@ const FilterBlock = React.memo(function FilterBlock(props){
         <div className={"filterset-block clickable mb-16" + (selected ? " selected" : "") + (!isEditingTitle ? " clickable" : "")}
             onClick={!isEditingTitle ? onSelectClick : null} data-duplicate-query={isDuplicateQuery} data-tip={isDuplicateQuery ? "Duplicate query of filter block #" + (duplicateQueryIndices[index] + 1) : null}>
             <div className="row px-2 pt-08 pb-04 title-controls-row">
-                <div className="col">
+                <div className="col d-flex align-items-center">
                     { title }
                 </div>
                 <div className="col-auto">
@@ -657,12 +707,12 @@ const FilterBlock = React.memo(function FilterBlock(props){
                     </div>
                 </div>
             </div>
-            <FieldBlocks {...{ filterBlock, facetDict, selected }} />
+            <FieldBlocks {...{ filterBlock, facetDict, schemas }} />
         </div>
     );
 });
 
-const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict, selected }) {
+function FieldBlocks({ filterBlock, facetDict, schemas }) {
     const { query: filterStrQuery } = filterBlock;
 
     if (!filterStrQuery) {
@@ -672,7 +722,6 @@ const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict, se
             </div>
         );
     }
-
 
     const { correctedQuery, sortedFields } = useMemo(function(){
 
@@ -721,6 +770,8 @@ const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict, se
             if (k.slice(-5) === ".from"){
                 field = k.slice(0, -5);
                 if (!facetDict[field] || typeof facetDict[field].aggregation_type !== "string"){
+                    // We might remove check of aggregation_type here since might not be present if being gotten from schemas.
+                    // Becomes slightly risky, if there's embedded linkto with field 'from' or 'to'.
                     field = k;
                     console.error("Attempted to remove 'from' from field but couldn't succeed", field, facetDict);
                 } else {
@@ -733,6 +784,8 @@ const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict, se
             } else if (k.slice(-3) === ".to") {
                 field = k.slice(0, -3);
                 if (!facetDict[field] || typeof facetDict[field].aggregation_type !== "string"){
+                    // We might remove check of aggregation_type here since might not be present if being gotten from schemas.
+                    // Becomes slightly risky, if there's embedded linkto with field 'from' or 'to'.
                     field = k;
                     console.error("Attempted to remove 'to' from field but couldn't succeed", field, facetDict);
                 } else {
@@ -775,13 +828,13 @@ const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetDict, se
     return (
         <div className="d-flex flex-wrap filter-query-viz-blocks px-2">
             { sortedFields.map(function(field, index){
-                return <FieldBlock terms={correctedQuery[field]} field={field} key={field} facetDict={facetDict} />;
+                return <FieldBlock {...{ field, facetDict, schemas }} terms={correctedQuery[field]} key={field} />;
             }) }
         </div>
     );
-});
+}
 
-function FieldBlock({ field, terms, facetDict, index }){
+function FieldBlock({ field, terms, facetDict, schemas }){
 
     const fieldFacet = facetDict[field];
     const {
@@ -795,7 +848,9 @@ function FieldBlock({ field, terms, facetDict, index }){
     //     // TODO: Show single > or < or something.
     // }
 
-    const fieldSchema = getSchemaProperty(field, Schemas.get(), "VariantSample");
+    console.log("SCHEMAS", facetDict, field, { ...schemas }, getSchemaProperty(field, schemas, "VariantSample"));
+
+    const fieldSchema = getSchemaProperty(field, schemas, "VariantSample");
     const {
         // Used primarily as fallback, we expect/hope for fieldFacet to be present/used primarily instead.
         title: fieldTitle = null,
@@ -995,28 +1050,27 @@ export class FilterSetController extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
-        const { initialFilterSetItem, context: searchContext, excludeFacets } = this.props;
-        const { currFilterSet, selectedFilterBlockIdx, isSettingFilterBlockIdx, cachedCounts: lastCachedCounts } = this.state;
-        const { initialFilterSetItem: pastInitialFilterSet, context: pastSearchContext } = pastProps;
+        const { initialFilterSetItem } = this.props;
+        const { initialFilterSetItem: pastInitialFilterSet } = pastProps;
 
         if (initialFilterSetItem !== pastInitialFilterSet) {
             this.setState(FilterSetController.resetState(this.props), this.navigateToCurrentBlock);
         }
 
-        // Just some debugging stuff.
+        // Just some debugging for dev environments.
         if (console.isDebugging()){
             var key;
             for (key in this.props) {
                 // eslint-disable-next-line react/destructuring-assignment
                 if (this.props[key] !== pastProps[key]) {
-                    console.log('FSUI changed props: %s', key, pastProps[key], this.props[key]);
+                    console.log('FilterSetController changed props: %s', key, pastProps[key], this.props[key]);
                 }
             }
 
             for (key in this.state) {
                 // eslint-disable-next-line react/destructuring-assignment
                 if (this.state[key] !== pastState[key]) {
-                    console.log('FSUI changed state: %s', key);
+                    console.log('FilterSetController changed state: %s', key, pastState[key], this.state[key]);
                 }
             }
         }
@@ -1053,26 +1107,48 @@ export class FilterSetController extends React.PureComponent {
     }
 
     removeFilterBlockAtIdx(idx){
-        this.setState(function({ currFilterSet: pastFS, selectedFilterBlockIdx }){
+        this.setState(function({ currFilterSet: pastFS, selectedFilterBlockIdx: pastSelectedIdx, cachedCounts: pastCounts }){
             const { filter_blocks = [] } = pastFS;
             const nextFB = filter_blocks.slice();
             nextFB.splice(idx, 1);
+            const nextFBLen = nextFB.length;
 
-            if (selectedFilterBlockIdx !== null) {
-                // Unset or shift it down if needed
-                if (selectedFilterBlockIdx === idx) {
+            // Shift cachedCounts indices/keys
+            const cachedCounts = {};
+            Object.keys(pastCounts).forEach(function(countKey){
+                const intKey = parseInt(countKey); // Obj keys are cast to type:string upon insertion, need to cast back to int for comparisons.
+                if (intKey < idx) {
+                    cachedCounts[countKey] = pastCounts[countKey];
+                } else if (intKey > idx) {
+                    cachedCounts[intKey - 1] = pastCounts[countKey];
+                }
+            });
+
+            // Update selected filter block index according to what feels like decent UX -
+            let selectedFilterBlockIdx = pastSelectedIdx; // Keep same as before, unless:
+            if (nextFBLen === 0) {
+                // Error, shouldn't occur
+                throw new Error("Must have at least one filter block, will not delete last one.");
+            } else if (nextFBLen === 1) {
+                // Set to the only fb, since otherwise would have no difference if is compound request, just lack of faceting (= extra UI click to get it back).
+                selectedFilterBlockIdx = 0;
+            } else if (pastSelectedIdx !== null) {
+                if (pastSelectedIdx === idx) {
+                    // We deleted the previously-selected block, unset selection.
                     selectedFilterBlockIdx = null;
-                } else if (selectedFilterBlockIdx > idx) {
+                } else if (pastSelectedIdx > idx) {
+                    // Shift index closer to start to keep previously-selected block selected.
                     selectedFilterBlockIdx = selectedFilterBlockIdx - 1;
                 }
             }
+
             return {
-                "currFilterSet": {
-                    ...pastFS,
-                    "filter_blocks" : nextFB
-                },
-                selectedFilterBlockIdx
+                cachedCounts,
+                selectedFilterBlockIdx,
+                "currFilterSet": { ...pastFS, "filter_blocks" : nextFB },
+                "isSettingFilterBlockIdx": (typeof selectedFilterBlockIdx === "number" && selectedFilterBlockIdx !== pastSelectedIdx)
             };
+
         }, this.navigateToCurrentBlock);
     }
 
@@ -1084,10 +1160,7 @@ export class FilterSetController extends React.PureComponent {
             nextBlock.name = newName;
             nextFB[idx] = nextBlock;
             return {
-                "currFilterSet": {
-                    ...pastFS,
-                    "filter_blocks" : nextFB
-                }
+                "currFilterSet": { ...pastFS, "filter_blocks" : nextFB }
             };
         }, cb);
     }

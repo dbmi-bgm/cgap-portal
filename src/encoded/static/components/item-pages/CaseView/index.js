@@ -119,6 +119,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         context = {},
         href,
         session,
+        schemas,
         graphData,
         selectedDiseases,
         windowWidth,
@@ -276,7 +277,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
-                        <FilteringTab {...{ context, windowHeight, session }} />
+                        <FilteringTab {...{ context, windowHeight, session, schemas }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
                         <InterpretationTab {...props} />
