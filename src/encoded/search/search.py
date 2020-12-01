@@ -132,7 +132,7 @@ class SearchBuilder:
         return self.forced_type.lower()
 
     @classmethod
-    def from_search(cls, context, request, search, return_generator):
+    def from_search(cls, context, request, search):
         """ Builds a SearchBuilder object with a pre-built search by skipping the bootstrap
             initialization and setting self.search directly.
 
@@ -142,7 +142,6 @@ class SearchBuilder:
         :return:
         """
         search_builder_instance = cls(context, request, skip_bootstrap=True)  # bypass (most of) bootstrap
-        search_builder_instance.return_generator = return_generator
         search_builder_instance.search.update_from_dict(search)  # parse compound query
         return search_builder_instance
 
@@ -1033,10 +1032,16 @@ class SearchBuilder:
         extra_requests_needed_count = math.ceil(total_results_expected / size_increment) - 1
 
         if extra_requests_needed_count > 0:
+            # Returns a generator as value of es_result['hits']['hits']
+            # Will be returned directly if self.return_generator is true
+            # or converted to list if meant to be HTTP response.
+            # Theoretical but unnecessary future: Consider allowing to return HTTP Stream of results w. return_generator=true (?)
             es_result['hits']['hits'] = itertools.chain(
                 es_result['hits']['hits'],
                 self.get_all_subsequent_results(
-                    self.request, es_result, self.search, extra_requests_needed_count, size_increment))
+                    self.request, es_result, self.search, extra_requests_needed_count, size_increment
+                )
+            )
         return es_result
 
     def execute_search(self):
@@ -1188,6 +1193,7 @@ def collection_view(context, request):
 def get_iterable_search_results(request, search_path='/search/', param_lists=None, **kwargs):
     '''
     Loops through search results, returns 100 (or search_results_chunk_row_size) results at a time. Pass it through itertools.chain.from_iterable to get one big iterable of results.
+    Potential TODO: Move to search_utils or other file, and have this (or another version of this) handle compound filter_sets.
 
     :param request: Only needed to pass to do_subreq to make a subrequest with.
     :param search_path: Root path to call, defaults to /search/.

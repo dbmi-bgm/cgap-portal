@@ -95,12 +95,14 @@ class CompoundSearchBuilder:
 
         :param request: current request
         :param es_results: response from ES
-        :param return_generator: whether or not we are returning a generator or a response
         :return: dictionary response
         """
-        # if this is a subrequest/gen request, return '@graph' directly
-        if request.__parent__ is not None or search_builder_instance.return_generator:
-            return [ hit['_source']['embedded'] for hit in es_results['hits']['hits'] ]
+
+        # RETURN_GENERATOR IS NOT CURRENTLY SUPPORTED FOR COMPOUND FILTER SETS - EVENTUALLY COULD BE PASSED IN BY `get_iterable_search_results`
+        # if `get_iterable_search_results` made to support compound filter sets. Will be done in tandem with allowing limit=all, if this becomes needed.
+
+        # if request.__parent__ is not None or getattr(search_builder_instance, "return_generator", False):
+        #     return [ hit['_source']['embedded'] for hit in es_results['hits']['hits'] ]
 
         if es_results['hits']['total'] == 0:
             request.response.status_code = 404  # see google webmaster doc on why
@@ -118,19 +120,19 @@ class CompoundSearchBuilder:
         }
 
     @staticmethod
-    def invoke_search(context, request, subreq, return_generator=False):
+    def invoke_search(context, request, subreq):
         """ Wrapper method that invokes the core search API (/search/) with the given subreq and
             propagates the response to the "parent" request.
 
         :param context: context of parent request
         :param request: parent request
         :param subreq: subrequest
-        :param return_generator: whether or not to return a generator
         :return: response from /search/
         """
-        search_builder_instance = SearchBuilder(context, subreq, None, return_generator)
-        search_builder_instance.assure_session_id()
-        response = search_builder_instance._search() # Calls SearchBuilder.format_results internally, incl. adding searchSessionID cookie to response.
+        # Initializes all of SearchBuilder stuff (uses constructor here, not from_search class method), incl. `assure_session_id`
+        search_builder_instance = SearchBuilder(context, subreq, None, return_generator=False)
+        # Calls SearchBuilder.format_results internally, incl. adding searchSessionID cookie to response.
+        response = search_builder_instance._search()
         if subreq.response.status_code == 404:
             request.response.status_code = 404
         return response
@@ -176,7 +178,7 @@ class CompoundSearchBuilder:
             else:
                 query = type_flag
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return cls.invoke_search(context, request, subreq, return_generator=return_generator)
+            return cls.invoke_search(context, request, subreq)
 
         # if we specified global_flags, combine that query with the single filter_block,
         # otherwise pass the filter_block query directly
@@ -189,7 +191,7 @@ class CompoundSearchBuilder:
                 query = block_query
             query = cls._add_type_to_flag_if_needed(query, type_flag)
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return cls.invoke_search(context, request, subreq, return_generator=return_generator)
+            return cls.invoke_search(context, request, subreq)
 
         # Extract query string and list of applied flags, add global_flags to block_query first
         # then add flags as applied and type_flag if needed.
@@ -207,7 +209,7 @@ class CompoundSearchBuilder:
                         break
             query = cls._add_type_to_flag_if_needed(query, type_flag)
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return cls.invoke_search(context, request, subreq, return_generator=return_generator)
+            return cls.invoke_search(context, request, subreq)
 
         # Build the compound_query
         # Iterate through filter_blocks, adding global_flags if specified and adding flags if specified
@@ -240,7 +242,7 @@ class CompoundSearchBuilder:
 
             sort, result_sort = build_sort_dicts(requested_sorts, request, [ doc_type ])
 
-            search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query, return_generator)
+            search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query)
             search_builder_instance.assure_session_id()
             search_builder_instance.search = search_builder_instance.search.sort(sort)
             search_builder_instance.search = search_builder_instance.search[from_ : from_ + to]
@@ -372,7 +374,10 @@ def compound_search(context, request):
 
     from_ = body.get('from', 0)
     limit = body.get('limit', 25)
-    return_generator = body.get('return_generator', False)
+    if limit == "all":
+        raise HTTPBadRequest("compound_search does not support limit=all at this time.")
+    if limit > 1000:
+        limit = 1000
     global_flags = body.get('global_flags', None)
     if from_ < 0 or limit < 0:
         raise HTTPBadRequest('Passed bad from, to request body params: %s, %s' % (from_, limit))
@@ -383,6 +388,5 @@ def compound_search(context, request):
         from_=from_,
         to=limit,
         global_flags=global_flags,
-        return_generator=return_generator,
         intersect=intersect,
     )
