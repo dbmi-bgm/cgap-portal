@@ -550,68 +550,93 @@ h3.submission-subtitle {
 
 /*** Status Color Styles & Indicators ***/
 
+// TODO: Move to more common/utility-like place.
+
 @mixin statusColorStyles {
-	&[data-status="released"]:before,
-	&[data-status="current"]:before,
-	&[data-status="uploaded"]:before,
-	&[data-status="published"]:before,
-	&[data-status="complete"]:before {
+
+	// Green
+	&[data-status="current"]:before,						// Applicable to Item.status
+	&[data-status="shared"]:before,							// Applicable to Item.status
+	&[data-status="released"]:before,						// Applicable to Item.status
+	&[data-status="uploaded"]:before,						// Applicable to File.status
+	&[data-status="public"]:before,							// Applicable to Pages & UserContent
+	&[data-status="complete"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
+	&[data-status="benign"]:before,							// Applicable to ClinVar Clinical Significance
+	&[data-status="protective"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #308756;
 	}
 
-	&[data-status="revoked"]:before,
-	&[data-status="obsolete"]:before,
-	&[data-status="restricted"]:before {
-		color: #fff;
-		background-color: #812423;
-	}
-
-	&[data-status="deleted"]:before,
-	&[data-status="upload failed"]:before,
-	&[data-status="failed"]:before {
-		color: #fff;
-		background-color: #a90d0b;
-	}
-
-	&[data-status="replaced"]:before,
-	&[data-status="planned"]:before,
-	&[data-status="to be uplodaded by workflow"]:before {
-		color: #fff;
-		background-color: #47419a;
-	}
-
-	&[data-status="in review by lab"]:before,
-	&[data-status="in review"]:before,
-	&[data-status="submission in progress"]:before,
-	&[data-status="uploading"]:before,
-	&[data-status="draft"]:before,
-	&[data-status="incomplete"]:before, 
-	&[data-status="in progress"]:before {
-		color: #fff;
-		background-color: #d8bd22;
-	}
-
-	&[data-status="released to project"]:before {
+	// Greener Yellow
+	&[data-status="released to project"]:before {			// Applicable to Item.status
 		color: #fff;
 		background-color: #397855;
 	}
 
-	&[data-status="released to lab"]:before {
+	// Green-Yellow
+	&[data-status="released to institution"]:before,		// Applicable to Item.status
+	&[data-status="in public review"]:before,				// Applicable to Item.status
+	&[data-status="uploading"]:before,						// Applicable to File.status
+	&[data-status="output_files_transferring"]:before,		// Applicable to WorkflowRun.run_status
+	&[data-status="output_file_transfer_finished"]:before,	// Applicable to WorkflowRun.run_status
+	&[data-status="likely benign"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #80921c;
 	}
 
-	&[data-status="unspecified"]:before,
-	&[data-status="archived"]:before,
-	&[data-status="archived to project"]:before,
-	&[data-status="not implemented"]:before,
-	&[data-status="not started"]:before {
+	// Yellow
+	&[data-status="in review"]:before,						// Applicable to Item.status
+	&[data-status="started"]:before, 						// Applicable to WorkflowRun.run_status
+	&[data-status="running"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
+	&[data-status="in progress"]:before, 					// Applicable to columnExtensionMap columns
+	&[data-status="incomplete"]:before, 					// Applicable to columnExtensionMap columns
+	&[data-status="uncertain significance"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="associaton"]:before {					// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: #d8bd22;
+	}
+
+	// Maroon/dark-red
+	&[data-status="replaced"]:before,						// Applicable to Item.status
+	&[data-status="inactive"]:before,						// Applicable to Item.status
+	&[data-status="revoked"]:before,						// Applicable to User.status
+	&[data-status="probable-pathogenic"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="affects"]:before,						// Applicable to ClinVar Clinical Significance
+	&[data-status="restricted"]:before {					// Deprecated?
+		color: #fff;
+		background-color: #812423;
+	}
+
+	// Bright Red
+	&[data-status="deleted"]:before,						// Applicable to Item.status
+	&[data-status="upload failed"]:before,					// Applicable to File.status
+	&[data-status="error"]:before,							// Applicable to WorkflowRun.run_status + columnExtensionMap columns
+	&[data-status="risk factor"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="pathogenic"]:before {					// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: #a90d0b;
+	}
+
+	// Purple
+	&[data-status="to be uplodaded by workflow"]:before,	// Applicable to File.status
+	&[data-status="other"]:before {							// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: #47419a;
+	}
+
+	
+	// Gray (unused?) (used to be for 'archived')
+	&[data-status="obsolete"]:before,						// Applicable to Item.status
+	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
+	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
+	&[data-status="not provided"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="unspecified"]:before {					// Deprecated? Fallback for lack of status in some cases?
 		color: #fff;
 		background-color: #7b7b7b;
 		//display: none;
 	}
 }
+
 
 i.status-indicator-dot {
 	display: inline-block;
@@ -2622,32 +2647,13 @@ $download-button-width : 100px;
 
 div.user-profile-page {
 
-	/* Panels */
-
-	.panel.shadow-border {
-		background-color: inherit;
-		margin-bottom: 15px;
-		padding: 15px 20px;
-		overflow: visible;
-		border: 1px solid transparent; /* So bordered and border-less panels have same padding */
-		@include box-shadow(0px 0px 0px rgba(0,0,0,0));
-
-		border: 1px solid #ddd;
-		border-bottom-color: #c8c8c8;
-		box-shadow: 0px 1px 9px -3px rgba(0,0,0,0.5);
-		background-color: #fff;
+	@include media-breakpoint-up(md){
+		min-height: calc(100vh - 250px); // 250px is sum of header, footer, and page title. If any of those change, this needs updating.
 	}
+
 
 	.panel.user-info,
 	.panel.user-work-info {
-
-		margin-bottom: 20px;
-		margin-top: 0;
-
-		@include media-breakpoint-up(lg){
-			margin-bottom: 0;
-			height: 100%;
-		}
 
 		// Override of prev CSS
 		.col-md-3.text-right.text-left-xs {
@@ -2683,7 +2689,7 @@ div.user-profile-page {
 
 	}
 
-	.panel.user-info {
+	.card.user-info {
 		/* for fun - comment out bottom transform in Inspect Element */
 		transform: rotateZ(0deg) scale3d(1, 1, 1) translateX(0);
 		opacity: 1;
@@ -2691,7 +2697,6 @@ div.user-profile-page {
 		transition: transform 1.2s ease-out, opacity 1.5s ease-out, left 1.2s ease-out;
 		position: relative;
 		z-index: 2;
-		background-color: #fff;
 
 		&.transition { transform: rotateZ(-900deg) scale3d(0.1, 0.1, 0.1) translateX(-1200px); opacity: 0; left: -900px; }
 
@@ -2700,15 +2705,8 @@ div.user-profile-page {
 			border-bottom: 1px solid #eee;
 		}
 
-		.user-title-col {
-			padding-bottom: 17px;
-		}
-
 		.user-title {
-			margin-top: 0px;
-			margin-bottom: 0px;
 			font-weight: 300;
-			font-size: 2.6rem;
 
 			.editable-field-entry {
 				//max-width: 50%; // Need to fit 2 inline editable fields on one row for users full name.
@@ -2719,19 +2717,11 @@ div.user-profile-page {
 						font-size: 1rem;
 					}
 				}
-				&.editing{
-					//max-width: 70%;
-				}
 			}
 
 		}
 
 		@include media-breakpoint-up(md){
-
-			.user-title-col {
-				padding-top: 15px;
-				min-height: 85px;
-			}
 
 			.user-title {
 				/* white-space: nowrap; */
@@ -2828,26 +2818,10 @@ div.user-profile-page {
 	}
 
 	.access-keys-container {
-		padding-top: 15px;
-
-		> h3 {
-
-			margin-bottom: 17px;
-			/*
-			padding-bottom: 17px;
-			border-bottom: 1px solid #eee;
-			*/
-		}
 
 		table.access-keys-table {
-			margin-bottom: 20px;
 
 			tr {
-				/*
-				&:nth-child(2n-1) {
-					background-color: #f8f8f8;
-				}
-				*/
 				td {
 					border-bottom: 1px solid #eee;
 					&.access-key-buttons {

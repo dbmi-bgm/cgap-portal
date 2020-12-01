@@ -26,8 +26,8 @@
                   "contents": [
                       {
                           "filetype": "beddb",
-                          "server": "https://higlass.io/api/v1",
-                          "tilesetUid": "P0PLbQMwTYGy-5uPIQid7A",
+                          "server": "https://cgap-higlass.com/api/v1",
+                          "tilesetUid": "gene_annotation_hg38",
                           "uid": "FocNIVsfRVWMRzfmHfncsQ",
                           "type": "gene-annotations",
                           "options": {
@@ -105,8 +105,8 @@
               "top":[
                 {
                   "filetype":"chromsizes-tsv",
-                  "server":"//higlass.io/api/v1",
-                  "tilesetUid":"NyITQvZsS_mOFNlz5C2LJg",
+                  "server":"https://cgap-higlass.com/api/v1",
+                  "tilesetUid":"chromsizes_hg38",
                   "uid":"AdlJsUYFRzuJRZyYeKDX2A",
                   "type":"chromosome-labels",
                   "options":{

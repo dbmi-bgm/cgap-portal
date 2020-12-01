@@ -29,7 +29,7 @@ export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 12
  * Maybe we could have something like 'shouldComponentUpdate(){ return false; }` to prevent it from ever even
  * attempting to compare props for performance gain (since many table cells).
  *
- * Colors are bound to 'data-status' attribute values in SCSS to statuses, so we re-use those here rather than 
+ * Colors are bound to 'data-status' attribute values in SCSS to statuses, so we re-use those here rather than
  * creating separate 'color map' for this, and override tooltip with custom value.
  */
 const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
@@ -275,8 +275,10 @@ export const columnExtensionMap = {
             let fastqPresent = false;
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                const { '@type': [type] } = file || {};
-                if (type === "FileFastq") {
+                const { uuid = null, '@type': [type], status: fileStatus = null } = file || {};
+                if (type === "FileFastq" &&
+                    (uuid && fileStatus && fileStatus !== "uploading" && fileStatus !== "upload_failed")
+                ) {
                     fastqPresent = true;
                     break;
                 }
@@ -315,49 +317,12 @@ export const columnExtensionMap = {
     /** "Bioinformatics" column title */
     'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
-            const { '@id' : resultHrefPath, sample = null, sample_processing = null, vcf_file = null } = result;
-            if (!sample_processing) return null; // Unsure if possible, but fallback to null / '-' in case so (not showing datetitle etc)
-            const {
-                analysis_type: mainTitle = null,
-                last_modified: { date_modified: date = null } = {}
-            } = sample_processing;
-            const {
-                files = [],
-                // processed_files = []
-            } = sample || {};
+            const { '@id' : resultHrefPath, sample_processing = null } = result;
+            if (!sample_processing) return null; // Fallback to null / '-' in case so (not showing datetitle etc)
 
-            let status = null;
-            let statusTip = null;
-
-            // Ensure fastQs exist
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const { uuid = null, status: fileStatus = null } = file;
-                if (!uuid || fileStatus === "uploading" || fileStatus === "upload_failed" || !fileStatus) {
-                    statusTip = "No fastq files";
-                    status = "not started";
-                    break;
-                } else {
-                    statusTip = "Fastq file(s) uploaded";
-                    status = "in progress";
-                }
-            }
-
-            // If fastQs are present... check if ingested
-            if (status === "in progress") {
-                const { file_ingestion_status: ingestionStatus = null } = vcf_file || {};
-                if (ingestionStatus && ingestionStatus === "Ingested") {
-                    statusTip = "Variants are ingested";
-                    status = "complete";
-                }
-            }
-
-            // Check if overall QCs passed (not yet implemented) -- to add later
-
-            // Unlikely to show in non-Case item results, so didn't add Case filter
             return (
                 <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Last Update:" />
+                    <BioinformaticsMultiLevelColumn result={result} />
                 </a>
             );
         }
@@ -438,7 +403,7 @@ export const columnExtensionMap = {
             const statusFormatted = Schemas.Term.toName('status', result.status);
             return (
                 <React.Fragment>
-                    <i className="item-status-indicator-dot mr-07" data-status={result.status}/>
+                    <i className="status-indicator-dot mr-07" data-status={result.status}/>
                     <span className="value">{ statusFormatted }</span>
                 </React.Fragment>
             );
@@ -479,3 +444,49 @@ export const columnExtensionMap = {
     }
 };
 
+
+const BioinformaticsMultiLevelColumn = React.memo(function BioinformaticsMultiLevelColumn({ result }){
+    const { sample, sample_processing, vcf_file } = result;
+    const {
+        analysis_type: mainTitle = null,
+        last_modified: { date_modified: date = null } = {}
+    } = sample_processing;
+    const {
+        files = [],
+        /* processed_files = [] */
+    } = sample || {};
+
+    const filesLen = files.length;
+
+    let status = null;
+    let statusTip = null;
+
+    // Ensure fastQs exist
+    if (filesLen > 0) {
+        statusTip = "Fastq file(s) uploaded";
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const { uuid = null, status: fileStatus = null } = file;
+            if (!uuid || fileStatus === "uploading" || fileStatus === "upload_failed" || !fileStatus) {
+                statusTip = "No fastq files";
+                status = "not started";
+                break;
+            }
+        }
+    }
+
+    // If fastQs are present... check if ingested
+    if (filesLen > 0 && status === null) {
+        status = "running";
+        const { file_ingestion_status: ingestionStatus = null } = vcf_file || {};
+        if (ingestionStatus === "Ingested") {
+            statusTip = "Variants are ingested";
+            status = "complete";
+        }
+    }
+
+    // Check if overall QCs passed (not yet implemented) -- to add later
+
+    // Unlikely to show in non-Case item results, so didn't add Case filter
+    return <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Last Update:" />;
+});

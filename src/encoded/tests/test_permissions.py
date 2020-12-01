@@ -9,57 +9,84 @@ from ..types.institution import Institution
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 
-# XXX: There are a lot of testing holes here. New datafixtures will need to be
-# developed to adequately test the permissions.
+"""Set up  of basic statuses for testing access to Items
+    statuses in this list have a mapping to an ACL
+    with the exception of 'upload failed' that acts as a standin for all non-ACL
+    mapped statuses and defaults to the admin only ACL
 
+    NOTE: 'public' applies to only certain Items - specified in status enum
+    and give public access so is tested separately
+"""
+# viewable by authenticated
+SHARED = "shared"
+OBSOLETE = "obsolete"
+# viewable by project member
+CURRENT = "current"
+INACTIVE = "inactive"
+IN_REVIEW = "in review"
+# kind of special admin-only
+DELETED = "deleted"
+# special file status case due to redirect
+REPLACED = "replaced"
+# no staus_acl mapping so default to admin only
+UPLOAD_FAILED = "upload failed"
+STATUSES = [SHARED, OBSOLETE, CURRENT, INACTIVE, IN_REVIEW, DELETED, REPLACED, UPLOAD_FAILED]
+
+# institution, project and user fixtures
 @pytest.fixture
-def remc_institution(testapp):
+def bwh_institution(testapp):
     item = {
-        'name': 'remc-institution',
-        'title': 'REMC institution',
+        'name': 'bwh',
+        'title': 'Brigham and Womens Hospital',
         'status': 'current'
     }
     return testapp.post_json('/institution', item).json['@graph'][0]
 
 
 @pytest.fixture
-def someinstitution_w_shared_project(testapp, project):
+def core_project(testapp):
     item = {
-        'name': 'some-institution',
-        'title': 'SOME institution',
-        'status': 'current',
-        'projects': [project['@id']]
-    }
-    return testapp.post_json('/institution', item).json['@graph'][0]
-
-
-@pytest.fixture
-def remc_project(testapp):
-    item = {
-        'name': 'remc-project',
-        'title': 'REMC Project',
-        'description': 'REMC test project',
-        'viewing_group': 'Not 4DN',
+        'name': 'core-project',
+        'title': 'CGAP',
+        'description': 'Project associated with most core shared items'
     }
     return testapp.post_json('/project', item).json['@graph'][0]
 
 
 @pytest.fixture
-def nofic_project(testapp):
+def udn_project(testapp):
     item = {
-        'name': 'NOFIC-project',
-        'description': 'NOFIC test project',
-        'viewing_group': 'NOFIC',
+        'name': 'udn-project',
+        'title': 'UDN Project',
+        'description': 'Undiagnosed Disease Network'
     }
     return testapp.post_json('/project', item).json['@graph'][0]
 
 
+BGM_PROJECT = 'bgm-project'
+CORE_PROJECT = 'core-project'
+UDN_PROJECT = 'udn-project'
+TEST_PROJECT_NAMES = [BGM_PROJECT, CORE_PROJECT, UDN_PROJECT]
+
+
 @pytest.fixture
-def wrangler(testapp):
+def projects_by_name(core_project, bgm_project, udn_project):
+    proj_by_name = {
+        core_project.get('name'): core_project,
+        bgm_project.get('name'): bgm_project,
+        udn_project.get('name'): udn_project
+    }
+    # test to make sure all names in fixtures are as expected
+    assert all([name in TEST_PROJECT_NAMES for name in proj_by_name])
+    return proj_by_name
+
+
+@pytest.fixture
+def admin_user(testapp):
     item = {
-        'first_name': 'Wrangler',
+        'first_name': 'CGAP',
         'last_name': 'Admin',
-        'email': 'wrangler@example.org',
+        'email': 'cgapadmin@example.org',
         'groups': ['admin'],
     }
 
@@ -69,12 +96,13 @@ def wrangler(testapp):
 
 
 @pytest.fixture
-def institution_viewer(testapp, institution, project):
+def udn_user(testapp, bwh_institution, udn_project):
     item = {
-        'first_name': 'ENCODE',
-        'last_name': 'institution viewer',
-        'email': 'encode_viewer@example.org',
-        'institution': institution['name'],
+        'first_name': 'UDN',
+        'last_name': 'user',
+        'email': 'udnuser@example.org',
+        'institution': bwh_institution['name'],
+        'project_roles': [{'project': udn_project['@id']}],
         'status': 'current'
     }
     # User @@object view has keys omitted.
@@ -83,26 +111,13 @@ def institution_viewer(testapp, institution, project):
 
 
 @pytest.fixture
-def project_viewer(testapp, someinstitution_w_shared_project):
+def multi_project_user(testapp, bwh_institution, bgm_project, udn_project):
     item = {
-        'first_name': 'SOME',
-        'last_name': 'project viewer',
-        'email': 'projectee@example.org',
-        'institution': someinstitution_w_shared_project['@id'],
-        'status': 'current',
-    }
-    # User @@object view has keys omitted.
-    res = testapp.post_json('/user', item)
-    return testapp.get(res.location).json
-
-
-# this user has the 4DN viewing group
-@pytest.fixture
-def viewing_group_member(testapp, project):
-    item = {
-        'first_name': 'Viewing',
-        'last_name': 'Group',
-        'email': 'viewing_group_member@example.org',
+        'first_name': 'Multi Project',
+        'last_name': 'user',
+        'email': 'multiuser@example.org',
+        'institution': bwh_institution['name'],
+        'project_roles': [{'project': bgm_project['@id']}, {'project': udn_project['@id']}],
         'status': 'current'
     }
     # User @@object view has keys omitted.
@@ -111,12 +126,12 @@ def viewing_group_member(testapp, project):
 
 
 @pytest.fixture
-def remc_submitter(testapp, remc_institution, remc_project):
+def no_project_user(testapp, bwh_institution, bgm_project, udn_project):
     item = {
-        'first_name': 'REMC',
-        'last_name': 'Submitter',
-        'email': 'remc_submitter@example.org',
-        'submits_for': [remc_institution['@id']],
+        'first_name': 'No Project',
+        'last_name': 'user',
+        'email': 'noproject@example.org',
+        'institution': bwh_institution['name'],
         'status': 'current'
     }
     # User @@object view has keys omitted.
@@ -124,6 +139,20 @@ def remc_submitter(testapp, remc_institution, remc_project):
     return testapp.get(res.location).json
 
 
+@pytest.fixture
+def deleted_user(testapp, bwh_institution, bgm_project):
+    item = {
+        'first_name': 'Deleted',
+        'last_name': 'BGM User',
+        'email': 'deleted_user@example.org',
+        'status': 'deleted',
+    }
+    # User @@object view has keys omitted.
+    res = testapp.post_json('/user', item)
+    return testapp.get(res.location).json
+
+
+# testapp fixtures acting as different users
 def remote_user_testapp(app, remote_user):
     environ = {
         'HTTP_ACCEPT': 'application/json',
@@ -133,102 +162,33 @@ def remote_user_testapp(app, remote_user):
 
 
 @pytest.fixture
-def revoked_user(testapp, institution, project):
-    item = {
-        'first_name': 'ENCODE',
-        'last_name': 'Submitter',
-        'email': 'no_login_submitter@example.org',
-        'submits_for': [institution['@id']],
-        'status': 'revoked',
-    }
-    # User @@object view has keys omitted.
-    res = testapp.post_json('/user', item)
-    return testapp.get(res.location).json
+def admin_testapp(admin_user, app, external_tx, zsa_savepoints):
+    return remote_user_testapp(app, admin_user['uuid'])
 
 
 @pytest.fixture
-def other_institution(testapp):
-    item = {
-        'title': 'Other institution',
-        'name': 'other-institution',
-    }
-    return testapp.post_json('/institution', item, status=201).json['@graph'][0]
+def bgm_user_testapp(bgm_user, app, external_tx, zsa_savepoints):
+    return remote_user_testapp(app, bgm_user['uuid'])
 
 
 @pytest.fixture
-def simple_file(testapp, institution, project, file_formats):
-    item = {
-        'uuid': '3413218c-3d86-498b-a0a2-9a406638e777',
-        'file_format': file_formats.get('fastq').get('@id'),
-        'paired_end': '1',
-        'institution': institution['@id'],
-        'project': project['@id'],
-        'status': 'uploaded',  # avoid s3 upload codepath
-    }
-    return testapp.post_json('/file_fastq', item).json['@graph'][0]
+def udn_user_testapp(udn_user, app, external_tx, zsa_savepoints):
+    return remote_user_testapp(app, udn_user['uuid'])
 
 
 @pytest.fixture
-def step_run(testapp, institution, project):
-    software = {
-        'name': 'do-thing',
-        'description': 'It does the thing',
-        'title': 'THING_DOER',
-        'version': '1.0',
-        'software_type': "normalizer",
-        'project': project['@id'],
-        'institution': institution['@id']
-    }
-    sw = testapp.post_json('/software', software, status=201).json['@graph'][0]
-
-    analysis_step = {
-        'name': 'do-thing-step',
-        'version': 1,
-        'software_used': sw['@id']
-    }
-    return testapp.post_json('/analysis-steps', analysis_step, status=201).json['@graph'][0]
+def multi_project_user_testapp(multi_project_user, app, external_tx, zsa_savepoints):
+    return remote_user_testapp(app, multi_project_user['uuid'])
 
 
 @pytest.fixture
-def expt_w_cont_institution_item(institution, remc_institution, project, human_biosample, exp_types):
-    return {
-        'institution': institution['@id'],
-        'project': project['@id'],
-        'biosample': human_biosample['@id'],
-        'experiment_type': exp_types['microc']['@id'],
-        'contributing_institutions': [remc_institution['@id']]
-    }
+def no_project_user_testapp(no_project_user, app, external_tx, zsa_savepoints):
+    return remote_user_testapp(app, no_project_user['uuid'])
 
 
 @pytest.fixture
-def wrangler_testapp(wrangler, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, wrangler['uuid'])
-
-
-@pytest.fixture
-def remc_member_testapp(remc_submitter, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, remc_submitter['uuid'])
-
-
-@pytest.fixture
-def submitter_testapp(submitter, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, submitter['uuid'])
-
-
-@pytest.fixture
-def institution_viewer_testapp(institution_viewer, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, institution_viewer['uuid'])
-
-
-@pytest.fixture
-def project_viewer_testapp(project_viewer, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, project_viewer['uuid'])
-
-
-@pytest.fixture
-def viewing_group_member_testapp(viewing_group_member, app, external_tx, zsa_savepoints):
-    # app for 4DN viewing group member
-    return remote_user_testapp(app, viewing_group_member['uuid'])
+def deleted_user_testapp(deleted_user, app, external_tx, zsa_savepoints):
+    return remote_user_testapp(app, deleted_user['uuid'])
 
 
 @pytest.fixture
@@ -236,266 +196,281 @@ def indexer_testapp(app, external_tx, zsa_savepoints):
     return remote_user_testapp(app, 'INDEXER')
 
 
-def test_wrangler_post_non_institution_collection(wrangler_testapp):
-    item = {
-        'first_name': 'Hi, my',
-        'last_name': 'name is',
-        'email': 'what@mynameis.what'
-    }
-    return wrangler_testapp.post_json('/user', item, status=201)
-
-
-def test_submitter_cant_post_non_institution_collection(submitter_testapp):
-    item = {
-        'first_name': 'Hi, my',
-        'last_name': 'name is',
-        'email': 'what@mynameis.what'
-    }
-    return submitter_testapp.post_json('/user', item, status=403)
-
-
-def test_user_view_details_admin(submitter, access_key, testapp):
-    res = testapp.get(submitter['@id'])
-    assert 'email' in res.json
-
-
-def test_users_view_details_self(submitter, access_key, submitter_testapp):
-    res = submitter_testapp.get(submitter['@id'])
-    assert 'email' in res.json
-
-
-def test_users_patch_self(submitter, access_key, submitter_testapp):
-    submitter_testapp.patch_json(submitter['@id'], {})
-
-
-def test_users_post_disallowed(submitter, access_key, submitter_testapp):
-    item = {
-        'first_name': 'ENCODE',
-        'last_name': 'Submitter2',
-        'email': 'encode_submitter2@example.org',
-    }
-    submitter_testapp.post_json('/user', item, status=403)
-
-
-def test_users_cannot_view_other_users_info_with_basic_authenticated(submitter, authenticated_testapp):
-    authenticated_testapp.get(submitter['@id'], status=403)
-
-
-def test_users_can_see_their_own_user_info(submitter, submitter_testapp):
-    res = submitter_testapp.get(submitter['@id'])
-    assert 'title' in res.json
-    assert 'email' in res.json
-
-
-def test_users_view_basic_anon(submitter, anontestapp):
-    anontestapp.get(submitter['@id'], status=403)
-
-
-def test_users_view_basic_indexer(submitter, indexer_testapp):
-    res = indexer_testapp.get(submitter['@id'])
-    assert 'title' in res.json
-    assert 'email' not in res.json
-    assert 'access_keys' not in res.json
-
-
-def test_submitter_patch_institution_disallowed(submitter, other_institution, submitter_testapp):
-    res = submitter_testapp.get(submitter['@id'])
-    institution = {'institution': other_institution['@id']}
-    submitter_testapp.patch_json(res.json['@id'], institution, status=422)  # is that the right status?
-
-
-def test_wrangler_patch_institution_allowed(submitter, other_institution, wrangler_testapp):
-    res = wrangler_testapp.get(submitter['@id'])
-    institution = {'institution': other_institution['@id']}
-    wrangler_testapp.patch_json(res.json['@id'], institution, status=200)
-
-
-def test_submitter_patch_submits_for_disallowed(submitter, other_institution, submitter_testapp):
-    res = submitter_testapp.get(submitter['@id'])
-    submits_for = {'submits_for': [res.json['submits_for'][0]['@id']] + [other_institution['@id']]}
-    submitter_testapp.patch_json(res.json['@id'], submits_for, status=422)
-
-
-def test_wrangler_patch_submits_for_allowed(submitter, other_institution, wrangler_testapp):
-    res = wrangler_testapp.get(submitter['@id'])
-    submits_for = {'submits_for': [res.json['submits_for'][0]['@id']] + [other_institution['@id']]}
-    wrangler_testapp.patch_json(res.json['@id'], submits_for, status=200)
-
-
-def test_submitter_patch_groups_disallowed(submitter, submitter_testapp):
-    res = submitter_testapp.get(submitter['@id'])
-    groups = {'groups': res.json.get('groups', []) + ['admin']}
-    submitter_testapp.patch_json(res.json['@id'], groups, status=422)
-
-
-def test_wrangler_patch_groups_allowed(submitter, other_institution, wrangler_testapp):
-    res = wrangler_testapp.get(submitter['@id'])
-    groups = {'groups': res.json.get('groups', []) + ['admin']}
-    wrangler_testapp.patch_json(res.json['@id'], groups, status=200)
-
-
-@pytest.mark.xfail # XXX: Bug?
-def test_submitter_patch_viewing_groups_disallowed(submitter, other_institution, submitter_testapp):
-    res = submitter_testapp.get(submitter['@id'])
-    vgroups = {'viewing_groups': res.json['viewing_groups'] + ['GGR']}
-    submitter_testapp.patch_json(res.json['@id'], vgroups, status=422)
-
-
-def test_institutions_view_wrangler(wrangler_testapp, other_institution):
-    institutions = wrangler_testapp.get('/institutions/', status=200)
-    assert(len(institutions.json['@graph']) == 1)
-
-
-##############################################
-# Permission tests based on different statuses
-# Submitter created item and wants to view
 @pytest.fixture
-def ind_human_item(human, project, institution):
-    return {
-        'project': project['@id'],
-        'institution': institution['@id'],
-        'organism': human['@id']
-    }
+def all_testapps(admin_testapp, bgm_user_testapp, udn_user_testapp,
+                 multi_project_user_testapp, no_project_user_testapp, anontestapp):
+    return [admin_testapp, bgm_user_testapp, udn_user_testapp,
+            multi_project_user_testapp, no_project_user_testapp, anontestapp]
 
 
+# Item fixtures
 @pytest.fixture
-def file_item(project, institution, file_formats):
+def simple_bgm_file_item(bwh_institution, bgm_project, file_formats):
+    # using file as it has all the statuses
     return {
-        'project': project['@id'],
-        'institution': institution['@id'],
+        'uuid': '3413218c-3d86-498b-a0a2-9a406638e777',
         'file_format': file_formats.get('fastq').get('@id'),
-        'paired_end': '1'
+        'institution': bwh_institution['@id'],
+        'project': bgm_project['@id'],
+        'read_length': 50,
+        'status': 'uploaded',  # avoid s3 upload codepath
     }
 
 
 @pytest.fixture
-def institution_item(institution):
+def simple_doc_item(bwh_institution, bgm_project):
+    # using file as it has all the statuses
     return {
-        'name': 'test-institution',
-        'title': 'test institution',
+        'institution': bwh_institution['@id'],
+        'project': bgm_project['@id'],
+        'description': 'test document'
     }
 
 
-@pytest.mark.xfail # XXX: Bug? Appears to auto deny
-def test_everyone_can_view_institution_item(institution_item, submitter_testapp, wrangler_testapp, remc_member_testapp):
-    statuses = ['current', 'inactive']
-    apps = [submitter_testapp, wrangler_testapp, remc_member_testapp]
-    res = wrangler_testapp.post_json('/institution', institution_item, status=201)
-    for status in statuses:
-        wrangler_testapp.patch_json(res.json['@graph'][0]['@id'], {"status": status}, status=200)
-        for app in apps:
-            app.get(res.json['@graph'][0]['@id'], status=200)
-
-
-def test_noone_can_view_deleted_institution_item(institution_item, submitter_testapp, wrangler_testapp, remc_member_testapp):
-    institution_item['status'] = 'deleted'
-    viewing_apps = [submitter_testapp, remc_member_testapp]
-    res = wrangler_testapp.post_json('/institution', institution_item, status=201)
-    for app in viewing_apps:
-        app.get(res.json['@graph'][0]['@id'], status=403)
-
-
-def test_institution_submitter_can_edit_institution(institution, submitter_testapp, wrangler_testapp):
-    res = submitter_testapp.get(institution['@id'])
-    wrangler_testapp.patch_json(res.json['@id'], {'status': 'current'}, status=200)
-    submitter_testapp.patch_json(res.json['@id'], {'city': 'My fair city'}, status=200)
-
-
-def test_statuses_that_institution_submitter_cannot_edit_institution(institution, submitter_testapp, wrangler_testapp):
-    statuses = ['deleted', 'inactive']
-    res = submitter_testapp.get(institution['@id'])
-    for status in statuses:
-        wrangler_testapp.patch_json(res.json['@id'], {'status': status}, status=200)
-        submitter_testapp.patch_json(res.json['@id'], {'city': 'My fair city'}, status=403)
-
-
-def test_institution_submitter_cannot_edit_institution_name_or_title(institution, submitter_testapp, wrangler_testapp):
-    res = submitter_testapp.get(institution['@id'])
-    wrangler_testapp.patch_json(res.json['@id'], {'status': 'current'}, status=200)
-    submitter_testapp.patch_json(res.json['@id'], {'title': 'Test Lab, HMS'}, status=422)
-    submitter_testapp.patch_json(res.json['@id'], {'name': 'test-institution'}, status=422)
-
-
-def test_wrangler_can_edit_institution_name_or_title(institution, submitter_testapp, wrangler_testapp):
-    statuses = ['deleted', 'inactive', 'current']
-    new_name = 'test-institution'
-    new_id = '/institutions/test-institution/'
-    res = submitter_testapp.get(institution['@id'])
-    original_id = res.json['@id']
-    original_name = res.json['name']
-    for status in statuses:
-        wrangler_testapp.patch_json(original_id, {'status': status}, status=200)
-        wrangler_testapp.patch_json(original_id, {'title': 'Test Lab, HMS'}, status=200)
-        wrangler_testapp.patch_json(original_id, {'name': new_name}, status=200)
-        wrangler_testapp.patch_json(new_id, {'name': original_name}, status=200)
-
-
-def test_ac_local_roles_for_institution(registry):
-    institution_data = {
-        'status': 'in review',
-        'project': 'b0b9c607-bbbb-4f02-93f4-9895baa1334b',
-        'uuid': '828cd4fe-aaaa-4b36-a94a-d2e3a36aa989'
-    }
-    test_institution = Institution.create(registry, None, institution_data)
-    institution_ac_locals = test_institution.__ac_local_roles__()
-    assert('role.institution_submitter' in institution_ac_locals.values())
-    assert('role.institution_member' in institution_ac_locals.values())
-
-
-### These aren't strictly permissions tests but putting them here so we don't need to
-###    move around wrangler and submitter testapps and associated fixtures
+def status_map_items(status2resp):
+    statuses = set(STATUSES)
+    to_test = set(status2resp.keys())
+    assert statuses == to_test, ("Mismatch between statuses expected {} and those in the test {}".format(statuses, to_test))
+    return status2resp.items()
 
 
 @pytest.fixture
-def planned_experiment_set_data(institution, project):
-    return {
-        'institution': institution['@id'],
-        'project': project['@id'],
-        'description': 'test experiment set',
-        'experimentset_type': 'custom',
+def simple_bgm_file(testapp, simple_bgm_file_item):
+    return testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+
+
+# permission tests
+@pytest.mark.parametrize('status', STATUSES)
+def test_admin_can_view_item_all_stati(testapp, admin_testapp, simple_bgm_file, status):
+    file_res = testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200).json['@graph'][0]
+    assert admin_testapp.get(file_res['@id'], status=200)
+
+
+@pytest.mark.parametrize('status', STATUSES)
+def test_admin_can_post_item_all_stati(testapp, admin_testapp, simple_bgm_file_item, status):
+    del simple_bgm_file_item['uuid']
+    simple_bgm_file_item['status'] = status
+    assert admin_testapp.post_json('/file_fastq', simple_bgm_file_item, status=201)
+
+
+@pytest.mark.parametrize('status', STATUSES)
+def test_admin_can_patch_item_all_stati(admin_testapp, simple_bgm_file, status):
+    assert simple_bgm_file['status'] == 'uploaded'
+    res = admin_testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200).json['@graph'][0]
+    assert res['status'] == status
+
+
+@pytest.mark.parametrize('status, expres', status_map_items(
+    {
+        SHARED: 200, OBSOLETE: 200, CURRENT: 200, INACTIVE: 200, IN_REVIEW: 200,
+        DELETED: 403, REPLACED: 404, UPLOAD_FAILED: 403
     }
+))
+def test_bgm_user_can_access_ok_stati_but_not_others_for_bgm_project_item(
+        testapp, bgm_user_testapp, simple_bgm_file, status, expres):
+    testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
+    res = bgm_user_testapp.get(simple_bgm_file['@id'], status=expres).json
+    if expres == 200:
+        assert res['status'] == status
+    else:
+        assert res['status'] == 'error'  # because get fails
+
+
+# Testing project-based posting - non-admin users can only post items that are attributed to the projects that
+# they are part of
+
+
+def test_bgm_user_can_post_bgm_item(bgm_user_testapp, simple_doc_item):
+    assert bgm_user_testapp.post_json('/document', simple_doc_item, status=201)
+
+
+def test_bgm_user_can_post_bgm_file(bgm_user_testapp, simple_bgm_file_item):
+    del simple_bgm_file_item['uuid']  # users wouldn't generally post uuids
+    del simple_bgm_file_item['status']  # this property also has restricted-fields and is not required
+    assert bgm_user_testapp.post_json('/file_fastq', simple_bgm_file_item, status=201)
+
+
+def test_udn_user_cannot_post_bgm_item(udn_user_testapp, simple_doc_item):
+    assert udn_user_testapp.post_json('/document', simple_doc_item, status=403)
+
+
+def test_udn_user_can_post_udn_item(udn_user_testapp, udn_project, simple_doc_item):
+    simple_doc_item['project'] = udn_project['@id']
+    assert udn_user_testapp.post_json('/document', simple_doc_item, status=201)
+
+
+@pytest.mark.parametrize('status, expres', status_map_items(
+    {
+        SHARED: 403, OBSOLETE: 403, CURRENT: 200, INACTIVE: 403, IN_REVIEW: 200,
+        DELETED: 403, REPLACED: 404, UPLOAD_FAILED: 403
+    }
+))
+def test_bgm_user_can_only_patch_current_or_in_review_item(testapp, bgm_user_testapp, simple_bgm_file, status, expres):
+    # want bgm user to only be able to patch items linked to their project with current status
+    testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
+    assert bgm_user_testapp.patch_json(simple_bgm_file['@id'], {'read_length': 100}, status=expres)
+
+
+@pytest.mark.parametrize('status, expres', status_map_items(
+    {
+        SHARED: 200, OBSOLETE: 200, CURRENT: 403, INACTIVE: 403, IN_REVIEW: 403,
+        DELETED: 403, REPLACED: 404, UPLOAD_FAILED: 403
+    }
+))
+def test_udn_user_cannot_access_bgm_item_unless_shared(testapp, udn_user_testapp, simple_bgm_file, status, expres):
+    testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200)
+    assert udn_user_testapp.get(simple_bgm_file['@id'], status=expres)
+
+
+@pytest.mark.parametrize('status', STATUSES)
+def test_udn_user_cannot_patch_bgm_item(testapp, udn_user_testapp, simple_bgm_file, status):
+    # shouldn't be able to patch at all but this may change
+    expres = 403
+    fitem = testapp.patch_json(simple_bgm_file['@id'], {'status': status}, status=200).json['@graph'][0]
+    assert fitem.get('status') == status
+    assert udn_user_testapp.patch_json(fitem['@id'], {'read_length': 100}, status=expres)
+
+
+@pytest.mark.parametrize('project_name, status, expres', [
+    (CORE_PROJECT, SHARED, 200),
+    (CORE_PROJECT, OBSOLETE, 200),
+    (CORE_PROJECT, CURRENT, 403),
+    (CORE_PROJECT, INACTIVE, 403),
+    (CORE_PROJECT, IN_REVIEW, 403),
+    (CORE_PROJECT, DELETED, 403),
+    (CORE_PROJECT, REPLACED, 403),
+    (CORE_PROJECT, UPLOAD_FAILED, 403),
+    (BGM_PROJECT, SHARED, 200),
+    (BGM_PROJECT, OBSOLETE, 200),
+    (BGM_PROJECT, CURRENT, 200),
+    (BGM_PROJECT, INACTIVE, 200),
+    (BGM_PROJECT, IN_REVIEW, 200),
+    (BGM_PROJECT, DELETED, 403),
+    (BGM_PROJECT, REPLACED, 403),
+    (BGM_PROJECT, UPLOAD_FAILED, 403),
+    (UDN_PROJECT, SHARED, 200),
+    (UDN_PROJECT, OBSOLETE, 200),
+    (UDN_PROJECT, CURRENT, 200),
+    (UDN_PROJECT, INACTIVE, 200),
+    (UDN_PROJECT, IN_REVIEW, 200),
+    (UDN_PROJECT, DELETED, 403),
+    (UDN_PROJECT, REPLACED, 403),
+    (UDN_PROJECT, UPLOAD_FAILED, 403)
+])
+def test_multi_proj_user_can_access_items_w_ok_status_from_multi_projects(
+        testapp, multi_project_user_testapp, simple_bgm_file_item,
+        projects_by_name, project_name, status, expres):
+    del simple_bgm_file_item['uuid']
+    simple_bgm_file_item['project'] = projects_by_name.get(project_name).get('@id')
+    simple_bgm_file_item['status'] = status
+    fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+    assert multi_project_user_testapp.get(fitem['@id'], status=expres)
+
+
+@pytest.mark.parametrize('project_name', [CORE_PROJECT, BGM_PROJECT, UDN_PROJECT])
+def test_project_users_can_access_shared_items_from_any_project(
+        testapp, bgm_user_testapp, simple_bgm_file, projects_by_name, project_name):
+    testapp.patch_json(
+        simple_bgm_file['@id'], {'status': SHARED, 'project': projects_by_name.get(project_name).get('@id')}, status=200)
+    assert bgm_user_testapp.get(simple_bgm_file['@id'], status=200)
+
+
+@pytest.mark.parametrize('project_name, status, expres', [
+    (CORE_PROJECT, SHARED, 200),
+    (CORE_PROJECT, OBSOLETE, 200),
+    (CORE_PROJECT, CURRENT, 403),
+    (CORE_PROJECT, INACTIVE, 403),
+    (CORE_PROJECT, IN_REVIEW, 403),
+    (CORE_PROJECT, DELETED, 403),
+    (CORE_PROJECT, REPLACED, 403),
+    (CORE_PROJECT, UPLOAD_FAILED, 403),
+    (BGM_PROJECT, SHARED, 200),
+    (BGM_PROJECT, OBSOLETE, 200),
+    (BGM_PROJECT, CURRENT, 403),
+    (BGM_PROJECT, INACTIVE, 403),
+    (BGM_PROJECT, IN_REVIEW, 403),
+    (BGM_PROJECT, DELETED, 403),
+    (BGM_PROJECT, REPLACED, 403),
+    (BGM_PROJECT, UPLOAD_FAILED, 403),
+    (UDN_PROJECT, SHARED, 200),
+    (UDN_PROJECT, OBSOLETE, 200),
+    (UDN_PROJECT, CURRENT, 403),
+    (UDN_PROJECT, INACTIVE, 403),
+    (UDN_PROJECT, IN_REVIEW, 403),
+    (UDN_PROJECT, DELETED, 403),
+    (UDN_PROJECT, REPLACED, 403),
+    (UDN_PROJECT, UPLOAD_FAILED, 403)
+])
+def test_authenticated_user_wo_project_can_only_see_shared(
+        testapp, no_project_user_testapp, simple_bgm_file_item, projects_by_name,
+        project_name, status, expres):
+    del simple_bgm_file_item['uuid']
+    simple_bgm_file_item['project'] = projects_by_name.get(project_name).get('@id')
+    simple_bgm_file_item['status'] = status
+    fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+    assert no_project_user_testapp.get(fitem['@id'], status=expres)
+
+
+def project_status_params():
+    # returns a list of tuples with all pairing combinations of test project names and status
+    # used to parameterize permission tests that all have the same expected response
+    return list(zip(TEST_PROJECT_NAMES * len(STATUSES), STATUSES * len(TEST_PROJECT_NAMES)))
+
+
+@pytest.mark.parametrize('project_name, status', project_status_params())
+def test_deleted_user_has_no_access(
+        testapp, deleted_user_testapp, simple_bgm_file_item, projects_by_name,
+        project_name, status):
+    expres = 403
+    del simple_bgm_file_item['uuid']
+    simple_bgm_file_item['status'] = status
+    fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+    assert deleted_user_testapp.get(fitem['@id'], status=expres)
+
+
+@pytest.mark.parametrize('project_name, status', project_status_params())
+def test_anonymous_user_has_no_access(
+        testapp, anontestapp, simple_bgm_file_item, projects_by_name,
+        project_name, status):
+    expres = 403
+    del simple_bgm_file_item['uuid']
+    simple_bgm_file_item['status'] = status
+    fitem = testapp.post_json('/file_fastq', simple_bgm_file_item, status=201).json['@graph'][0]
+    assert anontestapp.get(fitem['@id'], status=expres)
 
 
 @pytest.fixture
-def status2date():
-    return {
-        'released': 'public_release',
-        'released to project': 'project_release'
-    }
+def public_static_section(testapp):
+    ss = {'status': 'public', 'name': 'test section', 'section_type': 'Page Section', 'body': 'test section'}
+    return testapp.post_json('/static_section', ss, status=201).json['@graph'][0]
 
 
+def test_public_item_can_be_seen_by_anyone(all_testapps, public_static_section):
+    for app in all_testapps:
+        assert app.get(public_static_section['@id'], status=200)
 
 
-def test_update_of_item_without_release_dates_mixin(wrangler_testapp, project):
-    assert project['status'] == 'current'
-    datefields = ['public_release', 'project_release']
-    for field in datefields:
-        assert field not in project
+def test_public_item_wo_project_can_be_patched_by_admin(admin_testapp, public_static_section):
+    name2patch = 'patch name'
+    res = admin_testapp.patch_json(public_static_section['@id'], {'name': name2patch}, status=200).json['@graph'][0]
+    assert res.get('name') == name2patch
 
 
-
-@pytest.fixture
-def replicate_experiment_set_data(institution, project):
-    return {
-        'institution': institution['@id'],
-        'project': project['@id'],
-        'description': 'test replicate experiment set',
-        'experimentset_type': 'replicate',
-    }
+def test_public_item_wo_project_cannot_be_patched_by_project_member(bgm_user_testapp, public_static_section):
+    name2patch = 'patch name'
+    assert bgm_user_testapp.patch_json(public_static_section['@id'], {'name': name2patch}, status=403)
 
 
-@pytest.fixture
-def static_section_item():
-    return {
-        'name': 'static-section.test_ss',
-        'title': 'Test Static Section',
-        'body': 'This is a test section'
-    }
+def test_public_item_w_project_cannot_be_patched_by_project_member(testapp, bgm_user_testapp, bgm_project, public_static_section):
+    testapp.patch_json(public_static_section['@id'], {'project': bgm_project['@id']}, status=200)
+    name2patch = 'patch name'
+    assert bgm_user_testapp.patch_json(public_static_section['@id'], {'name': name2patch}, status=403)
 
 
-def test_static_section_with_institution_view_by_institution_member(
-        wrangler_testapp, institution_viewer_testapp, institution, static_section_item):
-    static_section_item['institution'] = institution['@id']
-    static_section_item['status'] = 'released to institution'
-    res = wrangler_testapp.post_json('/static_section', static_section_item).json['@graph'][0]
-    institution_viewer_testapp.get(res['@id'], status=200)
+def test_public_item_wo_project_can_be_posted_by_project_member(bgm_user_testapp, public_static_section):
+    fields2post = ['body', 'section_type']
+    res = bgm_user_testapp.get(public_static_section['@id'], status=200).json
+    to_post = {k: v for k, v in res.items() if k in fields2post}
+    # need to have a uniquename
+    to_post['name'] = 'another section name'
+    bgm_user_testapp.post_json('/static_section', to_post, status=201)

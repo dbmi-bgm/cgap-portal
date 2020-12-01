@@ -31,6 +31,8 @@ from .ingestion.common import register_path_content_type, metadata_bundles_bucke
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .inheritance_mode import InheritanceMode
+from .server_defaults import add_last_modified
+from .loadxl import LOADXL_USER_UUID
 from .types.ingestion import SubmissionFolio
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 from .util import (
@@ -46,8 +48,11 @@ VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
 STATUS_QUEUED = 'Queued'
 STATUS_INGESTED = 'Ingested'
 STATUS_DISABLED = 'Ingestion disabled'
+STATUS_ERROR = 'Error'
+STATUS_IN_PROGRESS = 'In progress'
 CGAP_CORE_PROJECT = '/projects/cgap-core'
 CGAP_CORE_INSTITUTION = '/institutions/hms-dbmi/'
+SHARED = 'shared'
 
 
 def includeme(config):
@@ -214,6 +219,7 @@ def verify_vcf_file_status_is_not_ingested(request, uuid):
     if isinstance(resp, HTTPMovedPermanently):  # if we hit a redirect, follow it
         subreq = Request.blank(resp.location, **kwargs)
         resp = request.invoke_subrequest(subreq, use_tweens=True)
+    log.error('VCF File Meta: %s' % resp.json)
     if resp.json.get('file_ingestion_status', None) == STATUS_INGESTED:
         return False
     return True
@@ -309,7 +315,7 @@ class IngestionQueueManager:
         self.queue_attrs = {
             self.queue_name: {
                 'DelaySeconds': '1',  # messages initially invisible for 1 sec
-                'VisibilityTimeout': '600',  # 10 mins
+                'VisibilityTimeout': '10800',  # 3 hours
                 'MessageRetentionPeriod': '604800',  # 7 days, in seconds
                 'ReceiveMessageWaitTimeSeconds': '5',  # 5 seconds of long polling
             }
@@ -496,6 +502,7 @@ class IngestionListener:
                             (self.vapp, _queue_manager, _update_status))
         self.queue_manager = IngestionQueueManager(registry) if not _queue_manager else _queue_manager
         self.update_status = _update_status
+        self.first_error_message = None
 
     @staticmethod
     def should_remain_online(override=None):
@@ -543,6 +550,22 @@ class IngestionListener:
                 debuglog("Deleted messages")
                 break
 
+    def _patch_value(self, uuid, field, value):
+        """ Patches field with value on item uuid """
+        self.vapp.patch_json('/' + uuid, {field: value})
+
+    def set_error(self, uuid):
+        """ Sets the file_ingestion_error field of the given uuid """
+        if self.first_error_message is None:
+            log.error('Tried to set error message but no message was set!')
+            return
+        self._patch_value(uuid, 'file_ingestion_error', self.first_error_message)
+        self.first_error_message = None  # reset this field
+
+    def set_status(self, uuid, status):
+        """ Sets the file_ingestion_status of the given uuid """
+        self._patch_value(uuid, 'file_ingestion_status', status)
+
     @staticmethod
     def build_variant_link(variant):
         """ This function takes a variant record and returns the corresponding UUID of this variant
@@ -557,7 +580,9 @@ class IngestionListener:
         variant = parser.create_variant_from_record(record)
         variant['project'] = project
         variant['institution'] = institution
+        variant['status'] = SHARED  # default variant status to shared, so visible to everyone
         parser.format_variant_sub_embedded_objects(variant)
+        add_last_modified(variant, userid=LOADXL_USER_UUID)
         try:
             self.vapp.post_json('/variant', variant, status=201)
         except Exception:  # XXX: HTTPConflict is thrown and should be caught but does not work
@@ -601,11 +626,11 @@ class IngestionListener:
                 variant_name = sample['variant']
                 chrom = variant_name[variant_name.index('chr') + 3]  # find chr* and get *
                 sample.update(InheritanceMode.compute_inheritance_modes(sample, chrom=chrom))
-
+                add_last_modified(variant, userid=LOADXL_USER_UUID)
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
                 log.error('Encountered exception posting variant_sample: %s' % e)
-                continue
+                raise  # propagate/report if error occurs here
 
     def search_for_sample_relations(self, vcf_file_accession):
         """ Helper function for below that handles search aspect (and can be mocked) """
@@ -649,7 +674,7 @@ class IngestionListener:
         """
         success, error = 0, 0
         vs_project, vs_institution, file_accession = (file_meta['project']['uuid'], file_meta['institution']['uuid'],
-                                                file_meta['accession'])
+                                                      file_meta['accession'])
         sample_relations = self.extract_sample_relations(file_accession)
         for idx, record in enumerate(parser):
             log.info('Attempting parse on record %s' % record)
@@ -662,6 +687,8 @@ class IngestionListener:
                 success += 1
             except Exception as e:  # ANNOTATION spec validation error, recoverable
                 log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))
+                if not self.first_error_message:
+                    self.first_error_message = str(e)
                 error += 1
 
         return success, error
@@ -744,6 +771,8 @@ class IngestionListener:
                     continue
 
                 # gunzip content, pass to parser, post variants/variant_samples
+                # patch in progress status
+                self.set_status(uuid, STATUS_IN_PROGRESS)
                 decoded_content = gunzip_content(raw_content)
                 log.info('Got decoded content: %s' % decoded_content[:20])
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
@@ -754,8 +783,10 @@ class IngestionListener:
                 if error > 0:
                     log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
                               'as ingested.' % uuid)
+                    self.set_status(uuid, STATUS_ERROR)
+                    self.set_error(uuid)
                 else:
-                    self.vapp.patch_json('/' + uuid, {'file_ingestion_status': STATUS_INGESTED})
+                    self.set_status(uuid, STATUS_INGESTED)
 
                 # report results in error_log regardless of status
                 msg = ('INGESTION_REPORT:\n'

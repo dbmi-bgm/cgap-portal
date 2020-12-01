@@ -55,6 +55,9 @@ class SearchBuilder:
         API itself. Search is by far our most complicated API, thus there is a lot of state.
     """
     DEFAULT_SEARCH_FRAME = 'embedded'
+    DEFAULT_HIDDEN = 'default_hidden'
+    ADDITIONAL_FACETS = 'additional_facet'
+    MISSING = object()
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):
@@ -111,6 +114,7 @@ class SearchBuilder:
         self.search_base = self.normalize_query(self.request, self.types, self.doc_types)
         self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
         self.prepared_terms = self.prepare_search_term(self.request)
+        self.additional_facets = self.request.normalized_params.getall(self.ADDITIONAL_FACETS)
 
         # Can potentially make an outside API call, but ideally is cached
         # Only needed if searching on a single item type
@@ -169,8 +173,7 @@ class SearchBuilder:
             search_types.append("ItemSearchResults")
         return search_types
 
-    @staticmethod
-    def normalize_query(request, types, doc_types):
+    def normalize_query(self, request, types, doc_types):
         """
         Normalize the query by calculating and setting request.normalized_params
         (a webob MultiDict) that is derived from custom query rules and also
@@ -253,11 +256,10 @@ class SearchBuilder:
         ])
         return qs
 
-    @staticmethod
-    def prepare_search_term(request):
+    def prepare_search_term(self, request):
         """
         Prepares search terms by making a dictionary where the keys are fields and the values are arrays
-        of query strings. This is an intermediary format  which will be modified when constructing the
+        of query strings. This is an intermediary format which will be modified when constructing the
         actual search query.
 
         Ignore certain keywords, such as type, format, and field
@@ -267,7 +269,9 @@ class SearchBuilder:
         """
         prepared_terms = {}
         for field, val in request.normalized_params.items():
-            if field.startswith('validation_errors') or field.startswith('aggregated_items'):
+            if (field.startswith('validation_errors') or
+                    field.startswith('aggregated_items') or
+                    field == self.ADDITIONAL_FACETS):
                 continue
             elif field == 'q':  # searched string has field 'q'
                 # people shouldn't provide multiple queries, but if they do,
@@ -579,6 +583,54 @@ class SearchBuilder:
             self.response['sort'] = result_sort
             self.search = self.search.sort(sort)
 
+    def _initialize_additional_facets(self, facets_so_far, current_type_schema):
+        """ Helper function for below method that handles additional_facets URL param
+
+            :param facets_so_far: list to add additional_facets to
+            :param current_type_schema: schema of the item we are faceting on
+        """
+        for extra_facet in self.additional_facets:
+            aggregation_type = 'terms'  # default
+
+            # determine if nested
+            if self.item_type_es_mapping and find_nested_path(extra_facet, self.item_type_es_mapping):
+                aggregation_type = 'nested'  # handle nested
+
+            # check if defined in facets
+            if 'facets' in current_type_schema:
+                schema_facets = current_type_schema['facets']
+                if extra_facet in schema_facets:
+                    if not schema_facets[extra_facet].get('disabled', False):
+                        facets_so_far.append((extra_facet, schema_facets[extra_facet]))
+                    continue  # if we found the facet, always continue from here
+
+            # not specified as facet - infer range vs. term based on schema
+            field_definition = schema_for_field(extra_facet, self.request, self.doc_types)
+            if not field_definition:  # if not on schema, try "terms"
+                facets_so_far.append((
+                    extra_facet, {'title': extra_facet.title()}
+                ))
+            else:
+                t = field_definition.get('type', None)
+                if not t:
+                    log.error('Encountered an additional facet that has no type! %s' % field_definition)
+                    continue  # drop this facet
+
+                # terms for string
+                if t == 'string':
+                    facets_so_far.append((
+                        extra_facet, {'title': extra_facet.title(), 'aggregation_type': aggregation_type}
+                    ))
+                else:  # try stats
+                    aggregation_type = 'stats'
+                    facets_so_far.append((
+                        extra_facet, {
+                            'title': field_definition.get('title', extra_facet.title()),
+                            'aggregation_type': aggregation_type,
+                            'number_step': 'any'
+                        }
+                    ))
+
     def initialize_facets(self):
         """
         Initialize the facets used for the search. If searching across multiple
@@ -612,17 +664,19 @@ class SearchBuilder:
             ('validation_errors.name', {'title': 'Validation Errors', 'order': 999})
         ]
 
+        current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
+        self._initialize_additional_facets(append_facets, current_type_schema)
+
         # hold disabled facets from schema; we also want to remove these from the prepared_terms facets
         disabled_facets = []
 
         # Add facets from schema if one Item type is defined.
         # Also, conditionally add extra appendable facets if relevant for type from schema.
         if len(self.doc_types) == 1 and self.doc_types[0] != 'Item':
-            current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
             if 'facets' in current_type_schema:
                 schema_facets = OrderedDict(current_type_schema['facets'])
                 for schema_facet in schema_facets.items():
-                    if schema_facet[1].get('disabled', False):
+                    if schema_facet[1].get('disabled', False) or schema_facet[1].get(self.DEFAULT_HIDDEN, False):
                         disabled_facets.append(schema_facet[0])
                         continue  # Skip disabled facets.
                     facets.append(schema_facet)
@@ -710,7 +764,6 @@ class SearchBuilder:
                 existing_facet_index = used_facets.index(ap_facet[0])
                 if facets[existing_facet_index][1].get('title') in (None, facets[existing_facet_index][0]):
                     facets[existing_facet_index][1]['title'] = ap_facet[1]['title']
-
         return facets
 
     def assure_session_id(self):
@@ -790,6 +843,9 @@ class SearchBuilder:
         # If no order is provided, assume 0 to
         # retain order of non-explicitly ordered facets
         for field, facet in sorted(self.facets, key=lambda fct: fct[1].get('order', 10000)):
+            if facet.get(self.DEFAULT_HIDDEN, False) and field not in self.additional_facets:  # skip if specified
+                continue
+
             result_facet = {
                 'field': field,
                 'title': facet.get('title', field),
@@ -815,7 +871,24 @@ class SearchBuilder:
                     for k in aggregations[full_agg_name]['primary_agg']['primary_agg'].keys():
                         result_facet[k] = aggregations[full_agg_name]['primary_agg']['primary_agg'][k]
 
-                else:  # 'terms' assumed.
+                elif facet['aggregation_type'] in ['range', 'nested:range']:
+                    # Shift the bucket location
+                    bucket_location = aggregations[full_agg_name]['primary_agg']
+                    if 'buckets' not in bucket_location:  # account for nested structure
+                        bucket_location = bucket_location['primary_agg']
+
+                    # TODO - refactor ?
+                    # merge bucket labels from ranges into buckets
+                    for r in result_facet['ranges']:
+                        for b in bucket_location['buckets']:
+
+                            # if ranges match we found our bucket, propagate doc_count into 'ranges' field
+                            if (r.get('from', self.MISSING) == b.get('from', self.MISSING) and
+                                    r.get('to', self.MISSING) == b.get('to', self.MISSING)):
+                                r['doc_count'] = b['doc_count']
+                                break
+
+                else:  # assume 'terms'
 
                     # Shift the bucket location
                     bucket_location = aggregations[full_agg_name]['primary_agg']
@@ -830,15 +903,13 @@ class SearchBuilder:
                     if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == NESTED:
                         continue
 
-                    # if we are nested, apply fix + replace
+                    # if we are nested, apply fix + replace (only for terms)
                     if facet['aggregation_type'] == NESTED:
                         self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
 
                     # Re-add buckets under 'terms' AFTER we have fixed the doc_counts
                     result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
 
-                    # Default - terms, range, or histogram buckets. Buckets may not be present
-                    result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
                     # Choosing to show facets with one term for summary info on search it provides
                     if len(result_facet.get('terms', [])) < 1:
                         continue
@@ -854,9 +925,17 @@ class SearchBuilder:
         #            and just treat the nested aggs exactly the same.
         for facet in result:
             for k, v in facet.items():
-                if k == 'aggregation_type' and v == 'nested:stats':
-                    facet[k] = 'stats'
-                    break
+                if k == 'aggregation_type':
+                    override = None
+                    if v == 'nested:stats':
+                        override = 'stats'
+                    elif v == 'nested:range':
+                        override = 'range'
+
+                    # apply override
+                    if override is not None:
+                        facet[k] = override
+                        break
         return result
 
     @staticmethod

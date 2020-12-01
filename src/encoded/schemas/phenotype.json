@@ -23,7 +23,7 @@
             "default": "1"
         },
         "status": {
-            "default": "released"
+            "default": "shared"
         },
         "hpo_id" : {
             "title" : "HPO Identifier",

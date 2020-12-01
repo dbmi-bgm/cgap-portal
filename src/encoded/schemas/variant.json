@@ -48,6 +48,9 @@
     "description": "Schema for variants",
     "id": "/profiles/variant.json",
     "properties": {
+        "status": {
+            "default": "shared"
+        },
         "ALT": {
             "title": "Alt",
             "field_name": "ALT",
@@ -938,6 +941,7 @@
             "items": {
                 "title": "Gene",
                 "type": "object",
+                "enable_nested": true,
                 "properties": {
                     "genes_ensg": {
                         "title": "Gene",
@@ -2885,6 +2889,7 @@
             "type": "array",
             "items": {
                 "title": "hg19 Coordinates",
+                "enable_nested": true,
                 "type": "object",
                 "properties": {
                     "hg19_hgvsg": {

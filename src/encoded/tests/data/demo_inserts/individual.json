@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
@@ -27,7 +27,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sex": "F",
         "is_still_birth": false,
@@ -51,7 +51,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
@@ -78,7 +78,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
@@ -105,7 +105,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sex": "F",
         "is_still_birth": false,
@@ -129,7 +129,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
@@ -156,7 +156,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sex": "M",
         "is_still_birth": false,
@@ -180,7 +180,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
@@ -209,7 +209,7 @@
         "quantity": 1
     },
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
@@ -236,7 +236,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
@@ -266,7 +266,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
@@ -293,7 +293,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
@@ -320,7 +320,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
@@ -347,7 +347,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
@@ -374,7 +374,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sex": "M",
         "is_still_birth": false,
@@ -398,7 +398,7 @@
         "is_deceased": false
     },
     {
-        "status": "released",
+        "status": "shared",
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sex": "F",
         "individual_id": "NA12878",
@@ -420,7 +420,7 @@
         "quantity": 1
     },
     {
-        "status": "released",
+        "status": "shared",
         "age_units": "day",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "is_spontaneous_abortion": false,
