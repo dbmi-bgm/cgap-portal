@@ -89,7 +89,7 @@ class CompoundSearchBuilder:
         return urllib.parse.urlencode(dict_to_merge_into, doseq=True)
 
     @staticmethod
-    def format_filter_set_results(request, es_results, filter_set, result_sort, return_generator=False):
+    def format_filter_set_results(request, es_results, filter_set, result_sort, search_builder_instance):
         """ Formats es_results from filter_set into a dictionary containing total and @graph,
             setting status on the request if needed.
 
@@ -99,11 +99,14 @@ class CompoundSearchBuilder:
         :return: dictionary response
         """
         # if this is a subrequest/gen request, return '@graph' directly
-        if request.__parent__ is not None or return_generator:
+        if request.__parent__ is not None or search_builder_instance.return_generator:
             return [ hit['_source']['embedded'] for hit in es_results['hits']['hits'] ]
 
         if es_results['hits']['total'] == 0:
             request.response.status_code = 404  # see google webmaster doc on why
+
+        if search_builder_instance.search_session_id:  # Is 'None' if e.g. limit=all
+            request.response.set_cookie('searchSessionID', search_builder_instance.search_session_id)
 
         return {
             # "@id": "/compound_search", # Not necessary from UI atm but considering adding for semantics
@@ -125,8 +128,9 @@ class CompoundSearchBuilder:
         :param return_generator: whether or not to return a generator
         :return: response from /search/
         """
-        search_builder = SearchBuilder(context, subreq, None, return_generator)
-        response = search_builder._search()
+        search_builder_instance = SearchBuilder(context, subreq, None, return_generator)
+        search_builder_instance.assure_session_id()
+        response = search_builder_instance._search() # Calls SearchBuilder.format_results internally, incl. adding searchSessionID cookie to response.
         if subreq.response.status_code == 404:
             request.response.status_code = 404
         return response
@@ -236,12 +240,13 @@ class CompoundSearchBuilder:
 
             sort, result_sort = build_sort_dicts(requested_sorts, request, [ doc_type ])
 
-            search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query)
-            search_dsl = search_builder_instance.search.sort(sort)
-            sized_search_dsl = search_dsl[from_ : from_ + to]
+            search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query, return_generator)
+            search_builder_instance.assure_session_id()
+            search_builder_instance.search = search_builder_instance.search.sort(sort)
+            search_builder_instance.search = search_builder_instance.search[from_ : from_ + to]
 
-            es_results = execute_search(compound_subreq, sized_search_dsl)
-            return cls.format_filter_set_results(request, es_results, filter_set, result_sort, return_generator)
+            es_results = execute_search(compound_subreq, search_builder_instance.search)
+            return cls.format_filter_set_results(request, es_results, filter_set, result_sort, search_builder_instance)
 
     @classmethod
     def validate_flag(cls, flag):

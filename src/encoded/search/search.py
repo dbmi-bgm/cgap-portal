@@ -132,7 +132,7 @@ class SearchBuilder:
         return self.forced_type.lower()
 
     @classmethod
-    def from_search(cls, context, request, search):
+    def from_search(cls, context, request, search, return_generator):
         """ Builds a SearchBuilder object with a pre-built search by skipping the bootstrap
             initialization and setting self.search directly.
 
@@ -141,9 +141,10 @@ class SearchBuilder:
         :param size: number of documents to return
         :return:
         """
-        result = cls(context, request, skip_bootstrap=True)  # bypass (most of) bootstrap
-        result.search.update_from_dict(search)  # parse compound query
-        return result
+        search_builder_instance = cls(context, request, skip_bootstrap=True)  # bypass (most of) bootstrap
+        search_builder_instance.return_generator = return_generator
+        search_builder_instance.search.update_from_dict(search)  # parse compound query
+        return search_builder_instance
 
     @staticmethod
     def build_search_types(types, doc_types):
@@ -703,9 +704,11 @@ class SearchBuilder:
 
     def assure_session_id(self):
         """ Add searchSessionID information if not part of a sub-request, a generator or a limit=all search """
-        if (self.request.__parent__ is None and
-                  not self.return_generator and
-                  self.size != 'all'):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
+        if (
+            self.request.__parent__ is None and
+            not getattr(self, "return_generator", None) and
+            getattr(self, "size", 25) != "all"
+        ):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
             self.search_session_id = self.request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
             self.search = self.search.params(preference=self.search_session_id)
 
@@ -1077,8 +1080,7 @@ class SearchBuilder:
         # Set @graph, save session ID for re-requests / subsequent pages.
         self.response['@graph'] = list(graph)
         if self.search_session_id:  # Is 'None' if e.g. limit=all
-            self.request.response.set_cookie('searchSessionID',
-                                             self.search_session_id)
+            self.request.response.set_cookie('searchSessionID', self.search_session_id)
 
     def _sort_custom_facets(self):
         """ Applies custom sort to facets based on a dictionary provided on the type definition
