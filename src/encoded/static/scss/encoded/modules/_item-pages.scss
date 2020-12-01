@@ -895,7 +895,7 @@ i.status-indicator-dot {
 /** JSON Tree Wrapper (e.g. fallback view) **/
 
 .json-tree-wrapper {
-	border-radius: $border-radius-large;
+	border-radius: $border-radius-lg;
 	overflow: hidden;
 	> ul {
 		padding: 8px 16px 16px !important;
@@ -1712,7 +1712,8 @@ $download-button-width : 100px;
 
 
 /**********************************************************
-			Processing Summary Table (CaseView > Bioinfo Tab)
+	Processing Summary Table (CaseView > Bioinfo Tab)
+	Move into own file?
 **********************************************************/
 
 .item-page-container {
@@ -2071,7 +2072,7 @@ $download-button-width : 100px;
 				background-color: #ffffff;
 				margin-bottom: 20px;
 				padding: 20px;
-				border-radius: $border-radius-large;
+				border-radius: $border-radius-lg;
 				box-shadow: 0 1px 5px #0002;
 				border-color: #d6d6d6;
 
@@ -2277,6 +2278,139 @@ $download-button-width : 100px;
 
 	}
 
+}
+
+
+/**********************************************************
+	CaseView -> FilterSetUI
+	N.B. Some of the dimensions, i.e. padding top of ampersand,
+	are dependent on font-size/face that we use.
+**********************************************************/
+
+.filterset-outer-container {
+	// TODO CHANGE
+	// border: 1px solid #999;
+	background-color: desaturate(lighten($primary-dark, 40%), 25%);// #b4c8d8; // $gray-300;
+	border-radius: $border-radius-lg;
+
+	.blocks-container {
+
+		.filterset-block {
+			border-radius: $border-radius-lg;
+			background-color: desaturate(lighten($primary, 50%), 15%); // #dce4f5; // TODO: Codify somewhere
+			border: 3px solid transparent;
+			// border-color: desaturate(lighten($primary-dark, 40%), 25%); /* Same as .filterset-outer-container background-color */
+			// margin: 0 -3px; /* Subtract border-width to align left + right unselected edges properly w. other UI elements */
+			/* transition: border-color .5s, background-color .5s; */
+			box-shadow: 0 1px 6px -3px black;
+
+			&.selected {
+				border-color: $primary-dark;
+				background-color: lighten($primary, 50%);
+			}
+
+			&[data-duplicate-query="true"] {
+				background-color: desaturate(lighten($danger, 50%), 10%);
+				&.selected {
+					border-color: desaturate(lighten($danger, 10%), 20%);
+				}
+			}
+
+			.title-controls-row {
+
+				i.icon.clickable {
+					opacity: 0.5;
+					&:hover {
+						opacity: 1;
+					}
+					&.disabled {
+						opacity: 0.3;
+						cursor: not-allowed;
+					}
+				}
+
+				.cached-counts-value {
+					height: 24px;
+					line-height: 20px;
+					min-width: 24px;
+					border: 2px solid transparent;
+					padding: 0 3px;
+					text-align: center;
+					font-size: 0.75em;
+					border-radius: 50%;
+					&[data-count-exists="true"] {
+						border-color: #0005;
+					}
+				}
+
+			}
+
+			.filter-query-viz-blocks {
+				
+				.field-block {
+					position: relative;
+
+					.value-blocks {
+						.value-block {
+							border-radius: $border-radius-lg;
+							padding: 5px 10px;
+							background-color: #fff;
+							position: relative;
+							box-shadow: 0 2px 8px -3px #000;
+							white-space: nowrap;
+							margin: 3px 0;
+							flex-grow: 1;
+							text-align: center;
+							&:not(:last-child) {
+								margin-right: 7px;
+								&:after {
+									content: "";
+									height: 16px;
+									top: 10px;
+									top: calc(50% - 8px);
+									border-right: 1px solid $gray-700;
+									//transform: scale3d(0.75, 0.75, 0.75);
+									right: -4px;
+									position: absolute;
+								}
+							}
+						}
+					}
+
+					.field-name {
+						position: relative;
+						padding-top: 5px;
+						font-size: .925em;
+						&:before {
+							content: " ";
+							position: absolute;
+							top: -2px;
+							height: 5px;
+							border: 1px solid #444;
+							left: -4px;
+							right: -4px;
+							border-top: none;
+						}
+					}
+
+					&:not(:last-child) {
+						margin-right: 15px;
+						&:after {
+							content: "&";
+							transform: scale3d(0.75, 0.75, 0.75);
+							right: -12px;
+							top: 10px;
+							top: calc(50% - 24px);
+							position: absolute;
+						}
+
+					}
+
+				}
+			}
+
+		}
+	}
 }
 
 
