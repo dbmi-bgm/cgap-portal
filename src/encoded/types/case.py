@@ -212,11 +212,7 @@ class Case(Item):
         "report.status",
         "report.accession",
         "report.case.accession",
-        "active_filterset.last_modified.date_modified",
-        "active_filterset.last_modified.modified_by",
-        "active_filterset.filter_blocks.query",
-        "active_filterset.filter_blocks.flags_applied",
-        "active_filterset.flags",
+        "active_filterset.@id",
         "cohort.filter_set.*",
         "project.name",
         "vcf_file.file_ingestion_status"

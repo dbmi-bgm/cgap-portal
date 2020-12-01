@@ -313,17 +313,6 @@ def test_filter_set_selectively_apply_flags(workbook, testapp, filter_set_with_m
 # entire process. - Will 06/17/2020
 
 
-def execute_and_verify_generator_search(testapp, filter_set, expected):
-    """ Iterates through generator returned in json_response, comparing number of entries
-        to the number expected
-    """
-    filter_set['return_generator'] = True
-    count = 0
-    for _ in testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json:
-        count += 1
-    assert count == expected
-
-
 @pytest.fixture
 def filter_set_with_only_flags():
     return {
@@ -339,9 +328,6 @@ def test_compound_search_only_global_flags(workbook, testapp, filter_set_with_on
     """
     resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_only_flags).json
     assert len(resp['@graph']) == 4
-
-    # do generator search
-    execute_and_verify_generator_search(testapp, filter_set_with_only_flags, 4)
 
 
 @pytest.fixture
@@ -363,9 +349,6 @@ def test_compound_search_single_filter_block(workbook, testapp, filter_set_with_
     resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block).json
     assert len(resp['@graph']) == 1
     assert 'facets' in resp
-
-    # do generator search
-    execute_and_verify_generator_search(testapp, filter_set_with_single_filter_block, 1)
 
 
 @pytest.fixture
@@ -394,8 +377,6 @@ def test_compound_search_filter_and_flags(workbook, testapp, filter_set_with_sin
     assert len(resp['@graph']) == 1
     assert 'facets' in resp
 
-    # do generator search
-    execute_and_verify_generator_search(testapp, filter_set_with_single_filter_block_and_flags, 1)
     filter_set_with_single_filter_block_and_flags['return_generator'] = False  # undo side-effect
 
 
@@ -404,11 +385,11 @@ def filter_set_with_multiple_disabled_flags():
     return {
         'search_type': 'Variant',
         'filter_blocks': [{
-            'query': '?type=Variant&POS.from=0&POS.to=10000000',
+            'query': 'POS.from=0&POS.to=10000000',
             'flags_applied': []
         },
         {
-            'query': '?type=Variant&REF=A',
+            'query': 'REF=A',
             'flags_applied': []
         }],
         'global_flags': '?type=Variant',
@@ -425,11 +406,6 @@ def test_compound_search_disabled_flags(workbook, testapp, filter_set_with_multi
     """ Tests a compound search with all flags disabled (raw filter_blocks + global_flags). """
     resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_multiple_disabled_flags).json
     assert len(resp['@graph']) == 2
-
-    # do generator search
-    execute_and_verify_generator_search(testapp, filter_set_with_multiple_disabled_flags, 2)
-    filter_set_with_multiple_disabled_flags['limit'] = 1
-    execute_and_verify_generator_search(testapp, filter_set_with_multiple_disabled_flags, 2)
 
 
 @pytest.fixture
@@ -458,11 +434,6 @@ def test_compound_search_from_to(workbook, testapp, request_with_lots_of_results
     paginated_request['limit'] = 10
     resp = testapp.post_json(COMPOUND_SEARCH_URL, paginated_request).json
     assert len(resp['@graph']) == 10
-
-    # attempt with generator
-    paginated_request['from'] = 0
-    paginated_request['limit'] = 10
-    execute_and_verify_generator_search(testapp, paginated_request, 10)
 
 
 def test_compound_search_rejects_malformed_filter_sets(testapp):
