@@ -130,9 +130,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
                     const ClinvarTrack = require('higlass-clinvar/es/ClinvarTrack').default;
                     const TextTrack = require('higlass-text/es/TextTrack').default;
                     const OrthologsTrack = require('higlass-orthologs/es/OrthologsTrack').default;
-                    // const Worker = require('higlass-pileup/es/bam-fetcher-worker').default;
                     const PileupTrack = require('higlass-pileup/es/PileupTrack').default;
-                    //const PileupTrack = require('higlass-pileup/dist/higlass-pileup').PileupTrack;
 
                     higlassRegister({
                         name: 'SequenceTrack',
