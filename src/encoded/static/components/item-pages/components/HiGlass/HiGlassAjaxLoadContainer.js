@@ -63,13 +63,11 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
             if(requestingTab === "bam" && bamSampleId !== null && file !== null){
                 // Get the associated case and extract BAM infos from there
                 ajax.load(
-                    //"/search/?bam_sample_id="+bamSampleId+"&type=Sample&field=processed_files",
                     "/search/?type=Case&sample.bam_sample_id="+bamSampleId+"&vcf_file.accession="+file,
                     (resp) => {
                         
                         if(resp["@graph"].length > 0 && resp["@graph"][0]["sample_processing"]){
                             const samplesPedigree = resp["@graph"][0]["sample_processing"]["samples_pedigree"] ??  null;
-                            console.log(samplesPedigree);
                             const payload = {
                                 'variant_pos_abs' : variantPositionAbsCoord,
                                 'requesting_tab' : requestingTab,
@@ -79,30 +77,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                             this.getViewconf(payload, fallbackCallback);
                         }else{
                             console.warn("There are no BAM files for this case.");
-                        }
-                        // let bamFileFound = false;
-                        // if(resp["@graph"].length > 0 && resp["@graph"][0]["processed_files"].length > 0){
-                        //     const processed_files = resp["@graph"][0]["processed_files"];
-                        //     console.log(processed_files);
-
-                        //     processed_files.forEach(file => {
-                        //         if(file["display_title"].includes(".bam")){
-                        //             const bamKey = file["uuid"]+"/"+file["display_title"];
-                        //             const payload = {
-                        //                 'variant_pos_abs' : variantPositionAbsCoord,
-                        //                 'requesting_tab' : requestingTab,
-                        //                 'bam_key' : bamKey,
-                        //             };
-                        //             this.getViewconf(payload, fallbackCallback);
-                        //             bamFileFound = true;
-                        //             return;
-                        //         }
-                        //     });
-                        // }
-                        // if(!bamFileFound){
-                        //     console.warn("BAM file "+sampleId+" not found.");
-                        // }
-                        
+                        } 
                     },
                     'GET',
                     fallbackCallback
@@ -118,27 +93,6 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                 this.getViewconf(payload, fallbackCallback)
             }
         
-            // const payload = {
-            //     'variant_pos_abs' : variantPositionAbsCoord,
-            //     'requesting_tab' : requestingTab,
-            //     'sample_id' : sampleId,
-            // };
-        
-            // ajax.load(
-            //     "/get_higlass_viewconf/",
-            //     (resp) => {
-            //         const higlassItem = {
-            //             viewconfig:  resp.viewconfig
-            //         }
-            //         this.setState({ 'higlassItem' : higlassItem,'loading': false });
-            //         console.log("Loading done")
-            //     },
-            //     'POST',
-            //     fallbackCallback,
-            //     JSON.stringify(payload)
-            // );
-
-
         });
     }
 
@@ -151,7 +105,6 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                     viewconfig:  resp.viewconfig
                 }
                 this.setState({ 'higlassItem' : higlassItem,'loading': false });
-                console.log("Loading done")
             },
             'POST',
             fallbackCallback,
@@ -159,9 +112,6 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
         );
 
     }
-
-
-
 
     render(){
         const { higlassItem, loading } = this.state;

@@ -144,6 +144,7 @@ def get_higlass_viewconf(context, request):
         # Vertical rules
         higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
         higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
+
     elif requesting_tab == "bam":
         variant_pos = request.json_body.get('variant_pos_abs', None)  
         variant_pos = variant_pos if variant_pos else 100000
@@ -162,9 +163,7 @@ def get_higlass_viewconf(context, request):
             host_url = "http://fourfront-cgaptest.9wzadzju3p.us-east-1.elasticbeanstalk.com"
 
         samples_pedigree = request.json_body.get('samples_pedigree', None) 
-        print(json.dumps(samples_pedigree, indent=2))
         samples_pedigree.sort(key=lambda x: x['sample_name'] == bam_sample_id, reverse=True)
-        print(json.dumps(samples_pedigree, indent=2))
 
         top_tracks = higlass_viewconfig['views'][0]['tracks']['top']
         empty_track_a = deepcopy(top_tracks[2])
@@ -172,11 +171,10 @@ def get_higlass_viewconf(context, request):
         empty_track_b = deepcopy(top_tracks[4])
         pileup_track = deepcopy(top_tracks[5])
 
-        # delete original tracks from the insert, replace them with adjusted data
+        # Delete original tracks from the insert, replace them with adjusted data
         # from the sample data. If there is no data, we only show the sequence track
         del top_tracks[2:6] 
         # print(json.dumps(top_tracks, indent=2))
-        # print(json.dumps(pileup_track, indent=2))
 
         for sample in samples_pedigree:
             empty_track_sample = deepcopy(empty_track_a)
@@ -194,8 +192,6 @@ def get_higlass_viewconf(context, request):
 
             pileup_track_sample = deepcopy(pileup_track)
             pileup_track_sample["uid"] = uuid.uuid4()
-            # pileup_track_sample['data']['bamUrl'] = 'https://aveit.s3.amazonaws.com/higlass/bam/testbam_public.bam'
-            # pileup_track_sample['data']['baiUrl'] = 'https://aveit.s3.amazonaws.com/higlass/bam/testbam_public.bam.bai'
             bam_key = sample["bam_location"]
             bai_key = bam_key + ".bai"
             pileup_track_sample['options']['workerScriptLocation'] = host_url + pileup_track_sample['options']['workerScriptLocation']
@@ -203,7 +199,7 @@ def get_higlass_viewconf(context, request):
             pileup_track_sample['data']['baiUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=bai_key)
             top_tracks.append(pileup_track_sample)
 
-        # Details
+        # Show the correct location
         higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_small
         higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_small 
 
@@ -211,18 +207,6 @@ def get_higlass_viewconf(context, request):
         higlass_viewconfig['views'][0]['tracks']['whole'][0]['x'] = variant_pos
         higlass_viewconfig['views'][0]['tracks']['whole'][1]['x'] = variant_pos + 1
             
-
-        # bamUrl = create_presigned_url(bucket_name="aveit", object_name="higlass/bam/testbam.bam")
-        # baiUrl = create_presigned_url(bucket_name="aveit", object_name="higlass/bam/testbam.bam.bai")
-
-        # bamUrl = create_presigned_url(bucket_name="elasticbeanstalk-fourfront-cgap-wfoutput", object_name=bam_key)
-        # baiUrl = create_presigned_url(bucket_name="elasticbeanstalk-fourfront-cgap-wfoutput", object_name=bai_key)
-
-        # higlass_viewconfig['views'][0]['tracks']['top'][3]['data']['bamUrl'] = bamUrl
-        # higlass_viewconfig['views'][0]['tracks']['top'][3]['data']['baiUrl'] = baiUrl
-        #higlass_viewconfig['views'][0]['tracks']['top'][5]['data']['bamUrl'] = 'https://aveit.s3.amazonaws.com/higlass/bam/testbam_public.bam'
-        #higlass_viewconfig['views'][0]['tracks']['top'][5]['data']['baiUrl'] = 'https://aveit.s3.amazonaws.com/higlass/bam/testbam_public.bam.bai'
-
     return {
         "success" : True,
         "errors": "",

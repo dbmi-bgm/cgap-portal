@@ -145,10 +145,10 @@
                     "sortLargestOnTop":true,
                     "extendedPreloading":false,
                     "colorScale": [
-                      "#2c7bb6",
-                      "#abd9e9",
-                      "#f2f2b1",
-                      "#fdae61",
+                      "#08519c",
+                      "#6baed6",
+                      "#993404",
+                      "#fe9929",
                       "#808080",
                       "#DCDCDC"
                     ]
@@ -188,7 +188,8 @@
                   "options": {
                     "fontSize": 9,
                     "labelFontColor": "#222222",
-                    "labelBackgroundColor": "#e9e9e9",
+                    "labelBackgroundPlusStrandColor": "#e9e9e9",
+                    "labelBackgroundMinusStrandColor": "#e9e9e9",
                     "minHeight": 24,
                     "plusStrandColor": "#bdbfff",
                     "minusStrandColor": "#fabec2",
@@ -449,7 +450,6 @@
                 "type": "horizontal-sequence",
                 "width": 768,
                 "height": 25,
-                "server": "https://cgap-higlass.com/api/v1",
                 "options": {
                   "name": "hg38",
                   "barBorder": true,
@@ -520,6 +520,11 @@
                 "options": {
                   "axisPositionHorizontal": "right",
                   "axisLabelFormatting": "normal",
+                  "showCoverage": true,
+                  "outlineReadOnHover": true,
+                  "groupBy": "strand",
+                  "minusStrandColor": "#ffd1d4",
+                  "plusStrandColor": "#cfd0ff",
                   "colorScale": [
                     "#08519c",
                     "#6baed6",
@@ -530,7 +535,7 @@
                   ],
                   "workerScriptLocation": "/static/build/"
                 },
-                "height": 180,
+                "height": 200,
                 "uid": "pileup",
                 "data": {
                   "type": "bam",
