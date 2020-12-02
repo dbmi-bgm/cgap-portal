@@ -5,7 +5,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
 
-import { console, navigate, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
@@ -131,7 +131,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         secondary_families = null,
         case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
         description = null,
-        actions: permissibleActions = [],
+        // actions: permissibleActions = [],
         display_title: caseTitle,
         accession: caseAccession,
         individual: caseIndividual,

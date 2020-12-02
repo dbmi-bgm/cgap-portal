@@ -10,7 +10,7 @@ import ReactTooltip from 'react-tooltip';
 
 import Collapse from "react-bootstrap/esm/Collapse";
 
-import { console, layout, navigate, ajax, itemUtil } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { getSchemaProperty } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/schema-transforms';
@@ -338,10 +338,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             isFetchingInitialFilterSetItem = false
         } = this.props;
         const { total: totalCount, facets = null } = searchContext || {};
-        const {
-            '@id': filterSetID,
-            filter_blocks = []
-        } = filterSet || {};
+        const { filter_blocks = [] } = filterSet || {};
         const { bodyOpen, bodyMounted, lastSavedFilterSet, isSavingFilterSet } = this.state;
 
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
@@ -448,7 +445,7 @@ function FilterSetUIHeader(props){
                 e.preventDefault();
                 setIsEditingTitle(false);
                 const formElem = e.target;
-                const inputElem = formElem.children[0];
+                const [ inputElem ] = formElem.children;
                 setTitleOfFilterSet(inputElem.value);
             }}>
                 <input type="text" name="filterName" className="form-control" defaultValue={fsTitle || fsDisplayTitle} />
@@ -515,7 +512,7 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
         schemas
     } = props;
-    const { filter_blocks = [], query = "" } = filterSet || {};
+    const { filter_blocks = [] } = filterSet || {};
     const { query: currentBlockQuery = null } = (typeof selectedFilterBlockIdx === "number" && filter_blocks[selectedFilterBlockIdx]) || {};
     const filterBlockLen = filter_blocks.length;
 
@@ -654,7 +651,7 @@ const FilterBlock = React.memo(function FilterBlock(props){
                 e.preventDefault();
                 setIsEditingTitle(false);
                 const formElem = e.target;
-                const inputElem = formElem.children[0];
+                const [ inputElem ] = formElem.children;
                 setNameOfFilterBlockAtIdx(index, inputElem.value);
             }}>
                 <input type="text" name="filterName" className="form-control" defaultValue={filterName} />
@@ -839,8 +836,8 @@ function FieldBlock({ field, terms, facetDict, schemas }){
     const fieldFacet = facetDict[field];
     const {
         title: facetTitle = null,
-        description: facetDescription = null,
-        aggregation_type = "terms"
+        // description: facetDescription = null,
+        // aggregation_type = "terms"
     } = fieldFacet || {};
 
 
@@ -848,13 +845,11 @@ function FieldBlock({ field, terms, facetDict, schemas }){
     //     // TODO: Show single > or < or something.
     // }
 
-    console.log("SCHEMAS", facetDict, field, { ...schemas }, getSchemaProperty(field, schemas, "VariantSample"));
-
     const fieldSchema = getSchemaProperty(field, schemas, "VariantSample");
     const {
         // Used primarily as fallback, we expect/hope for fieldFacet to be present/used primarily instead.
         title: fieldTitle = null,
-        description: fieldDescription = null
+        // description: fieldDescription = null
     } = fieldSchema || {};
 
     const title = facetTitle || fieldTitle || field;
@@ -1063,6 +1058,7 @@ export class FilterSetController extends React.PureComponent {
             for (key in this.props) {
                 // eslint-disable-next-line react/destructuring-assignment
                 if (this.props[key] !== pastProps[key]) {
+                    // eslint-disable-next-line react/destructuring-assignment
                     console.log('FilterSetController changed props: %s', key, pastProps[key], this.props[key]);
                 }
             }
@@ -1070,6 +1066,7 @@ export class FilterSetController extends React.PureComponent {
             for (key in this.state) {
                 // eslint-disable-next-line react/destructuring-assignment
                 if (this.state[key] !== pastState[key]) {
+                    // eslint-disable-next-line react/destructuring-assignment
                     console.log('FilterSetController changed state: %s', key, pastState[key], this.state[key]);
                 }
             }
@@ -1266,6 +1263,7 @@ export class FilterSetController extends React.PureComponent {
     }
 
     render(){
+        // eslint-disable-next-line no-unused-vars
         const { children, initialFilterSetItem, ...passProps } = this.props;
         const { currFilterSet, selectedFilterBlockIdx, cachedCounts, isSettingFilterBlockIdx } = this.state;
         const childProps = {
@@ -1280,8 +1278,6 @@ export class FilterSetController extends React.PureComponent {
             setNameOfFilterBlockAtIdx: this.setNameOfFilterBlockAtIdx,
             setTitleOfFilterSet: this.setTitleOfFilterSet
         };
-
-        // console.log('FilterSetController Props', this.props);
 
         return React.Children.map(children, (child)=>{
             if (!React.isValidElement(child)) { // String or something
