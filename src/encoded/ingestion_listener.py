@@ -335,6 +335,7 @@ class IngestionReport:
     Not creating an item for this is a design decision. The output of this process is more for
     debugging and not for auditing, so it does not merit an item at this time.
     """
+    MAX_ERRORS = 100  # tune this to get more errors, 100 is a lot though and probably more than needed
 
     def __init__(self):
         self.total = 0
@@ -353,7 +354,7 @@ class IngestionReport:
         return len(self.errors)
 
     def get_errors(self):
-        return self.errors
+        return self.errors[:self.MAX_ERRORS]
 
     def mark_success(self):
         """ Marks the current row number as successful, which in this case just involves incrementing the total """
