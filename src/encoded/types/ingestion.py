@@ -71,32 +71,6 @@ class SubmissionFolio:
     def submission_uri(self):
         return self.make_submission_uri(self.submission_id)
 
-    SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)/?$')
-
-    @classmethod
-    def create_item(cls, request, institution, project, ingestion_type):
-        json_body = {
-            "ingestion_type": ingestion_type,
-            "institution": institution,
-            "project": project,
-            "processing_status": {
-                "state": "submitted"
-            }
-        }
-        guid = None
-        item_url, res_json = None, None
-        try:
-            res_json = subrequest_item_creation(request=request, item_type='IngestionSubmission', json_body=json_body)
-            [item_url] = res_json['@graph']
-            matched = cls.SUBMISSION_PATTERN.match(item_url)
-            if matched:
-                guid = matched.group(1)
-        except Exception as e:
-            logging.error("%s: %s" % (e.__class__.__name__, e))
-            pass
-        check_true(guid, "Guid was not extracted from %s in %s" % (item_url, json.dumps(res_json)))
-        return guid
-
     def patch_item(self, **kwargs):
         res = self.vapp.patch_json(self.submission_uri, kwargs)
         [item] = res.json['@graph']

@@ -9,6 +9,7 @@ import io
 import json
 import os
 import psycopg2
+import re
 import requests  # XXX: C4-211 should not be needed but is // KMP needs this, too, until subrequest posts work
 import signal
 import socket
@@ -27,13 +28,13 @@ from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
 from .commands.ingest_vcf import VCFParser
-from .ingestion.common import register_path_content_type, metadata_bundles_bucket, get_parameter
+from .ingestion.common import register_path_content_type, metadata_bundles_bucket
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .inheritance_mode import InheritanceMode
 from .server_defaults import add_last_modified
 from .loadxl import LOADXL_USER_UUID
-from .types.ingestion import SubmissionFolio
+from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 from .util import (
     resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request, full_class_name,
@@ -72,21 +73,23 @@ def prompt_for_ingestion(context, request):
     return Response(PROMPT_FOR_INGESTION)
 
 
+SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)(|/.*)$')
+
 register_path_content_type(path='/submit_for_ingestion', content_type='multipart/form-data')
 
 
-@view_config(route_name='submit_for_ingestion', request_method='POST',
+@view_config(name='submit_for_ingestion', request_method='POST', context=IngestionSubmission,
              # Apparently adding this 'accept' causes discrimination on incoming requests not to find this method.
              # We do want this type, and instead we check the request to make sure we got it, but we omit it here
              # for practical reasons. -kmp 10-Sep-2020
              # accept='multipart/form-data',
-             permission='add')
+             permission='edit')
 @debug_log
 def submit_for_ingestion(context, request):
     ignored(context)
 
     check_true(request.content_type == 'multipart/form-data',  # even though we can't declare we accept this
-               "Expected request to have content_type 'multipart/form-data'.", error_class=RuntimeError)
+               "Expected request to have content_type 'multipart/form-data'.", error_class=SubmissionFailure)
 
     bs_env = beanstalk_env_from_request(request)
     bundles_bucket = metadata_bundles_bucket(request.registry)
@@ -101,14 +104,23 @@ def submit_for_ingestion(context, request):
     override_name = request.POST.get('override_name', None)
     parameters = dict(request.POST)
     parameters['datafile'] = filename
-    institution = get_parameter(parameters, 'institution')
-    project = get_parameter(parameters, 'project')
+
+    # These were needed in the old protocol but are not needed in the new protocol
+    # because someone will have set up the IngestionSubmission object already with the right values.
+    # It's best to avoid confusion by requiring they no longer be provided. -kmp 2-Dec-2020
+    if "institution" in parameters:
+        raise SubmissionFailure("'institution' is no longer a permitted parameter of submit_for_ingestion.")
+
+    if "project" in parameters:
+        raise SubmissionFailure("'project' is no longer a permitted parameter of submit_for_ingestion.")
+
     # Other parameters, like validate_only, will ride in on parameters via the manifest on s3
 
-    submission_id = SubmissionFolio.create_item(request,
-                                                ingestion_type=ingestion_type,
-                                                institution=institution,
-                                                project=project)
+    matched = SUBMISSION_PATTERN.match(request.path_info)
+    if matched:
+        submission_id = matched.group(1)
+    else:
+        raise SubmissionFailure("request.path_info is not in the expected form: %s" % request.path_info)
 
     # ``input_file`` contains the actual file data which needs to be
     # stored somewhere.
