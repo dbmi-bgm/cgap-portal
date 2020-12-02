@@ -162,6 +162,8 @@ def get_higlass_viewconf(context, request):
             host_url = "https://cgap.hms.harvard.edu"
         elif request.registry.settings.get('env.name') == "fourfront-cgaptest":
             host_url = "http://fourfront-cgaptest.9wzadzju3p.us-east-1.elasticbeanstalk.com"
+        elif request.registry.settings.get('env.name') == "fourfront-cgapdev":
+            host_url = "http://fourfront-cgapdev.9wzadzju3p.us-east-1.elasticbeanstalk.com/"
 
         samples_pedigree = request.json_body.get('samples_pedigree', None) 
         samples_pedigree.sort(key=lambda x: x['sample_name'] == bam_sample_id, reverse=True)
