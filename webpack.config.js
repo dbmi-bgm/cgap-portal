@@ -80,6 +80,7 @@ const optimization = {
         //})
         new TerserPlugin({
             parallel: true,
+            sourceMap: true,
             terserOptions:{
                 compress: true,
                 mangle: true,
