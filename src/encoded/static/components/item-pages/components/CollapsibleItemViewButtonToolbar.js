@@ -5,7 +5,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import Collapse from 'react-bootstrap/esm/Collapse';
-import { layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { responsiveGridState } from './../../util/layout';
 
 export class CollapsibleItemViewButtonToolbar extends React.PureComponent {
 
@@ -56,7 +56,7 @@ export class CollapsibleItemViewButtonToolbar extends React.PureComponent {
         }
 
         const { children, windowWidth, collapseButtonTitle, tooltip, constantButtons } = this.props;
-        const gridState = mounted && layout.responsiveGridState(windowWidth);
+        const gridState = mounted && responsiveGridState(windowWidth);
         const isMobileSize = gridState && ['xs', 'sm', 'md'].indexOf(gridState) > -1;
         const isOpen = !isMobileSize || open;
 

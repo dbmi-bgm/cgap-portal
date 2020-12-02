@@ -26,8 +26,8 @@ from snovault.typeinfo import AbstractTypeInfo
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
     find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
-    execute_search, make_search_subreq,
-    NESTED, COMMON_EXCLUDED_URI_PARAMS, MAX_FACET_COUNTS
+    execute_search, make_search_subreq, build_sort_dicts,
+    NESTED, COMMON_EXCLUDED_URI_PARAMS, MAX_FACET_COUNTS,
 )
 
 
@@ -108,9 +108,15 @@ class SearchBuilder:
         self.principals = self.request.effective_principals  # permissions to apply to this search
 
         # Initialized via outside function call
-        self.schemas = [self.types[item_type].schema for item_type in self.doc_types]  # schemas for doc_types
+        # schemas for doc_types
+        self.schemas = [
+            self.types[item_type].schema
+            for item_type in self.doc_types
+        ]
+        # item_type hierarchy we are searching on
         self.search_types = self.build_search_types(self.types, self.doc_types) + [
-            self.forced_type]  # item_type hierarchy we are searching on
+            self.forced_type
+        ]
         self.search_base = self.normalize_query(self.request, self.types, self.doc_types)
         self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
         self.prepared_terms = self.prepare_search_term(self.request)
@@ -126,7 +132,7 @@ class SearchBuilder:
         return self.forced_type.lower()
 
     @classmethod
-    def from_search(cls, context, request, search, from_=0, size=10):
+    def from_search(cls, context, request, search):
         """ Builds a SearchBuilder object with a pre-built search by skipping the bootstrap
             initialization and setting self.search directly.
 
@@ -135,11 +141,9 @@ class SearchBuilder:
         :param size: number of documents to return
         :return:
         """
-        result = cls(context, request, skip_bootstrap=True)  # bypass bootstrap
-        result.from_ = from_
-        result.to = size  # execute_search will apply pagination
-        result.search.update_from_dict(search)  # parse compound query
-        return result
+        search_builder_instance = cls(context, request, skip_bootstrap=True)  # bypass (most of) bootstrap
+        search_builder_instance.search.update_from_dict(search)  # parse compound query
+        return search_builder_instance
 
     @staticmethod
     def build_search_types(types, doc_types):
@@ -492,83 +496,14 @@ class SearchBuilder:
 
         ES5: simply pass in the sort OrderedDict into search.sort
         """
-        sort = OrderedDict()
-        result_sort = OrderedDict()
-        if len(self.doc_types) == 1:
-            type_schema = self.types[self.doc_types[0]].schema
-        else:
-            type_schema = None
-
-        def add_to_sort_dict(requested_sort):
-            if requested_sort.startswith('-'):
-                name = requested_sort[1:]
-                order = 'desc'
-            else:
-                name = requested_sort
-                order = 'asc'
-            sort_schema = schema_for_field(name, self.request, self.doc_types)
-
-            if sort_schema:
-                sort_type = sort_schema.get('type')
-            else:
-                sort_type = 'string'
-
-            # ES type != schema types
-            if sort_type == 'integer':
-                sort['embedded.' + name] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'long',
-                    'missing': '_last'
-                }
-            elif sort_type == 'number':
-                sort['embedded.' + name] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'float',
-                    'missing': '_last'
-                }
-            elif sort_schema and determine_if_is_date_field(name, sort_schema):
-                sort['embedded.' + name + '.raw'] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'date',
-                    'missing': '_last'
-                }
-            else:
-                # fallback case, applies to all string type:string fields
-                sort['embedded.' + name + '.lower_case_sort'] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'keyword',
-                    'missing': '_last'
-                }
 
         # Prefer sort order specified in request, if any
         requested_sorts = self.request.normalized_params.getall('sort')
-        if requested_sorts:
-            for rs in requested_sorts:
-                add_to_sort_dict(rs)
-
         text_search = self.prepared_terms.get('q')
+        sort, result_sort = build_sort_dicts(requested_sorts, self.request, self.doc_types, text_search)
 
         # Otherwise we use a default sort only when there's no text search to be ranked
-        if not sort and (text_search == '*' or not text_search):
-            # If searching for a single type, look for sort options in its schema
-            if type_schema:
-                if 'sort_by' in type_schema:
-                    for k, v in type_schema['sort_by'].items():
-                        # Should always sort on raw field rather than analyzed field
-                        # OR search on lower_case_sort for case insensitive results
-                        sort['embedded.' + k + '.lower_case_sort'] = result_sort[k] = v
-            # Default is most recent first, then alphabetical by label
-            if not sort:
-                sort['embedded.date_created.raw'] = result_sort['date_created'] = {
-                    'order': 'desc',
-                    'unmapped_type': 'keyword',
-                }
-                sort['embedded.label.raw'] = result_sort['label'] = {
-                    'order': 'asc',
-                    'missing': '_last',
-                    'unmapped_type': 'keyword',
-                }
-        elif not sort and text_search and text_search != '*':
+        if not sort and text_search and text_search != '*':
             self.search = self.search.sort(
                 # Multi-level sort. See http://www.elastic.co/guide/en/elasticsearch/guide/current/_sorting.html#_multilevel_sorting & https://stackoverflow.com/questions/46458803/python-elasticsearch-dsl-sorting-with-multiple-fields
                 {'_score': {"order": "desc"}},
@@ -768,9 +703,11 @@ class SearchBuilder:
 
     def assure_session_id(self):
         """ Add searchSessionID information if not part of a sub-request, a generator or a limit=all search """
-        if (self.request.__parent__ is None and
-                  not self.return_generator and
-                  self.size != 'all'):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
+        if (
+            self.request.__parent__ is None and
+            not getattr(self, "return_generator", None) and
+            getattr(self, "size", 25) != "all"
+        ):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
             self.search_session_id = self.request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
             self.search = self.search.params(preference=self.search_session_id)
 
@@ -964,11 +901,58 @@ class SearchBuilder:
         else:
             return None
 
+    @staticmethod
+    def build_initial_columns(used_type_schemas):
+        
+        columns = OrderedDict()
+
+        # Add title column, at beginning always
+        columns['display_title'] = {
+            "title": "Title",
+            "order": -1000
+        }
+
+        for schema in used_type_schemas:
+            if 'columns' in schema:
+                schema_columns = OrderedDict(schema['columns'])
+                # Add all columns defined in schema
+                for name, obj in schema_columns.items():
+                    if name not in columns:
+                        columns[name] = obj
+                    else:
+                        # If @type or display_title etc. column defined in schema, then override defaults.
+                        columns[name].update(schema_columns[name])
+
+        # Add status column, if not present, at end.
+        if 'status' not in columns:
+            columns['status'] = {
+                "title": "Status",
+                "default_hidden": True,
+                "order": 980
+            }
+
+        # Add date column, if not present, at end.
+        if 'date_created' not in columns:
+            columns['date_created'] = {
+                "title": "Date Created",
+                "colTitle": "Created",
+                "default_hidden": True,
+                "order": 1000
+            }
+
+        return columns
+
     def build_table_columns(self):
         """ Constructs an ordered dictionary of column information to be rendered by
             the front-end. If this functionality is needed outside of general search, this
             method should be moved to search_utils.py.
         """
+
+        columns = SearchBuilder.build_initial_columns(self.schemas)
+
+        if self.request.normalized_params.get('currentAction') in ('selection', 'multiselect'):
+            return columns
+
         any_abstract_types = 'Item' in self.doc_types
         if not any_abstract_types:  # Check explictly-defined types to see if any are abstract.
             type_infos = [self.request.registry[TYPES][t] for t in self.doc_types if t != 'Item']
@@ -978,16 +962,9 @@ class SearchBuilder:
                     any_abstract_types = True
                     break
 
-        columns = OrderedDict()
-
-        # Add title column, at beginning always
-        columns['display_title'] = {
-            "title": "Title",
-            "order": -1000
-        }
 
         # Add type column if any abstract types in search
-        if any_abstract_types and self.request.normalized_params.get('currentAction') != 'selection':
+        if any_abstract_types:
             columns['@type'] = {
                 "title": "Item Type",
                 "colTitle": "Type",
@@ -997,33 +974,6 @@ class SearchBuilder:
                 # "default_hidden": request.normalized_params.get('currentAction') == 'selection'
             }
 
-        for schema in self.schemas:
-            if 'columns' in schema:
-                schema_columns = OrderedDict(schema['columns'])
-                # Add all columns defined in schema
-                for name, obj in schema_columns.items():
-                    if name not in columns:
-                        columns[name] = obj
-                    else:
-                        # If @type or display_title etc. column defined in schema, then override defaults.
-                        for prop in schema_columns[name]:
-                            columns[name][prop] = schema_columns[name][prop]
-
-        # Add status column, if not present, at end.
-        if 'status' not in columns:
-            columns['status'] = {
-                "title": "Status",
-                "default_hidden": True,
-                "order": 980
-            }
-        # Add date column, if not present, at end.
-        if 'date_created' not in columns:
-            columns['date_created'] = {
-                "title": "Date Created",
-                "colTitle": "Created",
-                "default_hidden": True,
-                "order": 1000
-            }
         return columns
 
     def _format_results(self, hits):
@@ -1082,10 +1032,16 @@ class SearchBuilder:
         extra_requests_needed_count = math.ceil(total_results_expected / size_increment) - 1
 
         if extra_requests_needed_count > 0:
+            # Returns a generator as value of es_result['hits']['hits']
+            # Will be returned directly if self.return_generator is true
+            # or converted to list if meant to be HTTP response.
+            # Theoretical but unnecessary future: Consider allowing to return HTTP Stream of results w. return_generator=true (?)
             es_result['hits']['hits'] = itertools.chain(
                 es_result['hits']['hits'],
                 self.get_all_subsequent_results(
-                    self.request, es_result, self.search, extra_requests_needed_count, size_increment))
+                    self.request, es_result, self.search, extra_requests_needed_count, size_increment
+                )
+            )
         return es_result
 
     def execute_search(self):
@@ -1129,8 +1085,7 @@ class SearchBuilder:
         # Set @graph, save session ID for re-requests / subsequent pages.
         self.response['@graph'] = list(graph)
         if self.search_session_id:  # Is 'None' if e.g. limit=all
-            self.request.response.set_cookie('searchSessionID',
-                                             self.search_session_id)
+            self.request.response.set_cookie('searchSessionID', self.search_session_id)
 
     def _sort_custom_facets(self):
         """ Applies custom sort to facets based on a dictionary provided on the type definition
@@ -1238,6 +1193,7 @@ def collection_view(context, request):
 def get_iterable_search_results(request, search_path='/search/', param_lists=None, **kwargs):
     '''
     Loops through search results, returns 100 (or search_results_chunk_row_size) results at a time. Pass it through itertools.chain.from_iterable to get one big iterable of results.
+    Potential TODO: Move to search_utils or other file, and have this (or another version of this) handle compound filter_sets.
 
     :param request: Only needed to pass to do_subreq to make a subrequest with.
     :param search_path: Root path to call, defaults to /search/.

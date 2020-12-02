@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
-import { console, layout, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { responsiveGridState } from './../../util/layout';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
 import PedigreeViz, { PedigreeVizView, isRelationshipNode } from './../../viz/PedigreeViz';
 import { FullHeightCalculator } from './../components/FullHeightCalculator';
+
 
 
 /**
@@ -186,7 +188,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
             heightDiff = 0;
         }
 
-        const rgs = layout.responsiveGridState(windowWidth);
+        const rgs = responsiveGridState(windowWidth);
         let detailPaneOpenOffsetWidth = 0;
 
         if (rgs !== "xs" && rgs !== "sm") {
@@ -200,7 +202,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
         }
 
         /*
-        const rgs = layout.responsiveGridState(windowWidth);
+        const rgs = responsiveGridState(windowWidth);
         const enableMouseWheelZoom = (
             rgs !== "xs" && rgs !== "sm" &&
             // 400px minimumHeight (below) + UI height makes window scrollable at under ~ 620px height.
