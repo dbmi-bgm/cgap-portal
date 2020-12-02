@@ -2,9 +2,13 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import url from 'url';
 import ReactTooltip from 'react-tooltip';
-import * as d3 from 'd3';
+import { select as d3Select } from 'd3-selection';
+import { color as d3Color } from 'd3-color';
+import { interpolateRgb } from 'd3-interpolate';
+import { scaleOrdinal } from 'd3-scale';
+import { schemeCategory10 } from 'd3-scale-chromatic';
+import { treemap as d3Treemap, treemapResquarify, hierarchy as d3Hierarchy } from 'd3-hierarchy';
 import _ from 'underscore';
 
 import { ajax, layout, navigate, JWT, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -340,7 +344,7 @@ class HealthChart extends React.PureComponent {
     transitionSize(){
         const { mounted } = this.props;
         if (!mounted) return null;
-        const svg = this.svgRef && this.svgRef.current && d3.select(this.svgRef.current);
+        const svg = this.svgRef && this.svgRef.current && d3Select(this.svgRef.current);
         svg.selectAll('g').transition()
             .duration(750)
             .attr('transform', function(d) {
@@ -364,40 +368,40 @@ class HealthChart extends React.PureComponent {
 
         if (!dataToShow || !mounted) return null;
 
-        const svg = this.svgRef && this.svgRef.current && d3.select(this.svgRef.current);
+        const svg = this.svgRef && this.svgRef.current && d3Select(this.svgRef.current);
         function fader(color) {
-            return d3.interpolateRgb(color, "#fff")(0.2);
+            return interpolateRgb(color, "#fff")(0.2);
         }
 
-        const colorFallback = d3.scaleOrdinal(d3.schemeCategory10.map(fader));
+        const colorFallback = scaleOrdinal(schemeCategory10.map(fader));
 
         function colorStatus(origColor, status){
-            let d3Color;
+            let d3ColorUsed;
             if (['deleted', 'Left to Index'].indexOf(status) > -1){
-                d3Color = d3.color(origColor);
-                return d3Color.darker(1);
+                d3ColorUsed = d3Color(origColor);
+                return d3ColorUsed.darker(1);
             }
             if (['upload failed'].indexOf(status) > -1){
-                return d3.interpolateRgb(origColor, "rgb(222, 82, 83)")(0.6);
+                return interpolateRgb(origColor, "rgb(222, 82, 83)")(0.6);
             }
             if (['released to lab', 'released to project', 'in review by lab', 'in review by project'].indexOf(status) > -1){
-                d3Color = d3.color(origColor);
-                return d3Color.darker(0.5);
+                d3ColorUsed = d3Color(origColor);
+                return d3ColorUsed.darker(0.5);
             }
             if (['uploaded', 'released', 'current'].indexOf(status) > -1){
-                d3Color = d3.color(origColor);
-                return d3Color.brighter(0.25);
+                d3ColorUsed = d3Color(origColor);
+                return d3ColorUsed.brighter(0.25);
             }
             return origColor;
         }
 
-        const treemap = d3.treemap()
-            .tile(d3.treemapResquarify)
+        const treemap = d3Treemap()
+            .tile(treemapResquarify)
             .size([width, height])
             .round(true)
             .paddingInner(1);
 
-        const root = d3.hierarchy(dataToShow)
+        const root = d3Hierarchy(dataToShow)
             .eachBefore(function(d) {d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.name; })
             .sum(function(d){ return d.size; })
             .sort(function(a, b) { return b.height - a.height || b.value - a.value; });

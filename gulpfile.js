@@ -36,6 +36,12 @@ function cleanBuildDirectory(done){
         });
 
         const filesToDeleteLen = pathsToDelete.length;
+
+        if (filesToDeleteLen === 0) {
+            done();
+            return;
+        }
+
         var countDeleted = 0;
         pathsToDelete.forEach(function(filePath){
             fs.unlink(filePath, function(err){
