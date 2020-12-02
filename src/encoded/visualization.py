@@ -156,6 +156,7 @@ def get_higlass_viewconf(context, request):
         #s3_bucket = request.registry.settings.get('file_wfout_bucket')
         s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
 
+        # We need absolute URLs for the BAM Worker
         host_url = "http://localhost:6543"
         if request.registry.settings.get('env.name') == "fourfront-cgap":
             host_url = "https://cgap.hms.harvard.edu"
