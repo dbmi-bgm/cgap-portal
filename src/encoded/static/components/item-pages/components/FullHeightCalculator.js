@@ -1,7 +1,8 @@
 'use strict';
 
 import React from 'react';
-import { layout, console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { responsiveGridState } from './../../util/layout';
 
 
 export const FullHeightCalculator = React.memo(function FullHeightCalculator({
@@ -27,7 +28,7 @@ export const FullHeightCalculator = React.memo(function FullHeightCalculator({
     }
 
     if (typeof windowWidth === "number" && !isNaN(windowWidth)){
-        const rgs = layout.responsiveGridState(windowWidth);
+        const rgs = responsiveGridState(windowWidth);
         if (Array.isArray(skipGridStates) && skipGridStates.indexOf(rgs) > -1) {
             return children; // Doesn't need height
         }
