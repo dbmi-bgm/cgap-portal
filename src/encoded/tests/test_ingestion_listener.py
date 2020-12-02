@@ -261,7 +261,7 @@ def test_ingestion_error_basic(body, row):
     """ Tests basic functionality of the error class """
     test_error = IngestionError(body, row)
     test_error_dict = test_error.to_dict()
-    assert test_error_dict['body'] == body
+    assert test_error_dict['body'] == str(body)
     assert test_error_dict['row'] == row
 
 

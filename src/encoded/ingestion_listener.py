@@ -324,7 +324,7 @@ class IngestionError:
 
     def to_dict(self):
         return {
-            'body': self.body,
+            'body': str(self.body),
             'row': self.row
         }
 
@@ -706,7 +706,7 @@ class IngestionListener:
                 add_last_modified(variant, userid=LOADXL_USER_UUID)
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
-                log.error('Encountered exception posting variant_sample: %s' % e)
+                debuglog('Encountered exception posting variant_sample: %s' % e)
                 raise  # propagate/report if error occurs here
 
     def search_for_sample_relations(self, vcf_file_accession):
@@ -762,7 +762,7 @@ class IngestionListener:
                                                     sample_relations)
                 self.ingestion_report.mark_success()
             except Exception as e:  # ANNOTATION spec validation error, recoverable
-                log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))
+                debuglog('Encountered exception posting variant at row %s: %s ' % (idx, e))
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
 
         return self.ingestion_report.total_successful(), self.ingestion_report.total_error()
@@ -849,7 +849,7 @@ class IngestionListener:
                 # patch in progress status
                 self.set_status(uuid, STATUS_IN_PROGRESS)
                 decoded_content = gunzip_content(raw_content)
-                log.info('Got decoded content: %s' % decoded_content[:20])
+                debuglog('Got decoded content: %s' % decoded_content[:20])
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                                    reader=Reader(fsock=decoded_content.split('\n')))
                 success, error = self.post_variants_and_variant_samples(parser, file_meta)
