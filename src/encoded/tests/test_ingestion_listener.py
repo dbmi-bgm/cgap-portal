@@ -2,15 +2,15 @@ import datetime
 import json
 import mock
 import pytest
-import requests   # XXX: C4-211 this should NOT be necessary - there is a bug somewhere
 import time
 
 from dcicutils.qa_utils import ignored, notice_pytest_fixtures
 from uuid import uuid4
 from pyramid.testing import DummyRequest
-from ..ingestion_listener import (IngestionQueueManager, run, IngestionListener,
-                                  verify_vcf_file_status_is_not_ingested, IngestionError, IngestionReport)
-from ..util import gunzip_content
+from ..ingestion_listener import (
+    IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
+    IngestionError, IngestionReport,
+)
 from .variant_fixtures import gene_workbook, post_variant_consequence_items
 from .workbook_fixtures import workbook, app
 
@@ -272,6 +272,6 @@ def test_ingestion_report_basic(success):
     for _ in range(success):
         report.mark_success()
     report.mark_failure(body={'hello': 'world'}, row=1)
-    assert report.total == success + 1
+    assert report.grand_total == success + 1
     assert report.total_successful() == success
-    assert report.total_error() == 1
+    assert report.total_errors() == 1

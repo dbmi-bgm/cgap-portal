@@ -338,19 +338,19 @@ class IngestionReport:
     MAX_ERRORS = 100  # tune this to get more errors, 100 is a lot though and probably more than needed
 
     def __init__(self):
-        self.total = 0
+        self.grand_total = 0
         self.errors = []
 
-    def __str__(self):
-        return 'INGESTION REPORT: There were %s total variants detected, of which %s were successful' \
-               'and %s failed. Check ProcessedFile for full error output.' % (self.total,
+    def brief_summary(self):
+        return ('INGESTION REPORT: There were %s total variants detected, of which %s were successful'
+                'and %s failed. Check ProcessedFile for full error output.' % (self.grand_total,
                                                                               self.total_successful(),
-                                                                              self.total_error())
+                                                                              self.total_errors()))
 
     def total_successful(self):
-        return self.total - len(self.errors)
+        return self.grand_total - len(self.errors)
 
-    def total_error(self):
+    def total_errors(self):
         return len(self.errors)
 
     def get_errors(self, limit=True):
@@ -363,11 +363,11 @@ class IngestionReport:
 
     def mark_success(self):
         """ Marks the current row number as successful, which in this case just involves incrementing the total """
-        self.total += 1
+        self.grand_total += 1
 
     def mark_failure(self, *, body, row):
         """ Marks the current row as failed, creating an IngestionError holding the response body and row. """
-        self.total += 1
+        self.grand_total += 1
         self.errors.append(IngestionError(body, row).to_dict())
 
 
@@ -770,7 +770,7 @@ class IngestionListener:
                 debuglog('Encountered exception posting variant at row %s: %s ' % (idx, e))
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
 
-        return self.ingestion_report.total_successful(), self.ingestion_report.total_error()
+        return self.ingestion_report.total_successful(), self.ingestion_report.total_errors()
 
     def run(self):
         """ Main process for this class. Runs forever doing ingestion as needed.
@@ -867,7 +867,7 @@ class IngestionListener:
                     self.set_status(uuid, STATUS_INGESTED)
 
                 # report results in error_log regardless of status
-                msg = str(self.ingestion_report)
+                msg = self.ingestion_report.brief_summary()
                 log.error(msg)
                 self.update_status(msg=msg)
 
