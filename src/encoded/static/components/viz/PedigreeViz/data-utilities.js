@@ -254,7 +254,7 @@ export function findNodeWithId(objectGraph, id){
     return null;
 }
 
-export function isRelationship(node){
+export function isRelationshipNode(node){
     const { partners, children, _maritalRelationships, _parentalRelationship } = node;
     if (!_maritalRelationships && !_parentalRelationship && (Array.isArray(partners) || Array.isArray(children))) {
         return true;

@@ -10,7 +10,6 @@ import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/component
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
 import { responsiveGridState } from './../../util/layout';
-import { PedigreeVizView } from './../../viz/PedigreeViz';
 import DefaultItemView from './../DefaultItemView';
 import { TabPaneErrorBoundary } from './../components/TabView';
 import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
@@ -25,6 +24,7 @@ import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
 import CaseSubmissionView from './CaseSubmissionView';
+import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
 
 
@@ -67,6 +67,7 @@ export default class CaseView extends DefaultItemView {
      */
     getControllers(){
         return [
+            PedigreeVizLoader,
             CurrentFamilyController, // <- This passes down props.currFamily into PedigreeTabViewOptionsController. Could possibly change to just use context.family now.
             PedigreeTabViewOptionsController
         ];
@@ -124,8 +125,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         selectedDiseases,
         windowWidth,
         windowHeight,
-        idToGraphIdentifier
+        idToGraphIdentifier,
+        PedigreeVizLibrary = null
     } = props;
+    const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
     const {
         family: currFamily = null, // Previously selected via CurrentFamilyController.js, now primary from case.
         secondary_families = null,
@@ -194,7 +197,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         </div>
     );
 
-    if (windowWidth !== null && (rgs === "lg" || rgs === "xl")) {
+    if (PedigreeVizView && windowWidth !== null && (rgs === "lg" || rgs === "xl")) {
         // at windowWidth === null, `rgs` defaults to 'lg' or 'xl' for serverside render
 
         if (rgs === "lg") {

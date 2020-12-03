@@ -175,6 +175,8 @@ module.exports = [
         resolve: {
             ...resolve,
             alias: {
+                // We could eventually put 'pedigree-viz' into own repo/project (under dif name like @hms-dbmi-bgm/react-pedigree-viz or something).
+                'pedigree-viz': path.resolve(__dirname, "./src/encoded/static/components/viz/PedigreeViz"),
                 'higlass-dependencies': path.resolve(__dirname, "./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js"),
                 'package-lock.json': path.resolve(__dirname, "./package-lock.json"),
             },
@@ -232,6 +234,7 @@ module.exports = [
                 'auth0-lock': 'empty-module',
                 'aws-sdk': 'empty-module',
                 'package-lock.json': 'empty-module',
+                'pedigree-viz': 'empty-module',
                 // Below - prevent some stuff in SPC from being bundled in.
                 // These keys are literally matched against the string values, not actual path contents, hence why is "../util/aws".. it exactly what within SPC/SubmissionView.js
                 // We can clean up and change to 'aws-utils' in here in future as well and alias it to spc/utils/aws. But this needs to be synchronized with SPC and 4DN.
