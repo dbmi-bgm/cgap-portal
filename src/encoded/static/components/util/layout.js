@@ -26,14 +26,12 @@ export function responsiveGridState(width = null){
 
 
 /**
- * Get the width of what a 12-column bootstrap section would be in current viewport size.
+ * Get the width of what a 12-column bootstrap '.container' would be in current viewport size.
  * Keep widths in sync with stylesheet, e.g.
  * $container-tablet - $grid-gutter-width,
  * $container-desktop - $grid-gutter-width, and
  * $container-large-desktop - $grid-gutter-width
  * in src/encoded/static/scss/bootstrap/_variables.scss.
- *
- * @TODO INCOMPLETE - FINISH.
  *
  * @param {number} [windowWidth] Optional current window width to supply.
  * @return {integer}

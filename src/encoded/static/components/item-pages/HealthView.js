@@ -11,9 +11,10 @@ import { schemeCategory10 } from 'd3-scale-chromatic';
 import { treemap as d3Treemap, treemapResquarify, hierarchy as d3Hierarchy } from 'd3-hierarchy';
 import _ from 'underscore';
 
-import { ajax, layout, navigate, JWT, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { ajax, navigate, JWT, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { ItemDetailList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/ItemDetailList';
 import { Term } from './../util/Schemas';
+import { gridContainerWidth } from './../util/layout';
 import { PackageLockLoader } from './../util/package-lock-loader';
 
 /**
@@ -184,7 +185,7 @@ export default class HealthView extends React.PureComponent {
         const { db_es_compare, db_es_total, mounted } = this.state;
         const { description } = context;
         const notYetLoaded = (db_es_compare === null && db_es_total === null);
-        const width = layout.gridContainerWidth(windowWidth);
+        const width = gridContainerWidth(windowWidth);
 
         return (
             <div className="view-item container" id="content">
