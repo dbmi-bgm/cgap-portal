@@ -6,10 +6,9 @@ import boto3
 import contextlib
 import json
 import logging
-import re
 import traceback
 
-from dcicutils.misc_utils import ignored, check_true
+from dcicutils.misc_utils import ignored, check_true, PRINT
 from snovault import collection, load_schema
 from pyramid.request import Request
 from pyramid.security import Allow, Deny, Everyone
@@ -137,7 +136,7 @@ class SubmissionFolio:
         with s3_output_stream(submission.s3_client,
                               bucket=submission.bucket,
                               key="%s/resolution.json" % submission_id) as fp:
-            print(json.dumps(resolution, indent=2), file=fp)
+            PRINT(json.dumps(resolution, indent=2), file=fp)
 
 
 @collection(

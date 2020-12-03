@@ -19,16 +19,17 @@ import time
 import webtest
 
 from dcicutils.env_utils import is_stg_or_prd_env
-from dcicutils.misc_utils import VirtualApp, ignored, check_true
+from dcicutils.misc_utils import VirtualApp, ignored, check_true, full_class_name
 from pyramid import paster
-from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
+from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently, HTTPServerError
 from pyramid.request import Request
-from pyramid.response import Response
+# Possibly still needed by some commented-out code.
+# from pyramid.response import Response
 from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
 from .commands.ingest_vcf import VCFParser
-from .ingestion.common import register_path_content_type, metadata_bundles_bucket
+from .ingestion.common import register_path_content_type, metadata_bundles_bucket, get_parameter
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .inheritance_mode import InheritanceMode
@@ -37,7 +38,8 @@ from .loadxl import LOADXL_USER_UUID
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 from .util import (
-    resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request, full_class_name,
+    resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request,
+    subrequest_object,
 )
 
 
@@ -59,7 +61,8 @@ SHARED = 'shared'
 def includeme(config):
     config.add_route('queue_ingestion', '/queue_ingestion')
     config.add_route('ingestion_status', '/ingestion_status')
-    config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
+    # Disabled for now. See explanation below. -kmp 2-Dec-2020
+    # config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
     config.add_route('submit_for_ingestion', '/submit_for_ingestion')
     config.registry[INGESTION_QUEUE] = IngestionQueueManager(config.registry)
     config.scan(__name__)
@@ -70,7 +73,13 @@ def includeme(config):
 @debug_log
 def prompt_for_ingestion(context, request):
     ignored(context, request)
-    return Response(PROMPT_FOR_INGESTION)
+    # The new protocol requires a two-phase action, first creating the IngestionSubmission
+    # and then using that object to do the submission. We don't need this for debugging right now,
+    # so I've just disabled it to avoid confusion. We should decide later whether to fix this or
+    # just flush it as having served its purpose. -kmp 2-Dec-2020
+    raise HTTPServerError("This functionality is not presently working.")
+    # This is what this endpoint used to do:
+    # return Response(PROMPT_FOR_INGESTION)
 
 
 SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)(|/.*)$')
@@ -93,7 +102,6 @@ def submit_for_ingestion(context, request):
 
     bs_env = beanstalk_env_from_request(request)
     bundles_bucket = metadata_bundles_bucket(request.registry)
-    ingestion_type = request.POST['ingestion_type']
     datafile = request.POST['datafile']
     if not isinstance(datafile, cgi.FieldStorage):
         # e.g., specifically it might be b'' when no file is selected,
@@ -105,15 +113,6 @@ def submit_for_ingestion(context, request):
     parameters = dict(request.POST)
     parameters['datafile'] = filename
 
-    # These were needed in the old protocol but are not needed in the new protocol
-    # because someone will have set up the IngestionSubmission object already with the right values.
-    # It's best to avoid confusion by requiring they no longer be provided. -kmp 2-Dec-2020
-    if "institution" in parameters:
-        raise SubmissionFailure("'institution' is no longer a permitted parameter of submit_for_ingestion.")
-
-    if "project" in parameters:
-        raise SubmissionFailure("'project' is no longer a permitted parameter of submit_for_ingestion.")
-
     # Other parameters, like validate_only, will ride in on parameters via the manifest on s3
 
     matched = SUBMISSION_PATTERN.match(request.path_info)
@@ -121,6 +120,35 @@ def submit_for_ingestion(context, request):
         submission_id = matched.group(1)
     else:
         raise SubmissionFailure("request.path_info is not in the expected form: %s" % request.path_info)
+
+    instance = subrequest_object(request, submission_id)
+
+    # The three arguments institution, project, and ingestion_type were needed in the old protocol
+    # but are not needed in the new protocol because someone will have set up the IngestionSubmission
+    # object already with the right values. We tolerate them here, but we insist they be consistent (redundant).
+    # Note, too, that we use the 'update=True' option that causes them to be added to our parameters if they are
+    # missing, defaulted from the previous item, so that they will be written to the parameter block stored on S3.
+    # (We could do that differently now, by looking them up dynamically, but rather than risk making a mistake,
+    # I just went with path of least resistance for now.)
+    # -kmp 2-Dec-2020
+
+    institution = instance['institution']['@id']
+    institution_arg = get_parameter(parameters, "institution", default=institution, update=True)
+    if institution_arg != institution:
+        # If the "institution" argument was passed, which we no longer require, make sure it's consistent.
+        raise SubmissionFailure("'institution' was supplied inconsistetnly for submit_for_ingestion.")
+
+    project = instance['project']['@id']
+    project_arg = get_parameter(parameters, "project", default=project, update=True)
+    if project_arg != project:
+        # If the "project" argument was passed, which we no longer require, make sure it's consistent.
+        raise SubmissionFailure("'project' was supplied inconsistently for submit_for_ingestion.")
+
+    ingestion_type = instance['ingestion_type']
+    ingestion_type_arg = get_parameter(parameters, "ingestion_type", default=ingestion_type, update=True)
+    if ingestion_type_arg != ingestion_type:
+        # If the "ingestion_type" argument was passed, which we no longer require, make sure it's consistent.
+        raise SubmissionFailure("'ingestion_type' was supplied inconsistently for submit_for_ingestion.")
 
     # ``input_file`` contains the actual file data which needs to be
     # stored somewhere.
