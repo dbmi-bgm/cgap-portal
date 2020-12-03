@@ -353,8 +353,13 @@ class IngestionReport:
     def total_error(self):
         return len(self.errors)
 
-    def get_errors(self):
-        return self.errors[:self.MAX_ERRORS]
+    def get_errors(self, limit=True):
+        """Returns a limited number of errors, where limit can be True (self.MAX_ERRORS), False (no limit), or an integer."""
+        if limit is True:
+            limit = self.MAX_ERRORS
+        elif limit is False:
+            limit = None
+        return self.errors[:limit]
 
     def mark_success(self):
         """ Marks the current row number as successful, which in this case just involves incrementing the total """
