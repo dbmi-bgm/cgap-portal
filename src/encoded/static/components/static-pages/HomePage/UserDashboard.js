@@ -4,6 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import ReactTooltip from 'react-tooltip';
+import memoize from 'memoize-one';
 import _ from 'underscore';
 
 import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -15,6 +16,7 @@ import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedI
 
 
 export const UserDashboard = React.memo(function UserDashboard(props){
+    const { schemas } = props;
     // We can turn container into container-wide to expand width
     // We can convert dashboard-header into tabs, similar to Item pages.
     // We can do novel stuff like sidebar menu or something.
@@ -57,13 +59,72 @@ export const UserDashboard = React.memo(function UserDashboard(props){
                 <hr className="tab-section-title-horiz-divider"/>
 
                 <div className="container-wide py-2">
-                    <RecentCasesTables userUUID={userUUID} key={userUUID} />
+                    <RecentCasesTable {...{ schemas }} />
                 </div>
 
             </div>
         </React.Fragment>
     );
 });
+
+
+/** Used a 'classical' component here since harder to throttle state-changing funcs in functional components */
+class RecentCasesTable extends React.PureComponent {
+
+    static getHideFacets(schemas){
+        if (!schemas) return null;
+        const { Case : { facets: schemaFacets } } = schemas;
+        const hideFacets = Object.keys(schemaFacets || {}).filter(function(facetKey){
+            if (facetKey === "project.display_title") {
+                return false; // Filter out of hideFacets
+            }
+            const { default_hidden = false } = schemaFacets[facetKey];
+            if (default_hidden) {
+                return false; // Filter out of hideFacets since hidden anyways
+            }
+            return true;
+        });
+        hideFacets.push("report.uuid");
+        hideFacets.push("validation_errors.name");
+        return hideFacets;
+    }
+
+    constructor(props){
+        super(props);
+        this.onToggleOnlyShowCasesWithReports = _.throttle(this.onToggleOnlyShowCasesWithReports.bind(this), 500, { trailing: false });
+        this.state = {
+            "onlyShowCasesWithReports": true
+        };
+        this.memoized = {
+            getHideFacets: memoize(RecentCasesTable.getHideFacets)
+        };
+    }
+
+    onToggleOnlyShowCasesWithReports(e){
+        this.setState(function({ onlyShowCasesWithReports: pastShow }){
+            return { onlyShowCasesWithReports: !pastShow };
+        });
+    }
+
+    render(){
+        const { schemas } = this.props;
+        const { onlyShowCasesWithReports } = this.state;
+        const allCasesHref = "/search/?type=Case";
+        const searchHref = allCasesHref + (onlyShowCasesWithReports ? "&report.uuid!=No+value" : "");
+        const hideFacets = this.memoized.getHideFacets(schemas);
+        return (
+            <div className="recent-cases-table-section mt-12 mb-36">
+                <div className="toggle-reports mb-1">
+                    <Checkbox onChange={this.onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small">
+                        Show Only Cases with Reports
+                    </Checkbox>
+                </div>
+                <EmbeddedCaseSearchTable {...{ searchHref, hideFacets }} />
+            </div>
+        );
+    }
+
+}
 
 
 class RecentCasesTables extends React.PureComponent {
