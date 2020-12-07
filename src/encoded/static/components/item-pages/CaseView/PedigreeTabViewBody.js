@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import memoize from 'memoize-one';
 import _ from 'underscore';
-import { console, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { responsiveGridState } from './../../util/layout';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
+// In the future, we will try to code-split PedigreeViz out.
+// We might put PedigreeViz into separate repository which could streamline this a bit..
 import PedigreeViz, { PedigreeVizView, isRelationshipNode } from './../../viz/PedigreeViz';
 import { FullHeightCalculator } from './../components/FullHeightCalculator';
 
