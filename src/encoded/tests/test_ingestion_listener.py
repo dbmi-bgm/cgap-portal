@@ -2,14 +2,15 @@ import datetime
 import json
 import mock
 import pytest
-import requests   # XXX: C4-211 this should NOT be necessary - there is a bug somewhere
 import time
 
 from dcicutils.qa_utils import ignored, notice_pytest_fixtures
 from uuid import uuid4
 from pyramid.testing import DummyRequest
-from ..ingestion_listener import IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested
-from ..util import gunzip_content
+from ..ingestion_listener import (
+    IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
+    IngestionError, IngestionReport,
+)
 from .variant_fixtures import gene_workbook, post_variant_consequence_items
 from .workbook_fixtures import workbook, app
 
@@ -250,3 +251,27 @@ def test_test_port():
 
     from snovault.tests.test_postgresql_fixture import SNOVAULT_DB_TEST_PORT
     assert SNOVAULT_DB_TEST_PORT == 5440
+
+
+@pytest.mark.parametrize('body, row', [
+    ({'foo': 'bar'}, 1),
+    ('Success', 2)
+])
+def test_ingestion_error_basic(body, row):
+    """ Tests basic functionality of the error class """
+    test_error = IngestionError(body, row)
+    test_error_dict = test_error.to_dict()
+    assert test_error_dict['body'] == str(body)
+    assert test_error_dict['row'] == row
+
+
+@pytest.mark.parametrize('success', [5, 10])
+def test_ingestion_report_basic(success):
+    """ Tests basic functionality of the Report class, which is just a collection of errors """
+    report = IngestionReport()
+    for _ in range(success):
+        report.mark_success()
+    report.mark_failure(body={'hello': 'world'}, row=1)
+    assert report.grand_total == success + 1
+    assert report.total_successful() == success
+    assert report.total_errors() == 1
