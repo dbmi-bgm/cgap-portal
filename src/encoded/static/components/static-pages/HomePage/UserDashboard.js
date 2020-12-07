@@ -110,7 +110,11 @@ class RecentCasesTable extends React.PureComponent {
         const { schemas } = this.props;
         const { onlyShowCasesWithReports } = this.state;
         const allCasesHref = "/search/?type=Case";
-        const searchHref = allCasesHref + (onlyShowCasesWithReports ? "&report.uuid!=No+value" : "");
+        const searchHref = (
+            allCasesHref
+            + (onlyShowCasesWithReports ? "&report.uuid!=No+value" : "")
+            + "&sort=-last_modified.date_modified"
+        );
         const hideFacets = this.memoized.getHideFacets(schemas);
         return (
             <div className="recent-cases-table-section mt-12 mb-36">
