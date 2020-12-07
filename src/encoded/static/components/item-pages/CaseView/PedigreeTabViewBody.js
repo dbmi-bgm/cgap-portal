@@ -4,33 +4,10 @@ import _ from 'underscore';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { responsiveGridState } from './../../util/layout';
 import { PedigreeDetailPane } from './../components/PedigreeDetailPane';
-// In the future, we will try to code-split PedigreeViz out.
-// We might put PedigreeViz into separate repository which could streamline this a bit..
-import PedigreeViz, { PedigreeVizView, isRelationshipNode } from './../../viz/PedigreeViz';
 import { FullHeightCalculator } from './../components/FullHeightCalculator';
 
 
 
-/**
- * Creates Object mapping Individual `@id` to
- * the generational identifier (or `orderBasedName`)
- * that is present for that Individual node in graph
- * data.
- *
- * @param {{ id: string, orderBasedName: string }[]} objectGraph
- * @returns {Object.<string, string>}
- */
-export function idToGraphIdentifier(objectGraph){
-    const mapping = {};
-    objectGraph.forEach(function(node){
-        if (isRelationshipNode(node)) return;
-        // We use Individual's `@id` as their dataset entry `id`.
-        // If this changes, can change to get from `node.data.individualItem['@id']` instead.
-        console.log("id mapped to ", node.id, " : ", node.orderBasedName);
-        mapping[node.id] = node.orderBasedName;
-    });
-    return mapping;
-}
 
 
 /**
@@ -158,9 +135,9 @@ export class PedigreeTabViewBody extends React.PureComponent {
     }
 
     renderDetailPane(pedigreeVizProps){
-        const { session, href, context, schemas } = this.props;
+        const { session, href, context, schemas, PedigreeVizLibrary } = this.props;
         const { Individual : indvSchema = null, Document: docSchema = null, Image: imageSchema = null } = schemas || {};
-        return <PedigreeDetailPane {...pedigreeVizProps} {...{ session, href, context, indvSchema, docSchema, imageSchema }} />;
+        return <PedigreeDetailPane {...pedigreeVizProps} {...{ PedigreeVizLibrary, session, href, context, indvSchema, docSchema, imageSchema }} />;
     }
 
     render(){
@@ -172,8 +149,10 @@ export class PedigreeTabViewBody extends React.PureComponent {
             containerId = "pedigree-viz-container-cgap",
             visibleDiseases = null,
             scale = 1,
-            showOrderBasedName = true
+            showOrderBasedName = true,
+            PedigreeVizLibrary = null
         } = this.props;
+        const { default: PedigreeViz, PedigreeVizView } = PedigreeVizLibrary || {};
         const { isBrowserFullscreen, isPedigreeFullscreen } = this.state;
         const propName = "height"; //(isBrowserFullscreen ? "height" : "minimumHeight");
         const cls = (
@@ -239,13 +218,14 @@ export class PedigreeTabViewBody extends React.PureComponent {
         return (
             <div id={containerId} className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
-                    { graphData ?
-                        // If already have parsed graph data
-                        <PedigreeVizView {...pedigreeVizProps} {...graphData} />
-                        :
-                        // If letting PedigreeViz parse on the fly (this mostly for local demo/test data)
-                        <PedigreeViz {...pedigreeVizProps} dataset={dataset} />
-                    }
+                    { !PedigreeVizLibrary ? "Loading..."
+                        : (graphData ?
+                            // If already have parsed graph data
+                            <PedigreeVizView {...pedigreeVizProps} {...graphData} />
+                            :
+                            // If letting PedigreeViz parse on the fly (this mostly for local demo/test data)
+                            <PedigreeViz {...pedigreeVizProps} dataset={dataset} />
+                        )}
                 </FullHeightCalculator>
             </div>
         );
