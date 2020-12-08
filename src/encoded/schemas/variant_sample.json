@@ -621,8 +621,8 @@
             "order": 16,
             "grouping": "Genotype",
             "ranges": [
-                { "from": "0.1", "to": "0.9", "label": "de novo candidate (weak)" },
-                { "from": "0.9", "to": "1", "label": "de novo candidate (strong)" }
+                { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },
+                { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }
             ]
         },
         "variant.CHROM": {
@@ -656,11 +656,11 @@
             "order": 22,
             "grouping": "Conservation",
             "ranges": [
-                { "from": "-20", "to": "-3", "label": "strong positive selection" },
-                { "from": "-3", "to": "-2", "label": "positive selection" },
-                { "from": "-2", "to": "2", "label": "low selection" },
-                { "from": "2", "to": "3", "label": "conserved" },
-                { "from": "3", "to": "10", "label": "highly conserved"}
+                { "from": -20, "to": -3, "label": "strong positive selection" },
+                { "from": -3, "to": -2, "label": "positive selection" },
+                { "from": -2, "to": 2, "label": "low selection" },
+                { "from": 2, "to": 3, "label": "conserved" },
+                { "from": 3, "to": 10, "label": "highly conserved"}
             ]
         },
         "variant.cytoband_cytoband": {
@@ -744,10 +744,10 @@
             "order": 18,
             "grouping": "Population Frequency",
             "ranges": [
-                { "from": "0", "to": "0", "label": "unobserved" }, 
-                { "from": "0", "to": "0.001", "label": "ultra-rare" },
-                { "from": "0.001", "to": "0.01", "label": "rare" },
-                { "from": "0.01", "to": "1", "label": "common" }
+                { "from": 0, "to": 0, "label": "unobserved" }, 
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },
+                { "from": 0.001, "to": 0.01, "label": "rare" },
+                { "from": 0.01, "to": 1, "label": "common" }
             ]
         },
         "variant.gnomad_an": {
@@ -771,10 +771,10 @@
             "order": 19,
             "grouping": "Population Frequency",
             "ranges": [
-                { "from": "0", "to": "0", "label": "unobserved" }, 
-                { "from": "0", "to": "0.001", "label": "ultra-rare" },
-                { "from": "0.001", "to": "0.01", "label": "rare" },
-                { "from": "0.01", "to": "1", "label": "common" }
+                { "from": 0, "to": 0, "label": "unobserved" }, 
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },
+                { "from": 0.001, "to": 0.01, "label": "rare" },
+                { "from": 0.01, "to": 1, "label": "common" }
             ]
         },
         "variant.mutanno_variant_class": {
