@@ -1,11 +1,11 @@
 'use strict';
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import moment from 'moment';
-import ReactTooltip from 'react-tooltip';
+import React, { useMemo } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
+
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
@@ -59,7 +59,7 @@ export const UserDashboard = React.memo(function UserDashboard(props){
                 <hr className="tab-section-title-horiz-divider"/>
 
                 <div className="container-wide py-2">
-                    <RecentCasesTable {...{ schemas }} />
+                    <RecentCasesTable />
                 </div>
 
             </div>
@@ -71,32 +71,11 @@ export const UserDashboard = React.memo(function UserDashboard(props){
 /** Used a 'classical' component here since harder to throttle state-changing funcs in functional components */
 class RecentCasesTable extends React.PureComponent {
 
-    static getHideFacets(schemas){
-        if (!schemas) return null;
-        const { Case : { facets: schemaFacets } } = schemas;
-        const hideFacets = Object.keys(schemaFacets || {}).filter(function(facetKey){
-            if (facetKey === "project.display_title") {
-                return false; // Filter out of hideFacets
-            }
-            const { default_hidden = false } = schemaFacets[facetKey];
-            if (default_hidden) {
-                return false; // Filter out of hideFacets since hidden anyways
-            }
-            return true;
-        });
-        hideFacets.push("report.uuid");
-        hideFacets.push("validation_errors.name");
-        return hideFacets;
-    }
-
     constructor(props){
         super(props);
         this.onToggleOnlyShowCasesWithReports = _.throttle(this.onToggleOnlyShowCasesWithReports.bind(this), 500, { trailing: false });
         this.state = {
             "onlyShowCasesWithReports": true
-        };
-        this.memoized = {
-            getHideFacets: memoize(RecentCasesTable.getHideFacets)
         };
     }
 
@@ -107,7 +86,6 @@ class RecentCasesTable extends React.PureComponent {
     }
 
     render(){
-        const { schemas } = this.props;
         const { onlyShowCasesWithReports } = this.state;
         const allCasesHref = "/search/?type=Case";
         const searchHref = (
@@ -115,17 +93,85 @@ class RecentCasesTable extends React.PureComponent {
             + (onlyShowCasesWithReports ? "&report.uuid!=No+value" : "")
             + "&sort=-last_modified.date_modified"
         );
-        const hideFacets = this.memoized.getHideFacets(schemas);
         return (
             <div className="recent-cases-table-section mt-12 mb-36">
-                <div className="toggle-reports mb-1">
-                    <Checkbox onChange={this.onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small">
-                        Show Only Cases with Reports
-                    </Checkbox>
-                </div>
-                <EmbeddedCaseSearchTable {...{ searchHref, hideFacets }} />
+                <EmbeddedCaseSearchTable {...{ searchHref }} facets={null}
+                    aboveTableComponent={
+                        <AboveCasesTableOptions onToggleOnlyShowCasesWithReports={this.onToggleOnlyShowCasesWithReports}
+                            onlyShowCasesWithReports={onlyShowCasesWithReports} />
+                    }
+                />
             </div>
         );
     }
+
+}
+
+function AboveCasesTableOptions(props){
+    const {
+        onToggleOnlyShowCasesWithReports, onlyShowCasesWithReports,
+        context, onFilter, isContextLoading
+    } = props;
+
+    return (
+        <div className="toggle-reports mb-1 d-flex justify-content-between align-items-center">
+            <div className="d-flex align-items-center">
+                <div className="pr-1">View cases from</div>
+                <ProjectSelectDropdown {...{ context, onFilter, isContextLoading }} />
+            </div>
+            <Checkbox onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small">
+                Show Only Cases with Reports
+            </Checkbox>
+        </div>
+    );
+}
+
+function ProjectSelectDropdown({ context: searchContext, onFilter, isContextLoading = false }){
+    const {
+        facets: ctxFacets = [],
+        filters: ctxFilters
+    } = searchContext || {};
+    const projectFacet = _.findWhere(ctxFacets, { "field" : "project.display_title" });
+    const projectFilter = _.findWhere(ctxFilters, { "field" : "project.display_title" }) || null;
+    const { term: projectFilterTerm = null } = projectFilter || {};
+    const { terms: facetTerms = [] } = projectFacet || {};
+
+    function onTermSelect(evtKey, e){
+        e.preventDefault();
+        if (!evtKey) {
+            if (projectFilter) {
+                // Un-toggle
+                onFilter(projectFacet, { key: projectFilter.term });
+            }
+        } else {
+            if (!projectFilter || projectFilter.term !== evtKey) {
+                onFilter(projectFacet, { key: evtKey });
+            }
+        }
+    }
+
+    let options = null;
+    if (!isContextLoading) {
+        options = facetTerms.map(function(projectTermObj){
+            const { key: projectTerm, doc_count } = projectTermObj;
+            const active = projectTerm === projectFilterTerm;
+            return (
+                <DropdownItem key={projectTerm} eventKey={projectTerm} active={active}>
+                    { Schemas.Term.toName("project.display_title", projectTerm) }
+                    <small className="ml-07">({ doc_count })</small>
+                </DropdownItem>
+            );
+        });
+    }
+
+    return (
+        <DropdownButton disabled={isContextLoading || facetTerms.length === 0} size="sm"
+            title={ projectFilterTerm || "All Projects" } onSelect={onTermSelect}>
+            <DropdownItem eventKey={0} active={!projectFilterTerm} className="border-bottom">
+                <span>All Projects</span>
+            </DropdownItem>
+            { options }
+        </DropdownButton>
+    );
 
 }
