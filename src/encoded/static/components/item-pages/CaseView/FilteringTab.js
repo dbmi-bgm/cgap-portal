@@ -285,7 +285,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     let searchHrefBase = "/search/?type=VariantSample";
     searchHrefBase += initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "";
-    searchHrefBase += "&sort=-date_created";
+    searchHrefBase += "&sort=date_created";
 
     // DEPRECATED - we no longer have filter_blocks present initially.
     // const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
@@ -313,12 +313,12 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         }
 
         const blankFilterSetItem = {
-            "title" : "New FilterSet for Case " + caseAccession,
+            "title" : "FilterSet for Case " + caseAccession,
             "created_in_case_accession" : caseAccession,
             "search_type": "VariantSample",
             "filter_blocks" : [
                 {
-                    "name" : "New Filter Block 1",
+                    "name" : "Filter Block 1",
                     "query" : ""
                 }
             ]
