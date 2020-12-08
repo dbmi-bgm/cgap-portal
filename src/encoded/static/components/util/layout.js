@@ -1,4 +1,4 @@
-
+import { isServerSide } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/misc';
 
 /**
  * Get current grid size, if need to sidestep CSS.
