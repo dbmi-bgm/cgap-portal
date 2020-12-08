@@ -1,6 +1,6 @@
 import React from 'react';
 import memoize from 'memoize-one';
-import * as d3 from 'd3';
+import { path as d3Path } from 'd3-path';
 
 
 export const EdgesLayer = React.memo(function EdgesLayer(props){
@@ -31,7 +31,7 @@ const DebugVizGraphLayer = React.memo(function DebugVizGraphLayer(props){
             transform={"translate(" + dims.graphPadding + "," + dims.graphPadding + ")"}>
             {
                 [].concat(vSegments).concat(hSegments).map(function([ start, end ]){
-                    const path = d3.path();
+                    const path = d3Path();
                     path.moveTo(...start);
                     path.lineTo(...end);
                     const pathStr = path.toString();
@@ -44,7 +44,7 @@ const DebugVizGraphLayer = React.memo(function DebugVizGraphLayer(props){
 
 function makeEdgePathDimensions(edgeObj, dims){
     const { edgeLedge, edgeCornerDiameter = 10 } = dims;
-    const path = d3.path();
+    const path = d3Path();
     const vertices = edgeObj.vertices.map(function(v){
         return [ dims.graphPadding + v[0], dims.graphPadding + v[1] ];
     });
