@@ -152,7 +152,11 @@ function ProjectSelectDropdown({ context: searchContext, onFilter, isContextLoad
 
     let options = null;
     if (!isContextLoading) {
-        options = facetTerms.map(function(projectTermObj){
+        options = facetTerms.sort(function({ key: a, doc_count: aDC }, { key: b, doc_count: bDC }){
+            if (a === "CGAP Core") return -1;
+            if (b === "CGAP Core") return 1;
+            return aDC - bDC;
+        }).map(function(projectTermObj){
             const { key: projectTerm, doc_count } = projectTermObj;
             const active = projectTerm === projectFilterTerm;
             return (
@@ -166,9 +170,9 @@ function ProjectSelectDropdown({ context: searchContext, onFilter, isContextLoad
 
     return (
         <DropdownButton disabled={isContextLoading || facetTerms.length === 0} size="sm"
-            title={ projectFilterTerm || "All Projects" } onSelect={onTermSelect}>
-            <DropdownItem eventKey={0} active={!projectFilterTerm} className="border-bottom">
-                <span>All Projects</span>
+            title={ projectFilterTerm || "All Projects" } onSelect={onTermSelect} variant="outline-dark">
+            <DropdownItem eventKey={0} active={!projectFilterTerm}>
+                <span className="text-600">All Projects</span>
             </DropdownItem>
             { options }
         </DropdownButton>
