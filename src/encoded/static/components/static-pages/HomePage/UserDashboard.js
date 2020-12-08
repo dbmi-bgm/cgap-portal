@@ -1,10 +1,11 @@
 'use strict';
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import moment from 'moment';
-import ReactTooltip from 'react-tooltip';
+import React, { useMemo } from 'react';
+import memoize from 'memoize-one';
 import _ from 'underscore';
+
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
@@ -15,6 +16,7 @@ import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedI
 
 
 export const UserDashboard = React.memo(function UserDashboard(props){
+    const { schemas } = props;
     // We can turn container into container-wide to expand width
     // We can convert dashboard-header into tabs, similar to Item pages.
     // We can do novel stuff like sidebar menu or something.
@@ -57,7 +59,7 @@ export const UserDashboard = React.memo(function UserDashboard(props){
                 <hr className="tab-section-title-horiz-divider"/>
 
                 <div className="container-wide py-2">
-                    <RecentCasesTables userUUID={userUUID} key={userUUID} />
+                    <RecentCasesTable />
                 </div>
 
             </div>
@@ -66,88 +68,110 @@ export const UserDashboard = React.memo(function UserDashboard(props){
 });
 
 
-class RecentCasesTables extends React.PureComponent {
+/** Used a 'classical' component here since harder to throttle state-changing funcs in functional components */
+class RecentCasesTable extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.toggleCasesWithReportsByProject = {}; // Dictionary of methods bound to this + [projectName], filled on User load.
+        this.onToggleOnlyShowCasesWithReports = _.throttle(this.onToggleOnlyShowCasesWithReports.bind(this), 500, { trailing: false });
         this.state = {
-            project_roles: null, // 'null' will indicate loading, also. While empty arr is lack/failed.
-            projectsWithAllCases : {
-                // Lack of presence here means only Cases with reports will be shown for this project.
-                // Unless toggled later. Keyed by project `name` (uniqueKey) - if "name" field changed or removed, should change to `@id`.
-            }
+            "onlyShowCasesWithReports": true
         };
     }
 
-    componentDidMount(){
-        const { userUUID } = this.props;
-        const cb = (resp) => {
-            const { project_roles = [] } = resp;
-            const projectsWithAllCases = {};
-            project_roles.forEach(({ project : { name: projectName } }) => {
-                projectsWithAllCases[projectName] = false;
-                this.toggleCasesWithReportsByProject[projectName] = this.toggleCasesWithReports.bind(this, projectName);
-            });
-            this.setState({ project_roles, projectsWithAllCases });
-        };
-        ajax.load("/users/" + userUUID, cb, 'GET', cb);
-    }
-
-    toggleCasesWithReports(projectName){
-        this.setState(function({ projectsWithAllCases: existingStateMap }){
-            const projectsWithAllCases = {
-                ...existingStateMap,
-                [projectName]: !existingStateMap[projectName]
-            };
-            return { projectsWithAllCases };
+    onToggleOnlyShowCasesWithReports(e){
+        this.setState(function({ onlyShowCasesWithReports: pastShow }){
+            return { onlyShowCasesWithReports: !pastShow };
         });
     }
 
     render(){
-        const { project_roles, projectsWithAllCases } = this.state;
-        if (project_roles === null) { // == Still loading
-            // Eventually we could make cool graphic/CSS-animation of DNA strand pulsing or something... hmmm
-            return (
-                <div className="py-3 text-center">
-                    <h3 className="bg-transparent spinner-grow" role="status">
-                        <i className="icon fas icon-dna"/>
-                        <span className="sr-only">Loading...</span>
-                    </h3>
-                </div>
-            );
-        }
-
-        if (project_roles.length === 0) {
-            return null;
-        }
-
-        const tableSections = project_roles.map(({ role, project })=>{
-            const { name: projectName, '@id' : projectID, display_title: projectTitle } = project;
-            const casesWithReportsOnly = !projectsWithAllCases[projectName];
-            const allCasesHref = "/search/?type=Case&project.name=" + encodeURIComponent(projectName);
-            const searchHrefFull = allCasesHref + (casesWithReportsOnly ? "&report.uuid!=No+value" : "");
-            const titleTipName = projectName === projectTitle ? projectTitle : `${projectTitle} (${projectName})`;
-            const titleTip = "View all Cases from " + titleTipName + "<br/><label class='mb-0'>Role:</label> " + role;
-            return (
-                <div className="recent-cases-table-section mt-12 mb-36" data-project={projectName} key={projectName}>
-                    <div className="d-flex align-items-center mb-1">
-                        <h4 className="text-400 flex-fill mb-0 mt-0">
-                            <a href={allCasesHref} data-tip={titleTip} data-html data-place="right">{ projectTitle }</a>
-                        </h4>
-                        <div className="toggle-reports">
-                            <Checkbox onChange={this.toggleCasesWithReportsByProject[projectName]} checked={casesWithReportsOnly} labelClassName="mb-0 text-400 text-small">
-                                Show Only Cases with Reports
-                            </Checkbox>
-                        </div>
-                    </div>
-                    <EmbeddedCaseSearchTable facets={null} searchHref={searchHrefFull} />
-                </div>
-            );
-
-        });
-
-        return tableSections;
+        const { onlyShowCasesWithReports } = this.state;
+        const allCasesHref = "/search/?type=Case";
+        const searchHref = (
+            allCasesHref
+            + (onlyShowCasesWithReports ? "&report.uuid!=No+value" : "")
+            + "&sort=-last_modified.date_modified"
+        );
+        return (
+            <div className="recent-cases-table-section mt-12 mb-36">
+                <EmbeddedCaseSearchTable {...{ searchHref }} facets={null}
+                    aboveTableComponent={
+                        <AboveCasesTableOptions onToggleOnlyShowCasesWithReports={this.onToggleOnlyShowCasesWithReports}
+                            onlyShowCasesWithReports={onlyShowCasesWithReports} />
+                    }
+                />
+            </div>
+        );
     }
+
+}
+
+function AboveCasesTableOptions(props){
+    const {
+        onToggleOnlyShowCasesWithReports, onlyShowCasesWithReports,
+        context, onFilter, isContextLoading
+    } = props;
+
+    return (
+        <div className="toggle-reports mb-1 d-flex justify-content-between align-items-center">
+            <div className="d-flex align-items-center">
+                <div className="pr-1">View cases from</div>
+                <ProjectSelectDropdown {...{ context, onFilter, isContextLoading }} />
+            </div>
+            <Checkbox onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small">
+                Show Only Cases with Reports
+            </Checkbox>
+        </div>
+    );
+}
+
+function ProjectSelectDropdown({ context: searchContext, onFilter, isContextLoading = false }){
+    const {
+        facets: ctxFacets = [],
+        filters: ctxFilters
+    } = searchContext || {};
+    const projectFacet = _.findWhere(ctxFacets, { "field" : "project.display_title" });
+    const projectFilter = _.findWhere(ctxFilters, { "field" : "project.display_title" }) || null;
+    const { term: projectFilterTerm = null } = projectFilter || {};
+    const { terms: facetTerms = [] } = projectFacet || {};
+
+    function onTermSelect(evtKey, e){
+        e.preventDefault();
+        if (!evtKey) {
+            if (projectFilter) {
+                // Un-toggle
+                onFilter(projectFacet, { key: projectFilter.term });
+            }
+        } else {
+            if (!projectFilter || projectFilter.term !== evtKey) {
+                onFilter(projectFacet, { key: evtKey });
+            }
+        }
+    }
+
+    let options = null;
+    if (!isContextLoading) {
+        options = facetTerms.map(function(projectTermObj){
+            const { key: projectTerm, doc_count } = projectTermObj;
+            const active = projectTerm === projectFilterTerm;
+            return (
+                <DropdownItem key={projectTerm} eventKey={projectTerm} active={active}>
+                    { Schemas.Term.toName("project.display_title", projectTerm) }
+                    <small className="ml-07">({ doc_count })</small>
+                </DropdownItem>
+            );
+        });
+    }
+
+    return (
+        <DropdownButton disabled={isContextLoading || facetTerms.length === 0} size="sm"
+            title={ projectFilterTerm || "All Projects" } onSelect={onTermSelect}>
+            <DropdownItem eventKey={0} active={!projectFilterTerm} className="border-bottom">
+                <span>All Projects</span>
+            </DropdownItem>
+            { options }
+        </DropdownButton>
+    );
 
 }
