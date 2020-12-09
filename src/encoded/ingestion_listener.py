@@ -289,6 +289,88 @@ def get_queue_manager(request, *, override_name):
             else IngestionQueueManager(request.registry, override_name=override_name))
 
 
+class IngestionError:
+    """
+    Holds info on an error that occurred in ingestion. Right now this consists of the
+    offending request body and the VCF row it occurred on.
+
+    This class doesn't really do much except specify the structure. It must align with that of FileProcessed
+    (reproduced as of 12/2/2020 below):
+
+        "file_ingestion_error": {
+            "title": "Ingestion Error Report",
+            "description": "This field is set when an error occurred in ingestion with all errors encountered",
+            "type": "array",
+            "items": {
+                "title": "Ingestion Error",
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "index": false  # the intention is not to index this in the future
+                    },
+                    "row": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+
+    """
+
+    def __init__(self, body, row):
+        self.body = body
+        self.row = row
+
+    def to_dict(self):
+        return {
+            'body': str(self.body),
+            'row': self.row
+        }
+
+
+class IngestionReport:
+    """
+    A "virtual" item on file_processed that contains detailed information on the ingestion run.
+    Not creating an item for this is a design decision. The output of this process is more for
+    debugging and not for auditing, so it does not merit an item at this time.
+    """
+    MAX_ERRORS = 100  # tune this to get more errors, 100 is a lot though and probably more than needed
+
+    def __init__(self):
+        self.grand_total = 0
+        self.errors = []
+
+    def brief_summary(self):
+        return ('INGESTION REPORT: There were %s total variants detected, of which %s were successful'
+                'and %s failed. Check ProcessedFile for full error output.' % (self.grand_total,
+                                                                              self.total_successful(),
+                                                                              self.total_errors()))
+
+    def total_successful(self):
+        return self.grand_total - len(self.errors)
+
+    def total_errors(self):
+        return len(self.errors)
+
+    def get_errors(self, limit=True):
+        """Returns a limited number of errors, where limit can be True (self.MAX_ERRORS), False (no limit), or an integer."""
+        if limit is True:
+            limit = self.MAX_ERRORS
+        elif limit is False:
+            limit = None
+        return self.errors[:limit]
+
+    def mark_success(self):
+        """ Marks the current row number as successful, which in this case just involves incrementing the total """
+        self.grand_total += 1
+
+    def mark_failure(self, *, body, row):
+        """ Marks the current row as failed, creating an IngestionError holding the response body and row. """
+        self.grand_total += 1
+        self.errors.append(IngestionError(body, row).to_dict())
+
+
 class IngestionQueueManager:
     """
     Similar to QueueManager in snovault in that in manages SQS queues, but that code is not generic
@@ -502,7 +584,7 @@ class IngestionListener:
                             (self.vapp, _queue_manager, _update_status))
         self.queue_manager = IngestionQueueManager(registry) if not _queue_manager else _queue_manager
         self.update_status = _update_status
-        self.first_error_message = None
+        self.ingestion_report = IngestionReport()  # collect all errors
 
     @staticmethod
     def should_remain_online(override=None):
@@ -554,13 +636,13 @@ class IngestionListener:
         """ Patches field with value on item uuid """
         self.vapp.patch_json('/' + uuid, {field: value})
 
-    def set_error(self, uuid):
+    def patch_ingestion_report(self, uuid):
         """ Sets the file_ingestion_error field of the given uuid """
-        if self.first_error_message is None:
-            log.error('Tried to set error message but no message was set!')
+        if self.ingestion_report is None:
+            log.error('Tried to set IngestionReport but one was not created!')
             return
-        self._patch_value(uuid, 'file_ingestion_error', self.first_error_message)
-        self.first_error_message = None  # reset this field
+        self._patch_value(uuid, 'file_ingestion_error', self.ingestion_report.get_errors())
+        self.ingestion_report = None  # reset this field
 
     def set_status(self, uuid, status):
         """ Sets the file_ingestion_status of the given uuid """
@@ -629,7 +711,7 @@ class IngestionListener:
                 add_last_modified(variant, userid=LOADXL_USER_UUID)
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
-                log.error('Encountered exception posting variant_sample: %s' % e)
+                debuglog('Encountered exception posting variant_sample: %s' % e)
                 raise  # propagate/report if error occurs here
 
     def search_for_sample_relations(self, vcf_file_accession):
@@ -672,7 +754,6 @@ class IngestionListener:
         :param file_meta: metadata for the processed VCF file
         :return: 2-tuple of successful, failed number of posts
         """
-        success, error = 0, 0
         vs_project, vs_institution, file_accession = (file_meta['project']['uuid'], file_meta['institution']['uuid'],
                                                       file_meta['accession'])
         sample_relations = self.extract_sample_relations(file_accession)
@@ -684,14 +765,12 @@ class IngestionListener:
                                                       CGAP_CORE_INSTITUTION)  # /institutions/hms-dbmi/
                 self.build_and_post_variant_samples(parser, record, vs_project, vs_institution, variant, file_accession,
                                                     sample_relations)
-                success += 1
+                self.ingestion_report.mark_success()
             except Exception as e:  # ANNOTATION spec validation error, recoverable
-                log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))
-                if not self.first_error_message:
-                    self.first_error_message = str(e)
-                error += 1
+                debuglog('Encountered exception posting variant at row %s: %s ' % (idx, e))
+                self.ingestion_report.mark_failure(body=str(e), row=idx)
 
-        return success, error
+        return self.ingestion_report.total_successful(), self.ingestion_report.total_errors()
 
     def run(self):
         """ Main process for this class. Runs forever doing ingestion as needed.
@@ -761,6 +840,7 @@ class IngestionListener:
 
                 # if this file has been ingested (or explicitly disabled), do not do anything with this uuid
                 if file_meta.get('file_ingestion_status', 'N/A') in [STATUS_INGESTED, STATUS_DISABLED]:
+                    log.error('Skipping ingestion of file %s due to disabled ingestion status' % uuid)
                     continue
 
                 # attempt download with workaround
@@ -774,24 +854,20 @@ class IngestionListener:
                 # patch in progress status
                 self.set_status(uuid, STATUS_IN_PROGRESS)
                 decoded_content = gunzip_content(raw_content)
-                log.info('Got decoded content: %s' % decoded_content[:20])
+                debuglog('Got decoded content: %s' % decoded_content[:20])
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                                    reader=Reader(fsock=decoded_content.split('\n')))
                 success, error = self.post_variants_and_variant_samples(parser, file_meta)
 
                 # if we had no errors, patch the file status to 'Ingested'
                 if error > 0:
-                    log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
-                              'as ingested.' % uuid)
                     self.set_status(uuid, STATUS_ERROR)
-                    self.set_error(uuid)
+                    self.patch_ingestion_report(uuid)
                 else:
                     self.set_status(uuid, STATUS_INGESTED)
 
                 # report results in error_log regardless of status
-                msg = ('INGESTION_REPORT:\n'
-                       'Success: %s\n'
-                       'Error: %s\n' % (success, error))
+                msg = self.ingestion_report.brief_summary()
                 log.error(msg)
                 self.update_status(msg=msg)
 
