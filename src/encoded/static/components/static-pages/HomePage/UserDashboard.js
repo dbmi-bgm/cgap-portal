@@ -169,7 +169,7 @@ function ProjectSelectDropdown(props){
         options = facetTerms.sort(function({ key: a, doc_count: aDC }, { key: b, doc_count: bDC }){
             if (a === "CGAP Core") return -1;
             if (b === "CGAP Core") return 1;
-            return aDC - bDC;
+            return bDC - aDC;
         }).map(function(projectTermObj){
             const { key: projectTerm, doc_count } = projectTermObj;
             const active = projectTerm === projectFilterTerm;
