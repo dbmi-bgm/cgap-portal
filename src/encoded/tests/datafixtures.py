@@ -15,7 +15,7 @@ ORDER = [
     'quality_metric_vcfqc', 'quality_metric_bamqc', 'quality_metric_peddyqc',
     'software', 'static_section', 'tracking_item', 'workflow_mapping',
     'workflow_run_awsem', 'workflow_run', 'annotation_field', 'variant_sample',
-    'variant', 'variant_sample_list', 'gene_annotation_field',  # 'gene', 
+    'variant', 'variant_sample_list', 'gene_annotation_field',  # 'gene',
     'higlass_view_config', 'ingestion_submission',
 ]
 
@@ -564,6 +564,18 @@ def a_case(project, institution, child, sample_proc):
     }
 
 
+@pytest.fixture  # NOTE: variant_sample is unused in workbook so this is ok, later on there should be default inserts
+def test_variant_sample():
+    return {
+        'variant': 'f6aef055-4c88-4a3e-a306-d37a71535d8b',
+        'AD': '1,3',
+        'CALL_INFO': 'my_test_sample',
+        'file': 'dummy-file-name',
+        'project': 'hms-dbmi',
+        'institution': 'hms-dbmi'
+    }
+
+
 @pytest.fixture
 def protocol_data(institution, project):
     return {'description': 'A Protocol',
@@ -842,8 +854,14 @@ def workflow_mapping(testapp, workflow_bam, institution, project):
 
 
 @pytest.fixture
-def gene_item(testapp, institution, project):
-    return testapp.post_json('/gene', {'institution': institution['@id'], 'project': project['@id'], 'geneid': '5885'}).json['@graph'][0]
+def gene1(testapp, project, institution):
+    item = {
+        "project": project['@id'],
+        "institution": institution['@id'],
+        "gene_symbol": "GENEID1",
+        "ensgid": "ENSG00000000001"
+    }
+    return testapp.post_json('/gene', item).json['@graph'][0]
 
 
 @pytest.fixture

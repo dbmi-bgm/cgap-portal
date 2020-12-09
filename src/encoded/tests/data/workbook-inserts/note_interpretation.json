@@ -3,11 +3,18 @@
     "project": "hms-dbmi",
     "institution": "hms-dbmi",
     "uuid": "ab5e1c89-4c88-4a3e-a306-d37a12defd8b",
+    "note_text": "This variant has been reported in the ClinVar database as Unknown Significance.",
+    "conclusion": "For this reason, the variant has been classified as VUS.",
+    "status": "in review",
+    "classification": "VUS",
+    "version": 2,
+    "previous_note": "de5e1c12-4c88-4a3e-a306-d37a12defa6b"
+  },
+  {
+    "project": "hms-dbmi",
+    "institution": "hms-dbmi",
+    "uuid": "de5e1c12-4c88-4a3e-a306-d37a12defa6b",
     "note_text": "This variant has not been reported in the ClinVar database.",
-    "associated_items": [{
-        "item_type": "Variant",
-        "item_identifier": "f6aef055-4c88-4a3e-a306-d37a71535d8b"
-    }],
     "conclusion": "For this reason, the variant has been classified as VUS.",
     "status": "in review",
     "classification": "VUS"

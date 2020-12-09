@@ -9,15 +9,15 @@ from base64 import b64encode
 pytestmark = [pytest.mark.working, pytest.mark.schema]
 
 
-@pytest.fixture
-def gene1(testapp, project, institution):
-    item = {
-        "project": project['@id'],
-        "institution": institution['@id'],
-        "gene_symbol": "GENEID1",
-        "ensgid": "ENSG00000000001"
-    }
-    return testapp.post_json('/gene', item).json['@graph'][0]
+# @pytest.fixture
+# def gene1(testapp, project, institution):
+#     item = {
+#         "project": project['@id'],
+#         "institution": institution['@id'],
+#         "gene_symbol": "GENEID1",
+#         "ensgid": "ENSG00000000001"
+#     }
+#     return testapp.post_json('/gene', item).json['@graph'][0]
 
 
 @pytest.fixture
