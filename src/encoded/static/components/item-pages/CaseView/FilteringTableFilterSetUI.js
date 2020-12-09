@@ -464,7 +464,7 @@ function FilterSetUIHeader(props){
             <h4 className="text-400 clickable my-0 d-inline-block" onClick={toggleOpen}>
                 <i className={"small icon icon-fw fas mr-07 icon-" + (bodyOpen ? "minus" : "plus")} />
                 { fsTitle || fsDisplayTitle || <em>No Title Set</em> }
-                { bodyOpen ? <i className="icon icon-pencil-alt fas ml-1 clickable small text-secondary" onClick={onEditClick} /> : null }
+                { bodyOpen ? <i className="icon icon-pencil-alt fas ml-1 clickable text-small" onClick={onEditClick} /> : null }
             </h4>
         );
     }

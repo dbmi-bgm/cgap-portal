@@ -2280,11 +2280,26 @@ $download-button-width : 100px;
 	are dependent on font-size/face that we use.
 **********************************************************/
 
+@mixin clickable-hoverable-icon {
+	opacity: 0.5;
+	&:hover {
+		opacity: 1;
+	}
+	&.disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+	}
+}
+
 .filterset-outer-container {
 	// TODO CHANGE
 	// border: 1px solid #999;
 	background-color: desaturate(lighten($primary-dark, 40%), 25%);// #b4c8d8; // $gray-300;
 	border-radius: $border-radius-lg;
+
+	h4 i.icon.clickable {
+		@include clickable-hoverable-icon;
+	}
 
 	.blocks-container {
 
@@ -2312,14 +2327,7 @@ $download-button-width : 100px;
 			.title-controls-row {
 
 				i.icon.clickable {
-					opacity: 0.5;
-					&:hover {
-						opacity: 1;
-					}
-					&.disabled {
-						opacity: 0.3;
-						cursor: not-allowed;
-					}
+					@include clickable-hoverable-icon;
 				}
 
 				.cached-counts-value {
