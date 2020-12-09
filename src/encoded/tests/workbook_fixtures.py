@@ -45,7 +45,6 @@ def workbook(app):
 
 
 def make_fresh_workbook(app):
-    import pdb; pdb.set_trace()
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
