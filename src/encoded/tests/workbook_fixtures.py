@@ -32,9 +32,20 @@ def app(es_app_settings, **kwargs):
     DBSession.bind.pool.dispose()
 
 
+class WorkbookCache:
+    value = None
+
+
 @pytest.mark.fixture_cost(500)  # XXX: this does nothing...? -will
 @pytest.yield_fixture(scope='session')
 def workbook(app):
+    if not WorkbookCache.value:
+        WorkbookCache.value = make_fresh_workbook(app)
+    yield
+
+
+def make_fresh_workbook(app):
+    import pdb; pdb.set_trace()
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -47,5 +58,4 @@ def workbook(app):
         raise(load_res)
 
     testapp.post_json('/index', {})
-    yield
-    # XXX cleanup
+    return True
