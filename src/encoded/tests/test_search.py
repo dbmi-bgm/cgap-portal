@@ -15,9 +15,6 @@ from snovault.util import add_default_embeds
 from snovault.schema_utils import load_schema
 from webtest import AppError
 
-# Use workbook fixture from BDD tests (including elasticsearch)
-from .workbook_fixtures import workbook
-from .workbook_fixtures import testapp as es_testapp
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.indexing, pytest.mark.search]
 
@@ -1141,7 +1138,7 @@ def bucket_range_data_raw():
 
 
 @pytest.fixture(scope='module')  # XXX: consider scope further - Will 11/5/2020
-def bucket_range_data(es_testapp, bucket_range_data_raw):
+def bucket_range_data(es_testapp, workbook, bucket_range_data_raw):
     for entry in bucket_range_data_raw:
         es_testapp.post_json('/TestingBucketRangeFacets', entry, status=201)
     es_testapp.post_json('/index', {'record': False})

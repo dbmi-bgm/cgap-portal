@@ -2,9 +2,6 @@ import pytest
 import webtest
 
 
-from .workbook_fixtures import testapp as es_testapp
-
-
 pytestmark = [pytest.mark.indexing, pytest.mark.working]
 
 

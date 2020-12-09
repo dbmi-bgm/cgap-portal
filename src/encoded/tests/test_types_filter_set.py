@@ -1,7 +1,5 @@
 import pytest
 from webtest import AppError
-from .workbook_fixtures import workbook
-from .workbook_fixtures import testapp as es_testapp
 
 
 pytestmark = [pytest.mark.working, pytest.mark.search]
@@ -54,7 +52,7 @@ def test_filter_set_barebones(workbook, es_testapp, barebones_filter_set):
         'flags': [  # should have no effect, since no filter_blocks toggle it
             {
                 'name': 'gene',
-                'query': '?type=Gene'
+                'query': '?type=TrackingItem'
             }
         ],
         'search_type': 'Gene'

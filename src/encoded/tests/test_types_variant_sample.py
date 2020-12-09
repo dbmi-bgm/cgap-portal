@@ -1,8 +1,6 @@
 import pytest
 import requests  # XXX: C4-211
 from .test_ingest_vcf import VARIANT_SAMPLE_URL
-from .workbook_fixtures import workbook
-from .workbook_fixtures import testapp as es_testapp
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]

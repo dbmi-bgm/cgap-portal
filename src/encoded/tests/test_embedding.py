@@ -4,7 +4,6 @@ from .datafixtures import ORDER
 from snovault import TYPES
 from snovault.util import add_default_embeds, crawl_schemas_by_embeds
 from ..types.base import get_item_or_none
-from .workbook_fixtures import testapp as es_testapp
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]

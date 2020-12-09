@@ -12,7 +12,6 @@ from ..ingestion_listener import (
     IngestionError, IngestionReport,
 )
 from .variant_fixtures import gene_workbook, post_variant_consequence_items
-from .workbook_fixtures import workbook
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
@@ -137,7 +136,7 @@ def test_ingestion_queue_add_and_receive(fresh_ingestion_queue_manager_for_testi
     _expect_message_uuids(queue_manager, test_uuids)
 
 
-def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing, testapp):
+def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing, es_testapp):
     """ Tests adding uuids to the queue via /queue_ingestion """
     queue_manager = fresh_ingestion_queue_manager_for_testing
     test_uuids = [str(uuid4()), str(uuid4())]
@@ -147,21 +146,21 @@ def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing
         'uuids': test_uuids,
         'override_name': queue_manager.queue_name
     }
-    response = testapp.post_json(QUEUE_INGESTION_URL, request_body).json
+    response = es_testapp.post_json(QUEUE_INGESTION_URL, request_body).json
     print(json.dumps(response, indent=2))
     assert response['notification'] == 'Success'
     assert response['number_queued'] == 2
     _expect_message_uuids(queue_manager, test_uuids)
 
 
-def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, testapp):
+def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, es_testapp):
     """ Tests deleting messages from SQS results in no messages being there. """
     queue_manager = fresh_ingestion_queue_manager_for_testing
     request_body = {
         'uuids': [str(uuid4()), str(uuid4())],
         'override_name': queue_manager.queue_name
     }
-    testapp.post_json(QUEUE_INGESTION_URL, request_body, status=200)
+    es_testapp.post_json(QUEUE_INGESTION_URL, request_body, status=200)
     msgs = queue_manager.receive_messages()
     failed = queue_manager.delete_messages(msgs)
     assert failed == []
@@ -199,10 +198,10 @@ def mocked_familial_relations():
     ]}]
 
 
-def test_ingestion_listener_build_familial_relations(testapp, mocked_familial_relations):
+def test_ingestion_listener_build_familial_relations(es_testapp, mocked_familial_relations):
     """ Tests that we correctly extract familial relations from a mocked object that has the correct structure """
     with mock.patch.object(IngestionListener, 'search_for_sample_relations', new=lambda x, y: mocked_familial_relations):
-        listener = IngestionListener(testapp)
+        listener = IngestionListener(es_testapp)
         relations = listener.extract_sample_relations('dummy')
         assert relations['sample_one']['samplegeno_role'] == 'mother'
         assert relations['sample_two']['samplegeno_role'] == 'father'
@@ -212,15 +211,15 @@ def test_ingestion_listener_build_familial_relations(testapp, mocked_familial_re
         assert relations['sample_three']['samplegeno_sex'] == 'M'
 
 
-def test_ingestion_listener_verify_vcf_status_is_not_ingested(authenticated_testapp, app, workbook):
+def test_ingestion_listener_verify_vcf_status_is_not_ingested(authenticated_es_testapp, es_app, workbook):
     """ Posts a minimal processed file to be checked """
     request = DummyRequest(environ={'REMOTE_USER': 'EMBED'})
-    request.invoke_subrequest = app.invoke_subrequest
+    request.invoke_subrequest = es_app.invoke_subrequest
     assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION) is False
     assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True
 
 
-def test_ingestion_listener_run(testapp, fresh_ingestion_queue_manager_for_testing, workbook, project, institution,
+def test_ingestion_listener_run(es_testapp, fresh_ingestion_queue_manager_for_testing, workbook, project, institution,
                                 post_variant_consequence_items, gene_workbook):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
@@ -244,7 +243,7 @@ def test_ingestion_listener_run(testapp, fresh_ingestion_queue_manager_for_testi
     #      error occurred.
     with mock.patch.object(IngestionListener, 'should_remain_online', new=mocked_should_remain_online):
         with pytest.raises(ValueError):
-            run(testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed
+            run(es_testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed
 
 
 def test_test_port():

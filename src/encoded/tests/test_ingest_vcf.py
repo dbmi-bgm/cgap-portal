@@ -157,19 +157,19 @@ class TestIngestVCF:
         assert 'samplegeno_ad' in result['samplegeno'][0]
         assert 'samplegeno_gt' in result['samplegeno'][0]
 
-    def test_post_variants(self, testapp, institution, project, test_vcf, gene_workbook, post_variant_consequence_items):
+    def test_post_variants(self, es_testapp, test_vcf, gene_workbook, post_variant_consequence_items):
         """ Attempts to post all generated variants without links """
         for idx, record in enumerate(test_vcf):
             if idx == MAX_POSTS_FOR_TESTING:
                 break
             variant = test_vcf.create_variant_from_record(record)
-            variant['project'] = 'encode-project'
-            variant['institution'] = 'encode-institution'
+            variant['project'] = 'hms-dbmi'
+            variant['institution'] = 'hms-dbmi'
             test_vcf.format_variant_sub_embedded_objects(variant)
-            res = testapp.post_json(VARIANT_URL, variant, status=201).json
+            res = es_testapp.post_json(VARIANT_URL, variant, status=201).json
             assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
-    def test_post_variants_and_samples_with_links(self, testapp, institution, project, test_vcf, gene_workbook,
+    def test_post_variants_and_samples_with_links(self, es_testapp, test_vcf, gene_workbook,
                                                   post_variant_consequence_items):
         """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
             NOTE: This is the most important test functionally speaking.
@@ -179,17 +179,17 @@ class TestIngestVCF:
             if idx == MAX_POSTS_FOR_TESTING:
                 break
             variant = test_vcf.create_variant_from_record(record)
-            variant['project'] = 'encode-project'
-            variant['institution'] = 'encode-institution'
+            variant['project'] = 'hms-dbmi'
+            variant['institution'] = 'hms-dbmi'
             test_vcf.format_variant_sub_embedded_objects(variant)
-            res = testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
+            res = es_testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
             assert 'annotation_id' in res
             variant_samples = test_vcf.create_sample_variant_from_record(record)
             for sample in variant_samples:
-                sample['project'] = 'encode-project'
-                sample['institution'] = 'encode-institution'
+                sample['project'] = 'hms-dbmi'
+                sample['institution'] = 'hms-dbmi'
                 sample['variant'] = res['@id']  # make link
                 sample['file'] = 'dummy-filename'
-                res2 = testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
+                res2 = es_testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
                 assert 'annotation_id' in res2['@graph'][0]
                 assert 'bam_snapshot' in res2['@graph'][0]
