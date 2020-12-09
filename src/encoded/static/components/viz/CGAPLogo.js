@@ -2,7 +2,9 @@
 
 import React from 'react';
 import _ from 'underscore';
-import * as d3 from 'd3';
+import { selectAll as d3SelectAll } from 'd3-selection';
+import { active as d3Active } from 'd3-transition';
+import { easeQuadIn, easeQuadOut } from 'd3-ease';
 
 
 const commonStyle1 = {
@@ -61,18 +63,16 @@ const svgElemStyleHover = _.extend({}, svgElemStyle, {
 export class CGAPLogo extends React.PureComponent {
 
     static defaultProps = {
-        'id'                        : "logo_svg",
-        'hoverDelayUntilTransform'  : 10
+        'id' : "logo_svg",
+        'hoverDelayUntilTransform' : 10
     };
 
     constructor(props){
         super(props);
         this.setHoverStateOnDoTiming = _.throttle(this.setHoverStateOnDoTiming.bind(this), 1000);
-        this.setHoverStateOn    = this.setHoverStateOn.bind(this);
-        this.setHoverStateOff   = this.setHoverStateOff.bind(this);
-
-        this.svgRef             = React.createRef();
-
+        this.setHoverStateOn = this.setHoverStateOn.bind(this);
+        this.setHoverStateOff = this.setHoverStateOff.bind(this);
+        this.svgRef = React.createRef();
         this.state = { "hover" : false };
     }
 
@@ -86,39 +86,39 @@ export class CGAPLogo extends React.PureComponent {
         // CSS styles controlled via stylesheets
         setTimeout(()=>{
 
-            const pathsG1 = d3.selectAll("#logo_svg g path.path-g-1");
-            const pathsG2 = d3.selectAll("#logo_svg g path.path-g-2");
+            const pathsG1 = d3SelectAll("#logo_svg g path.path-g-1");
+            const pathsG2 = d3SelectAll("#logo_svg g path.path-g-2");
 
             if (!this.state.hover) return; // No longer hovering. Cancel.
 
             pathsG1
                 .transition()
-                .ease(d3.easeQuadIn)
+                .ease(easeQuadIn)
                 .duration(200)
                 .attr('transform', commonTransform1Hover)
                 .transition()
-                .ease(d3.easeQuadOut)
+                .ease(easeQuadOut)
                 //.delay(250)
                 .on('start', function(){
                     //if (!_this.state.hover) return;
                     // eslint-disable-next-line no-invalid-this
-                    d3.active(this) // `this` refers to the paths here.
+                    d3Active(this) // `this` refers to the paths here.
                         .duration(400)
                         .attr('transform', commonTransform1Hover2);
                 });
 
             pathsG2
                 .transition()
-                .ease(d3.easeQuadIn)
+                .ease(easeQuadIn)
                 .duration(200)
                 .attr('transform', commonTransform2Hover)
                 .transition()
-                .ease(d3.easeQuadOut)
+                .ease(easeQuadOut)
                 //.delay(250)
                 .on('start', function(){
                     //if (!_this.state.hover) return;
                     // eslint-disable-next-line no-invalid-this
-                    d3.active(this) // `this` refers to the paths here.
+                    d3Active(this) // `this` refers to the paths here.
                         .duration(400)
                         .attr('transform', commonTransform2Hover2);
                 });
@@ -128,19 +128,18 @@ export class CGAPLogo extends React.PureComponent {
     }
 
     setHoverStateOff(e){
-        const { circlePathDefinitionOrig, textTransformOrig, fgCircleTransformOrig } = this.props;
 
         this.setState({ 'hover' : false }, ()=>{
-            const pathsG1 = d3.selectAll("#logo_svg g path.path-g-1");
-            const pathsG2 = d3.selectAll("#logo_svg g path.path-g-2");
+            const pathsG1 = d3SelectAll("#logo_svg g path.path-g-1");
+            const pathsG2 = d3SelectAll("#logo_svg g path.path-g-2");
 
             pathsG1.interrupt().transition()
-                .ease(d3.easeQuadOut)
+                .ease(easeQuadOut)
                 .duration(300)
                 .attr('transform', commonTransform1);
 
             pathsG2.interrupt().transition()
-                .ease(d3.easeQuadOut)
+                .ease(easeQuadOut)
                 .duration(300)
                 .attr('transform', commonTransform2);
         });
@@ -148,14 +147,14 @@ export class CGAPLogo extends React.PureComponent {
     }
 
     render(){
-        const { id, circlePathDefinitionOrig, textTransformOrig, fgCircleTransformOrig, onClick } = this.props;
+        const { id, onClick } = this.props;
         const { hover } = this.state;
 
         const outerStyle = hover ? svgElemStyleHover : svgElemStyle;
         const style1 = hover ? commonStyle1Hover : commonStyle1;
         const style2 = hover ? commonStyle1Hover : commonStyle2;
-        const transform1 = hover ? commonTransform1Hover : commonTransform1;
-        const transform2 = hover ? commonTransform2Hover : commonTransform2;
+        // const transform1 = hover ? commonTransform1Hover : commonTransform1;
+        // const transform2 = hover ? commonTransform2Hover : commonTransform2;
 
         const containerCls = "img-container" + (hover ? " hover" : "");
 
