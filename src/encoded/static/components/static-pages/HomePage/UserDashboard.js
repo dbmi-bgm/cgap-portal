@@ -1,14 +1,12 @@
 'use strict';
 
-import React, { useMemo } from 'react';
-import memoize from 'memoize-one';
+import React from 'react';
 import _ from 'underscore';
 
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
-import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { console, ajax, JWT, searchFilters } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { Schemas } from './../../util';
 
@@ -110,14 +108,14 @@ class RecentCasesTable extends React.PureComponent {
 function AboveCasesTableOptions(props){
     const {
         onToggleOnlyShowCasesWithReports, onlyShowCasesWithReports,
-        context, onFilter, isContextLoading
+        context, onFilter, isContextLoading, navigate
     } = props;
 
     return (
         <div className="toggle-reports mb-1 d-flex justify-content-between align-items-center">
             <div className="d-flex align-items-center">
                 <div className="pr-1">View cases from</div>
-                <ProjectSelectDropdown {...{ context, onFilter, isContextLoading }} />
+                <ProjectSelectDropdown {...{ context, onFilter, isContextLoading, navigate }} />
             </div>
             <Checkbox onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small">
                 Show Only Cases with Reports
@@ -126,10 +124,17 @@ function AboveCasesTableOptions(props){
     );
 }
 
-function ProjectSelectDropdown({ context: searchContext, onFilter, isContextLoading = false }){
+function ProjectSelectDropdown(props){
+    const {
+        context: searchContext,
+        navigate: virtualNavigate,
+        onFilter,
+        isContextLoading = false
+    } = props;
     const {
         facets: ctxFacets = [],
-        filters: ctxFilters
+        filters: ctxFilters,
+        "@id": ctxHref
     } = searchContext || {};
     const projectFacet = _.findWhere(ctxFacets, { "field" : "project.display_title" });
     const projectFilter = _.findWhere(ctxFilters, { "field" : "project.display_title" }) || null;
@@ -144,9 +149,18 @@ function ProjectSelectDropdown({ context: searchContext, onFilter, isContextLoad
                 onFilter(projectFacet, { key: projectFilter.term });
             }
         } else {
-            if (!projectFilter || projectFilter.term !== evtKey) {
+            if (!projectFilter || evtKey === projectFilterTerm) {
+                // Single toggle request
                 onFilter(projectFacet, { key: evtKey });
+                return;
             }
+
+            let updatedFilters = searchFilters.contextFiltersToExpSetFilters(ctxFilters, { "type" : true });
+            // Unset existing first, then set new project filter, then perform virtual nav request.
+            updatedFilters = searchFilters.changeFilter("project.display_title", projectFilterTerm, updatedFilters, null, true);
+            updatedFilters = searchFilters.changeFilter("project.display_title", evtKey, updatedFilters, null, true);
+            const updatedSearchHref = searchFilters.filtersToHref(updatedFilters, ctxHref, null, false, null);
+            virtualNavigate(updatedSearchHref);
         }
     }
 
@@ -155,7 +169,7 @@ function ProjectSelectDropdown({ context: searchContext, onFilter, isContextLoad
         options = facetTerms.sort(function({ key: a, doc_count: aDC }, { key: b, doc_count: bDC }){
             if (a === "CGAP Core") return -1;
             if (b === "CGAP Core") return 1;
-            return aDC - bDC;
+            return bDC - aDC;
         }).map(function(projectTermObj){
             const { key: projectTerm, doc_count } = projectTermObj;
             const active = projectTerm === projectFilterTerm;
