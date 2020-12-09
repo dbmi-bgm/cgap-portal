@@ -4,7 +4,6 @@ import React from 'react';
 import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
 import { IndividualBody, getIndividualDisplayTitle } from './IndividualBody';
-import { isRelationshipNode } from './../../../viz/PedigreeViz';
 
 
 export class PedigreeDetailPane extends React.PureComponent {
@@ -17,11 +16,13 @@ export class PedigreeDetailPane extends React.PureComponent {
     }
 
     render(){
-        const { hoveredNode, unselectNode: onClose, indvSchema, docSchema, imageSchema, ...passProps } = this.props;
+        const { PedigreeVizLibrary, hoveredNode, unselectNode: onClose, indvSchema, docSchema, imageSchema, ...passProps } = this.props;
+        const { isRelationshipNode = null } = PedigreeVizLibrary || {};
         const { selectedNode } = passProps;
         const isHovered = hoveredNode === selectedNode;
 
-        if (!selectedNode){
+        if (!selectedNode || !isRelationshipNode){
+            // This PedigreeDetailPane shouldn't be visible in first place if no `PedigreeVizLibrary`/`isRelationshipNode`, but 'if check' on it here for safety.
             return null;
         } else if (isRelationshipNode(selectedNode)){
             return <RelationshipBody {...passProps} {...{ onClose, isHovered }} />;

@@ -1,4 +1,4 @@
-
+import { isServerSide } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/misc';
 
 /**
  * Get current grid size, if need to sidestep CSS.
@@ -22,4 +22,29 @@ export function responsiveGridState(width = null){
     if (width >= 768) return 'md';
     if (width >= 576) return 'sm';
     return 'xs';
+}
+
+
+/**
+ * Get the width of what a 12-column bootstrap '.container' would be in current viewport size.
+ * Keep widths in sync with stylesheet, e.g.
+ * $container-tablet - $grid-gutter-width,
+ * $container-desktop - $grid-gutter-width, and
+ * $container-large-desktop - $grid-gutter-width
+ * in src/encoded/static/scss/bootstrap/_variables.scss.
+ *
+ * @param {number} [windowWidth] Optional current window width to supply.
+ * @return {integer}
+ */
+export function gridContainerWidth(windowWidth = null){
+    // Subtract 20 for padding/margins.
+    switch(responsiveGridState(windowWidth)){
+        case 'xl': return 1120;
+        case 'lg': return 940;
+        case 'md': return 700;
+        case 'sm': return 520;
+        case 'xs':
+            if (isServerSide()) return 400;
+            return (windowWidth || window.innerWidth) - 20;
+    }
 }

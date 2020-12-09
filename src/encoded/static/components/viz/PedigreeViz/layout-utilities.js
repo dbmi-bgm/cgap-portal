@@ -1,5 +1,5 @@
 import { getGraphHeight } from './layout-utilities-drawing';
-import { getRelationships, isRelationship, numberToRomanNumeral, sortByAge, sortByGender } from './data-utilities';
+import { getRelationships, isRelationshipNode, numberToRomanNumeral, sortByAge, sortByGender } from './data-utilities';
 
 
 
@@ -250,7 +250,7 @@ function countNodesInBetween(order, fromNode, toNode){
         const node = orderByHeightIndex[heightIndex][ord];
         //console.log('IN BETWEEN', node);
         num += 2; // A node in between - count 3x
-        if (isRelationship(node)){
+        if (isRelationshipNode(node)){
             //if (node.partners.indexOf(fromNode) > -1 || node.partners.indexOf(toNode) > -1){
             //    continue;
             //}
@@ -326,7 +326,7 @@ function countEdgeCrossingInstance(order, fromNode, toNode){
     const subsequentSiblingsInIndex = orderByHeightIndex[hiFrom].slice(orderLow + 1, orderHigh + 1);
     subsequentSiblingsInIndex.forEach(function(siblingInIndex){
         const { id, partners, children, _maritalRelationships, _parentalRelationship } = siblingInIndex;
-        if (isRelationship(siblingInIndex)) {
+        if (isRelationshipNode(siblingInIndex)) {
             //if (partners.indexOf(fromNode) === -1){
             //    crossings++;
             //}
@@ -371,7 +371,7 @@ function countEdgeCrossings(order){
         nodesInRow.forEach(function(node, indexInRow){ // left to right
             const { id, partners, children, _maritalRelationships, _parentalRelationship } = node;
             //if (!seenFrom[id]) seenFrom[id] = new Set();
-            if (isRelationship(node)) {
+            if (isRelationshipNode(node)) {
                 if (indexInRow === 0) {
                     crossings += 10;
                 }
@@ -966,7 +966,7 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
             n._drawing.orderInHeightIndex = seenOrderInIndex[n.id];
             n._drawing.origPosInHeightIndex = seenPosInIndex[n.id]; // for debugging only rn past this
 
-            if ( isRelationship(n) ) {
+            if ( isRelationshipNode(n) ) {
                 // Don't increment or add to node.
                 return currNum;
             }
@@ -1029,7 +1029,7 @@ export function positionObjectGraph(objectGraph, order, dims, memoized = {}){
                 q.push(ch);
             });
             // Own children
-            if (isRelationship(child)){
+            if (isRelationshipNode(child)){
                 (children || []).forEach(function(ch){
                     q.push(ch);
                 });
@@ -1076,7 +1076,7 @@ export function positionObjectGraph(objectGraph, order, dims, memoized = {}){
                 offsetFromPrevNode = prevNode._drawing.xCoord + dims.individualWidth + dims.individualXSpacing;
                 _drawing.xCoord = offsetFromPrevNode;
 
-                if (isRelationship(currNode)){
+                if (isRelationshipNode(currNode)){
                     const childrenWithAssignedXCoord = children.filter(function(c){
                         return typeof c._drawing.xCoord === 'number';
                     });

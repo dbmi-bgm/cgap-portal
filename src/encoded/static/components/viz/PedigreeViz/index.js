@@ -5,7 +5,7 @@ import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
 /** @todo Pull this out into here if making a lib */
 import { requestAnimationFrame as raf, cancelAnimationFrame } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
-import { isRelationship } from './data-utilities';
+import { isRelationshipNode } from './data-utilities';
 import { graphToDiseaseIndices, orderNodesBottomRightToTopLeft } from './layout-utilities-drawing';
 import { GraphTransformer, buildGraphData } from './GraphTransformer';
 import { ScaleController, ScaleControls, scaledStyle } from './ScaleController';
@@ -592,7 +592,7 @@ const SelectedNodeIdentifier = React.memo(function SelectedNodeIdentifier({ sele
     let useHeight = dims.individualHeight;
     let useWidth = dims.individualWidth;
 
-    if (isRelationship(selectedNode)){
+    if (isRelationshipNode(selectedNode)){
         useHeight = dims.relationshipSize;
         useWidth = dims.relationshipSize;
     }
@@ -677,5 +677,5 @@ export {
     PedigreeVizView,
     GraphTransformer,
     buildGraphData as buildPedigreeGraphData,
-    isRelationship as isRelationshipNode
+    isRelationshipNode
 };

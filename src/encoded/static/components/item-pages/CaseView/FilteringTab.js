@@ -1,17 +1,13 @@
 'use strict';
 
-import React, { useState, useMemo } from 'react';
-import _ from 'underscore';
-import url from 'url';
+import React, { useMemo } from 'react';
 import queryString from 'query-string';
 
-import { console, layout, navigate, ajax, itemUtil } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
-import { DisplayTitleColumnWrapper, DisplayTitleColumnDefault } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
-import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
 
 const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ hgvsc }){
