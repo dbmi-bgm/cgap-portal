@@ -24,7 +24,7 @@
         },
         "version": {
             "title": "Version",
-            "type": "string",
+            "type": "number",
             "description": "Version of this particular note"
         },
         "previous_note": {
