@@ -19,6 +19,7 @@ import { store } from './../store';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Schemas, SEO, typedefs, navigate } from './util';
+import { responsiveGridState } from './util/layout';
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 
 import { PageTitleSection } from './PageTitleSection';
@@ -1634,7 +1635,7 @@ class BodyElement extends React.PureComponent {
             }
 
             this.setState(function({ windowWidth }){
-                const rgs = layout.responsiveGridState(windowWidth);
+                const rgs = responsiveGridState(windowWidth);
                 let scrolledPastTop = false;
                 let scrolledPast80 = false;
                 let scrolledPast160 = false;
@@ -1755,7 +1756,7 @@ class BodyElement extends React.PureComponent {
 
         let innerContainerMinHeight;
         if (mounted && windowHeight){
-            const rgs = layout.responsiveGridState(windowWidth);
+            const rgs = responsiveGridState(windowWidth);
             if ({ 'xl' : 1, 'lg' : 1, 'md' : 1 }[rgs]){
                 innerContainerMinHeight = (
                     // Hardcoded:

@@ -4,8 +4,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import Draggable from 'react-draggable';
-import { console, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
+import { responsiveGridState } from './../../util/layout';
 
 /** @todo moved to shared repo or remove from CGAP */
 
@@ -77,7 +78,7 @@ export class AdjustableDividerRow extends React.PureComponent {
                 props.leftPanelCollapseWidth || 0,
                 props.minLeftPanelWidth
             );
-            const layoutSize = layout.responsiveGridState(props.windowWidth) || null;
+            const layoutSize = responsiveGridState(props.windowWidth) || null;
             if (layoutSize === 'lg' || layoutSize === 'xl'){
                 const leftPanelWidth = props.leftPanelDefaultWidth || 240;
                 this.state.xOffset = - leftPanelWidth + props.minLeftPanelWidth;
@@ -153,7 +154,7 @@ export class AdjustableDividerRow extends React.PureComponent {
         const useLeftPanelCollapseWidth = Math.max(leftPanelCollapseWidth || 0, minLeftPanelWidth);
         let useHeight = height;
 
-        const layoutSize = layout.responsiveGridState(windowWidth) || null;
+        const layoutSize = responsiveGridState(windowWidth) || null;
         const isDraggableSize = layoutSize === 'lg' || layoutSize === 'xl';
 
         // Original full width. Used for <= small layout size.

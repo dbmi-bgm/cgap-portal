@@ -6,6 +6,7 @@ import _ from 'underscore';
 
 import { object, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { StackedBlockTable, StackedBlock, StackedBlockList, StackedBlockName, StackedBlockNameLabel } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/StackedBlockTable';
+import { responsiveGridState } from './../util/layout';
 
 
 export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
@@ -14,7 +15,7 @@ export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
 
     let usePadWidth = paddingWidth || 0;
     if (paddingWidthMap){
-        usePadWidth = paddingWidthMap[layout.responsiveGridState(windowWidth)] || paddingWidth;
+        usePadWidth = paddingWidthMap[responsiveGridState(windowWidth)] || paddingWidth;
     }
     const commonFamilySectionProps = {
         containerWidth, result, minimumWidth, paddingWidth: usePadWidth

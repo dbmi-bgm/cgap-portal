@@ -73,6 +73,9 @@
         }
     },
     "facets" : {
+        "project.display_title" : {
+            "title" : "Project"
+        },
         "individual.sex" : {
             "title" : "Gender",
             "grouping": "Individual"

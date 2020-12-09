@@ -124,7 +124,6 @@ export default class DefaultItemView extends React.PureComponent {
         this.getControllers = this.getControllers.bind(this);
         this.getCommonTabs = this.getCommonTabs.bind(this);
         this.getTabViewContents = this.getTabViewContents.bind(this);
-        this.getTabViewWidth = this.getTabViewWidth.bind(this);
         this.setTabViewKey = this.setTabViewKey.bind(this);
 
         /**
@@ -234,17 +233,6 @@ export default class DefaultItemView extends React.PureComponent {
         returnArr.push(DetailsTabView.getTabObject(this.props));
 
         return returnArr;
-    }
-
-    /**
-     * Calculated width of tabview pane.
-     * Alias of `layout.gridContainerWidth(this.props.windowWidth)`.
-     *
-     * @returns {number} Width of tabview.
-     */
-    getTabViewWidth(){
-        // eslint-disable-next-line react/destructuring-assignment
-        return layout.gridContainerWidth(this.props.windowWidth);
     }
 
     /**

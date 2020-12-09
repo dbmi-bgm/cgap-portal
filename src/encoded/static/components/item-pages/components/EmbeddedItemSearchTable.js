@@ -18,82 +18,58 @@ import { EmbeddedSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/co
 
 
 
+export function EmbeddedItemSearchTable (props){
+    const {
+        embeddedTableHeader: propEmbeddedTableHeader,
+        embeddedTableFooter,
+        /** @deprecated in favor of embeddedTableHeader */
+        title,
+        children,
+        facets,
+        session, schemas: propSchemas,
+        defaultOpenIndices, maxHeight,
+        columns, columnExtensionMap,
+        // May not be present which prevents VirtualHrefController from navigating upon mount. Useful if want to init with filterSet search or in other place.
+        searchHref,
+        aboveTableComponent,
+        aboveFacetListComponent,
+        filterFacetFxn, hideFacets,
+        filterColumnFxn, hideColumns,
+        renderDetailPane,
+        onClearFiltersVirtual,
+        isClearFiltersBtnVisible,
+        onLoad,
+        rowHeight = 90 // Keep in sync w CSS
+    } = props;
 
-export class EmbeddedItemSearchTable extends React.PureComponent {
+    const schemas = propSchemas || getSchemas() || null; // We might not have this e.g. in placeholders in StaticSections
+    const embeddedTableHeader = propEmbeddedTableHeader || title; // Receives props from VirtualHrefController state
 
-    static defaultProps = {
-        "columnExtensionMap": columnExtensionMapCGAP,
-        "facets" : undefined // Default to those from search response.
+    const passProps = {
+        facets, columns, columnExtensionMap, searchHref, session,
+        schemas, renderDetailPane, defaultOpenIndices, maxHeight,
+        rowHeight, onClearFiltersVirtual, isClearFiltersBtnVisible,
+        aboveTableComponent, aboveFacetListComponent,
+        embeddedTableHeader, embeddedTableFooter,
+        // TODO: belowTableComponent, belowFacetListComponent,
+        filterFacetFxn, hideFacets,
+        filterColumnFxn, hideColumns,
+        onLoad,
+        termTransformFxn: Term.toName,
+        separateSingleTermFacets: false,
     };
 
-    constructor(props){
-        super(props);
-        this.getCountCallback = this.getCountCallback.bind(this);
-        this.state = { totalCount: null };
-    }
-
-    getCountCallback(resp){
-        const { onLoad } = this.props;
-        if (resp && typeof resp.total === 'number'){
-            this.setState({ 'totalCount' : resp.total });
-        }
-        if (typeof onLoad === "function") {
-            onLoad(resp);
-        }
-    }
-
-    render(){
-        const {
-            title,
-            children,
-            facets,
-            session, schemas: propSchemas,
-            defaultOpenIndices, maxHeight,
-            columns, columnExtensionMap,
-            searchHref,
-            filterFacetFxn, hideFacets,
-            filterColumnFxn, hideColumns,
-            renderDetailPane,
-            onClearFiltersVirtual,
-            isClearFiltersBtnVisible,
-            rowHeight = 90 // Keep in sync w CSS
-        } = this.props;
-        const { totalCount } = this.state;
-
-        if (typeof searchHref !== "string") {
-            throw new Error("Expected a string 'searchHref'");
-        }
-
-        const schemas = propSchemas || getSchemas() || null; // We might not have this e.g. in placeholders in StaticSections
-
-        const passProps = {
-            facets, columns, columnExtensionMap, searchHref, session,
-            schemas, renderDetailPane, defaultOpenIndices, maxHeight,
-            rowHeight, onClearFiltersVirtual, isClearFiltersBtnVisible,
-            filterFacetFxn, hideFacets,
-            filterColumnFxn, hideColumns,
-            onLoad: this.getCountCallback,
-            termTransformFxn: Term.toName,
-            separateSingleTermFacets: false,
-        };
-
-        /** @deprecated - Should just pass down to embeddedTableHeader once `title` instances that depend on totalCount are migrated */
-        const showTitle = !title ? null
-            : React.isValidElement(title) ? (
-                typeof title.type === "string" ? title : React.cloneElement(title, { totalCount })
-            ) : title;
-
-        const showChildren = React.isValidElement(children) && typeof children.type !== "string" ?
-            React.cloneElement(children, { totalCount }) : children;
-
-        return (
-            <div className="embedded-search-view-outer-container">
-                <EmbeddedSearchView {...passProps} embeddedTableHeader={showTitle} />
-                { showChildren }
-            </div>
-        );
-    }
+    return (
+        <div className="embedded-search-view-outer-container">
+            <EmbeddedSearchView {...passProps} />
+            { children }
+        </div>
+    );
 }
+EmbeddedItemSearchTable.defaultProps = {
+    "columnExtensionMap": columnExtensionMapCGAP,
+    "facets" : undefined // Default to those from search response.
+};
 
 export function EmbeddedCaseSearchTable (props){
     const renderDetailPane = useMemo(function(){

@@ -172,6 +172,11 @@ $facetlist-omitted-term-color: #901414;
 $search-page-padding-resize-transition-in: padding .25s .5s linear;
 $search-page-padding-resize-transition-out: padding .25s linear;
 
+
+.search-view-controls-and-results .facets-container {
+	background-color: #fff;
+}
+
 /* Make page full(er) width when scroll down */
 @include navbar-fixed-position {
 	.search-page-outer-container.container-wide {
@@ -190,7 +195,6 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 			//background-color: #fff;
 			.facets-container {
 				transition: border-color .3s;
-				background-color: #fff;
 				> .row.facets-header {
 					transition: $search-page-padding-resize-transition-out;
 				}

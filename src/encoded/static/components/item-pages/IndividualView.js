@@ -29,7 +29,10 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
     if (context.mother){
         family.push(context.mother);
     }
-    const dataset = parseFamilyIntoDataset({ members: family, proband: context });
+    // Pass the following `dataset` into PedigreeTabViewBody to visualize this
+    // individual's direct parents.
+    // Else (for now) it just shows a sample/defaultProps dataset.
+    // const dataset = parseFamilyIntoDataset({ members: family, proband: context });
     return (
         <div>
             <h3 className="tab-section-title container-wide">
