@@ -7,18 +7,6 @@ from .workbook_fixtures import app, workbook
 pytestmark = [pytest.mark.working, pytest.mark.schema]
 
 
-@pytest.fixture  # NOTE: variant_sample is unused in workbook so this is ok, later on there should be default inserts
-def test_variant_sample():
-    return {
-        'variant': 'f6aef055-4c88-4a3e-a306-d37a71535d8b',
-        'AD': '1,3',
-        'CALL_INFO': 'my_test_sample',
-        'file': 'dummy-file-name',
-        'project': 'hms-dbmi',
-        'institution': 'hms-dbmi'
-    }
-
-
 @pytest.mark.integrated  # uses s3
 def test_bam_snapshot_download(workbook, testapp, test_variant_sample):
     """ Tests that we can correctly download an IGV image from the wfoutput bucket. """
@@ -29,3 +17,39 @@ def test_bam_snapshot_download(workbook, testapp, test_variant_sample):
     download = testapp.get('/' + uuid + '/@@download').location
     resp = requests.get(download)
     assert 'hello world' in resp.content.decode('utf-8')
+
+
+@pytest.fixture
+def variant_sample_list1():
+    return {
+        'project': 'hms-dbmi',
+        'institution': 'hms-dbmi',
+        'created_for_case': 'GAPCAP4E4GMG'
+    }
+
+variant_uuid = "f6aef055-4c88-4a3e-a306-d37a71535d8b"
+
+@pytest.fixture
+def test_variant_sample2(test_variant_sample):
+    test_variant_sample['file'] = 'other-file-name'
+    return test_variant_sample
+
+
+def test_variant_sample_list_post(workbook, testapp, variant_sample_list1):
+    testapp.post_json('/variant_sample_list', variant_sample_list1, status=201)
+
+def test_variant_sample_list_patch_success(workbook, testapp, variant_sample_list1, test_variant_sample2):
+    vsl = testapp.post_json('/variant_sample_list', variant_sample_list1, status=201).json['@graph'][0]
+    vs = testapp.post_json('/variant_sample', test_variant_sample2, status=201).json['@graph'][0]
+    patch = {
+        'variant_samples': [vs['@id']]
+    }
+    resp = testapp.patch_json(vsl['@id'], patch, status=200).json['@graph'][0]
+    assert resp['variant_samples'][0] == vs['@id']
+
+def test_variant_sample_list_patch_fail(workbook, testapp, variant_sample_list1):
+    vsl = testapp.post_json('/variant_sample_list', variant_sample_list1, status=201).json['@graph'][0]
+    patch = {
+        'variant_samples': [variant_uuid]  # wrong item type
+    }
+    testapp.patch_json(vsl['@id'], patch, status=422)

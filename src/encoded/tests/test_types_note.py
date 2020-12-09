@@ -30,22 +30,11 @@ def new_standard_note():
     }
 
 
-@pytest.fixture
-def test_report(testapp):
-    data = {
-        "project": "hms-dbmi",
-        "institution": "hms-dbmi",
-        "description": "This is a report for a case."
-    }
-    return testapp.post_json('/report', data, status=201).json['@graph'][0]
-
-
 def test_note_interpretation_note_link(workbook, testapp):
     resp1 = testapp.get(f'/notes-interpretation/{note1_uuid}/', status=200).json
     resp2 = testapp.get(f'/notes-interpretation/{note2_uuid}/', status=200).json
     assert resp1['previous_note']['@id'] == resp2['@id']
 
-# add note item
 def test_add_note_interpretation_success(workbook, testapp, new_interpretation):
     resp = testapp.post_json('/note_interpretation', new_interpretation, status=201)
 
@@ -90,16 +79,16 @@ def test_link_standard_note_to_report(workbook, testapp, new_standard_note, test
     resp = testapp.patch_json('/' + test_report['@id'], patch, status=200).json['@graph'][0]
     assert resp['extra_notes'] == [note['@id']]
 
-# link note to gene
 def test_add_note_to_gene(workbook, testapp, gene1):
+    """ test linking note to gene """
     note_info = testapp.get(f'/notes-interpretation/{note1_uuid}/', status=200).json
     patch = {'interpretations': [note1_uuid]}
     resp = testapp.patch_json('/' + gene1['@id'], patch, status=200).json['@graph'][0]
     gene_get = testapp.get('/' + resp['@id']).json
     assert resp['interpretations'] == [note_info['@id']]
 
-# link note to variant sample
 def test_add_note_to_variant_sample(workbook, testapp, test_variant_sample):
+    """ test linking note to variant sample item """
     note_info = testapp.get(f'/notes-interpretation/{note1_uuid}/', status=200).json
     vs = testapp.post_json('/variant_sample', test_variant_sample, status=201).json['@graph'][0]
     patch = {'interpretations': [note1_uuid]}

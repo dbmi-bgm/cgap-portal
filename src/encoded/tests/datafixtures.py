@@ -875,6 +875,16 @@ def quality_metric_fastqc(testapp, project, institution):
 
 
 @pytest.fixture
+def test_report(testapp):
+    data = {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "description": "This is a report for a case."
+    }
+    return testapp.post_json('/report', data, status=201).json['@graph'][0]
+
+
+@pytest.fixture
 def rel_disorders():
     return [
         {
