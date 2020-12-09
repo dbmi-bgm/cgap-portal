@@ -1,7 +1,8 @@
 import pytest
 import requests  # XXX: C4-211
 from .test_ingest_vcf import VARIANT_SAMPLE_URL
-from .workbook_fixtures import app, workbook
+from .workbook_fixtures import workbook
+from .workbook_fixtures import testapp as es_testapp
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]
@@ -20,12 +21,12 @@ def test_variant_sample():
 
 
 @pytest.mark.integrated  # uses s3
-def test_bam_snapshot_download(workbook, testapp, test_variant_sample):
+def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     """ Tests that we can correctly download an IGV image from the wfoutput bucket. """
-    res = testapp.post_json(VARIANT_SAMPLE_URL, test_variant_sample, status=201).json
+    res = es_testapp.post_json(VARIANT_SAMPLE_URL, test_variant_sample, status=201).json
     uuid = res['@graph'][0]['uuid']
     bam_snapshot_location = res['@graph'][0]['bam_snapshot']
     assert bam_snapshot_location == 'dummy-file-name/bamsnap/chr1:12125898.png'
-    download = testapp.get('/' + uuid + '/@@download').location
+    download = es_testapp.get('/' + uuid + '/@@download').location
     resp = requests.get(download)
     assert 'hello world' in resp.content.decode('utf-8')

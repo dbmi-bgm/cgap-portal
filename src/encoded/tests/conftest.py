@@ -14,9 +14,18 @@ from pyramid.request import apply_request_extensions
 from pyramid.testing import DummyRequest, setUp, tearDown
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
 from snovault import DBSESSION, ROOT, UPGRADER
-from snovault.elasticsearch import ELASTIC_SEARCH
+from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
 from .. import main
 from .conftest_settings import make_app_settings_dictionary
+
+
+"""
+README:
+    * This file contains application level fixtures and hooks in the server/data fixtures present in
+      other files. 
+    * There are "app" based fixtures that rely only on postgres, "es_app" fixtures that 
+      use both postgres and ES (for search/ES related testing)
+"""
 
 
 pytest_plugins = [
@@ -120,9 +129,20 @@ def dummy_request(root, registry, app):
 
 @pytest.fixture(scope='session')
 def app(app_settings):
-    '''WSGI application level functional testing.
-    '''
+    """ WSGI application level functional testing. """
     return main({}, **app_settings)
+
+
+@pytest.fixture(scope='session')
+def es_app(es_app_settings, **kwargs):
+    """
+    App that uses both Postgres and ES - pass this as "app" argument to TestApp.
+    Pass all kwargs onto create_mapping
+    """
+    app = main({}, **es_app_settings)
+    create_mapping.run(app, **kwargs)
+
+    return app
 
 
 @pytest.fixture
@@ -162,6 +182,14 @@ def anonhtmltestapp(app):
 
 
 @pytest.fixture
+def anon_html_es_testapp(es_app):
+    environ = {
+        'HTTP_ACCEPT': 'text/html'
+    }
+    return webtest.TestApp(es_app, environ)
+
+
+@pytest.fixture
 def htmltestapp(app):
     environ = {
         'HTTP_ACCEPT': 'text/html',
@@ -176,6 +204,16 @@ def htmltestapp(app):
     #     return original_get(url, params=params, headers=new_headers, **kwargs)
     # setattr(test_app, "get", new_get_request)
     return test_app
+
+
+@pytest.fixture
+def html_es_testapp(es_app):
+    """ HTML testapp that uses ES """
+    environ = {
+        'HTTP_ACCEPT': 'text/html',
+        'REMOTE_USER': 'TEST',
+    }
+    return webtest.TestApp(es_app, environ)
 
 
 @pytest.fixture(scope="module")
@@ -197,6 +235,15 @@ def anontestapp(app):
         'HTTP_ACCEPT': 'application/json',
     }
     return webtest.TestApp(app, environ)
+
+
+@pytest.fixture
+def anon_es_testapp(es_app):
+    """ TestApp simulating a bare Request entering the application (with ES enabled) """
+    environ = {
+        'HTTP_ACCEPT': 'application/json',
+    }
+    return webtest.TestApp(es_app, environ)
 
 
 @pytest.fixture
@@ -222,12 +269,14 @@ def submitter_testapp(app):
 
 
 @pytest.fixture
-def indexer_testapp(app):
+def indexer_testapp(es_app):
+    """ Indexer testapp, meant for manually triggering indexing runs by posting to /index.
+        Always uses the ES app (obviously, but not so obvious previously) """
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'INDEXER',
     }
-    return webtest.TestApp(app, environ)
+    return webtest.TestApp(es_app, environ)
 
 
 @pytest.fixture

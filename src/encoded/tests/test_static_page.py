@@ -1,11 +1,9 @@
 import pytest
 import webtest
 
-from dcicutils.qa_utils import notice_pytest_fixtures
-from .workbook_fixtures import app
 
+from .workbook_fixtures import testapp as es_testapp
 
-notice_pytest_fixtures(app)
 
 pytestmark = [pytest.mark.indexing, pytest.mark.working]
 
@@ -68,52 +66,52 @@ def help_page_json_deleted():
 
 
 @pytest.fixture(scope='module')
-def posted_help_page_section(testapp, help_page_section_json):
+def posted_help_page_section(es_testapp, help_page_section_json):
     try:
-        res = testapp.post_json('/static-sections/', help_page_section_json, status=201)
+        res = es_testapp.post_json('/static-sections/', help_page_section_json, status=201)
         val = res.json['@graph'][0]
     except webtest.AppError:
-        res = testapp.get('/' + help_page_section_json['uuid'], status=301).follow()
+        res = es_testapp.get('/' + help_page_section_json['uuid'], status=301).follow()
         val = res.json
     return val
 
 
 @pytest.fixture(scope='module')
-def help_page(testapp, posted_help_page_section, help_page_json):
+def help_page(es_testapp, posted_help_page_section, help_page_json):
     try:
-        res = testapp.post_json('/pages/', help_page_json, status=201)
+        res = es_testapp.post_json('/pages/', help_page_json, status=201)
         val = res.json['@graph'][0]
     except webtest.AppError:
-        res = testapp.get('/' + help_page_json['uuid'], status=301).follow()
+        res = es_testapp.get('/' + help_page_json['uuid'], status=301).follow()
         val = res.json
     return val
 
 
 @pytest.fixture(scope='module')
-def help_page_deleted(testapp, posted_help_page_section, help_page_json_deleted):
+def help_page_deleted(es_testapp, posted_help_page_section, help_page_json_deleted):
     try:
-        res = testapp.post_json('/pages/', help_page_json_deleted, status=201)
+        res = es_testapp.post_json('/pages/', help_page_json_deleted, status=201)
         val = res.json['@graph'][0]
     except webtest.AppError:
-        res = testapp.get('/' + help_page_json_deleted['uuid'], status=301).follow()
+        res = es_testapp.get('/' + help_page_json_deleted['uuid'], status=301).follow()
         val = res.json
     return val
 
 
 @pytest.fixture(scope='module')
-def help_page_in_review(testapp, posted_help_page_section, help_page_json_in_review):
+def help_page_in_review(es_testapp, posted_help_page_section, help_page_json_in_review):
     try:
-        res = testapp.post_json('/pages/', help_page_json_in_review, status=201)
+        res = es_testapp.post_json('/pages/', help_page_json_in_review, status=201)
         val = res.json['@graph'][0]
     except webtest.AppError:
-        res = testapp.get('/' + help_page_json_in_review['uuid'], status=301).follow()
+        res = es_testapp.get('/' + help_page_json_in_review['uuid'], status=301).follow()
         val = res.json
     return val
 
 
-def test_get_help_page(testapp, help_page):
+def test_get_help_page(es_testapp, help_page):
     help_page_url = "/" + help_page['name']
-    res = testapp.get(help_page_url, status=200)
+    res = es_testapp.get(help_page_url, status=200)
     assert res.json['@id'] == help_page_url
     assert res.json['@context'] == help_page_url
     assert 'HelpPage' in res.json['@type']
@@ -123,21 +121,21 @@ def test_get_help_page(testapp, help_page):
     assert res.json['toc'] == help_page['table-of-contents']
 
 
-def test_get_help_page_deleted(anonhtmltestapp, help_page_deleted):
+def test_get_help_page_deleted(anon_html_es_testapp, help_page_deleted):
     help_page_url = "/" + help_page_deleted['name']
-    anonhtmltestapp.get(help_page_url, status=403)
+    anon_html_es_testapp.get(help_page_url, status=403)
 
 
-def test_get_help_page_no_access(anonhtmltestapp, testapp, help_page_in_review):
+def test_get_help_page_no_access(anon_html_es_testapp, es_testapp, help_page_in_review):
     help_page_url = "/" + help_page_in_review['name']
-    anonhtmltestapp.get(help_page_url, status=403)
-    testapp.get(help_page_url, status=200)
+    anon_html_es_testapp.get(help_page_url, status=403)
+    es_testapp.get(help_page_url, status=200)
 
 
-def test_page_unique_name(testapp, help_page, help_page_deleted):
+def test_page_unique_name(es_testapp, help_page, help_page_deleted):
     # POST again with same name and expect validation error
     new_page = {'name': help_page['name']}
-    res = testapp.post_json('/page', new_page, status=422)
+    res = es_testapp.post_json('/page', new_page, status=422)
     expected_val_err = "%s already exists with name '%s'" % (help_page['uuid'], new_page['name'])
     actual_error_description = res.json['errors'][0]['description']
     print("expected:", expected_val_err)
@@ -145,5 +143,5 @@ def test_page_unique_name(testapp, help_page, help_page_deleted):
     assert expected_val_err in actual_error_description
 
     # also test PATCH of an existing page with another name
-    res = testapp.patch_json(help_page_deleted['@id'], {'name': new_page['name']}, status=422)
+    res = es_testapp.patch_json(help_page_deleted['@id'], {'name': new_page['name']}, status=422)
     assert expected_val_err in res.json['errors'][0]['description']

@@ -12,7 +12,7 @@ from ..ingestion_listener import (
     IngestionError, IngestionReport,
 )
 from .variant_fixtures import gene_workbook, post_variant_consequence_items
-from .workbook_fixtures import workbook, app
+from .workbook_fixtures import workbook
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]

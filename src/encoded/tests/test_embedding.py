@@ -4,6 +4,7 @@ from .datafixtures import ORDER
 from snovault import TYPES
 from snovault.util import add_default_embeds, crawl_schemas_by_embeds
 from ..types.base import get_item_or_none
+from .workbook_fixtures import testapp as es_testapp
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
@@ -56,7 +57,7 @@ def test_linked_uuids_embedded(content, dummy_request, threadlocals):
     assert dummy_request._linked_uuids == {'16157204-8c8f-4672-a1a4-14f4b8021fcd', '775795d3-4410-4114-836b-8eeecf1d0c2f'}
 
 
-def test_target_rev_linked_uuids_indexing_view(content, dummy_request, threadlocals):
+def test_target_rev_linked_uuids_indexing_view(es_testapp, content, dummy_request, threadlocals):
     res_target = dummy_request.embed('/testing-link-targets/', targets[0]['uuid'], '@@index-data', as_user='INDEXER')
     # should have the itself and the rev link to source in the _linked_uuids
     assert dummy_request._linked_uuids == {'16157204-8c8f-4672-a1a4-14f4b8021fcd', '775795d3-4410-4114-836b-8eeecf1d0c2f'}
@@ -64,7 +65,7 @@ def test_target_rev_linked_uuids_indexing_view(content, dummy_request, threadloc
     assert res_target['rev_linked_to_me'] == []
 
 
-def test_source_rev_linked_uuids_indexing_view(content, dummy_request, threadlocals):
+def test_source_rev_linked_uuids_indexing_view(es_testapp, content, dummy_request, threadlocals):
     res_target = dummy_request.embed('/testing-link-sources/', sources[0]['uuid'], '@@index-data', as_user='INDEXER')
     # should have the itself and the rev link to source in the _linked_uuids
     assert dummy_request._linked_uuids == {'16157204-8c8f-4672-a1a4-14f4b8021fcd', '775795d3-4410-4114-836b-8eeecf1d0c2f'}

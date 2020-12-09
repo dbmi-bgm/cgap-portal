@@ -2,9 +2,7 @@ import pkg_resources
 import pytest
 import webtest
 
-from snovault import DBSESSION
-from snovault.elasticsearch import create_mapping
-from .. import main
+
 from ..loadxl import load_all
 
 
@@ -17,44 +15,43 @@ def external_tx():
     pass
 
 
-@pytest.yield_fixture(scope='session')
-def app(es_app_settings, **kwargs):
-    """
-    Pass all kwargs onto create_mapping
-    """
-    app = main({}, **es_app_settings)
-    create_mapping.run(app, **kwargs)
-
-    yield app
-
-    DBSession = app.registry[DBSESSION]
-    # Dispose connections so postgres can tear down.
-    DBSession.bind.pool.dispose()
-
-
 class WorkbookCache:
-    value = None
+    """ Caches whether or not we have already provisioned the workbook. """
+    done = None
+
+    @classmethod
+    def initialize_if_needed(cls, es_app):
+        if not cls.done:
+            cls.done = cls.make_fresh_workbook(es_app)
+
+    @classmethod
+    def make_fresh_workbook(cls, es_app):
+        environ = {
+            'HTTP_ACCEPT': 'application/json',
+            'REMOTE_USER': 'TEST',
+        }
+        testapp = webtest.TestApp(es_app, environ)
+
+        # just load the workbook inserts
+        load_res = load_all(testapp, pkg_resources.resource_filename('encoded', 'tests/data/workbook-inserts/'), [])
+        if load_res:
+            raise (load_res)
+
+        testapp.post_json('/index', {})
+        return True
 
 
-@pytest.mark.fixture_cost(500)  # XXX: this does nothing...? -will
 @pytest.yield_fixture(scope='session')
-def workbook(app):
-    if not WorkbookCache.value:
-        WorkbookCache.value = make_fresh_workbook(app)
+def workbook(es_app):
+    WorkbookCache.initialize_if_needed(es_app)
     yield
 
 
-def make_fresh_workbook(app):
+@pytest.fixture(scope='session')
+def testapp(es_app):
+    """ TestApp with ES + Postgres. Must be imported where it is needed. """
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
     }
-    testapp = webtest.TestApp(app, environ)
-
-    # just load the workbook inserts
-    load_res = load_all(testapp, pkg_resources.resource_filename('encoded', 'tests/data/workbook-inserts/'), [])
-    if load_res:
-        raise(load_res)
-
-    testapp.post_json('/index', {})
-    return True
+    return webtest.TestApp(es_app, environ)
