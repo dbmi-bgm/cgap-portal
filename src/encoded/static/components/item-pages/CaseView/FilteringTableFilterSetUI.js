@@ -948,7 +948,6 @@ export class FilterSetController extends React.PureComponent {
 
         if (!searchContext){
             // Don't update from blank.
-            // return null;
             return { selectedFilterBlockIdx };
         }
 
@@ -958,9 +957,11 @@ export class FilterSetController extends React.PureComponent {
 
         const { filters: ctxFilters = [], total: totalCount } = searchContext || {};
 
-        // Get counts to show (todo: maybe prefetch these later on)
-        const nextCachedCounts = { ...lastCachedCounts };
-        nextCachedCounts[selectedFilterBlockIdx] = totalCount;
+        // Get counts to show @ top left of selectable filter blocks
+        let nextCachedCounts = lastCachedCounts;
+        if (nextCachedCounts[selectedFilterBlockIdx] !== totalCount) { // Don't update object reference unless is changed/first-set
+            nextCachedCounts = { ...nextCachedCounts, [selectedFilterBlockIdx]: totalCount };
+        }
 
         const currFilterBlock = filter_blocks[selectedFilterBlockIdx];
         const { query: filterStrQuery } = currFilterBlock;
@@ -1004,7 +1005,7 @@ export class FilterSetController extends React.PureComponent {
 
         if (extraCtxFilters.length === 0 && Object.keys(filterBlockQuery).length === 0) {
             // No changes to query
-            return { "cachedCounts": nextCachedCounts };
+            return { selectedFilterBlockIdx, "cachedCounts": nextCachedCounts };
         }
 
         const searchFiltersQuery = {}; // = new URLSearchParams() - might be nice to use this but not 100% of browser/node/url-in-package-lock.json issues.
@@ -1265,6 +1266,7 @@ export class FilterSetController extends React.PureComponent {
     }
 
     selectFilterBlockIdx(index = null){
+        const { selectedFilterBlockIdx: origIdx } = this.state;
         this.setState(function({ selectedFilterBlockIdx: pastIdx, isSettingFilterBlockIdx }){
             if (isSettingFilterBlockIdx) return; // Another update in progress already.
             if (index !== null && pastIdx === index) {
@@ -1278,7 +1280,14 @@ export class FilterSetController extends React.PureComponent {
                 "selectedFilterBlockIdx" : index,
                 "isSettingFilterBlockIdx" : true
             };
-        }, this.navigateToCurrentBlock);
+        }, () => {
+            const { selectedFilterBlockIdx: currIdx } = this.state;
+            if (currIdx !== origIdx) {
+                // We might get `0` re-selected if is the only filter block present
+                // (deselection of which is prevented), in which case can skip nav.
+                this.navigateToCurrentBlock();
+            }
+        });
     }
 
     render(){
