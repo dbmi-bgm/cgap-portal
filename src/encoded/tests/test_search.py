@@ -169,10 +169,10 @@ def test_search_ngram(workbook, es_testapp):
 
 
 @pytest.mark.skip # XXX: What is this really testing?
-def test_search_facets_and_columns_order(workbook, es_testapp, registry):
+def test_search_facets_and_columns_order(workbook, es_testapp):
     # TODO: Adjust ordering of mixed-in facets, perhaps sort by lookup or something, in order to un-xfail.
     test_type = 'experiment_set_replicate'
-    type_info = registry[TYPES].by_item_type[test_type]
+    type_info = es_testapp.app.registry[TYPES].by_item_type[test_type]
     schema = type_info.schema
     schema_facets = [('type', {'title': 'Data Type'})]
     schema_facets.extend(schema['facets'].items())
@@ -1160,7 +1160,7 @@ class TestSearchBucketRangeFacets:
         (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 5),
         (['array_of_objects_that_holds_integer.embedded_integer'], 10)
     ])
-    def test_search_bucket_range_simple(self, workbook, es_testapp, expected_fields, expected_counts):
+    def test_search_bucket_range_simple(self, workbook, es_testapp, bucket_range_data, expected_fields, expected_counts):
         """ Tests searching a collection of documents with varying integer field types that
             have the same distribution - all of which should give the same results. """
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets').json['facets']
