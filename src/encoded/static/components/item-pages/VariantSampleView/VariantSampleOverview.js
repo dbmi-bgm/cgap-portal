@@ -13,7 +13,8 @@ import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
 import { VariantTabBody } from './VariantTabBody';
 import { GeneTabBody } from './GeneTabBody';
 import { SampleTabBody } from './SampleTabBody';
-import { BrowserTabBody } from './BrowserTabBody';
+import { AnnotationBrowserTabBody } from './AnnotationBrowserTabBody';
+import { BamFileBrowserTabBody } from './BamFileBrowserTabBody';
 
 
 
@@ -149,8 +150,11 @@ function VariantSampleOverviewTabView(props){
         case "Sample":
             tabViewBody = <SampleTabBody {...{ context, schemas }} />;
             break;
-        case "Browser":
-            tabViewBody = <BrowserTabBody {...{ context, schemas }} />;
+        case "Annotation Browser":
+            tabViewBody = <AnnotationBrowserTabBody {...{ context, schemas }} />;
+            break;
+        case "BAM File Browser":
+            tabViewBody = <BamFileBrowserTabBody {...{ context, schemas }} />;
             break;
         default:
             throw new Error("Unsupported tab");
@@ -184,7 +188,8 @@ function VariantSampleOverviewTabView(props){
                 <OverviewTabTitle {...{ currentTab }} title="Variant" />
                 <OverviewTabTitle {...{ currentTab }} title="Gene" disabled={!currentGeneItem} loading={currentGeneItemLoading} />
                 <OverviewTabTitle {...{ currentTab }} title="Sample" />
-                <OverviewTabTitle {...{ currentTab }} title="Browser" />
+                <OverviewTabTitle {...{ currentTab }} title="Annotation Browser" />
+                <OverviewTabTitle {...{ currentTab }} title="BAM File Browser" />
             </div>
             <div className="content-column card">
                 { tabViewBody }
