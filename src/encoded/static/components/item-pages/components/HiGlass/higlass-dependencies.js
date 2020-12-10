@@ -10,6 +10,7 @@ import { default as TranscriptsTrack } from 'higlass-transcripts/es/TranscriptsT
 import { default as ClinvarTrack } from 'higlass-clinvar/es/ClinvarTrack';
 import { default as TextTrack } from 'higlass-text/es/TextTrack';
 import { default as OrthologsTrack } from 'higlass-orthologs/es/OrthologsTrack';
+import { default as PileupTrack } from 'higlass-pileup/es/PileupTrack';
 
 export {
     HiGlassComponent,
@@ -18,5 +19,6 @@ export {
     TranscriptsTrack,
     ClinvarTrack,
     TextTrack,
-    OrthologsTrack
+    OrthologsTrack,
+    PileupTrack
 };
