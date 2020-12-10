@@ -91,7 +91,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             if (currFilterBlocks.length > 1) {
                 return true;
             }
-            if (currFilterBlocks[0].query || currFilterBlocks[0].name.slice(0, 16) !== "New Filter Block" ) {
+            if (currFilterBlocks[0].query || currFilterBlocks[0].name !== "Filter Block 1" ) {
                 return true;
             }
             return false;
@@ -492,10 +492,15 @@ function FilterSetUIHeader(props){
                     <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-secondary"
                         data-tip={`Filter blocks with duplicate ${haveDuplicateQueries ? "queries" : "names"} exist below`} />
                     : null }
-                <button type="button" className="btn btn-primary" disabled={editBtnDisabled} onClick={onSaveBtnClick}>
+                <button type="button" className={"btn btn-sm btn-" + (editBtnDisabled ? "outline-primary-dark" : "primary-dark")} disabled={editBtnDisabled} onClick={onSaveBtnClick}>
                     { isSavingFilterSet ?
                         <i className="icon icon-spin icon-circle-notch fas" />
-                        : "Save Current Filter Set" }
+                        : (
+                            <React.Fragment>
+                                <i className="icon icon-save fas mr-07"/>
+                                Save
+                            </React.Fragment>
+                        )}
                 </button>
             </div>
         </div>
@@ -929,17 +934,26 @@ export class FilterSetController extends React.PureComponent {
      */
     static getDerivedStateFromProps(props, state) {
         const { context: searchContext, excludeFacets } = props;
-        const { currFilterSet, selectedFilterBlockIdx, isSettingFilterBlockIdx, cachedCounts: lastCachedCounts } = state;
+        const { currFilterSet, selectedFilterBlockIdx: currSelectedFilterBlockIdx, isSettingFilterBlockIdx, cachedCounts: lastCachedCounts } = state;
+        let selectedFilterBlockIdx = currSelectedFilterBlockIdx;
+
+        // Always have filter block selected if is the only one - helps reduce needless UI interaction(s)
+        // and glitches
+        const { filter_blocks = [] } = currFilterSet || {};
+        if (filter_blocks.length === 1) {
+            selectedFilterBlockIdx = 0;
+        }
 
         // Update state.currFilterSet with filters from response, unless amid some other update.
 
         if (!searchContext){
             // Don't update from blank.
-            return null;
+            // return null;
+            return { selectedFilterBlockIdx };
         }
 
         if (selectedFilterBlockIdx === null || isSettingFilterBlockIdx){
-            return null;
+            return { selectedFilterBlockIdx }; // Previously was `null`, changed to return selectedFilterBlockIdx
         }
 
         const { filters: ctxFilters = [], total: totalCount } = searchContext || {};
@@ -948,7 +962,7 @@ export class FilterSetController extends React.PureComponent {
         const nextCachedCounts = { ...lastCachedCounts };
         nextCachedCounts[selectedFilterBlockIdx] = totalCount;
 
-        const currFilterBlock = currFilterSet.filter_blocks[selectedFilterBlockIdx];
+        const currFilterBlock = filter_blocks[selectedFilterBlockIdx];
         const { query: filterStrQuery } = currFilterBlock;
         const filterBlockQuery = queryString.parse(filterStrQuery);
 
@@ -1011,7 +1025,11 @@ export class FilterSetController extends React.PureComponent {
             "query" : nextQuery
         };
 
-        return { "currFilterSet": nextCurrFilterSet, "cachedCounts": nextCachedCounts };
+        return {
+            selectedFilterBlockIdx,
+            "currFilterSet": nextCurrFilterSet,
+            "cachedCounts": nextCachedCounts
+        };
     }
 
     static resetState(props){
@@ -1128,6 +1146,7 @@ export class FilterSetController extends React.PureComponent {
                 throw new Error("Must have at least one filter block, will not delete last one.");
             } else if (nextFBLen === 1) {
                 // Set to the only fb, since otherwise would have no difference if is compound request, just lack of faceting (= extra UI click to get it back).
+                // (this is now redundant -- done also in getDerivedStateFromProps)
                 selectedFilterBlockIdx = 0;
             } else if (pastSelectedIdx !== null) {
                 if (pastSelectedIdx === idx) {

@@ -275,7 +275,6 @@ export function filterQueryByQuery(query1, query2){
 export const FilteringTab = React.memo(function FilteringTab(props) {
     const { context = null, windowHeight, session = false, schemas } = props;
     const {
-        display_title: caseDisplayTitle,
         accession: caseAccession,
         initial_search_href_filter_addon = "",
         active_filterset = null,
@@ -364,7 +363,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     return (
         <React.Fragment>
             <h1 className="mb-24 mt-0">
-                { caseDisplayTitle }: <span className="text-300">Variant Filtering and Technical Review</span>
+                <span className="text-300">Variant Filtering and Technical Review</span>
             </h1>
             <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader }}
                 key={searchTableKey} />
