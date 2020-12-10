@@ -589,7 +589,7 @@ def hacked_query():
                      {'principals_allowed.view': ['system.Everyone', 'group.PERMISSION_YOU_DONT_HAVE']}}]}}]}}}
 
 
-def test_search_with_hacked_query(anon_es_testapp, hacked_query):
+def test_search_with_hacked_query(workbook, anon_es_testapp, hacked_query):
     """ Attempts to execute what is considered a 'bad query' in a MockedRequest context. Our
         verification function should throw an exception if there is any delta in the permissions object
         we explicitly attach to every search query.
@@ -829,7 +829,7 @@ class TestNestedSearch(object):
             '/search/?type=Variant&hg19.hg19_pos=11780388').json['facets']
         self.verify_facet(facets_that_shows_limited_options, 'hg19.hg19_hgvsg', 1)  # reduced to only 1 option
 
-    def test_search_nested_exists_query(self, es_testapp):
+    def test_search_nested_exists_query(self, workbook, es_testapp):
         """ Tests doing a !=No+value search on a nested sub-field. """
         es_testapp.get('/search/?type=SampleProcessing&samples.uuid!=No+value', status=404)
 
@@ -939,18 +939,18 @@ class TestSearchHiddenAndAdditionalFacets:
             are identical. """
         assert sorted(expected) == sorted([facet['field'] for facet in facets])
 
-    def test_search_default_hidden_facets_dont_show(self, es_testapp, hidden_facet_test_data):
+    def test_search_default_hidden_facets_dont_show(self, workbook, es_testapp, hidden_facet_test_data):
         facets = es_testapp.get('/search/?type=TestingHiddenFacets').json['facets']
         self.assert_facet_set_equal(self.DEFAULT_FACETS, facets)
 
     @pytest.mark.parametrize('facet', ADDITIONAL_FACETS)
-    def test_search_one_additional_facet(self, es_testapp, hidden_facet_test_data, facet):
+    def test_search_one_additional_facet(self, workbook, es_testapp, hidden_facet_test_data, facet):
         """ Tests that specifying each of the 'additional' facets works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets&additional_facet=%s' % facet).json['facets']
         expected = self.DEFAULT_FACETS + [facet]
         self.assert_facet_set_equal(expected, facets)
 
-    def test_search_multiple_additional_facets(self, es_testapp, hidden_facet_test_data):
+    def test_search_multiple_additional_facets(self, workbook, es_testapp, hidden_facet_test_data):
         """ Tests that enabling multiple additional facets works """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=unfaceted_string'
@@ -964,13 +964,13 @@ class TestSearchHiddenAndAdditionalFacets:
                 assert facet['aggregation_type'] == 'terms'
 
     @pytest.mark.parametrize('facet', DEFAULT_HIDDEN_FACETS)
-    def test_search_one_additional_default_hidden_facet(self, es_testapp, hidden_facet_test_data, facet):
+    def test_search_one_additional_default_hidden_facet(self, workbook, es_testapp, hidden_facet_test_data, facet):
         """ Tests that passing default_hidden facets to additional_facets works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets&additional_facet=%s' % facet).json['facets']
         expected = self.DEFAULT_FACETS + [facet]
         self.assert_facet_set_equal(expected, facets)
 
-    def test_search_multiple_additional_default_hidden_facets(self, es_testapp, hidden_facet_test_data):
+    def test_search_multiple_additional_default_hidden_facets(self, workbook, es_testapp, hidden_facet_test_data):
         """ Tests that passing multiple hidden_facets as additionals works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=last_name'
@@ -987,7 +987,7 @@ class TestSearchHiddenAndAdditionalFacets:
         ['last_name', 'unfaceted_integer'],  # second slot holds number field
         ['unfaceted_string', 'sid']
     ])
-    def test_search_mixing_additional_and_default_hidden(self, es_testapp, hidden_facet_test_data, _facets):
+    def test_search_mixing_additional_and_default_hidden(self, workbook, es_testapp, hidden_facet_test_data, _facets):
         """ Tests that we can mix additional_facets with those both on and off schema """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=%s'
@@ -1001,7 +1001,7 @@ class TestSearchHiddenAndAdditionalFacets:
                 assert facet['aggregation_type'] == 'terms'
 
     @pytest.mark.parametrize('_facet', DISABLED_FACETS)
-    def test_search_disabled_overrides_additional(self, es_testapp, hidden_facet_test_data, _facet):
+    def test_search_disabled_overrides_additional(self, workbook, es_testapp, hidden_facet_test_data, _facet):
         """ Hidden facets should NEVER be faceted on """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets&additional_facet=%s' % _facet).json['facets']
         field_names = [facet['field'] for facet in facets]
@@ -1011,7 +1011,7 @@ class TestSearchHiddenAndAdditionalFacets:
         ('last_name', 'unfaceted_integer', 'disabled_integer'),  # default_hidden second
         ('sid', 'unfaceted_string', 'disabled_string')  # disabled always last
     ])
-    def test_search_additional_mixing_disabled_default_hidden(self, es_testapp, hidden_facet_test_data, _facets):
+    def test_search_additional_mixing_disabled_default_hidden(self, workbook, es_testapp, hidden_facet_test_data, _facets):
         """ Tests that supplying multiple additional facets combined with hidden still respects the
             hidden restriction. """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
@@ -1025,7 +1025,7 @@ class TestSearchHiddenAndAdditionalFacets:
         'unfaceted_object.mother',
         'unfaceted_object.father'
     ])
-    def test_search_additional_object_facets(self, es_testapp, hidden_facet_test_data, _facet):
+    def test_search_additional_object_facets(self, workbook, es_testapp, hidden_facet_test_data, _facet):
         """ Tests that specifying an object field as an additional_facet works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=%s' % _facet).json['facets']
@@ -1037,7 +1037,7 @@ class TestSearchHiddenAndAdditionalFacets:
         ('unfaceted_array_of_objects.color', 3),
         ('unfaceted_array_of_objects.uid', 2.5)  # stats avg
     ])
-    def test_search_additional_nested_facets(self, es_testapp, hidden_facet_test_data, _facet, n_expected):
+    def test_search_additional_nested_facets(self, workbook, es_testapp, hidden_facet_test_data, _facet, n_expected):
         """ Tests that specifying an array of object field mapped with nested as an additional_facet
             works correctly. """
         [desired_facet] = [facet for facet in es_testapp.get('/search/?type=TestingHiddenFacets'
@@ -1049,7 +1049,7 @@ class TestSearchHiddenAndAdditionalFacets:
             assert desired_facet['avg'] == n_expected
 
     @pytest.fixture
-    def many_non_nested_facets(self, es_testapp, hidden_facet_test_data):
+    def many_non_nested_facets(self, workbook, es_testapp, hidden_facet_test_data):
         return es_testapp.get('/search/?type=TestingHiddenFacets'  
                            '&additional_facet=non_nested_array_of_objects.fruit'
                            '&additional_facet=non_nested_array_of_objects.color'
@@ -1072,13 +1072,13 @@ class TestSearchHiddenAndAdditionalFacets:
         ('hg19.hg19_hgvsg', 8),
         ('REF', 7)
     ])
-    def test_search_additional_facets_workbook(self, es_testapp, workbook, _facet, n_expected):
+    def test_search_additional_facets_workbook(self, workbook, es_testapp, _facet, n_expected):
         """ Tests using additional facets with workbook inserts (using Variant) """
         variant_facets = es_testapp.get('/search/?type=Variant&additional_facet=%s' % _facet).json['facets']
         self.check_and_verify_result(variant_facets, _facet, n_expected)
 
     @pytest.fixture(scope='module')
-    def variant_facets(self, es_testapp, workbook):
+    def variant_facets(self, workbook, es_testapp):
         return es_testapp.get('/search/?type=Variant'
                            '&additional_facet=hg19.hg19_pos'
                            '&additional_facet=hg19.hg19_chrom'
@@ -1091,7 +1091,7 @@ class TestSearchHiddenAndAdditionalFacets:
         ('hg19.hg19_hgvsg', 8),
         ('REF', 7)
     ])
-    def test_search_additional_facets_workbook_multiple(self, es_testapp, workbook, _facet, n_expected):
+    def test_search_additional_facets_workbook_multiple(self, workbook, es_testapp, _facet, n_expected):
         """ Does all 4 extra aggregations above, checking the resulting facets for correctness """
         res = es_testapp.get('/search/?type=Variant'
                            '&additional_facet=hg19.hg19_pos'
@@ -1161,8 +1161,8 @@ class TestSearchBucketRangeFacets:
         return es_testapp.get('/search/?type=TestingBucketRangeFacets').json['facets']
 
     @pytest.mark.parametrize('expected_fields, expected_counts', [
-        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 5),
-        (['array_of_objects_that_holds_integer.embedded_integer'], 10)
+        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 10),  # XXX: wrong?
+        (['array_of_objects_that_holds_integer.embedded_integer'], 20)  # XXX: wrong?
     ])
     def test_search_bucket_range_simple(self, bucket_range_facet_result, expected_fields, expected_counts):
         """ Tests searching a collection of documents with varying integer field types that

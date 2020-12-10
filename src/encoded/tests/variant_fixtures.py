@@ -28,13 +28,3 @@ def genes(workbook, es_testapp, test_genes):
         gene['project'] = 'hms-dbmi'
         gene['institution'] = 'hms-dbmi'
         es_testapp.post_json(GENE_URL, gene, status=201)
-
-
-@pytest.fixture(scope='session')
-def gene_workbook(workbook, es_testapp):
-    """ Posts Genes required for the first few variants in the test VCF up to NUMBER_TO_POST """
-    genes = json.load(open(GENE_WORKBOOK, 'r'))
-    for entry in genes:
-        entry['project'] = 'hms-dbmi'
-        entry['institution'] = 'hms-dbmi'
-        es_testapp.post_json(GENE_URL, entry, status=201)

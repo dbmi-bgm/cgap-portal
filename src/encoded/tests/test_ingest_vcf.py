@@ -1,4 +1,5 @@
 import pytest
+import json
 from .data.variant_workbook.expected import (
     VARIANT_SCHEMA,
     VARIANT_SAMPLE_SCHEMA,
@@ -10,7 +11,8 @@ from ..commands.ingest_vcf import (
     VCFParser
 )
 from .variant_fixtures import (  # noqa
-    gene_workbook,
+    GENE_URL,
+    GENE_WORKBOOK,
     MAX_POSTS_FOR_TESTING,
     VARIANT_SAMPLE_URL,
     VARIANT_URL
@@ -169,11 +171,17 @@ class TestIngestVCF:
     #         res = es_testapp.post_json(VARIANT_URL, variant, status=201).json
     #         assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
-    def test_post_variants_and_samples_with_links(self, workbook, es_testapp, test_vcf, gene_workbook):
+    def test_post_variants_and_samples_with_links(self, workbook, es_testapp, test_vcf):
         """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
             NOTE: This is the most important test functionally speaking.
         """
-        VARIANT_URL, VARIANT_SAMPLE_URL = '/variant', '/variant_sample'
+        # post gene workbook
+        genes = json.load(open(GENE_WORKBOOK, 'r'))
+        for entry in genes:
+            entry['project'] = 'hms-dbmi'
+            entry['institution'] = 'hms-dbmi'
+            es_testapp.post_json(GENE_URL, entry, status=201)
+
         for idx, record in enumerate(test_vcf):
             if idx == MAX_POSTS_FOR_TESTING:
                 break
