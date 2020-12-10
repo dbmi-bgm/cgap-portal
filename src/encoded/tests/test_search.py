@@ -904,8 +904,8 @@ def hidden_facet_data_two():
     }
 
 
-@pytest.fixture(scope='module')  # XXX: consider scope further - Will 11/5/2020
-def hidden_facet_test_data(es_testapp, hidden_facet_data_one, hidden_facet_data_two):
+@pytest.fixture(scope='session')  # XXX: consider scope further - Will 11/5/2020
+def hidden_facet_test_data(workbook, es_testapp, hidden_facet_data_one, hidden_facet_data_two):
     es_testapp.post_json('/TestingHiddenFacets', hidden_facet_data_one, status=201)
     es_testapp.post_json('/TestingHiddenFacets', hidden_facet_data_two, status=201)
     es_testapp.post_json('/index', {'record': False})
@@ -1161,8 +1161,8 @@ class TestSearchBucketRangeFacets:
         return es_testapp.get('/search/?type=TestingBucketRangeFacets').json['facets']
 
     @pytest.mark.parametrize('expected_fields, expected_counts', [
-        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 10),  # XXX: wrong?
-        (['array_of_objects_that_holds_integer.embedded_integer'], 20)  # XXX: wrong?
+        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 5),  # XXX: wrong?
+        (['array_of_objects_that_holds_integer.embedded_integer'], 10)  # XXX: wrong?
     ])
     def test_search_bucket_range_simple(self, bucket_range_facet_result, expected_fields, expected_counts):
         """ Tests searching a collection of documents with varying integer field types that
