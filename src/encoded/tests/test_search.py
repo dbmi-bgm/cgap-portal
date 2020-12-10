@@ -1127,7 +1127,7 @@ def bucket_range_data_raw():
 
 
 @pytest.fixture(scope='session')  # XXX: consider scope further - Will 11/5/2020
-def bucket_range_data(es_testapp, workbook, bucket_range_data_raw):
+def bucket_range_data(workbook, es_testapp, bucket_range_data_raw):
     for entry in bucket_range_data_raw:
         es_testapp.post_json('/TestingBucketRangeFacets', entry, status=201)
     es_testapp.post_json('/index', {'record': False})
@@ -1156,18 +1156,15 @@ class TestSearchBucketRangeFacets:
                 break
         return result
 
-    @pytest.fixture(scope='module')
-    def bucket_range_facet_result(self, workbook, es_testapp, bucket_range_data):
-        return es_testapp.get('/search/?type=TestingBucketRangeFacets').json['facets']
-
     @pytest.mark.parametrize('expected_fields, expected_counts', [
-        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 5),  # XXX: wrong?
-        (['array_of_objects_that_holds_integer.embedded_integer'], 10)  # XXX: wrong?
+        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 5),
+        (['array_of_objects_that_holds_integer.embedded_integer'], 10)
     ])
-    def test_search_bucket_range_simple(self, bucket_range_facet_result, expected_fields, expected_counts):
+    def test_search_bucket_range_simple(self, workbook, es_testapp, expected_fields, expected_counts):
         """ Tests searching a collection of documents with varying integer field types that
             have the same distribution - all of which should give the same results. """
-        self.verify_facet_counts(bucket_range_facet_result, expected_fields, 2, expected_counts)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets').json['facets']
+        self.verify_facet_counts(res, expected_fields, 2, expected_counts)
 
     @pytest.mark.parametrize('identifier', [
         'reverse', 'forward'
