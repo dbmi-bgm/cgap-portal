@@ -69,6 +69,7 @@ macbuild-full:  # rebuilds for Catalina, addressing zlib possibly being in an al
 build-after-poetry:  # continuation of build after poetry install
 	make moto-setup
 	make npm-setup-if-needed
+	python setup_higlass.py
 	python setup_eb.py develop
 	make fix-dist-info
 
