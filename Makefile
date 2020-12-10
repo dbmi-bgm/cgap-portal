@@ -128,13 +128,13 @@ clean-python:
 	pip freeze | xargs pip uninstall -y
 
 test:
-	bin/test -vv --timeout=200 -m "working and not performance"
+	bin/test -vv --timeout=200 -m "working and not indexing" && bin/test -vv --timeout=200 -m "working and indexing"
 
 test-any:
 	bin/test -vv --timeout=200
 
 travis-test:
-	bin/test -vv --timeout=300 -m "working and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && bin/test -vv --timeout=300 -m "working and indexing" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+	bin/test -vv --timeout=300 -m "working and not indexing and not action_fail" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && bin/test -vv --timeout=300 -m "working and indexing and not action_fail" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update

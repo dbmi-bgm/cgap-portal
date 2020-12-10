@@ -511,7 +511,7 @@ def check_item_type(client, item_type):
     return client.get('/%s?limit=all' % item_type, status=[200, 301]).follow()
 
 
-def test_index_data_workbook(workbook, es_testapp, indexer_testapp, html_es_testapp):
+def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
     es = es_testapp.app.registry['elasticsearch']
     # we need to reindex the collections to make sure numbers are correct
     create_mapping.run(es_testapp.app, sync_index=True)
