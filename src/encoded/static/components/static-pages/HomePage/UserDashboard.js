@@ -40,25 +40,7 @@ export const UserDashboard = React.memo(function UserDashboard(props){
             {/* We apply .bg-light class here instead of .container-wide child divs because home-dashboard-area height is calculated off of window height in stylesheet */}
             <div className="home-dashboard-area bg-light" id="content">
 
-                <div className="container-wide py-0 bg-white">
-                    <div className="tab-section-title">
-                        <h3 className="text-400 my-0">
-                            Recent Cases <span className="text-300">by Project</span>
-                        </h3>
-                        <div className="btn-container">
-                            <a className="btn btn-primary btn-block" href="/search/?type=Case&currentAction=add">
-                                <i className="icon icon-plus fas mr-07" />
-                                New Case
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <hr className="tab-section-title-horiz-divider"/>
-
-                <div className="container-wide py-2">
-                    <RecentCasesTable />
-                </div>
+                <RecentCasesTable />
 
             </div>
         </React.Fragment>
@@ -92,7 +74,7 @@ class RecentCasesTable extends React.PureComponent {
             + "&sort=-last_modified.date_modified"
         );
         return (
-            <div className="recent-cases-table-section mt-12 mb-36">
+            <div className="recent-cases-table-section mb-36">
                 <EmbeddedCaseSearchTable {...{ searchHref }} facets={null}
                     aboveTableComponent={
                         <AboveCasesTableOptions onToggleOnlyShowCasesWithReports={this.onToggleOnlyShowCasesWithReports}
@@ -112,15 +94,32 @@ function AboveCasesTableOptions(props){
     } = props;
 
     return (
-        <div className="toggle-reports mb-1 d-flex justify-content-between align-items-center">
-            <div className="d-flex align-items-center">
-                <div className="pr-1">View cases from</div>
-                <ProjectSelectDropdown {...{ context, onFilter, isContextLoading, navigate }} />
+        <React.Fragment>
+            <div className="container-wide py-0 bg-white">
+                <div className="tab-section-title">
+                    <h3 className="text-400 my-0 d-flex align-items-center">
+                        Recent Cases&nbsp;
+                        <span className="text-300">from&nbsp;</span>
+                        <div className="px-1">
+                            <ProjectSelectDropdown {...{ context, onFilter, isContextLoading, navigate }} />
+                        </div>
+                    </h3>
+                    <div className="btn-container">
+                        <a className="btn btn-primary btn-block" href="/search/?type=Case&currentAction=add">
+                            <i className="icon icon-plus fas mr-07" />
+                            New Case
+                        </a>
+                    </div>
+                </div>
             </div>
-            <Checkbox onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small">
-                Show Only Cases with Reports
-            </Checkbox>
-        </div>
+
+            <hr className="tab-section-title-horiz-divider"/>
+            <div className="container-wide toggle-reports mb-1 mt-12">
+                <Checkbox onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small">
+                    Show Only Cases with Reports
+                </Checkbox>
+            </div>
+        </React.Fragment>
     );
 }
 
@@ -183,7 +182,7 @@ function ProjectSelectDropdown(props){
     }
 
     return (
-        <DropdownButton disabled={isContextLoading || facetTerms.length === 0} size="sm"
+        <DropdownButton disabled={isContextLoading || facetTerms.length === 0}
             title={ projectFilterTerm || "All Projects" } onSelect={onTermSelect} variant="outline-dark">
             <DropdownItem eventKey={0} active={!projectFilterTerm}>
                 <span className="text-600">All Projects</span>
