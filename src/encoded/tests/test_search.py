@@ -1157,7 +1157,7 @@ class TestSearchBucketRangeFacets:
         return result
 
     @pytest.fixture(scope='module')
-    def bucket_range_facet_result(self, es_testapp, bucket_range_data):
+    def bucket_range_facet_result(self, workbook, es_testapp, bucket_range_data):
         return es_testapp.get('/search/?type=TestingBucketRangeFacets').json['facets']
 
     @pytest.mark.parametrize('expected_fields, expected_counts', [
@@ -1172,7 +1172,7 @@ class TestSearchBucketRangeFacets:
     @pytest.mark.parametrize('identifier', [
         'reverse', 'forward'
     ])
-    def test_search_bucket_range_nested_qualifier(self, es_testapp, bucket_range_data, identifier):
+    def test_search_bucket_range_nested_qualifier(self, workbook, es_testapp, bucket_range_data, identifier):
         """ XXX: needs nested fix
         Tests aggregating on a nested field while selecting for a field within the nested object. """
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
@@ -1183,7 +1183,7 @@ class TestSearchBucketRangeFacets:
     @pytest.mark.parametrize('identifier', [
         'reverse', 'forward'
     ])
-    def test_search_bucket_range_nested_qualifier_multiple(self, es_testapp, bucket_range_data, identifier):
+    def test_search_bucket_range_nested_qualifier_multiple(self, workbook, es_testapp, bucket_range_data, identifier):
         """ XXX: needs nested fix
         Tests aggregating on a nested field while selecting for a field within the nested object (no change). """
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
