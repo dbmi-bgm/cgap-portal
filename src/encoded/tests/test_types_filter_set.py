@@ -433,7 +433,7 @@ def test_compound_search_from_to(workbook, es_testapp, request_with_lots_of_resu
     assert len(resp['@graph']) == 10
 
 
-def test_compound_search_rejects_malformed_filter_sets(es_testapp):
+def test_compound_search_rejects_malformed_filter_sets(workbook, es_testapp):
     """ Tests passing a bunch of malformed filter_sets raises an error. """
     filter_set_without_filter_block_sub_fields = {
         'search_type': 'Variant',
