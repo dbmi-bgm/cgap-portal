@@ -11,7 +11,6 @@ from ..commands.ingest_vcf import (
 )
 from .variant_fixtures import (  # noqa
     gene_workbook,
-    post_variant_consequence_items,
     MAX_POSTS_FOR_TESTING,
     VARIANT_SAMPLE_URL,
     VARIANT_URL
@@ -157,20 +156,20 @@ class TestIngestVCF:
         assert 'samplegeno_ad' in result['samplegeno'][0]
         assert 'samplegeno_gt' in result['samplegeno'][0]
 
-    def test_post_variants(self, es_testapp, test_vcf, gene_workbook, post_variant_consequence_items):
-        """ Attempts to post all generated variants without links """
-        for idx, record in enumerate(test_vcf):
-            if idx == MAX_POSTS_FOR_TESTING:
-                break
-            variant = test_vcf.create_variant_from_record(record)
-            variant['project'] = 'hms-dbmi'
-            variant['institution'] = 'hms-dbmi'
-            test_vcf.format_variant_sub_embedded_objects(variant)
-            res = es_testapp.post_json(VARIANT_URL, variant, status=201).json
-            assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
+    # Tests a subset of the last test
+    # def test_post_variants(self, es_testapp, test_vcf, gene_workbook, post_variant_consequence_items):
+    #     """ Attempts to post all generated variants without links """
+    #     for idx, record in enumerate(test_vcf):
+    #         if idx == MAX_POSTS_FOR_TESTING:
+    #             break
+    #         variant = test_vcf.create_variant_from_record(record)
+    #         variant['project'] = 'hms-dbmi'
+    #         variant['institution'] = 'hms-dbmi'
+    #         test_vcf.format_variant_sub_embedded_objects(variant)
+    #         res = es_testapp.post_json(VARIANT_URL, variant, status=201).json
+    #         assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
-    def test_post_variants_and_samples_with_links(self, es_testapp, test_vcf, gene_workbook,
-                                                  post_variant_consequence_items):
+    def test_post_variants_and_samples_with_links(self, es_testapp, workbook, test_vcf, gene_workbook):
         """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
             NOTE: This is the most important test functionally speaking.
         """

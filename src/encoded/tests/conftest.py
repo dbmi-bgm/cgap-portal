@@ -218,7 +218,7 @@ def html_es_testapp(es_app):
     return webtest.TestApp(es_app, environ)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def testapp(app):
     '''TestApp with JSON accept header.
     '''
@@ -270,13 +270,13 @@ def authenticated_testapp(app):
 
 
 @pytest.fixture
-def authenticated_es_testapp(app):
+def authenticated_es_testapp(es_app):
     """ TestApp for authenticated non-admin user with ES """
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_AUTHENTICATED',
     }
-    return webtest.TestApp(app, environ)
+    return webtest.TestApp(es_app, environ)
 
 
 
@@ -342,9 +342,8 @@ class WorkbookCache:
         return True
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def workbook(es_app):
     """ Loads a bunch of data (tests/data/workbook-inserts) into the system on first run
         (session scope doesn't work). """
     WorkbookCache.initialize_if_needed(es_app)
-    yield

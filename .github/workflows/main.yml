@@ -51,6 +51,7 @@ jobs:
           TRAVIS_JOB_ID: ${{ github.run_number }}
         run: |
           make travis-test
+
       - name: Cleanup
         if: ${{ always() }}
         env:

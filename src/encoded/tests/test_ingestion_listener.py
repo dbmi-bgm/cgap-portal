@@ -11,7 +11,6 @@ from ..ingestion_listener import (
     IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
     IngestionError, IngestionReport,
 )
-from .variant_fixtures import gene_workbook, post_variant_consequence_items
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
@@ -19,7 +18,6 @@ QUEUE_INGESTION_URL = '/queue_ingestion'
 INGESTION_STATUS_URL = '/ingestion_status'
 INGESTED_ACCESSION = 'GAPFIZ123456'
 NA_ACCESSION = 'GAPFIZ654321'
-notice_pytest_fixtures(gene_workbook, post_variant_consequence_items)
 
 
 def wait_for_queue_to_catch_up(queue_manager, n, initially=False):
@@ -136,7 +134,7 @@ def test_ingestion_queue_add_and_receive(fresh_ingestion_queue_manager_for_testi
     _expect_message_uuids(queue_manager, test_uuids)
 
 
-def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing, es_testapp):
+def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing, es_testapp, workbook):
     """ Tests adding uuids to the queue via /queue_ingestion """
     queue_manager = fresh_ingestion_queue_manager_for_testing
     test_uuids = [str(uuid4()), str(uuid4())]
@@ -153,7 +151,7 @@ def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing
     _expect_message_uuids(queue_manager, test_uuids)
 
 
-def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, es_testapp):
+def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, es_testapp, workbook):
     """ Tests deleting messages from SQS results in no messages being there. """
     queue_manager = fresh_ingestion_queue_manager_for_testing
     request_body = {
@@ -198,7 +196,7 @@ def mocked_familial_relations():
     ]}]
 
 
-def test_ingestion_listener_build_familial_relations(es_testapp, mocked_familial_relations):
+def test_ingestion_listener_build_familial_relations(es_testapp, workbook, mocked_familial_relations):
     """ Tests that we correctly extract familial relations from a mocked object that has the correct structure """
     with mock.patch.object(IngestionListener, 'search_for_sample_relations', new=lambda x, y: mocked_familial_relations):
         listener = IngestionListener(es_testapp)
@@ -211,16 +209,15 @@ def test_ingestion_listener_build_familial_relations(es_testapp, mocked_familial
         assert relations['sample_three']['samplegeno_sex'] == 'M'
 
 
-def test_ingestion_listener_verify_vcf_status_is_not_ingested(authenticated_es_testapp, es_app, workbook):
+def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, authenticated_es_testapp):
     """ Posts a minimal processed file to be checked """
     request = DummyRequest(environ={'REMOTE_USER': 'EMBED'})
-    request.invoke_subrequest = es_app.invoke_subrequest
+    request.invoke_subrequest = authenticated_es_testapp.app.invoke_subrequest
     assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION) is False
     assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True
 
 
-def test_ingestion_listener_run(es_testapp, fresh_ingestion_queue_manager_for_testing, workbook, project, institution,
-                                post_variant_consequence_items, gene_workbook):
+def test_ingestion_listener_run(es_testapp, workbook, fresh_ingestion_queue_manager_for_testing):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
     """

@@ -33,7 +33,7 @@ def test_filter_set_barebones(workbook, es_testapp, barebones_filter_set):
 
     # execute given the @id of a filter_set
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 4
+    assert len(compound_search_res) == 9
 
     # execute given flags only
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {
@@ -51,11 +51,11 @@ def test_filter_set_barebones(workbook, es_testapp, barebones_filter_set):
     es_testapp.post_json(COMPOUND_SEARCH_URL, {
         'flags': [  # should have no effect, since no filter_blocks toggle it
             {
-                'name': 'gene',
+                'name': 'trackingitem',
                 'query': '?type=TrackingItem'
             }
         ],
-        'search_type': 'Gene'
+        'search_type': 'TrackingItem'
     }, status=404)
 
 
@@ -96,7 +96,7 @@ def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
                                                 }],
                                                 'search_type': 'Variant'
                                             }).json['@graph']
-    assert len(compound_search_res) == 4
+    assert len(compound_search_res) == 9
 
     # execute given flags only
     compound_search_res = es_testapp.post_json('/compound_search', {
@@ -124,11 +124,11 @@ def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
         ],
         'search_type': 'Variant'
     }).json['@graph']
-    assert len(compound_search_res) == 4
+    assert len(compound_search_res) == 9
 
     # do similar search with @id
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 1
+    assert len(compound_search_res) == 2
 
 
 @pytest.fixture
@@ -165,7 +165,7 @@ def test_filter_set_typical(workbook, es_testapp, typical_filter_set):
 
     # execute the more complicated filter_set by @id
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 3
+    assert len(compound_search_res) == 5
 
 
 @pytest.fixture
@@ -209,7 +209,7 @@ def test_filter_set_complex(workbook, es_testapp, complex_filter_set):
     flags = res['@graph'][0]['flags']
 
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 4  # all variants will match
+    assert len(compound_search_res) == 9  # all variants will match
 
     # Modify POS
     filter_set = {
@@ -223,7 +223,7 @@ def test_filter_set_complex(workbook, es_testapp, complex_filter_set):
             block['query'] = 'POS.from=0&POS.to=80000'  # excludes 1/4 variants
             break
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
-    assert len(compound_search_res) == 3
+    assert len(compound_search_res) == 5
 
 
 def test_filter_set_intersection(workbook, es_testapp, complex_filter_set):
@@ -326,7 +326,7 @@ def test_compound_search_only_global_flags(workbook, es_testapp, filter_set_with
         explicitly for correctness in this test.
     """
     resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_only_flags).json
-    assert len(resp['@graph']) == 4
+    assert len(resp['@graph']) == 9
 
 
 @pytest.fixture
@@ -346,7 +346,7 @@ def test_compound_search_single_filter_block(workbook, es_testapp, filter_set_wi
         /search redirect is functioning if we get facets on the response.
     """
     resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block).json
-    assert len(resp['@graph']) == 1
+    assert len(resp['@graph']) == 6
     assert 'facets' in resp
 
 
@@ -373,10 +373,8 @@ def test_compound_search_filter_and_flags(workbook, es_testapp, filter_set_with_
         /search redirect is functioning if we get facets on the response.
     """
     resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block_and_flags).json
-    assert len(resp['@graph']) == 1
+    assert len(resp['@graph']) == 6
     assert 'facets' in resp
-
-    filter_set_with_single_filter_block_and_flags['return_generator'] = False  # undo side-effect
 
 
 @pytest.fixture
@@ -404,7 +402,7 @@ def filter_set_with_multiple_disabled_flags():
 def test_compound_search_disabled_flags(workbook, es_testapp, filter_set_with_multiple_disabled_flags):
     """ Tests a compound search with all flags disabled (raw filter_blocks + global_flags). """
     resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_multiple_disabled_flags).json
-    assert len(resp['@graph']) == 2
+    assert len(resp['@graph']) == 7
 
 
 @pytest.fixture

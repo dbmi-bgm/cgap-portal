@@ -1,6 +1,6 @@
 import pytest
 import requests  # XXX: C4-211
-from .test_ingest_vcf import VARIANT_SAMPLE_URL
+from .variant_fixtures import VARIANT_SAMPLE_URL
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]

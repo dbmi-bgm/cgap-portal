@@ -52,7 +52,7 @@ TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
 def app(es_app_settings, request):
     # for now, don't run with mpindexer. Add `True` to params above to do so
     if request.param:
-        es_app_settings['mpindexer'] = True
+        es_app_settings['mpindexer'] = False
     app = main({}, **es_app_settings)
 
     yield app
