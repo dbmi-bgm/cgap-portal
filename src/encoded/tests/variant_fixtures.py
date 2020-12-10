@@ -22,7 +22,7 @@ def test_genes():
 
 
 @pytest.fixture
-def genes(es_testapp, workbook, test_genes):
+def genes(workbook, es_testapp, test_genes):
     """ Fixture that posts a subset of genes """
     for gene in test_genes:
         gene['project'] = 'hms-dbmi'
@@ -31,7 +31,7 @@ def genes(es_testapp, workbook, test_genes):
 
 
 @pytest.fixture(scope='session')
-def gene_workbook(es_testapp, workbook):
+def gene_workbook(workbook, es_testapp):
     """ Posts Genes required for the first few variants in the test VCF up to NUMBER_TO_POST """
     genes = json.load(open(GENE_WORKBOOK, 'r'))
     for entry in genes:

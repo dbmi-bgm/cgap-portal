@@ -169,7 +169,7 @@ class TestIngestVCF:
     #         res = es_testapp.post_json(VARIANT_URL, variant, status=201).json
     #         assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
-    def test_post_variants_and_samples_with_links(self, es_testapp, workbook, test_vcf, gene_workbook):
+    def test_post_variants_and_samples_with_links(self, workbook, es_testapp, test_vcf, gene_workbook):
         """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
             NOTE: This is the most important test functionally speaking.
         """
