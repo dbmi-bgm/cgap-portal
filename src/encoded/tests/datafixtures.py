@@ -239,13 +239,26 @@ def uncle_sample(testapp, project, institution):
 
 
 @pytest.fixture
-def child_sample(testapp, project, institution):
+def proband_processed_file(testapp, project, institution, file_formats):
+    """Add a bam file to test the samples_pedigree"""
+    item = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'file_format': file_formats.get('bam').get('uuid'),
+        'filename': 'test_proband_file.bam'
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
+
+
+@pytest.fixture
+def child_sample(testapp, project, institution, proband_processed_file):
     item = {
         "accession": "GAPSAPROBAND",
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_006",
-        "status": "shared"
+        "status": "shared",
+        "processed_files": [proband_processed_file['@id'], ]
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
