@@ -238,9 +238,9 @@ def uncle_sample(testapp, project, institution):
     return testapp.post_json('/sample', item).json['@graph'][0]
 
 
-# add a bam file to test the samples_pedigree
 @pytest.fixture
 def proband_processed_file(testapp, project, institution, file_formats):
+    """Add a bam file to test the samples_pedigree"""
     item = {
         'project': project['@id'],
         'institution': institution['@id'],

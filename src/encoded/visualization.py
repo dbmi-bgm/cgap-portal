@@ -13,6 +13,7 @@ from .types.workflow import (
     WorkflowRunTracingException,
     item_model_to_object
 )
+from dcicutils.env_utils import CGAP_ENV_WEBPROD, CGAP_ENV_MASTERTEST, CGAP_ENV_DEV, CGAP_PUBLIC_URL_PRD
 import boto3
 from botocore.exceptions import ClientError
 import json
@@ -158,12 +159,12 @@ def get_higlass_viewconf(context, request):
 
         # We need absolute URLs for the BAM Worker
         host_url = "http://localhost:6543"
-        if request.registry.settings.get('env.name') == "fourfront-cgap":
-            host_url = "https://cgap.hms.harvard.edu"
-        elif request.registry.settings.get('env.name') == "fourfront-cgaptest":
-            host_url = "http://fourfront-cgaptest.9wzadzju3p.us-east-1.elasticbeanstalk.com"
-        elif request.registry.settings.get('env.name') == "fourfront-cgapdev":
-            host_url = "http://fourfront-cgapdev.9wzadzju3p.us-east-1.elasticbeanstalk.com/"
+        if request.registry.settings.get('env.name') == CGAP_ENV_WEBPROD:
+            host_url = CGAP_PUBLIC_URL_PRD
+        elif request.registry.settings.get('env.name') == CGAP_ENV_MASTERTEST:
+            host_url = f"http://{CGAP_ENV_MASTERTEST}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
+        elif request.registry.settings.get('env.name') == CGAP_ENV_DEV:
+            host_url = f"http://{CGAP_ENV_DEV}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
 
         samples_pedigree = request.json_body.get('samples_pedigree', None) 
         samples_pedigree.sort(key=lambda x: x['sample_name'] == bam_sample_id, reverse=True)
