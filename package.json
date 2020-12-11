@@ -132,7 +132,7 @@
     "react-json-tree": "^0.11.2",
     "react-jsx-parser": "^1.25.1",
     "react-redux": "^6.0.1",
-    "react-tooltip": "^4.2.8",
+    "react-tooltip": "4.2.10",
     "react-transition-group": "^4.4.1",
     "redux": "^3.7.0",
     "subprocess-middleware": "^0.1.0",
