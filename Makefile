@@ -69,8 +69,8 @@ macbuild-full:  # rebuilds for Catalina, addressing zlib possibly being in an al
 build-after-poetry:  # continuation of build after poetry install
 	make moto-setup
 	make npm-setup-if-needed
-	python setup_higlass.py
-	python setup_eb.py develop
+	poetry run python setup_higlass.py
+	poetry run python setup_eb.py develop
 	make fix-dist-info
 
 fix-dist-info:
@@ -128,13 +128,13 @@ clean-python:
 	pip freeze | xargs pip uninstall -y
 
 test:
-	bin/test -vv --timeout=200 -m "working and not performance"
+	bin/test -vv --timeout=200 -m "working and not indexing" && bin/test -vv --timeout=200 -m "working and indexing"
 
 test-any:
 	bin/test -vv --timeout=200
 
 travis-test:
-	bin/test -vv --timeout=300 -m "working and not performance" --aws-auth --durations=10 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 
+	bin/test -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not indexing and not action_fail" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && bin/test -vv --timeout=300 -m "working and indexing and not action_fail" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update

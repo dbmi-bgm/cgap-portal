@@ -7,6 +7,7 @@ from pyramid.view import view_config
 from webob.multidict import MultiDict
 from functools import reduce
 from elasticsearch_dsl import Search
+from elasticsearch.exceptions import NotFoundError
 from pyramid.httpexceptions import HTTPBadRequest
 from urllib.parse import urlencode
 from collections import OrderedDict
@@ -332,7 +333,10 @@ class SearchBuilder:
         if (len(self.doc_types) == 1) and 'Item' not in self.doc_types:
             search_term = 'search-info-header.' + self.doc_types[0]
             # XXX: this could be cached application side as well
-            static_section = self.request.registry['collections']['StaticSection'].get(search_term)
+            try:
+                static_section = self.request.registry['collections']['StaticSection'].get(search_term)
+            except NotFoundError:  # search could fail
+                static_section = None
             if static_section and hasattr(static_section.model, 'source'):  # extract from ES structure
                 item = static_section.model.source['object']
                 self.response['search_header'] = {}
@@ -900,7 +904,7 @@ class SearchBuilder:
 
     @staticmethod
     def build_initial_columns(used_type_schemas):
-        
+
         columns = OrderedDict()
 
         # Add title column, at beginning always

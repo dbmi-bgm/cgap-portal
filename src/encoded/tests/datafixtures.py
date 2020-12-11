@@ -47,16 +47,6 @@ def connection():
 
 
 @pytest.fixture
-def wrangler_testapp(wrangler, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, wrangler['uuid'])
-
-
-@pytest.fixture
-def submitter_testapp(submitter, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, submitter['uuid'])
-
-
-@pytest.fixture
 def project(testapp):
     item = {
         'name': 'encode-project',
