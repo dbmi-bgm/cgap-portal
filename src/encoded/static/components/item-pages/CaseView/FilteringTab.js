@@ -278,13 +278,17 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         accession: caseAccession,
         initial_search_href_filter_addon = "",
         active_filterset = null,
+        additional_variant_sample_facets = []
     } = context || {};
 
     const {  "@id" : activeFilterSetID = null } = active_filterset || {};
 
-    let searchHrefBase = "/search/?type=VariantSample";
-    searchHrefBase += initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "";
-    searchHrefBase += "&sort=date_created";
+    const searchHrefBase = (
+        "/search/?type=VariantSample"
+        + (initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "")
+        + (additional_variant_sample_facets.length > 0 ? "&" + additional_variant_sample_facets.map(function(fac){ return "additional_facet=" + encodeURIComponent(fac); }).join("&") : "")
+        + "&sort=date_created"
+    );
 
     // DEPRECATED - we no longer have filter_blocks present initially.
     // const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";

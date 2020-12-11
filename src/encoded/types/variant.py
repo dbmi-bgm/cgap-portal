@@ -223,6 +223,13 @@ class VariantSample(Item):
         }
     }
 
+    POSSIBLE_GENOTYPE_LABEL_FIELDS = [
+        'proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
+        'sister_genotype_label', 'brother_genotype_label', 'co_parent_genotype_label',
+        'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
+        'son_II_genotype_label'
+    ]
+
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
         """ Sets the annotation_id field on this variant_sample prior to passing on. """
@@ -347,10 +354,7 @@ class VariantSample(Item):
     def associated_genotype_labels(self, variant, CALL_INFO, samplegeno=None, genotype_labels=None):
         """ Builds the above sub-embedded object so we can search on the genotype labels """
 
-        possible_keys = ['proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
-                         'sister_genotype_label', 'brother_genotype_label', 'co_parent_genotype_label',
-                         'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
-                         'son_II_genotype_label']
+        possible_keys_set = set(VariantSample.POSSIBLE_GENOTYPE_LABEL_FIELDS)
 
         # XXX: will be useful if we want to have this field be "centric" WRT the
         # person who submitted this variant_sample
@@ -376,7 +380,7 @@ class VariantSample(Item):
             role = entry.get('role', '')
             label = entry.get('labels', [])
             role_key = infer_key_from_role(role)
-            if role_key not in possible_keys:
+            if role_key not in possible_keys_set:
                 continue
             elif len(label) == 1:
                 new_labels[role_key] = label[0]
