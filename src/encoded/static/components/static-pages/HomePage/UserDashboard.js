@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import _ from 'underscore';
 
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
@@ -14,7 +14,7 @@ import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedI
 
 
 export const UserDashboard = React.memo(function UserDashboard(props){
-    const { schemas } = props;
+    // const { schemas } = props;
     // We can turn container into container-wide to expand width
     // We can convert dashboard-header into tabs, similar to Item pages.
     // We can do novel stuff like sidebar menu or something.
@@ -25,7 +25,7 @@ export const UserDashboard = React.memo(function UserDashboard(props){
     // which need to make AJAX requests. This way we can just
     // re-initialize component upon 'Impersonate User' action
     // insteat of handling w. componentDidUpdate or similar.
-    const { uuid: userUUID = null } = JWT.getUserDetails() || {};
+    // const { uuid: userUUID = null } = JWT.getUserDetails() || {};
 
     return (
         <React.Fragment>
@@ -39,75 +39,51 @@ export const UserDashboard = React.memo(function UserDashboard(props){
 
             {/* We apply .bg-light class here instead of .container-wide child divs because home-dashboard-area height is calculated off of window height in stylesheet */}
             <div className="home-dashboard-area bg-light" id="content">
-
                 <RecentCasesTable />
-
             </div>
         </React.Fragment>
     );
 });
 
 
-/** Used a 'classical' component here since harder to throttle state-changing funcs in functional components */
-class RecentCasesTable extends React.PureComponent {
-
-    constructor(props){
-        super(props);
-        this.onToggleOnlyShowCasesWithReports = _.throttle(this.onToggleOnlyShowCasesWithReports.bind(this), 500, { trailing: false });
-        this.onToggleOnlyShowProbandCases = _.throttle(this.onToggleOnlyShowProbandCases.bind(this), 500, { trailing: false });
-        this.state = {
-            "onlyShowCasesWithReports": true,
-            "onlyShowProbandCases": true
-        };
-    }
-
-    onToggleOnlyShowCasesWithReports(e){
-        e.stopPropagation();
-        this.setState(function({ onlyShowCasesWithReports: pastShow }){
-            return { onlyShowCasesWithReports: !pastShow };
-        });
-    }
-
-    onToggleOnlyShowProbandCases(e){
-        e.stopPropagation();
-        this.setState(function({ onlyShowProbandCases: pastShow }){
-            return { onlyShowProbandCases: !pastShow };
-        });
-    }
-
-    render(){
-        const { onlyShowCasesWithReports, onlyShowProbandCases } = this.state;
-        const allCasesHref = "/search/?type=Case";
-        const searchHref = (
-            allCasesHref
-            + (onlyShowCasesWithReports ? "&report.uuid!=No+value" : "")
-            + (onlyShowProbandCases ? "&proband_case=true" : "")
-            + "&sort=-last_modified.date_modified"
-        );
-        return (
-            <div className="recent-cases-table-section mb-36">
-                <EmbeddedCaseSearchTable {...{ searchHref }} facets={null}
-                    aboveTableComponent={
-                        <AboveCasesTableOptions
-                            onToggleOnlyShowCasesWithReports={this.onToggleOnlyShowCasesWithReports}
-                            onlyShowCasesWithReports={onlyShowCasesWithReports}
-                            onToggleOnlyShowProbandCases={this.onToggleOnlyShowProbandCases}
-                            onlyShowProbandCases={onlyShowProbandCases}
-                        />
-                    }
-                />
-            </div>
-        );
-    }
-
-}
+const RecentCasesTable = React.memo(function RecentCasesTable(){
+    const searchHref = (
+        "/search/?type=Case"
+        + "&report.uuid!=No+value"
+        + "&proband_case=true"
+        + "&sort=-last_modified.date_modified"
+    );
+    return (
+        <div className="recent-cases-table-section mb-36">
+            <EmbeddedCaseSearchTable {...{ searchHref }} facets={null} aboveTableComponent={<AboveCasesTableOptions />} />
+        </div>
+    );
+});
 
 function AboveCasesTableOptions(props){
-    const {
-        onToggleOnlyShowCasesWithReports, onlyShowCasesWithReports,
-        onToggleOnlyShowProbandCases, onlyShowProbandCases,
-        context, onFilter, isContextLoading, navigate
-    } = props;
+    const { context, onFilter, isContextLoading, navigate } = props;
+    const { filters: ctxFilters = null } = context || {};
+
+    const { onlyShowCasesWithReports, onlyShowProbandCases } = useMemo(function(){
+        return {
+            onlyShowCasesWithReports: ctxFilters === null ? true : !!(_.findWhere(ctxFilters, { "field" : "report.uuid!", "term" : "No value" })),
+            onlyShowProbandCases: ctxFilters === null ? true : !!(_.findWhere(ctxFilters, { "field" : "proband_case", "term" : "true" }))
+        };
+    }, [ ctxFilters ]);
+
+    const { onToggleOnlyShowCasesWithReports, onToggleOnlyShowProbandCases } = useMemo(function(){
+        return {
+            // Throttling works here because we're memoizing on empty array (i.e. no new instances of these funcs ever created)
+            onToggleOnlyShowCasesWithReports: _.throttle(function(e){
+                e.stopPropagation();
+                onFilter({ "field" : "report.uuid!" }, { "key": "No value" });
+            }, 500, { trailing: false }),
+            onToggleOnlyShowProbandCases: _.throttle(function(e){
+                e.stopPropagation();
+                onFilter({ "field" : "proband_case" }, { "key": "true" });
+            }, 500, { trailing: false })
+        };
+    }, []);
 
     return (
         <React.Fragment>
