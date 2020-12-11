@@ -56,7 +56,8 @@ export function EmbeddedItemSearchTable (props){
         filterColumnFxn, hideColumns,
         onLoad,
         termTransformFxn: Term.toName,
-        separateSingleTermFacets: false,
+        "separateSingleTermFacets": false,
+        "allowPostRequest": true
     };
 
     return (

@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import _ from 'underscore';
 
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
@@ -14,7 +14,7 @@ import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedI
 
 
 export const UserDashboard = React.memo(function UserDashboard(props){
-    const { schemas } = props;
+    // const { schemas } = props;
     // We can turn container into container-wide to expand width
     // We can convert dashboard-header into tabs, similar to Item pages.
     // We can do novel stuff like sidebar menu or something.
@@ -25,7 +25,7 @@ export const UserDashboard = React.memo(function UserDashboard(props){
     // which need to make AJAX requests. This way we can just
     // re-initialize component upon 'Impersonate User' action
     // insteat of handling w. componentDidUpdate or similar.
-    const { uuid: userUUID = null } = JWT.getUserDetails() || {};
+    // const { uuid: userUUID = null } = JWT.getUserDetails() || {};
 
     return (
         <React.Fragment>
@@ -39,88 +39,82 @@ export const UserDashboard = React.memo(function UserDashboard(props){
 
             {/* We apply .bg-light class here instead of .container-wide child divs because home-dashboard-area height is calculated off of window height in stylesheet */}
             <div className="home-dashboard-area bg-light" id="content">
-
-                <div className="container-wide py-0 bg-white">
-                    <div className="tab-section-title">
-                        <h3 className="text-400 my-0">
-                            Recent Cases <span className="text-300">by Project</span>
-                        </h3>
-                        <div className="btn-container">
-                            <a className="btn btn-primary btn-block" href="/search/?type=Case&currentAction=add">
-                                <i className="icon icon-plus fas mr-07" />
-                                New Case
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <hr className="tab-section-title-horiz-divider"/>
-
-                <div className="container-wide py-2">
-                    <RecentCasesTable />
-                </div>
-
+                <RecentCasesTable />
             </div>
         </React.Fragment>
     );
 });
 
 
-/** Used a 'classical' component here since harder to throttle state-changing funcs in functional components */
-class RecentCasesTable extends React.PureComponent {
-
-    constructor(props){
-        super(props);
-        this.onToggleOnlyShowCasesWithReports = _.throttle(this.onToggleOnlyShowCasesWithReports.bind(this), 500, { trailing: false });
-        this.state = {
-            "onlyShowCasesWithReports": true
-        };
-    }
-
-    onToggleOnlyShowCasesWithReports(e){
-        this.setState(function({ onlyShowCasesWithReports: pastShow }){
-            return { onlyShowCasesWithReports: !pastShow };
-        });
-    }
-
-    render(){
-        const { onlyShowCasesWithReports } = this.state;
-        const allCasesHref = "/search/?type=Case";
-        const searchHref = (
-            allCasesHref
-            + (onlyShowCasesWithReports ? "&report.uuid!=No+value" : "")
-            + "&sort=-last_modified.date_modified"
-        );
-        return (
-            <div className="recent-cases-table-section mt-12 mb-36">
-                <EmbeddedCaseSearchTable {...{ searchHref }} facets={null}
-                    aboveTableComponent={
-                        <AboveCasesTableOptions onToggleOnlyShowCasesWithReports={this.onToggleOnlyShowCasesWithReports}
-                            onlyShowCasesWithReports={onlyShowCasesWithReports} />
-                    }
-                />
-            </div>
-        );
-    }
-
-}
+const RecentCasesTable = React.memo(function RecentCasesTable(){
+    const searchHref = (
+        "/search/?type=Case"
+        + "&report.uuid!=No+value"
+        + "&proband_case=true"
+        + "&sort=-last_modified.date_modified"
+    );
+    return (
+        <div className="recent-cases-table-section mb-36">
+            <EmbeddedCaseSearchTable {...{ searchHref }} facets={null} aboveTableComponent={<AboveCasesTableOptions />} />
+        </div>
+    );
+});
 
 function AboveCasesTableOptions(props){
-    const {
-        onToggleOnlyShowCasesWithReports, onlyShowCasesWithReports,
-        context, onFilter, isContextLoading, navigate
-    } = props;
+    const { context, onFilter, isContextLoading, navigate } = props;
+    const { filters: ctxFilters = null } = context || {};
+
+    const { onlyShowCasesWithReports, onlyShowProbandCases } = useMemo(function(){
+        return {
+            onlyShowCasesWithReports: ctxFilters === null ? true : !!(_.findWhere(ctxFilters, { "field" : "report.uuid!", "term" : "No value" })),
+            onlyShowProbandCases: ctxFilters === null ? true : !!(_.findWhere(ctxFilters, { "field" : "proband_case", "term" : "true" }))
+        };
+    }, [ ctxFilters ]);
+
+    const { onToggleOnlyShowCasesWithReports, onToggleOnlyShowProbandCases } = useMemo(function(){
+        return {
+            // Throttling works here because we're memoizing on empty array (i.e. no new instances of these funcs ever created)
+            onToggleOnlyShowCasesWithReports: _.throttle(function(e){
+                e.stopPropagation();
+                onFilter({ "field" : "report.uuid!" }, { "key": "No value" });
+            }, 500, { trailing: false }),
+            onToggleOnlyShowProbandCases: _.throttle(function(e){
+                e.stopPropagation();
+                onFilter({ "field" : "proband_case" }, { "key": "true" });
+            }, 500, { trailing: false })
+        };
+    }, []);
 
     return (
-        <div className="toggle-reports mb-1 d-flex justify-content-between align-items-center">
-            <div className="d-flex align-items-center">
-                <div className="pr-1">View cases from</div>
-                <ProjectSelectDropdown {...{ context, onFilter, isContextLoading, navigate }} />
+        <React.Fragment>
+            <div className="container-wide py-0 bg-white">
+                <div className="tab-section-title">
+                    <h3 className="text-400 my-0 d-flex align-items-center">
+                        Recent Cases&nbsp;
+                        <span className="text-300">from&nbsp;</span>
+                        <div className="px-1">
+                            <ProjectSelectDropdown {...{ context, onFilter, isContextLoading, navigate }} />
+                        </div>
+                    </h3>
+                    <div className="btn-container">
+                        <a className="btn btn-primary btn-block" href="/search/?type=Case&currentAction=add">
+                            <i className="icon icon-plus fas mr-07" />
+                            New Case
+                        </a>
+                    </div>
+                </div>
             </div>
-            <Checkbox onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small">
-                Show Only Cases with Reports
-            </Checkbox>
-        </div>
+
+            <hr className="tab-section-title-horiz-divider"/>
+            <div className="container-wide toggle-reports mb-1 mt-12 d-flex align-items-center">
+                <Checkbox onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small px-2">
+                    Show Only Cases with Reports
+                </Checkbox>
+                <Checkbox onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases} labelClassName="mb-0 text-400 text-small px-2">
+                    Show Only Proband Cases
+                </Checkbox>
+            </div>
+        </React.Fragment>
     );
 }
 
@@ -183,7 +177,7 @@ function ProjectSelectDropdown(props){
     }
 
     return (
-        <DropdownButton disabled={isContextLoading || facetTerms.length === 0} size="sm"
+        <DropdownButton disabled={isContextLoading || facetTerms.length === 0}
             title={ projectFilterTerm || "All Projects" } onSelect={onTermSelect} variant="outline-dark">
             <DropdownItem eventKey={0} active={!projectFilterTerm}>
                 <span className="text-600">All Projects</span>
