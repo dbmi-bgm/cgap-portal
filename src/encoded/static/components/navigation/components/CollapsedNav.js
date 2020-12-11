@@ -80,7 +80,7 @@ const LeftNavAuthenticated = React.memo(function LeftNavAuthenticated(props){
 
     return (
         <div className="navbar-nav mr-auto">
-            <a href="/cases/" className={"nav-link browse-nav-btn" + (isCasesLinkActive ? " active" : "")}>
+            <a href="/search/?type=Case&proband_case=true" className={"nav-link browse-nav-btn" + (isCasesLinkActive ? " active" : "")}>
                 Cases
             </a>
             <HelpNavItem {...props} />
@@ -94,8 +94,8 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
 
     return (
         <div className="navbar-nav mr-auto">
-            <a href="/case-studies" className={"nav-link" + (pathname === "/case-studies" ? " active" : "")}>
-                Case Studies
+            <a href="/cases/" className={"nav-link" + (pathname === "/case-studies" ? " active" : "")}>
+                Cases
             </a>
             <HelpNavItem {...props} />
             <a href="/about" className={"nav-link" + (pathname === "/about" ? " active" : "")}>
