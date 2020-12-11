@@ -54,31 +54,46 @@ class RecentCasesTable extends React.PureComponent {
     constructor(props){
         super(props);
         this.onToggleOnlyShowCasesWithReports = _.throttle(this.onToggleOnlyShowCasesWithReports.bind(this), 500, { trailing: false });
+        this.onToggleOnlyShowProbandCases = _.throttle(this.onToggleOnlyShowProbandCases.bind(this), 500, { trailing: false });
         this.state = {
-            "onlyShowCasesWithReports": true
+            "onlyShowCasesWithReports": true,
+            "onlyShowProbandCases": true
         };
     }
 
     onToggleOnlyShowCasesWithReports(e){
+        e.stopPropagation();
         this.setState(function({ onlyShowCasesWithReports: pastShow }){
             return { onlyShowCasesWithReports: !pastShow };
         });
     }
 
+    onToggleOnlyShowProbandCases(e){
+        e.stopPropagation();
+        this.setState(function({ onlyShowProbandCases: pastShow }){
+            return { onlyShowProbandCases: !pastShow };
+        });
+    }
+
     render(){
-        const { onlyShowCasesWithReports } = this.state;
+        const { onlyShowCasesWithReports, onlyShowProbandCases } = this.state;
         const allCasesHref = "/search/?type=Case";
         const searchHref = (
             allCasesHref
             + (onlyShowCasesWithReports ? "&report.uuid!=No+value" : "")
+            + (onlyShowProbandCases ? "&proband_case=true" : "")
             + "&sort=-last_modified.date_modified"
         );
         return (
             <div className="recent-cases-table-section mb-36">
                 <EmbeddedCaseSearchTable {...{ searchHref }} facets={null}
                     aboveTableComponent={
-                        <AboveCasesTableOptions onToggleOnlyShowCasesWithReports={this.onToggleOnlyShowCasesWithReports}
-                            onlyShowCasesWithReports={onlyShowCasesWithReports} />
+                        <AboveCasesTableOptions
+                            onToggleOnlyShowCasesWithReports={this.onToggleOnlyShowCasesWithReports}
+                            onlyShowCasesWithReports={onlyShowCasesWithReports}
+                            onToggleOnlyShowProbandCases={this.onToggleOnlyShowProbandCases}
+                            onlyShowProbandCases={onlyShowProbandCases}
+                        />
                     }
                 />
             </div>
@@ -90,6 +105,7 @@ class RecentCasesTable extends React.PureComponent {
 function AboveCasesTableOptions(props){
     const {
         onToggleOnlyShowCasesWithReports, onlyShowCasesWithReports,
+        onToggleOnlyShowProbandCases, onlyShowProbandCases,
         context, onFilter, isContextLoading, navigate
     } = props;
 
@@ -114,9 +130,12 @@ function AboveCasesTableOptions(props){
             </div>
 
             <hr className="tab-section-title-horiz-divider"/>
-            <div className="container-wide toggle-reports mb-1 mt-12">
-                <Checkbox onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small">
+            <div className="container-wide toggle-reports mb-1 mt-12 d-flex align-items-center">
+                <Checkbox onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small px-2">
                     Show Only Cases with Reports
+                </Checkbox>
+                <Checkbox onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases} labelClassName="mb-0 text-400 text-small px-2">
+                    Show Only Proband Cases
                 </Checkbox>
             </div>
         </React.Fragment>
