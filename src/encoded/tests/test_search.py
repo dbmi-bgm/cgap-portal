@@ -693,14 +693,25 @@ class TestNestedSearch(object):
         """ Do an OR search on hg19.hg19_chrom, matching three variants """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom=chr1').json
-        self.assert_length_is_expected(res, 8)
+        self.assert_length_is_expected(res, 3)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                'f6aef055-4c88-4a3e-a306-d37a71535d8b',
+                '852bb349-203e-437d-974a-e8d6cb56810a',
+                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+            ]
 
     def test_negative_search_on_clinic_notes(self, workbook, es_testapp):
         """ Do an OR search with hg19_post with a negative, should eliminate a variant """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom=chr1'
                           '&hg19.hg19_pos!=12185955').follow().json
-        self.assert_length_is_expected(res, 7)
+        self.assert_length_is_expected(res, 2)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                '852bb349-203e-437d-974a-e8d6cb56810a',
+                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+            ]
 
     def test_and_search_that_matches_one(self, workbook, es_testapp):
         """ Check three properties that occur in the same sub-embedded object in 1 variant """
@@ -758,7 +769,7 @@ class TestNestedSearch(object):
         """ Tests searching on 'No value' alone on a nested field """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom!=No+value').follow().json
-        self.assert_length_is_expected(res, 8)
+        self.assert_length_is_expected(res, 3)
 
     def test_nested_search_with_no_value_combined(self, workbook, es_testapp):
         """ Tests searching on 'No value' combined with another nested field, in this case
@@ -821,7 +832,7 @@ class TestNestedSearch(object):
         # selecting a facet in search does not affect the cardinality of the aggregation on that facet (alone)
         facets_that_should_show_all_options = es_testapp.get(
             '/search/?type=Variant&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json['facets']
-        self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 8)  # still 3 options
+        self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 3)  # still 3 options
 
         # selecting a different facet can affect the aggregation if it just so happens to eliminate
         # possibilities in other fields - this has always been the case
@@ -841,7 +852,7 @@ class TestNestedSearch(object):
         res = es_testapp.get('/search/?type=Variant&hg19=No+value').json
         self.assert_length_is_expected(res, 1)
         res = es_testapp.get('/search/?type=Variant&hg19!=No+value').follow().json
-        self.assert_length_is_expected(res, 8)
+        self.assert_length_is_expected(res, 3)
 
 
 @pytest.fixture(scope='session')
@@ -1069,8 +1080,8 @@ class TestSearchHiddenAndAdditionalFacets:
     @pytest.mark.parametrize('_facet, n_expected', [
         ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
         ('hg19.hg19_chrom', 1),
-        ('hg19.hg19_hgvsg', 8),
-        ('REF', 7)
+        ('hg19.hg19_hgvsg', 3),
+        ('REF', 3)
     ])
     def test_search_additional_facets_workbook(self, workbook, es_testapp, _facet, n_expected):
         """ Tests using additional facets with workbook inserts (using Variant) """
@@ -1088,8 +1099,8 @@ class TestSearchHiddenAndAdditionalFacets:
     @pytest.mark.parametrize('_facet, n_expected', [
         ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
         ('hg19.hg19_chrom', 1),
-        ('hg19.hg19_hgvsg', 8),
-        ('REF', 7)
+        ('hg19.hg19_hgvsg', 3),
+        ('REF', 3)
     ])
     def test_search_additional_facets_workbook_multiple(self, workbook, es_testapp, _facet, n_expected):
         """ Does all 4 extra aggregations above, checking the resulting facets for correctness """
@@ -1166,12 +1177,12 @@ class TestSearchBucketRangeFacets:
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets').json['facets']
         self.verify_facet_counts(res, expected_fields, 2, expected_counts)
 
+    # XXX: The following 2 tests don't function correctly because the facet doesn't utilize reverse_nested
     @pytest.mark.parametrize('identifier', [
         'reverse', 'forward'
     ])
     def test_search_bucket_range_nested_qualifier(self, workbook, es_testapp, bucket_range_data, identifier):
-        """ XXX: needs nested fix
-        Tests aggregating on a nested field while selecting for a field within the nested object. """
+        """ Tests aggregating on a nested field while selecting for a field within the nested object. """
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
                           '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
         self.verify_facet_counts(res, ['array_of_objects_that_holds_integer.embedded_integer'],
@@ -1181,8 +1192,7 @@ class TestSearchBucketRangeFacets:
         'reverse', 'forward'
     ])
     def test_search_bucket_range_nested_qualifier_multiple(self, workbook, es_testapp, bucket_range_data, identifier):
-        """ XXX: needs nested fix
-        Tests aggregating on a nested field while selecting for a field within the nested object (no change). """
+        """ Tests aggregating on a nested field while selecting for a field within the nested object (no change). """
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
                           '&array_of_objects_that_holds_integer.embedded_integer.from=6'
                           '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
