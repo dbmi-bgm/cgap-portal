@@ -1011,7 +1011,9 @@ class SearchBuilder:
 
     @staticmethod
     def get_all_subsequent_results(request, initial_search_result, search, extra_requests_needed_count, size_increment):
-        """ Generator method used to paginate. """
+        """
+        Calls `execute_search` in paginated manner iteratively until all results have been yielded.
+        """
         from_ = 0
         while extra_requests_needed_count > 0:
             # print(str(extra_requests_needed_count) + " requests left to get all results.")
@@ -1024,7 +1026,9 @@ class SearchBuilder:
 
     def execute_search_for_all_results(self, size_increment=100):
         """
-        Uses the above function to automatically paginate all results.
+        Returns a generator that iterates over _all_ results for search.
+        Calls `execute_search` in paginated manner iteratively until all results have been yielded
+        via `get_all_subsequent_results`.
 
         :param size_increment: number of results to get per page, default 100
         :return: all es_results that matched the given query
@@ -1082,19 +1086,18 @@ class SearchBuilder:
             if self.context:
                 self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
 
-        # Format results, handle "child" requests special
+        # `es_results['hits']['hits']` will contain a generator instead of list
+        # if limit=all was requested. `self._format_results` preserves the data structure,
+        # regardless if list or generator.
         graph = self._format_results(es_results['hits']['hits'])
 
-        if self.return_generator:
+        if self.return_generator or isinstance(graph, list):
             # Preserve `graph` as generator.
+            # Also, avoid calling list(graph) if already a list.
             self.response['@graph'] = graph
-        elif self.request.__parent__ is None:
-            # At some point, self.response['@graph'] was left blank
-            # for this condition. Is now enabled.
-            self.response['@graph'] = list(graph)
         else:
+            # Convert it into list if is a generator as we assume a HTTP request by default.
             self.response['@graph'] = list(graph)
-
 
         # Save session ID for re-requests / subsequent pages.
         if self.search_session_id:  # Is 'None' if e.g. limit=all
