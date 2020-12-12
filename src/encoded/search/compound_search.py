@@ -106,19 +106,6 @@ class CompoundSearchBuilder:
         }
 
     @staticmethod
-    def invoke_search(context, request, subreq):
-        """ Wrapper method that invokes the core search API (/search/) with the given subreq and
-            propagates the response to the "parent" request.
-
-        :param context: context of parent request
-        :param request: parent request
-        :param subreq: subrequest
-        :return: response from /search/
-        """
-
-        return single_query_search(context, subreq, return_generator=False)
-
-    @staticmethod
     def _add_type_to_flag_if_needed(flags, type_flag):
         """ Modifies 'flags' in place by adding type query if it is not present
 
@@ -148,8 +135,8 @@ class CompoundSearchBuilder:
         filter_blocks = filter_set.get(FILTER_BLOCKS, [])
         flags = filter_set.get(FLAGS, None)
         doc_type = filter_set.get(CompoundSearchBuilder.TYPE)
-        t = filter_set.get(cls.TYPE, 'Item')  # if type not set, attempt to search on item
-        type_flag = 'type=%s' % t
+        search_type = filter_set.get(cls.TYPE, 'Item')  # if type not set, attempt to search on item
+        type_flag = 'type=%s' % search_type
 
         # if we have no filter blocks, there is no context to enable flags, so
         # pass type_flag + global_flags
@@ -159,7 +146,7 @@ class CompoundSearchBuilder:
             else:
                 query = type_flag
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return cls.invoke_search(context, request, subreq)
+            return single_query_search(context, subreq, search_type)
 
         # if we specified global_flags, combine that query with the single filter_block,
         # otherwise pass the filter_block query directly
@@ -172,7 +159,7 @@ class CompoundSearchBuilder:
                 query = block_query
             query = cls._add_type_to_flag_if_needed(query, type_flag)
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return cls.invoke_search(context, request, subreq)
+            return single_query_search(context, subreq, search_type)
 
         # Extract query string and list of applied flags, add global_flags to block_query first
         # then add flags as applied and type_flag if needed.
@@ -190,7 +177,7 @@ class CompoundSearchBuilder:
                         break
             query = cls._add_type_to_flag_if_needed(query, type_flag)
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return cls.invoke_search(context, request, subreq)
+            return single_query_search(context, subreq, search_type)
 
         # Build the compound_query
         # Iterate through filter_blocks, adding global_flags if specified and adding flags if specified
@@ -215,7 +202,7 @@ class CompoundSearchBuilder:
 
 
             compound_query = LuceneBuilder.compound_search(sub_queries, intersect=intersect)
-            compound_subreq = cls.build_subreq_from_single_query(request, ('?type=' + t))
+            compound_subreq = cls.build_subreq_from_single_query(request, ('?type=' + search_type))
 
             requested_sorts = filter_set.get("sort", [])
             if not requested_sorts and global_flags:
