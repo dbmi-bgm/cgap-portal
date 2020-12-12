@@ -1086,17 +1086,17 @@ class SearchBuilder:
             if self.context:
                 self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
 
+        # `graph` below is a generator.
         # `es_results['hits']['hits']` will contain a generator instead of list
-        # if limit=all was requested. `self._format_results` preserves the data structure,
-        # regardless if list or generator.
+        # if limit=all was requested. `self._format_results` will always return a generator
+        # that iterates over es_results['hits']['hits'] regardless of its structure.
         graph = self._format_results(es_results['hits']['hits'])
 
-        if self.return_generator or isinstance(graph, list):
+        if self.return_generator:
             # Preserve `graph` as generator.
-            # Also, avoid calling list(graph) if already a list.
             self.response['@graph'] = graph
         else:
-            # Convert it into list if is a generator as we assume a HTTP request by default.
+            # Convert it into list as we assume we're responding to a HTTP request by default.
             self.response['@graph'] = list(graph)
 
         # Save session ID for re-requests / subsequent pages.
@@ -1162,6 +1162,7 @@ class SearchBuilder:
             if self.return_generator:
                 # If self.return_generator, then self.response['@graph'] will
                 # contain a generator rather than a list via `self.format_results`
+                # TODO: Move that functionality into this method instead?
                 return self.response['@graph']
 
         # apply custom facet filtering
