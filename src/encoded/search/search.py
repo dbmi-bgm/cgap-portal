@@ -251,9 +251,11 @@ class SearchBuilder:
                 del normalized_params['type']
             for dtype in doc_types:
                 normalized_params.add('type', dtype)
+
         # add the normalized params to the request
         # these will be used in place of request.params for the rest of search
         setattr(request, 'normalized_params', normalized_params)
+
         # the query string of the normalized search
         qs = '?' + urlencode([  # XXX: do we actually need to encode k,v  individually? -Will 6/24/2020
             (k.encode('utf-8'), v.encode('utf-8'))
@@ -388,8 +390,8 @@ class SearchBuilder:
 
                 qs = urlencode([
                     (k.encode('utf-8'), v.encode('utf-8'))
-                    for k, v in self.request.normalized_params.items() if
-                    not (k == 'type' and self.types.all.get('Item' if v == '*' else v) is ti)
+                    for k, v in self.request.normalized_params.items()
+                    if k != "limit" and k != "from" and not (k == 'type' and self.types.all.get('Item' if v == '*' else v) is ti)
                 ])
                 self.response['filters'].append({
                     'field': 'type',
@@ -1082,12 +1084,19 @@ class SearchBuilder:
 
         # Format results, handle "child" requests special
         graph = self._format_results(es_results['hits']['hits'])
-        if self.request.__parent__ is not None or self.return_generator:
-            if not self.return_generator:
-                self.response['@graph'] = list(graph)
 
-        # Set @graph, save session ID for re-requests / subsequent pages.
-        self.response['@graph'] = list(graph)
+        if self.return_generator:
+            # Preserve `graph` as generator.
+            self.response['@graph'] = graph
+        elif self.request.__parent__ is None:
+            # At some point, self.response['@graph'] was left blank
+            # for this condition. Is now enabled.
+            self.response['@graph'] = list(graph)
+        else:
+            self.response['@graph'] = list(graph)
+
+
+        # Save session ID for re-requests / subsequent pages.
         if self.search_session_id:  # Is 'None' if e.g. limit=all
             self.request.response.set_cookie('searchSessionID', self.search_session_id)
 
@@ -1148,6 +1157,8 @@ class SearchBuilder:
         # if this is a subrequest/gen request, return '@graph' directly
         if self.request.__parent__ is not None or self.return_generator:
             if self.return_generator:
+                # If self.return_generator, then self.response['@graph'] will
+                # contain a generator rather than a list via `self.format_results`
                 return self.response['@graph']
 
         # apply custom facet filtering

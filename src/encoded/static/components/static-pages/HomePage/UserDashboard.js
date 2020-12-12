@@ -75,11 +75,9 @@ function AboveCasesTableOptions(props){
         return {
             // Throttling works here because we're memoizing on empty array (i.e. no new instances of these funcs ever created)
             onToggleOnlyShowCasesWithReports: _.throttle(function(e){
-                e.stopPropagation();
                 onFilter({ "field" : "report.uuid!" }, { "key": "No value" });
             }, 500, { trailing: false }),
             onToggleOnlyShowProbandCases: _.throttle(function(e){
-                e.stopPropagation();
                 onFilter({ "field" : "proband_case" }, { "key": "true" });
             }, 500, { trailing: false })
         };
@@ -106,16 +104,55 @@ function AboveCasesTableOptions(props){
             </div>
 
             <hr className="tab-section-title-horiz-divider"/>
-            <div className="container-wide toggle-reports mb-1 mt-12 d-flex align-items-center">
-                <Checkbox onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports} labelClassName="mb-0 text-400 text-small px-2">
+            <div className="container-wide toggle-reports d-flex align-items-center">
+                <ProjectFilterCheckbox isContextLoading={isContextLoading} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
                     Show Only Cases with Reports
-                </Checkbox>
-                <Checkbox onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases} labelClassName="mb-0 text-400 text-small px-2">
+                </ProjectFilterCheckbox>
+                <ProjectFilterCheckbox isContextLoading={isContextLoading} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
                     Show Only Proband Cases
-                </Checkbox>
+                </ProjectFilterCheckbox>
             </div>
         </React.Fragment>
     );
+}
+
+
+class ProjectFilterCheckbox extends React.PureComponent {
+
+    constructor(props){
+        super(props);
+        this.onChange = this.onChange.bind(this);
+        this.state = { "isChanging": false };
+    }
+
+    componentDidUpdate({ isContextLoading: pastLoading }){
+        const { isContextLoading } = this.props;
+        if (!isContextLoading && pastLoading) {
+            this.setState({ "isChanging" : false });
+        }
+    }
+
+    onChange(e){
+        e.stopPropagation();
+        const { onChange } = this.props;
+        this.setState({ "isChanging": true }, () => {
+            onChange();
+        });
+    }
+
+    render(){
+        const { isContextLoading, checked, children } = this.props;
+        const { isChanging } = this.state;
+        return (
+            <Checkbox disabled={isContextLoading} onChange={this.onChange} checked={checked}
+                labelClassName={"mb-0 text-400 px-2 py-3" + (isChanging ? " is-changing position-relative" : "")}>
+                <span className="text-small">
+                    { isChanging ? <i className="icon icon-circle-notch icon-spin fas mr-07 text-small" /> : null }
+                    { children }
+                </span>
+            </Checkbox>
+        );
+    }
 }
 
 function ProjectSelectDropdown(props){
