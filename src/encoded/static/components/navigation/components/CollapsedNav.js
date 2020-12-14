@@ -73,11 +73,13 @@ function HelpNavItem(props){
  * @todo Test user actions or role for things to have here?
  */
 function LeftNavAuthenticated(props){
-    const { context } = props;
+    const { context, href } = props;
     const isCasesLinkActive = useMemo(function(){
-        const { "@id": searchHref } = context;
-        const { query = {} } = url.parse(searchHref, true);
+        const { "@id": contextID } = context;
+        const { query = {} } = url.parse(href || contextID, true);
         return query.type === 'Case';
+        // We assume href and context change together, so we memoize on context instead of href
+        // since is a more performant comparison.
     }, [ context ]);
     return (
         <div className="navbar-nav mr-auto">
