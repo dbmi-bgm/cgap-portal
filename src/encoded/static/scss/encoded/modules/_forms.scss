@@ -1,4 +1,6 @@
 /*     FORMS      */
+
+
 /* Input Fields */
 $inputBorder: #999999;
 $inputFocusBgColor: #ffffff;
@@ -34,6 +36,30 @@ label {
 		display: inline-block;
 		outline: none !important;
 		box-shadow: none;
+
+	}
+}
+
+
+/** Checkbox Add'l Stylings - used currently for homepage **/
+
+.checkbox-with-label {
+	> label.hide-checkbox > input[type="checkbox"] {
+		display: none;
+	}
+	> label.is-changing {
+		> input[type="checkbox"] {
+			visibility: hidden;
+		}
+
+		&.position-relative {
+			i.icon-circle-notch {
+				position: absolute;
+				left: 0.5rem;
+				top: 50%;
+				margin-top: -8px;
+			}
+		}
 
 	}
 }

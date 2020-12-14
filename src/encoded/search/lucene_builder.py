@@ -409,7 +409,7 @@ class LuceneBuilder:
             qs = urlencode([
                 (k.encode('utf-8'), v.encode('utf-8'))
                 for k, v in request.normalized_params.items()
-                if (k != field or v != term)
+                if k != "limit" and k != "from" and not (k == field and v == term)
             ])
             remove_path = '{}?{}'.format(request.path, qs)
 

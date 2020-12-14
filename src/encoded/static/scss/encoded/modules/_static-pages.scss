@@ -476,7 +476,7 @@
 		Misc Static Pages
 ***********************************************************/
 
-// Home
+// HomePage 
 
 .homepage-wrapper {
 
@@ -490,65 +490,19 @@
 		}
 	}
 
+	/* User Dashboard */
 	.home-dashboard-area {
 
 		/* 100% window height - 50px footer - 81px header+border - $tabbar-height dashboard header */
 		min-height: calc(100vh - 50px - 81px - #{$tabbar-height});
 
-		.case-items {
-
-			overflow-y: auto;
-			min-height: 240px;
-			max-height: 360px;
-			height: 25vh;
-
-			.case-item-container {
-				padding: 8px 12px;
-				background-color: #f4f4f4;
-				border: 1px solid #eee;
-				margin-bottom: 3px;
-				> .row {
-					align-items: center;
-					> div:first-child { // Title
-						overflow-x: hidden;
-						text-overflow: ellipsis;
-						white-space: nowrap;
-					}
+		.recent-cases-table-section {
+			.embedded-search-container {
+				.search-results-outer-container.is-within-page {
+					@extend .container-wide;
 				}
-
-				.time-from-now-container {
-					white-space: nowrap;
-					text-overflow: ellipsis;
-					overflow: hidden;
-				}
-
-				@include media-breakpoint-up(md){
-					.families-icon-container {
-						padding: 0;
-					}
-					.individuals-icon-container {
-						padding: 0;
-					}
-				}
-
-				&.no-families {
-					.families-icon-container {
-						color: #c33939;
-					}
-				}
-
-				&.no-individuals {
-					.individuals-icon-container {
-						color: #c33939;
-					}
-				}
-
 			}
-
 		}
-
-		/*** Other homepage things ***/
-
 	}
 
 	.home-content-area {

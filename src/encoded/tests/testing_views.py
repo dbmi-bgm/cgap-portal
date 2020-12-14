@@ -409,7 +409,7 @@ class TestingBucketRangeFacets(Item):
                 'type': 'array',
                 'items': {
                     'type': 'object',
-                    'enable_nested': True,
+                    'enable_nested': False,
                     'properties': {
                         'embedded_identifier': {
                             'type': 'string'
