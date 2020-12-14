@@ -44,6 +44,7 @@ ELASTIC_SEARCH_QUERY_KEYWORDS = [
 
 
 COMMON_EXCLUDED_URI_PARAMS = [
+    # Difference of this and URL params should result in all fields/filters.
     'frame', 'format', 'limit', 'sort', 'from', 'field',
     'mode', 'redirected_from', 'datastore', 'referrer',
     'currentAction', 'additional_facet'
