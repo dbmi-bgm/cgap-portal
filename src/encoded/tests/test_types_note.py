@@ -29,9 +29,30 @@ def new_standard_note():
     }
 
 
-def post_note(es_testapp, item, note_type='note_interpretation', expected_status=201):
+@pytest.fixture
+def gene1_es(es_testapp):
+    item = {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "gene_symbol": "GENEID1",
+        "ensgid": "ENSG00000000001"
+    }
+    return es_testapp.post_json('/gene', item).json['@graph'][0]
+
+
+@pytest.fixture
+def test_report(es_testapp):
+    data = {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "description": "This is a report for a case."
+    }
+    return es_testapp.post_json('/report', data, status=201).json['@graph'][0]
+
+
+def post_note(testapp, item, note_type='note_interpretation', expected_status=201):
     """ helper function for posting notes in tests """
-    return es_testapp.post_json('/' + note_type, item, status=expected_status)
+    return testapp.post_json('/' + note_type, item, status=expected_status)
 
 
 def test_note_interpretation_note_link(workbook, es_testapp):
@@ -40,17 +61,14 @@ def test_note_interpretation_note_link(workbook, es_testapp):
     resp2 = es_testapp.get(f'/notes-interpretation/{note2_uuid}/', status=200).json
     assert resp1['previous_note']['@id'] == resp2['@id']
 
-
 def test_add_note_interpretation_success(workbook, es_testapp, new_interpretation):
     """ test NoteInterpretation item posts successfully """
     post_note(es_testapp, new_interpretation)
 
-
 def test_add_note_interpretation_fail(workbook, es_testapp, new_interpretation):
     """ test NoteInterpretation item fails to post when schema isn't followed """
     new_interpretation['classification'] = 'Likely Pathogenic'  # wrong case for enum
-    resp = post_note(es_testapp, new_interpretation, expected_status=422)
-
+    post_note(es_testapp, new_interpretation, expected_status=422)
 
 def test_patch_note_interpretation_success(workbook, es_testapp, new_interpretation):
     """ test NoteIntepretation item is patched successfully when associated_items SOEA is added """
@@ -58,8 +76,7 @@ def test_patch_note_interpretation_success(workbook, es_testapp, new_interpretat
     patch_info = {
         'associated_items': [{"item_type": "Variant", "item_identifier": variant_with_note}]
     }
-    resp = es_testapp.patch_json('/' + resp['@id'], patch_info, status=200)
-
+    es_testapp.patch_json('/' + resp['@id'], patch_info, status=200)
 
 def test_patch_note_interpretation_fail(workbook, es_testapp, new_interpretation):
     """ test NoteInterpretation item fails to patch with incorrectly formatted prop """
@@ -67,33 +84,28 @@ def test_patch_note_interpretation_fail(workbook, es_testapp, new_interpretation
     patch_info = {
         'associated_items': {"item_type": "Variant", "item_identifier": variant_with_note}  # wrong type
     }
-    resp = es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
-
+    es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
 
 def test_add_standard_note_success(workbook, es_testapp, new_standard_note):
     """ test NoteStandard item posts successfully """
-    resp = post_note(es_testapp, new_standard_note, note_type='note_standard')
-
+    post_note(es_testapp, new_standard_note, note_type='note_standard')
 
 def test_add_standard_note_fail(workbook, es_testapp, new_standard_note):
     """ test NoteStandard item post fails when extra prop added """
     new_standard_note['classification'] = 'benign'  # not a standard note property
-    resp = post_note(es_testapp, new_standard_note, note_type='note_standard', expected_status=422)
-
+    post_note(es_testapp, new_standard_note, note_type='note_standard', expected_status=422)
 
 def test_patch_standard_note_success(workbook, es_testapp, new_standard_note):
     """ test NoteStandard item patches successfully """
     resp = post_note(es_testapp, new_standard_note, note_type='note_standard').json['@graph'][0]
     patch_info = {"note_text": "Some different text"}
-    resp = es_testapp.patch_json('/' + resp['@id'], patch_info, status=200)
-
+    es_testapp.patch_json('/' + resp['@id'], patch_info, status=200)
 
 def test_patch_standard_note_fail(workbook, es_testapp, new_standard_note):
     """ test NoteStandard item patch fails with extra property """
     resp = post_note(es_testapp, new_standard_note, note_type='note_standard').json['@graph'][0]
     patch_info = {"conclusion": "For these reasons we made a conclusion."}  # not a std note property
-    resp = es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
-
+    es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
 
 def test_link_standard_note_to_report(workbook, es_testapp, new_standard_note, test_report):
     """ test NoteStandard linkTo on Report item works """
@@ -102,15 +114,12 @@ def test_link_standard_note_to_report(workbook, es_testapp, new_standard_note, t
     resp = es_testapp.patch_json('/' + test_report['@id'], patch, status=200).json['@graph'][0]
     assert resp['extra_notes'] == [note['@id']]
 
-
-def test_add_note_to_gene(workbook, es_testapp, gene1):
+def test_add_note_to_gene(workbook, es_testapp, gene1_es):
     """ test linking note to gene """
     note_info = es_testapp.get(f'/notes-interpretation/{note1_uuid}/', status=200).json
     patch = {'interpretations': [note1_uuid]}
-    resp = es_testapp.patch_json('/' + gene1['@id'], patch, status=200).json['@graph'][0]
-    gene_get = es_testapp.get('/' + resp['@id']).json
+    resp = es_testapp.patch_json('/' + gene1_es['@id'], patch, status=200).json['@graph'][0]
     assert resp['interpretations'] == [note_info['@id']]
-
 
 def test_add_note_to_variant_sample(workbook, es_testapp, test_variant_sample):
     """ test linking note to variant sample item """

@@ -857,17 +857,6 @@ def workflow_mapping(testapp, workflow_bam, institution, project):
 
 
 @pytest.fixture
-def gene1(testapp, project, institution):
-    item = {
-        "project": project['@id'],
-        "institution": institution['@id'],
-        "gene_symbol": "GENEID1",
-        "ensgid": "ENSG00000000001"
-    }
-    return testapp.post_json('/gene', item).json['@graph'][0]
-
-
-@pytest.fixture
 def quality_metric_fastqc(testapp, project, institution):
     item = {
         "uuid": "ed80c2a5-ae55-459b-ba1d-7b0971ce2613",
@@ -875,16 +864,6 @@ def quality_metric_fastqc(testapp, project, institution):
         "institution": institution['@id']
     }
     return testapp.post_json('/quality_metric_fastqc', item).json['@graph'][0]
-
-
-@pytest.fixture
-def test_report(testapp):
-    data = {
-        "project": "hms-dbmi",
-        "institution": "hms-dbmi",
-        "description": "This is a report for a case."
-    }
-    return testapp.post_json('/report', data, status=201).json['@graph'][0]
 
 
 @pytest.fixture
