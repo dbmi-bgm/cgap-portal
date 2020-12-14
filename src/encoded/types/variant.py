@@ -419,7 +419,9 @@ class VariantSampleList(Item):
 
     item_type = 'variant_sample_list'
     schema = load_schema('encoded:schemas/variant_sample_list.json')
-    embedded_list = []
+    embedded_list = [
+        'variant_samples.*'
+    ]
 
 
 @view_config(name='download', context=VariantSample, request_method='GET',
