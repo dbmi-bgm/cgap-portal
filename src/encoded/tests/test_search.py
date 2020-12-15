@@ -621,6 +621,18 @@ def test_search_with_principals_allowed_fails(workbook, anon_es_testapp):
                         '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
 
 
+def test_search_debug_parameter(workbook, es_testapp, anon_es_testapp):
+    """ Tests that utilizing the query debug parameter works correctly with admin only. """
+    resp_with_debug = es_testapp.get('/search/?type=Family&debug=true', status=200).json
+    assert 'query' in resp_with_debug
+    # no results should still show query
+    resp_with_debug = es_testapp.get('/search/?type=Gene&debug=true', status=404).json
+    assert 'query' in resp_with_debug
+    # no results, no admin, no query
+    resp_without_debug = anon_es_testapp.get('/search/?type=Family&debug=true', status=404).json
+    assert 'query' not in resp_without_debug
+
+
 @pytest.fixture
 def sample_processing_mapping():
     return load_schema('encoded:tests/data/sample_processing_mapping.json')

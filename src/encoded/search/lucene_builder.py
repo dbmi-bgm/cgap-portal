@@ -678,13 +678,30 @@ class LuceneBuilder:
         elif BOOL in nested_sub_query:
             for inner_filter_type in [MUST, MUST_NOT]:
                 for nested_option in nested_sub_query[BOOL].get(inner_filter_type, []):
-
-                    # For structure like this:
-                    #   {'bool': {'must': [{'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.12185956del'}]
                     if isinstance(nested_option, dict):
-                        for field in nested_option.get(MATCH, {}).keys():  # should only be one per block
-                            if cls._check_and_remove(field, facet_filters, active_filter, query_field, filter_type):
-                                break
+
+                        # For structure like this:
+                        #   {'bool': {'must': [{'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.12185956del'}]
+                        if MATCH in nested_option:
+                            for field in nested_option.get(MATCH, {}).keys():  # should only be one per block
+                                if cls._check_and_remove(field, facet_filters, active_filter, query_field, filter_type):
+                                    break
+
+                        # For structure like this:
+                        # {'bool': {'should':
+                        # [{'match': {'embedded.variant.genes.genes_most_severe_consequence.coding_effect.raw':
+                        #       'Missense'}},
+                        # {'match': {'embedded.variant.genes.genes_most_severe_consequence.coding_effect.raw':
+                        #       'Synonymous'}}]}}
+                        elif BOOL in nested_option:
+                            inner_inner_bool = nested_option[BOOL]
+                            if SHOULD in inner_inner_bool:
+                                cls._check_and_remove_match_from_should(inner_inner_bool[SHOULD], facet_filters,
+                                                                        active_filter,
+                                                                        query_field, filter_type)
+                        else:
+                            search_log(log_handler=log, msg='Encountered a unexpected nested structure at second level:'
+                                                            ' %s' % nested_sub_query[BOOL])
 
                     # For structure like this:
                     #   {'bool': {'must': {'bool': {'should':
