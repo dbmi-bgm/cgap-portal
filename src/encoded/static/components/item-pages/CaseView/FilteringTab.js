@@ -359,7 +359,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     ) : (
         // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
         // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem} initialSelectedFilterBlockIdx={0}>
+        <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
             <FilteringTableFilterSetUI caseItem={context} />
         </FilterSetController>
     );
