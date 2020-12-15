@@ -24,6 +24,7 @@ from snovault.util import (
     debug_log,
 )
 from snovault.typeinfo import AbstractTypeInfo
+from ..authorization import is_admin_request
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
     find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
@@ -339,7 +340,7 @@ class SearchBuilder:
             # XXX: this could be cached application side as well
             try:
                 static_section = self.request.registry['collections']['StaticSection'].get(search_term)
-            except NotFoundError:  # search could fail
+            except Exception:  # NotFoundError not caught, search could fail
                 static_section = None
             if static_section and hasattr(static_section.model, 'source'):  # extract from ES structure
                 item = static_section.model.source['object']
@@ -1146,20 +1147,13 @@ class SearchBuilder:
                     entry['terms'] = sorted(unsorted_terms, key=lambda d: field_terms_override_order.get(d['key'],
                                                                                                          default))
 
-    @staticmethod
-    def is_admin_request(request):
-        """ Checks for 'group.admin' in effective_principals on request - if present we know this
-            request was submitted by an admin
-        """
-        return 'group.admin' in request.effective_principals
-
     def get_response(self):
         """ Gets the response for this search, setting 404 status if necessary. """
         if not self.response:
             return {}  # XXX: rather than raise exception? -Will
 
         # add query if an admin asks for it
-        if self.debug_is_active and self.is_admin_request(self.request):
+        if self.debug_is_active and is_admin_request(self.request):
             self.response['query'] = self.search.to_dict()
 
         # If we got no results, return 404 or []
