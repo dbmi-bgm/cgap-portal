@@ -2315,26 +2315,31 @@ $download-button-width : 100px;
 			// border-color: desaturate(lighten($primary-dark, 40%), 25%); /* Same as .filterset-outer-container background-color */
 			// margin: 0 -3px; /* Subtract border-width to align left + right unselected edges properly w. other UI elements */
 			/* transition: border-color .5s, background-color .5s; */
-			box-shadow: 0 1px 6px -3px black;
 
 			transition: border-color .5s ease-out, background-color .5s ease-out;
 
-			&.selected {
-				border-width: 3px;
-				padding: 0px;
-				border-color: $primary-dark;
-				background-color: lighten($primary, 50%);
-				&:hover {
-					@include user-select(none);
-					// background-color: desaturate(lighten($primary, 50%), 15%);
-					// transition: none;
-				}
-			}
+			&.clickable {
 
-			&:not(.selected):hover {
-				// background-color: lighten($primary, 45%);
-				border-color: $primary-dark;
-				transition: none;
+				box-shadow: 0 1px 6px -3px black;
+
+				&.selected {
+					border-width: 3px;
+					padding: 0px;
+					border-color: $primary-dark;
+					background-color: lighten($primary, 50%);
+					&:hover {
+						@include user-select(none);
+						// background-color: desaturate(lighten($primary, 50%), 15%);
+						// transition: none;
+					}
+				}
+
+				&:not(.selected):hover {
+					// background-color: lighten($primary, 45%);
+					border-color: $primary-dark;
+					transition: none;
+				}
+
 			}
 
 			&[data-duplicate-query="true"] {
@@ -2445,7 +2450,7 @@ $download-button-width : 100px;
 			}
 
 			&:hover {
-				.filterset-block.selected {
+				.filterset-block.clickable.selected {
 					//border-width: 3px;
 					//padding: 0px;
 					border-color: transparent;

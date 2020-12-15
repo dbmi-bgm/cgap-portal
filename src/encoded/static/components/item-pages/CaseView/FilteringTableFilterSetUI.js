@@ -567,7 +567,7 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
                     <div className="col-12 pb-02 col-sm">
                         { allFilterBlocksSelected ?
                             "Click on a filter block to only search its query"
-                            : "Shift+Click to select additional filter-blocks."
+                            : "Shift+Click to select an additional filter block."
                         }
                     </div>
                     <div className="col-12 pb-02 col-sm text-sm-right">
@@ -736,10 +736,15 @@ const FilterBlock = React.memo(function FilterBlock(props){
             </React.Fragment>
         );
     }
+    const cls = (
+        "filterset-block mb-16" +
+        (selected ? " selected" : "") +
+        (!isEditingTitle && filterBlocksLen > 1 ? " clickable" : "")
+    );
 
     return (
-        <div className={"filterset-block clickable mb-16" + (selected ? " selected" : "") + (!isEditingTitle ? " clickable" : "")}
-            onClick={!isEditingTitle ? onSelectClick : null} data-duplicate-query={isDuplicateQuery} data-tip={isDuplicateQuery ? "Duplicate query of filter block #" + (duplicateQueryIndices[index] + 1) : null}>
+        <div className={cls} onClick={!isEditingTitle ? onSelectClick : null} data-duplicate-query={isDuplicateQuery}
+            data-tip={isDuplicateQuery ? "Duplicate query of filter block #" + (duplicateQueryIndices[index] + 1) : null}>
             <div className="row px-2 pt-08 pb-04 title-controls-row">
                 <div className="col d-flex align-items-center">
                     { title }
@@ -1109,17 +1114,17 @@ export class FilterSetController extends React.PureComponent {
 
         // Update state.currFilterSet with filters from response, unless amid some other update.
 
-        if (!searchContext){
-            // Don't update from blank.
+        if (!searchContext || isSettingFilterBlockIdx){
+            // Don't update from blank. Or if still loading response for current selection.
             return { selectedFilterBlockIndices };
         }
 
-        if (selectedFilterBlockIdxCount !== 1 || isSettingFilterBlockIdx){
+        if (!(selectedFilterBlockIdxCount === 1 || (selectedFilterBlockIdxCount === 0 && filterBlocksLen === 1))){
             // Cancel if compound filterset request.
-            return { selectedFilterBlockIndices }; // Previously was `null`, changed to return selectedFilterBlockIndices
+            return { selectedFilterBlockIndices };
         }
 
-        const selectedFilterBlockIdx = parseInt(selectedFilterBlockIdxList[0]);
+        const selectedFilterBlockIdx = parseInt(selectedFilterBlockIdxList[0] || 0);
         const { total: totalCount } = searchContext;
 
         // Get counts to show @ top left of selectable filter blocks
@@ -1409,6 +1414,11 @@ export class FilterSetController extends React.PureComponent {
     }
 
     selectFilterBlockIdx(index = null, deselectOthers = true){
+        const { currFilterSet: { filter_blocks = [] } = {} } = this.state;
+        if (filter_blocks.length < 2) {
+            // Nothing to change/select.
+            return false;
+        }
         // const { isSettingFilterBlockIdx } = this.state;
         // if (isSettingFilterBlockIdx) {
         //     // Another update in progress already.
