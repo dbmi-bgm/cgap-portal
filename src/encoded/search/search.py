@@ -24,6 +24,7 @@ from snovault.util import (
     debug_log,
 )
 from snovault.typeinfo import AbstractTypeInfo
+from ..authorization import is_admin_request
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
     find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
@@ -58,6 +59,7 @@ class SearchBuilder:
     DEFAULT_SEARCH_FRAME = 'embedded'
     DEFAULT_HIDDEN = 'default_hidden'
     ADDITIONAL_FACETS = 'additional_facet'
+    DEBUG = 'debug'
     MISSING = object()
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
@@ -122,6 +124,7 @@ class SearchBuilder:
         self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
         self.prepared_terms = self.prepare_search_term(self.request)
         self.additional_facets = self.request.normalized_params.getall(self.ADDITIONAL_FACETS)
+        self.debug_is_active = self.request.normalized_params.getall(self.DEBUG)  # only used if admin
 
         # Can potentially make an outside API call, but ideally is cached
         # Only needed if searching on a single item type
@@ -337,7 +340,7 @@ class SearchBuilder:
             # XXX: this could be cached application side as well
             try:
                 static_section = self.request.registry['collections']['StaticSection'].get(search_term)
-            except NotFoundError:  # search could fail
+            except Exception:  # NotFoundError not caught, search could fail
                 static_section = None
             if static_section and hasattr(static_section.model, 'source'):  # extract from ES structure
                 item = static_section.model.source['object']
@@ -1145,6 +1148,10 @@ class SearchBuilder:
         """ Gets the response for this search, setting 404 status if necessary. """
         if not self.response:
             return {}  # XXX: rather than raise exception? -Will
+
+        # add query if an admin asks for it
+        if self.debug_is_active and is_admin_request(self.request):
+            self.response['query'] = self.search.to_dict()
 
         # If we got no results, return 404 or []
         if not self.response['total']:

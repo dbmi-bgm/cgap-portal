@@ -47,7 +47,7 @@ COMMON_EXCLUDED_URI_PARAMS = [
     # Difference of this and URL params should result in all fields/filters.
     'frame', 'format', 'limit', 'sort', 'from', 'field',
     'mode', 'redirected_from', 'datastore', 'referrer',
-    'currentAction', 'additional_facet'
+    'currentAction', 'additional_facet', 'debug'
 ]
 MAX_FACET_COUNTS = 100
 RAW_FIELD_AGGREGATIONS = [
