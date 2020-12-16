@@ -69,3 +69,10 @@ def groupfinder(login, request):
     groups = user_properties.get('groups', [])
     principals.extend('group.%s' % group for group in groups)
     return principals
+
+
+def is_admin_request(request):
+    """ Checks for 'group.admin' in effective_principals on request - if present we know this
+        request was submitted by an admin
+    """
+    return 'group.admin' in request.effective_principals

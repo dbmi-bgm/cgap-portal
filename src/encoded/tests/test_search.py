@@ -621,6 +621,24 @@ def test_search_with_principals_allowed_fails(workbook, anon_es_testapp):
                         '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
 
 
+def test_search_debug_parameter(workbook, es_testapp, anon_es_testapp, authenticated_es_testapp):
+    """ Tests that utilizing the query debug parameter works correctly with admin only. """
+    resp_with_debug = es_testapp.get('/search/?type=Family&debug=true', status=200).json
+    assert 'query' in resp_with_debug
+    # no results should still show query
+    resp_with_debug = es_testapp.get('/search/?type=Gene&debug=true', status=404).json
+    assert 'query' in resp_with_debug
+    # doesn't matter what you pass
+    resp_with_debug = es_testapp.get('/search/?type=Gene&debug=blah', status=404).json
+    assert 'query' in resp_with_debug
+    # no results, no admin, no query
+    resp_without_debug = anon_es_testapp.get('/search/?type=Family&debug=true', status=404).json
+    assert 'query' not in resp_without_debug
+    # authenticated but no admin, no query
+    resp_without_debug = authenticated_es_testapp.get('/search/?type=Family&debug=true', status=200).json
+    assert 'query' not in resp_without_debug
+
+
 @pytest.fixture
 def sample_processing_mapping():
     return load_schema('encoded:tests/data/sample_processing_mapping.json')
@@ -832,6 +850,12 @@ class TestNestedSearch(object):
         # selecting a facet in search does not affect the cardinality of the aggregation on that facet (alone)
         facets_that_should_show_all_options = es_testapp.get(
             '/search/?type=Variant&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json['facets']
+        self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 3)  # still 3 options
+
+        # selecting two facets has the same behavior
+        facets_that_should_show_all_options = es_testapp.get(
+            '/search/?type=Variant&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+            '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow().json['facets']
         self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 3)  # still 3 options
 
         # selecting a different facet can affect the aggregation if it just so happens to eliminate
