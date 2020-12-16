@@ -124,7 +124,7 @@ class SearchBuilder:
         self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
         self.prepared_terms = self.prepare_search_term(self.request)
         self.additional_facets = self.request.normalized_params.getall(self.ADDITIONAL_FACETS)
-        self.debug_is_active = self.request.normalized_params.getall(self.DEBUG)
+        self.debug_is_active = self.request.normalized_params.getall(self.DEBUG)  # only used if admin
 
         # Can potentially make an outside API call, but ideally is cached
         # Only needed if searching on a single item type

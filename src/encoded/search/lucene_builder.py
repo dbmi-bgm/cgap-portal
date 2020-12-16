@@ -666,7 +666,10 @@ class LuceneBuilder:
 
     @classmethod
     def _check_and_remove_nested(cls, facet_filters, active_filter, query_field, filter_type):
-        """ Helper function for _remove_from_active_filters that handles filter removal for nested query """
+        """ Helper function for _remove_from_active_filters that handles filter removal for nested query
+            Reminder that this code is responsible for constructing the aggregation filter, hence the desire
+            to omit selections on the field we are aggregating on.
+        """
         nested_sub_query = active_filter[NESTED][QUERY]
 
         # For No value searches
@@ -700,8 +703,9 @@ class LuceneBuilder:
                                                                         active_filter,
                                                                         query_field, filter_type)
                         else:
-                            search_log(log_handler=log, msg='Encountered a unexpected nested structure at second level:'
-                                                            ' %s' % nested_sub_query[BOOL])
+                            search_log(log_handler=log,
+                                       msg=('Encountered a unexpected nested structure at second level: %s'
+                                            % nested_sub_query[BOOL]))
 
                     # For structure like this:
                     #   {'bool': {'must': {'bool': {'should':
