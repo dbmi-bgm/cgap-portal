@@ -358,7 +358,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices);
 
         const filterBlocksLen = filter_blocks.length;
-        const allFilterBlocksSelected = selectedFilterBlockIdxCount === 0 || selectedFilterBlockIdxCount === filterBlocksLen;
+        const allFilterBlocksSelected = selectedFilterBlockIdxCount === filterBlocksLen;
         // 0 selectedFilterBlockIdxCount is considered same as all filterblocks selected so we ensure this here.
         const selectedFilterBlockCount = allFilterBlocksSelected ? filterBlocksLen : selectedFilterBlockIdxCount;
 
@@ -555,6 +555,12 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         addNewFilterBlock({ "query" : currentSingleBlockQuery });
     }
 
+    function onSelectAllClick(e){
+        e.stopPropagation();
+        e.preventDefault();
+        selectFilterBlockIdx(null);
+    }
+
     const commonProps = {
         facetDict, filterBlocksLen, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, isSettingFilterBlockIdx,
         duplicateQueryIndices, duplicateNameIndices, cachedCounts, schemas
@@ -585,16 +591,26 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
                     <h4 className="text-400 text-center text-danger my-0">No Blocks Defined</h4>
                 </div>
             ) }
-            <div className="btn-group" role="group" aria-label="Basic example">
-                <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
-                    <i className="icon icon-fw icon-plus fas mr-1" />
-                    Add Filter Block
-                </button>
-                { currentSingleBlockQuery ?
-                    <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} data-tip="Copy currently-selected filter block">
-                        <i className="icon icon-fw icon-clone far" />
+            <div className="row">
+                <div className="col">
+                    <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick}>
+                        <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
+                        { allFilterBlocksSelected ? "Deselect" : "Select" } All Filter Blocks
                     </button>
-                    : null }
+                </div>
+                <div className="col-auto">
+                    <div className="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
+                            <i className="icon icon-fw icon-plus fas mr-1" />
+                            Add Filter Block
+                        </button>
+                        { currentSingleBlockQuery ?
+                            <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} data-tip="Copy currently-selected filter block">
+                                <i className="icon icon-fw icon-clone far" />
+                            </button>
+                            : null }
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -1080,7 +1096,7 @@ export class FilterSetController extends React.PureComponent {
         // and glitches
         const { filter_blocks = [] } = currFilterSet || {};
         const filterBlocksLen = filter_blocks.length;
-        if (filterBlocksLen === 1) {
+        if (filterBlocksLen === 1 && !filter_blocks[0].query) {
             selectedFilterBlockIndices = { '0': true };
         } else if (filterBlocksLen === 0) { // Rare/if-at-all-occuring
             // Clear
@@ -1137,12 +1153,16 @@ export class FilterSetController extends React.PureComponent {
     }
 
     static resetState(props){
-        const { initialFilterSetItem, initialSelectedFilterBlockIndices = [] } = props;
+        const { initialFilterSetItem } = props;
         const selectedFilterBlockIndices = {};
-        initialSelectedFilterBlockIndices.forEach(function(selectedIndx){
-            // `selectedIndx` is cast to str when becomes key in `selectedFilterBlockIndices`.
-            selectedFilterBlockIndices[selectedIndx] = true;
+        const { filter_blocks = [] } = initialFilterSetItem || {};
+        filter_blocks.forEach(function(fb, idx){
+            selectedFilterBlockIndices[idx] = true;
         });
+        // initialSelectedFilterBlockIndices.forEach(function(selectedIndx){
+        //     // `selectedIndx` is cast to str when becomes key in `selectedFilterBlockIndices`.
+        //     selectedFilterBlockIndices[selectedIndx] = true;
+        // });
         return {
             "currFilterSet": initialFilterSetItem ? { ...initialFilterSetItem } : null,
             // todo: maybe change to allow multiple in future?
@@ -1367,7 +1387,9 @@ export class FilterSetController extends React.PureComponent {
                 global_flags = global_flags.slice(1).replace("type=VariantSample&", ""); // .replace("&sort=date_created", "");
             }
 
-            const selectedFilterBlocks = selectedIdxCount === 0 ? filter_blocks : filter_blocks.filter(function(fb, fbIdx){
+            // We use **2** empty filter_blocks because using 2 will hide FacetList by excluding facets from response.
+            // TODO: Make more performant version of this effect (currently does 2x search on backend)
+            const selectedFilterBlocks = selectedIdxCount === 0 ? [{ "query" : "" }, { "query" : "" }] : filter_blocks.filter(function(fb, fbIdx){
                 return selectedFilterBlockIndices[fbIdx];
             });
 
@@ -1403,29 +1425,40 @@ export class FilterSetController extends React.PureComponent {
     }
 
     selectFilterBlockIdx(index = null, deselectOthers = true){
-        const { currFilterSet: { filter_blocks = [] } = {} } = this.state;
-        if (filter_blocks.length < 2) {
-            // Nothing to change/select.
-            return false;
-        }
+        // const { currFilterSet: { filter_blocks = [] } = {} } = this.state;
+        // if (filter_blocks.length < 2) {
+        //     // Nothing to change/select.
+        //     return false;
+        // }
         // const { isSettingFilterBlockIdx } = this.state;
         // if (isSettingFilterBlockIdx) {
         //     // Another update in progress already.
         //     return false;
         // }
-        this.setState(function({ selectedFilterBlockIndices: pastSelectedIndices }){
+        this.setState(function({ selectedFilterBlockIndices: pastSelectedIndices, currFilterSet }){
             let selectedFilterBlockIndices;
+            const pastList = Object.keys(pastSelectedIndices);
+            const pastCount = pastList.length;
+            const { filter_blocks = [] } = currFilterSet || {};
+            const filterBlocksLen = filter_blocks.length;
+            const allFilterBlocksSelected = pastCount === filterBlocksLen;
 
             if (index === null) {
-                // Not used case?
-                // Clear all for now.
+                // Used to select all for now.
                 selectedFilterBlockIndices = {};
-            } else if (pastSelectedIndices[index]) {
+                if (allFilterBlocksSelected) {
+                    // Unselect all / continue;
+                } else {
+                    filter_blocks.forEach(function(fb, idx){
+                        selectedFilterBlockIndices[idx] = true;
+                    });
+                }
+            } else if (pastSelectedIndices[index] && !allFilterBlocksSelected) {
                 // Clear it.
                 selectedFilterBlockIndices = _.omit(pastSelectedIndices, index);
             } else {
                 // Select it
-                selectedFilterBlockIndices =  deselectOthers ? { [index]: true } : { ...pastSelectedIndices, [index]: true };
+                selectedFilterBlockIndices = deselectOthers ? { [index]: true } : { ...pastSelectedIndices, [index]: true };
             }
             return {
                 selectedFilterBlockIndices,
