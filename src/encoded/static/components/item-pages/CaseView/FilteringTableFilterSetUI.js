@@ -1090,27 +1090,15 @@ export class FilterSetController extends React.PureComponent {
             selectedFilterBlockIndices = currSelectedFilterBlockIndices;
         }
 
-        let selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices);
-        let selectedFilterBlockIdxCount = Object.keys(selectedFilterBlockIdxList).length;
-
-        // If no filter-blocks are currently selected, then select all, as is equivalent
-        // state and simpler to handle only 1 case/'shape' of it.
-        // Also handles req of always have 1 filter block selected if is the only one that exists
-        // -- helps reduce needless UI interaction(s) and glitches
-        // if (selectedFilterBlockIdxCount === 0 && filterBlocksLen > 0) {
-        //     filter_blocks.forEach(function(fb, idx){
-        //         selectedFilterBlockIndices[idx] = true;
-        //         selectedFilterBlockIdxList.push(idx);
-        //         selectedFilterBlockIdxCount++;
-        //     });
+        const selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices);
+        const selectedFilterBlockIdxCount = Object.keys(selectedFilterBlockIdxList).length;
+        // if (selectedFilterBlockIdxCount === filterBlocksLen) {
+        //     // If all filter-blocks are currently selected, then select none, as is the
+        //     // equivalent state and is simpler to handle only 1 case/'shape' of it.
+        //     selectedFilterBlockIndices = {};
+        //     selectedFilterBlockIdxCount = 0;
+        //     selectedFilterBlockIdxList = [];
         // }
-
-        if (selectedFilterBlockIdxCount === filterBlocksLen) {
-            selectedFilterBlockIndices = {};
-            selectedFilterBlockIdxCount = 0;
-            selectedFilterBlockIdxList = [];
-        }
-
 
         // Update state.currFilterSet with filters from response, unless amid some other update.
 
@@ -1119,8 +1107,8 @@ export class FilterSetController extends React.PureComponent {
             return { selectedFilterBlockIndices };
         }
 
-        if (!(selectedFilterBlockIdxCount === 1 || (selectedFilterBlockIdxCount === 0 && filterBlocksLen === 1))){
-            // Cancel if compound filterset request.
+        if (selectedFilterBlockIdxCount !== 1){
+            // Cancel if compound filterset request (if not only 1 filter-block selected).
             return { selectedFilterBlockIndices };
         }
 
@@ -1261,7 +1249,8 @@ export class FilterSetController extends React.PureComponent {
             // Shift cachedCounts indices/keys
             const cachedCounts = {};
             Object.keys(pastCounts).forEach(function(countKey){
-                const intKey = parseInt(countKey); // Obj keys are cast to type:string upon insertion, need to cast back to int for comparisons.
+                // Obj keys are cast to string type upon insertion, need to cast back to int for comparisons.
+                const intKey = parseInt(countKey);
                 if (intKey < idx) {
                     cachedCounts[countKey] = pastCounts[countKey];
                 } else if (intKey > idx) {
@@ -1271,12 +1260,12 @@ export class FilterSetController extends React.PureComponent {
 
             // Update selected filter block index according to what feels like decent UX -
             const selectedFilterBlockIndices = {};
-            if (nextFBLen === 0) {
-                // Error, shouldn't occur
+            if (nextFBLen === 0) { // Error, shouldn't occur
                 throw new Error("Must have at least one filter block, will not delete last one.");
             } else if (nextFBLen === 1) {
                 // Set to the only fb, since otherwise would have no difference if is compound request, just lack of faceting (= extra UI click to get it back).
                 // (this is now redundant -- done also in getDerivedStateFromProps)
+                // (somewhat deprecated -- this is unset in getDerivedStateFromProps where if all selected then selectedFilterBlockIndices becomes `{}`, but kept for clarity of intent)
                 selectedFilterBlockIndices['0'] = true;
             } else {
                 Object.keys(pastSelectedIndices).forEach(function(pastSelectedIndex){
@@ -1347,9 +1336,31 @@ export class FilterSetController extends React.PureComponent {
 
         const { filter_blocks, search_type = "VariantSample" } = currFilterSet;
 
-        if (selectedIdxCount > 1 || (selectedIdxCount === 0 && filter_blocks.length > 1)) {
+
+        if (selectedIdxCount === 1) {
+            // Navigate as if using single search URL href.
+            const [ selectedFilterBlockIdx = 0 ] = selectedIdxList;
+            // Parse to int, since object keys are always strings.
+            const currFilterSetQuery = filter_blocks[parseInt(selectedFilterBlockIdx)].query;
+            const { "@id": currSearchHref = null } = searchContext || {};
+            const nextSearchHref = searchHrefBase + (currFilterSetQuery ? "&" + currFilterSetQuery : "");
+
+            // Compares full hrefs, incl searchHrefBase params
+            const haveSearchParamsChanged = !currSearchHref || !_.isEqual(
+                url.parse(nextSearchHref, true).query,
+                url.parse(currSearchHref, true).query
+            );
+
+            if (haveSearchParamsChanged) {
+                virtualNavigate(nextSearchHref, null, (res)=>{
+                    this.setState({ "isSettingFilterBlockIdx": false });
+                });
+            } else {
+                this.setState({ "isSettingFilterBlockIdx": false });
+            }
+        } else /* if (selectedIdxCount > 1) */ {
             // Navigate using compound fs.
-            // Having 0 filter_blocks selected is effectively same as having all filter_blocks selected.
+            // DEPRECATED: Having 0 filter_blocks selected is effectively same as having all filter_blocks selected.
 
             let global_flags = url.parse(searchHrefBase, false).search;
             if (global_flags) {
@@ -1388,28 +1399,6 @@ export class FilterSetController extends React.PureComponent {
             });
 
             return;
-        } else {
-            // Navigate as if using single search URL href.
-            const [ selectedFilterBlockIdx = 0 ] = selectedIdxList;
-            // Parse to int, since object keys are always strings.
-            const currFilterSetQuery = filter_blocks[parseInt(selectedFilterBlockIdx)].query;
-            const { "@id": currSearchHref = null } = searchContext || {};
-            const nextSearchHref = searchHrefBase + (currFilterSetQuery ? "&" + currFilterSetQuery : "");
-
-            // Compares full hrefs, incl searchHrefBase params
-            const haveSearchParamsChanged = !currSearchHref || !_.isEqual(
-                url.parse(nextSearchHref, true).query,
-                url.parse(currSearchHref, true).query
-            );
-
-            if (haveSearchParamsChanged) {
-                virtualNavigate(nextSearchHref, null, (res)=>{
-                    this.setState({ "isSettingFilterBlockIdx": false });
-                });
-            } else {
-                this.setState({ "isSettingFilterBlockIdx": false });
-            }
-
         }
     }
 
