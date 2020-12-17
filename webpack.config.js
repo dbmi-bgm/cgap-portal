@@ -230,6 +230,7 @@ module.exports = [
                 'higlass-clinvar': 'empty-module',
                 'higlass-text': 'empty-module',
                 'higlass-orthologs': 'empty-module',
+                'higlass-pileup': 'empty-module',
                 'higlass-multivec': 'empty-module',
                 'auth0-lock': 'empty-module',
                 'aws-sdk': 'empty-module',

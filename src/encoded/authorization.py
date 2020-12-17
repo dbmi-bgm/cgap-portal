@@ -124,3 +124,10 @@ def groupfinder(login, request):
         PRINT("groupfinder for", login, "returning principals", json.dumps(principals, indent=2))
 
     return principals
+
+
+def is_admin_request(request):
+    """ Checks for 'group.admin' in effective_principals on request - if present we know this
+        request was submitted by an admin
+    """
+    return 'group.admin' in request.effective_principals

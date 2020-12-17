@@ -7,7 +7,7 @@ from snovault import TYPES
 from snovault.util import debug_log
 from snovault.embed import make_subrequest
 from ..types.base import get_item_or_none
-from .search import SearchBuilder
+from .search import SearchBuilder, search as single_query_search
 from .lucene_builder import LuceneBuilder
 from .search_utils import execute_search, build_sort_dicts, make_search_subreq
 from ..types.filter_set import FLAGS, FILTER_BLOCKS
@@ -33,19 +33,6 @@ class CompoundSearchBuilder:
     FLAGS_APPLIED = 'flags_applied'
     BUILD_QUERY_URL = '/build_query/'
 
-    @staticmethod
-    def transfer_request_permissions(parent_request, sub_request):
-        """ Copies over the REMOTE_USER field from the parent request to the sub_request. This is a critical
-            action that must be done to properly execute the sub_request with permissions. It is possible more
-            things need to be done.
-
-        :param parent_request: parent_request who possesses permissions
-        :param sub_request: request who requires the permissions of the parent request
-        """
-        # XXX: set parent request (is None *always* correct?) -Will
-        # XXX: unsure -Alex
-        sub_request.__parent__ = None
-
     @classmethod
     def build_subreq_from_single_query(cls, request, query, route='/search/', from_=0, to=10):
         """ Builds a Request object that is a proper sub-request of the given request.
@@ -65,7 +52,6 @@ class CompoundSearchBuilder:
         subreq = make_search_subreq(request, route + '%s&from=%s&limit=%s' % (query, from_, to))
         subreq.headers['Accept'] = 'application/json'
 
-        cls.transfer_request_permissions(request, subreq)  # VERY IMPORTANT - Will
         return subreq
 
     @staticmethod
@@ -120,19 +106,18 @@ class CompoundSearchBuilder:
         }
 
     @staticmethod
-    def invoke_search(context, request, subreq):
-        """ Wrapper method that invokes the core search API (/search/) with the given subreq and
-            propagates the response to the "parent" request.
+    def invoke_search(context, request, subreq, search_type):
+        """
+        Wrapper method that invokes the core search API (/search/) with the given subreq and
+        copies over status code to parent response.
 
         :param context: context of parent request
         :param request: parent request
         :param subreq: subrequest
         :return: response from /search/
         """
-        # Initializes all of SearchBuilder stuff (uses constructor here, not from_search class method), incl. `assure_session_id`
-        search_builder_instance = SearchBuilder(context, subreq, None, return_generator=False)
         # Calls SearchBuilder.format_results internally, incl. adding searchSessionID cookie to response.
-        response = search_builder_instance._search()
+        response = single_query_search(context, subreq, search_type)
         if subreq.response.status_code == 404:
             request.response.status_code = 404
         return response
@@ -167,8 +152,8 @@ class CompoundSearchBuilder:
         filter_blocks = filter_set.get(FILTER_BLOCKS, [])
         flags = filter_set.get(FLAGS, None)
         doc_type = filter_set.get(CompoundSearchBuilder.TYPE)
-        t = filter_set.get(cls.TYPE, 'Item')  # if type not set, attempt to search on item
-        type_flag = 'type=%s' % t
+        search_type = filter_set.get(cls.TYPE, 'Item')  # if type not set, attempt to search on item
+        type_flag = 'type=%s' % search_type
 
         # if we have no filter blocks, there is no context to enable flags, so
         # pass type_flag + global_flags
@@ -178,7 +163,7 @@ class CompoundSearchBuilder:
             else:
                 query = type_flag
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return cls.invoke_search(context, request, subreq)
+            return CompoundSearchBuilder.invoke_search(context, request, subreq, search_type)
 
         # if we specified global_flags, combine that query with the single filter_block,
         # otherwise pass the filter_block query directly
@@ -191,7 +176,7 @@ class CompoundSearchBuilder:
                 query = block_query
             query = cls._add_type_to_flag_if_needed(query, type_flag)
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return cls.invoke_search(context, request, subreq)
+            return CompoundSearchBuilder.invoke_search(context, request, subreq, search_type)
 
         # Extract query string and list of applied flags, add global_flags to block_query first
         # then add flags as applied and type_flag if needed.
@@ -209,7 +194,7 @@ class CompoundSearchBuilder:
                         break
             query = cls._add_type_to_flag_if_needed(query, type_flag)
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return cls.invoke_search(context, request, subreq)
+            return CompoundSearchBuilder.invoke_search(context, request, subreq, search_type)
 
         # Build the compound_query
         # Iterate through filter_blocks, adding global_flags if specified and adding flags if specified
@@ -234,7 +219,7 @@ class CompoundSearchBuilder:
 
 
             compound_query = LuceneBuilder.compound_search(sub_queries, intersect=intersect)
-            compound_subreq = cls.build_subreq_from_single_query(request, ('?type=' + t))
+            compound_subreq = cls.build_subreq_from_single_query(request, ('?type=' + search_type))
 
             requested_sorts = filter_set.get("sort", [])
             if not requested_sorts and global_flags:
@@ -381,6 +366,7 @@ def compound_search(context, request):
     global_flags = body.get('global_flags', None)
     if from_ < 0 or limit < 0:
         raise HTTPBadRequest('Passed bad from, to request body params: %s, %s' % (from_, limit))
+
     return CompoundSearchBuilder.execute_filter_set(
         context,
         request,

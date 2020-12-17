@@ -7,6 +7,7 @@ from pyramid.view import view_config
 from webob.multidict import MultiDict
 from functools import reduce
 from elasticsearch_dsl import Search
+from elasticsearch.exceptions import NotFoundError
 from pyramid.httpexceptions import HTTPBadRequest
 from urllib.parse import urlencode
 from collections import OrderedDict
@@ -23,6 +24,7 @@ from snovault.util import (
     debug_log,
 )
 from snovault.typeinfo import AbstractTypeInfo
+from ..authorization import is_admin_request
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
     find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
@@ -57,6 +59,7 @@ class SearchBuilder:
     DEFAULT_SEARCH_FRAME = 'embedded'
     DEFAULT_HIDDEN = 'default_hidden'
     ADDITIONAL_FACETS = 'additional_facet'
+    DEBUG = 'debug'
     MISSING = object()
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
@@ -121,6 +124,7 @@ class SearchBuilder:
         self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
         self.prepared_terms = self.prepare_search_term(self.request)
         self.additional_facets = self.request.normalized_params.getall(self.ADDITIONAL_FACETS)
+        self.debug_is_active = self.request.normalized_params.getall(self.DEBUG)  # only used if admin
 
         # Can potentially make an outside API call, but ideally is cached
         # Only needed if searching on a single item type
@@ -250,9 +254,11 @@ class SearchBuilder:
                 del normalized_params['type']
             for dtype in doc_types:
                 normalized_params.add('type', dtype)
+
         # add the normalized params to the request
         # these will be used in place of request.params for the rest of search
         setattr(request, 'normalized_params', normalized_params)
+
         # the query string of the normalized search
         qs = '?' + urlencode([  # XXX: do we actually need to encode k,v  individually? -Will 6/24/2020
             (k.encode('utf-8'), v.encode('utf-8'))
@@ -332,7 +338,10 @@ class SearchBuilder:
         if (len(self.doc_types) == 1) and 'Item' not in self.doc_types:
             search_term = 'search-info-header.' + self.doc_types[0]
             # XXX: this could be cached application side as well
-            static_section = self.request.registry['collections']['StaticSection'].get(search_term)
+            try:
+                static_section = self.request.registry['collections']['StaticSection'].get(search_term)
+            except Exception:  # NotFoundError not caught, search could fail
+                static_section = None
             if static_section and hasattr(static_section.model, 'source'):  # extract from ES structure
                 item = static_section.model.source['object']
                 self.response['search_header'] = {}
@@ -384,8 +393,8 @@ class SearchBuilder:
 
                 qs = urlencode([
                     (k.encode('utf-8'), v.encode('utf-8'))
-                    for k, v in self.request.normalized_params.items() if
-                    not (k == 'type' and self.types.all.get('Item' if v == '*' else v) is ti)
+                    for k, v in self.request.normalized_params.items()
+                    if k != "limit" and k != "from" and not (k == 'type' and self.types.all.get('Item' if v == '*' else v) is ti)
                 ])
                 self.response['filters'].append({
                     'field': 'type',
@@ -903,7 +912,7 @@ class SearchBuilder:
 
     @staticmethod
     def build_initial_columns(used_type_schemas):
-        
+
         columns = OrderedDict()
 
         # Add title column, at beginning always
@@ -1005,7 +1014,9 @@ class SearchBuilder:
 
     @staticmethod
     def get_all_subsequent_results(request, initial_search_result, search, extra_requests_needed_count, size_increment):
-        """ Generator method used to paginate. """
+        """
+        Calls `execute_search` in paginated manner iteratively until all results have been yielded.
+        """
         from_ = 0
         while extra_requests_needed_count > 0:
             # print(str(extra_requests_needed_count) + " requests left to get all results.")
@@ -1018,7 +1029,9 @@ class SearchBuilder:
 
     def execute_search_for_all_results(self, size_increment=100):
         """
-        Uses the above function to automatically paginate all results.
+        Returns a generator that iterates over _all_ results for search.
+        Calls `execute_search` in paginated manner iteratively until all results have been yielded
+        via `get_all_subsequent_results`.
 
         :param size_increment: number of results to get per page, default 100
         :return: all es_results that matched the given query
@@ -1076,14 +1089,20 @@ class SearchBuilder:
             if self.context:
                 self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
 
-        # Format results, handle "child" requests special
+        # `graph` below is a generator.
+        # `es_results['hits']['hits']` will contain a generator instead of list
+        # if limit=all was requested. `self._format_results` will always return a generator
+        # that iterates over es_results['hits']['hits'] regardless of its structure.
         graph = self._format_results(es_results['hits']['hits'])
-        if self.request.__parent__ is not None or self.return_generator:
-            if not self.return_generator:
-                self.response['@graph'] = list(graph)
 
-        # Set @graph, save session ID for re-requests / subsequent pages.
-        self.response['@graph'] = list(graph)
+        if self.return_generator:
+            # Preserve `graph` as generator.
+            self.response['@graph'] = graph
+        else:
+            # Convert it into list as we assume we're responding to a HTTP request by default.
+            self.response['@graph'] = list(graph)
+
+        # Save session ID for re-requests / subsequent pages.
         if self.search_session_id:  # Is 'None' if e.g. limit=all
             self.request.response.set_cookie('searchSessionID', self.search_session_id)
 
@@ -1133,6 +1152,10 @@ class SearchBuilder:
         if not self.response:
             return {}  # XXX: rather than raise exception? -Will
 
+        # add query if an admin asks for it
+        if self.debug_is_active and is_admin_request(self.request):
+            self.response['query'] = self.search.to_dict()
+
         # If we got no results, return 404 or []
         if not self.response['total']:
             # http://googlewebmastercentral.blogspot.com/2014/02/faceted-navigation-best-and-5-of-worst.html
@@ -1144,6 +1167,9 @@ class SearchBuilder:
         # if this is a subrequest/gen request, return '@graph' directly
         if self.request.__parent__ is not None or self.return_generator:
             if self.return_generator:
+                # If self.return_generator, then self.response['@graph'] will
+                # contain a generator rather than a list via `self.format_results`
+                # TODO: Move that functionality into this method instead?
                 return self.response['@graph']
 
         # apply custom facet filtering
