@@ -134,7 +134,7 @@ def submit_for_ingestion(context, request):
     institution_arg = get_parameter(parameters, "institution", default=institution, update=True)
     if institution_arg != institution:
         # If the "institution" argument was passed, which we no longer require, make sure it's consistent.
-        raise SubmissionFailure("'institution' was supplied inconsistetnly for submit_for_ingestion.")
+        raise SubmissionFailure("'institution' was supplied inconsistently for submit_for_ingestion.")
 
     project = instance['project']['@id']
     project_arg = get_parameter(parameters, "project", default=project, update=True)
