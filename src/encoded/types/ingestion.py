@@ -28,14 +28,14 @@ from ..util import (
 )
 from ..ingestion.common import metadata_bundles_bucket, get_parameter
 
-ALLOW_SUBMITTER_VIEW_ACL = (
-    # TODO: There is an issue here where we want a logged in user remotely only to view this
-    #       but if we are proxying for them internall we want to be able to view OR edit.
-    #       There is never reason for a user outside the system to update this status. -kmp 26-Jul-2020
-    []  # Special additional permissions might go here.
-    + ALLOW_PROJECT_MEMBER_ADD_ACL  # Is this right? See note above.
-    + ONLY_ADMIN_VIEW_ACL     # Slightly misleading name. Allows admins to edit, too, actually. But only they can view.
-)
+# ALLOW_SUBMITTER_VIEW_ACL = (
+#     # TODO: There is an issue here where we want a logged in user remotely only to view this
+#     #       but if we are proxying for them internall we want to be able to view OR edit.
+#     #       There is never reason for a user outside the system to update this status. -kmp 26-Jul-2020
+#     []  # Special additional permissions might go here.
+#     + ALLOW_PROJECT_MEMBER_ADD_ACL  # Is this right? See note above.
+#     + ONLY_ADMIN_VIEW_ACL     # Slightly misleading name. Allows admins to edit, too, actually. But only they can view.
+# )
 
 
 class SubmissionFolio:
@@ -141,7 +141,7 @@ class SubmissionFolio:
 
 @collection(
     name='ingestion-submissions',
-    acl=ALLOW_SUBMITTER_VIEW_ACL,
+    # acl=ALLOW_SUBMITTER_VIEW_ACL,
     unique_key='object_name',
     properties={
         'title': 'Ingestion Submissions',
