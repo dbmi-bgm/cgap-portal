@@ -114,8 +114,20 @@ class LocalRolesAuthorizationPolicy(object):
 
     def permits(self, context, principals, permission):
         principals = local_principals(context, principals)
-        return self.wrapped_policy.permits(context, principals, permission)
+        result = self.wrapped_policy.permits(context, principals, permission)
+        if DEBUG_PERMISSIONS:
+            PRINT("LocalRolesAuthorizationPolicy.permits")
+            PRINT(" permission=", permission)
+            PRINT(" principals=", principals)
+            PRINT("LocalRolesAuthorizationPolicy.permits returning", result)
+        return result
 
     def principals_allowed_by_permission(self, context, permission):
         principals = self.wrapped_policy.principals_allowed_by_permission(context, permission)
-        return merged_local_principals(context, principals)
+        result = merged_local_principals(context, principals)
+        if DEBUG_PERMISSIONS:
+            PRINT("LocalRolesAuthorizationPolicy.principals_allowed_by_permission")
+            PRINT(" permission=", permission)
+            PRINT(" principals=", principals)
+            PRINT("LocalRolesAuthorizationPolicy.principals_allowed_by_permission returning", result)
+        return result
