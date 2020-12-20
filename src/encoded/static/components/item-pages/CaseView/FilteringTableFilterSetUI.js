@@ -214,7 +214,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             || cachedCounts !== pastCachedCounts    // Tooltip on filterblocks' counts indicator, if present.
             || !_.isEqual(selectedFilterBlockIndices, pastSelectedIndices)
         ) {
-            setTimeout(ReactTooltip.rebuild, 0);
+            setTimeout(ReactTooltip.rebuild, 50);
         }
     }
 
@@ -358,7 +358,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices);
 
         const filterBlocksLen = filter_blocks.length;
-        const allFilterBlocksSelected = selectedFilterBlockIdxCount === 0 || selectedFilterBlockIdxCount === filterBlocksLen;
+        const allFilterBlocksSelected = filterBlocksLen > 0 && (selectedFilterBlockIdxCount === 0 || selectedFilterBlockIdxCount === filterBlocksLen);
         // 0 selectedFilterBlockIdxCount is considered same as all filterblocks selected so we ensure this here.
         const selectedFilterBlockCount = allFilterBlocksSelected ? filterBlocksLen : selectedFilterBlockIdxCount;
 
@@ -473,7 +473,7 @@ function FilterSetUIHeader(props){
                 setTitleOfFilterSet(inputElem.value);
             }}>
                 <input type="text" name="filterName" className="form-control" defaultValue={fsTitle || fsDisplayTitle} />
-                <button type="reset" className="btn btn-sm btn-outline-dark ml-08" onClick={function(e){
+                <button type="reset" className="btn btn-sm btn-outline-light ml-08" onClick={function(e){
                     e.stopPropagation();
                     e.preventDefault();
                     setIsEditingTitle(false);
@@ -509,14 +509,14 @@ function FilterSetUIHeader(props){
 
     // todo if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
     return (
-        <div className="row align-items-center px-3 py-3">
+        <div className="row filter-set-ui-header align-items-center px-3 py-3">
             <div className="col">{ titleBlock }</div>
             <div className="col-auto">
                 { haveDuplicateQueries || haveDuplicateNames ?
                     <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-secondary"
                         data-tip={`Filter blocks with duplicate ${haveDuplicateQueries ? "queries" : "names"} exist below`} />
                     : null }
-                <button type="button" className={"btn btn-sm btn-" + (editBtnDisabled ? "outline-primary-dark" : "primary-dark")} disabled={editBtnDisabled} onClick={onSaveBtnClick}>
+                <button type="button" className="btn btn-sm btn-outline-light" disabled={editBtnDisabled} onClick={onSaveBtnClick}>
                     { isSavingFilterSet ?
                         <i className="icon icon-spin icon-circle-notch fas" />
                         : (
@@ -555,26 +555,31 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         addNewFilterBlock({ "query" : currentSingleBlockQuery });
     }
 
+    function onSelectAllClick(e){
+        e.stopPropagation();
+        e.preventDefault();
+        selectFilterBlockIdx(null);
+    }
+
     const commonProps = {
         facetDict, filterBlocksLen, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, isSettingFilterBlockIdx,
         duplicateQueryIndices, duplicateNameIndices, cachedCounts, schemas
     };
 
     return (
-        <div className="blocks-container px-3 pb-16">
-            { filterBlocksLen > 1 ?
-                <div className="row pt-0 pb-06 small">
-                    <div className="col-12 pb-02 col-sm">
-                        { allFilterBlocksSelected ?
-                            "Click on a filter block to only search its query"
-                            : "Shift+Click to select an additional filter block."
-                        }
-                    </div>
-                    <div className="col-12 pb-02 col-sm text-sm-right">
-                        { (allFilterBlocksSelected ? "All" : selectedFilterBlockIdxCount + "/" + filterBlocksLen) + " filter blocks selected" }
-                    </div>
+        <div className="blocks-container px-3 pb-16 pt-12">
+            <div className="row pb-06 small">
+                <div className="col-12 pb-02 col-sm">
+                    { filterBlocksLen === 1 ? null
+                        : allFilterBlocksSelected ?
+                            "Click on a filter block to only search its query and/or edit its filters"
+                            : "Shift+Click to select an additional filter block"
+                    }
                 </div>
-                : null }
+                <div className="col-12 pb-02 col-sm text-sm-right">
+                    { (allFilterBlocksSelected ? "All" : selectedFilterBlockIdxCount + "/" + filterBlocksLen) + " filter blocks selected" }
+                </div>
+            </div>
             { filterBlocksLen > 0 ? filter_blocks.map(function(fb, index){
                 const selected = allFilterBlocksSelected || selectedFilterBlockIndices[index];
                 return <FilterBlock {...commonProps} filterBlock={fb} index={index} key={index} selected={selected} />;
@@ -585,16 +590,26 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
                     <h4 className="text-400 text-center text-danger my-0">No Blocks Defined</h4>
                 </div>
             ) }
-            <div className="btn-group" role="group" aria-label="Basic example">
-                <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
-                    <i className="icon icon-fw icon-plus fas mr-1" />
-                    Add Filter Block
-                </button>
-                { currentSingleBlockQuery ?
-                    <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} data-tip="Copy currently-selected filter block">
-                        <i className="icon icon-fw icon-clone far" />
+            <div className="row">
+                <div className="col">
+                    <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
+                        <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
+                        Select All
                     </button>
-                    : null }
+                </div>
+                <div className="col-auto">
+                    <div className="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
+                            <i className="icon icon-fw icon-plus fas mr-1" />
+                            Add Filter Block
+                        </button>
+                        { currentSingleBlockQuery ?
+                            <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} data-tip="Copy currently-selected filter block">
+                                <i className="icon icon-fw icon-clone far" />
+                            </button>
+                            : null }
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -725,7 +740,7 @@ const FilterBlock = React.memo(function FilterBlock(props){
 
         title = (
             <React.Fragment>
-                <i className={deleteIconCls} onClick={filterBlocksLen > 1 ? onRemoveClick : null} data-tip={filterBlocksLen > 1 ? "Remove this filter block" : "Can't delete last filter block"} />
+                <i className={deleteIconCls} onClick={filterBlocksLen > 1 ? onRemoveClick : null} data-tip={filterBlocksLen > 1 ? "Delete this filter block" : "Can't delete last filter block"} />
                 <span className={titleCls} data-tip={isDuplicateName ? "Duplicate title of filter block #" + (duplicateNameIndices[index] + 1) : null}>
                     { filterName || <em>No Name</em> }
                 </span>
@@ -1428,8 +1443,7 @@ export class FilterSetController extends React.PureComponent {
             let selectedFilterBlockIndices;
 
             if (index === null) {
-                // Not used case?
-                // Clear all for now.
+                // Used to select all for now.
                 selectedFilterBlockIndices = {};
             } else if (pastSelectedIndices[index]) {
                 // Clear it.
