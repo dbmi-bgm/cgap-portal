@@ -60,8 +60,8 @@ def content_type_allowed(request):
     exceptions = CONTENT_TYPE_SPECIAL_CASES.get(request.content_type)
 
     if exceptions:
-        for prefix in exceptions:
-            if request.path.startswith(prefix):
+        for text in exceptions:
+            if text in request.path:
                 return True
 
     return False
