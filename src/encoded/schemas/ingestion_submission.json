@@ -69,14 +69,15 @@
             "properties": {
                 "state": {
                     "title": "State",
-                    "description": "A state machine description of how processing is progressing (submitted, processed, or done).",
+                    "description": "A state machine description of how processing is progressing (created, submitted, processed, or done).",
                     "type": "string",
                     "enum": [
+                        "created",
                         "submitted",
                         "processing",
                         "done"
                     ],
-                    "default": "submitted"
+                    "default": "created"
                 },
                 "outcome": {
                     "title": "Outcome",
