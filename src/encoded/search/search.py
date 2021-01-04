@@ -612,7 +612,7 @@ class SearchBuilder:
         self._initialize_additional_facets(append_facets, current_type_schema)
 
         # hold disabled facets from schema; we also want to remove these from the prepared_terms facets
-        disabled_facets = []
+        disabled_facet_fields = set()
 
         # Add facets from schema if one Item type is defined.
         # Also, conditionally add extra appendable facets if relevant for type from schema.
@@ -621,23 +621,28 @@ class SearchBuilder:
                 schema_facets = OrderedDict(current_type_schema['facets'])
                 for schema_facet in schema_facets.items():
                     if schema_facet[1].get('disabled', False) or schema_facet[1].get(self.DEFAULT_HIDDEN, False):
-                        disabled_facets.append(schema_facet[0])
+                        disabled_facet_fields.add(schema_facet[0])
                         continue  # Skip disabled facets.
                     facets.append(schema_facet)
 
-        # Add facets for any non-schema ?field=value filters requested in the search (unless already set)
-        # TODO: this use is confusing and should be refactored -Will 6/24/2020
-        used_facets = [facet[0] for facet in facets + append_facets]
-        used_facet_titles = [
-            facet[1]['title'] for facet in facets + append_facets
-            if 'title' in facet[1]
-        ]
+        # Add facets for any non-schema ?field=value filters requested in the search (unless already set, via used_facet_fields)
+        used_facet_fields = set()
+        used_facet_titles = set()
+        for facet in facets + append_facets:
+            used_facet_fields.add(facet[0])
+            if 'title' in facet[1]:
+                used_facet_titles.add(facet[1]['title'])
 
         for field in self.prepared_terms:
             if field.startswith('embedded'):
-                split_field = field.strip().split(
-                    '.')  # Will become, e.g. ['embedded', 'experiments_in_set', 'files', 'file_size', 'from']
-                use_field = '.'.join(split_field[1:])
+
+                # Will become, e.g. ['embedded', 'experiments_in_set', 'files', 'file_size', 'from']
+                split_field = field.strip().split('.')
+                use_field = '.'.join(split_field[1:]) # e.g. "experiments_in_set.files.file_size.from"
+
+                if use_field in used_facet_fields or use_field in disabled_facet_fields:
+                    # Cancel if already in facets or is disabled (first check, before more broad check re: agg_type:stats, etc)
+                    continue
 
                 # 'terms' is the default per-term bucket aggregation for all non-schema facets
                 if self.item_type_es_mapping and find_nested_path(field, self.item_type_es_mapping):
@@ -661,11 +666,6 @@ class SearchBuilder:
                 else:
                     is_object_title = False
 
-                if title_field in used_facets or title_field in disabled_facets:
-                    # Cancel if already in facets or is disabled
-                    continue
-                used_facets.append(title_field)
-
                 # If we have a range filter in the URL, strip out the ".to" and ".from"
                 if title_field == 'from' or title_field == 'to':
                     if len(split_field) >= 3:
@@ -678,6 +678,13 @@ class SearchBuilder:
                                 use_field = f_field
                                 aggregation_type = 'stats'
 
+                # At moment is equivalent to `if aggregation_type == 'stats'` until/unless more agg types are added for _facets_.
+                if aggregation_type == 'stats':
+                    # Remove completely if duplicate (e.g. don't need to have` .from` and `.to` both present)
+                    if use_field in used_facet_fields or use_field in disabled_facet_fields:
+                        continue
+                    # Facet would be otherwise added twice if both `.from` and `.to` are requested.
+
                 for schema in self.schemas:
                     if title_field in schema['properties']:
                         title_field = schema['properties'][title_field].get('title', title_field)
@@ -686,28 +693,19 @@ class SearchBuilder:
                             title_field += ' (Title)'
                         break
 
-                facet_tuple = (use_field, {'title': title_field, 'aggregation_type': aggregation_type})
-
-                # At moment is equivalent to `if aggregation_type == 'stats'` until/unless more agg types are added for _facets_.
-                if aggregation_type != 'terms':
-                    # Remove completely if duplicate (e.g. .from and .to both present)
-                    if use_field in used_facets:
-                        continue
-                    # facet_tuple[1]['hide_from_view'] = True # Temporary until we handle these better on front-end.
-                    # Facet would be otherwise added twice if both `.from` and `.to` are requested.
-
-                facets.append(facet_tuple)
+                used_facet_fields.add(use_field)
+                facets.append((
+                    use_field,
+                    { 'title': title_field, 'aggregation_type': aggregation_type }
+                ))
 
         # Append additional facets (status, validation_errors, ...) at the end of
         # list unless were already added via schemas, etc.
-        used_facets = [facet[0] for facet in facets]  # Reset this var
+        used_facet_fields = { facet[0] for facet in facets } # Reset this
         for ap_facet in append_facets + validation_error_facets:
-            if ap_facet[0] not in used_facets:
+            if ap_facet[0] not in used_facet_fields:
+                used_facet_fields.add(ap_facet[0])
                 facets.append(ap_facet)
-            else:  # Update with better title if not already defined from e.g. requested filters.
-                existing_facet_index = used_facets.index(ap_facet[0])
-                if facets[existing_facet_index][1].get('title') in (None, facets[existing_facet_index][0]):
-                    facets[existing_facet_index][1]['title'] = ap_facet[1]['title']
         return facets
 
     def assure_session_id(self):
@@ -870,18 +868,17 @@ class SearchBuilder:
         #            Ideally, the client should accept 'stats', 'terms', 'nested:terms', 'nested:stats',
         #            and just treat the nested aggs exactly the same.
         for facet in result:
-            for k, v in facet.items():
-                if k == 'aggregation_type':
-                    override = None
-                    if v == 'nested:stats':
-                        override = 'stats'
-                    elif v == 'nested:range':
-                        override = 'range'
+            agg_type = facet.get("aggregation_type")
+            override = None
+            if agg_type == 'nested:stats':
+                override = 'stats'
+            elif agg_type == 'nested:range':
+                override = 'range'
 
-                    # apply override
-                    if override is not None:
-                        facet[k] = override
-                        break
+            # apply override
+            if override is not None:
+                facet["aggregation_type"] = override
+
         return result
 
     @staticmethod

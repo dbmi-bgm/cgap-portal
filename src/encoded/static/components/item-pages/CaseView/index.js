@@ -446,7 +446,6 @@ DotRouterTab.defaultProps = {
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context, currFamily, secondary_families = [] } = props;
-    const { display_title: caseDisplayTitle } = context;
     const { display_title: primaryFamilyTitle, '@id' : currFamilyID } = currFamily;
     const [ isSecondaryFamiliesOpen, setSecondaryFamiliesOpen ] = useState(false);
     const secondaryFamiliesLen = secondary_families.length;
@@ -465,7 +464,7 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
         <React.Fragment>
             <h1 className="row align-items-center">
                 <div className="col">
-                    { caseDisplayTitle }: <span className="text-300">Accessioning Report and History</span>
+                    <span className="text-300">Accessioning Report and History</span>
                 </div>
                 <div className="col-auto">
                     <span className="current-case text-small text-400 m-0">Current Selection</span>

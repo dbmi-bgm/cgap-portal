@@ -105,10 +105,10 @@ function AboveCasesTableOptions(props){
 
             <hr className="tab-section-title-horiz-divider"/>
             <div className="container-wide toggle-reports d-flex align-items-center">
-                <ProjectFilterCheckbox isContextLoading={isContextLoading} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
+                <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
                     Show Only Cases with Reports
                 </ProjectFilterCheckbox>
-                <ProjectFilterCheckbox isContextLoading={isContextLoading} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
+                <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
                     Show Only Proband Cases
                 </ProjectFilterCheckbox>
             </div>
