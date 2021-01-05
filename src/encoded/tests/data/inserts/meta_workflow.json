@@ -14,7 +14,7 @@
                   {
                       "argument_name": "bam"
                   }
-              ]
+              ],
               "outputs": [
                   {
                       "argument_name": "rck"
