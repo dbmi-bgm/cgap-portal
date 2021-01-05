@@ -324,6 +324,26 @@ class Case(Item):
             return ''
         vcf_acc = vcf.split('/')[2]
         add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
+
+        sp_item = get_item_or_none(request, sample_processing, 'sample_processing')
+        analysis_type = sp_item.get('analysis_type')
+        if analysis_type.endswith('-Trio') or analysis_type.endswith('-Group'):
+            included_relations = [item.get('relationship') for item in sp_item.get('samples_pedigree', [{}])]
+            for relation in ['mother', 'father', 'sister', 'brother', 'co-parent',
+                             'daughter', 'son', 'daughter II', 'son II', 'daughter III', 'son III']:
+                if relation in included_relations:
+                    relation = relation.replace(' ', '_').replace('-', '_')
+                    add_on += ('&additional_facet=associated_genotype_labels.'
+                               f'{relation}_genotype_label')
+
+        #     add_on += '&additional_facet=associated_genotype_labels.mother_genotype_label'
+        #     add_on += '&additional_facet=associated_genotype_labels.father_genotype_label'
+        # elif sp_item.get('analysis_type').endswith('-Group'):
+        #     add_on += '&additional_facet=associated_genotype_labels.mother_genotype_label'
+        #     add_on += '&additional_facet=associated_genotype_labels.father_genotype_label'
+        #     add_on += '&additional_facet=associated_genotype_labels.sister_genotype_label'
+        #     add_on += '&additional_facet=associated_genotype_labels.brother_genotype_label'
+
         return add_on
 
     @calculated_property(schema={
@@ -384,3 +404,28 @@ class Case(Item):
         else:
             title = "{} {} - in {}".format(ind_id, analysis, pro_id)
         return title
+
+    # @calculated_property(schema={
+    #     "title": "Search Query Filter String Add-On",
+    #     "description": "String to be appended to the initial search query to limit variant sample results to those related to this case.",
+    #     "type": "string"
+    # })
+    # def initial_search_href_filter_addon(self, request, sample_processing=None, individual=None):
+    #     """
+    #     Use vcf file and sample accessions to limit variant/variantsample to this case
+    #     """
+    #     if not individual or not sample_processing:
+    #         return ''
+    #     sample = self.sample(request, individual, sample_processing)
+    #     if not sample:
+    #         return ''
+    #     vcf = self.vcf_file(request, sample_processing)
+    #     if not vcf:
+    #         return ''
+    #     sp_data = get_item_or_none(request, sample, 'sample')
+    #     sample_read_group = sp_data.get('bam_sample_id', '')
+    #     if not sample_read_group:
+    #         return ''
+    #     vcf_acc = vcf.split('/')[2]
+    #     add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
+    #     return add_on
