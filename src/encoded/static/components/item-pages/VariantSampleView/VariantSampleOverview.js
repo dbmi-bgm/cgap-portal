@@ -133,77 +133,116 @@ function getCurrentTranscriptGeneID(context, transcriptIndex){
  *
  * @todo probably eventually move into own file, along w child tabs
  */
-function VariantSampleOverviewTabView(props){
-    const { context, schemas, currentGeneItem, currentGeneItemLoading, currentTranscriptIdx } = props;
-    const [ currentTab, setCurrentTab ] = useState("Variant");
 
-    let tabViewBody = null;
+class VariantSampleOverviewTabView extends React.PureComponent {
 
-    // Route by tab title (in future may change into some sort of dot-router 'key' later like '.variant-sample-overview.variant' or something).
-    switch (currentTab) {
-        case "Variant":
-            tabViewBody = <VariantTabBody {...{ context, schemas, currentTranscriptIdx }} />;
-            break;
-        case "Gene":
-            tabViewBody = <GeneTabBody {...{ context, schemas, currentGeneItem, currentGeneItemLoading }} />;
-            break;
-        case "Sample":
-            tabViewBody = <SampleTabBody {...{ context, schemas }} />;
-            break;
-        case "Annotation Browser":
-            tabViewBody = <AnnotationBrowserTabBody {...{ context, schemas }} />;
-            break;
-        case "BAM File Browser":
-            tabViewBody = <BamFileBrowserTabBody {...{ context, schemas }} />;
-            break;
-        default:
-            throw new Error("Unsupported tab");
+    static tabNames = [
+        "Variant",
+        "Gene",
+        "Sample",
+        "Annotation Browser",
+        "BAM File Browser"
+    ];
+
+    constructor(props){
+        super(props);
+        this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
+        this.state = { "currentTab" : 0 };
+        this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
-    const onClick = useMemo(function(){
-        return function(e){
-            // Event delegation cuz why not. Less event listeners is good usually, tho somewhat moot in React
-            // since it has SyntheticEvents anyway.
-            if (e.target.type === "button") {
-                const tabTitle = e.target.getAttribute("data-tab-title");
-                setCurrentTab(tabTitle);
+    componentDidUpdate(pastProps){
+        const { currentTab: pastTab } = pastProps;
+        const { currentTab } = this.props;
+        if (currentTab !== pastTab) {
+            // ReactTooltip.rebuild is called by App upon navigation
+            // to rebuild tooltips from current DOM.
+            // However most tabs' DOM contents not visible until swithc to them
+            // so we needa rebuild tooltip upon that.
+            // If DotRouter can be reused/integrated here or similar, we can
+            // remove this useEffect.
+            setTimeout(ReactTooltip.rebuild, 200);
+        }
+    }
+
+    componentWillUnmount(){
+        this.openPersistentTabs = [];
+    }
+
+    handleTabClick(e){
+        // Event delegation cuz why not. Less event listeners is good usually, tho somewhat moot in React
+        // since it has SyntheticEvents anyway.
+        if (e.target.type === "button") {
+            const tabTitle = parseInt(e.target.getAttribute("data-tab-index"));
+            this.setState({ "currentTab": tabTitle });
+        }
+    }
+
+    render(){
+        const { context, schemas, currentGeneItem, currentGeneItemLoading, currentTranscriptIdx } = this.props;
+        const { currentTab } = this.state;
+
+        const tabTitleElements = [];
+        const tabBodyElements = []; // [ ...this.cachedTabs ];
+
+        VariantSampleOverviewTabView.tabNames.forEach((title, index) => {
+            const tabTitleElemProps = { currentTab, index, title, "key": index };
+            if (index === 1) {
+                // If Gene:
+                tabTitleElemProps.disabled = !currentGeneItem;
+                tabTitleElemProps.loading = currentGeneItemLoading;
             }
-        };
-    }, []);
+            tabTitleElements.push(<OverviewTabTitle {...tabTitleElemProps} />);
 
-    useEffect(function(){
-        // ReactTooltip.rebuild is called by App upon navigation
-        // to rebuild tooltips from current DOM.
-        // However most tabs' DOM contents not visible until swithc to them
-        // so we needa rebuild tooltip upon that.
-        // If DotRouter can be reused/integrated here or similar, we can
-        // remove this useEffect.
-        setTimeout(ReactTooltip.rebuild, 200);
-    }, [ currentTab ]);
+            if (index === currentTab || this.openPersistentTabs[index]) {
+                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
+                switch (index) {
+                    case 0:
+                        tabBodyElements.push(<VariantTabBody {...commonBodyProps} {...{ currentTranscriptIdx }} />);
+                        break;
+                    case 1:
+                        tabBodyElements.push(<GeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
+                        break;
+                    case 2:
+                        tabBodyElements.push(<SampleTabBody {...commonBodyProps} />);
+                        break;
+                    case 3:
+                        tabBodyElements.push(<AnnotationBrowserTabBody {...commonBodyProps} />);
+                        this.openPersistentTabs[3] = true; // Persist open after first appearance.
+                        break;
+                    case 4:
+                        tabBodyElements.push(<BamFileBrowserTabBody {...commonBodyProps} />);
+                        this.openPersistentTabs[4] = true; // Persist open after first appearance.
+                        break;
+                    default:
+                        throw new Error("Unsupported tab");
+                }
+            }
 
-    // TODO in SCSS: give tabs-column hard-coded width, give content-column flex-width
-    return (
-        <div className="d-flex align-items-flex-start sample-variant-overview-tab-view-container flex-column flex-lg-row">
-            <div className="tabs-column col col-lg-2 col-xl-1 px-0" onClick={onClick}>
-                <OverviewTabTitle {...{ currentTab }} title="Variant" />
-                <OverviewTabTitle {...{ currentTab }} title="Gene" disabled={!currentGeneItem} loading={currentGeneItemLoading} />
-                <OverviewTabTitle {...{ currentTab }} title="Sample" />
-                <OverviewTabTitle {...{ currentTab }} title="Annotation Browser" />
-                <OverviewTabTitle {...{ currentTab }} title="BAM File Browser" />
+        });
+
+
+        // TODO in SCSS: give tabs-column hard-coded width, give content-column flex-width
+        return (
+            <div className="d-flex align-items-flex-start sample-variant-overview-tab-view-container flex-column flex-lg-row">
+                <div className="tabs-column col col-lg-2 col-xl-1 px-0" onClick={this.handleTabClick}>
+                    { tabTitleElements }
+                </div>
+                <div className="content-column card">
+                    { tabBodyElements }
+                </div>
             </div>
-            <div className="content-column card">
-                { tabViewBody }
-            </div>
-        </div>
-    );
+        );
+    }
+
 }
 
 
 const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
-    const { currentTab, title, disabled = false, loading = false } = props;
-    const active = (currentTab === title);
+    const { currentTab, title, index, disabled = false, loading = false } = props;
+    const active = (currentTab === index);
     return (
-        <button type="button" className="d-block overview-tab" data-tab-title={title} data-active={active} disabled={disabled}>
+        <button type="button" className="d-block overview-tab" data-tab-title={title} data-tab-index={index} data-active={active} disabled={disabled}>
             { loading ?
                 <i className="icon icon-spin icon-circle-notch fas mr-07"/>
                 : title }
