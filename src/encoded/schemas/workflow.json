@@ -297,6 +297,12 @@
                         "description": "Whether the input file should be mounted instead of downlaoded to EC2",
                         "type": "boolean"
                     },
+                    "default_input_file": {
+                        "title": "Default Input File"
+                        "description": "default input file (e.g. for reference file)",
+                        "type": "string",
+                        "linkTo": "File"
+                    },
                     "argument_to_be_attached_to": {
                         "title": "Argument To Be Attached To",
                         "description": "Argument to be attached to, for qc files and input extra files",
