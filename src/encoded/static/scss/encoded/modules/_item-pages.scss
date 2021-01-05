@@ -1897,7 +1897,7 @@ $download-button-width : 100px;
 				display: flex;
 				justify-content: space-evenly;
 
-				@include media-breakpoint-down(sm) {
+				@include media-breakpoint-down(md) {
 					flex-direction: column;
 				}
 
@@ -1906,7 +1906,7 @@ $download-button-width : 100px;
 					display: flex;
 					height: $search-results-header-row-height; // Eh why not re-use this, can change always in future.
 
-					@include media-breakpoint-down(sm) {
+					@include media-breakpoint-down(md) {
 						margin-bottom: 5px;
 					}
 					
@@ -1957,12 +1957,12 @@ $download-button-width : 100px;
 							}
 						}
 
-						@include media-breakpoint-down(sm) {
+						@include media-breakpoint-down(md) {
 							display: none;
 						}
 					}
 
-					@include media-breakpoint-up(md) {
+					@include media-breakpoint-up(lg) {
 
 						&:first-child {
 							> .btn-prepend {
