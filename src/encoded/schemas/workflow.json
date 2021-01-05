@@ -293,12 +293,12 @@
                         ]
                     },
                     "mounted": {
-                        "title": "Mounted"
+                        "title": "Mounted",
                         "description": "Whether the input file should be mounted instead of downlaoded to EC2",
                         "type": "boolean"
                     },
                     "default_input_file": {
-                        "title": "Default Input File"
+                        "title": "Default Input File",
                         "description": "default input file (e.g. for reference file)",
                         "type": "string",
                         "linkTo": "File"

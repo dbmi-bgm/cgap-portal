@@ -79,7 +79,7 @@
                         "title" : "Name",
                         "description" : "Name of the workflow, unique within the meta workflow",
                         "type" : "string"
-                    }
+                    },
                     "workflow" : {
                         "title" : "Workflow",
                         "description" : "Link to the workflow item",
@@ -108,7 +108,7 @@
                                 },
                                 "scatter": {
                                     "title": "Scatter",
-                                    "description" : "Whether the input is an array from multiple runs of the source"
+                                    "description" : "Whether the input is an array from multiple runs of the source",
                                     "type" : "boolean"
                                 }
                             }
@@ -136,7 +136,7 @@
                                 },
                                 "scatter": {
                                     "title": "Scatter",
-                                    "description" : "Whether the input of the target is an array from multiple runs of the workflow"
+                                    "description" : "Whether the input of the target is an array from multiple runs of the workflow",
                                     "type" : "boolean"
                                 }
                             }
