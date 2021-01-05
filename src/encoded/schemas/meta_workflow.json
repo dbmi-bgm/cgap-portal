@@ -1,0 +1,163 @@
+{
+    "title": "MetaWorkflow",
+    "description": "Schema for a meta workflow that connects a set of computational analysis workflows",
+    "id": "/profiles/meta_workflow.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": ["title", "name", "project", "institution"],
+    "additionalProperties": false,
+    "identifyingProperties": ["uuid", "aliases", "accession"],
+    "mixinProperties": [
+        { "$ref": "mixins.json#/schema_version" },
+        { "$ref": "mixins.json#/aliases" },
+        { "$ref": "mixins.json#/uuid" },
+        { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/submitted" },
+        { "$ref": "mixins.json#/modified" },
+        { "$ref": "mixins.json#/documents" },
+        { "$ref": "mixins.json#/attribution" },
+        { "$ref": "mixins.json#/static_embeds" },
+        { "$ref": "mixins.json#/tags" },
+        { "$ref": "mixins.json#/accession" }
+    ],
+    "mixinFacets" : [
+        { "$ref": "mixins.json#/facets_common" }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "accession": {
+            "accessionType": "MW"
+        },
+        "title": {
+            "title": "Title",
+            "description": "The preferred viewable name of the meta workflow.",
+            "type": "string"
+        },
+        "name": {
+            "title": "Name",
+            "description": "The name of the meta workflow",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "A short text description of the meta workflow.",
+            "type": "string",
+            "formInput": "textarea"
+        },
+        "meta_workflow_version": {
+            "title": "meta workflow version",
+            "description": "The version of the meta workflow.",
+            "type": "string"
+        },
+        "previous_version": {
+            "title": "Previous versions",
+            "description": "Link to the previous versions of the meta workflow.",
+            "type": "array",
+            "items": {
+                "title": "Previous version",
+                "description": "Link to a previous version of the meta workflow.",
+                "type": "string",
+                "linkTo": "MetaWorkflow"
+            }
+        },
+        "version_upgrade_log": {
+            "title": "Version upgrade log",
+            "description": "Version upgrade log",
+            "type": "string"
+        },
+        "workflows" : {
+            "title": "Workflows",
+            "type": "array",
+            "exclude_from": ["FFedit-create"],
+            "items": {
+                "title": "Workflows",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "name" : {
+                        "title" : "Name",
+                        "description" : "Name of the workflow, unique within the meta workflow",
+                        "type" : "string"
+                    "workflow" : {
+                        "title" : "Workflow",
+                        "description" : "Link to the workflow item",
+                        "type" : "string",
+                        "linkTo": "Workflow"
+                    },
+                    "inputs" : {
+                        "title" : "Workflow Inputs",
+                        "type" : "array",
+                        "items" : {
+                            "type" : "object",
+                            "properties" : {
+                                "argument_name" : {
+                                    "title" : "Input Argument Name",
+                                    "type" : "string"
+                                },
+                                "source" : {
+                                    "title" : "Source Workflow",
+                                    "description" : "Where this input file came from (source workflow name). If this field is null or undefined, the input is global and not from another workflow's output.",
+                                    "type" : "string"
+                                },
+                                "name_in_source" : {
+                                    "title" : "Name in Source Workflow",
+                                    "description" : "Output argument name in the source workflow",
+                                    "type" : "string"
+                                },
+                                "scatter": {
+                                    "title": "Scatter",
+                                    "description" : "Whether the input is an array from multiple runs of the source"
+                                    "type" : "boolean"
+                                }
+                            }
+                        }
+                    },
+                    "outputs" : {
+                        "title" : "Workflow Outputs",
+                        "type" : "array",
+                        "items" : {
+                            "type" : "object",
+                            "properties" : {
+                                "argument_name" : {
+                                    "title" : "Output Name",
+                                    "type" : "string"
+                                },
+                                "target" : {
+                                    "title" : "Target Workflow",
+                                    "description" : "Where this output file should go next (target workflow name). If this field is null or undefined, the output is global and going into another workflow as input.",
+                                    "type" : "string",
+                                },
+                                "name_in_target" : {
+                                    "title" : "Name in Target Workflow",
+                                    "description" : "Input argument name in the target workflow",
+                                    "type" : "string"
+                                },
+                                "scatter": {
+                                    "title": "Scatter",
+                                    "description" : "Whether the input of the target is an array from multiple runs of the workflow"
+                                    "type" : "boolean"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "facets" : {
+        "workflows.workflow.display_title": {
+            "title" : "Workflow"
+        }
+    },
+    "columns" : {
+        "name": {
+            "title": "Name"
+        },
+        "meta_workflow_version": {
+            "title": "Version",
+            "colTitle" : "Version"
+        }
+    }
+}

@@ -292,6 +292,11 @@
                             "other"
                         ]
                     },
+                    "mounted": {
+                        "title": "Mounted"
+                        "description": "Whether the input file should be mounted instead of downlaoded to EC2",
+                        "type": "boolean"
+                    },
                     "argument_to_be_attached_to": {
                         "title": "Argument To Be Attached To",
                         "description": "Argument to be attached to, for qc files and input extra files",

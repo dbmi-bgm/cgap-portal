@@ -1018,3 +1018,17 @@ def run_workflow(context, request):
                 raise HTTPUnprocessableEntity(str(event['executionFailedEventDetails']))
 
     return res_dict
+
+
+@collection(
+    name='meta-workflows',
+    unique_key='accession',
+    properties={
+        'title': 'MetaWorkflows',
+        'description': 'Listing of MetaWorkflows',
+    })  
+class MetaWorkflow(Item):
+    item_type = 'meta_workflow'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/meta_workflow.json')
+    rev = {'indiv': ('Individual', 'meta_workflow')}

@@ -1,0 +1,45 @@
+[
+    {
+      "title": "Test Meta Workflow",
+      "name": "test_metawf",
+      "meta_workflow_version": "v1",
+      "description": "Test meta workflow",
+      "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+      "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+      "workflows": [
+          {
+              "name": "mpileup",
+              "workflow": "e2e95743-0d3b-4e07-b1e5-71c80dd74906",
+              "inputs": [
+                  {
+                      "argument_name": "bam"
+                  }
+              ]
+              "outputs": [
+                  {
+                      "argument_name": "rck"
+                      "target": "rcktar"
+                      "name_in_target": "input_rcks",
+                      "scatter": true
+                  }
+              ]
+          },
+          {
+              "name": "rcktar",
+              "workflow": "40f60563-a3e6-4a45-b083-c6a2e00dc71f",
+              "inputs": [
+                  {
+                      "argument_name": "input_rcks",
+                      "source": "mpileup",
+                      "name_in_source": "rck",
+                      "scatter": true
+                  }
+              ]
+              "outputs": [
+                  {   
+                      "argument_name": "rcktar"
+                  }
+              ]
+          }
+      ]
+]
