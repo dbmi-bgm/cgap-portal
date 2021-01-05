@@ -17,8 +17,8 @@
               ],
               "outputs": [
                   {
-                      "argument_name": "rck"
-                      "target": "rcktar"
+                      "argument_name": "rck",
+                      "target": "rcktar",
                       "name_in_target": "input_rcks",
                       "scatter": true
                   }
@@ -34,7 +34,7 @@
                       "name_in_source": "rck",
                       "scatter": true
                   }
-              ]
+              ],
               "outputs": [
                   {   
                       "argument_name": "rcktar"
