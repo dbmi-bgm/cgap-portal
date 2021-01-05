@@ -70,7 +70,6 @@
         "workflows" : {
             "title": "Workflows",
             "type": "array",
-            "exclude_from": ["FFedit-create"],
             "items": {
                 "title": "Workflows",
                 "type": "object",
@@ -80,6 +79,7 @@
                         "title" : "Name",
                         "description" : "Name of the workflow, unique within the meta workflow",
                         "type" : "string"
+                    }
                     "workflow" : {
                         "title" : "Workflow",
                         "description" : "Link to the workflow item",
