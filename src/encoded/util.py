@@ -8,7 +8,7 @@ import tempfile
 
 from dcicutils.misc_utils import check_true
 from io import BytesIO
-from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden
+from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden, HTTPServerError
 from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
@@ -86,6 +86,15 @@ def debuglog(*args):
             # Maybe it was a bad pathname? Out of disk space? Network error?
             # It doesn't really matter. Just continue...
             pass
+
+
+def subrequest_object(request, object_id):
+    subreq = make_subrequest(request, "/" + object_id)
+    response = request.invoke_subrequest(subreq, use_tweens=True)
+    if response.status_code >= 300:  # alas, the response from a pyramid subrequest has no .raise_for_status()
+        raise HTTPServerError("Error obtaining object: %s" % object_id)
+    object_json = response.json
+    return object_json
 
 
 def subrequest_item_creation(request: pyramid.request.Request, item_type: str, json_body: dict = None) -> dict:
@@ -236,16 +245,6 @@ def create_empty_s3_file(s3_client, bucket: str, key: str):
     """
     empty_file = "/dev/null"
     s3_client.upload_file(empty_file, Bucket=bucket, Key=key)
-
-
-def full_class_name(object):
-    # Source: https://stackoverflow.com/questions/2020014/get-fully-qualified-class-name-of-an-object-in-python
-
-    module = object.__class__.__module__
-    if module is None or module == str.__class__.__module__:
-        return object.__class__.__name__  # Avoid reporting __builtin__
-    else:
-        return module + '.' + object.__class__.__name__
 
 
 def get_trusted_email(request, context=None, raise_errors=True):

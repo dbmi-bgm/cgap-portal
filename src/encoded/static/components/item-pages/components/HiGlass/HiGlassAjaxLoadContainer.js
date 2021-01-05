@@ -3,7 +3,7 @@
 import React from 'react';
 import _ from 'underscore';
 import memoize from 'memoize-one';
-import { console, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { HiGlassPlainContainer, HiGlassLoadingIndicator } from './HiGlassPlainContainer';
 
 
@@ -23,7 +23,10 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
         this.state = {
             'loading': false,
             'higlassItem' : null,
-            'variantPositionAbsCoord' : props.variantPositionAbsCoord ? props.variantPositionAbsCoord : null
+            'variantPositionAbsCoord' : props.variantPositionAbsCoord ? props.variantPositionAbsCoord : null,
+            'requestingTab' : props.requestingTab,
+            'bamSampleId' : props.bamSampleId ? props.bamSampleId : null,
+            'file' : props.file ? props.file : null,
         };
         this.containerRef = React.createRef();
     }
@@ -55,31 +58,60 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                 console.warn(errResp);
             };
 
-            const { variantPositionAbsCoord } = this.state;
-        
-            const payload = {
-                'viewconfig_uuid' : "00000000-1111-0000-1111-000000000000", // Default CGAP viewconf
-                'variant_pos_abs' : variantPositionAbsCoord
-            };
-        
-            ajax.load(
-                "/get_higlass_viewconf/",
-                (resp) => {
-                    const higlassItem = {
-                        viewconfig:  resp.viewconfig
-                    }
-                    this.setState({ 'higlassItem' : higlassItem,'loading': false });
-                    console.log("Loading done")
-                },
-                'POST',
-                fallbackCallback,
-                JSON.stringify(payload)
-            );
+            const { variantPositionAbsCoord, requestingTab, bamSampleId, file } = this.state;
 
+            if(requestingTab === "bam" && bamSampleId !== null && file !== null){
+                // Get the associated case and extract BAM infos from there
+                ajax.load(
+                    "/search/?type=Case&sample.bam_sample_id="+bamSampleId+"&vcf_file.accession="+file,
+                    (resp) => {
+                        
+                        if(resp["@graph"].length > 0 && resp["@graph"][0]["sample_processing"]){
+                            const samplesPedigree = resp["@graph"][0]["sample_processing"]["samples_pedigree"] ??  null;
+                            const payload = {
+                                'variant_pos_abs' : variantPositionAbsCoord,
+                                'requesting_tab' : requestingTab,
+                                'samples_pedigree' : samplesPedigree,
+                                'bam_sample_id' : bamSampleId,
+                            };
+                            this.getViewconf(payload, fallbackCallback);
+                        }else{
+                            console.warn("There are no BAM files for this case.");
+                        } 
+                    },
+                    'GET',
+                    fallbackCallback
+                );
+            }
+            else{
 
+                const payload = {
+                    'variant_pos_abs' : variantPositionAbsCoord,
+                    'requesting_tab' : requestingTab
+                };
+
+                this.getViewconf(payload, fallbackCallback)
+            }
+        
         });
     }
 
+    getViewconf(payload, fallbackCallback){
+
+        ajax.load(
+            "/get_higlass_viewconf/",
+            (resp) => {
+                const higlassItem = {
+                    viewconfig:  resp.viewconfig
+                }
+                this.setState({ 'higlassItem' : higlassItem,'loading': false });
+            },
+            'POST',
+            fallbackCallback,
+            JSON.stringify(payload)
+        );
+
+    }
 
     render(){
         const { higlassItem, loading } = this.state;

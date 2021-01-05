@@ -175,6 +175,7 @@ export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabV
  */
 export const PedigreeTabView = React.memo(function PedigreeTabView(props){
     const {
+        PedigreeVizLibrary,
         context, schemas, windowWidth, windowHeight, href, session, graphData,
         availableDiseases, selectedDiseases, onToggleSelectedDisease, onTogglePedigreeOptionCheckbox,
         showOrderBasedName,
@@ -190,6 +191,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
     }
 
     const pedigreeTabViewBodyProps = {
+        PedigreeVizLibrary,
         graphData, session, href,
         context, showOrderBasedName,
         windowWidth, windowHeight,

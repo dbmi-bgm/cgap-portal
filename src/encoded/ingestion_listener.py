@@ -9,6 +9,7 @@ import io
 import json
 import os
 import psycopg2
+import re
 import requests  # XXX: C4-211 should not be needed but is // KMP needs this, too, until subrequest posts work
 import signal
 import socket
@@ -18,11 +19,12 @@ import time
 import webtest
 
 from dcicutils.env_utils import is_stg_or_prd_env
-from dcicutils.misc_utils import VirtualApp, ignored, check_true
+from dcicutils.misc_utils import VirtualApp, ignored, check_true, full_class_name
 from pyramid import paster
-from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
+from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently, HTTPServerError
 from pyramid.request import Request
-from pyramid.response import Response
+# Possibly still needed by some commented-out code.
+# from pyramid.response import Response
 from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
@@ -33,10 +35,11 @@ from .ingestion.processors import get_ingestion_processor
 from .inheritance_mode import InheritanceMode
 from .server_defaults import add_last_modified
 from .loadxl import LOADXL_USER_UUID
-from .types.ingestion import SubmissionFolio
+from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 from .util import (
-    resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request, full_class_name,
+    resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request,
+    subrequest_object,
 )
 
 
@@ -58,39 +61,45 @@ SHARED = 'shared'
 def includeme(config):
     config.add_route('queue_ingestion', '/queue_ingestion')
     config.add_route('ingestion_status', '/ingestion_status')
-    config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
+    # config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
     config.add_route('submit_for_ingestion', '/submit_for_ingestion')
     config.registry[INGESTION_QUEUE] = IngestionQueueManager(config.registry)
     config.scan(__name__)
 
 
-# This endpoint is intended only for debugging. Use the command line tool.
-@view_config(route_name='prompt_for_ingestion', request_method='GET')
-@debug_log
-def prompt_for_ingestion(context, request):
-    ignored(context, request)
-    return Response(PROMPT_FOR_INGESTION)
+# The new protocol requires a two-phase action, first creating the IngestionSubmission
+# and then using that object to do the submission. We don't need this for debugging right now,
+# so I've just disabled it to avoid confusion. We should decide later whether to fix this or
+# just flush it as having served its purpose. -kmp 2-Dec-2020
+#
+# # This endpoint is intended only for debugging. Use the command line tool.
+# @view_config(route_name='prompt_for_ingestion', request_method='GET')
+# @debug_log
+# def prompt_for_ingestion(context, request):
+#     ignored(context, request)
+#     return Response(PROMPT_FOR_INGESTION)
 
+
+SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)(|/.*)$')
 
 register_path_content_type(path='/submit_for_ingestion', content_type='multipart/form-data')
 
 
-@view_config(route_name='submit_for_ingestion', request_method='POST',
+@view_config(name='submit_for_ingestion', request_method='POST', context=IngestionSubmission,
              # Apparently adding this 'accept' causes discrimination on incoming requests not to find this method.
              # We do want this type, and instead we check the request to make sure we got it, but we omit it here
              # for practical reasons. -kmp 10-Sep-2020
              # accept='multipart/form-data',
-             permission='add')
+             permission='edit')
 @debug_log
 def submit_for_ingestion(context, request):
     ignored(context)
 
     check_true(request.content_type == 'multipart/form-data',  # even though we can't declare we accept this
-               "Expected request to have content_type 'multipart/form-data'.", error_class=RuntimeError)
+               "Expected request to have content_type 'multipart/form-data'.", error_class=SubmissionFailure)
 
     bs_env = beanstalk_env_from_request(request)
     bundles_bucket = metadata_bundles_bucket(request.registry)
-    ingestion_type = request.POST['ingestion_type']
     datafile = request.POST['datafile']
     if not isinstance(datafile, cgi.FieldStorage):
         # e.g., specifically it might be b'' when no file is selected,
@@ -101,14 +110,43 @@ def submit_for_ingestion(context, request):
     override_name = request.POST.get('override_name', None)
     parameters = dict(request.POST)
     parameters['datafile'] = filename
-    institution = get_parameter(parameters, 'institution')
-    project = get_parameter(parameters, 'project')
+
     # Other parameters, like validate_only, will ride in on parameters via the manifest on s3
 
-    submission_id = SubmissionFolio.create_item(request,
-                                                ingestion_type=ingestion_type,
-                                                institution=institution,
-                                                project=project)
+    matched = SUBMISSION_PATTERN.match(request.path_info)
+    if matched:
+        submission_id = matched.group(1)
+    else:
+        raise SubmissionFailure("request.path_info is not in the expected form: %s" % request.path_info)
+
+    instance = subrequest_object(request, submission_id)
+
+    # The three arguments institution, project, and ingestion_type were needed in the old protocol
+    # but are not needed in the new protocol because someone will have set up the IngestionSubmission
+    # object already with the right values. We tolerate them here, but we insist they be consistent (redundant).
+    # Note, too, that we use the 'update=True' option that causes them to be added to our parameters if they are
+    # missing, defaulted from the previous item, so that they will be written to the parameter block stored on S3.
+    # (We could do that differently now, by looking them up dynamically, but rather than risk making a mistake,
+    # I just went with path of least resistance for now.)
+    # -kmp 2-Dec-2020
+
+    institution = instance['institution']['@id']
+    institution_arg = get_parameter(parameters, "institution", default=institution, update=True)
+    if institution_arg != institution:
+        # If the "institution" argument was passed, which we no longer require, make sure it's consistent.
+        raise SubmissionFailure("'institution' was supplied inconsistently for submit_for_ingestion.")
+
+    project = instance['project']['@id']
+    project_arg = get_parameter(parameters, "project", default=project, update=True)
+    if project_arg != project:
+        # If the "project" argument was passed, which we no longer require, make sure it's consistent.
+        raise SubmissionFailure("'project' was supplied inconsistently for submit_for_ingestion.")
+
+    ingestion_type = instance['ingestion_type']
+    ingestion_type_arg = get_parameter(parameters, "ingestion_type", default=ingestion_type, update=True)
+    if ingestion_type_arg != ingestion_type:
+        # If the "ingestion_type" argument was passed, which we no longer require, make sure it's consistent.
+        raise SubmissionFailure("'ingestion_type' was supplied inconsistently for submit_for_ingestion.")
 
     # ``input_file`` contains the actual file data which needs to be
     # stored somewhere.
@@ -287,6 +325,88 @@ def get_queue_manager(request, *, override_name):
     return (request.registry[INGESTION_QUEUE]
             if not override_name
             else IngestionQueueManager(request.registry, override_name=override_name))
+
+
+class IngestionError:
+    """
+    Holds info on an error that occurred in ingestion. Right now this consists of the
+    offending request body and the VCF row it occurred on.
+
+    This class doesn't really do much except specify the structure. It must align with that of FileProcessed
+    (reproduced as of 12/2/2020 below):
+
+        "file_ingestion_error": {
+            "title": "Ingestion Error Report",
+            "description": "This field is set when an error occurred in ingestion with all errors encountered",
+            "type": "array",
+            "items": {
+                "title": "Ingestion Error",
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "index": false  # the intention is not to index this in the future
+                    },
+                    "row": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+
+    """
+
+    def __init__(self, body, row):
+        self.body = body
+        self.row = row
+
+    def to_dict(self):
+        return {
+            'body': str(self.body),
+            'row': self.row
+        }
+
+
+class IngestionReport:
+    """
+    A "virtual" item on file_processed that contains detailed information on the ingestion run.
+    Not creating an item for this is a design decision. The output of this process is more for
+    debugging and not for auditing, so it does not merit an item at this time.
+    """
+    MAX_ERRORS = 100  # tune this to get more errors, 100 is a lot though and probably more than needed
+
+    def __init__(self):
+        self.grand_total = 0
+        self.errors = []
+
+    def brief_summary(self):
+        return ('INGESTION REPORT: There were %s total variants detected, of which %s were successful'
+                'and %s failed. Check ProcessedFile for full error output.' % (self.grand_total,
+                                                                              self.total_successful(),
+                                                                              self.total_errors()))
+
+    def total_successful(self):
+        return self.grand_total - len(self.errors)
+
+    def total_errors(self):
+        return len(self.errors)
+
+    def get_errors(self, limit=True):
+        """Returns a limited number of errors, where limit can be True (self.MAX_ERRORS), False (no limit), or an integer."""
+        if limit is True:
+            limit = self.MAX_ERRORS
+        elif limit is False:
+            limit = None
+        return self.errors[:limit]
+
+    def mark_success(self):
+        """ Marks the current row number as successful, which in this case just involves incrementing the total """
+        self.grand_total += 1
+
+    def mark_failure(self, *, body, row):
+        """ Marks the current row as failed, creating an IngestionError holding the response body and row. """
+        self.grand_total += 1
+        self.errors.append(IngestionError(body, row).to_dict())
 
 
 class IngestionQueueManager:
@@ -502,7 +622,7 @@ class IngestionListener:
                             (self.vapp, _queue_manager, _update_status))
         self.queue_manager = IngestionQueueManager(registry) if not _queue_manager else _queue_manager
         self.update_status = _update_status
-        self.first_error_message = None
+        self.ingestion_report = IngestionReport()  # collect all errors
 
     @staticmethod
     def should_remain_online(override=None):
@@ -554,13 +674,13 @@ class IngestionListener:
         """ Patches field with value on item uuid """
         self.vapp.patch_json('/' + uuid, {field: value})
 
-    def set_error(self, uuid):
+    def patch_ingestion_report(self, uuid):
         """ Sets the file_ingestion_error field of the given uuid """
-        if self.first_error_message is None:
-            log.error('Tried to set error message but no message was set!')
+        if self.ingestion_report is None:
+            log.error('Tried to set IngestionReport but one was not created!')
             return
-        self._patch_value(uuid, 'file_ingestion_error', self.first_error_message)
-        self.first_error_message = None  # reset this field
+        self._patch_value(uuid, 'file_ingestion_error', self.ingestion_report.get_errors())
+        self.ingestion_report = None  # reset this field
 
     def set_status(self, uuid, status):
         """ Sets the file_ingestion_status of the given uuid """
@@ -629,7 +749,7 @@ class IngestionListener:
                 add_last_modified(variant, userid=LOADXL_USER_UUID)
                 self.vapp.post_json('/variant_sample', sample, status=201)
             except Exception as e:
-                log.error('Encountered exception posting variant_sample: %s' % e)
+                debuglog('Encountered exception posting variant_sample: %s' % e)
                 raise  # propagate/report if error occurs here
 
     def search_for_sample_relations(self, vcf_file_accession):
@@ -672,7 +792,6 @@ class IngestionListener:
         :param file_meta: metadata for the processed VCF file
         :return: 2-tuple of successful, failed number of posts
         """
-        success, error = 0, 0
         vs_project, vs_institution, file_accession = (file_meta['project']['uuid'], file_meta['institution']['uuid'],
                                                       file_meta['accession'])
         sample_relations = self.extract_sample_relations(file_accession)
@@ -684,14 +803,12 @@ class IngestionListener:
                                                       CGAP_CORE_INSTITUTION)  # /institutions/hms-dbmi/
                 self.build_and_post_variant_samples(parser, record, vs_project, vs_institution, variant, file_accession,
                                                     sample_relations)
-                success += 1
+                self.ingestion_report.mark_success()
             except Exception as e:  # ANNOTATION spec validation error, recoverable
-                log.error('Encountered exception posting variant at row %s: %s ' % (idx, e))
-                if not self.first_error_message:
-                    self.first_error_message = str(e)
-                error += 1
+                debuglog('Encountered exception posting variant at row %s: %s ' % (idx, e))
+                self.ingestion_report.mark_failure(body=str(e), row=idx)
 
-        return success, error
+        return self.ingestion_report.total_successful(), self.ingestion_report.total_errors()
 
     def run(self):
         """ Main process for this class. Runs forever doing ingestion as needed.
@@ -761,6 +878,7 @@ class IngestionListener:
 
                 # if this file has been ingested (or explicitly disabled), do not do anything with this uuid
                 if file_meta.get('file_ingestion_status', 'N/A') in [STATUS_INGESTED, STATUS_DISABLED]:
+                    log.error('Skipping ingestion of file %s due to disabled ingestion status' % uuid)
                     continue
 
                 # attempt download with workaround
@@ -774,24 +892,20 @@ class IngestionListener:
                 # patch in progress status
                 self.set_status(uuid, STATUS_IN_PROGRESS)
                 decoded_content = gunzip_content(raw_content)
-                log.info('Got decoded content: %s' % decoded_content[:20])
+                debuglog('Got decoded content: %s' % decoded_content[:20])
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                                    reader=Reader(fsock=decoded_content.split('\n')))
                 success, error = self.post_variants_and_variant_samples(parser, file_meta)
 
                 # if we had no errors, patch the file status to 'Ingested'
                 if error > 0:
-                    log.error('Some VCF rows for uuid %s failed to post - not marking VCF '
-                              'as ingested.' % uuid)
                     self.set_status(uuid, STATUS_ERROR)
-                    self.set_error(uuid)
+                    self.patch_ingestion_report(uuid)
                 else:
                     self.set_status(uuid, STATUS_INGESTED)
 
                 # report results in error_log regardless of status
-                msg = ('INGESTION_REPORT:\n'
-                       'Success: %s\n'
-                       'Error: %s\n' % (success, error))
+                msg = self.ingestion_report.brief_summary()
                 log.error(msg)
                 self.update_status(msg=msg)
 

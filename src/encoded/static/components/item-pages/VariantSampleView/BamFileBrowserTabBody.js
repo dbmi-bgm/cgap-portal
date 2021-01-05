@@ -9,10 +9,12 @@ import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoa
 // import { HiGlassPlainContainer } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/HiGlass/HiGlassPlainContainer';
 
 
-export const BrowserTabBody = React.memo(function BrowserTabBody ({ context, schemas }) {
+export const BamFileBrowserTabBody = React.memo(function BamFileBrowserTabBody ({ context, schemas }) {
 
     const higlassContainerRef = useRef(null);
     const variantPositionAbsCoord = context.variant.POS_ABS;
+    const bamSampleId = context.CALL_INFO;
+    const file = context.file;
 
     return (
         <div className="browser-tab-body card-body">
@@ -21,11 +23,11 @@ export const BrowserTabBody = React.memo(function BrowserTabBody ({ context, sch
                     <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
                         <div className="info-header-title">
                             <h4>
-                                HiGlass Browser
+                                BAM File Viewer
                             </h4>
                         </div>
                         <div className="info-body">
-                            <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantPositionAbsCoord} ref={higlassContainerRef} />
+                            <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantPositionAbsCoord} ref={higlassContainerRef} requestingTab="bam" bamSampleId={bamSampleId} file={file}/>
                         </div>
                     </div>
                 </div>

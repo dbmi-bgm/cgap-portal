@@ -1,17 +1,13 @@
 'use strict';
 
-import React, { useState, useMemo } from 'react';
-import _ from 'underscore';
-import url from 'url';
+import React, { useMemo } from 'react';
 import queryString from 'query-string';
 
-import { console, layout, navigate, ajax, itemUtil } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
-import { DisplayTitleColumnWrapper, DisplayTitleColumnDefault } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
-import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
 
 const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ hgvsc }){
@@ -279,17 +275,20 @@ export function filterQueryByQuery(query1, query2){
 export const FilteringTab = React.memo(function FilteringTab(props) {
     const { context = null, windowHeight, session = false, schemas } = props;
     const {
-        display_title: caseDisplayTitle,
         accession: caseAccession,
         initial_search_href_filter_addon = "",
         active_filterset = null,
+        additional_variant_sample_facets = []
     } = context || {};
 
     const {  "@id" : activeFilterSetID = null } = active_filterset || {};
 
-    let searchHrefBase = "/search/?type=VariantSample";
-    searchHrefBase += initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "";
-    searchHrefBase += "&sort=-date_created";
+    const searchHrefBase = (
+        "/search/?type=VariantSample"
+        + (initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "")
+        + (additional_variant_sample_facets.length > 0 ? "&" + additional_variant_sample_facets.map(function(fac){ return "additional_facet=" + encodeURIComponent(fac); }).join("&") : "")
+        + "&sort=date_created"
+    );
 
     // DEPRECATED - we no longer have filter_blocks present initially.
     // const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
@@ -317,12 +316,12 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         }
 
         const blankFilterSetItem = {
-            "title" : "New FilterSet for Case " + caseAccession,
+            "title" : "FilterSet for Case " + caseAccession,
             "created_in_case_accession" : caseAccession,
             "search_type": "VariantSample",
             "filter_blocks" : [
                 {
-                    "name" : "New Filter Block 1",
+                    "name" : "Filter Block 1",
                     "query" : ""
                 }
             ]
@@ -360,7 +359,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     ) : (
         // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
         // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem} initialSelectedFilterBlockIdx={0}>
+        <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
             <FilteringTableFilterSetUI caseItem={context} />
         </FilterSetController>
     );
@@ -368,7 +367,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     return (
         <React.Fragment>
             <h1 className="mb-24 mt-0">
-                { caseDisplayTitle }: <span className="text-300">Variant Filtering and Technical Review</span>
+                <span className="text-300">Variant Filtering and Technical Review</span>
             </h1>
             <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader }}
                 key={searchTableKey} />

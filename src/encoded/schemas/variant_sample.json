@@ -592,22 +592,76 @@
         },
         "associated_genotype_labels.father_genotype_label": {
             "title": "Father Genotype",
-            "order": 14,
+            "order": 20,
             "grouping": "Genotype"
         },
         "associated_genotype_labels.mother_genotype_label": {
             "title": "Mother Genotype",
-            "order": 13,
+            "order": 21,
             "grouping": "Genotype"
         },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Proband Genotype",
-            "order": 12,
+            "order": 22,
             "grouping": "Genotype"
+        },
+        "associated_genotype_labels.sister_genotype_label": {
+            "title": "Sister Genotype",
+            "order": 23,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.brother_genotype_label": {
+            "title": "Brother Genotype",
+            "order": 24,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.coparent_genotype_label": {
+            "title": "Co-Parent Genotype",
+            "order": 25,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.daughter_genotype_label": {
+            "title": "Daughter Genotype",
+            "order": 26,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.son_genotype_label": {
+            "title": "Son Genotype",
+            "order": 27,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.daughter_II_genotype_label": {
+            "title": "Daughter II Genotype",
+            "order": 28,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.son_II_genotype_label": {
+            "title": "Son II Genotype",
+            "order": 29,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.daughter_III_genotype_label": {
+            "title": "Daughter III Genotype",
+            "order": 30,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.son_III_genotype_label": {
+            "title": "Son III Genotype",
+            "order": 31,
+            "grouping": "Genotype",
+            "default_hidden": true
         },
         "cmphet.comhet_impact_gene": {
             "title": "ComHet Impact",
-            "order": 17,
+            "order": 200,
             "grouping": "Genotype"
         },
         "inheritance_modes": {
