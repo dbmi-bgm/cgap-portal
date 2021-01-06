@@ -3,17 +3,17 @@ Based on environment variables make a config file (production.ini) for our encod
 """
 
 import os
-from dcicutils.deployment_utils import Deployer
+from dcicutils.deployment_utils import IniFileManager
 
 
-class CGAPDeployer(Deployer):
+class CGAPIniFileManager(IniFileManager):
     _MY_DIR = os.path.dirname(__file__)
     TEMPLATE_DIR = os.path.join(_MY_DIR, "ini_files")
     PYPROJECT_FILE_NAME = os.path.join(os.path.dirname(_MY_DIR), "pyproject.toml")
 
 
 def main():
-    CGAPDeployer.main()
+    IniFileManager.main()
 
 
 if __name__ == '__main__':

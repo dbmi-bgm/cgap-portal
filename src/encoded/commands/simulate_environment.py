@@ -5,7 +5,7 @@ import structlog
 from contextlib import contextmanager
 from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.beanstalk_utils import get_beanstalk_environment_variables
-from deploy.generate_production_ini import CGAPDeployer
+from deploy.generate_production_ini import CGAPIniFileManager
 
 
 logger = structlog.getLogger(__name__)
@@ -42,7 +42,8 @@ def main():
     # get env, invoke deployer
     beanstalk_env = get_beanstalk_environment_variables(args.environment)
     with secure_environ(beanstalk_env):
-        CGAPDeployer.main()
+        template_file_name = CGAPIniFileManager.environment_template_filename(args.environment)
+        CGAPIniFileManager.build_ini_file_from_template(template_file_name, 'production.ini')
     logger.info('Successfully wrote production.ini')
     exit(0)
 
