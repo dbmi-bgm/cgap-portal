@@ -195,6 +195,9 @@ ingestion = "encoded.commands.ingestion:main"
 clear-variants-and-genes = "encoded.commands.clear_variants_and_genes:main"
 ingestion-listener = "encoded.ingestion_listener:main"
 
+# container commands
+simulate-environment = "encoded.commands.simulate_environment:main"
+
 [paste.app_factory]
 main = "encoded:main"
 
