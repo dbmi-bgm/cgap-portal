@@ -71,7 +71,7 @@
             "linkTo": "FilterSet",
             "notes": "We could maybe have this be a sub-embedded object and save related metadata like date_changed or something, idk."
         },
-        "additional_variant_sample_facets" : {
+        "extra_variant_sample_facets" : {
             "title": "Additional Variant Sample Facets",
             "description": "List of additional fields to show in FacetList",
             "type": "array",
