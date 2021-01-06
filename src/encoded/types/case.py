@@ -328,16 +328,17 @@ class Case(Item):
 
     @calculated_property(schema={
         "title": "Additional Variant Sample Facets",
-        "description": "String to be appended to the initial search query to limit variant sample results to those related to this case.",
-        "type": "string"
+        "description": "Additional facets relevant to this case.",
+        "type": "array",
+        "items": {
+            "title": "Additional Variant Sample Facet",
+            "type": "string"
+        }
     })
-    def additional_variant_sample_facets(self, request, sample_processing=None, extra_variant_sample_facets=None):
+    def additional_variant_sample_facets(self, request, sample_processing=None, extra_variant_sample_facets=[]):
         if not sample_processing:
             return ''
-        if extra_variant_sample_facets:
-            add_on = ''.join(['&additional_facet=' + field for field in extra_variant_sample_facets])
-        else:
-            add_on = ''
+        fields = [facet for facet in extra_variant_sample_facets]
         sp_item = get_item_or_none(request, sample_processing, 'sample_processing')
         analysis_type = sp_item.get('analysis_type')
         if analysis_type.endswith('-Trio') or analysis_type.endswith('-Group'):
@@ -346,8 +347,8 @@ class Case(Item):
                             'daughter', 'son', 'daughter II', 'son II', 'daughter III', 'son III']:
                 if relation in included_relations:
                     relation = relation.replace(' ', '_').replace('-', '_')
-                    add_on += f'&additional_facet=associated_genotype_labels.{relation}_genotype_label'
-        return add_on
+                    fields.append(f'associated_genotype_labels.{relation}_genotype_label')
+        return fields
 
     @calculated_property(schema={
         "title": "Proband Case",

@@ -143,11 +143,11 @@ def test_case_additional_facets(testapp, project, institution, new_case,
     for relation in genotype_relations:
         if genotype_relations.index(relation) + 2 <= num_samples:
             # genotype labels for this relation should be an additional facet in prop
-            assert (f'&additional_facet=associated_genotype_labels.{relation}_genotype_label'
+            assert (f'associated_genotype_labels.{relation}_genotype_label'
                     in case['additional_variant_sample_facets'])
         else:
             # genotype labels for this relation should NOT be an additional facet in this prop
-            assert (f'&additional_facet=associated_genotype_labels.{relation}_genotype_label'
+            assert (f'associated_genotype_labels.{relation}_genotype_label'
                     not in case['additional_variant_sample_facets'])
 
 
