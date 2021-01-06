@@ -341,7 +341,7 @@ class Case(Item):
         fields = [facet for facet in extra_variant_sample_facets]
         sp_item = get_item_or_none(request, sample_processing, 'sample_processing')
         analysis_type = sp_item.get('analysis_type')
-        if analysis_type.endswith('-Trio') or analysis_type.endswith('-Group'):
+        if analysis_type and (analysis_type.endswith('-Trio') or analysis_type.endswith('-Group')):
             included_relations = [item.get('relationship') for item in sp_item.get('samples_pedigree', [{}])]
             for relation in ['mother', 'father', 'sister', 'brother', 'co-parent',
                             'daughter', 'son', 'daughter II', 'son II', 'daughter III', 'son III']:
