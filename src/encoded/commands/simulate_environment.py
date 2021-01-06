@@ -37,7 +37,7 @@ def main():
     logging.basicConfig()
 
     parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
-        description='Clear an item type out of metadata storage',
+        description='Simulates an environment, checking that the caller has permission',
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
