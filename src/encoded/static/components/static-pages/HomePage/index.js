@@ -27,7 +27,7 @@ export default class HomePage extends React.PureComponent {
      * @returns {Element} A React <div> element.
      */
     render() {
-        const { session, context, alerts, schemas } = this.props;
+        const { session, context, alerts, schemas, windowHeight, windowWidth } = this.props;
         const commonProps = { context };
         // Render alerts here instead of (unused-for-homepage) PageTitleSection
         return (
@@ -36,7 +36,7 @@ export default class HomePage extends React.PureComponent {
                     <Alerts alerts={alerts} className="alerts" />
                 </div>
                 { session ?
-                    <UserDashboard {...commonProps} schemas={schemas} />
+                    <UserDashboard {...commonProps} {...{ schemas, windowHeight, windowWidth }} />
                     :
                     <GuestHomeView {...commonProps} />
                 }

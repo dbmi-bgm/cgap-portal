@@ -510,8 +510,8 @@ function FilterSetUIHeader(props){
     // todo if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
     return (
         <div className="row filter-set-ui-header align-items-center px-3 py-3">
-            <div className="col">{ titleBlock }</div>
-            <div className="col-auto">
+            <div className="col pl-0">{ titleBlock }</div>
+            <div className="col-auto pr-0">
                 { haveDuplicateQueries || haveDuplicateNames ?
                     <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-secondary"
                         data-tip={`Filter blocks with duplicate ${haveDuplicateQueries ? "queries" : "names"} exist below`} />
