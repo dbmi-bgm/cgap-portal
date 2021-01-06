@@ -21,6 +21,17 @@ def secure_environ(env):
     os.environ = original_env
 
 
+def build_ini_file(environment, use_prod):
+    """ Wrapper method for main functionality that can be invoked directly by others. """
+    if is_stg_or_prd_env(environment) and not use_prod:
+        return False
+    beanstalk_env = get_beanstalk_environment_variables(environment)
+    template_file_name = CGAPIniFileManager.environment_template_filename(environment)
+    with secure_environ(beanstalk_env):
+        CGAPIniFileManager.build_ini_file_from_template(template_file_name, 'production.ini')
+    return True
+
+
 def main():
     """ Entry point for this command """
     logging.basicConfig()
@@ -35,15 +46,10 @@ def main():
     args = parser.parse_args()
 
     # check prod
-    if is_stg_or_prd_env(args.environment) and not args.prod:
-        logger.error('Specified CGAP production without prod argument!')
+    if not build_ini_file(args.environment, args.prod):
+        logger.info('Failed to build production.ini')
         exit(1)
 
-    # get env, invoke deployer
-    beanstalk_env = get_beanstalk_environment_variables(args.environment)
-    with secure_environ(beanstalk_env):
-        template_file_name = CGAPIniFileManager.environment_template_filename(args.environment)
-        CGAPIniFileManager.build_ini_file_from_template(template_file_name, 'production.ini')
     logger.info('Successfully wrote production.ini')
     exit(0)
 
