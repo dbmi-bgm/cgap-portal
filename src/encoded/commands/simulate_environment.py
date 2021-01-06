@@ -45,7 +45,6 @@ def main():
     parser.add_argument('--prod', help='Must be specified to run this on CGAP production', default=False)
     args = parser.parse_args()
 
-    # check prod
     if not build_ini_file(args.environment, args.prod):
         logger.info('Failed to build production.ini')
         exit(1)
