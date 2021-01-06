@@ -88,12 +88,8 @@ def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case
     file_acc = file_id.split('/')[2]
     proband_sample_tag = "ext_id_006"
     mother_sample_tag = "ext_id_003"
-    assert proband['initial_search_href_filter_addon'].startswith(
-        "CALL_INFO={}&file={}".format(proband_sample_tag, file_acc)
-    )
-    assert mother['initial_search_href_filter_addon'].startswith(
-        "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
-    )
+    assert proband['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(proband_sample_tag, file_acc)
+    assert mother['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
 
 
 @pytest.fixture
@@ -148,11 +144,11 @@ def test_case_additional_facets(testapp, project, institution, new_case,
         if genotype_relations.index(relation) + 2 <= num_samples:
             # genotype labels for this relation should be an additional facet in prop
             assert (f'&additional_facet=associated_genotype_labels.{relation}_genotype_label'
-                    in case['initial_search_href_filter_addon'])
+                    in case['additional_variant_sample_facets'])
         else:
             # genotype labels for this relation should NOT be an additional facet in this prop
             assert (f'&additional_facet=associated_genotype_labels.{relation}_genotype_label'
-                    not in case['initial_search_href_filter_addon'])
+                    not in case['additional_variant_sample_facets'])
 
 
 def test_case_proband_case(testapp, proband_case, mother_case):
