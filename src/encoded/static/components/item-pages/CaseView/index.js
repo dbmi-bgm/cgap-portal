@@ -407,7 +407,7 @@ class DotRouter extends React.PureComponent {
 }
 
 function DotRouterTab(props) {
-    const { tabTitle, dotPath, className, disabled, active, prependDotPath, children } = props;
+    const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
 
     const onClick = useMemo(function(){
         return function(){
@@ -424,7 +424,7 @@ function DotRouterTab(props) {
     }
 
     return (
-        <div className={(className ? className + " " : "") + (disabled ? "disabled " : "") + (active ? " active" : "")} >
+        <div className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")} >
             <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
@@ -440,9 +440,6 @@ function DotRouterTab(props) {
         </div>
     );
 }
-DotRouterTab.defaultProps = {
-    "className" : "arrow-tab d-flex"
-};
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context, currFamily, secondary_families = [] } = props;
