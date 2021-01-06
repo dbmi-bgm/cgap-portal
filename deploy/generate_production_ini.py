@@ -13,7 +13,7 @@ class CGAPIniFileManager(IniFileManager):
 
 
 def main():
-    IniFileManager.main()
+    CGAPIniFileManager.main()
 
 
 if __name__ == '__main__':
