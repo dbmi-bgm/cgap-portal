@@ -22,7 +22,12 @@ def secure_environ(env):
 
 
 def build_ini_file(environment, use_prod):
-    """ Wrapper method for main functionality that can be invoked directly by others. """
+    """ Wrapper method for main functionality that can be invoked directly by others.
+
+        :param environment: environment to simulate
+        :param use_prod: an extra value that must be true to simulate staging/production
+        :returns: True if successful, False otherwise
+    """
     if is_stg_or_prd_env(environment) and not use_prod:
         return False
     beanstalk_env = get_beanstalk_environment_variables(environment)
@@ -46,7 +51,7 @@ def main():
     args = parser.parse_args()
 
     if not build_ini_file(args.environment, args.prod):
-        logger.info('Failed to build production.ini')
+        logger.error('Failed to build production.ini - env: %s, prod: %s' % (args.environment, args.prod))
         exit(1)
 
     logger.info('Successfully wrote production.ini')
