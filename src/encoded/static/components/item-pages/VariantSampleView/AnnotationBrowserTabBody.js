@@ -25,9 +25,6 @@ export const AnnotationBrowserTabBody = React.memo(function AnnotationBrowserTab
         if(hgc){
             // Force Higlass to repaint. Without this the tracks can positioned incorrectly
             hgc.boundRefreshView();
-            console.warn("Triggered boundRefreshView");
-        }else{
-            console.warn("hgc not found");
         }
     }, [ active ]); 
 

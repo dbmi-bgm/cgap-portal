@@ -27,9 +27,6 @@ export const BamFileBrowserTabBody = React.memo(function BamFileBrowserTabBody (
         if(hgc){
             // Force Higlass to repaint. Without this the tracks can positioned incorrectly
             hgc.boundRefreshView();
-            console.warn("Triggered boundRefreshView");
-        }else{
-            console.warn("hgc not found");
         }
     }, [ active ]);
 
