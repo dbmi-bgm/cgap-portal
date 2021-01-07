@@ -227,28 +227,38 @@ table.matrix {
 
 @import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/stacked-block-table.scss";
 
-.stacked-block-table {
+/** Below, add in any edits, styling, and override for specific CGAP tables or CGAP-specific styling **/
 
-	/** Edits, styling, and override for specific CGAP tables or CGAP-specific styling **/
+.result-table-detail .family-info-wrapper {
 
-	> .body {
+	/* 
+		This applies primarily to stacked block tables within Case search detail panes.
+		Here, we usually have consistent height of stacked-table blocks.
+		So, to improve visual appeal, we can and should align the label to top edge.
+		This is done with an align-items override below.
+	*/
+	
+	.stacked-block-table {
 
-		.s-block {
-			&.stack-depth-1.individual,
-			&.stack-depth-2.libraries {
-				/* 
-					This applies primarily to stacked block tables within Case search detail panes.
-					Here, we usually have consistent height of stacked-table blocks.
-					So, to improve visual appeal, we can and should align the label to top edge.
-					This is done with an align-items override below.
-				*/
-				align-items: stretch; /* overrides default align-items: center */
+		> .body {
+	
+			.s-block {
+				&.stack-depth-1.individual,
+				&.stack-depth-2.libraries {
+					/* 
+						This applies primarily to stacked block tables within Case search detail panes.
+						Here, we usually have consistent height of stacked-table blocks.
+						So, to improve visual appeal, we can and should align the label to top edge.
+						This is done with an align-items override below.
+					*/
+					align-items: stretch; /* overrides default align-items: center */
+				}
+	
 			}
-
+	
 		}
-
+	
 	}
-
 }
 
 
