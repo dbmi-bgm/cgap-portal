@@ -127,7 +127,7 @@
                                 "target" : {
                                     "title" : "Target Workflow",
                                     "description" : "Where this output file should go next (target workflow name). If this field is null or undefined, the output is global and going into another workflow as input.",
-                                    "type" : "string",
+                                    "type" : "string"
                                 },
                                 "name_in_target" : {
                                     "title" : "Name in Target Workflow",
