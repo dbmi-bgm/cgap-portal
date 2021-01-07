@@ -62,7 +62,7 @@ ServerSentEventListener.propTypes = {
     eventUrl : PropTypes.string.isRequired
 };
 
-export class ExcelSubmissionView extends React.Component {
+export default class ExcelSubmissionView extends React.Component {
     // componentDidUpdate(pastProps){
     //     const { serverSentEvents, onCompleted } = this.props;
     //     if (serverSentEvents !== pastProps.serverSentEvents) {
@@ -82,7 +82,7 @@ export class ExcelSubmissionView extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className="container-wide search-page-outer-container" id="content">
                 Test
                 {/* <ExcelSubmissionButton></ExcelSubmissionButton> */}
             </div>

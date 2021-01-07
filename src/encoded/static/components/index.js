@@ -33,6 +33,7 @@ import DocumentView                         from './item-pages/DocumentView';
 import StaticSectionView                    from './item-pages/StaticSectionView';
 import CGAPSubmissionView                   from './forms/CGAPSubmissionView';
 import SearchView                           from './browse/SearchView';
+import ExcelSubmissionView                  from './forms/ExcelSubmissionView';
 
 /**
  * These content_view.register actions occur in this index.js as otherwise
@@ -44,6 +45,8 @@ content_views.register(DirectoryPage,           'DirectoryPage');
 
 content_views.register(HomePage,                'HomePage');
 content_views.register(ReleaseUpdates,          'Release-updatesPage');
+
+content_views.register(ExcelSubmissionView,     'Submissions');
 
 content_views.register(DefaultItemView,         'Item');
 content_views.register(CaseView,                'Case');
