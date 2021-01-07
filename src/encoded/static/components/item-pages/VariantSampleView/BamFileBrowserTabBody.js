@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 //import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoadContainer';
 
@@ -19,6 +19,19 @@ export const BamFileBrowserTabBody = React.memo(function BamFileBrowserTabBody (
             POS_ABS: variantPositionAbsCoord
         }
     } = context;
+
+    useEffect(function(){
+        if (!active) return;
+        const hgc = higlassContainerRef.current.getHiGlassComponent();
+        // hgc only exists when we visit the tab a second time
+        if(hgc){
+            // Force Higlass to repaint. Without this the tracks can positioned incorrectly
+            hgc.boundRefreshView();
+            console.warn("Triggered boundRefreshView");
+        }else{
+            console.warn("hgc not found");
+        }
+    }, [ active ]);
 
     return (
         <div className={"browser-tab-body card-body" + (!active ? " d-none" : "")}>

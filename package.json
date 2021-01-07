@@ -113,7 +113,7 @@
     "higlass-register": "^0.3.0",
     "higlass-sequence": "0.3.1",
     "higlass-transcripts": "0.3.0",
-    "higlass-text": "0.1.1",
+    "higlass-text": "0.1.2",
     "higlass-orthologs": "0.2.1",
     "higlass-clinvar": "0.2.1",
     "higlass-pileup": "1.0.0",

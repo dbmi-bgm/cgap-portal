@@ -172,7 +172,7 @@ class VariantSampleOverviewTabView extends React.PureComponent {
     handleTabClick(e){
         // Event delegation cuz why not. Less event listeners is good usually, tho somewhat moot in React
         // since it has SyntheticEvents anyway.
-        if (e.target.type === "button") {
+        if (e.target && e.target.type === "button") {
             const tabTitle = parseInt(e.target.getAttribute("data-tab-index"));
             this.setState({ "currentTab": tabTitle });
         }
