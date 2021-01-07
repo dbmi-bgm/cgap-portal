@@ -139,10 +139,11 @@ export class FamilyReportStackedTable extends React.PureComponent {
     static builtInHeaders(){
         // Keeping these builtInHeader methods separate in case we want to build in custom columns later
         return [
-            { columnClass: 'individual',    className: 'text-left',     title: 'Individual',    initialWidth: 220   },
-            { columnClass: 'libraries',     className: 'text-left',     title: 'Libraries',     initialWidth: 220   },
-            { columnClass: 'analysis',                                  title: 'Analysis',      initialWidth: 200   },
-            { columnClass: 'report',        className: 'text-left',     title: 'Report',        initialWidth: 200   }
+            { columnClass: 'individual',    className: 'text-left',         title: 'Individual',    initialWidth: 220   },
+            { columnClass: 'libraries',     className: 'text-left',         title: 'Libraries',     initialWidth: 220   },
+            { columnClass: 'analysis',                                      title: 'Analysis',      initialWidth: 200   },
+            /* report column has no label, but has left alignment, so we add 12px padding left to visually align header to it better */
+            { columnClass: 'report',        className: 'text-left pl-12',   title: 'Report',        initialWidth: 200   }
         ];
     }
 
