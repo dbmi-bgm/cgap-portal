@@ -8,16 +8,16 @@ from .variant_fixtures import ANNOTATION_FIELD_URL
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = resolve_file_path('annotations/variant_table_v0.4.8.csv')
+MT_LOC = resolve_file_path('annotations/variant_table_v0.5.0.csv')
 ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
-EXPECTED_FIELDS = ['no', 'field_name', 'source_name', 'source_version', 'sub_embedding_group',
-                   'field_type', 'is_list',
+EXPECTED_FIELDS = ['no', 'field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
+                   'field_type', 'is_list', 'facet_default_hidden', 'priority', 'source',
                    'description', 'value_example', 'enum_list', 'do_import',
                    'facet_order', 'column_order', 'annotation_category',
                    'scope', 'schema_title', 'links_to', 'embedded_field',
                    'calculated_property', 'pattern', 'default', 'min', 'max', 'link', 'comments',
                    'annotation_space_location']
-EXPECTED_INSERT = {'field_name': 'CHROM', 'schema_title': 'Chromosome',
+EXPECTED_INSERT = {'field_name': 'CHROM', 'vcf_field': 'CHROM', 'schema_title': 'Chromosome',
                    'do_import': True, 'scope': 'variant', 'source_name': 'VCF',
                    'source_version': 'VCFv4.2', 'description': 'Chromosome',
                    'field_type': 'string', 'is_list': False, 'annotation_category': 'Position',
@@ -30,12 +30,12 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid',
                           'transcript.vep_consequence.var_conseq_name']
-VARIANT_TABLE_VERSION = 'annV0.4.8'
-VARIANT_TABLE_DATE = '09.04.2020'
-NUMBER_ANNOTATION_FIELDS = 356
-SAMPLE_FIELDS_EXPECTED = 27
-VARIANT_FIELDS_EXPECTED = 329
-TRANSCRIPT_FIELDS_EXPECTED = 35
+VARIANT_TABLE_VERSION = 'annV0.5.0'
+VARIANT_TABLE_DATE = '01.05.2021'
+NUMBER_ANNOTATION_FIELDS = 176
+SAMPLE_FIELDS_EXPECTED = 25
+VARIANT_FIELDS_EXPECTED = 150
+TRANSCRIPT_FIELDS_EXPECTED = 33
 
 
 @pytest.fixture
@@ -110,6 +110,7 @@ def test_generate_sample_json_items(MTParser, inserts):
     assert sample_props['novoPP']['type'] == 'number'
     assert 'samplegeno' in sample_props
     assert 'cmphet' in sample_props
+    assert 'ALT' not in sample_props
 
     # check cols/facs (there are none now)
     assert 'AF' in cols
@@ -126,27 +127,32 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert var_props['CHROM']['title'] == 'Chromosome'
     assert var_props['CHROM']['type'] == 'string'
     assert var_props['POS']['type'] == 'integer'
-    assert var_props['cadd_phred']['source_name'] == 'CADD'
-    assert var_props['cadd_phred']['type'] == 'number'
+    assert var_props['csq_cadd_phred']['source_name'] == 'dbNSFP'
+    assert var_props['csq_cadd_phred']['type'] == 'number'
 
     # check vep (transcript) sub-embedded object
     sub_obj_props = var_props['transcript']['items']['properties']
     assert len(sub_obj_props.keys()) == TRANSCRIPT_FIELDS_EXPECTED
-    assert sub_obj_props['vep_gene']['field_name'] == 'vep_gene'
-    assert sub_obj_props['vep_gene']['type'] == 'string'
-    assert sub_obj_props['vep_distance']['type'] == 'string'
-    assert sub_obj_props['vep_canonical']['type'] == 'boolean'
+    assert sub_obj_props['csq_gene']['field_name'] == 'csq_gene'
+    assert sub_obj_props['csq_gene']['linkTo'] == 'Gene'
+    assert sub_obj_props['csq_gene']['type'] == 'string'
+    assert sub_obj_props['csq_distance']['type'] == 'string'
+    assert sub_obj_props['csq_canonical']['type'] == 'boolean'
 
     # check sub-embedded object array
-    assert sub_obj_props['vep_consequence']['type'] == 'array'
-    assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
+    assert sub_obj_props['csq_consequence']['type'] == 'array'
+    assert sub_obj_props['csq_consequence']['items']['type'] == 'string'
+    assert sub_obj_props['csq_consequence']['items']['linkTo'] == 'VariantConsequence'
 
     # check cols/facs
-    assert 'max_pop_af_af_popmax' in cols
-    assert 'gnomad_af' in facs
+    assert 'csq_gnomadg_af_popmax' in cols
+    assert 'csq_gnomadg_af' in facs
     assert facs['CHROM']['title'] == 'Chromosome'
     assert facs['CHROM']['grouping'] == 'Position'
-    assert cols['genes.genes_ensg.display_title']['order'] == 40
+    assert facs['CHROM']['order'] == 1
+    assert cols['csq_gnomadg_af']['order'] == 60
+    assert cols['genes.genes_most_severe_gene.display_title']['order'] == 40
+    assert cols['genes.genes_most_severe_transcript']['order'] == 41
 
 
 def test_generate_variant_sample_schema(MTParser, sample_variant_items):
@@ -155,7 +161,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     schema = MTParser.generate_variant_sample_schema(items, cols, facs, {}, {})
     properties = schema['properties']
     assert 'CHROM' not in properties
-    assert 'vep_consequence' not in properties
+    assert 'csq_consequence' not in properties
 
     # check samplegeno sub-embedded obj
     assert 'samplegeno' in properties
@@ -184,6 +190,8 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert cols['GT']['order'] == 30
     assert facs['cmphet.comhet_impact_gene']['order'] == 17
     assert facs['inheritance_modes']['order'] == 15
+    for fac in facs:  # no default_hidden facets yet
+        assert 'default_hidden' not in fac
 
 
 def test_generate_variant_schema(MTParser, variant_items):
@@ -199,36 +207,34 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert 'enum' in properties['CHROM']
     assert properties['ALT']['field_name'] == 'ALT'
     assert properties['ALT']['type'] == 'string'
-    assert properties['max_pop_af_af_popmax']['default'] == 0
-    assert properties['max_pop_af_af_popmax']['min'] == 0
-    assert properties['max_pop_af_af_popmax']['max'] == 1
+    assert properties['csq_gnomadg_af_popmax']['default'] == 0
+    assert properties['csq_gnomadg_af_popmax']['min'] == 0
+    assert properties['csq_gnomadg_af_popmax']['max'] == 1
 
     # check sub-embedded object fields
     assert properties['transcript']['type'] == 'array'
     assert properties['transcript']['title'] == 'Transcript'
     sub_obj_props = properties['transcript']['items']['properties']
     assert len(sub_obj_props) == TRANSCRIPT_FIELDS_EXPECTED
-    assert sub_obj_props['vep_consequence']['type'] == 'array'
-    assert sub_obj_props['vep_consequence']['items']['type'] == 'string'
-    assert sub_obj_props['vep_consequence']['items']['linkTo'] == 'VariantConsequence'
-    assert sub_obj_props['vep_domains']['type'] == 'array'
-    assert sub_obj_props['vep_domains']['items']['type'] == 'string'
-    assert sub_obj_props['vep_tsl']['type'] == 'integer'
-    assert sub_obj_props['vep_domains']['type'] == 'array'
-    assert sub_obj_props['vep_domains']['items']['type'] == 'string'
+    assert sub_obj_props['csq_consequence']['type'] == 'array'
+    assert sub_obj_props['csq_consequence']['items']['type'] == 'string'
+    assert sub_obj_props['csq_consequence']['items']['linkTo'] == 'VariantConsequence'
+    assert sub_obj_props['csq_domains']['type'] == 'array'
+    assert sub_obj_props['csq_domains']['items']['type'] == 'string'
+    assert sub_obj_props['csq_tsl']['type'] == 'integer'
 
     # check (existence of) different sub-embedded object fields
     assert properties['genes']['type'] == 'array'
     assert properties['hg19']['type'] == 'array'
-    assert properties['clinvar_submission']['type'] == 'array'
+    assert properties['csq_clinvar_clnsigconf']['type'] == 'array'
 
     # check cols/facs
     assert 'AF' not in schema['columns']
     assert 'CHROM' in schema['facets']
     assert 'POS' in schema['facets']
     assert 'order' in schema['facets']['POS']
-    assert cols['genes.genes_ensg.display_title']['order'] == 40
-    assert cols['clinvar_variationid']['order'] == 70
+    assert cols['genes.genes_most_severe_gene.display_title']['order'] == 40
+    assert cols['csq_clinvar']['order'] == 70
 
     # check embedded fields are there
     with open(MTParser.EMBEDDED_VARIANT_FIELDS, 'r') as fd:

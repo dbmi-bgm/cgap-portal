@@ -22,14 +22,15 @@ class MappingTableIntakeException(Exception):
 class MappingTableParser(object):
     """ Class that encapsulates data/functions related to the annotation field mapping table. """
     HEADER_ROW_INDEX = 2
-    FIELD_TYPE_INDEX = 9  # XXX: hardcoded, must change if field_type is moved on mapping table
+    FIELD_TYPE_INDEX = 10  # XXX: hardcoded, must change if field_type is moved on mapping table
     INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_order', 'facet_order', 'default', 'min', 'max']
-    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field', 'do_import']
-    STRING_FIELDS = ['field_name', 'source_name', 'source_version', 'sub_embedding_group',
-                     'annotation_category', 'separator', 'description', 'value_example',
-                     'scope', 'schema_title', 'pattern', 'link', 'comments']
-    SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to', 'annotation_space_location']
-    ALL_FIELDS = INTEGER_FIELDS + BOOLEAN_FIELDS + STRING_FIELDS + SPECIAL_FIELDS
+    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field', 'do_import', 'facet_default_hidden']
+    STRING_FIELDS = ['field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
+                     'annotation_category', 'separator', 'description',
+                     'scope', 'schema_title', 'pattern', 'link']
+    SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to']
+    IGNORED_FIELDS = ['source', 'priority', 'annotation_space_location', 'comments', 'value_example']
+    ALL_FIELDS = INTEGER_FIELDS + BOOLEAN_FIELDS + STRING_FIELDS + SPECIAL_FIELDS + IGNORED_FIELDS
     EMBEDDED_VARIANT_FIELDS = resolve_file_path('schemas/variant_embeds.json')
     EMBEDDED_VARIANT_SAMPLE_FIELDS = resolve_file_path('schemas/variant_sample_embeds.json')  # XXX: unused currently
     EMBEDS_TO_GENERATE = [('variant', EMBEDDED_VARIANT_FIELDS),
@@ -349,8 +350,13 @@ class MappingTableParser(object):
         def has_grouping(o):
             return o.get('annotation_category', False)
 
+        def is_default_hidden(o):
+            return o.get('facet_default_hidden', 'N') == 'Y'
+
         def insert_column_or_facet(d, o, facet=True):
             val = {'title': o.get('schema_title', o.get(self.NAME_FIELD))}
+            if is_default_hidden(o):
+                val['default_hidden'] = True
             if is_numbered_field(o) and is_facet(o):
                 val['aggregation_type'] = 'stats'
                 if "number_step" in o:
