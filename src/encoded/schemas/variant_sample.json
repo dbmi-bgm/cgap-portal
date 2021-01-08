@@ -594,12 +594,14 @@
         "associated_genotype_labels.father_genotype_label": {
             "title": "Father Genotype",
             "order": 20,
-            "grouping": "Genotype"
+            "grouping": "Genotype",
+            "default_hidden": true
         },
         "associated_genotype_labels.mother_genotype_label": {
             "title": "Mother Genotype",
             "order": 21,
-            "grouping": "Genotype"
+            "grouping": "Genotype",
+            "default_hidden": true
         },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Proband Genotype",
@@ -618,7 +620,7 @@
             "grouping": "Genotype",
             "default_hidden": true
         },
-        "associated_genotype_labels.coparent_genotype_label": {
+        "associated_genotype_labels.co_parent_genotype_label": {
             "title": "Co-Parent Genotype",
             "order": 25,
             "grouping": "Genotype",
