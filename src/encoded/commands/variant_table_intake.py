@@ -602,6 +602,35 @@ class MappingTableParser(object):
         schema['description'] = "Schema for variants"
         schema['id'] = '/profiles/variant.json'
         schema['properties'] = var_props
+        schema['properties']['hg19'] = {  # required for testing :( - will 1-8-2021
+            "title": "hg19 Coordinates",
+            "type": "array",
+            "items": {
+                "title": "hg19 Coordinates",
+                "enable_nested": True,
+                "type": "object",
+                "properties": {
+                    "hg19_hgvsg": {
+                        "title": "Variant",
+                        "field_name": "hg19_hgvsg",
+                        "type": "string",
+                        "description": "HGVS genome sequence name (hg19)",
+                    },
+                    "hg19_chrom": {
+                        "title": "Chromosome (hg19)",
+                        "field_name": "hg19_chrom",
+                        "type": "string",
+                        "description": "hg19 coordinate chromosome",
+                    },
+                    "hg19_pos": {
+                        "title": "Position (hg19)",
+                        "field_name": "hg19_pos",
+                        "type": "integer",
+                        "description": "hg19 coordinate position",
+                    }
+                }
+            }
+        }
         schema['properties']['schema_version'] = {'default': '1'}
         schema['facets'] = facs
         schema['columns'] = cols

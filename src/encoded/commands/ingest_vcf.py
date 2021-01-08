@@ -34,8 +34,14 @@ class VCFParser(object):
         '%7C': '|',
         '%3B': ';'
     }
-    MUTANNO = 'MUTANNO'  # annotation field from MUTANNO
+    VEP = 'VEP'  # annotation field from VEP
+    CSQ = 'CSQ'  # INFO field that contains VEP annotations
     GRANITE = 'GRANITE'  # annotation field from GRANITE
+    OVERWRITE_FIELDS = {  # field names that do not validate our DB and are mapped
+        'csq_hg19_pos(1-based)': 'csq_hg19_pos',
+        'csq_gerp++_rs': 'csq_gerp_rs'
+    }
+    DISABLED_FIELDS = ['csq_tsl']  # annotation fields that do not validate
     VCF_FIELDS = ['CHROM', 'POS', 'ID', 'REF', 'ALT']
     VCF_SAMPLE_FIELDS = ['FILTER', 'QUAL']
     DROPPED_FIELD = 'DROPPED'
@@ -126,10 +132,13 @@ class VCFParser(object):
         return _defaults
 
     def read_vcf_metadata(self):
-        """ Parses VCF file meta data to get annotation fields under MUTANNO/GRANITE """
-        for field in itertools.chain(self.reader.metadata.get(self.MUTANNO, []),
-                                     self.reader.metadata.get(self.GRANITE, [])):
-            self.annotation_keys[field['ID']] = True
+        """ Parses VCF file meta data to get annotation fields under VEP/GRANITE """
+        [granite_header] = self.reader.metadata.get(self.GRANITE, [])
+        vep_header = self.reader.metadata.get(self.VEP, [])
+        if granite_header:
+            self.annotation_keys[granite_header['ID']] = True
+        if vep_header:
+            self.annotation_keys['CSQ'] = True
 
     def _strip(self, s):
         """ Strips whitespace and quotation characters and also lowercases the given string s
@@ -137,7 +146,9 @@ class VCFParser(object):
         :param s: String to strip
         :return: processed string
         """
-        return re.sub(self.regex, '', s).lower()
+        if not isinstance(s, str):
+            raise VCFParserException('Tried to apply string strip to non-string %s' % s)
+        return s.lower().strip(' "\'')
 
     def verify_in_schema(self, field, sub_group=None):
         """ Helper to verify the given field is in the schema.
@@ -149,11 +160,13 @@ class VCFParser(object):
         :return: field or self.DROPPED_FIELD if this is not a schema field
         """
         field_lower = field.lower()
+        if field_lower in self.OVERWRITE_FIELDS:
+            field_lower = self.OVERWRITE_FIELDS[field_lower]  # replace with overwrite
         for schema in [self.variant_sample_schema, self.variant_schema]:
             if sub_group and sub_group in schema['properties']:
-                if field in schema['properties'][sub_group]['items']['properties']:
+                if field_lower in schema['properties'][sub_group]['items']['properties']:
                     return field
-            if field in schema['properties'] or field_lower in schema['properties']:
+            if field_lower in schema['properties']:
                 return field
         return self.DROPPED_FIELD  # must maintain field order
 
@@ -314,7 +327,7 @@ class VCFParser(object):
         elif type == 'array':
             if sub_type:
                 if not isinstance(value, list):
-                    items = self.fix_encoding(value).split('~') if sub_type == 'string' else value
+                    items = self.fix_encoding(value).split('&') if sub_type == 'string' else value
                 else:
                     items = value
                 return list(map(lambda v: self.cast_field_value(sub_type, v, sub_type=None), items))
@@ -364,6 +377,10 @@ class VCFParser(object):
             type = props[field]['type']
             if type == 'array':
                 sub_type = props[field]['items']['type']
+
+        # if this field is specifically disabled (due to formatting error), drop it here
+        if field in self.DISABLED_FIELDS:
+            return None
         return self.cast_field_value(type, value, sub_type)
 
     @staticmethod
@@ -437,13 +454,28 @@ class VCFParser(object):
                         if fn == self.DROPPED_FIELD:
                             continue
 
+                        # if the field we are processing is an overwrite field, apply the overwrite
+                        if fn in self.OVERWRITE_FIELDS:
+                            fn = self.OVERWRITE_FIELDS[fn]
+
                         # handle sub-embedded
                         if key in self.sub_embedded_mapping:
                             if sub_embedded_group not in result:  # create sub-embedded group if not there
                                 result[sub_embedded_group] = {}
                             if g_idx not in result[sub_embedded_group]:
                                 result[sub_embedded_group][g_idx] = {}
-                            result[sub_embedded_group][g_idx][fn] = self.validate_variant_value(fn, field, key)
+
+                            # XXX: Special Behavior here in light of VEP annotations
+                            # VEP duplicates annotations in the same CSQ INFO field, so while some fields
+                            # vary by VEP transcript, a large set of others (that are in our data set)
+                            # do not and are duplicated in every transcript entry. Detect when this occurs
+                            # and place the field value at top level instead of in the transcript object.
+                            possible_value = self.validate_variant_value(fn, field, key)
+                            if possible_value is not None:
+                                if fn in self.variant_props:
+                                    result[fn] = self.validate_variant_value(fn, field, key)
+                                else:
+                                    result[sub_embedded_group][g_idx][fn] = self.validate_variant_value(fn, field, key)
                         else:
                             possible_value = self.validate_variant_value(fn, field, key)
                             if possible_value is not None:
@@ -524,17 +556,20 @@ class VCFParser(object):
                             s[field] = 'PASS'
                     else:
                         s[field] = getattr(record, field) or ''
-                if field == 'samplegeno':  # XXX: should be refactored
-                    genotypes = record.INFO.get('SAMPLEGENO')
-                    s['samplegeno'] = []
-                    for gt in genotypes:
-                        numgt, gt, ad, sample_id = gt.split('|')
-                        tmp = dict()
-                        tmp['samplegeno_numgt'] = numgt
-                        tmp['samplegeno_gt'] = gt
-                        tmp['samplegeno_ad'] = ad
-                        tmp['samplegeno_sampleid'] = sample_id
-                        s['samplegeno'].append(tmp)
+
+                # XXX: should now be able to be computed here
+                if field == 'samplegeno':
+                    pass
+                    # genotypes = record.INFO.get('SAMPLEGENO')
+                    # s['samplegeno'] = []
+                    # for gt in genotypes:
+                    #     numgt, gt, ad, sample_id = gt.split('|')
+                    #     tmp = dict()
+                    #     tmp['samplegeno_numgt'] = numgt
+                    #     tmp['samplegeno_gt'] = gt
+                    #     tmp['samplegeno_ad'] = ad
+                    #     tmp['samplegeno_sampleid'] = sample_id
+                    #     s['samplegeno'].append(tmp)
                 elif field == 'multiallele_samplevariantkey':  # XXX: refactor with samplegeno
                     multiallele = record.INFO.get('MULTIALLELE', None)
                     if multiallele:

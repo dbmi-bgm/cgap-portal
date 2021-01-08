@@ -240,6 +240,19 @@
             "description": "For included Variant : ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB",
             "scope": "variant"
         },
+        "csq_clinvar_clnhgvs": {
+            "title": "Variant",
+            "field_name": "csq_clinvar_clnhgvs",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "csq_clinvar_clnhgvs",
+            "source_name": "ClinVar",
+            "source_version": "v20201101",
+            "annotation_category": "Position",
+            "description": "HGVS genome sequence name",
+            "scope": "variant",
+            "schema_title": "Variant"
+        },
         "csq_clinvar_clnrevstat": {
             "title": "csq_clinvar_clnrevstat",
             "type": "array",
@@ -1142,6 +1155,32 @@
             "default": 0,
             "min": 0
         },
+        "csq_hg19_chr": {
+            "title": "Chromosome (hg19)",
+            "field_name": "csq_hg19_chr",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "csq_hg19_chr",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Position",
+            "description": "hg19 coordinate chromosome",
+            "scope": "variant",
+            "schema_title": "Chromosome (hg19)"
+        },
+        "csq_hg19_pos": {
+            "title": "Position (hg19)",
+            "field_name": "csq_hg19_pos",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "csq_hg19_pos(1-based)",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Position",
+            "description": "hg19 coordinate position (1-based)",
+            "scope": "variant",
+            "schema_title": "Position (hg19)"
+        },
         "csq_phastcons100way_vertebrate": {
             "title": "PhastCons (100 Vertebrates)",
             "field_name": "csq_phastcons100way_vertebrate",
@@ -1510,35 +1549,26 @@
             "type": "array",
             "items": {
                 "title": "hg19 Coordinates",
+                "enable_nested": true,
                 "type": "object",
                 "properties": {
-                    "csq_hg19_chr": {
-                        "title": "Chromosome (hg19)",
-                        "field_name": "csq_hg19_chr",
+                    "hg19_hgvsg": {
+                        "title": "Variant",
+                        "field_name": "hg19_hgvsg",
                         "type": "string",
-                        "do_import": true,
-                        "vcf_field": "csq_hg19_chr",
-                        "source_name": "dbNSFP",
-                        "source_version": "v4.1a",
-                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
-                        "annotation_category": "Position",
-                        "description": "hg19 coordinate chromosome",
-                        "scope": "variant",
-                        "schema_title": "Chromosome (hg19)"
+                        "description": "HGVS genome sequence name (hg19)"
                     },
-                    "csq_hg19_pos": {
+                    "hg19_chrom": {
+                        "title": "Chromosome (hg19)",
+                        "field_name": "hg19_chrom",
+                        "type": "string",
+                        "description": "hg19 coordinate chromosome"
+                    },
+                    "hg19_pos": {
                         "title": "Position (hg19)",
-                        "field_name": "csq_hg19_pos",
+                        "field_name": "hg19_pos",
                         "type": "integer",
-                        "do_import": true,
-                        "vcf_field": "csq_hg19_pos(1-based)",
-                        "source_name": "dbNSFP",
-                        "source_version": "v4.1a",
-                        "sub_embedding_group": "{\"key\": \"hg19\", \"title\": \"hg19 Coordinates\"}",
-                        "annotation_category": "Position",
-                        "description": "hg19 coordinate position (1-based)",
-                        "scope": "variant",
-                        "schema_title": "Position (hg19)"
+                        "description": "hg19 coordinate position"
                     }
                 }
             }
