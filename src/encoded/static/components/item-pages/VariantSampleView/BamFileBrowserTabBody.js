@@ -25,7 +25,7 @@ export const BamFileBrowserTabBody = React.memo(function BamFileBrowserTabBody (
         const hgc = higlassContainerRef.current.getHiGlassComponent();
         // hgc only exists when we visit the tab a second time
         if(hgc){
-            // Force Higlass to repaint. Without this the tracks can positioned incorrectly
+            // Force Higlass to repaint. Without this the tracks can be positioned incorrectly
             hgc.boundRefreshView();
         }
     }, [ active ]);
