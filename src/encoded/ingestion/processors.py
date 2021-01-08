@@ -1,9 +1,9 @@
-import boto3
+import io
 import json
-import traceback
 
+from dcicutils.misc_utils import ignored
 from ..ingestion.common import get_parameter
-from ..util import debuglog, s3_output_stream, create_empty_s3_file
+from ..util import debuglog, s3_local_file
 from ..submit import submit_metadata_bundle
 from .exceptions import UndefinedIngestionProcessorType
 from ..types.ingestion import SubmissionFolio
@@ -31,11 +31,6 @@ def get_ingestion_processor(processor_type):
     return handler
 
 
-def _show_report_lines(lines, fp, default="Nothing to report."):
-    for line in lines or ([default] if default else []):
-        print(line, file=fp)
-
-
 @ingestion_processor('data_bundle')
 def handle_data_bundle(submission: SubmissionFolio):
 
@@ -43,7 +38,7 @@ def handle_data_bundle(submission: SubmissionFolio):
     # to not upset anyone testing with the old name, but this is not the name to use
     # any more, so reject new submissions of this kind. -kmp 27-Aug-2020
 
-    with submission.processing_context(submission):
+    with submission.processing_context():
 
         raise RuntimeError("handle_data_bundle was called (for ingestion_type=%s). This is always an error."
                            " The ingestion_type 'data_bundle' was renamed to 'metadata_bundle'"
@@ -54,7 +49,7 @@ def handle_data_bundle(submission: SubmissionFolio):
 @ingestion_processor('metadata_bundle')
 def handle_metadata_bundle(submission: SubmissionFolio):
 
-    with submission.processing_context(submission) as resolution:
+    with submission.processing_context():
 
         s3_client = submission.s3_client
         submission_id = submission.submission_id
@@ -63,51 +58,112 @@ def handle_metadata_bundle(submission: SubmissionFolio):
         project = get_parameter(submission.parameters, 'project')
         validate_only = get_parameter(submission.parameters, 'validate_only', as_type=bool, default=False)
 
-        # if isinstance(institution, str):
-        #     institution = submission.vapp.get(institution).json
-        # if isinstance(project, str):
-        #     project = submission.vapp.get(project).json
+        bundle_results = submit_metadata_bundle(s3_client=s3_client,
+                                                bucket=submission.bucket,
+                                                key=submission.object_name,
+                                                project=project,
+                                                institution=institution,
+                                                vapp=submission.vapp,
+                                                validate_only=validate_only)
 
-        bundle_result = submit_metadata_bundle(s3_client=s3_client,
-                                                    bucket=submission.bucket,
-                                                    key=submission.object_name,
-                                                    project=project,
-                                                    institution=institution,
-                                                    vapp=submission.vapp,
-                                                    validate_only=validate_only)
+        debuglog(submission_id, "bundle_result:", json.dumps(bundle_results, indent=2))
 
-        debuglog(submission_id, "bundle_result:", json.dumps(bundle_result, indent=2))
+        with submission.s3_output(key_name='validation_report') as fp:
+            submission.show_report_lines(bundle_results['validation_output'], fp)
+            submission.note_additional_datum('validation_output', from_dict=bundle_results)
 
-        resolution["validation_report_key"] = validation_report_key = "%s/validation-report.txt" % submission_id
-        resolution["submission_key"] = submission_key = "%s/submission.json" % submission_id
-        resolution["submission_response_key"] = submission_response_key = "%s/submission-response.txt" % submission_id
-        resolution["upload_info_key"] = upload_info_key = "%s/upload_info.txt" % submission_id
+        submission.process_standard_bundle_results(bundle_results)
 
-        def note_additional_datum(key, bundle_key=None):
-            submission.other_details['additional_data'] = additional_data = (
-                submission.other_details.get('additional_data', {})
-            )
-            additional_data[key] = bundle_result[bundle_key or key]
+        if not bundle_results['success']:
+            submission.fail()
 
-        with s3_output_stream(s3_client, bucket=submission.bucket, key=validation_report_key) as fp:
-            _show_report_lines(bundle_result['validation_output'], fp)
-            note_additional_datum('validation_output')
 
-        # Next several files are created only if relevant.
+@ingestion_processor('simulated')
+def handle_simulated(submission: SubmissionFolio):
 
-        if bundle_result['result']:
-            with s3_output_stream(s3_client, bucket=submission.bucket, key=submission_key) as fp:
-                print(json.dumps(bundle_result['result'], indent=2), file=fp)
-                submission.other_details['result'] = bundle_result['result']
+    with submission.processing_context() as resolution:
 
-        if bundle_result['post_output']:
-            with s3_output_stream(s3_client, bucket=submission.bucket, key=submission_response_key) as fp:
-                _show_report_lines(bundle_result['post_output'], fp)
-                note_additional_datum('post_output')
+        ignored(resolution)
 
-        if bundle_result['upload_info']:
-            with s3_output_stream(s3_client, bucket=submission.bucket, key=upload_info_key) as fp:
-                print(json.dumps(bundle_result['upload_info'], indent=2), file=fp)
-                note_additional_datum('upload_info')
+        s3_client = submission.s3_client
+        submission_id = submission.submission_id
 
-        submission.outcome = "success" if bundle_result['success'] else "failure"
+        institution = get_parameter(submission.parameters, 'institution')
+        project = get_parameter(submission.parameters, 'project')
+        validate_only = get_parameter(submission.parameters, 'validate_only', as_type=bool, default=False)
+
+        bundle_results = simulated_processor(s3_client=s3_client,
+                                             bucket=submission.bucket,
+                                             key=submission.object_name,
+                                             project=project,
+                                             institution=institution,
+                                             vapp=submission.vapp,
+                                             validate_only=validate_only)
+
+        debuglog(submission_id, "bundle_result:", json.dumps(bundle_results, indent=2))
+
+        with submission.s3_output(key_name='validation_report') as fp:
+            submission.show_report_lines(bundle_results['validation_output'], fp)
+            submission.note_additional_datum('validation_output', from_dict=bundle_results)
+
+        submission.process_standard_bundle_results(bundle_results)
+
+        if not bundle_results['success']:
+            submission.fail()
+
+
+def simulated_processor(s3_client, bucket, key, project, institution, vapp,  # <- Required keyword arguments
+                        validate_only=False):  # <-- Optional keyword arguments (with defaults)
+    """
+    This processor expects the data to contain JSON containing:
+
+    {
+      "project": <project>,           # The value to validate the give project against.
+      "institution": <institution>,   # The value to validate the given project against.
+      "success": <true/false>,        # True if full processing should return success
+      "result": <processing-result>,  # Result to return if simulated processing happens
+      "post_output": [...],           # Post output to expect if simulated processing happens
+      "upload_info": [...]            # Upload info to return if simulated processing happens
+    }
+
+    Simulated validation will check that the given project is the same as the project in the file
+    and the given institution is the same as the institution in the file.
+
+    * If simulated validation fails, the simulated processing won't occur.
+    * If validate_only is True, simulated processing won't occur,
+      so the result, post_output, and upload_info will be null.
+    """
+
+    ignored(vapp)
+
+    def simulated_validation(data, project, institution):
+        # Simulated Validation
+        validated = True
+        validation_output = []
+        for key, value in [("project", project), ("institution", institution)]:
+            if data.get(key) == value:
+                validation_output.append("The %s is OK" % key)
+            else:
+                validation_output.append("Expected %s %s." % (key, value))
+                validated = False
+
+        return validated, validation_output
+
+    with s3_local_file(s3_client=s3_client, bucket=bucket, key=key) as filename:
+
+        with io.open(filename) as fp:
+            data = json.load(fp)
+
+        result = {}
+
+        validated, validation_output = simulated_validation(data, project, institution)
+
+        result["validation_output"] = validation_output
+        if validate_only or not validated:
+            result["success"] = validated
+            return result
+
+        for key in ["success", "result", "post_output", "upload_info"]:
+            result[key] = data[key]
+
+        return data
