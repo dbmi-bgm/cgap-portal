@@ -392,7 +392,8 @@ class IngestionReport:
         return len(self.errors)
 
     def get_errors(self, limit=True):
-        """Returns a limited number of errors, where limit can be True (self.MAX_ERRORS), False (no limit), or an integer."""
+        """ Returns a limited number of errors, where limit can be True (self.MAX_ERRORS), False (no limit),
+            or an integer. """
         if limit is True:
             limit = self.MAX_ERRORS
         elif limit is False:

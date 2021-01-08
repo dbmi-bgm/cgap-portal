@@ -4,6 +4,9 @@ import logging
 from dcicutils.misc_utils import VirtualApp
 from pyramid.paster import get_app
 from tqdm import tqdm
+from ..inheritance_mode import InheritanceMode
+from ..server_defaults import add_last_modified
+from ..loadxl import LOADXL_USER_UUID
 from ..commands.variant_table_intake import MappingTableParser
 from ..commands.ingest_vcf import VCFParser
 
@@ -22,8 +25,12 @@ def run_variant_table_intake(app_handle, args):
     logger.info('Successfully posted annotations')
     return True
 
+
 def run_ingest_vcf(app_handle, args):
-    """ Runs the vcf ingestion step """
+    """ Runs the vcf ingestion step
+
+        XXX: Needs updating to match behavior of the ingestion listener
+    """
     logger.info('Ingesting VCF file: %s' % args.vcf)
     vcf_parser = VCFParser(args.vcf, args.variant, args.sample)
     if args.post_variant_consequences:
@@ -38,6 +45,7 @@ def run_ingest_vcf(app_handle, args):
                     variant['project'] = args.variant_project
                     variant['institution'] = args.variant_institution
                     vcf_parser.format_variant_sub_embedded_objects(variant)
+                    add_last_modified(variant, userid=LOADXL_USER_UUID)
                     res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
                     success += 1
                 except Exception:  # ANNOTATION spec validation error, recoverable
@@ -48,7 +56,14 @@ def run_ingest_vcf(app_handle, args):
                     sample['project'] = args.variant_project
                     sample['institution'] = args.variant_institution
                     sample['variant'] = res['@id']  # make link
-                    sample['file'] = 'dummy-file'  # XXX: Do not use for actual loading!
+                    sample['file'] = 'dummy-file'  # XXX: FIX ME
+
+                    # XXX: familial relations from samplegeno need to be added
+                    # add inheritance modes
+                    variant_name = sample['variant']
+                    chrom = variant_name[variant_name.index('chr') + 3]  # find chr* and get *
+                    sample.update(InheritanceMode.compute_inheritance_modes(sample, chrom=chrom))
+                    add_last_modified(variant, userid=LOADXL_USER_UUID)
                     app_handle.post_json('/variant_sample', sample, status=201)
         except Exception as e:  # VCF spec validation error, not recoverable
             logger.error('Encountered VCF format error: %s' % str(e))
