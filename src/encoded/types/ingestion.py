@@ -10,7 +10,7 @@ import os
 import re
 import traceback
 
-from dcicutils.misc_utils import ignored, check_true
+from dcicutils.misc_utils import ignored, check_true, PRINT
 from snovault import collection, load_schema
 from pyramid.request import Request
 from pyramid.security import Allow, Deny, Everyone
@@ -30,14 +30,14 @@ from ..util import (
 )
 from ..ingestion.common import metadata_bundles_bucket, get_parameter
 
-ALLOW_SUBMITTER_VIEW_ACL = (
-    # TODO: There is an issue here where we want a logged in user remotely only to view this
-    #       but if we are proxying for them internall we want to be able to view OR edit.
-    #       There is never reason for a user outside the system to update this status. -kmp 26-Jul-2020
-    []  # Special additional permissions might go here.
-    + ALLOW_PROJECT_MEMBER_ADD_ACL  # Is this right? See note above.
-    + ONLY_ADMIN_VIEW_ACL     # Slightly misleading name. Allows admins to edit, too, actually. But only they can view.
-)
+# ALLOW_SUBMITTER_VIEW_ACL = (
+#     # TODO: There is an issue here where we want a logged in user remotely only to view this
+#     #       but if we are proxying for them internall we want to be able to view OR edit.
+#     #       There is never reason for a user outside the system to update this status. -kmp 26-Jul-2020
+#     []  # Special additional permissions might go here.
+#     + ALLOW_PROJECT_MEMBER_ADD_ACL  # Is this right? See note above.
+#     + ONLY_ADMIN_VIEW_ACL     # Slightly misleading name. Allows admins to edit, too, actually. But only they can view.
+# )
 
 
 class SubmissionFolio:
@@ -72,32 +72,6 @@ class SubmissionFolio:
     @property
     def submission_uri(self):
         return self.make_submission_uri(self.submission_id)
-
-    SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)/?$')
-
-    @classmethod
-    def create_item(cls, request, institution, project, ingestion_type):
-        json_body = {
-            "ingestion_type": ingestion_type,
-            "institution": institution,
-            "project": project,
-            "processing_status": {
-                "state": "submitted"
-            }
-        }
-        guid = None
-        item_url, res_json = None, None
-        try:
-            res_json = subrequest_item_creation(request=request, item_type='IngestionSubmission', json_body=json_body)
-            [item_url] = res_json['@graph']
-            matched = cls.SUBMISSION_PATTERN.match(item_url)
-            if matched:
-                guid = matched.group(1)
-        except Exception as e:
-            logging.error("%s: %s" % (e.__class__.__name__, e))
-            pass
-        check_true(guid, "Guid was not extracted from %s in %s" % (item_url, json.dumps(res_json)))
-        return guid
 
     def patch_item(self, **kwargs):
         res = self.vapp.patch_json(self.submission_uri, kwargs)
@@ -191,7 +165,7 @@ class SubmissionFolio:
         with s3_output_stream(self.s3_client,
                               bucket=self.bucket,
                               key="%s/resolution.json" % submission_id) as fp:
-            print(json.dumps(resolution, indent=2), file=fp)
+            PRINT(json.dumps(resolution, indent=2), file=fp)
 
     def process_standard_bundle_results(self, bundle_result):
 
@@ -219,7 +193,7 @@ class SubmissionFolio:
 
 @collection(
     name='ingestion-submissions',
-    acl=ALLOW_SUBMITTER_VIEW_ACL,
+    # acl=ALLOW_SUBMITTER_VIEW_ACL,
     unique_key='object_name',
     properties={
         'title': 'Ingestion Submissions',

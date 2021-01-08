@@ -1,8 +1,14 @@
-from zope.interface import implementer
+import json
+
+from dcicutils.misc_utils import environ_bool, PRINT
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.compat import is_nonstr_iter
 from pyramid.interfaces import IAuthorizationPolicy
 from pyramid.location import lineage
+from zope.interface import implementer
+
+
+DEBUG_PERMISSIONS = environ_bool("DEBUG_PERMISSIONS", default=False)
 
 
 # This code (right now) is identical to that of https://github.com/lrowe/pyramid_localroles
@@ -43,6 +49,14 @@ def local_principals(context, principals):
         return principals
 
     local_principals.update(principals)
+
+    if DEBUG_PERMISSIONS:
+        PRINT("local_principals")
+        PRINT(" context.collection=", context.collection)
+        PRINT(" context.__acl__()=", context.__acl__())
+        PRINT(" context.collection.__ac_local_roles_()=", context.__ac_local_roles__())
+        PRINT("local_principals returning", local_principals)
+
     return local_principals
 
 
@@ -74,7 +88,17 @@ def merged_local_principals(context, principals):
         return principals
 
     local_principals.update(principals)
-    return list(local_principals)
+
+    local_principals = list(local_principals)
+
+    if DEBUG_PERMISSIONS:
+        PRINT("merged_local_principals")
+        PRINT(" context.collection=", context.collection)
+        PRINT(" context.__acl__()=", context.__acl__())
+        PRINT(" context.collection.__ac_local_roles_()=", context.__ac_local_roles__())
+        PRINT("merged_local_principals returning", local_principals)
+
+    return local_principals
 
 
 @implementer(IAuthorizationPolicy)
@@ -90,8 +114,20 @@ class LocalRolesAuthorizationPolicy(object):
 
     def permits(self, context, principals, permission):
         principals = local_principals(context, principals)
-        return self.wrapped_policy.permits(context, principals, permission)
+        result = self.wrapped_policy.permits(context, principals, permission)
+        if DEBUG_PERMISSIONS:
+            PRINT("LocalRolesAuthorizationPolicy.permits")
+            PRINT(" permission=", permission)
+            PRINT(" principals=", principals)
+            PRINT("LocalRolesAuthorizationPolicy.permits returning", result)
+        return result
 
     def principals_allowed_by_permission(self, context, permission):
         principals = self.wrapped_policy.principals_allowed_by_permission(context, permission)
-        return merged_local_principals(context, principals)
+        result = merged_local_principals(context, principals)
+        if DEBUG_PERMISSIONS:
+            PRINT("LocalRolesAuthorizationPolicy.principals_allowed_by_permission")
+            PRINT(" permission=", permission)
+            PRINT(" principals=", principals)
+            PRINT("LocalRolesAuthorizationPolicy.principals_allowed_by_permission returning", result)
+        return result

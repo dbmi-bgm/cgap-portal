@@ -1897,7 +1897,7 @@ $download-button-width : 100px;
 				display: flex;
 				justify-content: space-evenly;
 
-				@include media-breakpoint-down(sm) {
+				@include media-breakpoint-down(md) {
 					flex-direction: column;
 				}
 
@@ -1906,7 +1906,7 @@ $download-button-width : 100px;
 					display: flex;
 					height: $search-results-header-row-height; // Eh why not re-use this, can change always in future.
 
-					@include media-breakpoint-down(sm) {
+					@include media-breakpoint-down(md) {
 						margin-bottom: 5px;
 					}
 					
@@ -1957,12 +1957,12 @@ $download-button-width : 100px;
 							}
 						}
 
-						@include media-breakpoint-down(sm) {
+						@include media-breakpoint-down(md) {
 							display: none;
 						}
 					}
 
-					@include media-breakpoint-up(md) {
+					@include media-breakpoint-up(lg) {
 
 						&:first-child {
 							> .btn-prepend {
@@ -2280,30 +2280,87 @@ $download-button-width : 100px;
 	are dependent on font-size/face that we use.
 **********************************************************/
 
+@mixin clickable-hoverable-icon {
+	opacity: 0.5;
+	&:hover {
+		opacity: 1;
+	}
+	&.disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+	}
+}
+
+
 .filterset-outer-container {
 	// TODO CHANGE
 	// border: 1px solid #999;
-	background-color: desaturate(lighten($primary-dark, 40%), 25%);// #b4c8d8; // $gray-300;
+	/* background-color: desaturate(lighten($primary-dark, 45%), 30%); */ // #b4c8d8; // $gray-300;
+	background-color: #dedede;
 	border-radius: $border-radius-lg;
+	border: 4px solid transparent;
+	transition: background-color .5s ease-out;
+
+	h4 i.icon.clickable {
+		@include clickable-hoverable-icon;
+	}
+
+	
+
+	.filter-set-ui-header {
+		/** Header **/
+		/** Margins are negatively offset from parent elem's border - tho maybe dif layouting in future to be adopted **/
+		margin: -4px;
+		background-color: $primary-dark;
+		h4 {
+			color: #fff;
+		}
+	}
 
 	.blocks-container {
 
 		.filterset-block {
 			border-radius: $border-radius-lg;
-			background-color: desaturate(lighten($primary, 50%), 15%); // #dce4f5; // TODO: Codify somewhere
-			border: 3px solid transparent;
+			border: 1px solid #8e8e8e;
+			padding: 2px;
+
+			background-color: #f1f1f1;
+			/* background-color: desaturate(lighten($primary, 50%), 15%); */ // #dce4f5; // TODO: Codify somewhere
+			
 			// border-color: desaturate(lighten($primary-dark, 40%), 25%); /* Same as .filterset-outer-container background-color */
 			// margin: 0 -3px; /* Subtract border-width to align left + right unselected edges properly w. other UI elements */
 			/* transition: border-color .5s, background-color .5s; */
-			box-shadow: 0 1px 6px -3px black;
+
+			transition: background-color .5s ease-out;
+
+
+			/* box-shadow: 0 1px 6px -3px black; */
 
 			&.selected {
+				border-width: 3px;
+				padding: 0px;
+				border-radius: $border-radius-lg + 2px;
 				border-color: $primary-dark;
 				background-color: lighten($primary, 50%);
+				&.clickable:hover {
+					@include user-select(none);
+					// background-color: desaturate(lighten($primary, 50%), 15%);
+					// transition: none;
+				}
 			}
 
+			&.clickable:not(.selected):hover {
+				// background-color: lighten($primary, 45%);
+				border-width: 2px;
+				padding: 1px;
+				border-radius: $border-radius-lg + 1px;
+				border-color: $primary-dark;
+				transition: none;
+			}
+
+
 			&[data-duplicate-query="true"] {
-				background-color: desaturate(lighten($danger, 50%), 10%);
+				background-color: desaturate(lighten($danger, 45%), 10%);
 				&.selected {
 					border-color: desaturate(lighten($danger, 10%), 20%);
 				}
@@ -2312,14 +2369,7 @@ $download-button-width : 100px;
 			.title-controls-row {
 
 				i.icon.clickable {
-					opacity: 0.5;
-					&:hover {
-						opacity: 1;
-					}
-					&.disabled {
-						opacity: 0.3;
-						cursor: not-allowed;
-					}
+					@include clickable-hoverable-icon;
 				}
 
 				.cached-counts-value {
@@ -2345,11 +2395,11 @@ $download-button-width : 100px;
 
 					.value-blocks {
 						.value-block {
-							border-radius: $border-radius-lg;
+							border-radius: 25px;
 							padding: 5px 10px;
 							background-color: #fff;
 							position: relative;
-							box-shadow: 0 2px 8px -3px #000;
+							/* box-shadow: 0 2px 8px -3px #000; */
 							white-space: nowrap;
 							margin: 3px 0;
 							flex-grow: 1;
@@ -2403,7 +2453,34 @@ $download-button-width : 100px;
 			}
 
 		}
+
 	}
+
+	&[data-all-selected="true"] {
+		border-color: $primary-dark;
+		background-color: desaturate(lighten($primary-dark, 40%), 25%);
+		.blocks-container {
+
+		 	.filterset-block.selected {
+		 		border-width: 1px;
+				padding: 2px;
+				border-radius: $border-radius-lg;
+				border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+			}
+
+			&:hover {
+				.filterset-block.clickable.selected {
+					&:hover {
+						border-width: 2px;
+						padding: 1px;
+						border-radius: $border-radius-lg + 1px;
+						border-color: $primary-dark;
+					}
+				}
+			}
+		}
+	}
+
 }
 
 

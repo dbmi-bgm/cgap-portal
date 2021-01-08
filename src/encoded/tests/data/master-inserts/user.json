@@ -69,6 +69,26 @@
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
+        "email": "kent_pitman_1@hms.harvard.edu",
+        "first_name": "Kent",
+        "last_name": "Pitman-One",
+        "uuid": "cbff0d3a-ed67-4fd5-9ca2-8505549cac42",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
+        "email": "kent_pitman_2@hms.harvard.edu",
+        "first_name": "Kent",
+        "last_name": "Pitman-Two",
+        "uuid": "242ad280-6b14-4c4b-9045-a7ad4a921f0f",
+        "project": "59dfdfff-cd30-45d8-bb50-63b3a092578a",
+        "project_roles": [{"project": "59dfdfff-cd30-45d8-bb50-63b3a092578a",
+                           "role": "developer"}],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
         "email": "eric_berg@hms.harvard.edu",
         "first_name": "Eric",
         "last_name": "Berg",

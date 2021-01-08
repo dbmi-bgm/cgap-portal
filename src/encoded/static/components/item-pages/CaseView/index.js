@@ -407,7 +407,7 @@ class DotRouter extends React.PureComponent {
 }
 
 function DotRouterTab(props) {
-    const { tabTitle, dotPath, className, disabled, active, prependDotPath, children } = props;
+    const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
 
     const onClick = useMemo(function(){
         return function(){
@@ -424,7 +424,7 @@ function DotRouterTab(props) {
     }
 
     return (
-        <div className={(className ? className + " " : "") + (disabled ? "disabled " : "") + (active ? " active" : "")} >
+        <div className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")} >
             <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
@@ -440,13 +440,9 @@ function DotRouterTab(props) {
         </div>
     );
 }
-DotRouterTab.defaultProps = {
-    "className" : "arrow-tab d-flex"
-};
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context, currFamily, secondary_families = [] } = props;
-    const { display_title: caseDisplayTitle } = context;
     const { display_title: primaryFamilyTitle, '@id' : currFamilyID } = currFamily;
     const [ isSecondaryFamiliesOpen, setSecondaryFamiliesOpen ] = useState(false);
     const secondaryFamiliesLen = secondary_families.length;
@@ -465,7 +461,7 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
         <React.Fragment>
             <h1 className="row align-items-center">
                 <div className="col">
-                    { caseDisplayTitle }: <span className="text-300">Accessioning Report and History</span>
+                    <span className="text-300">Accessioning Report and History</span>
                 </div>
                 <div className="col-auto">
                     <span className="current-case text-small text-400 m-0">Current Selection</span>

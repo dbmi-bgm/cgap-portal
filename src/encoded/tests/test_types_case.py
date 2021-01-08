@@ -92,6 +92,65 @@ def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case
     assert mother['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
 
 
+@pytest.fixture
+def new_sample_processing(testapp, project, institution, fam, file_vcf):
+    data = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'samples': [
+            "GAPSAPROBAND",
+            "GAPSAFATHER1",
+            "GAPSAMOTHER1",
+            "GAPSABROTHER"
+            ],
+        'families': [fam['@id']],
+        'processed_files': [file_vcf['@id']]
+    }
+    return data
+
+
+@pytest.fixture
+def new_case(testapp, project, institution, fam, new_sample_processing):
+    data = {
+        "accession": "GAPCAP4E4GMG",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'family': fam['@id'],
+        'individual': 'GAPIDPROBAND'
+    }
+    return data
+
+
+@pytest.mark.parametrize('num_samples, analysis_type', [
+    (1, 'WGS'),  # proband only
+    (2, 'WGS-Group'),  # proband and father
+    (3, 'WES-Trio'),  # proband, father, mother
+    (4, 'WES-Group')])  # proband, father, mother, brother
+def test_case_additional_facets(testapp, project, institution, new_case,
+                                new_sample_processing, num_samples, analysis_type):
+    """
+    tests that additional facets are added to initial_search_href_filter_addon calc prop as appropriate:
+    none for proband only, mother and father genotype labels for trio, mother/father/sibling
+    genotype labels for quad.
+    """
+    genotype_relations = ['father', 'mother', 'brother', 'sister']
+    new_sample_processing['analysis_type'] = analysis_type
+    # limit samples to size of analysis we want to test
+    new_sample_processing['samples'] = new_sample_processing['samples'][:num_samples]
+    sp = testapp.post_json('/sample_processing', new_sample_processing).json['@graph'][0]
+    new_case['sample_processing'] = sp['@id']
+    case = testapp.post_json('/case', new_case).json['@graph'][0]
+    for relation in genotype_relations:
+        if genotype_relations.index(relation) + 2 <= num_samples:
+            # genotype labels for this relation should be an additional facet in prop
+            assert (f'associated_genotype_labels.{relation}_genotype_label'
+                    in case['additional_variant_sample_facets'])
+        else:
+            # genotype labels for this relation should NOT be an additional facet in this prop
+            assert (f'associated_genotype_labels.{relation}_genotype_label'
+                    not in case['additional_variant_sample_facets'])
+
+
 def test_case_proband_case(testapp, proband_case, mother_case):
     assert proband_case['proband_case'] is True
     assert mother_case['proband_case'] is False
