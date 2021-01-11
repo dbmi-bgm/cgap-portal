@@ -176,7 +176,6 @@ class VCFParser(object):
         :return: a list of fields on this sub-embedded object
         """
         sub_embedded = self._strip(hdr.desc.split(':')[1:2][0])  # extracts string that comes after 'Subembedded'
-        import pdb; pdb.set_trace()
         self.sub_embedded_mapping[hdr.id] = sub_embedded
         entries = hdr.desc.split(':')[3:][0].split('|')  # get everything after 'Format', split on field sep
         entries = map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries)  # ID + stripped field name
@@ -425,8 +424,6 @@ class VCFParser(object):
                     result[vcf_key] = attr
 
         for key in self.format.keys():
-            if key == 'CSQ':
-                import pdb; pdb.set_trace()
 
             # handle non-annotation fields
             if key not in self.annotation_keys:
