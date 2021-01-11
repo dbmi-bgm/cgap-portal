@@ -46,6 +46,7 @@
             "enum": [
                 "data_bundle",
                 "metadata_bundle",
+                "simulated_bundle",
                 "vcf"
             ]
         },
