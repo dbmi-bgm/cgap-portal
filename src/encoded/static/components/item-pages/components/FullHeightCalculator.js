@@ -52,4 +52,3 @@ export const FullHeightCalculator = React.memo(function FullHeightCalculator({
         return React.cloneElement(child, { [propName]: height });
     });
 });
-
