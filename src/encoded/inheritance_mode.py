@@ -339,6 +339,8 @@ class InheritanceMode:
                 2. inheritance_modes
         """
         sample_geno = variant_sample.get('samplegeno', [])
+        if not sample_geno:
+            return {}
         try:
             sample_ids = {s["samplegeno_role"]: s["samplegeno_sampleid"] for s in sample_geno}
             genotypes = {s["samplegeno_role"]: s["samplegeno_numgt"] for s in sample_geno}

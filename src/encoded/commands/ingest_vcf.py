@@ -1,9 +1,7 @@
-import re
 import vcf
 import json
 import argparse
 import logging
-import itertools
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
 from collections import OrderedDict
@@ -74,7 +72,6 @@ class VCFParser(object):
         """
         self.variant_schema = json.load(open(variant, 'r'))
         self.variant_sample_schema = json.load(open(sample, 'r'))
-        self.regex = re.compile(r"""(\s+$|["]|['])""")  # for stripping
         self.annotation_keys = OrderedDict()  # list of INFO fields that contain annotation fields
         self.format = OrderedDict()  # intermediate representation of the item format
         self.sub_embedded_mapping = OrderedDict()  # denotes which INFO fields belong in a SEO
@@ -138,9 +135,10 @@ class VCFParser(object):
         if granite_header:
             self.annotation_keys[granite_header['ID']] = True
         if vep_header:
-            self.annotation_keys['CSQ'] = True
+            self.annotation_keys[self.CSQ] = True
 
-    def _strip(self, s):
+    @staticmethod
+    def _strip(s):
         """ Strips whitespace and quotation characters and also lowercases the given string s
 
         :param s: String to strip
@@ -178,6 +176,7 @@ class VCFParser(object):
         :return: a list of fields on this sub-embedded object
         """
         sub_embedded = self._strip(hdr.desc.split(':')[1:2][0])  # extracts string that comes after 'Subembedded'
+        import pdb; pdb.set_trace()
         self.sub_embedded_mapping[hdr.id] = sub_embedded
         entries = hdr.desc.split(':')[3:][0].split('|')  # get everything after 'Format', split on field sep
         entries = map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries)  # ID + stripped field name
@@ -414,7 +413,10 @@ class VCFParser(object):
         result = {}
         for vcf_key in self.VCF_FIELDS:
             if vcf_key == 'ALT':  # requires special care
-                result[vcf_key] = getattr(record, vcf_key)[0].sequence
+                val = getattr(record, vcf_key)[0].sequence
+                if val == '*':
+                    val = '-'  # replace with '-' as '*' is a path character and ALT is part of the pkey
+                result[vcf_key] = val
             elif vcf_key == 'CHROM':
                 result[vcf_key] = self.remove_prefix('chr', getattr(record, vcf_key))  # splice chr off
             else:
@@ -423,6 +425,8 @@ class VCFParser(object):
                     result[vcf_key] = attr
 
         for key in self.format.keys():
+            if key == 'CSQ':
+                import pdb; pdb.set_trace()
 
             # handle non-annotation fields
             if key not in self.annotation_keys:

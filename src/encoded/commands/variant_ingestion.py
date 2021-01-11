@@ -20,8 +20,9 @@ def run_variant_table_intake(app_handle, args):
     parser = MappingTableParser(args.variant_table, args.variant_annotation_field_schema)
     inserts = parser.run(args.sample, args.variant, institution=args.variant_institution, project=args.variant_project,
                          write=args.write_variant_schemas)
-    for entry in tqdm(inserts, unit='variant_annotation_fields'):
-        app_handle.post_json('/annotation_field', entry)
+    # XXX: make configurable
+    # for entry in tqdm(inserts, unit='variant_annotation_fields'):
+    #     app_handle.post_json('/annotation_field', entry)
     logger.info('Successfully posted annotations')
     return True
 
@@ -48,7 +49,8 @@ def run_ingest_vcf(app_handle, args):
                     add_last_modified(variant, userid=LOADXL_USER_UUID)
                     res = app_handle.post_json('/variant', variant, status=201).json['@graph'][0]  # only one item posted
                     success += 1
-                except Exception:  # ANNOTATION spec validation error, recoverable
+                except Exception as e:  # ANNOTATION spec validation error, recoverable
+                    logger.error(e)
                     error += 1
                     continue
                 variant_samples = vcf_parser.create_sample_variant_from_record(record)

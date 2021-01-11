@@ -168,7 +168,7 @@ class TestIngestVCF:
 
 
 # integrated test, so outside of class
-@pytest.mark.skip  # Comment this out and run directly to test the first 5 variants and variant samples validation
+#@pytest.mark.skip  # Comment this out and run directly to test the first 5 variants and variant samples validation
 def test_post_variants_and_samples_with_links(workbook, es_testapp, test_vcf):
     """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
         NOTE: This is the most important test functionally speaking.
@@ -188,6 +188,7 @@ def test_post_variants_and_samples_with_links(workbook, es_testapp, test_vcf):
         if idx == MAX_POSTS_FOR_TESTING:
             break
         variant = test_vcf.create_variant_from_record(record)
+        assert 'transcript' in variant
         variant['project'] = 'hms-dbmi'
         variant['institution'] = 'hms-dbmi'
         test_vcf.format_variant_sub_embedded_objects(variant)
