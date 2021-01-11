@@ -276,12 +276,12 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
                         label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}>
                         <StackedBlockName>
-                            <div className="d-flex flex-wrap">
-                                <span className="mr-07">Case ID:</span>
+                            <div className="d-flex text-left">
+                                <span className="mr-07 text-nowrap">Case ID:</span>
                                 { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
                             </div>
-                            <div className="d-flex flex-wrap">
-                                <span className="mr-07">Report:</span>
+                            <div className="d-flex text-left">
+                                <span className="mr-07 text-nowrap">Report:</span>
                                 { reportAtId ? <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a> : <span className="name-title text-capitalize">{ reportTitle }</span>}
                             </div>
                         </StackedBlockName>
@@ -293,11 +293,13 @@ export class FamilyReportStackedTable extends React.PureComponent {
                         label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}
                     >
                         <StackedBlockName>
-                            <span className="mr-07">Case ID:</span>
-                            { caseAtId ?
-                                <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a>
-                                : <span className="name-title text-capitalize">{ case_title }</span>
-                            }
+                            <div className="d-flex text-left">
+                                <span className="mr-07 text-nowrap">Case ID:</span>
+                                { caseAtId ?
+                                    <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a>
+                                    : <span className="name-title text-capitalize">{ case_title }</span>
+                                }
+                            </div>
                         </StackedBlockName>
                     </StackedBlock>);
                 caseToReportMap[caseAtId] = reportAtId;
