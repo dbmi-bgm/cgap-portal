@@ -1,4 +1,5 @@
-$pedigree-viz-bg-color: #ffffff !default;
+$pedigree-viz-bg-color: #f8f8f8 !default;
+$pedigree-viz-node-bg-color: #fff !default;
 $pedigree-viz-node-stroke-color: #444 !default;
 
 
@@ -316,7 +317,7 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
 
             .bg-shape-copy {
                 stroke-width: 0px;
-                fill: $pedigree-viz-bg-color;
+                fill: $pedigree-viz-node-bg-color;
             }
 
             .fg-shape {

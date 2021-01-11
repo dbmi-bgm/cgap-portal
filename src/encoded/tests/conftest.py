@@ -1,7 +1,7 @@
-'''py.test fixtures for Pyramid.
+"""py.test fixtures for Pyramid.
 
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
-'''
+"""
 import os
 import logging
 import pytest
@@ -220,8 +220,8 @@ def html_es_testapp(es_app):
 
 @pytest.fixture(scope="session")
 def testapp(app):
-    '''TestApp with JSON accept header.
-    '''
+    """TestApp with JSON accept header.
+    """
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -241,8 +241,8 @@ def es_testapp(es_app):
 
 @pytest.fixture
 def anontestapp(app):
-    '''TestApp with JSON accept header.
-    '''
+    """TestApp with JSON accept header.
+    """
     environ = {
         'HTTP_ACCEPT': 'application/json',
     }
@@ -260,8 +260,8 @@ def anon_es_testapp(es_app):
 
 @pytest.fixture
 def authenticated_testapp(app):
-    '''TestApp with JSON accept header for non-admin user.
-    '''
+    """TestApp with JSON accept header for non-admin user.
+    """
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_AUTHENTICATED',
@@ -282,8 +282,8 @@ def authenticated_es_testapp(es_app):
 
 @pytest.fixture
 def submitter_testapp(app):
-    '''TestApp with JSON accept header for non-admin user.
-    '''
+    """TestApp with JSON accept header for non-admin user.
+    """
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_SUBMITTER',
