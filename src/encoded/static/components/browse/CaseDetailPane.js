@@ -139,10 +139,11 @@ export class FamilyReportStackedTable extends React.PureComponent {
     static builtInHeaders(){
         // Keeping these builtInHeader methods separate in case we want to build in custom columns later
         return [
-            { columnClass: 'individual',     className: 'text-left',     title: 'Individual',     initialWidth: 220   },
-            { columnClass: 'libraries',    className: 'text-left',     title: 'Libraries',    initialWidth: 220   },
-            { columnClass: 'analysis',    title: 'Analysis',    initialWidth: 200   },
-            { columnClass: 'report',    title: 'Report',          initialWidth: 200  }
+            { columnClass: 'individual',    className: 'text-left',         title: 'Individual',    initialWidth: 220   },
+            { columnClass: 'libraries',     className: 'text-left',         title: 'Libraries',     initialWidth: 220   },
+            { columnClass: 'analysis',                                      title: 'Analysis',      initialWidth: 200   },
+            /* report column has no label, but has left alignment, so we add 12px padding left to visually align header to it better */
+            { columnClass: 'report',        className: 'text-left pl-12',   title: 'Report',        initialWidth: 200   }
         ];
     }
 
@@ -275,12 +276,14 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
                         label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}>
                         <StackedBlockName>
-                            <span className="d-inline">
-                                Case ID: { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
-                            </span>
-                            <span className="d-inline">
-                                { reportAtId ? <>Report: <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a></> : <>Report: <span className="name-title text-capitalize">{ reportTitle }</span></>}
-                            </span>
+                            <div className="d-flex text-left">
+                                <span className="mr-07 text-nowrap">Case ID:</span>
+                                { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
+                            </div>
+                            <div className="d-flex text-left">
+                                <span className="mr-07 text-nowrap">Report:</span>
+                                { reportAtId ? <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a> : <span className="name-title text-capitalize">{ reportTitle }</span>}
+                            </div>
                         </StackedBlockName>
                     </StackedBlock>);
                 caseToReportMap[caseAtId] = reportAtId;
@@ -290,9 +293,13 @@ export class FamilyReportStackedTable extends React.PureComponent {
                         label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}
                     >
                         <StackedBlockName>
-                            <span className="d-inline">
-                                Case ID: { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
-                            </span>
+                            <div className="d-flex text-left">
+                                <span className="mr-07 text-nowrap">Case ID:</span>
+                                { caseAtId ?
+                                    <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a>
+                                    : <span className="name-title text-capitalize">{ case_title }</span>
+                                }
+                            </div>
                         </StackedBlockName>
                     </StackedBlock>);
                 caseToReportMap[caseAtId] = reportAtId;
