@@ -219,13 +219,15 @@ export class PedigreeTabViewBody extends React.PureComponent {
 
         if (!PedigreeVizLibrary) {
             body = (
-                <div className="py-3 d-flex align-items-center justify-content-center">
+                <div className="py-3 text-center">
                     Loading...
                 </div>
             );
         } else if (graphData) {
+            // If already have parsed graph data
             body = <PedigreeVizView {...pedigreeVizProps} {...graphData} />;
         } else if (dataset) {
+            // If letting PedigreeViz parse on the fly (this mostly for local demo/test data)
             body = <PedigreeViz {...pedigreeVizProps} dataset={dataset} />;
         }
 
@@ -237,5 +239,4 @@ export class PedigreeTabViewBody extends React.PureComponent {
             </div>
         );
     }
-
 }
