@@ -1,0 +1,9 @@
+{
+    "success": true,
+    "validation_output": ["Some validation stuff"],
+    "post_output": ["Some post stuff", "More post stuff"],
+    "upload_info": {},
+    "result": {"answer": 42},
+    "institution": "/institutions/hms-dbmi/",
+    "project": "/projects/hms-dbmi/"
+}
