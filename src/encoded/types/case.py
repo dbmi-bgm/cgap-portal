@@ -327,6 +327,30 @@ class Case(Item):
         return add_on
 
     @calculated_property(schema={
+        "title": "Additional Variant Sample Facets",
+        "description": "Additional facets relevant to this case.",
+        "type": "array",
+        "items": {
+            "title": "Additional Variant Sample Facet",
+            "type": "string"
+        }
+    })
+    def additional_variant_sample_facets(self, request, sample_processing=None, extra_variant_sample_facets=[]):
+        if not sample_processing:
+            return ''
+        fields = [facet for facet in extra_variant_sample_facets]
+        sp_item = get_item_or_none(request, sample_processing, 'sample_processing')
+        analysis_type = sp_item.get('analysis_type')
+        if analysis_type and (analysis_type.endswith('-Trio') or analysis_type.endswith('-Group')):
+            included_relations = [item.get('relationship') for item in sp_item.get('samples_pedigree', [{}])]
+            for relation in ['mother', 'father', 'sister', 'brother', 'co-parent',
+                            'daughter', 'son', 'daughter II', 'son II', 'daughter III', 'son III']:
+                if relation in included_relations:
+                    relation = relation.replace(' ', '_').replace('-', '_')
+                    fields.append(f'associated_genotype_labels.{relation}_genotype_label')
+        return fields
+
+    @calculated_property(schema={
         "title": "Proband Case",
         "description": "Does this case belong to the proband",
         "type": "boolean"

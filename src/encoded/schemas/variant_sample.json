@@ -551,18 +551,6 @@
         }
     },
     "facets": {
-        "AD_ALT": {
-            "title": "Allelic Depth (Alt)",
-            "aggregation_type": "range",
-            "default_hidden": true,
-            "order": 8,
-            "ranges": [
-                {"from": 1, "to": 4, "label": "Very Low"},
-                {"from": 5, "to": 9, "label": "Low"},
-                {"from": 10, "to": 19, "label": "Medium"},
-                {"from": 20, "label": "High"}
-            ]
-        },
         "AF": {
             "title": "VAF",
             "aggregation_type": "stats",
@@ -591,15 +579,29 @@
             "order": 11,
             "grouping": "Variant Quality"
         },
+        "AD_ALT": {
+            "title": "Allelic Depth (Alt)",
+            "aggregation_type": "range",
+            "order": 12,
+            "ranges": [
+                {"from": 1, "to": 4, "label": "Very Low"},
+                {"from": 5, "to": 9, "label": "Low"},
+                {"from": 10, "to": 19, "label": "Medium"},
+                {"from": 20, "label": "High"}
+            ],
+            "grouping": "Variant Quality"
+        },
         "associated_genotype_labels.father_genotype_label": {
             "title": "Father Genotype",
             "order": 20,
-            "grouping": "Genotype"
+            "grouping": "Genotype",
+            "default_hidden": true
         },
         "associated_genotype_labels.mother_genotype_label": {
             "title": "Mother Genotype",
             "order": 21,
-            "grouping": "Genotype"
+            "grouping": "Genotype",
+            "default_hidden": true
         },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Proband Genotype",
@@ -618,7 +620,7 @@
             "grouping": "Genotype",
             "default_hidden": true
         },
-        "associated_genotype_labels.coparent_genotype_label": {
+        "associated_genotype_labels.co_parent_genotype_label": {
             "title": "Co-Parent Genotype",
             "order": 25,
             "grouping": "Genotype",
@@ -671,10 +673,14 @@
         },
         "novoPP": {
             "title": "novoCaller PP",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
             "number_step": "any",
             "order": 16,
-            "grouping": "Genotype"
+            "grouping": "Genotype",
+            "ranges": [
+                { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },
+                { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }
+            ]
         },
         "variant.CHROM": {
             "title": "Chromosome",
@@ -702,10 +708,17 @@
         },
         "variant.conservation_phylop100": {
             "title": "PhyloP (100 Vertabrates)",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
             "number_step": "any",
             "order": 22,
-            "grouping": "Conservation"
+            "grouping": "Conservation",
+            "ranges": [
+                { "from": -20, "to": -3, "label": "strong positive selection" },
+                { "from": -3, "to": -2, "label": "positive selection" },
+                { "from": -2, "to": 2, "label": "low selection" },
+                { "from": 2, "to": 3, "label": "conserved" },
+                { "from": 3, "to": 10, "label": "highly conserved"}
+            ]
         },
         "variant.cytoband_cytoband": {
             "title": "Cytoband",
@@ -783,10 +796,16 @@
         },
         "variant.gnomad_af": {
             "title": "GnomAD Alt Allele Frequency",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
             "number_step": "any",
             "order": 18,
-            "grouping": "Population Frequency"
+            "grouping": "Population Frequency",
+            "ranges": [
+                { "from": 0, "to": 0, "label": "unobserved" }, 
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },
+                { "from": 0.001, "to": 0.01, "label": "rare" },
+                { "from": 0.01, "to": 1, "label": "common" }
+            ]
         },
         "variant.gnomad_an": {
             "title": "GnomAD Total Allele Number",
@@ -804,10 +823,16 @@
         },
         "variant.max_pop_af_af_popmax": {
             "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
             "number_step": "any",
             "order": 19,
-            "grouping": "Population Frequency"
+            "grouping": "Population Frequency",
+            "ranges": [
+                { "from": 0, "to": 0, "label": "unobserved" }, 
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },
+                { "from": 0.001, "to": 0.01, "label": "rare" },
+                { "from": 0.01, "to": 1, "label": "common" }
+            ]
         },
         "variant.mutanno_variant_class": {
             "title": "Variant Type",
