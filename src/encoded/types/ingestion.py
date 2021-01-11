@@ -78,12 +78,13 @@ class SubmissionFolio:
         [item] = res.json['@graph']
         debuglog(json.dumps(item))
 
-    def note_additional_datum(self, key, from_dict, from_key=None):
+    def note_additional_datum(self, key, from_dict, from_key=None, default=None):
         self.other_details['additional_data'] = additional_data = (
             self.other_details.get('additional_data', {})
         )
-        additional_data[key] = from_dict[from_key or key]
+        additional_data[key] = from_dict.get(from_key or key, default)
 
+    @contextlib.contextmanager
     def s3_output(self, key_name, key_type='txt'):
         key = "%s/%s.%s" % (self.submission_id, key_name, key_type)
         self.resolution[key_name] = key
@@ -97,7 +98,7 @@ class SubmissionFolio:
         self.outcome = 'success'
 
     def is_done(self):
-        return self.outcome == 'unknown'
+        return self.outcome != 'unknown'
 
     @contextlib.contextmanager
     def processing_context(self):
@@ -171,20 +172,20 @@ class SubmissionFolio:
 
         # Next several files are created only if relevant.
 
-        if bundle_result['result']:
+        if bundle_result.get('result'):
             with self.s3_output(key_name='submission.json', key_type='json') as fp:
                 print(json.dumps(bundle_result['result'], indent=2), file=fp)
-                self.note_additional_datum('result', from_dict=bundle_result)
+                self.note_additional_datum('result', from_dict=bundle_result, default={})
 
-        if bundle_result['post_output']:
+        if bundle_result.get('post_output'):
             with self.s3_output(key_name='submission_response') as fp:
                 self.show_report_lines(bundle_result['post_output'], fp)
-                self.note_additional_datum('post_output', from_dict=bundle_result)
+                self.note_additional_datum('post_output', from_dict=bundle_result, default=[])
 
-        if bundle_result['upload_info']:
+        if bundle_result.get('upload_info'):
             with self.s3_output(key_name='upload_info') as fp:
                 print(json.dumps(bundle_result['upload_info'], indent=2), file=fp)
-                self.note_additional_datum('upload_info', from_dict=bundle_result)
+                self.note_additional_datum('upload_info', from_dict=bundle_result, default=[])
 
     @staticmethod
     def show_report_lines(lines, fp, default="Nothing to report."):

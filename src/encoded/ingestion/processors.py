@@ -69,18 +69,47 @@ def handle_metadata_bundle(submission: SubmissionFolio):
         debuglog(submission_id, "bundle_result:", json.dumps(bundle_results, indent=2))
 
         with submission.s3_output(key_name='validation_report') as fp:
-            submission.show_report_lines(bundle_results['validation_output'], fp)
+            submission.show_report_lines(bundle_results.get('validation_output', []), fp)
             submission.note_additional_datum('validation_output', from_dict=bundle_results)
 
         submission.process_standard_bundle_results(bundle_results)
 
-        if not bundle_results['success']:
+        if not bundle_results.get('success'):
             submission.fail()
 
 
-@ingestion_processor('simulated')
-def handle_simulated(submission: SubmissionFolio):
-
+@ingestion_processor('simulated_bundle')
+def handle_simulated_bundle(submission: SubmissionFolio):
+    """
+    This handler exists for test purposes and as an example of how to write an alternate processor.
+    It wants a file that contains data like:
+    {
+      "success": true,
+      "validation_output": ["Some validation stuff"],
+      "post_output": ["Some post stuff", "More post stuff"],
+      "upload_info": {},
+      "result": {"answer": 42},
+      "institution": "/institutions/hms-dbmi/",
+      "project": "/projects/hms-dbmi/"
+    }
+    and does several things:
+    * Checks that the submission was given a matching institution and project, or else it won't validate.
+      Returns the given validation output PLUS information about the validation of those two fields.
+    * If validation_only=true is given, then returns the validation result, as the result.
+      That includes:
+      * success" - either true or false to validation success or failure in the case of validation_only,
+                   or always false (of course) in the case validation_only was false but the validation failed.
+      * validation_output - a list of output lines explaining validation results. There might be such lines
+        whether or not there was validation success.
+    * If validation_only is missing or not true, then returns the indicated values for
+      * success - either true or false to simulate overall success or failure
+      * result - any overall result value
+      * post_output - a list of text lines that represent output describing results of posts.
+      * upload_info - information about any uploads that need to be done, in the format:
+        [{'filename': ..., 'uuid': ...}, ...}
+        where filename is the name of the filename that needs to be uploaded, and uuid is the uuid of the item
+        for which it needs to be uploaded.
+    """
     with submission.processing_context() as resolution:
 
         ignored(resolution)
@@ -103,12 +132,12 @@ def handle_simulated(submission: SubmissionFolio):
         debuglog(submission_id, "bundle_result:", json.dumps(bundle_results, indent=2))
 
         with submission.s3_output(key_name='validation_report') as fp:
-            submission.show_report_lines(bundle_results['validation_output'], fp)
-            submission.note_additional_datum('validation_output', from_dict=bundle_results)
+            submission.show_report_lines(bundle_results.get('validation_output', []), fp)
+            submission.note_additional_datum('validation_output', from_dict=bundle_results, default=[])
 
         submission.process_standard_bundle_results(bundle_results)
 
-        if not bundle_results['success']:
+        if not bundle_results.get('success'):
             submission.fail()
 
 
@@ -139,11 +168,12 @@ def simulated_processor(s3_client, bucket, key, project, institution, vapp,  # <
     def simulated_validation(data, project, institution):
         # Simulated Validation
         validated = True
-        validation_output = []
+        validation_output = data.get("validation_output", [])
         for key, value in [("project", project), ("institution", institution)]:
             if data.get(key) == value:
                 validation_output.append("The %s is OK" % key)
             else:
+
                 validation_output.append("Expected %s %s." % (key, value))
                 validated = False
 
@@ -163,7 +193,10 @@ def simulated_processor(s3_client, bucket, key, project, institution, vapp,  # <
             result["success"] = validated
             return result
 
-        for key in ["success", "result", "post_output", "upload_info"]:
-            result[key] = data[key]
+        for key, default in [("success", False),
+                             ("result", {}),
+                             ("post_output", []),
+                             ("upload_info", [])]:
+            result[key] = data.get(key, default)
 
-        return data
+        return result
