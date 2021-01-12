@@ -227,7 +227,9 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 	}
 }
 
-/** CGAP-Related SearchView Theming **/
+/************************************************
+******** CGAP-Related SearchView Theming ********
+*************************************************/
 
 body[data-pathname="/search/"]:not([data-current-action="add"]) {
 	#slot-application,
@@ -238,7 +240,10 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 	}
 }
 
-.search-page-container {
+/** Applies to both embedded search views and /search/ page views **/
+/** Here we give the facetlist a predefined max width of 320px for larger screen sizes **/
+.search-page-container,
+.embedded-search-container {
 
 	> div.search-view-controls-and-results.row {
 
@@ -251,15 +256,29 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 		}
 
 		.facets-column {
-
+			
 			@include navbar-static-position {
 				width: 100%;
 			}
 	
-	
 			@include navbar-fixed-position {
 				width: 320px;
 			}
+
+		}
+
+	}
+
+}
+
+/** Applies to only /search/ page views **/
+.search-page-container {
+
+	> div.search-view-controls-and-results.row {
+
+		.facets-column {
+
+			/** The following changes the position of facets-container to be stickied to top of browser on /search/ pages **/
 	
 			.facets-container {
 				position: -webkit-sticky;
