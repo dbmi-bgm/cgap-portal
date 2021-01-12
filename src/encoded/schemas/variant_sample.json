@@ -728,7 +728,7 @@
         "variant.genes.genes_ensg.display_title": {
             "title": "Gene",
             "order": 1,
-            "search_type": "sayt",
+            "search_type": "sayt_without_terms",
             "sayt_item_type": "Gene"
         },
         "variant.genes.genes_ensg.gene_lists.display_title": {
