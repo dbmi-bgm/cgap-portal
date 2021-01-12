@@ -7,7 +7,6 @@ import url from 'url';
 
 import { memoizedUrlParse, schemaTransforms, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { SearchView as CommonSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/SearchView';
-import { ActiveFiltersBar } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/ActiveFiltersBar';
 import { columnExtensionMap } from './columnExtensionMap';
 import { CaseDetailPane } from './CaseDetailPane';
 import { Schemas } from './../util';
@@ -136,10 +135,6 @@ export default class SearchView extends React.PureComponent {
 
         return (
             <div className="container-wide search-page-outer-container" id="content">
-                {/* TEMPORARY UNTIL DECIDE WHERE TO PUT
-                <ActiveFiltersBar {...{ context, filters, schemas }}
-                    termTransformFxn={Schemas.Term.toName} fieldTransformFxn={Schemas.Field.toName}/>
-                */}
                 <CommonSearchView {...passProps} {...{ columnExtensionMap, tableColumnClassName, facetColumnClassName, facets }}
                     renderDetailPane={isCaseSearch ? this.memoized.renderCaseDetailPane : null} termTransformFxn={Schemas.Term.toName} separateSingleTermFacets={false} rowHeight={90} openRowHeight={90} />
             </div>
