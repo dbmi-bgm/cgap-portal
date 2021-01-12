@@ -625,7 +625,13 @@
                   "fontFamily": "Helvetica",
                   "maxTexts": 100,
                   "showToggleTranscriptsButton": false,
-                  "startCollapsed": false
+                  "startCollapsed": false,
+                  "sequenceData": {
+                    "type": "fasta",
+                    "fastaUrl": "https://aveit.s3.amazonaws.com/higlass/data/sequence/hg38.fa",
+                    "faiUrl": "https://aveit.s3.amazonaws.com/higlass/data/sequence/hg38.fa.fai",
+                    "chromSizesUrl": "https://aveit.s3.amazonaws.com/higlass/data/sequence/hg38.chrom.sizes"
+                  }
                 },
                 "width": 768,
                 "height": 40
