@@ -2,7 +2,7 @@
 
 import React from 'react';
 import ReactTooltip from 'react-tooltip';
-import Modal from 'react-bootstrap';
+import { Modal, InputGroup, DropdownButton, Dropdown, FormControl, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 import { DragAndDropFileUploadController } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/DragAndDropUpload';
@@ -65,6 +65,15 @@ ServerSentEventListener.propTypes = {
 };
 
 export default class ExcelSubmissionView extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            submissionType: "Accessioning", // Accessioning, Family History, or Gene List
+            fileName: null
+        };
+        this.onSelectSubmissionType = this.onSelectSubmissionType.bind(this);
+    }
     // componentDidUpdate(pastProps){
     //     const { serverSentEvents, onCompleted } = this.props;
     //     if (serverSentEvents !== pastProps.serverSentEvents) {
@@ -82,7 +91,14 @@ export default class ExcelSubmissionView extends React.Component {
     //     }
     // }
 
+    onSelectSubmissionType(eventKey) {
+        if (eventKey !== this.state.submissionType) {
+            this.setState({ submissionType: eventKey });
+        }
+    }
+
     render() {
+        const { submissionType, fileName } = this.state;
         return (
             <div className="case-submission-view">
                 <div className="container">
@@ -94,30 +110,12 @@ export default class ExcelSubmissionView extends React.Component {
                         </a>
                         <i className="icon icon-external-link-alt fas text-smaller ml-05"/>
                     </h5>
-                    {/* <div className="panel-selection">
-                        <div>
-                            <div className="row">
-                                <div className="col-auto number-indicator">
-                                    <span>###</span>
-                                </div>
-                                <div className="col">
-                                    <span className="panel-title d-block small">Step </span>
-                                    <span>Title</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div> */}
                     <hr />
                     <p>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                     </p>
                     <form className="panel-form-container d-block is-creating" onSubmit={null}>
                         <h4 className="text-300 mt-2">Required Fields</h4>
-
-                        {/* <label className="field-section mt-2 d-block">
-                            <span className="d-block mb-05">Case Title</span>
-                            <input type="text" className="form-control d-block"/>
-                        </label> */}
 
                         <div className="field-section linkto-section mt-2 d-block">
                             <label className="d-block mb-05">Project</label>
@@ -140,24 +138,23 @@ export default class ExcelSubmissionView extends React.Component {
                         </div>
 
                         <div className="field-section linkto-section mt-2 d-block">
-                            <label className="d-block mb-05">Excel File</label>
-                            <div className="row align-items-center">
-                                <div className="col-auto">
-                                    <div className="input-group">
-                                        <div>
-                                            <input
-                                                type="file"
-                                                // className="btn-primary"
-                                                // id="inputGroupFile01"
-                                                // aria-describedby="inputGroupFileAddon01"
-                                            />
-                                            <label className="custom-file-label" htmlFor="inputGroupFile01">
-                                                Select a file...
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <label className="d-block mb-05">File Details</label>
+                            <InputGroup className="mb-3">
+                                <DropdownButton
+                                    as={InputGroup.Prepend}
+                                    variant="primary text-600"
+                                    title={submissionType}
+                                    id="input-group-dropdown-1"
+                                >
+                                    <Dropdown.Item eventKey="Accessioning" onSelect={this.onSelectSubmissionType}>Accessioning</Dropdown.Item>
+                                    <Dropdown.Item eventKey="Family History" onSelect={this.onSelectSubmissionType}>Family History</Dropdown.Item>
+                                    <Dropdown.Item eventKey="Gene List" onSelect={this.onSelectSubmissionType}>Gene List</Dropdown.Item>
+                                </DropdownButton>
+                                <FormControl aria-describedby="basic-addon1" value={ fileName || "Upload from your computer..." }/>
+                                <InputGroup.Append>
+                                    <Button variant="primary">Browse Files</Button>
+                                </InputGroup.Append>
+                            </InputGroup>
                         </div>
                         
                         
