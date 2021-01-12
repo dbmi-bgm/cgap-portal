@@ -574,7 +574,8 @@
                 {"to": 20, "label": "Low Strand Bias (P >= 0.01)"},
                 {"from": 20, "label": "High Strand Bias (P < 0.01)"}
             ],
-            "grouping": "Variant Quality"
+            "grouping": "Variant Quality",
+            "abbreviation": "SF"
         },
         "GQ": {
             "title": "Genotype Quality",
