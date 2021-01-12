@@ -133,6 +133,17 @@
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
+        "email": "ozturkutku@gmail.com",
+        "first_name": "Utku",
+        "last_name": "Ozturk",
+        "uuid": "986b362f-4eb6-4a9c-8173-3ab267221235",
+        "groups": ["admin"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
         "email": "soohyun_lee@hms.harvard.edu",
         "first_name": "Soo",
         "last_name": "Lee",

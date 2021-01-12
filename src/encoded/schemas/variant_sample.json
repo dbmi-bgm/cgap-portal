@@ -725,6 +725,12 @@
             "order": 3,
             "grouping": "Position"
         },
+        "variant.genes.genes_ensg.display_title": {
+            "title": "Gene",
+            "order": 1,
+            "search_type": "sayt",
+            "sayt_item_type": "Gene"
+        },
         "variant.genes.genes_ensg.gene_lists.display_title": {
             "title": "Gene List",
             "order": 99,
