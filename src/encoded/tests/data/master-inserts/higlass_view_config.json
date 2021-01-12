@@ -416,51 +416,40 @@
           "tracks": {
             "top": [
               {
-                "uid": "texttrack_transcripts",
-                "type": "text",
-                "server": "https://cgap-higlass.com/api/v1",
-                "options": {
-                  "backgroundColor": "#ededed",
-                  "textColor": "#333333",
-                  "fontSize": 11,
-                  "fontFamily": "Arial",
-                  "fontWeight": "normal",
-                  "offsetY": 4,
-                  "align": "left",
-                  "text": "Canonical transcripts"
-                },
-                "width": 568,
-                "height": 20
-              },
-              {
-                "uid": "emptytrack_transcripts",
-                "type": "empty",
-                "options": {},
-                "width": 568,
-                "height": 10
-              },
-              {
                 "type": "combined",
                 "uid": "FkGY-Yv9T8avNXljXklukw",
-                "height": 30,
+                "height": 55,
                 "width": 568,
                 "contents": [
                   {
-                    "filetype":"chromsizes-tsv",
-                    "server":"https://cgap-higlass.com/api/v1",
-                    "tilesetUid":"chromsizes_hg38",
-                    "uid":"AdlJsUYFRzuJRZyYeKDX2B",
-                    "type":"chromosome-labels",
-                    "options":{
-                      "color":"#808080",
-                      "stroke":"#ffffff",
-                      "fontSize":12,
-                      "fontIsLeftAligned":false,
-                      "showMousePosition":false,
-                      "mousePositionColor":"#000000"
+                    "filetype": "beddb",
+                    "server": "https://cgap-higlass.com/api/v1",
+                    "tilesetUid": "gene_annotation_hg38",
+                    "uid": "FocNIVsfRVWMRzfmHfncsQ",
+                    "type": "gene-annotations",
+                    "options": {
+                        "fontSize": 10,
+                        "labelColor": "black",
+                        "labelBackgroundColor": "#ffffff",
+                        "labelPosition": "hidden",
+                        "labelLeftMargin": 0,
+                        "labelRightMargin": 0,
+                        "labelTopMargin": 0,
+                        "labelBottomMargin": 0,
+                        "minHeight": 24,
+                        "plusStrandColor": "#8a8ccf",
+                        "minusStrandColor": "#e8727a",
+                        "trackBorderWidth": 0,
+                        "trackBorderColor": "black",
+                        "showMousePosition": false,
+                        "mousePositionColor": "#000000",
+                        "geneAnnotationHeight": 12,
+                        "geneLabelPosition": "outside",
+                        "geneStrandSpacing": 2,
+                        "name": "Gene Annotations (hg38)"
                     },
-                    "width":811,
-                    "height":30
+                    "width": 568,
+                    "height": 55
                   },
                   {
                       "uid": "d6KeVfkNSmq_YNj_rWJgBA",
@@ -474,36 +463,10 @@
                       "strokeWidth": 1
                       },
                       "width": 568,
-                      "height": 30
+                      "height": 55
                   }
                 ],
                 "options": {}
-              },
-              {
-                "server": "https://cgap-higlass.com/api/v1",
-                "tilesetUid": "canonical_transcripts_hg38",
-                "uid": "transcript_annotation2",
-                "type": "horizontal-transcripts",
-                "options": {
-                  "fontSize": 9,
-                  "labelFontColor": "#222222",
-                  "labelBackgroundPlusStrandColor": "#e9e9e9",
-                  "labelBackgroundMinusStrandColor": "#e9e9e9",
-                  "minHeight": 24,
-                  "plusStrandColor": "#bdbfff",
-                  "minusStrandColor": "#fabec2",
-                  "utrColor": "#C0EAAF",
-                  "mousePositionColor": "#000000",
-                  "transcriptHeight": 12,
-                  "transcriptSpacing": 2,
-                  "name": "Gene transcripts",
-                  "fontFamily": "Helvetica",
-                  "maxTexts": 100,
-                  "showToggleTranscriptsButton": false,
-                  "startCollapsed": false
-                },
-                "width": 768,
-                "height": 40
               }
             ],
             "left": [],
@@ -609,6 +572,63 @@
                     "fontWeight": "bold"
                   }
                 }
+              },
+              {
+                "uid": "emptytrack_text_transcripts",
+                "type": "empty",
+                "options": {},
+                "width": 568,
+                "height": 10
+              },
+              {
+                "uid": "texttrack_transcripts",
+                "type": "text",
+                "server": "https://cgap-higlass.com/api/v1",
+                "options": {
+                  "backgroundColor": "#ededed",
+                  "textColor": "#333333",
+                  "fontSize": 11,
+                  "fontFamily": "Arial",
+                  "fontWeight": "normal",
+                  "offsetY": 4,
+                  "align": "left",
+                  "text": "Canonical transcripts"
+                },
+                "width": 568,
+                "height": 20
+              },
+              {
+                "uid": "emptytrack_transcripts",
+                "type": "empty",
+                "options": {},
+                "width": 568,
+                "height": 10
+              },
+              {
+                "server": "https://cgap-higlass.com/api/v1",
+                "tilesetUid": "canonical_transcripts_hg38",
+                "uid": "transcript_annotation2",
+                "type": "horizontal-transcripts",
+                "options": {
+                  "fontSize": 9,
+                  "labelFontColor": "#222222",
+                  "labelBackgroundPlusStrandColor": "#e9e9e9",
+                  "labelBackgroundMinusStrandColor": "#e9e9e9",
+                  "minHeight": 24,
+                  "plusStrandColor": "#bdbfff",
+                  "minusStrandColor": "#fabec2",
+                  "utrColor": "#C0EAAF",
+                  "mousePositionColor": "#000000",
+                  "transcriptHeight": 12,
+                  "transcriptSpacing": 2,
+                  "name": "Gene transcripts",
+                  "fontFamily": "Helvetica",
+                  "maxTexts": 100,
+                  "showToggleTranscriptsButton": false,
+                  "startCollapsed": false
+                },
+                "width": 768,
+                "height": 40
               },
               {
                 "uid": "emptytrack_a",

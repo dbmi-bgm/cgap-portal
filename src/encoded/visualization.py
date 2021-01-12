@@ -171,14 +171,14 @@ def get_higlass_viewconf(context, request):
         samples_pedigree.sort(key=lambda x: x['sample_name'] == bam_sample_id, reverse=True)
 
         top_tracks = higlass_viewconfig['views'][1]['tracks']['top']
-        empty_track_a = deepcopy(top_tracks[2])
-        text_track = deepcopy(top_tracks[3])
-        empty_track_b = deepcopy(top_tracks[4])
-        pileup_track = deepcopy(top_tracks[5])
+        empty_track_a = deepcopy(top_tracks[6])
+        text_track = deepcopy(top_tracks[7])
+        empty_track_b = deepcopy(top_tracks[8])
+        pileup_track = deepcopy(top_tracks[9])
 
         # Delete original tracks from the insert, replace them with adjusted data
         # from the sample data. If there is no data, we only show the sequence track
-        del top_tracks[2:6] 
+        del top_tracks[6:10] 
         # print(json.dumps(top_tracks, indent=2))
 
         for sample in samples_pedigree:
