@@ -265,6 +265,11 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 				width: 320px;
 			}
 
+			// Align header height with $search-results-header-row-height.
+			.facets-container.with-header-bg .facets-header {
+				height: $search-results-header-row-height;
+			}
+
 		}
 
 	}
@@ -290,11 +295,6 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 				@include navbar-fixed-position {
 					top: $cgap-search-sticky-header-top-offset;
 					margin-bottom: 0px;
-				}
-
-				// Align header height with $search-results-header-row-height.
-				&.with-header-bg .facets-header {
-					height: $search-results-header-row-height;
 				}
 	
 				body.scrolled-past-160 & {
