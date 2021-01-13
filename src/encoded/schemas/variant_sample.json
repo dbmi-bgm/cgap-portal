@@ -462,6 +462,9 @@
                             "half-sibling",
                             "wife",
                             "husband",
+                            "son",
+                            "daughter",
+                            "child",
                             "grandson",
                             "granddaughter",
                             "grandchild",
@@ -575,15 +578,10 @@
         },
         "FS": {
             "title": "Strand Fisher Score",
-            "aggregation_type": "range",
+            "aggregation_type": "stats",
             "number_step": "any",
             "order": 10,
-            "ranges": [
-                {"to": 20, "label": "Low Strand Bias (P ≥ 0.01)"},
-                {"from": 20, "label": "High Strand Bias (P < 0.01)"}
-            ],
-            "grouping": "Variant Quality",
-            "abbreviation": "SF"
+            "grouping": "Variant Quality"
         },
         "GQ": {
             "title": "Genotype Quality",
@@ -592,21 +590,8 @@
             "order": 11,
             "grouping": "Variant Quality"
         },
-        "AD_ALT": {
-            "title": "Allelic Depth (Alt)",
-            "aggregation_type": "range",
-            "order": 12,
-            "ranges": [
-                {"from": 1, "to": 4, "label": "Very Low"},
-                {"from": 5, "to": 9, "label": "Low"},
-                {"from": 10, "to": 19, "label": "Medium"},
-                {"from": 20, "label": "High"}
-            ],
-            "grouping": "Variant Quality"
-        },
         "associated_genotype_labels.father_genotype_label": {
             "title": "Father Genotype",
-<<<<<<< HEAD
             "order": 14,
             "grouping": "Genotype"
         },
@@ -614,80 +599,12 @@
             "title": "Mother Genotype",
             "order": 13,
             "grouping": "Genotype"
-=======
-            "order": 20,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.mother_genotype_label": {
-            "title": "Mother Genotype",
-            "order": 21,
-            "grouping": "Genotype",
-            "default_hidden": true
->>>>>>> master
         },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Proband Genotype",
             "order": 12,
             "grouping": "Genotype"
         },
-<<<<<<< HEAD
-=======
-        "associated_genotype_labels.sister_genotype_label": {
-            "title": "Sister Genotype",
-            "order": 23,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.brother_genotype_label": {
-            "title": "Brother Genotype",
-            "order": 24,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.co_parent_genotype_label": {
-            "title": "Co-Parent Genotype",
-            "order": 25,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.daughter_genotype_label": {
-            "title": "Daughter Genotype",
-            "order": 26,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.son_genotype_label": {
-            "title": "Son Genotype",
-            "order": 27,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.daughter_II_genotype_label": {
-            "title": "Daughter II Genotype",
-            "order": 28,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.son_II_genotype_label": {
-            "title": "Son II Genotype",
-            "order": 29,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.daughter_III_genotype_label": {
-            "title": "Daughter III Genotype",
-            "order": 30,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.son_III_genotype_label": {
-            "title": "Son III Genotype",
-            "order": 31,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
->>>>>>> master
         "cmphet.comhet_impact_gene": {
             "title": "ComHet Impact",
             "order": 17,
@@ -699,14 +616,10 @@
         },
         "novoPP": {
             "title": "novoCaller PP",
-            "aggregation_type": "range",
+            "aggregation_type": "stats",
             "number_step": "any",
             "order": 16,
-            "grouping": "Genotype",
-            "ranges": [
-                { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },
-                { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }
-            ]
+            "grouping": "Genotype"
         },
         "variant.CHROM": {
             "title": "Chromosome",
@@ -732,28 +645,12 @@
             "order": 36,
             "grouping": "variant database"
         },
-<<<<<<< HEAD
         "variant.csq_gnomadg_af": {
             "title": "GnomAD Alt Allele Frequency",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 18,
             "grouping": "Population Frequency"
-=======
-        "variant.conservation_phylop100": {
-            "title": "PhyloP (100 Vertabrates)",
-            "aggregation_type": "range",
-            "number_step": "any",
-            "order": 22,
-            "grouping": "Conservation",
-            "ranges": [
-                { "from": -20, "to": -3, "label": "strong positive selection" },
-                { "from": -3, "to": -2, "label": "positive selection" },
-                { "from": -2, "to": 2, "label": "low selection" },
-                { "from": 2, "to": 3, "label": "conserved" },
-                { "from": 3, "to": 10, "label": "highly conserved"}
-            ]
->>>>>>> master
         },
         "variant.csq_gnomadg_af_popmax": {
             "title": "GnomAD Alt AF - PopMax",
@@ -850,7 +747,6 @@
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 24,
-<<<<<<< HEAD
             "grouping": "Effect Predictors"
         },
         "variant.spliceai_maxds": {
@@ -859,49 +755,6 @@
             "number_step": "any",
             "order": 27,
             "grouping": "Effect Predictors"
-=======
-            "grouping": "Missense Predictors"
-        },
-        "variant.gnomad_af": {
-            "title": "GnomAD Alt Allele Frequency",
-            "aggregation_type": "range",
-            "number_step": "any",
-            "order": 18,
-            "grouping": "Population Frequency",
-            "ranges": [
-                { "from": 0, "to": 0, "label": "unobserved" }, 
-                { "from": 0, "to": 0.001, "label": "ultra-rare" },
-                { "from": 0.001, "to": 0.01, "label": "rare" },
-                { "from": 0.01, "to": 1, "label": "common" }
-            ]
-        },
-        "variant.gnomad_an": {
-            "title": "GnomAD Total Allele Number",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 20,
-            "grouping": "Population Frequency"
-        },
-        "variant.gnomad_nhomalt": {
-            "title": "GnomAD Homozgyous Count",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 21,
-            "grouping": "Population Frequency"
-        },
-        "variant.max_pop_af_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "range",
-            "number_step": "any",
-            "order": 19,
-            "grouping": "Population Frequency",
-            "ranges": [
-                { "from": 0, "to": 0, "label": "unobserved" }, 
-                { "from": 0, "to": 0.001, "label": "ultra-rare" },
-                { "from": 0.001, "to": 0.01, "label": "rare" },
-                { "from": 0.01, "to": 1, "label": "common" }
-            ]
->>>>>>> master
         },
         "variant.variant_class": {
             "title": "Variant Type",
