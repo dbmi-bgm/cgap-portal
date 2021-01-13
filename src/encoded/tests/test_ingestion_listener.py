@@ -4,7 +4,7 @@ import mock
 import pytest
 import time
 
-from dcicutils.qa_utils import ignored, notice_pytest_fixtures
+from dcicutils.qa_utils import ignored
 from uuid import uuid4
 from pyramid.testing import DummyRequest
 from ..ingestion_listener import (
@@ -167,7 +167,8 @@ def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, workb
 
 def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_for_testing):
     """ Tests that the 'should_remain_online' method works """
-    _await = lambda: time.sleep(3)
+    def _await():
+        time.sleep(3)
     before = datetime.datetime.utcnow()
     end_delta = datetime.timedelta(seconds=2)  # this diff should not occur if _await is not executed
     IngestionListener.should_remain_online(override=_await)
@@ -198,7 +199,8 @@ def mocked_familial_relations():
 
 def test_ingestion_listener_build_familial_relations(workbook, es_testapp, mocked_familial_relations):
     """ Tests that we correctly extract familial relations from a mocked object that has the correct structure """
-    with mock.patch.object(IngestionListener, 'search_for_sample_relations', new=lambda x, y: mocked_familial_relations):
+    with mock.patch.object(IngestionListener, 'search_for_sample_relations',
+                           new=lambda x, y: mocked_familial_relations):
         listener = IngestionListener(es_testapp)
         relations = listener.extract_sample_relations('dummy')
         assert relations['sample_one']['samplegeno_role'] == 'mother'

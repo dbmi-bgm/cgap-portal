@@ -5,11 +5,39 @@ from encoded.commands.variant_ingestion import run_variant_table_intake, run_ing
 from encoded.commands.gene_ingestion import run_gene_table_intake, run_ingest_genes
 from dcicutils.misc_utils import VirtualApp
 from dcicutils.env_utils import CGAP_ENV_DEV, CGAP_ENV_WOLF
+from ..util import resolve_file_path
 from pyramid.paster import get_app
 
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
+
+
+class IngestionConfigError(Exception):
+    pass
+
+
+class IngestionConfig:
+    """ Data class that packages arguments necessary for invoking variant ingestion. """
+
+    def __init__(self, vcf, gene_list=None):
+        self.VARIANT_TABLE = resolve_file_path('annotations/variant_table_v0.5.0.csv')
+        self.GENE_TABLE = resolve_file_path('annotations/gene_table_v0.4.6.csv')
+        self.VARIANT_ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
+        self.GENE_ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/gene_annotation_field.json')
+        self.vcf = vcf  # assume path to VCF does not require any resolution (ie: full absolute/relative path)
+        self.GENE_LIST = None
+        if gene_list:
+            self.GENE_LIST = gene_list  # same assumption as above
+        self.validate()
+
+    def validate(self):
+        """ Validates fields set above map to files that exist. """
+        for field in filter(lambda f: not f.startswith('__') and not callable(getattr(self, f)) and
+                            getattr(self, f, None) is not None, dir(self)):
+            if not os.path.exists(getattr(self, field)):
+                raise IngestionConfigError('Required file location does not exist: %s' % field)
+
 
 
 def validate_files_exist(args):

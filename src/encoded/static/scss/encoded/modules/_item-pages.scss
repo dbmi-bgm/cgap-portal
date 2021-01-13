@@ -2064,6 +2064,7 @@ $download-button-width : 100px;
 			.tab-inner-container {
 				background-color: #ffffff;
 				margin-bottom: 20px;
+				/* todo: consider having no padding here and instead apply padding to children, perhaps via 'px-' classNames */
 				padding: 20px;
 				border-radius: $border-radius-lg;
 				box-shadow: 0 1px 5px #0002;
@@ -2075,12 +2076,12 @@ $download-button-width : 100px;
 
 				h2.section-header {
 					background-color: $primary-dark;
-					width: calc( 100% + 40px);
-					padding: 10px 10px 10px 20px;
+					/* This width definition is not needed as blocks will auto-fit available width by default, but left for explicitness */
+					width: calc(100% + 40px);
+					/* This padding definition matches padding of .card-header */
+					padding: 0.75rem 1.25rem;
 					color: #ffff;
-					margin-left: -20px;
-					margin-right: -40px;
-					margin-top: -20px;
+					margin: -20px -20px 10px -20px;
 				}
 
 				.processing-summary-table {
@@ -2314,6 +2315,14 @@ $download-button-width : 100px;
 		background-color: $primary-dark;
 		h4 {
 			color: #fff;
+		}
+	}
+
+	&[data-is-open="false"] {
+		.filter-set-ui-header {
+			/* Appear more as button when closed */
+			/* Same as parent .filterset-outer-container above */
+			border-radius: inherit;
 		}
 	}
 

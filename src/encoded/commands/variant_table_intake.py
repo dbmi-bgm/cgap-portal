@@ -549,8 +549,9 @@ class MappingTableParser(object):
             'title': 'Familial Relation',
             'description': 'Relationship of the person who submitted this sample relative to the proband',
             'type': 'string',
-            'enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling', 'half-brother', 'half-sister',
-                     'half-sibling', 'wife', 'husband', 'grandson', 'granddaughter', 'grandchild',
+            'enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling',
+                     'half-brother', 'half-sister', 'half-sibling', 'wife', 'husband',
+                     'son', 'daughter', 'child', 'grandson', 'granddaughter', 'grandchild',
                      'grandmother', 'family-in-law', 'extended-family', 'not linked'],
         }
         schema['properties']['samplegeno']['items']['properties']['samplegeno_sex'] = {  # noqa structure is there

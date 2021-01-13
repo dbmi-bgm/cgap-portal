@@ -153,6 +153,7 @@ def get_higlass_viewconf(context, request):
         # This should be the first file in the Higlass viewconf
         bam_sample_id = request.json_body.get('bam_sample_id', None)  
         window_size_small = 20 # window size for the interpretation space
+        window_size_large = 5000 # window size for the overview
 
         #s3_bucket = request.registry.settings.get('file_wfout_bucket')
         s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
@@ -169,15 +170,15 @@ def get_higlass_viewconf(context, request):
         samples_pedigree = request.json_body.get('samples_pedigree', None) 
         samples_pedigree.sort(key=lambda x: x['sample_name'] == bam_sample_id, reverse=True)
 
-        top_tracks = higlass_viewconfig['views'][0]['tracks']['top']
-        empty_track_a = deepcopy(top_tracks[2])
-        text_track = deepcopy(top_tracks[3])
-        empty_track_b = deepcopy(top_tracks[4])
-        pileup_track = deepcopy(top_tracks[5])
+        top_tracks = higlass_viewconfig['views'][1]['tracks']['top']
+        empty_track_a = deepcopy(top_tracks[6])
+        text_track = deepcopy(top_tracks[7])
+        empty_track_b = deepcopy(top_tracks[8])
+        pileup_track = deepcopy(top_tracks[9])
 
         # Delete original tracks from the insert, replace them with adjusted data
         # from the sample data. If there is no data, we only show the sequence track
-        del top_tracks[2:6] 
+        del top_tracks[6:10] 
         # print(json.dumps(top_tracks, indent=2))
 
         for sample in samples_pedigree:
@@ -204,12 +205,15 @@ def get_higlass_viewconf(context, request):
             top_tracks.append(pileup_track_sample)
 
         # Show the correct location
-        higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_small
-        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_small 
+        higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
+        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large 
+
+        higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
+        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small 
 
         # Vertical rules
-        higlass_viewconfig['views'][0]['tracks']['whole'][0]['x'] = variant_pos
-        higlass_viewconfig['views'][0]['tracks']['whole'][1]['x'] = variant_pos + 1
+        higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
+        higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
             
     return {
         "success" : True,

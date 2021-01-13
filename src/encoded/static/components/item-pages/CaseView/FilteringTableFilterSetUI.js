@@ -388,7 +388,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         return (
             // TODO Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
             <div className="above-variantsample-table-ui">
-                <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected}>
+                <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
                     <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
                     <Collapse in={bodyOpen}>
                         <div className="filterset-blocks-container">
