@@ -9,8 +9,8 @@ from uuid import uuid4
 from pyramid.testing import DummyRequest
 from ..ingestion_listener import (
     IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
-    IngestionError, IngestionReport,
 )
+from ..ingestion.common import IngestionReport, IngestionError
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]

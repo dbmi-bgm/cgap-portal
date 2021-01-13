@@ -117,3 +117,86 @@ def get_parameter(parameter_block, parameter_name, as_type=None, default=_NO_DEF
 
     else:
         raise TypeError("Expected parameter_block to be a dict: %s", parameter_block)
+
+
+class IngestionError:
+    """
+    Holds info on an error that occurred in ingestion. Right now this consists of the
+    offending request body and the VCF row it occurred on.
+
+    This class doesn't really do much except specify the structure. It must align with that of FileProcessed
+    (reproduced as of 12/2/2020 below):
+
+        "file_ingestion_error": {
+            "title": "Ingestion Error Report",
+            "description": "This field is set when an error occurred in ingestion with all errors encountered",
+            "type": "array",
+            "items": {
+                "title": "Ingestion Error",
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "index": false  # the intention is not to index this in the future
+                    },
+                    "row": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+
+    """
+
+    def __init__(self, body, row):
+        self.body = body
+        self.row = row
+
+    def to_dict(self):
+        return {
+            'body': str(self.body),
+            'row': self.row
+        }
+
+
+class IngestionReport:
+    """
+    A "virtual" item on file_processed that contains detailed information on the ingestion run.
+    Not creating an item for this is a design decision. The output of this process is more for
+    debugging and not for auditing, so it does not merit an item at this time.
+    """
+    MAX_ERRORS = 100  # tune this to get more errors, 100 is a lot though and probably more than needed
+
+    def __init__(self):
+        self.grand_total = 0
+        self.errors = []
+
+    def brief_summary(self):
+        return ('INGESTION REPORT: There were %s total variants detected, of which %s were successful'
+                'and %s failed. Check ProcessedFile for full error output.' % (self.grand_total,
+                                                                              self.total_successful(),
+                                                                              self.total_errors()))
+
+    def total_successful(self):
+        return self.grand_total - len(self.errors)
+
+    def total_errors(self):
+        return len(self.errors)
+
+    def get_errors(self, limit=True):
+        """ Returns a limited number of errors, where limit can be True (self.MAX_ERRORS), False (no limit),
+            or an integer. """
+        if limit is True:
+            limit = self.MAX_ERRORS
+        elif limit is False:
+            limit = None
+        return self.errors[:limit]
+
+    def mark_success(self):
+        """ Marks the current row number as successful, which in this case just involves incrementing the total """
+        self.grand_total += 1
+
+    def mark_failure(self, *, body, row):
+        """ Marks the current row as failed, creating an IngestionError holding the response body and row. """
+        self.grand_total += 1
+        self.errors.append(IngestionError(body, row).to_dict())
