@@ -7,7 +7,7 @@ from tqdm import tqdm
 from ..inheritance_mode import InheritanceMode
 from ..server_defaults import add_last_modified
 from ..loadxl import LOADXL_USER_UUID
-from ..commands.variant_table_intake import MappingTableParser
+from ..commands.variant_table_intake import VariantTableParser
 from ..commands.ingest_vcf import VCFParser
 
 
@@ -17,7 +17,7 @@ EPILOG = __doc__
 
 def run_variant_table_intake(app_handle, args):
     """ Runs mapping table intake with the given args """
-    parser = MappingTableParser(args.variant_table, args.variant_annotation_field_schema)
+    parser = VariantTableParser(args.variant_table, args.variant_annotation_field_schema)
     inserts = parser.run(args.sample, args.variant, institution=args.variant_institution, project=args.variant_project,
                          write=args.write_variant_schemas)
     # XXX: make configurable

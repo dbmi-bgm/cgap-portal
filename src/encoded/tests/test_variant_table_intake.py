@@ -2,7 +2,7 @@ import json
 import pytest
 
 from ..util import resolve_file_path
-from ..commands.variant_table_intake import MappingTableParser
+from ..ingestion.table_utils import VariantTableParser, MappingTableHeader
 from .variant_fixtures import ANNOTATION_FIELD_URL
 
 
@@ -40,7 +40,7 @@ TRANSCRIPT_FIELDS_EXPECTED = 33
 
 @pytest.fixture
 def MTParser():
-    parser = MappingTableParser(MT_LOC, ANNOTATION_FIELD_SCHEMA)
+    parser = VariantTableParser(MT_LOC, ANNOTATION_FIELD_SCHEMA)
     return parser
 
 
@@ -79,7 +79,7 @@ def test_read_variant_table_header(MTParser):
     assert MTParser.date == VARIANT_TABLE_DATE
     assert sorted(MTParser.fields) == sorted(EXPECTED_FIELDS)
     for field in EXPECTED_FIELDS:  # all fields are categorized by the Parser
-        assert field in MTParser.ALL_FIELDS
+        assert field in MappingTableHeader.ALL_FIELDS
 
 
 def test_process_variant_table_inserts(MTParser, inserts):
