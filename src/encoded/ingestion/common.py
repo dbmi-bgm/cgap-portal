@@ -30,6 +30,8 @@ CONTENT_TYPE_SPECIAL_CASES = {
         '/metadata/'
     ]
 }
+CGAP_CORE_PROJECT = '/projects/cgap-core'
+CGAP_CORE_INSTITUTION = '/institutions/hms-dbmi/'
 
 
 def register_path_content_type(*, path, content_type):
