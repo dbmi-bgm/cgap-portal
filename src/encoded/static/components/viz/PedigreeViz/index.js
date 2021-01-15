@@ -88,7 +88,7 @@ const PedigreeVizView = React.memo(function PedigreeVizView(props){
      * `SelectedNodeController` provides & passes down:
      *   `selectedNode`, `hoveredNode`, `onNodeSelect`, `onNodeUnselect`, `onNodeMouseIn`, ...
      *
-     * `DetailPaneOffsetContainerSize` provides & passes down:
+     * `DetailPaneController` provides & passes down:
      *   `containerWidth` & `containerHeight` (adjusted)
      *
      * `ScaleController` provides & passes down:
@@ -96,18 +96,22 @@ const PedigreeVizView = React.memo(function PedigreeVizView(props){
      */
     return (
         <SelectedNodeController {...{ onNodeSelected, onDataChanged, objectGraph, disableSelect }}>
-            <DetailPaneOffsetContainerSize {...{ containerWidth, containerHeight, detailPaneOpenOffsetWidth, detailPaneOpenOffsetHeight }}>
+            <DetailPaneController {...{ containerWidth, containerHeight, detailPaneOpenOffsetWidth, detailPaneOpenOffsetHeight }}>
                 <ScaleController {...scaleProps}>
                     <PedigreeVizViewUserInterface {...pedigreeViewProps} />
                 </ScaleController>
-            </DetailPaneOffsetContainerSize>
+            </DetailPaneController>
         </SelectedNodeController>
     );
 });
 PedigreeVizView.propTypes = pedigreeVizViewPropTypes;
 PedigreeVizView.defaultProps = pedigreeVizViewDefaultProps;
 
-const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContainerSize(props){
+/**
+ * Controls when detail pane is open (currently always - may change with explicit 'close' button or similar).
+ * Also applies detailPaneOpenOffsetHeight & detailPaneOpenOffsetWidth when open
+ */
+const DetailPaneController = React.memo(function DetailPaneController(props){
     const {
         children,
         selectedNode,
@@ -117,9 +121,14 @@ const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContai
         detailPaneOpenOffsetHeight,
         ...passProps
     } = props;
+
+    const isDetailPaneOpen = true;
+    // Implement UI for later: const [ isDetailPaneOpen, setIsDetailPaneOpen ] = useState(true);
+
     let containerHeight = propContainerHeight;
     let containerWidth = propContainerWidth;
-    if (selectedNode){
+
+    if (isDetailPaneOpen){
         if (typeof detailPaneOpenOffsetHeight === "number" && typeof containerHeight === "number"){
             containerHeight -= detailPaneOpenOffsetHeight;
         }
@@ -128,9 +137,10 @@ const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContai
         }
     }
 
-    const childProps = { ...passProps, selectedNode, containerWidth, containerHeight };
+    const childProps = { ...passProps, isDetailPaneOpen, selectedNode, containerWidth, containerHeight };
 
     return React.Children.map(children, function(child){
+        if (!React.isValidElement(child)) return child;
         return React.cloneElement(child, childProps);
     });
 
@@ -176,10 +186,10 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
     }
 
     static defaultProps = {
-        'width': 600,
-        "scale" : 1,
+        "width": 600,
+        "scale": 1,
         "visibleDiseases": null,
-        "onDimensionsChanged" : function(width, height){
+        "onDimensionsChanged": function(width, height){
             console.log("DIMENSIONS CHANGED (default handler)", "WIDTH", width, "HEIGHT", height);
         },
         "onMount": function(innerContainerDOMElement){
@@ -490,7 +500,6 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                 'unselectNode' : onUnselectNode
             });
         }
-        const detailPaneHasNode = !!(selectedNodePane && selectedNode);
 
         const commonChildProps = {
             ...passProps,
@@ -541,7 +550,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                     <ScaleControls {...{ scale, minScale, maxScale, setScale }} />
                     : null }
                 { selectedNodePane ?
-                    <div className={"detail-pane-container" + (detailPaneHasNode ? " has-selected-node" : "")}>
+                    <div className="detail-pane-container" data-is-open="true" data-has-selected-node={!!(selectedNode)}>
                         { selectedNodePane }
                     </div>
                     : null }
@@ -566,7 +575,8 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
     const textScaleTransformStr = "scale3d(" + textScale +"," + textScale +",1)";
 
     return (
-        <svg className="pedigree-viz-shapes-layer shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
+        <svg className="pedigree-viz-shapes-layer shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight}
+            style={svgStyle} data-is-node-hovered-over={!!(hoveredNode)} data-is-node-selected={!!(selectedNode)}>
             <EdgesLayer {...{ edges, dims }} />
             <SelectedNodeIdentifier {...{ selectedNode, dims, textScale }} />
             <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims, textScale, textScaleTransformStr }} />

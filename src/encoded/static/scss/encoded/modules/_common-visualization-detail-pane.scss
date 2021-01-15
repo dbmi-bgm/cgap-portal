@@ -20,7 +20,9 @@
                 //overflow-y: auto;
                 overflow-x: hidden;
             }
-            &.has-selected-node {
+            &.has-selected-node,
+            &[data-has-selected-node="true"],
+            &[data-is-open="true"] {
                 background-color: #fff;
                 width: 320px;
                 flex: 0 0 320px;
@@ -38,7 +40,9 @@
             .detail-pane-inner {
                 width: 400px;
             }
-            &.has-selected-node {
+            &.has-selected-node,
+            &[data-has-selected-node="true"],
+            &[data-is-open="true"] {
                 width: 400px;
                 flex: 0 0 400px;
             }
@@ -106,7 +110,7 @@
             > .details {
                 > .detail-row {
                     padding: 9px 18px;
-                    border-bottom: 1px solid #eee;
+                    border-bottom: 1px solid #f4f4f4;
 
                     label {
                         font-weight: 600;

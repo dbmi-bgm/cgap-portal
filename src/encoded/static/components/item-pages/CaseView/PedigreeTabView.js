@@ -83,13 +83,15 @@ function toggleSelectedDiseaseCallable(selectedDiseases, availableDiseases, setS
  *     Worst case scenario can refactor back to Class component...
  */
 export function usePhenotypicFeatureStrings(currFamily){
-    const { family_phenotypic_features } = currFamily;
+    const { family_phenotypic_features = [] } = currFamily || {};
+
     // Initially-visible things
     const contextPhenotypicFeatureStrings = useMemo(function(){
         return getPhenotypicFeatureStrings(family_phenotypic_features);
     }, [ family_phenotypic_features ]);
 
     // Set as selectedDiseases
+    // Possible TODO: Update this state if (from props) `family_phenotypic_features` changes?
     const [ selectedDiseases, setSelectedDiseases ] = useState(contextPhenotypicFeatureStrings);
 
     // All diseases present in family
@@ -115,14 +117,13 @@ export function usePhenotypicFeatureStrings(currFamily){
         [ currFamily, contextPhenotypicFeatureStrings ]
     );
 
-    const onToggleSelectedDisease = useCallback( // `useMemo` & `useCallback` hooks are almost equivalent exc. for param signatures
-        function(evt){
-            const diseaseStr = evt.target.getAttribute("name");
-            if (!diseaseStr) return;
-            return toggleSelectedDiseaseCallable(selectedDiseases, availableDiseases, setSelectedDiseases, diseaseStr);
-        },
-        [ selectedDiseases, availableDiseases, setSelectedDiseases ]
-    );
+    // `useCallback(fn, deps)` is equivalent to `useMemo(() => fn, deps)`
+    // See https://reactjs.org/docs/hooks-reference.html#usecallback
+    const onToggleSelectedDisease = useCallback(function(evt){
+        const diseaseStr = evt.target.getAttribute("name");
+        if (!diseaseStr) return;
+        return toggleSelectedDiseaseCallable(selectedDiseases, availableDiseases, setSelectedDiseases, diseaseStr);
+    }, [ selectedDiseases, availableDiseases, setSelectedDiseases ]);
 
     return {
         selectedDiseases,
@@ -149,8 +150,9 @@ export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabV
         return false;
     }
 
+    const { selectedDiseases, availableDiseases, onToggleSelectedDisease } = usePhenotypicFeatureStrings(currentFamily);
+
     if (currentFamily) {
-        const { selectedDiseases, availableDiseases, onToggleSelectedDisease } = usePhenotypicFeatureStrings(currentFamily);
         const childProps = {
             ...props,
             availableDiseases,
@@ -191,11 +193,13 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
     }
 
     const pedigreeTabViewBodyProps = {
+        session, href, context, schemas,
         PedigreeVizLibrary,
-        graphData, session, href,
-        context, showOrderBasedName,
+        graphData,
+        showOrderBasedName,
         windowWidth, windowHeight,
-        visibleDiseases: selectedDiseases
+        selectedDiseases, availableDiseases, onToggleSelectedDisease
+        /// "visibleDiseases": selectedDiseases
     };
 
     return (
@@ -206,7 +210,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                     <CollapsibleItemViewButtonToolbar windowWidth={windowWidth}>
                         {/* <ColorAllDiseasesCheckbox checked={showAllDiseases} onChange={this.handleToggleCheckbox} /> */}
                         <UniqueIdentifiersCheckbox checked={!showOrderBasedName} onChange={onTogglePedigreeOptionCheckbox} />
-                        <SelectDiseasesDropdown {...{ selectedDiseases, availableDiseases, onToggleSelectedDisease }} />
+                        {/* <SelectDiseasesDropdown {...{ selectedDiseases, availableDiseases, onToggleSelectedDisease }} /> */}
                         {/* <ShowAsDiseasesDropdown onSelect={setShowAsDiseases} showAsDiseases={showAsDiseases}  /> */}
                         {/* <FamilySelectionDropdown {...{ families, currentFamilyIdx: pedigreeFamiliesIdx }} onSelect={onFamilySelect} /> */}
                         <PedigreeFullScreenBtn />
@@ -214,7 +218,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                 </h3>
             </div>
             <hr className="tab-section-title-horiz-divider"/>
-            <PedigreeTabViewBody {...pedigreeTabViewBodyProps} {...{ schemas }} />
+            <PedigreeTabViewBody {...pedigreeTabViewBodyProps} />
         </div>
     );
 });
@@ -233,57 +237,6 @@ PedigreeTabView.getTabObject = function(props){
     };
 };
 
-const SelectDiseasesDropdown = React.memo(function SelectDiseasesDropdown(props){
-    const {
-        availableDiseases = [],
-        selectedDiseases = [],
-        onToggleSelectedDisease,
-        title = "Select Case Phenotypic Features",
-    } = props;
-    if (availableDiseases.length === 0) {
-        return null;
-    }
-
-    // `selectedDiseases` is passed down to PedigreeViz and assigned data-disease-index by array order.
-    // So we must do same here for consistency.
-    const selectedMap = {};
-    selectedDiseases.forEach(function(sD, index){
-        // Ordering of `data-disease-index` (and color assignments) start from 1; +1 selectedDisease index.
-        selectedMap[sD] = index + 1;
-    });
-
-    const optionItems = availableDiseases.map(function(aD){
-        const {
-            display_title: title,
-            '@id': id
-        } = aD;
-        const diseaseIndex = selectedMap[title] || null;
-        const checked = !!(diseaseIndex);
-
-        return (
-            <div className="disease-option" key={id}>
-                <Checkbox checked={checked}
-                    onChange={onToggleSelectedDisease} name={title}
-                    className="text-400">
-                    <span className="align-middle text-400">{ title }</span>
-                </Checkbox>
-                <div className="disease-color-patch" data-disease-index={diseaseIndex}>
-                    <span>{ diseaseIndex }</span>
-                </div>
-            </div>
-        );
-    });
-    return (
-        <Dropdown alignRight>
-            <Dropdown.Toggle as={Button} variant="outline-dark">
-                { title }
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-                { optionItems }
-            </Dropdown.Menu>
-        </Dropdown>
-    );
-});
 
 const UniqueIdentifiersCheckbox = React.memo(function UniqueIdentifiersCheckbox({ checked, onChange }){
     return (
