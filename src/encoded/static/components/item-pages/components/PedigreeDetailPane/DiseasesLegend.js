@@ -14,7 +14,7 @@ import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/f
 export function DiseasesLegend (props) {
     const {
         availableDiseases = [],
-        selectedDiseases = [],
+        selectedDiseaseIdxMap = {},
         onToggleSelectedDisease
     } = props;
 
@@ -22,23 +22,13 @@ export function DiseasesLegend (props) {
         return null;
     }
 
-    // `selectedDiseases` is passed down to PedigreeViz and assigned data-disease-index by array order.
-    // So we must do same here for consistency.
-    const selectedMap = useMemo(function(){
-        const selectedMap = {};
-        selectedDiseases.forEach(function(sD, index){
-            // Ordering of `data-disease-index` (and color assignments) start from 1; +1 selectedDisease index.
-            selectedMap[sD] = index + 1;
-        });
-        return selectedMap;
-    }, [ selectedDiseases ]);
-
     return availableDiseases.map(function(aD){
         const {
             display_title: title,
             '@id': id
         } = aD;
-        const diseaseIndex = selectedMap[title] || null;
+
+        const diseaseIndex = selectedDiseaseIdxMap[title] || null;
         const checked = !!(diseaseIndex);
 
         return (

@@ -157,19 +157,6 @@ let createdInstanceCount = 0;
 
 class PedigreeVizViewUserInterface extends React.PureComponent {
 
-    static diseaseToIndex(visibleDiseases, objectGraph){
-        let diseaseToIndex;
-        if (Array.isArray(visibleDiseases)){
-            diseaseToIndex = {};
-            visibleDiseases.forEach(function(disease, index){
-                diseaseToIndex[disease] = index + 1;
-            });
-            return diseaseToIndex;
-        } else {
-            return graphToDiseaseIndices(objectGraph);
-        }
-    }
-
     static visAreaTransform(scaledVizStyle, containerHeight, containerWidth){
         const hasExtraHeight = containerHeight >= scaledVizStyle.height;
         const hasExtraWidth = (typeof containerWidth === "number" && containerWidth >= scaledVizStyle.width);
@@ -188,7 +175,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
     static defaultProps = {
         "width": 600,
         "scale": 1,
-        "visibleDiseases": null,
+        "visibleDiseaseIdxMap": null,
         "onDimensionsChanged": function(width, height){
             console.log("DIMENSIONS CHANGED (default handler)", "WIDTH", width, "HEIGHT", height);
         },
@@ -226,7 +213,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
 
         this.memoized = {
             maxHeightIndex: memoize(PedigreeVizViewUserInterface.maxHeightIndex),
-            diseaseToIndex: memoize(PedigreeVizViewUserInterface.diseaseToIndex),
+            graphToDiseaseIndices: memoize(graphToDiseaseIndices),
             orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
             scaledStyle: memoize(scaledStyle),
             visAreaTransform: memoize(PedigreeVizViewUserInterface.visAreaTransform)
@@ -462,7 +449,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             objectGraph,
             dims, order,
             renderDetailPane, containerStyle,
-            visibleDiseases = null,
+            visibleDiseaseIdxMap = null,
             scale = 1,
             minScale, maxScale,
             graphHeight, graphWidth,
@@ -476,7 +463,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             ...passProps
         } = this.props;
         const { isMouseDownOnContainer, mounted } = this.state;
-        const diseaseToIndex = this.memoized.diseaseToIndex(visibleDiseases, objectGraph);
+        const diseaseToIndex = visibleDiseaseIdxMap || this.memoized.graphToDiseaseIndices(objectGraph);
         const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
         const scaledVizStyle = this.memoized.scaledStyle(graphHeight, graphWidth, scale);
         const maxHeightIndex = this.memoized.maxHeightIndex(objectGraph);

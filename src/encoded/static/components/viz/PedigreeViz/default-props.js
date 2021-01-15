@@ -153,7 +153,7 @@ export const pedigreeVizViewDefaultProps = {
      *
      * @type {!string[]}
      */
-    "visibleDiseases": null,
+    "visibleDiseaseIdxMap": null,
 
 
     /**

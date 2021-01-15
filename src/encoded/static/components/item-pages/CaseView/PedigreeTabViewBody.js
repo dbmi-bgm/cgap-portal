@@ -138,9 +138,9 @@ export class PedigreeTabViewBody extends React.PureComponent {
         const {
             session, href, context, schemas,
             PedigreeVizLibrary,
-            availableDiseases, selectedDiseases, onToggleSelectedDisease
+            availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease
         } = this.props;
-        const passedDownProps = { PedigreeVizLibrary, session, href, context, schemas, availableDiseases, selectedDiseases, onToggleSelectedDisease };
+        const passedDownProps = { PedigreeVizLibrary, session, href, context, schemas, availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease };
         return <PedigreeDetailPane {...pedigreeVizProps} {...passedDownProps} />;
     }
 
@@ -151,7 +151,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
             windowWidth,
             windowHeight,
             containerId = "pedigree-viz-container-cgap",
-            selectedDiseases = null,
+            selectedDiseaseIdxMap = null,
             scale = 1,
             showOrderBasedName = true,
             PedigreeVizLibrary = null
@@ -207,7 +207,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
         const pedigreeVizProps = {
             showOrderBasedName,
             scale, enableMouseWheelZoom, detailPaneOpenOffsetWidth,
-            "visibleDiseases": selectedDiseases,
+            "visibleDiseaseIdxMap": selectedDiseaseIdxMap,
             "filterUnrelatedIndividuals": false,
             "renderDetailPane": this.renderDetailPane,
             "height": 600,

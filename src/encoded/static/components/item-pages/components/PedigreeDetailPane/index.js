@@ -40,7 +40,7 @@ export class PedigreeDetailPane extends React.PureComponent {
 
 
 function LegendBody(props) {
-    const { availableDiseases, selectedDiseases, onToggleSelectedDisease } = props;
+    const { availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease } = props;
     let body = null;
     if (!availableDiseases || availableDiseases.length === 0) {
         body = (
@@ -52,7 +52,7 @@ function LegendBody(props) {
         body = (
             <React.Fragment>
                 <div className="detail-row small text-secondary">Toggle which features to color-code in the pedigree</div>
-                <DiseasesLegend {...{ availableDiseases, selectedDiseases, onToggleSelectedDisease }} />
+                <DiseasesLegend {...{ availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease }} />
             </React.Fragment>
         );
     }
