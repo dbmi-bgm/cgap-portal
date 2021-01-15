@@ -2038,6 +2038,8 @@ $download-button-width : 100px;
 			}
 
 			h1 {
+				/* todo: consider using an h2 instead, as is 2.1rem by default (close to the 2rem set here) and */
+				/* possibly more semantically accurate (i.e. is a section title, not page title) (subjective) */
 				font-size: 2rem;
 				margin-bottom: 20px;
 				font-weight: 500;
@@ -2062,26 +2064,17 @@ $download-button-width : 100px;
 			}
 
 			.tab-inner-container {
-				background-color: #ffffff;
 				margin-bottom: 20px;
-				/* todo: consider having no padding here and instead apply padding to children, perhaps via 'px-' classNames */
-				padding: 20px;
-				border-radius: $border-radius-lg;
-				box-shadow: 0 1px 5px #0002;
-				border-color: #d6d6d6;
 
 				&.qc-status {
 					font-size: 19px;
 				}
 
-				h2.section-header {
+				.card-header.section-header {
 					background-color: $primary-dark;
-					/* This width definition is not needed as blocks will auto-fit available width by default, but left for explicitness */
-					width: calc(100% + 40px);
-					/* This padding definition matches padding of .card-header */
-					padding: 0.75rem 1.25rem;
 					color: #ffff;
-					margin: -20px -20px 10px -20px;
+					font-weight: 400;
+					margin: 0; /* overrides the default `margin: 10px 0` of header (h1, h2, ..) elems */
 				}
 
 				.processing-summary-table {
@@ -2122,8 +2115,8 @@ $download-button-width : 100px;
 					}
 				}
 
-				.row.qc-summary {
-					padding: 2px 0;
+				.row.qc-summary:not(:last-child) {
+					padding-bottom: 5px;
 				}
 
 				.processing-summary-table-container {
@@ -2799,8 +2792,6 @@ $download-button-width : 100px;
 					color: #fff8;
 				}
 				&[data-active="true"] {
-					// background-color: $primary-dark;
-					// color: #fff;
 					@extend .card;
 					color: $primary-dark;
 					display: initial;
