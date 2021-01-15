@@ -8,7 +8,7 @@ from .data.variant_workbook.expected import (
     TEST_VCF,
     RAW_INFOTAG_DESCRIPTION,
 )
-from ..commands.ingest_vcf import (
+from ..ingestion.vcf_utils import (
     VCFParser
 )
 from .variant_fixtures import (  # noqa
