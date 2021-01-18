@@ -1,8 +1,8 @@
 import pytest
 
 from datetime import datetime
+from dcicutils.misc_utils import utc_today_str
 from ..types.image import Image
-from ..utils import utc_today_str
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
