@@ -20,7 +20,8 @@ def _type_length():
     type_length_dict = {}
     for name in ORDER:
         try:
-            type_length_dict[name] = len(json.load(utf8(pkg_resources.resource_stream('encoded', 'tests/data/workbook-inserts/%s.json' % name))))
+            utf8_stream = utf8(pkg_resources.resource_stream('encoded', 'tests/data/workbook-inserts/%s.json' % name))
+            type_length_dict[name] = len(json.load(utf8_stream))
         except Exception:
             type_length_dict[name] = 0
 
