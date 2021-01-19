@@ -4,7 +4,7 @@ import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
 from ..ingestion.table_utils import GeneTableParser, GeneTableIntakeException
-from ..commands.ingest_genes import GeneIngestion
+from ..ingestion.gene_utils import GeneIngestion
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
