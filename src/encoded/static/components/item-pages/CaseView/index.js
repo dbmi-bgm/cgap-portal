@@ -407,7 +407,7 @@ class DotRouter extends React.PureComponent {
 }
 
 function DotRouterTab(props) {
-    const { tabTitle, dotPath, className, disabled, active, prependDotPath, children } = props;
+    const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
 
     const onClick = useMemo(function(){
         return function(){
@@ -424,7 +424,7 @@ function DotRouterTab(props) {
     }
 
     return (
-        <div className={(className ? className + " " : "") + (disabled ? "disabled " : "") + (active ? " active" : "")} >
+        <div className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")} >
             <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
@@ -440,13 +440,9 @@ function DotRouterTab(props) {
         </div>
     );
 }
-DotRouterTab.defaultProps = {
-    "className" : "arrow-tab d-flex"
-};
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context, currFamily, secondary_families = [] } = props;
-    const { display_title: caseDisplayTitle } = context;
     const { display_title: primaryFamilyTitle, '@id' : currFamilyID } = currFamily;
     const [ isSecondaryFamiliesOpen, setSecondaryFamiliesOpen ] = useState(false);
     const secondaryFamiliesLen = secondary_families.length;
@@ -465,39 +461,41 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
         <React.Fragment>
             <h1 className="row align-items-center">
                 <div className="col">
-                    { caseDisplayTitle }: <span className="text-300">Accessioning Report and History</span>
+                    <span className="text-300">Accessioning Report and History</span>
                 </div>
                 <div className="col-auto">
                     <span className="current-case text-small text-400 m-0">Current Selection</span>
                 </div>
             </h1>
-            <div className="tab-inner-container">
-                <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
-                    persistent={[
-                        <div key={currFamilyID} className="primary-family">
-                            <h4 className="mt-0 mb-05 text-400">
-                                <span className="text-300">Primary Cases from </span>
-                                { primaryFamilyTitle }
-                            </h4>
-                            <FamilyAccessionStackedTable family={currFamily} result={context}
-                                fadeIn collapseLongLists collapseShow={1} />
-                        </div>
-                    ]}
-                    collapsible={
-                        secondary_families.map(function(family){
-                            const { display_title, '@id' : familyID } = family;
-                            return (
-                                <div className="py-4 secondary-family" key={familyID}>
-                                    <h4 className="mt-0 mb-05 text-400">
-                                        <span className="text-300">Related Cases from </span>
-                                        { display_title }
-                                    </h4>
-                                    <FamilyAccessionStackedTable result={context} family={family} collapseLongLists/>
-                                </div>
-                            );
-                        })
-                    } />
-                { viewSecondaryFamiliesBtn }
+            <div className="tab-inner-container card">
+                <div className="card-body">
+                    <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
+                        persistent={[
+                            <div key={currFamilyID} className="primary-family">
+                                <h4 className="mt-0 mb-05 text-400">
+                                    <span className="text-300">Primary Cases from </span>
+                                    { primaryFamilyTitle }
+                                </h4>
+                                <FamilyAccessionStackedTable family={currFamily} result={context}
+                                    fadeIn collapseLongLists collapseShow={1} />
+                            </div>
+                        ]}
+                        collapsible={
+                            secondary_families.map(function(family){
+                                const { display_title, '@id' : familyID } = family;
+                                return (
+                                    <div className="py-4 secondary-family" key={familyID}>
+                                        <h4 className="mt-0 mb-05 text-400">
+                                            <span className="text-300">Related Cases from </span>
+                                            { display_title }
+                                        </h4>
+                                        <FamilyAccessionStackedTable result={context} family={family} collapseLongLists/>
+                                    </div>
+                                );
+                            })
+                        } />
+                    { viewSecondaryFamiliesBtn }
+                </div>
             </div>
         </React.Fragment>
     );
@@ -584,7 +582,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     });
 
     return (
-        <>
+        <React.Fragment>
             <div className="row qc-summary">
                 <div className="col-sm-8 text-600">
                     Total Number of Reads:
@@ -669,7 +667,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     { (msaStats.filteredVariants && msaStats.filteredVariants.value) ? decorateNumberWithCommas(msaStats.filteredVariants.value) : "" }
                 </div>
             </div>
-        </>
+        </React.Fragment>
     );
 });
 
@@ -698,7 +696,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     }, []);
 
     const title = (
-        <h4 data-family-index={0} className="pb-0 p-2 mb-0 d-inline-block w-100">
+        <h4 data-family-index={0} className="my-0 d-inline-block w-100">
             <span className="font-italic text-500">{ familyDisplayTitle }</span>
             {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
             <button type="button" className="btn btn-sm btn-primary pull-right"
@@ -717,13 +715,15 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                 <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
             </div> */}
-            <div className="tab-inner-container">
-                <h2 className="section-header">Quality Control Metrics (QC)</h2>
-                <BioinfoStats {...{ caseSample, sampleProcessing }} />
+            <div className="tab-inner-container card">
+                <h4 className="card-header section-header">Quality Control Metrics (QC)</h4>
+                <div className="card-body">
+                    <BioinfoStats {...{ caseSample, sampleProcessing }} />
+                </div>
             </div>
-            <div className="tab-inner-container">
-                <h2 className="section-header">Multisample Analysis Table</h2>
-                <div className="family-index-0" data-is-current-family={true}>
+            <div className="tab-inner-container card">
+                <h4 className="card-header section-header">Multisample Analysis Table</h4>
+                <div className="card-body family-index-0" data-is-current-family={true}>
                     { title }
                     <CaseSummaryTable {...family} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
                 </div>

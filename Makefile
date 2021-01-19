@@ -69,7 +69,6 @@ macbuild-full:  # rebuilds for Catalina, addressing zlib possibly being in an al
 build-after-poetry:  # continuation of build after poetry install
 	make moto-setup
 	make npm-setup-if-needed
-	poetry run python setup_higlass.py
 	poetry run python setup_eb.py develop
 	make fix-dist-info
 
@@ -130,6 +129,9 @@ clean-python:
 test:
 	bin/test -vv --timeout=200 -m "working and not indexing" && bin/test -vv --timeout=200 -m "working and indexing"
 
+retest:
+	bin/test -vv --last-failed
+
 test-any:
 	bin/test -vv --timeout=200
 
@@ -154,11 +156,12 @@ info:
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts.)
 	   $(info - Use 'make deploy2' to spin up the application server.)
 	   $(info - Use 'make deploy3' to load variants and genes.)
-	   $(info - Use 'make psql-dev' to start psql on data associated with an active 'make deploy1'.)
 	   $(info - Use 'make kibana-start' to start kibana, and 'make kibana-stop' to stop it.)
 	   $(info - Use 'make kill' to kill postgres and elasticsearch proccesses. Please use with care.)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests. Implied by 'make build'.)
 	   $(info - Use 'make npm-setup' to build the front-end. Implied by 'make build'.)
+	   $(info - Use 'make psql-dev' to start psql on data associated with an active 'make deploy1'.)
+	   $(info - Use 'make retest' to run failing tests from the previous test run.)
 	   $(info - Use 'make test' to run tests with normal options we use on travis ('-m "working and not performance"').)
 	   $(info - Use 'make test-any' to run tests without marker constraints (i.e., with no '-m' option).)
 	   $(info - Use 'make update' to update dependencies (and the lock file).)

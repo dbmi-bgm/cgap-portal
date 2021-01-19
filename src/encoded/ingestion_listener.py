@@ -9,6 +9,7 @@ import io
 import json
 import os
 import psycopg2
+import re
 import requests  # XXX: C4-211 should not be needed but is // KMP needs this, too, until subrequest posts work
 import signal
 import socket
@@ -18,11 +19,12 @@ import time
 import webtest
 
 from dcicutils.env_utils import is_stg_or_prd_env
-from dcicutils.misc_utils import VirtualApp, ignored, check_true
+from dcicutils.misc_utils import VirtualApp, ignored, check_true, full_class_name
 from pyramid import paster
-from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
+from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently, HTTPServerError
 from pyramid.request import Request
-from pyramid.response import Response
+# Possibly still needed by some commented-out code.
+# from pyramid.response import Response
 from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
@@ -33,10 +35,11 @@ from .ingestion.processors import get_ingestion_processor
 from .inheritance_mode import InheritanceMode
 from .server_defaults import add_last_modified
 from .loadxl import LOADXL_USER_UUID
-from .types.ingestion import SubmissionFolio
+from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 from .util import (
-    resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request, full_class_name,
+    resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request,
+    subrequest_object,
 )
 
 
@@ -58,39 +61,45 @@ SHARED = 'shared'
 def includeme(config):
     config.add_route('queue_ingestion', '/queue_ingestion')
     config.add_route('ingestion_status', '/ingestion_status')
-    config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
+    # config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
     config.add_route('submit_for_ingestion', '/submit_for_ingestion')
     config.registry[INGESTION_QUEUE] = IngestionQueueManager(config.registry)
     config.scan(__name__)
 
 
-# This endpoint is intended only for debugging. Use the command line tool.
-@view_config(route_name='prompt_for_ingestion', request_method='GET')
-@debug_log
-def prompt_for_ingestion(context, request):
-    ignored(context, request)
-    return Response(PROMPT_FOR_INGESTION)
+# The new protocol requires a two-phase action, first creating the IngestionSubmission
+# and then using that object to do the submission. We don't need this for debugging right now,
+# so I've just disabled it to avoid confusion. We should decide later whether to fix this or
+# just flush it as having served its purpose. -kmp 2-Dec-2020
+#
+# # This endpoint is intended only for debugging. Use the command line tool.
+# @view_config(route_name='prompt_for_ingestion', request_method='GET')
+# @debug_log
+# def prompt_for_ingestion(context, request):
+#     ignored(context, request)
+#     return Response(PROMPT_FOR_INGESTION)
 
+
+SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)(|/.*)$')
 
 register_path_content_type(path='/submit_for_ingestion', content_type='multipart/form-data')
 
 
-@view_config(route_name='submit_for_ingestion', request_method='POST',
+@view_config(name='submit_for_ingestion', request_method='POST', context=IngestionSubmission,
              # Apparently adding this 'accept' causes discrimination on incoming requests not to find this method.
              # We do want this type, and instead we check the request to make sure we got it, but we omit it here
              # for practical reasons. -kmp 10-Sep-2020
              # accept='multipart/form-data',
-             permission='add')
+             permission='edit')
 @debug_log
 def submit_for_ingestion(context, request):
     ignored(context)
 
     check_true(request.content_type == 'multipart/form-data',  # even though we can't declare we accept this
-               "Expected request to have content_type 'multipart/form-data'.", error_class=RuntimeError)
+               "Expected request to have content_type 'multipart/form-data'.", error_class=SubmissionFailure)
 
     bs_env = beanstalk_env_from_request(request)
     bundles_bucket = metadata_bundles_bucket(request.registry)
-    ingestion_type = request.POST['ingestion_type']
     datafile = request.POST['datafile']
     if not isinstance(datafile, cgi.FieldStorage):
         # e.g., specifically it might be b'' when no file is selected,
@@ -101,14 +110,43 @@ def submit_for_ingestion(context, request):
     override_name = request.POST.get('override_name', None)
     parameters = dict(request.POST)
     parameters['datafile'] = filename
-    institution = get_parameter(parameters, 'institution')
-    project = get_parameter(parameters, 'project')
+
     # Other parameters, like validate_only, will ride in on parameters via the manifest on s3
 
-    submission_id = SubmissionFolio.create_item(request,
-                                                ingestion_type=ingestion_type,
-                                                institution=institution,
-                                                project=project)
+    matched = SUBMISSION_PATTERN.match(request.path_info)
+    if matched:
+        submission_id = matched.group(1)
+    else:
+        raise SubmissionFailure("request.path_info is not in the expected form: %s" % request.path_info)
+
+    instance = subrequest_object(request, submission_id)
+
+    # The three arguments institution, project, and ingestion_type were needed in the old protocol
+    # but are not needed in the new protocol because someone will have set up the IngestionSubmission
+    # object already with the right values. We tolerate them here, but we insist they be consistent (redundant).
+    # Note, too, that we use the 'update=True' option that causes them to be added to our parameters if they are
+    # missing, defaulted from the previous item, so that they will be written to the parameter block stored on S3.
+    # (We could do that differently now, by looking them up dynamically, but rather than risk making a mistake,
+    # I just went with path of least resistance for now.)
+    # -kmp 2-Dec-2020
+
+    institution = instance['institution']['@id']
+    institution_arg = get_parameter(parameters, "institution", default=institution, update=True)
+    if institution_arg != institution:
+        # If the "institution" argument was passed, which we no longer require, make sure it's consistent.
+        raise SubmissionFailure("'institution' was supplied inconsistently for submit_for_ingestion.")
+
+    project = instance['project']['@id']
+    project_arg = get_parameter(parameters, "project", default=project, update=True)
+    if project_arg != project:
+        # If the "project" argument was passed, which we no longer require, make sure it's consistent.
+        raise SubmissionFailure("'project' was supplied inconsistently for submit_for_ingestion.")
+
+    ingestion_type = instance['ingestion_type']
+    ingestion_type_arg = get_parameter(parameters, "ingestion_type", default=ingestion_type, update=True)
+    if ingestion_type_arg != ingestion_type:
+        # If the "ingestion_type" argument was passed, which we no longer require, make sure it's consistent.
+        raise SubmissionFailure("'ingestion_type' was supplied inconsistently for submit_for_ingestion.")
 
     # ``input_file`` contains the actual file data which needs to be
     # stored somewhere.

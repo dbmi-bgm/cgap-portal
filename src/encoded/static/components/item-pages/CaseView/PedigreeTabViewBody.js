@@ -215,20 +215,28 @@ export class PedigreeTabViewBody extends React.PureComponent {
             console.error("Expected `dataset` or `graphData` to be present");
         }
 
+        let body = null;
+
+        if (!PedigreeVizLibrary) {
+            body = (
+                <div className="py-3 text-center">
+                    Loading...
+                </div>
+            );
+        } else if (graphData) {
+            // If already have parsed graph data
+            body = <PedigreeVizView {...pedigreeVizProps} {...graphData} />;
+        } else if (dataset) {
+            // If letting PedigreeViz parse on the fly (this mostly for local demo/test data)
+            body = <PedigreeViz {...pedigreeVizProps} dataset={dataset} />;
+        }
+
         return (
             <div id={containerId} className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
-                    { !PedigreeVizLibrary ? "Loading..."
-                        : (graphData ?
-                            // If already have parsed graph data
-                            <PedigreeVizView {...pedigreeVizProps} {...graphData} />
-                            :
-                            // If letting PedigreeViz parse on the fly (this mostly for local demo/test data)
-                            <PedigreeViz {...pedigreeVizProps} dataset={dataset} />
-                        )}
+                    { body }
                 </FullHeightCalculator>
             </div>
         );
     }
-
 }

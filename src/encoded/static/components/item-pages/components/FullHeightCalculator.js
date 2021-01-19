@@ -48,7 +48,7 @@ export const FullHeightCalculator = React.memo(function FullHeightCalculator({
     const height = Math.max(windowHeight - surroundingComponentsHeight, minHeight);
 
     return React.Children.map(children, function(child){
+        if (!React.isValidElement(child)) return child;
         return React.cloneElement(child, { [propName]: height });
     });
 });
-
