@@ -176,41 +176,6 @@ def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_f
     assert after > (before + end_delta)
 
 
-@pytest.fixture
-def mocked_familial_relations():
-    return [{'samples_pedigree': [
-                {
-                    'sample_name': 'sample_one',
-                    'relationship': 'mother',
-                    'sex': 'F'
-                },
-                {
-                    'sample_name': 'sample_two',
-                    'relationship': 'father',
-                    'sex': 'M'
-                },
-                {
-                    'sample_name': 'sample_three',
-                    'relationship': 'proband',
-                    'sex': 'M'
-                }
-    ]}]
-
-
-def test_ingestion_listener_build_familial_relations(workbook, es_testapp, mocked_familial_relations):
-    """ Tests that we correctly extract familial relations from a mocked object that has the correct structure """
-    with mock.patch.object(IngestionListener, 'search_for_sample_relations',
-                           new=lambda x, y: mocked_familial_relations):
-        listener = IngestionListener(es_testapp)
-        relations = listener.extract_sample_relations('dummy')
-        assert relations['sample_one']['samplegeno_role'] == 'mother'
-        assert relations['sample_two']['samplegeno_role'] == 'father'
-        assert relations['sample_three']['samplegeno_role'] == 'proband'
-        assert relations['sample_one']['samplegeno_sex'] == 'F'
-        assert relations['sample_two']['samplegeno_sex'] == 'M'
-        assert relations['sample_three']['samplegeno_sex'] == 'M'
-
-
 def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testapp):
     """ Posts a minimal processed file to be checked """
     request = DummyRequest(environ={'REMOTE_USER': 'TEST'})

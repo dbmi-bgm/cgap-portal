@@ -1,4 +1,5 @@
 import structlog
+from tqdm import tqdm
 from ..inheritance_mode import InheritanceMode
 from ..server_defaults import add_last_modified
 from ..loadxl import LOADXL_USER_UUID
@@ -20,12 +21,18 @@ class VariantBuilder:
         self.file = file  # source VCF file, should be the accession of a processed file
         self.ingestion_report = IngestionReport()
 
-    def _add_project_and_institution(self, obj):
-        obj['project'] = self.project
-        obj['institution'] = self.institution
+    def _add_project_and_institution(self, obj, variant=False):
+        """ Helper function that adds project/institution to the given dict object. """
+        if variant:  # variants are always part of CGAP CORE
+            obj['project'] = CGAP_CORE_PROJECT
+            obj['institution'] = CGAP_CORE_INSTITUTION
+        else:
+            obj['project'] = self.project
+            obj['institution'] = self.institution
 
     @staticmethod
     def _set_shared_obj_status(obj):
+        """ Helper function that sets status to 'shared' on the given dict object. """
         obj['status'] = 'shared'
 
     def _post_or_patch_variant(self, variant):
@@ -44,14 +51,11 @@ class VariantBuilder:
             ), variant, status=200)
 
     def _post_variant_sample(self, variant_sample):
-        try:
-            self.vapp.post_json('/variant_sample', variant_sample, status=201)
-        except Exception as e:
-            log.error('Encountered exception posting variant_sample: %s' % e)
-            raise  # propagate/report if error occurs here
+        """ Posts a variant_sample item. If this fails, exception should be caught by the caller. """
+        self.vapp.post_json('/variant_sample', variant_sample, status=201)
 
     def build_variant(self, record):
-        """ Parses the VCF row, adding required fields/formatting. """
+        """ Builds a raw variant from the given VCF record. """
         raw_variant = self.parser.create_variant_from_record(record)
         self._add_project_and_institution(raw_variant)
         self._set_shared_obj_status(raw_variant)
@@ -59,29 +63,31 @@ class VariantBuilder:
         add_last_modified(raw_variant, userid=LOADXL_USER_UUID)
         return raw_variant
 
-    def extract_sample_relations(self):
-        """ Searches the application for a single SampleProcessing file with the to-be-ingested VCF file
-            as a processed file. When located, sample_relation info is processed to be added to
-            all variant sample items. """
+    def search_for_sample_relations(self):
+        """ Helper function for below method that is easy to mock. """
         search_qs = '/search/?type=SampleProcessing&processed_files.accession=%s' % self.file
         search_result = []
-        sample_relations = {}
         try:
             search_result = self.vapp.get(search_qs).json['@graph']
         except Exception as e:  # will catch 404
             log.error('No sample_processing found for this VCF! Familial relations will be absent. Error: %s' % e)
-        if len(search_result) > 1:
-            log.error('Ambiguous sample_processing detected for vcf %s, search: %s' % (self.file, search_qs))
-        else:  # one result
-            sample_procesing = search_result[0]
-            sample_pedigrees = sample_procesing.get('samples_pedigree', [])
-            for entry in sample_pedigrees:
-                sample_id = entry['sample_name']
-                sample_relations[sample_id] = {}
-                for field, key in zip(['relationship', 'sex'], ['samplegeno_role', 'samplegeno_sex']):
-                    value = entry.get(field, None)
-                    if value is not None:
-                        sample_relations[sample_id][key] = value
+        return search_result
+
+    def extract_sample_relations(self):
+        """ Searches the application for a single SampleProcessing file with the to-be-ingested VCF file
+            as a processed file. When located, sample_relation info is processed to be added to
+            all variant sample items. """
+        search_result = self.search_for_sample_relations()
+        sample_relations = {}
+        sample_procesing = search_result[0]
+        sample_pedigrees = sample_procesing.get('samples_pedigree', [])
+        for entry in sample_pedigrees:
+            sample_id = entry['sample_name']
+            sample_relations[sample_id] = {}
+            for field, key in zip(['relationship', 'sex'], ['samplegeno_role', 'samplegeno_sex']):
+                value = entry.get(field, None)
+                if value is not None:
+                    sample_relations[sample_id][key] = value
         return sample_relations
 
     def build_variant_samples(self, variant, record, sample_relations):
@@ -109,11 +115,11 @@ class VariantBuilder:
             add_last_modified(variant, userid=LOADXL_USER_UUID)
         return variant_samples
 
-    def ingest_vcf(self):
+    def ingest_vcf(self, use_tqdm=False):
         """ Ingests the VCF, building/posting variants and variant samples until done, creating a report
             at the end of the run. """
         sample_relations = self.extract_sample_relations()
-        for idx, record in enumerate(self.parser):
+        for idx, record in enumerate(self.parser if not use_tqdm else tqdm(self.parser)):
             log.info('Parsing record %s' % record)
 
             # build the items
