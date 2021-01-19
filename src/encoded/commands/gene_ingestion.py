@@ -3,7 +3,7 @@ import argparse
 import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
-from ..commands.gene_table_intake import GeneTableParser, GeneTableIntakeException
+from ..ingestion.table_utils import GeneTableParser, GeneTableIntakeException
 from ..commands.ingest_genes import GeneIngestion
 from tqdm import tqdm
 

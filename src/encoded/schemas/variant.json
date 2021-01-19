@@ -2125,7 +2125,7 @@
             "order": 22,
             "grouping": "Effect Predictors"
         },
-        "genes.genes_ensg.gene_lists.display_title": {
+        "genes.genes_most_severe_gene.gene_lists.display_title": {
             "title": "Gene List",
             "order": 99,
             "grouping": "Genes"
