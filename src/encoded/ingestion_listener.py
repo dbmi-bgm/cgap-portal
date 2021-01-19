@@ -30,15 +30,10 @@ from vcf import Reader
 from .commands.ingest_vcf import VCFParser
 from .ingestion.common import (
     register_path_content_type, metadata_bundles_bucket, get_parameter, IngestionReport,
-    CGAP_CORE_INSTITUTION, CGAP_CORE_PROJECT,
 )
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
-from .inheritance_mode import InheritanceMode
-from .server_defaults import add_last_modified
-from .loadxl import LOADXL_USER_UUID
 from .types.ingestion import SubmissionFolio, IngestionSubmission
-from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 from .util import (
     resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request,
     subrequest_object,

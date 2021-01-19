@@ -39,7 +39,6 @@ class IngestionConfig:
                 raise IngestionConfigError('Required file location does not exist: %s' % field)
 
 
-
 def validate_files_exist(args):
     """ Validates that the files we care about (passed through args) are actually present, that way we don't
         run through a (potentially long) step only to File Not Found
