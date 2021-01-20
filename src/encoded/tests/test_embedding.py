@@ -1,6 +1,6 @@
 import pytest
 
-from .datafixtures import ORDER
+from .conftest_settings import ORDER
 from snovault import TYPES
 from snovault.util import add_default_embeds, crawl_schemas_by_embeds
 from ..types.base import get_item_or_none
