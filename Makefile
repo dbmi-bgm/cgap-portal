@@ -127,16 +127,16 @@ clean-python:
 	pip freeze | xargs pip uninstall -y
 
 test:
-	pytest -vv --timeout=200 -m "working and not indexing" && pytest -vv --timeout=200 -m "working and indexing"
+	poetry run pytest -vv --timeout=200 -m "working and not indexing" && pytest -vv --timeout=200 -m "working and indexing"
 
 retest:
-	pytest -vv --last-failed
+	poetry run pytest -vv --last-failed
 
 test-any:
-	pytest -vv --timeout=200
+	poetry run pytest -vv --timeout=200
 
 travis-test:
-	pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not indexing and not action_fail" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && pytest -vv --timeout=300 -m "working and indexing and not action_fail" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+	poetry run pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not indexing and not action_fail" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && poetry run pytest -vv --timeout=300 -m "working and indexing and not action_fail" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update
