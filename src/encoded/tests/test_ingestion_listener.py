@@ -213,7 +213,7 @@ def test_ingestion_listener_build_familial_relations(workbook, es_testapp, mocke
 
 def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testapp):
     """ Posts a minimal processed file to be checked """
-    request = DummyRequest(environ={'REMOTE_USER': 'TEST'})
+    request = DummyRequest(environ={'REMOTE_USER': 'TEST', 'HTTP_ACCEPT': 'application/json'})
     request.invoke_subrequest = es_testapp.app.invoke_subrequest
     assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION) is False
     assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True
