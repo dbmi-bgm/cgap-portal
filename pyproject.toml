@@ -42,10 +42,10 @@ certifi = ">=2020.11.8"
 chardet = "3.0.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
-dcicsnovault = "4.1.0"
-dcicutils = "^1.4.0"
+dcicsnovault = "4.1.2.1b1"  # was "4.1.0"
+dcicutils = "^1.10.0"
 docutils = "0.12"
-elasticsearch = "6.4.0"
+elasticsearch = "6.8.1"
 elasticsearch-dsl = "^6.4.0"
 execnet = "1.4.1"
 future = "^0.15.2"
@@ -147,6 +147,14 @@ pytest-timeout = "1.3.4"  # was "1.0.0"
 pytest-xdist = ">=1.14"  # was "1.14"
 "repoze.debug" = "1.1"  # was "1.0.2"
 # responses = "0.10.14"
+
+# In pytest 6.0, we'll be able to use this instead of a separate pytest.ini configuration.
+# -kmp 18-Jan-2021
+#
+# [tool.pytest.ini_options]
+# minversion = "6.0"
+# ...etc.
+# See details at https://pytest.org/en/stable/customize.html
 
 [tool.poetry.scripts]
 # snovault commands
