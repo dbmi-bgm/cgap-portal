@@ -7,8 +7,8 @@ from base64 import b64encode
 from jsonschema_serialize_fork import Draft4Validator
 from pyramid.compat import ascii_native_
 from urllib.parse import urlparse
-from webtest import TestApp
-from .datafixtures import ORDER
+from dcicutils.misc_utils import TestApp
+from .conftest_settings import ORDER
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
