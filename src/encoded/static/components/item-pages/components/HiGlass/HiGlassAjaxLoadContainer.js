@@ -19,6 +19,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
         super(props);
 
         this.getFullHiglassItem = this.getFullHiglassItem.bind(this);
+        this.getHiGlassComponent = this.getHiGlassComponent.bind(this);
 
         this.state = {
             'loading': false,

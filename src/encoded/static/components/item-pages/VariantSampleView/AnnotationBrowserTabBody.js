@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 //import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoadContainer';
 
@@ -9,13 +9,27 @@ import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoa
 // import { HiGlassPlainContainer } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/HiGlass/HiGlassPlainContainer';
 
 
-export const AnnotationBrowserTabBody = React.memo(function AnnotationBrowserTabBody ({ context, schemas }) {
-
+export const AnnotationBrowserTabBody = React.memo(function AnnotationBrowserTabBody (props) {
+    const { context, schemas, active = false } = props;
     const higlassContainerRef = useRef(null);
-    const variantPositionAbsCoord = context.variant.POS_ABS;
+    const {
+        variant: {
+            POS_ABS: variantPositionAbsCoord
+        }
+    } = context;
+
+    useEffect(function(){
+        if (!active) return;
+        const hgc = higlassContainerRef.current.getHiGlassComponent();
+        // hgc only exists when we visit the tab a second time
+        if(hgc){
+            // Force Higlass to repaint. Without this the tracks can be positioned incorrectly
+            hgc.boundRefreshView();
+        }
+    }, [ active ]); 
 
     return (
-        <div className="browser-tab-body card-body">
+        <div className={"browser-tab-body card-body" + (!active ? " d-none" : "")}>
             <div className="row">
                 <div className="col-12">
                     <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">

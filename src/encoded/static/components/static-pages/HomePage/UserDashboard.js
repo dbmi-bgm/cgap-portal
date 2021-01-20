@@ -8,12 +8,13 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console, ajax, JWT, searchFilters } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
-import { Schemas } from './../../util';
+import { Term } from './../../util/Schemas';
+import { responsiveGridState } from './../../util/layout';
 
 import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
 
 
-export const UserDashboard = React.memo(function UserDashboard(props){
+export const UserDashboard = React.memo(function UserDashboard({ windowHeight, windowWidth }){
     // const { schemas } = props;
     // We can turn container into container-wide to expand width
     // We can convert dashboard-header into tabs, similar to Item pages.
@@ -39,23 +40,30 @@ export const UserDashboard = React.memo(function UserDashboard(props){
 
             {/* We apply .bg-light class here instead of .container-wide child divs because home-dashboard-area height is calculated off of window height in stylesheet */}
             <div className="home-dashboard-area bg-light" id="content">
-                <RecentCasesTable />
+                <RecentCasesTable {...{ windowHeight, windowWidth }} />
             </div>
         </React.Fragment>
     );
 });
 
 
-const RecentCasesTable = React.memo(function RecentCasesTable(){
+const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, windowWidth }){
     const searchHref = (
         "/search/?type=Case"
         + "&report.uuid!=No+value"
         + "&proband_case=true"
         + "&sort=-last_modified.date_modified"
     );
+    const maxHeight = typeof windowHeight === "number" ?
+        (
+            windowHeight
+            - (80 + 46 + 78 + 52 + 20 + 50) // Sum of all footer/header elem heights & margins (excl. checkboxes)
+            - (responsiveGridState(windowWidth) !== "xs" ? 53 : 106) // Height of checkboxes
+        )
+        : 400;
     return (
         <div className="recent-cases-table-section mb-36">
-            <EmbeddedCaseSearchTable {...{ searchHref }} facets={null} aboveTableComponent={<AboveCasesTableOptions />} />
+            <EmbeddedCaseSearchTable {...{ searchHref, maxHeight }} facets={null} aboveTableComponent={<AboveCasesTableOptions />} />
         </div>
     );
 });
@@ -73,13 +81,8 @@ function AboveCasesTableOptions(props){
 
     const { onToggleOnlyShowCasesWithReports, onToggleOnlyShowProbandCases } = useMemo(function(){
         return {
-            // Throttling works here because we're memoizing on empty array (i.e. no new instances of these funcs ever created)
-            onToggleOnlyShowCasesWithReports: _.throttle(function(e){
-                onFilter({ "field" : "report.uuid!" }, { "key": "No value" });
-            }, 500, { trailing: false }),
-            onToggleOnlyShowProbandCases: _.throttle(function(e){
-                onFilter({ "field" : "proband_case" }, { "key": "true" });
-            }, 500, { trailing: false })
+            onToggleOnlyShowCasesWithReports: function(){ onFilter({ "field" : "report.uuid!" }, { "key": "No value" }); },
+            onToggleOnlyShowProbandCases: function(){ onFilter({ "field" : "proband_case" }, { "key": "true" }); }
         };
     }, []);
 
@@ -96,21 +99,25 @@ function AboveCasesTableOptions(props){
                     </h3>
                     <div className="btn-container">
                         <a className="btn btn-primary btn-block" href="/search/?type=Case&currentAction=add">
-                            <i className="icon icon-plus fas mr-07" />
-                            New Case
+                            <i className="icon icon-plus fas" />
+                            <span className="ml-1 d-none d-sm-inline">New Case</span>
                         </a>
                     </div>
                 </div>
             </div>
 
             <hr className="tab-section-title-horiz-divider"/>
-            <div className="container-wide toggle-reports d-flex align-items-center">
-                <ProjectFilterCheckbox isContextLoading={isContextLoading} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
-                    Show Only Cases with Reports
-                </ProjectFilterCheckbox>
-                <ProjectFilterCheckbox isContextLoading={isContextLoading} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
-                    Show Only Proband Cases
-                </ProjectFilterCheckbox>
+            <div className="container-wide toggle-reports row align-items-center">
+                <div className="col-12 col-sm-auto">
+                    <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
+                        Show Only Cases with Reports
+                    </ProjectFilterCheckbox>
+                </div>
+                <div className="col-12 col-sm-auto">
+                    <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
+                        Show Only Proband Cases
+                    </ProjectFilterCheckbox>
+                </div>
             </div>
         </React.Fragment>
     );
@@ -121,7 +128,7 @@ class ProjectFilterCheckbox extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.onChange = this.onChange.bind(this);
+        this.onChange = _.throttle(this.onChange.bind(this), 500, { trailing: false });
         this.state = { "isChanging": false };
     }
 
@@ -206,7 +213,7 @@ function ProjectSelectDropdown(props){
             const active = projectTerm === projectFilterTerm;
             return (
                 <DropdownItem key={projectTerm} eventKey={projectTerm} active={active}>
-                    { Schemas.Term.toName("project.display_title", projectTerm) }
+                    { Term.toName("project.display_title", projectTerm) }
                     <small className="ml-07">({ doc_count })</small>
                 </DropdownItem>
             );

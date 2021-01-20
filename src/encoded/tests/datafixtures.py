@@ -139,6 +139,8 @@ def bgm_user(testapp, institution, bgm_project):
         'first_name': 'BGM',
         'last_name': 'user',
         'email': 'bgmuser@example.org',
+        # Does it break tests to add this? -kmp 9-Dec-2020
+        'user_institution': institution['name'],
         'institution': institution['name'],
         'project_roles': [
             {
@@ -159,6 +161,58 @@ def access_key(testapp, bgm_user):
     description = 'My programmatic key'
     item = {
         'user': bgm_user['@id'],
+        'description': description,
+    }
+    res = testapp.post_json('/access_key', item)
+    result = res.json['@graph'][0].copy()
+    result['secret_access_key'] = res.json['secret_access_key']
+    return result
+
+
+@pytest.fixture
+def bgm_access_key(access_key):
+    # An alias for access_key, useful for emphasis to compare to non_bgm_access_key
+    return access_key
+
+
+@pytest.fixture
+def non_bgm_project(testapp):
+    item = {
+        'name': 'not-bgm-project',
+        'title': 'Not BGM Project',
+        'description': 'Not Brigham Genomic Medicine'
+    }
+    return testapp.post_json('/project', item).json['@graph'][0]
+
+
+@pytest.fixture
+def non_bgm_user(testapp, institution, non_bgm_project):
+    item = {
+        'first_name': 'Not-BGM',
+        'last_name': 'user',
+        'email': 'notbgmuser@example.org',
+        # Whether we have 'user_institution' should depend on whether bgm_user does. -kmp 9-Dec-2020
+        'user_institution': institution['name'],  # bgm_project and non_bgm_project are both at same user_institution
+        'institution': institution['name'],  # bgm_project and non_bgm_project are both at same institution
+        'project_roles': [
+            {
+                'project': non_bgm_project['@id'],
+                'role': 'project_member'  # XXX: you probably want this
+            }
+        ],
+        'project': non_bgm_project['@id'],
+        'status': 'current'
+    }
+    # User @@object view has keys omitted.
+    res = testapp.post_json('/user', item)
+    return testapp.get(res.location).json
+
+
+@pytest.fixture
+def non_bgm_access_key(testapp, non_bgm_user):
+    description = 'My non-BGM programmatic key'
+    item = {
+        'user': non_bgm_user['@id'],
         'description': description,
     }
     res = testapp.post_json('/access_key', item)
@@ -843,6 +897,8 @@ def workflow_mapping(testapp, workflow_bam, institution, project):
         "data_input_type": "experiment",
         'institution': institution['@id'],
         'project': project['@id'],
+        # TODO: This value of "workflow_parameters" is duplicated and should be removed or merged with the other.
+        #       Probably only the second value is being used right now. - Will and Kent 17-Dec-2020
         "workflow_parameters": [
             {"parameter": "bowtie_index", "value": "some value"}
         ],
