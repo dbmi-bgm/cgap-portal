@@ -4,6 +4,7 @@ from operator import itemgetter
 import jwt
 from base64 import b64decode
 
+from dcicutils.misc_utils import remove_element
 from passlib.context import CryptContext
 from urllib.parse import urlencode
 from pyramid.authentication import (
@@ -47,15 +48,22 @@ CRYPT_CONTEXT = __name__ + ':crypt_context'
 JWT_ENCODING_ALGORITHM = 'HS256'
 
 # Might need to keep a list of previously used algorithms here, not just the one we use now.
-# Decryption algorithm used to default to a long list,
-# but more recent versions of jwt library say we should stop assuming that.
+# Decryption algorithm used to default to a long list, but more recent versions of jwt library
+# say we should stop assuming that.
 #
 # In case it goes away, as far as I can tell, the default for decoding from their
-# default_algorithms() method used to be: ['ES512', 'RS384', 'HS512', 'ES256', 'none',
-# 'RS256', 'PS512', 'ES384', 'HS384', 'ES521', 'PS384', 'HS256', 'PS256', 'RS512']
-# -kmp 15-May-2020
+# default_algorithms() method used to be what we've got in JWT_ALL_ALGORITHMS here.
+#  -kmp 15-May-2020
 
-# TODO: JWT_DECODING_ALGORITHMS = [JWT_ENCODING_ALGORITHM]
+JWT_ALL_ALGORITHMS = ['ES512', 'RS384', 'HS512', 'ES256', 'none',
+                      'RS256', 'PS512', 'ES384', 'HS384', 'ES521',
+                      'PS384', 'HS256', 'PS256', 'RS512']
+
+# Probably we could get away with fewer, but I think not as few as just our own encoding algorithm,
+# so for now I believe the above list was the default, and this just rearranges it to prefer the one
+# we use for encoding. -kmp 19-Jan-2021
+
+JWT_DECODING_ALGORITHMS = [JWT_ENCODING_ALGORITHM] + remove_element(JWT_ENCODING_ALGORITHM, JWT_ALL_ALGORITHMS)
 
 
 def includeme(config):
@@ -236,7 +244,7 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
             if auth0_client and auth0_secret:
                 # leeway accounts for clock drift between us and auth0
                 payload = jwt.decode(token, b64decode(auth0_secret, '-_'),
-                                     # algorithms=JWT_DECODING_ALGORITHMS
+                                     algorithms=JWT_DECODING_ALGORITHMS,
                                      audience=auth0_client, leeway=30)
                 if 'email' in payload and self.email_is_partners_or_hms(payload):
                     request.set_property(lambda r: False, 'auth0_expired')
