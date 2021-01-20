@@ -594,7 +594,8 @@
                 {"from": 10, "to": 19, "label": "Medium"},
                 {"from": 20, "label": "High"}
             ],
-            "grouping": "Variant Quality"
+            "grouping": "Variant Quality",
+            "abbreviation": "AD"
         },
         "associated_genotype_labels.father_genotype_label": {
             "title": "Father Genotype",
@@ -685,7 +686,8 @@
             "ranges": [
                 { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },
                 { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }
-            ]
+            ],
+            "abbreviation": "novoPP"
         },
         "variant.CHROM": {
             "title": "Chromosome",
@@ -723,7 +725,8 @@
                 { "from": -2, "to": 2, "label": "low selection" },
                 { "from": 2, "to": 3, "label": "conserved" },
                 { "from": 3, "to": 10, "label": "highly conserved"}
-            ]
+            ],
+            "abbreviation": "PhyloP"
         },
         "variant.cytoband_cytoband": {
             "title": "Cytoband",
@@ -810,7 +813,8 @@
                 { "from": 0, "to": 0.001, "label": "ultra-rare" },
                 { "from": 0.001, "to": 0.01, "label": "rare" },
                 { "from": 0.01, "to": 1, "label": "common" }
-            ]
+            ],
+            "abbreviation": "AF"
         },
         "variant.gnomad_an": {
             "title": "GnomAD Total Allele Number",
@@ -837,7 +841,8 @@
                 { "from": 0, "to": 0.001, "label": "ultra-rare" },
                 { "from": 0.001, "to": 0.01, "label": "rare" },
                 { "from": 0.01, "to": 1, "label": "common" }
-            ]
+            ],
+            "abbreviation": "PopMax AF"
         },
         "variant.mutanno_variant_class": {
             "title": "Variant Type",
