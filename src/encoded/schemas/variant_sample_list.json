@@ -45,7 +45,7 @@
                         "type": "string",
                         "description": "User ID of person who made this selection"
                     },
-                    "selection_date": {
+                    "date_selected": {
                         "title": "Date Selected",
                         "type": "string",
                         "format": "date-time"
