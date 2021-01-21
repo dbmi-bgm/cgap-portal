@@ -22,7 +22,7 @@ import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
 import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
-import { FilteringTab } from './FilteringTab';
+import { FilteringTab, SelectedVariantSamplesController } from './FilteringTab';
 import CaseSubmissionView from './CaseSubmissionView';
 import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
@@ -280,7 +280,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
-                        <FilteringTab {...{ context, windowHeight, session, schemas }} />
+                        <SelectedVariantSamplesController>
+                            <FilteringTab {...{ context, windowHeight, session, schemas }} />
+                        </SelectedVariantSamplesController>
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
                         <InterpretationTab {...props} />
