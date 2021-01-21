@@ -3,6 +3,7 @@ import os
 import argparse
 import structlog
 from contextlib import contextmanager
+from dcicutils.qa_utils import override_environ
 from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.beanstalk_utils import get_beanstalk_environment_variables
 from deploy.generate_production_ini import CGAPIniFileManager
@@ -10,15 +11,6 @@ from deploy.generate_production_ini import CGAPIniFileManager
 
 logger = structlog.getLogger(__name__)
 EPILOG = __doc__
-
-
-@contextmanager
-def secure_environ(env):
-    """ Adds the given env to os.environ, restoring original state when yielding back. """
-    original_env = os.environ.copy()
-    os.environ.update(env)
-    yield
-    os.environ = original_env
 
 
 def build_ini_file(environment, use_prod):
@@ -32,7 +24,7 @@ def build_ini_file(environment, use_prod):
         return False
     beanstalk_env = get_beanstalk_environment_variables(environment)
     template_file_name = CGAPIniFileManager.environment_template_filename(environment)
-    with secure_environ(beanstalk_env):
+    with override_environ(**beanstalk_env):
         CGAPIniFileManager.build_ini_file_from_template(template_file_name, 'production.ini')
     return True
 

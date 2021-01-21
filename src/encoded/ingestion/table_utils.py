@@ -2,7 +2,7 @@ import csv
 import six
 import json
 import logging
-from collections import OrderedDict, Mapping
+from collections import namedtuple, Mapping
 from ..util import resolve_file_path
 
 logger = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ class VariantTableParser(object):
         Returns:
             list of fields
         """
-        fields = OrderedDict()
+        fields = {}
         for name in row:
             if name not in fields:
                 fields[name] = True
@@ -220,29 +220,28 @@ class VariantTableParser(object):
             return fmt[type]
 
     def generate_properties(self, inserts, variant=True):
-        """ Generates sample variant or variant schema properties
-            This function is quite long and complicated... Should probably be
-            refactored
+        """ Generates variant/variant sample properties.
 
         :param inserts: result of one of the above two functions
         :param variant: whether or not we are generating variant props or sample_variant props
         :return: properties
         """
-        props = OrderedDict()
-        cols = OrderedDict()
-        facs = OrderedDict()
+        # TODO: refactor this process, as it is a little hard to follow - Will 1/21/2021
+        props = {}
+        cols = {}
+        facs = {}
 
         # inner functions to be used as helper
         def get_prop(item):
             if item.get('embedded_field', False):
                 self.update_embeds(item, item.get('scope', 'gene'))  # XXX: HACK - how to get around? -Will
-                return OrderedDict()
+                return {}
             if not item.get('do_import', True):  # DROP fields that explicitly have do_import = False
-                return OrderedDict()
+                return {}
 
-            temp = OrderedDict()
+            temp = {}
             prop_name = item[self.NAME_FIELD]
-            features = OrderedDict()
+            features = {}
             features.update({
                 "title": item.get('schema_title', prop_name),
                 self.NAME_FIELD: prop_name,
@@ -275,8 +274,8 @@ class VariantTableParser(object):
 
             # handle sub_embedded object
             if item.get('sub_embedding_group'):
-                sub_temp = OrderedDict()
-                prop = OrderedDict()
+                sub_temp = {}
+                prop = {}
                 sum_ob_name = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='key')
                 sub_title = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='title')
 
@@ -312,7 +311,7 @@ class VariantTableParser(object):
 
             # convert to array structure
             if item.get('is_list'):
-                array_item = OrderedDict()
+                array_item = {}
                 array_item.update({
                     "title": item.get('schema_title', item[self.NAME_FIELD]),
                     "type": "array",

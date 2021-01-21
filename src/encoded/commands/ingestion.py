@@ -31,10 +31,17 @@ class IngestionConfig:
             self.GENE_LIST = gene_list  # same assumption as above
         self.validate()
 
+    def extract_class_fields(self):
+        """ This function does a neat trick to resolve the class fields defined above that have values.
+            It extracts all fields in dir that are not __ prefixed, not callable and have a value.
+            In this case, these fields are all file paths that are validated in the below method.
+        """
+        return filter(lambda f: not f.startswith('__') and not callable(getattr(self, f)) and
+                      getattr(self, f, None) is not None, dir(self))
+
     def validate(self):
         """ Validates fields set above map to files that exist. """
-        for field in filter(lambda f: not f.startswith('__') and not callable(getattr(self, f)) and
-                            getattr(self, f, None) is not None, dir(self)):
+        for field in self.extract_class_fields():
             if not os.path.exists(getattr(self, field)):
                 raise IngestionConfigError('Required file location does not exist: %s' % field)
 
