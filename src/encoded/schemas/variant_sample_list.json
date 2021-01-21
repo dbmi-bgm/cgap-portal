@@ -48,7 +48,10 @@
                     "date_selected": {
                         "title": "Date Selected",
                         "type": "string",
-                        "format": "date-time"
+                        "anyOf": [
+                            {"format": "date-time"},
+                            {"format": "date"}
+                        ]
                     }
                 }
             }
