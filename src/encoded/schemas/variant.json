@@ -1177,7 +1177,7 @@
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
             "annotation_category": "Position",
-            "description": "hg19 coordinate position (1-based)",
+            "description": "hg19 coordinate position",
             "scope": "variant",
             "schema_title": "Position (hg19)"
         },
@@ -1576,12 +1576,12 @@
         "schema_version": {
             "default": "1"
         },
-        "spliceai_maxds": {
+        "spliceaiMaxds": {
             "title": "SpliceAI Max Delta",
-            "field_name": "spliceai_maxds",
+            "field_name": "spliceaiMaxds",
             "type": "number",
             "do_import": true,
-            "vcf_field": "spliceai_maxds",
+            "vcf_field": "spliceaiMaxds",
             "annotation_category": "Effect Predictors",
             "description": "maximum delta scores",
             "scope": "variant",
@@ -1833,19 +1833,6 @@
                         "scope": "variant",
                         "schema_title": "Most Severe Transcript (Boolean)"
                     },
-                    "csq_tsl": {
-                        "title": "Transcript support level",
-                        "field_name": "csq_tsl",
-                        "type": "integer",
-                        "do_import": true,
-                        "vcf_field": "csq_tsl",
-                        "source_name": "VEP",
-                        "source_version": "v101",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "description": "Transcript support level",
-                        "scope": "variant",
-                        "schema_title": "Transcript support level"
-                    },
                     "csq_ccds": {
                         "title": "CCDS ID",
                         "field_name": "csq_ccds",
@@ -2045,9 +2032,9 @@
                 }
             }
         },
-        "variant_class": {
+        "variantClass": {
             "title": "Variant Type",
-            "field_name": "variant_class",
+            "field_name": "variantClass",
             "type": "string",
             "enum": [
                 "SNV",
@@ -2056,7 +2043,7 @@
                 "MNV"
             ],
             "do_import": true,
-            "vcf_field": "variant_class",
+            "vcf_field": "variantClass",
             "source_version": "v0.4",
             "annotation_category": "Variant Type",
             "description": "Variant type (SNV, INS, DEL)",
@@ -2125,11 +2112,6 @@
             "order": 22,
             "grouping": "Effect Predictors"
         },
-        "genes.genes_most_severe_gene.gene_lists.display_title": {
-            "title": "Gene List",
-            "order": 99,
-            "grouping": "Genes"
-        },
         "genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
             "order": 5,
@@ -2144,6 +2126,11 @@
             "title": "Location",
             "order": 6,
             "grouping": "Consequence"
+        },
+        "genes.genes_most_severe_gene.gene_lists.display_title": {
+            "title": "Gene List",
+            "order": 99,
+            "grouping": "Genes"
         },
         "genes.genes_most_severe_gene.oe_lof": {
             "title": "o/e (LoF)",
@@ -2194,14 +2181,14 @@
             "order": 24,
             "grouping": "Effect Predictors"
         },
-        "spliceai_maxds": {
+        "spliceaiMaxds": {
             "title": "SpliceAI Max Delta",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 27,
             "grouping": "Effect Predictors"
         },
-        "variant_class": {
+        "variantClass": {
             "title": "Variant Type",
             "order": 4,
             "grouping": "Variant Type"

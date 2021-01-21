@@ -8,7 +8,7 @@ from .variant_fixtures import ANNOTATION_FIELD_URL
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = resolve_file_path('annotations/variant_table_v0.5.0.csv')
+MT_LOC = resolve_file_path('annotations/variant_table_v0.5.1.csv')
 ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
 EXPECTED_FIELDS = ['no', 'field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list', 'facet_default_hidden', 'priority', 'source',
@@ -30,12 +30,12 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid',
                           'transcript.vep_consequence.var_conseq_name']
-VARIANT_TABLE_VERSION = 'annV0.5.0'
-VARIANT_TABLE_DATE = '01.05.2021'
+VARIANT_TABLE_VERSION = 'annV0.5.1'
+VARIANT_TABLE_DATE = '01.20.2021'
 NUMBER_ANNOTATION_FIELDS = 176
 SAMPLE_FIELDS_EXPECTED = 25
 VARIANT_FIELDS_EXPECTED = 151
-TRANSCRIPT_FIELDS_EXPECTED = 33
+TRANSCRIPT_FIELDS_EXPECTED = 32
 
 
 @pytest.fixture
@@ -184,7 +184,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'file' in properties
     assert 'variant.display_title' in cols
     assert facs['DP']['order'] == 8
-    assert facs['AF']['order'] == 9
+    assert facs['AF']['order'] == 11
     assert cols['DP']['order'] == 20
     assert cols['AF']['order'] == 21
     assert cols['GT']['order'] == 30
@@ -221,7 +221,7 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert sub_obj_props['csq_consequence']['items']['linkTo'] == 'VariantConsequence'
     assert sub_obj_props['csq_domains']['type'] == 'array'
     assert sub_obj_props['csq_domains']['items']['type'] == 'string'
-    assert sub_obj_props['csq_tsl']['type'] == 'integer'
+    assert sub_obj_props['csq_sift']['type'] == 'number'
 
     # check (existence of) different sub-embedded object fields
     assert properties['genes']['type'] == 'array'

@@ -48,7 +48,7 @@
     "id": "/profiles/variant_sample.json",
     "properties": {
         "AD": {
-            "title": "AD",
+            "title": "Allelic Depth",
             "field_name": "AD",
             "type": "string",
             "do_import": true,
@@ -58,7 +58,8 @@
             "annotation_category": "Variant Quality",
             "description": "Allelic depth",
             "scope": "sample_variant",
-            "schema_title": "AD"
+            "schema_title": "Allelic Depth",
+            "facet_order": 10
         },
         "AD_ALT": {
             "title": "AD (Alt)",
@@ -102,7 +103,7 @@
             "scope": "sample_variant",
             "schema_title": "VAF",
             "column_order": 21,
-            "facet_order": 9,
+            "facet_order": 11,
             "min": 0,
             "max": 1
         },
@@ -147,7 +148,7 @@
             "description": "Fisher strand score",
             "scope": "sample_variant",
             "schema_title": "Strand Fisher Score",
-            "facet_order": 10
+            "facet_order": 12
         },
         "GQ": {
             "title": "Genotype Quality",
@@ -161,7 +162,7 @@
             "description": "phred-scaled quality score that the genotype is accurate [min(99,PL(max)-PL(second))]",
             "scope": "sample_variant",
             "schema_title": "Genotype Quality",
-            "facet_order": 11
+            "facet_order": 13
         },
         "GT": {
             "title": "Genotype",
@@ -562,11 +563,16 @@
         }
     },
     "facets": {
+        "AD": {
+            "title": "Allelic Depth",
+            "order": 10,
+            "grouping": "Variant Quality"
+        },
         "AF": {
             "title": "VAF",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 9,
+            "order": 11,
             "grouping": "Variant Quality"
         },
         "DP": {
@@ -580,14 +586,14 @@
             "title": "Strand Fisher Score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 10,
+            "order": 12,
             "grouping": "Variant Quality"
         },
         "GQ": {
             "title": "Genotype Quality",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 11,
+            "order": 13,
             "grouping": "Variant Quality"
         },
         "associated_genotype_labels.father_genotype_label": {
@@ -680,11 +686,6 @@
             "order": 22,
             "grouping": "Effect Predictors"
         },
-        "variant.genes.genes_ensg.gene_lists.display_title": {
-            "title": "Gene List",
-            "order": 99,
-            "grouping": "Genes"
-        },
         "variant.genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
             "order": 5,
@@ -699,6 +700,11 @@
             "title": "Location",
             "order": 6,
             "grouping": "Consequence"
+        },
+        "variant.genes.genes_most_severe_gene.gene_lists.display_title": {
+            "title": "Gene List",
+            "order": 99,
+            "grouping": "Genes"
         },
         "variant.genes.genes_most_severe_gene.oe_lof": {
             "title": "o/e (LoF)",
@@ -749,14 +755,14 @@
             "order": 24,
             "grouping": "Effect Predictors"
         },
-        "variant.spliceai_maxds": {
+        "variant.spliceaiMaxds": {
             "title": "SpliceAI Max Delta",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 27,
             "grouping": "Effect Predictors"
         },
-        "variant.variant_class": {
+        "variant.variantClass": {
             "title": "Variant Type",
             "order": 4,
             "grouping": "Variant Type"
