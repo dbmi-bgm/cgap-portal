@@ -27,9 +27,30 @@
             "description": "VariantSample items saved to this list",
             "type": "array",
             "items": {
-                "title": "Variant Sample",
-                "type": "string",
-                "linkTo": "VariantSample"
+                "title": "Variant Sample Selection",
+                "type": "object",
+                "properties": {
+                    "variant_sample_item": {
+                        "title": "Variant Sample",
+                        "type": "string",
+                        "linkTo": "VariantSample"
+                    },
+                    "filter_blocks_request_at_time_of_selection" : {
+                        "title": "Filter Block Request",
+                        "type": "string",
+                        "description": "Stringified JSON representing the compound filter block request made when this Variant Sample was selected"
+                    },
+                    "userid": {
+                        "title": "User",
+                        "type": "string",
+                        "description": "User ID of person who made this selection"
+                    },
+                    "selection_date": {
+                        "title": "Date Selected",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
             }
         },
         "created_for_case": {
