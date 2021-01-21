@@ -726,7 +726,7 @@
                 { "from": 2, "to": 3, "label": "conserved" },
                 { "from": 3, "to": 10, "label": "highly conserved"}
             ],
-            "abbreviation": "PhyloP"
+            "abbreviation": "PhyloP100"
         },
         "variant.cytoband_cytoband": {
             "title": "Cytoband",
