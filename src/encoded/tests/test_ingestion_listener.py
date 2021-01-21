@@ -20,13 +20,24 @@ INGESTED_ACCESSION = 'GAPFIZ123456'
 NA_ACCESSION = 'GAPFIZ654321'
 
 
+# First an experimentally long wait just to see if wait time is what is killing us.
+# Probably something more like 5 seconds is better, but we can zero in on a best time once we know this is the issue.
+# -kmp 21-Jan-2021
+
+QUEUE_CATCH_UP_WAIT_SECONDS = 10
+
+
 def wait_for_queue_to_catch_up(queue_manager, n, initially=False):
-    """ Wait until queue has done the things we told it to do. Right now this just sleeps for 10 seconds
-        assuming most operations should complete within that amount of time.
+    """
+    Wait until queue has done the things we told it to do.
+
+    Right now this just sleeps for QUEUE_CATCH_UP_WAIT_SECONDS seconds
+    in any non-initial situation (i.e., where initially is False),
+    assuming most operations should complete within that amount of time.
     """
     ignored(queue_manager, n)
     if not initially:
-        time.sleep(3)
+        time.sleep(QUEUE_CATCH_UP_WAIT_SECONDS)
 
 
 class MockedEnv:
