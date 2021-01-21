@@ -20,11 +20,7 @@ INGESTED_ACCESSION = 'GAPFIZ123456'
 NA_ACCESSION = 'GAPFIZ654321'
 
 
-# First an experimentally long wait just to see if wait time is what is killing us.
-# Probably something more like 5 seconds is better, but we can zero in on a best time once we know this is the issue.
-# -kmp 21-Jan-2021
-
-QUEUE_CATCH_UP_WAIT_SECONDS = 10
+QUEUE_CATCH_UP_WAIT_SECONDS = 3
 
 
 def wait_for_queue_to_catch_up(queue_manager, n, initially=False):
