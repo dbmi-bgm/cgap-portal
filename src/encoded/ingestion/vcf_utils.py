@@ -31,6 +31,7 @@ class VCFParser(object):
     VEP = 'VEP'  # annotation field from VEP
     CSQ = 'CSQ'  # INFO field that contains VEP annotations
     GRANITE = 'GRANITE'  # annotation field from GRANITE
+    CGAP = 'CGAP'  # annotation fields from CGAP itself
     OVERWRITE_FIELDS = {  # field names that do not validate our DB and are mapped
         'csq_hg19_pos(1-based)': 'csq_hg19_pos',
         'csq_gerp++_rs': 'csq_gerp_rs'
@@ -126,12 +127,17 @@ class VCFParser(object):
 
     def read_vcf_metadata(self):
         """ Parses VCF file meta data to get annotation fields under VEP/GRANITE """
-        [granite_header] = self.reader.metadata.get(self.GRANITE, [])
+        granite_header = self.reader.metadata.get(self.GRANITE, [])
         vep_header = self.reader.metadata.get(self.VEP, [])
+        cgap_header = self.reader.metadata.get(self.CGAP, [])
         if granite_header:
-            self.annotation_keys[granite_header['ID']] = True
-        if vep_header:
+            for entry in granite_header:
+                self.annotation_keys[entry['ID']] = True
+        if vep_header:  # only one entry, CSQ
             self.annotation_keys[self.CSQ] = True
+        if cgap_header:
+            for entry in cgap_header:
+                self.annotation_keys[entry['ID']] = True
 
     @staticmethod
     def _strip(s):
@@ -554,24 +560,19 @@ class VCFParser(object):
                     else:
                         s[field] = getattr(record, field) or ''
 
-                # XXX: should now be able to be computed here
+                # Special variant sample fields
                 if field == 'samplegeno':
-                    pass
-                    # genotypes = record.INFO.get('SAMPLEGENO')
-                    # s['samplegeno'] = []
-                    # for gt in genotypes:
-                    #     numgt, gt, ad, sample_id = gt.split('|')
-                    #     tmp = dict()
-                    #     tmp['samplegeno_numgt'] = numgt
-                    #     tmp['samplegeno_gt'] = gt
-                    #     tmp['samplegeno_ad'] = ad
-                    #     tmp['samplegeno_sampleid'] = sample_id
-                    #     s['samplegeno'].append(tmp)
-                elif field == 'multiallele_samplevariantkey':  # XXX: refactor with samplegeno
-                    multiallele = record.INFO.get('MULTIALLELE', None)
-                    if multiallele:
-                        s['multiallele_samplevariantkey'] = self.fix_encoding(multiallele[0])
-                elif field == 'cmphet':  # XXX: refactor as well
+                    genotypes = record.INFO.get('SAMPLEGENO')
+                    s['samplegeno'] = []
+                    for gt in genotypes:
+                        numgt, gt, ad, sample_id = gt.split('|')
+                        tmp = dict()
+                        tmp['samplegeno_numgt'] = numgt
+                        tmp['samplegeno_gt'] = gt
+                        tmp['samplegeno_ad'] = ad
+                        tmp['samplegeno_sampleid'] = sample_id
+                        s['samplegeno'].append(tmp)
+                elif field == 'cmphet':
                     comhet = record.INFO.get('comHet', None)
                     if comhet:
                         s['cmphet'] = []

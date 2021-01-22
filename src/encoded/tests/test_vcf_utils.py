@@ -1,12 +1,10 @@
 import pytest
 import json
-from snovault.interfaces import STORAGE
 from .data.variant_workbook.expected import (
     VARIANT_SCHEMA,
     VARIANT_SAMPLE_SCHEMA,
     EXPECTED_ANNOTATION_FIELDS,
     TEST_VCF,
-    RAW_INFOTAG_DESCRIPTION,
 )
 from ..ingestion.vcf_utils import (
     VCFParser
@@ -117,18 +115,22 @@ class TestIngestVCF:
         assert self.get_transcript_field(result, 0, 'csq_domains') == ['Pfam:PF03715', 'PANTHER:PTHR12687',
                                                                        'PANTHER:PTHR12687:SF10', 'Superfamily:SSF48371']
 
-        # XXX: check genes (missing)
-        # assert self.get_genes_field(result, 0, 'genes_ensg') == 'ENSG00000187642'
-        # assert self.get_genes_field(result, 0, 'genes_most_severe_transcript') == 'ENST00000433179'
+        # check genes
+        assert self.get_genes_field(result, 0, 'genes_most_severe_gene') == 'ENSG00000188976'
+        assert self.get_genes_field(result, 0, 'genes_most_severe_transcript') == 'ENST00000327044'
 
         # check record 3 (only a few things)
         record = test_vcf.read_next_record()
         result = test_vcf.create_variant_from_record(record)
         assert len(result[self.VEP_IDENTIFIER].keys()) == 2
+        assert self.get_top_level_field(result, 'spliceaiMaxds') == 0.03
+        assert self.get_top_level_field(result, 'variantClass') == 'DEL'
         assert self.get_top_level_field(result, 'csq_spliceai_pred_symbol') == 'PERM1'
         assert self.get_transcript_field(result, 0, 'csq_consequence') == ['inframe_deletion']
         assert self.get_transcript_field(result, 0, 'csq_feature') == 'ENST00000341290'
         assert self.get_transcript_field(result, 0, 'csq_trembl') is None
+        assert self.get_genes_field(result, 0, 'genes_most_severe_gene') == 'ENSG00000187642'
+        assert self.get_genes_field(result, 0, 'genes_most_severe_hgvsc') == 'ENST00000433179.3:c.1993_1995del'
 
     def test_build_multiple_sample_variants(self, test_vcf):
         """ Generates 3 sample variant items and checks them for correctness """
@@ -148,10 +150,10 @@ class TestIngestVCF:
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)[0]
         assert self.get_top_level_field(result, 'DP') == 38
-        # assert len(result['samplegeno']) == 3  # just check field presence
-        # assert 'samplegeno_numgt' in result['samplegeno'][0]
-        # assert 'samplegeno_ad' in result['samplegeno'][0]
-        # assert 'samplegeno_gt' in result['samplegeno'][0]
+        assert len(result['samplegeno']) == 3  # just check field presence
+        assert result['samplegeno'][0]['samplegeno_numgt'] == '0/0'
+        assert result['samplegeno'][0]['samplegeno_ad'] == '36/0'
+        assert result['samplegeno'][0]['samplegeno_gt'] == 'CGAA/CGAA'
 
     # Tests a subset of the last test
     # def test_post_variants(self, es_testapp, test_vcf, gene_workbook, post_variant_consequence_items):
