@@ -1,8 +1,9 @@
 import csv
 import six
+import io
 import json
 import logging
-from collections import namedtuple, Mapping
+from collections import Mapping
 from ..util import resolve_file_path
 
 logger = logging.getLogger(__name__)
@@ -33,8 +34,9 @@ class MappingTableHeader:
                      'annotation_category', 'separator', 'description',
                      'scope', 'schema_title', 'pattern', 'link']
     SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to']
+    ENUM_FIELDS = ['enum_list']
     IGNORED_FIELDS = ['source', 'priority', 'annotation_space_location', 'comments', 'value_example']
-    ALL_FIELDS = INTEGER_FIELDS + BOOLEAN_FIELDS + STRING_FIELDS + SPECIAL_FIELDS + IGNORED_FIELDS
+    ALL_FIELDS = INTEGER_FIELDS + BOOLEAN_FIELDS + STRING_FIELDS + SPECIAL_FIELDS + ENUM_FIELDS + IGNORED_FIELDS
 
 
 class VariantTableParser(object):
@@ -84,7 +86,7 @@ class VariantTableParser(object):
             this functionality (for genes).
         """
         for field, f in self.EMBEDS_TO_GENERATE:
-            with open(f, 'w+') as fd:
+            with io.open(f, 'w+') as fd:
                 json.dump({field: {}}, fd)
 
     def read_mp_meta(self):
@@ -130,7 +132,7 @@ class VariantTableParser(object):
                     continue
                 for field_name, entry in zip(self.fields, row):
                     if field_name not in self.annotation_field_schema['properties'] or not entry:
-                        continue
+                        continue  # skip entry not in field schema
                     if field_name in MappingTableHeader.INTEGER_FIELDS:  # handle int fields
                         if entry is not None:  # entry=0 is a normal value
                             insert[field_name] = int(entry)
@@ -140,7 +142,7 @@ class VariantTableParser(object):
                                 insert[field_name] = True
                             else:  # assume False if anything other than 'Y' is present
                                 insert[field_name] = False
-                    elif field_name in ['enum_list']:  # handle enum fields
+                    elif field_name in MappingTableHeader.ENUM_FIELDS:  # handle enum fields
                         if entry is not None:
                             field_type = row[self.FIELD_TYPE_INDEX]
                             val_list = []
@@ -179,15 +181,14 @@ class VariantTableParser(object):
 
     def update_embeds(self, item, typ):
         """ Updates the EMBEDDED_FIELDS location JSON containing the embeds for Variant.
-            NOTE: the files are overwritten everytime you run the process!
-
-            XXX: This does NOT work properly if for linkTos, embeds required .keyword!
+            NOTE: the files are overwritten every time you run the process!
 
         :param item: embedded field to be written
         """
+        # XXX: This does NOT work properly if for linkTos, embeds required .keyword!
         for t, f in self.EMBEDS_TO_GENERATE:
             if typ == t:
-                with open(f, 'rb') as fd:
+                with io.open(f, 'rb') as fd:
                     embeds = json.load(fd)
                     link_type = 'embedded_field'
                     prefix = ''
@@ -197,7 +198,7 @@ class VariantTableParser(object):
                         embeds[t][link_type] = [prefix + item[self.NAME_FIELD]]
                     else:
                         embeds[t][link_type].append(prefix + item[self.NAME_FIELD])
-                with open(f, 'w+') as wfd:
+                with io.open(f, 'w+') as wfd:
                     json.dump(embeds, wfd)
                     wfd.write('\n')  # write newline at EOF
 
@@ -674,7 +675,7 @@ class VariantTableParser(object):
             fname: file to write out to
         """
         schema['properties'] = self.sort_schema_properties(schema)
-        with open(fname, 'w+') as out:
+        with io.open(fname, 'w+') as out:
             json.dump(schema, out, indent=4)
         logger.info('Successfully wrote schema: %s to file: %s\n' % (schema['title'], fname))
 
@@ -782,5 +783,5 @@ class GeneTableParser(VariantTableParser):
             if not gs_out:
                 raise GeneTableIntakeException('Write specified but no output file given')
             self.write_schema(gene_schema, gs_out)
-            logger.info('Successfully wrote gene schema')
+            logger.info('Successfully wrote gene schema to %s' % gs_out)
         return inserts
