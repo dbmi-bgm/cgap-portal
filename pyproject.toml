@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "5.2.1"
+version = "5.2.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -187,11 +187,7 @@ verify-item = "encoded.commands.verify_item:main"
 # cgap commands
 variant-table-intake = "encoded.commands.variant_table_intake:main"
 ingest-vcf = "encoded.commands.ingest_vcf:main"
-variant-ingestion = "encoded.commands.variant_ingestion:main"
 gene-table-intake = "encoded.commands.gene_table_intake:main"
-ingest-genes = "encoded.commands.ingest_genes:main"
-gene-ingestion = "encoded.commands.gene_ingestion:main"
-ingestion = "encoded.commands.ingestion:main"
 clear-variants-and-genes = "encoded.commands.clear_variants_and_genes:main"
 ingestion-listener = "encoded.ingestion_listener:main"
 

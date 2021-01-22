@@ -627,22 +627,3 @@ class VCFParser(object):
             self.format_variant_sub_embedded_objects(v)
             variants.append(v)
         return variant_samples, variants
-
-    @staticmethod
-    def post_variant_consequence_items(virtualapp, project=None, institution=None):
-        """ Posts variant_consequence items under the given project/institution. Required for poasting variants.
-
-        :param virtualapp: application_handle to post under
-        :param project: project to post under
-        :param institution: institution to post under
-=        """
-        vcs = json.load(open(resolve_file_path('annotations/variant_consequence.json'), 'r'))
-        for entry in vcs:
-            if project:
-                entry['project'] = project
-            if institution:
-                entry['institution'] = institution
-            try:
-                virtualapp.post_json('/variant_consequence', entry, status=201)
-            except Exception as e:  # can happen with master-inserts collision
-                logger.info('Failed to post variant consequence %s' % str(e))

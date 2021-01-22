@@ -1,13 +1,49 @@
+import os
+import json
 import structlog
 from tqdm import tqdm
 from ..inheritance_mode import InheritanceMode
 from ..server_defaults import add_last_modified
 from ..loadxl import LOADXL_USER_UUID
 from ..types.variant import build_variant_display_title, ANNOTATION_ID_SEP
+from ..util import resolve_file_path
 from .common import CGAP_CORE_PROJECT, CGAP_CORE_INSTITUTION, IngestionReport
 
 
 log = structlog.getLogger(__name__)
+
+
+class IngestionConfigError(Exception):
+    pass
+
+
+class IngestionConfig:
+    """ Data class that packages arguments necessary for invoking variant ingestion. """
+
+    def __init__(self, vcf, gene_list=None):
+        self.VARIANT_TABLE = resolve_file_path('annotations/variant_table_v0.5.1.csv')
+        self.GENE_TABLE = resolve_file_path('annotations/gene_table_v0.4.6.csv')
+        self.VARIANT_ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
+        self.GENE_ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/gene_annotation_field.json')
+        self.vcf = vcf  # assume path to VCF does not require any resolution (ie: full absolute/relative path)
+        self.GENE_LIST = None
+        if gene_list:
+            self.GENE_LIST = gene_list  # same assumption as above
+        self.validate()
+
+    def extract_class_fields(self):
+        """ This function does a neat trick to resolve the class fields defined above that have values.
+            It extracts all fields in dir that are not __ prefixed, not callable and have a value.
+            In this case, these fields are all file paths that are validated in the below method.
+        """
+        return filter(lambda f: not f.startswith('__') and not callable(getattr(self, f)) and
+                      getattr(self, f, None) is not None, dir(self))
+
+    def validate(self):
+        """ Validates fields set above map to files that exist. """
+        for field in self.extract_class_fields():
+            if not os.path.exists(getattr(self, field)):
+                raise IngestionConfigError('Required file location does not exist: %s' % field)
 
 
 class VariantBuilder:
@@ -41,14 +77,15 @@ class VariantBuilder:
             the latest annotations from the most recent VCF from which the variant has been seen. """
         try:
             self.vapp.post_json('/variant', variant, status=201)
-        except Exception:  # XXX: HTTPConflict should be thrown and appears to be yet it is not caught
+        except Exception as e:  # XXX: HTTPConflict should be thrown and appears to be yet it is not caught
+            log.error('Exception encountered on post (attempting patch): %s' % e)
             self.vapp.patch_json('/variant/%s' % build_variant_display_title(
                 variant['CHROM'],
                 variant['POS'],
                 variant['REF'],
                 variant['ALT'],
                 sep=ANNOTATION_ID_SEP
-            ), variant, status=200)
+            ), variant, status=200)  # will get logged/raised if error occurs
 
     def _post_variant_sample(self, variant_sample):
         """ Posts a variant_sample item. If this fails, exception should be caught by the caller. """
@@ -59,7 +96,7 @@ class VariantBuilder:
         raw_variant = self.parser.create_variant_from_record(record)
         self._add_project_and_institution(raw_variant)
         self._set_shared_obj_status(raw_variant)
-        self.parser.format_variant_subembedded_objects(raw_variant)
+        self.parser.format_variant_sub_embedded_objects(raw_variant)
         add_last_modified(raw_variant, userid=LOADXL_USER_UUID)
         return raw_variant
 
@@ -77,8 +114,10 @@ class VariantBuilder:
         """ Searches the application for a single SampleProcessing file with the to-be-ingested VCF file
             as a processed file. When located, sample_relation info is processed to be added to
             all variant sample items. """
-        search_result = self.search_for_sample_relations()
         sample_relations = {}
+        search_result = self.search_for_sample_relations()
+        if not search_result:
+            return sample_relations
         sample_procesing = search_result[0]
         sample_pedigrees = sample_procesing.get('samples_pedigree', [])
         for entry in sample_pedigrees:
@@ -115,17 +154,32 @@ class VariantBuilder:
             add_last_modified(variant, userid=LOADXL_USER_UUID)
         return variant_samples
 
+    def post_variant_consequence_items(self):
+        """ Posts variant_consequence items under the given project/institution. Required for poasting variants.
+
+        :param virtualapp: application_handle to post under
+        :param project: project to post under
+        :param institution: institution to post under
+=        """
+        vcs = json.load(open(resolve_file_path('annotations/variant_consequence.json'), 'r'))
+        for entry in vcs:
+            entry['project'] = self.project
+            entry['institution'] = self.institution
+            try:
+                self.vapp.post_json('/variant_consequence', entry, status=201)
+            except Exception as e:  # can happen with master-inserts collision
+                log.error('Failed to post variant consequence %s' % str(e))
+
     def ingest_vcf(self, use_tqdm=False):
         """ Ingests the VCF, building/posting variants and variant samples until done, creating a report
             at the end of the run. """
         sample_relations = self.extract_sample_relations()
         for idx, record in enumerate(self.parser if not use_tqdm else tqdm(self.parser)):
-            log.info('Parsing record %s' % record)
 
             # build the items
             try:
                 variant = self.build_variant(record)
-                variant_samples = self.build_variant_samples(record, variant, sample_relations)
+                variant_samples = self.build_variant_samples(variant, record, sample_relations)
             except Exception as e:
                 log.error('Error encountered building variant/variant_sample: %s' % e)
                 self.ingestion_report.mark_failure(body=str(e), row=idx)

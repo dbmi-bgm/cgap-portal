@@ -2,6 +2,8 @@ import logging
 import argparse
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
+from ..util import resolve_file_path
+from ..ingestion.gene_utils import GeneIngestion
 from ..ingestion.vcf_utils import VCFParser
 from ..ingestion.variant_utils import VariantBuilder
 
@@ -11,16 +13,7 @@ EPILOG = __doc__
 
 
 def main():
-    """ Main, ingests VCF and posts if args specified.
-
-        NOTE: is currently a no-op if inserts are not being posted
-
-        Required Args:
-            vcf: path to VCF file to ingest
-            vcf_accession: the accession of the VCF file on the portal
-            project: project to post variants/samples under
-            institution: institution to post variants/samples under
-            config_uri: standard arg for commands to pass ini file
+    """ Entry point for VCF Ingestion related tasks.
     """
     logging.basicConfig()
     parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
@@ -34,23 +27,33 @@ def main():
     parser.add_argument('institution', help='institution to post inserts under')
     parser.add_argument('config_uri', help="path to configfile")  # to get app
     parser.add_argument('--app-name', help="Pyramid app name in configfile")  # to get app
-    parser.add_argument('--post-inserts', action='store_true', default=False,
+    parser.add_argument('--post-variants', action='store_true', default=False,
                         help='If specified, will post inserts, by default False.')
+    parser.add_argument('--post-conseq', action='store_true', default=False,
+                        help='Provide if consequences should be uploaded')
+    parser.add_argument('--post-genes', action='store_true', default=False,
+                        help='Provide if genes should be uploaded')
     args = parser.parse_args()
 
     logger.info('Ingesting VCF file: %s' % args.vcf)
-    vcf_parser = VCFParser(args.vcf, args.variant, args.sample)
 
-    # get app, form links then post items
-    if args.post_inserts:
-        environ = {
-            'HTTP_ACCEPT': 'application/json',
-            'REMOTE_USER': 'TEST',
-        }
-        app = get_app(args.config_uri, args.app_name)
-        app_handle = VirtualApp(app, environ)
-        builder = VariantBuilder(app_handle, vcf_parser, args.vcf_accession,
-                                 project=args.project, institution=args.institution)
+    # XXX: Refactor to use IngestionConfig
+    app = get_app(args.config_uri, args.app_name)
+    environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': 'TEST',
+    }
+    app_handle = VirtualApp(app, environ)
+    vcf_parser = VCFParser(args.vcf, resolve_file_path('schemas/variant.json'),
+                           resolve_file_path('schemas/variant_sample.json'))
+    builder = VariantBuilder(app_handle, vcf_parser, args.vcf_accession,
+                             project=args.project, institution=args.institution)
+    if args.post_conseq:
+        builder.post_variant_consequence_items()
+    if args.post_genes:
+        gene_handler = GeneIngestion(resolve_file_path('annotations/gene_inserts_v0.4.5.json'))
+        gene_handler.upload(app_handle, project=args.project, institution=args.institution, use_tqdm=True)
+    if args.post_variants:
         builder.ingest_vcf(use_tqdm=True)
         logger.info('Succesfully posted VCF entries')
     exit(0)
