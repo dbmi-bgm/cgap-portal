@@ -5,6 +5,7 @@ import React, { useMemo } from 'react';
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
+import { SelectionItemCheckbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/SelectedItemsController';
 
 /* Used in FilteringTab */
 
@@ -144,7 +145,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         ...passProps
     } = props;
 
-    console.log("PASSPROPS", passProps);
+    console.log("PASSPROPS", props);
 
     // Will use this method to inject modal open fx when Annotation/Interpretation spaces are moved to overlay
     // const onSelectVariant = function(e) {
@@ -160,18 +161,20 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
             ...variantSampleAdditionalColumnExtensionMap,
             "display_title" : {
                 ...originalColExtMap.display_title,
-                widthMap: { 'lg' : 250, 'md' : 220, 'sm' : 200 },
-                render: function(result, parentProps){
+                "widthMap": { 'lg' : 250, 'md' : 220, 'sm' : 200 },
+                "minColumnWidth" : (originalColExtMap.display_title.minColumnWidth || 100) + 20,
+                "render": function(result, parentProps){
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
                         <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <SelectableTitle />
+                            <SelectionItemCheckbox {...{ selectedItems, onSelectItem }} isMultiSelect />
+                            <VSDisplayTitleColumnDefault />
                         </DisplayTitleColumnWrapper>
                     );
                 }
             }
         };
-    }, [ originalColExtMap ]);
+    }, [ originalColExtMap, selectedItems ]);
 
     return (
         <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />
@@ -230,8 +233,8 @@ const VSDisplayTitleColumnDefault = React.memo(function VSDisplayTitleColumnDefa
     );
 });
 
-function SelectableTitle({ onSelectVariant, result, link }){
-    // DisplayTitleColumnWrapper passes own 'onClick' func as prop to this component which would navigate to Item URL; don't use it here; intercept and instead use onSelectVariant from FilteringTab (or wherever).
-    // `link` is also from DisplayTitleColumnWrapper; I think good to keep as it'll translate into <a href={link}> in DisplayTitleColumnDefault and this will still allow to right-click + open in new tab (may need event.preventDefault() and/or event.stopPropagation() present in onSelectVariant).
-    return <VSDisplayTitleColumnDefault {...{ result, link }} onClick={onSelectVariant} />;
-}
+// function SelectableTitle({ onSelectVariant, result, link }){
+//     // DisplayTitleColumnWrapper passes own 'onClick' func as prop to this component which would navigate to Item URL; don't use it here; intercept and instead use onSelectVariant from FilteringTab (or wherever).
+//     // `link` is also from DisplayTitleColumnWrapper; I think good to keep as it'll translate into <a href={link}> in DisplayTitleColumnDefault and this will still allow to right-click + open in new tab (may need event.preventDefault() and/or event.stopPropagation() present in onSelectVariant).
+//     return <VSDisplayTitleColumnDefault {...{ result, link }} onClick={onSelectVariant} />;
+// }

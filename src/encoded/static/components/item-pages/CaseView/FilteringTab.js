@@ -2,8 +2,9 @@
 
 import React, { useMemo } from 'react';
 import queryString from 'query-string';
+import moment from 'moment';
 
-import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
 import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
@@ -190,32 +191,77 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     );
 });
 
-export class SelectedVariantSamplesController extends React.PureComponent {
 
-    constructor(props){
-        super(props);
-        this.state = { "selectedVariantSamples" : new Map() };
-    }
 
-    onSelectVariantSample(variantSample, filterSet){
-        this.setState(function({ selectedVariantSamples: existingSelection }){
 
-        });
-    }
 
-    render(){
-        const { children } = this.props;
-        const { selectedVariantSamples } = this.state;
+// export class SelectedVariantSamplesController extends React.PureComponent {
 
-        const childProps = {
-            selectedVariantSamples
-        };
+//     constructor(props){
+//         super(props);
+//         this.state = {
+//             /** This Map will be keyed by VariantSample `@id` and contain as values objects which match schema of `VariantSampleListItem.variant_samples` */
+//             "selectedVariantSamples" : new Map()
+//         };
+//     }
 
-        return React.Children.map(children, function(child){
-            if (!React.isValidElement(child)) return child;
-            // TODO if not valid component return child;
-            return React.cloneElement(child, childProps);
-        });
-    }
+//     // loadVariantSampleListItem(){
+//     //     const { variantSampleListItemUUID = null } = this.props;
+//     //     if (!variantSampleListItemUUID) return false;
 
-}
+//     //     const requestHref = "/variant-sample-list-items/" + variantSampleListItemUUID;
+
+//     //     const onLoad = (res) => {
+//     //         const { "@id": itemID } = res;
+//     //         if (!itemID) {
+//     //             throw new Error("Couldn't load " + requestHref);
+//     //         }
+//     //     };
+
+//     //     ajax.load(requestHref, onLoad, "GET", onLoad);
+//     // }
+
+//     onResetSelectedVariantSamples(existingVariantSampleSelections = []){
+//         this.setState({ "selectedVariantSamples": new Map(existingVariantSampleSelections) });
+//     }
+
+//     onSelectVariantSample(variantSample, filterSet){
+//         this.setState(function({ selectedVariantSamples: existingSelection }){
+//             const selectedVariantSamples = new Map(existingSelection); // Clone so we save new reference.
+//             const { "@id": vsID } = variantSample;
+//             if (!vsID) throw new Error("Expected VariantSample to have an @id");
+//             if (selectedVariantSamples.has(vsID)) {
+//                 selectedVariantSamples.delete(vsID);
+//             } else {
+//                 const { uuid: userid } = JWT.getUserDetails() || {};
+//                 selectedVariantSamples.set(vsID, {
+//                     // We need to remember to convert this to UUID or @id before POSTing or PATCHing
+//                     "variant_sample_item": variantSample,
+//                     "filter_blocks_request_at_time_of_selection": JSON.stringify(filterSet),
+//                     "date_selected": moment.utc().toISOString(), // May need to be adjusted a little bit here or before patch (i.e. trim off trailing 'Z'?)
+//                     userid
+//                 });
+//             }
+//         });
+//     }
+
+//     render(){
+//         const { children } = this.props;
+//         const { selectedVariantSamples } = this.state;
+
+//         // Somewhere down in the hierarchy of these components we'll likely
+//         // have a button that POSTs or PATCHes selectedVariantSamples inside a VSListItem
+//         const childProps = {
+//             selectedVariantSamples,
+//             "onResetSelectedVariantSamples": this.onResetSelectedVariantSamples,
+//             "onSelectVariantSample": this.onSelectVariantSample
+//         };
+
+//         return React.Children.map(children, function(child){
+//             if (!React.isValidElement(child)) return child;
+//             // TODO if not valid component return child;
+//             return React.cloneElement(child, childProps);
+//         });
+//     }
+
+// }

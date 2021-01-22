@@ -8,6 +8,7 @@ import url from 'url';
 import { console, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
+import { SelectedItemsController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/SelectedItemsController';
 
 import { responsiveGridState } from './../../util/layout';
 import DefaultItemView from './../DefaultItemView';
@@ -280,9 +281,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
-                        <SelectedVariantSamplesController>
+                        <SelectedItemsController isMultiselect>
                             <FilteringTab {...{ context, windowHeight, session, schemas }} />
-                        </SelectedVariantSamplesController>
+                        </SelectedItemsController>
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
                         <InterpretationTab {...props} />
