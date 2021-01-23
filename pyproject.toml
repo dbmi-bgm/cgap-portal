@@ -10,7 +10,7 @@ homepage = "https://github.com/dbmi-bgm/cgap-portal"
 repository = "https://github.com/dbmi-bgm/cgap-portal"
 documentation = "https://github.com/dbmi-bgm/cgap-portal"
 packages = [
-  { include="encoded", from="" }
+  { include="encoded", from="src" }
 ]
 classifiers = [
     # How mature is this project? Common values are
