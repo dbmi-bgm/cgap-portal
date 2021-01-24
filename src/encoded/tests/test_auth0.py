@@ -186,10 +186,10 @@ def test_get_jwt_falls_back_to_cookie(fake_request):
 
 
 def test_get_jwt_falls_back_to_cookie_too(fake_request):
-    fake_request.cookies['jwtToken'] = 'test_token'
-    fake_request.headers['Authorization'] = 'Basic stuff_base64_encoded'
-    jwt = get_jwt(fake_request)
-    assert jwt == 'test_token'
+    with override_dict(fake_request.cookies, jwtToken='test_token'):
+        with override_dict(fake_request.headers, Authorization='Basic stuff_base64_encoded'):
+            jwt = get_jwt(fake_request)
+            assert jwt == 'test_token'
 
 
 @pytest.mark.parametrize('request_method', ['HEAD', 'GET', 'POST', 'PATCH'])
@@ -289,7 +289,6 @@ def test_jwt_is_stateless_so_doesnt_actually_need_login(testapp, anontestapp, au
 
     res2 = anontestapp.get('/users/', headers=headers, status=200)
     assert '@id' in res2.json['@graph'][0]
-    # assert not res2.json['@graph']
 
 
 def test_jwt_works_without_keys(testapp, anontestapp, auth0_4dn_user_token,
@@ -302,7 +301,6 @@ def test_jwt_works_without_keys(testapp, anontestapp, auth0_4dn_user_token,
 
     anontestapp.app.registry.settings['auth0.secret'] = old_key
     assert '@id' in res2.json['@graph'][0]
-    # assert not res2.json['@graph']
 
 
 def test_impersonate_invalid_user(anontestapp, admin):
