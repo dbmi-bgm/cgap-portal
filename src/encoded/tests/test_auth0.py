@@ -107,6 +107,8 @@ def auth0_existing_4dn_user_profile(testapp, auth0_4dn_user_profile):
     return user  # Now that it exists
 
 
+# I am not sure this should have session scope. It makes side-effects to this visible to other tests.
+# -kmp 23-Jan-2021
 @pytest.fixture(scope='session')
 def headers(auth0_access_token):
     return {
@@ -116,6 +118,8 @@ def headers(auth0_access_token):
     }
 
 
+# I am not sure this should have session scope. It makes side-effects to this visible to other tests.
+# -kmp 23-Jan-2021
 @pytest.fixture(scope='session')
 def fake_request(headers):
 
