@@ -5,7 +5,8 @@ import pytest
 import requests
 import time
 
-from dcicutils.misc_utils import make_counter, Retry
+from dcicutils.misc_utils import Retry
+from dcicutils.qa_utils import override_dict
 from pyramid.testing import DummyRequest
 from ..authentication import get_jwt
 
@@ -28,11 +29,11 @@ def auth0_access_token():
         res = requests.post(url, json=creds)
         res.raise_for_status()
     except Exception as e:
-        pytest.skip("Error retrieving auth0 test user access token: %r" % e)
+        raise AssertionError("Error retrieving auth0 test user access token: %r" % e)
 
-    data = res.json()  # noqa - PyCharm doesn't know pytest.skip will unconditionally raise, so fears 'res' undefined
+    data = res.json()
     if 'id_token' not in data:
-        pytest.skip("Missing 'id_token' in auth0 test user access token: %r" % data)
+        raise AssertionError("Missing 'id_token' in auth0 test user access token: %r" % data)
 
     return data['id_token']
 
@@ -52,11 +53,11 @@ def auth0_access_token_no_email():
         res = requests.post(url, json=creds)
         res.raise_for_status()
     except Exception as e:
-        pytest.skip("Error retrieving auth0 test user access token: %r" % e)
+        raise AssertionError("Error retrieving auth0 test user access token: %r" % e)
 
-    data = res.json()  # noqa - PyCharm doesn't know pytest.skip will unconditionally raise, so fears 'res' undefined
+    data = res.json()
     if 'id_token' not in data:
-        pytest.skip("Missing 'id_token' in auth0 test user access token: %r" % data)
+        raise AssertionError("Missing 'id_token' in auth0 test user access token: %r" % data)
 
     return data['id_token']
 
@@ -168,9 +169,9 @@ def test_get_jwt_fails_bearer_auth_no_sep():
 
 
 def test_get_jwt_skips_basic_auth(fake_request):
-    fake_request.headers['Authorization'] = 'Basic test_token'
-    jwt = get_jwt(fake_request)
-    assert jwt is None
+    with override_dict(fake_request.headers, Authorization='Basic test_token'):
+        jwt = get_jwt(fake_request)
+        assert jwt is None
 
 
 def test_get_jwt_falls_back_to_cookie(fake_request):
@@ -237,7 +238,7 @@ def test_invalid_login(anontestapp, headers):
 
 @pytest.mark.skip  # XXX: This is failing for reasons we don't understand, BUT it was always not run on Travis
 def test_404_keeps_auth_info(testapp, anontestapp, headers,
-                             auth0_exiting_4dn_user_profile,
+                             auth0_existing_4dn_user_profile,
                              auth0_4dn_user_token):
 
     page_view_request_headers = headers.copy()
