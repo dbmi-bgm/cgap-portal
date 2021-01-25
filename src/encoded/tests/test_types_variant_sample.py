@@ -6,56 +6,54 @@ from .variant_fixtures import VARIANT_SAMPLE_URL
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]
 
-variant_uuid = "f6aef055-4c88-4a3e-a306-d37a71535d8b"
-
 
 # Copied from test_permissions.py
 # Maybe we could make test_permissions.py fixtures be largely defined in importable file or in datafixtures.py?
-@pytest.fixture
-def bgm_user_testapp(bgm_user, app, external_tx, zsa_savepoints):
-    environ = {
-        'HTTP_ACCEPT': 'application/json',
-        'REMOTE_USER': str(bgm_user['uuid']),
-    }
-    return webtest.TestApp(app, environ)
+# @pytest.fixture
+# def bgm_user_testapp(bgm_user, app, external_tx, zsa_savepoints):
+#     environ = {
+#         'HTTP_ACCEPT': 'application/json',
+#         'REMOTE_USER': str(bgm_user['uuid']),
+#     }
+#     return webtest.TestApp(app, environ)
 
 
-@pytest.fixture
-def bgm_variant(bgm_user_testapp, bgm_project, institution):
-    '''Same thing as workbook inserts, but different project stuff'''
-    item = {
-        'project': bgm_project['@id'],
-        'institution': institution["name"],
-        # We do not supply an explicit UUID here anymore because it says we need "permission restricted items"
-        # Might be some other way of getting it in here, but idk nor have time to rly explore atm.
-        # "uuid": "f6aef055-4c88-4a3e-a306-d37a71535d8b",
-        "ID": "rs564328546",
-        "ALT": "T",
-        "POS": 12125898,
-        "REF": "TG",
-        "hg19": [
-        {
-            "hg19_pos": 12185955,
-            "hg19_chrom": "chr1",
-            "hg19_hgvsg": "NC_000001.11:g.12185956del"
-        }
-        ],
-        "CHROM": "1",
-        "topmed_an": 125568
-    }
-    return bgm_user_testapp.post_json('/variants', item).json['@graph'][0]
+# @pytest.fixture
+# def bgm_variant(bgm_user_testapp, bgm_project, institution):
+#     '''Same thing as workbook inserts, but different project stuff'''
+#     item = {
+#         'project': bgm_project['@id'],
+#         'institution': institution["name"],
+#         # We do not supply an explicit UUID here anymore because it says we need "permission restricted items"
+#         # Might be some other way of getting it in here, but idk nor have time to rly explore atm.
+#         # "uuid": "f6aef055-4c88-4a3e-a306-d37a71535d8b",
+#         "ID": "rs564328546",
+#         "ALT": "T",
+#         "POS": 12125898,
+#         "REF": "TG",
+#         "hg19": [
+#         {
+#             "hg19_pos": 12185955,
+#             "hg19_chrom": "chr1",
+#             "hg19_hgvsg": "NC_000001.11:g.12185956del"
+#         }
+#         ],
+#         "CHROM": "1",
+#         "topmed_an": 125568
+#     }
+#     return bgm_user_testapp.post_json('/variants', item).json['@graph'][0]
 
-@pytest.fixture
-def bgm_test_variant_sample(bgm_variant, institution, bgm_project):
-    # IS NOT pre-POSTed into DB.
-    return {
-        'variant': bgm_variant['@id'],
-        'AD': '1,3',
-        'CALL_INFO': 'my_test_sample',
-        'file': 'dummy-file-name',
-        'project': bgm_project['@id'],
-        'institution': institution['@id']
-    }
+# @pytest.fixture
+# def bgm_test_variant_sample(bgm_variant, institution, bgm_project):
+#     # IS NOT pre-POSTed into DB.
+#     return {
+#         'variant': bgm_variant['@id'],
+#         'AD': '1,3',
+#         'CALL_INFO': 'my_test_sample',
+#         'file': 'dummy-file-name',
+#         'project': bgm_project['@id'],
+#         'institution': institution['@id']
+#     }
 
 @pytest.fixture
 def bgm_test_variant_sample2(bgm_test_variant_sample):
