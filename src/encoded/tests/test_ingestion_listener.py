@@ -191,6 +191,7 @@ def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testa
     assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True
 
 
+@pytest.mark.skip
 def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_manager_for_testing):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
