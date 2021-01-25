@@ -29,7 +29,7 @@ from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
 from .commands.ingest_vcf import VCFParser
-from .ingestion.common import register_path_content_type, metadata_bundles_bucket, get_parameter
+from .ingestion.common import metadata_bundles_bucket, get_parameter
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .inheritance_mode import InheritanceMode
@@ -39,7 +39,7 @@ from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 from .util import (
     resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request,
-    subrequest_object,
+    subrequest_object, register_path_content_type,
 )
 
 

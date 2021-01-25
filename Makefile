@@ -38,7 +38,7 @@ macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an e
 
 configure:  # does any pre-requisite installs
 	pip install --upgrade pip
-	pip install poetry==1.0.10  # pinned to avoid build problems we cannot fix in pyproject.toml
+	pip install poetry  # Will and I think latest version is fine again. -kmp 25-Jan-2021
 
 build:  # builds
 	make configure
