@@ -137,8 +137,8 @@ export const variantSampleAdditionalColumnExtensionMap = {
  */
 export function CaseViewEmbeddedVariantSampleSearchTable(props){
     const {
-        columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap, // Get/reuse default colExtMap from EmbeddedItemSearchTable
-        // onSelectVariant, // `onSelectVariant` theoretically passed down from FilteringTab or something; will perform AJAX request + update selected variantsample state.
+        // Get/reuse default colExtMap from EmbeddedItemSearchTable
+        columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
         selectedItems,
         onSelectItem,
         onResetSelectedItems,
@@ -153,13 +153,13 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
     //     console.log("thing happened, e", e);
     // };
 
+    /* Generates new object `columnExtensionMap` only if `originalColExtMap` changes (if ever) */
     const columnExtensionMap = useMemo(function() {
-        // Generates new object `columnExtensionMap` only if `originalColExtMap` changes (if ever)
         return {
-            // Copy in existing vals but overwrite display_title.render
             ...originalColExtMap,
             ...variantSampleAdditionalColumnExtensionMap,
             "display_title" : {
+                // Preserve existing 'display_title' extension properties but overwrite render, minColumnWidth..
                 ...originalColExtMap.display_title,
                 "widthMap": { 'lg' : 250, 'md' : 220, 'sm' : 200 },
                 "minColumnWidth" : (originalColExtMap.display_title.minColumnWidth || 100) + 20,
