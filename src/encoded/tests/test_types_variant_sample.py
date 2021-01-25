@@ -67,7 +67,7 @@ def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_s
     assert resp['variant_samples'][0]["variant_sample_item"] == vs1['@id']
     assert resp['variant_samples'][1]["variant_sample_item"] == vs2['@id']
     assert len(resp['variant_samples'][1]["date_selected"]) > 10 # Check that datetime is auto-populated
-    assert resp['variant_samples'][1]["userid"] == bgm_user["@id"] # Check that datetime is auto-populated
+    assert resp['variant_samples'][1]["userid"] == bgm_user["uuid"] # Check that userid is auto-populated
 
 
 def test_variant_sample_list_patch_fail(bgm_variant, bgm_user_testapp, variant_sample_list1):
