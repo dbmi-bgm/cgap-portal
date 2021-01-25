@@ -307,7 +307,7 @@ def canonical_redirect(event):
 # which should contain 'text/html'
 MIME_TYPES_SUPPORTED = ['text/html', 'application/json', 'application/ld+json']
 MIME_TYPE_DEFAULT = 'application/json'
-MIME_TYPE_TRIAGE_MODE = 'legacy'  # 'modern'  # if this doesn't work, fall back to 'legacy'
+MIME_TYPE_TRIAGE_MODE = 'modern'  # if this doesn't work, fall back to 'legacy'
 
 
 def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
@@ -379,8 +379,7 @@ def should_transform(request, response):
     # Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
     # which should contain 'text/html'
     # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
-    # TODO: Maybe use mime_type = best_mime_type(request) instead.
-    mime_type = request.accept.best_match(['application/json', 'text/html', 'application/ld+json'], 'application/json')
+    mime_type = best_mime_type(request)
     format = mime_type.split('/', 1)[1] # Will be 1 of 'html', 'json', 'json-ld'
 
     # N.B. ld+json (JSON-LD) is likely more unique case and might be sent by search engines (?) which can parse JSON-LDs.
