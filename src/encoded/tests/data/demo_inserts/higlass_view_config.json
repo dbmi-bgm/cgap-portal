@@ -101,6 +101,14 @@
               594954043.6728096,
               2673883060.323411
             ],
+            "genomePositionSearchBox":{
+              "autocompleteServer":"https://cgap-higlass.com/api/v1",
+              "autocompleteId":"P0PLbQMwTYGy-5uPIQid7A",
+              "chromInfoServer":"https://cgap-higlass.com/api/v1",
+              "chromInfoId":"hg38",
+              "visible":true
+            },
+            "chromInfoPath":"//s3.amazonaws.com/pkerp/data/hg38/chromSizes.tsv",
             "tracks":{
               "top":[
                 {
@@ -310,6 +318,96 @@
                       "zebrafish"
                     ]
                   }
+                },
+                {
+                  "uid": "emptytrack_gnomad",
+                  "type": "empty",
+                  "options": {},
+                  "width": 568,
+                  "height": 10
+                },
+                {
+                  "uid": "texttrack_gnomad",
+                  "type": "text",
+                  "server": "https://cgap-higlass.com/api/v1",
+                  "options": {
+                    "backgroundColor": "#ededed",
+                    "textColor": "#333333",
+                    "fontSize": 11,
+                    "fontFamily": "Arial",
+                    "fontWeight": "normal",
+                    "offsetY": 4,
+                    "align": "left",
+                    "text": "GnomAD (allele frequencies)"
+                  },
+                  "width": 568,
+                  "height": 20
+                },
+                {
+                  "uid": "emptytrack_gnomad2",
+                  "type": "empty",
+                  "options": {},
+                  "width": 568,
+                  "height": 7
+                },
+                {
+                  "filetype": "bigwig",
+                  "server": "https://cgap-higlass.com/api/v1",
+                  "tilesetUid": "gnomad_coverage",
+                  "uid": "dGGE208qQNmBcvlBnfpFuA",
+                  "type": "bar",
+                  "options": {
+                    "align": "bottom",
+                    "labelPosition": "topLeft",
+                    "labelLeftMargin": 0,
+                    "labelRightMargin": 0,
+                    "labelTopMargin": 0,
+                    "labelBottomMargin": 0,
+                    "labelShowResolution": false,
+                    "labelShowAssembly": false,
+                    "axisLabelFormatting": "scientific",
+                    "axisPositionHorizontal": "right",
+                    "barFillColor": "grey",
+                    "valueScaling": "linear",
+                    "trackBorderWidth": 0,
+                    "trackBorderColor": "black",
+                    "labelTextOpacity": 0.4,
+                    "barOpacity": 1,
+                    "valueScaleMin": 0,
+                    "valueScaleMax": 60,
+                    "name": "GnomAd - median coverage"
+                  },
+                  "width": 768,
+                  "height": 45
+                },
+                {
+                  "uid": "emptytrack_gnomad3",
+                  "type": "empty",
+                  "options": {},
+                  "width": 568,
+                  "height": 7
+                },
+                {
+                  "uid": "gnomad",
+                  "type": "gnomad",
+                  "options": {
+                    "colorScale": [
+                      [0.3, 0.3, 0.3, 0.6],
+                      [0.6, 0.6, 0.0, 0.7],
+                      [1, 0.0, 0.0, 0.6]
+                    ],
+                    "showMousePosition": false,
+                    "workerScriptLocation": "/static/build/",
+                    "variantHeight": 12
+                  },
+                  "data": {
+                    "type": "vcf",
+                    "vcfUrl": "https://cgap-higlass.s3.amazonaws.com/gnomad/gnomad.higlass.v3.1.sites.vcf.gz",
+                    "tbiUrl": "https://cgap-higlass.s3.amazonaws.com/gnomad/gnomad.higlass.v3.1.sites.vcf.gz.tbi",
+                    "chromSizesUrl": "https://aveit.s3.amazonaws.com/higlass/data/sequence/hg38.chrom.sizes"
+                  },
+                  "width": 768,
+                  "height": 200
                 },
                 {
                   "uid": "emptytrack",
