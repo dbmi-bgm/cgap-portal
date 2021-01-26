@@ -44,7 +44,8 @@
                         "title": "User ID",
                         "type": "string",
                         "description": "User ID of person who made this selection",
-                        "serverDefault": "userid"
+                        "serverDefault": "userid",
+                        "format": "uuid"
                     },
                     "date_selected": {
                         "title": "Date Selected",
