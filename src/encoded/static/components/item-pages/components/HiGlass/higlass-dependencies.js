@@ -11,6 +11,7 @@ import { default as ClinvarTrack } from 'higlass-clinvar/es/ClinvarTrack';
 import { default as TextTrack } from 'higlass-text/es/TextTrack';
 import { default as OrthologsTrack } from 'higlass-orthologs/es/OrthologsTrack';
 import { default as PileupTrack } from 'higlass-pileup/es/PileupTrack';
+import { default as GnomadTrack } from 'higlass-gnomad/es/GnomadTrack';
 
 export {
     HiGlassComponent,
@@ -20,5 +21,6 @@ export {
     ClinvarTrack,
     TextTrack,
     OrthologsTrack,
-    PileupTrack
+    PileupTrack,
+    GnomadTrack
 };
