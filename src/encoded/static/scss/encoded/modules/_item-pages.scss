@@ -2660,28 +2660,32 @@ $download-button-width : 100px;
 
 	}
 
-	/** Dropdown for selecting diseases/features -- CGAP-specific **/
+	/** DetailPane Legend Body for selecting diseases/features -- CGAP-specific **/
 
-	.tabview-title-controls-container {
+	.detail-pane-container {
 		.disease-option {
-			padding: 1px 10px;
 			display: flex;
 			align-items: center;
+
 			.checkbox-with-label {
 				flex: 1;
 				> label {
 					cursor: pointer;
+					> input {
+						// Override default mr-08
+						margin-right: 16px !important;
+					}
 				}
 			}
 			.disease-color-patch {
-				height: 16px;
-				width: 16px;
+				height: 20px;
+				width: 20px;
+				line-height: 20px;
 				border-radius: 50%;
 				transition: background-color .3s;
 				text-align: center;
-				line-height: 1;
 				> span {
-					font-size: 0.675rem;
+					font-size: 0.75rem;
 					font-weight: 600;
 					top: -2px;
 					position: relative;

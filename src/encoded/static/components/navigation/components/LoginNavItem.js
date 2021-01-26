@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import { layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -9,13 +9,13 @@ import { UserRegistrationModal } from './UserRegistrationModal';
 
 export const LoginNavItem = React.memo(function LoginNavItem(props){
     const { id =  "loginbtn", isRegistrationModalVisible, showLock, isLoading } = props;
-    const onClick = useMemo(function(){
-        return function(e){
-            // Prevent setting URL to '#' as might cause navigation away from tab.
-            e.preventDefault();
-            showLock();
-            return false;
-        };
+    const onClick = useCallback(function(e){
+        // Prevent setting URL to '#' as might cause navigation away from tab.
+        // `useCallback(fn, deps)` is equivalent to `useMemo(() => fn, deps)`
+        // See https://reactjs.org/docs/hooks-reference.html#usecallback
+        e.preventDefault();
+        showLock();
+        return false;
     }, [ showLock ]);
     return (
         <React.Fragment>
