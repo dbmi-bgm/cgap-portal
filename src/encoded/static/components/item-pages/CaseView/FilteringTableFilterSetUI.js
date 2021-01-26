@@ -344,8 +344,11 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             addNewFilterBlock, selectedFilterBlockIndices, selectFilterBlockIdx, removeFilterBlockAtIdx,
             setNameOfFilterBlockAtIdx, setTitleOfFilterSet, isSettingFilterBlockIdx,
 
-            // From ajax.FetchedItem
-            isFetchingInitialFilterSetItem = false
+            // From ajax.FetchedItem:
+            isFetchingInitialFilterSetItem = false,
+
+            // From SelectedItemsController (SPC):
+            selectedItems = null
         } = this.props;
         const { total: totalCount, facets = null } = searchContext || {};
         const { filter_blocks = [] } = filterSet || {};
@@ -386,29 +389,44 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         }
 
         return (
-            // TODO Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
-            <div className="above-variantsample-table-ui">
-                <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
-                    <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
-                    <Collapse in={bodyOpen}>
-                        <div className="filterset-blocks-container">
-                            { body }
+            // TODO 1: Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
+            // Consider: Keep state of VSL (loaded via AJAX or not) somewhere above this maybe.. so can dedupe before rendering this button. Not necessary at all esp if gets complexy.
+            <React.Fragment>
+                <div className="row mb-24 mt-0">
+                    <h1 className="col my-0">
+                        <span className="text-300">Variant Filtering and Technical Review</span>
+                    </h1>
+                    { selectedItems instanceof Map ?
+                        <div className="col-auto">
+                            <button type="button" className="btn btn-primary" disabled={selectedItems.size === 0}>
+                                Add { selectedItems.size } Variant Samples to Interpretation Tab
+                            </button>
                         </div>
-                    </Collapse>
+                        : null }
                 </div>
-                <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
-                    panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
-                    <h4 className="text-400 col my-0">
-                        <span className="text-600 mr-1">{ totalCount }</span>
-                        <span>
-                            Variant Matches for { currentFilterBlockName ?
-                                <em>{ currentFilterBlockName }</em>
-                                // TODO: Allow to toggle Union vs Intersection in FilterSetController
-                                : `Union of ${selectedFilterBlockCount} Filter Blocks` }
-                        </span>
-                    </h4>
-                </AboveTableControlsBase>
-            </div>
+                <div className="above-variantsample-table-ui">
+                    <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
+                        <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
+                        <Collapse in={bodyOpen}>
+                            <div className="filterset-blocks-container">
+                                { body }
+                            </div>
+                        </Collapse>
+                    </div>
+                    <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
+                        panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
+                        <h4 className="text-400 col my-0">
+                            <span className="text-600 mr-1">{ totalCount }</span>
+                            <span>
+                                Variant Matches for { currentFilterBlockName ?
+                                    <em>{ currentFilterBlockName }</em>
+                                    // TODO: Allow to toggle Union vs Intersection in FilterSetController
+                                    : `Union of ${selectedFilterBlockCount} Filter Blocks` }
+                            </span>
+                        </h4>
+                    </AboveTableControlsBase>
+                </div>
+            </React.Fragment>
         );
     }
 

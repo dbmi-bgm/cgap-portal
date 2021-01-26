@@ -150,6 +150,26 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem };
     }, [ context ]);
 
+    // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedItems there.
+    const fsuiProps = { schemas, selectedItems, "caseItem": context };
+
+    // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
+    // regardless of how much Case embeds.
+    const embeddedTableHeader = activeFilterSetID ? (
+        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
+            <FilterSetController {...{ searchHrefBase, onResetSelectedItems }} excludeFacets={hideFacets}>
+                <FilteringTableFilterSetUI {...fsuiProps} />
+            </FilterSetController>
+        </ajax.FetchedItem>
+    ) : (
+        // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
+        // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
+        <FilterSetController {...{ searchHrefBase, onResetSelectedItems }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+            <FilteringTableFilterSetUI {...fsuiProps} />
+        </FilterSetController>
+    );
+
+
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
     // 405px offset likely would need to be changed if we change height of tab nav, tab title area, etc.
@@ -159,21 +179,6 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // Table re-initializes upon change of key so we use it refresh table based on session.
     const searchTableKey = "session:" + session;
 
-    // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
-    // regardless of how much Case embeds.
-    const embeddedTableHeader = activeFilterSetID ? (
-        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
-            <FilterSetController {...{ searchHrefBase, onResetSelectedItems }} excludeFacets={hideFacets}>
-                <FilteringTableFilterSetUI caseItem={context} schemas={schemas} />
-            </FilterSetController>
-        </ajax.FetchedItem>
-    ) : (
-        // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
-        // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
-            <FilteringTableFilterSetUI caseItem={context} />
-        </FilterSetController>
-    );
 
     const tableProps = {
         hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader,
@@ -182,12 +187,8 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     };
 
     return (
-        <React.Fragment>
-            <h1 className="mb-24 mt-0">
-                <span className="text-300">Variant Filtering and Technical Review</span>
-            </h1>
-            <CaseViewEmbeddedVariantSampleSearchTable { ...tableProps} />
-        </React.Fragment>
+        // The title/header is rendered by FilteringTableFilterSetUI (`props.embeddedTableHeader` of CaseViewEmbeddedVariantSampleSearchTable)
+        <CaseViewEmbeddedVariantSampleSearchTable {...tableProps} />
     );
 });
 
