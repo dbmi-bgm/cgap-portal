@@ -151,7 +151,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     }, [ context ]);
 
     // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedItems there.
-    const fsuiProps = { schemas, selectedItems, "caseItem": context };
+    const fsuiProps = { schemas, "caseItem": context };
 
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
@@ -187,8 +187,21 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     };
 
     return (
-        // The title/header is rendered by FilteringTableFilterSetUI (`props.embeddedTableHeader` of CaseViewEmbeddedVariantSampleSearchTable)
-        <CaseViewEmbeddedVariantSampleSearchTable {...tableProps} />
+        <React.Fragment>
+            <div className="row mb-24 mt-0">
+                <h1 className="col my-0">
+                    <span className="text-300">Variant Filtering and Technical Review</span>
+                </h1>
+                { selectedItems instanceof Map ?
+                    <div className="col-auto">
+                        <button type="button" className="btn btn-primary" disabled={selectedItems.size === 0}>
+                            Add { selectedItems.size } Variant Samples to Interpretation Tab
+                        </button>
+                    </div>
+                    : null }
+            </div>
+            <CaseViewEmbeddedVariantSampleSearchTable {...tableProps} />
+        </React.Fragment>
     );
 });
 
