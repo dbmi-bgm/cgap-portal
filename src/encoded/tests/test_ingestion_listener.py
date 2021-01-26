@@ -4,7 +4,7 @@ import mock
 import pytest
 import time
 
-from dcicutils.qa_utils import ignored, notice_pytest_fixtures
+from dcicutils.qa_utils import ignored
 from uuid import uuid4
 from pyramid.testing import DummyRequest
 from ..ingestion_listener import (
@@ -20,13 +20,20 @@ INGESTED_ACCESSION = 'GAPFIZ123456'
 NA_ACCESSION = 'GAPFIZ654321'
 
 
+QUEUE_CATCH_UP_WAIT_SECONDS = 3
+
+
 def wait_for_queue_to_catch_up(queue_manager, n, initially=False):
-    """ Wait until queue has done the things we told it to do. Right now this just sleeps for 10 seconds
-        assuming most operations should complete within that amount of time.
+    """
+    Wait until queue has done the things we told it to do.
+
+    Right now this just sleeps for QUEUE_CATCH_UP_WAIT_SECONDS seconds
+    in any non-initial situation (i.e., where initially is False),
+    assuming most operations should complete within that amount of time.
     """
     ignored(queue_manager, n)
     if not initially:
-        time.sleep(3)
+        time.sleep(QUEUE_CATCH_UP_WAIT_SECONDS)
 
 
 class MockedEnv:
@@ -167,7 +174,8 @@ def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, workb
 
 def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_for_testing):
     """ Tests that the 'should_remain_online' method works """
-    _await = lambda: time.sleep(3)
+    def _await():
+        time.sleep(3)
     before = datetime.datetime.utcnow()
     end_delta = datetime.timedelta(seconds=2)  # this diff should not occur if _await is not executed
     IngestionListener.should_remain_online(override=_await)
@@ -198,7 +206,8 @@ def mocked_familial_relations():
 
 def test_ingestion_listener_build_familial_relations(workbook, es_testapp, mocked_familial_relations):
     """ Tests that we correctly extract familial relations from a mocked object that has the correct structure """
-    with mock.patch.object(IngestionListener, 'search_for_sample_relations', new=lambda x, y: mocked_familial_relations):
+    with mock.patch.object(IngestionListener, 'search_for_sample_relations',
+                           new=lambda x, y: mocked_familial_relations):
         listener = IngestionListener(es_testapp)
         relations = listener.extract_sample_relations('dummy')
         assert relations['sample_one']['samplegeno_role'] == 'mother'
@@ -211,7 +220,7 @@ def test_ingestion_listener_build_familial_relations(workbook, es_testapp, mocke
 
 def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testapp):
     """ Posts a minimal processed file to be checked """
-    request = DummyRequest(environ={'REMOTE_USER': 'TEST'})
+    request = DummyRequest(environ={'REMOTE_USER': 'TEST', 'HTTP_ACCEPT': 'application/json'})
     request.invoke_subrequest = es_testapp.app.invoke_subrequest
     assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION) is False
     assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True

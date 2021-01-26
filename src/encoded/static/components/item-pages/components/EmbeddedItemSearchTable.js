@@ -39,11 +39,21 @@ export function EmbeddedItemSearchTable (props){
         onClearFiltersVirtual,
         isClearFiltersBtnVisible,
         onLoad,
-        rowHeight = 90 // Keep in sync w CSS
+        rowHeight = 90, // Keep in sync w CSS
+        tableColumnClassName: propTableColumnClassName,
+        facetColumnClassName: propFacetColumnClassName
     } = props;
 
     const schemas = propSchemas || getSchemas() || null; // We might not have this e.g. in placeholders in StaticSections
     const embeddedTableHeader = propEmbeddedTableHeader || title; // Receives props from VirtualHrefController state
+
+    // Unless otherwise defined, set defaults for these classNames (for CGAP) to be `col-auto` + `col`.
+    // TODO: Move 'facets-column' and 'results-column' to always be added to these columns in SPC.
+    const facetColumnClassName = facets === null ? null
+        : propFacetColumnClassName || "facets-column col-auto";
+
+    const tableColumnClassName = facets === null ? undefined // undefined will be overriden by "col-12" or similar.
+        : propTableColumnClassName || "results-column col";
 
     const passProps = {
         facets, columns, columnExtensionMap, searchHref, session,
@@ -55,7 +65,8 @@ export function EmbeddedItemSearchTable (props){
         filterFacetFxn, hideFacets,
         filterColumnFxn, hideColumns,
         onLoad,
-        termTransformFxn: Term.toName,
+        facetColumnClassName, tableColumnClassName,
+        "termTransformFxn": Term.toName,
         "separateSingleTermFacets": false,
         "allowPostRequest": true
     };

@@ -388,7 +388,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         return (
             // TODO Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
             <div className="above-variantsample-table-ui">
-                <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected}>
+                <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
                     <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
                     <Collapse in={bodyOpen}>
                         <div className="filterset-blocks-container">
@@ -510,8 +510,8 @@ function FilterSetUIHeader(props){
     // todo if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
     return (
         <div className="row filter-set-ui-header align-items-center px-3 py-3">
-            <div className="col">{ titleBlock }</div>
-            <div className="col-auto">
+            <div className="col pl-0">{ titleBlock }</div>
+            <div className="col-auto pr-0">
                 { haveDuplicateQueries || haveDuplicateNames ?
                     <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-secondary"
                         data-tip={`Filter blocks with duplicate ${haveDuplicateQueries ? "queries" : "names"} exist below`} />

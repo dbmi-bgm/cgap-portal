@@ -330,7 +330,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             err_msg = 'Failure loading inserts from %s. Could not find matching file or directory.' % inserts
             print(err_msg)
             yield str.encode('ERROR: %s\n' % err_msg)
-            raise StopIteration
+            return
+            # raise StopIteration
         # load from the directory/file
         for a_file in files:
             if use_itype:
@@ -357,7 +358,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             err_msg += ' for item type(s) %s' % itype
         print(err_msg)
         yield str.encode('ERROR: %s' % err_msg)
-        raise StopIteration
+        return
+        # raise StopIteration
     # order Items
     all_types = list(store.keys())
     for ref_item in reversed(ORDER):
@@ -423,7 +425,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                         # remove newlines from error, since they mess with generator output
                         e_str = str(e).replace('\n', '')
                         yield str.encode('ERROR: %s\n' % e_str)
-                        raise StopIteration
+                        return
+                        # raise StopIteration
             if not post_only:
                 second_round_items[a_type] = [i for i in store[a_type] if i['uuid'] not in skip_existing_items]
             logger.info('{} 1st: {} items posted, {} items exists.'.format(a_type, posted, skip_exist))
@@ -455,7 +458,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                       a_type, str(an_item), str(e)))
                 e_str = str(e).replace('\n', '')
                 yield str.encode('ERROR: %s\n' % e_str)
-                raise StopIteration
+                return
+                # raise StopIteration
         logger.info('{}{}: {} items patched .'.format(a_type, rnd, patched))
 
     # explicit return upon finish

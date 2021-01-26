@@ -135,9 +135,13 @@ export class PedigreeTabViewBody extends React.PureComponent {
     }
 
     renderDetailPane(pedigreeVizProps){
-        const { session, href, context, schemas, PedigreeVizLibrary } = this.props;
-        const { Individual : indvSchema = null, Document: docSchema = null, Image: imageSchema = null } = schemas || {};
-        return <PedigreeDetailPane {...pedigreeVizProps} {...{ PedigreeVizLibrary, session, href, context, indvSchema, docSchema, imageSchema }} />;
+        const {
+            session, href, context, schemas,
+            PedigreeVizLibrary,
+            availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease
+        } = this.props;
+        const passedDownProps = { PedigreeVizLibrary, session, href, context, schemas, availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease };
+        return <PedigreeDetailPane {...pedigreeVizProps} {...passedDownProps} />;
     }
 
     render(){
@@ -147,7 +151,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
             windowWidth,
             windowHeight,
             containerId = "pedigree-viz-container-cgap",
-            visibleDiseases = null,
+            selectedDiseaseIdxMap = null,
             scale = 1,
             showOrderBasedName = true,
             PedigreeVizLibrary = null
@@ -201,13 +205,14 @@ export class PedigreeTabViewBody extends React.PureComponent {
          * grid states larger than 'sm' (@see FullHeightCalculator `defaultProps.skipGridStates`).
          */
         const pedigreeVizProps = {
-            visibleDiseases, showOrderBasedName,
+            showOrderBasedName,
             scale, enableMouseWheelZoom, detailPaneOpenOffsetWidth,
-            filterUnrelatedIndividuals: false,
-            renderDetailPane: this.renderDetailPane,
-            height: 600,
-            width: windowWidth,
-            minimumHeight: 400,
+            "visibleDiseaseIdxMap": selectedDiseaseIdxMap,
+            "filterUnrelatedIndividuals": false,
+            "renderDetailPane": this.renderDetailPane,
+            "height": 600,
+            "width": windowWidth,
+            "minimumHeight": 400,
             windowWidth // <- Todo - maybe remove dependence on this, supply prop instead if needed..
         };
 
@@ -215,20 +220,28 @@ export class PedigreeTabViewBody extends React.PureComponent {
             console.error("Expected `dataset` or `graphData` to be present");
         }
 
+        let body = null;
+
+        if (!PedigreeVizLibrary) {
+            body = (
+                <div className="py-3 text-center">
+                    Loading...
+                </div>
+            );
+        } else if (graphData) {
+            // If already have parsed graph data
+            body = <PedigreeVizView {...pedigreeVizProps} {...graphData} />;
+        } else if (dataset) {
+            // If letting PedigreeViz parse on the fly (this mostly for local demo/test data)
+            body = <PedigreeViz {...pedigreeVizProps} dataset={dataset} />;
+        }
+
         return (
             <div id={containerId} className={cls}>
                 <FullHeightCalculator {...{ windowWidth, windowHeight, propName, heightDiff }}>
-                    { !PedigreeVizLibrary ? "Loading..."
-                        : (graphData ?
-                            // If already have parsed graph data
-                            <PedigreeVizView {...pedigreeVizProps} {...graphData} />
-                            :
-                            // If letting PedigreeViz parse on the fly (this mostly for local demo/test data)
-                            <PedigreeViz {...pedigreeVizProps} dataset={dataset} />
-                        )}
+                    { body }
                 </FullHeightCalculator>
             </div>
         );
     }
-
 }
