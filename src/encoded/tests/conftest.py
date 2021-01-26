@@ -2,13 +2,9 @@
 
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
 """
-import os
 import logging
 import pytest
 import webtest
-import tempfile
-import time
-import subprocess
 import pkg_resources
 
 from pyramid.request import apply_request_extensions
@@ -16,8 +12,9 @@ from pyramid.testing import DummyRequest, setUp, tearDown
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
 from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
-from .. import main
+from snovault.util import generate_indexer_namespace_for_testing
 from .conftest_settings import make_app_settings_dictionary
+from .. import main
 from ..loadxl import load_all
 
 
@@ -28,12 +25,6 @@ README:
     * There are "app" based fixtures that rely only on postgres, "es_app" fixtures that 
       use both postgres and ES (for search/ES related testing)
 """
-
-
-pytest_plugins = [
-    'encoded.tests.datafixtures',
-    'snovault.tests.serverfixtures',
-]
 
 
 @pytest.fixture(autouse=True)
@@ -51,6 +42,9 @@ def app_settings(request, wsgi_server_host_port, conn, DBSession):
     return settings
 
 
+INDEXER_NAMESPACE_FOR_TESTING = generate_indexer_namespace_for_testing('cgap')
+
+
 @pytest.fixture(scope='session')
 def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server, aws_auth):
     settings = make_app_settings_dictionary()
@@ -61,7 +55,7 @@ def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_serv
     settings['collection_datastore'] = 'elasticsearch'
     settings['item_datastore'] = 'elasticsearch'
     settings['indexer'] = True
-    settings['indexer.namespace'] = os.environ.get('TRAVIS_JOB_ID', '')  # set namespace for tests
+    settings['indexer.namespace'] = INDEXER_NAMESPACE_FOR_TESTING
 
     # use aws auth to access elasticsearch
     if aws_auth:

@@ -41,13 +41,16 @@
                         "description": "Stringified JSON representing the compound filter block request made when this Variant Sample was selected"
                     },
                     "userid": {
-                        "title": "User",
+                        "title": "User ID",
                         "type": "string",
-                        "description": "User ID of person who made this selection"
+                        "description": "User ID of person who made this selection",
+                        "serverDefault": "userid",
+                        "format": "uuid"
                     },
                     "date_selected": {
                         "title": "Date Selected",
                         "type": "string",
+                        "serverDefault": "now",
                         "anyOf": [
                             {"format": "date-time"},
                             {"format": "date"}

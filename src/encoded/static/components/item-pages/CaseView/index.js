@@ -59,7 +59,7 @@ export default class CaseView extends DefaultItemView {
      *     </CurrentFamilyController>
      * }
      * function CaseViewBody (props){
-     *    const { currFamily, selectedDiseases, ... } = props;
+     *    const { currFamily, selectedDiseaseIdxMap, ... } = props;
      *    const tabs = [];
      *    tabs.push(CaseInfoTabView.getTabObject(props));
      *    // ... Case-related-logic ..
@@ -123,7 +123,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         session,
         schemas,
         graphData,
-        selectedDiseases,
+        selectedDiseaseIdxMap,
         windowWidth,
         windowHeight,
         idToGraphIdentifier,
@@ -217,7 +217,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             pedBlock = (
                 <div className="pedigree-pane-wrapper flex-fill">
                     <PedigreeVizView {...graphData} width={pedWidth} height={300} disableSelect showNotes={false}
-                        visibleDiseases={selectedDiseases} showZoomControls={false} enablePinchZoom={false} />
+                        visibleDiseaseIdxMap={selectedDiseaseIdxMap} showZoomControls={false} enablePinchZoom={false} />
                 </div>
             );
         }

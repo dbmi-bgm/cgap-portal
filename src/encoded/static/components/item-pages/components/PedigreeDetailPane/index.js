@@ -4,6 +4,7 @@ import React from 'react';
 import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
 import { IndividualBody, getIndividualDisplayTitle } from './IndividualBody';
+import { DiseasesLegend } from './DiseasesLegend';
 
 
 export class PedigreeDetailPane extends React.PureComponent {
@@ -16,20 +17,56 @@ export class PedigreeDetailPane extends React.PureComponent {
     }
 
     render(){
-        const { PedigreeVizLibrary, hoveredNode, unselectNode: onClose, indvSchema, docSchema, imageSchema, ...passProps } = this.props;
+        const {
+            unselectNode: onClose,
+            hoveredNode, // Exclude from passProps - don't need to trigger update everytime hovered node change.
+            PedigreeVizLibrary,
+            ...passProps // Includes `schemas`
+        } = this.props;
         const { isRelationshipNode = null } = PedigreeVizLibrary || {};
         const { selectedNode } = passProps;
-        const isHovered = hoveredNode === selectedNode;
+        // const isHovered = hoveredNode === selectedNode;
 
-        if (!selectedNode || !isRelationshipNode){
-            // This PedigreeDetailPane shouldn't be visible in first place if no `PedigreeVizLibrary`/`isRelationshipNode`, but 'if check' on it here for safety.
-            return null;
+        if (!selectedNode || !isRelationshipNode){ // If no isRelationshipNode func, lib hasn't loaded yet (unlikely case).
+            return <LegendBody {...passProps} />;
         } else if (isRelationshipNode(selectedNode)){
-            return <RelationshipBody {...passProps} {...{ onClose, isHovered }} />;
+            return <RelationshipBody {...passProps} {...{ onClose }} />;
         } else {
-            return <IndividualBody {...passProps} {...{ onClose, isHovered, indvSchema, docSchema, imageSchema }} />;
+            return <IndividualBody {...passProps} {...{ onClose }} />;
         }
     }
+}
+
+
+
+function LegendBody(props) {
+    const { availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease } = props;
+    let body = null;
+    if (!availableDiseases || availableDiseases.length === 0) {
+        body = (
+            <div className="detail-row text-secondary">
+                <em>No phenotypic features have yet been defined for any individuals in this pedigree.</em>
+            </div>
+        );
+    } else {
+        body = (
+            <React.Fragment>
+                <div className="detail-row small text-secondary">Toggle which features to color-code in the pedigree</div>
+                <DiseasesLegend {...{ availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease }} />
+            </React.Fragment>
+        );
+    }
+    return (
+        <div className="detail-pane-inner">
+            <div className="title-box">
+                <div className="label-row">
+                    <label>Phenotypic Features</label>
+                </div>
+                <h3>Legend</h3>
+            </div>
+            <div className="details">{ body }</div>
+        </div>
+    );
 }
 
 

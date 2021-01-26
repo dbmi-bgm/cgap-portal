@@ -4,6 +4,7 @@ import webtest
 from datetime import date
 from urllib.parse import urlencode
 from ..types.institution import Institution
+from .datafixtures import remote_user_testapp
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
@@ -152,23 +153,9 @@ def deleted_user(testapp, bwh_institution, bgm_project):
     return testapp.get(res.location).json
 
 
-# testapp fixtures acting as different users
-def remote_user_testapp(app, remote_user):
-    environ = {
-        'HTTP_ACCEPT': 'application/json',
-        'REMOTE_USER': str(remote_user),
-    }
-    return webtest.TestApp(app, environ)
-
-
 @pytest.fixture
 def admin_testapp(admin_user, app, external_tx, zsa_savepoints):
     return remote_user_testapp(app, admin_user['uuid'])
-
-
-@pytest.fixture
-def bgm_user_testapp(bgm_user, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, bgm_user['uuid'])
 
 
 @pytest.fixture
