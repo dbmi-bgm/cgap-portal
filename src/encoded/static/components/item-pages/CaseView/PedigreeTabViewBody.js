@@ -135,9 +135,13 @@ export class PedigreeTabViewBody extends React.PureComponent {
     }
 
     renderDetailPane(pedigreeVizProps){
-        const { session, href, context, schemas, PedigreeVizLibrary } = this.props;
-        const { Individual : indvSchema = null, Document: docSchema = null, Image: imageSchema = null } = schemas || {};
-        return <PedigreeDetailPane {...pedigreeVizProps} {...{ PedigreeVizLibrary, session, href, context, indvSchema, docSchema, imageSchema }} />;
+        const {
+            session, href, context, schemas,
+            PedigreeVizLibrary,
+            availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease
+        } = this.props;
+        const passedDownProps = { PedigreeVizLibrary, session, href, context, schemas, availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease };
+        return <PedigreeDetailPane {...pedigreeVizProps} {...passedDownProps} />;
     }
 
     render(){
@@ -147,7 +151,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
             windowWidth,
             windowHeight,
             containerId = "pedigree-viz-container-cgap",
-            visibleDiseases = null,
+            selectedDiseaseIdxMap = null,
             scale = 1,
             showOrderBasedName = true,
             PedigreeVizLibrary = null
@@ -201,13 +205,14 @@ export class PedigreeTabViewBody extends React.PureComponent {
          * grid states larger than 'sm' (@see FullHeightCalculator `defaultProps.skipGridStates`).
          */
         const pedigreeVizProps = {
-            visibleDiseases, showOrderBasedName,
+            showOrderBasedName,
             scale, enableMouseWheelZoom, detailPaneOpenOffsetWidth,
-            filterUnrelatedIndividuals: false,
-            renderDetailPane: this.renderDetailPane,
-            height: 600,
-            width: windowWidth,
-            minimumHeight: 400,
+            "visibleDiseaseIdxMap": selectedDiseaseIdxMap,
+            "filterUnrelatedIndividuals": false,
+            "renderDetailPane": this.renderDetailPane,
+            "height": 600,
+            "width": windowWidth,
+            "minimumHeight": 400,
             windowWidth // <- Todo - maybe remove dependence on this, supply prop instead if needed..
         };
 
