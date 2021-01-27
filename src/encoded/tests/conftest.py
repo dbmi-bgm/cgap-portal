@@ -338,8 +338,7 @@ class WorkbookCache:
         elif load_res:
             raise RuntimeError("load_all returned a true value that was not an exception.")
 
-
-        testapp.post_json('/index', {'record': True})
+        testapp.post_json('/index', {})
         return True
 
 
