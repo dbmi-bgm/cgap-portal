@@ -3,7 +3,7 @@
 
 'use strict';
 
-import React, { useMemo, useRef } from 'react';
+import React, { useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import Modal from 'react-bootstrap/esm/Modal';
@@ -580,42 +580,42 @@ export function ImpersonateUserForm({ updateUserInfo }) {
      *
      * @param {Object} data - User ID or email address.
      */
-    const onSubmit = useMemo(function(){
-        return function(e){
-            e.preventDefault();
-            const { value: userid = "" } = inputFieldRef.current;
-            if (userid.length === 0){
-                console.warn("No userid supplied", e);
-                return;
-            }
-            const url = "/impersonate-user";
-            const postData = { 'userid' : userid };
-            const callbackFxn = (resp) => {
-                //if(typeof(Storage) !== 'undefined'){ // check if localStorage supported
-                //    localStorage.setItem("user_info", JSON.stringify(payload));
-                //}
-                JWT.saveUserInfo(resp);
-                updateUserInfo();
-                let navTarget = "/";
-                const profileAction = resp.user_actions && _.find(resp.user_actions, { 'id' : 'profile' });
-                if (profileAction && profileAction.href){
-                    navTarget = profileAction.href;
-                }
-                navigate(navTarget, { 'inPlace' : true });
-                alert('Success! ' + userid + ' is being impersonated.');
-            };
-            const fallbackFxn = function() {
-                alert('Impersonation unsuccessful.\nPlease check to make sure the provided email is correct.');
-            };
-
-            //var userInfo = localStorage.getItem('user_info') || null;
-            //var idToken = userInfo ? JSON.parse(userInfo).id_token : null;
-            //var reqHeaders = {'Accept': 'application/json'};
-            //if(userInfo){
-            //    reqHeaders['Authorization'] = 'Bearer '+idToken;
+    const onSubmit = useCallback(function(e){
+        // `useCallback(fn, deps)` is equivalent to `useMemo(() => fn, deps)`
+        // See https://reactjs.org/docs/hooks-reference.html#usecallback
+        e.preventDefault();
+        const { value: userid = "" } = inputFieldRef.current;
+        if (userid.length === 0){
+            console.warn("No userid supplied", e);
+            return;
+        }
+        const url = "/impersonate-user";
+        const postData = { 'userid' : userid };
+        const callbackFxn = (resp) => {
+            //if(typeof(Storage) !== 'undefined'){ // check if localStorage supported
+            //    localStorage.setItem("user_info", JSON.stringify(payload));
             //}
-            ajax.load(url, callbackFxn, 'POST', fallbackFxn, JSON.stringify(postData));
+            JWT.saveUserInfo(resp);
+            updateUserInfo();
+            let navTarget = "/";
+            const profileAction = resp.user_actions && _.find(resp.user_actions, { 'id' : 'profile' });
+            if (profileAction && profileAction.href){
+                navTarget = profileAction.href;
+            }
+            navigate(navTarget, { 'inPlace' : true });
+            alert('Success! ' + userid + ' is being impersonated.');
         };
+        const fallbackFxn = function() {
+            alert('Impersonation unsuccessful.\nPlease check to make sure the provided email is correct.');
+        };
+
+        //var userInfo = localStorage.getItem('user_info') || null;
+        //var idToken = userInfo ? JSON.parse(userInfo).id_token : null;
+        //var reqHeaders = {'Accept': 'application/json'};
+        //if(userInfo){
+        //    reqHeaders['Authorization'] = 'Bearer '+idToken;
+        //}
+        ajax.load(url, callbackFxn, 'POST', fallbackFxn, JSON.stringify(postData));
     }, [ updateUserInfo ]);
 
     return (
