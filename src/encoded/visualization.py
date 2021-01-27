@@ -128,6 +128,15 @@ def get_higlass_viewconf(context, request):
             "viewconfig": None
         } 
 
+    # We need absolute URLs for the BAM adn GnomAD Worker
+    host_url = "http://localhost:6543"
+    if request.registry.settings.get('env.name') == CGAP_ENV_WEBPROD:
+        host_url = CGAP_PUBLIC_URL_PRD
+    elif request.registry.settings.get('env.name') == CGAP_ENV_MASTERTEST:
+        host_url = f"http://{CGAP_ENV_MASTERTEST}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
+    elif request.registry.settings.get('env.name') == CGAP_ENV_DEV:
+        host_url = f"http://{CGAP_ENV_DEV}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
+
     if requesting_tab == "annotation":
         variant_pos = request.json_body.get('variant_pos_abs', None)  
         variant_pos = variant_pos if variant_pos else 100000
@@ -146,6 +155,9 @@ def get_higlass_viewconf(context, request):
         higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
         higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
 
+        wsl = higlass_viewconfig['views'][1]['tracks']['top'][17]['options']['workerScriptLocation']
+        higlass_viewconfig['views'][1]['tracks']['top'][17]['options']['workerScriptLocation'] = host_url + wsl
+
     elif requesting_tab == "bam":
         variant_pos = request.json_body.get('variant_pos_abs', None)  
         variant_pos = variant_pos if variant_pos else 100000
@@ -153,31 +165,23 @@ def get_higlass_viewconf(context, request):
         # This should be the first file in the Higlass viewconf
         bam_sample_id = request.json_body.get('bam_sample_id', None)  
         window_size_small = 20 # window size for the interpretation space
+        window_size_large = 5000 # window size for the overview
 
         #s3_bucket = request.registry.settings.get('file_wfout_bucket')
         s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
 
-        # We need absolute URLs for the BAM Worker
-        host_url = "http://localhost:6543"
-        if request.registry.settings.get('env.name') == CGAP_ENV_WEBPROD:
-            host_url = CGAP_PUBLIC_URL_PRD
-        elif request.registry.settings.get('env.name') == CGAP_ENV_MASTERTEST:
-            host_url = f"http://{CGAP_ENV_MASTERTEST}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
-        elif request.registry.settings.get('env.name') == CGAP_ENV_DEV:
-            host_url = f"http://{CGAP_ENV_DEV}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
-
         samples_pedigree = request.json_body.get('samples_pedigree', None) 
         samples_pedigree.sort(key=lambda x: x['sample_name'] == bam_sample_id, reverse=True)
 
-        top_tracks = higlass_viewconfig['views'][0]['tracks']['top']
-        empty_track_a = deepcopy(top_tracks[2])
-        text_track = deepcopy(top_tracks[3])
-        empty_track_b = deepcopy(top_tracks[4])
-        pileup_track = deepcopy(top_tracks[5])
+        top_tracks = higlass_viewconfig['views'][1]['tracks']['top']
+        empty_track_a = deepcopy(top_tracks[6])
+        text_track = deepcopy(top_tracks[7])
+        empty_track_b = deepcopy(top_tracks[8])
+        pileup_track = deepcopy(top_tracks[9])
 
         # Delete original tracks from the insert, replace them with adjusted data
         # from the sample data. If there is no data, we only show the sequence track
-        del top_tracks[2:6] 
+        del top_tracks[6:10] 
         # print(json.dumps(top_tracks, indent=2))
 
         for sample in samples_pedigree:
@@ -204,12 +208,15 @@ def get_higlass_viewconf(context, request):
             top_tracks.append(pileup_track_sample)
 
         # Show the correct location
-        higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_small
-        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_small 
+        higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
+        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large 
+
+        higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
+        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small 
 
         # Vertical rules
-        higlass_viewconfig['views'][0]['tracks']['whole'][0]['x'] = variant_pos
-        higlass_viewconfig['views'][0]['tracks']['whole'][1]['x'] = variant_pos + 1
+        higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
+        higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
             
     return {
         "success" : True,

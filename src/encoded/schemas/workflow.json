@@ -162,7 +162,8 @@
             "type": "string",
             "enum": [
                 "CWL",
-                "WDL"
+                "WDL",
+                "WDL_DRAFT2"
             ],
             "default": "CWL"
         },
@@ -342,6 +343,11 @@
                              "description": "Name or suffix of QC table file in the zipped file",
                              "type": "string"
                         }
+                    },
+                    "qc_unzip_from_ec2": {
+                        "title": "Unzip zipped qc from ec2",
+                        "description": "Unzip the zipped qc from ec2 rather than from lambda",
+                        "type": "boolean"
                     },
                     "qc_type": {
                         "title": "QC Type",

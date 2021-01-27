@@ -20,13 +20,20 @@ INGESTED_ACCESSION = 'GAPFIZ123456'
 NA_ACCESSION = 'GAPFIZ654321'
 
 
+QUEUE_CATCH_UP_WAIT_SECONDS = 3
+
+
 def wait_for_queue_to_catch_up(queue_manager, n, initially=False):
-    """ Wait until queue has done the things we told it to do. Right now this just sleeps for 10 seconds
-        assuming most operations should complete within that amount of time.
+    """
+    Wait until queue has done the things we told it to do.
+
+    Right now this just sleeps for QUEUE_CATCH_UP_WAIT_SECONDS seconds
+    in any non-initial situation (i.e., where initially is False),
+    assuming most operations should complete within that amount of time.
     """
     ignored(queue_manager, n)
     if not initially:
-        time.sleep(3)
+        time.sleep(QUEUE_CATCH_UP_WAIT_SECONDS)
 
 
 class MockedEnv:
@@ -213,7 +220,7 @@ def test_ingestion_listener_build_familial_relations(workbook, es_testapp, mocke
 
 def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testapp):
     """ Posts a minimal processed file to be checked """
-    request = DummyRequest(environ={'REMOTE_USER': 'TEST'})
+    request = DummyRequest(environ={'REMOTE_USER': 'TEST', 'HTTP_ACCEPT': 'application/json'})
     request.invoke_subrequest = es_testapp.app.invoke_subrequest
     assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION) is False
     assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True

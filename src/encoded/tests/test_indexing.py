@@ -5,13 +5,13 @@ elasticsearch running as subprocesses.
 """
 import json
 import os
+import pkg_resources
 import pytest
 import re
 import time
 import transaction
 import uuid
 
-from pkg_resources import resource_filename
 from snovault import DBSESSION, TYPES
 from snovault.elasticsearch import create_mapping, ELASTIC_SEARCH
 from snovault.elasticsearch.create_mapping import (
@@ -20,8 +20,8 @@ from snovault.elasticsearch.create_mapping import (
     build_index_record,
     compare_against_existing_mapping
 )
-from snovault.elasticsearch.interfaces import INDEXER_QUEUE
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
+from snovault.elasticsearch.interfaces import INDEXER_QUEUE
 from sqlalchemy import MetaData, func
 from timeit import default_timer as timer
 from unittest import mock
@@ -70,6 +70,7 @@ def setup_and_teardown(app):
     Run create mapping and purge queue before tests and clear out the
     DB tables after the test
     """
+
     # BEFORE THE TEST - run create mapping for tests types and clear queues
     create_mapping.run(app, collections=TEST_COLLECTIONS, skip_indexing=True)
     app.registry[INDEXER_QUEUE].clear_queue()
@@ -163,8 +164,7 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
         assert compare_against_existing_mapping(es, namespaced_index, item_type, item_record, True)
 
 
-def test_file_processed_detailed(app, testapp, indexer_testapp, project,
-                                 institution, file_formats):
+def test_file_processed_detailed(app, testapp, indexer_testapp, project, institution, file_formats):
     # post file_processed
     item = {
         'institution': institution['uuid'],
@@ -224,8 +224,7 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, project,
     assert found_rel_sid > found_fp_sid  # sid of related file is greater
 
 
-def test_real_validation_error(app, indexer_testapp, testapp, institution,
-                               project, file_formats):
+def test_real_validation_error(app, indexer_testapp, testapp, institution, project, file_formats):
     """
     Create an item (file-processed) with a validation error and index,
     to ensure that validation errors work
@@ -241,14 +240,15 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution,
         # 'higlass_uid': 1  # validation error -- higlass_uid should be string
     }
     res = testapp.post_json('/files-processed/?validate=false&upgrade=False',
-                                  fp_body, status=201).json
+                            fp_body, status=201).json
     fp_id = res['@graph'][0]['@id']
     val_err_view = testapp.get(fp_id + '@@validation-errors', status=200).json
     assert val_err_view['@id'] == fp_id
     assert val_err_view['validation_errors'] == []
 
-    # call to /index will throw MissingIndexItemException multiple times, since
-    # associated file_format, institution, and project are not indexed. That's okay
+    # call to /index will throw MissingIndexItemException multiple times,
+    # since associated file_format, institution, and project are not indexed.
+    # That's okay if we don't detect that it succeeded, keep trying until it does
     indexer_testapp.post_json('/index', {'record': True})
     time.sleep(2)
     namespaced_fp = get_namespaced_index(app, 'file_processed')
@@ -276,7 +276,7 @@ def test_load_and_index_perf_data(testapp, indexer_testapp):
     Note: run with bin/test -s -m performance to see the prints from the test
     '''
 
-    insert_dir = resource_filename('encoded', 'tests/data/perf-testing/')
+    insert_dir = pkg_resources.resource_filename('encoded', 'tests/data/perf-testing/')
     inserts = [f for f in os.listdir(insert_dir) if os.path.isfile(os.path.join(insert_dir, f))]
     json_inserts = {}
 
