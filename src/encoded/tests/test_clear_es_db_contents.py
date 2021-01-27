@@ -6,7 +6,7 @@ from ..commands.clear_db_es_contents import (
 )
 
 
-pytestmark = [pytest.mark.setone, pytest.mark.working]
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.indexing]
 
 
 def test_clear_db_tables(app, testapp):
