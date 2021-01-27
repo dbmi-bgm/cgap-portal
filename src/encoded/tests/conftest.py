@@ -81,10 +81,12 @@ def pytest_configure():
     logging.getLogger('sqlalchemy.engine.base.Engine').addFilter(Shorten())
 
 
-@pytest.yield_fixture
-def config():
-    yield setUp()
-    tearDown()
+# Removed as a hunch that it's not even used. -kmp 26-Jan-2021
+#
+# @pytest.yield_fixture
+# def config():
+#     yield setUp()
+#     tearDown()
 
 
 @pytest.yield_fixture
@@ -327,12 +329,17 @@ class WorkbookCache:
         }
         testapp = webtest.TestApp(es_app, environ)
 
-        # just load the workbook inserts
+        # Just load the workbook inserts
+        # Note that load_all returns None for success or an Exception on failure.
         load_res = load_all(testapp, pkg_resources.resource_filename('encoded', 'tests/data/workbook-inserts/'), [])
-        if load_res:
-            raise (load_res)
 
-        testapp.post_json('/index', {})
+        if isinstance(load_res, Exception):
+            raise load_res
+        elif load_res:
+            raise RuntimeError("load_all returned a true value that was not an exception.")
+
+
+        testapp.post_json('/index', {'record': True})
         return True
 
 
