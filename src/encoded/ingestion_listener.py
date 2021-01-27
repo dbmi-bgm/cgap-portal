@@ -243,7 +243,7 @@ def ingestion_status(context, request):
     }
 
 
-def verify_vcf_file_status_is_not_ingested(request, uuid):
+def verify_vcf_file_status_is_not_ingested(request, uuid, *, expected=True):
     """ Verifies the given VCF file has not already been ingested by checking
         'file_ingestion_status'
     """
@@ -258,9 +258,10 @@ def verify_vcf_file_status_is_not_ingested(request, uuid):
         subreq = Request.blank(resp.location, **kwargs)
         resp = request.invoke_subrequest(subreq, use_tweens=True)
     log.error('VCF File Meta: %s' % resp.json)
-    if resp.json.get('file_ingestion_status', None) == STATUS_INGESTED:
-        return False
-    return True
+    verified = bool(expected) is (resp.json.get('file_ingestion_status', None) != STATUS_INGESTED)
+    # if not verified:
+    #     import pdb; pdb.set_trace()
+    return verified
 
 
 def patch_vcf_file_status(request, uuids):
