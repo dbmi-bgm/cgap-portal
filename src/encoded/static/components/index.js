@@ -46,8 +46,6 @@ content_views.register(DirectoryPage,           'DirectoryPage');
 content_views.register(HomePage,                'HomePage');
 content_views.register(ReleaseUpdates,          'Release-updatesPage');
 
-content_views.register(ExcelSubmissionView,     'Submissions');
-
 content_views.register(DefaultItemView,         'Item');
 content_views.register(CaseView,                'Case');
 content_views.register(VariantSampleView,       'VariantSample');
@@ -66,6 +64,7 @@ content_views.register(CGAPSubmissionView,      'Item', 'create');
 content_views.register(CGAPSubmissionView,      'Item', 'clone');
 content_views.register(CGAPSubmissionView,      'Search', 'add');
 content_views.register(CaseSubmissionView,      'CaseSearchResults', 'add');
+content_views.register(ExcelSubmissionView,     'IngestionSubmissionSearchResults', 'add');
 
 content_views.register(SearchView,              'Search');
 content_views.register(SearchView,              'Search', 'selection');

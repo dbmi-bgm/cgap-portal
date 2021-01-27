@@ -1,9 +1,8 @@
 /** Stylesheet for Case Submission View/Wizard **/
 
-body[data-current-action="add"],
-body[data-path="/submissions"] {
+body[data-current-action="add"] {
 
-    .case-submission-view {
+    .ingestion-submission-view {
 
 
         /** Menu to select step **/
