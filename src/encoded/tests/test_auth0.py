@@ -57,17 +57,17 @@ def auth0_access_token_no_email():
     return data['id_token']
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def auth0_4dn_user_token(auth0_access_token):
     return {'id_token': auth0_access_token}
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def auth0_4dn_user_profile():
     return {'email': '4dndcic@gmail.com'}
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def headers(auth0_access_token):
     return {
         'Accept': 'application/json',
@@ -76,7 +76,7 @@ def headers(auth0_access_token):
     }
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def fake_request(headers):
 
     class FakeRequest(object):
