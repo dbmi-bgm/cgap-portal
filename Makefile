@@ -127,7 +127,7 @@ clean-python:
 	pip freeze | xargs pip uninstall -y
 
 test:
-	poetry run pytest -vv --timeout=200 -m "working and not indexing" && pytest -vv --timeout=200 -m "working and indexing"
+	poetry run python -m pytest -vv --timeout=200 -m "working and not indexing" && poetry run python -m pytest -vv --timeout=200 -m "working and indexing"
 
 retest:
 	poetry run pytest -vv --last-failed
