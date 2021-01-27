@@ -67,9 +67,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
         }
         this.setState(function({ panelsComplete: pastPanelsComplete }){
             let panelsComplete;
-            if (pastPanelsComplete[0] === true){
-                panelsComplete = pastPanelsComplete; // Don't change reference.
-            } else {
+            if (pastPanelsComplete[0] !== true){ // ensure step is completed, move to next
                 panelsComplete = pastPanelsComplete.slice(0);
                 panelsComplete[0] = true;
             }
@@ -159,15 +157,15 @@ function PanelSelectionMenu(props){
     const { onSelect, panelIdx, panelsComplete, submissionItem } = props;
     const steps = [
         "Basic Information",
-        "Upload Submission",
+        "Upload Files",
         "Finalize and View"
     ];
 
     const renderedItems = steps.map(function(stepTitle, stepIdx){
         const stepNum = stepIdx + 1;
         const active = panelIdx === stepIdx;
-        const disabled = stepIdx !== 0 && !submissionItem; // Becomes undisabled after first panel completed.
         const completed = panelsComplete[stepIdx];
+        const disabled = !active && !completed; // Hard sequence... cannot go back to previous steps
         const cls = (
             "panel-menu-item" +
             (active? " active" : "") +
@@ -175,7 +173,7 @@ function PanelSelectionMenu(props){
             (completed? " completed" : "")
         );
         return (
-            <div data-for-panel={stepNum} onClick={!disabled && onSelect} key={stepNum} className={cls}>
+            <div data-for-panel={stepNum} onClick={!disabled && !completed && onSelect} key={stepNum} className={cls}>
                 <div className="row">
                     <div className="col-auto number-indicator">
                         <span>{ stepNum }</span>
@@ -297,9 +295,7 @@ class PanelOne extends React.PureComponent {
         if (submissionItem){
             const { institutionID, projectID, submissionTitle: title } = this.state;
             const valuesDiffer = this.memoized.checkIfChanged(submissionItem, title, institutionID, projectID);
-            if (valuesDiffer && panelsComplete[0] === true){
-                markCompleted(0, false);
-            } else if (!valuesDiffer && panelIdx === 0 && panelsComplete[0] === false) {
+            if (!valuesDiffer && panelIdx === 0 && panelsComplete[0] === false) {
                 // We already completed POST; once submission present, mark this complete also.
                 markCompleted(0, true);
             }
