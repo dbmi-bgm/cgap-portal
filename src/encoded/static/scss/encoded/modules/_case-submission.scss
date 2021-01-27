@@ -1,6 +1,7 @@
 /** Stylesheet for Case Submission View/Wizard **/
 
-body[data-current-action="add"] {
+body[data-current-action="add"],
+body[data-path="/submissions"] {
 
     .case-submission-view {
 
