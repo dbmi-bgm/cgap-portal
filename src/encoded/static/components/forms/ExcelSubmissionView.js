@@ -6,6 +6,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
 
+import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
@@ -238,9 +239,12 @@ class PanelOne extends React.PureComponent {
         this.handleSelectInstitution = this.handleSelectInstitution.bind(this);
         this.handleSelectProject = this.handleSelectProject.bind(this);
         this.handleCreate = this.handleCreate.bind(this);
+        this.handleSelectIngestionType = this.handleSelectIngestionType.bind(this);
+
         this.state = {
             selectingField: null,
             submissionTitle: "",
+            ingestionType: null,
             error: null,
             isCreating: false,
             ...PanelOne.flatFieldsFromUser(props.user)
@@ -319,6 +323,13 @@ class PanelOne extends React.PureComponent {
         this.setState({ submissionTitle: e.target.value });
     }
 
+    handleSelectIngestionType(eventKey) {
+        const { ingestionType } = this.state;
+        if (eventKey !== ingestionType) {
+            this.setState({ ingestionType: eventKey });
+        }
+    }
+
     handleSelectInstitution(institutionJSON, institutionID){
         const { display_title: institutionTitle = null } = institutionJSON;
         this.setState({ institutionID, institutionTitle });
@@ -335,13 +346,14 @@ class PanelOne extends React.PureComponent {
             submissionTitle: title,
             institutionID: institution,
             projectID: project,
+            ingestionType,
             isCreating = false
         } = this.state;
 
         e.preventDefault();
         e.stopPropagation();
 
-        if (isCreating || !institution || !project || !title) return false;
+        if (isCreating || !institution || !project || !title || !ingestionType) return false;
 
         const cb = (res) => {
             this.setState({ isCreating: false });
@@ -383,7 +395,7 @@ class PanelOne extends React.PureComponent {
             });
         };
 
-        const postData = { submission_id: title, institution, project };
+        const postData = { submission_id: title, institution, project, ingestion_type: ingestionType };
 
         this.setState({ isCreating: true }, ()=>{
             this.request = ajax.load(
@@ -403,6 +415,7 @@ class PanelOne extends React.PureComponent {
             institutionID, institutionTitle,
             projectID, projectTitle,
             submissionTitle,
+            ingestionType,
             isCreating = false
         } = this.state;
 
@@ -430,6 +443,18 @@ class PanelOne extends React.PureComponent {
                     type="Institution" selectedID={institutionID} selectedTitle={institutionTitle} searchAsYouType/>
                 <LinkToFieldSection onSelect={this.handleSelectProject} title="Project"
                     type="Project" selectedID={projectID} selectedTitle={projectTitle} searchAsYouType />
+                <label className="field-section mt-2 d-block">
+                    <span className="d-block mb-05">Ingestion Type</span>
+                    <DropdownButton
+                        variant="primary text-600"
+                        title={ingestionType || "None Selected"}
+                        id="ingestion-type"
+                    >
+                        <Dropdown.Item eventKey="metadata_bundle" onSelect={this.handleSelectIngestionType}>Metadata Bundle</Dropdown.Item>
+                        <Dropdown.Item eventKey="vcf" onSelect={this.handleSelectIngestionType}>VCF</Dropdown.Item>
+                        {/* <Dropdown.Item eventKey="Gene List" onSelect={this.handleSelectIngestionType}>Gene List</Dropdown.Item> */}
+                    </DropdownButton>
+                </label>
                 <label className="field-section mt-2 d-block">
                     <span className="d-block mb-05">IngestionSubmission Title</span>
                     <input type="text" value={submissionTitle} onChange={this.handleChangeIngestionSubmissionTitle}
