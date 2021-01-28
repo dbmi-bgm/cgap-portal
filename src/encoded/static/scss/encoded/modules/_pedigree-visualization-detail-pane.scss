@@ -34,7 +34,7 @@ div#pedigree-viz-container-cgap {
             > .detail-pane-container {
                 background-color: $pedigree-viz-bg-color;
                 @include transition(flex .3s ease-in-out, width .3s ease-in-out, background-color .2s);
-                &.has-selected-node {
+                &[data-is-open="true"] {
                     background-color: #fff;
                     border-left-color: darken($pedigree-viz-bg-color, 10%) !important;
                 }
