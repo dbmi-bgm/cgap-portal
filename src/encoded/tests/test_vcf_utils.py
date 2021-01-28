@@ -170,7 +170,7 @@ class TestIngestVCF:
 
 
 # integrated test, so outside of class
-@pytest.mark.skip  # Comment this out and run directly to test the first 5 variants and variant samples validation
+#@pytest.mark.skip  # Comment this out and run directly to test the first 5 variants and variant samples validation
 def test_post_variants_and_samples_with_links(workbook, es_testapp, test_vcf):
     """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
         NOTE: This is the most important test functionally speaking.

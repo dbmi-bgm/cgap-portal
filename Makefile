@@ -105,7 +105,7 @@ deploy2:  # spins up waittress to serve the application
 	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini
 
 deploy3:  # Uploads genes, consequences then ingests the VCF below
-	poetry run ingest-vcf src/encoded/annotations/GAPFIRMV7N2U_format.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
+	poetry run ingest-vcf src/encoded/annotations/GAPFIAI7IZ9Y.reformat.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
 
 psql-dev:  # starts psql with the url after 'sqlalchemy.url =' in development.ini
 	@psql `grep 'sqlalchemy[.]url =' development.ini | sed -E 's/^.* = (.*)/\1/'`

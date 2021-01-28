@@ -1,5 +1,4 @@
 import pytest
-import json
 from ..util import resolve_file_path
 from ..ingestion.gene_utils import GeneIngestion
 
