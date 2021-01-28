@@ -21,8 +21,6 @@ import { PageTitleContainer, OnlyTitle, TitleAndSubtitleUnder, pageTitleViews } 
 import { Schemas } from '../util';
 
 
-// NOT CURRENTLY USED, MAY BE REINTRODUCED IN FUTURE
-
 
 export default class ExcelSubmissionView extends React.PureComponent {
 
@@ -221,6 +219,7 @@ class PanelOne extends React.PureComponent {
         return initState;
     }
 
+    // TODO: Delete probably -- hard sequence from step 1 -> 2 -> 3... no more going back and updating
     static checkIfChanged(submissionItem, title, institutionID, projectID){
         const {
             institution: { '@id' : submissionInstitutionID = null } = {},
@@ -242,7 +241,7 @@ class PanelOne extends React.PureComponent {
         this.state = {
             selectingField: null,
             submissionTitle: "",
-            ingestionType: null,
+            ingestionType: "metadata_bundle",
             error: null,
             isCreating: false,
             ...PanelOne.flatFieldsFromUser(props.user)
@@ -349,7 +348,7 @@ class PanelOne extends React.PureComponent {
         e.preventDefault();
         e.stopPropagation();
 
-        if (isCreating || !institution || !project || !title || !ingestionType) return false;
+        if (isCreating || !institution || !project || !ingestionType) return false;
 
         const cb = (res) => {
             this.setState({ isCreating: false });
@@ -391,7 +390,8 @@ class PanelOne extends React.PureComponent {
             });
         };
 
-        const postData = { submission_id: title, institution, project, ingestion_type: ingestionType, processing_status: { state: "created" } };
+        const postData = { institution, project, ingestion_type: ingestionType, processing_status: { state: "created" } };
+        if (title) { postData["display_title"] = title; }
 
         this.setState({ isCreating: true }, ()=>{
             this.request = ajax.load(
@@ -429,30 +429,34 @@ class PanelOne extends React.PureComponent {
         }
 
         const valuesChanged = !submissionItem || this.memoized.checkIfChanged(submissionItem, submissionTitle, institutionID, projectID);
-        const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID || !submissionTitle);
+        const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID || !ingestionType);
 
         return (
             <form className={"panel-form-container d-block" + (isCreating ? " is-creating" : "")} onSubmit={this.handleCreate}>
-                <h4 className="text-300 mt-2">Required Fields</h4>
-
-                <LinkToFieldSection onSelect={this.handleSelectInstitution} title="Institution"
+                <h4 className="text-300 mt-2">Required Fields = <span className="text-danger">*</span></h4>
+                {/** Maybe replace with SAYTAJAX? */}
+                <LinkToFieldSection onSelect={this.handleSelectInstitution} title="Institution" required
                     type="Institution" selectedID={institutionID} selectedTitle={institutionTitle} searchAsYouType/>
-                <LinkToFieldSection onSelect={this.handleSelectProject} title="Project"
+                <LinkToFieldSection onSelect={this.handleSelectProject} title="Project" required
                     type="Project" selectedID={projectID} selectedTitle={projectTitle} searchAsYouType />
+                <div className="field-section linkto-section mt-2 d-block">
+                    <label className="d-block mb-05">Ingestion Type <span className="text-danger">*</span></label>
+                    <div className="row">
+                        <div className="col-auto">
+                            <DropdownButton
+                                variant="primary text-600 text-capitalize"
+                                title={ingestionType.split("_").join(" ")}
+                                id="ingestion-type"
+                            >
+                                <Dropdown.Item eventKey="metadata_bundle" onSelect={this.handleSelectIngestionType}>Metadata Bundle</Dropdown.Item>
+                                <Dropdown.Item eventKey="vcf" onSelect={this.handleSelectIngestionType}>VCF</Dropdown.Item>
+                                {/* TODO: May need to switch back to Accessioning, Family History, Gene List */}
+                            </DropdownButton>
+                        </div>
+                    </div>
+                </div>
                 <label className="field-section mt-2 d-block">
-                    <span className="d-block mb-05">Ingestion Type</span>
-                    <DropdownButton
-                        variant="primary text-600"
-                        title={ingestionType || "None Selected"}
-                        id="ingestion-type"
-                    >
-                        <Dropdown.Item eventKey="metadata_bundle" onSelect={this.handleSelectIngestionType}>Metadata Bundle</Dropdown.Item>
-                        <Dropdown.Item eventKey="vcf" onSelect={this.handleSelectIngestionType}>VCF</Dropdown.Item>
-                        {/* <Dropdown.Item eventKey="Gene List" onSelect={this.handleSelectIngestionType}>Gene List</Dropdown.Item> */}
-                    </DropdownButton>
-                </label>
-                <label className="field-section mt-2 d-block">
-                    <span className="d-block mb-05">IngestionSubmission Title</span>
+                    <span className="d-block mb-05">Display Title</span>
                     <input type="text" value={submissionTitle} onChange={this.handleChangeIngestionSubmissionTitle}
                         className="form-control d-block" ref={this.submissionTitleInputRef}/>
                 </label>
@@ -818,7 +822,7 @@ class PanelThree extends React.PureComponent {
 
 
 const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
-    const { title, type, onSelect, selectedID, selectedTitle, variant = "primary", searchAsYouType } = props;
+    const { title, type, onSelect, selectedID, selectedTitle, variant = "primary", required, searchAsYouType } = props;
 
     let showTitle;
     if (selectedTitle && selectedID){
@@ -831,7 +835,7 @@ const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
 
     return (
         <div className="field-section linkto-section mt-2 d-block">
-            <label className="d-block mb-05">{ title }</label>
+            <label className="d-block mb-05">{ title } {required ? <span className="text-danger">*</span>: null}</label>
             <div className="row">
                 <div className="col-auto">
                     <LinkToDropdown {...{ onSelect, selectedID, variant, searchAsYouType }} searchURL={"/search/?type=" + type} selectedTitle={showTitle} />
