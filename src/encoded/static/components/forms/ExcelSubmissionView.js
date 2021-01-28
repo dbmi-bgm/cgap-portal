@@ -15,7 +15,7 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 import { LinkToDropdown } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/LinkToDropdown';
 import { AliasInputFieldValidated } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/submission-fields';
 
-import { AttachmentInputController } from '../item-pages/CaseView/attachment-input';
+import { AttachmentInputController } from './attachment-input';
 
 import { PageTitleContainer, OnlyTitle, TitleAndSubtitleUnder, pageTitleViews } from '../PageTitleSection';
 import { Schemas } from '../util';
@@ -391,7 +391,7 @@ class PanelOne extends React.PureComponent {
             });
         };
 
-        const postData = { submission_id: title, institution, project, ingestion_type: ingestionType };
+        const postData = { submission_id: title, institution, project, ingestion_type: ingestionType, processing_status: { state: "created" } };
 
         this.setState({ isCreating: true }, ()=>{
             this.request = ajax.load(
@@ -562,43 +562,23 @@ class PanelTwo extends React.PureComponent {
             return null;
         }
 
-        const {
-            '@id' : submissionID,
-            families = []
-        } = submissionItem || {};
-
-        const familiesLen = families.length;
-        const familiesInfo = families.map(function(fam, idx){
-            const {
-                members = [],
-                original_pedigree: { '@id' : pedID, display_title: pedTitle } = {}
-            } = fam;
-            return (
-                <div className="family-info mt-1" key={idx}>
-                    <h5 className="mb-0 text-600">Family { idx + 1 }</h5>
-                    <div className="">&bull; { members.length } members</div>
-                    { pedID && pedTitle ?
-                        <div className="">&bull; Document - <a href={pedID} target="_blank" rel="noopener noreferrer">{ pedTitle }</a></div>
-                        : null }
-                </div>
-            );
-        });
-
         return (
             <div className="panel-form-container">
                 <h4 className="text-300 mt-2">
-                    { familiesLen } { familiesLen === 1 ? "Family" : "Families" } in IngestionSubmission
+                    Attach a file to this IngestionSubmission
                 </h4>
-                { familiesInfo }
+                <div className="mt-1">
+                    Click <a href="https://hms-dbmi.atlassian.net/browse/C4-505" target="_blank" rel="noreferrer">here</a> for more on how to format your document.
+                </div>
                 <hr className="mb-1"/>
                 <div className="field-section mt-2">
                     <label className="d-block mb-05">
-                        Add Family
+                        Submit Data
                         <i className="icon icon-info-circle fas icon-fw ml-05"
                             data-tip="Select & upload files generated in Proband and other pedigree software" />
                     </label>
                     <AttachmentInputController href={href} context={submissionItem} onAddedFamily={this.onAddedFamily}>
-                        <PedigreeAttachmentBtn/>
+                        <FileAttachmentBtn/>
                     </AttachmentInputController>
                 </div>
             </div>
@@ -607,15 +587,16 @@ class PanelTwo extends React.PureComponent {
 
 }
 
-function PedigreeAttachmentBtn(props){
-    const { loadingPedigreeResult, onFileInputChange } = props;
-    const icon = loadingPedigreeResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
+function FileAttachmentBtn(props){
+    const { loadingFileResult, onFileInputChange } = props;
+    const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
     return (
-        <label htmlFor="test_pedigree" disabled={loadingPedigreeResult}
-            className={"btn btn-primary clickable" + (loadingPedigreeResult ? " disabled" : "")}>
-            <input id="test_pedigree" type="file" onChange={!loadingPedigreeResult && onFileInputChange} className="d-none" accept="*/*" />
+        <label htmlFor="test_file" disabled={loadingFileResult}
+            className={"btn btn-primary clickable" + (loadingFileResult ? " disabled" : "")}>
+            <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange} className="d-none"
+                accept=".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
             <i className={"mr-08 icon icon-fw icon-" + icon}/>
-            <span>Select Pedigree File...</span>
+            <span>Select Excel File...</span>
         </label>
     );
 }
