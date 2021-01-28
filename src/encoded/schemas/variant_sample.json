@@ -640,7 +640,7 @@
             "grouping": "Position"
         },
         "variant.csq_cadd_phred": {
-            "title": "CADD",
+            "title": "CADD Phred score",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 23,

@@ -148,8 +148,47 @@
             "type": "string",
             "uniqueKey": true
         },
+        "csq_Polyphen2_hvar_pred": {
+            "title": "PolyPhen 2 prediction",
+            "field_name": "csq_Polyphen2_hvar_pred",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "csq_Polyphen2_hvar_pred",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "PolyPhen 2 prediction",
+            "scope": "variant",
+            "schema_title": "PolyPhen 2 prediction"
+        },
+        "csq_Polyphen2_hvar_rankscore": {
+            "title": "PolyPhen 2 rankscore",
+            "field_name": "csq_Polyphen2_hvar_rankscore",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_Polyphen2_hvar_rankscore",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "PolyPhen 2 rankscore",
+            "scope": "variant",
+            "schema_title": "PolyPhen 2 rankscore"
+        },
+        "csq_Polyphen2_hvar_score": {
+            "title": "PolyPhen 2 score",
+            "field_name": "csq_Polyphen2_hvar_score",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_Polyphen2_hvar_score",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "PolyPhen 2 score",
+            "scope": "variant",
+            "schema_title": "PolyPhen 2 score"
+        },
         "csq_cadd_phred": {
-            "title": "CADD",
+            "title": "CADD Phred score",
             "field_name": "csq_cadd_phred",
             "type": "number",
             "do_import": true,
@@ -159,8 +198,21 @@
             "annotation_category": "Effect Predictors",
             "description": "CADD Phred score",
             "scope": "variant",
-            "schema_title": "CADD",
+            "schema_title": "CADD Phred score",
             "facet_order": 23
+        },
+        "csq_cadd_raw_rankscore": {
+            "title": "CADD rankscore",
+            "field_name": "csq_cadd_raw_rankscore",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_cadd_raw_rankscore",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "CADD rankscore",
+            "scope": "variant",
+            "schema_title": "CADD rankscore"
         },
         "csq_clinvar": {
             "title": "Clinvar ID",
@@ -389,7 +441,7 @@
             "scope": "variant"
         },
         "csq_gerp_rs": {
-            "title": "Gerp++",
+            "title": "Gerp++ score",
             "field_name": "csq_gerp_rs",
             "type": "number",
             "do_import": true,
@@ -399,7 +451,20 @@
             "annotation_category": "Effect Predictors",
             "description": "GERP score",
             "scope": "variant",
-            "schema_title": "Gerp++"
+            "schema_title": "Gerp++ score"
+        },
+        "csq_gerp_rs_rankscore": {
+            "title": "Gerp++ rankscore",
+            "field_name": "csq_gerp_rs_rankscore",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_gerp++_rs_rankscore",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "GERP rankscore",
+            "scope": "variant",
+            "schema_title": "Gerp++ rankscore"
         },
         "csq_gnomadg_ac": {
             "title": "GnomAD Alt Allele Count",
@@ -1210,6 +1275,19 @@
             "min": -20,
             "max": 10
         },
+        "csq_phylop100way_vertebrate_rankscore": {
+            "title": "PhyloP (100 Vertebrates) rankscore",
+            "field_name": "csq_phylop100way_vertebrate_rankscore",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_phylop100way_vertebrate_rankscore",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "PhyloP 100 way rankscore",
+            "scope": "variant",
+            "schema_title": "PhyloP (100 Vertebrates) rankscore"
+        },
         "csq_phylop30way_mammalian": {
             "title": "PhyloP (30 Mammals)",
             "field_name": "csq_phylop30way_mammalian",
@@ -1223,8 +1301,34 @@
             "scope": "variant",
             "schema_title": "PhyloP (30 Mammals)"
         },
+        "csq_primateai_pred": {
+            "title": "PrimateAI prediction",
+            "field_name": "csq_primateai_pred",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "csq_primateai_pred",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "PrimateAI prediction",
+            "scope": "variant",
+            "schema_title": "PrimateAI prediction"
+        },
+        "csq_primateai_rankscore": {
+            "title": "PrimateAI rankscore",
+            "field_name": "csq_primateai_rankscore",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_primateai_rankscore",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "PrimateAI rankscore",
+            "scope": "variant",
+            "schema_title": "PrimateAI rankscore"
+        },
         "csq_primateai_score": {
-            "title": "PrimateAI (DL score)",
+            "title": "PrimateAI score",
             "field_name": "csq_primateai_score",
             "type": "number",
             "do_import": true,
@@ -1234,7 +1338,7 @@
             "annotation_category": "Effect Predictors",
             "description": "PrimateAI score",
             "scope": "variant",
-            "schema_title": "PrimateAI (DL score)"
+            "schema_title": "PrimateAI score"
         },
         "csq_rs_dbsnp151": {
             "title": "dbSNP ID",
@@ -1249,6 +1353,45 @@
             "scope": "variant",
             "schema_title": "dbSNP ID",
             "column_order": 11
+        },
+        "csq_sift_converted_rankscore": {
+            "title": "SIFT rankscore",
+            "field_name": "csq_sift_converted_rankscore",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_sift_converted_rankscore",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "SIFT rankscore",
+            "scope": "variant",
+            "schema_title": "SIFT rankscore"
+        },
+        "csq_sift_pred": {
+            "title": "SIFT prediction",
+            "field_name": "csq_sift_pred",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "csq_sift_pred",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "SIFT prediction",
+            "scope": "variant",
+            "schema_title": "SIFT prediction"
+        },
+        "csq_sift_score": {
+            "title": "SIFT score",
+            "field_name": "csq_sift_score",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_sift_score",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "annotation_category": "Effect Predictors",
+            "description": "SIFT score",
+            "scope": "variant",
+            "schema_title": "SIFT score"
         },
         "csq_siphy_29way_logodds": {
             "title": "SiPhy (Omega)",
@@ -1416,7 +1559,7 @@
                         "do_import": true,
                         "vcf_field": "genes_most_severe_gene",
                         "source_name": "GENES",
-                        "source_version": "v99",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Gene",
                         "scope": "variant",
@@ -1430,7 +1573,7 @@
                         "do_import": true,
                         "vcf_field": "genes_most_severe_transcript",
                         "source_name": "GENES",
-                        "source_version": "v99",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Gene",
                         "scope": "variant",
@@ -1444,7 +1587,7 @@
                         "do_import": true,
                         "vcf_field": "genes_most_severe_feature_ncbi",
                         "source_name": "GENES",
-                        "source_version": "v99",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "scope": "variant"
                     },
@@ -1455,7 +1598,7 @@
                         "do_import": true,
                         "vcf_field": "genes_most_severe_hgvsc",
                         "source_name": "GENES",
-                        "source_version": "v99",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Gene",
                         "scope": "variant",
@@ -1469,7 +1612,7 @@
                         "do_import": true,
                         "vcf_field": "genes_most_severe_hgvsp",
                         "source_name": "GENES",
-                        "source_version": "v99",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Gene",
                         "scope": "variant",
@@ -1483,7 +1626,7 @@
                         "do_import": true,
                         "vcf_field": "genes_most_severe_amino_acids",
                         "source_name": "GENES",
-                        "source_version": "v99",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "scope": "variant"
                     },
@@ -1494,7 +1637,7 @@
                         "do_import": true,
                         "vcf_field": "genes_most_severe_sift_score",
                         "source_name": "GENES",
-                        "source_version": "v99",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Effect Predictors",
                         "scope": "variant",
@@ -1508,7 +1651,7 @@
                         "do_import": true,
                         "vcf_field": "genes_most_severe_polyphen_score",
                         "source_name": "GENES",
-                        "source_version": "v99",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Effect Predictors",
                         "scope": "variant",
@@ -1522,7 +1665,7 @@
                         "do_import": true,
                         "vcf_field": "genes_most_severe_maxentscan_diff",
                         "source_name": "GENES",
-                        "source_version": "v99",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Effect Predictors",
                         "scope": "variant",
@@ -1537,7 +1680,7 @@
                         "do_import": true,
                         "vcf_field": "genes_most_severe_consequence",
                         "source_name": "GENES",
-                        "source_version": "v99",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "scope": "variant"
                     }
@@ -1828,6 +1971,8 @@
                         "type": "boolean",
                         "do_import": true,
                         "vcf_field": "csq_most_severe",
+                        "source_name": "VEP",
+                        "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
                         "description": "Indicates if transcript is most severe for this gene",
                         "scope": "variant",
@@ -1901,34 +2046,6 @@
                         "description": "UniParc accession",
                         "scope": "variant",
                         "schema_title": "Protein ID (UniParc)"
-                    },
-                    "csq_sift": {
-                        "title": "SIFT score",
-                        "field_name": "csq_sift",
-                        "type": "number",
-                        "do_import": true,
-                        "vcf_field": "csq_sift",
-                        "source_name": "VEP",
-                        "source_version": "v101",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Effect Predictors",
-                        "description": "SIFT score",
-                        "scope": "variant",
-                        "schema_title": "SIFT score"
-                    },
-                    "csq_polyphen": {
-                        "title": "PolyPhen score",
-                        "field_name": "csq_polyphen",
-                        "type": "number",
-                        "do_import": true,
-                        "vcf_field": "csq_polyphen",
-                        "source_name": "VEP",
-                        "source_version": "v101",
-                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Effect Predictors",
-                        "description": "PolyPhen score",
-                        "scope": "variant",
-                        "schema_title": "PolyPhen score"
                     },
                     "csq_domains": {
                         "title": "csq_domains",
@@ -2044,7 +2161,8 @@
             ],
             "do_import": true,
             "vcf_field": "variantClass",
-            "source_version": "v0.4",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2",
             "annotation_category": "Variant Type",
             "description": "Variant type (SNV, INS, DEL)",
             "scope": "variant",
@@ -2066,7 +2184,7 @@
             "grouping": "Position"
         },
         "csq_cadd_phred": {
-            "title": "CADD",
+            "title": "CADD Phred score",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 23,

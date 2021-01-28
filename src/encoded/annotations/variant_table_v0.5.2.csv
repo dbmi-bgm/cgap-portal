@@ -1,5 +1,5 @@
-,#FILEFORMAT=annV0.5.1,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,#FILEDATE=01.20.2021,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,#FILEFORMAT=annV0.5.2,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,#FILEDATE=01.25.2021,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,source_version,description,field_type,sub_embedding_group,is_list,annotation_category,facet_order,facet_default_hidden,column_order,priority,source,pattern,default,min,max,enum_list,links_to,embedded_field,calculated_property,link,comments,annotation_space_location
 1,CHROM,CHROM,Chromosome,Y,1;2;3;4;5;6;22;X;Y;M,variant,VCF,VCFv4.2,Chromosome,string,,N,Position,1,,,5,VCF,,,,,"1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,M",,,,,,Position
 2,POS,POS,Position,Y,949608,variant,VCF,VCFv4.2,Position,integer,,N,Position,2,,,5,VCF,,,0,,,,,,,,Position - maybe later
@@ -26,16 +26,16 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 23,samplegeno_ad,samplegeno_ad,Sample Genotype (Allele Depth),Y,21/10,sample_variant,SAMPLEGENO,v0.4,Allelic depth,string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,Genotype,,,,5,manual,,,,,,,,,,,Coverage (Relation and Call are coming soon)
 24,samplegeno_sampleid,samplegeno_sampleid,Sample Genotype (Sample ID),Y,,sample_variant,SAMPLEGENO,v0.4,Sample ID,string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,Genotype,,,,5,manual,,,,,,,,,,,Coverage
 25,csq_clinvar_clnhgvs,csq_clinvar_clnhgvs,Variant,Y,NC_000001.11:g.1014228G>A,variant,ClinVar,v20201101,HGVS genome sequence name,string,,N,Position,,,,3,manual,,,,,,,,,,available only for clinvar,Position
-26,variantClass,variantClass,Variant Type,Y,,variant,,v0.4,"Variant type (SNV, INS, DEL)",string,,N,Variant Type,4,,,3,manual,,,,,"SNV,INS,DEL,MNV",,,,,,
+26,variantClass,variantClass,Variant Type,Y,,variant,VCF,VCFv4.2,"Variant type (SNV, INS, DEL)",string,,N,Variant Type,4,,,3,manual,,,,,"SNV,INS,DEL,MNV",,,,,,
 27,csq_hg19_chr,csq_hg19_chr,Chromosome (hg19),Y,1,variant,dbNSFP,v4.1a,hg19 coordinate chromosome,string,,N,Position,,,,3,manual,,,,,,,,,,available only for nonsynonymous variants,Position
 28,csq_hg19_pos,csq_hg19_pos(1-based),Position (hg19),Y,69511,variant,dbNSFP,v4.1a,hg19 coordinate position,integer,,N,Position,,,,3,manual,,,,,,,,,,available only for nonsynonymous variants,Position - maybe later
 29,csq_consequence,csq_consequence,,Y,intron_variant&non_coding_transcript_variant,variant,VEP,v101,Consequence type,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",Y,Consequence,,,,5,vep,,,,,,VariantConsequence,,,,,
-30,csq_consequence.var_conseq_id,csq_consequence.var_conseq_id,,Y,,variant,VEP,v99,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,calculated,,,,,,,Y,,,,
-31,csq_consequence.definition,csq_consequence.definition,,Y,,variant,VEP,v99,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,calculated,,,,,,,Y,,,,
-32,csq_consequence.impact,csq_consequence.impact,Impact (Trancript),Y,,variant,VEP,v99,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,calculated,,,,,,,Y,,,,
-33,csq_consequence.location,csq_consequence.location,Location (Transcript),Y,,variant,VEP,v99,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,calculated,,,,,,,Y,,,,VEP - used to build location
-34,csq_consequence.coding_effect,csq_consequence.coding_effect,Coding Effect (Transcript),Y,,variant,VEP,v99,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,calculated,,,,,,,Y,,,,VEP
-35,csq_consequence.var_conseq_name,csq_consequence.var_conseq_name,Consequence Name,Y,,variant,VEP,v99,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,,,,,,,,Y,,,,
+30,csq_consequence.var_conseq_id,csq_consequence.var_conseq_id,,Y,,variant,VEP,v101,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,calculated,,,,,,,Y,,,,
+31,csq_consequence.definition,csq_consequence.definition,,Y,,variant,VEP,v101,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,calculated,,,,,,,Y,,,,
+32,csq_consequence.impact,csq_consequence.impact,Impact (Trancript),Y,,variant,VEP,v101,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,calculated,,,,,,,Y,,,,
+33,csq_consequence.location,csq_consequence.location,Location (Transcript),Y,,variant,VEP,v101,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,calculated,,,,,,,Y,,,,VEP - used to build location
+34,csq_consequence.coding_effect,csq_consequence.coding_effect,Coding Effect (Transcript),Y,,variant,VEP,v101,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,calculated,,,,,,,Y,,,,VEP
+35,csq_consequence.var_conseq_name,csq_consequence.var_conseq_name,Consequence Name,Y,,variant,VEP,v101,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,,,,,,,,Y,,,,
 36,csq_gene,csq_gene,,Y,ENSG00000223972,variant,VEP,v101,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Gene Identifiers,,,,,vep,,,,,,Gene,,,,,
 37,csq_gene.gene_symbol,csq_gene.gene_symbol,Gene,Y,,variant,VEP,v101,Stable ID of affected gene,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Gene Identifiers,,,,,calculated,,,,,,,Y,,,,VEP
 38,csq_gene.ensgid,csq_gene.ensgid,Gene (Ensembl),Y,,variant,VEP,v101,Enseml ID of affected gene,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Gene Identifiers,,,,,calculated,,,,,,,Y,,,,
@@ -54,15 +54,13 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 51,csq_distance,csq_distance,distance to transcript,Y,1863,variant,VEP,v101,Shortest distance from variant to transcript,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,,,
 52,csq_strand,csq_strand,Strand,Y,1,variant,VEP,v101,Strand of the feature,boolean,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,,,
 53,csq_canonical,csq_canonical,Canonical Transcript (Boolean),Y,YES,variant,VEP,v101,Indicates if transcript is canonical for this gene,boolean,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,,,VEP - used in title if True
-54,csq_most_severe,csq_most_severe,Most Severe Transcript (Boolean),Y,1,variant,,,Indicates if transcript is most severe for this gene,boolean,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,,,
+54,csq_most_severe,csq_most_severe,Most Severe Transcript (Boolean),Y,1,variant,VEP,v101,Indicates if transcript is most severe for this gene,boolean,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,,,
 55,csq_tsl,csq_tsl,Transcript support level,N,.&NA,variant,VEP,v101,Transcript support level,integer,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,,Maybe a bug (multiple values associated with a transcript),
 56,csq_ccds,csq_ccds,CCDS ID,Y,CCDS30547.1,variant,VEP,v101,Consensus coding sequence (CCDS) database ID,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,https://www.ncbi.nlm.nih.gov/CCDS/CcdsBrowse.cgi?REQUEST=CCDS&DATA=<ID>,,
 57,csq_ensp,csq_ensp,Protein ID (Ensembl),Y,ENSP00000493376,variant,VEP,v101,Protein identifer,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,http://useast.ensembl.org/Homo_sapiens/Transcript/ProteinSummary?p=<ID>,,
 58,csq_swissprot,csq_swissprot,Protein ID (UniProtKB/Swiss-Prot),Y,P0DMR1&B7ZW38,variant,VEP,v101,UniProtKB/Swiss-Prot accession,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,https://www.uniprot.org/uniprot/<ID>,,
 59,csq_trembl,csq_trembl,Protein ID (UniProtKB/TrEMBL),Y,A0A2R8Y7R4&M4WDD3,variant,VEP,v101,UniProtKB/TrEMBL accession,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,https://www.uniprot.org/uniprot/<ID>,,
 60,csq_uniparc,csq_uniparc,Protein ID (UniParc),Y,UPI000D1938F0,variant,VEP,v101,UniParc accession,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,,,
-61,csq_sift,csq_sift,SIFT score,Y,tolerated(0.82),variant,VEP,v101,SIFT score,number,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Effect Predictors,,,,,vep / manual,,,,,,,,,,copy to worst effect transcript gene also for filtering,
-62,csq_polyphen,csq_polyphen,PolyPhen score,Y,benign(0),variant,VEP,v101,PolyPhen score,number,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Effect Predictors,,,,,vep / manual,,,,,,,,,,copy to worst effect transcript gene also for filtering,
 63,csq_domains,csq_domains,,Y,Prints:PR00237&Gene3D:1.20.1070.10&Pfam:PF13853&PROSITE_profiles:PS50262&Superfamily:SSF81321&Transmembrane_helices:TMhelix&CDD:cd15226&Low_complexity_(Seg):seg,variant,VEP,v101,The source and identifer of any overlapping protein domains,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",Y,,,,,,vep,,,,,,,,,,links to several dbs. Figure out how to link them. (missing in examples so far.),
 64,csq_hgvs_offset,csq_hgvs_offset,,Y,5,variant,VEP,v101,"Indicates by how many bases the HGVS notations for this variant have been shifted, for indels",string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,vep,,,,,,,,,,,
 65,csq_pubmed,csq_pubmed,,Y,21159730&21492446&23664118&19096721,variant,VEP,v101,Pubmed ID(s) of publications that cite existing variant,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",Y,,,,,,vep,,,,,,,,,,link needed (missing in examples so far),
@@ -70,20 +68,20 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 67,csq_maxentscan_diff,csq_maxentscan_diff,MaxEntScan,Y,-0.274,variant,MaxEnt,v20040421,MaxEntScan score difference,number,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Effect Predictors,,,,,vep,,,,,,,,,,copy to worst effect transcript gene also for filtering,
 68,csq_maxentscan_ref,csq_maxentscan_ref,MaxEntScan - Ref,Y,9.171,variant,MaxEnt,v20040421,MaxEntScan reference sequence score,number,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Effect Predictors,,,,,vep,,,,,,,,,,,
 69,csq_tssdistance,csq_tssdistance,,Y,1863,variant,VEP,v101,Distance from the transcription start site,integer,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,Consequence,,,,,vep,,,,,,,,,,,
-70,genes_most_severe_gene,genes_most_severe_gene,Gene,Y,,variant,GENES,v99,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Gene,,,40,4,manual - VEP,,,,,,Gene,,,,,
+70,genes_most_severe_gene,genes_most_severe_gene,Gene,Y,,variant,GENES,v101,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Gene,,,40,4,manual - VEP,,,,,,Gene,,,,,
 71,genes_most_severe_gene.s_het,genes_most_severe_gene.s_het,S_het,Y,0.712744609;0.687495742;0.660254755;0.639410094;0.620360495;0.616952455;0.615396766;0.608889049;0.598649548;0.586267656;0.583941063;0.573090113;0.552121239;0.547772441;0.547290214;0.547052978;0.542223592;0.541479417;0.536996463,variant,CassaNatGenet2017,04/03/2017,,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Constraint Metrics,32,,,3,genes,,,,,,,Y,,,,
 72,genes_most_severe_gene.oe_mis,genes_most_severe_gene.oe_mis,o/e (missense),Y,,variant,gnomADmetrics,v2.1.1,Observed/Expected Missense,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Constraint Metrics,34,,,4,genes,,,,,,,Y,,,,
 73,genes_most_severe_gene.oe_lof,genes_most_severe_gene.oe_lof,o/e (LoF),Y,,variant,gnomADmetrics,v2.1.1,Observed/Expected Loss of function,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Constraint Metrics,35,,,4,genes,,,,,,,Y,,,,
 74,genes_most_severe_gene.oe_lof_upper,genes_most_severe_gene.oe_lof_upper,LOEUF,Y,,variant,gnomADmetrics,v2.1.1,"loss-of-function observed/expected upper bound fraction, is a metric that is developed by the gnomAD team and supersedes pLI. See gnomAD FAQs (https://gnomad.broadinstitute.org/faq) for more information.",number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Constraint Metrics,33,,,4,genes,,,,,,,Y,,,,
-75,genes_most_severe_transcript,genes_most_severe_transcript,Transcript,Y,,variant,GENES,v99,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Gene,,,41,4,manual - VEP,,,,,,,,,,,
-76,genes_most_severe_feature_ncbi,genes_most_severe_feature_ncbi,,Y,,variant,GENES,v99,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,,,,,,,,,,,,,,,,,
-77,genes_most_severe_hgvsc,genes_most_severe_hgvsc,Coding Sequence,Y,,variant,GENES,v99,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Gene,,,50,4,manual - VEP,,,,,,,,,,,
-78,genes_most_severe_hgvsp,genes_most_severe_hgvsp,Protein Sequence,Y,,variant,GENES,v99,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Gene,,,50,4,manual - VEP,,,,,,,,,,,
-79,genes_most_severe_amino_acids,genes_most_severe_amino_acids,,Y,,variant,GENES,v99,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,,,,,,,,,,,,,,,,,
-80,genes_most_severe_sift_score,genes_most_severe_sift_score,SIFT score,Y,,variant,GENES,v99,,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Effect Predictors,24,,,4,manual - VEP,,,,,,,,,,,Missense
-81,genes_most_severe_polyphen_score,genes_most_severe_polyphen_score,PolyPhen score,Y,,variant,GENES,v99,,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Effect Predictors,25,,,4,manual - VEP,,,,,,,,,,,Missense
-82,genes_most_severe_maxentscan_diff,genes_most_severe_maxentscan_diff,MaxEntScan Diff,Y,,variant,GENES,v99,,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Effect Predictors,31,,,4,manual - VEP,,,,,,,,,,,Splicing
-83,genes_most_severe_consequence,genes_most_severe_consequence,,Y,,variant,GENES,v99,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,,,,,4,manual - VEP,,,,,,VariantConsequence,,,,,
+75,genes_most_severe_transcript,genes_most_severe_transcript,Transcript,Y,,variant,GENES,v101,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Gene,,,41,4,manual - VEP,,,,,,,,,,,
+76,genes_most_severe_feature_ncbi,genes_most_severe_feature_ncbi,,Y,,variant,GENES,v101,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,,,,,,,,,,,,,,,,,
+77,genes_most_severe_hgvsc,genes_most_severe_hgvsc,Coding Sequence,Y,,variant,GENES,v101,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Gene,,,50,4,manual - VEP,,,,,,,,,,,
+78,genes_most_severe_hgvsp,genes_most_severe_hgvsp,Protein Sequence,Y,,variant,GENES,v101,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Gene,,,50,4,manual - VEP,,,,,,,,,,,
+79,genes_most_severe_amino_acids,genes_most_severe_amino_acids,,Y,,variant,GENES,v101,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,,,,,,,,,,,,,,,,,
+80,genes_most_severe_sift_score,genes_most_severe_sift_score,SIFT score,Y,,variant,GENES,v101,,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Effect Predictors,24,,,4,manual - VEP,,,,,,,,,,,Missense
+81,genes_most_severe_polyphen_score,genes_most_severe_polyphen_score,PolyPhen score,Y,,variant,GENES,v101,,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Effect Predictors,25,,,4,manual - VEP,,,,,,,,,,,Missense
+82,genes_most_severe_maxentscan_diff,genes_most_severe_maxentscan_diff,MaxEntScan Diff,Y,,variant,GENES,v101,,number,"{""key"": ""genes"", ""title"": ""Gene""}",N,Effect Predictors,31,,,4,manual - VEP,,,,,,,,,,,Splicing
+83,genes_most_severe_consequence,genes_most_severe_consequence,,Y,,variant,GENES,v101,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,,,,,4,manual - VEP,,,,,,VariantConsequence,,,,,
 84,genes_most_severe_consequence.display_title,genes_most_severe_consequence.display_title,Consequence,Y,,variant,,,,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Consequence,,,,4,calculated_property,,,,,,,Y,,,,
 85,genes_most_severe_consequence.impact,genes_most_severe_consequence.impact,Impact,Y,,variant,,,Impact on worst effect transcript,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Consequence,7,,,4,calculated_property,,,,,,,Y,,,,
 86,genes_most_severe_consequence.location,genes_most_severe_consequence.location,Location,Y,,variant,,,Location on worst effect transcript ,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,Consequence,6,,,4,calculated_property,,,,,,,Y,,,,
@@ -92,12 +90,23 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 89,csq_rs_dbsnp151,csq_rs_dbsnp151,dbSNP ID,Y,rs770467308&rs7513079,variant,dbNSFP,v4.1a,dbSNP RS number,string,,N,Position,,,11,3,manual,,,,,,,,,,,Position
 90,csq_phastcons100way_vertebrate,csq_phastcons100way_vertebrate,PhastCons (100 Vertebrates),Y,0,variant,dbNSFP,v4.1a,PhastCons 100 way score,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
 91,csq_phylop100way_vertebrate,csq_phylop100way_vertebrate,PhyloP (100 Vertebrates),Y,-0.684,variant,dbNSFP,v4.1a,PhyloP 100 way score,number,,N,Effect Predictors,22,,,3,phyloP,,,-20,10,,,,,,,Conservation
+,csq_phylop100way_vertebrate_rankscore,csq_phylop100way_vertebrate_rankscore,PhyloP (100 Vertebrates) rankscore,Y,10.40694444,variant,dbNSFP,v4.1a,PhyloP 100 way rankscore,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
 92,csq_phylop30way_mammalian,csq_phylop30way_mammalian,PhyloP (30 Mammals),Y,-0.327,variant,dbNSFP,v4.1a,PhyloP 30 way score,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
-93,csq_gerp_rs,csq_gerp++_rs,Gerp++,Y,1.15,variant,dbNSFP,v4.1a,GERP score,number,,N,Effect Predictors,,,,,,,,,,,,,,,,Conservation
+93,csq_gerp_rs,csq_gerp++_rs,Gerp++ score,Y,1.15,variant,dbNSFP,v4.1a,GERP score,number,,N,Effect Predictors,,,,,,,,,,,,,,,,Conservation
+,csq_gerp_rs_rankscore,csq_gerp++_rs_rankscore,Gerp++ rankscore,Y,20.66458333,variant,dbNSFP,v4.1a,GERP rankscore,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
 94,csq_siphy_29way_logodds,csq_siphy_29way_logodds,SiPhy (Omega),Y,4.1978,variant,dbNSFP,v4.1a,Siphy omega score,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
 95,csq_siphy_29way_pi,csq_siphy_29way_pi,SiPhy (p-value),Y,0.1516:0.0:0.6258:0.2226,variant,dbNSFP,v4.1a,Siphy p score,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
-96,csq_primateai_score,csq_primateai_score,PrimateAI (DL score),Y,0.6325855851,variant,dbNSFP,v4.1a,PrimateAI score,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
-97,csq_cadd_phred,csq_cadd_phred,CADD,Y,2.209,variant,dbNSFP,v4.1a,CADD Phred score,number,,N,Effect Predictors,23,,,3,CADD,,,,,,,,,,,Missense
+96,csq_primateai_score,csq_primateai_score,PrimateAI score,Y,0.6325855851,variant,dbNSFP,v4.1a,PrimateAI score,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
+,csq_primateai_pred,csq_primateai_pred,PrimateAI prediction,Y,T,variant,dbNSFP,v4.1a,PrimateAI prediction,string,,N,Effect Predictors,,,,,,,,,,,,,,,,
+,csq_primateai_rankscore,csq_primateai_rankscore,PrimateAI rankscore,Y,11.98333333,variant,dbNSFP,v4.1a,PrimateAI rankscore,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
+97,csq_cadd_phred,csq_cadd_phred,CADD Phred score,Y,2.209,variant,dbNSFP,v4.1a,CADD Phred score,number,,N,Effect Predictors,23,,,3,CADD,,,,,,,,,,,Missense
+,csq_cadd_raw_rankscore,csq_cadd_raw_rankscore,CADD rankscore,Y,48.46666667,variant,dbNSFP,v4.1a,CADD rankscore,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
+,csq_Polyphen2_hvar_pred,csq_Polyphen2_hvar_pred,PolyPhen 2 prediction,Y,D,variant,dbNSFP,v4.1a,PolyPhen 2 prediction,string,,N,Effect Predictors,,,,,,,,,,,,,,,,
+,csq_Polyphen2_hvar_rankscore,csq_Polyphen2_hvar_rankscore,PolyPhen 2 rankscore,Y,52.85625,variant,dbNSFP,v4.1a,PolyPhen 2 rankscore,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
+,csq_Polyphen2_hvar_score,csq_Polyphen2_hvar_score,PolyPhen 2 score,Y,0.9,variant,dbNSFP,v4.1a,PolyPhen 2 score,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
+,csq_sift_pred,csq_sift_pred,SIFT prediction,Y,D,variant,dbNSFP,v4.1a,SIFT prediction,string,,N,Effect Predictors,,,,,,,,,,,,,,,,
+,csq_sift_converted_rankscore,csq_sift_converted_rankscore,SIFT rankscore,Y,36.925,variant,dbNSFP,v4.1a,SIFT rankscore,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
+,csq_sift_score,csq_sift_score,SIFT score,Y,0.012,variant,dbNSFP,v4.1a,SIFT score,number,,N,Effect Predictors,,,,,,,,,,,,,,,,
 98,csq_spliceai_pred_symbol,csq_spliceai_pred_symbol,SpliceAI Gene,Y,OR4F5,variant,SpliceAI,v1.3,affected gene symbol,string,,N,Effect Predictors,,,,,,,,,,,,,,,,Splicing
 99,csq_spliceai_pred_ds_ag,csq_spliceai_pred_ds_ag,SpliceAI Delta Score Acceptor Gain,Y,0.01,variant,SpliceAI,v1.3,delta scores (DS) for acceptor gain (AG),number,,N,Effect Predictors,,,,,,,,0,1,,,,,,,Splicing ?
 100,csq_spliceai_pred_ds_al,csq_spliceai_pred_ds_al,SpliceAI Delta Score Acceptor Loss,Y,0.08,variant,SpliceAI,v1.3,delta scores (DS) for acceptor loss (AL),number,,N,Effect Predictors,,,,,,,,0,1,,,,,,,Splicing ?
@@ -107,7 +116,7 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 104,csq_spliceai_pred_dp_al,csq_spliceai_pred_dp_al,SpliceAI Delta Position Acceptor Loss,Y,26,variant,SpliceAI,v1.3,delta positions (DP) for acceptor loss (AL),integer,,N,Effect Predictors,,,,,,,,,,,,,,,,Splicing ?
 105,csq_spliceai_pred_dp_dg,csq_spliceai_pred_dp_dg,SpliceAI Delta Position Donor Gain,Y,-28,variant,SpliceAI,v1.3,delta positions (DP) for donor gain (DG),integer,,N,Effect Predictors,,,,,,,,,,,,,,,,Splicing ?
 106,csq_spliceai_pred_dp_dl,csq_spliceai_pred_dp_dl,SpliceAI Delta Position Donor Loss,Y,-25,variant,SpliceAI,v1.3,delta positions (DP) for donor loss (DL),integer,,N,Effect Predictors,,,,,,,,,,,,,,,,Splicing ?
-107,spliceaiMaxds,spliceaiMaxds,SpliceAI Max Delta,Y,,variant,,,maximum delta scores,number,,N,Effect Predictors,27,,,4,spliceAI,,,,,,,,,,,Splicing
+107,spliceaiMaxds,spliceaiMaxds,SpliceAI Max Delta,Y,0.8,variant,,,maximum delta scores,number,,N,Effect Predictors,27,,,4,spliceAI,,,,,,,,,,,Splicing
 108,csq_gnomadg_ac,csq_gnomadg_ac,GnomAD Alt Allele Count,Y,10088,variant,gnomAD,v3.1,Alternate allele count for samples,integer,,N,Population Frequency,,,,,,,0,0,,,,,,,,GnomAD
 109,csq_gnomadg_af_popmax,csq_gnomadg_af_popmax,GnomAD Alt AF - PopMax,Y,0.636029,variant,gnomAD,v3.1,maximum population allele frequency from gnomAD gnome v3.0,number,,N,Population Frequency,19,,61,4,manual / gnomad,,0,0,1,,,,,,,
 110,csq_gnomadg_ac-afr,csq_gnomadg_ac-afr,GnomAD Alt AC - African-American/African,Y,2444,variant,gnomAD,v3.1,Alternate allele count for samples of African-American/African ancestry,integer,,N,Population Frequency,,,,,,,0,0,,,,,,,,GnomAD

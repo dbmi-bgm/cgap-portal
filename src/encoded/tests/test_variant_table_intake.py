@@ -8,7 +8,7 @@ from .variant_fixtures import ANNOTATION_FIELD_URL
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = resolve_file_path('annotations/variant_table_v0.5.1.csv')
+MT_LOC = resolve_file_path('annotations/variant_table_v0.5.2.csv')
 ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
 EXPECTED_FIELDS = ['no', 'field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list', 'facet_default_hidden', 'priority', 'source',
@@ -30,12 +30,12 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid',
                           'transcript.vep_consequence.var_conseq_name']
-VARIANT_TABLE_VERSION = 'annV0.5.1'
-VARIANT_TABLE_DATE = '01.20.2021'
-NUMBER_ANNOTATION_FIELDS = 176
+VARIANT_TABLE_VERSION = 'annV0.5.2'
+VARIANT_TABLE_DATE = '01.25.2021'
+NUMBER_ANNOTATION_FIELDS = 185
 SAMPLE_FIELDS_EXPECTED = 25
-VARIANT_FIELDS_EXPECTED = 151
-TRANSCRIPT_FIELDS_EXPECTED = 32
+VARIANT_FIELDS_EXPECTED = 160
+TRANSCRIPT_FIELDS_EXPECTED = 30
 
 
 @pytest.fixture
@@ -210,6 +210,7 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert properties['csq_gnomadg_af_popmax']['default'] == 0
     assert properties['csq_gnomadg_af_popmax']['min'] == 0
     assert properties['csq_gnomadg_af_popmax']['max'] == 1
+    assert properties['csq_sift_pred']['type'] == 'string'
 
     # check sub-embedded object fields
     assert properties['transcript']['type'] == 'array'
@@ -221,7 +222,6 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert sub_obj_props['csq_consequence']['items']['linkTo'] == 'VariantConsequence'
     assert sub_obj_props['csq_domains']['type'] == 'array'
     assert sub_obj_props['csq_domains']['items']['type'] == 'string'
-    assert sub_obj_props['csq_sift']['type'] == 'number'
 
     # check (existence of) different sub-embedded object fields
     assert properties['genes']['type'] == 'array'
@@ -262,6 +262,6 @@ def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
                            vs_out=resolve_file_path('schemas/variant_sample.json'),
-                           v_out=resolve_file_path('schemas/variant.json'), write=False)  # enable to generate schemas
+                           v_out=resolve_file_path('schemas/variant.json'), write=True)  # enable to generate schemas
     for item in inserts:
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)
