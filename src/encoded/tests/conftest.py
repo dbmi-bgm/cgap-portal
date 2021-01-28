@@ -81,14 +81,6 @@ def pytest_configure():
     logging.getLogger('sqlalchemy.engine.base.Engine').addFilter(Shorten())
 
 
-# Removed as a hunch that it's not even used. -kmp 26-Jan-2021
-#
-# @pytest.yield_fixture
-# def config():
-#     yield setUp()
-#     tearDown()
-
-
 @pytest.yield_fixture
 def threadlocals(request, dummy_request, registry):
     threadlocal_manager.push({'request': dummy_request, 'registry': registry})
@@ -162,6 +154,10 @@ def upgrader(registry):
 def root(registry):
     return registry[ROOT]
 
+
+# TODO: Reconsider naming to have some underscores interspersed for better readability.
+#       e.g., html_testapp rather than htmltestapp, and especially anon_html_test_app rather than anonhtmltestapp.
+#       -kmp 03-Feb-2020
 
 @pytest.fixture
 def anonhtmltestapp(app):
@@ -237,8 +233,7 @@ def es_testapp(es_app):
 
 @pytest.fixture
 def anontestapp(app):
-    """TestApp with JSON accept header.
-    """
+    """TestApp for anonymous user (i.e., no user specified), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
     }
@@ -256,8 +251,7 @@ def anon_es_testapp(es_app):
 
 @pytest.fixture
 def authenticated_testapp(app):
-    """TestApp with JSON accept header for non-admin user.
-    """
+    """TestApp for an authenticated, non-admin user (TEST_AUTHENTICATED), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_AUTHENTICATED',
@@ -278,8 +272,7 @@ def authenticated_es_testapp(es_app):
 
 @pytest.fixture
 def submitter_testapp(app):
-    """TestApp with JSON accept header for non-admin user.
-    """
+    """TestApp for a non-admin user (TEST_SUBMITTER), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_SUBMITTER',
