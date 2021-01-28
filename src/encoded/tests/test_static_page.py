@@ -62,7 +62,7 @@ def help_page_json_deleted():
     }
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def posted_help_page_section(es_testapp, workbook, help_page_section_json):
     try:
         res = es_testapp.post_json('/static-sections/', help_page_section_json, status=201)
@@ -73,7 +73,7 @@ def posted_help_page_section(es_testapp, workbook, help_page_section_json):
     return val
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def help_page(es_testapp, workbook, posted_help_page_section, help_page_json):
     try:
         res = es_testapp.post_json('/pages/', help_page_json, status=201)
@@ -84,7 +84,7 @@ def help_page(es_testapp, workbook, posted_help_page_section, help_page_json):
     return val
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def help_page_deleted(es_testapp, workbook, posted_help_page_section, help_page_json_deleted):
     try:
         res = es_testapp.post_json('/pages/', help_page_json_deleted, status=201)
@@ -95,7 +95,7 @@ def help_page_deleted(es_testapp, workbook, posted_help_page_section, help_page_
     return val
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def help_page_in_review(es_testapp, workbook, posted_help_page_section, help_page_json_in_review):
     try:
         res = es_testapp.post_json('/pages/', help_page_json_in_review, status=201)
