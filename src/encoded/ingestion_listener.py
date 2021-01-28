@@ -16,6 +16,7 @@ import structlog
 import threading
 import time
 import webtest
+import tempfile
 
 from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.misc_utils import VirtualApp, ignored, check_true, full_class_name
@@ -27,7 +28,8 @@ from pyramid.request import Request
 from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
-from .commands.ingest_vcf import VCFParser
+from .ingestion.vcf_utils import VCFParser
+from .commands.reformat_vcf import runner as reformat_vcf
 from .ingestion.common import (
     register_path_content_type, metadata_bundles_bucket, get_parameter, IngestionReport,
 )
@@ -487,8 +489,17 @@ class IngestionListener:
                 self.set_status(uuid, STATUS_IN_PROGRESS)
                 decoded_content = gunzip_content(raw_content)
                 debuglog('Got decoded content: %s' % decoded_content[:20])
+
+                # reformat VCF
+                formatted = tempfile.TemporaryFile()
+                reformat_args = {
+                    'inputfile': Reader(fsock=decoded_content.split('\n')),
+                    'outputfile': formatted,
+                    'verbose': False
+                }
+                reformat_vcf(reformat_args)
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
-                                   reader=Reader(fsock=decoded_content.split('\n')))
+                                   reader=formatted)
                 variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
                                                  project=file_meta['project']['@id'],
                                                  institution=file_meta['institution']['@id'])
