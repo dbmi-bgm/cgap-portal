@@ -192,15 +192,12 @@ function PanelSelectionMenu(props){
     );
 }
 
-// NOT CURRENTLY USED, MAY BE REINTRODUCED IN FUTURE
 class PanelOne extends React.PureComponent {
 
-    // OUTDATED - WE NOW HAVE PROJECT_ROLES
     static flatFieldsFromUser(user){
         const {
-            institution = {},
+            user_institution : institution = {},
             project = {},
-            submits_for = [] // OUTDATED - WE NOW HAVE PROJECT_ROLES
         } = user || {};
         const initState = {
             "institutionID": institution['@id'] || null,
@@ -208,14 +205,15 @@ class PanelOne extends React.PureComponent {
             "projectID": project['@id'] || null,
             "projectTitle": project.display_title || null
         };
-        if (!initState.institutionID){
-            for (let i = 0; i < submits_for.length; i++){                           // OUTDATED - WE NOW HAVE PROJECT_ROLES
-                if (!submits_for[i]['@id']) continue;                               // OUTDATED - WE NOW HAVE PROJECT_ROLES
-                initState.institutionID = submits_for[i]['@id'] || null;            // OUTDATED - WE NOW HAVE PROJECT_ROLES
-                initState.institutionTitle = submits_for[i].display_title || null;  // OUTDATED - WE NOW HAVE PROJECT_ROLES
-                break;
-            }
-        }
+        console.log("user", user);
+        // if (!initState.institutionID){ /* DEPRECATED: single institution per user
+        //     for (let i = 0; i < submits_for.length; i++){                           // OUTDATED - WE NOW HAVE PROJECT_ROLES
+        //         if (!submits_for[i]['@id']) continue;                               // OUTDATED - WE NOW HAVE PROJECT_ROLES
+        //         initState.institutionID = submits_for[i]['@id'] || null;            // OUTDATED - WE NOW HAVE PROJECT_ROLES
+        //         initState.institutionTitle = submits_for[i].display_title || null;  // OUTDATED - WE NOW HAVE PROJECT_ROLES
+        //         break;
+        //     }
+        // }
         return initState;
     }
 
