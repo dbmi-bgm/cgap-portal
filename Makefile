@@ -130,13 +130,13 @@ test:
 	poetry run python -m pytest -vv --timeout=200 -m "working and not indexing" && poetry run python -m pytest -vv --timeout=200 -m "working and indexing"
 
 retest:
-	poetry run pytest -vv --last-failed
+	poetry run python -m pytest -vv --last-failed
 
 test-any:
-	poetry run pytest -vv --timeout=200
+	poetry run python -m pytest -vv --timeout=200
 
 travis-test:
-	poetry run pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not indexing and not action_fail" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && poetry run pytest -vv --timeout=300 -m "working and indexing and not action_fail" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+	poetry run python -m pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not indexing and not action_fail" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && poetry run python -m pytest -vv --timeout=300 -m "working and indexing and not action_fail" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update
