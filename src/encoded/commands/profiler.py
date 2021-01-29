@@ -18,7 +18,7 @@ import logging
 import cProfile
 import pstats
 
-from webtest import TestApp
+from dcicutils.misc_utils import TestApp
 from pyramid import paster
 
 
