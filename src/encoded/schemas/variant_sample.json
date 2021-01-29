@@ -732,8 +732,10 @@
         },
         "variant.genes.genes_ensg.gene_lists.display_title": {
             "title": "Gene List",
-            "order": 99,
-            "grouping": "Genes"
+            "order": 1,
+            "grouping": "Genes",
+            "search_type": "sayt_without_terms",
+            "sayt_item_type": "Gene"
         },
         "variant.genes.genes_ensg.oe_lof": {
             "title": "o/e (LoF)",
