@@ -16,7 +16,7 @@
 #       requires granite library
 #
 ################################################
-import sys
+import io
 import argparse
 from granite.lib import vcf_parser
 # shared_functions as *
@@ -193,7 +193,7 @@ def runner(args):
     variant_def = '##INFO=<ID=variantClass,Number=1,Type=String,Description="Variant type">'
 
     # Buffers
-    fo = open(args['outputfile'], 'w')
+    fo = io.open(args['outputfile'], 'w', encoding='utf-8')
 
     # Creating Vcf object
     vcf_obj = vcf_parser.Vcf(args['inputfile'])

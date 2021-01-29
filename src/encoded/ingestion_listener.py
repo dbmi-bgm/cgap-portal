@@ -30,7 +30,7 @@ from snovault.util import debug_log
 from vcf import Reader
 from .ingestion.vcf_utils import VCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
-from .ingestion.common import metadata_bundles_bucket, get_parameter
+from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .types.ingestion import SubmissionFolio, IngestionSubmission
@@ -250,10 +250,10 @@ def verify_vcf_file_status_is_not_ingested(request, uuid, *, expected=True):
         'content_type': 'application/json'
     }
     subreq = Request.blank('/' + uuid, **kwargs)
-    resp = request.invoke_subrequest(subreq, use_tweens=True)
+    resp = request.invoke_subrequest(subreq)
     if isinstance(resp, HTTPMovedPermanently):  # if we hit a redirect, follow it
         subreq = Request.blank(resp.location, **kwargs)
-        resp = request.invoke_subrequest(subreq, use_tweens=True)
+        resp = request.invoke_subrequest(subreq)
     log.error('VCF File Meta: %s' % resp.json)
     verified = bool(expected) is (resp.json.get('file_ingestion_status', None) != STATUS_INGESTED)
     # if not verified:
@@ -486,19 +486,21 @@ class IngestionListener:
                 # gunzip content, pass to parser, post variants/variant_samples
                 # patch in progress status
                 self.set_status(uuid, STATUS_IN_PROGRESS)
-                decoded_content = gunzip_content(raw_content)
-                debuglog('Got decoded content: %s' % decoded_content[:20])
+                # decoded_content = gunzip_content(raw_content)
+                # debuglog('Got decoded content: %s' % decoded_content[:20])
 
                 # reformat VCF
-                formatted = tempfile.TemporaryFile()
+                vcf_to_be_formatted = tempfile.NamedTemporaryFile(suffix='.gz')
+                vcf_to_be_formatted.write(raw_content)
+                formatted = tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8')
                 reformat_args = {
-                    'inputfile': Reader(fsock=decoded_content.split('\n')),
-                    'outputfile': formatted,
+                    'inputfile': vcf_to_be_formatted.name,
+                    'outputfile': formatted.name,
                     'verbose': False
                 }
                 reformat_vcf(reformat_args)
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
-                                   reader=formatted)
+                                   reader=Reader(formatted))
                 variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
                                                  project=file_meta['project']['@id'],
                                                  institution=file_meta['institution']['@id'])
