@@ -99,7 +99,6 @@ def test_get_health_page(app, testapp):
         app.registry.settings['env.name'] = prev_env
 
 
-
 @pytest.mark.parametrize('item_type', [k for k in TYPE_LENGTH if k not in ['user', 'access_key']])
 def test_collections_anon(anontestapp, item_type):
     res = anontestapp.get('/' + item_type).follow(status=200)
@@ -130,7 +129,7 @@ def test_html_server_pages(item_type, wsgi_app):
         headers={'Accept': 'application/json'},
     )
     for item in res.json['@graph']:
-        res = wsgi_app.get(item['@id'], headers={ 'Accept': 'text/html' }, status=200)
+        res = wsgi_app.get(item['@id'], headers={'Accept': 'text/html'}, status=200)
         assert res.body.startswith(b'<!DOCTYPE html>')
         assert b'Internal Server Error' not in res.body
 
@@ -144,7 +143,7 @@ def test_json(testapp, item_type):
 def test_json_basic_auth(anonhtmltestapp):
     url = '/'
     value = "Authorization: Basic %s" % ascii_native_(b64encode(b'nobody:pass'))
-    res = anonhtmltestapp.get(url, headers={ 'Authorization': value, 'Accept' : "application/json" }, status=401)
+    res = anonhtmltestapp.get(url, headers={'Authorization': value, 'Accept': "application/json"}, status=401)
     assert res.content_type == 'application/json'
 
 

@@ -2,6 +2,7 @@ import argparse
 import logging
 import structlog
 from dcicutils.es_utils import create_es_client
+from dcicutils.ff_utils import get_health_page
 
 log = structlog.getLogger(__name__)
 EPILOG = __doc__

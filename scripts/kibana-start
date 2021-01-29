@@ -1,3 +1,14 @@
+internal_kibana_port=5601
+local_kibana_port=${internal_kibana_port}
+
+
+# TODO: Write something to use in pdb when debugging that will
+#   fish around in 'ps aux' and find the elasticsearch temporarily
+#   running for testing, fish out its port number, and
+#   set local_es_port to that number.  (As a fallback, or in addition,
+#   make the script take that port number as an argument.)
+#   -kmp 27-Jan-2021
+
 docker --version
 
 if [ $? -ne 0 ]; then
@@ -19,14 +30,14 @@ existing_kibana=`docker ps | egrep 'kibana:[0-9]*.[0-9]+.*[ ].*'`
 
 if [ -z "${existing_kibana}" ]; then
 
-    docker run -d --network localnet -p 5601:5601 -e ELASTICSEARCH_URL=http://host.docker.internal:9200 docker.elastic.co/kibana/kibana-oss:6.8.9
+    docker run -d --network localnet -p ${local_kibana_port}:5601 -e ELASTICSEARCH_URL=http://host.docker.internal:${local_es_port} docker.elastic.co/kibana/kibana-oss:6.8.9
 
 else
     echo "Kibana is already running. From 'docker ps':"
     echo " ${existing_kibana}"
 fi
 
-local_kibana_url="http://localhost:5601/app/kibana#/dev_tools/console?_g=()"
+local_kibana_url="http://localhost:${local_kibana_port}/app/kibana#/dev_tools/console?_g=()"
 
 echo "Opening kibana in browser at '${local_kibana_url}'..."
 open "${local_kibana_url}" &

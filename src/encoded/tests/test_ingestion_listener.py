@@ -11,6 +11,7 @@ from ..ingestion_listener import (
     IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
 )
 from ..ingestion.common import IngestionReport, IngestionError
+from ..util import debuglog
 
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
@@ -187,8 +188,8 @@ def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testa
     """ Posts a minimal processed file to be checked """
     request = DummyRequest(environ={'REMOTE_USER': 'TEST', 'HTTP_ACCEPT': 'application/json'})
     request.invoke_subrequest = es_testapp.app.invoke_subrequest
-    assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION) is False
-    assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True
+    assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION, expected=False)
+    assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION, expected=True)
 
 
 @pytest.mark.skip
@@ -204,11 +205,15 @@ def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_mana
     # configure run for 10 seconds
     start_time = datetime.datetime.utcnow()
     end_delta = datetime.timedelta(seconds=10)
+    end_time = start_time + end_delta
+    debuglog("start_time [%s] + end_delta [%s] = end_time [%s]" % (start_time, end_delta, end_time))
 
     def mocked_should_remain_online(override=None):
         ignored(override)
         current_time = datetime.datetime.utcnow()
-        return current_time < (start_time + end_delta)
+        recommendation = current_time < end_time
+        debuglog("At %s, should_remain_online=%s" % (current_time, recommendation))
+        return recommendation
 
     # XXX: This is a really hard thing to test, but take my word for it that this is doing "something" -Will
     #      If you do not get ValueError here, it means the VCF wasn't processed in the run method or a different

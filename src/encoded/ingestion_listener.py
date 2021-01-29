@@ -30,15 +30,13 @@ from snovault.util import debug_log
 from vcf import Reader
 from .ingestion.vcf_utils import VCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
-from .ingestion.common import (
-    register_path_content_type, metadata_bundles_bucket, get_parameter, IngestionReport,
-)
+from .ingestion.common import metadata_bundles_bucket, get_parameter
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
     resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request,
-    subrequest_object,
+    subrequest_object, register_path_content_type,
 )
 from .ingestion.queue_utils import IngestionQueueManager
 from .ingestion.variant_utils import VariantBuilder
@@ -242,7 +240,7 @@ def ingestion_status(context, request):
     }
 
 
-def verify_vcf_file_status_is_not_ingested(request, uuid):
+def verify_vcf_file_status_is_not_ingested(request, uuid, *, expected=True):
     """ Verifies the given VCF file has not already been ingested by checking
         'file_ingestion_status'
     """
@@ -257,9 +255,10 @@ def verify_vcf_file_status_is_not_ingested(request, uuid):
         subreq = Request.blank(resp.location, **kwargs)
         resp = request.invoke_subrequest(subreq, use_tweens=True)
     log.error('VCF File Meta: %s' % resp.json)
-    if resp.json.get('file_ingestion_status', None) == STATUS_INGESTED:
-        return False
-    return True
+    verified = bool(expected) is (resp.json.get('file_ingestion_status', None) != STATUS_INGESTED)
+    # if not verified:
+    #     import pdb; pdb.set_trace()
+    return verified
 
 
 def patch_vcf_file_status(request, uuids):
