@@ -184,6 +184,7 @@ def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_f
     assert after > (before + end_delta)
 
 
+@pytest.mark.skip
 def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testapp):
     """ Posts a minimal processed file to be checked """
     request = DummyRequest(environ={'REMOTE_USER': 'TEST', 'HTTP_ACCEPT': 'application/json'})
