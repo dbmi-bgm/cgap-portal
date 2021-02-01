@@ -38,8 +38,8 @@ export class VariantSampleOverview extends React.PureComponent {
         });
 
         if (initialIndex === -1){
-            initialIndex = transcript.findIndex(function({ vap_canonical }){
-                return !!(vap_canonical);
+            initialIndex = transcript.findIndex(function({ vep_canonical }){
+                return !!(vep_canonical);
             });
         }
 
