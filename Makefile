@@ -1,3 +1,5 @@
+SHELL=/bin/bash
+
 clean:  # clear node modules, eggs, npm build stuff
 	make clean-python-caches
 	make clean-npm-caches
@@ -124,7 +126,7 @@ kill:  # kills back-end processes associated with the application. Use with care
 clean-python:
 	@echo -n "Are you sure? This will wipe all libraries installed on this virtualenv [y/N] " && read ans && [ $${ans:-N} = y ]
 	pip uninstall encoded
-	pip freeze | xargs pip uninstall -y
+	pip uninstall -y -r <(pip freeze)
 
 test:
 	poetry run python -m pytest -vv --timeout=200 -m "working and not indexing" && poetry run python -m pytest -vv --timeout=200 -m "working and indexing"
