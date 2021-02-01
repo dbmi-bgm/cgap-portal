@@ -17,7 +17,7 @@ import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 
 export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
     const { variant } = context;
-    const { clinvar_variationid: variationID } = variant;
+    const { csq_clinvar: variationID } = variant;
 
     const { getTipForField, clinvarExternalHref } = useMemo(function(){
 
@@ -35,7 +35,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                 return (schemaProperty || {}).description || null;
             };
             if (variationID) {
-                const clinvarIDSchemaProperty = schemaTransforms.getSchemaProperty("clinvar_variationid", schemas, "Variant");
+                const clinvarIDSchemaProperty = schemaTransforms.getSchemaProperty("csq_clinvar", schemas, "Variant");
                 ret.clinvarExternalHref = clinvarIDSchemaProperty.link.replace("<ID>", variationID);
             }
         }
@@ -208,11 +208,11 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
 function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref }){
     const { variant } = context;
     const {
-        clinvar_variationid: variationID,
-        clinvar_clnsig: clinicalSignificance,
-        clinvar_clnsigconf: conflictingClinicalSignificance,
+        csq_clinvar: variationID,
+        csq_clinvar_clnsig: clinicalSignificance,
+        csq_clinvar_clnsigconf: conflictingClinicalSignificance,
         clinvar_submission = [],
-        clinvar_clnrevstat: reviewStatus
+        csq_clinvar_clnrevstat: reviewStatus
     } = variant;
 
     if (!variationID) {
@@ -235,7 +235,7 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
 
             <div className="row mb-1">
                 <div className="col">
-                    <label data-tip={getTipForField("clinvar_variationid")} className="mr-1 mb-0">ID: </label>
+                    <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
                     { clinvarExternalHref?
                         <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
                             { variationID }
@@ -253,7 +253,7 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
 
             <div className="row">
                 <div className="col-3">
-                    <label data-tip={getTipForField("clinvar_clnsig")} className="mb-03">Interpretation: </label>
+                    <label data-tip={getTipForField("csq_clinvar_clnsig")} className="mb-03">Interpretation: </label>
                 </div>
                 <div className="col-9">
                     { clinicalSignificance }
@@ -262,7 +262,7 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
 
             <div className="row">
                 <div className="col-3">
-                    <label data-tip={getTipForField("clinvar_clnrevstat")} className="mb-0">Review Status: </label>
+                    <label data-tip={getTipForField("csq_clinvar_clnrevstat")} className="mb-0">Review Status: </label>
                 </div>
                 <div className="col-9">
                     { reviewStatus }
@@ -467,7 +467,7 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
     const { variant } = context;
     const { transcript = [], } = variant;
     const externalDatabaseFieldnames = [
-        "clinvar_variationid"
+        "csq_clinvar"
     ];
 
     const transcriptFieldNames = [
