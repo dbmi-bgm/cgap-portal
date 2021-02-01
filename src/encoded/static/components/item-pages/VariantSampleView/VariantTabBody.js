@@ -327,7 +327,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const {
         conservation_gerp = fallbackElem,
         conservation_phylop100 = fallbackElem,
-        cadd_phred = fallbackElem,
+        csq_cadd_phred = fallbackElem,
         transcript = [],
         spliceai_maxds = fallbackElem,
         primateai_primatedl_score = fallbackElem
@@ -336,10 +336,9 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     // Should we instead find transcript with largest score instead of using current?
     const currentTranscript = transcript[currentTranscriptIdx];
     const {
-        vep_sift_score = fallbackElem,
-        vep_sift_prediction = fallbackElem,
-        vep_polyphen_score = fallbackElem,
-        vep_polyphen_prediction = fallbackElem
+        csq_sift = fallbackElem,
+        csq_polyphen_score = fallbackElem,
+        csq_polyphen = fallbackElem
     } = currentTranscript || {};
 
     // Not too sure whether to use table or <row> and <cols> here..
@@ -391,21 +390,21 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("cadd_phred")}>CADD</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_cadd_phred")}>CADD</label>
                             </td>
-                            <td className="text-left">{ cadd_phred }</td>
+                            <td className="text-left">{ csq_cadd_phred }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("transcript.vep_sift_score")}>SIFT</label>
+                                <label className="mb-0" data-tip={getTipForField("transcript.csq_sift")}>SIFT</label>
                             </td>
-                            <td className="text-left">{ vep_sift_score }</td>
+                            <td className="text-left">{ csq_sift }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("transcript.vep_polyphen_score")}>PolyPhen2</label>
+                                <label className="mb-0" data-tip={getTipForField("transcript.csq_polyphen_score")}>PolyPhen2</label>
                             </td>
-                            <td className="text-left">{ vep_polyphen_score }</td>
+                            <td className="text-left">{ csq_polyphen_score }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
@@ -466,11 +465,11 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
     ];
 
     const transcriptFieldNames = [
-        "vep_feature",
-        "vep_ccds",
-        "vep_ensp",
-        "vep_swissprot",
-        "vep_trembl"
+        "csq_feature",
+        "csq_ccds",
+        "csq_ensp",
+        "csq_swissprot",
+        "csq_trembl"
     ];
 
     if (!variant) {

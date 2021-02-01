@@ -119,7 +119,7 @@ export class VariantSampleOverview extends React.PureComponent {
 
 function getCurrentTranscriptGeneID(context, transcriptIndex){
     const { variant: { transcript: geneTranscriptList = [] } = {} } = context;
-    const { vep_gene : { "@id" : geneID = null } = {} } = geneTranscriptList[transcriptIndex] || {};
+    const { csq_gene : { "@id" : geneID = null } = {} } = geneTranscriptList[transcriptIndex] || {};
     return geneID;
 }
 

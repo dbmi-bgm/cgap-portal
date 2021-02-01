@@ -143,16 +143,16 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                     return <StackedRowColumn rowKey="genes_gnomad" className="text-center" {...{ rows }}/>;
                 }
             },
-            "variant.cadd_phred": { // Predictors column (cadd_phred, spliceai, phylop100)
+            "variant.csq_cadd_phred": { // Predictors column (csq_cadd_phred, spliceai, phylop100)
                 render: function(result, props) {
-                    const { variant : { cadd_phred = null, spliceai_maxds = null, conservation_phylop100 = null } = {} } = result;
+                    const { variant : { csq_cadd_phred = null, spliceai_maxds = null, conservation_phylop100 = null } = {} } = result;
                     const rows = [];
 
-                    if (!cadd_phred && !spliceai_maxds && !conservation_phylop100) {
+                    if (!csq_cadd_phred && !spliceai_maxds && !conservation_phylop100) {
                         return null;
                     }
-                    if (cadd_phred) {
-                        rows.push(<div key="cadd_phred" className="d-block text-truncate"><span className="text-600">Cadd Phred: </span>{cadd_phred || "-"}</div>);
+                    if (csq_cadd_phred) {
+                        rows.push(<div key="csq_cadd_phred" className="d-block text-truncate"><span className="text-600">Cadd Phred: </span>{csq_cadd_phred || "-"}</div>);
                     }
                     if (spliceai_maxds) {
                         rows.push(<div key="spliceai_maxds" className="d-block text-truncate"><span className="text-600">SpliceAI MaxDS: </span>{spliceai_maxds || "-"}</div>);
