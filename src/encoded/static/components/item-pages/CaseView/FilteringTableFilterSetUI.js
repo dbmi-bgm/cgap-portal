@@ -345,7 +345,13 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             setNameOfFilterBlockAtIdx, setTitleOfFilterSet, isSettingFilterBlockIdx,
 
             // From ajax.FetchedItem:
-            isFetchingInitialFilterSetItem = false
+            isFetchingInitialFilterSetItem = false,
+
+            // From SelectedItemsController:
+            selectedItems,
+
+            // From VariantSampleListController (in index.js, wraps CaseInfoTabView)
+            variantSampleListItem,
         } = this.props;
         const { total: totalCount, facets = null } = searchContext || {};
         const { filter_blocks = [] } = filterSet || {};
@@ -387,33 +393,110 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         return (
             // TODO 1: Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
-            // Consider: Keep state of VSL (loaded via AJAX or not) somewhere above this maybe.. so can dedupe before rendering this button. Not necessary at all esp if gets complexy.
-            <div className="above-variantsample-table-ui">
-                <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
-                    <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
-                    <Collapse in={bodyOpen}>
-                        <div className="filterset-blocks-container">
-                            { body }
+            <React.Fragment>
+
+                <div className="row mb-24 mt-0">
+                    <h1 className="col my-0">
+                        <span className="text-300">Variant Filtering and Technical Review</span>
+                    </h1>
+                    { selectedItems instanceof Map ?
+                        <div className="col-auto">
+                            <AddToVariantSampleListButton {...{ selectedItems, variantSampleListItem, caseItem, filterSet, selectedFilterBlockIndices }} />
                         </div>
-                    </Collapse>
+                        : null }
                 </div>
-                <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
-                    panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
-                    <h4 className="text-400 col my-0">
-                        <span className="text-600 mr-1">{ totalCount }</span>
-                        <span>
-                            Variant Matches for { currentFilterBlockName ?
-                                <em>{ currentFilterBlockName }</em>
-                                // TODO: Allow to toggle Union vs Intersection in FilterSetController
-                                : `Union of ${selectedFilterBlockCount} Filter Blocks` }
-                        </span>
-                    </h4>
-                </AboveTableControlsBase>
-            </div>
+
+                <div className="above-variantsample-table-ui">
+                    <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
+                        <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
+                        <Collapse in={bodyOpen}>
+                            <div className="filterset-blocks-container">
+                                { body }
+                            </div>
+                        </Collapse>
+                    </div>
+                    <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
+                        panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
+                        <h4 className="text-400 col my-0">
+                            <span className="text-600 mr-1">{ totalCount }</span>
+                            <span>
+                                Variant Matches for { currentFilterBlockName ?
+                                    <em>{ currentFilterBlockName }</em>
+                                    // TODO: Allow to toggle Union vs Intersection in FilterSetController
+                                    : `Union of ${selectedFilterBlockCount} Filter Blocks` }
+                            </span>
+                        </h4>
+                    </AboveTableControlsBase>
+                </div>
+
+            </React.Fragment>
         );
     }
-
 }
+
+
+
+function AddToVariantSampleListButton(props){
+    const {
+        selectedItems,
+        variantSampleListItem = null,
+        caseItem = null,
+        filterSet,
+        selectedFilterBlockIndices = {}
+    } = props;
+    const { accession: caseAccession = null } = caseItem;
+
+    /** PATCH or create new VariantSampleList w. additions */
+
+
+    const onButtonClick = function(){
+
+        if (!filterSet) {
+            throw new Error("Expected some filterSet to be present");
+        }
+
+        let filterBlocksRequestData = _.pick(filterSet, "filter_blocks", "flags", "uuid");
+
+        // Only keep filter_blocks which were used in this query --
+        filterBlocksRequestData.filter_blocks = filterBlocksRequestData.filter_blocks.filter(function(fb, fbIdx){
+            return selectedFilterBlockIndices[fbIdx];
+        });
+
+        // Convert to string (avoid needing to add to schema for now)
+        filterBlocksRequestData = JSON.stringify(filterBlocksRequestData);
+
+        if (!variantSampleListItem) {
+            // Create new Item, then PATCH its @id to `Case.variant_sample_list_id` field.
+            const payload = { "variant_samples": [] };
+            if (caseAccession) {
+                payload.created_for_case = caseAccession;
+            }
+            // This is type Map, so param signature is `value, key, map`
+            // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
+            selectedItems.forEach(function(variantSampleItem, variantSampleATID){
+                payload.variant_samples.push({
+                    "variant_sample_item": variantSampleATID, // Will become linkTo (embedded),
+                    "filter_blocks_request_at_time_of_selection": filterBlocksRequestData
+                    // "userid" & "date_selected" are filled in by serverDefaults on backend.
+                });
+            });
+
+            // todo: AJAX POST that ^
+        } else {
+            // patch existing
+        }
+
+    };
+
+
+    return (
+        <button type="button" className="btn btn-primary" disabled={selectedItems.size === 0} onClick={onButtonClick}>
+            Add { selectedItems.size } Variant Samples to Interpretation Tab
+        </button>
+    );
+}
+
+
 
 function FilterSetUIHeader(props){
     const {

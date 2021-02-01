@@ -84,6 +84,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         selectedItems,          // passed in from SelectedItemsController
         onSelectItem,           // passed in from SelectedItemsController
         onResetSelectedItems,   // passed in from SelectedItemsController
+        variantSampleListItem  // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
     } = props;
     const {
         accession: caseAccession,
@@ -151,7 +152,10 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     }, [ context ]);
 
     // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedItems there.
-    const fsuiProps = { schemas, "caseItem": context };
+    const fsuiProps = {
+        schemas, variantSampleListItem, selectedItems,
+        "caseItem": context
+    };
 
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
@@ -186,23 +190,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         "key": searchTableKey
     };
 
-    return (
-        <React.Fragment>
-            <div className="row mb-24 mt-0">
-                <h1 className="col my-0">
-                    <span className="text-300">Variant Filtering and Technical Review</span>
-                </h1>
-                { selectedItems instanceof Map ?
-                    <div className="col-auto">
-                        <button type="button" className="btn btn-primary" disabled={selectedItems.size === 0}>
-                            Add { selectedItems.size } Variant Samples to Interpretation Tab
-                        </button>
-                    </div>
-                    : null }
-            </div>
-            <CaseViewEmbeddedVariantSampleSearchTable {...tableProps} />
-        </React.Fragment>
-    );
+    return <CaseViewEmbeddedVariantSampleSearchTable {...tableProps} />;
 });
 
 

@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
@@ -14,7 +14,9 @@ import { responsiveGridState } from './../../util/layout';
 import DefaultItemView from './../DefaultItemView';
 import { TabPaneErrorBoundary } from './../components/TabView';
 import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
+import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
+import { VariantSampleListController } from './VariantSampleListController';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -23,9 +25,9 @@ import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
 import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
-import { FilteringTab, SelectedVariantSamplesController } from './FilteringTab';
+import { FilteringTab } from './FilteringTab';
 import CaseSubmissionView from './CaseSubmissionView';
-import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
+
 
 
 
@@ -127,9 +129,12 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         windowWidth,
         windowHeight,
         idToGraphIdentifier,
-        PedigreeVizLibrary = null
+        PedigreeVizLibrary = null,
+        // Passed in from VariantSampleListController which wraps this component in `getTabObject`
+        variantSampleListItem = null
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
+
     const {
         family: currFamily = null, // Previously selected via CurrentFamilyController.js, now primary from case.
         secondary_families = null,
@@ -140,8 +145,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         accession: caseAccession,
         individual: caseIndividual,
         sample_processing: sampleProcessing = null,
-        initial_search_href_filter_addon: filterHrefAddon = "",
+        initial_search_href_filter_addon: filterHrefAddon = ""
     } = context;
+
+    const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
 
     const {
         countIndividuals: numIndividuals,
@@ -282,10 +289,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
                         <SelectedItemsController isMultiselect>
-                            <FilteringTab {...{ context, windowHeight, session, schemas }} />
+                            <FilteringTab {...{ context, windowHeight, session, schemas, variantSampleListItem }} />
                         </SelectedItemsController>
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
+                    <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled={vsSelections.length === 0} cache={false}>
                         <InterpretationTab {...props} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
@@ -297,6 +304,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     );
 });
 CaseInfoTabView.getTabObject = function(props){
+    const { context: { variant_sample_list_id } = {} } = props;
     return {
         'tab' : (
             <React.Fragment>
@@ -306,7 +314,11 @@ CaseInfoTabView.getTabObject = function(props){
         ),
         'key' : 'case-info',
         'disabled' : false,
-        'content' : <CaseInfoTabView {...props} />
+        'content' : (
+            <VariantSampleListController id={variant_sample_list_id}>
+                <CaseInfoTabView {...props} />
+            </VariantSampleListController>
+        )
     };
 };
 
@@ -412,22 +424,20 @@ class DotRouter extends React.PureComponent {
 function DotRouterTab(props) {
     const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
 
-    const onClick = useMemo(function(){
-        return function(){
-            const targetDotPath = prependDotPath + dotPath;
-            navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
-                // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
-                // layout.animateScrollTo(targetDotPath);
-            });
-        };
-    }, [ dotPath ]);
+    const onClick = useCallback(function(){
+        const targetDotPath = prependDotPath + dotPath;
+        navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
+            // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
+            // layout.animateScrollTo(targetDotPath);
+        });
+    }, []); // Previously was: [ prependDotPath, dotPath ] -- removed for now since these are hardcoded and don't change. IMPORTANT: REVERT IF THESE BECOME DYNAMIC.
 
     if (!React.isValidElement(children)) {
         throw new Error("Expected children to be present and valid JSX");
     }
 
     return (
-        <div className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")} >
+        <div className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")}>
             <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
