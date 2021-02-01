@@ -325,8 +325,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
-        conservation_gerp = fallbackElem,
-        conservation_phylop100 = fallbackElem,
+        'csq_gerp++_rs': gerp = fallbackElem,
+        csq_phylop100way_vertebrate = fallbackElem,
         csq_cadd_phred = fallbackElem,
         transcript = [],
         spliceai_maxds = fallbackElem,
@@ -359,9 +359,9 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("conservation_gerp")}>GERP++</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_gerp++_rs")}>GERP++</label>
                             </td>
-                            <td className="text-left">{ conservation_gerp }</td>
+                            <td className="text-left">{ gerp }</td>
                             {/* TODO for all:
                             <td className="text-left">{ prediction }/td>
                             <td className="text-left">{ score }</td>
@@ -369,9 +369,9 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("conservation_phylop100")}>PhyloP (100 Vertebrates)</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_phylop100way_vertebrate")}>PhyloP (100 Vertebrates)</label>
                             </td>
-                            <td className="text-left">{ conservation_phylop100 }</td>
+                            <td className="text-left">{ csq_phylop100way_vertebrate }</td>
                         </tr>
                     </tbody>
                 </table>

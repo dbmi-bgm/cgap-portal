@@ -145,10 +145,10 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
             },
             "variant.csq_cadd_phred": { // Predictors column (csq_cadd_phred, spliceai, phylop100)
                 render: function(result, props) {
-                    const { variant : { csq_cadd_phred = null, spliceai_maxds = null, conservation_phylop100 = null } = {} } = result;
+                    const { variant : { csq_cadd_phred = null, spliceai_maxds = null, csq_phylop100way_vertebrate = null } = {} } = result;
                     const rows = [];
 
-                    if (!csq_cadd_phred && !spliceai_maxds && !conservation_phylop100) {
+                    if (!csq_cadd_phred && !spliceai_maxds && !csq_phylop100way_vertebrate) {
                         return null;
                     }
                     if (csq_cadd_phred) {
@@ -157,8 +157,8 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                     if (spliceai_maxds) {
                         rows.push(<div key="spliceai_maxds" className="d-block text-truncate"><span className="text-600">SpliceAI MaxDS: </span>{spliceai_maxds || "-"}</div>);
                     }
-                    if (conservation_phylop100) {
-                        rows.push(<div key="phylop" className="d-block text-truncate"><span className="text-600">PhyloP 100: </span>{conservation_phylop100 || "-"}</div>);
+                    if (csq_phylop100way_vertebrate) {
+                        rows.push(<div key="phylop" className="d-block text-truncate"><span className="text-600">PhyloP 100: </span>{csq_phylop100way_vertebrate || "-"}</div>);
                     }
                     return <StackedRowColumn rowKey="genes_predictors" className="text-center" {...{ rows }}/>;
                 }
