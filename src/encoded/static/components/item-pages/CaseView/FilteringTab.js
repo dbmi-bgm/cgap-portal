@@ -85,7 +85,9 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         onSelectItem,           // passed in from SelectedItemsController
         onResetSelectedItems,   // passed in from SelectedItemsController
         variantSampleListItem,  // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
-        updateVariantSampleListID // ^
+        updateVariantSampleListID, // Passed in from VariantSampleListController
+        savedVariantSampleIDMap,// Passed in from VariantSampleListController
+        refreshExistingVariantSampleListItem, // Passed in from VariantSampleListController
     } = props;
     const {
         accession: caseAccession,
@@ -155,8 +157,8 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedItems there.
     const fsuiProps = {
         schemas,
-        variantSampleListItem, updateVariantSampleListID,
-        selectedItems,
+        variantSampleListItem, updateVariantSampleListID, refreshExistingVariantSampleListItem,
+        selectedItems, onResetSelectedItems,
         "caseItem": context
     };
 
@@ -190,6 +192,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     const tableProps = {
         hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader,
         selectedItems, onSelectItem, onResetSelectedItems,
+        savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
         "key": searchTableKey
     };
 

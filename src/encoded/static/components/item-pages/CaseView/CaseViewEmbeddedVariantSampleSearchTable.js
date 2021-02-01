@@ -1,11 +1,10 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
-import { SelectionItemCheckbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/SelectedItemsController';
 
 /* Used in FilteringTab */
 
@@ -142,18 +141,10 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         selectedItems,
         onSelectItem,
         onResetSelectedItems,
+        savedVariantSampleIDMap = {},
         ...passProps
     } = props;
 
-    console.log("PASSPROPS", props);
-
-    // Will use this method to inject modal open fx when Annotation/Interpretation spaces are moved to overlay
-    // const onSelectVariant = function(e) {
-    //     e.preventDefault();
-    //     console.log("thing happened, e", e);
-    // };
-
-    /* Generates new object `columnExtensionMap` only if `originalColExtMap` changes (if ever) */
     const columnExtensionMap = useMemo(function() {
         return {
             ...originalColExtMap,
@@ -167,20 +158,40 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
                         <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <SelectionItemCheckbox {...{ selectedItems, onSelectItem }} isMultiSelect />
+                            <VariantSampleSelectionCheckbox {...{ selectedItems, onSelectItem, savedVariantSampleIDMap }} />
                             <VSDisplayTitleColumnDefault />
                         </DisplayTitleColumnWrapper>
                     );
                 }
             }
         };
-    }, [ originalColExtMap, selectedItems ]);
+    }, [ originalColExtMap, selectedItems, savedVariantSampleIDMap ]);
 
-    return (
-        <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />
-    );
+    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
 
+/** Based mostly on SPC SelectionItemCheckbox w. minor alterations */
+export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleSelectionCheckbox(props){
+    const { selectedItems, result, onSelectItem, savedVariantSampleIDMap } = props;
+    const { "@id": resultID } = result;
+    const isPrevSaved = savedVariantSampleIDMap[resultID];
+    const isSelected = selectedItems.has(resultID);
+    const isChecked = isPrevSaved || isSelected;
+
+    const onChange = useCallback(function(e){
+        return onSelectItem(result, true);
+    }, [ onSelectItem, result ]);
+
+    useEffect(function(){
+        // Unselect this if for some reason has been previously selected.
+        // (might occur if someone started selecting things before VariantSampleList?datastore=databse Item has finished loading)
+        if (isSelected && isPrevSaved) {
+            onSelectItem(result, true);
+        }
+    }, [ isSelected, isPrevSaved ]);
+
+    return <input type="checkbox" checked={isChecked} onChange={onChange} disabled={isPrevSaved} className="mr-2" />;
+});
 
 
 /**************************************************
