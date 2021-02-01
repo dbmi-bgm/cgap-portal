@@ -351,7 +351,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             selectedItems,
 
             // From VariantSampleListController (in index.js, wraps CaseInfoTabView)
-            variantSampleListItem,
+            variantSampleListItem, updateVariantSampleListID
         } = this.props;
         const { total: totalCount, facets = null } = searchContext || {};
         const { filter_blocks = [] } = filterSet || {};
@@ -401,7 +401,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                     </h1>
                     { selectedItems instanceof Map ?
                         <div className="col-auto">
-                            <AddToVariantSampleListButton {...{ selectedItems, variantSampleListItem, caseItem, filterSet, selectedFilterBlockIndices }} />
+                            <AddToVariantSampleListButton {...{ selectedItems, variantSampleListItem, updateVariantSampleListID, caseItem, filterSet, selectedFilterBlockIndices }} />
                         </div>
                         : null }
                 </div>
@@ -440,19 +440,31 @@ function AddToVariantSampleListButton(props){
     const {
         selectedItems,
         variantSampleListItem = null,
+        updateVariantSampleListID,
         caseItem = null,
         filterSet,
         selectedFilterBlockIndices = {}
     } = props;
-    const { accession: caseAccession = null } = caseItem;
+
+    const {
+        "@id": caseAtID,
+        project: { "@id": caseProjectID } = {},
+        institution: { "@id" : caseInstitutionID } = {},
+        accession: caseAccession = null
+    } = caseItem;
+
+    console.log("TT", props);
 
     /** PATCH or create new VariantSampleList w. additions */
-
 
     const onButtonClick = function(){
 
         if (!filterSet) {
             throw new Error("Expected some filterSet to be present");
+        }
+
+        if (selectedItems.size === 0) {
+            throw new Error("Expected selected items");
         }
 
         let filterBlocksRequestData = _.pick(filterSet, "filter_blocks", "flags", "uuid");
@@ -467,23 +479,73 @@ function AddToVariantSampleListButton(props){
 
         if (!variantSampleListItem) {
             // Create new Item, then PATCH its @id to `Case.variant_sample_list_id` field.
-            const payload = { "variant_samples": [] };
+            const createVSLPayload = {
+                "variant_samples": [],
+                "institution": caseInstitutionID,
+                "project": caseProjectID
+            };
             if (caseAccession) {
-                payload.created_for_case = caseAccession;
+                createVSLPayload.created_for_case = caseAccession;
             }
             // This is type Map, so param signature is `value, key, map`
             // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
             selectedItems.forEach(function(variantSampleItem, variantSampleATID){
-                payload.variant_samples.push({
+                createVSLPayload.variant_samples.push({
                     "variant_sample_item": variantSampleATID, // Will become linkTo (embedded),
                     "filter_blocks_request_at_time_of_selection": filterBlocksRequestData
                     // "userid" & "date_selected" are filled in by serverDefaults on backend.
                 });
             });
 
-            // todo: AJAX POST that ^
+
+            ajax.promise(
+                "/variant-sample-lists/",
+                "POST",
+                {},
+                JSON.stringify(createVSLPayload)
+            ).then(function(respVSL){
+                console.log('respVSL', respVSL);
+                const {
+                    "@graph": [{
+                        "@id": vslAtID
+                    }],
+                    error: vslError
+                } = respVSL;
+
+                if (vslError || !vslAtID) {
+                    console.error(respVSL);
+                    throw new Error("Didn't succeed in creating new VSL Item");
+                }
+
+                updateVariantSampleListID(vslAtID);
+
+                return ajax.promise(
+                    caseAtID,
+                    "PATCH",
+                    {},
+                    JSON.stringify({ "variant_sample_list_id": vslAtID })
+                );
+            }).then(function(respCase){
+                console.log('respVSL', respCase);
+                const {
+                    "@graph": [{
+                        "@id": respCaseAtID
+                    }],
+                    error: caseError
+                } = respCase;
+                if (caseError || !respCaseAtID) {
+                    console.error(respCase);
+                    throw new Error("Didn't succeed in PATCHing Case Item");
+                }
+                console.info("Updated Case.variant_sample_list_id", respCase);
+                // TODO Maybe local-patch in-redux-store Case with new last_modified + variant_sample_list_id stuff? Idk.
+            }).catch(function(error){
+                console.error(error);
+            });
+
         } else {
             // patch existing
+            const payload = { "variant_samples": [] };
         }
 
     };

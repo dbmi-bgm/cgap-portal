@@ -3,11 +3,28 @@
 import React, { useMemo } from 'react';
 import queryString from 'query-string';
 import moment from 'moment';
+import memoize from "memoize-one";
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 /** Holds datastore=database representation of VariantSampleList Item */
 export class VariantSampleListController extends React.PureComponent {
+
+    /**
+     * Returns all variant_samples' `@ids` as JS object keys for filtering.
+     * @todo Once flags of some kinds are available, filter out "deleted" VS samples.
+     */
+    static activeVariantSampleIDMap(variant_samples){
+        const retDict = {};
+        variant_samples.forEach(function(vsSelection){
+            const { variant_sample_item: { "@id": vsAtID = null } } = vsSelection;
+            if (!vsAtID) {
+                return; // perhaps no view permission
+            }
+            retDict[vsAtID] = true;
+        });
+        return retDict;
+    }
 
     static getDerivedStateFromProps(props, state) {
         if (props.id) {
@@ -24,6 +41,10 @@ export class VariantSampleListController extends React.PureComponent {
         this.state = {
             "variantSampleListItem": null,
             "variantSampleListID": typeof vslID === "string" ? vslID : null
+        };
+
+        this.memoized = {
+            activeVariantSampleIDMap: memoize(VariantSampleListController.activeVariantSampleIDMap)
         };
     }
 
@@ -75,9 +96,11 @@ export class VariantSampleListController extends React.PureComponent {
     render(){
         const { children, id: propVSLID, ...passProps } = this.props;
         const { variantSampleListItem } = this.state;
+        const { variant_samples = [] } = variantSampleListItem || {};
         const childProps = {
             ...passProps,
             variantSampleListItem,
+            "savedVariantSampleIDMap": this.memoized.activeVariantSampleIDMap(variant_samples),
             "updateVariantSampleListID": this.updateVariantSampleListID
         };
         return React.Children.map(children, function(child){
