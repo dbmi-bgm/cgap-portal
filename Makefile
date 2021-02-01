@@ -38,7 +38,7 @@ macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an e
 
 configure:  # does any pre-requisite installs
 	pip install --upgrade pip
-	pip install poetry==1.0.10  # pinned to avoid build problems we cannot fix in pyproject.toml
+	pip install poetry==1.1.4  # A version known to work.
 
 build:  # builds
 	make configure
@@ -108,10 +108,16 @@ deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, th
 	python src/encoded/commands/ingestion.py src/encoded/annotations/variant_table_v0.4.8.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/annotations/GAPFI3JX5D2J.vcf hms-dbmi hms-dbmi src/encoded/annotations/gene_table_v0.4.6.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/annotations/gene_inserts_v0.4.6.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
 
 psql-dev:  # starts psql with the url after 'sqlalchemy.url =' in development.ini
-	@psql `grep 'sqlalchemy[.]url =' development.ini | sed -E 's/^.* = (.*)/\1/'`
+	@scripts/psql-start dev
 
-kibana-start:
+psql-test:  # starts psql with a url constructed from data in 'ps aux'.
+	@scripts/psql-start test
+
+kibana-start:  # starts a dev version of kibana (default port)
 	scripts/kibana-start
+
+kibana-start-test:  # starts a test version of kibana (port chosen for active tests)
+	scripts/kibana-start test
 
 kibana-stop:
 	scripts/kibana-stop
@@ -127,16 +133,16 @@ clean-python:
 	pip freeze | xargs pip uninstall -y
 
 test:
-	poetry run pytest -vv --timeout=200 -m "working and not indexing" && pytest -vv --timeout=200 -m "working and indexing"
+	poetry run python -m pytest -vv --timeout=200 -m "working and not indexing" && poetry run python -m pytest -vv --timeout=200 -m "working and indexing"
 
 retest:
-	poetry run pytest -vv --last-failed
+	poetry run python -m pytest -vv --last-failed
 
 test-any:
-	poetry run pytest -vv --timeout=200
+	poetry run python -m pytest -vv --timeout=200
 
 travis-test:
-	poetry run pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not indexing and not action_fail" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && poetry run pytest -vv --timeout=300 -m "working and indexing and not action_fail" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+	poetry run python -m pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not indexing and not action_fail" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && poetry run python -m pytest -vv --timeout=300 -m "working and indexing and not action_fail" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update
@@ -156,11 +162,13 @@ info:
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts.)
 	   $(info - Use 'make deploy2' to spin up the application server.)
 	   $(info - Use 'make deploy3' to load variants and genes.)
-	   $(info - Use 'make kibana-start' to start kibana, and 'make kibana-stop' to stop it.)
+	   $(info - Use 'make kibana-start' to start kibana on the default local ES port, and 'make kibana-stop' to stop it.)
+	   $(info - Use 'make kibana-start-test' to start kibana on the port being used for active testing, and 'make kibana-stop' to stop it.)
 	   $(info - Use 'make kill' to kill postgres and elasticsearch proccesses. Please use with care.)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests. Implied by 'make build'.)
 	   $(info - Use 'make npm-setup' to build the front-end. Implied by 'make build'.)
 	   $(info - Use 'make psql-dev' to start psql on data associated with an active 'make deploy1'.)
+	   $(info - Use 'make psql-test' to start psql on data associated with an active test.)
 	   $(info - Use 'make retest' to run failing tests from the previous test run.)
 	   $(info - Use 'make test' to run tests with normal options we use on travis ('-m "working and not performance"').)
 	   $(info - Use 'make test-any' to run tests without marker constraints (i.e., with no '-m' option).)

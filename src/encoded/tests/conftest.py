@@ -82,12 +82,6 @@ def pytest_configure():
 
 
 @pytest.yield_fixture
-def config():
-    yield setUp()
-    tearDown()
-
-
-@pytest.yield_fixture
 def threadlocals(request, dummy_request, registry):
     threadlocal_manager.push({'request': dummy_request, 'registry': registry})
     yield dummy_request
@@ -160,6 +154,10 @@ def upgrader(registry):
 def root(registry):
     return registry[ROOT]
 
+
+# TODO: Reconsider naming to have some underscores interspersed for better readability.
+#       e.g., html_testapp rather than htmltestapp, and especially anon_html_test_app rather than anonhtmltestapp.
+#       -kmp 03-Feb-2020
 
 @pytest.fixture
 def anonhtmltestapp(app):
@@ -235,8 +233,7 @@ def es_testapp(es_app):
 
 @pytest.fixture
 def anontestapp(app):
-    """TestApp with JSON accept header.
-    """
+    """TestApp for anonymous user (i.e., no user specified), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
     }
@@ -254,8 +251,7 @@ def anon_es_testapp(es_app):
 
 @pytest.fixture
 def authenticated_testapp(app):
-    """TestApp with JSON accept header for non-admin user.
-    """
+    """TestApp for an authenticated, non-admin user (TEST_AUTHENTICATED), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_AUTHENTICATED',
@@ -276,8 +272,7 @@ def authenticated_es_testapp(es_app):
 
 @pytest.fixture
 def submitter_testapp(app):
-    """TestApp with JSON accept header for non-admin user.
-    """
+    """TestApp for a non-admin user (TEST_SUBMITTER), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_SUBMITTER',
@@ -327,10 +322,14 @@ class WorkbookCache:
         }
         testapp = webtest.TestApp(es_app, environ)
 
-        # just load the workbook inserts
+        # Just load the workbook inserts
+        # Note that load_all returns None for success or an Exception on failure.
         load_res = load_all(testapp, pkg_resources.resource_filename('encoded', 'tests/data/workbook-inserts/'), [])
-        if load_res:
-            raise (load_res)
+
+        if isinstance(load_res, Exception):
+            raise load_res
+        elif load_res:
+            raise RuntimeError("load_all returned a true value that was not an exception.")
 
         testapp.post_json('/index', {})
         return True

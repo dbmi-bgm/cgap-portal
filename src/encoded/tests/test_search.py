@@ -505,9 +505,14 @@ def test_collection_actions_filtered_by_permission(workbook, es_testapp, anon_es
     assert len(res.json['@graph']) == 0
 
 
-@Retry.retry_allowed('test_index_data_workbook.check', wait_seconds=1, retries_allowed=5)
+@Retry.retry_allowed('test_index_data_workbook.check', wait_seconds=1, retries_allowed=20)
 def check_item_type(client, item_type):
     # This might get a 404 if not enough time has elapsed, so try a few times before giving up.
+    #
+    # We retry a lot of times because it's still fast if things are working quickly, but if it's
+    # slow it's better to wait than fail the test. Slowness is not what we're trying to check for here.
+    # And even if it's slow for one item, that same wait time will help others have time to catch up,
+    # so it shouldn't be slow for others. At least that's the theory. -kmp 27-Jan-2021
     return client.get('/%s?limit=all' % item_type, status=[200, 301]).follow()
 
 
