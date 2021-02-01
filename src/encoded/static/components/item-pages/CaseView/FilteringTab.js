@@ -123,22 +123,22 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                     return null;
                 }
             },
-            "variant.gnomad_af": { // Gnomad column
+            "variant.csq_gnomadg_af": { // Gnomad column
                 widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
                 render: function(result, props){
-                    const { variant : { gnomad_af = null, csq_gnomadg_af_popmax = null } = {} } = result;
+                    const { variant : { csq_gnomadg_af = null, csq_gnomadg_af_popmax = null } = {} } = result;
                     const rows = [];
 
-                    if (!gnomad_af && !csq_gnomadg_af_popmax) {
+                    if (!csq_gnomadg_af && !csq_gnomadg_af_popmax) {
                         return null;
                     }
-                    if (gnomad_af) {
-                        const gnomad_af_exp = gnomad_af ? gnomad_af.toExponential(3): null;
-                        rows.push(<div key="gnomad_af" className="d-block text-truncate"><span className="text-600">ALL: </span>{gnomad_af_exp || gnomad_af || "-"}</div>);
+                    if (csq_gnomadg_af) {
+                        const csq_gnomadg_af_exp = csq_gnomadg_af ? csq_gnomadg_af.toExponential(3): null;
+                        rows.push(<div key="csq_gnomadg_af" className="d-block text-truncate"><span className="text-600">ALL: </span>{csq_gnomadg_af_exp || csq_gnomadg_af || "-"}</div>);
                     }
                     if (csq_gnomadg_af_popmax){
                         const csq_gnomadg_af_popmax_exp = csq_gnomadg_af_popmax ? csq_gnomadg_af_popmax.toExponential(3): null;
-                        rows.push(<div key="gnomad_af_popmax" className="d-block text-truncate"><span className="text-600">MAX: </span>{csq_gnomadg_af_popmax_exp || csq_gnomadg_af_popmax || "-"}</div>);
+                        rows.push(<div key="csq_gnomadg_af_popmax" className="d-block text-truncate"><span className="text-600">MAX: </span>{csq_gnomadg_af_popmax_exp || csq_gnomadg_af_popmax || "-"}</div>);
                     }
                     return <StackedRowColumn rowKey="genes_gnomad" className="text-center" {...{ rows }}/>;
                 }

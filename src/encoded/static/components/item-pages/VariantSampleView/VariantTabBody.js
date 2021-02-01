@@ -111,15 +111,21 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
     const { variant } = context;
     const {
         // Allele Counts
-        gnomad_ac,      // Total
-        gnomad_ac_female, // Female
-        gnomad_ac_male, // Male
+        csq_gnomadg_ac: gnomad_ac,      // Total
+        'csq_gnomadg_ac-xx': gnomad_ac_female, // Female
+        'csq_gnomadg_ac-xy': gnomad_ac_male, // Male
         // Allele Frequences
-        gnomad_af, gnomad_af_female, gnomad_af_male,
+        csq_gnomadg_af: gnomad_af,
+        'csq_gnomadg_af-xx': gnomad_af_female,
+        'csq_gnomadg_af-xy': gnomad_af_male,
         // Allele Numbers
-        gnomad_an, gnomad_an_female, gnomad_an_male,
+        csq_gnomadg_af: gnomad_an,
+        'csq_gnomadg_an-xx': gnomad_an_female,
+        'csq_gnomadg_an-xy': gnomad_an_male,
         // Homozygote Numbers
-        gnomad_nhomalt, gnomad_nhomalt_female, gnomad_nhomalt_male
+        csq_gnomadg_nhomalt: gnomad_nhomalt,
+        'csq_gnomadg_nhomalt-xx': gnomad_nhomalt_female,
+        'csq_gnomadg_nhomalt-xy': gnomad_nhomalt_male
     } = variant;
 
     const populationsAncestryList = [
@@ -137,10 +143,10 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
     const ancestryRowData = _.sortBy(
         populationsAncestryList.map(function([popStr, populationTitle]){
             const {
-                ["gnomad_ac_" + popStr]: alleleCount,
-                ["gnomad_af_" + popStr]: alleleFreq,
-                ["gnomad_an_" + popStr]: alleleNum,
-                ["gnomad_nhomalt_" + popStr]: homozygoteNum,
+                ["csq_gnomadg_ac-" + popStr]: alleleCount,
+                ["csq_gnomadg_af-" + popStr]: alleleFreq,
+                ["csq_gnomadg_an-" + popStr]: alleleNum,
+                ["csq_gnomadg_nhomalt-" + popStr]: homozygoteNum,
             } = variant;
             return { popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum };
         }),
@@ -165,10 +171,10 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
             <thead>
                 <tr>
                     <th className="text-left">Population</th>
-                    <th data-tip={getTipForField("gnomad_ac")}>Allele Count</th>
-                    <th data-tip={getTipForField("gnomad_an")}>Allele Number</th>
-                    <th data-tip={getTipForField("gnomad_nhomalt")}># of Homozygotes</th>
-                    <th className="text-left" data-tip={getTipForField("gnomad_af")}>Allele Frequency</th>
+                    <th data-tip={getTipForField("csq_gnomadg_ac")}>Allele Count</th>
+                    <th data-tip={getTipForField("csq_gnomadg_an")}>Allele Number</th>
+                    <th data-tip={getTipForField("csq_gnomadg_nhomalt")}># of Homozygotes</th>
+                    <th className="text-left" data-tip={getTipForField("csq_gnomadg_af")}>Allele Frequency</th>
                 </tr>
             </thead>
             <tbody>
