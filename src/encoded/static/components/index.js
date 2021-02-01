@@ -64,6 +64,7 @@ content_views.register(CGAPSubmissionView,      'Item', 'create');
 content_views.register(CGAPSubmissionView,      'Item', 'clone');
 content_views.register(CGAPSubmissionView,      'Search', 'add');
 content_views.register(CaseSubmissionView,      'CaseSearchResults', 'add');
+content_views.register(ExcelSubmissionView,     'IngestionSubmission', 'create');
 content_views.register(ExcelSubmissionView,     'IngestionSubmissionSearchResults', 'add');
 
 content_views.register(SearchView,              'Search');
