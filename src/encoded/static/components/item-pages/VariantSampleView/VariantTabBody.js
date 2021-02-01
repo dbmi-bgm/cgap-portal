@@ -330,7 +330,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
         csq_cadd_phred = fallbackElem,
         transcript = [],
         spliceai_maxds = fallbackElem,
-        primateai_primatedl_score = fallbackElem
+        csq_primateai_score = fallbackElem
     } = variant;
 
     // Should we instead find transcript with largest score instead of using current?
@@ -408,9 +408,9 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("primateai_primatedl_score")}>PrimateAI DL Score</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_primateai_score")}>PrimateAI DL Score</label>
                             </td>
-                            <td className="text-left">{ primateai_primatedl_score }</td>
+                            <td className="text-left">{ csq_primateai_score }</td>
                         </tr>
                     </tbody>
                 </table>

@@ -20,7 +20,7 @@ export function VariantSampleInfoHeader(props) {
         schemas,
         caseID = <span className="text-muted"> - </span> // null
     } = props;
-    const { variant: { dbsnp_rs_number = fallbackElem } = {} } = context;
+    const { variant: { csq_rs_dbsnp151 = fallbackElem } = {} } = context;
 
     function getTipForField(field, itemType = "VariantSample"){
         if (!schemas) return null;
@@ -63,7 +63,7 @@ export function VariantSampleInfoHeader(props) {
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-2">
-                                    <label htmlFor="variant.dbsnp_rs_number" className="mb-0" data-tip={getTipForField("variant.dbsnp_rs_number")}>
+                                    <label htmlFor="variant.csq_rs_dbsnp151" className="mb-0" data-tip={getTipForField("variant.csq_rs_dbsnp151")}>
                                         dbSNP:
                                     </label>
                                 </div>
@@ -71,8 +71,8 @@ export function VariantSampleInfoHeader(props) {
                                  * 'col[-xl]-auto' allows entire item to ellide to next row.
                                  * May or may not be preferable depending on value content/type.
                                  */}
-                                <div className="col-12 col-xl-auto" id="variant.dbsnp_rs_number">
-                                    { dbsnp_rs_number }
+                                <div className="col-12 col-xl-auto" id="variant.csq_rs_dbsnp151">
+                                    { csq_rs_dbsnp151 }
                                 </div>
                             </div>
 

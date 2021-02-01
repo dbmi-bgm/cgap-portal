@@ -126,19 +126,19 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
             "variant.gnomad_af": { // Gnomad column
                 widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
                 render: function(result, props){
-                    const { variant : { gnomad_af = null, max_pop_af_af_popmax = null } = {} } = result;
+                    const { variant : { gnomad_af = null, csq_gnomadg_af_popmax = null } = {} } = result;
                     const rows = [];
 
-                    if (!gnomad_af && !max_pop_af_af_popmax) {
+                    if (!gnomad_af && !csq_gnomadg_af_popmax) {
                         return null;
                     }
                     if (gnomad_af) {
                         const gnomad_af_exp = gnomad_af ? gnomad_af.toExponential(3): null;
                         rows.push(<div key="gnomad_af" className="d-block text-truncate"><span className="text-600">ALL: </span>{gnomad_af_exp || gnomad_af || "-"}</div>);
                     }
-                    if (max_pop_af_af_popmax){
-                        const max_pop_af_af_popmax_exp = max_pop_af_af_popmax ? max_pop_af_af_popmax.toExponential(3): null;
-                        rows.push(<div key="gnomad_af_popmax" className="d-block text-truncate"><span className="text-600">MAX: </span>{max_pop_af_af_popmax_exp || max_pop_af_af_popmax || "-"}</div>);
+                    if (csq_gnomadg_af_popmax){
+                        const csq_gnomadg_af_popmax_exp = csq_gnomadg_af_popmax ? csq_gnomadg_af_popmax.toExponential(3): null;
+                        rows.push(<div key="gnomad_af_popmax" className="d-block text-truncate"><span className="text-600">MAX: </span>{csq_gnomadg_af_popmax_exp || csq_gnomadg_af_popmax || "-"}</div>);
                     }
                     return <StackedRowColumn rowKey="genes_gnomad" className="text-center" {...{ rows }}/>;
                 }
@@ -185,15 +185,15 @@ function StackedRowColumn(props) {
 const VSDisplayTitleColumnDefault = React.memo(function VSDisplayTitleColumnDefault(props) {
     const { result = null, link, onClick, className = null } = props;
     const { variant = null } = result || {};
-    const { display_title = null, dbsnp_rs_number = null } = variant;
+    const { display_title = null, csq_rs_dbsnp151 = null } = variant;
 
     const cls = ("title-block" + (className ? " " + className : ""));
     const rows = [
         <span key="variant-title" className="d-block text-600 text-truncate">{display_title}</span>
     ];
 
-    if (dbsnp_rs_number) {
-        rows.push(<span key="dbsnp" className="font-italic">{dbsnp_rs_number}</span>);
+    if (csq_rs_dbsnp151) {
+        rows.push(<span key="dbsnp" className="font-italic">{csq_rs_dbsnp151}</span>);
     }
 
     return (
