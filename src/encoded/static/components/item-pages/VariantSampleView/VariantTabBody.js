@@ -211,7 +211,7 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
         csq_clinvar: variationID,
         csq_clinvar_clnsig: clinicalSignificance,
         csq_clinvar_clnsigconf: conflictingClinicalSignificance,
-        clinvar_submission = [],
+        clinvar_submission = [], // TODO - missing in data rn.
         csq_clinvar_clnrevstat: reviewStatus
     } = variant;
 
