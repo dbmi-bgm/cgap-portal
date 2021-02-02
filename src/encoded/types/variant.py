@@ -3,6 +3,7 @@ import os
 import boto3
 import pytz
 import datetime
+import structlog
 from pyramid.view import view_config
 from pyramid.settings import asbool
 from urllib.parse import (
@@ -28,6 +29,7 @@ from .base import (
 import negspy.coordinates as nc
 
 
+log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
 ANNOTATION_ID_SEP = '_'
 

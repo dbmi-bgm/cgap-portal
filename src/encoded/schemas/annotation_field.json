@@ -24,9 +24,14 @@
         },
         "field_name": {
             "title": "Field Name",
-            "description": "Original name of the annotation field name on vcf file",
+            "description": "Name of the annotation field in the CGAP Metadata DB",
             "type": "string",
             "uniqueKey": true
+        },
+        "vcf_field": {
+            "title": "VCF Field",
+            "description": "Name of the annotation field on the annotated VCF.",
+            "type": "string"
         },
         "source_name": {
             "title": "Source Name",
@@ -168,6 +173,11 @@
             "title": "Calculated Property",
             "description": "Boolean on whether or not this field is a calculated property of a variant",
             "type": "boolean"
+        },
+        "abbreviation": {
+            "title": "Abbreviation",
+            "description": "A shorter name for this field, used by the UI",
+            "type": "string"
         }
     },
     "facets": {
