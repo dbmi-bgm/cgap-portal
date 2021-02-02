@@ -32,7 +32,7 @@ class MappingTableHeader:
     BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field', 'do_import', 'facet_default_hidden']
     STRING_FIELDS = ['field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
                      'annotation_category', 'separator', 'description',
-                     'scope', 'schema_title', 'pattern', 'link']
+                     'scope', 'schema_title', 'pattern', 'link', 'abbreviation']
     SPECIAL_FIELDS = ['field_type', 'enum_list', 'links_to']
     ENUM_FIELDS = ['enum_list']
     IGNORED_FIELDS = ['source', 'priority', 'annotation_space_location', 'comments', 'value_example']
@@ -132,7 +132,7 @@ class VariantTableParser(object):
                     continue
                 for field_name, entry in zip(self.fields, row):
                     if field_name not in self.annotation_field_schema['properties'] or not entry:
-                        continue  # skip entry not in field schema
+                        continue  # IMPORTANT: skip entry not in field schema
                     if field_name in MappingTableHeader.INTEGER_FIELDS:  # handle int fields
                         if entry is not None:  # entry=0 is a normal value
                             insert[field_name] = int(entry)
@@ -265,7 +265,7 @@ class VariantTableParser(object):
 
             # handle string fields
             for a_field in MappingTableHeader.STRING_FIELDS:
-                if item.get(a_field):
+                if item.get(a_field) is not None:
                     features[a_field] = item[a_field]
 
             # handle int fields

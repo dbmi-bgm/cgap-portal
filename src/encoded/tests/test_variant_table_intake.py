@@ -16,7 +16,7 @@ EXPECTED_FIELDS = ['no', 'field_name', 'vcf_field', 'source_name', 'source_versi
                    'facet_order', 'column_order', 'annotation_category',
                    'scope', 'schema_title', 'links_to', 'embedded_field',
                    'calculated_property', 'pattern', 'default', 'min', 'max', 'link', 'comments',
-                   'annotation_space_location']
+                   'annotation_space_location', 'abbreviation']
 EXPECTED_INSERT = {'field_name': 'CHROM', 'vcf_field': 'CHROM', 'schema_title': 'Chromosome',
                    'do_import': True, 'scope': 'variant', 'source_name': 'VCF',
                    'source_version': 'VCFv4.2', 'description': 'Chromosome',
@@ -103,6 +103,7 @@ def test_generate_sample_json_items(MTParser, inserts):
     """ Tests that sample JSON is being created correctly checking three we expect """
     sample_fields = MTParser.filter_fields_by_sample(inserts)
     sample_props, cols, facs = MTParser.generate_properties(sample_fields, variant=False)
+    assert sample_props['novoPP']['abbreviation'] == 'novoPP'
     assert sample_props['DP']['type'] == 'integer'
     assert sample_props['DP']['field_name'] == 'DP'
     assert sample_props['PGT']['type'] == 'string'

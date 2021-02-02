@@ -73,7 +73,8 @@
             "annotation_category": "Variant Quality",
             "description": "Alternate allelic depth",
             "scope": "sample_variant",
-            "schema_title": "AD (Alt)"
+            "schema_title": "AD (Alt)",
+            "abbreviation": "AD"
         },
         "AD_REF": {
             "title": "AD (Ref)",
@@ -380,6 +381,7 @@
             "description": "Posterior probability of de novo mutation",
             "scope": "sample_variant",
             "schema_title": "novoCaller PP",
+            "abbreviation": "novoPP",
             "facet_order": 16,
             "min": 0,
             "max": 1

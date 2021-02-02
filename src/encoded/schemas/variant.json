@@ -658,6 +658,7 @@
             "description": "Alternate allele frequency in samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt Allele Frequency",
+            "abbreviation": "AF",
             "column_order": 60,
             "facet_order": 18,
             "default": 0,
@@ -852,6 +853,7 @@
             "description": "maximum population allele frequency from gnomAD gnome v3.0",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - PopMax",
+            "abbreviation": "PopMax AF",
             "column_order": 61,
             "facet_order": 19,
             "default": 0,
@@ -1271,6 +1273,7 @@
             "description": "PhyloP 100 way score",
             "scope": "variant",
             "schema_title": "PhyloP (100 Vertebrates)",
+            "abbreviation": "PhyloP100",
             "facet_order": 22,
             "min": -20,
             "max": 10
