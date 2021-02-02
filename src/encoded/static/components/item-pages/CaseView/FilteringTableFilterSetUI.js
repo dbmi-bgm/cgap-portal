@@ -457,8 +457,6 @@ function AddToVariantSampleListButton(props){
 
     const [ isLoading, setIsLoading ] = useState(false);
 
-    console.log("TT", props);
-
     /** PATCH or create new VariantSampleList w. additions */
 
     const onButtonClick = function(){
