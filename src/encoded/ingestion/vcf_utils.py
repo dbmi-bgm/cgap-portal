@@ -2,7 +2,7 @@ import vcf
 import json
 import logging
 from collections import OrderedDict
-from ..util import resolve_file_path
+
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +34,7 @@ class VCFParser(object):
     CGAP = 'CGAP'  # annotation fields from CGAP itself
     OVERWRITE_FIELDS = {  # field names that do not validate our DB and are mapped
         'csq_hg19_pos(1-based)': 'csq_hg19_pos',
+        'csq_gerp++_rs_rankscore': 'csq_gerp_rs_rankscore',
         'csq_gerp++_rs': 'csq_gerp_rs'
     }
     DISABLED_FIELDS = ['csq_tsl']  # annotation fields that do not validate
@@ -141,7 +142,7 @@ class VCFParser(object):
 
     @staticmethod
     def _strip(s):
-        """ Strips whitespace and quotation characters and also lowercases the given string s
+        """ Strips whitespace and quotation characters and lowercases the given string s
 
         :param s: String to strip
         :return: processed string

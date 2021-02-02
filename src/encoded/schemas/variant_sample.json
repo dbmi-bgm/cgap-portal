@@ -58,8 +58,7 @@
             "annotation_category": "Variant Quality",
             "description": "Allelic depth",
             "scope": "sample_variant",
-            "schema_title": "Allelic Depth",
-            "facet_order": 10
+            "schema_title": "Allelic Depth"
         },
         "AD_ALT": {
             "title": "AD (Alt)",
@@ -73,7 +72,9 @@
             "annotation_category": "Variant Quality",
             "description": "Alternate allelic depth",
             "scope": "sample_variant",
-            "schema_title": "AD (Alt)"
+            "schema_title": "AD (Alt)",
+            "abbreviation": "AD",
+            "facet_order": 10
         },
         "AD_REF": {
             "title": "AD (Ref)",
@@ -380,6 +381,7 @@
             "description": "Posterior probability of de novo mutation",
             "scope": "sample_variant",
             "schema_title": "novoCaller PP",
+            "abbreviation": "novoPP",
             "facet_order": 16,
             "min": 0,
             "max": 1
@@ -563,8 +565,10 @@
         }
     },
     "facets": {
-        "AD": {
-            "title": "Allelic Depth",
+        "AD_ALT": {
+            "title": "AD (Alt)",
+            "aggregation_type": "stats",
+            "number_step": 1,
             "order": 10,
             "grouping": "Variant Quality"
         },
@@ -703,8 +707,10 @@
         },
         "variant.genes.genes_most_severe_gene.gene_lists.display_title": {
             "title": "Gene List",
-            "order": 99,
-            "grouping": "Genes"
+            "order": 1,
+            "grouping": "Genes",
+            "search_type": "sayt_without_terms",
+            "sayt_item_type": "Gene"
         },
         "variant.genes.genes_most_severe_gene.oe_lof": {
             "title": "o/e (LoF)",

@@ -173,6 +173,11 @@
             "title": "Calculated Property",
             "description": "Boolean on whether or not this field is a calculated property of a variant",
             "type": "boolean"
+        },
+        "abbreviation": {
+            "title": "Abbreviation",
+            "description": "A shorter name for this field, used by the UI",
+            "type": "string"
         }
     },
     "facets": {
