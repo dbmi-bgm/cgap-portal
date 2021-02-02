@@ -4,6 +4,7 @@ import os
 import psutil
 import time
 
+from dcicutils.misc_utils import environ_bool, PRINT
 from functools import lru_cache
 from pkg_resources import resource_filename
 from pyramid.events import BeforeRender, subscriber
@@ -317,9 +318,16 @@ def canonical_redirect(event):
 
 # Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
 # which should contain 'text/html'
-MIME_TYPES_SUPPORTED = ['text/html', 'application/json', 'application/ld+json']
-MIME_TYPE_DEFAULT = 'application/json'
+MIME_TYPE_HTML = 'text/html'
+MIME_TYPE_JSON = 'application/json'
+MIME_TYPE_LD_JSON = 'application/ld+json'
+
+MIME_TYPES_SUPPORTED = [MIME_TYPE_JSON, MIME_TYPE_LD_JSON, MIME_TYPE_HTML]
+MIME_TYPE_DEFAULT = MIME_TYPE_JSON
 MIME_TYPE_TRIAGE_MODE = 'modern'  # if this doesn't work, fall back to 'legacy'
+ACCEPT_ANY = "*/*"
+
+DEBUG_MIME_TYPES = environ_bool("DEBUG_MIME_TYPES", default=False)
 
 
 def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
@@ -342,7 +350,7 @@ def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
         #      being maintained for backward compatibility, but it will be deprecated in the future,
         #      as it does not conform to the RFC.
         # TODO: Once the modern replacement is shown to work, we should remove this conditional branch.
-        return request.accept.best_match(MIME_TYPES_SUPPORTED, MIME_TYPE_DEFAULT)
+        result = request.accept.best_match(MIME_TYPES_SUPPORTED, MIME_TYPE_DEFAULT)
     else:
         options = request.accept.acceptable_offers(MIME_TYPES_SUPPORTED)
         if not options:
@@ -350,10 +358,19 @@ def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
             #       no acceptable types are available. (Certainly returning JSON in this case is
             #       not some kind of friendly help toa naive user with an old browser.)
             #       Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-            return MIME_TYPE_DEFAULT
+            result = MIME_TYPE_DEFAULT
         else:
             mime_type, score = options[0]
-            return mime_type
+            result = mime_type
+    # accept_header = request.headers.get('Accept') or ACCEPT_ANY
+    # if result == MIME_TYPE_HTML and accept_header == ACCEPT_ANY:
+    #     result = MIME_TYPE_JSON
+    if DEBUG_MIME_TYPES:
+        PRINT("Using mime type", result, "for", request.method, request.url)
+        for k, v in request.headers.items():
+            PRINT("%s: %s" % (k, v))
+        PRINT("----------")
+    return result
 
 
 @lru_cache(maxsize=16)
