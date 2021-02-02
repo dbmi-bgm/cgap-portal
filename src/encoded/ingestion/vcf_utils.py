@@ -2,7 +2,7 @@ import vcf
 import json
 import logging
 from collections import OrderedDict
-from ..util import resolve_file_path
+
 
 logger = logging.getLogger(__name__)
 
@@ -142,14 +142,14 @@ class VCFParser(object):
 
     @staticmethod
     def _strip(s):
-        """ Strips whitespace and quotation characters and also lowercases the given string s
+        """ Strips whitespace and quotation characters from the given string s
 
         :param s: String to strip
         :return: processed string
         """
         if not isinstance(s, str):
             raise VCFParserException('Tried to apply string strip to non-string %s' % s)
-        return s.lower().strip(' "\'')
+        return s.strip(' "\'')
 
     def verify_in_schema(self, field, sub_group=None):
         """ Helper to verify the given field is in the schema.
