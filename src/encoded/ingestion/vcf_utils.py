@@ -34,6 +34,7 @@ class VCFParser(object):
     CGAP = 'CGAP'  # annotation fields from CGAP itself
     OVERWRITE_FIELDS = {  # field names that do not validate our DB and are mapped
         'csq_hg19_pos(1-based)': 'csq_hg19_pos',
+        'csq_gerp++_rs_rankscore': 'csq_gerp_rs_rankscore',
         'csq_gerp++_rs': 'csq_gerp_rs'
     }
     DISABLED_FIELDS = ['csq_tsl']  # annotation fields that do not validate
