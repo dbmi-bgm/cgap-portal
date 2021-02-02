@@ -4,7 +4,7 @@ import os
 import psutil
 import time
 
-from dcicutils.misc_utils import environ_bool, PRINT
+from dcicutils.misc_utils import environ_bool, PRINT, ignored
 from functools import lru_cache
 from pkg_resources import resource_filename
 from pyramid.events import BeforeRender, subscriber
@@ -93,6 +93,7 @@ def validate_request_tween_factory(handler, registry):
     Apache config:
         SetEnvIf Request_Method HEAD X_REQUEST_METHOD=HEAD
     """
+    ignored(registry)
 
     def validate_request_tween(request):
 
@@ -118,6 +119,7 @@ def validate_request_tween_factory(handler, registry):
 
 
 def security_tween_factory(handler, registry):
+    ignored(registry)
 
     def security_tween(request):
         """
@@ -225,6 +227,7 @@ def remove_expired_session_cookies_tween_factory(handler, registry):
     their removal in security_tween_factory & authentication.py as well as client-side
     (upon "Logout" action). If needed for some reason, can re-enable.
     """  # noQA - not going to break the long URL line above
+    ignored(registry)
 
     ignore = {
         '/favicon.ico',
@@ -261,6 +264,8 @@ def remove_expired_session_cookies_tween_factory(handler, registry):
 
 def set_response_headers_tween_factory(handler, registry):
     """Add additional response headers here"""
+    ignored(registry)
+
     def set_response_headers_tween(request):
         response = handler(request)
         response.headers['X-Request-URL'] = request.url
@@ -325,7 +330,6 @@ MIME_TYPE_LD_JSON = 'application/ld+json'
 MIME_TYPES_SUPPORTED = [MIME_TYPE_JSON, MIME_TYPE_LD_JSON, MIME_TYPE_HTML]
 MIME_TYPE_DEFAULT = MIME_TYPE_JSON
 MIME_TYPE_TRIAGE_MODE = 'modern'  # if this doesn't work, fall back to 'legacy'
-ACCEPT_ANY = "*/*"
 
 DEBUG_MIME_TYPES = environ_bool("DEBUG_MIME_TYPES", default=False)
 
@@ -362,9 +366,6 @@ def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
         else:
             mime_type, score = options[0]
             result = mime_type
-    # accept_header = request.headers.get('Accept') or ACCEPT_ANY
-    # if result == MIME_TYPE_HTML and accept_header == ACCEPT_ANY:
-    #     result = MIME_TYPE_JSON
     if DEBUG_MIME_TYPES:
         PRINT("Using mime type", result, "for", request.method, request.url)
         for k, v in request.headers.items():
