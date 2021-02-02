@@ -33,13 +33,13 @@ export class VariantSampleOverview extends React.PureComponent {
         } = props;
 
         // Set initial index to most severe or canonical transcript.
-        let initialIndex = transcript.findIndex(function({ vep_most_severe }){
-            return !!(vep_most_severe);
+        let initialIndex = transcript.findIndex(function({ csq_most_severe }){
+            return !!(csq_most_severe);
         });
 
         if (initialIndex === -1){
-            initialIndex = transcript.findIndex(function({ vep_canonical }){
-                return !!(vep_canonical);
+            initialIndex = transcript.findIndex(function({ csq_canonical }){
+                return !!(csq_canonical);
             });
         }
 
