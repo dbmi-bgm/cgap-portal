@@ -2200,7 +2200,6 @@
         },
         "csq_gnomadg_af": {
             "title": "GnomAD Alt Allele Frequency",
-            "abbreviation": "AF",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 18,
@@ -2208,7 +2207,6 @@
         },
         "csq_gnomadg_af_popmax": {
             "title": "GnomAD Alt AF - PopMax",
-            "abbreviation": "PopMax AF",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 19,
@@ -2230,7 +2228,6 @@
         },
         "csq_phylop100way_vertebrate": {
             "title": "PhyloP (100 Vertebrates)",
-            "abbreviation": "PhyloP100",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 22,
@@ -2325,14 +2322,12 @@
         },
         "csq_gnomadg_af": {
             "title": "GnomAD Alt Allele Frequency",
-            "abbreviation": "AF",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 60
         },
         "csq_gnomadg_af_popmax": {
             "title": "GnomAD Alt AF - PopMax",
-            "abbreviation": "PopMax AF",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 61

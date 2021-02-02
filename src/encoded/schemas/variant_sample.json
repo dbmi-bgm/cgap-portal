@@ -526,14 +526,12 @@
         },
         "variant.csq_gnomadg_af": {
             "title": "GnomAD Alt Allele Frequency",
-            "abbreviation": "AF",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 60
         },
         "variant.csq_gnomadg_af_popmax": {
             "title": "GnomAD Alt AF - PopMax",
-            "abbreviation": "PopMax AF",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 61
@@ -569,7 +567,6 @@
     "facets": {
         "AD_ALT": {
             "title": "AD (Alt)",
-            "abbreviation": "AD",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 10,
@@ -629,7 +626,6 @@
         },
         "novoPP": {
             "title": "novoCaller PP",
-            "abbreviation": "novoPP",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 16,
@@ -661,7 +657,6 @@
         },
         "variant.csq_gnomadg_af": {
             "title": "GnomAD Alt Allele Frequency",
-            "abbreviation": "AF",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 18,
@@ -669,7 +664,6 @@
         },
         "variant.csq_gnomadg_af_popmax": {
             "title": "GnomAD Alt AF - PopMax",
-            "abbreviation": "PopMax AF",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 19,
@@ -691,7 +685,6 @@
         },
         "variant.csq_phylop100way_vertebrate": {
             "title": "PhyloP (100 Vertebrates)",
-            "abbreviation": "PhyloP100",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 22,

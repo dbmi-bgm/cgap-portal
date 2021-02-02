@@ -362,14 +362,8 @@ class VariantTableParser(object):
         def is_default_hidden(o):
             return o.get('facet_default_hidden', 'N') == 'Y'
 
-        def has_abbreviation(o):
-            return o.get('abbreviation', None)
-
         def insert_column_or_facet(d, o, facet=True):
             val = {'title': o.get('schema_title', o.get(self.NAME_FIELD))}
-            abbreviation = has_abbreviation(o)
-            if abbreviation is not None:
-                val['abbreviation'] = abbreviation
             if is_default_hidden(o):
                 val['default_hidden'] = True
             if is_numbered_field(o) and is_facet(o):
