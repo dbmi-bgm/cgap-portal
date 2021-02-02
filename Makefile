@@ -1,3 +1,5 @@
+SHELL=/bin/bash
+
 clean:  # clear node modules, eggs, npm build stuff
 	make clean-python-caches
 	make clean-npm-caches
@@ -38,7 +40,7 @@ macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an e
 
 configure:  # does any pre-requisite installs
 	pip install --upgrade pip
-	pip install poetry==1.1.4  # A version known to work.
+	pip install poetry==1.1.4  # poetry latest as of 1/25/2021 seemed to work but apparantly does not
 
 build:  # builds
 	make configure
@@ -104,8 +106,8 @@ deploy1b:  # starts ingestion engine separately so it can be easily stopped and 
 deploy2:  # spins up waittress to serve the application
 	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini
 
-deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, then Variant + VariantSamples
-	python src/encoded/commands/ingestion.py src/encoded/annotations/variant_table_v0.4.8.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/annotations/GAPFI3JX5D2J.vcf hms-dbmi hms-dbmi src/encoded/annotations/gene_table_v0.4.6.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/annotations/gene_inserts_v0.4.6.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
+deploy3:  # Uploads genes, consequences then ingests the VCF below
+	poetry run ingest-vcf src/encoded/annotations/GAPFIAI7IZ9Y.reformat.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
 
 psql-dev:  # starts psql with the url after 'sqlalchemy.url =' in development.ini
 	@scripts/psql-start dev
@@ -130,7 +132,7 @@ kill:  # kills back-end processes associated with the application. Use with care
 clean-python:
 	@echo -n "Are you sure? This will wipe all libraries installed on this virtualenv [y/N] " && read ans && [ $${ans:-N} = y ]
 	pip uninstall encoded
-	pip freeze | xargs pip uninstall -y
+	pip uninstall -y -r <(pip freeze)
 
 test:
 	poetry run python -m pytest -vv --timeout=200 -m "working and not indexing" && poetry run python -m pytest -vv --timeout=200 -m "working and indexing"

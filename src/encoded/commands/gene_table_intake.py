@@ -2,91 +2,10 @@ import argparse
 import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
-from ..commands.variant_table_intake import MappingTableParser
-
+from ..ingestion.table_utils import GeneTableParser
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
-
-
-class GeneTableIntakeException(Exception):
-    """ Specific type of exception we'd like to throw if we fail in this stage
-        due to an error with the table itself
-    """
-    pass
-
-
-class GeneTableParser(MappingTableParser):
-    """ Subclass of MappingTableParser that overrides methods required for any differences across tables. """
-
-    def __init__(self, *args, **kwargs):
-        self.FIELD_TYPE_INDEX = 8
-        kwargs['skip_embeds'] = True  # do not clear embeds when running gene intake
-        super(GeneTableParser, self).__init__(*args, **kwargs)
-
-    @staticmethod
-    def add_default_schema_fields(schema):
-        """ Adds default schema fields
-
-        Args:
-            schema: schema to add fields to
-        """
-        schema['$schema'] = 'http://json-schema.org/draft-04/schema#'
-        schema['type'] = 'object'
-        schema['required'] = ['institution', 'project', 'gene_symbol', 'ensgid']
-        schema['identifyingProperties'] = ['uuid', 'aliases']
-        schema['additionalProperties'] = False
-        schema['mixinProperties'] = [
-            {"$ref": "mixins.json#/schema_version"},
-            {"$ref": "mixins.json#/uuid"},
-            {"$ref": "mixins.json#/aliases"},
-            {"$ref": "mixins.json#/submitted"},
-            {"$ref": "mixins.json#/modified"},
-            {"$ref": "mixins.json#/status"},
-            {"$ref": "mixins.json#/attribution"},
-            {"$ref": "mixins.json#/notes"},
-            {"$ref": "mixins.json#/static_embeds"}
-        ]
-
-    def generate_gene_schema(self, gene_props, columns, facets):
-        """
-        Builds gene.json schema based on gene_props
-
-        :param gene_props: dictionary of 'properties' based on the gene fields
-        :param columns: columns to attach
-        :param facets: facets to compute
-        :return: gene schema
-        """
-        schema = {}
-        self.add_default_schema_fields(schema)
-        schema['title'] = 'Genes'
-        schema['description'] = "Schema for Genes"
-        schema['id'] = '/profiles/gene.json'
-        gene_props['ensgid']['uniqueKey'] = True  # XXX: This is required for genes
-        schema['properties'] = gene_props
-        schema['properties']['schema_version'] = {'default': '1'}
-        schema['facets'] = facets
-        schema['columns'] = columns
-        logger.info('Build gene schema')
-        return schema
-
-    def run(self, gs_out=None, write=False):  # noqa - args are different then in superclass but we don't care
-        """
-        Ingests the gene table, producing the gene schema
-
-        :param gs_out: path where to write the gene schema
-        :param write: whether or not to actually write the schema (can do dry-run)
-        :return: gene_annotation_field inserts
-        """
-        inserts = self.process_annotation_field_inserts()
-        gene_props, columns, facets = self.generate_properties(inserts)
-        gene_schema = self.generate_gene_schema(gene_props, columns, facets)
-        if write:
-            if not gs_out:
-                raise GeneTableIntakeException('Write specified but no output file given')
-            self.write_schema(gene_schema, gs_out)
-            logger.info('Successfully wrote gene schema')
-        return inserts
 
 
 def main():

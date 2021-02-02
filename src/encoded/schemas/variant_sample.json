@@ -48,16 +48,17 @@
     "id": "/profiles/variant_sample.json",
     "properties": {
         "AD": {
-            "title": "AD",
+            "title": "Allelic Depth",
             "field_name": "AD",
             "type": "string",
             "do_import": true,
+            "vcf_field": "AD",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "Allelic depth",
             "scope": "sample_variant",
-            "schema_title": "AD"
+            "schema_title": "Allelic Depth"
         },
         "AD_ALT": {
             "title": "AD (Alt)",
@@ -65,12 +66,15 @@
             "type": "integer",
             "calculated_property": true,
             "do_import": true,
+            "vcf_field": "AD_ALT",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "Alternate allelic depth",
             "scope": "sample_variant",
-            "schema_title": "AD (Alt)"
+            "schema_title": "AD (Alt)",
+            "abbreviation": "AD",
+            "facet_order": 10
         },
         "AD_REF": {
             "title": "AD (Ref)",
@@ -78,6 +82,7 @@
             "type": "integer",
             "calculated_property": true,
             "do_import": true,
+            "vcf_field": "AD_REF",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
@@ -91,6 +96,7 @@
             "type": "number",
             "calculated_property": true,
             "do_import": true,
+            "vcf_field": "AF",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
@@ -98,7 +104,7 @@
             "scope": "sample_variant",
             "schema_title": "VAF",
             "column_order": 21,
-            "facet_order": 9,
+            "facet_order": 11,
             "min": 0,
             "max": 1
         },
@@ -107,6 +113,7 @@
             "field_name": "CALL_INFO",
             "type": "string",
             "do_import": true,
+            "vcf_field": "CALL_INFO",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
@@ -119,6 +126,7 @@
             "field_name": "DP",
             "type": "integer",
             "do_import": true,
+            "vcf_field": "DP",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
@@ -134,32 +142,35 @@
             "field_name": "FS",
             "type": "number",
             "do_import": true,
+            "vcf_field": "FS",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "Fisher strand score",
             "scope": "sample_variant",
             "schema_title": "Strand Fisher Score",
-            "facet_order": 10
+            "facet_order": 12
         },
         "GQ": {
             "title": "Genotype Quality",
             "field_name": "GQ",
             "type": "integer",
             "do_import": true,
+            "vcf_field": "GQ",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
             "description": "phred-scaled quality score that the genotype is accurate [min(99,PL(max)-PL(second))]",
             "scope": "sample_variant",
             "schema_title": "Genotype Quality",
-            "facet_order": 11
+            "facet_order": 13
         },
         "GT": {
             "title": "Genotype",
             "field_name": "GT",
             "type": "string",
             "do_import": true,
+            "vcf_field": "GT",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
@@ -173,6 +184,7 @@
             "field_name": "PGT",
             "type": "string",
             "do_import": true,
+            "vcf_field": "PGT",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
@@ -185,6 +197,7 @@
             "field_name": "PID",
             "type": "string",
             "do_import": true,
+            "vcf_field": "PID",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
@@ -197,6 +210,7 @@
             "field_name": "PL",
             "type": "string",
             "do_import": true,
+            "vcf_field": "PL",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
@@ -209,6 +223,7 @@
             "field_name": "PS",
             "type": "integer",
             "do_import": true,
+            "vcf_field": "PS",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
@@ -221,6 +236,7 @@
             "field_name": "QUAL",
             "type": "number",
             "do_import": true,
+            "vcf_field": "QUAL",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Variant Quality",
@@ -250,8 +266,9 @@
                         "field_name": "comhet_phase",
                         "type": "string",
                         "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
+                        "vcf_field": "comhet_phase",
+                        "source_name": "comHet",
+                        "source_version": "v0.1.3",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                         "scope": "sample_variant"
                     },
@@ -260,8 +277,9 @@
                         "field_name": "comhet_gene",
                         "type": "string",
                         "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
+                        "vcf_field": "comhet_gene",
+                        "source_name": "comHet",
+                        "source_version": "v0.1.3",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                         "scope": "sample_variant"
                     },
@@ -273,8 +291,9 @@
                             "field_name": "comhet_transcript",
                             "type": "string",
                             "do_import": true,
-                            "source_name": "COMHET",
-                            "source_version": "v1",
+                            "vcf_field": "comhet_transcript",
+                            "source_name": "comHet",
+                            "source_version": "v0.1.3",
                             "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                             "scope": "sample_variant"
                         }
@@ -284,8 +303,9 @@
                         "field_name": "comhet_impact_gene",
                         "type": "string",
                         "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
+                        "vcf_field": "comhet_impact_gene",
+                        "source_name": "comHet",
+                        "source_version": "v0.1.3",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                         "annotation_category": "Genotype",
                         "scope": "sample_variant",
@@ -297,8 +317,9 @@
                         "field_name": "comhet_impact_transcript",
                         "type": "string",
                         "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
+                        "vcf_field": "comhet_impact_transcript",
+                        "source_name": "comHet",
+                        "source_version": "v0.1.3",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                         "scope": "sample_variant"
                     },
@@ -307,8 +328,9 @@
                         "field_name": "comhet_mate_variant",
                         "type": "string",
                         "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
+                        "vcf_field": "comhet_mate_variant",
+                        "source_name": "comHet",
+                        "source_version": "v0.1.3",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                         "scope": "sample_variant"
                     }
@@ -343,33 +365,23 @@
         "inheritance_modes": {
             "title": "Inheritance Modes",
             "type": "array",
-            "extended_description" : "src/encoded/docs/extended_description_VariantSample_inheritance_mode.html",
             "items": {
                 "type": "string"
             }
-        },
-        "multiallele_samplevariantkey": {
-            "title": "multiallele_samplevariantkey",
-            "field_name": "multiallele_samplevariantkey",
-            "type": "string",
-            "do_import": true,
-            "source_name": "MULTIALLELE",
-            "source_version": "v0.4",
-            "annotation_category": "Position",
-            "description": "key for multi-allelic variant ",
-            "scope": "sample_variant"
         },
         "novoPP": {
             "title": "novoCaller PP",
             "field_name": "novoPP",
             "type": "number",
             "do_import": true,
+            "vcf_field": "novoPP",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
             "annotation_category": "Genotype",
             "description": "Posterior probability of de novo mutation",
             "scope": "sample_variant",
             "schema_title": "novoCaller PP",
+            "abbreviation": "novoPP",
             "facet_order": 16,
             "min": 0,
             "max": 1
@@ -386,6 +398,7 @@
                         "field_name": "samplegeno_numgt",
                         "type": "string",
                         "do_import": true,
+                        "vcf_field": "samplegeno_numgt",
                         "source_name": "SAMPLEGENO",
                         "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
@@ -399,6 +412,7 @@
                         "field_name": "samplegeno_gt",
                         "type": "string",
                         "do_import": true,
+                        "vcf_field": "samplegeno_gt",
                         "source_name": "SAMPLEGENO",
                         "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
@@ -412,6 +426,7 @@
                         "field_name": "samplegeno_ad",
                         "type": "string",
                         "do_import": true,
+                        "vcf_field": "samplegeno_ad",
                         "source_name": "SAMPLEGENO",
                         "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
@@ -425,6 +440,7 @@
                         "field_name": "samplegeno_sampleid",
                         "type": "string",
                         "do_import": true,
+                        "vcf_field": "samplegeno_sampleid",
                         "source_name": "SAMPLEGENO",
                         "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
@@ -449,6 +465,9 @@
                             "half-sibling",
                             "wife",
                             "husband",
+                            "son",
+                            "daughter",
+                            "child",
                             "grandson",
                             "granddaughter",
                             "grandchild",
@@ -481,81 +500,83 @@
         }
     },
     "columns": {
-        "display_title": {
-            "title": "Position",
-            "sort_fields" : [
-                { "field" : "variant.display_title", "title" : "Variant Display Title" },
-                { "field" : "variant.dbsnp_rs_number", "title": "dbSNP RS Number" }
-            ]
-        },
-        "variant.genes.genes_ensg.display_title": {
-            "title": "Gene, Transcript",
-            "order": 20,
-            "sort_fields": [
-                { "field": "variant.genes.genes_ensg.display_title", "title": "Gene" },
-                { "field": "variant.genes.genes_most_severe_transcript", "title": "Most Severe Transcript" }
-            ]
-        },
-        "variant.genes.genes_most_severe_hgvsc": {
-            "title": "Variant",
-            "order": 25
-        },
-        "variant.genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 30,
-            "sort_fields": [
-                { "field": "variant.genes.genes_most_severe_consequence.coding_effect", "title": "Coding Effect" }
-            ]
-        },
-        "variant.gnomad_af": {
-            "title": "gnomAD",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 35,
-            "sort_fields": [
-                { "field": "variant.gnomad_af", "title": "gnomad AF" },
-                { "field": "variant.max_pop_af_af_popmax", "title": "gnomad AF Population Max" }
-            ]
-        },
-        "variant.cadd_phred": {
-            "title": "Predictors",
-            "order": 40,
-            "sort_fields": [
-                { "field": "variant.cadd_phred", "title": "Cadd Phred Score" },
-                { "field": "variant.spliceai_maxds", "title": "SpliceAI Max DS"},
-                { "field": "variant.conservation_phylop100", "title": "PhyloP 100 Score"}
-            ]
-        },
-        "associated_genotype_labels.proband_genotype_label": {
-            "title": "Genotype",
-            "order": 45,
-            "sort_fields": [
-                { "field" : "associated_genotype_labels.proband_genotype_label", "title": "Proband GT" },
-                { "field" : "associated_genotype_labels.mother_genotype_label", "title": "Mother GT" },
-                { "field": "associated_genotype_labels.father_genotype_label", "title": "Father GT" }
-            ]
-        },
-        "DP": {
-            "title": "Coverage, VAF",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 50,
-            "sort_fields": [
-                { "field" : "DP", "title" : "Coverage" },
-                { "field" : "AF", "title": "VAF" }
-            ]
-        },
-        "bam_snapshot": {
-            "title": "Genome Snapshot",
-            "order": 81
-        }
-    },
-    "facets": {
         "AF": {
             "title": "VAF",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 9,
+            "order": 21
+        },
+        "DP": {
+            "title": "Coverage",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 20
+        },
+        "GT": {
+            "title": "Genotype",
+            "order": 30
+        },
+        "bam_snapshot": {
+            "title": "Genome Snapshot",
+            "order": 81
+        },
+        "variant.csq_clinvar": {
+            "title": "Clinvar ID",
+            "order": 70
+        },
+        "variant.csq_gnomadg_af": {
+            "title": "GnomAD Alt Allele Frequency",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 60
+        },
+        "variant.csq_gnomadg_af_popmax": {
+            "title": "GnomAD Alt AF - PopMax",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 61
+        },
+        "variant.csq_rs_dbsnp151": {
+            "title": "dbSNP ID",
+            "order": 11
+        },
+        "variant.display_title": {
+            "title": "Variant"
+        },
+        "variant.genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 51
+        },
+        "variant.genes.genes_most_severe_gene.display_title": {
+            "title": "Gene",
+            "order": 40
+        },
+        "variant.genes.genes_most_severe_hgvsc": {
+            "title": "Coding Sequence",
+            "order": 50
+        },
+        "variant.genes.genes_most_severe_hgvsp": {
+            "title": "Protein Sequence",
+            "order": 50
+        },
+        "variant.genes.genes_most_severe_transcript": {
+            "title": "Transcript",
+            "order": 41
+        }
+    },
+    "facets": {
+        "AD_ALT": {
+            "title": "AD (Alt)",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 10,
+            "grouping": "Variant Quality"
+        },
+        "AF": {
+            "title": "VAF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 11,
             "grouping": "Variant Quality"
         },
         "DP": {
@@ -567,109 +588,36 @@
         },
         "FS": {
             "title": "Strand Fisher Score",
-            "aggregation_type": "range",
+            "aggregation_type": "stats",
             "number_step": "any",
-            "order": 10,
-            "ranges": [
-                {"to": 20, "label": "Low Strand Bias (P ≥ 0.01)"},
-                {"from": 20, "label": "High Strand Bias (P < 0.01)"}
-            ],
-            "grouping": "Variant Quality",
-            "abbreviation": "SF"
+            "order": 12,
+            "grouping": "Variant Quality"
         },
         "GQ": {
             "title": "Genotype Quality",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 11,
-            "grouping": "Variant Quality"
-        },
-        "AD_ALT": {
-            "title": "Allelic Depth (Alt)",
-            "aggregation_type": "range",
-            "order": 12,
-            "ranges": [
-                {"from": 1, "to": 4, "label": "Very Low"},
-                {"from": 5, "to": 9, "label": "Low"},
-                {"from": 10, "to": 19, "label": "Medium"},
-                {"from": 20, "label": "High"}
-            ],
+            "order": 13,
             "grouping": "Variant Quality"
         },
         "associated_genotype_labels.father_genotype_label": {
             "title": "Father Genotype",
-            "order": 20,
-            "grouping": "Genotype",
-            "default_hidden": true
+            "order": 14,
+            "grouping": "Genotype"
         },
         "associated_genotype_labels.mother_genotype_label": {
             "title": "Mother Genotype",
-            "order": 21,
-            "grouping": "Genotype",
-            "default_hidden": true
+            "order": 13,
+            "grouping": "Genotype"
         },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Proband Genotype",
-            "order": 22,
+            "order": 12,
             "grouping": "Genotype"
-        },
-        "associated_genotype_labels.sister_genotype_label": {
-            "title": "Sister Genotype",
-            "order": 23,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.brother_genotype_label": {
-            "title": "Brother Genotype",
-            "order": 24,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.co_parent_genotype_label": {
-            "title": "Co-Parent Genotype",
-            "order": 25,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.daughter_genotype_label": {
-            "title": "Daughter Genotype",
-            "order": 26,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.son_genotype_label": {
-            "title": "Son Genotype",
-            "order": 27,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.daughter_II_genotype_label": {
-            "title": "Daughter II Genotype",
-            "order": 28,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.son_II_genotype_label": {
-            "title": "Son II Genotype",
-            "order": 29,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.daughter_III_genotype_label": {
-            "title": "Daughter III Genotype",
-            "order": 30,
-            "grouping": "Genotype",
-            "default_hidden": true
-        },
-        "associated_genotype_labels.son_III_genotype_label": {
-            "title": "Son III Genotype",
-            "order": 31,
-            "grouping": "Genotype",
-            "default_hidden": true
         },
         "cmphet.comhet_impact_gene": {
             "title": "ComHet Impact",
-            "order": 200,
+            "order": 17,
             "grouping": "Genotype"
         },
         "inheritance_modes": {
@@ -678,14 +626,10 @@
         },
         "novoPP": {
             "title": "novoCaller PP",
-            "aggregation_type": "range",
+            "aggregation_type": "stats",
             "number_step": "any",
             "order": 16,
-            "grouping": "Genotype",
-            "ranges": [
-                { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },
-                { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }
-            ]
+            "grouping": "Genotype"
         },
         "variant.CHROM": {
             "title": "Chromosome",
@@ -699,71 +643,52 @@
             "order": 2,
             "grouping": "Position"
         },
-        "variant.cadd_phred": {
-            "title": "CADD",
+        "variant.csq_cadd_phred": {
+            "title": "CADD Phred score",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 23,
-            "grouping": "Missense Predictors"
+            "grouping": "Effect Predictors"
         },
-        "variant.clinvar_clnsig": {
+        "variant.csq_clinvar_clnsig": {
             "title": "Clinvar",
             "order": 36,
             "grouping": "variant database"
         },
-        "variant.conservation_phylop100": {
-            "title": "PhyloP (100 Vertabrates)",
-            "aggregation_type": "range",
+        "variant.csq_gnomadg_af": {
+            "title": "GnomAD Alt Allele Frequency",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 18,
+            "grouping": "Population Frequency"
+        },
+        "variant.csq_gnomadg_af_popmax": {
+            "title": "GnomAD Alt AF - PopMax",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 19,
+            "grouping": "Population Frequency"
+        },
+        "variant.csq_gnomadg_an": {
+            "title": "GnomAD Total Allele Number",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 20,
+            "grouping": "Population Frequency"
+        },
+        "variant.csq_gnomadg_nhomalt": {
+            "title": "GnomAD Homozygous Count",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 21,
+            "grouping": "Population Frequency"
+        },
+        "variant.csq_phylop100way_vertebrate": {
+            "title": "PhyloP (100 Vertebrates)",
+            "aggregation_type": "stats",
             "number_step": "any",
             "order": 22,
-            "grouping": "Conservation",
-            "ranges": [
-                { "from": -20, "to": -3, "label": "strong positive selection" },
-                { "from": -3, "to": -2, "label": "positive selection" },
-                { "from": -2, "to": 2, "label": "low selection" },
-                { "from": 2, "to": 3, "label": "conserved" },
-                { "from": 3, "to": 10, "label": "highly conserved"}
-            ]
-        },
-        "variant.cytoband_cytoband": {
-            "title": "Cytoband",
-            "order": 3,
-            "grouping": "Position"
-        },
-        "variant.genes.genes_ensg.gene_lists.display_title": {
-            "title": "Gene List",
-            "order": 1,
-            "grouping": "Genes",
-            "search_type": "sayt_without_terms",
-            "sayt_item_type": "Gene"
-        },
-        "variant.genes.genes_ensg.oe_lof": {
-            "title": "o/e (LoF)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 35,
-            "grouping": "Constraint Metrics"
-        },
-        "variant.genes.genes_ensg.oe_lof_upper": {
-            "title": "LOEUF",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 33,
-            "grouping": "Constraint Metrics"
-        },
-        "variant.genes.genes_ensg.oe_mis": {
-            "title": "o/e (missense)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 34,
-            "grouping": "Constraint Metrics"
-        },
-        "variant.genes.genes_ensg.s_het": {
-            "title": "S_het",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 32,
-            "grouping": "Constraint Metrics"
+            "grouping": "Effect Predictors"
         },
         "variant.genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
@@ -780,78 +705,73 @@
             "order": 6,
             "grouping": "Consequence"
         },
+        "variant.genes.genes_most_severe_gene.gene_lists.display_title": {
+            "title": "Gene List",
+            "order": 1,
+            "grouping": "Genes",
+            "search_type": "sayt_without_terms",
+            "sayt_item_type": "Gene"
+        },
+        "variant.genes.genes_most_severe_gene.oe_lof": {
+            "title": "o/e (LoF)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 35,
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes_most_severe_gene.oe_lof_upper": {
+            "title": "LOEUF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 33,
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes_most_severe_gene.oe_mis": {
+            "title": "o/e (missense)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 34,
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes_most_severe_gene.s_het": {
+            "title": "S_het",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 32,
+            "grouping": "Constraint Metrics"
+        },
         "variant.genes.genes_most_severe_maxentscan_diff": {
             "title": "MaxEntScan Diff",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 31,
-            "grouping": "Splice Predictors"
+            "grouping": "Effect Predictors"
         },
         "variant.genes.genes_most_severe_polyphen_score": {
             "title": "PolyPhen score",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 25,
-            "grouping": "Missense Predictors"
+            "grouping": "Effect Predictors"
         },
         "variant.genes.genes_most_severe_sift_score": {
             "title": "SIFT score",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 24,
-            "grouping": "Missense Predictors"
+            "grouping": "Effect Predictors"
         },
-        "variant.gnomad_af": {
-            "title": "GnomAD Alt Allele Frequency",
-            "aggregation_type": "range",
-            "number_step": "any",
-            "order": 18,
-            "grouping": "Population Frequency",
-            "ranges": [
-                { "from": 0, "to": 0, "label": "unobserved" }, 
-                { "from": 0, "to": 0.001, "label": "ultra-rare" },
-                { "from": 0.001, "to": 0.01, "label": "rare" },
-                { "from": 0.01, "to": 1, "label": "common" }
-            ]
-        },
-        "variant.gnomad_an": {
-            "title": "GnomAD Total Allele Number",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 20,
-            "grouping": "Population Frequency"
-        },
-        "variant.gnomad_nhomalt": {
-            "title": "GnomAD Homozgyous Count",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 21,
-            "grouping": "Population Frequency"
-        },
-        "variant.max_pop_af_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "range",
-            "number_step": "any",
-            "order": 19,
-            "grouping": "Population Frequency",
-            "ranges": [
-                { "from": 0, "to": 0, "label": "unobserved" }, 
-                { "from": 0, "to": 0.001, "label": "ultra-rare" },
-                { "from": 0.001, "to": 0.01, "label": "rare" },
-                { "from": 0.01, "to": 1, "label": "common" }
-            ]
-        },
-        "variant.mutanno_variant_class": {
-            "title": "Variant Type",
-            "order": 4,
-            "grouping": "Variant Type"
-        },
-        "variant.spliceai_maxds": {
+        "variant.spliceaiMaxds": {
             "title": "SpliceAI Max Delta",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 27,
-            "grouping": "Splice Predictors"
+            "grouping": "Effect Predictors"
+        },
+        "variant.variantClass": {
+            "title": "Variant Type",
+            "order": 4,
+            "grouping": "Variant Type"
         }
     }
 }
