@@ -474,6 +474,13 @@ class VariantTableParser(object):
 
     @staticmethod
     def add_extra_variant_sample_facets(facs):
+        facs["variant.genes.genes_most_severe_gene.gene_lists.display_title"] = {
+            "title": "Gene List",
+            "order": 1,
+            # "grouping": "Genes",                  # Currently ungrouped (no siblings with grouping:Genes), may be changed later.
+            "search_type": "sayt_without_terms",    # Enables search-as-you-type via AJAX (SAYT-AJAX) for this facet
+            "sayt_item_type": "Gene"                # Required if "search_type" == "sayt_without_terms"
+        }
         facs['associated_genotype_labels.proband_genotype_label'] = {
             'title': 'Proband Genotype',
             'order': 12,
