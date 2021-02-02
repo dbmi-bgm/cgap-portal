@@ -142,14 +142,14 @@ class VCFParser(object):
 
     @staticmethod
     def _strip(s):
-        """ Strips whitespace and quotation characters from the given string s
+        """ Strips whitespace and quotation characters and lowercases the given string s
 
         :param s: String to strip
         :return: processed string
         """
         if not isinstance(s, str):
             raise VCFParserException('Tried to apply string strip to non-string %s' % s)
-        return s.strip(' "\'')
+        return s.lower().strip(' "\'')
 
     def verify_in_schema(self, field, sub_group=None):
         """ Helper to verify the given field is in the schema.
