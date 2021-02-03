@@ -118,8 +118,8 @@ class VariantBuilder:
         search_result = self.search_for_sample_relations()
         if not search_result:
             return sample_relations
-        sample_procesing = search_result[0]
-        sample_pedigrees = sample_procesing.get('samples_pedigree', [])
+        sample_processing = search_result[0]
+        sample_pedigrees = sample_processing.get('samples_pedigree', [])
         for entry in sample_pedigrees:
             sample_id = entry['sample_name']
             sample_relations[sample_id] = {}
@@ -160,15 +160,16 @@ class VariantBuilder:
         :param virtualapp: application_handle to post under
         :param project: project to post under
         :param institution: institution to post under
-=        """
-        vcs = json.load(open(resolve_file_path('annotations/variant_consequence.json'), 'r'))
-        for entry in vcs:
-            entry['project'] = self.project
-            entry['institution'] = self.institution
-            try:
-                self.vapp.post_json('/variant_consequence', entry, status=201)
-            except Exception as e:  # can happen with master-inserts collision
-                log.error('Failed to post variant consequence %s' % str(e))
+=       """
+        with open(resolve_file_path('annotations/variant_consequence.json'), 'r') as f:
+            vcs = json.load(f)
+            for entry in vcs:
+                entry['project'] = self.project
+                entry['institution'] = self.institution
+                try:
+                    self.vapp.post_json('/variant_consequence', entry, status=201)
+                except Exception as e:  # can happen with master-inserts collision
+                    log.error('Failed to post variant consequence %s' % str(e))
 
     def ingest_vcf(self, use_tqdm=False):
         """ Ingests the VCF, building/posting variants and variant samples until done, creating a report
