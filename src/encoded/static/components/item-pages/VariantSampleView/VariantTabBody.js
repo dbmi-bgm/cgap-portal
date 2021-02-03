@@ -331,7 +331,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
-        'csq_gerp++_rs': gerp = fallbackElem,
+        csq_gerp_rs: gerp = fallbackElem,
         csq_phylop100way_vertebrate = fallbackElem,
         csq_cadd_phred = fallbackElem,
         transcript = [],
@@ -364,7 +364,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_gerp++_rs")}>GERP++</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_gerp_rs")}>GERP++</label>
                             </td>
                             <td className="text-left">{ gerp }</td>
                             {/* TODO for all:
