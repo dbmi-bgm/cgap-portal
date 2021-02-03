@@ -74,6 +74,9 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                     return <StackedRowColumn className="text-center" {...{ rows }}/>;
                 }
             },
+            "GT" : { // Genotype Column (numerical, e.g. 0/1)
+                widthMap: { 'lg' : 70, 'md' : 70, 'sm' : 60 }
+            },
             "associated_genotype_labels.proband_genotype_label" : { // Genotype column
                 widthMap: { 'lg' : 240, 'md' : 230, 'sm' : 200 },
                 render: function(result, props) {

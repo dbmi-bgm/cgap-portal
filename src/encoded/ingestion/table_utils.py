@@ -477,7 +477,7 @@ class VariantTableParser(object):
             "order": 81
         }
         cols["associated_genotype_labels.proband_genotype_label"] = {
-            "title": "Genotype Label",
+            "title": "Genotype",
             "order": 39,
             "sort_fields": [
                 { "field": "associated_genotype_labels.proband_genotype_label", "title": "Proband GT" },
