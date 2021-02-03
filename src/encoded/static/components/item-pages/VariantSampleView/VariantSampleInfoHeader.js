@@ -344,7 +344,7 @@ function GDNAList({ context }){
         mutanno_hgvsg = fallbackElem,
         // POS: pos,
         CHROM: chrom = fallbackElem,
-        hg19 = []
+        csq_hg19 = []
     } = variant;
 
     const renderedRows = [];
@@ -359,12 +359,12 @@ function GDNAList({ context }){
     );
 
     // Legacy GRCh37/hg19 support.
-    hg19.forEach(function({ hg19_pos, hg19_chrom, hg19_hgvsg }, idx){
+    csq_hg19.forEach(function({ csq_hg19_pos, csq_hg19_chrom, csq_hg19_hgvsg }, idx){
         renderedRows.push(
             <div className="row pb-1 pb-md-03" key={idx}>
                 <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
-                <div className="col-12 col-md-2 ">{ hg19_chrom }</div>
-                <div className="col-12 col-md-7">{ hg19_hgvsg }</div>
+                <div className="col-12 col-md-2 ">{ csq_hg19_chrom }</div>
+                <div className="col-12 col-md-7">{ csq_hg19_hgvsg }</div>
             </div>
         );
     });
