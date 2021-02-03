@@ -123,42 +123,42 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                     return null;
                 }
             },
-            "variant.gnomad_af": { // Gnomad column
+            "variant.csq_gnomadg_af": { // Gnomad column
                 widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
                 render: function(result, props){
-                    const { variant : { gnomad_af = null, max_pop_af_af_popmax = null } = {} } = result;
+                    const { variant : { csq_gnomadg_af = null, csq_gnomadg_af_popmax = null } = {} } = result;
                     const rows = [];
 
-                    if (!gnomad_af && !max_pop_af_af_popmax) {
+                    if (!csq_gnomadg_af && !csq_gnomadg_af_popmax) {
                         return null;
                     }
-                    if (gnomad_af) {
-                        const gnomad_af_exp = gnomad_af ? gnomad_af.toExponential(3): null;
-                        rows.push(<div key="gnomad_af" className="d-block text-truncate"><span className="text-600">ALL: </span>{gnomad_af_exp || gnomad_af || "-"}</div>);
+                    if (csq_gnomadg_af) {
+                        const csq_gnomadg_af_exp = csq_gnomadg_af ? csq_gnomadg_af.toExponential(3): null;
+                        rows.push(<div key="csq_gnomadg_af" className="d-block text-truncate"><span className="text-600">ALL: </span>{csq_gnomadg_af_exp || csq_gnomadg_af || "-"}</div>);
                     }
-                    if (max_pop_af_af_popmax){
-                        const max_pop_af_af_popmax_exp = max_pop_af_af_popmax ? max_pop_af_af_popmax.toExponential(3): null;
-                        rows.push(<div key="gnomad_af_popmax" className="d-block text-truncate"><span className="text-600">MAX: </span>{max_pop_af_af_popmax_exp || max_pop_af_af_popmax || "-"}</div>);
+                    if (csq_gnomadg_af_popmax){
+                        const csq_gnomadg_af_popmax_exp = csq_gnomadg_af_popmax ? csq_gnomadg_af_popmax.toExponential(3): null;
+                        rows.push(<div key="csq_gnomadg_af_popmax" className="d-block text-truncate"><span className="text-600">MAX: </span>{csq_gnomadg_af_popmax_exp || csq_gnomadg_af_popmax || "-"}</div>);
                     }
                     return <StackedRowColumn rowKey="genes_gnomad" className="text-center" {...{ rows }}/>;
                 }
             },
-            "variant.cadd_phred": { // Predictors column (cadd_phred, spliceai, phylop100)
+            "variant.csq_cadd_phred": { // Predictors column (csq_cadd_phred, spliceai, phylop100)
                 render: function(result, props) {
-                    const { variant : { cadd_phred = null, spliceai_maxds = null, conservation_phylop100 = null } = {} } = result;
+                    const { variant : { csq_cadd_phred = null, spliceai_maxds = null, csq_phylop100way_vertebrate = null } = {} } = result;
                     const rows = [];
 
-                    if (!cadd_phred && !spliceai_maxds && !conservation_phylop100) {
+                    if (!csq_cadd_phred && !spliceai_maxds && !csq_phylop100way_vertebrate) {
                         return null;
                     }
-                    if (cadd_phred) {
-                        rows.push(<div key="cadd_phred" className="d-block text-truncate"><span className="text-600">Cadd Phred: </span>{cadd_phred || "-"}</div>);
+                    if (csq_cadd_phred) {
+                        rows.push(<div key="csq_cadd_phred" className="d-block text-truncate"><span className="text-600">Cadd Phred: </span>{csq_cadd_phred || "-"}</div>);
                     }
                     if (spliceai_maxds) {
                         rows.push(<div key="spliceai_maxds" className="d-block text-truncate"><span className="text-600">SpliceAI MaxDS: </span>{spliceai_maxds || "-"}</div>);
                     }
-                    if (conservation_phylop100) {
-                        rows.push(<div key="phylop" className="d-block text-truncate"><span className="text-600">PhyloP 100: </span>{conservation_phylop100 || "-"}</div>);
+                    if (csq_phylop100way_vertebrate) {
+                        rows.push(<div key="phylop" className="d-block text-truncate"><span className="text-600">PhyloP 100: </span>{csq_phylop100way_vertebrate || "-"}</div>);
                     }
                     return <StackedRowColumn rowKey="genes_predictors" className="text-center" {...{ rows }}/>;
                 }
@@ -185,15 +185,15 @@ function StackedRowColumn(props) {
 const VSDisplayTitleColumnDefault = React.memo(function VSDisplayTitleColumnDefault(props) {
     const { result = null, link, onClick, className = null } = props;
     const { variant = null } = result || {};
-    const { display_title = null, dbsnp_rs_number = null } = variant;
+    const { display_title = null, csq_rs_dbsnp151 = null } = variant;
 
     const cls = ("title-block" + (className ? " " + className : ""));
     const rows = [
         <span key="variant-title" className="d-block text-600 text-truncate">{display_title}</span>
     ];
 
-    if (dbsnp_rs_number) {
-        rows.push(<span key="dbsnp" className="font-italic">{dbsnp_rs_number}</span>);
+    if (csq_rs_dbsnp151) {
+        rows.push(<span key="dbsnp" className="font-italic">{csq_rs_dbsnp151}</span>);
     }
 
     return (

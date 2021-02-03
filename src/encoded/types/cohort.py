@@ -13,7 +13,7 @@ from snovault import (
     load_schema,
 )
 from snovault.util import debug_log
-from webtest import TestApp
+from dcicutils.misc_utils import VirtualApp
 from xml.etree.ElementTree import fromstring
 from .base import Item
 from ..util import get_trusted_email
@@ -74,8 +74,8 @@ class Cohort(Item):
 def process_pedigree(context, request):
     """
     Endpoint to handle creation of a family of individuals provided a pedigree
-    file. Uses a webtest TestApp to handle POSTing and PATCHing items.
-    The request.json contains attachment information and file content.
+    file. Uses a dcicutils.misc_utils.VirtualApp to handle POSTing and PATCHing
+    items. The request.json contains attachment information and file content.
 
     Currently, only handles XML input formatted from the Proband app.
     This endpoint takes the following options, provided through request params:
@@ -115,10 +115,10 @@ def process_pedigree(context, request):
     ped_datetime = datetime.utcnow()
     ped_timestamp = ped_datetime.isoformat() + '+00:00'
     app = get_app(config_uri, 'app')
-    # get user email for TestApp authentication
+    # get user email for VirtualApp authentication
     email = get_trusted_email(request, context="Cohort %s" % cohort)
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
-    testapp = TestApp(app, environ)
+    testapp = VirtualApp(app, environ)
 
     # parse XML and create family by two rounds of POSTing/PATCHing individuals
     response = {'title': 'Pedigree Processing'}
@@ -305,7 +305,7 @@ def descendancy_xml_ref_to_parents(testapp, ref_id, refs, data, cohort, uuids_by
     them in a standardized way.
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_id (str): value for the reference field of the relevant xml obj
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -349,7 +349,7 @@ def add_to_clinic_notes(testapp, notes, refs, data, cohort, uuids_by_ref):
     other functions that change `clinic_notes`
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         notes (str): notes value for the object
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -377,7 +377,7 @@ def annotations_xml_ref_to_clinic_notes(testapp, ref_ids, refs, data, cohort, uu
     to find the annotations used as note .
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_ids (list): value for the reference field of the relevant xml obj
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -409,7 +409,7 @@ def diagnoses_xml_to_phenotypic_features(testapp, ref_vals, refs, data, cohort, 
     `phenotypic_features` or `clinic_notes` in the family metadata.
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_vals (list): list of dict diagnoses values
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -473,7 +473,7 @@ def affected_xml_to_phenotypic_features(testapp, ref_vals, refs, data, cohort, u
     `phenotypic_features` or `clinic_notes` in the family metadata.
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_vals (list): list of dict affected values (should only have 1 item)
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -503,7 +503,7 @@ def cause_of_death_xml_to_phenotype(testapp, ref_vals, refs, data, cohort, uuids
     `cause_of_death` or `clinic_notes` in the family metadata.
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_vals (list): list of dict containg cause of death info (should be length 1)
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -614,7 +614,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, cohort,
     Can be easily extended by adding tuples to `to_convert` dict
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         xml_data (dict): parsed XMl data, probably from `etree_to_dict`
         refs: (dict): reference-based parsed XML data
         ref_field (str): name of reference field from the XML data

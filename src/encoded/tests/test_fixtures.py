@@ -1,10 +1,10 @@
 import pytest
 
-from webtest import TestApp
-from .datafixtures import ORDER
+from dcicutils.misc_utils import TestApp
+from .conftest_settings import ORDER
 
 
-pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
 
 
 @pytest.yield_fixture(scope='session')

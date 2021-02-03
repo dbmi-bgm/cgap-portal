@@ -57,9 +57,20 @@ function cleanBuildDirectory(done){
 
 //Moving Higlass workers from node_modules to static/build/
 function copyHiGlassBamFetcherWorker(done){
-    // File destination.txt will be created or overwritten by default.
+    // dest will be created or overwritten by default.
     const source = "./node_modules/higlass-pileup/dist/0.higlass-pileup.min.worker.js";
     const dest = "./src/encoded/static/build/bam-fetcher-worker.js";
+    fs.copyFile(source, dest, function(err){
+        if (err) throw err;
+        done();
+    });
+}
+
+//Moving Higlass workers from node_modules to static/build/
+function copyHiGlassGnomadFetcherWorker(done){
+    // dest will be created or overwritten by default.
+    const source = "./node_modules/higlass-gnomad/dist/0.higlass-gnomad.min.worker.js";
+    const dest = "./src/encoded/static/build/vcf-fetcher-worker.js";
     fs.copyFile(source, dest, function(err){
         if (err) throw err;
         done();
@@ -220,6 +231,7 @@ function doSassBuild(done, options = {}) {
 const devQuick = gulp.series(
     cleanBuildDirectory,
     copyHiGlassBamFetcherWorker,
+    copyHiGlassGnomadFetcherWorker,
     setQuick,
     doWebpack,
     gulp.parallel(watch, watchSharedPortalComponents)
@@ -228,6 +240,7 @@ const devQuick = gulp.series(
 const devAnalyzed = gulp.series(
     cleanBuildDirectory,
     copyHiGlassBamFetcherWorker,
+    copyHiGlassGnomadFetcherWorker,
     setDevelopment,
     buildSharedPortalComponents,
     doWebpack
@@ -236,6 +249,7 @@ const devAnalyzed = gulp.series(
 const build = gulp.series(
     cleanBuildDirectory,
     copyHiGlassBamFetcherWorker,
+    copyHiGlassGnomadFetcherWorker,
     setProduction,
     doWebpack
 );

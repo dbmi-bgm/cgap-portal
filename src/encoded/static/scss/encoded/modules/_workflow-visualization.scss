@@ -20,7 +20,7 @@
                     flex: 1 0;
                 }
                 > .detail-pane-container {
-                    &.has-selected-node {
+                    &[data-is-open="true"] {
                         border-left-color: #ddd !important;
                     }
                 }

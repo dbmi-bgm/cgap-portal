@@ -2,13 +2,9 @@
 
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
 """
-import os
 import logging
 import pytest
 import webtest
-import tempfile
-import time
-import subprocess
 import pkg_resources
 
 from pyramid.request import apply_request_extensions
@@ -16,8 +12,9 @@ from pyramid.testing import DummyRequest, setUp, tearDown
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
 from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
-from .. import main
+from snovault.util import generate_indexer_namespace_for_testing
 from .conftest_settings import make_app_settings_dictionary
+from .. import main
 from ..loadxl import load_all
 
 
@@ -28,12 +25,6 @@ README:
     * There are "app" based fixtures that rely only on postgres, "es_app" fixtures that 
       use both postgres and ES (for search/ES related testing)
 """
-
-
-pytest_plugins = [
-    'encoded.tests.datafixtures',
-    'snovault.tests.serverfixtures',
-]
 
 
 @pytest.fixture(autouse=True)
@@ -51,6 +42,9 @@ def app_settings(request, wsgi_server_host_port, conn, DBSession):
     return settings
 
 
+INDEXER_NAMESPACE_FOR_TESTING = generate_indexer_namespace_for_testing('cgap')
+
+
 @pytest.fixture(scope='session')
 def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server, aws_auth):
     settings = make_app_settings_dictionary()
@@ -61,7 +55,7 @@ def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_serv
     settings['collection_datastore'] = 'elasticsearch'
     settings['item_datastore'] = 'elasticsearch'
     settings['indexer'] = True
-    settings['indexer.namespace'] = os.environ.get('TRAVIS_JOB_ID', '')  # set namespace for tests
+    settings['indexer.namespace'] = INDEXER_NAMESPACE_FOR_TESTING
 
     # use aws auth to access elasticsearch
     if aws_auth:
@@ -85,12 +79,6 @@ def pytest_configure():
             return True
 
     logging.getLogger('sqlalchemy.engine.base.Engine').addFilter(Shorten())
-
-
-@pytest.yield_fixture
-def config():
-    yield setUp()
-    tearDown()
 
 
 @pytest.yield_fixture
@@ -167,6 +155,10 @@ def root(registry):
     return registry[ROOT]
 
 
+# TODO: Reconsider naming to have some underscores interspersed for better readability.
+#       e.g., html_testapp rather than htmltestapp, and especially anon_html_test_app rather than anonhtmltestapp.
+#       -kmp 03-Feb-2020
+
 @pytest.fixture
 def anonhtmltestapp(app):
     environ = {
@@ -241,8 +233,7 @@ def es_testapp(es_app):
 
 @pytest.fixture
 def anontestapp(app):
-    """TestApp with JSON accept header.
-    """
+    """TestApp for anonymous user (i.e., no user specified), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
     }
@@ -260,8 +251,7 @@ def anon_es_testapp(es_app):
 
 @pytest.fixture
 def authenticated_testapp(app):
-    """TestApp with JSON accept header for non-admin user.
-    """
+    """TestApp for an authenticated, non-admin user (TEST_AUTHENTICATED), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_AUTHENTICATED',
@@ -282,8 +272,7 @@ def authenticated_es_testapp(es_app):
 
 @pytest.fixture
 def submitter_testapp(app):
-    """TestApp with JSON accept header for non-admin user.
-    """
+    """TestApp for a non-admin user (TEST_SUBMITTER), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_SUBMITTER',
@@ -333,10 +322,14 @@ class WorkbookCache:
         }
         testapp = webtest.TestApp(es_app, environ)
 
-        # just load the workbook inserts
+        # Just load the workbook inserts
+        # Note that load_all returns None for success or an Exception on failure.
         load_res = load_all(testapp, pkg_resources.resource_filename('encoded', 'tests/data/workbook-inserts/'), [])
-        if load_res:
-            raise (load_res)
+
+        if isinstance(load_res, Exception):
+            raise load_res
+        elif load_res:
+            raise RuntimeError("load_all returned a true value that was not an exception.")
 
         testapp.post_json('/index', {})
         return True

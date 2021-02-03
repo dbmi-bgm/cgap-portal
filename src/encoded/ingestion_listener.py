@@ -12,11 +12,11 @@ import psycopg2
 import re
 import requests  # XXX: C4-211 should not be needed but is // KMP needs this, too, until subrequest posts work
 import signal
-import socket
 import structlog
 import threading
 import time
 import webtest
+import tempfile
 
 from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.misc_utils import VirtualApp, ignored, check_true, full_class_name
@@ -28,19 +28,18 @@ from pyramid.request import Request
 from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
-from .commands.ingest_vcf import VCFParser
-from .ingestion.common import register_path_content_type, metadata_bundles_bucket, get_parameter
+from .ingestion.vcf_utils import VCFParser
+from .commands.reformat_vcf import runner as reformat_vcf
+from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
 from .ingestion.processors import get_ingestion_processor
-from .inheritance_mode import InheritanceMode
-from .server_defaults import add_last_modified
-from .loadxl import LOADXL_USER_UUID
 from .types.ingestion import SubmissionFolio, IngestionSubmission
-from .types.variant import build_variant_display_title, ANNOTATION_ID_SEP
 from .util import (
     resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request,
-    subrequest_object,
+    subrequest_object, register_path_content_type,
 )
+from .ingestion.queue_utils import IngestionQueueManager
+from .ingestion.variant_utils import VariantBuilder
 
 
 log = structlog.getLogger(__name__)
@@ -53,8 +52,6 @@ STATUS_INGESTED = 'Ingested'
 STATUS_DISABLED = 'Ingestion disabled'
 STATUS_ERROR = 'Error'
 STATUS_IN_PROGRESS = 'In progress'
-CGAP_CORE_PROJECT = '/projects/cgap-core'
-CGAP_CORE_INSTITUTION = '/institutions/hms-dbmi/'
 SHARED = 'shared'
 
 
@@ -243,7 +240,7 @@ def ingestion_status(context, request):
     }
 
 
-def verify_vcf_file_status_is_not_ingested(request, uuid):
+def verify_vcf_file_status_is_not_ingested(request, uuid, *, expected=True):
     """ Verifies the given VCF file has not already been ingested by checking
         'file_ingestion_status'
     """
@@ -253,14 +250,15 @@ def verify_vcf_file_status_is_not_ingested(request, uuid):
         'content_type': 'application/json'
     }
     subreq = Request.blank('/' + uuid, **kwargs)
-    resp = request.invoke_subrequest(subreq, use_tweens=True)
+    resp = request.invoke_subrequest(subreq)
     if isinstance(resp, HTTPMovedPermanently):  # if we hit a redirect, follow it
         subreq = Request.blank(resp.location, **kwargs)
-        resp = request.invoke_subrequest(subreq, use_tweens=True)
+        resp = request.invoke_subrequest(subreq)
     log.error('VCF File Meta: %s' % resp.json)
-    if resp.json.get('file_ingestion_status', None) == STATUS_INGESTED:
-        return False
-    return True
+    verified = bool(expected) is (resp.json.get('file_ingestion_status', None) != STATUS_INGESTED)
+    # if not verified:
+    #     import pdb; pdb.set_trace()
+    return verified
 
 
 def patch_vcf_file_status(request, uuids):
@@ -325,285 +323,6 @@ def get_queue_manager(request, *, override_name):
     return (request.registry[INGESTION_QUEUE]
             if not override_name
             else IngestionQueueManager(request.registry, override_name=override_name))
-
-
-class IngestionError:
-    """
-    Holds info on an error that occurred in ingestion. Right now this consists of the
-    offending request body and the VCF row it occurred on.
-
-    This class doesn't really do much except specify the structure. It must align with that of FileProcessed
-    (reproduced as of 12/2/2020 below):
-
-        "file_ingestion_error": {
-            "title": "Ingestion Error Report",
-            "description": "This field is set when an error occurred in ingestion with all errors encountered",
-            "type": "array",
-            "items": {
-                "title": "Ingestion Error",
-                "type": "object",
-                "properties": {
-                    "body": {
-                        "type": "string",
-                        "index": false  # the intention is not to index this in the future
-                    },
-                    "row": {
-                        "type": "integer"
-                    }
-                }
-            }
-        }
-
-    """
-
-    def __init__(self, body, row):
-        self.body = body
-        self.row = row
-
-    def to_dict(self):
-        return {
-            'body': str(self.body),
-            'row': self.row
-        }
-
-
-class IngestionReport:
-    """
-    A "virtual" item on file_processed that contains detailed information on the ingestion run.
-    Not creating an item for this is a design decision. The output of this process is more for
-    debugging and not for auditing, so it does not merit an item at this time.
-    """
-    MAX_ERRORS = 100  # tune this to get more errors, 100 is a lot though and probably more than needed
-
-    def __init__(self):
-        self.grand_total = 0
-        self.errors = []
-
-    def brief_summary(self):
-        return ('INGESTION REPORT: There were %s total variants detected, of which %s were successful'
-                'and %s failed. Check ProcessedFile for full error output.' % (self.grand_total,
-                                                                              self.total_successful(),
-                                                                              self.total_errors()))
-
-    def total_successful(self):
-        return self.grand_total - len(self.errors)
-
-    def total_errors(self):
-        return len(self.errors)
-
-    def get_errors(self, limit=True):
-        """Returns a limited number of errors, where limit can be True (self.MAX_ERRORS), False (no limit), or an integer."""
-        if limit is True:
-            limit = self.MAX_ERRORS
-        elif limit is False:
-            limit = None
-        return self.errors[:limit]
-
-    def mark_success(self):
-        """ Marks the current row number as successful, which in this case just involves incrementing the total """
-        self.grand_total += 1
-
-    def mark_failure(self, *, body, row):
-        """ Marks the current row as failed, creating an IngestionError holding the response body and row. """
-        self.grand_total += 1
-        self.errors.append(IngestionError(body, row).to_dict())
-
-
-class IngestionQueueManager:
-    """
-    Similar to QueueManager in snovault in that in manages SQS queues, but that code is not generic
-    enough to use here, so it is "duplicated" so to speak here. At a later time the functionality of this
-    class and QueueManager should be refactored into a "helper" class, but for now this is sufficient
-    and is tested independently here.
-
-    We will use a single queue to keep track of VCF File uuids to be indexed.
-    """
-    BUCKET_EXTENSION = '-vcfs'
-
-    def __init__(self, registry, override_name=None):
-        """ Does initial setup for interacting with SQS """
-        self.batch_size = 10
-        self.env_name = registry.settings.get('env.name', None)
-        if not self.env_name:  # replace with something usable
-            backup = socket.gethostname()[:80].replace('.', '-')
-            self.env_name = backup if backup else 'cgap-backup'
-        kwargs = {
-            'region_name': 'us-east-1'
-        }
-        self.client = boto3.client('sqs', **kwargs)
-        self.queue_name = override_name or (self.env_name + self.BUCKET_EXTENSION)
-        self.queue_attrs = {
-            self.queue_name: {
-                'DelaySeconds': '1',  # messages initially invisible for 1 sec
-                'VisibilityTimeout': '10800',  # 3 hours
-                'MessageRetentionPeriod': '604800',  # 7 days, in seconds
-                'ReceiveMessageWaitTimeSeconds': '5',  # 5 seconds of long polling
-            }
-        }
-        self.queue_url = self._initialize()
-
-    def _initialize(self):
-        """ Initializes the actual queue - helper method for init """
-        try:
-            response = self.client.create_queue(
-                QueueName=self.queue_name,
-                Attributes=self.queue_attrs[self.queue_name]
-            )
-            queue_url = response['QueueUrl']
-        except self.client.exceptions.QueueNameExists:
-            queue_url = self._get_queue_url(self.queue_name)
-        except Exception as e:
-            log.error('Error while attempting to create queue: %s' % e)
-            queue_url = self._get_queue_url(self.queue_name)
-        return queue_url
-
-    def _get_queue_url(self, queue_name):
-        """
-        Simple function that returns url of associated queue name
-        """
-        try:
-            response = self.client.get_queue_url(
-                QueueName=queue_name
-            )
-        except Exception as e:
-            log.error('Cannot resolve queue_url: %s' % e)
-            response = {}
-        return response.get('QueueUrl', None)
-
-    def _chunk_messages(self, msgs):
-        """ Chunks messages into self.send_batch_size batches (for efficiency).
-
-        :param msgs: list of messages to be chunked
-        """
-        for i in range(0, len(msgs), self.batch_size):
-            yield msgs[i:i + self.batch_size]
-
-    def _send_messages(self, msgs, retries=3):
-        """ Sends msgs to the ingestion queue (with retries for failed messages).
-
-        :param msgs: to be sent
-        :param retries: number of times to resend failed messages, decremented on recursion
-        :return: list of any failed messages
-        """
-        failed = []
-        for msg_batch in self._chunk_messages(msgs):
-            log.info('Trying to chunk messages: %s' % msgs)
-            entries = []
-            for msg in msg_batch:
-                entries.append({
-                    'Id': str(int(time.time() * 1000000)),
-                    'MessageBody': json.dumps(msg)
-                })
-            response = self.client.send_message_batch(
-                QueueUrl=self.queue_url,
-                Entries=entries
-            )
-            failed_messages = response.get('Failed', [])
-
-            # attempt resend of failed messages
-            if failed_messages and retries > 0:
-                msgs_to_retry = []
-                for failed_message in failed_messages:
-                    fail_id = failed_message.get('Id')
-                    msgs_to_retry.extend([json.loads(ent['MessageBody']) for ent in entries if ent['Id'] == fail_id])
-                    if msgs_to_retry:
-                        failed_messages = self._send_messages(msgs_to_retry, retries=retries - 1)
-            failed.extend(failed_messages)
-        return failed
-
-    def delete_messages(self, messages):
-        """
-        Called after a message has been successfully received and processed.
-        Removes message from the queue.
-        Input should be the messages directly from receive messages. At the
-        very least, needs a list of messages with 'Id' and 'ReceiptHandle' as this
-        metadata is necessary to identify the message in SQS internals.
-
-        NOTE: deletion does NOT have a retry mechanism
-
-        :param messages: messages to be deleted
-        :returns: a list with any failed messages
-        """
-        failed = []
-        for batch in self._chunk_messages(messages):
-            # need to change message format, since deleting takes slightly
-            # different fields what's return from receiving
-            for i in range(len(batch)):
-                to_delete = {
-                    'Id': batch[i]['MessageId'],
-                    'ReceiptHandle': batch[i]['ReceiptHandle']
-                }
-                batch[i] = to_delete
-            response = self.client.delete_message_batch(
-                QueueUrl=self.queue_url,
-                Entries=batch
-            )
-            failed.extend(response.get('Failed', []))
-        return failed
-
-    def add_uuids(self, uuids, ingestion_type='vcf'):
-        """ Takes a list of string uuids and adds them to the ingestion queue.
-            If ingestion_type is not specified, it defaults to 'vcf'.
-
-            :precondition: uuids are all of type FileProcessed
-            :param uuids: uuids to be added to the queue.
-            :param ingestion_type: the ingestion type of the uuids (default 'vcf' for legacy reasons)
-            :returns: 2-tuple: uuids queued, failed messages (if any)
-        """
-        curr_time = datetime.datetime.utcnow().isoformat()
-        msgs = []
-        for uuid in uuids:
-            current_msg = {
-                'ingestion_type': ingestion_type,
-                'uuid': uuid,
-                'timestamp': curr_time
-            }
-            msgs.append(current_msg)
-        failed = self._send_messages(msgs)
-        return uuids, failed
-
-    def get_counts(self):
-        """ Returns number counts of waiting/inflight messages
-            * Makes a boto3 API Call to do so *
-
-            :returns: 2 tuple of waiting, inflight messages
-        """
-        response = self.client.get_queue_attributes(
-            QueueUrl=self.queue_url,
-            AttributeNames=[
-                'ApproximateNumberOfMessages',
-                'ApproximateNumberOfMessagesNotVisible'
-            ]
-        )
-        formatted = {
-            'waiting': response.get('Attributes', {}).get('ApproximateNumberOfMessages'),
-            'inflight': response.get('Attributes', {}).get('ApproximateNumberOfMessagesNotVisible')
-        }
-        return formatted['waiting'], formatted['inflight']
-
-    def receive_messages(self, batch_size=None):
-        """ Returns an array of messages, if any that are waiting
-
-            :param batch_size: an integer number of messages
-            :returns: messages received or [] if no messages were ready to be received
-        """
-        response = self.client.receive_message(
-            QueueUrl=self.queue_url,
-            MaxNumberOfMessages=self.batch_size if batch_size is None else batch_size
-        )
-        return response.get('Messages', [])
-
-    def clear_queue(self):
-        """ Clears the queue by receiving all messages. BE CAREFUL as this has potential to
-            infinite loop under certain conditions. This risk is preferred to using 'purge', which
-            has a long timeout. The guarantees this functions provides are minimal at best - it should
-            really only be used in testing.
-        """
-        while True:
-            messages = self.receive_messages()
-            self.delete_messages(messages)
-            if len(messages) == 0:
-                break
 
 
 class IngestionListener:
@@ -686,130 +405,6 @@ class IngestionListener:
         """ Sets the file_ingestion_status of the given uuid """
         self._patch_value(uuid, 'file_ingestion_status', status)
 
-    @staticmethod
-    def build_variant_link(variant):
-        """ This function takes a variant record and returns the corresponding UUID of this variant
-            in the portal via search.
-        """
-        annotation_id = build_variant_display_title(variant['CHROM'], variant['POS'], variant['REF'], variant['ALT'],
-                                                    sep=ANNOTATION_ID_SEP)
-        return annotation_id
-
-    def build_and_post_variant(self, parser, record, project, institution):
-        """ Helper method for below that builds and posts a variant item given a record """
-        variant = parser.create_variant_from_record(record)
-        variant['project'] = project
-        variant['institution'] = institution
-        variant['status'] = SHARED  # default variant status to shared, so visible to everyone
-        parser.format_variant_sub_embedded_objects(variant)
-        add_last_modified(variant, userid=LOADXL_USER_UUID)
-        try:
-            self.vapp.post_json('/variant', variant, status=201)
-        except Exception:  # XXX: HTTPConflict is thrown and should be caught but does not work
-            self.vapp.patch_json('/variant/%s' % build_variant_display_title(
-                variant['CHROM'],
-                variant['POS'],
-                variant['REF'],
-                variant['ALT'],
-                sep=ANNOTATION_ID_SEP
-            ), variant, status=200)
-        return variant
-
-    def build_and_post_variant_samples(self, parser, record, project, institution, variant, file, sample_relations):
-        """ Helper method that builds and posts all variant_samples associated with a record
-
-            :param parser: handle to VCF Parser
-            :param record: record to parse
-            :param project: project to associate with samples
-            :param institution: institution to associate with samples
-            :param variant: associated variant metadata
-            :param file: vcf file accession
-            :param sample_relations: dictionary mapping call_info -> familial relation
-        """
-        if variant is None:
-            return
-        variant_samples = parser.create_sample_variant_from_record(record)
-        for sample in variant_samples:
-            try:
-                sample['project'] = project
-                sample['institution'] = institution
-                sample['variant'] = self.build_variant_link(variant)  # make links
-                sample['file'] = file
-
-                # add familial relations to samplegeno field
-                for geno in sample.get('samplegeno', []):
-                    sample_id = geno['samplegeno_sampleid']
-                    if sample_id in sample_relations:
-                        geno.update(sample_relations[sample_id])
-
-                # add inheritance mode information
-                variant_name = sample['variant']
-                chrom = variant_name[variant_name.index('chr') + 3]  # find chr* and get *
-                sample.update(InheritanceMode.compute_inheritance_modes(sample, chrom=chrom))
-                add_last_modified(variant, userid=LOADXL_USER_UUID)
-                self.vapp.post_json('/variant_sample', sample, status=201)
-            except Exception as e:
-                debuglog('Encountered exception posting variant_sample: %s' % e)
-                raise  # propagate/report if error occurs here
-
-    def search_for_sample_relations(self, vcf_file_accession):
-        """ Helper function for below that handles search aspect (and can be mocked) """
-        search_qs = '/search/?type=SampleProcessing&processed_files.accession=%s' % vcf_file_accession
-        search_result = []
-        try:
-            search_result = self.vapp.get(search_qs).json['@graph']
-        except Exception as e:
-            log.error('No sample_processing found for this VCF! Familial relations will be absent. Error: %s' % e)
-        if len(search_result) > 1:
-            log.error('Ambiguous sample_processing detected for vcf %s, search: %s' % (vcf_file_accession, search_qs))
-        return search_result
-
-    def extract_sample_relations(self, vcf_file_accession):
-        """ Extracts a dictionary of sample relationships based on the file metadata given. """
-        search_result = self.search_for_sample_relations(vcf_file_accession)
-        sample_relations = {}  # should never be None now
-        if len(search_result) == 1:
-            sample_procesing = search_result[0]
-            sample_pedigrees = sample_procesing.get('samples_pedigree', [])
-            for entry in sample_pedigrees:
-                sample_id = entry['sample_name']
-                sample_relations[sample_id] = {}
-                for field, key in zip(['relationship', 'sex'], ['samplegeno_role', 'samplegeno_sex']):
-                    value = entry.get(field, None)
-                    if value is not None:
-                        sample_relations[sample_id][key] = value
-
-        return sample_relations
-
-    def post_variants_and_variant_samples(self, parser, file_meta):
-        """ Posts variants and variant_sample items given the parser and relevant
-            file metadata.
-
-            NOTE: There are variations of this code throughout other entry points, but
-            the version here is THE version that should be used.
-
-        :param parser: VCFParser to be used
-        :param file_meta: metadata for the processed VCF file
-        :return: 2-tuple of successful, failed number of posts
-        """
-        vs_project, vs_institution, file_accession = (file_meta['project']['uuid'], file_meta['institution']['uuid'],
-                                                      file_meta['accession'])
-        sample_relations = self.extract_sample_relations(file_accession)
-        for idx, record in enumerate(parser):
-            log.info('Attempting parse on record %s' % record)
-            try:
-                variant = self.build_and_post_variant(parser, record,
-                                                      CGAP_CORE_PROJECT,  # /projects/cgap-core
-                                                      CGAP_CORE_INSTITUTION)  # /institutions/hms-dbmi/
-                self.build_and_post_variant_samples(parser, record, vs_project, vs_institution, variant, file_accession,
-                                                    sample_relations)
-                self.ingestion_report.mark_success()
-            except Exception as e:  # ANNOTATION spec validation error, recoverable
-                debuglog('Encountered exception posting variant at row %s: %s ' % (idx, e))
-                self.ingestion_report.mark_failure(body=str(e), row=idx)
-
-        return self.ingestion_report.total_successful(), self.ingestion_report.total_errors()
-
     def run(self):
         """ Main process for this class. Runs forever doing ingestion as needed.
 
@@ -891,11 +486,25 @@ class IngestionListener:
                 # gunzip content, pass to parser, post variants/variant_samples
                 # patch in progress status
                 self.set_status(uuid, STATUS_IN_PROGRESS)
-                decoded_content = gunzip_content(raw_content)
-                debuglog('Got decoded content: %s' % decoded_content[:20])
+                # decoded_content = gunzip_content(raw_content)
+                # debuglog('Got decoded content: %s' % decoded_content[:20])
+
+                # reformat VCF
+                vcf_to_be_formatted = tempfile.NamedTemporaryFile(suffix='.gz')
+                vcf_to_be_formatted.write(raw_content)
+                formatted = tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8')
+                reformat_args = {
+                    'inputfile': vcf_to_be_formatted.name,
+                    'outputfile': formatted.name,
+                    'verbose': False
+                }
+                reformat_vcf(reformat_args)
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
-                                   reader=Reader(fsock=decoded_content.split('\n')))
-                success, error = self.post_variants_and_variant_samples(parser, file_meta)
+                                   reader=Reader(formatted))
+                variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
+                                                 project=file_meta['project']['@id'],
+                                                 institution=file_meta['institution']['@id'])
+                success, error = variant_builder.ingest_vcf()
 
                 # if we had no errors, patch the file status to 'Ingested'
                 if error > 0:

@@ -7,8 +7,8 @@ from base64 import b64encode
 from jsonschema_serialize_fork import Draft4Validator
 from pyramid.compat import ascii_native_
 from urllib.parse import urlparse
-from webtest import TestApp
-from .datafixtures import ORDER
+from dcicutils.misc_utils import TestApp
+from .conftest_settings import ORDER
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
@@ -20,7 +20,8 @@ def _type_length():
     type_length_dict = {}
     for name in ORDER:
         try:
-            type_length_dict[name] = len(json.load(utf8(pkg_resources.resource_stream('encoded', 'tests/data/workbook-inserts/%s.json' % name))))
+            utf8_stream = utf8(pkg_resources.resource_stream('encoded', 'tests/data/workbook-inserts/%s.json' % name))
+            type_length_dict[name] = len(json.load(utf8_stream))
         except Exception:
             type_length_dict[name] = 0
 
@@ -98,7 +99,6 @@ def test_get_health_page(app, testapp):
         app.registry.settings['env.name'] = prev_env
 
 
-
 @pytest.mark.parametrize('item_type', [k for k in TYPE_LENGTH if k not in ['user', 'access_key']])
 def test_collections_anon(anontestapp, item_type):
     res = anontestapp.get('/' + item_type).follow(status=200)
@@ -129,7 +129,7 @@ def test_html_server_pages(item_type, wsgi_app):
         headers={'Accept': 'application/json'},
     )
     for item in res.json['@graph']:
-        res = wsgi_app.get(item['@id'], headers={ 'Accept': 'text/html' }, status=200)
+        res = wsgi_app.get(item['@id'], headers={'Accept': 'text/html'}, status=200)
         assert res.body.startswith(b'<!DOCTYPE html>')
         assert b'Internal Server Error' not in res.body
 
@@ -143,7 +143,7 @@ def test_json(testapp, item_type):
 def test_json_basic_auth(anonhtmltestapp):
     url = '/'
     value = "Authorization: Basic %s" % ascii_native_(b64encode(b'nobody:pass'))
-    res = anonhtmltestapp.get(url, headers={ 'Authorization': value, 'Accept' : "application/json" }, status=401)
+    res = anonhtmltestapp.get(url, headers={'Authorization': value, 'Accept': "application/json"}, status=401)
     assert res.content_type == 'application/json'
 
 
