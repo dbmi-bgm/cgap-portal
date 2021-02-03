@@ -343,7 +343,6 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const currentTranscript = transcript[currentTranscriptIdx];
     const {
         csq_sift = fallbackElem,
-        csq_polyphen_score = fallbackElem,
         csq_polyphen = fallbackElem
     } = currentTranscript || {};
 
@@ -408,9 +407,9 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("transcript.csq_polyphen_score")}>PolyPhen2</label>
+                                <label className="mb-0" data-tip={getTipForField("transcript.csq_polyphen")}>PolyPhen2</label>
                             </td>
-                            <td className="text-left">{ csq_polyphen_score }</td>
+                            <td className="text-left">{ csq_polyphen }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
