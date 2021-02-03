@@ -535,7 +535,7 @@ class VariantTableParser(object):
 
         if "variant.genes.genes_most_severe_hgvsc" in cols:
             cols["variant.genes.genes_most_severe_hgvsc"].update({
-                "title": "Coding & Protein Sequence",
+                "title": "Variant",
                 "sort_fields": [
                     { "field": "variant.genes.genes_most_severe_hgvsc", "title": "Coding Sequence" },
                     { "field": "variant.genes.genes_most_severe_hgvsp", "title": "Protein Sequence" }

@@ -516,6 +516,14 @@
                 { "field": "variant.genes.genes_most_severe_transcript", "title": "Most Severe Transcript" }
             ]
         },
+        "variant.genes.genes_most_severe_hgvsc": {
+            "order": 25,
+            "title": "Variant",
+            "sort_fields": [
+                { "field": "variant.genes.genes_most_severe_hgvsc", "title": "Coding Sequence" },
+                { "field": "variant.genes.genes_most_severe_hgvsp", "title": "Protein Sequence" }
+            ]
+        },
         "variant.genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
             "order": 30
@@ -533,7 +541,7 @@
             "title": "Predictors",
             "sort_fields": [
                 { "field": "variant.csq_cadd_phred", "title": "Cadd Phred Score" },
-                { "field": "variant.spliceaiMaxds", "title": "SpliceAI Max DS"},
+                { "field": "variant.spliceaiMaxds", "title": "SpliceAI Max DS" },
                 { "field": "variant.csq_phylop100way_vertebrate", "title": "PhyloP 100 Score"}
             ]
         },
@@ -557,14 +565,6 @@
             "sort_fields": [
                 { "field": "DP", "title": "Coverage" },
                 { "field": "AF", "title": "VAF" }
-            ]
-        },
-        "variant.genes.genes_most_severe_hgvsc": {
-            "order": 50,
-            "title": "Coding & Protein Sequence",
-            "sort_fields": [
-                { "field": "variant.genes.genes_most_severe_hgvsc", "title": "Coding Sequence" },
-                { "field": "variant.genes.genes_most_severe_hgvsp", "title": "Protein Sequence" }
             ]
         },
         "variant.csq_clinvar": {
