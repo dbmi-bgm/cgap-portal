@@ -509,9 +509,8 @@
             ]
         },
         "variant.genes.genes_most_severe_gene.display_title": {
-            "title": "Gene",
             "order": 15,
-            "colTitle": "Gene, Transcript",
+            "title": "Gene, Transcript",
             "sort_fields": [
                 { "field": "variant.genes.genes_most_severe_gene.display_title", "title": "Gene" },
                 { "field": "variant.genes.genes_most_severe_transcript", "title": "Most Severe Transcript" }
@@ -522,18 +521,16 @@
             "order": 30
         },
         "variant.csq_gnomadg_af": {
-            "title": "GnomAD Alt Allele Frequency",
             "order": 35,
-            "colTitle" : "gnomAD",
+            "title" : "gnomAD",
             "sort_fields": [
                 { "field": "variant.csq_gnomadg_af", "title": "gnomad AF" },
                 { "field": "variant.csq_gnomadg_af_popmax", "title": "gnomad AF Population Max" }
             ]
         },
         "variant.csq_cadd_phred": {
-            "title": "CADD Phred score",
             "order": 36,
-            "colTitle": "Predictors",
+            "title": "Predictors",
             "sort_fields": [
                 { "field": "variant.csq_cadd_phred", "title": "Cadd Phred Score" },
                 { "field": "variant.spliceaiMaxds", "title": "SpliceAI Max DS"},
@@ -555,21 +552,20 @@
             ]
         },
         "DP": {
-            "title": "Coverage",
             "order": 40,
-            "colTitle": "Coverage, VAF",
+            "title": "Coverage, VAF",
             "sort_fields": [
                 { "field": "DP", "title": "Coverage" },
                 { "field": "AF", "title": "VAF" }
             ]
         },
         "variant.genes.genes_most_severe_hgvsc": {
-            "title": "Coding Sequence",
-            "order": 50
-        },
-        "variant.genes.genes_most_severe_hgvsp": {
-            "title": "Protein Sequence",
-            "order": 50
+            "order": 50,
+            "title": "Coding & Protein Sequence",
+            "sort_fields": [
+                { "field": "variant.genes.genes_most_severe_hgvsc", "title": "Coding Sequence" },
+                { "field": "variant.genes.genes_most_severe_hgvsp", "title": "Protein Sequence" }
+            ]
         },
         "variant.csq_clinvar": {
             "title": "Clinvar ID",

@@ -427,7 +427,8 @@ export const columnExtensionMap = {
     },
     'bam_snapshot': {
         "noSort": true,
-        "widthMap": { 'lg' : 100, 'md' : 90, 'sm' : 80 },
+        "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
+        "colTitle": <i className="icon icon-fw icon-image fas" />,
         "render": function(result, props) {
             const { bam_snapshot = null, uuid = null } = result;
             if (bam_snapshot) {

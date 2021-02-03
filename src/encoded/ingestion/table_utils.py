@@ -496,7 +496,7 @@ class VariantTableParser(object):
         if "variant.genes.genes_most_severe_gene.display_title" in cols:
             # We combine `genes_most_severe_gene` + `genes_most_severe_transcript` columns in the UI column render func for compactness.
             cols["variant.genes.genes_most_severe_gene.display_title"].update({
-                "colTitle": "Gene, Transcript",
+                "title": "Gene, Transcript",
                 "sort_fields": [
                     { "field": "variant.genes.genes_most_severe_gene.display_title", "title": "Gene" },
                     { "field": "variant.genes.genes_most_severe_transcript", "title": "Most Severe Transcript" }
@@ -506,7 +506,7 @@ class VariantTableParser(object):
         if "DP" in cols:
             # We combine `DP` + `AF` columns in the UI column render func for compactness.
             cols["DP"].update({
-                "colTitle": "Coverage, VAF",
+                "title": "Coverage, VAF",
                 "sort_fields": [
                     { "field": "DP", "title": "Coverage" },
                     { "field": "AF", "title": "VAF" }
@@ -516,7 +516,7 @@ class VariantTableParser(object):
         if "variant.csq_gnomadg_af" in cols:
             # We combine `csq_gnomadg_af` + `csq_gnomadg_af_popmax` columns in the UI column render func for compactness.
             cols["variant.csq_gnomadg_af"].update({
-                "colTitle" : "gnomAD",
+                "title" : "gnomAD",
                 "sort_fields": [
                     { "field": "variant.csq_gnomadg_af", "title": "gnomad AF" },
                     { "field": "variant.csq_gnomadg_af_popmax", "title": "gnomad AF Population Max" }
@@ -525,11 +525,20 @@ class VariantTableParser(object):
 
         if "variant.csq_cadd_phred" in cols:
             cols["variant.csq_cadd_phred"].update({
-                "colTitle": "Predictors",
+                "title": "Predictors",
                 "sort_fields": [
                     { "field": "variant.csq_cadd_phred", "title": "Cadd Phred Score" },
                     { "field": "variant.spliceaiMaxds", "title": "SpliceAI Max DS"},
                     { "field": "variant.csq_phylop100way_vertebrate", "title": "PhyloP 100 Score"}
+                ]
+            })
+
+        if "variant.genes.genes_most_severe_hgvsc" in cols:
+            cols["variant.genes.genes_most_severe_hgvsc"].update({
+                "title": "Coding & Protein Sequence",
+                "sort_fields": [
+                    { "field": "variant.genes.genes_most_severe_hgvsc", "title": "Coding Sequence" },
+                    { "field": "variant.genes.genes_most_severe_hgvsp", "title": "Protein Sequence" }
                 ]
             })
 
