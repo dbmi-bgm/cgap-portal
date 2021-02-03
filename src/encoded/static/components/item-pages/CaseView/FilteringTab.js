@@ -78,7 +78,7 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                     return <StackedRowColumn rowKey="genotype" className="text-center" {...{ rows }}/>;
                 }
             },
-            "variant.genes.genes_ensg.display_title": { // Gene Transcript column
+            "variant.genes.genes_most_severe_gene.display_title": { // "Gene, Transcript" column
                 widthMap: { 'lg' : 155, 'md' : 140, 'sm' : 130 },
                 render: function(result, props) {
                     const { variant : { genes = [] } = {} } = result;

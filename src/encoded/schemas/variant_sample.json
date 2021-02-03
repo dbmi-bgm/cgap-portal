@@ -500,56 +500,68 @@
         }
     },
     "columns": {
-        "AF": {
-            "title": "VAF",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 21
-        },
-        "DP": {
-            "title": "Coverage",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 20
-        },
-        "GT": {
-            "title": "Genotype",
-            "order": 30
-        },
-        "bam_snapshot": {
-            "title": "Genome Snapshot",
-            "order": 81
-        },
-        "variant.csq_clinvar": {
-            "title": "Clinvar ID",
-            "order": 70
-        },
-        "variant.csq_gnomadg_af": {
-            "title": "GnomAD Alt Allele Frequency",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 60
-        },
-        "variant.csq_gnomadg_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 61
-        },
-        "variant.csq_rs_dbsnp151": {
-            "title": "dbSNP ID",
-            "order": 11
-        },
-        "variant.display_title": {
-            "title": "Variant"
-        },
-        "variant.genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 51
+        "display_title": {
+            "title": "Position",
+            "order": 0,
+            "sort_fields" : [
+                { "field" : "variant.display_title", "title" : "Variant Display Title" },
+                { "field" : "variant.csq_rs_dbsnp151", "title": "dbSNP RS Number" }
+            ]
         },
         "variant.genes.genes_most_severe_gene.display_title": {
             "title": "Gene",
-            "order": 40
+            "order": 15,
+            "colTitle": "Gene, Transcript",
+            "sort_fields": [
+                { "field": "variant.genes.genes_most_severe_gene.display_title", "title": "Gene" },
+                { "field": "variant.genes.genes_most_severe_transcript", "title": "Most Severe Transcript" }
+            ]
+        },
+        "variant.genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 30
+        },
+        "variant.csq_gnomadg_af": {
+            "title": "GnomAD Alt Allele Frequency",
+            "order": 35,
+            "colTitle" : "gnomAD",
+            "sort_fields": [
+                { "field": "variant.csq_gnomadg_af", "title": "gnomad AF" },
+                { "field": "variant.csq_gnomadg_af_popmax", "title": "gnomad AF Population Max" }
+            ]
+        },
+        "variant.csq_cadd_phred": {
+            "title": "CADD Phred score",
+            "order": 36,
+            "colTitle": "Predictors",
+            "sort_fields": [
+                { "field": "variant.csq_cadd_phred", "title": "Cadd Phred Score" },
+                { "field": "variant.spliceaiMaxds", "title": "SpliceAI Max DS"},
+                { "field": "variant.csq_phylop100way_vertebrate", "title": "PhyloP 100 Score"}
+            ]
+        },
+        "GT": {
+            "title": "Genotype",
+            "order": 37,
+            "default_hidden": true
+        },
+        "associated_genotype_labels.proband_genotype_label" : {
+            "title": "Genotype Label",
+            "order": 39,
+            "sort_fields": [
+                { "field": "associated_genotype_labels.proband_genotype_label", "title": "Proband GT" },
+                { "field": "associated_genotype_labels.mother_genotype_label", "title": "Mother GT" },
+                { "field": "associated_genotype_labels.father_genotype_label", "title": "Father GT" }
+            ]
+        },
+        "DP": {
+            "title": "Coverage",
+            "order": 40,
+            "colTitle": "Coverage, VAF",
+            "sort_fields": [
+                { "field": "DP", "title": "Coverage" },
+                { "field": "AF", "title": "VAF" }
+            ]
         },
         "variant.genes.genes_most_severe_hgvsc": {
             "title": "Coding Sequence",
@@ -559,9 +571,14 @@
             "title": "Protein Sequence",
             "order": 50
         },
-        "variant.genes.genes_most_severe_transcript": {
-            "title": "Transcript",
-            "order": 41
+        "variant.csq_clinvar": {
+            "title": "Clinvar ID",
+            "order": 70,
+            "default_hidden": true
+        },
+        "bam_snapshot": {
+            "title": "Genome Snapshot",
+            "order": 81
         }
     },
     "facets": {

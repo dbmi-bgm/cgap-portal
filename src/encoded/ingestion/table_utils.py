@@ -464,13 +464,86 @@ class VariantTableParser(object):
     @staticmethod
     def add_extra_variant_sample_columns(cols):
         """ Adds href, variant display title to columns (fields not on mapping table) """
+        cols['display_title'] = {
+            "title": "Position",
+            "order": 0,
+            "sort_fields" : [
+                { "field" : "variant.display_title", "title" : "Variant Display Title" },
+                { "field" : "variant.csq_rs_dbsnp151", "title": "dbSNP RS Number" }
+            ]
+        }
         cols['bam_snapshot'] = {
-            'title': 'Genome Snapshot',
-            'order': 81,
+            "title": 'Genome Snapshot',
+            "order": 81
         }
-        cols['variant.display_title'] = {
-            'title': 'Variant',
+        cols["associated_genotype_labels.proband_genotype_label"] = {
+            "title": "Genotype Label",
+            "order": 39,
+            "sort_fields": [
+                { "field": "associated_genotype_labels.proband_genotype_label", "title": "Proband GT" },
+                { "field": "associated_genotype_labels.mother_genotype_label", "title": "Mother GT" },
+                { "field": "associated_genotype_labels.father_genotype_label", "title": "Father GT" }
+            ]
         }
+        # Redundant - display_title column renders this as well.
+        # cols['variant.display_title'] = {
+        #     'title': 'Variant',
+        # }
+
+    @staticmethod
+    def extend_variant_sample_columns(cols):
+
+        if "variant.genes.genes_most_severe_gene.display_title" in cols:
+            # We combine `genes_most_severe_gene` + `genes_most_severe_transcript` columns in the UI column render func for compactness.
+            cols["variant.genes.genes_most_severe_gene.display_title"].update({
+                "colTitle": "Gene, Transcript",
+                "sort_fields": [
+                    { "field": "variant.genes.genes_most_severe_gene.display_title", "title": "Gene" },
+                    { "field": "variant.genes.genes_most_severe_transcript", "title": "Most Severe Transcript" }
+                ]
+            })
+
+        if "DP" in cols:
+            # We combine `DP` + `AF` columns in the UI column render func for compactness.
+            cols["DP"].update({
+                "colTitle": "Coverage, VAF",
+                "sort_fields": [
+                    { "field": "DP", "title": "Coverage" },
+                    { "field": "AF", "title": "VAF" }
+                ]
+            })
+
+        if "variant.csq_gnomadg_af" in cols:
+            # We combine `csq_gnomadg_af` + `csq_gnomadg_af_popmax` columns in the UI column render func for compactness.
+            cols["variant.csq_gnomadg_af"].update({
+                "colTitle" : "gnomAD",
+                "sort_fields": [
+                    { "field": "variant.csq_gnomadg_af", "title": "gnomad AF" },
+                    { "field": "variant.csq_gnomadg_af_popmax", "title": "gnomad AF Population Max" }
+                ]
+            })
+
+        if "variant.csq_cadd_phred" in cols:
+            cols["variant.csq_cadd_phred"].update({
+                "colTitle": "Predictors",
+                "sort_fields": [
+                    { "field": "variant.csq_cadd_phred", "title": "Cadd Phred Score" },
+                    { "field": "variant.spliceaiMaxds", "title": "SpliceAI Max DS"},
+                    { "field": "variant.csq_phylop100way_vertebrate", "title": "PhyloP 100 Score"}
+                ]
+            })
+
+        # Default Hidden Columns:
+
+        if "variant.csq_clinvar" in cols:
+            cols["variant.csq_clinvar"].update({
+                "default_hidden": True
+            })
+
+        if "GT" in cols:
+            cols["GT"].update({
+                "default_hidden": True
+            })
 
     @staticmethod
     def add_extra_variant_sample_facets(facs):
@@ -500,6 +573,10 @@ class VariantTableParser(object):
             'title': 'Inheritance Modes',
             'order': 15,
         }
+
+    @staticmethod
+    def extend_variant_sample_facets(facs):
+        pass
 
     def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):
         """ Builds the variant_sample.json schema based on sample_props. Will also add variant columns and
@@ -592,8 +669,10 @@ class VariantTableParser(object):
         variant_facs = format_variant_cols_or_facs(variant_facs)
         cols.update(variant_cols)  # add variant stuff since we are embedding this info
         facs.update(variant_facs)
-        self.add_extra_variant_sample_columns(cols)
-        self.add_extra_variant_sample_facets(facs)
+        MappingTableHeader.add_extra_variant_sample_columns(cols)
+        MappingTableHeader.extend_variant_sample_columns(cols)
+        MappingTableHeader.add_extra_variant_sample_facets(facs)
+        MappingTableHeader.extend_variant_sample_facets(facs)
         schema['columns'] = cols
         schema['facets'] = facs
         schema['facets'] = self.sort_schema_properties(schema, key='facets')
