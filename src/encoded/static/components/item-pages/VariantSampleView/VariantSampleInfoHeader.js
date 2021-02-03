@@ -107,7 +107,7 @@ function TranscriptSelectionSection(props){
 
     const geneListOptions = geneTranscriptList.map(function(transcript, idx){
         return (
-            <DropdownItem key={idx} eventKey={idx} active={idx === currentTranscriptIdx}>
+            <DropdownItem key={idx} eventKey={idx.toString()} active={idx === currentTranscriptIdx}>
                 <GeneTranscriptDisplayTitle transcript={transcript} />
             </DropdownItem>
         );
