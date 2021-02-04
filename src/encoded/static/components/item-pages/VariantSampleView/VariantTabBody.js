@@ -336,15 +336,10 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
         csq_cadd_phred = fallbackElem,
         transcript = [],
         spliceai_maxds = fallbackElem,
-        csq_primateai_score = fallbackElem
-    } = variant;
-
-    // Should we instead find transcript with largest score instead of using current?
-    const currentTranscript = transcript[currentTranscriptIdx];
-    const {
+        csq_primateai_score = fallbackElem,
         csq_sift = fallbackElem,
-        csq_polyphen = fallbackElem
-    } = currentTranscript || {};
+        csq_polyphen2_hvar_score = fallbackElem
+    } = variant;
 
     // Not too sure whether to use table or <row> and <cols> here..
     // Went with <table> since is more semantically correct for the data we're
@@ -401,15 +396,15 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("transcript.csq_sift")}>SIFT</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_sift")}>SIFT</label>
                             </td>
                             <td className="text-left">{ csq_sift }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("transcript.csq_polyphen")}>PolyPhen2</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_polyphen2_hvar_score")}>PolyPhen2</label>
                             </td>
-                            <td className="text-left">{ csq_polyphen }</td>
+                            <td className="text-left">{ csq_polyphen2_hvar_score }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
