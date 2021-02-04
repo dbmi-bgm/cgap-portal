@@ -12,7 +12,12 @@ from .util import s3_local_file, debuglog
 
 
 GENERIC_FIELD_MAPPING = {  # for spreadsheet column names that are different from schema property names
-    'individual': {},
+    'individual': {
+        'mother id': 'mother',
+        'father id': 'father',
+        'hpo terms': 'phenotypic_features',
+        'mondo terms': 'disorders'
+    },
     'family': {},
     'sample': {
         'date collected': 'specimen_collection_date',
@@ -55,13 +60,15 @@ YES_VALS = ['y', 'yes']
 # SS at end refers to spreadsheet, to distinguish from prop names in schema if we need
 # vars for those at any point.
 SS_INDIVIDUAL_ID = 'individual id'
+SS_FAMILY_ID = 'family id'
 SS_SPECIMEN_ID = 'specimen id'
 SS_ANALYSIS_ID = 'analysis id'
 SS_RELATION = 'relation to proband'
 SS_REPORT_REQUIRED = 'report required'
 
 REQUIRED_CASE_COLS = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
-REQUIRED_COLUMNS =  REQUIRED_CASE_COLS + [SS_INDIVIDUAL_ID, SS_RELATION, SS_REPORT_REQUIRED]
+REQUIRED_COLUMNS_ACCESSIONING =  REQUIRED_CASE_COLS + [SS_INDIVIDUAL_ID, SS_RELATION, SS_REPORT_REQUIRED]
+REQUIRED_COLUMNS_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID]
 
 # half-siblings not currently supported, because pedigree info is needed to know
 # which parent is shared. Can come back to this after pedigree processing is integrated.
@@ -86,7 +93,7 @@ LINKTO_FIELDS = [  # linkTo properties that we will want to patch in second-roun
 ID_SOURCES = ['UDN']
 
 
-def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp,  # <- Required keyword arguments
+def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, submission_type, vapp,  # <- Required keyword arguments
                            validate_only=False):  # <-- Optional keyword arguments (with defaults)
     """
     Handles processing of a submitted workbook.
@@ -120,7 +127,9 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
                    'Please submit a file of the proper type.')
             results['validation_output'].append(msg)
             return results
-        json_data, json_success = xls_to_json(rows, project=project_json, institution=institution_json)
+        json_data, json_success = xls_to_json(
+            rows, project=project_json, institution=institution_json, submission_type=submission_type
+        )
         if not json_success:
             results['validation_output'] = json_data['errors']
             return results
@@ -260,7 +269,7 @@ class SubmissionRow:
 
     def found_missing_values(self):
         # makes sure no required values from spreadsheet are missing
-        missing_required = [col for col in REQUIRED_COLUMNS
+        missing_required = [col for col in REQUIRED_COLUMNS_ACCESSIONING
                             if col not in self.metadata or not self.metadata[col]]
         if missing_required:
             self.errors.append(
@@ -426,6 +435,37 @@ class SubmissionRow:
                 else:
                     self.sample.metadata.setdefault('processed_files', []).append(file_alias)
                 self.files_processed.append(MetadataItem(file_info, self.row, 'file_processed'))
+
+
+class PedigreeRow:
+
+    def __init__(self, row, metadata, project, institution):
+        self.project = project
+        self.institution = institution
+        self.row = row
+        self.metadata = metadata
+        self.indiv_alias = '{}:individual-{}'.format(project, remove_spaces_in_id(metadata['individual id']))
+        self.individual = self.extract_individual_metadata()
+        self.family = None
+        self.proband = self.is_proband()
+        self.errors = []
+
+    @staticmethod
+    def reformat_phenotypic_features(feature_list):
+        if not feature_list:
+            return []
+        return [{'phenotypic_feature': feature} for feature in feature_list]
+
+    def extract_individual_metadata(self):
+        info = {'aliases': [self.indiv_alias]}
+        info = map_fields(self.metadata, info, ['individual_id', 'family_id'], 'individual')
+        info['phenotypic_features'] = self.reformat_phenotypic_features(info.get('phenotypic_features', []))
+        return MetadataItem(info, self.row, 'individual')
+
+    def is_proband(self):
+        if self.metadata['proband'].lower().startswith('y'):
+            return True
+        return False
 
 
 class SubmissionMetadata:
@@ -703,6 +743,82 @@ class SubmissionMetadata:
             self.json_out['errors'] = self.errors
 
 
+class PedigreeMetadata:
+
+    def __init__(self, rows, project, institution, counter=1):
+        self.rows = rows
+        self.project = project.get('name')
+        self.project_atid = project.get('@id')
+        self.institution = institution.get('name')
+        self.institution_atid = institution.get('@id')
+        self.counter = counter
+        self.metadata = []
+        self.individuals = {}
+        self.families = {}
+        self.errors = []
+        self.json_out = {}
+        self.itemtype_dict = {
+            'individual': self.individuals,
+            'family': self.families,
+        }
+        self.process_rows()
+        self.create_json_out()
+
+    def add_metadata_single_item(self, item):
+        """
+        Looks at metadata from a PedigreeRow object, one DB itemtype at a time
+        and compares and adds it. If each item is not
+        already represented in metadata for current SubmissionMetadata instance,
+        it is added; if it is represented, missing fields are added to item.
+        Currently used for Individual and Sample items
+        """
+        previous = self.itemtype_dict[item.itemtype]
+        prev = [p for p in previous.keys()]
+        if item.alias not in prev:
+            previous[item.alias] = item.metadata
+        else:
+            for key in item.metadata:
+                if key not in previous[item.alias]:
+                    previous[item.alias][key] = item.metadata[key]
+
+    def add_family_metadata(self):
+        family_metadata = {}
+        for alias, item in self.individuals.items():
+            family_metadata.setdefault(item['family_id'], {'members': []})
+            family_metadata[item['family_id']]['members'].append(alias)
+        # get family aliases
+
+    def process_rows(self):
+        """
+        Method for iterating over spreadsheet rows to process each one and compare it to previous rows.
+        """
+        for i, row in enumerate(self.rows):
+            try:
+                processed_row = PedigreeRow(i + 1 + self.counter, row, self.project, self.institution)
+                simple_add_items = [processed_row.individual, processed_row.family]
+                for item in simple_add_items:
+                    self.add_metadata_single_item(item)
+                # self.add_family_metadata(processed_row.row, processed_row.family, processed_row.individual)
+                self.errors.extend(processed_row.errors)
+            except AttributeError:
+                self.errors.extend(processed_row.errors)
+                continue
+
+    def create_json_out(self):
+        """
+        Creates final json that can be used for subsequent validation function.
+        """
+        for key in self.itemtype_dict:
+            self.json_out[key] = {}
+            for alias, metadata in self.itemtype_dict[key].items():
+                new_metadata = {k: v for k, v in metadata.items() if v}
+                new_metadata['project'] = self.project_atid
+                new_metadata['institution'] = self.institution_atid
+                self.json_out[key][alias] = new_metadata
+            # self.json_out[key] = self.itemtype_dict[key]
+            self.json_out['errors'] = self.errors
+
+
 class SpreadsheetProcessing:
     """
     class that holds relevant information for processing of a single spreadsheet.
@@ -710,10 +826,18 @@ class SpreadsheetProcessing:
     to hold all metadata extracted from spreadsheet.
     """
 
-    def __init__(self, row, project, institution):
+    def __init__(self, row, project, institution, submission_type='accessioning'):
         self.input = row
         self.project = project
         self.institution = institution
+        self.submission_type = submission_type
+        if self.submission_type == 'accessioning':
+            self.required_columns = REQUIRED_COLUMNS_ACCESSIONING
+        elif self.submission_type == 'pedigree':
+            self.required_columns = REQUIRED_COLUMNS_PEDIGREE
+        else:
+            pass
+            # TODO: raise error
         self.output = {}
         self.errors = []
         self.keys = []
@@ -747,7 +871,7 @@ class SpreadsheetProcessing:
         """
         Turns each row into a dictionary of form {column heading1: row value1, ...}
         """
-        missing = [col for col in REQUIRED_COLUMNS if col not in self.keys]
+        missing = [col for col in self.required_columns if col not in self.keys]
         if missing:
             msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
             self.errors.append(msg)
@@ -761,20 +885,30 @@ class SpreadsheetProcessing:
                 self.rows.append(row_dict)
 
     def extract_metadata(self):
-        result = SubmissionMetadata(self.rows, self.project, self.institution, self.counter)
+        if self.submission_type == 'accessioning':
+            result = SubmissionMetadata(self.rows, self.project, self.institution, self.counter)
+        elif self.submission_type == 'pedigree':
+            result = PedigreeMetadata(self.rows, self.project, self.institution, self.counter)
+        else:
+            pass
+            # TODO: handle this case
         self.output = result.json_out
         self.errors.extend(result.errors)
         self.passing = True
 
 
-def xls_to_json(row, project, institution):
+def xls_to_json(row, project, institution, submission_type):
     """
     Wrapper for SpreadsheetProcessing that returns expected values:
     result.output - metadata to be submitted in json
     result.passing - whether submission "passes" this part of the code and can move
         on to the next step.
     """
-    result = SpreadsheetProcessing(row, project, institution)
+    if submission_type not in ['accessioning', 'pedigree']:
+        pass
+        # TODO: handle this case
+    else:
+        result = SpreadsheetProcessing(row, project, institution, submission_type)
     result.output['errors'] = result.errors
     return result.output, result.passing
 

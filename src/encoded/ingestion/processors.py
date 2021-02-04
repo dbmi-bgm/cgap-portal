@@ -56,6 +56,7 @@ def handle_metadata_bundle(submission: SubmissionFolio):
 
         institution = get_parameter(submission.parameters, 'institution')
         project = get_parameter(submission.parameters, 'project')
+        submission_type = get_parameter(submission.parameters, 'submission_type', default='accessioning')
         validate_only = get_parameter(submission.parameters, 'validate_only', as_type=bool, default=False)
 
         bundle_results = submit_metadata_bundle(s3_client=s3_client,
@@ -63,6 +64,7 @@ def handle_metadata_bundle(submission: SubmissionFolio):
                                                 key=submission.object_name,
                                                 project=project,
                                                 institution=institution,
+                                                submission_type=submission_type,
                                                 vapp=submission.vapp,
                                                 validate_only=validate_only)
 
