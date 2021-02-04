@@ -183,7 +183,6 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'facets' in schema
     assert 'variant' in properties
     assert 'file' in properties
-    assert 'variant.display_title' in cols
     assert facs['DP']['order'] == 8
     assert facs['AF']['order'] == 11
     assert cols['DP']['order'] == 20
