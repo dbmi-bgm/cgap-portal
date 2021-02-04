@@ -678,10 +678,10 @@ class VariantTableParser(object):
         variant_facs = format_variant_cols_or_facs(variant_facs)
         cols.update(variant_cols)  # add variant stuff since we are embedding this info
         facs.update(variant_facs)
-        MappingTableHeader.add_extra_variant_sample_columns(cols)
-        MappingTableHeader.extend_variant_sample_columns(cols)
-        MappingTableHeader.add_extra_variant_sample_facets(facs)
-        MappingTableHeader.extend_variant_sample_facets(facs)
+        self.add_extra_variant_sample_columns(cols)
+        self.extend_variant_sample_columns(cols)
+        self.add_extra_variant_sample_facets(facs)
+        self.extend_variant_sample_facets(facs)
         schema['columns'] = cols
         schema['facets'] = facs
         schema['facets'] = self.sort_schema_properties(schema, key='facets')
