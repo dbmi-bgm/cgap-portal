@@ -10,13 +10,28 @@ import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
 
-const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ hgvsc }){
+const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene }){
+    const {
+        genes_most_severe_hgvsc = null,
+        genes_most_severe_hgvsp = null
+    } = gene || {};
+
     // Memoized on the 1 prop it receives which is dependency for its calculation.
-    const hgvscSplit = hgvsc.split(":");
-    const pSplit = hgvscSplit[1].split(".");
-    // Will add hgvsp when added in data/backend
-    const rows = [<div className="text-truncate d-block" key="genes_severe_transcript"><span className="text-600">{ pSplit[0] }.</span><span>{ pSplit[1] }</span></div>];
-    return <StackedRowColumn rowKey="genes_hgvsc" className="text-center" {...{ rows }} />;
+    const hgvscSplit = genes_most_severe_hgvsc.split(":");
+    const scSplit = hgvscSplit[1].split(".");
+
+    const hgvspSplit = genes_most_severe_hgvsp.split(":");
+    const spSplit = hgvspSplit[1].split(".");
+
+    const rows = [
+        <div className="text-truncate d-block" key="sc">
+            <span className="text-600">{ scSplit[0] }.</span><span>{ scSplit[1] }</span>
+        </div>,
+        <div className="text-truncate d-block" key="sp">
+            <span className="text-600">{ spSplit[0] }.</span><span>{ spSplit[1] }</span>
+        </div>
+    ];
+    return <StackedRowColumn className="text-center" {...{ rows }} />;
 });
 
 function CaseViewEmbeddedVariantSampleSearchTable(props){
@@ -56,8 +71,11 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                         <span key="DP" data-tip="Coverage" className="d-block text-truncate">{DP || "-"}</span>,
                         <span key="AF" data-tip="VAF" className="d-block text-truncate">{AF || "-"}</span>
                     ];
-                    return <StackedRowColumn rowKey="Coverage, AF Row" className="text-center" {...{ rows }}/>;
+                    return <StackedRowColumn className="text-center" {...{ rows }}/>;
                 }
+            },
+            "GT" : { // Genotype Column (numerical, e.g. 0/1)
+                widthMap: { 'lg' : 70, 'md' : 70, 'sm' : 60 }
             },
             "associated_genotype_labels.proband_genotype_label" : { // Genotype column
                 widthMap: { 'lg' : 240, 'md' : 230, 'sm' : 200 },
@@ -75,16 +93,16 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                     if (father_genotype_label) {
                         rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
                     }
-                    return <StackedRowColumn rowKey="genotype" className="text-center" {...{ rows }}/>;
+                    return <StackedRowColumn className="text-center" {...{ rows }}/>;
                 }
             },
-            "variant.genes.genes_ensg.display_title": { // Gene Transcript column
+            "variant.genes.genes_most_severe_gene.display_title": { // "Gene, Transcript" column
                 widthMap: { 'lg' : 155, 'md' : 140, 'sm' : 130 },
                 render: function(result, props) {
                     const { variant : { genes = [] } = {} } = result;
 
                     const geneTitles = genes.map((geneItem) => {
-                        const { genes_ensg: { display_title = null } = {} } = geneItem || {};
+                        const { genes_most_severe_gene: { display_title = null } = {} } = geneItem || {};
                         return display_title;
                     });
                     if (genes.length > 0) {
@@ -93,22 +111,23 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                             <span key="genes_ensg" className="font-italic d-block text-truncate">{ geneTitles.length > 1 ? geneTitles.join() : geneTitles } </span>,
                             <span data-tip="Most Severe Transcript" key="genes_severe_transcript" className="font-italic d-block text-truncate">{ genes_most_severe_transcript}</span>
                         ];
-                        return <StackedRowColumn rowKey="genes_data" className="text-center" {...{ rows }} />;
+                        return <StackedRowColumn className="text-center" {...{ rows }} />;
                     }
                     return null;
                 }
             },
-            "variant.genes.genes_most_severe_hgvsc": { // Variant column
-                noSort: true,
-                widthMap: { 'lg' : 120, 'md' : 110, 'sm' : 95 },
+            "variant.genes.genes_most_severe_hgvsc": { // "Coding & Protein Sequence" col (existing 'Variant' column)
+                // noSort: true,
+                widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
                 render: function(result, props) {
-                    const { variant : { genes : [firstGene = null] = [] } = {} } = result;
-                    const { genes_most_severe_hgvsc = null } = firstGene || {};
+                    const { variant : { genes : [ firstGene = null ] = [] } = {} } = result;
+                    const { genes_most_severe_hgvsc = null, genes_most_severe_hgvsp = null } = firstGene || {};
 
-                    if (firstGene && genes_most_severe_hgvsc) {
-                        return <GenesMostSevereHGVSCColumn hgvsc={genes_most_severe_hgvsc} />;
+                    if (!genes_most_severe_hgvsc && !genes_most_severe_hgvsp) {
+                        return null;
                     }
-                    return null;
+
+                    return <GenesMostSevereHGVSCColumn gene={firstGene} />;
                 }
             },
             "variant.genes.genes_most_severe_consequence.coding_effect": { // Coding Effect column
@@ -118,7 +137,7 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                     const { genes_most_severe_consequence : { coding_effect = null } = {} } = firstGene || {};
 
                     if (firstGene && coding_effect) {
-                        return <StackedRowColumn rowKey="genes_codingeffect" className="text-center text-truncate" rows={[coding_effect]} />;
+                        return <StackedRowColumn className="text-center text-truncate" rows={[coding_effect]} />;
                     }
                     return null;
                 }
@@ -140,27 +159,27 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                         const csq_gnomadg_af_popmax_exp = csq_gnomadg_af_popmax ? csq_gnomadg_af_popmax.toExponential(3): null;
                         rows.push(<div key="csq_gnomadg_af_popmax" className="d-block text-truncate"><span className="text-600">MAX: </span>{csq_gnomadg_af_popmax_exp || csq_gnomadg_af_popmax || "-"}</div>);
                     }
-                    return <StackedRowColumn rowKey="genes_gnomad" className="text-center" {...{ rows }}/>;
+                    return <StackedRowColumn className="text-center" {...{ rows }}/>;
                 }
             },
             "variant.csq_cadd_phred": { // Predictors column (csq_cadd_phred, spliceai, phylop100)
                 render: function(result, props) {
-                    const { variant : { csq_cadd_phred = null, spliceai_maxds = null, csq_phylop100way_vertebrate = null } = {} } = result;
+                    const { variant : { csq_cadd_phred = null, spliceaiMaxds = null, csq_phylop100way_vertebrate = null } = {} } = result;
                     const rows = [];
 
-                    if (!csq_cadd_phred && !spliceai_maxds && !csq_phylop100way_vertebrate) {
+                    if (!csq_cadd_phred && !spliceaiMaxds && !csq_phylop100way_vertebrate) {
                         return null;
                     }
                     if (csq_cadd_phred) {
                         rows.push(<div key="csq_cadd_phred" className="d-block text-truncate"><span className="text-600">Cadd Phred: </span>{csq_cadd_phred || "-"}</div>);
                     }
-                    if (spliceai_maxds) {
-                        rows.push(<div key="spliceai_maxds" className="d-block text-truncate"><span className="text-600">SpliceAI MaxDS: </span>{spliceai_maxds || "-"}</div>);
+                    if (spliceaiMaxds) {
+                        rows.push(<div key="spliceai_maxds" className="d-block text-truncate"><span className="text-600">SpliceAI MaxDS: </span>{spliceaiMaxds || "-"}</div>);
                     }
                     if (csq_phylop100way_vertebrate) {
                         rows.push(<div key="phylop" className="d-block text-truncate"><span className="text-600">PhyloP 100: </span>{csq_phylop100way_vertebrate || "-"}</div>);
                     }
-                    return <StackedRowColumn rowKey="genes_predictors" className="text-center" {...{ rows }}/>;
+                    return <StackedRowColumn className="text-center" {...{ rows }}/>;
                 }
             }
         };
@@ -169,10 +188,10 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
 }
 
 function StackedRowColumn(props) {
-    const { rowKey = null, rows = [], className = null } = props;
+    const { rows = [], className = null } = props;
     const cls = ("w-100" + (className ? " " + className : ""));
     return (
-        <div key={rowKey} className={cls} data-delay-dhow={750}>
+        <div className={cls} data-delay-dhow={750}>
             { rows }
         </div>
     );
@@ -198,7 +217,7 @@ const VSDisplayTitleColumnDefault = React.memo(function VSDisplayTitleColumnDefa
 
     return (
         <a key="title" href={link || '#'} onClick={onClick} className="d-block text-truncate">
-            <StackedRowColumn rowKey="title-container" {...{ rows, cls }}  />
+            <StackedRowColumn {...{ rows, cls }}  />
         </a>
     );
 });
