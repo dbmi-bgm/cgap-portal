@@ -269,4 +269,15 @@
                            "role": "developer"}],
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     }
+    {
+        "email": "douglas_rioux@hms.harvard.edu",
+        "first_name": "Douglas",
+        "last_name": "Rioux",
+        "uuid": "d1d2c132-d5aa-4a0a-0525-96d647a09die",
+        "groups": ["admin"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    }
 ]
