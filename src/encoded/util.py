@@ -90,7 +90,10 @@ def debuglog(*args):
 
 def subrequest_object(request, object_id):
     subreq = make_subrequest(request, "/" + object_id)
-    response = request.invoke_subrequest(subreq, use_tweens=True)
+    subreq.headers['Accept'] = 'application/json'
+    # Tweens are suppressed here because this is an internal call and doesn't need things like HTML processing.
+    # -kmp 2-Feb-2021
+    response = request.invoke_subrequest(subreq, use_tweens=False)
     if response.status_code >= 300:  # alas, the response from a pyramid subrequest has no .raise_for_status()
         raise HTTPServerError("Error obtaining object: %s" % object_id)
     object_json = response.json
