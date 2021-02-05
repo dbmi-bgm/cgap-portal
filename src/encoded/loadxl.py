@@ -279,10 +279,11 @@ def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=Fa
     # run the generator; don't worry about the output
     for _ in gen:
         pass
-    # gen.caught will str error message on error, otherwise None on success
-    if gen.caught is not None:
+    # gen.caught is None for success and an error message on failure
+    if gen.caught is None:
+        return None
+    else:
         return Exception(gen.caught)
-    return gen.caught
 
 
 def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False, post_only=False):
@@ -328,6 +329,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             use_itype = True if (itype and isinstance(itype, basestring)) else False
         else:  # cannot get the file
             err_msg = 'Failure loading inserts from %s. Could not find matching file or directory.' % inserts
+            # import pdb; pdb.set_trace()
             print(err_msg)
             yield str.encode('ERROR: %s\n' % err_msg)
             return
@@ -356,6 +358,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             err_msg = 'No items found in %s' % inserts
         if itype:
             err_msg += ' for item type(s) %s' % itype
+        # import pdb; pdb.set_trace()
         print(err_msg)
         yield str.encode('ERROR: %s' % err_msg)
         return
@@ -424,6 +427,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                               ''.format(a_type, str(first_fields), str(e)))
                         # remove newlines from error, since they mess with generator output
                         e_str = str(e).replace('\n', '')
+                        # import pdb; pdb.set_trace()
                         yield str.encode('ERROR: %s\n' % e_str)
                         return
                         # raise StopIteration
@@ -457,6 +461,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                 print('Patching {} failed. Patch body:\n{}\n\nError Message:\n{}'.format(
                       a_type, str(an_item), str(e)))
                 e_str = str(e).replace('\n', '')
+                # import pdb; pdb.set_trace()
                 yield str.encode('ERROR: %s\n' % e_str)
                 return
                 # raise StopIteration
