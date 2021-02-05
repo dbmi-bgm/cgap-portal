@@ -556,18 +556,25 @@ class VariantTableParser(object):
 
     @staticmethod
     def add_extra_variant_sample_facets(facs):
+        '''
+        Order of a Facet Group within top-level FacetList is determined by `min(grouped facet 1, grouped facet 2, ...)`
+        which is then used for sorting relative to all other top-level facets' and facet groups' orders.
+        Facets within a group are sorted relative to each other.
+        '''
         facs["variant.genes.genes_most_severe_gene.display_title"] = {
             "title": "Gene",
             "order": 1,
-            # "grouping": "Genes",                  # Currently ungrouped (no siblings with grouping:Genes), may be changed later.
+            "grouping": "Genes",
             "search_type": "sayt_without_terms",    # Enables search-as-you-type via AJAX (SAYT-AJAX) for this facet
             "sayt_item_type": "Gene"                # Required if "search_type" == "sayt_without_terms"
         }
         facs["variant.genes.genes_most_severe_gene.gene_lists.display_title"] = {
             "title": "Gene List",
-            "order": 99,
-            "grouping": "Genes"
+            "order": 2,
+            "grouping": "Genes",
+            "description": "Groups of genes that are relevant for a disease or condition"
         }
+
         facs['associated_genotype_labels.proband_genotype_label'] = {
             'title': 'Proband Genotype',
             'order': 12,
@@ -583,6 +590,7 @@ class VariantTableParser(object):
             'order': 14,
             'grouping': 'Genotype',
         }
+
         facs['inheritance_modes'] = {
             'title': 'Inheritance Modes',
             'order': 15,

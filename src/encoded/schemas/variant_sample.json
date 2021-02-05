@@ -721,13 +721,15 @@
         "variant.genes.genes_most_severe_gene.display_title": {
             "title": "Gene",
             "order": 1,
+            "grouping": "Genes",
             "search_type": "sayt_without_terms",
             "sayt_item_type": "Gene"
         },
         "variant.genes.genes_most_severe_gene.gene_lists.display_title": {
             "title": "Gene List",
-            "order": 99,
-            "grouping": "Genes"
+            "order": 2,
+            "grouping": "Genes",
+            "description": "Groups of genes that are relevant for a disease or condition"
         },
         "variant.genes.genes_most_severe_gene.oe_lof": {
             "title": "o/e (LoF)",
