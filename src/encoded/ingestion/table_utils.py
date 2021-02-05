@@ -656,7 +656,7 @@ class VariantTableParser(object):
             'title': 'Familial Relation',
             'description': 'Relationship of the person who submitted this sample relative to the proband',
             'type': 'string',
-            'enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling',
+            'suggested_enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling',
                      'half-brother', 'half-sister', 'half-sibling', 'wife', 'husband',
                      'son', 'daughter', 'child', 'grandson', 'granddaughter', 'grandchild',
                      'grandmother', 'family-in-law', 'extended-family', 'not linked'],

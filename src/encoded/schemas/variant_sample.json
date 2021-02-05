@@ -453,7 +453,7 @@
                         "title": "Familial Relation",
                         "description": "Relationship of the person who submitted this sample relative to the proband",
                         "type": "string",
-                        "enum": [
+                        "suggested_enum": [
                             "proband",
                             "father",
                             "mother",
