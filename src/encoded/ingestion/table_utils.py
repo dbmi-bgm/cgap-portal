@@ -575,26 +575,144 @@ class VariantTableParser(object):
             "description": "Groups of genes that are relevant for a disease or condition"
         }
 
-        facs['associated_genotype_labels.proband_genotype_label'] = {
-            'title': 'Proband Genotype',
-            'order': 12,
-            'grouping': 'Genotype',
-        }
-        facs['associated_genotype_labels.mother_genotype_label'] = {
-            'title': 'Mother Genotype',
-            'order': 13,
-            'grouping': 'Genotype',
-        }
-        facs['associated_genotype_labels.father_genotype_label'] = {
-            'title': 'Father Genotype',
-            'order': 14,
-            'grouping': 'Genotype',
-        }
-
         facs['inheritance_modes'] = {
             'title': 'Inheritance Modes',
             'order': 15,
         }
+
+        # Genotype labels (calculated properties)
+        facs.update({
+            "associated_genotype_labels.proband_genotype_label": {
+                "title": "Proband Genotype",
+                "order": 12,
+                "grouping": "Genotype"
+            },
+            "associated_genotype_labels.mother_genotype_label": {
+                "title": "Mother Genotype",
+                "order": 13,
+                "grouping": "Genotype"
+            },
+            "associated_genotype_labels.father_genotype_label": {
+                "title": "Father Genotype",
+                "order": 14,
+                "grouping": "Genotype"
+            },
+
+            # Below facets are default-hidden unless e.g. additional_facet=associated_genotype_labels.co_parent_genotype_label
+            # URL param is supplied in filter block flags or search href.
+
+            "associated_genotype_labels.co_parent_genotype_label": {
+                "title": "Co-Parent Genotype",
+                "order": 1000,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+
+
+            "associated_genotype_labels.sister_genotype_label": {
+                "title": "Sister Genotype",
+                "order": 1001,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.sister_II_genotype_label": {
+                "title": "Sister II Genotype",
+                "order": 1002,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.sister_III_genotype_label": {
+                "title": "Sister III Genotype",
+                "order": 1003,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.sister_IV_genotype_label": {
+                "title": "Sister IV Genotype",
+                "order": 1004,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+
+
+            "associated_genotype_labels.brother_genotype_label": {
+                "title": "Brother Genotype",
+                "order": 1005,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.brother_II_genotype_label": {
+                "title": "Brother II Genotype",
+                "order": 1006,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.brother_III_genotype_label": {
+                "title": "Brother III Genotype",
+                "order": 1007,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.brother_IV_genotype_label": {
+                "title": "Brother IV Genotype",
+                "order": 1008,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+
+
+            "associated_genotype_labels.daughter_genotype_label": {
+                "title": "Daughter Genotype",
+                "order": 1009,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.daughter_II_genotype_label": {
+                "title": "Daughter II Genotype",
+                "order": 1010,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.daughter_III_genotype_label": {
+                "title": "Daughter III Genotype",
+                "order": 1011,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.daughter_IV_genotype_label": {
+                "title": "Daughter IV Genotype",
+                "order": 1012,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+
+
+            "associated_genotype_labels.son_genotype_label": {
+                "title": "Son Genotype",
+                "order": 1013,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.son_II_genotype_label": {
+                "title": "Son II Genotype",
+                "order": 1014,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.son_III_genotype_label": {
+                "title": "Son III Genotype",
+                "order": 1015,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            },
+            "associated_genotype_labels.son_IV_genotype_label": {
+                "title": "Son IV Genotype",
+                "order": 1016,
+                "grouping": "Genotype",
+                "default_hidden" : true
+            }
+        })
+        
 
     @staticmethod
     def extend_variant_sample_facets(facs):
