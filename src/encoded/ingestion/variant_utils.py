@@ -103,11 +103,11 @@ class VariantBuilder:
     def search_for_sample_relations(self):
         """ Helper function for below method that is easy to mock. """
         search_qs = '/search/?type=SampleProcessing&processed_files.accession=%s' % self.file
-        search_result = []
         try:
             search_result = self.vapp.get(search_qs).json['@graph']
         except Exception as e:  # will catch 404
             log.error('No sample_processing found for this VCF! Familial relations will be absent. Error: %s' % e)
+            raise e
         return search_result
 
     def extract_sample_relations(self):
