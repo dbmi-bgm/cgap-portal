@@ -718,11 +718,16 @@
             "order": 6,
             "grouping": "Consequence"
         },
-        "variant.genes.genes_most_severe_gene.gene_lists.display_title": {
-            "title": "Gene List",
+        "variant.genes.genes_most_severe_gene.display_title": {
+            "title": "Gene",
             "order": 1,
             "search_type": "sayt_without_terms",
-            "sayt_item_type": "GeneList"
+            "sayt_item_type": "Gene"
+        },
+        "variant.genes.genes_most_severe_gene.gene_lists.display_title": {
+            "title": "Gene List",
+            "order": 99,
+            "grouping": "Genes"
         },
         "variant.genes.genes_most_severe_gene.oe_lof": {
             "title": "o/e (LoF)",
