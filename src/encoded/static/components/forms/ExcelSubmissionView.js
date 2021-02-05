@@ -234,12 +234,12 @@ class PanelOne extends React.PureComponent {
         this.handleSelectInstitution = this.handleSelectInstitution.bind(this);
         this.handleSelectProject = this.handleSelectProject.bind(this);
         this.handleCreate = this.handleCreate.bind(this);
-        this.handleSelectIngestionType = this.handleSelectIngestionType.bind(this);
+        this.handleSelectSubmissionType = this.handleSelectSubmissionType.bind(this);
 
         this.state = {
             selectingField: null,
             submissionTitle: "",
-            ingestionType: "metadata_bundle",
+            submissionType: null,
             error: null,
             isCreating: false,
             ...PanelOne.flatFieldsFromUser(props.user)
@@ -316,10 +316,10 @@ class PanelOne extends React.PureComponent {
         this.setState({ submissionTitle: e.target.value });
     }
 
-    handleSelectIngestionType(eventKey) {
-        const { ingestionType } = this.state;
-        if (eventKey !== ingestionType) {
-            this.setState({ ingestionType: eventKey });
+    handleSelectSubmissionType(eventKey) {
+        const { submissionType } = this.state;
+        if (eventKey !== submissionType) {
+            this.setState({ submissionType: eventKey });
         }
     }
 
@@ -339,14 +339,13 @@ class PanelOne extends React.PureComponent {
             submissionTitle: title,
             institutionID: institution,
             projectID: project,
-            ingestionType,
             isCreating = false
         } = this.state;
 
         e.preventDefault();
         e.stopPropagation();
 
-        if (isCreating || !institution || !project || !ingestionType) return false;
+        if (isCreating || !institution || !project ) return false;
 
         const cb = (res) => {
             this.setState({ isCreating: false });
@@ -388,7 +387,7 @@ class PanelOne extends React.PureComponent {
             });
         };
 
-        const postData = { institution, project, ingestion_type: ingestionType, processing_status: { state: "created" } };
+        const postData = { institution, project, ingestion_type: "metadata_bundle", processing_status: { state: "created" } };
         if (title) { postData["display_title"] = title; }
 
         this.setState({ isCreating: true }, ()=>{
@@ -409,7 +408,7 @@ class PanelOne extends React.PureComponent {
             institutionID, institutionTitle,
             projectID, projectTitle,
             submissionTitle,
-            ingestionType,
+            submissionType,
             isCreating = false
         } = this.state;
 
@@ -427,7 +426,7 @@ class PanelOne extends React.PureComponent {
         }
 
         const valuesChanged = !submissionItem || this.memoized.checkIfChanged(submissionItem, submissionTitle, institutionID, projectID);
-        const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID || !ingestionType);
+        const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID );
 
         return (
             <form className={"panel-form-container d-block" + (isCreating ? " is-creating" : "")} onSubmit={this.handleCreate}>
@@ -438,16 +437,17 @@ class PanelOne extends React.PureComponent {
                 <LinkToFieldSection onSelect={this.handleSelectProject} title="Project" required
                     type="Project" selectedID={projectID} selectedTitle={projectTitle} searchAsYouType />
                 <div className="field-section linkto-section mt-2 d-block">
-                    <label className="d-block mb-05">Ingestion Type <span className="text-danger">*</span></label>
+                    <label className="d-block mb-05">Submission Type</label>
                     <div className="row">
                         <div className="col-auto">
                             <DropdownButton
                                 variant="primary text-600 text-capitalize"
-                                title={ingestionType.split("_").join(" ")}
-                                id="ingestion-type"
+                                title={submissionType || "Click to Select..."}
+                                id="submission-type"
                             >
-                                <Dropdown.Item eventKey="metadata_bundle" onSelect={this.handleSelectIngestionType}>Metadata Bundle</Dropdown.Item>
-                                <Dropdown.Item eventKey="vcf" onSelect={this.handleSelectIngestionType}>VCF</Dropdown.Item>
+                                <Dropdown.Item eventKey="Accessioning" onSelect={this.handleSelectSubmissionType}>Accessioning</Dropdown.Item>
+                                <Dropdown.Item eventKey="Family History" onSelect={this.handleSelectSubmissionType}>Family History</Dropdown.Item>
+                                <Dropdown.Item eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List</Dropdown.Item>
                                 {/* TODO: May need to switch back to Accessioning, Family History, Gene List */}
                             </DropdownButton>
                         </div>
@@ -590,16 +590,20 @@ class PanelTwo extends React.PureComponent {
 }
 
 function FileAttachmentBtn(props){
-    const { loadingFileResult, onFileInputChange } = props;
+    const { loadingFileResult, postFileSuccess, onFileInputChange } = props;
     const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
     return (
-        <label htmlFor="test_file" disabled={loadingFileResult}
-            className={"btn btn-primary clickable" + (loadingFileResult ? " disabled" : "")}>
-            <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange} className="d-none"
-                accept=".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
-            <i className={"mr-08 icon icon-fw icon-" + icon}/>
-            <span>Select Excel File...</span>
-        </label>
+        <React.Fragment>
+            <label htmlFor="test_file" disabled={loadingFileResult}
+                className={"btn btn-primary clickable" + (loadingFileResult ? " disabled" : "")}>
+                <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange} className="d-none"
+                    accept=".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                <i className={"mr-08 icon icon-fw icon-" + icon}/>
+                <span>Select Excel File...</span>
+            </label>
+            { !loadingFileResult && postFileSuccess ? <span className="ml-1 text-success">Success! <i className="icon icon-check fas"></i></span> : null}
+            { !loadingFileResult && postFileSuccess === false ? <span className="ml-1 text-danger">Failure! <i className="icon icon-times-circle fas"></i></span> : null}
+        </React.Fragment>
     );
 }
 
