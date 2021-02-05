@@ -1,9 +1,11 @@
 import json
 import pytest
 import mock
+import webtest
 
 from datetime import (datetime, timedelta)
 from dcicutils.misc_utils import Retry
+from dcicutils.qa_utils import local_attrs
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
@@ -505,15 +507,41 @@ def test_collection_actions_filtered_by_permission(workbook, es_testapp, anon_es
     assert len(res.json['@graph']) == 0
 
 
-@Retry.retry_allowed('test_index_data_workbook.check', wait_seconds=1, retries_allowed=20)
-def check_item_type(client, item_type):
-    # This might get a 404 if not enough time has elapsed, so try a few times before giving up.
-    #
-    # We retry a lot of times because it's still fast if things are working quickly, but if it's
-    # slow it's better to wait than fail the test. Slowness is not what we're trying to check for here.
-    # And even if it's slow for one item, that same wait time will help others have time to catch up,
-    # so it shouldn't be slow for others. At least that's the theory. -kmp 27-Jan-2021
-    return client.get('/%s?limit=all' % item_type, status=[200, 301]).follow()
+class ItemTypeChecker:
+
+    @staticmethod
+    @Retry.retry_allowed('ItemTypeCheckerf.check_item_type', wait_seconds=1, retries_allowed=5)
+    def check_item_type(client, item_type, deleted=False):
+        # This might get a 404 if not enough time has elapsed, so try a few times before giving up.
+        #
+        # We retry a lot of times because it's still fast if things are working quickly, but if it's
+        # slow it's better to wait than fail the test. Slowness is not what we're trying to check for here.
+        # And even if it's slow for one item, that same wait time will help others have time to catch up,
+        # so it shouldn't be slow for others. At least that's the theory. -kmp 27-Jan-2021
+        extra = "&status=deleted" if deleted else ""
+        return client.get('/%s?limit=all%s' % (item_type, extra), status=[200, 301]).follow()
+
+
+    CONSIDER_DELETED = True
+
+    @classmethod
+    def get_all_items_of_type(cls, client, item_type):
+        if cls.CONSIDER_DELETED:
+            try:
+                res = cls.check_item_type(client, item_type)
+                items_not_deleted = res.json.get('@graph', [])
+            except webtest.AppError:
+                items_not_deleted = []
+            try:
+                res = cls.check_item_type(client, item_type, deleted=True)
+                items_deleted = res.json.get('@graph', [])
+            except webtest.AppError:
+                items_deleted = []
+            return items_not_deleted + items_deleted
+        else:
+            res = cls.check_item_type(client, item_type)
+            items_not_deleted = res.json.get('@graph', [])
+            return items_not_deleted
 
 
 def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
@@ -551,8 +579,8 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
         # check items in search result individually
         search_url = '/%s?limit=all' % item_type
         print("search_url=", search_url)
-        res = check_item_type(client=es_testapp, item_type=item_type)
-        for item_res in res.json.get('@graph', []):
+        items = ItemTypeChecker.get_all_items_of_type(client=es_testapp, item_type=item_type)
+        for item_res in items:
             index_view_res = es.get(index=namespaced_index, doc_type=item_type,
                                     id=item_res['uuid'])['_source']
             # make sure that the linked_uuids match the embedded data
@@ -572,6 +600,40 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
                 assert html_res.body.startswith(b'<!DOCTYPE html>')
             except Exception as e:
                 pass
+
+@pytest.mark.manual
+def test_index_data_workbook_after_posting_deleted_page_c4_570(workbook, es_testapp, html_es_testapp):
+    """
+    Regression test for C4-570.
+
+    This test takes a long time to run since it runs a long-running test three different ways.
+    This test must be invoked manually. 'make test' and 'make travis-test' will skip it because it's marked manual.
+    See details at https://hms-dbmi.atlassian.net/browse/C4-570
+    """
+
+    # Running the test this way should work fine
+    test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+
+    # But now let's add a deleted page.
+    # test_index_data_workbook will fail if preceded by anything that makes a deleted page
+    es_testapp.post_json('/pages/',
+                         {
+                             "name": "help/user-guide/sample-deleted-page",
+                             "title": "Sample Deleted Page",
+                             "content": [],
+                             "uuid": "db807a0f-2e76-4c77-a6bb-313a9c174252",
+                             "status": "deleted"
+                         },
+                         status=201)
+
+    # This test will now protect itself against failure.
+    test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+
+    # And we can see that if we hadn't protected ourselves against failure, this would reliably fail.
+    with pytest.raises(webtest.AppError):
+        with local_attrs(ItemTypeChecker, CONSIDER_DELETED=False):
+            test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+
 
 
 class MockedRequest(object):
