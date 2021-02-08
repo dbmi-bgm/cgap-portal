@@ -1,6 +1,6 @@
-,#FILEFORMAT=annV0.5.2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-,#FILEDATE=01.25.2021,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,source_version,description,field_type,sub_embedding_group,is_list,annotation_category,facet_order,facet_default_hidden,column_order,priority,source,pattern,default,min,max,enum_list,links_to,embedded_field,calculated_property,link,comments,annotation_space_location,abbreviation,
+,#FILEFORMAT=annV0.5.2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,#FILEDATE=01.25.2021,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,source_version,description,field_type,sub_embedding_group,is_list,annotation_category,facet_order,facet_default_hidden,column_order,priority,source,pattern,default,min,max,enum_list,links_to,embedded_field,calculated_property,link,comments,annotation_space_location,abbreviation
 1,CHROM,CHROM,Chromosome,Y,1;2;3;4;5;6;22;X;Y;M,variant,VCF,VCFv4.2,Chromosome,string,,N,Position,1,,,5,VCF,,,,,"1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,M",,,,,,Position,,
 2,POS,POS,Position,Y,949608,variant,VCF,VCFv4.2,Position,integer,,N,Position,2,,,5,VCF,,,0,,,,,,,,Position - maybe later,,
 3,ID,ID,dbSNP ID,Y,rs1921,variant,VCF,VCFv4.2,dbSNP ID,string,,N,Position,,,,3,GATK / manual,,,,,,,,,,do we know why this is less complete than dbsnp_rs_number?,,,
