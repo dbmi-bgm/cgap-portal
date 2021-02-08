@@ -103,7 +103,6 @@
             "description": "Variant allele fraction",
             "scope": "sample_variant",
             "schema_title": "VAF",
-            "column_order": 21,
             "facet_order": 11,
             "min": 0,
             "max": 1
@@ -500,12 +499,6 @@
         }
     },
     "columns": {
-        "AF": {
-            "title": "VAF",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 21
-        },
         "DP": {
             "title": "Coverage, VAF",
             "aggregation_type": "stats",
@@ -584,16 +577,6 @@
                 }
             ]
         },
-        "variant.csq_gnomadg_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 61
-        },
-        "variant.csq_rs_dbsnp151": {
-            "title": "dbSNP ID",
-            "order": 11
-        },
         "variant.genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
             "order": 51
@@ -625,14 +608,6 @@
                     "title": "Protein Sequence"
                 }
             ]
-        },
-        "variant.genes.genes_most_severe_hgvsp": {
-            "title": "Protein Sequence",
-            "order": 50
-        },
-        "variant.genes.genes_most_severe_transcript": {
-            "title": "Transcript",
-            "order": 41
         }
     },
     "facets": {

@@ -113,8 +113,7 @@ def test_generate_sample_json_items(MTParser, inserts):
     assert 'cmphet' in sample_props
     assert 'ALT' not in sample_props
 
-    # check cols/facs (there are none now)
-    assert 'AF' in cols
+    # check cols/facs
     assert 'DP' in cols
     assert 'GQ' in facs
     assert 'novoPP' in facs
@@ -146,14 +145,14 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert sub_obj_props['csq_consequence']['items']['linkTo'] == 'VariantConsequence'
 
     # check cols/facs
-    assert 'csq_gnomadg_af_popmax' in cols
+    assert 'genes.genes_most_severe_hgvsc' in cols
     assert 'csq_gnomadg_af' in facs
     assert facs['CHROM']['title'] == 'Chromosome'
     assert facs['CHROM']['grouping'] == 'Position'
     assert facs['CHROM']['order'] == 1
     assert cols['csq_gnomadg_af']['order'] == 60
     assert cols['genes.genes_most_severe_gene.display_title']['order'] == 40
-    assert cols['genes.genes_most_severe_transcript']['order'] == 41
+    assert cols['genes.genes_most_severe_consequence.coding_effect']['order'] == 51
 
 
 def test_generate_variant_sample_schema(MTParser, sample_variant_items):
@@ -186,7 +185,6 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert facs['DP']['order'] == 8
     assert facs['AF']['order'] == 11
     assert cols['DP']['order'] == 20
-    assert cols['AF']['order'] == 21
     assert cols['GT']['order'] == 30
     assert facs['cmphet.comhet_impact_gene']['order'] == 17
     assert facs['inheritance_modes']['order'] == 15
@@ -262,6 +260,6 @@ def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
                            vs_out=resolve_file_path('schemas/variant_sample.json'),
-                           v_out=resolve_file_path('schemas/variant.json'), write=True)  # enable to generate schemas
+                           v_out=resolve_file_path('schemas/variant.json'), write=False)  # enable to generate schemas
     for item in inserts:
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)

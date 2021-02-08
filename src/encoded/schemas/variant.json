@@ -815,7 +815,6 @@
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - PopMax",
             "abbreviation": "PopMax AF",
-            "column_order": 61,
             "facet_order": 19,
             "default": 0,
             "min": 0,
@@ -1354,8 +1353,7 @@
             "annotation_category": "Position",
             "description": "dbSNP RS number",
             "scope": "variant",
-            "schema_title": "dbSNP ID",
-            "column_order": 11
+            "schema_title": "dbSNP ID"
         },
         "csq_sift_converted_rankscore": {
             "title": "SIFT rankscore",
@@ -1580,8 +1578,7 @@
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Gene",
                         "scope": "variant",
-                        "schema_title": "Transcript",
-                        "column_order": 41
+                        "schema_title": "Transcript"
                     },
                     "genes_most_severe_feature_ncbi": {
                         "title": "genes_most_severe_feature_ncbi",
@@ -1619,8 +1616,7 @@
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Gene",
                         "scope": "variant",
-                        "schema_title": "Protein Sequence",
-                        "column_order": 50
+                        "schema_title": "Protein Sequence"
                     },
                     "genes_most_severe_amino_acids": {
                         "title": "genes_most_severe_amino_acids",
@@ -2338,16 +2334,6 @@
                 }
             ]
         },
-        "csq_gnomadg_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 61
-        },
-        "csq_rs_dbsnp151": {
-            "title": "dbSNP ID",
-            "order": 11
-        },
         "genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
             "order": 51
@@ -2379,14 +2365,6 @@
                     "title": "Protein Sequence"
                 }
             ]
-        },
-        "genes.genes_most_severe_hgvsp": {
-            "title": "Protein Sequence",
-            "order": 50
-        },
-        "genes.genes_most_severe_transcript": {
-            "title": "Transcript",
-            "order": 41
         }
     }
 }
