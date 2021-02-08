@@ -500,71 +500,67 @@
         }
     },
     "columns": {
-        "display_title": {
-            "title": "Position",
-            "order": 0,
-            "sort_fields" : [
-                { "field" : "variant.display_title", "title" : "Variant Display Title" },
-                { "field" : "variant.csq_rs_dbsnp151", "title": "dbSNP RS Number" }
-            ]
+        "AF": {
+            "title": "VAF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 21
         },
-        "variant.genes.genes_most_severe_gene.display_title": {
-            "order": 15,
-            "title": "Gene, Transcript",
+        "DP": {
+            "title": "Coverage, VAF",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 20,
             "sort_fields": [
-                { "field": "variant.genes.genes_most_severe_gene.display_title", "title": "Gene" },
-                { "field": "variant.genes.genes_most_severe_transcript", "title": "Most Severe Transcript" }
-            ]
-        },
-        "variant.genes.genes_most_severe_hgvsc": {
-            "order": 25,
-            "title": "Variant",
-            "sort_fields": [
-                { "field": "variant.genes.genes_most_severe_hgvsc", "title": "Coding Sequence" },
-                { "field": "variant.genes.genes_most_severe_hgvsp", "title": "Protein Sequence" }
-            ]
-        },
-        "variant.genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 30
-        },
-        "variant.csq_gnomadg_af": {
-            "order": 35,
-            "title" : "gnomAD",
-            "sort_fields": [
-                { "field": "variant.csq_gnomadg_af", "title": "gnomad AF" },
-                { "field": "variant.csq_gnomadg_af_popmax", "title": "gnomad AF Population Max" }
-            ]
-        },
-        "variant.csq_cadd_phred": {
-            "order": 36,
-            "title": "Predictors",
-            "sort_fields": [
-                { "field": "variant.csq_cadd_phred", "title": "Cadd Phred Score" },
-                { "field": "variant.spliceaiMaxds", "title": "SpliceAI Max DS" },
-                { "field": "variant.csq_phylop100way_vertebrate", "title": "PhyloP 100 Score"}
+                {
+                    "field": "DP",
+                    "title": "Coverage"
+                },
+                {
+                    "field": "AF",
+                    "title": "VAF"
+                }
             ]
         },
         "GT": {
             "title": "Genotype",
-            "order": 37,
+            "order": 30,
             "default_hidden": true
         },
-        "associated_genotype_labels.proband_genotype_label" : {
+        "associated_genotype_labels.proband_genotype_label": {
             "title": "Genotype",
             "order": 39,
             "sort_fields": [
-                { "field": "associated_genotype_labels.proband_genotype_label", "title": "Proband GT" },
-                { "field": "associated_genotype_labels.mother_genotype_label", "title": "Mother GT" },
-                { "field": "associated_genotype_labels.father_genotype_label", "title": "Father GT" }
+                {
+                    "field": "associated_genotype_labels.proband_genotype_label",
+                    "title": "Proband GT"
+                },
+                {
+                    "field": "associated_genotype_labels.mother_genotype_label",
+                    "title": "Mother GT"
+                },
+                {
+                    "field": "associated_genotype_labels.father_genotype_label",
+                    "title": "Father GT"
+                }
             ]
         },
-        "DP": {
-            "order": 40,
-            "title": "Coverage, VAF",
+        "bam_snapshot": {
+            "title": "Genome Snapshot",
+            "order": 81
+        },
+        "display_title": {
+            "title": "Position",
+            "order": 0,
             "sort_fields": [
-                { "field": "DP", "title": "Coverage" },
-                { "field": "AF", "title": "VAF" }
+                {
+                    "field": "variant.display_title",
+                    "title": "Variant Display Title"
+                },
+                {
+                    "field": "variant.csq_rs_dbsnp151",
+                    "title": "dbSNP RS Number"
+                }
             ]
         },
         "variant.csq_clinvar": {
@@ -572,9 +568,71 @@
             "order": 70,
             "default_hidden": true
         },
-        "bam_snapshot": {
-            "title": "Genome Snapshot",
-            "order": 81
+        "variant.csq_gnomadg_af": {
+            "title": "gnomAD",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 60,
+            "sort_fields": [
+                {
+                    "field": "variant.csq_gnomadg_af",
+                    "title": "gnomad AF"
+                },
+                {
+                    "field": "variant.csq_gnomadg_af_popmax",
+                    "title": "gnomad AF Population Max"
+                }
+            ]
+        },
+        "variant.csq_gnomadg_af_popmax": {
+            "title": "GnomAD Alt AF - PopMax",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 61
+        },
+        "variant.csq_rs_dbsnp151": {
+            "title": "dbSNP ID",
+            "order": 11
+        },
+        "variant.genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 51
+        },
+        "variant.genes.genes_most_severe_gene.display_title": {
+            "title": "Gene, Transcript",
+            "order": 40,
+            "sort_fields": [
+                {
+                    "field": "variant.genes.genes_most_severe_gene.display_title",
+                    "title": "Gene"
+                },
+                {
+                    "field": "variant.genes.genes_most_severe_transcript",
+                    "title": "Most Severe Transcript"
+                }
+            ]
+        },
+        "variant.genes.genes_most_severe_hgvsc": {
+            "title": "Variant",
+            "order": 50,
+            "sort_fields": [
+                {
+                    "field": "variant.genes.genes_most_severe_hgvsc",
+                    "title": "Coding Sequence"
+                },
+                {
+                    "field": "variant.genes.genes_most_severe_hgvsp",
+                    "title": "Protein Sequence"
+                }
+            ]
+        },
+        "variant.genes.genes_most_severe_hgvsp": {
+            "title": "Protein Sequence",
+            "order": 50
+        },
+        "variant.genes.genes_most_severe_transcript": {
+            "title": "Transcript",
+            "order": 41
         }
     },
     "facets": {
@@ -613,11 +671,63 @@
             "order": 13,
             "grouping": "Variant Quality"
         },
-
-
-        "associated_genotype_labels.proband_genotype_label": {
-            "title": "Proband Genotype",
-            "order": 12,
+        "associated_genotype_labels.brother_III_genotype_label": {
+            "title": "Brother III Genotype",
+            "order": 1007,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.brother_II_genotype_label": {
+            "title": "Brother II Genotype",
+            "order": 1006,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.brother_IV_genotype_label": {
+            "title": "Brother IV Genotype",
+            "order": 1008,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.brother_genotype_label": {
+            "title": "Brother Genotype",
+            "order": 1005,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.co_parent_genotype_label": {
+            "title": "Co-Parent Genotype",
+            "order": 1000,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.daughter_III_genotype_label": {
+            "title": "Daughter III Genotype",
+            "order": 1011,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.daughter_II_genotype_label": {
+            "title": "Daughter II Genotype",
+            "order": 1010,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.daughter_IV_genotype_label": {
+            "title": "Daughter IV Genotype",
+            "order": 1012,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.daughter_genotype_label": {
+            "title": "Daughter Genotype",
+            "order": 1009,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
+        "associated_genotype_labels.father_genotype_label": {
+            "title": "Father Genotype",
+            "order": 14,
             "grouping": "Genotype"
         },
         "associated_genotype_labels.mother_genotype_label": {
@@ -625,124 +735,59 @@
             "order": 13,
             "grouping": "Genotype"
         },
-        "associated_genotype_labels.father_genotype_label": {
-            "title": "Father Genotype",
-            "order": 14,
+        "associated_genotype_labels.proband_genotype_label": {
+            "title": "Proband Genotype",
+            "order": 12,
             "grouping": "Genotype"
-        },
-
-        "associated_genotype_labels.co_parent_genotype_label": {
-            "title": "Co-Parent Genotype",
-            "order": 1000,
-            "grouping": "Genotype",
-            "default_hidden" : true
-        },
-
-
-        "associated_genotype_labels.sister_genotype_label": {
-            "title": "Sister Genotype",
-            "order": 1001,
-            "grouping": "Genotype",
-            "default_hidden" : true
-        },
-        "associated_genotype_labels.sister_II_genotype_label": {
-            "title": "Sister II Genotype",
-            "order": 1002,
-            "grouping": "Genotype",
-            "default_hidden" : true
         },
         "associated_genotype_labels.sister_III_genotype_label": {
             "title": "Sister III Genotype",
             "order": 1003,
             "grouping": "Genotype",
-            "default_hidden" : true
+            "default_hidden": true
+        },
+        "associated_genotype_labels.sister_II_genotype_label": {
+            "title": "Sister II Genotype",
+            "order": 1002,
+            "grouping": "Genotype",
+            "default_hidden": true
         },
         "associated_genotype_labels.sister_IV_genotype_label": {
             "title": "Sister IV Genotype",
             "order": 1004,
             "grouping": "Genotype",
-            "default_hidden" : true
+            "default_hidden": true
         },
-
-
-        "associated_genotype_labels.brother_genotype_label": {
-            "title": "Brother Genotype",
-            "order": 1005,
+        "associated_genotype_labels.sister_genotype_label": {
+            "title": "Sister Genotype",
+            "order": 1001,
             "grouping": "Genotype",
-            "default_hidden" : true
-        },
-        "associated_genotype_labels.brother_II_genotype_label": {
-            "title": "Brother II Genotype",
-            "order": 1006,
-            "grouping": "Genotype",
-            "default_hidden" : true
-        },
-        "associated_genotype_labels.brother_III_genotype_label": {
-            "title": "Brother III Genotype",
-            "order": 1007,
-            "grouping": "Genotype",
-            "default_hidden" : true
-        },
-        "associated_genotype_labels.brother_IV_genotype_label": {
-            "title": "Brother IV Genotype",
-            "order": 1008,
-            "grouping": "Genotype",
-            "default_hidden" : true
-        },
-
-
-        "associated_genotype_labels.daughter_genotype_label": {
-            "title": "Daughter Genotype",
-            "order": 1009,
-            "grouping": "Genotype",
-            "default_hidden" : true
-        },
-        "associated_genotype_labels.daughter_II_genotype_label": {
-            "title": "Daughter II Genotype",
-            "order": 1010,
-            "grouping": "Genotype",
-            "default_hidden" : true
-        },
-        "associated_genotype_labels.daughter_III_genotype_label": {
-            "title": "Daughter III Genotype",
-            "order": 1011,
-            "grouping": "Genotype",
-            "default_hidden" : true
-        },
-        "associated_genotype_labels.daughter_IV_genotype_label": {
-            "title": "Daughter IV Genotype",
-            "order": 1012,
-            "grouping": "Genotype",
-            "default_hidden" : true
-        },
-
-
-        "associated_genotype_labels.son_genotype_label": {
-            "title": "Son Genotype",
-            "order": 1013,
-            "grouping": "Genotype",
-            "default_hidden" : true
-        },
-        "associated_genotype_labels.son_II_genotype_label": {
-            "title": "Son II Genotype",
-            "order": 1014,
-            "grouping": "Genotype",
-            "default_hidden" : true
+            "default_hidden": true
         },
         "associated_genotype_labels.son_III_genotype_label": {
             "title": "Son III Genotype",
             "order": 1015,
             "grouping": "Genotype",
-            "default_hidden" : true
+            "default_hidden": true
+        },
+        "associated_genotype_labels.son_II_genotype_label": {
+            "title": "Son II Genotype",
+            "order": 1014,
+            "grouping": "Genotype",
+            "default_hidden": true
         },
         "associated_genotype_labels.son_IV_genotype_label": {
             "title": "Son IV Genotype",
             "order": 1016,
             "grouping": "Genotype",
-            "default_hidden" : true
+            "default_hidden": true
         },
-
-
+        "associated_genotype_labels.son_genotype_label": {
+            "title": "Son Genotype",
+            "order": 1013,
+            "grouping": "Genotype",
+            "default_hidden": true
+        },
         "cmphet.comhet_impact_gene": {
             "title": "ComHet Impact",
             "order": 17,
