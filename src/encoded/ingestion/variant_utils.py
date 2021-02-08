@@ -72,24 +72,32 @@ class VariantBuilder:
         obj['status'] = 'shared'
 
     def _post_or_patch_variant(self, variant):
-        """ Tries to post the given variant to the application. If 201 is not encountered, assume the
-            variant is already present and should be patched (ie: we update variants we've seen before with
-            the latest annotations from the most recent VCF from which the variant has been seen. """
+        """ POST/PATCH the variant ie: create it if it doesn't exist, or update existing.
+            NOTE: snovault does not implement standard HTTP PUT.
+        """
         try:
             self.vapp.post_json('/variant', variant, status=201)
-        except Exception as e:  # XXX: HTTPConflict should be thrown and appears to be yet it is not caught
-            log.error('Exception encountered on post (attempting patch): %s' % e)
+        except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
+            log.error('Exception encountered on variant post (attempting patch): %s' % e)
             self.vapp.patch_json('/variant/%s' % build_variant_display_title(
                 variant['CHROM'],
                 variant['POS'],
                 variant['REF'],
                 variant['ALT'],
                 sep=ANNOTATION_ID_SEP
-            ), variant, status=200)  # will get logged/raised if error occurs
+            ), variant, status=200)
 
-    def _post_variant_sample(self, variant_sample):
-        """ Posts a variant_sample item. If this fails, exception should be caught by the caller. """
-        self.vapp.post_json('/variant_sample', variant_sample, status=201)
+    def _post_or_patch_variant_sample(self, variant_sample):
+        """ POST/PATCH the variant_sample ie: create it if it doesn't exist, or update existing.
+            NOTE: snovault does not implement standard HTTP PUT.
+        """
+        try:
+            self.vapp.post_json('/variant_sample', variant_sample, status=201)
+        except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
+            log.info('Exception encountered on variant_sample post (attempting patch): %s' % e)
+            self.vapp.patch_json('/variant_sample/%s' %
+                                 variant_sample['CALL_INFO'] + ':' + variant_sample['variant'],
+                                 status=200)
 
     def build_variant(self, record):
         """ Builds a raw variant from the given VCF record. """
@@ -186,11 +194,11 @@ class VariantBuilder:
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
                 continue
 
-            # post the items
+            # PUT the items
             try:
                 self._post_or_patch_variant(variant)
                 for sample in variant_samples:
-                    self._post_variant_sample(sample)
+                    self._post_or_patch_variant_sample(sample)
                 self.ingestion_report.mark_success()
             except Exception as e:
                 log.error('Error encountered posting variant/variant_sample: %s' % e)
