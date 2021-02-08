@@ -397,8 +397,10 @@ export function createObjectGraph(jsonList, filterUnrelatedIndividuals = false){
 /** TODO: enforce 2 parents _or_ handle 3+ parents */
 export function createRelationships(objectGraph, sepVal = '\t'){
     const idMap = {};
-    const childToParentsMap = {};
-    const parentRelationships = new Set();
+    const childToParentsMap = {}; // { child ID : [ parentNode1, ... ] }
+    const parentRelationshipStringMap = {};
+    const claimedChildren = {}; // Keep track of claimed children so single-parent-relationships don't override.
+
     objectGraph.forEach(function(individual){
         const { _parentReferences = [], id } = individual;
         idMap[id] = individual;
@@ -418,6 +420,9 @@ export function createRelationships(objectGraph, sepVal = '\t'){
 
         childToParentsMap[id] = _parentReferences;
     });
+
+    // Below block generates a unique set of "parentID1\tparentID2[\tparentID3 ...]" strings
+    // (`parentRelationships`) from which relationship nodes are then formed.
     const childrenWithParentIDs = Object.keys(childToParentsMap);
     childrenWithParentIDs.forEach(function(childID){
         const parentIDs = childToParentsMap[childID].map(function(parent){
@@ -425,22 +430,41 @@ export function createRelationships(objectGraph, sepVal = '\t'){
         });
         parentIDs.sort();
         const parentIDString = parentIDs.join(sepVal);
-        parentRelationships.add(parentIDString);
+        // parentRelationships.add(parentIDString);
+        parentRelationshipStringMap[parentIDString] = parentIDs;
     });
 
-    const relationshipObjects = [...parentRelationships].map(function(prStr){
-        const parentIDs = prStr.split(sepVal);
+    // Relationships with most parents first, so single-parent relationships are last.
+    // (Single-parent relationships don't narrow down their children to just their-relationship's children)
+    const orderedRelationshipArrs = [];
+    Object.values(parentRelationshipStringMap).sort(function(a,b){
+        return b.length - a.length;
+    }).forEach(function(relationshipArr){
+        orderedRelationshipArrs.push(relationshipArr);
+    });
+
+    const relationshipObjects = [...orderedRelationshipArrs].map(function(parentIDs){
         const parents = parentIDs.map(function(pID){ return idMap[pID]; });
         const childrenSet = new Set();
         const [ parent1, ...otherParents ] = parents;
+
         (parent1._childReferences || []).forEach(function(child){
+            if (claimedChildren[child.id]){
+                return;
+            }
             childrenSet.add(child.id);
         });
+
         otherParents.forEach(function(parent){
             const childIDs = {};
             (parent._childReferences || []).forEach(function(c){
+                if (claimedChildren[c.id]){
+                    return;
+                }
                 childIDs[c.id] = true;
             });
+            // Remove children until only those common in all parents
+            // are present. (Doesn't run for single-parent relationships).
             for (const childID of childrenSet){
                 if (!childIDs[childID]) {
                     childrenSet.delete(childID);
@@ -450,15 +474,21 @@ export function createRelationships(objectGraph, sepVal = '\t'){
 
         const partners = parents.slice(0);
         partners.sort(sortByGender);
-        const children = [...childrenSet].map(function(childID){ return idMap[childID]; });
+        const children = [...childrenSet].map(function(childID){
+            claimedChildren[childID] = true;
+            return idMap[childID];
+        });
         children.sort(sortByAge);
 
         // Will assign `_drawing` in subsequent functions
-        return {
+        const relationshipObject = {
             partners,
             children,
             'id' : "relationship:" + parents.map(function(indv){ return indv.id; }).join(',')
         };
+
+        // console.log("Created relationshipObject", relationshipObject);
+        return relationshipObject;
     });
 
     relationshipObjects.forEach(function(relationshipObject){
