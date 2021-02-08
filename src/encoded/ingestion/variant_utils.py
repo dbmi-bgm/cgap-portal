@@ -71,25 +71,13 @@ class VariantBuilder:
         """ Helper function that sets status to 'shared' on the given dict object. """
         obj['status'] = 'shared'
 
-    def _post_or_patch_variant(self, variant):
-        """ Tries to post the given variant to the application. If 201 is not encountered, assume the
-            variant is already present and should be patched (ie: we update variants we've seen before with
-            the latest annotations from the most recent VCF from which the variant has been seen. """
-        try:
-            self.vapp.post_json('/variant', variant, status=201)
-        except Exception as e:  # XXX: HTTPConflict should be thrown and appears to be yet it is not caught
-            log.error('Exception encountered on post (attempting patch): %s' % e)
-            self.vapp.patch_json('/variant/%s' % build_variant_display_title(
-                variant['CHROM'],
-                variant['POS'],
-                variant['REF'],
-                variant['ALT'],
-                sep=ANNOTATION_ID_SEP
-            ), variant, status=200)  # will get logged/raised if error occurs
+    def _put_variant(self, variant):
+        """ HTTP PUT the variant ie: create it if it doesn't exist, or update existing. """
+        self.vapp.put_json('/variant', variant, status=[200, 201])
 
-    def _post_variant_sample(self, variant_sample):
-        """ Posts a variant_sample item. If this fails, exception should be caught by the caller. """
-        self.vapp.post_json('/variant_sample', variant_sample, status=201)
+    def _put_variant_sample(self, variant_sample):
+        """ HTTP PUT the variant_sample ie: create it if it doesn't exist, or update existing. """
+        self.vapp.put_json('/variant_sample', variant_sample, status=[200, 201])
 
     def build_variant(self, record):
         """ Builds a raw variant from the given VCF record. """
@@ -186,11 +174,11 @@ class VariantBuilder:
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
                 continue
 
-            # post the items
+            # PUT the items
             try:
-                self._post_or_patch_variant(variant)
+                self._put_variant(variant)
                 for sample in variant_samples:
-                    self._post_variant_sample(sample)
+                    self._put_variant_sample(sample)
                 self.ingestion_report.mark_success()
             except Exception as e:
                 log.error('Error encountered posting variant/variant_sample: %s' % e)
