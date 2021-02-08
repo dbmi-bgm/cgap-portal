@@ -398,7 +398,7 @@ export function createObjectGraph(jsonList, filterUnrelatedIndividuals = false){
 export function createRelationships(objectGraph, sepVal = '\t'){
     const idMap = {};
     const childToParentsMap = {}; // { child ID : [ parentNode1, ... ] }
-    const parentRelationshipStringMap = {};
+    const parentRelationshipStringMap = {}; // { "parentID1\tparentID2[\tparentID3 ...]" : [parentID1, parentID2] } for uniqueness
     const claimedChildren = {}; // Keep track of claimed children so single-parent-relationships don't override.
 
     objectGraph.forEach(function(individual){
@@ -421,8 +421,6 @@ export function createRelationships(objectGraph, sepVal = '\t'){
         childToParentsMap[id] = _parentReferences;
     });
 
-    // Below block generates a unique set of "parentID1\tparentID2[\tparentID3 ...]" strings
-    // (`parentRelationships`) from which relationship nodes are then formed.
     const childrenWithParentIDs = Object.keys(childToParentsMap);
     childrenWithParentIDs.forEach(function(childID){
         const parentIDs = childToParentsMap[childID].map(function(parent){
@@ -430,7 +428,6 @@ export function createRelationships(objectGraph, sepVal = '\t'){
         });
         parentIDs.sort();
         const parentIDString = parentIDs.join(sepVal);
-        // parentRelationships.add(parentIDString);
         parentRelationshipStringMap[parentIDString] = parentIDs;
     });
 
