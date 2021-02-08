@@ -117,19 +117,11 @@ class SyncedAccessKeyTable extends React.PureComponent {
     /**
      * Add new access key for user via AJAX.
      *
+     * @todo Determine if we even need to pass in user email, given server can authenticate us.
+     *
      * @param {MouseEvent} e - Click event.
      */
     handleCreate(e) {
-        const item = {};
-        const idToken = JWT.get();
-        if (idToken){
-            const decoded = JWT.decode(idToken);
-            item.user = decoded.email.toLowerCase();
-        } else {
-            console.warn("Access key aborted");
-            return;
-        }
-
         ajax.load('/access-keys/', (resp)=>{
             const [ newKey ] = resp['@graph'];
             this.setState(function({ access_keys : prevKeys }){
@@ -145,7 +137,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
                 "message"   : "Check your internet connection or if you have been logged out due to expired session.",
                 "style"     : 'danger'
             });
-        }, JSON.stringify(item));
+        }, "{}"); // Yep - no post body
     }
 
     showNewSecret(response, reset = false) {

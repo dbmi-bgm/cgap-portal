@@ -125,13 +125,6 @@ export default class App extends React.PureComponent {
         });
     }
 
-    /**
-     * @property {boolean} initialSession - Whether user is logged in upon initial render. Only passed in on server-side render.
-     */
-    static defaultProps = {
-        'initialSession' : null
-    };
-
     static debouncedOnNavigationTooltipRebuild = _.debounce(ReactTooltip.rebuild, 500);
 
     /**
@@ -141,13 +134,13 @@ export default class App extends React.PureComponent {
     constructor(props){
         super(props);
         _.bindAll(this, 'currentAction', 'loadSchemas',
-            'setIsSubmitting', 'stayOnSubmissionsPage', 'authenticateUser',
+            'setIsSubmitting', 'stayOnSubmissionsPage',
             'updateUserInfo', 'confirmNavigation', 'navigate',
             // Global event handlers. These will catch events unless they are caught and prevented from bubbling up earlier.
             'handleClick', 'handleSubmit', 'handlePopState', 'handleBeforeUnload'
         );
 
-        const { context, initialSession } = props;
+        const { context } = props;
 
         Alerts.setStore(store);
 
@@ -160,21 +153,12 @@ export default class App extends React.PureComponent {
         this.historyEnabled = !!(typeof window != 'undefined' && window.history && window.history.pushState);
 
         // Todo: Migrate session & user_actions to redux store?
-        let session = false;
-        if (typeof initialSession === 'boolean'){
-            // Only provided from server
-            session = initialSession;
-        } else {
-            // Only available client-side. Same cookie sent to server-side to authenticate initialSession, so it must match.
-            session = !!(JWT.get('cookie'));
-        }
+        const session = !!(JWT.getUserInfo());
 
         // Save navigate fxn and other req'd stuffs to GLOBAL navigate obj.
         // So that we may call it from anywhere if necessary without passing through props.
         navigate.initializeFromApp(this);
         navigate.registerCallbackFunction(Alerts.updateCurrentAlertsTitleMap.bind(this, null));
-
-        if (context.schemas) Schemas.set(context.schemas);
 
         /**
          * Initial state of application.
@@ -235,9 +219,6 @@ export default class App extends React.PureComponent {
                 }
             );
         }
-
-        // Authenticate user if not yet handled server-side w/ cookie and rendering props.
-        this.authenticateUser();
 
         // Load schemas into app.state, access them where needed via props (preferred, safer) or this.context.
         this.loadSchemas();
@@ -627,55 +608,6 @@ export default class App extends React.PureComponent {
     }
 
     /**
-     * Grabs JWT from local cookie and, if not already authenticated or are missing 'user_actions',
-     * perform authentication via AJAX to grab user actions, updated JWT token, and save to localStorage.
-     *
-     * @deprecated (?) Since browser.js calls JWT.remove() + reloads as anonymous user
-     * @private
-     * @param {function} [callback=null] Optional callback to be ran upon completing authentication.
-     * @returns {void}
-     */
-    authenticateUser(callback = null){
-        const { session } = this.state;
-        const idToken = JWT.get();
-        const userInfo = JWT.getUserInfo();
-        const userActions = (userInfo && userInfo.user_actions) || null;
-
-        if (idToken && (!session || !userActions)){
-            // if JWT present, and session not yet set (from back-end), try to authenticate
-            // This is very unlikely due to us rendering re: session server-side. Mostly a remnant.
-            console.info('AUTHENTICATING USER; JWT PRESENT BUT NO STATE.SESSION OR USER_ACTIONS');
-            ajax.promise('/login', 'POST', { 'Authorization' : 'Bearer ' + idToken }, JSON.stringify({ 'id_token' : idToken }))
-                .then((response) => {
-                    if (response.code || response.status || response.id_token !== idToken) throw response;
-                    return response;
-                })
-                .then(
-                    (response) => {
-                        JWT.saveUserInfo(response);
-                        this.updateUserInfo(callback);
-                        analytics.event('Authentication', 'ExistingSessionLogin', {
-                            'eventLabel' : 'Authenticated ClientSide'
-                        });
-                    },
-                    (error) => {
-                        // error, clear JWT token from cookie & user_info from localStorage (via JWT.remove())
-                        // and unset state.session (via this.updateUserInfo())
-                        JWT.remove();
-                        this.updateUserInfo(callback);
-                    }
-                );
-            return idToken;
-        } else if (idToken && session && userActions){
-            console.info('User is logged in already, continuing session.');
-            analytics.event('Authentication', 'ExistingSessionLogin', {
-                'eventLabel' : 'Authenticated ServerSide'
-            });
-        }
-        return null;
-    }
-
-    /**
      * Tests that JWT is present along with user info and user actions, and if so, updates `state.session`.
      * Called by `authenticateUser` as well as Login.
      *
@@ -688,8 +620,8 @@ export default class App extends React.PureComponent {
         const userInfo  = JWT.getUserInfo();
         // We definitively use Cookies for JWT.
         // It can be unset via response headers from back-end.
-        const currentToken = JWT.get('cookie');
-        const session = !!(userInfo && currentToken); // cast to bool
+        // const currentToken = JWT.get('cookie');
+        const session = !!(userInfo); // cast to bool
 
         this.setState(function({ session : existingSession }){
             if (session === existingSession) {
@@ -894,7 +826,7 @@ export default class App extends React.PureComponent {
                 return false;
             }
 
-            this.currentNavigationRequest = ajax.fetch(targetHref, { 'cache' : options.cache === false ? false : true });
+            this.currentNavigationRequest = ajax.fetch(targetHref);
             // Keep a reference in current scope to later assert if same request instance (vs new superceding one).
             const currentRequestInThisScope = this.currentNavigationRequest;
             const timeout = new Timeout(App.SLOW_REQUEST_TIME);
