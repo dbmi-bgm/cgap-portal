@@ -295,8 +295,7 @@ def get_jwt(request):
     return token
 
 
-@view_config(route_name='login', request_method='POST',
-             permission=NO_PERMISSION_REQUIRED)
+@view_config(route_name='login', request_method='POST', permission=NO_PERMISSION_REQUIRED)
 @debug_log
 def login(context, request):
     '''
@@ -304,11 +303,31 @@ def login(context, request):
     user_info comes from /session-properties and other places and would contain ultimately:
         { id_token: string, user_actions : string[], details : { uuid, email, first_name, last_name, groups, timezone, status } }
     '''
-    user_info = getattr(request, 'user_info', None)
-    if user_info and user_info.get('id_token'): # Authenticated
-        return user_info
 
-    raise LoginDenied(domain=request.domain)
+    request_token = request.params.get("id_token")
+
+    print("AAA\n\n")
+    print(request.referrer)
+    print(request.url)
+
+    request.response.set_cookie(
+        "jwtToken",
+        value=request_token,
+        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
+        domain=request.referrer,
+        path="/",
+        samesite="strict",
+        overwrite=True
+    )
+
+    return { "saved_cookie" : True }
+
+    # user_info = getattr(request, 'user_info', None)
+    # if user_info and user_info.get('id_token'):
+    #     # Authenticated
+    #     return user_info
+
+    # raise LoginDenied(domain=request.domain)
 
 
 @view_config(route_name='logout',
@@ -325,19 +344,26 @@ def logout(context, request):
     The front-end handles logging out by discarding the locally-held JWT from
     browser cookies and re-requesting the current 4DN URL.
     """
-    #request.session.invalidate()
-    #request.response.headerlist.extend(forget(request))
 
-    # call auth0 to logout
-    auth0_logout_url = "https://{domain}/v2/logout" \
-                .format(domain='hms-dbmi.auth0.com')
+    request.response.delete_cookie(
+        "jwtToken",
+        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
+        domain=request.referrer,
+        path="/"
+    )
 
-    requests.get(auth0_logout_url)
+    return { "deleted_cookie" : True }
 
-    if asbool(request.params.get('redirect', True)):
-        raise HTTPFound(location=request.resource_path(request.root))
+    # call auth0 to logout - TODO: DO THIS CLIENTSIDE
+    # auth0_logout_url = "https://{domain}/v2/logout" \
+    #             .format(domain='hms-dbmi.auth0.com')
 
-    return {}
+    # requests.get(auth0_logout_url)
+
+    # if asbool(request.params.get('redirect', True)):
+    #     raise HTTPFound(location=request.resource_path(request.root))
+
+    # return {}
 
 
 @view_config(route_name='me', request_method='GET', permission=NO_PERMISSION_REQUIRED)
