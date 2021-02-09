@@ -322,13 +322,6 @@ def login(context, request):
 
     return { "saved_cookie" : True }
 
-    # user_info = getattr(request, 'user_info', None)
-    # if user_info and user_info.get('id_token'):
-    #     # Authenticated
-    #     return user_info
-
-    # raise LoginDenied(domain=request.domain)
-
 
 @view_config(route_name='logout',
              permission=NO_PERMISSION_REQUIRED, http_cache=0)
@@ -362,7 +355,11 @@ def logout(context, request):
 
     return { "deleted_cookie" : True }
 
-    # call auth0 to logout - TODO: DO THIS CLIENTSIDE
+    # TODO: NEED DO THIS CLIENTSIDE SO IT UNSETS USER'S COOKIE - MUST BE THRU REDIRECT NOT AJAX
+    # (we don't do this - i.e. we don't bother to log user out of all of Auth0 session, just out of
+    # own web app)
+
+    # call auth0 to logout -
     # auth0_logout_url = "https://{domain}/v2/logout" \
     #             .format(domain='hms-dbmi.auth0.com')
 
