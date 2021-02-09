@@ -969,7 +969,7 @@ class LuceneBuilder:
                 'missing': facet.get('missing_value_replacement', 'No value')
             }
         }
-        if requested_values is not None:
+        if requested_values:  # getall returns [], not None
             agg[TERMS]['include'] = requested_values
         return agg
 
