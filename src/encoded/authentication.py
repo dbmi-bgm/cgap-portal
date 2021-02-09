@@ -316,6 +316,7 @@ def login(context, request):
         # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
         domain=request_domain,
         path="/",
+        httponly=True,
         samesite="strict",
         overwrite=True
     )
@@ -505,6 +506,7 @@ def impersonate_user(context, request):
         # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
         domain=request_domain,
         path="/",
+        httponly=True,
         samesite="strict",
         overwrite=True
     )
