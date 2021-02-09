@@ -346,24 +346,22 @@ function GDNAList({ context }){
         // POS: pos,
         CHROM: chrom = fallbackElem,
         csq_hg19_chr = fallbackElem,
-        csq_hg19_pos = fallbackElem,
-        csq_hg19_hgvsg = fallbackElem
+        csq_hg19_pos = fallbackElem
     } = variant;
 
-    const renderedRows = [];
-
-    // Canononical GRCh38 entry
-    renderedRows.push(
+    const renderedRows =  (
         <React.Fragment>
+            {/* Canononical GRCh38 entry */}
             <div className="row pb-1 pb-md-03" key="GRCh38">
                 <div className="col-12 col-md-3 font-italic"><em>GRCh38</em></div>
                 <div className="col-12 col-md-2">{ chrom }</div>
                 <div className="col-12 col-md-7">{ hgvsg_placeholder }</div>
             </div>
+            {/* Legacy GRCh37/hg19 support. */}
             <div className="row pb-1 pb-md-03" key="GCRCh37">
                 <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
                 <div className="col-12 col-md-2 ">{ csq_hg19_chr }</div>
-                <div className="col-12 col-md-7">{ csq_hg19_hgvsg }</div>
+                <div className="col-12 col-md-7">{ csq_hg19_pos }</div>
             </div>
         </React.Fragment>
     );
