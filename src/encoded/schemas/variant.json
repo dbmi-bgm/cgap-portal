@@ -815,7 +815,6 @@
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - PopMax",
             "abbreviation": "PopMax AF",
-            "column_order": 61,
             "facet_order": 19,
             "default": 0,
             "min": 0,
@@ -1354,8 +1353,7 @@
             "annotation_category": "Position",
             "description": "dbSNP RS number",
             "scope": "variant",
-            "schema_title": "dbSNP ID",
-            "column_order": 11
+            "schema_title": "dbSNP ID"
         },
         "csq_sift_converted_rankscore": {
             "title": "SIFT rankscore",
@@ -1580,8 +1578,7 @@
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Gene",
                         "scope": "variant",
-                        "schema_title": "Transcript",
-                        "column_order": 41
+                        "schema_title": "Transcript"
                     },
                     "genes_most_severe_feature_ncbi": {
                         "title": "genes_most_severe_feature_ncbi",
@@ -1619,8 +1616,7 @@
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
                         "annotation_category": "Gene",
                         "scope": "variant",
-                        "schema_title": "Protein Sequence",
-                        "column_order": 50
+                        "schema_title": "Protein Sequence"
                     },
                     "genes_most_severe_amino_acids": {
                         "title": "genes_most_severe_amino_acids",
@@ -1732,7 +1728,8 @@
             "description": "maximum delta scores",
             "scope": "variant",
             "schema_title": "SpliceAI Max Delta",
-            "facet_order": 27
+            "facet_order": 27,
+            "default": 0
         },
         "transcript": {
             "title": "Transcript",
@@ -2318,43 +2315,56 @@
     "columns": {
         "csq_clinvar": {
             "title": "Clinvar ID",
-            "order": 70
+            "order": 70,
+            "default_hidden": true
         },
         "csq_gnomadg_af": {
-            "title": "GnomAD Alt Allele Frequency",
+            "title": "gnomAD",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 60
-        },
-        "csq_gnomadg_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 61
-        },
-        "csq_rs_dbsnp151": {
-            "title": "dbSNP ID",
-            "order": 11
+            "order": 60,
+            "sort_fields": [
+                {
+                    "field": "variant.csq_gnomadg_af",
+                    "title": "gnomad AF"
+                },
+                {
+                    "field": "variant.csq_gnomadg_af_popmax",
+                    "title": "gnomad AF Population Max"
+                }
+            ]
         },
         "genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
             "order": 51
         },
         "genes.genes_most_severe_gene.display_title": {
-            "title": "Gene",
-            "order": 40
+            "title": "Gene, Transcript",
+            "order": 40,
+            "sort_fields": [
+                {
+                    "field": "variant.genes.genes_most_severe_gene.display_title",
+                    "title": "Gene"
+                },
+                {
+                    "field": "variant.genes.genes_most_severe_transcript",
+                    "title": "Most Severe Transcript"
+                }
+            ]
         },
         "genes.genes_most_severe_hgvsc": {
-            "title": "Coding Sequence",
-            "order": 50
-        },
-        "genes.genes_most_severe_hgvsp": {
-            "title": "Protein Sequence",
-            "order": 50
-        },
-        "genes.genes_most_severe_transcript": {
-            "title": "Transcript",
-            "order": 41
+            "title": "Variant",
+            "order": 50,
+            "sort_fields": [
+                {
+                    "field": "variant.genes.genes_most_severe_hgvsc",
+                    "title": "Coding Sequence"
+                },
+                {
+                    "field": "variant.genes.genes_most_severe_hgvsp",
+                    "title": "Protein Sequence"
+                }
+            ]
         }
     }
 }
