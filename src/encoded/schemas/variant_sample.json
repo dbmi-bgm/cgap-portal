@@ -734,12 +734,14 @@
         "associated_genotype_labels.father_genotype_label": {
             "title": "Father Genotype",
             "order": 14,
-            "grouping": "Genotype"
+            "grouping": "Genotype",
+            "default_hidden": true
         },
         "associated_genotype_labels.mother_genotype_label": {
             "title": "Mother Genotype",
             "order": 13,
-            "grouping": "Genotype"
+            "grouping": "Genotype",
+            "default_hidden": true
         },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Proband Genotype",
