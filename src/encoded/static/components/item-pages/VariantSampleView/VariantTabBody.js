@@ -335,7 +335,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
         csq_phylop100way_vertebrate = fallbackElem,
         csq_cadd_phred = fallbackElem,
         transcript = [],
-        spliceai_maxds = fallbackElem,
+        spliceaiMaxds = fallbackElem,
         csq_primateai_score = fallbackElem,
         csq_sift_score = fallbackElem,
         csq_polyphen2_hvar_score = fallbackElem
@@ -431,7 +431,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                             <td className="text-left">
                                 <label className="mb-0" data-tip={getTipForField("spliceaiMaxds")}>SpliceAI</label>
                             </td>
-                            <td className="text-left">{ spliceai_maxds }</td>
+                            <td className="text-left">{ spliceaiMaxds }</td>
                         </tr>
                     </tbody>
                 </table>
