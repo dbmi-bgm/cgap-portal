@@ -135,7 +135,7 @@ export default class App extends React.PureComponent {
         super(props);
         _.bindAll(this, 'currentAction', 'loadSchemas',
             'setIsSubmitting', 'stayOnSubmissionsPage',
-            'updateUserInfo', 'confirmNavigation', 'navigate',
+            'updateAppSessionState', 'confirmNavigation', 'navigate',
             // Global event handlers. These will catch events unless they are caught and prevented from bubbling up earlier.
             'handleClick', 'handleSubmit', 'handlePopState', 'handleBeforeUnload'
         );
@@ -199,7 +199,7 @@ export default class App extends React.PureComponent {
         const { href, context } = this.props;
         const { session } = this.state;
 
-        ajax.AJAXSettings.addSessionExpiredCallback(this.updateUserInfo);
+        ajax.AJAXSettings.addSessionExpiredCallback(this.updateAppSessionState);
 
         // The href prop we have was from serverside. It would not have a hash in it, and might be shortened.
         // Here we grab full-length href from window and then update props.href (via Redux), if it is different.
@@ -618,7 +618,7 @@ export default class App extends React.PureComponent {
      * @param {function} [callback=null] Optional callback to be ran upon completing authentication.
      * @returns {void}
      */
-    updateUserInfo(callback = null){
+    updateAppSessionState(callback = null){
         // get user actions (a function of log in) from local storage
         const userInfo  = JWT.getUserInfo();
         // We definitively use Cookies for JWT.
@@ -847,10 +847,6 @@ export default class App extends React.PureComponent {
             currentRequestInThisScope
                 .then((response)=>{
                     console.info("Fetched new context", response);
-
-                    // Update `state.session` after (possibly) removing expired JWT. Backend does this via set cookie header.
-                    // Also, may have been logged out in different browser window so keep state.session up-to-date BEFORE a re-request
-                    // this.updateUserInfo();
 
                     if (!object.isValidJSON(response)) { // Probably only if 500 server error or similar. Or link to xml or image etc.
                         // navigate normally to URL of unexpected non-JSON response so back button works.
@@ -1092,7 +1088,7 @@ export default class App extends React.PureComponent {
             routeLeaf,
             hrefParts,
             'updateUploads'  : this.updateUploads,
-            'updateUserInfo' : this.updateUserInfo,
+            'updateAppSessionState' : this.updateAppSessionState,
             'setIsSubmitting': this.setIsSubmitting,
             'onBodyClick'    : this.handleClick,
             'onBodySubmit'   : this.handleSubmit,
@@ -1195,7 +1191,7 @@ const ContentRenderer = React.memo(function ContentRenderer(props){
     const commonContentViewProps = _.pick(props,
         // Props from App:
         'schemas', 'session', 'href', 'navigate', 'uploads', 'updateUploads', 'alerts',
-        'browseBaseState', 'setIsSubmitting', 'updateUserInfo', 'context', 'currentAction',
+        'browseBaseState', 'setIsSubmitting', 'updateAppSessionState', 'context', 'currentAction',
         // Props from BodyElement:
         'windowWidth', 'windowHeight', 'registerWindowOnResizeHandler', 'registerWindowOnScrollHandler',
         'addToBodyClassList', 'removeFromBodyClassList', 'toggleFullScreen', 'isFullscreen',
@@ -1680,7 +1676,7 @@ class BodyElement extends React.PureComponent {
      * TestWarning stuff is _possibly_ deprecated and for 4DN only.
      */
     render(){
-        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas, browseBaseState, updateUserInfo } = this.props;
+        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas, browseBaseState, updateAppSessionState } = this.props;
         const { windowWidth, windowHeight, classList, hasError, isFullscreen, testWarningPresent } = this.state;
         const { registerWindowOnResizeHandler, registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen } = this;
         const appClass = slowLoad ? 'communicating' : 'done';
@@ -1706,7 +1702,7 @@ class BodyElement extends React.PureComponent {
             isFullscreen, toggleFullScreen, overlaysContainer,
             testWarningPresent, hideTestWarning: this.hideTestWarning,
             context, href, currentAction, session, schemas,
-            browseBaseState, updateUserInfo
+            browseBaseState, updateAppSessionState
         };
 
         const propsPassedToAllViews = {

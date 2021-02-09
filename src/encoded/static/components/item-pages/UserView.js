@@ -562,7 +562,7 @@ const ProfileWorkFields = React.memo(function ProfileWorkFields({ user }){
 });
 
 
-export function ImpersonateUserForm({ updateUserInfo }) {
+export function ImpersonateUserForm({ updateAppSessionState }) {
 
     const inputFieldRef = useRef(null);
     /**
@@ -585,7 +585,7 @@ export function ImpersonateUserForm({ updateUserInfo }) {
         const postData = { 'userid' : userid };
         const callbackFxn = (resp) => {
             JWT.saveUserInfoLocalStorage(resp);
-            updateUserInfo();
+            updateAppSessionState();
             let navTarget = "/";
             const profileAction = resp.user_actions && _.find(resp.user_actions, { 'id' : 'profile' });
             if (profileAction && profileAction.href){
@@ -599,7 +599,7 @@ export function ImpersonateUserForm({ updateUserInfo }) {
         };
 
         ajax.load(url, callbackFxn, 'POST', fallbackFxn, JSON.stringify(postData));
-    }, [ updateUserInfo ]);
+    }, [ updateAppSessionState ]);
 
     return (
         <div className="mt-3 container" id="content">
