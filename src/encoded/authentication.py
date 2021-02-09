@@ -345,11 +345,12 @@ def logout(context, request):
     browser cookies and re-requesting the current 4DN URL.
     """
 
-    request.response.delete_cookie(
-        "jwtToken",
-        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
-        domain=request.referrer,
-        path="/"
+    # Deletes the cookie
+    request.response.set_cookie(
+        name='jwtToken',
+        value=None,
+        max_age=0,
+        path='/'
     )
 
     return { "deleted_cookie" : True }

@@ -158,11 +158,11 @@ function UserActionsMenu(props){
     );
 }
 
-function LogoutLink({ performLogout }){
+function LogoutLink({ performLogout, isLoading = false }){
     return (
         <div className="level-1-title-container">
             <a className="level-1-title text-medium d-block" onClick={performLogout} id="logoutbtn" href="#">
-                <i className="icon icon-fw icon-sign-out-alt fas mr-07"/>
+                <i className={"icon icon-fw fas mr-07 icon-" + (isLoading ? "spin icon-circle-notch" : "sign-out-alt")}/>
                 <span>Log Out</span>
             </a>
         </div>
