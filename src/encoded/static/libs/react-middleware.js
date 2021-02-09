@@ -42,7 +42,6 @@ const render = function (AppComponent, body, res) {
         userInfo = JSON.parse(res.getHeader('X-User-Info'));
         if (userInfo){
             JWT.saveUserInfoLocalStorage(userInfo);
-            JWT.save(jwtToken); // Just in case we want to access this later in server-side for some reason.
         }
     } else if (jwtToken === 'expired'){
         disp_dict.alerts.push(Alerts.LoggedOut);

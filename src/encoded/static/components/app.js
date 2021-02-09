@@ -199,6 +199,8 @@ export default class App extends React.PureComponent {
         const { href, context } = this.props;
         const { session } = this.state;
 
+        ajax.AJAXSettings.addSessionExpiredCallback(this.updateUserInfo);
+
         // The href prop we have was from serverside. It would not have a hash in it, and might be shortened.
         // Here we grab full-length href from window and then update props.href (via Redux), if it is different.
         const windowHref = (window && window.location && window.location.href) || href;
@@ -241,6 +243,7 @@ export default class App extends React.PureComponent {
             window.onhashchange = this.onHashChange;
         }
 
+        // TODO: We don't need this in here, can be in SubmissionsView itself...
         window.onbeforeunload = this.handleBeforeUnload;
 
         // Save some stuff to global window variables so we can access it in tests:
@@ -847,7 +850,7 @@ export default class App extends React.PureComponent {
 
                     // Update `state.session` after (possibly) removing expired JWT. Backend does this via set cookie header.
                     // Also, may have been logged out in different browser window so keep state.session up-to-date BEFORE a re-request
-                    this.updateUserInfo();
+                    // this.updateUserInfo();
 
                     if (!object.isValidJSON(response)) { // Probably only if 500 server error or similar. Or link to xml or image etc.
                         // navigate normally to URL of unexpected non-JSON response so back button works.
@@ -1107,8 +1110,8 @@ export default class App extends React.PureComponent {
                     <meta name="google-site-verification" content="sia9P1_R16tk3XW93WBFeJZvlTt3h0qL00aAJd3QknU" />
                     <HTMLTitle {...{ context, currentAction, canonical, status }} />
                     {base ? <base href={base}/> : null}
-                    <script data-prop-name="user_details" type="application/json" dangerouslySetInnerHTML={{
-                        __html: jsonScriptEscape(JSON.stringify(JWT.getUserDetails())) /* Kept up-to-date in browser.js */
+                    <script data-prop-name="user_info" type="application/json" dangerouslySetInnerHTML={{
+                        __html: jsonScriptEscape(JSON.stringify(JWT.getUserInfo())) /* Kept up-to-date in browser.js */
                     }}/>
                     <script data-prop-name="lastCSSBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastCSSBuildTime }}/>
                     <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastCSSBuildTime || 0)} />

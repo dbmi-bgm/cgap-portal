@@ -6,7 +6,7 @@ from base64 import b64decode
 
 from dcicutils.misc_utils import remove_element
 from passlib.context import CryptContext
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from pyramid.authentication import (
     BasicAuthAuthenticationPolicy as _BasicAuthAuthenticationPolicy,
     CallbackAuthenticationPolicy
@@ -299,22 +299,22 @@ def get_jwt(request):
 @debug_log
 def login(context, request):
     '''
-    Check the auth0 assertion and return User Information to be stored client-side
-    user_info comes from /session-properties and other places and would contain ultimately:
-        { id_token: string, user_actions : string[], details : { uuid, email, first_name, last_name, groups, timezone, status } }
+    Save JWT as httpOnly cookie
     '''
 
-    request_token = request.params.get("id_token")
+    request_token = request.json_body.get("id_token")
 
-    print("AAA\n\n")
-    print(request.referrer)
-    print(request.url)
+    # Better place to get this maybe?
+    request_parts = urlparse(request.referrer)
+    request_domain = request_parts.hostname
+
+    print("Setting cookie", request_token)
 
     request.response.set_cookie(
         "jwtToken",
         value=request_token,
         # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
-        domain=request.referrer,
+        domain=request_domain,
         path="/",
         samesite="strict",
         overwrite=True
@@ -350,7 +350,14 @@ def logout(context, request):
         name='jwtToken',
         value=None,
         max_age=0,
-        path='/'
+        path='/',
+        overwrite=True
+    )
+
+    request.response.status_code = 401
+    request.response.headers['WWW-Authenticate'] = (
+        "Bearer realm=\"{}\", title=\"Session Expired\"; Basic realm=\"{}\""
+        .format(request.domain, request.domain)
     )
 
     return { "deleted_cookie" : True }
@@ -483,10 +490,27 @@ def impersonate_user(context, request):
         'aud': auth0_client,
     }
 
-    id_token = jwt.encode(jwt_contents, b64decode(auth0_secret, '-_'),
-                          algorithm=JWT_ENCODING_ALGORITHM
-						  )
-    user_properties['id_token'] = id_token.decode('utf-8')
+    id_token = jwt.encode(
+        jwt_contents,
+        b64decode(auth0_secret, '-_'),
+        algorithm=JWT_ENCODING_ALGORITHM
+	)
+
+    # Better place to get this maybe?
+    request_parts = urlparse(request.referrer)
+    request_domain = request_parts.hostname
+    if (request_parts.port):
+        request_domain += ":" + str(request_parts.port)
+
+    request.response.set_cookie(
+        "jwtToken",
+        value=id_token.decode('utf-8'),
+        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
+        domain=request_domain,
+        path="/",
+        samesite="strict",
+        overwrite=True
+    )
 
     return user_properties
 

@@ -584,10 +584,7 @@ export function ImpersonateUserForm({ updateUserInfo }) {
         const url = "/impersonate-user";
         const postData = { 'userid' : userid };
         const callbackFxn = (resp) => {
-            //if(typeof(Storage) !== 'undefined'){ // check if localStorage supported
-            //    localStorage.setItem("user_info", JSON.stringify(payload));
-            //}
-            JWT.saveUserInfo(resp);
+            JWT.saveUserInfoLocalStorage(resp);
             updateUserInfo();
             let navTarget = "/";
             const profileAction = resp.user_actions && _.find(resp.user_actions, { 'id' : 'profile' });
@@ -601,12 +598,6 @@ export function ImpersonateUserForm({ updateUserInfo }) {
             alert('Impersonation unsuccessful.\nPlease check to make sure the provided email is correct.');
         };
 
-        //var userInfo = localStorage.getItem('user_info') || null;
-        //var idToken = userInfo ? JSON.parse(userInfo).id_token : null;
-        //var reqHeaders = {'Accept': 'application/json'};
-        //if(userInfo){
-        //    reqHeaders['Authorization'] = 'Bearer '+idToken;
-        //}
         ajax.load(url, callbackFxn, 'POST', fallbackFxn, JSON.stringify(postData));
     }, [ updateUserInfo ]);
 
