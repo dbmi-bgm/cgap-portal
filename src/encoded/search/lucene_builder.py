@@ -1024,7 +1024,7 @@ class LuceneBuilder:
             field_schema = schema_for_field(field, request, doc_types, should_log=True)
             query_field = get_query_field(field, facet)
             nested_path = find_nested_path(query_field, es_mapping)
-            requested_values = request.params.get(field, None)
+            requested_values = request.params.getall(field)
 
             # Build the aggregation based on its type (by side-effect) - stats, range or terms
             agg_name = field.replace('.', '-')
