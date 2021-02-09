@@ -337,7 +337,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
         transcript = [],
         spliceai_maxds = fallbackElem,
         csq_primateai_score = fallbackElem,
-        csq_sift = fallbackElem,
+        csq_sift_score = fallbackElem,
         csq_polyphen2_hvar_score = fallbackElem
     } = variant;
 
@@ -396,9 +396,9 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_sift")}>SIFT</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_sift_score")}>SIFT</label>
                             </td>
-                            <td className="text-left">{ csq_sift }</td>
+                            <td className="text-left">{ csq_sift_score }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
