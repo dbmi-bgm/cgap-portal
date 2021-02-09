@@ -667,12 +667,14 @@ class VariantTableParser(object):
             "associated_genotype_labels.mother_genotype_label": {
                 "title": "Mother Genotype",
                 "order": 13,
-                "grouping": "Genotype"
+                "grouping": "Genotype",
+                "default_hidden": True
             },
             "associated_genotype_labels.father_genotype_label": {
                 "title": "Father Genotype",
                 "order": 14,
-                "grouping": "Genotype"
+                "grouping": "Genotype",
+                "default_hidden": True
             },
 
             # Below facets are default-hidden unless e.g. additional_facet=associated_genotype_labels.co_parent_genotype_label
