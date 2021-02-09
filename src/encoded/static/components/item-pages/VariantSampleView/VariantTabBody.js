@@ -119,7 +119,7 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         'csq_gnomadg_af-xx': gnomad_af_female,
         'csq_gnomadg_af-xy': gnomad_af_male,
         // Allele Numbers
-        csq_gnomadg_af: gnomad_an,
+        csq_gnomadg_an: gnomad_an,
         'csq_gnomadg_an-xx': gnomad_an_female,
         'csq_gnomadg_an-xy': gnomad_an_male,
         // Homozygote Numbers
