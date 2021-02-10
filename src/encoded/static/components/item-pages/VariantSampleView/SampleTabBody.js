@@ -539,6 +539,7 @@ class CompoundHetTableWrapper extends React.Component {
     getMateData() {
         const { cmphetArr = [] } = this.state;
         const encodedQueryString = this.constructGetMatesQuery();
+        // console.log("getQueryString", encodedQueryString);
 
         // Request variant mates
         return ajax.promise(encodedQueryString, 'GET', {})
@@ -569,7 +570,8 @@ class CompoundHetTableWrapper extends React.Component {
                     // update each state object with link data
                     response['@graph'].forEach((svObj) => {
                         const { "@id": svAtId = null, variant = null } = svObj;
-                        const { display_title: variantTitle = null, genes = null } = variant || {};
+                        // console.log("svObj", svObj);
+                        const { display_title: variantTitle = null, genes = [] } = variant || {};
                         if (variantToStateIndexMap[variantTitle] != undefined) {
                             const stateIndex = variantToStateIndexMap[variantTitle];
                             newState[stateIndex]["href"] = svAtId;
@@ -578,11 +580,12 @@ class CompoundHetTableWrapper extends React.Component {
                             genes.forEach((gene) => {
                                 const {
                                     genes_most_severe_consequence = null,
-                                    genes_ensg = null
+                                    genes_most_severe_gene = null
                                 } = gene || {};
 
-                                const { "@id": geneAtId = "" } = genes_ensg;
-                                const thisGene = geneAtId.split("/")[2];
+                                const { "@id": geneAtId = "" } = genes_most_severe_gene || {};
+                                const geneSplit = geneAtId.split("/");
+                                const { 2: thisGene = null } = geneSplit || [];
 
                                 const associatedGene = variantToGeneMap[variantTitle];
                                 if (thisGene === associatedGene) {
@@ -590,10 +593,16 @@ class CompoundHetTableWrapper extends React.Component {
 
                                     newState[stateIndex]["location"] = location;
                                     newState[stateIndex]["coding_effect"] = coding_effect;
+                                } else {
+                                    newState[stateIndex]["location"] = null;
+                                    newState[stateIndex]["coding_effect"] = null;
                                 }
                             });
                         }
                     });
+                    // console.log("newState", newState);
+                    // console.log("variantToStateIndexMap", variantToStateIndexMap);
+                    // console.log("variantToGeneMap", variantToGeneMap);
 
                     // Update state with links, then go ahead and pull/populate with gene data
                     this.setState({ cmphetArr : newState });
