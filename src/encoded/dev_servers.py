@@ -44,7 +44,7 @@ def nginx_server_process(prefix='', echo=False):
         process.stdout.close()
 
     if echo:
-        print('Started: http://localhost:80')
+        print('Started: http://localhost:8000')
 
     return process
 
