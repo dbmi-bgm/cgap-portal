@@ -307,8 +307,8 @@ def login(context, request):
     # Better place to get this maybe?
     request_parts = urlparse(request.referrer)
     request_domain = request_parts.hostname
-
-    print("Setting cookie", request_token)
+    # Below not yet tested:
+    # is_https = request_parts.scheme == "https"
 
     request.response.set_cookie(
         "jwtToken",
@@ -318,7 +318,8 @@ def login(context, request):
         path="/",
         httponly=True,
         samesite="strict",
-        overwrite=True
+        overwrite=True,
+        # secure=is_https
     )
 
     return { "saved_cookie" : True }
@@ -497,8 +498,7 @@ def impersonate_user(context, request):
     # Better place to get this maybe?
     request_parts = urlparse(request.referrer)
     request_domain = request_parts.hostname
-    if (request_parts.port):
-        request_domain += ":" + str(request_parts.port)
+    # is_https = request_parts.scheme == "https"
 
     request.response.set_cookie(
         "jwtToken",
@@ -508,7 +508,9 @@ def impersonate_user(context, request):
         path="/",
         httponly=True,
         samesite="strict",
-        overwrite=True
+        overwrite=True,
+        # Not yet tested:
+        # secure=is_https
     )
 
     return user_properties
