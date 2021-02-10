@@ -230,7 +230,8 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         else:
             return False
 
-    def get_token_info(self, token, request):
+    @staticmethod
+    def get_token_info(token, request):
         '''
         Given a jwt get token info from auth0, handle retrying and whatnot.
         This is only called if we receive a Bearer token in Authorization header.
@@ -246,7 +247,7 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                 payload = jwt.decode(token, b64decode(auth0_secret, '-_'),
                                      algorithms=JWT_DECODING_ALGORITHMS,
                                      audience=auth0_client, leeway=30)
-                if 'email' in payload and self.email_is_partners_or_hms(payload):
+                if 'email' in payload and Auth0AuthenticationPolicy.email_is_partners_or_hms(payload):
                     request.set_property(lambda r: False, 'auth0_expired')
                     return payload
 
@@ -254,7 +255,7 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                 user_url = "https://{domain}/tokeninfo".format(domain='hms-dbmi.auth0.com')
                 resp  = requests.post(user_url, {'id_token':token})
                 payload = resp.json()
-                if 'email' in payload and self.email_is_partners_or_hms(payload):
+                if 'email' in payload and Auth0AuthenticationPolicy.email_is_partners_or_hms(payload):
                     request.set_property(lambda r: False, 'auth0_expired')
                     return payload
 
@@ -268,25 +269,29 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         return None
 
 
+def get_jwt_from_auth_header(request):
+    if "Authorization" in request.headers:
+        try:
+            # Ensure this is a JWT token, not basic auth.
+            # Per https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication and
+            # https://tools.ietf.org/html/rfc6750, JWT is introduced by 'bearer', as in
+            #   Authorization: Bearer something.something.something
+            # rather than, for example, the 'basic' key information, which as discussed in
+            # https://tools.ietf.org/html/rfc7617 is base64 encoded and looks like:
+            #   Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
+            # See also https://jwt.io/introduction/ for other info specific to JWT.
+            [ auth_type, auth_data ] = request.headers['Authorization'].strip().split(' ', 1)
+            if auth_type.lower() == 'bearer':
+                return auth_data.strip()  # The spec says exactly one space, but then a token, so spaces don't matter
+        except Exception:
+            return None
+    return None
+
+
 def get_jwt(request):
 
-    token = None
-
     # First try to obtain JWT from headers
-    try:
-        # Ensure this is a JWT token, not basic auth.
-        # Per https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication and
-        # https://tools.ietf.org/html/rfc6750, JWT is introduced by 'bearer', as in
-        #   Authorization: Bearer something.something.something
-        # rather than, for example, the 'basic' key information, which as discussed in
-        # https://tools.ietf.org/html/rfc7617 is base64 encoded and looks like:
-        #   Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
-        # See also https://jwt.io/introduction/ for other info specific to JWT.
-        [auth_type, auth_data] = request.headers['Authorization'].strip().split(' ', 1)
-        if auth_type.lower() == 'bearer':
-            token = auth_data.strip()  # The spec says exactly one space, but then a token, so spaces don't matter
-    except Exception:
-        pass
+    token = get_jwt_from_auth_header(request)
 
     # If the JWT is not in the headers, get it from cookies
     if not token:
@@ -302,13 +307,29 @@ def login(context, request):
     Save JWT as httpOnly cookie
     '''
 
-    request_token = request.json_body.get("id_token")
+    # Allow providing token thru Authorization header as well as POST request body.
+    # Should be about equally secure if using HTTPS.
+    request_token = get_jwt_from_auth_header(request)
+    if request_token is None:
+        request_token = request.json_body.get("id_token", None)
 
-    # Better place to get this maybe?
     request_parts = urlparse(request.referrer)
     request_domain = request_parts.hostname
     # Below not yet tested:
     # is_https = request_parts.scheme == "https"
+
+
+    # The below 'check' is disabled to provide less feedback than possible
+    # to make it slightly harder for brute force attacks.
+
+    # is_valid_token = Auth0AuthenticationPolicy.get_token_info(request_token, request)
+    # if not is_valid_token:
+    #     # Doesn't check if User exists in system, just if token is validly signed,
+    #     # to allow for unregistered users to still have cookie stored so
+    #     # they can go through registration process.
+    #     # (This check is not strictly needed for anything, just provides more feedback faster.. maybe should be removed?)
+    #     raise LoginDenied(domain=request.domain)
+
 
     request.response.set_cookie(
         "jwtToken",
@@ -420,7 +441,7 @@ def session_properties(context, request):
         if principal.startswith('userid.'):
             break
     else:
-        return {}
+        raise LoginDenied(domain=request.domain)
 
     namespace, userid = principal.split('.', 1)
     properties = get_basic_properties_for_user(request, userid)
