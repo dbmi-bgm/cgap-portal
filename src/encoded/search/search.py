@@ -125,6 +125,7 @@ class SearchBuilder:
         self.prepared_terms = self.prepare_search_term(self.request)
         self.additional_facets = self.request.normalized_params.getall(self.ADDITIONAL_FACETS)
         self.debug_is_active = self.request.normalized_params.getall(self.DEBUG)  # only used if admin
+        self.source_fields = sorted(self.list_source_fields())
 
         # Can potentially make an outside API call, but ideally is cached
         # Only needed if searching on a single item type
@@ -482,6 +483,8 @@ class SearchBuilder:
         query_info = {}
         string_query = None
         query_dict = {'query': {'bool': {}}}
+        # handle field, frame
+        self.search = self.search.source(list(self.source_fields))
         # locate for 'q' query, if any
         for field, value in self.prepared_terms.items():
             if field == 'q':

@@ -4,6 +4,7 @@ import os
 import psutil
 import time
 
+from dcicutils.misc_utils import environ_bool, PRINT, ignored
 from functools import lru_cache
 from pkg_resources import resource_filename
 from pyramid.events import BeforeRender, subscriber
@@ -92,6 +93,7 @@ def validate_request_tween_factory(handler, registry):
     Apache config:
         SetEnvIf Request_Method HEAD X_REQUEST_METHOD=HEAD
     """
+    ignored(registry)
 
     def validate_request_tween(request):
 
@@ -117,6 +119,7 @@ def validate_request_tween_factory(handler, registry):
 
 
 def security_tween_factory(handler, registry):
+    ignored(registry)
 
     def security_tween(request):
         """
@@ -224,6 +227,7 @@ def remove_expired_session_cookies_tween_factory(handler, registry):
     their removal in security_tween_factory & authentication.py as well as client-side
     (upon "Logout" action). If needed for some reason, can re-enable.
     """  # noQA - not going to break the long URL line above
+    ignored(registry)
 
     ignore = {
         '/favicon.ico',
@@ -260,6 +264,8 @@ def remove_expired_session_cookies_tween_factory(handler, registry):
 
 def set_response_headers_tween_factory(handler, registry):
     """Add additional response headers here"""
+    ignored(registry)
+
     def set_response_headers_tween(request):
         response = handler(request)
         response.headers['X-Request-URL'] = request.url
@@ -317,12 +323,19 @@ def canonical_redirect(event):
 
 # Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
 # which should contain 'text/html'
-MIME_TYPES_SUPPORTED = ['text/html', 'application/json', 'application/ld+json']
-MIME_TYPE_DEFAULT = 'application/json'
+MIME_TYPE_HTML = 'text/html'
+MIME_TYPE_JSON = 'application/json'
+MIME_TYPE_LD_JSON = 'application/ld+json'
+
+MIME_TYPES_SUPPORTED = [MIME_TYPE_JSON, MIME_TYPE_HTML, MIME_TYPE_LD_JSON]
+MIME_TYPE_DEFAULT = MIME_TYPES_SUPPORTED[0]
 MIME_TYPE_TRIAGE_MODE = 'modern'  # if this doesn't work, fall back to 'legacy'
+
+DEBUG_MIME_TYPES = environ_bool("DEBUG_MIME_TYPES", default=False)
 
 
 def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
+    # TODO: I think this function does nothing but return MIME_TYPES_SUPPORTED[0] -kmp 3-Feb-2021
     """
     Given a request, tries to figure out the best kind of MIME type to use in response
     based on what kinds of responses we support and what was requested.
@@ -342,7 +355,7 @@ def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
         #      being maintained for backward compatibility, but it will be deprecated in the future,
         #      as it does not conform to the RFC.
         # TODO: Once the modern replacement is shown to work, we should remove this conditional branch.
-        return request.accept.best_match(MIME_TYPES_SUPPORTED, MIME_TYPE_DEFAULT)
+        result = request.accept.best_match(MIME_TYPES_SUPPORTED, MIME_TYPE_DEFAULT)
     else:
         options = request.accept.acceptable_offers(MIME_TYPES_SUPPORTED)
         if not options:
@@ -350,20 +363,37 @@ def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
             #       no acceptable types are available. (Certainly returning JSON in this case is
             #       not some kind of friendly help toa naive user with an old browser.)
             #       Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-            return MIME_TYPE_DEFAULT
+            result = MIME_TYPE_DEFAULT
         else:
             mime_type, score = options[0]
-            return mime_type
+            result = mime_type
+    if DEBUG_MIME_TYPES:
+        PRINT("Using mime type", result, "for", request.method, request.url)
+        for k, v in request.headers.items():
+            PRINT("%s: %s" % (k, v))
+        PRINT("----------")
+    return result
 
 
 @lru_cache(maxsize=16)
 def should_transform(request, response):
     """
     Determines whether to transform the response from JSON->HTML/JS depending on type of response
-    and what the request is looking for to be returned via e.g. request Accept, Authorization header.
-    In case of no Accept header, attempts to guess.
+    and what the request is looking for to be returned via these criteria, which are tried in order
+    until one succeeds:
 
-    Memoized via `lru_cache`. Cache size is set to be 16 (> 1) in case sub-requests fired off during handling.
+    * If the request method is other than GET or HEAD, returns False.
+    * If the response.content_type is other than 'application/json', returns False.
+    * If a 'frame=' query param is given and not 'page' (the default), returns False.
+    * If a 'format=json' query param is given explicitly,
+        * For 'format=html', returns True.
+        * For 'format=json', returns False.
+      This rule does not match if 'format=' is not given explicitly.
+      If 'format=' is given an explicit value of ther than 'html' or 'json', an HTTPNotAcceptable error will be raised.
+    * If the first element of MIME_TYPES_SUPPORTED[0] is 'text/html', returns True.
+    * Otherwise, in all remaining cases, returns False.
+
+    NOTE: Memoized via `lru_cache`. Cache size is set to be 16 (> 1) in case sub-requests fired off during handling.
     """
     # We always return JSON in response to POST, PATCH, etc.
     if request.method not in ('GET', 'HEAD'):

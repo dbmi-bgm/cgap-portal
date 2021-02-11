@@ -50,8 +50,7 @@
         "hg19_hgvsg": "NC_000001.11:g.11780388G>A"
       }
     ],
-    "CHROM": "1",
-    "rmsk_repname": "AluSq2"
+    "CHROM": "1"
   },
   {
     "project": "hms-dbmi",
