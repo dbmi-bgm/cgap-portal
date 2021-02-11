@@ -960,18 +960,22 @@ class LuceneBuilder:
         }
 
     @staticmethod
-    def _build_terms_aggregation(query_field, facet):
-        """ Builds a terms aggregation. """
-        return {
+    def _build_terms_aggregation(query_field, facet, requested_values):
+        """ Builds a terms aggregation, specifically requesting counts for any selected values. """
+        agg = {
             TERMS: {
                 'size': MAX_FACET_COUNTS,
                 'field': query_field,
                 'missing': facet.get('missing_value_replacement', 'No value')
             }
         }
+        if requested_values:  # getall returns [], not None
+            agg[TERMS]['include'] = requested_values
+        return agg
 
     @classmethod
-    def _add_terms_aggregation(cls, facet, query_field, search_filters, string_query, nested_path, aggs, agg_name):
+    def _add_terms_aggregation(cls, facet, query_field, search_filters, string_query, nested_path, aggs, agg_name,
+                               requested_values):
         """ Builds a standard terms aggregation, setting a nested identifier to be repaired later
             by elasticsearch_dsl, adding it to the given aggs.
 
@@ -982,6 +986,7 @@ class LuceneBuilder:
             :param nested_path: path to nested object we are aggregating on
             :param aggs: the aggregation object we are building
             :param agg_name: name of the aggregation we are building
+            :param requested_values: values for this terms agg we requested (to be explicitly included)
         """
         if nested_path:
             facet['aggregation_type'] = NESTED  # special in that it is used to identify (broken) facets - Will 11/17/20
@@ -990,7 +995,7 @@ class LuceneBuilder:
 
         facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
                                                                                string_query)
-        terms_aggregation = cls._build_terms_aggregation(query_field, facet)
+        terms_aggregation = cls._build_terms_aggregation(query_field, facet, requested_values)
         aggs[facet['aggregation_type'] + ":" + agg_name] = {
             AGGS: {
                 'primary_agg': terms_aggregation
@@ -1019,6 +1024,7 @@ class LuceneBuilder:
             field_schema = schema_for_field(field, request, doc_types, should_log=True)
             query_field = get_query_field(field, facet)
             nested_path = find_nested_path(query_field, es_mapping)
+            requested_values = request.params.getall(field)
 
             # Build the aggregation based on its type (by side-effect) - stats, range or terms
             agg_name = field.replace('.', '-')
@@ -1031,7 +1037,7 @@ class LuceneBuilder:
                                              aggs, agg_name)
             else:  # assume terms
                 cls._add_terms_aggregation(facet, query_field, search_filters, string_query, nested_path,
-                                           aggs, agg_name)
+                                           aggs, agg_name, requested_values)
 
             # Update facet with title, description from field_schema, if missing.
             if facet.get('title') is None and field_schema and 'title' in field_schema:
