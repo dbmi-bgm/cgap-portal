@@ -202,7 +202,7 @@ def test_get_jwt_falls_back_to_cookie_for_any_method(fake_request, request_metho
 def test_auth_token_unknown_user(anontestapp, auth0_4dn_user_token):
     # Should succeed regardless of token - endpoint just saves cookie.
     # (We give less feedback from this endpoint than we could to help avoid brute-force attacks)
-    anontestapp.get('/login', auth0_4dn_user_token, status=200)
+    anontestapp.post_json('/login', auth0_4dn_user_token, status=200)
 
 
 def test_auth_token_no_email(anontestapp, auth0_access_token_no_email, headers):
