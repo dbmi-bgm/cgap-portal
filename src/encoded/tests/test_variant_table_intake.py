@@ -184,7 +184,7 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     assert 'file' in properties
     assert facs['DP']['order'] == 8
     assert facs['AF']['order'] == 11
-    assert cols['DP']['order'] == 40
+    assert cols['DP']['order'] == 20
     assert cols['GT']['order'] == 30
     assert facs['cmphet.comhet_impact_gene']['order'] == 17
     assert facs['inheritance_modes']['order'] == 15

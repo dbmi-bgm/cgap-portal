@@ -12,7 +12,7 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 9,AD,AD,Allelic Depth,Y,"33,14",sample_variant,VCF,VCFv4.2,Allelic depth,string,,N,Variant Quality,,,,5,VCF,,,,,,,,,,,,,
 10,AD_REF,AD_REF,AD (Ref),Y,33,sample_variant,VCF,VCFv4.2,Reference allelic depth,integer,,N,Variant Quality,,,,5,manual / calculated?,,,,,,,,Y,,,,,
 11,AD_ALT,AD_ALT,AD (Alt),Y,14,sample_variant,VCF,VCFv4.2,Alternate allelic depth,integer,,N,Variant Quality,10,,,5,manual / calculated?,,,,,,,,Y,,,,AD,
-12,DP,DP,Coverage,Y,47,sample_variant,VCF,VCFv4.2,Approximate read depth,integer,,N,Variant Quality,8,,40,4,VCF,,,0,,,,,,,,,,
+12,DP,DP,Coverage,Y,47,sample_variant,VCF,VCFv4.2,Approximate read depth,integer,,N,Variant Quality,8,,20,4,VCF,,,0,,,,,,,,,,
 13,GQ,GQ,Genotype Quality,Y,99,sample_variant,VCF,VCFv4.2,"phred-scaled quality score that the genotype is accurate [min(99,PL(max)-PL(second))]",integer,,N,Variant Quality,13,,,4,VCF,,,,,,,,,,,Quality,,
 14,PL,PL,"Genotype Likelihoods (0/0,0/1,1/1)",Y,"310,200,100",sample_variant,VCF,VCFv4.2,"Phred-scaled likelihoods for genotype (Ref/Ref, Ref/Alt, Alt/Alt)",string,,N,Variant Quality,,,,,VCF,,,,,,,,,,,Quality,,
 15,PGT,PGT,Phasing information,Y,0|1,sample_variant,VCF,VCFv4.2,Physical phasing haplotype information,string,,N,Genotype,,,,,VCF,,,,,,,,,,,,,
