@@ -995,13 +995,30 @@ class LuceneBuilder:
 
         facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
                                                                                string_query)
-        terms_aggregation = cls._build_terms_aggregation(query_field, facet, requested_values)
-        aggs[facet['aggregation_type'] + ":" + agg_name] = {
-            AGGS: {
-                'primary_agg': terms_aggregation
-            },
-            FILTER: facet_filters,
-        }
+        terms_aggregation = cls._build_terms_aggregation(query_field, facet, None)
+
+        # NOTE: if we requested values for this field, we must expand to do two aggregations
+        # Unfortunately when you pass "include" to a terms aggregation it acts as a hard filter,
+        # not a "force bucket", which makes implementing this very tricky. To get around this we
+        # expand to 2 aggregations - one for the requested field and one for the remaining top fields
+        import pdb; pdb.set_trace()
+        if requested_values:
+            terms_aggregation_requested = cls._build_terms_aggregation(query_field, facet, requested_values)
+            aggs[facet['aggregation_type'] + ":" + agg_name] = {
+                AGGS: {
+                    'primary_agg': terms_aggregation_requested,
+                    'requested_agg': terms_aggregation
+                },
+                FILTER: facet_filters,
+            }
+
+        else:
+            aggs[facet['aggregation_type'] + ":" + agg_name] = {
+                AGGS: {
+                    'primary_agg': terms_aggregation
+                },
+                FILTER: facet_filters,
+            }
 
     @classmethod
     def build_facets(cls, search, facets, search_filters, string_query, request, doc_types,
@@ -1034,7 +1051,7 @@ class LuceneBuilder:
                                            nested_path, aggs, agg_name)
             elif facet_type in ['range', 'nested:range']:
                 cls._add_range_aggregation(facet, query_field, search_filters, string_query, nested_path,
-                                             aggs, agg_name)
+                                           aggs, agg_name)
             else:  # assume terms
                 cls._add_terms_aggregation(facet, query_field, search_filters, string_query, nested_path,
                                            aggs, agg_name, requested_values)

@@ -50,6 +50,10 @@ def test_search_view(workbook, es_testapp):
     assert res['title'] == 'Search'
     assert res['total'] > 0
     assert 'facets' in res
+    for facet in res['facets']:
+        if facet['field'] == 'type':
+            assert len(facet['terms']) > 1
+            break
     assert 'filters' in res
     assert '@graph' in res
 
