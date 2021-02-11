@@ -9,37 +9,32 @@ import { DragAndDropFileUploadController } from '@hms-dbmi-bgm/shared-portal-com
 export class FileWrapper extends React.PureComponent {
 
     static propTypes = {
-        individual: PropTypes.object,
-        haveEditPermission: PropTypes.bool,
-        indvSchema: PropTypes.object,
-        docSchema: PropTypes.object,
-        imageSchema: PropTypes.object
+        "individual": PropTypes.object.isRequired,
+        "haveEditPermission": PropTypes.bool,
+        "schemas": PropTypes.object
     };
 
     static findFieldsWithDocumentsOrImages(indvSchema){
         const { properties = {} } = indvSchema || {};
         // Isolate the field/property names of linkTos with type Document or Image
         const allProperties = _.keys(properties);
-        const relevantFields = [];
+        const relevantFields = []; // If need to bundle more properties, see https://github.com/dbmi-bgm/cgap-portal/pull/236 for potential implementation notes
 
         allProperties.forEach(function(property){
             const propertyFields = properties[property];
             const { type = null, linkTo = null, items = {} } = propertyFields;
 
             // If not an array, check linkTo directly from property data root
-            if (type !== "array" &&
-                (linkTo === "Document" || linkTo === "Image")
-            ) {
-                relevantFields.push({ [property] : linkTo });
+            if (type !== "array" && (linkTo === "Document" || linkTo === "Image")) {
+                relevantFields.push({ property, "linkToItemType": linkTo });
             }
+
             // If an array, check the items field for linkTo data
-            else if ( type === "array" &&
-                (items["linkTo"] === "Document" || items["linkTo"] === "Image")
-            ) {
-                relevantFields.push({ [property]: items["linkTo"] });
+            else if (type === "array" && (items["linkTo"] === "Document" || items["linkTo"] === "Image")) {
+                relevantFields.push({ property, "linkToItemType": items["linkTo"] });
             }
+
         });
-        console.log("relevantFields", relevantFields);
         return relevantFields;
     }
 
@@ -51,64 +46,60 @@ export class FileWrapper extends React.PureComponent {
     }
 
     render() {
-        const { individual, haveEditPermission, docSchema, imageSchema, indvSchema = {} } = this.props;
-        const { properties = {} } = indvSchema;
+        const { individual, haveEditPermission, schemas } = this.props;
+        const {
+            Individual: indvSchema = null,
+            Document: docSchema = null,
+            Image: imageSchema = null
+        } = schemas || {};
+        const { properties: indvProperties = {} } = indvSchema || {};
         const { "@id": individualId, institution, project } = individual;
         const fieldsToRender = this.memoized.findFieldsWithDocumentsOrImages(indvSchema);
 
-        return (
-            <React.Fragment>
-                { fieldsToRender.map((obj) => {
-                    const property = _.keys(obj)[0];
-                    const files = individual[property];
+        return fieldsToRender.map(function({ property, linkToItemType }){
+            const files = individual[property];
+            // Pass the correct schema for this particular type of file (Image OR Document)
+            const fileSchema = (linkToItemType === "Document") ? docSchema : imageSchema;
+            return (
+                <FileArrayField {...{ files, haveEditPermission, individualId, institution, project, fileSchema }} key={property}
+                    fieldType={property} fieldName={linkToItemType} fieldDisplayTitle={indvProperties[property]["title"]} />
+            );
+        });
+    }
+}
 
-                    // Pass the correct schema for this particular type of file (Image OR Document)
-                    let fileSchema;
-                    const fieldName = obj[property];
-                    if (fieldName === "Document") { fileSchema = docSchema; }
-                    else { fileSchema = imageSchema; }
-
-                    return <FileArrayField key={property} fieldType={property} fieldDisplayTitle={properties[property]["title"]} {...{ files, haveEditPermission,
-                        individualId, institution, project, fileSchema, fieldName }} />;
+function FileArrayField (props) {
+    const { fieldDisplayTitle, fieldName, fieldType, files, individualId, haveEditPermission = false, institution, project, fileSchema } = props;
+    return (
+        <div className="detail-row" data-describing={fieldDisplayTitle}>
+            <label className="d-block">{fieldDisplayTitle}</label>
+            <ul>
+                { files.map(function({ "@id" : fileID, display_title: fileDisplayTitle }){
+                    return (
+                        <li key={fileID}>
+                            <a href={fileID}>{ fileDisplayTitle }</a>
+                        </li>
+                    );
                 }) }
-            </ React.Fragment>
-        );
-    }
+            </ul>
+            { haveEditPermission ?
+                <DragAndDropFileUploadController {...{ fieldDisplayTitle, fieldType, fieldName, individualId, project, institution, fileSchema, files }}
+                    award={null} lab={null} cls="btn btn-sm btn-outline-dark" />
+                : null }
+        </div>
+    );
 }
-
-class FileArrayField extends React.Component {
-
-    static propTypes = {
-        fieldDisplayTitle: PropTypes.string.isRequired,
-        fieldName: PropTypes.string.isRequired,
-        fieldType: PropTypes.string.isRequired,
-        individualId: PropTypes.string.isRequired,
-        institution: PropTypes.object.isRequired,
-        project: PropTypes.object.isRequired,
-        files: PropTypes.array,
-        haveEditPermission: PropTypes.bool,
-        fileSchema: PropTypes.object.isRequired
-    };
-
-    static defaultProps = {
-        files: []
-    };
-
-    render() {
-        const { fieldDisplayTitle, fieldName, fieldType, files, individualId, haveEditPermission = false, institution, project, fileSchema } = this.props;
-
-        return (
-            <div className="detail-row" data-describing={fieldDisplayTitle}>
-                <label className="d-block">{fieldDisplayTitle}</label>
-                <ul>
-                    {
-                        files.map((file) => <li key={file['@id']}><a href={file['@id']}>{file.display_title}</a></li>)
-                    }
-                </ul>
-                { haveEditPermission ?
-                    <DragAndDropFileUploadController award={null} lab={null}
-                        {...{ fieldDisplayTitle, fieldType, fieldName, individualId, project, institution, fileSchema, files }} cls="btn btn-sm btn-outline-dark" /> : null }
-            </div>
-        );
-    }
-}
+FileArrayField.propTypes = {
+    "fieldDisplayTitle": PropTypes.string.isRequired,
+    "fieldName": PropTypes.string.isRequired,
+    "fieldType": PropTypes.string.isRequired,
+    "individualId": PropTypes.string.isRequired,
+    "institution": PropTypes.object.isRequired,
+    "project": PropTypes.object.isRequired,
+    "files": PropTypes.array,
+    "haveEditPermission": PropTypes.bool,
+    "fileSchema": PropTypes.object.isRequired
+};
+FileArrayField.defaultProps = {
+    files: []
+};

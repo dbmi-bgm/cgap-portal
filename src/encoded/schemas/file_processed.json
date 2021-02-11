@@ -17,6 +17,7 @@
         { "$ref": "mixins.json#/accession" },
         { "$ref": "mixins.json#/dbxrefs" },
         { "$ref": "mixins.json#/static_embeds" },
+        { "$ref": "mixins.json#/tags" },
         { "$ref": "file.json#/properties" }
     ],
     "mixinFacets": [
@@ -54,15 +55,35 @@
                 "N/A",
                 "Waiting",
                 "Queued",
+                "In progress",
                 "Ingested",
-                "Ingestion disabled"
+                "Ingestion disabled",
+                "Error"
             ]
+        },
+        "file_ingestion_error": {
+            "title": "Ingestion Error Report",
+            "description": "This field is set when an error occurred in ingestion with the first error encountered",
+            "type": "array",
+            "items": {
+                "title": "Ingestion Error",
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "index": false
+                    },
+                    "row": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "file_classification": {
             "title": "General Classification",
             "type": "string",
             "default": "processed file",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": ["FFedit-create"],
             "enum": ["processed file"]
         },
         "source_samples": {
@@ -70,7 +91,6 @@
             "description": "Samples that this file is associated with",
             "type": "array",
             "lookup": 40,
-            "exclude_from": ["submit4dn"],
             "items": {
                 "title": "Source Sample",
                 "type": "string"
@@ -98,7 +118,7 @@
             "title": "Disable wfr inputs field",
             "description": "Do not compute workflow_run_inputs field for files used as control",
             "type": "boolean",
-            "exclude_from": ["submit4dn", "FFedit-create"]
+            "exclude_from": ["FFedit-create"]
         }
      },
     "facets" : {

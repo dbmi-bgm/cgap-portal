@@ -93,8 +93,7 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 	
 	&[data-field="status"] {
 		> .inner {
-			i.status-indicator-dot,
-			i.item-status-indicator-dot {
+			i.status-indicator-dot {
 				margin-left: 4px;
 				margin-right: 2px;
 			}
@@ -173,6 +172,11 @@ $facetlist-omitted-term-color: #901414;
 $search-page-padding-resize-transition-in: padding .25s .5s linear;
 $search-page-padding-resize-transition-out: padding .25s linear;
 
+
+.search-view-controls-and-results .facets-container {
+	background-color: #fff;
+}
+
 /* Make page full(er) width when scroll down */
 @include navbar-fixed-position {
 	.search-page-outer-container.container-wide {
@@ -191,7 +195,6 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 			//background-color: #fff;
 			.facets-container {
 				transition: border-color .3s;
-				background-color: #fff;
 				> .row.facets-header {
 					transition: $search-page-padding-resize-transition-out;
 				}
@@ -224,7 +227,9 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 	}
 }
 
-/** CGAP-Related SearchView Theming **/
+/************************************************
+******** CGAP-Related SearchView Theming ********
+*************************************************/
 
 body[data-pathname="/search/"]:not([data-current-action="add"]) {
 	#slot-application,
@@ -235,7 +240,10 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 	}
 }
 
-.search-page-container {
+/** Applies to both embedded search views and /search/ page views **/
+/** Here we give the facetlist a predefined max width of 320px for larger screen sizes **/
+.search-page-container,
+.embedded-search-container {
 
 	> div.search-view-controls-and-results.row {
 
@@ -248,15 +256,34 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 		}
 
 		.facets-column {
-
+			
 			@include navbar-static-position {
 				width: 100%;
 			}
 	
-	
 			@include navbar-fixed-position {
 				width: 320px;
 			}
+
+			// Align header height with $search-results-header-row-height.
+			.facets-container.with-header-bg .facets-header {
+				height: $search-results-header-row-height;
+			}
+
+		}
+
+	}
+
+}
+
+/** Applies to only /search/ page views **/
+.search-page-container {
+
+	> div.search-view-controls-and-results.row {
+
+		.facets-column {
+
+			/** The following changes the position of facets-container to be stickied to top of browser on /search/ pages **/
 	
 			.facets-container {
 				position: -webkit-sticky;
@@ -268,11 +295,6 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 				@include navbar-fixed-position {
 					top: $cgap-search-sticky-header-top-offset;
 					margin-bottom: 0px;
-				}
-
-				// Align header height with $search-results-header-row-height.
-				&.with-header-bg .facets-header {
-					height: $search-results-header-row-height;
 				}
 	
 				body.scrolled-past-160 & {
@@ -356,12 +378,3 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 	}
 
 }
-
-
-/********************************/
-/****** Active Filters Bar ******/
-/********************************/
-
-@import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/active-filters-bar.scss"
-
-

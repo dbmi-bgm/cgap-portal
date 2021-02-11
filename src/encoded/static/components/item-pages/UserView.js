@@ -3,7 +3,7 @@
 
 'use strict';
 
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import Modal from 'react-bootstrap/esm/Modal';
@@ -15,6 +15,7 @@ import { EditableField, FieldSet } from '@hms-dbmi-bgm/shared-portal-components/
 
 import { store } from './../../store';
 import { OnlyTitle, PageTitleContainer, pageTitleViews } from './../PageTitleSection';
+import { Term } from './../util/Schemas';
 
 // eslint-disable-next-line no-unused-vars
 import { Item } from './../util/typedefs';
@@ -50,9 +51,17 @@ class SyncedAccessKeyTable extends React.PureComponent {
             'groups' : PropTypes.array,
             'status' : PropTypes.string,
             'timezone' : PropTypes.string,
-            'role' : PropTypes.string,
-            'submits_for' : PropTypes.array
+            'project_roles': PropTypes.shape({
+                'role' : PropTypes.string,
+                'project' : PropTypes.object
+            })
         })
+    };
+
+    static loadStatusMap = {
+        'loading' : 1,
+        'loaded' : 2,
+        'failed' : 3
     };
 
     constructor(props){
@@ -62,7 +71,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
 
         this.state = {
             'access_keys'   : null,
-            'loadingStatus' : 'loading',
+            'loadingStatus' : SyncedAccessKeyTable.loadStatusMap.loading,
             'modal'         : null
         };
     }
@@ -81,10 +90,13 @@ class SyncedAccessKeyTable extends React.PureComponent {
         const requestSucceeded = (resp) => {
             // Use for both load success+fail ajax callback in case of 404 (no results)
             if (!resp || !Array.isArray(resp['@graph'])){
-                this.setState({ 'loadingStatus' : 'failed', 'access_keys' : null });
+                this.setState({
+                    'loadingStatus' : SyncedAccessKeyTable.loadStatusMap.failed,
+                    'access_keys' : null
+                });
             }
             this.setState({
-                'loadingStatus' :' loaded',
+                'loadingStatus' : SyncedAccessKeyTable.loadStatusMap.loaded,
                 'access_keys' : resp['@graph']
             });
         };
@@ -94,8 +106,8 @@ class SyncedAccessKeyTable extends React.PureComponent {
             ajax.load(hrefToRequest, requestSucceeded, 'GET', requestSucceeded);
         };
 
-        if (loadingStatus !== 'loading'){
-            this.setState({ 'loadingStatus' : 'loading' }, loadFxn);
+        if (loadingStatus !== SyncedAccessKeyTable.loadStatusMap.loading){
+            this.setState({ 'loadingStatus' : SyncedAccessKeyTable.loadStatusMap.loading }, loadFxn);
         } else {
             loadFxn();
         }
@@ -141,7 +153,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
         this.setState({ 'modal' : (
             <Modal show onHide={this.hideModal}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{ "Your secret key has been " + (reset ? "reset" : "created") }</Modal.Title>
+                    <Modal.Title>Your secret key has been {reset ? "reset" : "created" }</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <p className="text-center text-600">
@@ -185,21 +197,22 @@ class SyncedAccessKeyTable extends React.PureComponent {
         });
     }
 
-    handleDelete(item) {
+    handleDelete(accessKeyToDelete) {
         const dispatch_body = { 'status': 'deleted' };
-        if (item.accession){
-            dispatch_body.accession = item.accession;
+        const { accession, uuid, '@id' : accessKeyID } = accessKeyToDelete;
+        if (accession){
+            dispatch_body.accession = accession;
         }
-        if (item.uuid){
-            dispatch_body.uuid = item.uuid;
+        if (uuid){
+            dispatch_body.uuid = uuid;
         }
-        ajax.load(item['@id'] + '?render=false', (resp)=>{
+        ajax.load(accessKeyID + '?render=false', (resp)=>{
             this.setState(({ access_keys : prevKeys }) => {
-                const foundItemIdx = _.findIndex(prevKeys, function(sItem){
-                    return sItem['@id'] === item['@id'];
+                const foundItemIdx = _.findIndex(prevKeys, function({ '@id' : existingKeyID }){
+                    return existingKeyID === accessKeyID;
                 });
                 if (typeof foundItemIdx !== 'number' || foundItemIdx === -1){
-                    throw new Error('Couldn\'t find deleted key - ' + sItem['@id']);
+                    throw new Error("Couldn't find deleted key - " + accessKeyID);
                 }
                 const foundItem = prevKeys[foundItemIdx];
                 const nextKeys = prevKeys.slice(0);
@@ -215,7 +228,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
                     )
                 };
             });
-        }, "PATCH", ()=>{
+        }, "PATCH", function(){
             Alerts.queue({
                 'title'     : "Deleting access key failed",
                 "message"   : "Check your internet connection or if you have been logged out due to expired session.",
@@ -231,29 +244,29 @@ class SyncedAccessKeyTable extends React.PureComponent {
     render() {
         const { access_keys, loadingStatus, modal } = this.state;
 
-        if (!Array.isArray(access_keys) || !this.store){
-            if (loadingStatus === 'loading'){
+        if (!Array.isArray(access_keys)){
+            if (loadingStatus === SyncedAccessKeyTable.loadStatusMap.loading){
                 return (
                     <AccessKeyTableContainer>
                         <div className="text-center pt-3 pb-3">
-                            <i className="icon icon-2x icon-fw icon-circle-notch fas icon-spin" style={{ 'color' : '#999' }}/>
+                            <i className="icon icon-2x icon-fw icon-circle-notch fas icon-spin text-secondary"/>
                         </div>
                     </AccessKeyTableContainer>
                 );
-            } else if (loadingStatus === 'failed'){
+            } else if (loadingStatus === SyncedAccessKeyTable.loadStatusMap.failed){
                 return (
                     <AccessKeyTableContainer>
                         <div className="text-center pt-3 pb-3">
-                            <i className="icon icon-2x icon-fw icon-times fas" style={{ 'color' : 'maroon' }}/>
+                            <i className="icon icon-2x icon-fw icon-times fas text-danger"/>
                             <h4 className="text-400">Failed to load Access Keys</h4>
                         </div>
                     </AccessKeyTableContainer>
                 );
-            } else if (loadingStatus === 'loaded'){
+            } else if (loadingStatus === SyncedAccessKeyTable.loadStatusMap.loaded){
                 return (
                     <AccessKeyTableContainer>
                         <div className="text-center pt-3 pb-3">
-                            <i className="icon icon-2x icon-fw icon-times fas" style={{ 'color' : 'maroon' }}/>
+                            <i className="icon icon-2x icon-fw icon-times fas text-danger" />
                             <h4 className="text-400">Unknown Error</h4>
                         </div>
                     </AccessKeyTableContainer>
@@ -262,20 +275,29 @@ class SyncedAccessKeyTable extends React.PureComponent {
         }
 
         return (
-            <AccessKeyTableContainer>
+            <AccessKeyTableContainer bodyClassName="card-body px-0 pt-0">
                 <AccessKeyTable accessKeys={access_keys} onResetSecret={this.handleResetSecret} onDelete={this.handleDelete} />
-                <button type="button" id="add-access-key" className="btn btn-success mb-2" onClick={this.handleCreate}>Add Access Key</button>
+                <div className="px-3 pt-16">
+                    <button type="button" id="add-access-key" className="btn btn-success" onClick={this.handleCreate}>Add Access Key</button>
+                </div>
                 { modal }
             </AccessKeyTableContainer>
         );
     }
 }
 
-function AccessKeyTableContainer({ children }){
+function AccessKeyTableContainer({ children, bodyClassName="card-body" }){
     return (
-        <div className="access-keys-container">
-            <h3 className="text-300">Access Keys</h3>
-            <div className="access-keys-table-container clearfix">{ children }</div>
+        <div className="access-keys-container card mt-36">
+            <div className="card-header">
+                <h3 className="text-300">
+                    <i className="icon icon-fw icon-unlock fas mr-12" />
+                    Access Keys
+                </h3>
+            </div>
+            <div className={bodyClassName}>
+                { children }
+            </div>
         </div>
     );
 }
@@ -284,14 +306,14 @@ const AccessKeyTable = React.memo(function AccessKeyTable({ accessKeys, onDelete
 
     if (typeof accessKeys === 'undefined' || !accessKeys.length){
         return (
-            <div className="no-access-keys">
-                <hr/><span>No access keys set.</span>
-            </div>
+            <h5 className="no-access-keys text-400 px-3 my-0 pt-16 text-secondary text-center">
+                No access keys set
+            </h5>
         );
     }
 
     return (
-        <table className="table access-keys-table">
+        <table className="table access-keys-table bg-white">
             <thead>
                 <tr>
                     <th>Access Key ID</th>
@@ -301,25 +323,36 @@ const AccessKeyTable = React.memo(function AccessKeyTable({ accessKeys, onDelete
                 </tr>
             </thead>
             <tbody>
-                { _.map(accessKeys, function(accessKey, idx){
-                    const { access_key_id : id, date_created, description, uuid } = accessKey;
-                    const atId = accessKey['@id'];
-                    function resetKey(e){ onResetSecret(atId); }
-                    function deleteKey(e){ onDelete({ '@id' : atId, uuid }); }
-                    return (
-                        <tr key={id || idx}>
-                            <td className="access-key-id">{ id }</td>
-                            <td>{ date_created ? <LocalizedTime timestamp={date_created} formatType="date-time-md" dateTimeSeparator=" - " /> : 'N/A' }</td>
-                            <td>{ description }</td>
-                            <td className="access-key-buttons">
-                                <button type="button" className="btn btn-xs btn-success" onClick={resetKey}>Reset</button>
-                                <button type="button" className="btn btn-xs btn-danger" onClick={deleteKey}>Delete</button>
-                            </td>
-                        </tr>
-                    );
+                { accessKeys.map(function(accessKey, idx){
+                    return <AccessKeyTableRow {...{ onDelete, onResetSecret, accessKey, idx }} key={idx} />;
                 }) }
             </tbody>
         </table>
+    );
+});
+
+const AccessKeyTableRow = React.memo(function AccessKeyTableRow({ accessKey, idx, onResetSecret, onDelete }){
+    const {
+        '@id': atId,
+        access_key_id: id,
+        date_created,
+        description,
+        uuid
+    } = accessKey;
+
+    function resetKey(e){ onResetSecret(atId); }
+    function deleteKey(e){ onDelete({ '@id' : atId, uuid }); }
+
+    return (
+        <tr key={id || idx}>
+            <td className="access-key-id">{ id }</td>
+            <td>{ date_created ? <LocalizedTime timestamp={date_created} formatType="date-time-md" dateTimeSeparator=" - " /> : 'N/A' }</td>
+            <td>{ description }</td>
+            <td className="access-key-buttons">
+                <button type="button" className="btn btn-xs btn-success" onClick={resetKey}>Reset</button>
+                <button type="button" className="btn btn-xs btn-danger" onClick={deleteKey}>Delete</button>
+            </td>
+        </tr>
     );
 });
 
@@ -346,7 +379,6 @@ export default class UserView extends React.Component {
     static propTypes = {
         'context' : PropTypes.shape({
             '@id' : PropTypes.string.isRequired,
-            'access_keys' : PropTypes.array,
             'email' : PropTypes.string,
             'first_name' : PropTypes.string,
             'last_name' : PropTypes.string,
@@ -383,62 +415,64 @@ export default class UserView extends React.Component {
 
     render() {
         const { context : user, schemas, href, windowWidth } = this.props;
-        const { email, lab, submits_for, access_keys } = user;
+        const { email, project } = user;
         const mayEdit = this.mayEdit();
         // Todo: remove
         const ifCurrentlyEditingClass = this.state && this.state.currentlyEditing ? ' editing editable-fields-container' : '';
 
         return (
-            <div className="user-profile-page container" id="content">
+            <div className="user-profile-page container-wide bg-light py-5 border-top">
 
-                <header className="row">
-                    <div className="col-sm-12">
-                    </div>
-                </header>
+                <div className="container" id="content">
 
-                <div className={"page-container data-display" + ifCurrentlyEditingClass}>
+                    <div className={"page-container data-display" + ifCurrentlyEditingClass}>
 
-                    <div className="row mt-5 mb-12">
+                        <div className="row">
 
-                        <div className="col-12 col-lg-6 col-xl-7">
+                            <div className="col-12 col-lg-6 col-xl-7 mb-2 mb-lg-0">
 
-                            <div className="panel user-info shadow-border">
-                                <div className="user-title-row-container">
-                                    <div className="row title-row">
-                                        <div className="col-md-3 gravatar-container">
-                                            { object.itemUtil.User.gravatar(email, 70) }
-                                            <a className="edit-button-remote text-center" target="_blank" rel="noopener noreferrer" href="https://gravatar.com">
-                                                <i className="icon icon-pencil-alt fas"/>
-                                            </a>
-                                        </div>
-                                        <div className="col-md-9 user-title-col">
-                                            <h1 className="user-title">
-                                                <FieldSet context={user} parent={this} style="inline"
-                                                    inputSize="lg" absoluteBox objectType="User" onSave={UserView.onEditableFieldSave}
-                                                    schemas={schemas} disabled={!mayEdit} href={href} windowWidth={windowWidth}>
-                                                    <EditableField labelID="first_name" fallbackText="No first name set"
-                                                        placeholder="First name" />
-                                                    {' '}
-                                                    <EditableField labelID="last_name" fallbackText="No last name set"
-                                                        placeholder="Last name" />
-                                                </FieldSet>
-                                            </h1>
+                                <div className="user-info card h-100">
+                                    <div className="card-header">
+                                        <div className="row title-row align-items-center py-2">
+                                            <div className="col-md-3 gravatar-container">
+                                                { object.itemUtil.User.gravatar(email, 70) }
+                                                <a className="edit-button-remote text-center" target="_blank" rel="noopener noreferrer" href="https://gravatar.com">
+                                                    <i className="icon icon-pencil-alt fas"/>
+                                                </a>
+                                            </div>
+                                            <div className="col-md-9 user-title-col">
+                                                <h1 className="user-title">
+                                                    <FieldSet context={user} parent={this} style="inline"
+                                                        inputSize="lg" absoluteBox objectType="User" onSave={UserView.onEditableFieldSave}
+                                                        schemas={schemas} disabled={!mayEdit} href={href} windowWidth={windowWidth}>
+                                                        <EditableField labelID="first_name" fallbackText="No first name set"
+                                                            placeholder="First name" />
+                                                        {' '}
+                                                        <EditableField labelID="last_name" fallbackText="No last name set"
+                                                            placeholder="Last name" />
+                                                    </FieldSet>
+                                                </h1>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div className="card-body">
+                                        <ProfileContactFields user={user} parent={this} mayEdit={mayEdit} href={href} />
+                                    </div>
                                 </div>
-                                <ProfileContactFields user={user} parent={this} mayEdit={mayEdit} href={href} />
+
+                            </div>
+                            <div className="col-12 col-lg-6 col-xl-5">
+                                <ProfileWorkFields user={user} />
                             </div>
 
                         </div>
-                        <div className="col-12 col-lg-6 col-xl-5">
-                            <ProfileWorkFields user={user} parent={this} href={href} />
-                        </div>
+
+                        <SyncedAccessKeyTable {...{ user }} />
 
                     </div>
 
-                    { lab || submits_for ? <SyncedAccessKeyTable user={user} access_keys={access_keys} /> : null }
-
                 </div>
+
             </div>
         );
     }
@@ -463,19 +497,19 @@ function ProfileContactFields(props){
             schemas={schemas} href={href}>
 
             <EditableField label="Email" labelID="email" placeholder="name@example.com" fallbackText="No email address" fieldType="email" disabled={true}>
-                <ProfileContactFieldsIcon icon="envelope far" />&nbsp; <a href={'mailto:' + email}>{ email }</a>
+                <ProfileContactFieldsIcon icon="envelope far" /><span className="text-secondary">{ email }</span>
             </EditableField>
 
             <EditableField label="Phone" labelID="phone1" placeholder="17775551234 x47" fallbackText="No phone number" fieldType="phone">
-                <ProfileContactFieldsIcon icon="phone fas" />&nbsp; { phone1 }
+                <ProfileContactFieldsIcon icon="phone fas" />{ phone1 }
             </EditableField>
 
             <EditableField label="Fax" labelID="fax" placeholder="17775554321" fallbackText="No fax number" fieldType="phone">
-                <ProfileContactFieldsIcon icon="fax fas" />&nbsp; { fax }
+                <ProfileContactFieldsIcon icon="fax fas" />{ fax }
             </EditableField>
 
             <EditableField label="Skype" labelID="skype" fallbackText="No skype ID" fieldType="username">
-                <ProfileContactFieldsIcon icon="skype fab" />&nbsp; { skype }
+                <ProfileContactFieldsIcon icon="skype fab" />{ skype }
             </EditableField>
 
         </FieldSet>
@@ -483,222 +517,62 @@ function ProfileContactFields(props){
 }
 
 function ProfileContactFieldsIcon({ icon }){
-    return <i className={"visible-lg-inline icon icon-fw icon-" + icon }/>;
+    return <i className={"visible-lg-inline icon icon-fw mr-07 icon-" + icon }/>;
 }
 
 
-/**
- * Renders out the lab and awards fields for user, which are not editable.
- * Uses AJAX to fetch details for fields which are not embedded.
- *
- * @private
- * @type {Component}
- */
-
-class ProfileWorkFields extends React.PureComponent {
-
-    /**
-    * Get list of all awards (unique) from list of labs.
-    * ToDo : Migrate somewhere more static-cy.
-    *
-    * @param {Item[]} labDetails - Array of lab objects with embedded award details.
-    * @return {Item[]} List of all unique awards in labs.
-    */
-    static getAwardsList(labDetails){
-
-        if (!labDetails || !Array.isArray(labDetails) || labDetails.length === 0){
-            return [];
-        }
-
-        // Awards are embedded within labs, so we get full details.
-        var awardsList = [];
-
-        function addAwardToList(award){
-            if (!award || typeof award['@id'] !== 'string' || _.pluck(awardsList, '@id').indexOf(award['@id']) > -1) return;
-            awardsList.push(award);
-        }
-
-        _.forEach(labDetails, function(lab){
-            if (!lab || !lab.awards || !Array.isArray(lab.awards) || lab.awards.length === 0) return;
-            _.forEach(lab.awards, addAwardToList);
-        });
-
-        return awardsList;
-    }
 
 
-    static defaultProps = {
-        containerClassName : 'panel user-work-info shadow-border'
-    }
-
-    constructor(props){
-        super(props);
-        this.updateAwardsList = this.updateAwardsList.bind(this);
-        this.render = this.render.bind(this);
-        this.state = {
-            'awards_list' : []
-        };
-
-        if (props.user && props.user.lab && props.user.lab.awards){
-            this.state.awards_list = props.user.lab.awards.slice(0);
-        }
-    }
-
-    /**
-     * Update state.awards_list with award details from list of lab details.
-     *
-     * @param {Item[]} labDetails - Array of lab objects with embedded award details.
-     * @returns {void} Nothing.
-     */
-    updateAwardsList(labDetails){
-
-        if (!labDetails || !Array.isArray(labDetails) || labDetails.length === 0){
-            return;
-        }
-
-        this.setState(function({ awards_list = [] }){
-            // As of React 16 we can return null in setState func to cancel out of state update.
-            const nextAwardsList      = awards_list.slice(0);
-            const nextAwardsListIDs   = new Set(_.map(nextAwardsList, object.atIdFromObject));
-            const newAwards           = ProfileWorkFields.getAwardsList(labDetails);
-
-            for (var i = 0; i < newAwards.length; i++){
-                const award   = newAwards[i];
-                const awardID = award && object.atIdFromObject(award);
-                if (!awardID) continue; // Error ?
-                if (!nextAwardsListIDs.has(awardID)) nextAwardsList.push(award);
-            }
-
-            if (nextAwardsList.length > (awards_list || []).length){
-                return { 'awards_list' : nextAwardsList };
-            } else {
-                return null;
-            }
-
-        });
-    }
 
 
-    render(){
-        const { user, containerClassName } = this.props;
-        const { submits_for = [], lab, pending_lab, role } = user;
-        const { awards_list: awards } = this.state;
 
-        let labTitle = <span className="not-set">No Labs</span>;
-        const pendingLabText = "Will be verified in the next few business days"; // Default
+const ProfileWorkFields = React.memo(function ProfileWorkFields({ user }){
+    const { project_roles = [] } = user;
 
-        if (lab){
-            labTitle = object.itemUtil.generateLink(lab);
-        } else if (pending_lab && object.itemUtil.isAnItem(pending_lab)){
-            // Might occur later... currently not embedded.
-            labTitle = <span>{ object.itemUtil.generateLink(pending_lab) } <em data-tip={pendingLabText}>(pending)</em></span>;
-        } else if (pending_lab && typeof pending_lab === 'string'){
-            labTitle = <span className="text-400">{ pendingLabText }</span>;
-        }
-
-        // THESE FIELDS ARE NOT EDITABLE.
-        // To be modified by admins, potentially w/ exception of 'Primary Lab' (e.g. select from submits_for list).
+    const renderedRoles = project_roles.map(function({ role, project }, index){
+        const roleProjectID = "project-" + index;
+        const roleRoleID = "project-role-" + index;
         return (
-            <div className={containerClassName}>
+            <li className="list-group-item" key={index}>
+                <div className="row project">
+                    <div className="col-md-3 text-left text-md-right">
+                        <label htmlFor={roleProjectID} className="text-500">Project</label>
+                    </div>
+                    <div id={roleProjectID} className="col-md-9 value text-500">
+                        { object.itemUtil.generateLink(project) }
+                    </div>
+                </div>
+                <div className="row role">
+                    <div className="col-md-3 text-left text-md-right">
+                        <label htmlFor={roleRoleID} className="text-500">Role</label>
+                    </div>
+                    <div id={roleRoleID} className="col-md-9 value text-500">
+                        { Term.toName("project_roles.role", role) }
+                    </div>
+                </div>
+            </li>
+        );
+    });
+
+    return (
+        <div className="card h-100">
+            <div className="card-header">
                 <h3 className="text-300 block-title">
-                    <i className="icon icon-users fas icon-fw"></i> Organizations
+                    <i className="icon icon-users fas icon-fw mr-12" />
+                    Organizations
                 </h3>
-                <div className="row field-entry lab">
-                    <div className="col-md-3 text-right text-left-xs">
-                        <label htmlFor="lab">Primary Lab</label>
-                    </div>
-                    <div id="lab" className="col-md-9 value text-500">
-                        { labTitle }
-                    </div>
-                </div>
-                <div className="row field-entry role">
-                    <div className="col-md-3 text-right text-left-xs">
-                        <label htmlFor="role">Role</label>
-                    </div>
-                    <div id="role" className="col-md-9 value">
-                        { role || <span className="not-set">No Job Title</span> }
-                    </div>
-                </div>
-                {/*
-                <div className="row field-entry submits_for">
-                    <div className="col-md-3 text-right text-left-xs">
-                        <label htmlFor="submits_for">Submits For</label>
-                    </div>
-                    <div className="col-md-9 value text-500">
-                        <FormattedInfoBlock.List
-                            renderItem={object.itemUtil.generateLink}
-                            endpoints={_.filter(_.map(submits_for, object.itemUtil.atId))}
-                            propertyName="submits_for"
-                            fallbackMsg="Not submitting for any organizations"
-                            ajaxCallback={this.updateAwardsList}
-                        />
-                    </div>
-                </div>
-                <div className="row field-entry awards">
-                    <div className="col-md-3 text-right text-left-xs">
-                        <label htmlFor="awards">Awards</label>
-                    </div>
-                    <div className="col-md-9 value text-500">
-                        <FormattedInfoBlock.List
-                            details={awards}
-                            renderItem={object.linkFromItem}
-                            propertyName="awards"
-                            fallbackMsg="No awards"
-                            loading={false}
-                        />
-                    </div>
-                </div>
-                */}
             </div>
-        );
-    }
-
-}
-
-
-
-class BasicForm extends React.PureComponent {
-
-    constructor(props){
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.state = {
-            'value' : ''
-        };
-    }
-
-    handleChange(e) {
-        this.setState({ 'value': e.target.value });
-    }
-
-    handleSubmit(e){
-        e.preventDefault();
-        const { onSubmit } = this.props, { value } = this.state;
-        if (value.length === 0){
-            return;
-        }
-        onSubmit(value);
-        this.setState({ 'value': '' });
-    }
-
-    render() {
-        const { value } = this.state;
-        return(
-            <form onSubmit={this.handleSubmit}>
-                <input type="text" className="mt-08 form-control" onChange={this.handleChange} value={value} placeholder="Enter an email to impersonate..." />
-                <button type="submit" className="btn btn-primary btn-md mt-15">
-                    <i className="icon icon-fw icon-user icon-user-ninja fas"/>&nbsp; Impersonate
-                </button>
-            </form>
-        );
-    }
-
-}
+            <ul className="list-group list-group-flush">
+                { renderedRoles }
+            </ul>
+        </div>
+    );
+});
 
 
 export function ImpersonateUserForm({ updateUserInfo }) {
 
+    const inputFieldRef = useRef(null);
     /**
      * Handler for Impersonate User submit button/action.
      * Performs AJAX request to '/impersonate-user' endpoint then saves returned JWT
@@ -706,9 +580,17 @@ export function ImpersonateUserForm({ updateUserInfo }) {
      *
      * @param {Object} data - User ID or email address.
      */
-    const onSubmit = function(data){
+    const onSubmit = useCallback(function(e){
+        // `useCallback(fn, deps)` is equivalent to `useMemo(() => fn, deps)`
+        // See https://reactjs.org/docs/hooks-reference.html#usecallback
+        e.preventDefault();
+        const { value: userid = "" } = inputFieldRef.current;
+        if (userid.length === 0){
+            console.warn("No userid supplied", e);
+            return;
+        }
         const url = "/impersonate-user";
-        const postData = { 'userid' : data };
+        const postData = { 'userid' : userid };
         const callbackFxn = (resp) => {
             //if(typeof(Storage) !== 'undefined'){ // check if localStorage supported
             //    localStorage.setItem("user_info", JSON.stringify(payload));
@@ -721,7 +603,7 @@ export function ImpersonateUserForm({ updateUserInfo }) {
                 navTarget = profileAction.href;
             }
             navigate(navTarget, { 'inPlace' : true });
-            alert('Success! ' + data + ' is being impersonated.');
+            alert('Success! ' + userid + ' is being impersonated.');
         };
         const fallbackFxn = function() {
             alert('Impersonation unsuccessful.\nPlease check to make sure the provided email is correct.');
@@ -734,14 +616,19 @@ export function ImpersonateUserForm({ updateUserInfo }) {
         //    reqHeaders['Authorization'] = 'Bearer '+idToken;
         //}
         ajax.load(url, callbackFxn, 'POST', fallbackFxn, JSON.stringify(postData));
-    };
+    }, [ updateUserInfo ]);
 
     return (
         <div className="mt-3 container" id="content">
             <h2 className="text-400 mt-5">Impersonate a User</h2>
             <div className="row">
                 <div className="col-12 col-lg-6">
-                    <BasicForm onSubmit={onSubmit} />
+                    <form onSubmit={onSubmit}>
+                        <input type="text" className="mt-08 form-control" placeholder="Enter an email to impersonate..." ref={inputFieldRef} />
+                        <button type="submit" className="btn btn-primary btn-md mt-15">
+                            <i className="icon icon-fw icon-user icon-user-ninja fas"/>&nbsp; Impersonate
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -750,7 +637,7 @@ export function ImpersonateUserForm({ updateUserInfo }) {
 
 
 
-/*** Page Tttles ***/
+/*** Page Title ***/
 
 
 const UserViewPageTitle = React.memo(function UserViewPageTitle({ context, schemas, currentAction, alerts }){
@@ -764,7 +651,7 @@ const UserViewPageTitle = React.memo(function UserViewPageTitle({ context, schem
     }
 
     return (
-        <PageTitleContainer alerts={alerts}>
+        <PageTitleContainer alerts={alerts} className="container pb-55">
             <OnlyTitle>{ titleStr }</OnlyTitle>
         </PageTitleContainer>
     );

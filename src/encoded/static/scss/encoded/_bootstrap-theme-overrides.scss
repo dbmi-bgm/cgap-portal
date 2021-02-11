@@ -74,7 +74,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 /** Extending Bootstrap button w/ rounded & ext-padding class **/
 /** btn-xs was removed in Bootstrap v4 so we recreate it here **/
 .btn.btn-xs {
-    @include button-size(1px, 5px, 0.825rem, 1.5, $border-radius-small);
+    @include button-size(1px, 5px, 0.825rem, 1.5, $border-radius-sm);
     font-weight: 400;
     padding-top: 2px;
     //> i.icon {
@@ -205,6 +205,19 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 
 	padding-left: 15px;
 	padding-right: 15px;
+
+	.modal-header {
+		.modal-title {
+			/* Unset default .h1-.h6 styling of bottom+top margin. */
+			margin-top: 0;
+			margin-bottom: 0;
+
+			&.h4 + button.close {
+				/* Default size for Modal.Title is h4; increase close button icon size (experimental) */
+				font-size: 1.8em;
+			}
+		}
+	}
 
 	.modal-content {
 

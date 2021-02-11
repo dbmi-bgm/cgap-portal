@@ -1,4 +1,5 @@
 import structlog
+from collections import OrderedDict
 from elasticsearch import (
     TransportError,
     RequestError,
@@ -32,6 +33,7 @@ NESTED = 'nested'
 PATH = 'path'
 TERMS = 'terms'
 RANGE = 'range'
+STATS = 'stats'
 AGGS = 'aggs'
 REVERSE_NESTED = 'reverse_nested'
 # just for book-keeping/readability but is 'unused' for now
@@ -42,9 +44,14 @@ ELASTIC_SEARCH_QUERY_KEYWORDS = [
 
 
 COMMON_EXCLUDED_URI_PARAMS = [
+    # Difference of this and URL params should result in all fields/filters.
     'frame', 'format', 'limit', 'sort', 'from', 'field',
     'mode', 'redirected_from', 'datastore', 'referrer',
-    'currentAction'
+    'currentAction', 'additional_facet', 'debug'
+]
+MAX_FACET_COUNTS = 100
+RAW_FIELD_AGGREGATIONS = [
+    'stats', 'nested:stats', 'date_histogram', 'histogram', 'range', 'nested:range',
 ]
 
 
@@ -219,7 +226,7 @@ def get_query_field(field, facet):
         return 'embedded.@type.raw'
     elif not is_schema_field(field):
         return field + '.raw'
-    elif facet.get('aggregation_type') in ('stats', 'date_histogram', 'histogram', 'range'):
+    elif facet.get('aggregation_type') in RAW_FIELD_AGGREGATIONS:
         return 'embedded.' + field
     else:
         return 'embedded.' + field + '.raw'
@@ -325,6 +332,8 @@ def execute_search(request, search):
     err_exp = None
     es_results = None
     try:
+        # set timeout
+        search = search.params(request_timeout=30)
         es_results = search.execute().to_dict()
     except ConnectionTimeout:
         err_exp = 'The search failed due to a timeout. Please try a different query.'
@@ -370,3 +379,88 @@ def is_numerical_field(field_schema):
 def is_date_field(field, field_schema):
     """ Helper method that determines if field_schema is  """
     return determine_if_is_date_field(field, field_schema)
+
+
+def build_sort_dicts(requested_sorts, request, doc_types=[], text_search=None):
+    '''
+    `text_search` not applicable for compound filtersets atm.. afaik... maybe we handle it later.
+    '''
+
+    sort = OrderedDict()
+    result_sort = OrderedDict()
+
+    if len(doc_types) == 1:
+        type_schema = request.registry[TYPES][doc_types[0]].schema
+    else:
+        type_schema = None
+
+    def add_to_sort_dict(requested_sort):
+        if requested_sort.startswith('-'):
+            name = requested_sort[1:]
+            order = 'desc'
+        else:
+            name = requested_sort
+            order = 'asc'
+
+        sort_schema = schema_for_field(name, request, doc_types)
+
+        if sort_schema:
+            sort_type = sort_schema.get('type')
+        else:
+            sort_type = 'string'
+
+        # ES type != schema types
+        if sort_type == 'integer':
+            sort['embedded.' + name] = result_sort[name] = {
+                'order': order,
+                'unmapped_type': 'long',
+                'missing': '_last'
+            }
+        elif sort_type == 'number':
+            sort['embedded.' + name] = result_sort[name] = {
+                'order': order,
+                'unmapped_type': 'float',
+                'missing': '_last'
+            }
+        elif sort_schema and determine_if_is_date_field(name, sort_schema):
+            sort['embedded.' + name + '.raw'] = result_sort[name] = {
+                'order': order,
+                'unmapped_type': 'date',
+                'missing': '_last'
+            }
+        else:
+            # fallback case, applies to all string type:string fields
+            sort['embedded.' + name + '.lower_case_sort'] = result_sort[name] = {
+                'order': order,
+                'unmapped_type': 'keyword',
+                'missing': '_last'
+            }
+
+
+    # Prefer sort order specified in request, if any
+    if requested_sorts:
+        for rs in requested_sorts:
+            add_to_sort_dict(rs)
+
+    # Otherwise we use a default sort only when there's no text search to be ranked
+    if not sort and (text_search == '*' or not text_search):
+        # If searching for a single type, look for sort options in its schema
+        if type_schema:
+            if 'sort_by' in type_schema:
+                for k, v in type_schema['sort_by'].items():
+                    # Should always sort on raw field rather than analyzed field
+                    # OR search on lower_case_sort for case insensitive results
+                    sort['embedded.' + k + '.lower_case_sort'] = result_sort[k] = v
+        # Default is most recent first, then alphabetical by label
+        if not sort:
+            sort['embedded.date_created.raw'] = result_sort['date_created'] = {
+                'order': 'desc',
+                'unmapped_type': 'keyword',
+            }
+            sort['embedded.label.raw'] = result_sort['label'] = {
+                'order': 'asc',
+                'missing': '_last',
+                'unmapped_type': 'keyword',
+            }
+
+    return (sort, result_sort)

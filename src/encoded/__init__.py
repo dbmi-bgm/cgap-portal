@@ -17,11 +17,11 @@ from dcicutils.ff_utils import get_health_page
 from sentry_sdk.integrations.pyramid import PyramidIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from pyramid.config import Configurator
-from pyramid_localroles import LocalRolesAuthorizationPolicy
+from .local_roles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
 from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
 from snovault.elasticsearch import APP_FACTORY
-from webtest import TestApp
+from dcicutils.misc_utils import VirtualApp
 from .ingestion_listener import INGESTION_QUEUE
 from .loadxl import load_all
 
@@ -80,7 +80,7 @@ def load_workbook(app, workbook_filename, docsdir):
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'IMPORT',
     }
-    testapp = TestApp(app, environ)
+    testapp = VirtualApp(app, environ)
     load_all(testapp, workbook_filename, docsdir)
 
 

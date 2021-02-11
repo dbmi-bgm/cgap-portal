@@ -1,6 +1,5 @@
 import pytest
 from webtest import AppError
-from .workbook_fixtures import app, workbook
 
 
 pytestmark = [pytest.mark.working, pytest.mark.search]
@@ -26,18 +25,18 @@ def barebones_filter_set():
     }
 
 
-def test_filter_set_barebones(workbook, testapp, barebones_filter_set):
+def test_filter_set_barebones(workbook, es_testapp, barebones_filter_set):
     """ Tests posting a filter set and executing it through the /compound_search route """
-    res = testapp.post_json(FILTER_SET_URL, barebones_filter_set, status=201).json
+    res = es_testapp.post_json(FILTER_SET_URL, barebones_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
-    testapp.post_json('/index', {})
+    es_testapp.post_json('/index', {})
 
     # execute given the @id of a filter_set
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
     assert len(compound_search_res) == 4
 
     # execute given flags only
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {
         'flags': [  # should have no effect, since no filter_blocks toggle it
             {
                 'name': 'project',
@@ -49,14 +48,14 @@ def test_filter_set_barebones(workbook, testapp, barebones_filter_set):
     assert len(compound_search_res) == 1
 
     # do it again, this time with a type that will return 404
-    testapp.post_json(COMPOUND_SEARCH_URL, {
+    es_testapp.post_json(COMPOUND_SEARCH_URL, {
         'flags': [  # should have no effect, since no filter_blocks toggle it
             {
-                'name': 'gene',
-                'query': '?type=Gene'
+                'name': 'trackingitem',
+                'query': '?type=TrackingItem'
             }
         ],
-        'search_type': 'Gene'
+        'search_type': 'TrackingItem'
     }, status=404)
 
 
@@ -83,14 +82,14 @@ def simple_filter_set():
     }
 
 
-def test_filter_set_simple(workbook, testapp, simple_filter_set):
+def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
     """ Test posting a non-trivial (but simple) filter set """
-    res = testapp.post_json(FILTER_SET_URL, simple_filter_set, status=201).json
+    res = es_testapp.post_json(FILTER_SET_URL, simple_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
-    testapp.post_json('/index', {})
+    es_testapp.post_json('/index', {})
 
     # execute filter_blocks only
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {
                                                 'filter_blocks': [{
                                                     'query': 'type=variant&CHROM=1',
                                                     'flags_applied': []
@@ -100,7 +99,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     assert len(compound_search_res) == 4
 
     # execute given flags only
-    compound_search_res = testapp.post_json('/compound_search', {
+    compound_search_res = es_testapp.post_json('/compound_search', {
         'flags': [  # should have no effect, since no filter_blocks toggle it
             {
                 'name': 'project',
@@ -112,7 +111,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     assert len(compound_search_res) == 1
 
     # execute the same search using filter_blocks and flags
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {
         'filter_blocks': [{
             'query': 'CHROM=1',
             'flags_applied': ['variant']
@@ -128,7 +127,7 @@ def test_filter_set_simple(workbook, testapp, simple_filter_set):
     assert len(compound_search_res) == 4
 
     # do similar search with @id
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
     assert len(compound_search_res) == 1
 
 
@@ -159,13 +158,13 @@ def typical_filter_set():
     }
 
 
-def test_filter_set_typical(workbook, testapp, typical_filter_set):
+def test_filter_set_typical(workbook, es_testapp, typical_filter_set):
     """ Executes a filter set with multiple filter blocks """
-    res = testapp.post_json(FILTER_SET_URL, typical_filter_set, status=201).json
+    res = es_testapp.post_json(FILTER_SET_URL, typical_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
 
     # execute the more complicated filter_set by @id
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
     assert len(compound_search_res) == 3
 
 
@@ -201,15 +200,15 @@ def complex_filter_set():
     }
 
 
-def test_filter_set_complex(workbook, testapp, complex_filter_set):
+def test_filter_set_complex(workbook, es_testapp, complex_filter_set):
     """ Executes a 'complex' filter set, toggling and re-searching with certain blocks disabled """
-    res = testapp.post_json(FILTER_SET_URL, complex_filter_set, status=201).json
+    res = es_testapp.post_json(FILTER_SET_URL, complex_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
     t = res['@graph'][0]['search_type']
     filter_blocks = res['@graph'][0]['filter_blocks']
     flags = res['@graph'][0]['flags']
 
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
     assert len(compound_search_res) == 4  # all variants will match
 
     # Modify POS
@@ -223,11 +222,11 @@ def test_filter_set_complex(workbook, testapp, complex_filter_set):
         if 'POS' in query:
             block['query'] = 'POS.from=0&POS.to=80000'  # excludes 1/4 variants
             break
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 3
 
 
-def test_filter_set_intersection(workbook, testapp, complex_filter_set):
+def test_filter_set_intersection(workbook, es_testapp, complex_filter_set):
     """ Uses the complex filter set with an AND filter_set execution, which should be
         functionally identical but will show slightly different results.
     """
@@ -240,7 +239,7 @@ def test_filter_set_intersection(workbook, testapp, complex_filter_set):
         'flags': flags,
         'intersect': True
     }
-    testapp.post_json(COMPOUND_SEARCH_URL, filter_set, status=404)  # AND will eliminate all here
+    es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set, status=404)  # AND will eliminate all here
 
 
 @pytest.fixture
@@ -283,27 +282,27 @@ def filter_set_with_many_flags():
     }
 
 
-def test_filter_set_selectively_apply_flags(workbook, testapp, filter_set_with_many_flags):
+def test_filter_set_selectively_apply_flags(workbook, es_testapp, filter_set_with_many_flags):
     """ Executes a complex filter set with multiple flags added selectively across fields """
     filter_set = filter_set_with_many_flags
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 2
 
     # add chr=2 flag, giving no results
     for filter_block in filter_set['filter_blocks']:
         filter_block['flags_applied'].append('hg19_chrom_is_two')
-    testapp.post_json(COMPOUND_SEARCH_URL, filter_set, status=404)
+    es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set, status=404)
 
     # disable all flags, still only giving 2 results
     for filter_block in filter_set['filter_blocks']:
         filter_block['flags_applied'] = []
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 2
 
     # enable multiple flags, which should disqualify 1/2 remaining variants
     for filter_block in filter_set['filter_blocks']:
         filter_block['flags_applied'] = ['variant_chrom', 'position_lower_bound']
-    compound_search_res = testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 1
 
 
@@ -311,17 +310,6 @@ def test_filter_set_selectively_apply_flags(workbook, testapp, filter_set_with_m
 # the compound_search route, NOT with filter_sets themselves. In particular, we test /search
 # redirects for certain types of filter_sets that we know don't need to proceed through the
 # entire process. - Will 06/17/2020
-
-
-def execute_and_verify_generator_search(testapp, filter_set, expected):
-    """ Iterates through generator returned in json_response, comparing number of entries
-        to the number expected
-    """
-    filter_set['return_generator'] = True
-    count = 0
-    for _ in testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json:
-        count += 1
-    assert count == expected
 
 
 @pytest.fixture
@@ -332,16 +320,13 @@ def filter_set_with_only_flags():
     }
 
 
-def test_compound_search_only_global_flags(workbook, testapp, filter_set_with_only_flags):
+def test_compound_search_only_global_flags(workbook, es_testapp, filter_set_with_only_flags):
     """ Tests compound search with a filter set that has only flags
         /search redirect is functioning if we get correct facets on the response, which are checked
         explicitly for correctness in this test.
     """
-    resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_only_flags).json
+    resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_only_flags).json
     assert len(resp['@graph']) == 4
-
-    # do generator search
-    execute_and_verify_generator_search(testapp, filter_set_with_only_flags, 4)
 
 
 @pytest.fixture
@@ -356,16 +341,13 @@ def filter_set_with_single_filter_block():
     }
 
 
-def test_compound_search_single_filter_block(workbook, testapp, filter_set_with_single_filter_block):
+def test_compound_search_single_filter_block(workbook, es_testapp, filter_set_with_single_filter_block):
     """ Tests compound search with a filter set with only one filter_block.
         /search redirect is functioning if we get facets on the response.
     """
-    resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block).json
+    resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block).json
     assert len(resp['@graph']) == 1
     assert 'facets' in resp
-
-    # do generator search
-    execute_and_verify_generator_search(testapp, filter_set_with_single_filter_block, 1)
 
 
 @pytest.fixture
@@ -386,17 +368,13 @@ def filter_set_with_single_filter_block_and_flags():
     }
 
 
-def test_compound_search_filter_and_flags(workbook, testapp, filter_set_with_single_filter_block_and_flags):
+def test_compound_search_filter_and_flags(workbook, es_testapp, filter_set_with_single_filter_block_and_flags):
     """ Tests compound search with a filter set that has one filter block and flags
         /search redirect is functioning if we get facets on the response.
     """
-    resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block_and_flags).json
+    resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block_and_flags).json
     assert len(resp['@graph']) == 1
     assert 'facets' in resp
-
-    # do generator search
-    execute_and_verify_generator_search(testapp, filter_set_with_single_filter_block_and_flags, 1)
-    filter_set_with_single_filter_block_and_flags['return_generator'] = False  # undo side-effect
 
 
 @pytest.fixture
@@ -404,11 +382,11 @@ def filter_set_with_multiple_disabled_flags():
     return {
         'search_type': 'Variant',
         'filter_blocks': [{
-            'query': '?type=Variant&POS.from=0&POS.to=10000000',
+            'query': 'POS.from=0&POS.to=10000000',
             'flags_applied': []
         },
         {
-            'query': '?type=Variant&REF=A',
+            'query': 'REF=A',
             'flags_applied': []
         }],
         'global_flags': '?type=Variant',
@@ -421,15 +399,10 @@ def filter_set_with_multiple_disabled_flags():
     }
 
 
-def test_compound_search_disabled_flags(workbook, testapp, filter_set_with_multiple_disabled_flags):
+def test_compound_search_disabled_flags(workbook, es_testapp, filter_set_with_multiple_disabled_flags):
     """ Tests a compound search with all flags disabled (raw filter_blocks + global_flags). """
-    resp = testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_multiple_disabled_flags).json
+    resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_multiple_disabled_flags).json
     assert len(resp['@graph']) == 2
-
-    # do generator search
-    execute_and_verify_generator_search(testapp, filter_set_with_multiple_disabled_flags, 2)
-    filter_set_with_multiple_disabled_flags['limit'] = 1
-    execute_and_verify_generator_search(testapp, filter_set_with_multiple_disabled_flags, 2)
 
 
 @pytest.fixture
@@ -439,7 +412,7 @@ def request_with_lots_of_results():
     }
 
 
-def test_compound_search_from_to(workbook, testapp, request_with_lots_of_results):
+def test_compound_search_from_to(workbook, es_testapp, request_with_lots_of_results):
     """ Tests pagination + generator with compound searches """
     paginated_request = request_with_lots_of_results  # since we have a lot of results, paginate through them
 
@@ -448,7 +421,7 @@ def test_compound_search_from_to(workbook, testapp, request_with_lots_of_results
         paginated_request['from'] = from_
         paginated_request['limit'] = limit
         with pytest.raises(AppError):
-            testapp.post_json(COMPOUND_SEARCH_URL, paginated_request)
+            es_testapp.post_json(COMPOUND_SEARCH_URL, paginated_request)
     test_failure(0, -5)
     test_failure(-5, 0)
     test_failure(-3, 1)
@@ -456,16 +429,11 @@ def test_compound_search_from_to(workbook, testapp, request_with_lots_of_results
     # attempt to paginate
     paginated_request['from'] = 5
     paginated_request['limit'] = 10
-    resp = testapp.post_json(COMPOUND_SEARCH_URL, paginated_request).json
+    resp = es_testapp.post_json(COMPOUND_SEARCH_URL, paginated_request).json
     assert len(resp['@graph']) == 10
 
-    # attempt with generator
-    paginated_request['from'] = 0
-    paginated_request['limit'] = 10
-    execute_and_verify_generator_search(testapp, paginated_request, 10)
 
-
-def test_compound_search_rejects_malformed_filter_sets(testapp):
+def test_compound_search_rejects_malformed_filter_sets(workbook, es_testapp):
     """ Tests passing a bunch of malformed filter_sets raises an error. """
     filter_set_without_filter_block_sub_fields = {
         'search_type': 'Variant',
@@ -476,14 +444,14 @@ def test_compound_search_rejects_malformed_filter_sets(testapp):
         ]
     }
     with pytest.raises(AppError):
-        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
+        es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
     filter_set_without_filter_block_sub_fields['filter_blocks'][0]['flags_applied'] = []
     del filter_set_without_filter_block_sub_fields['filter_blocks'][0]['query']  # no query
     with pytest.raises(AppError):
-        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
+        es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
     filter_set_without_filter_block_sub_fields['filter_blocks'][0]['query'] = ['hello']  # bad type
     with pytest.raises(AppError):
-        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
+        es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
 
     filter_set_without_flag_sub_fields = {
         'search_type': 'Variant',
@@ -494,11 +462,11 @@ def test_compound_search_rejects_malformed_filter_sets(testapp):
         ]
     }
     with pytest.raises(AppError):
-        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
+        es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
     filter_set_without_flag_sub_fields['flags'][0]['query'] = 'type=Variant'
     del filter_set_without_flag_sub_fields['flags'][0]['name']  # no name
     with pytest.raises(AppError):
-        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
+        es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
     filter_set_without_flag_sub_fields['flags'][0]['name'] = 5  # bad type
     with pytest.raises(AppError):
-        testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)
+        es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_flag_sub_fields)

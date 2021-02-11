@@ -6,10 +6,11 @@ import boto3
 import contextlib
 import json
 import logging
+import os
 import re
 import traceback
 
-from dcicutils.misc_utils import ignored, check_true
+from dcicutils.misc_utils import ignored, check_true, PRINT
 from snovault import collection, load_schema
 from pyramid.request import Request
 from pyramid.security import Allow, Deny, Everyone
@@ -18,24 +19,25 @@ from .base import (
     # TODO: Maybe collect all these permission styles into a single file, give them symbolic names,
     #       and permit only the symbolic names to be used in each situation so we can curate a full inventory of modes.
     #       -kmp 26-Jul-2020
-    ALLOW_SUBMITTER_ADD,
+    # Ticket C4-332
+    ALLOW_PROJECT_MEMBER_ADD_ACL,
 )
-from .institution import (
-    ONLY_ADMIN_VIEW,
+from .base import (
+    ONLY_ADMIN_VIEW_ACL,
 )
 from ..util import (
     debuglog, subrequest_item_creation, beanstalk_env_from_registry, create_empty_s3_file, s3_output_stream
 )
 from ..ingestion.common import metadata_bundles_bucket, get_parameter
 
-ALLOW_SUBMITTER_VIEW = (
-    # TODO: There is an issue here where we want a logged in user remotely only to view this
-    #       but if we are proxying for them internall we want to be able to view OR edit.
-    #       There is never reason for a user outside the system to update this status. -kmp 26-Jul-2020
-    []  # Special additional permissions might go here.
-    + ALLOW_SUBMITTER_ADD  # Is this right? See note above.
-    + ONLY_ADMIN_VIEW      # Slightly misleading name. Allows admins to edit, too, actually. But only they can view.
-)
+# ALLOW_SUBMITTER_VIEW_ACL = (
+#     # TODO: There is an issue here where we want a logged in user remotely only to view this
+#     #       but if we are proxying for them internall we want to be able to view OR edit.
+#     #       There is never reason for a user outside the system to update this status. -kmp 26-Jul-2020
+#     []  # Special additional permissions might go here.
+#     + ALLOW_PROJECT_MEMBER_ADD_ACL  # Is this right? See note above.
+#     + ONLY_ADMIN_VIEW_ACL     # Slightly misleading name. Allows admins to edit, too, actually. But only they can view.
+# )
 
 
 class SubmissionFolio:
@@ -58,6 +60,7 @@ class SubmissionFolio:
         # that accesses to these instance variables are legit. -kmp 27-Aug-2020
         self.object_name = None
         self.parameters = None
+        self.resolution = None
 
     def __str__(self):
         return "<SubmissionFolio(%s) %s>" % (self.ingestion_type, self.submission_id)
@@ -70,46 +73,42 @@ class SubmissionFolio:
     def submission_uri(self):
         return self.make_submission_uri(self.submission_id)
 
-    SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)/?$')
-
-    @classmethod
-    def create_item(cls, request, institution, project, ingestion_type):
-        json_body = {
-            "ingestion_type": ingestion_type,
-            "institution": institution,
-            "project": project,
-            "processing_status": {
-                "state": "submitted"
-            }
-        }
-        guid = None
-        item_url, res_json = None, None
-        try:
-            res_json = subrequest_item_creation(request=request, item_type='IngestionSubmission', json_body=json_body)
-            [item_url] = res_json['@graph']
-            matched = cls.SUBMISSION_PATTERN.match(item_url)
-            if matched:
-                guid = matched.group(1)
-        except Exception as e:
-            logging.error("%s: %s" % (e.__class__.__name__, e))
-            pass
-        check_true(guid, "Guid was not extracted from %s in %s" % (item_url, json.dumps(res_json)))
-        return guid
-
     def patch_item(self, **kwargs):
         res = self.vapp.patch_json(self.submission_uri, kwargs)
         [item] = res.json['@graph']
         debuglog(json.dumps(item))
 
+    def note_additional_datum(self, key, from_dict, from_key=None, default=None):
+        self.other_details['additional_data'] = additional_data = (
+            self.other_details.get('additional_data', {})
+        )
+        additional_data[key] = from_dict.get(from_key or key, default)
+
     @contextlib.contextmanager
-    def processing_context(self, submission):
+    def s3_output(self, key_name, key_type='txt'):
+        key = "%s/%s.%s" % (self.submission_id, key_name, key_type)
+        self.resolution[key_name] = key
+        with s3_output_stream(self.s3_client, bucket=self.bucket, key=key) as fp:
+            yield fp
 
-        submission.log.info("Processing {submission_id} as {ingestion_type}."
-                            .format(submission_id=submission.submission_id, ingestion_type=submission.ingestion_type))
+    def fail(self):
+        self.outcome = 'failure'
 
-        submission_id = submission.submission_id
+    def succeed(self):
+        self.outcome = 'success'
+
+    def is_done(self):
+        return self.outcome != 'unknown'
+
+    @contextlib.contextmanager
+    def processing_context(self):
+
+        self.log.info("Processing {submission_id} as {ingestion_type}."
+                      .format(submission_id=self.submission_id, ingestion_type=self.ingestion_type))
+
+        submission_id = self.submission_id
         manifest_key = "%s/manifest.json" % submission_id
-        response = submission.s3_client.get_object(Bucket=submission.bucket, Key=manifest_key)
+        response = self.s3_client.get_object(Bucket=self.bucket, Key=manifest_key)
         manifest = json.load(response['Body'])
 
         self.object_name = object_name = manifest['object_name']
@@ -119,7 +118,7 @@ class SubmissionFolio:
         debuglog(submission_id, "parameters:", parameters)
 
         started_key = "%s/started.txt" % submission_id
-        create_empty_s3_file(submission.s3_client, bucket=submission.bucket, key=started_key)
+        create_empty_s3_file(self.s3_client, bucket=self.bucket, key=started_key)
 
         # PyCharm thinks this is unused. -kmp 26-Jul-2020
         # data_stream = submission.s3_client.get_object(Bucket=submission.bucket, Key="%s/manifest.json" % submission_id)['Body']
@@ -131,42 +130,71 @@ class SubmissionFolio:
         }
 
         try:
-            submission.patch_item(submission_id=submission_id,
-                                  object_name=object_name,
-                                  parameters=parameters,
-                                  processing_status={"state": "processing"})
+            self.patch_item(submission_id=submission_id,
+                            object_name=object_name,
+                            parameters=parameters,
+                            processing_status={"state": "processing"})
+
+            self.resolution = resolution
 
             yield resolution
 
-            submission.patch_item(processing_status={"state": "done", "outcome": submission.outcome, "progress": "complete"},
-                                  **submission.other_details)
+            if not self.is_done():
+                self.succeed()
+
+            self.patch_item(processing_status={"state": "done", "outcome": self.outcome, "progress": "complete"},
+                            **self.other_details)
 
         except Exception as e:
 
             resolution["traceback_key"] = traceback_key = "%s/traceback.txt" % submission_id
-            with s3_output_stream(submission.s3_client, bucket=submission.bucket, key=traceback_key) as fp:
+            with s3_output_stream(self.s3_client, bucket=self.bucket, key=traceback_key) as fp:
                 traceback.print_exc(file=fp)
 
             resolution["error_type"] = e.__class__.__name__
             resolution["error_message"] = str(e)
 
-            submission.patch_item(
+            self.patch_item(
                 errors=["%s: %s" % (e.__class__.__name__, e)],
                 processing_status={
-                "state": "done",
-                "outcome": "error",
-                "progress": "incomplete"
-            })
+                    "state": "done",
+                    "outcome": "error",
+                    "progress": "incomplete"
+                }
+            )
 
-        with s3_output_stream(submission.s3_client,
-                              bucket=submission.bucket,
+        with s3_output_stream(self.s3_client,
+                              bucket=self.bucket,
                               key="%s/resolution.json" % submission_id) as fp:
-            print(json.dumps(resolution, indent=2), file=fp)
+            PRINT(json.dumps(resolution, indent=2), file=fp)
 
+    def process_standard_bundle_results(self, bundle_result):
+
+        # Next several files are created only if relevant.
+
+        if bundle_result.get('result'):
+            with self.s3_output(key_name='submission.json', key_type='json') as fp:
+                print(json.dumps(bundle_result['result'], indent=2), file=fp)
+                self.note_additional_datum('result', from_dict=bundle_result, default={})
+
+        if bundle_result.get('post_output'):
+            with self.s3_output(key_name='submission_response') as fp:
+                self.show_report_lines(bundle_result['post_output'], fp)
+                self.note_additional_datum('post_output', from_dict=bundle_result, default=[])
+
+        if bundle_result.get('upload_info'):
+            with self.s3_output(key_name='upload_info') as fp:
+                print(json.dumps(bundle_result['upload_info'], indent=2), file=fp)
+                self.note_additional_datum('upload_info', from_dict=bundle_result, default=[])
+
+    @staticmethod
+    def show_report_lines(lines, fp, default="Nothing to report."):
+        for line in lines or ([default] if default else []):
+            print(line, file=fp)
 
 @collection(
     name='ingestion-submissions',
-    acl=ALLOW_SUBMITTER_VIEW,
+    # acl=ALLOW_SUBMITTER_VIEW_ACL,
     unique_key='object_name',
     properties={
         'title': 'Ingestion Submissions',

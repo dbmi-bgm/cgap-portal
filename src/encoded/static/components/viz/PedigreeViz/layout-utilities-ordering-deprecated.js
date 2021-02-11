@@ -82,7 +82,7 @@ export function orderObjectGraph2(objectGraph, relationships = null){
     orderByHeightIndex.forEach(function(nodesInRow, hi){
         const generationRomanNumeral = numberToRomanNumeral(heightIndicesCount - hi);
         nodesInRow.reduce(function(currNum, n){
-            if ( isRelationship(n) ) return currNum;
+            if ( isRelationshipNode(n) ) return currNum;
             n.orderBasedName = "" + generationRomanNumeral + " – " + currNum;
             if (n.isProband) {
                 // Append "p" if proband
@@ -194,7 +194,7 @@ function initOrdering(objectGraph, startIndividuals = null, direction = "childre
 
             assignOrder(node);
 
-            if (isRelationship(node)){
+            if (isRelationshipNode(node)){
                 if (direction === "parents" && partners){
                     partners.sort(sortByAncestorCount).sort(sortPartnersByGender).forEach(addToQ);
                 } else if (direction === "children" && children){
@@ -358,10 +358,10 @@ function heuristicallyAdjustOrder(order){
             const nodeSet = nodesInRow.slice(i, i+3);
             if (nodeSet.length < 3) continue;
             const [ leftNode, centerNode, rightNode ] = nodeSet;
-            if (leftNode.gender === "male" || isRelationship(leftNode)){
+            if (leftNode.gender === "male" || isRelationshipNode(leftNode)){
                 continue;
             }
-            if (rightNode.gender !== "male" || isRelationship(rightNode)){
+            if (rightNode.gender !== "male" || isRelationshipNode(rightNode)){
                 continue;
             }
             if (leftNode._maritalRelationships.length > 1 || rightNode._maritalRelationships.length > 1){
@@ -370,7 +370,7 @@ function heuristicallyAdjustOrder(order){
             if (leftNode._parentalRelationship && rightNode._parentalRelationship){
                 continue;
             }
-            if (!isRelationship(centerNode) || centerNode.partners.indexOf(leftNode) === -1 || centerNode.partners.indexOf(rightNode) === -1){
+            if (!isRelationshipNode(centerNode) || centerNode.partners.indexOf(leftNode) === -1 || centerNode.partners.indexOf(rightNode) === -1){
                 continue;
             }
             swapOrder(nodesInRow, seenOrderInIndex, i, i+2);
@@ -383,14 +383,14 @@ function heuristicallyAdjustOrder(order){
         for (let i = 0; i < rowLen; i++){
             const node = nodesInRow[i];
             if (currGroup.length === 0){
-                if (isRelationship(node)) continue;
+                if (isRelationshipNode(node)) continue;
                 if (!node._parentalRelationship) continue;
                 if (node._maritalRelationships.length > 0) continue;
                 currGroup.push(node);
                 currGroupStartIdx = i;
                 continue;
             }
-            if (isRelationship(node) ||
+            if (isRelationshipNode(node) ||
                 !node._parentalRelationship ||
                 node._parentalRelationship !== currGroup[0]._parentalRelationship ||
                 node._maritalRelationships.length > 0

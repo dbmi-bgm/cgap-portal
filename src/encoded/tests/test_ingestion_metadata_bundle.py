@@ -1,5 +1,6 @@
 import boto3
 import botocore.exceptions
+import contextlib
 import datetime as datetime_module
 import io
 import json
@@ -127,29 +128,8 @@ def file_contents(filename, binary=False):
         return fp.read()
 
 
-def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_status=200):
-
-    class ControlledTimeWithFix(ControlledTime):
-
-        def just_utcnow(self):
-            return self.just_now().astimezone(pytz.UTC).replace(tzinfo=None)
-
-    dt = ControlledTimeWithFix()
-
-    ingestion_type = 'metadata_bundle'
-
-    mocked_queue_manager = MockQueueManager(expected_ingestion_type='metadata_bundle')
-
-    post_files = [("datafile", METADATA_BUNDLE_PATH)]
-
-    post_data = {
-        'ingestion_type': ingestion_type,
-        'institution': DBMI_INSTITUTION,
-        'project': TEST_PROJECT,
-        'validate_only': True,
-    }
-
-    fake_tester_email = "test@cgap.hms.harvard.edu"
+@contextlib.contextmanager
+def authorized_ingestion_simulation(mocked_queue_manager, mocked_s3_client, test_pseudoenv, fake_tester_email, dt):
 
     def mocked_get_trusted_email(request, context, raise_errors):
         assert context is "Submission"
@@ -158,8 +138,6 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
             return fake_tester_email
         else:
             return None
-
-    test_pseudoenv = "fourfront-cgaplocal-test"
 
     with mock.patch.object(ingestion_listener_module, "get_trusted_email", mocked_get_trusted_email):
         with mock.patch.object(datetime_module, "datetime", dt):
@@ -174,66 +152,101 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
                                 with mock.patch.object(ingestion_module, "subrequest_item_creation",
                                                        expect_unreachable_in_mock("subrequest_item_creation")):
 
-                                    response = testapp.post(SUBMIT_FOR_INGESTION, post_data, upload_files=post_files,
-                                                            content_type='multipart/form-data', status=expected_status)
+                                    yield mock_submission_folio_class
 
-                                    assert response.status_code == expected_status, (
-                                        "Expected response status %s but got %s."
-                                        % (expected_status, response.status_code)
-                                    )
 
-                                    # The FakeGuid facility makes ids sequentially, so we can predict we'll get
-                                    # one guid added to our mock queue. This test doesn't test the queue processing,
-                                    # only that something ends up passed off to thq queue.
-                                    expected_guid = '000-0000-001'
+def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_status=200):
 
-                                    assert mocked_queue_manager.uuids == [expected_guid]
+    class ControlledTimeWithFix(ControlledTime):
 
-                                    assert mock_submission_folio_class.items_created == [expected_guid]
+        def just_utcnow(self):
+            return self.just_now().astimezone(pytz.UTC).replace(tzinfo=None)
 
-                                    s3_file_system = mocked_s3_client.s3_files.files
+    dt = ControlledTimeWithFix()
 
-                                    expected_bucket = "elasticbeanstalk-fourfront-cgaplocal-test-metadata-bundles"
+    mocked_queue_manager = MockQueueManager(expected_ingestion_type='metadata_bundle')
 
-                                    datafile_short_name = "datafile.xlsx"
-                                    manifest_short_name = "manifest.json"
+    test_pseudoenv = "fourfront-cgaplocal-test"
 
-                                    datafile_key = os.path.join(expected_guid, datafile_short_name)
-                                    manifest_key = os.path.join(expected_guid, manifest_short_name)
+    fake_tester_email = "test@cgap.hms.harvard.edu"
 
-                                    datafile_name = os.path.join(expected_bucket, datafile_key)
-                                    manifest_name = os.path.join(expected_bucket, manifest_key)
+    with authorized_ingestion_simulation(mocked_queue_manager=mocked_queue_manager,
+                                         mocked_s3_client=mocked_s3_client,
+                                         dt=dt,
+                                         test_pseudoenv=test_pseudoenv,
+                                         fake_tester_email=fake_tester_email) as mock_submission_folio_class:
 
-                                    assert set(s3_file_system.keys()) == {datafile_name, manifest_name}
+        ingestion_type = 'metadata_bundle'
 
-                                    assert s3_file_system[datafile_name] == file_contents(METADATA_BUNDLE_PATH,
-                                                                                          binary=True)
+        post_files = [("datafile", METADATA_BUNDLE_PATH)]
 
-                                    assert json.loads(s3_file_system[manifest_name].decode('utf-8')) == {
-                                        "filename": METADATA_BUNDLE_PATH,
-                                        "object_name": datafile_key,
-                                        "submission_id": expected_guid,
-                                        "submission_uri": "/ingestion-submissions/000-0000-001",
-                                        "beanstalk_env_is_prd": False,
-                                        "beanstalk_env": test_pseudoenv,
-                                        "bucket": expected_bucket,
-                                        "authenticated_userid": "remoteuser.TEST",
-                                        "email": fake_tester_email,
-                                        "success": True,
-                                        "message": "Uploaded successfully.",
+        post_data = {
+            'ingestion_type': ingestion_type,
+            'institution': DBMI_INSTITUTION,
+            'project': TEST_PROJECT,
+            'validate_only': True,
+        }
 
-                                        "upload_time": dt.just_utcnow().isoformat(),
-                                        "parameters": {
-                                            "ingestion_type": ingestion_type,
-                                            "institution": DBMI_INSTITUTION,
-                                            "project": TEST_PROJECT,
-                                            "validate_only": "True",
-                                            "datafile": METADATA_BUNDLE_PATH,
-                                        },
-                                    }
+        response = testapp.post(SUBMIT_FOR_INGESTION, post_data, upload_files=post_files,
+                                content_type='multipart/form-data', status=expected_status)
 
-                                    # Make sure we report success from the endpoint
-                                    assert response.status_code == 200
+        assert response.status_code == expected_status, (
+            "Expected response status %s but got %s."
+            % (expected_status, response.status_code)
+        )
+
+        # The FakeGuid facility makes ids sequentially, so we can predict we'll get
+        # one guid added to our mock queue. This test doesn't test the queue processing,
+        # only that something ends up passed off to thq queue.
+        expected_guid = '000-0000-001'
+
+        assert mocked_queue_manager.uuids == [expected_guid]
+
+        assert mock_submission_folio_class.items_created == [expected_guid]
+
+        s3_file_system = mocked_s3_client.s3_files.files
+
+        expected_bucket = "elasticbeanstalk-fourfront-cgaplocal-test-metadata-bundles"
+
+        datafile_short_name = "datafile.xlsx"
+        manifest_short_name = "manifest.json"
+
+        datafile_key = os.path.join(expected_guid, datafile_short_name)
+        manifest_key = os.path.join(expected_guid, manifest_short_name)
+
+        datafile_name = os.path.join(expected_bucket, datafile_key)
+        manifest_name = os.path.join(expected_bucket, manifest_key)
+
+        assert set(s3_file_system.keys()) == {datafile_name, manifest_name}
+
+        assert s3_file_system[datafile_name] == file_contents(METADATA_BUNDLE_PATH,
+                                                              binary=True)
+
+        assert json.loads(s3_file_system[manifest_name].decode('utf-8')) == {
+            "filename": METADATA_BUNDLE_PATH,
+            "object_name": datafile_key,
+            "submission_id": expected_guid,
+            "submission_uri": "/ingestion-submissions/000-0000-001",
+            "beanstalk_env_is_prd": False,
+            "beanstalk_env": test_pseudoenv,
+            "bucket": expected_bucket,
+            "authenticated_userid": "remoteuser.TEST",
+            "email": fake_tester_email,
+            "success": True,
+            "message": "Uploaded successfully.",
+
+            "upload_time": dt.just_utcnow().isoformat(),
+            "parameters": {
+                "ingestion_type": ingestion_type,
+                "institution": DBMI_INSTITUTION,
+                "project": TEST_PROJECT,
+                "validate_only": "True",
+                "datafile": METADATA_BUNDLE_PATH,
+            },
+        }
+
+        # Make sure we report success from the endpoint
+        assert response.status_code == 200
 
 
 # This runs the standard test pretty much as expected.

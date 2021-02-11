@@ -11,8 +11,9 @@ from .search_utils import (
     find_nested_path, convert_search_to_dictionary,
     QueryConstructionException,
     COMMON_EXCLUDED_URI_PARAMS, QUERY, FILTER, MUST, MUST_NOT, BOOL, MATCH, SHOULD,
-    EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED,
-    schema_for_field, get_query_field, search_log,
+    EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED, STATS,
+    schema_for_field, get_query_field, search_log, MAX_FACET_COUNTS,
+
 )
 
 
@@ -118,23 +119,27 @@ class LuceneBuilder:
                         continue
 
                 # Build must/must_not sub-queries
+                # Example:
+                # {'bool': {'must': {'bool':
+                #   {'should': [{'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.12185956del'}},
+                #               {'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.11901816A>T'}}
+                #               ]}}}}
+                # This is a "normal" query that we must convert to a "nested" sub-query on nested_path
                 must_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_terms')
                 must_not_terms = cls.construct_nested_sub_queries(query_field, filters, key='must_not_terms')
 
-                # XXX: BREAKING ES 6 CHANGE
-                # MUST -> MUST_NOT EXISTS does not work?
-                # Have to use EXISTS under MUST_NOT
+                # XXX: In ES6, MUST -> MUST_NOT EXISTS does not work - have to use EXISTS under MUST_NOT
+                # This means you cannot search on field=value or field DNE
                 if filters['add_no_value'] is True:  # when searching on 'No Value'
-                    should_arr = [must_terms] if must_terms else []
+                    should_arr = [must_not_terms] if must_not_terms else []
                     should_arr.append({BOOL: {MUST: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
                     must_not_filters_nested.append((query_field, should_arr))
-                elif filters['add_no_value'] is False:  # when not searching on 'No Value'
+                    if must_terms: must_filters_nested.append((query_field, must_terms))
+                else:  # when not searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
                     should_arr.append({EXISTS: {FIELD: query_field}})   # field=value OR field EXISTS
                     must_filters_nested.append((query_field, should_arr))
-                else:
-                    if must_terms: must_filters_nested.append((query_field, must_terms))
-                if must_not_terms: must_not_filters_nested.append((query_field, must_not_terms))
+                    if must_not_terms: must_not_filters_nested.append((query_field, must_not_terms))
 
             # if we are not nested, handle this with 'terms' query like usual
             else:
@@ -264,12 +269,36 @@ class LuceneBuilder:
                 if type(query) == list:
                     if len(query) == 1:
                         query = query[0]
+
+                    # Handle queries with different query types ie: exists + match
+                    # Note: this kind of query will always return no results when combined with No value,
+                    # since the truth values are computed in separate clauses (in ES6). This limitation is
+                    # not ideal but needs a more well thought out solution.
+                    # TODO: refactor nested into normal query building step (not post-pass)
+                    # (always gives no results)
                     else:
-                        raise QueryConstructionException(
-                            query_type='nested',
-                            func='handle_nested_filters',
-                            msg='Malformed entry on query field: %s' % query
-                        )
+                        inner_query = []
+                        for _q in query:
+                            if BOOL in _q:
+                                inner = _q[BOOL].get(key, [])
+                            else:
+                                inner = _q
+                            if isinstance(inner, list):
+                                inner_query += inner
+                            else:
+                                inner_query.append(inner)
+                        if inner_query:
+                            final_filters[BOOL][key].append({
+                                NESTED: {
+                                    PATH: nested_path,
+                                    QUERY: {
+                                        BOOL: {
+                                            MUST: inner_query
+                                        }
+                                    }
+                                }
+                            })
+                        continue
 
                 # if there is no boolean clause in this sub-query, add it directly to final_filters
                 # otherwise continue logic below
@@ -380,7 +409,7 @@ class LuceneBuilder:
             qs = urlencode([
                 (k.encode('utf-8'), v.encode('utf-8'))
                 for k, v in request.normalized_params.items()
-                if (k != field or v != term)
+                if k != "limit" and k != "from" and not (k == field and v == term)
             ])
             remove_path = '{}?{}'.format(request.path, qs)
 
@@ -620,8 +649,27 @@ class LuceneBuilder:
             cls._check_and_remove(compare_field, facet_filters, active_filter, query_field, filter_type)
 
     @classmethod
+    def _check_and_remove_match_from_should(cls, query_options, facet_filters, active_filter, query_field,
+                                            filter_type):
+        """ Helper function that searches a MATCH query for the given query_field, removing the
+            active filter if found.
+        """
+        for inner_query in query_options:
+            if MATCH in inner_query:
+                for field in inner_query.get(MATCH, {}).keys():  # should be only one per block
+                    if cls._check_and_remove(field, facet_filters, active_filter, query_field,
+                                             filter_type):
+                        return
+            else:
+                search_log(log_handler=log, msg='Encountered a unexpected nested structure in '
+                                                'query: %s' % inner_query)
+
+    @classmethod
     def _check_and_remove_nested(cls, facet_filters, active_filter, query_field, filter_type):
-        """ Helper function for _remove_from_active_filters that handles filter removal for nested query """
+        """ Helper function for _remove_from_active_filters that handles filter removal for nested query
+            Reminder that this code is responsible for constructing the aggregation filter, hence the desire
+            to omit selections on the field we are aggregating on.
+        """
         nested_sub_query = active_filter[NESTED][QUERY]
 
         # For No value searches
@@ -633,13 +681,31 @@ class LuceneBuilder:
         elif BOOL in nested_sub_query:
             for inner_filter_type in [MUST, MUST_NOT]:
                 for nested_option in nested_sub_query[BOOL].get(inner_filter_type, []):
-
-                    # For structure like this:
-                    #   {'bool': {'must': [{'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.12185956del'}]
                     if isinstance(nested_option, dict):
-                        for field in nested_option.get(MATCH, {}).keys():  # should only be one per block
-                            if cls._check_and_remove(field, facet_filters, active_filter, query_field, filter_type):
-                                break
+
+                        # For structure like this:
+                        #   {'bool': {'must': [{'match': {'embedded.hg19.hg19_hgvsg.raw': 'NC_000001.11:g.12185956del'}]
+                        if MATCH in nested_option:
+                            for field in nested_option.get(MATCH, {}).keys():  # should only be one per block
+                                if cls._check_and_remove(field, facet_filters, active_filter, query_field, filter_type):
+                                    break
+
+                        # For structure like this:
+                        # {'bool': {'should':
+                        # [{'match': {'embedded.variant.genes.genes_most_severe_consequence.coding_effect.raw':
+                        #       'Missense'}},
+                        # {'match': {'embedded.variant.genes.genes_most_severe_consequence.coding_effect.raw':
+                        #       'Synonymous'}}]}}
+                        elif BOOL in nested_option:
+                            inner_inner_bool = nested_option[BOOL]
+                            if SHOULD in inner_inner_bool:
+                                cls._check_and_remove_match_from_should(inner_inner_bool[SHOULD], facet_filters,
+                                                                        active_filter,
+                                                                        query_field, filter_type)
+                        else:
+                            search_log(log_handler=log,
+                                       msg=('Encountered a unexpected nested structure at second level: %s'
+                                            % nested_sub_query[BOOL]))
 
                     # For structure like this:
                     #   {'bool': {'must': {'bool': {'should':
@@ -648,15 +714,19 @@ class LuceneBuilder:
                     elif isinstance(nested_option, str):
                         inner_bool = nested_sub_query[BOOL].get(inner_filter_type, {})
                         if SHOULD in inner_bool:
-                            for inner_query in inner_bool[SHOULD]:
-                                if MATCH in inner_query:
-                                    for field in inner_query.get(MATCH, {}).keys():  # should be only one per block
-                                        if cls._check_and_remove(field, facet_filters, active_filter, query_field,
-                                                                 filter_type):
-                                            break
-                                else:
-                                    search_log(log_handler=log, msg='Encountered a unexpected nested structure in '
-                                                                    'query: %s' % inner_query)
+                            cls._check_and_remove_match_from_should(inner_bool[SHOULD], facet_filters, active_filter,
+                                                                    query_field, filter_type)
+
+                        # For structure like this:
+                        # {'bool': {'should': [
+                        #    {'match': {'embedded.variant.genes.genes_most_severe_consequence.impact.raw': 'MODIFIER'}},
+                        #    {'match': {'embedded.variant.genes.genes_most_severe_consequence.impact.raw': 'LOW'}}]}}
+                        elif BOOL in inner_bool:
+                            inner_inner_bool = inner_bool[BOOL]
+                            if SHOULD in inner_inner_bool:
+                                cls._check_and_remove_match_from_should(inner_inner_bool[SHOULD], facet_filters, active_filter,
+                                                                        query_field, filter_type)
+
                     else:
                         search_log(log_handler=log, msg='Encountered a unexpected nested structure at top level: %s'
                                                         % nested_sub_query[BOOL])
@@ -702,6 +772,10 @@ class LuceneBuilder:
         :param string_query: query string if provided
         :return: Copy of search_filters, minus filter for current query_field (if one set).
         """
+        if not search_filters or BOOL not in search_filters:  # a sane default if this happens -Will 11/17/20
+            log.error('Encountered an unexpected query format: %s' % search_filters)
+            return {BOOL: {MUST: [{TERMS: {'principals_allowed.view': ['system.Everyone']}}]}}
+
         facet_filters = deepcopy(search_filters[BOOL])
 
         for filter_type in [MUST, MUST_NOT]:
@@ -714,7 +788,7 @@ class LuceneBuilder:
             # combine statements within 'must' for each
             facet_filters[MUST].append(string_query[MUST])
 
-        return facet_filters
+        return {BOOL: facet_filters}
 
     @staticmethod
     def set_additional_aggregations(search_as_dict, request, doc_types, extra_aggregations=None):
@@ -755,7 +829,7 @@ class LuceneBuilder:
     @staticmethod
     def fix_nested_aggregations(search, es_mapping):
         """
-        Unfortunately, elasticsearch_dsl will not update_from_dict with a nested aggregation (bug?), so we must
+        Unfortunately, elasticsearch_dsl will not update_from_dict with a nested terms aggregation (bug?), so we must
         update the search manually after processing all the "terms". This method handles that update in place.
         It does this in 3 steps: first by overwriting the current 'agg bucket' with a empty new one, recreating the
         'primary_agg' and adding a REVERSE_NESTED bucket called 'primary_agg_reverse_nested', which will contain the
@@ -765,14 +839,164 @@ class LuceneBuilder:
         :param es_mapping: mapping of this item
         """
         aggs_ptr = search.aggs['all_items']
+        nested_identifier = NESTED + ':'  # nested:field vs. terms:field/stats:field vs. stats:field_nested_name
         for agg in aggs_ptr:
-            if NESTED in agg and 'stats' not in agg:  # stats aggs are already correct
+            if nested_identifier in agg and STATS not in agg and RANGE not in agg:
                 (search.aggs['all_items'][agg]  # create a sub-bucket, preserving the boolean qualifiers
                  .bucket('primary_agg',
                          'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
                  .bucket('primary_agg',
-                         Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=100, missing='No value'))
+                         Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=MAX_FACET_COUNTS, missing='No value'))
                  .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
+
+    @staticmethod
+    def _build_nested_aggregation(sub_query, nested_path):
+        """ Builds a nested aggregation.
+
+            :param sub_query: query to use as the 'primary_agg'
+            :param nested_path: path to nested object we are searching on
+            :returns: the nested form of sub_query
+        """
+        return {
+            NESTED: {
+                PATH: nested_path
+            },
+            AGGS: {
+                'primary_agg': sub_query
+            }
+        }
+
+    @classmethod
+    def _add_stats_aggregation(cls, field, facet, field_schema, query_field, search_filters, string_query,
+                               nested_path, aggs, agg_name):
+        """ Builds a stats aggregation, adding it to the given aggs.
+
+            :param field: raw field name we are searching on (ex: AF)
+            :param facet: facet metadata
+            :param field_schema: schema for the field we are searching on
+            :param query_field: ES document field we are searching on (ex: embedded.AF)
+            :param search_filters: filters we are searching on
+            :param string_query: simple query string if specified
+            :param nested_path: path to nested object we are aggregating on
+            :param aggs: the aggregation object we are building
+            :param agg_name: name of the aggregation we are building
+        """
+        is_date_field = field_schema and determine_if_is_date_field(field, field_schema)
+        is_numerical_field = field_schema and field_schema['type'] in ("integer", "float", "number")
+        if is_date_field:
+            facet['field_type'] = 'date'
+        elif is_numerical_field:
+            facet["field_type"] = field_schema['type'] or "number"
+            if "number_step" not in facet:
+                if "number_step" in field_schema:
+                    facet["number_step"] = field_schema['number_step']
+                elif facet["field_type"] == "integer":
+                    facet["number_step"] = 1
+                else:  # Default
+                    facet["number_step"] = "any"
+        facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
+                                                                               string_query)
+        # stats aggregations could be nested too
+        stats_agg = {
+            STATS: {
+                'field': query_field
+            }
+        }
+        if nested_path:
+            facet['aggregation_type'] = 'nested:stats'
+            aggs[facet['aggregation_type'] + ':' + agg_name] = {
+                AGGS: {
+                    'primary_agg': cls._build_nested_aggregation(stats_agg, nested_path)
+                },
+                FILTER: facet_filters
+            }
+
+        else:
+            aggs[facet['aggregation_type'] + ":" + agg_name] = {
+                AGGS: {
+                    'primary_agg': stats_agg
+                },
+                FILTER: facet_filters
+            }
+
+    @staticmethod
+    def _build_range_aggregation(query_field, ranges):
+        """ Builds a range aggregation. """
+        return {
+            RANGE: {
+                FIELD: query_field,
+                'ranges': ranges
+            }
+        }
+
+    @classmethod
+    def _add_range_aggregation(cls, facet, query_field, search_filters, string_query, nested_path, aggs, agg_name):
+        """ Builds a range aggregation utilizing the ranges defined on schema facet, adding it to the given aggs.
+
+            :param facet: facet metadata
+            :param query_field: field we are searching on.
+            :param search_filters: filters we are searching on
+            :param string_query: simple query string if specified
+            :param nested_path: path to nested object we are aggregating on
+            :param aggs: the aggregation object we are building
+            :param agg_name: name of the aggregation we are building
+        """
+        facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
+                                                                               string_query)
+        ranges = [{k: v for k, v in r.items() if k in ['from', 'to']} for r in facet['ranges']]
+        range_agg = cls._build_range_aggregation(query_field, ranges)
+        if nested_path:
+            facet['aggregation_type'] = 'nested:range'
+            field = facet['aggregation_type'] + ':' + agg_name
+            range_agg = cls._build_nested_aggregation(range_agg, nested_path)
+        else:
+            facet['aggregation_type'] = RANGE
+            field = facet['aggregation_type'] + ':' + agg_name
+        aggs[field] = {
+            AGGS: {
+                'primary_agg': range_agg
+            },
+            FILTER: facet_filters
+        }
+
+    @staticmethod
+    def _build_terms_aggregation(query_field, facet):
+        """ Builds a terms aggregation. """
+        return {
+            TERMS: {
+                'size': MAX_FACET_COUNTS,
+                'field': query_field,
+                'missing': facet.get('missing_value_replacement', 'No value')
+            }
+        }
+
+    @classmethod
+    def _add_terms_aggregation(cls, facet, query_field, search_filters, string_query, nested_path, aggs, agg_name):
+        """ Builds a standard terms aggregation, setting a nested identifier to be repaired later
+            by elasticsearch_dsl, adding it to the given aggs.
+
+            :param facet: facet metadata
+            :param query_field: field we are searching on.
+            :param search_filters: filters we are searching on
+            :param string_query: simple query string if specified
+            :param nested_path: path to nested object we are aggregating on
+            :param aggs: the aggregation object we are building
+            :param agg_name: name of the aggregation we are building
+        """
+        if nested_path:
+            facet['aggregation_type'] = NESTED  # special in that it is used to identify (broken) facets - Will 11/17/20
+        else:
+            facet['aggregation_type'] = TERMS
+
+        facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
+                                                                               string_query)
+        terms_aggregation = cls._build_terms_aggregation(query_field, facet)
+        aggs[facet['aggregation_type'] + ":" + agg_name] = {
+            AGGS: {
+                'primary_agg': terms_aggregation
+            },
+            FILTER: facet_filters,
+        }
 
     @classmethod
     def build_facets(cls, search, facets, search_filters, string_query, request, doc_types,
@@ -793,83 +1017,21 @@ class LuceneBuilder:
         aggs = OrderedDict()
         for field, facet in facets:  # E.g. 'type','experimentset_type','experiments_in_set.award.project', ...
             field_schema = schema_for_field(field, request, doc_types, should_log=True)
-            is_date_field = field_schema and determine_if_is_date_field(field, field_schema)
-            is_numerical_field = field_schema and field_schema['type'] in ("integer", "float", "number")
             query_field = get_query_field(field, facet)
             nested_path = find_nested_path(query_field, es_mapping)
 
-            ## Create the aggregation itself, extend facet with info to pass down to front-end
+            # Build the aggregation based on its type (by side-effect) - stats, range or terms
             agg_name = field.replace('.', '-')
-            if facet.get('aggregation_type') == 'stats':
-
-                if is_date_field:
-                    facet['field_type'] = 'date'
-                elif is_numerical_field:
-                    facet["field_type"] = field_schema['type'] or "number"
-                    if "number_step" not in facet:
-                        if "number_step" in field_schema:
-                            facet["number_step"] = field_schema['number_step']
-                        elif facet["field_type"] == "integer":
-                            facet["number_step"] = 1
-                        else:  # Default
-                            facet["number_step"] = "any"
-                facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
-                                                                                       string_query)
-                # stats aggregations could be nested too
-                if nested_path:
-                    facet['aggregation_type'] = 'nested:stats'
-                    aggs[facet['aggregation_type'] + ':' + agg_name] = {
-                        AGGS: {
-                            'primary_agg': {
-                                NESTED: {
-                                    PATH: nested_path
-                                },
-                                AGGS: {
-                                    'primary_agg': {
-                                        'stats': {
-                                            'field': query_field
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        FILTER: {BOOL: facet_filters}
-                    }
-
-                else:
-                    aggs[facet['aggregation_type'] + ":" + agg_name] = {
-                        AGGS: {
-                            'primary_agg': {
-                                'stats': {
-                                    'field': query_field
-                                }
-                            }
-                        },
-                        FILTER: {BOOL: facet_filters}
-                    }
-
-            else:
-                if nested_path:
-                    facet['aggregation_type'] = NESTED
-                else:
-                    facet['aggregation_type'] = TERMS
-
-                facet_filters = cls.generate_filters_for_terms_agg_from_search_filters(query_field, search_filters,
-                                                                                       string_query)
-                term_aggregation = {
-                    TERMS: {
-                        'size': 100,
-                        # Maximum terms returned (default=10); see https://github.com/10up/ElasticPress/wiki/Working-with-Aggregations
-                        'field': query_field,
-                        'missing': facet.get("missing_value_replacement", "No value")
-                    }
-                }
-                aggs[facet['aggregation_type'] + ":" + agg_name] = {
-                    AGGS: {
-                        'primary_agg': term_aggregation
-                    },
-                    FILTER: {BOOL: facet_filters},
-                }
+            facet_type = facet.get('aggregation_type')
+            if facet_type in ['stats', 'nested:stats']:
+                cls._add_stats_aggregation(field, facet, field_schema, query_field, search_filters, string_query,
+                                           nested_path, aggs, agg_name)
+            elif facet_type in ['range', 'nested:range']:
+                cls._add_range_aggregation(facet, query_field, search_filters, string_query, nested_path,
+                                             aggs, agg_name)
+            else:  # assume terms
+                cls._add_terms_aggregation(facet, query_field, search_filters, string_query, nested_path,
+                                           aggs, agg_name)
 
             # Update facet with title, description from field_schema, if missing.
             if facet.get('title') is None and field_schema and 'title' in field_schema:

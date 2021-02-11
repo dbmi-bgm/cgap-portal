@@ -87,9 +87,7 @@ export class IndividualBody extends React.PureComponent {
             diseaseToIndex,
             session,
             href,
-            indvSchema,
-            docSchema,
-            imageSchema
+            schemas
         } = this.props;
         const {
             isLoadingIndividual,
@@ -154,7 +152,7 @@ export class IndividualBody extends React.PureComponent {
                     { ancestry ? <InlineDetailRow label="Ancestry" value={ancestry} /> : null }
                     <PhenotypicFeatures features={phenotypic_features} diseaseToIndex={diseaseToIndex} />
                     <ClinicianNotes individual={loadedIndividualItem || individualItem} haveEditPermission={haveEditPermission} />
-                    <FileWrapper individual={loadedIndividualItem || individualItem } {...{ haveEditPermission, indvSchema, docSchema, imageSchema }} />
+                    <FileWrapper individual={loadedIndividualItem || individualItem } {...{ haveEditPermission, schemas }} />
                     {/*
                     <div className="detail-row row" data-describing="parents">
                         <div className="col-12">
@@ -192,7 +190,6 @@ function InlineDetailRow({ property, label, value }){
 
 
 function PhenotypicFeatures({ features, diseaseToIndex }){
-    if (features.length === 0) return null;
     const renderedFeatures = features.map(function(feature, idx){
         const {
             phenotypic_feature : {
@@ -216,10 +213,12 @@ function PhenotypicFeatures({ features, diseaseToIndex }){
             </div>
         );
     });
+
     return (
         <div className="detail-row phenotypic-features" data-describing="phenotypic_features">
             <label className="d-block">Phenotypic Features</label>
-            { renderedFeatures }
+            { renderedFeatures.length > 0 ? renderedFeatures
+                : <em>None</em> }
         </div>
     );
 }

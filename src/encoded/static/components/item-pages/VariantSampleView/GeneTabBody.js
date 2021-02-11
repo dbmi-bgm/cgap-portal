@@ -93,88 +93,88 @@ export function GeneTabBody(props){
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.name" className="mb-0" data-tip={getTipForField("name")}>
+                                    <label htmlFor="variant.transcript.csq_gene.name" className="mb-0" data-tip={getTipForField("name")}>
                                         Gene Name:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.name">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.name">
                                     { name }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.gene_symbol" className="mb-0" data-tip={getTipForField("gene_symbol")}>
+                                    <label htmlFor="variant.transcript.csq_gene.gene_symbol" className="mb-0" data-tip={getTipForField("gene_symbol")}>
                                         Symbol:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.gene_symbol">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.gene_symbol">
                                     { gene_symbol }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.todo1" className="mb-0" data-tip={null}>
+                                    <label htmlFor="variant.transcript.csq_gene.todo1" className="mb-0" data-tip={null}>
                                         Gene Location:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.todo1">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.todo1">
                                     { geneLocation }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.gene_biotype" className="mb-0" data-tip={getTipForField("gene_biotype")}>
+                                    <label htmlFor="variant.transcript.csq_gene.gene_biotype" className="mb-0" data-tip={getTipForField("gene_biotype")}>
                                         Gene Type:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.gene_biotype">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.gene_biotype">
                                     { Schemas.Term.toName("gene_biotype", gene_biotype) }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.alias_symbol" className="mb-0" data-tip={null}>
+                                    <label htmlFor="variant.transcript.csq_gene.alias_symbol" className="mb-0" data-tip={null}>
                                         Alias Symbol:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.alias_symbol">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.alias_symbol">
                                     { aliasSymbolRendered }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.prev_symbol" className="mb-0" data-tip={null}>
+                                    <label htmlFor="variant.transcript.csq_gene.prev_symbol" className="mb-0" data-tip={null}>
                                         Previous Symbol:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.prev_symbol">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.prev_symbol">
                                     { prevSymbolRendered }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.todo3" className="mb-0" data-tip={null}>
+                                    <label htmlFor="variant.transcript.csq_gene.todo3" className="mb-0" data-tip={null}>
                                         Alias Names:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.todo3">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.todo3">
                                     { alias_name }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.gene_summary" className="mb-0" data-tip={getTipForField("gene_summary")}>
+                                    <label htmlFor="variant.transcript.csq_gene.gene_summary" className="mb-0" data-tip={getTipForField("gene_summary")}>
                                         Gene Summary:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.gene_summary">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.gene_summary">
                                     { gene_summary }
                                 </div>
                             </div>

@@ -14,6 +14,7 @@
         { "$ref": "mixins.json#/submitted" },
         { "$ref": "mixins.json#/modified" },
         { "$ref": "mixins.json#/status" },
+        { "$ref": "mixins.json#/tags" },
         { "$ref": "mixins.json#/attribution" }
     ],
     "properties": {
@@ -69,9 +70,21 @@
             "type": "string",
             "linkTo": "FilterSet",
             "notes": "We could maybe have this be a sub-embedded object and save related metadata like date_changed or something, idk."
+        },
+        "extra_variant_sample_facets" : {
+            "title": "Extra Variant Sample Facets",
+            "description": "List of user-specified additional fields to show in FacetList",
+            "type": "array",
+            "items": {
+                "title": "Extra Variant Sample Facet",
+                "type": "string"
+            }
         }
     },
     "facets" : {
+        "project.display_title" : {
+            "title" : "Project"
+        },
         "individual.sex" : {
             "title" : "Gender",
             "grouping": "Individual"

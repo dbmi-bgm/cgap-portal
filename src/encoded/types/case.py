@@ -169,7 +169,6 @@ class Case(Item):
         "sample.files.status",
         "sample.completed_processes",
         "sample.processed_files.file_format.file_format",
-        "sample.processed_files.file_ingestion_status",
         "sample.processed_files.quality_metric.quality_metric_summary.sample",
         "sample.processed_files.quality_metric.quality_metric_summary.title",
         "sample.processed_files.quality_metric.quality_metric_summary.value",
@@ -209,17 +208,16 @@ class Case(Item):
         "sample_processing.sample_processed_files.processed_files.last_modified.*",
         "sample_processing.sample_processed_files.sample.accession",
         "sample_processing.completed_processes",
+        "sample_processing.samples_pedigree.*",
         "report.last_modified.*",
         "report.status",
         "report.accession",
         "report.case.accession",
-        "active_filterset.last_modified.date_modified",
-        "active_filterset.last_modified.modified_by",
-        "active_filterset.filter_blocks.query",
-        "active_filterset.filter_blocks.flags_applied",
-        "active_filterset.flags",
+        "active_filterset.@id",
         "cohort.filter_set.*",
-        "project.name"
+        "project.name",
+        "vcf_file.file_ingestion_status",
+        "vcf_file.accession",
     ]
 
     @calculated_property(schema={
@@ -327,6 +325,30 @@ class Case(Item):
         vcf_acc = vcf.split('/')[2]
         add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
         return add_on
+
+    @calculated_property(schema={
+        "title": "Additional Variant Sample Facets",
+        "description": "Additional facets relevant to this case.",
+        "type": "array",
+        "items": {
+            "title": "Additional Variant Sample Facet",
+            "type": "string"
+        }
+    })
+    def additional_variant_sample_facets(self, request, sample_processing=None, extra_variant_sample_facets=[]):
+        if not sample_processing:
+            return ''
+        fields = [facet for facet in extra_variant_sample_facets]
+        sp_item = get_item_or_none(request, sample_processing, 'sample_processing')
+        analysis_type = sp_item.get('analysis_type')
+        if analysis_type and (analysis_type.endswith('-Trio') or analysis_type.endswith('-Group')):
+            included_relations = [item.get('relationship') for item in sp_item.get('samples_pedigree', [{}])]
+            for relation in ['mother', 'father', 'sister', 'brother', 'co-parent',
+                            'daughter', 'son', 'daughter II', 'son II', 'daughter III', 'son III']:
+                if relation in included_relations:
+                    relation = relation.replace(' ', '_').replace('-', '_')
+                    fields.append(f'associated_genotype_labels.{relation}_genotype_label')
+        return fields
 
     @calculated_property(schema={
         "title": "Proband Case",

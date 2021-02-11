@@ -339,6 +339,8 @@ class InheritanceMode:
                 2. inheritance_modes
         """
         sample_geno = variant_sample.get('samplegeno', [])
+        if not sample_geno:
+            return {}
         try:
             sample_ids = {s["samplegeno_role"]: s["samplegeno_sampleid"] for s in sample_geno}
             genotypes = {s["samplegeno_role"]: s["samplegeno_numgt"] for s in sample_geno}
@@ -347,7 +349,7 @@ class InheritanceMode:
             cmphet = variant_sample.get("cmphet")
             novoPP = variant_sample.get("novoPP", -1)
         except Exception as e:
-            log.error('Was not able to extract inheritance modes - the required fields do not exist!'
+            log.info('Was not able to extract inheritance modes - the required fields do not exist!'
                       '\n%s\n%s\n%s' % (sample_geno, variant_sample, e))
             return {}
 

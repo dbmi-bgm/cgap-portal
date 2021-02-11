@@ -1,9 +1,32 @@
 [
     {
-        "title": "Test Project",
+        "title": "CGAP Core",
         "uuid": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "description": "This is a test project",
-        "status": "current",
-        "name": "hms-dbmi"
+        "description": "Core Project for all items that are in general use",
+        "name": "hms-dbmi",
+        "date_created": "2020-07-15T02:26:28.509115+00:00"
+    },
+    {
+        "title": "CGAP Backend Testing",
+        "uuid": "59dfdfff-cd30-45d8-bb50-63b3a092578a",
+        "description": "Project only for use in testing of the CGAP backend",
+        "name": "cgap-backend-testing",
+        "date_created": "2020-11-24T20:46:00.000000+00:00"
+    },
+    {
+        "title": "Brigham Genomic Medicine",
+        "uuid": "c2f37035-f7df-4e00-aca7-6bfbe2d5f936",
+        "pi": "986b362f-4eb6-4a9c-8173-3acba722bba1",
+        "name": "brigham-genomic-medicine",
+        "aliases": ["hms-dbmi:BGM"],
+        "date_created": "2020-07-21T17:19:17.058289+00:00"
+    },
+    {
+        "name": "multiple-system-atrophy",
+        "title": "Multiple System Atrophy",
+        "aliases": ["hms-dbmi:msa"],
+        "description": "Project for the Multiple System Atrophy Coalition's cases",
+        "date_created": "2020-10-27T20:08:55.654261+00:00",
+        "uuid": "a97a4781-75aa-436d-baca-829335263cdf"
     }
 ]

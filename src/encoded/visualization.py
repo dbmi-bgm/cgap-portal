@@ -13,6 +13,11 @@ from .types.workflow import (
     WorkflowRunTracingException,
     item_model_to_object
 )
+from dcicutils.env_utils import CGAP_ENV_WEBPROD, CGAP_ENV_MASTERTEST, CGAP_ENV_DEV, CGAP_PUBLIC_URL_PRD
+import boto3
+from botocore.exceptions import ClientError
+import json
+import uuid
 
 from .types.base import get_item_or_none
 
@@ -97,7 +102,7 @@ def get_higlass_viewconf(context, request):
     """ Add multiple files to the given Higlass view config.
     Args:
         request(obj): Http request object. Assumes request's request is JSON and contains these keys:
-            viewconfig_uuid(str) : UUID of the viewconf
+            requesting_tab(str) : "annotation" or "bam"
             variant_pos_abs(int) : Center of the viewconf in abs genome coordinates
             
     Returns:
@@ -106,15 +111,13 @@ def get_higlass_viewconf(context, request):
             errors(str)         : A string containing errors. Will be None if this is successful.
             viewconfig(dict)    : Dict representing the new viewconfig.
     """
-    uuid = request.json_body.get('viewconfig_uuid', None)  
-    uuid = uuid if uuid else "00000000-1111-0000-1111-000000000000"
 
-    variant_pos = request.json_body.get('variant_pos_abs', None)  
-    variant_pos = variant_pos if variant_pos else 100000
-    window_size_small = 20 # window size for the interpretation space
-    window_size_large = 5000 # window size for the overview
+    requesting_tab = request.json_body.get('requesting_tab', None)  
+    requesting_tab = requesting_tab if requesting_tab else "annotation"
 
-    default_higlass_viewconf = get_item_or_none(request, uuid)
+    viewconf_uuid = "00000000-1111-0000-1111-000000000000" if requesting_tab == "annotation" else "9146eeba-ebb8-41aa-93a8-ada8efaff64b"
+
+    default_higlass_viewconf = get_item_or_none(request, viewconf_uuid)
     higlass_viewconfig = default_higlass_viewconf["viewconfig"] if default_higlass_viewconf else None
 
     # If no view config could be found, fail
@@ -123,24 +126,123 @@ def get_higlass_viewconf(context, request):
             "success" : False,
             "errors": "No view config found.",
             "viewconfig": None
-        }   
+        } 
 
-    # Overview
-    higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
-    higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large 
+    # We need absolute URLs for the BAM adn GnomAD Worker
+    host_url = "http://localhost:6543"
+    if request.registry.settings.get('env.name') == CGAP_ENV_WEBPROD:
+        host_url = CGAP_PUBLIC_URL_PRD
+    elif request.registry.settings.get('env.name') == CGAP_ENV_MASTERTEST:
+        host_url = f"http://{CGAP_ENV_MASTERTEST}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
+    elif request.registry.settings.get('env.name') == CGAP_ENV_DEV:
+        host_url = f"http://{CGAP_ENV_DEV}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
 
-    # Details
-    higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
-    higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small 
+    if requesting_tab == "annotation":
+        variant_pos = request.json_body.get('variant_pos_abs', None)  
+        variant_pos = variant_pos if variant_pos else 100000
+        window_size_small = 20 # window size for the interpretation space
+        window_size_large = 5000 # window size for the overview
 
-    # Vertical rules
-    higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
-    higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
+        # Overview
+        higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
+        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large 
 
+        # Details
+        higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
+        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small 
+
+        # Vertical rules
+        higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
+        higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
+
+        wsl = higlass_viewconfig['views'][1]['tracks']['top'][17]['options']['workerScriptLocation']
+        higlass_viewconfig['views'][1]['tracks']['top'][17]['options']['workerScriptLocation'] = host_url + wsl
+
+    elif requesting_tab == "bam":
+        variant_pos = request.json_body.get('variant_pos_abs', None)  
+        variant_pos = variant_pos if variant_pos else 100000
+        # This is the id of the variant sample that we are currently looking at.
+        # This should be the first file in the Higlass viewconf
+        bam_sample_id = request.json_body.get('bam_sample_id', None)  
+        window_size_small = 20 # window size for the interpretation space
+        window_size_large = 5000 # window size for the overview
+
+        #s3_bucket = request.registry.settings.get('file_wfout_bucket')
+        s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
+
+        samples_pedigree = request.json_body.get('samples_pedigree', None) 
+        samples_pedigree.sort(key=lambda x: x['sample_name'] == bam_sample_id, reverse=True)
+
+        top_tracks = higlass_viewconfig['views'][1]['tracks']['top']
+        empty_track_a = deepcopy(top_tracks[6])
+        text_track = deepcopy(top_tracks[7])
+        empty_track_b = deepcopy(top_tracks[8])
+        pileup_track = deepcopy(top_tracks[9])
+
+        # Delete original tracks from the insert, replace them with adjusted data
+        # from the sample data. If there is no data, we only show the sequence track
+        del top_tracks[6:10] 
+        # print(json.dumps(top_tracks, indent=2))
+
+        for sample in samples_pedigree:
+            empty_track_sample = deepcopy(empty_track_a)
+            empty_track_sample["uid"] = uuid.uuid4()
+            top_tracks.append(empty_track_sample)
+
+            text_track_sample = deepcopy(text_track)
+            text_track_sample["uid"] = uuid.uuid4()
+            text_track_sample["options"]["text"] = "%s (%s)" % (sample["relationship"].capitalize(),sample["sample_name"])
+            top_tracks.append(text_track_sample)
+
+            empty_track_sample = deepcopy(empty_track_b)
+            empty_track_sample["uid"] = uuid.uuid4()
+            top_tracks.append(empty_track_sample)
+
+            pileup_track_sample = deepcopy(pileup_track)
+            pileup_track_sample["uid"] = uuid.uuid4()
+            bam_key = sample["bam_location"]
+            bai_key = bam_key + ".bai"
+            pileup_track_sample['options']['workerScriptLocation'] = host_url + pileup_track_sample['options']['workerScriptLocation']
+            pileup_track_sample['data']['bamUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=bam_key)
+            pileup_track_sample['data']['baiUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=bai_key)
+            top_tracks.append(pileup_track_sample)
+
+        # Show the correct location
+        higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
+        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large 
+
+        higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
+        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small 
+
+        # Vertical rules
+        higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
+        higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
+            
     return {
         "success" : True,
         "errors": "",
         "viewconfig" : higlass_viewconfig
-    }        
+    }     
+
+def create_presigned_url(bucket_name, object_name, expiration=3600):
+    """Generate a presigned URL to share an S3 object
+
+    :param bucket_name: string
+    :param object_name: string
+    :param expiration: Time in seconds for the presigned URL to remain valid
+    :return: Presigned URL as string. If error, returns None.
+    """
+
+    # Generate a presigned URL for the S3 object
+    s3_client = boto3.client('s3')
+    try:
+        params = {'Bucket': bucket_name, 'Key': object_name}
+        response = s3_client.generate_presigned_url('get_object', Params=params, ExpiresIn=expiration)
+    except ClientError as e:
+        print(e)
+        return None
+
+    # The response contains the presigned URL
+    return response   
 
     

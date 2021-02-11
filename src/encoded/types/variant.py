@@ -3,6 +3,7 @@ import os
 import boto3
 import pytz
 import datetime
+import structlog
 from pyramid.view import view_config
 from pyramid.settings import asbool
 from urllib.parse import (
@@ -15,6 +16,7 @@ from pyramid.httpexceptions import (
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
 from ..util import resolve_file_path
+from ..inheritance_mode import InheritanceMode
 from snovault import (
     calculated_property,
     collection,
@@ -27,6 +29,7 @@ from .base import (
 import negspy.coordinates as nc
 
 
+log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
 ANNOTATION_ID_SEP = '_'
 
@@ -193,6 +196,45 @@ class VariantSample(Item):
     item_type = 'variant_sample'
     schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant_sample.json'))
     embedded_list = build_variant_sample_embedded_list()
+    FACET_ORDER_OVERRIDE = {
+        'inheritance_modes': {
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_STRONG: 1,  # de novo (strong)
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_MEDIUM: 2,  # de novo (medium)
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_WEAK: 3,  # de novo (weak)
+            InheritanceMode.INHMODE_LABEL_DE_NOVO_CHRXY: 4,  # de novo (chrXY) XXX: no GATK?
+            InheritanceMode.INHMODE_LABEL_RECESSIVE: 5,  # Recessive
+            'Compound Het (Phased/strong_pair)': 6,  # cmphet all auto-generated, see compute_cmphet_inheritance_modes
+            'Compound Het (Phased/medium_pair)': 7,
+            'Compound Het (Phased/weak_pair)': 8,
+            'Compound Het (Unphased/strong_pair)': 9,
+            'Compound Het (Unphased/medium_pair)': 10,
+            'Compound Het (Unphased/weak_pair)': 11,
+            InheritanceMode.INHMODE_LABEL_LOH: 12,  # Loss of Heterozygousity
+            InheritanceMode.INHMODE_DOMINANT_MOTHER: 13,  # Dominant (maternal)
+            InheritanceMode.INHMODE_DOMINANT_FATHER: 14,  # Dominant (paternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER: 15,  # X-linked recessive (Maternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER: 16,  # X-linked dominant (Maternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER: 17,  # X-linked dominant (Paternal)
+            InheritanceMode.INHMODE_LABEL_Y_LINKED: 18,  # Y-linked dominant
+            InheritanceMode.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT: 19,  # Low relevance, homozygous in a parent
+            InheritanceMode.INHMODE_LABEL_NONE_MN: 20,  # Low relevance, multiallelic site family
+            InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 21,  # Low relevance, present in both parent(s)
+            InheritanceMode.INHMODE_LABEL_NONE_DOT: 22,  # Low relevance, missing call(s) in family
+            InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 23,  # Low relevance, mismatching chrXY genotype(s)
+            '_default': 1000  # arbitrary large number
+        }
+    }
+
+    POSSIBLE_GENOTYPE_LABEL_FIELDS = [
+        'proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
+        'sister_genotype_label', 'sister_II_genotype_label', 'sister_III_genotype_label',
+        'sister_IV_genotype_label',
+        'brother_genotype_label', 'brother_II_genotype_label', 'brother_III_genotype_label',
+        'brother_IV_genotype_label'
+        'co_parent_genotype_label',
+        'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
+        'son_II_genotype_label'
+    ]
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
@@ -210,9 +252,11 @@ class VariantSample(Item):
         "type": "string"
     })
     def display_title(self, request, CALL_INFO, variant=None):
-        variant = get_item_or_none(request, variant, 'Variant')
+        variant = get_item_or_none(request, variant, 'Variant', frame='raw')
+        variant_display_title = build_variant_display_title(variant['CHROM'], variant['POS'],
+                                                            variant['REF'], variant['ALT'])
         if variant:
-            return CALL_INFO + ':' + variant['display_title']  # HG002:chr1:504A>T
+            return CALL_INFO + ':' + variant_display_title  # HG002:chr1:504A>T
         return CALL_INFO
 
     @calculated_property(schema={
@@ -258,7 +302,9 @@ class VariantSample(Item):
         "type": "string"
     })
     def bam_snapshot(self, request, file, variant):
-        variant_props = get_item_or_none(request, variant, 'Variant')
+        variant_props = get_item_or_none(request, variant, 'Variant', frame='raw')
+        if variant_props is None:
+            raise RuntimeError('Got none for something that definitely exists')
         file_path = '%s/bamsnap/chr%s:%s.png' % (  # file = accession of associated VCF file
             file, variant_props['CHROM'], variant_props['POS']
         )
@@ -268,6 +314,7 @@ class VariantSample(Item):
         "title": "Associated Genotype Labels",
         "description": "Named Genotype Label fields that can be searched on",
         "type": "object",
+        "additional_properties": True,
         "properties": {
             "proband_genotype_label": {
                 "title": "Proband Genotype",
@@ -314,10 +361,7 @@ class VariantSample(Item):
     def associated_genotype_labels(self, variant, CALL_INFO, samplegeno=None, genotype_labels=None):
         """ Builds the above sub-embedded object so we can search on the genotype labels """
 
-        possible_keys = ['proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
-                         'sister_genotype_label', 'brother_genotype_label', 'co_parent_genotype_label',
-                         'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
-                         'son_II_genotype_label']
+        possible_keys_set = set(VariantSample.POSSIBLE_GENOTYPE_LABEL_FIELDS)
 
         # XXX: will be useful if we want to have this field be "centric" WRT the
         # person who submitted this variant_sample
@@ -343,7 +387,7 @@ class VariantSample(Item):
             role = entry.get('role', '')
             label = entry.get('labels', [])
             role_key = infer_key_from_role(role)
-            if role_key not in possible_keys:
+            if role_key not in possible_keys_set:
                 continue
             elif len(label) == 1:
                 new_labels[role_key] = label[0]

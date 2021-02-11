@@ -8,7 +8,7 @@ import tempfile
 
 from dcicutils.misc_utils import check_true
 from io import BytesIO
-from pyramid.httpexceptions import HTTPUnprocessableEntity
+from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden, HTTPServerError
 from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
@@ -86,6 +86,18 @@ def debuglog(*args):
             # Maybe it was a bad pathname? Out of disk space? Network error?
             # It doesn't really matter. Just continue...
             pass
+
+
+def subrequest_object(request, object_id):
+    subreq = make_subrequest(request, "/" + object_id)
+    subreq.headers['Accept'] = 'application/json'
+    # Tweens are suppressed here because this is an internal call and doesn't need things like HTML processing.
+    # -kmp 2-Feb-2021
+    response = request.invoke_subrequest(subreq, use_tweens=False)
+    if response.status_code >= 300:  # alas, the response from a pyramid subrequest has no .raise_for_status()
+        raise HTTPServerError("Error obtaining object: %s" % object_id)
+    object_json = response.json
+    return object_json
 
 
 def subrequest_item_creation(request: pyramid.request.Request, item_type: str, json_body: dict = None) -> dict:
@@ -238,16 +250,6 @@ def create_empty_s3_file(s3_client, bucket: str, key: str):
     s3_client.upload_file(empty_file, Bucket=bucket, Key=key)
 
 
-def full_class_name(object):
-    # Source: https://stackoverflow.com/questions/2020014/get-fully-qualified-class-name-of-an-object-in-python
-
-    module = object.__class__.__module__
-    if module is None or module == str.__class__.__module__:
-        return object.__class__.__name__  # Avoid reporting __builtin__
-    else:
-        return module + '.' + object.__class__.__name__
-
-
 def get_trusted_email(request, context=None, raise_errors=True):
     """
     Get an email address on behalf of which we can issue other requests.
@@ -287,3 +289,68 @@ def beanstalk_env_from_request(request):
 
 def beanstalk_env_from_registry(registry):
     return registry.settings.get('env.name')
+
+
+def check_user_is_logged_in(request):
+    """ Raises HTTPForbidden if the request did not come from a logged in user. """
+    for principal in request.effective_principals:
+        if principal.startswith('userid.') or principal == 'group.admin':  # allow if not logged in OR has admin
+            break
+    else:
+        raise HTTPForbidden(title="Not logged in.")
+
+
+# IMPLEMENTATION NOTE:
+#
+#    We have middleware that overrides various details about content type that are declared in the view_config.
+#    It used to work by having a wired set of exceptions, but this facility allows us to do it in a more data-driven
+#    way. Really I think we should just rely on the information in the view_config, but I didn't have time to explore
+#    why we are not using that.
+#
+#    See validate_request_tween_factory in renderers.py for where this is used. This declaration info is here
+#    rather than there to simplify the load order dependencies.
+#
+#    -kmp 1-Sep-2020
+
+CONTENT_TYPE_SPECIAL_CASES = {
+    'application/x-www-form-urlencoded': [
+        # Single legacy special case to allow us to POST to metadata TSV requests via form submission.
+        # All other special case values should be added using register_path_content_type.
+        '/metadata/'
+    ]
+}
+
+
+def register_path_content_type(*, path, content_type):
+    """
+    Registers that endpoints that begin with the specified path use the indicated content_type.
+
+    This is part of an inelegant workaround for an issue in renderers.py that maybe we can make go away in the future.
+    See the 'implementation note' in ingestion/common.py for more details.
+    """
+    exceptions = CONTENT_TYPE_SPECIAL_CASES.get(content_type, None)
+    if exceptions is None:
+        CONTENT_TYPE_SPECIAL_CASES[content_type] = exceptions = []
+    if path not in exceptions:
+        exceptions.append(path)
+
+
+def content_type_allowed(request):
+    """
+    Returns True if the current request allows the requested content type.
+
+    This is part of an inelegant workaround for an issue in renderers.py that maybe we can make go away in the future.
+    See the 'implementation note' in ingestion/common.py for more details.
+    """
+    if request.content_type == "application/json":
+        # For better or worse, we always allow this.
+        return True
+
+    exceptions = CONTENT_TYPE_SPECIAL_CASES.get(request.content_type)
+
+    if exceptions:
+        for text in exceptions:
+            if text in request.path:
+                return True
+
+    return False
