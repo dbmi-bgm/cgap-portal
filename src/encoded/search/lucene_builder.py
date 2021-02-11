@@ -1001,7 +1001,6 @@ class LuceneBuilder:
         # Unfortunately when you pass "include" to a terms aggregation it acts as a hard filter,
         # not a "force bucket", which makes implementing this very tricky. To get around this we
         # expand to 2 aggregations - one for the requested field and one for the remaining top fields
-        import pdb; pdb.set_trace()
         if requested_values:
             terms_aggregation_requested = cls._build_terms_aggregation(query_field, facet, requested_values)
             aggs[facet['aggregation_type'] + ":" + agg_name] = {

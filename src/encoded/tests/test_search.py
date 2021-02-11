@@ -50,6 +50,8 @@ def test_search_view(workbook, es_testapp):
     assert res['title'] == 'Search'
     assert res['total'] > 0
     assert 'facets' in res
+
+    # type facet should always have > 1 option here, even when it is selected
     for facet in res['facets']:
         if facet['field'] == 'type':
             assert len(facet['terms']) > 1
