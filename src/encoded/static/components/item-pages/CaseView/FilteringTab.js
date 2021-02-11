@@ -16,21 +16,26 @@ const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColum
         genes_most_severe_hgvsp = null
     } = gene || {};
 
+    const rows = [];
     // Memoized on the 1 prop it receives which is dependency for its calculation.
-    const hgvscSplit = genes_most_severe_hgvsc.split(":");
-    const scSplit = hgvscSplit[1].split(".");
+    if (genes_most_severe_hgvsc) {
+        const hgvscSplit = genes_most_severe_hgvsc.split(":");
+        var scSplit = hgvscSplit[1].split(".");
+        rows.push(
+            <div className="text-truncate d-block" key="sc">
+                <span className="text-600">{ scSplit[0] }.</span><span>{ scSplit[1] }</span>
+            </div>);
+    }
 
-    const hgvspSplit = genes_most_severe_hgvsp.split(":");
-    const spSplit = hgvspSplit[1].split(".");
+    if (genes_most_severe_hgvsp) {
+        const hgvspSplit = genes_most_severe_hgvsp.split(":");
+        var spSplit = hgvspSplit[1].split(".");
+        rows.push(
+            <div className="text-truncate d-block" key="sp">
+                <span className="text-600">{ spSplit[0] }.</span><span>{ spSplit[1] }</span>
+            </div>);
+    }
 
-    const rows = [
-        <div className="text-truncate d-block" key="sc">
-            <span className="text-600">{ scSplit[0] }.</span><span>{ scSplit[1] }</span>
-        </div>,
-        <div className="text-truncate d-block" key="sp">
-            <span className="text-600">{ spSplit[0] }.</span><span>{ spSplit[1] }</span>
-        </div>
-    ];
     return <StackedRowColumn className="text-center" {...{ rows }} />;
 });
 
@@ -174,7 +179,7 @@ function CaseViewEmbeddedVariantSampleSearchTable(props){
                         rows.push(<div key="csq_cadd_phred" className="d-block text-truncate"><span className="text-600">Cadd Phred: </span>{csq_cadd_phred || "-"}</div>);
                     }
                     if (spliceaiMaxds) {
-                        rows.push(<div key="spliceai_maxds" className="d-block text-truncate"><span className="text-600">SpliceAI MaxDS: </span>{spliceaiMaxds || "-"}</div>);
+                        rows.push(<div key="spliceaiMaxds" className="d-block text-truncate"><span className="text-600">SpliceAI MaxDS: </span>{spliceaiMaxds || "-"}</div>);
                     }
                     if (csq_phylop100way_vertebrate) {
                         rows.push(<div key="phylop" className="d-block text-truncate"><span className="text-600">PhyloP 100: </span>{csq_phylop100way_vertebrate || "-"}</div>);

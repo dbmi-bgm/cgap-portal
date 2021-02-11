@@ -169,7 +169,7 @@ class TestIngestVCF:
     #         assert 'annotation_id' in res['@graph'][0]  # verify annotation_id is added on post
 
 
-# integrated test, so outside of class
+# integrated test, so outside of class XXX: Refactor to use variant_utils
 @pytest.mark.skip  # Comment this out and run directly to test the first 5 variants and variant samples validation
 def test_post_variants_and_samples_with_links(workbook, es_testapp, test_vcf):
     """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
@@ -182,10 +182,6 @@ def test_post_variants_and_samples_with_links(workbook, es_testapp, test_vcf):
         entry['institution'] = 'hms-dbmi'
         es_testapp.post_json(GENE_URL, entry, status=201)
 
-    uuids_to_purge = {
-        'variant': [],
-        'variant_sample': []
-    }
     for idx, record in enumerate(test_vcf):
         if idx == MAX_POSTS_FOR_TESTING:
             break
@@ -196,7 +192,6 @@ def test_post_variants_and_samples_with_links(workbook, es_testapp, test_vcf):
         test_vcf.format_variant_sub_embedded_objects(variant)
         res = es_testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
         assert 'annotation_id' in res
-        uuids_to_purge['variant'].append(res['uuid'])
         variant_samples = test_vcf.create_sample_variant_from_record(record)
         for sample in variant_samples:
             sample['project'] = 'hms-dbmi'
@@ -204,6 +199,5 @@ def test_post_variants_and_samples_with_links(workbook, es_testapp, test_vcf):
             sample['variant'] = res['@id']  # make link
             sample['file'] = 'dummy-filename'
             res2 = es_testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
-            uuids_to_purge['variant_sample'].append(res['uuid'])
             assert 'annotation_id' in res2['@graph'][0]
             assert 'bam_snapshot' in res2['@graph'][0]
