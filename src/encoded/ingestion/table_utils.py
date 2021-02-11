@@ -580,6 +580,83 @@ class VariantTableParser(object):
             'order': 15,
         }
 
+        # Range facets using range aggregation_type (ranges will be defined from Q2Q tab in future)
+        facs['variant.csq_gnomadg_af'] = {
+            "title": "GnomAD Alt Allele Frequency",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 18,
+            "grouping": "Population Frequency",
+            "ranges": [	
+                { "from": 0, "to": 0, "label": "unobserved" }, 	
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },	
+                { "from": 0.001, "to": 0.01, "label": "rare" },	
+                { "from": 0.01, "to": 1, "label": "common" }	
+            ]
+        }
+        facs['variant.csq_gnomadg_af_popmax'] = {
+            "title": "GnomAD Alt AF - PopMax",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 19,
+            "grouping": "Population Frequency",
+            "ranges": [	
+                { "from": 0, "to": 0, "label": "unobserved" }, 	
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },	
+                { "from": 0.001, "to": 0.01, "label": "rare" },	
+                { "from": 0.01, "to": 1, "label": "common" }	
+            ]
+        }
+        facs['variant.csq_phylop100way_vertebrate'] = {
+            "title": "PhyloP (100 Vertebrates)",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 22,
+            "grouping": "Effect Predictors",
+            "ranges": [	
+                { "from": -20, "to": -3, "label": "strong positive selection" },	
+                { "from": -3, "to": -2, "label": "positive selection" },	
+                { "from": -2, "to": 2, "label": "low selection" },	
+                { "from": 2, "to": 3, "label": "conserved" },	
+                { "from": 3, "to": 10, "label": "highly conserved"}	
+            ]
+        }
+        facs['FS'] = {
+            "title": "Strand Fisher Score",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 12,
+            "grouping": "Variant Quality",
+            "ranges": [
+                { "to": 20, "label": "Low Strand Bias (P ≥ 0.01)" },	
+                { "from": 20, "label": "High Strand Bias (P < 0.01)" }	
+            ]
+        }
+        facs['AD_ALT'] = {
+            "title": "AD (Alt)",
+            "aggregation_type": "range",
+            "number_step": 1,
+            "order": 10,
+            "grouping": "Variant Quality",
+            "ranges": [	
+                { "from": 1, "to": 4, "label": "Very Low" },	
+                { "from": 5, "to": 9, "label": "Low" },	
+                { "from": 10, "to": 19, "label": "Medium" },	
+                { "from": 20, "label": "High" }	
+            ]
+        }
+        facs['novoPP'] = {
+            "title": "novoCaller PP",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 16,
+            "grouping": "Genotype",
+            "ranges": [	
+                { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },	
+                { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }	
+            ]
+        }
+
         # Genotype labels (calculated properties)
         facs.update({
             "associated_genotype_labels.proband_genotype_label": {
@@ -590,12 +667,14 @@ class VariantTableParser(object):
             "associated_genotype_labels.mother_genotype_label": {
                 "title": "Mother Genotype",
                 "order": 13,
-                "grouping": "Genotype"
+                "grouping": "Genotype",
+                "default_hidden": True
             },
             "associated_genotype_labels.father_genotype_label": {
                 "title": "Father Genotype",
                 "order": 14,
-                "grouping": "Genotype"
+                "grouping": "Genotype",
+                "default_hidden": True
             },
 
             # Below facets are default-hidden unless e.g. additional_facet=associated_genotype_labels.co_parent_genotype_label
