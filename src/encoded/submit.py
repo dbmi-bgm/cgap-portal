@@ -127,9 +127,10 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, subm
                    'Please submit a file of the proper type.')
             results['validation_output'].append(msg)
             return results
-        json_data, json_success = xls_to_json(
-            rows, project=project_json, institution=institution_json, submission_type=submission_type
-        )
+        json_data, json_success = xls_to_json(vapp, rows,
+                                              project=project_json,
+                                              institution=institution_json,
+                                              submission_type=submission_type)
         if not json_success:
             results['validation_output'] = json_data['errors']
             return results
@@ -745,7 +746,8 @@ class SubmissionMetadata:
 
 class PedigreeMetadata:
 
-    def __init__(self, rows, project, institution, counter=1):
+    def __init__(self, vapp, rows, project, institution, counter=1):
+        self.virtualapp = vapp
         self.rows = rows
         self.project = project.get('name')
         self.project_atid = project.get('@id')
@@ -784,9 +786,27 @@ class PedigreeMetadata:
     def add_family_metadata(self):
         family_metadata = {}
         for alias, item in self.individuals.items():
-            family_metadata.setdefault(item['family_id'], {'members': []})
-            family_metadata[item['family_id']]['members'].append(alias)
-        # get family aliases
+            family_metadata.setdefault(item.metadata['family_id'], {'members': []})
+            family_metadata[item.metadata['family_id']]['members'].append(alias)
+            if item.isproband():
+                family_metadata[item.metadata['family_id']]['proband'] = alias
+        # TODO: family_phenotypic_features - change to calculated property?
+        # TODO: get family aliases
+        for key in family_metadata.keys():
+            try:
+                family_matches = self.virtualapp.get(f'/search/?type=Family&family_id={key}')
+                for match in family_matches.json['@graph'][0]:
+                    family_metadata[match['@id']] = family_metadata[key]
+                    if family_metadata[key].get('proband'):
+                        del family_metadata[match['@id']]['proband']
+                        phenotypes = [item['phenotypic_feature'] for item in
+                                      self.individuals[family_metadata[key]['proband']].get('phenotypic_features', [])]
+                        if phenotypes:
+                            family_metadata[match['@id']]['family_phenotyic_features'] = phenotypes[:4]
+            except Exception:
+                print('error')
+                self.errors.append('get request failed')
+
 
     def process_rows(self):
         """
@@ -826,7 +846,8 @@ class SpreadsheetProcessing:
     to hold all metadata extracted from spreadsheet.
     """
 
-    def __init__(self, row, project, institution, submission_type='accessioning'):
+    def __init__(self, vapp, row, project, institution, submission_type='accessioning'):
+        self.virtualapp = vapp
         self.input = row
         self.project = project
         self.institution = institution
@@ -888,7 +909,7 @@ class SpreadsheetProcessing:
         if self.submission_type == 'accessioning':
             result = SubmissionMetadata(self.rows, self.project, self.institution, self.counter)
         elif self.submission_type == 'pedigree':
-            result = PedigreeMetadata(self.rows, self.project, self.institution, self.counter)
+            result = PedigreeMetadata(self.virtualapp, self.rows, self.project, self.institution, self.counter)
         else:
             pass
             # TODO: handle this case
@@ -897,7 +918,7 @@ class SpreadsheetProcessing:
         self.passing = True
 
 
-def xls_to_json(row, project, institution, submission_type):
+def xls_to_json(vapp, row, project, institution, submission_type):
     """
     Wrapper for SpreadsheetProcessing that returns expected values:
     result.output - metadata to be submitted in json
@@ -908,7 +929,7 @@ def xls_to_json(row, project, institution, submission_type):
         pass
         # TODO: handle this case
     else:
-        result = SpreadsheetProcessing(row, project, institution, submission_type)
+        result = SpreadsheetProcessing(vapp, row, project, institution, submission_type)
     result.output['errors'] = result.errors
     return result.output, result.passing
 
