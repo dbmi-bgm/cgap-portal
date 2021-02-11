@@ -238,7 +238,11 @@ class VariantSample(Item):
 
     POSSIBLE_GENOTYPE_LABEL_FIELDS = [
         'proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
-        'sister_genotype_label', 'brother_genotype_label', 'co_parent_genotype_label',
+        'sister_genotype_label', 'sister_II_genotype_label', 'sister_III_genotype_label',
+        'sister_IV_genotype_label',
+        'brother_genotype_label', 'brother_II_genotype_label', 'brother_III_genotype_label',
+        'brother_IV_genotype_label'
+        'co_parent_genotype_label',
         'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
         'son_II_genotype_label'
     ]
@@ -332,6 +336,7 @@ class VariantSample(Item):
         "title": "Associated Genotype Labels",
         "description": "Named Genotype Label fields that can be searched on",
         "type": "object",
+        "additional_properties": True,
         "properties": {
             "proband_genotype_label": {
                 "title": "Proband Genotype",

@@ -582,7 +582,7 @@ class VCFParser(object):
                             annotations = {}
                             for field_name, value in zip(field_names, group.split('|')):
                                 if field_name == 'comhet_transcript':  # array field
-                                    annotations[field_name] = self.fix_encoding(value).split('~')
+                                    annotations[field_name] = self.fix_encoding(value).split('&')
                                 else:
                                     annotations[field_name] = self.fix_encoding(value)
                             s['cmphet'].append(annotations)
