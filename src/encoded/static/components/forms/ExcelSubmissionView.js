@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
@@ -9,6 +9,7 @@ import ReactTooltip from 'react-tooltip';
 import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+import Collapse from 'react-bootstrap/esm/Collapse';
 
 import { console, ajax, JWT, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
@@ -135,7 +136,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
                     <PanelOne {...this.props} {...this.state} userDetails={userDetails} markCompleted={this.markCompleted}
                         onLoadUser={this.handleLoadedUser} onSubmitIngestionSubmission={this.handleLoadedIngestionSubmission} />
 
-                    <PanelTwo {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
+                    <PanelTwo {...this.props} {...this.state} userDetails={userDetails} onLoadedFileToIngestionSubmission={this.handleLoadedIngestionSubmission}
                         markCompleted={this.markCompleted} />
 
                     <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
@@ -475,31 +476,31 @@ class PanelOne extends React.PureComponent {
     }
 }
 
-class AliasInputFieldContainer extends React.PureComponent {
-    constructor(props){
-        super(props);
-        this.onAliasChange = this.onAliasChange.bind(this);
+// class AliasInputFieldContainer extends React.PureComponent {
+//     constructor(props){
+//         super(props);
+//         this.onAliasChange = this.onAliasChange.bind(this);
 
-    }
+//     }
 
-    onAliasChange(val){
-        const { index, onAliasChange } = this.props;
-        onAliasChange(val, index);
-    }
+//     onAliasChange(val){
+//         const { index, onAliasChange } = this.props;
+//         onAliasChange(val, index);
+//     }
 
-    render(){
-        const { value, user, ...passProps } = this.props;
-        return (
-            <div className="mb-1">
-                <AliasInputFieldValidated {...passProps}
-                    onAliasChange={this.onAliasChange}
-                    currentSubmittingUser={user}
-                    showErrorMsg value={value} />
-            </div>
-        );
-    }
+//     render(){
+//         const { value, user, ...passProps } = this.props;
+//         return (
+//             <div className="mb-1">
+//                 <AliasInputFieldValidated {...passProps}
+//                     onAliasChange={this.onAliasChange}
+//                     currentSubmittingUser={user}
+//                     showErrorMsg value={value} />
+//             </div>
+//         );
+//     }
 
-}
+// }
 
 
 class PanelTwo extends React.PureComponent {
@@ -507,32 +508,38 @@ class PanelTwo extends React.PureComponent {
     constructor(props){
         super(props);
         this.onAddedFile = this.onAddedFile.bind(this);
+        this.setStatusIdx = this.setStatusIdx.bind(this);
+        this.state = {
+            statusIdx: 0 // 0 = attaching file, 1 = polling for status, 2 = ready to view
+        };
     }
 
     componentDidUpdate(pastProps){
         const { submissionItem, markCompleted, panelIdx } = this.props;
-        const { families = [] } = submissionItem || {};
-        const { submissionItem: pastIngestionSubmissionItem, panelIdx: pastPanelIdx } = pastProps;
-        const { pastFamilies = [] } = pastIngestionSubmissionItem || {};
+        const { statusIdx } = this.state;
+        const { submissionItem: pastIngestionSubmissionItem } = pastProps;
         if (submissionItem !== pastIngestionSubmissionItem){
             ReactTooltip.rebuild();
         }
 
-        if (panelIdx === 1 && pastFamilies.length !== families.length){
+        if (panelIdx === 1 && statusIdx === 2){
             // We already completed POST; once submission present, mark this complete also.
             markCompleted(1);
         }
     }
 
+    setStatusIdx(idx) {
+        this.setState({statusIdx: idx});
+    }
+
     onAddedFile(response){
-        const { onLoadedIngestionSubmission } = this.props;
+        // const { onLoadedIngestionSubmission } = this.props;
 
         const json = JSON.parse(response);
-        const { context, filename, submission_uri } = json;
+        const { filename, submission_uri } = json;        
 
-        console.log(json.submission_uri);
-
-        // onLoadedIngestionSubmission(context);
+        console.log("json", json);
+        // onLoadedFileToIngestionSubmission(context);
 
         let message = null;
         if (submission_uri) {
@@ -548,38 +555,117 @@ class PanelTwo extends React.PureComponent {
             message ,
             "style" : "success"
         });
+
+        // Wait a few seconds before setting new status
+        setTimeout(this.setState({ statusIdx: 1 }), 200);
     }
 
     render(){
         const { user, submissionItem, panelIdx, href } = this.props;
+        const { statusIdx } = this.state;
 
         if (panelIdx !== 1) {
             return null;
         }
 
+        let panelContents;
+        if (statusIdx === 0) {
+            panelContents = (
+                <React.Fragment>
+                    <h4 className="text-300 mt-2">
+                        Attach a file to this IngestionSubmission
+                    </h4>
+                    <div className="mt-1">
+                        Click <a href="https://hms-dbmi.atlassian.net/browse/C4-505" target="_blank" rel="noreferrer">here</a> for more on how to format your document.
+                    </div>
+                    <hr className="mb-1"/>
+                    <div className="field-section mt-2">
+                        <label className="d-block mb-05">
+                            Submit Data
+                            <i className="icon icon-info-circle fas icon-fw ml-05"
+                                data-tip="Select & upload files generated in Proband and other pedigree software" />
+                        </label>
+                        <AttachmentInputController href={href} context={submissionItem} onAddedFile={this.onAddedFile}>
+                            <FileAttachmentBtn/>
+                        </AttachmentInputController>
+                    </div>
+                </React.Fragment>
+            );
+        } else if (statusIdx === 1) {
+            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} />;
+        } else {
+            panelContents = <h4 className="text-300 mt-2">Successfully processed file. Ready to view results.</h4>;
+        }
+
         return (
             <div className="panel-form-container">
-                <h4 className="text-300 mt-2">
-                    Attach a file to this IngestionSubmission
-                </h4>
-                <div className="mt-1">
-                    Click <a href="https://hms-dbmi.atlassian.net/browse/C4-505" target="_blank" rel="noreferrer">here</a> for more on how to format your document.
-                </div>
-                <hr className="mb-1"/>
-                <div className="field-section mt-2">
-                    <label className="d-block mb-05">
-                        Submit Data
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip="Select & upload files generated in Proband and other pedigree software" />
-                    </label>
-                    <AttachmentInputController href={href} context={submissionItem} onAddedFile={this.onAddedFile}>
-                        <FileAttachmentBtn/>
-                    </AttachmentInputController>
-                </div>
+                { panelContents }
             </div>
         );
     }
 
+}
+
+// Custom React Hook by Dan Abramov https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+function useInterval(callback, delay) {
+    const savedCallback = useRef();
+
+    // Remember the latest callback.
+    useEffect(() => {
+        savedCallback.current = callback;
+    }, [callback]);
+
+    // Set up the interval.
+    useEffect(() => {
+        function tick() {
+            savedCallback.current();
+        }
+        if (delay !== null) {
+            const id = setInterval(tick, delay);
+            return () => clearInterval(id);
+        }
+    }, [delay]);
+}
+
+function Poller(props){
+    const { context: { uuid }, setStatusIdx } = props;
+    const getURL = "/ingestion-submissions/" + uuid;
+
+    useInterval(() => {
+        console.log("Checking if processing status is updated.");
+        ajax.promise(getURL, "GET")
+            .then((response)=> {
+                console.log("response", response);
+                if (response.validation_errors) {
+                    throw new Error("Did not pass server-side validation...");
+                } else {
+                    const { processing_status : { outcome } = {} } = response || {};
+                    switch(outcome) {
+                        case "success":
+                            // TODO: Upload global item and
+                            setStatusIdx(2); // Allow to proceed to finalization
+                            break;
+                        case "error":
+                        case "failure":
+                            // TODO: Better error handling/display of validation errors (maybe update global item context?)
+                            throw new Error("Something failed");
+                        case "unknown":
+                        default:
+                            // pass
+                    }
+                }
+            })
+            .catch((error)=> {
+                console.log("error", error);
+                setStatusIdx(0); // Re-enable file upload.
+            });
+    }, 15000);
+
+    return (
+        <div className="mt-2 text-center d-flex align-items-center justify-content-center">
+            <i className="icon icon-sync icon-spin fas" />&nbsp; Processing...
+        </div>
+    );
 }
 
 function FileAttachmentBtn(props){
