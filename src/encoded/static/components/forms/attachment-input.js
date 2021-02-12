@@ -27,38 +27,43 @@ export class AttachmentInputController extends React.PureComponent {
     }
 
     handleChange(e){
-        const file = e.target.files[0];
-        file.filename = file.name;
+        const { 0: file = null } = e.target.files || {};
 
-        const formData = new FormData();
-        formData.append("datafile", file);
+        if (file) {
+            file.filename = file.name;
 
-        this.setState({ loading: true }, ()=>{
+            const formData = new FormData();
+            formData.append("datafile", file);
 
-            const { context: { uuid }, href } = this.props;
+            this.setState({ loading: true }, ()=>{
 
-            const postURL = '/ingestion-submissions/' + uuid + '/submit_for_ingestion';
-            console.log(`Attempting Ingestion. \n\nPosting to: ${postURL}`);
+                const { context: { uuid }, onAddedFile } = this.props;
 
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", postURL, true);
+                const postURL = '/ingestion-submissions/' + uuid + '/submit_for_ingestion';
+                console.log(`Attempting Ingestion. \n\nPosting to: ${postURL}`);
 
-            xhr.onreadystatechange = function() { // Call a function when the state changes.
-                if (xhr.readyState !== 4) return;
-                if (xhr.readyState === xhr.DONE && xhr.status === 200) {
-                    // Request finished. Do processing here.
-                    console.log("response:", xhr.response);
-                    this.setState({ loading: false, success: true });
-                } else {
-                    this.setState({ loading: false, success: false }, function(){
-                        Alerts.queue(AttachmentInputController.ErrorObject);
-                    });
-                    console.error("Submission Ingestion Error: ", this.response);
-                }
-            }.bind(this);
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", postURL, true);
 
-            xhr.send(formData);
-        });
+                xhr.onreadystatechange = function() { // Call a function when the state changes.
+                    if (xhr.readyState !== 4) return;
+                    if (xhr.readyState === xhr.DONE && xhr.status === 200) {
+                        // Request finished. Do processing here.
+                        console.log("response:", xhr.response);
+                        onAddedFile(xhr.response);
+                        this.setState({ loading: false, success: true });
+                    } else {
+                        this.setState({ loading: false, success: false }, function(){
+                            Alerts.queue(AttachmentInputController.ErrorObject);
+                        });
+                        console.error("Submission Ingestion Error: ", this.response);
+                    }
+                }.bind(this);
+
+                xhr.send(formData);
+            });
+
+        }
     }
 
     onFormSubmit() {
