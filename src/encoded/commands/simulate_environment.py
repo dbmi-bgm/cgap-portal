@@ -1,8 +1,6 @@
 import logging
-import os
 import argparse
 import structlog
-from contextlib import contextmanager
 from dcicutils.qa_utils import override_environ
 from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.beanstalk_utils import get_beanstalk_environment_variables
@@ -21,7 +19,7 @@ def build_ini_file(environment, use_prod):
         :returns: True if successful, False otherwise
     """
     if is_stg_or_prd_env(environment) and not use_prod:
-        return False
+        raise Exception('Tried to run on production env %s without prod identifier!' % environment)
     beanstalk_env = get_beanstalk_environment_variables(environment)
     template_file_name = CGAPIniFileManager.environment_template_filename(environment)
     with override_environ(**beanstalk_env):
@@ -41,11 +39,7 @@ def main():
     parser.add_argument('environment', help='environment to simulate')
     parser.add_argument('--prod', help='Must be specified to run this on CGAP production', default=False)
     args = parser.parse_args()
-
-    if not build_ini_file(args.environment, args.prod):
-        logger.error('Failed to build production.ini - env: %s, prod: %s' % (args.environment, args.prod))
-        exit(1)
-
+    build_ini_file(args.environment, args.prod)
     logger.info('Successfully wrote production.ini')
     exit(0)
 
