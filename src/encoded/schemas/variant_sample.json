@@ -803,6 +803,7 @@
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
+            "extended_description" : "src/encoded/docs/extended_description_VariantSample_inheritance_mode.html",
             "order": 15
         },
         "novoPP": {
