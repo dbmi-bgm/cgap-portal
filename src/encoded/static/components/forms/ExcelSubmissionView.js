@@ -171,7 +171,7 @@ function PanelSelectionMenu(props){
             (completed? " completed" : "")
         );
         return (
-            <div data-for-panel={stepNum} onClick={!disabled && !completed && onSelect} key={stepNum} className={cls}>
+            <div data-for-panel={stepNum} onClick={!disabled && !completed && onSelect ? onSelect : undefined} key={stepNum} className={cls}>
                 <div className="row">
                     <div className="col-auto number-indicator">
                         <span>{ stepNum }</span>
@@ -506,7 +506,7 @@ class PanelTwo extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.onAddedFamily = this.onAddedFamily.bind(this);
+        this.onAddedFile = this.onAddedFile.bind(this);
     }
 
     componentDidUpdate(pastProps){
@@ -524,35 +524,28 @@ class PanelTwo extends React.PureComponent {
         }
     }
 
-    onAddedFamily(response){
+    onAddedFile(response){
         const { onLoadedIngestionSubmission } = this.props;
-        const { context } = response;
 
-        onLoadedIngestionSubmission(context);
+        const json = JSON.parse(response);
+        const { context, filename, submission_uri } = json;
 
-        const { families = [] } = context || {};
-        const familiesLen = families.length;
-        const newestFamily = families[familiesLen - 1];
-        const {
-            original_pedigree : {
-                '@id' : pedigreeID,
-                display_title: pedigreeTitle
-            } = {},
-            pedigree_source = null
-        } = newestFamily;
+        console.log(json.submission_uri);
+
+        // onLoadedIngestionSubmission(context);
 
         let message = null;
-        if (pedigreeTitle && pedigreeID){
+        if (submission_uri) {
             message = (
                 <React.Fragment>
-                    <p className="mb-0">Added family from pedigree <a href={pedigreeID}>{ pedigreeTitle }</a>.</p>
-                    { pedigree_source? <p className="mb-0 text-small">Source of pedigree: <em>{ pedigree_source }</em></p> : null }
+                    <p className="mb-0">Keep this window open for updates on file processing status. Note: this may take a while.</p>
+                    {/* <p className="mb-0 text-small">To check status of file processing manually, click <em><a href={submission_uri} target="_blank" rel="noreferrer">here</a></em>.</p> */}
                 </React.Fragment>
             );
         }
         Alerts.queue({
-            "title" : "Added family " + familiesLen,
-            message,
+            "title" : "Uploaded file (" + filename + ") successfully!",
+            message ,
             "style" : "success"
         });
     }
@@ -579,7 +572,7 @@ class PanelTwo extends React.PureComponent {
                         <i className="icon icon-info-circle fas icon-fw ml-05"
                             data-tip="Select & upload files generated in Proband and other pedigree software" />
                     </label>
-                    <AttachmentInputController href={href} context={submissionItem} onAddedFamily={this.onAddedFamily}>
+                    <AttachmentInputController href={href} context={submissionItem} onAddedFile={this.onAddedFile}>
                         <FileAttachmentBtn/>
                     </AttachmentInputController>
                 </div>
@@ -594,11 +587,12 @@ function FileAttachmentBtn(props){
     const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
     return (
         <React.Fragment>
-            <label htmlFor="test_file" disabled={loadingFileResult}
-                className={"btn btn-primary clickable" + (loadingFileResult ? " disabled" : "")}>
-                <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange} className="d-none"
+            <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
+                className={"btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
+                <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
+                    disabled={loadingFileResult || postFileSuccess === true}
                     accept=".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
-                <i className={"mr-08 icon icon-fw icon-" + icon}/>
+                <i className={"mr-08 icon icon-fw icon-" + icon} />
                 <span>Select Excel File...</span>
             </label>
             { !loadingFileResult && postFileSuccess ? <span className="ml-1 text-success">Success! <i className="icon icon-check fas"></i></span> : null}
