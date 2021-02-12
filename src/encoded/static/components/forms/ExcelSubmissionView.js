@@ -69,8 +69,22 @@ export default class ExcelSubmissionView extends React.PureComponent {
             if (pastPanelsComplete[0] !== true){ // ensure step is completed, move to next
                 panelsComplete = pastPanelsComplete.slice(0);
                 panelsComplete[0] = true;
+                return { submissionItem, panelsComplete, panelIdx: 1 };
+            } else { // if updating w/status of new ingestion submission
+                const {
+                    processing_status: { state, outcome, progress },
+                    additional_data: { validation_output = [] }
+                } = submissionItem;
+
+                if (state === "done" && outcome !== "success") {
+                    Alerts.queue({
+                        "title": "Something went wrong while processing this file...",
+                        "message": <ul>{validation_output.map((item) => <li key="item">{item}</li>)}</ul>,
+                        "style": "danger"
+                    });
+                }
+                return { submissionItem };
             }
-            return { submissionItem, panelsComplete, panelIdx: 1 };
         });
     }
 
@@ -96,7 +110,11 @@ export default class ExcelSubmissionView extends React.PureComponent {
     render(){
         const { panelIdx, panelsComplete, submissionItem } = this.state;
         const userDetails = JWT.getUserDetails();
-        const { '@id' : submissionID, 'display_title': submissionTitle } = submissionItem || {};
+        const {
+            '@id' : submissionID,
+            'display_title': submissionTitle,
+            processing_status: { state, outcome } = {}
+        } = submissionItem || {};
 
         let submissionLink = null;
         let finishBtn = null;
@@ -111,7 +129,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
                     <i className="icon icon-external-link-alt fas text-smaller ml-05"/>
                 </h5>
             );
-            if (panelIdx !== 2){
+            if (panelIdx !== 2 && state === "done" && outcome === "success"){
                 // Hide when on last panel since that has same button, but which also
                 // performs a PATCH
                 finishBtn = (
@@ -136,7 +154,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
                     <PanelOne {...this.props} {...this.state} userDetails={userDetails} markCompleted={this.markCompleted}
                         onLoadUser={this.handleLoadedUser} onSubmitIngestionSubmission={this.handleLoadedIngestionSubmission} />
 
-                    <PanelTwo {...this.props} {...this.state} userDetails={userDetails} onLoadedFileToIngestionSubmission={this.handleLoadedIngestionSubmission}
+                    <PanelTwo {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
                         markCompleted={this.markCompleted} />
 
                     <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
@@ -206,15 +224,6 @@ class PanelOne extends React.PureComponent {
             "projectID": project['@id'] || null,
             "projectTitle": project.display_title || null
         };
-        console.log("user", user);
-        // if (!initState.institutionID){ /* DEPRECATED: single institution per user
-        //     for (let i = 0; i < submits_for.length; i++){                           // OUTDATED - WE NOW HAVE PROJECT_ROLES
-        //         if (!submits_for[i]['@id']) continue;                               // OUTDATED - WE NOW HAVE PROJECT_ROLES
-        //         initState.institutionID = submits_for[i]['@id'] || null;            // OUTDATED - WE NOW HAVE PROJECT_ROLES
-        //         initState.institutionTitle = submits_for[i].display_title || null;  // OUTDATED - WE NOW HAVE PROJECT_ROLES
-        //         break;
-        //     }
-        // }
         return initState;
     }
 
@@ -529,17 +538,13 @@ class PanelTwo extends React.PureComponent {
     }
 
     setStatusIdx(idx) {
-        this.setState({statusIdx: idx});
+        this.setState({ statusIdx: idx });
     }
 
     onAddedFile(response){
-        // const { onLoadedIngestionSubmission } = this.props;
-
         const json = JSON.parse(response);
-        const { filename, submission_uri } = json;        
-
+        const { filename, submission_uri } = json;
         console.log("json", json);
-        // onLoadedFileToIngestionSubmission(context);
 
         let message = null;
         if (submission_uri) {
@@ -561,7 +566,7 @@ class PanelTwo extends React.PureComponent {
     }
 
     render(){
-        const { user, submissionItem, panelIdx, href } = this.props;
+        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission } = this.props;
         const { statusIdx } = this.state;
 
         if (panelIdx !== 1) {
@@ -592,7 +597,7 @@ class PanelTwo extends React.PureComponent {
                 </React.Fragment>
             );
         } else if (statusIdx === 1) {
-            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} />;
+            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} {...{ onLoadedIngestionSubmission }}/>;
         } else {
             panelContents = <h4 className="text-300 mt-2">Successfully processed file. Ready to view results.</h4>;
         }
@@ -628,35 +633,54 @@ function useInterval(callback, delay) {
 }
 
 function Poller(props){
-    const { context: { uuid }, setStatusIdx } = props;
+    const { context = null, setStatusIdx, onLoadedIngestionSubmission } = props;
+    const { uuid } = context || {};
     const getURL = "/ingestion-submissions/" + uuid;
 
+    // console.log("context", context);
     useInterval(() => {
         console.log("Checking if processing status is updated.");
         ajax.promise(getURL, "GET")
             .then((response)=> {
                 console.log("response", response);
-                if (response.validation_errors) {
+                const {
+                    processing_status : { outcome, state, progress } = {},
+                    validation_errors = [],
+                    errors = []
+                } = response || {};
+
+                if (validation_errors.length > 0) {
+                    console.error(validation_errors);
                     throw new Error("Did not pass server-side validation...");
+
+                } else if (errors.length > 0) {
+                    console.error(errors);
+                    throw new Error("Something went wrong while processing...");
+
                 } else {
-                    const { processing_status : { outcome } = {} } = response || {};
-                    switch(outcome) {
-                        case "success":
-                            // TODO: Upload global item and
-                            setStatusIdx(2); // Allow to proceed to finalization
-                            break;
-                        case "error":
-                        case "failure":
-                            // TODO: Better error handling/display of validation errors (maybe update global item context?)
-                            throw new Error("Something failed");
-                        case "unknown":
-                        default:
-                            // pass
-                    }
+                    if (state === "done") {
+                        switch(outcome) {
+                            case "success":
+                                // Upload global item
+                                onLoadedIngestionSubmission(response);
+                                setStatusIdx(2); // Quit polling; allow to proceed to finalization
+                                break;
+                            case "error":
+                            case "failure":
+                                onLoadedIngestionSubmission(response);
+                                setStatusIdx(0);
+                                break;
+                            case "unknown":
+                            default: // Shouldn't happen; outcome should only be unknown if state is not done
+                                throw new Error("Something went wrong while processing...");
+                        }
+                    } // continue checking until complete
+                    console.log("Progress: ", progress);
                 }
             })
             .catch((error)=> {
-                console.log("error", error);
+                console.log("catching error", error);
+                Alerts.queue({ "title": error, style: "danger" });
                 setStatusIdx(0); // Re-enable file upload.
             });
     }, 15000);
