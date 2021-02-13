@@ -503,7 +503,7 @@
             "title": "Coverage, VAF",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 40,
+            "order": 20,
             "sort_fields": [
                 {
                     "field": "DP",
@@ -803,6 +803,7 @@
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
+            "extended_description" : "src/encoded/docs/extended_description_VariantSample_inheritance_mode.html",
             "order": 15
         },
         "novoPP": {
