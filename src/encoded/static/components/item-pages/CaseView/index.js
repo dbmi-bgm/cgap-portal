@@ -26,6 +26,7 @@ import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
+import { InterpretationTab } from './InterpretationTab';
 import CaseSubmissionView from './CaseSubmissionView';
 
 
@@ -292,11 +293,12 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
                         <SelectedItemsController isMultiselect>
-                            <FilteringTab {...{ context, windowHeight, session, schemas, variantSampleListItem, updateVariantSampleListID, savedVariantSampleIDMap, refreshExistingVariantSampleListItem }} />
+                            <FilteringTab {...{ context, windowHeight, session, schemas, variantSampleListItem,
+                                updateVariantSampleListID, savedVariantSampleIDMap, refreshExistingVariantSampleListItem }} />
                         </SelectedItemsController>
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled={vsSelections.length === 0} cache={false}>
-                        <InterpretationTab {...props} />
+                        <InterpretationTab {...{ variantSampleListItem, schemas }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
                         <ReportingTab {...props} />
@@ -726,7 +728,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
     return (
         <React.Fragment>
-            <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
+            <h1><span className="text-300">Bioinformatics Analysis</span></h1>
             {/* <div className="tab-inner-container clearfix font-italic qc-status">
                 <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
@@ -749,11 +751,6 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 });
 
 
-
-
-function InterpretationTab(props) {
-    return <h1>This is the interpretation tab.</h1>;
-}
 function ReportingTab(props) {
     return <h1>This is the reporting tab</h1>;
 }

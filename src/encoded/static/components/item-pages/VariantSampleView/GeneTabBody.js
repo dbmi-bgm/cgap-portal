@@ -3,8 +3,6 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import DropdownButton from 'react-bootstrap/esm/DropdownButton';
-import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, schemaTransforms, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 

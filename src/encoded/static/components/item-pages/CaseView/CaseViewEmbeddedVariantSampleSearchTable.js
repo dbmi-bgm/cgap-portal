@@ -163,7 +163,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     return (
                         <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
                             <VariantSampleSelectionCheckbox {...{ selectedItems, onSelectItem, savedVariantSampleIDMap }} />
-                            <VSDisplayTitleColumnDefault />
+                            <VariantSampleDisplayTitleColumn />
                         </DisplayTitleColumnWrapper>
                     );
                 }
@@ -242,7 +242,7 @@ const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColum
 });
 
 /** An edited version of SPC's DisplayTitleColumnDefault */
-const VSDisplayTitleColumnDefault = React.memo(function VSDisplayTitleColumnDefault(props) {
+export const VariantSampleDisplayTitleColumn = React.memo(function VariantSampleDisplayTitleColumn(props) {
     const { result = null, link, onClick, className = null } = props;
     const { variant = null } = result || {};
     const { display_title = null, dbsnp_rs_number = null } = variant;

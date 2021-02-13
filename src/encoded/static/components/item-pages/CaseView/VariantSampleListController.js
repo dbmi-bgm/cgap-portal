@@ -7,7 +7,11 @@ import memoize from "memoize-one";
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
-/** Holds datastore=database representation of VariantSampleList Item */
+/**
+ * Holds datastore=database representation of VariantSampleList Item
+ * Gets refreshed after saving/moving VariantSamples to InterpretationTab
+ * and upon mount.
+ */
 export class VariantSampleListController extends React.PureComponent {
 
     /**
@@ -28,6 +32,9 @@ export class VariantSampleListController extends React.PureComponent {
 
     static getDerivedStateFromProps(props, state) {
         if (props.id) {
+            // If supplied via props, always set to props.id and prevent
+            // from ever changing.
+            // Else rely on `updateVariantSampleListID` to set it.
             return { "variantSampleListID": props.id };
         }
         return null;
@@ -42,6 +49,7 @@ export class VariantSampleListController extends React.PureComponent {
         this.state = {
             "variantSampleListItem": null,
             "variantSampleListID": typeof vslID === "string" ? vslID : null,
+            // `refreshCount` not necessary at all, just for potential internal debugging.
             "refreshCount": 0
         };
 
