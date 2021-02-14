@@ -2,10 +2,10 @@ import pytest
 import webtest
 
 from dcicutils.qa_utils import notice_pytest_fixtures
-from .workbook_support import workbook_from_snapshot
+from .workbook_support import workbook
 
 
-notice_pytest_fixtures(workbook_from_snapshot)
+notice_pytest_fixtures(workbook)
 
 pytestmark = [pytest.mark.working]
 
@@ -68,7 +68,7 @@ def help_page_json_deleted():
 
 
 @pytest.fixture()
-def posted_help_page_section(es_testapp, workbook_from_snapshot, help_page_section_json):
+def posted_help_page_section(es_testapp, workbook, help_page_section_json):
     try:
         res = es_testapp.post_json('/static-sections/', help_page_section_json, status=201)
         val = res.json['@graph'][0]
@@ -79,7 +79,7 @@ def posted_help_page_section(es_testapp, workbook_from_snapshot, help_page_secti
 
 
 @pytest.fixture()
-def help_page(es_testapp, workbook_from_snapshot, posted_help_page_section, help_page_json):
+def help_page(es_testapp, workbook, posted_help_page_section, help_page_json):
     try:
         res = es_testapp.post_json('/pages/', help_page_json, status=201)
         val = res.json['@graph'][0]
@@ -90,7 +90,7 @@ def help_page(es_testapp, workbook_from_snapshot, posted_help_page_section, help
 
 
 @pytest.fixture()
-def help_page_deleted(es_testapp, workbook_from_snapshot, posted_help_page_section, help_page_json_deleted):
+def help_page_deleted(es_testapp, workbook, posted_help_page_section, help_page_json_deleted):
     try:
         res = es_testapp.post_json('/pages/', help_page_json_deleted, status=201)
         val = res.json['@graph'][0]
@@ -101,7 +101,7 @@ def help_page_deleted(es_testapp, workbook_from_snapshot, posted_help_page_secti
 
 
 @pytest.fixture()
-def help_page_in_review(es_testapp, workbook_from_snapshot, posted_help_page_section, help_page_json_in_review):
+def help_page_in_review(es_testapp, workbook, posted_help_page_section, help_page_json_in_review):
     try:
         res = es_testapp.post_json('/pages/', help_page_json_in_review, status=201)
         val = res.json['@graph'][0]
@@ -111,7 +111,7 @@ def help_page_in_review(es_testapp, workbook_from_snapshot, posted_help_page_sec
     return val
 
 
-def test_get_help_page(es_testapp, workbook_from_snapshot, help_page):
+def test_get_help_page(es_testapp, workbook, help_page):
     help_page_url = "/" + help_page['name']
     res = es_testapp.get(help_page_url, status=200)
     assert res.json['@id'] == help_page_url
@@ -124,18 +124,18 @@ def test_get_help_page(es_testapp, workbook_from_snapshot, help_page):
     assert res.json['toc'] == help_page['table-of-contents']
 
 
-def test_get_help_page_deleted(workbook_from_snapshot, anon_html_es_testapp, help_page_deleted):
+def test_get_help_page_deleted(workbook, anon_html_es_testapp, help_page_deleted):
     help_page_url = "/" + help_page_deleted['name']
     anon_html_es_testapp.get(help_page_url, status=403)
 
 
-def test_get_help_page_no_access(workbook_from_snapshot, anon_html_es_testapp, es_testapp, help_page_in_review):
+def test_get_help_page_no_access(workbook, anon_html_es_testapp, es_testapp, help_page_in_review):
     help_page_url = "/" + help_page_in_review['name']
     anon_html_es_testapp.get(help_page_url, status=403)
     es_testapp.get(help_page_url, status=200)
 
 
-def test_page_unique_name(workbook_from_snapshot, es_testapp, help_page, help_page_deleted):
+def test_page_unique_name(workbook, es_testapp, help_page, help_page_deleted):
     # POST again with same name and expect validation error
     new_page = {'name': help_page['name']}
     res = es_testapp.post_json('/page', new_page, status=422)

@@ -1,3 +1,4 @@
+import datetime
 import logging
 import pkg_resources
 import pytest
@@ -26,6 +27,13 @@ def ancestor_classes(cls, reverse=False):
         result.reverse()
     print("ancestor_classes(%r, reverse=%s) = %r" %(cls, reverse, result))
     return result
+
+def is_proper_subclass(cls, maybe_proper_superclass):
+    """
+    Returns true of its first argument is a subclass of the second argument, but is not that class itself.
+    (Every class is a subclass of itself, but no class is a 'proper subclass' of itself.)
+    """
+    return cls is not maybe_proper_superclass and issubclass(cls, maybe_proper_superclass)
 
 
 # TODO: Move later to dcicutils
@@ -196,6 +204,8 @@ class ElasticSearchDataCache:
             If False, if the data is not newly created, it is restored from a snapshot.
         """
         if DEBUG_WORKBOOK_CACHE:
+            logging.warning("Entering load_data at %s" % datetime.datetime.now())
+        if DEBUG_WORKBOOK_CACHE:
             PRINT("%s.assure_data_loaded(...)" % cls.__name__)
 
         snapshot_name = cls.defaulted_snapshot_name(snapshot_name)
@@ -220,27 +230,51 @@ class ElasticSearchDataCache:
 
     @classmethod
     def load_data(cls, es_testapp, datadir, indexer_namespace, other_data=None):
+        if "load_additional_data" not in cls.__dict__:
+            raise RuntimeError("The class %s must provide a 'load_additional_data' method.")
         if DEBUG_WORKBOOK_CACHE:
             PRINT("Checking ancestors of", cls.__name__)
-        for ancestor_class in ancestor_classes(cls, reverse=True):
+        ancestor_found = None
+        for ancestor_class in ancestor_classes(cls):
             if DEBUG_WORKBOOK_CACHE:
                 PRINT("Trying ancestor", ancestor_class)
-            # We apply each of these in order from general to specific.
+            # We only care about classes that are descended from our root class, obeying our protocols.
             if issubclass(ancestor_class, ElasticSearchDataCache):
-                if DEBUG_WORKBOOK_CACHE:
-                    PRINT("Loading data for ancestor class", ancestor_class.__name__)
-                ancestor_class.assure_data_loaded(es_testapp,
-                                                  datadir=datadir,
-                                                  indexer_namespace=indexer_namespace,
-                                                  other_data=other_data)
-                if DEBUG_WORKBOOK_CACHE:
-                    PRINT("Done loading data for ancestor class", ancestor_class.__name__)
-            else:
-                if DEBUG_WORKBOOK_CACHE:
-                    PRINT("Not ElasticSearchDataCache:", ancestor_class)
+                if ancestor_found:
+                    if not issubclass(ancestor_found, ancestor_class):
+                        # This could happen with multiple inheritance. We can't rely on just calling its
+                        # assure_data_loaded method because that method will blow away all indexes to build
+                        # its foundation and we've already done that.  Even if we worked backward and loaded
+                        # the less specific type first, risking reloads, that would only work for single
+                        # inheritance, since it would again blow away the foundation before loading another layer,
+                        # so we require single-inheritance and just assume the top layer knows what it's doing.
+                        # -kmp 14-Feb-2021
+                        raise RuntimeError("%s requires its descendants to use only single inheritance"
+                                           ", but %s mixes %s and %s, and %s is not a subclass of %s."
+                                           % (ElasticSearchDataCache.__name__,
+                                              cls.__name__,
+                                              ancestor_found.__name__,
+                                              ancestor_class.__name__,
+                                              ancestor_found.__name__,
+                                              ancestor_class.__name__))
+                elif getattr(ancestor_class, "load_additional_data", None):
+                    ancestor_found = ancestor_class
+        if ancestor_found:
+            if DEBUG_WORKBOOK_CACHE:
+                PRINT("Loading data for ancestor class", ancestor_found.__name__)
+            ancestor_found.assure_data_loaded(es_testapp,
+                                              datadir=datadir,
+                                              indexer_namespace=indexer_namespace,
+                                              other_data=other_data)
+            if DEBUG_WORKBOOK_CACHE:
+                PRINT("Done loading data for ancestor class", ancestor_found.__name__)
+        else:
+            if DEBUG_WORKBOOK_CACHE:
+                PRINT("No useful ancestor found. No foundation to load.", cls.__name__)
         # Having built a foundation, now add the data that we wanted.
         if DEBUG_WORKBOOK_CACHE:
             PRINT("Loading additional requested class data", cls.__name__)
+        # Now that a proper foundation is assured, load the new data that this class contributes.
         cls.load_additional_data(es_testapp, other_data=other_data)
         if DEBUG_WORKBOOK_CACHE:
             PRINT("Done loading additional requested class data", cls.__name__)
@@ -316,7 +350,7 @@ class WorkbookCache(ElasticSearchDataCache):
 
 
 @pytest.fixture()
-def workbook_from_snapshot(es_testapp, workbook, elasticsearch_server_dir, indexer_namespace):
+def workbook(es_testapp, obsolete_workbook, elasticsearch_server_dir, indexer_namespace):
     WorkbookCache.assure_data_loaded(es_testapp,
                                      datadir=elasticsearch_server_dir,
                                      indexer_namespace=indexer_namespace)
@@ -331,7 +365,7 @@ class PersonasCache(WorkbookCache):
 
 
 @pytest.fixture()
-def personas_from_snapshot(es_testapp, personas, elasticsearch_server_dir, indexer_namespace):
+def personas(es_testapp, obsolete_personas, elasticsearch_server_dir, indexer_namespace):
     PersonasCache.assure_data_loaded(es_testapp,
                                      datadir=elasticsearch_server_dir,
                                      indexer_namespace=indexer_namespace)

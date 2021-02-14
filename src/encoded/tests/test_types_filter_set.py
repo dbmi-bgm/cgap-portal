@@ -2,10 +2,10 @@ import pytest
 
 from dcicutils.qa_utils import notice_pytest_fixtures
 from webtest import AppError
-from .workbook_support import workbook_from_snapshot
+from .workbook_support import workbook
 
 
-notice_pytest_fixtures(workbook_from_snapshot)
+notice_pytest_fixtures(workbook)
 
 pytestmark = [pytest.mark.working, pytest.mark.search]
 COMPOUND_SEARCH_URL = '/compound_search'
@@ -30,7 +30,7 @@ def barebones_filter_set():
     }
 
 
-def test_filter_set_barebones(workbook_from_snapshot, es_testapp, barebones_filter_set):
+def test_filter_set_barebones(workbook, es_testapp, barebones_filter_set):
     """ Tests posting a filter set and executing it through the /compound_search route """
     res = es_testapp.post_json(FILTER_SET_URL, barebones_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
@@ -87,7 +87,7 @@ def simple_filter_set():
     }
 
 
-def test_filter_set_simple(workbook_from_snapshot, es_testapp, simple_filter_set):
+def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
     """ Test posting a non-trivial (but simple) filter set """
     res = es_testapp.post_json(FILTER_SET_URL, simple_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
@@ -163,7 +163,7 @@ def typical_filter_set():
     }
 
 
-def test_filter_set_typical(workbook_from_snapshot, es_testapp, typical_filter_set):
+def test_filter_set_typical(workbook, es_testapp, typical_filter_set):
     """ Executes a filter set with multiple filter blocks """
     res = es_testapp.post_json(FILTER_SET_URL, typical_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
@@ -205,7 +205,7 @@ def complex_filter_set():
     }
 
 
-def test_filter_set_complex(workbook_from_snapshot, es_testapp, complex_filter_set):
+def test_filter_set_complex(workbook, es_testapp, complex_filter_set):
     """ Executes a 'complex' filter set, toggling and re-searching with certain blocks disabled """
     res = es_testapp.post_json(FILTER_SET_URL, complex_filter_set, status=201).json
     uuid = res['@graph'][0]['@id']
@@ -231,7 +231,7 @@ def test_filter_set_complex(workbook_from_snapshot, es_testapp, complex_filter_s
     assert len(compound_search_res) == 3
 
 
-def test_filter_set_intersection(workbook_from_snapshot, es_testapp, complex_filter_set):
+def test_filter_set_intersection(workbook, es_testapp, complex_filter_set):
     """ Uses the complex filter set with an AND filter_set execution, which should be
         functionally identical but will show slightly different results.
     """
@@ -287,7 +287,7 @@ def filter_set_with_many_flags():
     }
 
 
-def test_filter_set_selectively_apply_flags(workbook_from_snapshot, es_testapp, filter_set_with_many_flags):
+def test_filter_set_selectively_apply_flags(workbook, es_testapp, filter_set_with_many_flags):
     """ Executes a complex filter set with multiple flags added selectively across fields """
     filter_set = filter_set_with_many_flags
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
@@ -325,7 +325,7 @@ def filter_set_with_only_flags():
     }
 
 
-def test_compound_search_only_global_flags(workbook_from_snapshot, es_testapp, filter_set_with_only_flags):
+def test_compound_search_only_global_flags(workbook, es_testapp, filter_set_with_only_flags):
     """ Tests compound search with a filter set that has only flags
         /search redirect is functioning if we get correct facets on the response, which are checked
         explicitly for correctness in this test.
@@ -346,7 +346,7 @@ def filter_set_with_single_filter_block():
     }
 
 
-def test_compound_search_single_filter_block(workbook_from_snapshot, es_testapp, filter_set_with_single_filter_block):
+def test_compound_search_single_filter_block(workbook, es_testapp, filter_set_with_single_filter_block):
     """ Tests compound search with a filter set with only one filter_block.
         /search redirect is functioning if we get facets on the response.
     """
@@ -373,7 +373,7 @@ def filter_set_with_single_filter_block_and_flags():
     }
 
 
-def test_compound_search_filter_and_flags(workbook_from_snapshot, es_testapp,
+def test_compound_search_filter_and_flags(workbook, es_testapp,
                                           filter_set_with_single_filter_block_and_flags):
     """ Tests compound search with a filter set that has one filter block and flags
         /search redirect is functioning if we get facets on the response.
@@ -407,7 +407,7 @@ def filter_set_with_multiple_disabled_flags():
     }
 
 
-def test_compound_search_disabled_flags(workbook_from_snapshot, es_testapp, filter_set_with_multiple_disabled_flags):
+def test_compound_search_disabled_flags(workbook, es_testapp, filter_set_with_multiple_disabled_flags):
     """ Tests a compound search with all flags disabled (raw filter_blocks + global_flags). """
     resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_multiple_disabled_flags).json
     assert len(resp['@graph']) == 2
@@ -420,7 +420,7 @@ def request_with_lots_of_results():
     }
 
 
-def test_compound_search_from_to(workbook_from_snapshot, es_testapp, request_with_lots_of_results):
+def test_compound_search_from_to(workbook, es_testapp, request_with_lots_of_results):
     """ Tests pagination + generator with compound searches """
     paginated_request: dict = request_with_lots_of_results  # since we have a lot of results, paginate through them
 
@@ -441,7 +441,7 @@ def test_compound_search_from_to(workbook_from_snapshot, es_testapp, request_wit
     assert len(resp['@graph']) == 10
 
 
-def test_compound_search_rejects_malformed_filter_sets(workbook_from_snapshot, es_testapp):
+def test_compound_search_rejects_malformed_filter_sets(workbook, es_testapp):
     """ Tests passing a bunch of malformed filter_sets raises an error. """
     filter_set_without_filter_block_sub_fields: dict = {
         'search_type': 'Variant',

@@ -11,7 +11,7 @@ from .data.variant_workbook.expected import (
 from ..ingestion.vcf_utils import (
     VCFParser
 )
-from .workbook_support import workbook_from_snapshot
+from .workbook_support import workbook
 from .variant_fixtures import (  # noqa
     GENE_URL,
     GENE_WORKBOOK,
@@ -21,7 +21,7 @@ from .variant_fixtures import (  # noqa
 )
 
 
-notice_pytest_fixtures(workbook_from_snapshot)
+notice_pytest_fixtures(workbook)
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 
@@ -176,7 +176,7 @@ class TestIngestVCF:
 
 # integrated test, so outside of class XXX: Refactor to use variant_utils
 @pytest.mark.skip  # Comment this out and run directly to test the first 5 variants and variant samples validation
-def test_post_variants_and_samples_with_links(workbook_from_snapshot, es_testapp, test_vcf):
+def test_post_variants_and_samples_with_links(workbook, es_testapp, test_vcf):
     """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
         NOTE: This is the most important test functionally speaking.
     """

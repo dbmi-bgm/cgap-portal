@@ -2,10 +2,10 @@ import pytest
 from dcicutils.qa_utils import notice_pytest_fixtures
 from ..util import resolve_file_path
 from ..ingestion.gene_utils import GeneIngestion
-from .workbook_support import workbook_from_snapshot
+from .workbook_support import workbook
 
 
-notice_pytest_fixtures(workbook_from_snapshot)
+notice_pytest_fixtures(workbook)
 
 
 GENES_LOC = resolve_file_path('tests/data/variant_workbook/gene_inserts_partial.json')
@@ -26,7 +26,7 @@ def test_genes():
 
 
 @pytest.fixture
-def genes(workbook_from_snapshot, es_testapp, test_genes):
+def genes(workbook, es_testapp, test_genes):
     """ Fixture that posts a subset of genes """
     for gene in test_genes:
         gene['project'] = 'hms-dbmi'

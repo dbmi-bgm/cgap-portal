@@ -310,7 +310,7 @@ def indexer_namespace(es_app_settings):
 
 
 @pytest.fixture(scope='session')
-def workbook(es_testapp, elasticsearch_server_dir, indexer_namespace):
+def obsolete_workbook(es_testapp, elasticsearch_server_dir, indexer_namespace):
     """ Loads a bunch of data (tests/data/workbook-inserts) into the system on first run
         (session scope doesn't work). """
     WorkbookCache.assure_data_once_loaded(es_testapp,
@@ -318,7 +318,7 @@ def workbook(es_testapp, elasticsearch_server_dir, indexer_namespace):
                                           indexer_namespace=indexer_namespace)
 
 @pytest.fixture(scope='session')
-def personas(es_testapp, workbook, elasticsearch_server_dir, indexer_namespace):
+def obsolete_personas(es_testapp, obsolete_workbook, elasticsearch_server_dir, indexer_namespace):
     """ Loads a bunch of data (tests/data/workbook-inserts) into the system on first run
         (session scope doesn't work). """
     PersonasCache.assure_data_once_loaded(es_testapp,

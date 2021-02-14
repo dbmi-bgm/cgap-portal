@@ -1,11 +1,11 @@
 import pytest
 import requests  # XXX: C4-211
 from .variant_fixtures import VARIANT_SAMPLE_URL
-from .workbook_support import workbook_from_snapshot
+from .workbook_support import workbook
 from dcicutils.qa_utils import notice_pytest_fixtures
 
 
-notice_pytest_fixtures(workbook_from_snapshot)
+notice_pytest_fixtures(workbook)
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]
@@ -24,7 +24,7 @@ def test_variant_sample():
 
 
 @pytest.mark.integrated  # uses s3
-def test_bam_snapshot_download(workbook_from_snapshot, es_testapp, test_variant_sample):
+def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     """ Tests that we can correctly download an IGV image from the wfoutput bucket. """
     res = es_testapp.post_json(VARIANT_SAMPLE_URL, test_variant_sample, status=201).json
     uuid = res['@graph'][0]['uuid']
