@@ -13,7 +13,7 @@ from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
 from snovault.util import generate_indexer_namespace_for_testing
 from .conftest_settings import make_app_settings_dictionary
-from .workbook_support import WorkbookCache
+from .workbook_support import WorkbookCache, PersonasCache
 from .. import main
 
 
@@ -313,6 +313,14 @@ def indexer_namespace(es_app_settings):
 def workbook(es_testapp, elasticsearch_server_dir, indexer_namespace):
     """ Loads a bunch of data (tests/data/workbook-inserts) into the system on first run
         (session scope doesn't work). """
-    WorkbookCache.initialize_if_needed(es_testapp,
-                                       datadir=elasticsearch_server_dir,
-                                       indexer_namespace=indexer_namespace)
+    WorkbookCache.assure_data_once_loaded(es_testapp,
+                                          datadir=elasticsearch_server_dir,
+                                          indexer_namespace=indexer_namespace)
+
+@pytest.fixture(scope='session')
+def personas(es_testapp, workbook, elasticsearch_server_dir, indexer_namespace):
+    """ Loads a bunch of data (tests/data/workbook-inserts) into the system on first run
+        (session scope doesn't work). """
+    PersonasCache.assure_data_once_loaded(es_testapp,
+                                          datadir=elasticsearch_server_dir,
+                                          indexer_namespace=indexer_namespace)

@@ -4,15 +4,18 @@ import mock
 import pytest
 import time
 
-from dcicutils.qa_utils import ignored
+from dcicutils.qa_utils import ignored, notice_pytest_fixtures
 from uuid import uuid4
 from pyramid.testing import DummyRequest
+from .workbook_support import workbook_from_snapshot
 from ..ingestion_listener import (
     IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
 )
 from ..ingestion.common import IngestionReport, IngestionError
 from ..util import debuglog
 
+
+notice_pytest_fixtures(workbook_from_snapshot)
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 QUEUE_INGESTION_URL = '/queue_ingestion'
@@ -142,7 +145,7 @@ def test_ingestion_queue_add_and_receive(fresh_ingestion_queue_manager_for_testi
     _expect_message_uuids(queue_manager, test_uuids)
 
 
-def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing, workbook, es_testapp):
+def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing, workbook_from_snapshot, es_testapp):
     """ Tests adding uuids to the queue via /queue_ingestion """
     queue_manager = fresh_ingestion_queue_manager_for_testing
     test_uuids = [str(uuid4()), str(uuid4())]
@@ -159,7 +162,7 @@ def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing
     _expect_message_uuids(queue_manager, test_uuids)
 
 
-def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, workbook, es_testapp):
+def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, workbook_from_snapshot, es_testapp):
     """ Tests deleting messages from SQS results in no messages being there. """
     queue_manager = fresh_ingestion_queue_manager_for_testing
     request_body = {
@@ -185,7 +188,7 @@ def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_f
 
 
 @pytest.mark.skip
-def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testapp):
+def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook_from_snapshot, es_testapp):
     """ Posts a minimal processed file to be checked """
     request = DummyRequest(environ={'REMOTE_USER': 'TEST', 'HTTP_ACCEPT': 'application/json'})
     request.invoke_subrequest = es_testapp.app.invoke_subrequest
@@ -194,7 +197,7 @@ def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testa
 
 
 @pytest.mark.skip
-def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_manager_for_testing):
+def test_ingestion_listener_run(workbook_from_snapshot, es_testapp, fresh_ingestion_queue_manager_for_testing):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
     """

@@ -90,36 +90,53 @@ def pattern_fields():
     }
 
 
+class MasterMixins:
+
+    CACHED_RESULT = None
+
+    @classmethod
+    def computed(cls):
+        if cls.CACHED_RESULT is None:
+            cls.CACHED_RESULT = cls.compute_master_mixins()
+        return cls.CACHED_RESULT
+
+    @staticmethod
+    def compute_master_mixins():
+        mixins = load_schema('encoded:schemas/mixins.json')
+        mixin_keys = [
+            'schema_version',
+            'uuid',
+            'accession',
+            'aliases',
+            'status',
+            'submitted',
+            'modified',
+            'attribution',
+            'notes',
+            'documents',
+            'attachment',
+            'dbxrefs',
+            'alternative_ids',
+            'static_embeds',
+            'tags',
+            'facets_common',
+            'supplementary_files'
+        ]
+        for key in mixin_keys:
+            assert(mixins[key])
+
+
+
 @pytest.fixture(scope='module')
 def master_mixins():
     return compute_master_mixins()
 
 
 def compute_master_mixins():
-    mixins = load_schema('encoded:schemas/mixins.json')
-    mixin_keys = [
-        'schema_version',
-        'uuid',
-        'accession',
-        'aliases',
-        'status',
-        'submitted',
-        'modified',
-        'attribution',
-        'notes',
-        'documents',
-        'attachment',
-        'dbxrefs',
-        'alternative_ids',
-        'static_embeds',
-        'tags',
-        'facets_common',
-        'supplementary_files'
-    ]
-    for key in mixin_keys:
-        assert(mixins[key])
+    return MasterMixins.computed()
 
 
+# TODO: reconcile this with the similar function dcicutils.misc_utils
 def camel_case(name):
     return ''.join(x for x in name.title() if not x == '_')
 

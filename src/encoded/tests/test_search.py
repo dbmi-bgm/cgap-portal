@@ -1,17 +1,14 @@
-import io
-import json
-import os
 import pytest
 import mock
 import webtest
 
 from datetime import (datetime, timedelta)
 from dcicutils.misc_utils import Retry
-from dcicutils.qa_utils import local_attrs
+from dcicutils.qa_utils import local_attrs, notice_pytest_fixtures
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
-from .workbook_support import WorkbookCache
+from .workbook_support import WorkbookCache, workbook_from_snapshot, personas_from_snapshot
 from ..search import lucene_builder
 from ..search.lucene_builder import LuceneBuilder
 from ..search.search_utils import find_nested_path
@@ -20,6 +17,8 @@ from snovault.util import add_default_embeds
 from snovault.schema_utils import load_schema
 from webtest import AppError
 
+
+notice_pytest_fixtures(workbook_from_snapshot, personas_from_snapshot)
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search]
 
@@ -43,7 +42,7 @@ def recursively_find_uuids(json, uuids):
     return uuids
 
 
-def test_search_view(workbook, es_testapp):
+def test_search_view(workbook_from_snapshot, es_testapp):
     """ Test basic things about search view """
     res = es_testapp.get('/search/?type=Item').json
     assert res['@type'] == ['ItemSearchResults', 'Search']
@@ -57,7 +56,7 @@ def test_search_view(workbook, es_testapp):
     assert '@graph' in res
 
 
-def test_search_with_no_query(workbook, es_testapp):
+def test_search_with_no_query(workbook_from_snapshot, es_testapp):
     """
     using /search/ (with no query) should default to /search/?type=Item
     thus, should satisfy same assertions as test_search_view
@@ -78,7 +77,7 @@ def test_search_with_no_query(workbook, es_testapp):
     assert '@graph' in res
 
 
-def test_collections_redirect_to_search(workbook, es_testapp):
+def test_collections_redirect_to_search(workbook_from_snapshot, es_testapp):
     """
     we removed the collections page and redirect to search of that type
     redirected_from is not used for search
@@ -96,7 +95,7 @@ def test_collections_redirect_to_search(workbook, es_testapp):
     assert '@graph' in res
 
 
-def test_search_with_embedding(workbook, es_testapp):
+def test_search_with_embedding(workbook_from_snapshot, es_testapp):
     """ Searches for a family and checks members.*, an embedded field, is properly resolved """
     res = es_testapp.get('/search/?type=Family&limit=all').json
     embed = res['@graph'][0]['members']
@@ -106,7 +105,7 @@ def test_search_with_embedding(workbook, es_testapp):
     assert embed[1]['mother']['display_title'] == 'GAPIDISC7R73'
 
 
-def test_search_with_simple_query(workbook, es_testapp):
+def test_search_with_simple_query(workbook_from_snapshot, es_testapp):
     """
     Tests simple query string searches on CGAP using type-based
     q= and generic q=
@@ -137,7 +136,7 @@ def test_search_with_simple_query(workbook, es_testapp):
     res = es_testapp.get('/search/?type=Disorder&q=(oranges)+(apples)+(bananas)', status=404)
 
 
-def test_search_ngram(workbook, es_testapp):
+def test_search_ngram(workbook_from_snapshot, es_testapp):
     """
     Tests edge-ngram related behavior with simple query string
     """
@@ -174,7 +173,7 @@ def test_search_ngram(workbook, es_testapp):
 
 
 @pytest.mark.skip # XXX: What is this really testing?
-def test_search_facets_and_columns_order(workbook, es_testapp):
+def test_search_facets_and_columns_order(workbook_from_snapshot, es_testapp):
     # TODO: Adjust ordering of mixed-in facets, perhaps sort by lookup or something, in order to un-xfail.
     test_type = 'experiment_set_replicate'
     type_info = es_testapp.app.registry[TYPES].by_item_type[test_type]
@@ -195,7 +194,7 @@ def test_search_facets_and_columns_order(workbook, es_testapp):
 
 
 @pytest.fixture
-def dd_dts(es_testapp, workbook):
+def dd_dts(es_testapp, workbook_from_snapshot):
     # returns a dictionary of strings of various date and datetimes
     # relative to the creation date of the mboI one object in test inserts
     enz = es_testapp.get('/search/?type=Disorder&disorder_name=Dummy+Disorder').json['@graph'][0]
@@ -218,7 +217,7 @@ def dd_dts(es_testapp, workbook):
     }
 
 
-def test_search_date_range_find_within(dd_dts, es_testapp, workbook):
+def test_search_date_range_find_within(dd_dts, es_testapp, workbook_from_snapshot):
     # the MboI enzyme should be returned with all the provided pairs
     gres = es_testapp.get('/search/?type=Disorder&disorder_name=Dummy+Disorder').json
     g_uuids = [item['uuid'] for item in gres['@graph'] if 'uuid' in item]
@@ -239,7 +238,7 @@ def test_search_date_range_find_within(dd_dts, es_testapp, workbook):
 
 
 @pytest.mark.skip # XXX: how to best port?
-def test_search_with_nested_integer(es_testapp, workbook):
+def test_search_with_nested_integer(es_testapp, workbook_from_snapshot):
     search0 = '/search/?type=ExperimentHiC'
     s0res = es_testapp.get(search0).json
     s0_uuids = [item['uuid'] for item in s0res['@graph'] if 'uuid' in item]
@@ -259,7 +258,7 @@ def test_search_with_nested_integer(es_testapp, workbook):
     assert set(s1_uuids) | set(s2_uuids) == set(s0_uuids)
 
 
-def test_search_date_range_dontfind_without(dd_dts, es_testapp, workbook):
+def test_search_date_range_dontfind_without(dd_dts, es_testapp, workbook_from_snapshot):
     # the MboI enzyme should be returned with all the provided pairs
     dts = {k: v.replace(':', '%3A') for k, v in dd_dts.items()}
     datepairs = [
@@ -272,7 +271,7 @@ def test_search_date_range_dontfind_without(dd_dts, es_testapp, workbook):
         assert es_testapp.get(search, status=404)
 
 
-def test_search_query_string_AND_NOT_cancel_out(workbook, es_testapp):
+def test_search_query_string_AND_NOT_cancel_out(workbook_from_snapshot, es_testapp):
     """
     Tests if you use + and - with same field you should get no result
     """
@@ -280,7 +279,7 @@ def test_search_query_string_AND_NOT_cancel_out(workbook, es_testapp):
     assert es_testapp.get(search, status=404)
 
 
-def test_search_query_string_with_booleans(workbook, es_testapp):
+def test_search_query_string_with_booleans(workbook_from_snapshot, es_testapp):
     """
     Tests some search queries involving booleans on users
     """
@@ -312,7 +311,7 @@ def test_search_query_string_with_booleans(workbook, es_testapp):
 
 
 # @pytest.mark.skip  # N/A?
-# def test_metadata_tsv_view(workbook, htmltestapp):
+# def test_metadata_tsv_view(workbook_from_snapshot, htmltestapp):
 #
 #     FILE_ACCESSION_COL_INDEX = 3
 #     FILE_DOWNLOAD_URL_COL_INDEX = 0
@@ -379,7 +378,7 @@ def test_search_query_string_with_booleans(workbook, es_testapp):
 #     check_tsv(result_rows, len(res2_post_data['accession_triples']))
 
 
-def test_default_schema_and_non_schema_facets(workbook, es_testapp):
+def test_default_schema_and_non_schema_facets(workbook_from_snapshot, es_testapp):
     test_type = 'user'
     type_info = es_testapp.app.registry[TYPES].by_item_type[test_type]
     schema = type_info.schema
@@ -398,7 +397,7 @@ def test_default_schema_and_non_schema_facets(workbook, es_testapp):
     assert 'institution.display_title' in facet_fields
 
 
-def test_search_query_string_no_longer_functional(workbook, es_testapp):
+def test_search_query_string_no_longer_functional(workbook_from_snapshot, es_testapp):
     # since we now use simple_query_string, cannot use field:value or range
     # expect 404s, since simple_query_string doesn't return exceptions
     search_field = '/search/?q=name%3Ahuman&type=Item'
@@ -409,7 +408,7 @@ def test_search_query_string_no_longer_functional(workbook, es_testapp):
     res_search = es_testapp.get(search_range, status=404)
     assert len(res_search.json['@graph']) == 0
 
-def test_search_with_added_display_title(workbook, es_testapp):
+def test_search_with_added_display_title(workbook_from_snapshot, es_testapp):
     search = '/search/?type=Individual&father=GAPID3PW26SK'
     # 301 because search query is changed
     res_json = es_testapp.get(search, status=301).follow(status=200).json
@@ -449,7 +448,7 @@ def test_search_with_added_display_title(workbook, es_testapp):
     assert added_ff_facet[0]['title'] == ff_title + ' (Title)'
 
 
-def test_search_with_no_value(workbook, es_testapp):
+def test_search_with_no_value(workbook_from_snapshot, es_testapp):
     search = '/search/?comment=No+value&comment=This+comment+is+to+test+oranges&type=Disorder'
     res_json = es_testapp.get(search).json
     # grab some random results
@@ -466,7 +465,7 @@ def test_search_with_no_value(workbook, es_testapp):
     assert(set(res_ids2) != set(res_ids))
 
 
-def test_search_with_static_header(workbook, es_testapp, indexer_testapp):
+def test_search_with_static_header(workbook_from_snapshot, es_testapp, indexer_testapp):
     """ Performs a search which should be accompanied by a search header """
     indexer_testapp.post_json('/index', {'record': False})  # try to ensure static_sections are indexed
 
@@ -485,7 +484,7 @@ def test_search_with_static_header(workbook, es_testapp, indexer_testapp):
     assert res_json['search_header']['title'] == 'Workflow Information'
 
 
-def test_search_multiple_types(workbook, es_testapp):
+def test_search_multiple_types(workbook_from_snapshot, es_testapp):
     """ Note that the behavior now is in '@type' will be the highest common ancestor if searched on multiple types """
     search = '/search/?type=Individual&type=Workflow'
     res = es_testapp.get(search).json
@@ -496,12 +495,12 @@ def test_search_multiple_types(workbook, es_testapp):
 ## Tests for collections (search 301s) ##
 #########################################
 
-def test_collection_limit(workbook, es_testapp):
+def test_collection_limit(workbook_from_snapshot, es_testapp):
     res = es_testapp.get('/user/?limit=1', status=301)
     assert len(res.follow().json['@graph']) == 1
 
 
-def test_collection_actions_filtered_by_permission(workbook, es_testapp, anon_es_testapp):
+def test_collection_actions_filtered_by_permission(workbook_from_snapshot, es_testapp, anon_es_testapp):
     res = es_testapp.get('/user/')
     assert any(action for action in res.follow().json.get('actions', []) if action['name'] == 'add')
 
@@ -547,7 +546,7 @@ class ItemTypeChecker:
             return items_not_deleted
 
 
-def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
+def test_index_data_workbook(workbook_from_snapshot, es_testapp, html_es_testapp):
     es = es_testapp.app.registry['elasticsearch']
     # we need to reindex the collections to make sure numbers are correct
     create_mapping.run(es_testapp.app, sync_index=True)
@@ -605,7 +604,7 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
                 pass
 
 @pytest.mark.manual
-def test_index_data_workbook_after_posting_deleted_page_c4_570(workbook, es_testapp, html_es_testapp):
+def test_index_data_workbook_after_posting_deleted_page_c4_570(workbook_from_snapshot, es_testapp, html_es_testapp):
     """
     Regression test for C4-570.
 
@@ -615,7 +614,7 @@ def test_index_data_workbook_after_posting_deleted_page_c4_570(workbook, es_test
     """
 
     # Running the test this way should work fine
-    test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+    test_index_data_workbook(workbook_from_snapshot, es_testapp, html_es_testapp)
 
     # But now let's add a deleted page.
     # test_index_data_workbook will fail if preceded by anything that makes a deleted page
@@ -630,12 +629,12 @@ def test_index_data_workbook_after_posting_deleted_page_c4_570(workbook, es_test
                          status=201)
 
     # This test will now protect itself against failure.
-    test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+    test_index_data_workbook(workbook_from_snapshot, es_testapp, html_es_testapp)
 
     # And we can see that if we hadn't protected ourselves against failure, this would reliably fail.
     with pytest.raises(webtest.AppError):
         with local_attrs(ItemTypeChecker, CONSIDER_DELETED=False):
-            test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+            test_index_data_workbook(workbook_from_snapshot, es_testapp, html_es_testapp)
 
 
 
@@ -659,7 +658,7 @@ def hacked_query():
                      {'principals_allowed.view': ['system.Everyone', 'group.PERMISSION_YOU_DONT_HAVE']}}]}}]}}}
 
 
-def test_search_with_hacked_query(workbook, anon_es_testapp, hacked_query):
+def test_search_with_hacked_query(workbook_from_snapshot, anon_es_testapp, hacked_query):
     """ Attempts to execute what is considered a 'bad query' in a MockedRequest context. Our
         verification function should throw an exception if there is any delta in the permissions object
         we explicitly attach to every search query.
@@ -673,7 +672,7 @@ def test_search_with_hacked_query(workbook, anon_es_testapp, hacked_query):
         LuceneBuilder.verify_search_has_permissions(mocked_request_with_same_permissions, None)
 
 
-def test_search_with_principals_allowed_fails(workbook, anon_es_testapp):
+def test_search_with_principals_allowed_fails(workbook_from_snapshot, anon_es_testapp):
     """ Tests query with a query string parameter for principals_allowed.view, which will be AND'd with what's
         on the request.
 
@@ -691,7 +690,7 @@ def test_search_with_principals_allowed_fails(workbook, anon_es_testapp):
                         '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
 
 
-def test_search_debug_parameter(workbook, es_testapp, anon_es_testapp, authenticated_es_testapp):
+def test_search_debug_parameter(workbook_from_snapshot, es_testapp, anon_es_testapp, authenticated_es_testapp):
     """ Tests that utilizing the query debug parameter works correctly with admin only. """
     resp_with_debug = es_testapp.get('/search/?type=Family&debug=true', status=200).json
     assert 'query' in resp_with_debug
@@ -747,14 +746,14 @@ class TestNestedSearch(object):
                 assert len(facet['terms']) == count
                 return
 
-    def test_search_on_single_nested_field(self, workbook, es_testapp):
+    def test_search_on_single_nested_field(self, workbook_from_snapshot, es_testapp):
         """ One match for variant with hg19.hg19_pos=12185955 """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_pos=12185955').json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
 
-    def test_or_search_on_same_nested_field(self, workbook, es_testapp):
+    def test_or_search_on_same_nested_field(self, workbook_from_snapshot, es_testapp):
         """ Should match 2 since OR on this field """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
@@ -763,13 +762,13 @@ class TestNestedSearch(object):
         for variant in res['@graph']:
             assert variant['uuid'] in ['f6aef055-4c88-4a3e-a306-d37a71535d8b', '852bb349-203e-437d-974a-e8d6cb56810a']
 
-    def test_and_search_on_nested_field_that_does_not_match(self, workbook, es_testapp):
+    def test_and_search_on_nested_field_that_does_not_match(self, workbook_from_snapshot, es_testapp):
         """ This has a chrom value that does not match the position, so will give no results """
         es_testapp.get('/search/?type=Variant'
                     '&hg19.hg19_pos=12185955'
                     '&hg19.hg19_chrom=chr3', status=404)
 
-    def test_and_search_on_nested_field_that_matches_one(self, workbook, es_testapp):
+    def test_and_search_on_nested_field_that_matches_one(self, workbook_from_snapshot, es_testapp):
         """ This has the correct 'hg19_chrom', so should match one """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_pos=12185955'
@@ -777,7 +776,7 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
 
-    def test_or_search_on_nested_hg_19_multiple_match(self, workbook, es_testapp):
+    def test_or_search_on_nested_hg_19_multiple_match(self, workbook_from_snapshot, es_testapp):
         """ Do an OR search on hg19.hg19_chrom, matching three variants """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom=chr1').json
@@ -789,7 +788,7 @@ class TestNestedSearch(object):
                 '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
             ]
 
-    def test_negative_search_on_clinic_notes(self, workbook, es_testapp):
+    def test_negative_search_on_clinic_notes(self, workbook_from_snapshot, es_testapp):
         """ Do an OR search with hg19_post with a negative, should eliminate a variant """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom=chr1'
@@ -801,7 +800,7 @@ class TestNestedSearch(object):
                 '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
             ]
 
-    def test_and_search_that_matches_one(self, workbook, es_testapp):
+    def test_and_search_that_matches_one(self, workbook_from_snapshot, es_testapp):
         """ Check three properties that occur in the same sub-embedded object in 1 variant """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom=chr1'
@@ -815,14 +814,14 @@ class TestNestedSearch(object):
                     '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
 
     @pytest.mark.skip  # re-enable once workbook inserts are built out more
-    def test_and_search_that_matches_multiple(self, workbook, es_testapp):
+    def test_and_search_that_matches_multiple(self, workbook_from_snapshot, es_testapp):
         """ Check two properties that occur in the same sub-embedded object in 3 variants """
         res = es_testapp.get('/search/?type=Variant'
                           '&families.members.mother.display_title=GAPIDISC7R73'
                           '&families.members.father.display_title=GAPID3PW26SK').json
         self.assert_length_is_expected(res, 3)
 
-    def test_and_search_on_three_fields(self, workbook, es_testapp):
+    def test_and_search_on_three_fields(self, workbook_from_snapshot, es_testapp):
         """ OR search that will match all variants with these fields"""
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom=chr1'
@@ -840,7 +839,7 @@ class TestNestedSearch(object):
                 '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
             ]
 
-    def test_search_with_non_existant_combinations(self, workbook, es_testapp):
+    def test_search_with_non_existant_combinations(self, workbook_from_snapshot, es_testapp):
         """ Test that swapping around fields that would match across different sub-embedded objects
             does not actually do so (ie: returns no results). """
         es_testapp.get('/search/?type=Variant'
@@ -853,13 +852,13 @@ class TestNestedSearch(object):
                     '&hg19.hg19_pos=11780388'
                     '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
 
-    def test_nested_search_with_no_value(self, workbook, es_testapp):
+    def test_nested_search_with_no_value(self, workbook_from_snapshot, es_testapp):
         """ Tests searching on 'No value' alone on a nested field """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom!=No+value').follow().json
         self.assert_length_is_expected(res, 3)
 
-    def test_nested_search_with_no_value_combined(self, workbook, es_testapp):
+    def test_nested_search_with_no_value_combined(self, workbook_from_snapshot, es_testapp):
         """ Tests searching on 'No value' combined with another nested field, in this case
             should give no results (no matter the ordering) """
         es_testapp.get('/search/?type=Variant'
@@ -875,7 +874,7 @@ class TestNestedSearch(object):
                     '&hg19.hg19_pos=11780388'
                     '&hg19.hg19_hgvsg=No+value', status=404)
 
-    def test_search_nested_with_non_nested_fields(self, workbook, es_testapp):
+    def test_search_nested_with_non_nested_fields(self, workbook_from_snapshot, es_testapp):
         """ Tests that combining a nested search with a non-nested one works in any order
             NOTE: this test used to be broken due to incorrect behavior with No+value.
             It is assumed that if you are selecting on a facet positively or negatively that
@@ -892,7 +891,7 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
 
-    def test_search_nested_no_value_with_multiple_other_fields(self, workbook, es_testapp):
+    def test_search_nested_no_value_with_multiple_other_fields(self, workbook_from_snapshot, es_testapp):
         """ Tests that combining a 'No value' search with another nested search and a different non-nested
             field works correctly """
         res = es_testapp.get('/search/?type=Variant'
@@ -905,7 +904,7 @@ class TestNestedSearch(object):
                     '&hg19.hg19_pos=No+value'
                     '&REF=G', status=404)  # REF should disqualify
 
-    def test_search_nested_facets_are_correct(self, workbook, es_testapp):
+    def test_search_nested_facets_are_correct(self, workbook_from_snapshot, es_testapp):
         """ Tests that nested facets are properly rendered both on a normal search and when selecting on
             nested facets. When examining the aggregations on a field we are searching on, we should see
             the cardinality of the field.
@@ -934,11 +933,11 @@ class TestNestedSearch(object):
             '/search/?type=Variant&hg19.hg19_pos=11780388').json['facets']
         self.verify_facet(facets_that_shows_limited_options, 'hg19.hg19_hgvsg', 1)  # reduced to only 1 option
 
-    def test_search_nested_exists_query(self, workbook, es_testapp):
+    def test_search_nested_exists_query(self, workbook_from_snapshot, es_testapp):
         """ Tests doing a !=No+value search on a nested sub-field. """
         es_testapp.get('/search/?type=SampleProcessing&samples.uuid!=No+value', status=404)
 
-    def test_search_nested_field_no_value(self, workbook, es_testapp):
+    def test_search_nested_field_no_value(self, workbook_from_snapshot, es_testapp):
         """ Tests that we can do item.sub_embedded_object=No+value and get correct results
             Note that there is 1 variant with no hg19 sub embedded object and 3 variants that
             have the annotation.
@@ -949,7 +948,7 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 3)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()  # (scope='session')
 def hidden_facet_data_one():
     """ Sample TestingHiddenFacets object we are going to facet on """
     return {
@@ -979,7 +978,7 @@ def hidden_facet_data_one():
     }
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()  # (scope='session')
 def hidden_facet_data_two():
     """ A second sample TestingHiddenFacets object we are going to facet on """
     return {
@@ -1009,11 +1008,27 @@ def hidden_facet_data_two():
     }
 
 
-@pytest.fixture(scope='session')  # XXX: consider scope further - Will 11/5/2020
-def hidden_facet_test_data(workbook, es_testapp, hidden_facet_data_one, hidden_facet_data_two):
-    es_testapp.post_json('/TestingHiddenFacets', hidden_facet_data_one, status=201)
-    es_testapp.post_json('/TestingHiddenFacets', hidden_facet_data_two, status=201)
-    es_testapp.post_json('/index', {'record': False})
+class TestingHiddenFacetsCache(WorkbookCache):
+
+    @classmethod
+    def load_additional_data(cls, es_testapp, other_data=None):
+        if other_data:
+            for hidden_faceted_data_item in other_data:
+                es_testapp.post_json('/TestingHiddenFacets', hidden_faceted_data_item, status=201)
+
+
+
+@pytest.fixture()  # (scope='session')  # XXX: consider scope further - Will 11/5/2020
+def hidden_facet_test_data(workbook_from_snapshot, es_testapp, hidden_facet_data_one, hidden_facet_data_two,
+                           elasticsearch_server_dir, indexer_namespace):
+    TestingHiddenFacetsCache.assure_data_loaded(es_testapp,
+                                                datadir=elasticsearch_server_dir,
+                                                indexer_namespace=indexer_namespace,
+                                                other_data=[hidden_facet_data_one, hidden_facet_data_two])
+
+    # es_testapp.post_json('/TestingHiddenFacets', hidden_facet_data_one, status=201)
+    # es_testapp.post_json('/TestingHiddenFacets', hidden_facet_data_two, status=201)
+    # es_testapp.post_json('/index', {'record': False})
 
 
 class TestSearchHiddenAndAdditionalFacets:
@@ -1044,18 +1059,18 @@ class TestSearchHiddenAndAdditionalFacets:
             are identical. """
         assert sorted(expected) == sorted([facet['field'] for facet in facets])
 
-    def test_search_default_hidden_facets_dont_show(self, workbook, es_testapp, hidden_facet_test_data):
+    def test_search_default_hidden_facets_dont_show(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data):
         facets = es_testapp.get('/search/?type=TestingHiddenFacets').json['facets']
         self.assert_facet_set_equal(self.DEFAULT_FACETS, facets)
 
     @pytest.mark.parametrize('facet', ADDITIONAL_FACETS)
-    def test_search_one_additional_facet(self, workbook, es_testapp, hidden_facet_test_data, facet):
+    def test_search_one_additional_facet(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data, facet):
         """ Tests that specifying each of the 'additional' facets works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets&additional_facet=%s' % facet).json['facets']
         expected = self.DEFAULT_FACETS + [facet]
         self.assert_facet_set_equal(expected, facets)
 
-    def test_search_multiple_additional_facets(self, workbook, es_testapp, hidden_facet_test_data):
+    def test_search_multiple_additional_facets(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data):
         """ Tests that enabling multiple additional facets works """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=unfaceted_string'
@@ -1069,13 +1084,13 @@ class TestSearchHiddenAndAdditionalFacets:
                 assert facet['aggregation_type'] == 'terms'
 
     @pytest.mark.parametrize('facet', DEFAULT_HIDDEN_FACETS)
-    def test_search_one_additional_default_hidden_facet(self, workbook, es_testapp, hidden_facet_test_data, facet):
+    def test_search_one_additional_default_hidden_facet(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data, facet):
         """ Tests that passing default_hidden facets to additional_facets works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets&additional_facet=%s' % facet).json['facets']
         expected = self.DEFAULT_FACETS + [facet]
         self.assert_facet_set_equal(expected, facets)
 
-    def test_search_multiple_additional_default_hidden_facets(self, workbook, es_testapp, hidden_facet_test_data):
+    def test_search_multiple_additional_default_hidden_facets(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data):
         """ Tests that passing multiple hidden_facets as additionals works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=last_name'
@@ -1092,7 +1107,7 @@ class TestSearchHiddenAndAdditionalFacets:
         ['last_name', 'unfaceted_integer'],  # second slot holds number field
         ['unfaceted_string', 'sid']
     ])
-    def test_search_mixing_additional_and_default_hidden(self, workbook, es_testapp, hidden_facet_test_data, _facets):
+    def test_search_mixing_additional_and_default_hidden(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data, _facets):
         """ Tests that we can mix additional_facets with those both on and off schema """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=%s'
@@ -1106,7 +1121,7 @@ class TestSearchHiddenAndAdditionalFacets:
                 assert facet['aggregation_type'] == 'terms'
 
     @pytest.mark.parametrize('_facet', DISABLED_FACETS)
-    def test_search_disabled_overrides_additional(self, workbook, es_testapp, hidden_facet_test_data, _facet):
+    def test_search_disabled_overrides_additional(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data, _facet):
         """ Hidden facets should NEVER be faceted on """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets&additional_facet=%s' % _facet).json['facets']
         field_names = [facet['field'] for facet in facets]
@@ -1116,7 +1131,7 @@ class TestSearchHiddenAndAdditionalFacets:
         ('last_name', 'unfaceted_integer', 'disabled_integer'),  # default_hidden second
         ('sid', 'unfaceted_string', 'disabled_string')  # disabled always last
     ])
-    def test_search_additional_mixing_disabled_default_hidden(self, workbook, es_testapp, hidden_facet_test_data, _facets):
+    def test_search_additional_mixing_disabled_default_hidden(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data, _facets):
         """ Tests that supplying multiple additional facets combined with hidden still respects the
             hidden restriction. """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
@@ -1130,7 +1145,7 @@ class TestSearchHiddenAndAdditionalFacets:
         'unfaceted_object.mother',
         'unfaceted_object.father'
     ])
-    def test_search_additional_object_facets(self, workbook, es_testapp, hidden_facet_test_data, _facet):
+    def test_search_additional_object_facets(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data, _facet):
         """ Tests that specifying an object field as an additional_facet works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=%s' % _facet).json['facets']
@@ -1142,7 +1157,7 @@ class TestSearchHiddenAndAdditionalFacets:
         ('unfaceted_array_of_objects.color', 3),
         ('unfaceted_array_of_objects.uid', 2.5)  # stats avg
     ])
-    def test_search_additional_nested_facets(self, workbook, es_testapp, hidden_facet_test_data, _facet, n_expected):
+    def test_search_additional_nested_facets(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data, _facet, n_expected):
         """ Tests that specifying an array of object field mapped with nested as an additional_facet
             works correctly. """
         [desired_facet] = [facet for facet in es_testapp.get('/search/?type=TestingHiddenFacets'
@@ -1154,7 +1169,7 @@ class TestSearchHiddenAndAdditionalFacets:
             assert desired_facet['avg'] == n_expected
 
     @pytest.fixture
-    def many_non_nested_facets(self, workbook, es_testapp, hidden_facet_test_data):
+    def many_non_nested_facets(self, workbook_from_snapshot, es_testapp, hidden_facet_test_data):
         return es_testapp.get('/search/?type=TestingHiddenFacets'  
                            '&additional_facet=non_nested_array_of_objects.fruit'
                            '&additional_facet=non_nested_array_of_objects.color'
@@ -1177,18 +1192,22 @@ class TestSearchHiddenAndAdditionalFacets:
         ('hg19.hg19_hgvsg', 3),
         ('REF', 3)
     ])
-    def test_search_additional_facets_workbook(self, workbook, es_testapp, _facet, n_expected):
+    def test_search_additional_facets_workbook(self, workbook_from_snapshot, es_testapp, _facet, n_expected):
         """ Tests using additional facets with workbook inserts (using Variant) """
         variant_facets = es_testapp.get('/search/?type=Variant&additional_facet=%s' % _facet).json['facets']
         self.check_and_verify_result(variant_facets, _facet, n_expected)
 
-    @pytest.fixture(scope='module')
-    def variant_facets(self, workbook, es_testapp):
-        return es_testapp.get('/search/?type=Variant'
-                           '&additional_facet=hg19.hg19_pos'
-                           '&additional_facet=hg19.hg19_chrom'
-                           '&additional_facet=hg19.hg19_hgvsg'
-                           '&additional_facet=REF').json['facets']
+    VARIANT_FACETS_CACHED_RESULT = None
+
+    @pytest.fixture()  # (scope='module')
+    def variant_facets(self, workbook_from_snapshot, es_testapp):
+        if self.VARIANT_FACETS_CACHED_RESULT is None:
+            self.VARIANT_FACETS_CACHED_RESULT = es_testapp.get('/search/?type=Variant'
+                                                               '&additional_facet=hg19.hg19_pos'
+                                                               '&additional_facet=hg19.hg19_chrom'
+                                                               '&additional_facet=hg19.hg19_hgvsg'
+                                                               '&additional_facet=REF').json['facets']
+        return self.VARIANT_FACETS_CACHED_RESULT
 
     @pytest.mark.parametrize('_facet, n_expected', [
         ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
@@ -1196,7 +1215,7 @@ class TestSearchHiddenAndAdditionalFacets:
         ('hg19.hg19_hgvsg', 3),
         ('REF', 3)
     ])
-    def test_search_additional_facets_workbook_multiple(self, workbook, es_testapp, _facet, n_expected):
+    def test_search_additional_facets_workbook_multiple(self, workbook_from_snapshot, es_testapp, _facet, n_expected):
         """ Does all 4 extra aggregations above, checking the resulting facets for correctness """
         res = es_testapp.get('/search/?type=Variant'
                            '&additional_facet=hg19.hg19_pos'
@@ -1206,7 +1225,7 @@ class TestSearchHiddenAndAdditionalFacets:
         self.check_and_verify_result(res, _facet, n_expected)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()  # (scope='session')
 def bucket_range_data_raw():
     """ 10 objects with a numerical field we will bucket on.
             'special_integer' has i in it.
@@ -1231,8 +1250,8 @@ def bucket_range_data_raw():
     } for i in range(10)]
 
 
-@pytest.fixture(scope='session')  # XXX: consider scope further - Will 11/5/2020
-def bucket_range_data(workbook, es_testapp, bucket_range_data_raw):
+@pytest.fixture()  # (scope='session')  # XXX: consider scope further - Will 11/5/2020
+def bucket_range_data(workbook_from_snapshot, es_testapp, bucket_range_data_raw):
     for entry in bucket_range_data_raw:
         es_testapp.post_json('/TestingBucketRangeFacets', entry, status=201)
     es_testapp.post_json('/index', {'record': False})
@@ -1265,7 +1284,7 @@ class TestSearchBucketRangeFacets:
         (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 5),
         (['array_of_objects_that_holds_integer.embedded_integer'], 10)
     ])
-    def test_search_bucket_range_simple(self, workbook, es_testapp, bucket_range_data, expected_fields, expected_counts):
+    def test_search_bucket_range_simple(self, workbook_from_snapshot, es_testapp, bucket_range_data, expected_fields, expected_counts):
         """ Tests searching a collection of documents with varying integer field types that
             have the same distribution - all of which should give the same results. """
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets').json['facets']
@@ -1275,7 +1294,7 @@ class TestSearchBucketRangeFacets:
     @pytest.mark.parametrize('identifier', [
         'reverse', 'forward'
     ])
-    def test_search_bucket_range_nested_qualifier(self, workbook, es_testapp, bucket_range_data, identifier):
+    def test_search_bucket_range_nested_qualifier(self, workbook_from_snapshot, es_testapp, bucket_range_data, identifier):
         """ Tests aggregating on a nested field while selecting for a field within the nested object. """
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
                           '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
@@ -1285,7 +1304,7 @@ class TestSearchBucketRangeFacets:
     @pytest.mark.parametrize('identifier', [
         'reverse', 'forward'
     ])
-    def test_search_bucket_range_nested_qualifier_multiple(self, workbook, es_testapp, bucket_range_data, identifier):
+    def test_search_bucket_range_nested_qualifier_multiple(self, workbook_from_snapshot, es_testapp, bucket_range_data, identifier):
         """ Tests aggregating on a nested field while selecting for a field within the nested object (no change). """
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
                           '&array_of_objects_that_holds_integer.embedded_integer.from=6'
@@ -1297,18 +1316,12 @@ class TestSearchBucketRangeFacets:
             assert 'label' in r
             assert r['label'] in ['Low', 'High']
 
-    def test_search_bucket_range_workbook(self, es_testapp, workbook):
+    def test_search_bucket_range_workbook(self, es_testapp, workbook_from_snapshot):
         # TODO: write me once some bucket-range aggregations are defined on schemas for workbook inserts
         pass
 
 
-@pytest.fixture()
-def workbook_from_snapshot(es_testapp, workbook, elasticsearch_server_dir, indexer_namespace):
-    WorkbookCache.make_or_restore_workbook(es_testapp,
-                                           datadir=elasticsearch_server_dir,
-                                           indexer_namespace=indexer_namespace)
-
-def test_workbook_restore1(workbook_from_snapshot, es_testapp):
+def test_workbook_restore1(personas_from_snapshot, es_testapp):
 
     existing_institutions = es_testapp.get('/institutions/', status=301).follow().json['@graph']
     existing_institution_names = sorted([inst['name'] for inst in existing_institutions])
@@ -1346,7 +1359,7 @@ def test_workbook_restore1(workbook_from_snapshot, es_testapp):
     assert 'cgap-fixture-testing' not in existing_project_names
 
 
-def test_workbook_restore2(workbook, es_testapp):
+def test_workbook_restore2(personas, es_testapp):
 
     existing_institutions = es_testapp.get('/institutions/', status=301).follow().json['@graph']
     existing_institution_names = sorted([inst['name'] for inst in existing_institutions])
@@ -1369,7 +1382,7 @@ def test_workbook_restore2(workbook, es_testapp):
     assert existing_project_names == ['hms-dbmi']
 
 
-def test_workbook_restore3(workbook_from_snapshot, es_testapp):
+def test_workbook_restore3(personas_from_snapshot, es_testapp):
 
     existing_institutions = es_testapp.get('/institutions/', status=301).follow().json['@graph']
     existing_institution_names = sorted([inst['name'] for inst in existing_institutions])

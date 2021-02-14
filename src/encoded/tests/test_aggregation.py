@@ -1,15 +1,16 @@
 # import pytest
 # from dcicutils.qa_utils import notice_pytest_fixtures
-# from .workbook_fixtures import app_settings, workbook
+# # from .workbook_fixtures import app_settings, workbook
+# from .workbook_support import workbook_from_snapshot
 
 # XXX: All need refactor
 # pytestmark = [pytest.mark.working, pytest.mark.indexing]
 #
 #
-# notice_pytest_fixtures(app_settings, workbook)
+# notice_pytest_fixtures(app_settings, workbook_from_snapshot)
 #
 #
-# def test_aggregation_facet(workbook, testapp):
+# def test_aggregation_facet(workbook_from_snapshot, testapp):
 #     res = testapp.get('/search/?type=ExperimentSetReplicate').json
 #     badge_facets = [facet for facet in res['facets'] if facet['title'] in
 #                    ['Commendations', 'Warnings']]
@@ -20,7 +21,7 @@
 #     assert len([t for t in terms if t != 'No value']) == 3
 #
 #
-# def test_aggregation_itemview(workbook, testapp):
+# def test_aggregation_itemview(workbook_from_snapshot, testapp):
 #     res = testapp.get('/experiment-set-replicates/4DNESAAAAAA1/').json
 #     assert 'aggregated-items' in res.keys()
 #     parents = ''.join([badge['parent'] for badge in res['aggregated-items']['badges']])
@@ -30,7 +31,7 @@
 #     assert len(items) == len(list(set(items)))
 #
 #
-# def test_aggregation_view(workbook, testapp):
+# def test_aggregation_view(workbook_from_snapshot, testapp):
 #     res = testapp.get('/experiment-set-replicates/4DNESAAAAAA1/@@aggregated-items').json
 #     agg = res['aggregated_items']
 #     assert 'badges' in agg.keys()

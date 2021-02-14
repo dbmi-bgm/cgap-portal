@@ -473,13 +473,13 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
 
 def load_data(app, indir='inserts', docsdir=None, overwrite=False,
               use_master_inserts=True):
-    '''
+    """
     This function will take the inserts folder as input, and place them to the given environment.
     args:
         app:
         indir (inserts): inserts folder, should be relative to tests/data/
         docsdir (None): folder with attachment documents, relative to tests/data
-    '''
+    """
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
