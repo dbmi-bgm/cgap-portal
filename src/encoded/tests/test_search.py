@@ -4,11 +4,11 @@ import webtest
 
 from datetime import (datetime, timedelta)
 from dcicutils.misc_utils import Retry
-from dcicutils.qa_utils import local_attrs, notice_pytest_fixtures
+from dcicutils.qa_utils import local_attrs
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
-from .workbook_support import WorkbookCache, workbook, personas
+from .workbook_support import WorkbookCache
 from ..search import lucene_builder
 from ..search.lucene_builder import LuceneBuilder
 from ..search.search_utils import find_nested_path
@@ -17,8 +17,6 @@ from snovault.util import add_default_embeds
 from snovault.schema_utils import load_schema
 from webtest import AppError
 
-
-notice_pytest_fixtures(workbook, personas)
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search]
 

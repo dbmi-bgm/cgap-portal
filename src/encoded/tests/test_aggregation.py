@@ -1,7 +1,6 @@
 # import pytest
 # from dcicutils.qa_utils import notice_pytest_fixtures
-# # from .workbook_fixtures import app_settings, workbook
-# from .workbook_support import workbook
+# from .workbook_fixtures import app_settings, workbook
 
 # XXX: All need refactor
 # pytestmark = [pytest.mark.working, pytest.mark.indexing]

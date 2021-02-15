@@ -1,11 +1,6 @@
 import pytest
 import requests  # XXX: C4-211
 from .variant_fixtures import VARIANT_SAMPLE_URL
-from .workbook_support import workbook
-from dcicutils.qa_utils import notice_pytest_fixtures
-
-
-notice_pytest_fixtures(workbook)
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]

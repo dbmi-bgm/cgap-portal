@@ -6,6 +6,7 @@ import logging
 import pytest
 import webtest
 
+from dcicutils.qa_utils import notice_pytest_fixtures
 from pyramid.request import apply_request_extensions
 from pyramid.testing import DummyRequest, setUp, tearDown
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
@@ -13,7 +14,7 @@ from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
 from snovault.util import generate_indexer_namespace_for_testing
 from .conftest_settings import make_app_settings_dictionary
-from .workbook_support import WorkbookCache, PersonasCache
+from .workbook_support import PersonasCache, WorkbookCache
 from .. import main
 
 
@@ -28,11 +29,13 @@ README:
 
 @pytest.fixture(autouse=True)
 def autouse_external_tx(external_tx):
+    notice_pytest_fixtures(external_tx)
     pass
 
 
 @pytest.fixture(scope='session')
-def app_settings(request, wsgi_server_host_port, conn, DBSession):
+def app_settings(request, wsgi_server_host_port, conn, DBSession):  # noQA - choice of name DBSession wasn't made here
+    notice_pytest_fixtures(request, wsgi_server_host_port, conn, DBSession)
 
     settings = make_app_settings_dictionary()
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
@@ -82,6 +85,8 @@ def pytest_configure():
 
 @pytest.yield_fixture
 def threadlocals(request, dummy_request, registry):
+    notice_pytest_fixtures(request, dummy_request, registry)
+
     threadlocal_manager.push({'request': dummy_request, 'registry': registry})
     yield dummy_request
     threadlocal_manager.pop()
@@ -268,7 +273,6 @@ def authenticated_es_testapp(es_app):
     return webtest.TestApp(es_app, environ)
 
 
-
 @pytest.fixture
 def submitter_testapp(app):
     """TestApp for a non-admin user (TEST_SUBMITTER), accepting JSON data."""
@@ -317,10 +321,25 @@ def obsolete_workbook(es_testapp, elasticsearch_server_dir, indexer_namespace):
                                           datadir=elasticsearch_server_dir,
                                           indexer_namespace=indexer_namespace)
 
+
 @pytest.fixture(scope='session')
-def obsolete_personas(es_testapp, obsolete_workbook, elasticsearch_server_dir, indexer_namespace):
+def obsolete_personas(es_testapp, elasticsearch_server_dir, indexer_namespace):
     """ Loads a bunch of data (tests/data/workbook-inserts) into the system on first run
         (session scope doesn't work). """
     PersonasCache.assure_data_once_loaded(es_testapp,
                                           datadir=elasticsearch_server_dir,
                                           indexer_namespace=indexer_namespace)
+
+
+@pytest.fixture()
+def workbook(es_testapp, obsolete_workbook, elasticsearch_server_dir, indexer_namespace):
+    WorkbookCache.assure_data_loaded(es_testapp,
+                                     datadir=elasticsearch_server_dir,
+                                     indexer_namespace=indexer_namespace)
+
+
+@pytest.fixture()
+def personas(es_testapp, obsolete_personas, elasticsearch_server_dir, indexer_namespace):
+    PersonasCache.assure_data_loaded(es_testapp,
+                                     datadir=elasticsearch_server_dir,
+                                     indexer_namespace=indexer_namespace)

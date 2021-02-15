@@ -1,11 +1,6 @@
 import pytest
-from dcicutils.qa_utils import notice_pytest_fixtures
 from ..util import resolve_file_path
 from ..ingestion.gene_utils import GeneIngestion
-from .workbook_support import workbook
-
-
-notice_pytest_fixtures(workbook)
 
 
 GENES_LOC = resolve_file_path('tests/data/variant_workbook/gene_inserts_partial.json')

@@ -4,18 +4,15 @@ import mock
 import pytest
 import time
 
-from dcicutils.qa_utils import ignored, notice_pytest_fixtures
+from dcicutils.qa_utils import ignored
 from uuid import uuid4
 from pyramid.testing import DummyRequest
-from .workbook_support import workbook
 from ..ingestion_listener import (
     IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
 )
 from ..ingestion.common import IngestionReport, IngestionError
 from ..util import debuglog
 
-
-notice_pytest_fixtures(workbook)
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 QUEUE_INGESTION_URL = '/queue_ingestion'

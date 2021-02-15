@@ -1,16 +1,11 @@
 import pytest
 import webtest
 
-from dcicutils.qa_utils import notice_pytest_fixtures
-from .workbook_support import workbook
-
-
-notice_pytest_fixtures(workbook)
 
 pytestmark = [pytest.mark.working]
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()  # (scope='session')
 def help_page_section_json():
     return {
         "title": "",
@@ -20,7 +15,7 @@ def help_page_section_json():
     }
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()  # (scope='session')
 def help_page_json():
     return {
         "name": "help/user-guide/rev-links",
@@ -35,7 +30,7 @@ def help_page_json():
     }
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()  # (scope='session')
 def help_page_json_in_review():
     return {
         "name": "help/user-guide/rev-links-in-review",
@@ -51,7 +46,7 @@ def help_page_json_in_review():
     }
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()  # (scope='session')
 def help_page_json_deleted():
     return {
         "name": "help/user-guide/rev-links-deleted",
@@ -67,7 +62,7 @@ def help_page_json_deleted():
     }
 
 
-@pytest.fixture()
+@pytest.fixture()  # ()
 def posted_help_page_section(es_testapp, workbook, help_page_section_json):
     try:
         res = es_testapp.post_json('/static-sections/', help_page_section_json, status=201)

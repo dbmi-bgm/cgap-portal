@@ -1,7 +1,5 @@
 import pytest
 import json
-
-from dcicutils.qa_utils import notice_pytest_fixtures
 from .data.variant_workbook.expected import (
     VARIANT_SCHEMA,
     VARIANT_SAMPLE_SCHEMA,
@@ -11,7 +9,6 @@ from .data.variant_workbook.expected import (
 from ..ingestion.vcf_utils import (
     VCFParser
 )
-from .workbook_support import workbook
 from .variant_fixtures import (  # noqa
     GENE_URL,
     GENE_WORKBOOK,
@@ -20,8 +17,6 @@ from .variant_fixtures import (  # noqa
     VARIANT_URL
 )
 
-
-notice_pytest_fixtures(workbook)
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 

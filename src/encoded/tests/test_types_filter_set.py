@@ -1,11 +1,6 @@
 import pytest
-
-from dcicutils.qa_utils import notice_pytest_fixtures
 from webtest import AppError
-from .workbook_support import workbook
 
-
-notice_pytest_fixtures(workbook)
 
 pytestmark = [pytest.mark.working, pytest.mark.search]
 COMPOUND_SEARCH_URL = '/compound_search'
