@@ -38,6 +38,12 @@ export default class ExcelSubmissionView extends React.PureComponent {
             submissionItem: null,
             user: null
         };
+        console.log('excelsubmissionview props', props);
+    }
+
+    componentDidMount() {
+        const { setIsSubmitting } = this.props;
+        setIsSubmitting(true); // prompt user on attempt to navigate away
     }
 
     componentDidUpdate(pastState){
