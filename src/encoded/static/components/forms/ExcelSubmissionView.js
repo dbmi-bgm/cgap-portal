@@ -691,7 +691,7 @@ function Poller(props){
         <React.Fragment>
             <div className="mt-2 text-center d-flex flex-column align-items-center justify-content-center">
                 <span><i className="icon icon-sync icon-spin fas" />&nbsp; Processing...</span>
-                <span className="text-small text-secondary">Last ping at: { lastUpdated }</span>
+                <span className="text-small text-secondary">Last update at: { lastUpdated }</span>
             </div>
         </React.Fragment>
     );
