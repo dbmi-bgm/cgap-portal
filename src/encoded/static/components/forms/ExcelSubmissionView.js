@@ -644,7 +644,7 @@ function Poller(props){
                     errors = []
                 } = response || {};
 
-                // TODO: Add an additional check for bad status codes, etc.
+                // TODO: Add an additional check for bad status codes, etc?
                 if (validation_errors.length > 0) {
                     console.error(validation_errors);
                     throw new Error("Did not pass server-side validation...");
@@ -681,8 +681,12 @@ function Poller(props){
                 }
             })
             .catch((error)=> {
-                console.log("catching error", error);
-                Alerts.queue({ "title": error, style: "danger" });
+                if (typeof error === "string") {
+                    Alerts.queue({ "title": error, style: "danger" });
+                } else {
+                    console.error(error);
+                    Alerts.queue({ "title": "An unknown error occurred. See console for more details.", style: "danger" });
+                }
                 setStatusIdx(0); // Re-enable file upload.
             });
     }, 15000);
