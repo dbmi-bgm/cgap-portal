@@ -228,19 +228,18 @@ class PanelOne extends React.PureComponent {
     }
 
     // TODO: Delete probably -- hard sequence from step 1 -> 2 -> 3... no more going back and updating
-    static checkIfChanged(submissionItem, title, institutionID, projectID){
+    static checkIfChanged(submissionItem, institutionID, projectID){
         const {
             institution: { '@id' : submissionInstitutionID = null } = {},
             project: { '@id' : submissionProjectID = null } = {},
             display_title: submissionTitle
         } = submissionItem;
-        return (institutionID !== submissionInstitutionID) || (projectID !== submissionProjectID) || (title !== submissionTitle);
+        return (institutionID !== submissionInstitutionID) || (projectID !== submissionProjectID);
     }
 
     constructor(props){
         super(props);
         this.loadUser = this.loadUser.bind(this);
-        this.handleChangeIngestionSubmissionTitle = this.handleChangeIngestionSubmissionTitle.bind(this);
         this.handleSelectInstitution = this.handleSelectInstitution.bind(this);
         this.handleSelectProject = this.handleSelectProject.bind(this);
         this.handleCreate = this.handleCreate.bind(this);
@@ -248,7 +247,6 @@ class PanelOne extends React.PureComponent {
 
         this.state = {
             selectingField: null,
-            submissionTitle: "",
             submissionType: null,
             error: null,
             isCreating: false,
@@ -261,8 +259,6 @@ class PanelOne extends React.PureComponent {
         this.memoized = {
             checkIfChanged: PanelOne.checkIfChanged
         };
-
-        this.submissionTitleInputRef = React.createRef();
     }
 
     componentDidMount(){
@@ -275,7 +271,6 @@ class PanelOne extends React.PureComponent {
 
         if (user !== pastUser){
             this.setState(PanelOne.flatFieldsFromUser(user));
-            this.submissionTitleInputRef.current && this.submissionTitleInputRef.current.focus();
             ReactTooltip.rebuild();
             return;
         }
@@ -292,7 +287,6 @@ class PanelOne extends React.PureComponent {
                 } = {}
             } = submissionItem;
             this.setState({
-                submissionTitle: submissionItem.title || "",
                 institutionID, institutionTitle,
                 projectID, projectTitle
             });
@@ -300,8 +294,8 @@ class PanelOne extends React.PureComponent {
         }
 
         if (submissionItem){
-            const { institutionID, projectID, submissionTitle: title } = this.state;
-            const valuesDiffer = this.memoized.checkIfChanged(submissionItem, title, institutionID, projectID);
+            const { institutionID, projectID } = this.state;
+            const valuesDiffer = this.memoized.checkIfChanged(submissionItem, institutionID, projectID);
             if (!valuesDiffer && panelIdx === 0 && panelsComplete[0] === false) {
                 // We already completed POST; once submission present, mark this complete also.
                 markCompleted(0, true);
@@ -320,10 +314,6 @@ class PanelOne extends React.PureComponent {
             }
             onLoadUser(res);
         });
-    }
-
-    handleChangeIngestionSubmissionTitle(e){
-        this.setState({ submissionTitle: e.target.value });
     }
 
     handleSelectSubmissionType(eventKey) {
@@ -346,7 +336,6 @@ class PanelOne extends React.PureComponent {
     handleCreate(e){
         const { onSubmitIngestionSubmission, submissionItem } = this.props;
         const {
-            submissionTitle: title,
             institutionID: institution,
             projectID: project,
             isCreating = false
@@ -398,7 +387,6 @@ class PanelOne extends React.PureComponent {
         };
 
         const postData = { institution, project, ingestion_type: "metadata_bundle", processing_status: { state: "created" } };
-        if (title) { postData["display_title"] = title; }
 
         this.setState({ isCreating: true }, ()=>{
             this.request = ajax.load(
@@ -414,10 +402,8 @@ class PanelOne extends React.PureComponent {
     render(){
         const { userDetails, panelIdx, user, submissionItem } = this.props;
         const {
-            selectingField,
             institutionID, institutionTitle,
             projectID, projectTitle,
-            submissionTitle,
             submissionType,
             isCreating = false
         } = this.state;
@@ -435,7 +421,7 @@ class PanelOne extends React.PureComponent {
             );
         }
 
-        const valuesChanged = !submissionItem || this.memoized.checkIfChanged(submissionItem, submissionTitle, institutionID, projectID);
+        const valuesChanged = !submissionItem || this.memoized.checkIfChanged(submissionItem, institutionID, projectID);
         const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID );
 
         return (
@@ -463,11 +449,6 @@ class PanelOne extends React.PureComponent {
                         </div>
                     </div>
                 </div>
-                <label className="field-section mt-2 d-block">
-                    <span className="d-block mb-05">Display Title</span>
-                    <input type="text" value={submissionTitle} onChange={this.handleChangeIngestionSubmissionTitle}
-                        className="form-control d-block" ref={this.submissionTitleInputRef}/>
-                </label>
 
                 <hr className="mb-1"/>
 
