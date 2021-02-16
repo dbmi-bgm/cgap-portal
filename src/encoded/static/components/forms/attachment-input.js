@@ -18,11 +18,9 @@ export class AttachmentInputController extends React.PureComponent {
     constructor(props){
         super(props);
         this.handleChange = this.handleChange.bind(this);
-        // this.onFormSubmit = this.onFormSubmit.bind(this);
         this.state = {
             loading: false,
-            success: null,
-
+            success: null
         };
     }
 
@@ -42,10 +40,11 @@ export class AttachmentInputController extends React.PureComponent {
                 const postURL = '/ingestion-submissions/' + uuid + '/submit_for_ingestion';
                 console.log(`Attempting Ingestion. \n\nPosting to: ${postURL}`);
 
+                // TODO: Move to SPC ajax
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", postURL, true);
 
-                xhr.onreadystatechange = function() { // Callled when the state changes.
+                xhr.onreadystatechange = function() { // Called when the state changes.
                     if (xhr.readyState !== 4) return;
                     if (xhr.readyState === xhr.DONE && xhr.status === 200) { // Request finished successfully
                         console.log("response:", xhr.response);
@@ -53,7 +52,7 @@ export class AttachmentInputController extends React.PureComponent {
                             onAddedFile(xhr.response);
                         });
                     } else {
-                        console.error("Submission Ingestion Error: ", this.response);
+                        console.error("Submission Ingestion Error: ", xhr.response);
                         this.setState({ loading: false, success: false }, function(){
                             Alerts.queue(AttachmentInputController.ErrorObject);
                         });
