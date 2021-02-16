@@ -72,24 +72,32 @@ class VariantBuilder:
         obj['status'] = 'shared'
 
     def _post_or_patch_variant(self, variant):
-        """ Tries to post the given variant to the application. If 201 is not encountered, assume the
-            variant is already present and should be patched (ie: we update variants we've seen before with
-            the latest annotations from the most recent VCF from which the variant has been seen. """
+        """ POST/PATCH the variant ie: create it if it doesn't exist, or update existing.
+            NOTE: snovault does not implement standard HTTP PUT.
+        """
         try:
             self.vapp.post_json('/variant', variant, status=201)
-        except Exception as e:  # XXX: HTTPConflict should be thrown and appears to be yet it is not caught
-            log.error('Exception encountered on post (attempting patch): %s' % e)
+        except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
+            log.error('Exception encountered on variant post (attempting patch): %s' % e)
             self.vapp.patch_json('/variant/%s' % build_variant_display_title(
                 variant['CHROM'],
                 variant['POS'],
                 variant['REF'],
                 variant['ALT'],
                 sep=ANNOTATION_ID_SEP
-            ), variant, status=200)  # will get logged/raised if error occurs
+            ), variant, status=200)
 
-    def _post_variant_sample(self, variant_sample):
-        """ Posts a variant_sample item. If this fails, exception should be caught by the caller. """
-        self.vapp.post_json('/variant_sample', variant_sample, status=201)
+    def _post_or_patch_variant_sample(self, variant_sample):
+        """ POST/PATCH the variant_sample ie: create it if it doesn't exist, or update existing.
+            NOTE: snovault does not implement standard HTTP PUT.
+        """
+        try:
+            self.vapp.post_json('/variant_sample', variant_sample, status=201)
+        except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
+            log.info('Exception encountered on variant_sample post (attempting patch): %s' % e)
+            self.vapp.patch_json('/variant_sample/%s' %
+                                 variant_sample['CALL_INFO'] + ':' + variant_sample['variant'],
+                                 status=200)
 
     def build_variant(self, record):
         """ Builds a raw variant from the given VCF record. """
@@ -103,11 +111,11 @@ class VariantBuilder:
     def search_for_sample_relations(self):
         """ Helper function for below method that is easy to mock. """
         search_qs = '/search/?type=SampleProcessing&processed_files.accession=%s' % self.file
-        search_result = []
         try:
             search_result = self.vapp.get(search_qs).json['@graph']
         except Exception as e:  # will catch 404
             log.error('No sample_processing found for this VCF! Familial relations will be absent. Error: %s' % e)
+            raise e
         return search_result
 
     def extract_sample_relations(self):
@@ -118,8 +126,8 @@ class VariantBuilder:
         search_result = self.search_for_sample_relations()
         if not search_result:
             return sample_relations
-        sample_procesing = search_result[0]
-        sample_pedigrees = sample_procesing.get('samples_pedigree', [])
+        sample_processing = search_result[0]
+        sample_pedigrees = sample_processing.get('samples_pedigree', [])
         for entry in sample_pedigrees:
             sample_id = entry['sample_name']
             sample_relations[sample_id] = {}
@@ -160,15 +168,16 @@ class VariantBuilder:
         :param virtualapp: application_handle to post under
         :param project: project to post under
         :param institution: institution to post under
-=        """
-        vcs = json.load(open(resolve_file_path('annotations/variant_consequence.json'), 'r'))
-        for entry in vcs:
-            entry['project'] = self.project
-            entry['institution'] = self.institution
-            try:
-                self.vapp.post_json('/variant_consequence', entry, status=201)
-            except Exception as e:  # can happen with master-inserts collision
-                log.error('Failed to post variant consequence %s' % str(e))
+=       """
+        with open(resolve_file_path('annotations/variant_consequence.json'), 'r') as f:
+            vcs = json.load(f)
+            for entry in vcs:
+                entry['project'] = self.project
+                entry['institution'] = self.institution
+                try:
+                    self.vapp.post_json('/variant_consequence', entry, status=201)
+                except Exception as e:  # can happen with master-inserts collision
+                    log.error('Failed to post variant consequence %s' % str(e))
 
     def ingest_vcf(self, use_tqdm=False):
         """ Ingests the VCF, building/posting variants and variant samples until done, creating a report
@@ -185,11 +194,11 @@ class VariantBuilder:
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
                 continue
 
-            # post the items
+            # PUT the items
             try:
                 self._post_or_patch_variant(variant)
                 for sample in variant_samples:
-                    self._post_variant_sample(sample)
+                    self._post_or_patch_variant_sample(sample)
                 self.ingestion_report.mark_success()
             except Exception as e:
                 log.error('Error encountered posting variant/variant_sample: %s' % e)

@@ -119,7 +119,7 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         'csq_gnomadg_af-xx': gnomad_af_female,
         'csq_gnomadg_af-xy': gnomad_af_male,
         // Allele Numbers
-        csq_gnomadg_af: gnomad_an,
+        csq_gnomadg_an: gnomad_an,
         'csq_gnomadg_an-xx': gnomad_an_female,
         'csq_gnomadg_an-xy': gnomad_an_male,
         // Homozygote Numbers
@@ -331,21 +331,15 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
-        'csq_gerp++_rs': gerp = fallbackElem,
+        csq_gerp_rs: gerp = fallbackElem,
         csq_phylop100way_vertebrate = fallbackElem,
         csq_cadd_phred = fallbackElem,
         transcript = [],
-        spliceai_maxds = fallbackElem,
-        csq_primateai_score = fallbackElem
+        spliceaiMaxds = fallbackElem,
+        csq_primateai_score = fallbackElem,
+        csq_sift_score = fallbackElem,
+        csq_polyphen2_hvar_score = fallbackElem
     } = variant;
-
-    // Should we instead find transcript with largest score instead of using current?
-    const currentTranscript = transcript[currentTranscriptIdx];
-    const {
-        csq_sift = fallbackElem,
-        csq_polyphen_score = fallbackElem,
-        csq_polyphen = fallbackElem
-    } = currentTranscript || {};
 
     // Not too sure whether to use table or <row> and <cols> here..
     // Went with <table> since is more semantically correct for the data we're
@@ -365,7 +359,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_gerp++_rs")}>GERP++</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_gerp_rs")}>GERP++</label>
                             </td>
                             <td className="text-left">{ gerp }</td>
                             {/* TODO for all:
@@ -402,15 +396,15 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("transcript.csq_sift")}>SIFT</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_sift_score")}>SIFT</label>
                             </td>
-                            <td className="text-left">{ csq_sift }</td>
+                            <td className="text-left">{ csq_sift_score }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("transcript.csq_polyphen_score")}>PolyPhen2</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_polyphen2_hvar_score")}>PolyPhen2</label>
                             </td>
-                            <td className="text-left">{ csq_polyphen_score }</td>
+                            <td className="text-left">{ csq_polyphen2_hvar_score }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
@@ -435,9 +429,9 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("spliceai_maxds")}>SpliceAI</label>
+                                <label className="mb-0" data-tip={getTipForField("spliceaiMaxds")}>SpliceAI</label>
                             </td>
-                            <td className="text-left">{ spliceai_maxds }</td>
+                            <td className="text-left">{ spliceaiMaxds }</td>
                         </tr>
                     </tbody>
                 </table>

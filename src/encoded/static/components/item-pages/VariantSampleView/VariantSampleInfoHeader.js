@@ -107,7 +107,7 @@ function TranscriptSelectionSection(props){
 
     const geneListOptions = geneTranscriptList.map(function(transcript, idx){
         return (
-            <DropdownItem key={idx} eventKey={idx} active={idx === currentTranscriptIdx}>
+            <DropdownItem key={idx} eventKey={idx.toString()} active={idx === currentTranscriptIdx}>
                 <GeneTranscriptDisplayTitle transcript={transcript} />
             </DropdownItem>
         );
@@ -341,33 +341,43 @@ function GDNAList({ context }){
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const { variant = {} } = context;
     const {
-        mutanno_hgvsg = fallbackElem,
+        // mutanno_hgvsg = fallbackElem, // (temporarily?) removed
+        display_title: hgvsg_placeholder = fallbackElem,
         // POS: pos,
         CHROM: chrom = fallbackElem,
-        hg19 = []
+        csq_hg19_chr = fallbackElem,
+        csq_hg19_pos = fallbackElem
     } = variant;
 
-    const renderedRows = [];
-
-    // Canononical GRCh38 entry
-    renderedRows.push(
-        <div className="row pb-1 pb-md-03" key="GRCh38">
-            <div className="col-12 col-md-3 font-italic"><em>GRCh38</em></div>
-            <div className="col-12 col-md-2">{ chrom }</div>
-            <div className="col-12 col-md-7">{ mutanno_hgvsg }</div>
-        </div>
+    const renderedRows =  (
+        <React.Fragment>
+            {/* Canononical GRCh38 entry */}
+            <div className="row pb-1 pb-md-03" key="GRCh38">
+                <div className="col-12 col-md-3 font-italic"><em>GRCh38</em></div>
+                <div className="col-12 col-md-2">{ chrom }</div>
+                <div className="col-12 col-md-7">{ hgvsg_placeholder }</div>
+            </div>
+            {/* Legacy GRCh37/hg19 support. */}
+            <div className="row pb-1 pb-md-03" key="GCRCh37">
+                <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
+                <div className="col-12 col-md-2 ">{ csq_hg19_chr }</div>
+                <div className="col-12 col-md-7">{ csq_hg19_pos }</div>
+            </div>
+        </React.Fragment>
     );
 
-    // Legacy GRCh37/hg19 support.
-    hg19.forEach(function({ hg19_pos, hg19_chrom, hg19_hgvsg }, idx){
+    //Legacy GRCh37/hg19 support.
+    /** @DEPRECATED as of Annotations v20; leaving here since csq_hg19 may be reverted to array again in future
+     * csq_hg19.forEach(function({ csq_hg19_pos, csq_hg19_chrom, csq_hg19_hgvsg }, idx){
         renderedRows.push(
             <div className="row pb-1 pb-md-03" key={idx}>
                 <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
-                <div className="col-12 col-md-2 ">{ hg19_chrom }</div>
-                <div className="col-12 col-md-7">{ hg19_hgvsg }</div>
+                <div className="col-12 col-md-2 ">{ csq_hg19_chrom }</div>
+                <div className="col-12 col-md-7">{ csq_hg19_hgvsg }</div>
             </div>
         );
     });
+    */
 
     return renderedRows;
 }
