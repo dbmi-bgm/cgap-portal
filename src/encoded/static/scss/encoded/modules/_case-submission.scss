@@ -49,9 +49,9 @@ body[data-current-action="add"] {
                     }
                 }
 
-                &:not(.disabled):not([disabled]) {
+                /*&:not(.disabled):not([disabled]):not(.completed) {
                     cursor: pointer;
-                }
+                }*/
 
                 > .row {
                     flex-wrap: nowrap;
