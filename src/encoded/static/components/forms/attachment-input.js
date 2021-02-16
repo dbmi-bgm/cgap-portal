@@ -45,18 +45,18 @@ export class AttachmentInputController extends React.PureComponent {
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", postURL, true);
 
-                xhr.onreadystatechange = function() { // Call a function when the state changes.
+                xhr.onreadystatechange = function() { // Callled when the state changes.
                     if (xhr.readyState !== 4) return;
-                    if (xhr.readyState === xhr.DONE && xhr.status === 200) {
-                        // Request finished. Do processing here.
+                    if (xhr.readyState === xhr.DONE && xhr.status === 200) { // Request finished successfully
                         console.log("response:", xhr.response);
-                        onAddedFile(xhr.response);
-                        this.setState({ loading: false, success: true });
+                        this.setState({ loading: false, success: true }, function() {
+                            onAddedFile(xhr.response);
+                        });
                     } else {
+                        console.error("Submission Ingestion Error: ", this.response);
                         this.setState({ loading: false, success: false }, function(){
                             Alerts.queue(AttachmentInputController.ErrorObject);
                         });
-                        console.error("Submission Ingestion Error: ", this.response);
                     }
                 }.bind(this);
 
