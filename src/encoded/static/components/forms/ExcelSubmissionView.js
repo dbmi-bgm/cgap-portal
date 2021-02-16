@@ -629,6 +629,9 @@ function Poller(props){
     const { uuid } = context || {};
     const getURL = "/ingestion-submissions/" + uuid;
 
+    const timeStarted = new Date(Date.now());
+    const [ lastUpdated, setLastUpdated ] = useState(timeStarted.toLocaleTimeString('en-US'));
+
     // console.log("context", context);
     useInterval(() => {
         console.log("Checking if processing status is updated.");
@@ -641,6 +644,7 @@ function Poller(props){
                     errors = []
                 } = response || {};
 
+                // TODO: Add an additional check for bad status codes, etc.
                 if (validation_errors.length > 0) {
                     console.error(validation_errors);
                     throw new Error("Did not pass server-side validation...");
@@ -667,8 +671,13 @@ function Poller(props){
                             default: // Shouldn't happen; outcome should only be unknown if state is not done
                                 throw new Error("Something went wrong while processing...");
                         }
-                    } // continue checking until complete
-                    console.log("Progress: ", progress);
+                    }  else {
+                        // update "last checked" status
+                        const timeUpdated = new Date(Date.now());
+                        setLastUpdated(timeUpdated.toLocaleTimeString('en-US'));
+                        // continue checking until complete; log any progress data to console (not useful, typically)
+                        console.log("Progress: ", progress);
+                    }
                 }
             })
             .catch((error)=> {
@@ -679,9 +688,12 @@ function Poller(props){
     }, 15000);
 
     return (
-        <div className="mt-2 text-center d-flex align-items-center justify-content-center">
-            <i className="icon icon-sync icon-spin fas" />&nbsp; Processing...
-        </div>
+        <React.Fragment>
+            <div className="mt-2 text-center d-flex flex-column align-items-center justify-content-center">
+                <span><i className="icon icon-sync icon-spin fas" />&nbsp; Processing...</span>
+                <span className="text-small text-secondary">Last ping at: { lastUpdated }</span>
+            </div>
+        </React.Fragment>
     );
 }
 
