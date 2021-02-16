@@ -41,16 +41,16 @@ export default class ExcelSubmissionView extends React.PureComponent {
         console.log('excelsubmissionview props', props);
     }
 
-    componentDidMount() {
-        const { setIsSubmitting } = this.props;
-        setIsSubmitting(true); // prompt user on attempt to navigate away
-    }
-
     componentDidUpdate(pastState){
         const { panelIdx } = this.state;
         if (panelIdx !== pastState.panelIdx){
             ReactTooltip.rebuild();
         }
+    }
+
+    componentWillUnmount() {
+        const { setIsSubmitting } = this.props;
+        setIsSubmitting(false); // remove user prompt on navigation, if hasn't been already
     }
 
     handleSelectPanel(e){
@@ -63,7 +63,11 @@ export default class ExcelSubmissionView extends React.PureComponent {
     }
 
     handleLoadedUser(user){
+        const { setIsSubmitting } = this.props;
         this.setState({ user });
+        setIsSubmitting(true); // prompt user on attempt to navigate away
+        // note, this is handled here instead of in componentWillMount (for example) to ensure
+        // href is fully updated/context fully changed before triggering
     }
 
     handleLoadedIngestionSubmission(submissionItem){
@@ -121,6 +125,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
             'display_title': submissionTitle,
             processing_status: { state, outcome } = {}
         } = submissionItem || {};
+        const { setIsSubmitting } = this.props;
 
         let submissionLink = null;
         let finishBtn = null;
@@ -157,10 +162,10 @@ export default class ExcelSubmissionView extends React.PureComponent {
 
                     <PanelSelectionMenu {...{ panelIdx, panelsComplete, submissionItem }} onSelect={this.handleSelectPanel} />
 
-                    <PanelOne {...this.props} {...this.state} userDetails={userDetails} markCompleted={this.markCompleted}
+                    <PanelOne {...this.props} {...this.state} {...{ setIsSubmitting, userDetails }} markCompleted={this.markCompleted}
                         onLoadUser={this.handleLoadedUser} onSubmitIngestionSubmission={this.handleLoadedIngestionSubmission} />
 
-                    <PanelTwo {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
+                    <PanelTwo {...this.props} {...this.state} {...{ setIsSubmitting, userDetails }} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
                         markCompleted={this.markCompleted} />
 
                     <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
@@ -553,7 +558,7 @@ class PanelTwo extends React.PureComponent {
     }
 
     render(){
-        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission } = this.props;
+        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission, setIsSubmitting } = this.props;
         const { statusIdx } = this.state;
 
         if (panelIdx !== 1) {
@@ -584,7 +589,7 @@ class PanelTwo extends React.PureComponent {
                 </React.Fragment>
             );
         } else if (statusIdx === 1) {
-            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} {...{ onLoadedIngestionSubmission }}/>;
+            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} {...{ onLoadedIngestionSubmission, setIsSubmitting }}/>;
         } else {
             panelContents = <h4 className="text-300 mt-2">Successfully processed file. Ready to view results.</h4>;
         }
@@ -620,7 +625,7 @@ function useInterval(callback, delay) {
 }
 
 function Poller(props){
-    const { context = null, setStatusIdx, onLoadedIngestionSubmission } = props;
+    const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting } = props;
     const { uuid } = context || {};
     const getURL = "/ingestion-submissions/" + uuid;
 
@@ -651,6 +656,7 @@ function Poller(props){
                                 // Upload global item
                                 onLoadedIngestionSubmission(response);
                                 setStatusIdx(2); // Quit polling; allow to proceed to finalization
+                                setIsSubmitting(false);
                                 break;
                             case "error":
                             case "failure":
