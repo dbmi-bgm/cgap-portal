@@ -5,5 +5,12 @@
         "description": "This is a test project",
         "status": "current",
         "name": "hms-dbmi"
+    },
+    {
+        "title": "CGAP Fixture Testing",
+        "uuid": "ebe0450d-e6f5-4251-8719-98cac8950e77",
+        "description": "Project only for testing fixtures in the CGAP unit tests.",
+        "name": "cgap-fixture-testing",
+        "date_created": "2021-02-11T03:38:00.000000+00:00"
     }
 ]

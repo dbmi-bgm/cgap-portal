@@ -5,7 +5,6 @@ http://pyramid.readthedocs.org/en/latest/narr/testing.html
 import logging
 import pytest
 import webtest
-import pkg_resources
 
 from pyramid.request import apply_request_extensions
 from pyramid.testing import DummyRequest, setUp, tearDown
@@ -14,8 +13,8 @@ from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
 from snovault.util import generate_indexer_namespace_for_testing
 from .conftest_settings import make_app_settings_dictionary
+from .workbook_support import WorkbookCache
 from .. import main
-from ..loadxl import load_all
 
 
 """
@@ -305,38 +304,15 @@ def wsgi_app(wsgi_server):
     return webtest.TestApp(wsgi_server)
 
 
-class WorkbookCache:
-    """ Caches whether or not we have already provisioned the workbook. """
-    done = None
-
-    @classmethod
-    def initialize_if_needed(cls, es_app):
-        if not cls.done:
-            cls.done = cls.make_fresh_workbook(es_app)
-
-    @classmethod
-    def make_fresh_workbook(cls, es_app):
-        environ = {
-            'HTTP_ACCEPT': 'application/json',
-            'REMOTE_USER': 'TEST',
-        }
-        testapp = webtest.TestApp(es_app, environ)
-
-        # Just load the workbook inserts
-        # Note that load_all returns None for success or an Exception on failure.
-        load_res = load_all(testapp, pkg_resources.resource_filename('encoded', 'tests/data/workbook-inserts/'), [])
-
-        if isinstance(load_res, Exception):
-            raise load_res
-        elif load_res:
-            raise RuntimeError("load_all returned a true value that was not an exception.")
-
-        testapp.post_json('/index', {})
-        return True
+@pytest.fixture(scope='session')
+def indexer_namespace(es_app_settings):
+    return es_app_settings['indexer.namespace']
 
 
 @pytest.fixture(scope='session')
-def workbook(es_app):
+def workbook(es_testapp, elasticsearch_server_dir, indexer_namespace):
     """ Loads a bunch of data (tests/data/workbook-inserts) into the system on first run
         (session scope doesn't work). """
-    WorkbookCache.initialize_if_needed(es_app)
+    WorkbookCache.initialize_if_needed(es_testapp,
+                                       datadir=elasticsearch_server_dir,
+                                       indexer_namespace=indexer_namespace)

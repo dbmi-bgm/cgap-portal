@@ -1,4 +1,6 @@
+import io
 import json
+import os
 import pytest
 import mock
 import webtest
@@ -9,6 +11,7 @@ from dcicutils.qa_utils import local_attrs
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
+from .workbook_support import WorkbookCache
 from ..search import lucene_builder
 from ..search.lucene_builder import LuceneBuilder
 from ..search.search_utils import find_nested_path
@@ -1297,3 +1300,85 @@ class TestSearchBucketRangeFacets:
     def test_search_bucket_range_workbook(self, es_testapp, workbook):
         # TODO: write me once some bucket-range aggregations are defined on schemas for workbook inserts
         pass
+
+
+@pytest.fixture()
+def workbook_from_snapshot(es_testapp, workbook, elasticsearch_server_dir, indexer_namespace):
+    WorkbookCache.make_or_restore_workbook(es_testapp,
+                                           datadir=elasticsearch_server_dir,
+                                           indexer_namespace=indexer_namespace)
+
+def test_workbook_restore1(workbook_from_snapshot, es_testapp):
+
+    existing_institutions = es_testapp.get('/institutions/', status=301).follow().json['@graph']
+    existing_institution_names = sorted([inst['name'] for inst in existing_institutions])
+    assert len(existing_institutions) == 1
+    assert existing_institution_names == ['hms-dbmi']
+
+    es_testapp.post_json('/index', {'record': False})
+
+    es_testapp.post_json('/Institution',
+                         {
+                             'name': 'some-institution',
+                             'title': "Some Institution",
+                             'uuid': '56075c5f-0672-479a-b275-f5571b010691'
+                         })
+
+    es_testapp.post_json('/index', {'record': False})
+
+    existing_institutions = es_testapp.get('/institutions/', status=301).follow().json['@graph']
+    existing_institution_names = sorted([inst['name'] for inst in existing_institutions])
+    assert len(existing_institutions) == 2
+    assert existing_institution_names == ['hms-dbmi', 'some-institution']
+
+    existing_projects = es_testapp.get('/projects/', status=301).follow().json['@graph']
+    existing_project_names = sorted([proj['name'] for proj in existing_projects])
+    assert 'cgap-fixture-testing' in existing_project_names
+
+    for proj in existing_projects:
+        if proj['name'] == 'cgap-fixture-testing':
+            es_testapp.delete_json('/projects/' + proj['uuid'])
+
+    es_testapp.post_json('/index', {'record': False})
+
+    existing_projects = es_testapp.get('/projects/', status=301).follow().json['@graph']
+    existing_project_names = sorted([proj['name'] for proj in existing_projects])
+    assert 'cgap-fixture-testing' not in existing_project_names
+
+
+def test_workbook_restore2(workbook, es_testapp):
+
+    existing_institutions = es_testapp.get('/institutions/', status=301).follow().json['@graph']
+    existing_institution_names = sorted([inst['name'] for inst in existing_institutions])
+
+    # Test for stale data from test_workbook_restore1
+
+    # A fresh workbook expect this to return: 1
+    assert len(existing_institutions) == 2
+
+    # A fresh workbook expect this to return: ['hms-dbmi']
+    assert existing_institution_names == ['hms-dbmi', 'some-institution']
+
+    existing_projects = es_testapp.get('/projects/', status=301).follow().json['@graph']
+    existing_project_names = sorted([proj['name'] for proj in existing_projects])
+
+    # A fresh workbook would assert: 'cgap-fixture-testing' in existing_project_names
+    assert 'cgap-fixture-testing' not in existing_project_names
+
+    # This is what a fresh workbook would assert: existing_project_names == ['cgap-fixture-testing', 'hms-dbmi']
+    assert existing_project_names == ['hms-dbmi']
+
+
+def test_workbook_restore3(workbook_from_snapshot, es_testapp):
+
+    existing_institutions = es_testapp.get('/institutions/', status=301).follow().json['@graph']
+    existing_institution_names = sorted([inst['name'] for inst in existing_institutions])
+    assert len(existing_institutions) == 1
+    assert existing_institution_names == ['hms-dbmi']
+
+    existing_projects = es_testapp.get('/projects/', status=301).follow().json['@graph']
+    existing_project_names = sorted([proj['name'] for proj in existing_projects])
+    assert 'cgap-fixture-testing' in existing_project_names
+    assert existing_project_names == ['cgap-fixture-testing', 'hms-dbmi']
+
+
