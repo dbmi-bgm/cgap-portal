@@ -758,12 +758,24 @@ class SearchBuilder:
         :param full_agg_name: full name of the aggregation
         """
         result_facet['aggregation_type'] = 'terms'
-        buckets = aggregations[full_agg_name]['primary_agg']['primary_agg']['buckets']
-        for bucket in buckets:
+        term_to_bucket = {}  # so we can deduplicate keys
+        source_aggregation = aggregations[full_agg_name]['primary_agg']
+        primary_buckets = source_aggregation['primary_agg']['buckets']
+        for bucket in primary_buckets:
             if 'primary_agg_reverse_nested' in bucket:
                 bucket['doc_count'] = bucket['primary_agg_reverse_nested']['doc_count']
-        aggregations[full_agg_name]['primary_agg']['buckets'] = \
-            sorted(buckets, key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
+            if bucket['key'] not in term_to_bucket:
+                term_to_bucket[bucket['key']] = bucket
+        if 'requested_agg' in source_aggregation:
+            requested_buckets = source_aggregation['requested_agg']['buckets']
+            for bucket in requested_buckets:
+                if 'primary_agg_reverse_nested' in bucket:
+                    bucket['doc_count'] = bucket['primary_agg_reverse_nested']['doc_count']
+                if bucket['key'] not in term_to_bucket:
+                    term_to_bucket[bucket['key']] = bucket
+
+        result_facet['terms'] = sorted(list(term_to_bucket.values()),
+                                       key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
 
     def format_facets(self, es_results):
         """
@@ -843,14 +855,24 @@ class SearchBuilder:
                             raise Exception('No buckets found on terms agg!')
                         return path['buckets']
 
-                    terms = []
+                    term_to_bucket = {}  # so we can deduplicate keys
                     source_aggregation = aggregations[full_agg_name]
-                    # If we had a selection, add the selections to terms
                     if 'requested_agg' in source_aggregation:
-                        terms.extend(extract_buckets(source_aggregation['requested_agg']))
+                        for bucket in extract_buckets(source_aggregation['requested_agg']):
+                            if bucket['key'] in term_to_bucket:
+                                continue
+                            else:
+                                term_to_bucket[bucket['key']] = bucket
+                        terms.extend()
 
-                    terms.extend(extract_buckets(source_aggregation['primary_agg']))
-                    result_facet['terms'] = terms
+                    # always present
+                    for bucket in extract_buckets(source_aggregation['primary_agg']):
+                        if bucket['key'] in term_to_bucket:
+                            continue
+                        else:
+                            term_to_bucket[bucket['key']] = bucket
+
+                    result_facet['terms'] = list(term_to_bucket.values())
 
                     # Choosing to show facets with one term for summary info on search it provides
                     # XXX: The above comment is misleading - this drops all facets with no buckets
@@ -859,13 +881,9 @@ class SearchBuilder:
                     if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == NESTED:
                         continue
 
-                    # if we are nested, apply fix + replace (only for terms)
-                    # XXX: needs to handle requested_agg
+                    # If we are nested, reverse_nested counts are what we care about
                     if facet['aggregation_type'] == NESTED:
                         self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
-
-                        # Re-add buckets under 'terms' AFTER we have fixed the doc_counts
-                        result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
 
                     # Choosing to show facets with one term for summary info on search it provides
                     if len(result_facet.get('terms', [])) < 1:
