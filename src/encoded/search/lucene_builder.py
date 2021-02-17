@@ -1069,7 +1069,7 @@ class LuceneBuilder:
             :param string_query:   Dict holding the query_string used in the search
         """
         if from_ != 0:
-            return search
+            return query
 
         aggs = OrderedDict()
         for field, facet in facets:  # E.g. 'type','experimentset_type','experiments_in_set.award.project', ...

@@ -69,7 +69,7 @@ class CompoundSearchBuilder:
         for k, v in dict_with_more_vals.items():
             if k in dict_to_merge_into:
                 dict_to_merge_into[k] += v
-            else: 
+            else:
                 dict_to_merge_into[k] = v
 
         return urllib.parse.urlencode(dict_to_merge_into, doseq=True)
@@ -295,7 +295,7 @@ def build_query(context, request):
     """
     builder = SearchBuilder(context, request)
     builder._build_query()
-    return builder.search.to_dict()
+    return builder.query
 
 
 @view_config(route_name='compound_search', request_method='POST', permission='search')
@@ -352,7 +352,7 @@ def compound_search(context, request):
     body = json.loads(request.body)
     filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, body)
     intersect = True if body.get('intersect', False) else False
-    
+
     # Disabled for time being to allow test(s) to pass. Not sure whether to add Project to FilterSet schema 'search_type' enum.
     # if filter_set.get(CompoundSearchBuilder.TYPE) not in request.registry[TYPES]["FilterSet"].schema["properties"][CompoundSearchBuilder.TYPE]["enum"]:
     #    raise HTTPBadRequest("Passed bad {} body param: {}".format(CompoundSearchBuilder.TYPE, filter_set.get(CompoundSearchBuilder.TYPE)))
