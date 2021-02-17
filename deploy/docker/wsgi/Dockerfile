@@ -1,59 +1,95 @@
-FROM ubuntu:18.04
+FROM python:3.6-buster
 
-# XXX: We should consider a multi-base image setup where python, poetry, app etc are done
-# separately and can be extended.
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update
+# Copied from: https://github.com/nginxinc/docker-nginx/blob/594ce7a8bc26c85af88495ac94d5cd0096b306f7/mainline/buster/Dockerfile
 
-# Add some tools
-RUN apt-get -y install emacs vim
-RUN apt-get -y install software-properties-common
+# Standard set up Nginx
+ENV NGINX_VERSION=1.17.10
+ENV NJS_VERSION=0.3.9
+ENV PKG_RELEASE=1~buster
 
-# Add Python
-RUN add-apt-repository ppa:deadsnakes/ppa
-RUN apt-get update
-RUN apt-get -y install python3.6-dev
-RUN python3.6 -V
+RUN set -x \
+    && apt-get update \
+    && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
+    && \
+    NGINX_GPGKEY=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62; \
+    found=''; \
+    for server in \
+        ha.pool.sks-keyservers.net \
+        hkp://keyserver.ubuntu.com:80 \
+        hkp://p80.pool.sks-keyservers.net:80 \
+        pgp.mit.edu \
+    ; do \
+        echo "Fetching GPG key $NGINX_GPGKEY from $server"; \
+        apt-key adv --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$NGINX_GPGKEY" && found=yes && break; \
+    done; \
+    test -z "$found" && echo >&2 "error: failed to fetch GPG key $NGINX_GPGKEY" && exit 1; \
+    apt-get remove --purge --auto-remove -y gnupg1 && rm -rf /var/lib/apt/lists/* \
+    && dpkgArch="$(dpkg --print-architecture)" \
+    && nginxPackages=" \
+        nginx=${NGINX_VERSION}-${PKG_RELEASE} \
+        nginx-module-xslt=${NGINX_VERSION}-${PKG_RELEASE} \
+        nginx-module-geoip=${NGINX_VERSION}-${PKG_RELEASE} \
+        nginx-module-image-filter=${NGINX_VERSION}-${PKG_RELEASE} \
+        nginx-module-njs=${NGINX_VERSION}.${NJS_VERSION}-${PKG_RELEASE} \
+    " \
+    && case "$dpkgArch" in \
+        amd64|i386) \
+            echo "deb https://nginx.org/packages/mainline/debian/ buster nginx" >> /etc/apt/sources.list.d/nginx.list \
+            && apt-get update \
+            ;; \
+        *) \
+            echo "deb-src https://nginx.org/packages/mainline/debian/ buster nginx" >> /etc/apt/sources.list.d/nginx.list \
+            \
+            && tempDir="$(mktemp -d)" \
+            && chmod 777 "$tempDir" \
+            \
+            && savedAptMark="$(apt-mark showmanual)" \
+            \
+            && apt-get update \
+            && apt-get build-dep -y $nginxPackages \
+            && ( \
+                cd "$tempDir" \
+                && DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" \
+                    apt-get source --compile $nginxPackages \
+            ) \
+            \
+            && apt-mark showmanual | xargs apt-mark auto > /dev/null \
+            && { [ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; } \
+            \
+            && ls -lAFh "$tempDir" \
+            && ( cd "$tempDir" && dpkg-scanpackages . > Packages ) \
+            && grep '^Package: ' "$tempDir/Packages" \
+            && echo "deb [ trusted=yes ] file://$tempDir ./" > /etc/apt/sources.list.d/temp.list \
+            && apt-get -o Acquire::GzipIndexes=false update \
+            ;; \
+    esac \
+    \
+    && apt-get install --no-install-recommends --no-install-suggests -y \
+                        $nginxPackages \
+                        gettext-base \
+    && apt-get remove --purge --auto-remove -y ca-certificates && rm -rf /var/lib/apt/lists/* /etc/apt/sources.list.d/nginx.list \
+    \
+    && if [ -n "$tempDir" ]; then \
+        apt-get purge -y --auto-remove \
+        && rm -rf "$tempDir" /etc/apt/sources.list.d/temp.list; \
+    fi
 
-# Install mod_wsgi
-RUN apt-get -y install git git-c++ wget
-RUN apt-get -y install apache2-dev apache2-utils ssl-cert libapache2-mod-wsgi
+# forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
 
-# Install mod_wsgi
-RUN apt-get install libapache2-mod-wsgi
-RUN systemctl restart apache2
+# end of nginx setup
 
-# Environment Configuration
-# Adapated from https://github.com/python-poetry/poetry/discussions/1879
-# Don't buffer output from Python
-ENV PYTHONUNBUFFERED=1
-# Don't write .pyc files (to disk)
-ENV PYTHONDONTWRITEBYTECODE=1
+EXPOSE 80
+EXPOSE 443
 
-# Optimize pip
-ENV PIP_NO_CACHE_DIR=off
-ENV PIP_DISABLE_PIP_VERSION_CHECK=on
-ENV PIP_DEFAULT_TIMEOUT=100
-
-# Configure poetry
-# Reference: https://python-poetry.org/docs/configuration/#using-environment-variables
-ENV POETRY_VERSION=1.1.4
-# make poetry install to this location
-ENV POETRY_HOME="/home/cgap-admin/poetry"
-# make poetry create the virtual environment in the project's root
-# it gets named `.venv`
-ENV POETRY_VIRTUALENVS_IN_PROJECT=true
-ENV POETRY_NO_INTERACTION=1
-# This is where our requirements + virtual environment will live
-ENV PYSETUP_PATH="/home/cgap-admin/cgap-portal"
-ENV VENV_PATH="/home/cgap-admin/.venv"
-
-
-# Configure Path
-ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
+# Remove default configuration from Nginx
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/nginx.conf
 
 
 # Configure CGAP User
