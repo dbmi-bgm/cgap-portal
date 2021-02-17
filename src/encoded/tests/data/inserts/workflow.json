@@ -1,124 +1,259 @@
 [
     {
-      "docker_image_name": "duplexa/4dn-hic:v42",
-      "category": [
-        "processing"
-      ],
-      "steps": [
-        {
-          "meta": {
-            "software_used": [
-              "02d636b9-d82d-4da9-950c-2ca994a13209"
-            ],
-            "analysis_step_types": [
-              "alignment"
-            ]
-          },
-          "name": "bwa-mem",
-          "inputs": [
-            {
-              "meta": {
-                "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
-                "cardinality": "single",
-                "global": true,
-                "type": "data file"
-              },
-              "name": "fastq1",
-              "source": [
-                {
-                  "name": "fastq1"
-                }
-              ]
-            },
-            {
-              "meta": {
-                "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
-                "cardinality": "single",
-                "global": true,
-                "type": "data file"
-              },
-              "name": "fastq2",
-              "source": [
-                {
-                  "name": "fastq2"
-                }
-              ]
-            },
-            {
-              "meta": {
-                "cardinality": "single",
-                "global": true,
-                "type": "parameter"
-              },
-              "name": "nThreads",
-              "source": [
-                {
-                  "name": "nThreads"
-                }
-              ]
-            }
-          ],
-          "outputs": [
-            {
-              "meta": {
-                "file_format": "bam",
-                "cardinality": "single",
-                "global": true,
-                "type": "data file"
-              },
-              "target": [
-                {
-                  "name": "out_bam"
-                }
-              ],
-              "name": "out_bam"
-            }
-          ]
-        }
-      ],
-      "uuid": "10eedadc-50f9-4bb4-919b-09a8b731d0cc",
-      "description": "Creating a lossless alignment bam file from a pair of fastq files",
-      "version_upgrade_log": "use of official release of bwa",
-      "cwl_directory_url": "https://raw.githubusercontent.com/4dn-dcic/pipelines-cwl/0.2.6/cwl_awsem_v1/",
+      "app_name": "test_mpileup",
+      "app_version": "v18",
       "arguments": [
-        {
-          "workflow_argument_name": "fastq1",
-          "argument_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
-          "description": "",
-          "argument_type": "Input file"
-        },
-        {
-          "workflow_argument_name": "fastq2",
-          "argument_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
-          "description": "",
-          "argument_type": "Input file"
-        },
-        {
-          "workflow_argument_name": "nThreads",
-          "argument_type": "parameter"
-        },
-        {
-          "workflow_argument_name": "out_bam",
-          "argument_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
-          "argument_type": "Output processed file"
-        }
+          {
+              "argument_format": "bam",
+              "argument_type": "Input file",
+              "workflow_argument_name": "input_bam",
+              "mount": True
+          },
+          {
+              "argument_format": "regions",
+              "argument_type": "Input file",
+              "workflow_argument_name": "regions",
+              "default_input_file": "1c07a3aa-e2a3-498c-b838-15991c4a2f28"
+          },
+          {
+              "argument_format": "rck_gz",
+              "argument_type": "Output processed file",
+              "workflow_argument_name": "rck",
+              "secondary_file_formats": ["rck_gz_tbi"]
+          },
       ],
-
-      "workflow_language": "CWL",
-      "app_version": "0.2.6",
-      "title": "Alignment for Hi-C using bwa-mem 0.2.6",
-      "docker_registry_url": "https://hub.docker.com/",
-      "accession": "GAPWF84NFOQP",
-      "name": "bwa-mem",
-      "schema_version": "7",
-      "app_name": "bwa-mem",
-      "cwl_pointer": "",
-      "cwl_directory_url_draft3": "",
-      "cwl_main_filename": "bwa-mem.cwl",
-      "cwl_directory_url_v1": "https://raw.githubusercontent.com/4dn-dcic/pipelines-cwl/0.2.6/cwl_awsem_v1/",
-      "status": "shared",
+      "default_tibanna_config": {
+          "instance_type": "c5.4xlarge",
+          "ebs_size": "200",
+          "EBS_optimized": True
+       },
       "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-      "institution": "hms-dbmi",
-      "submitted_by": "koray_kirli@hms.harvard.edu"
+      "category": ["processing"],
+      "cwl_child_filenames": [],
+      "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v18/cwl",
+      "cwl_main_filename": "test.cwl",
+      "cwl_pointer": "",
+      "description": "Test workflow",
+      "docker_image_name": "test/test:test",
+      "docker_registry_url": "https://hub.docker.com/",
+      "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+      "name": "test_mpileup_v18",
+      "aliases": ["cgap:test_mpileup_v18"],
+      "steps": [
+          {
+              "inputs": [
+                  {
+                      "meta": {
+                          "cardinality": "single",
+                          "file_format": "bam",
+                          "global": true,
+                          "type": "data file"
+                      },
+                      "name": "input_bam",
+                      "source": [
+                          {
+                              "name": "input_bam"
+                          }
+                      ]
+                  },
+                  {
+                      "meta": {
+                          "cardinality": "single",
+                          "file_format": "txt",
+                          "global": true,
+                          "type": "reference file"
+                      },
+                      "name": "regions",
+                      "source": [
+                          {
+                              "name": "regions"
+                          }
+                      ]
+                  }
+              ],
+              "meta": {
+                  "analysis_step_types": [
+                      "Run granite mpileupCounts"
+                  ],
+                  "software_used": [
+                     "/softwares/02d636b9-d82d-4da9-950c-2ca994a13209"
+                  ]
+              },
+              "name": "granite",
+              "outputs": [
+                  {
+                      "meta": {
+                          "cardinality": "single",
+                          "file_format": "rck_gz",
+                          "global": true,
+                          "type": "data file"
+                      },
+                      "name": "rck",
+                      "target": [
+                          {
+                              "name": "rck"
+                          }
+                      ]
+                  }
+              ]
+          }
+      ],
+      "title": "Test mpileup",
+      "uuid": "e2e95743-0d3b-4e07-b1e5-71c80dd74906"
+    },
+    {
+      "app_name": "test_rcktar",
+      "app_version": "v17",
+      "arguments": [
+          {
+              "argument_format": "rck_gz",
+              "argument_type": "Input file",
+              "workflow_argument_name": "input_rcks"
+          },
+          {
+              "argument_format": "rck_tar",
+              "argument_type": "Output processed file",
+              "workflow_argument_name": "rck_tar",
+              "secondary_file_formats": ["rck_tar_index"]
+          }
+      ],
+      "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+      "category": ["processing"],
+      "cwl_child_filenames": [],
+      "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v17/cwl",
+      "cwl_main_filename": "test.cwl",
+      "cwl_pointer": "",
+      "description": "Test rcktar",
+      "docker_image_name": "test/test:test",
+      "docker_registry_url": "https://hub.docker.com/",
+      "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+      "name": "test_rcktar_v17",
+      "aliases": ["cgap:test_rcktar_v17"],
+      "steps": [
+          {
+              "inputs": [
+                  {
+                      "meta": {
+                          "cardinality": "array",
+                          "file_format": "rck_gz",
+                          "global": true,
+                          "type": "data file"
+                      },
+                      "name": "input_rcks",
+                      "source": [
+                          {
+                              "name": "input_rcks"
+                          }
+                      ]
+                  }
+              ],
+              "meta": {
+                  "analysis_step_types": [
+                      "Run granite rckTar"
+                  ],
+                  "software_used": [
+                     "/softwares/02d636b9-d82d-4da9-950c-2ca994a13209"
+                  ]
+              },
+              "name": "granite",
+              "outputs": [
+                  {
+                      "meta": {
+                          "cardinality": "single",
+                          "file_format": "rck_tar",
+                          "global": true,
+                          "type": "data file"
+                      },
+                      "name": "rck_tar",
+                      "target": [
+                          {
+                              "name": "rck_tar"
+                          }
+                      ]
+                  }
+              ]
+          }
+      ],
+      "title": "Test rcktar v17",
+      "uuid": "1f35dde7-a768-48a7-81d9-0e047afeed17"
+    },
+    {
+      "app_name": "test_rcktar",
+      "app_version": "v18",
+      "arguments": [
+          {
+              "argument_format": "rck_gz",
+              "argument_type": "Input file",
+              "workflow_argument_name": "input_rcks"
+          },
+          {
+              "argument_format": "rck_tar",
+              "argument_type": "Output processed file",
+              "workflow_argument_name": "rck_tar",
+              "secondary_file_formats": ["rck_tar_index"]
+          }
+      ],
+      "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+      "category": ["processing"],
+      "cwl_child_filenames": [],
+      "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v18/cwl",
+      "cwl_main_filename": "test.cwl",
+      "cwl_pointer": "",
+      "description": "Test rcktar",
+      "docker_image_name": "test/test:test",
+      "docker_registry_url": "https://hub.docker.com/",
+      "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+      "name": "test_rcktar_v18",
+      "aliases": ["cgap:test_rcktar_v18",
+                  "cgap:test_rcktar_v17"],
+      "steps": [
+          {
+              "inputs": [
+                  {
+                      "meta": {
+                          "cardinality": "array",
+                          "file_format": "rck_gz",
+                          "global": true,
+                          "type": "data file"
+                      },
+                      "name": "input_rcks",
+                      "source": [
+                          {
+                              "name": "input_rcks"
+                          }
+                      ]
+                  }
+              ],
+              "meta": {
+                  "analysis_step_types": [
+                      "Run granite rckTar"
+                  ],
+                  "software_used": [
+                     "/softwares/02d636b9-d82d-4da9-950c-2ca994a13209"
+                  ]
+              },
+              "name": "granite",
+              "outputs": [
+                  {
+                      "meta": {
+                          "cardinality": "single",
+                          "file_format": "rck_tar",
+                          "global": true,
+                          "type": "data file"
+                      },
+                      "name": "rck_tar",
+                      "target": [
+                          {
+                              "name": "rck_tar"
+                          }
+                      ]
+                  }
+              ]
+          }
+      ],
+      "title": "Test rcktar v18",
+      "uuid": "40f60563-a3e6-4a45-b083-c6a2e00dc71f",
+      "previous_version": ["1f35dde7-a768-48a7-81d9-0e047afeed17"],
+      "version_upgrade_log": "Updated the version"
     }
 ]
