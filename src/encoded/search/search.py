@@ -718,8 +718,6 @@ class SearchBuilder:
             getattr(self, "size", 25) != "all"
         ):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
             self.search_session_id = self.request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
-            # XXX: add preference at the end
-            #self.query['params']['preference'] = self.search_session_id
 
     def build_search_query(self):
         """ Builds the search query utilizing a combination of helper methods within this class
@@ -742,7 +740,7 @@ class SearchBuilder:
                                                  self.from_, self.item_type_es_mapping)
 
         # Add preference from session, if available
-        # XXX: add when executing
+        # This just sets the value on the class - it is passed to execute_search later
         self.assure_session_id()
 
     @staticmethod
@@ -1184,8 +1182,8 @@ class SearchBuilder:
         self.build_search_query()
 
     def get_query(self):
-        """ Grabs the search object """
-        return self.search
+        """ Grabs the query object, now a dictionary """
+        return self.query
 
     def _search(self):
         """ Executes the end-to-end search.

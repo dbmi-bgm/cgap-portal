@@ -339,7 +339,6 @@ def execute_search(es, query, index, from_, size, session_id=None):
     try:
         # set timeout
         es_results = es.search(index=index, body=query, from_=from_, size=size, timeout='30s', preference=session_id)
-        #es_results = search.execute().to_dict()
     except ConnectionTimeout:
         err_exp = 'The search failed due to a timeout. Please try a different query.'
     except RequestError as exc:

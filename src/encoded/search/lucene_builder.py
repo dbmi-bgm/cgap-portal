@@ -577,10 +577,6 @@ class LuceneBuilder:
         # add range limits to filters if given
         cls.apply_range_filters(range_filters, must_filters, es_mapping)
 
-        # To modify filters of elasticsearch_dsl Search, must call to_dict(),
-        # modify that, then update from the new dict
-        #prev_search = search.to_dict()
-
         # initialize filter hierarchy
         final_filters = {BOOL: {MUST: [f for _, f in must_filters], MUST_NOT: [f for _, f in must_not_filters]}}
         cls.handle_nested_filters(must_filters_nested, final_filters, es_mapping, key=MUST)
@@ -588,12 +584,6 @@ class LuceneBuilder:
 
         # at this point, final_filters is valid lucene and can be dropped into the query directly
         query[QUERY][BOOL][FILTER] = final_filters
-        # try:
-        #     search.update_from_dict(prev_search)
-        # except Exception as e:  # not ideal, but important to catch at this stage no matter what it is
-        #     search_log(log_handler=log, msg='Exception encountered when converting raw lucene params to '
-        #                                     'elasticsearch_dsl, search: %s\n error: %s' % (prev_search, str(e)))
-        #     raise HTTPBadRequest('The search failed - the DCIC team has been notified.')
         return query, final_filters
 
     @staticmethod
@@ -1113,11 +1103,6 @@ class LuceneBuilder:
             # We do currently have (hidden) monthly date histogram facets which may yet to be utilized for common size!=0 agg use cases.
             cls.set_additional_aggregations(query, request, doc_types, custom_aggregations)
 
-        # update with all terms aggregations
-        # search.update_from_dict(search_as_dict)
-
-        # update with correct nested aggregations, see docstring
-        #cls.fix_nested_aggregations(search, es_mapping)
         return query
 
     @staticmethod

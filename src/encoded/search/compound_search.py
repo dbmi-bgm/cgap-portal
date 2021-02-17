@@ -229,10 +229,11 @@ class CompoundSearchBuilder:
 
             search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query)
             search_builder_instance.assure_session_id()
-            search_builder_instance.search = search_builder_instance.search.sort(sort)
-            search_builder_instance.search = search_builder_instance.search[from_ : from_ + to]
-
-            es_results = execute_search(compound_subreq, search_builder_instance.search)
+            search_builder_instance.query['sort'] = sort
+            es_results = execute_search(search_builder_instance.es,
+                                        search_builder_instance.query,
+                                        search_builder_instance.es_index,
+                                        from_, to, search_builder_instance.search_session_id)
             return cls.format_filter_set_results(request, es_results, filter_set, result_sort, search_builder_instance)
 
     @classmethod
