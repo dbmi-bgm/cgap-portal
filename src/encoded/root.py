@@ -1,11 +1,12 @@
 import uptime
+
+from collections import OrderedDict
 from dcicutils import lang_utils
+from encoded import APP_VERSION_REGISTRY_KEY
 from pyramid.decorator import reify
+from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
 from snovault import Root, calculated_property, root, COLLECTIONS, STORAGE
 from .schema_formats import is_accession
-from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
-from collections import OrderedDict
-from encoded import APP_VERSION_REGISTRY_KEY
 
 
 def includeme(config):
@@ -140,6 +141,7 @@ def submissions_page(config):
         'submissions-page',
         '/submissions'
     )
+
     def submissions_page_view(request):
         response = request.response
         response.content_type = 'application/json; charset=utf-8'
