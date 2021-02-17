@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import queryString from 'query-string';
 import moment from 'moment';
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { variantSampleAdditionalColumnExtensionMap, VariantSampleDisplayTitleColumn } from './CaseViewEmbeddedVariantSampleSearchTable';
 
@@ -67,7 +68,14 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             <LocalizedTime timestamp={date_selected} formatType="date-time-sm" />
                         </div>
                         <div className="flex-auto pl-3">
-                            <i className="icon icon-ellipsis-v fas"/>
+                            <DropdownButton size="sm" variant="light" title={
+                                <React.Fragment>
+                                    <i className="icon icon-bars fas mr-07"/>
+                                    Actions
+                                </React.Fragment>
+                            }>
+                                TODO
+                            </DropdownButton>
                         </div>
                     </div>
                 </div>
