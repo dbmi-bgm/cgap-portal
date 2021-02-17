@@ -337,8 +337,8 @@
                             "other"
                         ]
                     },
-                    "mounted": {
-                        "title": "Mounted",
+                    "mount": {
+                        "title": "Mount",
                         "description": "Whether the input file should be mounted instead of downlaoded to EC2",
                         "type": "boolean"
                     },
