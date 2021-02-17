@@ -816,29 +816,6 @@ class LuceneBuilder:
         return search_as_dict
 
     @staticmethod
-    def fix_nested_aggregations(search, es_mapping):
-        """
-        Unfortunately, elasticsearch_dsl will not update_from_dict with a nested terms aggregation (bug?), so we must
-        update the search manually after processing all the "terms". This method handles that update in place.
-        It does this in 3 steps: first by overwriting the current 'agg bucket' with a empty new one, recreating the
-        'primary_agg' and adding a REVERSE_NESTED bucket called 'primary_agg_reverse_nested', which will contain the
-        doc count wrt the item we are searching on.
-
-        :param search: search object
-        :param es_mapping: mapping of this item
-        """
-        aggs_ptr = search.aggs['all_items']
-        nested_identifier = NESTED + ':'  # nested:field vs. terms:field/stats:field vs. stats:field_nested_name
-        for agg in aggs_ptr:
-            if nested_identifier in agg and STATS not in agg and RANGE not in agg:
-                (search.aggs['all_items'][agg]  # create a sub-bucket, preserving the boolean qualifiers
-                 .bucket('primary_agg',
-                         'nested', path=find_nested_path(aggs_ptr.aggs[agg]['primary_agg'].field, es_mapping))
-                 .bucket('primary_agg',
-                         Terms(field=aggs_ptr.aggs[agg]['primary_agg'].field, size=MAX_FACET_COUNTS, missing='No value'))
-                 .bucket('primary_agg_reverse_nested', REVERSE_NESTED))
-
-    @staticmethod
     def _build_nested_aggregation(sub_query, nested_path, requested=None):
         """ Builds a nested aggregation.
 

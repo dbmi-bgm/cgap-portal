@@ -836,11 +836,21 @@ class SearchBuilder:
 
                 else:  # assume 'terms'
 
-                    # Shift the bucket location
-                    bucket_location = aggregations[full_agg_name]['primary_agg']
-                    if 'buckets' not in bucket_location:  # account for nested structure
-                        bucket_location = bucket_location['primary_agg']
-                    result_facet['terms'] = bucket_location['buckets']
+                    def extract_buckets(path):
+                        if 'buckets' not in path:
+                            path = path['primary_agg']
+                        if 'buckets' not in path:
+                            raise Exception('No buckets found on terms agg!')
+                        return path['buckets']
+
+                    terms = []
+                    source_aggregation = aggregations[full_agg_name]
+                    # If we had a selection, add the selections to terms
+                    if 'requested_agg' in source_aggregation:
+                        terms.extend(extract_buckets(source_aggregation['requested_agg']))
+
+                    terms.extend(extract_buckets(source_aggregation['primary_agg']))
+                    result_facet['terms'] = terms
 
                     # Choosing to show facets with one term for summary info on search it provides
                     # XXX: The above comment is misleading - this drops all facets with no buckets
@@ -850,11 +860,12 @@ class SearchBuilder:
                         continue
 
                     # if we are nested, apply fix + replace (only for terms)
+                    # XXX: needs to handle requested_agg
                     if facet['aggregation_type'] == NESTED:
                         self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
 
-                    # Re-add buckets under 'terms' AFTER we have fixed the doc_counts
-                    result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
+                        # Re-add buckets under 'terms' AFTER we have fixed the doc_counts
+                        result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
 
                     # Choosing to show facets with one term for summary info on search it provides
                     if len(result_facet.get('terms', [])) < 1:
