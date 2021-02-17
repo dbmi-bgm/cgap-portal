@@ -779,13 +779,16 @@ class SearchBuilder:
 
     def format_facets(self, es_results):
         """
+        This method processes the 'aggregations' component of the ES response.
+        It does this by creating result_facet frames for all facets retrieved from ES
+        and populating the frame with the relevant aggregation info depending on it's type.
+
         Format the facets for the final results based on the es results.
         Sort based off of the 'order' of the facets
         These are stored within 'aggregations' of the result.
 
         If the frame for the search != embedded, return no facets
         """
-        # TODO: refactor this method. -Will 05/01/2020
         result = []
         if self.search_frame != 'embedded':
             return result
@@ -795,7 +798,6 @@ class SearchBuilder:
             return result
 
         aggregations = es_results['aggregations']['all_items']
-        used_facets = set()
 
         # Sort facets by order (ascending).
         # If no order is provided, assume 0 to
@@ -804,6 +806,7 @@ class SearchBuilder:
             if facet.get(self.DEFAULT_HIDDEN, False) and field not in self.additional_facets:  # skip if specified
                 continue
 
+            # Build result frame for the front-end
             result_facet = {
                 'field': field,
                 'title': facet.get('title', field),
@@ -812,11 +815,12 @@ class SearchBuilder:
             }
 
             result_facet.update({k: v for k, v in facet.items() if k not in result_facet.keys()})
-            used_facets.add(field)
             field_agg_name = field.replace('.', '-')
             full_agg_name = facet['aggregation_type'] + ':' + field_agg_name
 
-            if full_agg_name in aggregations:
+            if full_agg_name in aggregations:  # found an agg for this field
+
+                # process stats agg
                 if facet['aggregation_type'] == 'stats':
                     result_facet['total'] = aggregations[full_agg_name]['doc_count']
                     # Used for fields on which can do range filter on, to provide min + max bounds
@@ -829,6 +833,7 @@ class SearchBuilder:
                     for k in aggregations[full_agg_name]['primary_agg']['primary_agg'].keys():
                         result_facet[k] = aggregations[full_agg_name]['primary_agg']['primary_agg'][k]
 
+                # process range agg
                 elif facet['aggregation_type'] in ['range', 'nested:range']:
                     # Shift the bucket location
                     bucket_location = aggregations[full_agg_name]['primary_agg']
@@ -846,7 +851,12 @@ class SearchBuilder:
                                 r['doc_count'] = b['doc_count']
                                 break
 
-                else:  # assume 'terms'
+                # process terms agg
+                else:
+                    # do the below, except account for nested agg structure
+                    if facet['aggregation_type'] == NESTED:
+                        self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
+                        continue
 
                     def extract_buckets(path):
                         if 'buckets' not in path:
@@ -859,36 +869,17 @@ class SearchBuilder:
                     source_aggregation = aggregations[full_agg_name]
                     if 'requested_agg' in source_aggregation:
                         for bucket in extract_buckets(source_aggregation['requested_agg']):
-                            if bucket['key'] in term_to_bucket:
-                                continue
-                            else:
+                            if bucket['key'] not in term_to_bucket:
                                 term_to_bucket[bucket['key']] = bucket
-                        terms.extend()
 
                     # always present
                     for bucket in extract_buckets(source_aggregation['primary_agg']):
-                        if bucket['key'] in term_to_bucket:
-                            continue
-                        else:
+                        if bucket['key'] not in term_to_bucket:
                             term_to_bucket[bucket['key']] = bucket
 
                     result_facet['terms'] = list(term_to_bucket.values())
 
-                    # Choosing to show facets with one term for summary info on search it provides
-                    # XXX: The above comment is misleading - this drops all facets with no buckets
-                    # we apparently want this for non-nested fields based on the tests, but should be
-                    # investigated as having to do this doesn't really make sense.
-                    if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == NESTED:
-                        continue
-
-                    # If we are nested, reverse_nested counts are what we care about
-                    if facet['aggregation_type'] == NESTED:
-                        self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
-
-                    # Choosing to show facets with one term for summary info on search it provides
-                    if len(result_facet.get('terms', [])) < 1:
-                        continue
-
+                # XXX: not clear this functions as intended - Will 2/17/2020
                 if len(aggregations[full_agg_name].keys()) > 2:
                     result_facet['extra_aggs'] = {k: v for k, v in aggregations[full_agg_name].items() if
                                                   k not in ('doc_count', 'primary_agg')}
