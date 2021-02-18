@@ -100,8 +100,8 @@ export default class ExcelSubmissionView extends React.PureComponent {
 
     handleComplete(e){
         const { submissionItem } = this.state;
-        const { '@id' : submissionID } = submissionItem || {};
-        navigate(submissionID);
+        const { uuid } = submissionItem || {};
+        navigate(`/search/?type=Case&ingestion_id=${uuid}`);
     }
 
     markCompleted(panelIdx, setTo = true){
