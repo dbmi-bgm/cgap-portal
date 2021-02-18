@@ -18,6 +18,11 @@
         ]
     },
     {
+        "name": "cgap-unit-testing-institution",
+        "title": "CGAP Unit Testing Institution",
+        "uuid": "87199845-51b5-4352-bdea-583edae4bb6a"
+    },
+    {
         "address2": "75 Francis Street",
         "address1": "Brigham and Women's Hospital",
         "city": "Boston",

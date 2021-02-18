@@ -89,6 +89,16 @@
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
+        "email": "developer_persona@hms.harvard.edu",
+        "first_name": "Developer",
+        "last_name": "Persona",
+        "uuid": "f7cdf3a6-1bcd-4eaa-a857-5f15c378f71a",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "project_roles": [{"project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+                           "role": "developer"}],
+        "user_institution": "87199845-51b5-4352-bdea-583edae4bb6a"
+    },
+    {
         "email": "eric_berg@hms.harvard.edu",
         "first_name": "Eric",
         "last_name": "Berg",

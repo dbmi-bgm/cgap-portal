@@ -10,7 +10,7 @@ import os
 import re
 import traceback
 
-from dcicutils.misc_utils import ignored, check_true, PRINT
+from dcicutils.misc_utils import ignored, check_true, PRINT, VirtualApp
 from snovault import collection, load_schema
 from pyramid.request import Request
 from pyramid.security import Allow, Deny, Everyone
@@ -26,9 +26,11 @@ from .base import (
     ONLY_ADMIN_VIEW_ACL,
 )
 from ..util import (
-    debuglog, subrequest_item_creation, beanstalk_env_from_registry, create_empty_s3_file, s3_output_stream
+    debuglog, subrequest_item_creation, beanstalk_env_from_registry, create_empty_s3_file, s3_output_stream,
+    vapp_for_email,
 )
 from ..ingestion.common import metadata_bundles_bucket, get_parameter
+
 
 # ALLOW_SUBMITTER_VIEW_ACL = (
 #     # TODO: There is an issue here where we want a logged in user remotely only to view this
@@ -77,6 +79,11 @@ class SubmissionFolio:
         res = self.vapp.patch_json(self.submission_uri, kwargs)
         [item] = res.json['@graph']
         debuglog(json.dumps(item))
+
+    def get_item(self):
+        res = self.vapp.get(self.submission_uri)
+        [item] = res.json['@graph']
+        return item
 
     def note_additional_datum(self, key, from_dict, from_key=None, default=None):
         self.other_details['additional_data'] = additional_data = (
@@ -191,6 +198,11 @@ class SubmissionFolio:
     def show_report_lines(lines, fp, default="Nothing to report."):
         for line in lines or ([default] if default else []):
             print(line, file=fp)
+
+    def restricted_post_json(self, email, url, json=None):
+        with vapp_for_email(email, app=self.vapp.app) as vapp:
+            vapp.post_json('/process_ingestion', {} if json is None else json)
+
 
 @collection(
     name='ingestion-submissions',

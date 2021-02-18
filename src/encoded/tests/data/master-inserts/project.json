@@ -7,6 +7,13 @@
         "date_created": "2020-07-15T02:26:28.509115+00:00"
     },
     {
+        "title": "CGAP Unit Testing Project",
+        "uuid": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "name": "cgap-unit-testing-project",
+        "description": "Project only for use of CGAP unit testing",
+        "date_created": "2021-02-06T23:10:00.000000+00:00"
+    },
+    {
         "title": "CGAP Backend Testing",
         "uuid": "59dfdfff-cd30-45d8-bb50-63b3a092578a",
         "description": "Project only for use in testing of the CGAP backend",

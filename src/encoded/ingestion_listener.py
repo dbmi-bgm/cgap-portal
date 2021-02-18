@@ -31,12 +31,13 @@ from vcf import Reader
 from .ingestion.vcf_utils import VCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
 from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
-from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
+from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure, BadParameter
 from .ingestion.processors import get_ingestion_processor
+from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
     resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request,
-    subrequest_object, register_path_content_type,
+    subrequest_object, register_path_content_type, vapp_for_email,
 )
 from .ingestion.queue_utils import IngestionQueueManager
 from .ingestion.variant_utils import VariantBuilder
@@ -56,6 +57,7 @@ SHARED = 'shared'
 
 
 def includeme(config):
+    # config.add_route('process_ingestion', '/process_ingestion')
     config.add_route('queue_ingestion', '/queue_ingestion')
     config.add_route('ingestion_status', '/ingestion_status')
     # config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
@@ -82,6 +84,17 @@ SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)(|/.*)$
 register_path_content_type(path='/submit_for_ingestion', content_type='multipart/form-data')
 
 
+def extract_submission_info(request):
+    matched = SUBMISSION_PATTERN.match(request.path_info)
+    if matched:
+        submission_id = matched.group(1)
+    else:
+        raise SubmissionFailure("request.path_info is not in the expected form: %s" % request.path_info)
+
+    instance = subrequest_object(request, submission_id)
+    return submission_id, instance
+
+
 @view_config(name='submit_for_ingestion', request_method='POST', context=IngestionSubmission,
              # Apparently adding this 'accept' causes discrimination on incoming requests not to find this method.
              # We do want this type, and instead we check the request to make sure we got it, but we omit it here
@@ -105,18 +118,17 @@ def submit_for_ingestion(context, request):
         raise UnspecifiedFormParameter('datafile')
     filename = datafile.filename
     override_name = request.POST.get('override_name', None)
-    parameters = dict(request.POST)
+    parameters = dict(request.POST)  # Convert to regular dictionary, which is also a copy
+    # bogus_trusted_email = parameters.get('trusted_email')
+    # if bogus_trusted_email:
+    #     raise BadParameter(parameter_name='trusted_email', parameter_value=bogus_trusted_email,
+    #                        extra_detail="The parameter name 'trusted_email' is reserved and may not be specified.")
+    # parameters['trusted_email'] = get_trusted_email(request=request, context="submit_for_ingestion", raise_errors=False)
     parameters['datafile'] = filename
 
     # Other parameters, like validate_only, will ride in on parameters via the manifest on s3
 
-    matched = SUBMISSION_PATTERN.match(request.path_info)
-    if matched:
-        submission_id = matched.group(1)
-    else:
-        raise SubmissionFailure("request.path_info is not in the expected form: %s" % request.path_info)
-
-    instance = subrequest_object(request, submission_id)
+    submission_id, instance = extract_submission_info(request)
 
     # The three arguments institution, project, and ingestion_type were needed in the old protocol
     # but are not needed in the new protocol because someone will have set up the IngestionSubmission
@@ -238,6 +250,22 @@ def ingestion_status(context, request):
         'waiting': n_waiting,
         'inflight': n_inflight
     }
+
+
+def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=None, s3_client=None):
+    bundles_bucket = bundles_bucket or metadata_bundles_bucket(app.registry)
+    s3_client = s3_client or boto3.client('s3')
+    manifest_name = "{id}/manifest.json".format(id=submission_id)
+    data = s3_client.get_object(Bucket=bundles_bucket, Key=manifest_name)
+    with vapp_for_email(data['email'], app=app) as vapp:
+        submission = SubmissionFolio(vapp=vapp, ingestion_type=ingestion_type, submission_id=submission_id, log=None)
+        handler = get_ingestion_processor(ingestion_type)
+        result = handler(submission)
+        return {
+            "result": result,
+            "ingestion_type": ingestion_type,
+            "submission_id": submission_id,
+        }
 
 
 def verify_vcf_file_status_is_not_ingested(request, uuid, *, expected=True):
@@ -449,11 +477,13 @@ class IngestionListener:
                     # Let's minimally disrupt things for now. We can refactor this later
                     # to make all the parts work the same -kmp
                     submission = SubmissionFolio(vapp=self.vapp, ingestion_type=ingestion_type, submission_id=uuid)
-                    handler = get_ingestion_processor(ingestion_type)
                     try:
-                        debuglog("HANDLING:", uuid)
-                        handler(submission)
-                        debuglog("HANDLED:", uuid)
+                        debuglog("REQUESTING RESTRICTED PROCESSING:", uuid)
+                        process_submission(submission_id=uuid,
+                                           ingestion_type=ingestion_type,
+                                           # bundles_bucket=submission.bucket,
+                                           app=self.vapp.app)
+                        debuglog("RESTRICTED PROCESSING DONE:", uuid)
                     except Exception as e:
                         log.error(e)
                     # If we suceeded, we don't need to do it again, and if we failed we don't need to fail again.
