@@ -39,8 +39,7 @@ def item_counts(config):
             es_total += es_count
             warn_str = build_warn_string(db_count, es_count)
             item_name = request.registry[COLLECTIONS][item_type].type_info.name
-            db_es_compare[item_name] = ("DB: %s   ES: %s %s" %
-                                         (str(db_count), str(es_count), warn_str))
+            db_es_compare[item_name] = ("DB: %s   ES: %s %s" % (str(db_count), str(es_count), warn_str))
         warn_str = build_warn_string(db_total, es_total)
         db_es_total = ("DB: %s   ES: %s %s" %
                        (str(db_total), str(es_total), warn_str))
