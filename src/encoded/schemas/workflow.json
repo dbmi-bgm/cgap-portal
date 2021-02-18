@@ -206,6 +206,50 @@
                 }
             }
         },
+        "default_tibanna_config": {
+            "title": "Default tibanna config",
+            "description": "default tibanna config",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "instance_type": {
+                    "title": "Instance type",
+                    "description": "Name of the type of the AWS EC2 instance",
+                    "type": "string"
+                },
+                "ebs_size": {
+                    "title": "EBS size",
+                    "description": "size of EBS",
+                    "type": "string"
+                },
+                "EBS_optimized": {
+                    "title": "EBS optimized",
+                    "description": "whether the instance is EBS optimized",
+                    "type": "boolean"
+                },
+                "cpu": {
+                    "title": "CPU",
+                    "description": "number of CPUs needed",
+                    "type": "integer"
+                },
+                "mem": {
+                    "title": "MEM",
+                    "description": "MEM needed in GB",
+                    "type": "number"
+                },
+                "spot_instance": {
+                    "title": "Spot instance",
+                    "description": "Whether a spot instance should be used",
+                    "type": "boolean"
+                },
+                "behavior_on_capacity_limit": {
+                    "title": "Behavior on capacity limit",
+                    "description": "Behavior on capacity limit",
+                    "type": "string",
+                    "default": "wait_and_retry"
+                }
+            }
+        },
         "arguments": {
             "title": "Workflow Arguments",
             "description": "arguments of the workflow.",
@@ -292,6 +336,17 @@
                             "zip",
                             "other"
                         ]
+                    },
+                    "mount": {
+                        "title": "Mount",
+                        "description": "Whether the input file should be mounted instead of downlaoded to EC2",
+                        "type": "boolean"
+                    },
+                    "default_input_file": {
+                        "title": "Default Input File",
+                        "description": "default input file (e.g. for reference file)",
+                        "type": "string",
+                        "linkTo": "File"
                     },
                     "argument_to_be_attached_to": {
                         "title": "Argument To Be Attached To",
