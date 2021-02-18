@@ -93,6 +93,24 @@
             "notes": "Maybe eventually this could be 'case_accession_contexts' (list of accessions) or something of all Cases this is used for if multiple.",
             "type" : "string",
             "format": "accession"
-        }
+        },
+        "is_preset_for_project": {
+	    "title": "Preset for project",
+	    "description": "Link filter set to project",
+	    "type": "array",
+	    "format": "uuid"
+	},
+        "is_preset_for_user": {
+	    "title": "Preset for user",
+	    "description": "Link filter set to user",
+	    "type": "array",
+	    "format": "uuid"
+	},
+        "is_default_for_project": {
+	    "title": "Default for project",
+	    "description": "Make filter set default for project",
+	    "type": "array",
+	    "format": "uuid"
+	}
     }
 }
