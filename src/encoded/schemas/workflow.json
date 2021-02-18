@@ -235,7 +235,7 @@
                 "mem": {
                     "title": "MEM",
                     "description": "MEM needed in GB",
-                    "type": "float"
+                    "type": "number"
                 },
                 "spot_instance": {
                     "title": "Spot instance",
