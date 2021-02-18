@@ -449,13 +449,12 @@ class PanelOne extends React.PureComponent {
                         <div className="col-auto">
                             <DropdownButton
                                 variant="primary text-600 text-capitalize"
-                                title={submissionType || "Click to Select..."}
+                                title={submissionType || "Accessioning"}
                                 id="submission-type"
                             >
                                 <Dropdown.Item eventKey="Accessioning" onSelect={this.handleSelectSubmissionType}>Accessioning</Dropdown.Item>
-                                <Dropdown.Item eventKey="Family History" onSelect={this.handleSelectSubmissionType}>Family History</Dropdown.Item>
-                                <Dropdown.Item eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List</Dropdown.Item>
-                                {/* TODO: May need to switch back to Accessioning, Family History, Gene List */}
+                                <Dropdown.Item disabled class="unclickable" eventKey="Family History" onSelect={this.handleSelectSubmissionType}>Family History (coming soon)</Dropdown.Item>
+                                <Dropdown.Item disabled class="unclickable" eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List (coming soon)</Dropdown.Item>
                             </DropdownButton>
                         </div>
                     </div>
