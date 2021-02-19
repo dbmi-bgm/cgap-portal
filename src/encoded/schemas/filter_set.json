@@ -130,7 +130,8 @@
             "items": {
                 "title": "Project uuid",
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "uniqueItems": true
             }
         },
         "is_preset_for_users": {
@@ -140,7 +141,8 @@
             "items": {
                 "title": "User uuid",
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "uniqueItems": true
             }
         },
         "is_default_for_project": {
@@ -150,7 +152,8 @@
             "items": {
                 "title": "Project uuid",
                 "type": "string",
-                "format": "uuid"
+                "format": "uuid",
+                "uniqueItems": true
             }
         }
     }
