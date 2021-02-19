@@ -34,32 +34,26 @@ export class AttachmentInputController extends React.PureComponent {
             formData.append("datafile", file);
 
             this.setState({ loading: true }, ()=>{
-
                 const { context: { uuid }, onAddedFile } = this.props;
 
                 const postURL = '/ingestion-submissions/' + uuid + '/submit_for_ingestion';
                 console.log(`Attempting Ingestion. \n\nPosting to: ${postURL}`);
 
-                // TODO: Move to SPC ajax
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", postURL, true);
+                const onErrorCallback = (response) => {
+                    console.error("Submission Ingestion Error: ", response);
+                    this.setState({ loading: false, success: false }, function(){
+                        Alerts.queue(AttachmentInputController.ErrorObject);
+                    });
+                };
 
-                xhr.onreadystatechange = function() { // Called when the state changes.
-                    if (xhr.readyState !== 4) return;
-                    if (xhr.readyState === xhr.DONE && xhr.status === 200) { // Request finished successfully
-                        console.log("response:", xhr.response);
-                        this.setState({ loading: false, success: true }, function() {
-                            onAddedFile(xhr.response);
-                        });
-                    } else {
-                        console.error("Submission Ingestion Error: ", xhr.response);
-                        this.setState({ loading: false, success: false }, function(){
-                            Alerts.queue(AttachmentInputController.ErrorObject);
-                        });
-                    }
-                }.bind(this);
+                const onSuccessCallback = (response) => {
+                    console.log("response:", response);
+                    this.setState({ loading: false, success: true }, function() {
+                        onAddedFile(response);
+                    });
+                };
 
-                xhr.send(formData);
+                ajax.postMultipartFormdata(postURL, formData, onErrorCallback, onSuccessCallback);
             });
 
         }
