@@ -1084,8 +1084,6 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                         patch_info[field] = item[field]
                         del item[field]
                 try:
-                    # if k == 'case':
-                    #     item['ingestion_id'] = ingestion_id
                     response = virtualapp.post_json('/' + k, item, status=201)
                     if response.json['status'] == 'success':
                         final_status[k]['posted'] += 1
