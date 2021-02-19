@@ -89,7 +89,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
                 if (state === "done" && outcome !== "success") {
                     Alerts.queue({
                         "title": "Something went wrong while processing this file...",
-                        "message": <ul>{validation_output.map((item) => <li key="item">{item}</li>)}</ul>,
+                        "message": <ul>{validation_output.map((item) => <li key={item}>{item}</li>)}</ul>,
                         "style": "danger"
                     });
                 }
