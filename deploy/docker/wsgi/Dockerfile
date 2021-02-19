@@ -11,6 +11,7 @@ ENV NGINX_VERSION=1.17.10
 ENV NJS_VERSION=0.3.9
 ENV PKG_RELEASE=1~buster
 
+# Securely provisions deps, installs Nginx, then removes all artifacts
 RUN set -x \
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
@@ -82,7 +83,14 @@ RUN set -x \
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
-# end of nginx setup
+# end of Nginx setup
+
+# Intall things needed for our system
+RUN apt-get update
+RUN apt-get install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
+RUN apt-get install -y ca-certificates nodejs npm
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 
 EXPOSE 80
 EXPOSE 443
@@ -91,26 +99,41 @@ EXPOSE 443
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/nginx.conf
 
-
-# Configure CGAP User
+# Configure venv
 RUN useradd -ms /bin/bash cgap-admin
-RUN mkdir -p /home/cgap-admin/cgap-portal
-RUN chown cgap-admin $PYSETUP_PATH
-USER cgap-admin
-
-# Clone to /home/cgap-admin/cgap-portal
 WORKDIR /home/cgap-admin
+RUN python -m venv /opt/venv
+RUN chown cgap-admin /opt/venv
+RUN mkdir -p /home/cgap-admin/cgap-portal
+RUN mkdir -p /home/cgap-admin/.poetry
+RUN chown cgap-admin /home/cgap-admin/cgap-portal
+RUN chown cgap-admin /home/cgap-admin/.poetry
+
+# Configure Poetry
+ENV PYTHONFAULTHANDLER=1 \
+  PYTHONUNBUFFERED=1 \
+  PYTHONHASHSEED=random \
+  PIP_NO_CACHE_DIR=off \
+  PIP_DISABLE_PIP_VERSION_CHECK=on \
+  PIP_DEFAULT_TIMEOUT=100 \
+  POETRY_VERSION=1.1.4
+
+# Copy to /home/cgap-admin/cgap-portal
+WORKDIR /home/cgap-admin/
 RUN git clone https://github.com/dbmi-bgm/cgap-portal.git
 
 # Build, configure the back-end
 WORKDIR /home/cgap-admin/cgap-portal
-RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
-RUN poetry install && poetry run python setup_eb.py develop
+RUN . /opt/venv/bin/activate && pip install --upgrade pip
+RUN . /opt/venv/bin/activate && make build
 RUN make aws-ip-ranges
 RUN cat /dev/urandom | head -c 256 | base64 > session-secret.b64
+USER cgap-admin
 
-# Execute commands with:
-# docker run -it cgap-ingestion-docker:<version> bash -c
-#   poetry run simulate-environment <env> &&
-#   poetry run reformat-vcf <args> &&
-#   poetry run ingest-vcf <args>
+#COPY entrypoint.sh /home/cgap-admin/entrypoint.sh
+#ENTRYPOINT ["/home/cgap-admin/entrypoint.sh"]
+#TODO link up with nginx
+#TODO expose back-end ports
+#ie: make deploy1 on local machine, make deploy2/3 runs in the docker
+
+

@@ -2,7 +2,7 @@ configure:
 	brew install docker
 
 build:
-	docker build -t cgap-docker:0.0.0b0 .
+	docker build --progress=plain -t cgap-docker:0.0.0b0 .
 
 enter:
 	docker run -it cgap-docker:0.0.0b0 bash
