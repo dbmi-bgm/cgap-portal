@@ -1039,8 +1039,9 @@ class SearchBuilder:
         while extra_requests_needed_count > 0:
             # print(str(extra_requests_needed_count) + " requests left to get all results.")
             from_ = from_ + size_increment
-            subsequent_search_result = execute_search(self.es, self.query, self.es_index, from_, size_increment,
-                                                      self.search_session_id)
+            subsequent_search_result = execute_search(es=self.es, query=self.query, index=self.es_index,
+                                                      from_=from_, size=size_increment,
+                                                      session_id=self.search_session_id)
             extra_requests_needed_count -= 1
             for hit in subsequent_search_result['hits'].get('hits', []):
                 yield hit
@@ -1054,8 +1055,8 @@ class SearchBuilder:
         :param size_increment: number of results to get per page, default 100
         :return: all es_results that matched the given query
         """
-        es_result = execute_search(self.es, self.query, self.es_index, 0, size_increment,
-                                   self.search_session_id)
+        es_result = execute_search(es=self.es, query=self.query, index=self.es_index, from_=0, size=size_increment,
+                                   session_id=self.search_session_id)
 
         total_results_expected = es_result['hits'].get('total', 0)
 
@@ -1081,8 +1082,9 @@ class SearchBuilder:
         if self.size == 'all':
             es_results = self.execute_search_for_all_results()
         else:  # from_, size are integers
-            es_results = execute_search(self.es, self.query, self.es_index, self.from_, self.size,
-                                        self.search_session_id)
+            es_results = execute_search(es=self.es, query=self.query, index=self.es_index,
+                                        from_=self.from_, size=self.size,
+                                        session_id=self.search_session_id)
         return es_results
 
     def format_results(self, es_results):

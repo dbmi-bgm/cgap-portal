@@ -321,7 +321,7 @@ def is_linkto_or_object_array_root_field(field, types, doc_types):
     return False
 
 
-def execute_search(es, query, index, from_, size, session_id=None):
+def execute_search(*, es, query, index, from_, size, session_id=None):
     """
     Execute the given Elasticsearch-dsl search. Raise HTTPBadRequest for any
     exceptions that arise.

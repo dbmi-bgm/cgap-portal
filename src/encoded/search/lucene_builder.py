@@ -938,7 +938,7 @@ class LuceneBuilder:
         }
 
     @staticmethod
-    def _build_terms_aggregation(query_field, facet, requested_values, nested=False):
+    def _build_terms_aggregation(query_field, facet, requested_values=None, nested=False):
         """ Builds a terms aggregation, specifically requesting counts for any selected values. """
         agg = {
             TERMS: {
