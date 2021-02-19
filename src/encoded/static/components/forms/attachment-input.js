@@ -53,7 +53,7 @@ export class AttachmentInputController extends React.PureComponent {
                     });
                 };
 
-                ajax.postMultipartFormdata(postURL, formData, onErrorCallback, onSuccessCallback);
+                ajax.postMultipartFormData(postURL, formData, onErrorCallback, onSuccessCallback);
             });
 
         }
