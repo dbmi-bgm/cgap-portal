@@ -120,7 +120,9 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
                    'Please submit a file of the proper type.')
             results['validation_output'].append(msg)
             return results
-        json_data, json_success = xls_to_json(rows, project=project_json, institution=institution_json)
+        json_data, json_success = xls_to_json(
+            rows, project=project_json, institution=institution_json, ingestion_id=key.split('/')[0]
+        )
         if not json_success:
             results['validation_output'] = json_data['errors']
             return results
@@ -438,12 +440,13 @@ class SubmissionMetadata:
     have metadata that occurs across multiple rows.
     """
 
-    def __init__(self, rows, project, institution, counter=1):
+    def __init__(self, rows, project, institution, ingestion_id, counter=1):
         self.rows = rows
         self.project = project.get('name')
         self.project_atid = project.get('@id')
         self.institution = institution.get('name')
         self.institution_atid = institution.get('@id')
+        self.ingestion_id = ingestion_id
         self.counter = counter
         self.proband_rows = [row for row in rows if row.get(SS_RELATION).lower() == 'proband']
         self.family_dict = {
@@ -602,7 +605,12 @@ class SubmissionMetadata:
                     indiv = [ikey for ikey, ival in self.individuals.items() if sample in ival.get('samples', [])][0]
                 except IndexError:
                     indiv = ''
-                case_info = {'aliases': [case_alias],'sample_processing': k,'individual': indiv}
+                case_info = {
+                    'aliases': [case_alias],
+                    'sample_processing': k,
+                    'individual': indiv,
+                    'ingestion_ids': [self.ingestion_id]
+                }
                 for fam in v.get('families', []):
                     if fam in self.families and indiv in self.families[fam]['members']:
                         case_info['family'] = fam
@@ -710,10 +718,11 @@ class SpreadsheetProcessing:
     to hold all metadata extracted from spreadsheet.
     """
 
-    def __init__(self, row, project, institution):
+    def __init__(self, row, project, institution, ingestion_id):
         self.input = row
         self.project = project
         self.institution = institution
+        self.ingestion_id = ingestion_id
         self.output = {}
         self.errors = []
         self.keys = []
@@ -761,20 +770,20 @@ class SpreadsheetProcessing:
                 self.rows.append(row_dict)
 
     def extract_metadata(self):
-        result = SubmissionMetadata(self.rows, self.project, self.institution, self.counter)
+        result = SubmissionMetadata(self.rows, self.project, self.institution, self.ingestion_id, self.counter)
         self.output = result.json_out
         self.errors.extend(result.errors)
         self.passing = True
 
 
-def xls_to_json(row, project, institution):
+def xls_to_json(row, project, institution, ingestion_id):
     """
     Wrapper for SpreadsheetProcessing that returns expected values:
     result.output - metadata to be submitted in json
     result.passing - whether submission "passes" this part of the code and can move
         on to the next step.
     """
-    result = SpreadsheetProcessing(row, project, institution)
+    result = SpreadsheetProcessing(row, project, institution, ingestion_id)
     result.output['errors'] = result.errors
     return result.output, result.passing
 
@@ -1006,10 +1015,55 @@ def validate_all_items(virtualapp, json_data):
         return json_data_final, output, True
 
 
+def check_for_output(json_data):
+    """
+    This function is for checking the json_data to be posted/patched and making
+    sure there is something there other than patching the ingestion_id to Case.
+    It first checks for any items to post and returns True if present. If not, it
+    checks for anything to patch other than Case ingestion_id. It returns True if
+    present, or False if not. If False is returned, there are no updates to items
+    and we don't want to patch ingestion_id.
+
+    args:
+        json_data : dict of format
+            {
+                'post': {
+                    itemtype1: [post_data1a, post_data1b, ...],
+                    itemtype2: [post_data2a, post_data2b, ...]
+                },
+                'patch': {
+                    itemtype1: {
+                        id1: patch_data1,
+                        id2, patch_data2,
+                        ...
+                    },
+                    itemtype2: {
+                        id3: patch_data3,
+                        ...
+                    }
+                }
+            }
+
+    returns: bool
+    """
+    for itemtype in json_data['post']:
+        if json_data['post'][itemtype]:
+            return True
+    for itemtype in json_data['patch']:
+        for k, v in json_data['patch'][itemtype]:
+            if itemtype != 'case':
+                if v:
+                    return True
+            else:
+                if len(v.keys()) > 1:  # more to patch than ingestion_id which is always there
+                    return True
+    return False
+
+
 def post_and_patch_all_items(virtualapp, json_data_final):
     output = []
     files = []
-    if not json_data_final:
+    if not json_data_final or not check_for_output(json_data_final):
         return output, 'not run', []
     item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_accession'}
     final_status = {}
@@ -1030,6 +1084,8 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                         patch_info[field] = item[field]
                         del item[field]
                 try:
+                    # if k == 'case':
+                    #     item['ingestion_id'] = ingestion_id
                     response = virtualapp.post_json('/' + k, item, status=201)
                     if response.json['status'] == 'success':
                         final_status[k]['posted'] += 1
