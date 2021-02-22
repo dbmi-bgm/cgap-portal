@@ -78,7 +78,7 @@ class VariantBuilder:
         try:
             self.vapp.post_json('/variant', variant, status=201)
         except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
-            log.error('Exception encountered on variant post (attempting patch): %s' % e)
+            log.info('Exception encountered on variant post (attempting patch): %s' % e)
             self.vapp.patch_json('/variant/%s' % build_variant_display_title(
                 variant['CHROM'],
                 variant['POS'],
@@ -190,7 +190,7 @@ class VariantBuilder:
                 variant = self.build_variant(record)
                 variant_samples = self.build_variant_samples(variant, record, sample_relations)
             except Exception as e:
-                log.error('Error encountered building variant/variant_sample: %s' % e)
+                log.info('Error encountered building variant/variant_sample: %s' % e)
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
                 continue
 
@@ -201,7 +201,7 @@ class VariantBuilder:
                     self._post_or_patch_variant_sample(sample)
                 self.ingestion_report.mark_success()
             except Exception as e:
-                log.error('Error encountered posting variant/variant_sample: %s' % e)
+                log.info('Error encountered posting variant/variant_sample: %s' % e)
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
 
         return self.ingestion_report.total_successful(), self.ingestion_report.total_errors()

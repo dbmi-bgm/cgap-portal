@@ -254,7 +254,7 @@ def verify_vcf_file_status_is_not_ingested(request, uuid, *, expected=True):
     if isinstance(resp, HTTPMovedPermanently):  # if we hit a redirect, follow it
         subreq = Request.blank(resp.location, **kwargs)
         resp = request.invoke_subrequest(subreq)
-    log.error('VCF File Meta: %s' % resp.json)
+    log.info('VCF File Meta: %s' % resp.json)
     verified = bool(expected) is (resp.json.get('file_ingestion_status', None) != STATUS_INGESTED)
     # if not verified:
     #     import pdb; pdb.set_trace()
@@ -399,7 +399,7 @@ class IngestionListener:
             log.error('Tried to set IngestionReport but one was not created!')
             return
         self._patch_value(uuid, 'file_ingestion_error', self.ingestion_report.get_errors())
-        self.ingestion_report = None  # reset this field
+        self.ingestion_report = IngestionReport()
 
     def set_status(self, uuid, status):
         """ Sets the file_ingestion_status of the given uuid """
@@ -506,17 +506,17 @@ class IngestionListener:
                                                  institution=file_meta['institution']['@id'])
                 success, error = variant_builder.ingest_vcf()
 
+                # report results in error_log regardless of status
+                msg = self.ingestion_report.brief_summary()
+                log.error(msg)
+                self.update_status(msg=msg)
+
                 # if we had no errors, patch the file status to 'Ingested'
                 if error > 0:
                     self.set_status(uuid, STATUS_ERROR)
                     self.patch_ingestion_report(uuid)
                 else:
                     self.set_status(uuid, STATUS_INGESTED)
-
-                # report results in error_log regardless of status
-                msg = self.ingestion_report.brief_summary()
-                log.error(msg)
-                self.update_status(msg=msg)
 
                 discard(message)
 
