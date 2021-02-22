@@ -5,7 +5,7 @@ build:
 	docker build --progress=plain -t cgap-docker:0.0.0b0 .
 
 enter:
-	docker run -v /tmp/snovault/pgdata:/tmp/snovault/pgdata -p 5441:5441 -p 6543:6543 -it cgap-docker:0.0.0b0 bash
+	docker run -v /tmp/snovault/pgdata:/tmp/snovault/pgdata -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -p 6543:6543 -it cgap-docker:0.0.0b0 bash
 
 info:
 	@: $(info Here are some 'make' options:)

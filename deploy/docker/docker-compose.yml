@@ -1,0 +1,48 @@
+version: "3.8"
+
+# use this in development.ini
+# sqlalchemy.url = postgresql://postgres:postgres@db:5432/postgres
+services:
+
+  # Postgres Component
+  # Connect to it in development.ini with
+  # sqlalchemy.url = postgresql://postgres:postgres@db:5441/postgres
+  db:
+    build: ./postgres
+    container_name: pg1
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5432
+
+  # ElasticSearch Component
+  es:
+    build: ./elasticsearch
+    container_name: es1
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+
+  # Main Application Component
+  app:
+    build: ./local
+    container_name: cgap
+    command: "/home/cgap-admin/cgap-portal/entrypoint.sh"
+    environment:
+      AWS_ACCESS_KEY_ID: "$AWS_ACCESS_KEY_ID"
+      AWS_SECRET_ACCESS_KEY: "$AWS_SECRET_ACCESS_KEY"
+    ports:
+      - "6543:6543"
+      - "8000:8000"
+    depends_on:
+      - db
+      - es

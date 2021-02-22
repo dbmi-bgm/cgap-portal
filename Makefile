@@ -149,6 +149,12 @@ travis-test:
 update:  # updates dependencies
 	poetry update
 
+build-docker:
+	pushd deploy/docker/ && docker-compose build && popd
+
+deploy-docker:
+	pushd deploy/docker/ && docker-compose up
+
 help:
 	@make info
 

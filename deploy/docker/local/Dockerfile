@@ -18,18 +18,12 @@ ENV PYTHONFAULTHANDLER=1 \
 # Install nginx (unused for local deployment as this runs as part of `make deploy1`)
 COPY install_nginx.sh /
 RUN bash /install_nginx.sh
-# Remove default configuration from Nginx
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/conf.d/nginx.conf
 
 # Intall things needed for our system
 RUN apt-get update
 RUN apt-get install -y curl postgresql-client
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
 RUN apt-get install -y ca-certificates nodejs npm
-
-EXPOSE 80
-EXPOSE 443
 
 # Configure CGAP User
 RUN useradd -ms /bin/bash cgap-admin
@@ -52,13 +46,17 @@ RUN pip install --upgrade pip
 RUN make build
 RUN make aws-ip-ranges
 RUN cat /dev/urandom | head -c 256 | base64 > session-secret.b64
+
+# Copy config files in (down here for quick debugging)
+# Remove default configuration from Nginx
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/nginx.conf
 COPY development.ini .
+COPY entrypoint.sh .
+RUN chmod 777 entrypoint.sh
+EXPOSE 8000
 USER cgap-admin
 
-#COPY entrypoint.sh /home/cgap-admin/entrypoint.sh
-#ENTRYPOINT ["/home/cgap-admin/entrypoint.sh"]
-#TODO link up with nginx
-#TODO expose back-end ports
-#ie: make deploy1 on local machine, make deploy2/3 runs in the docker
+CMD service nginx start
 
-
+ENTRYPOINT ["/home/cgap-admin/cgap-portal/entrypoint.sh"]
