@@ -104,6 +104,8 @@ def main():
             # Newline at end of file
             fp.write("\n")
 
+    print("Done.")
+
 
 if __name__ == '__main__':
     main()
