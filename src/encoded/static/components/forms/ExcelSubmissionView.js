@@ -8,18 +8,15 @@ import ReactTooltip from 'react-tooltip';
 
 import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
-import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import Collapse from 'react-bootstrap/esm/Collapse';
 
-import { console, ajax, JWT, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, JWT, navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { LinkToDropdown } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/LinkToDropdown';
-import { AliasInputFieldValidated } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/submission-fields';
 
 import { AttachmentInputController } from './attachment-input';
 
-import { PageTitleContainer, OnlyTitle, TitleAndSubtitleUnder, pageTitleViews } from '../PageTitleSection';
-import { Schemas } from '../util';
+import { PageTitleContainer, OnlyTitle, pageTitleViews } from '../PageTitleSection';
 
 
 
@@ -92,6 +89,12 @@ export default class ExcelSubmissionView extends React.PureComponent {
                         "message": <ul>{validation_output.map((item) => <li key={item}>{item}</li>)}</ul>,
                         "style": "danger"
                     });
+                } else {
+                    Alerts.queue({
+                        "title": "All items validated successfully.",
+                        "message": <ul>{validation_output.map((item) => <li key={item}>{item}</li>)}</ul>,
+                        "style": "success"
+                    });
                 }
                 return { submissionItem };
             }
@@ -146,7 +149,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
                 finishBtn = (
                     <div className="buttons-container finish-row text-right">
                         <button type="button" className="btn btn-outline-success" onClick={this.handleComplete}>
-                            Finish & View IngestionSubmission
+                            View New Cases
                         </button>
                     </div>
                 );
@@ -168,8 +171,8 @@ export default class ExcelSubmissionView extends React.PureComponent {
                     <PanelTwo {...this.props} {...this.state} {...{ setIsSubmitting, userDetails }} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
                         markCompleted={this.markCompleted} />
 
-                    <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
-                        onComplete={this.handleComplete} markCompleted={this.markCompleted} />
+                    {/* <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
+                        onComplete={this.handleComplete} markCompleted={this.markCompleted} /> */}
 
                     { finishBtn }
 
@@ -438,7 +441,6 @@ class PanelOne extends React.PureComponent {
         return (
             <form className={"panel-form-container d-block" + (isCreating ? " is-creating" : "")} onSubmit={this.handleCreate}>
                 <h4 className="text-300 mt-2">Required Fields = <span className="text-danger">*</span></h4>
-                {/** Maybe replace with SAYTAJAX? */}
                 <LinkToFieldSection onSelect={this.handleSelectInstitution} title="Institution" required
                     type="Institution" selectedID={institutionID} selectedTitle={institutionTitle} searchAsYouType/>
                 <LinkToFieldSection onSelect={this.handleSelectProject} title="Project" required
@@ -475,32 +477,6 @@ class PanelOne extends React.PureComponent {
         );
     }
 }
-
-// class AliasInputFieldContainer extends React.PureComponent {
-//     constructor(props){
-//         super(props);
-//         this.onAliasChange = this.onAliasChange.bind(this);
-
-//     }
-
-//     onAliasChange(val){
-//         const { index, onAliasChange } = this.props;
-//         onAliasChange(val, index);
-//     }
-
-//     render(){
-//         const { value, user, ...passProps } = this.props;
-//         return (
-//             <div className="mb-1">
-//                 <AliasInputFieldValidated {...passProps}
-//                     onAliasChange={this.onAliasChange}
-//                     currentSubmittingUser={user}
-//                     showErrorMsg value={value} />
-//             </div>
-//         );
-//     }
-
-// }
 
 
 class PanelTwo extends React.PureComponent {
@@ -542,7 +518,6 @@ class PanelTwo extends React.PureComponent {
             message = (
                 <React.Fragment>
                     <p className="mb-0">Keep this window open for updates on file processing status. Note: this may take a while.</p>
-                    {/* <p className="mb-0 text-small">To check status of file processing manually, click <em><a href={submission_uri} target="_blank" rel="noreferrer">here</a></em>.</p> */}
                 </React.Fragment>
             );
         }
@@ -559,6 +534,11 @@ class PanelTwo extends React.PureComponent {
     render(){
         const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission, setIsSubmitting } = this.props;
         const { statusIdx } = this.state;
+
+        const {
+            '@id': atID,
+            additional_data: { result: { aliases = {} } = {} } = {}
+        } = submissionItem || {};
 
         if (panelIdx !== 1) {
             return null;
@@ -590,7 +570,15 @@ class PanelTwo extends React.PureComponent {
         } else if (statusIdx === 1) {
             panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} {...{ onLoadedIngestionSubmission, setIsSubmitting }}/>;
         } else {
-            panelContents = <h4 className="text-300 mt-2">Successfully processed file. Ready to view results.</h4>;
+            panelContents = (
+                <React.Fragment>
+                    <h4 className="text-300 mt-2">Successfully processed file.</h4>
+                    <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span>
+                    <hr/>
+                    <span>Results:</span>
+                    <CreatedItemsTable aliasToAtIDMap={aliases} />
+                </React.Fragment>
+            );
         }
 
         return (
@@ -600,6 +588,32 @@ class PanelTwo extends React.PureComponent {
         );
     }
 
+}
+
+function CreatedItemsTable(props) {
+    const { aliasToAtIDMap = {} } = props;
+    const aliases = Object.keys(aliasToAtIDMap);
+
+    const persistent = aliases.map((alias) => {
+        const atID = aliasToAtIDMap[alias];
+
+        const label = (
+            <React.Fragment>
+                <a className="text-500" href={atID}>{alias}</a>
+                <i className="icon icon-external-link-alt fas text-smaller ml-05"></i>
+            </React.Fragment>
+        );
+
+        const atIDSplit = atID.split("/");
+        const { 2: accession = null } = atIDSplit || [];
+
+        const value = (
+            <object.CopyWrapper className="d-inline" value={accession} key="copy-accession">{ accession }</object.CopyWrapper>
+        );
+
+        return <PartialList.Row {...{ label, value }} key={alias} />;
+    });
+    return <PartialList {...{ persistent }} />;
 }
 
 // Custom React Hook by Dan Abramov https://overreacted.io/making-setinterval-declarative-with-react-hooks/
@@ -719,222 +733,17 @@ function FileAttachmentBtn(props){
     );
 }
 
-class PanelThree extends React.PureComponent {
-
-    static checkIfChanged(submissionItem, status, description, aliases = []){
-        const { description: cDescription, aliases: cAliases = [], status: cStatus } = submissionItem;
-        const statusDiffers = cStatus !== status;
-        if (statusDiffers) return true;
-        const descDiffers = !(!description && !cDescription) && (
-            (description && !cDescription) || (description && !cDescription) || description !== cDescription
-        );
-        if (descDiffers) return true;
-        const aliasesDiffers = aliases.length !== cAliases.length || (aliases.length > 0 && !_.every(aliases, function(alias, idx){
-            return alias === cAliases[idx];
-        }));
-        if (aliasesDiffers) return true;
-        return false;
-    }
-
-    constructor(props){
-        super(props);
-        this.handleStatusChange = this.handleStatusChange.bind(this);
-        this.handleAliasChange = this.handleAliasChange.bind(this);
-        this.handleDescriptionChange = this.handleDescriptionChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.state = {
-            isPatching: false,
-            status: props.submissionItem && props.submissionItem.status,
-            aliases: (props.submissionItem && props.submissionItem.aliases && props.submissionItem.aliases.slice(0)) || [],
-            description: (props.submissionItem && props.submissionItem.description) || ""
-        };
-
-        this.memoized = {
-            checkIfChanged: memoize(PanelThree.checkIfChanged)
-        };
-    }
-
-    componentDidUpdate(pastProps){
-        const { submissionItem = null, markCompleted, panelIdx, panelsComplete } = this.props;
-        const { submissionItem: pastIngestionSubmissionItem = null, panelIdx: pastPanelIdx } = pastProps;
-
-        if (submissionItem && submissionItem !== pastIngestionSubmissionItem){
-            this.setState({
-                status: submissionItem.status,
-                aliases: (submissionItem.aliases || []).slice(0),
-                description: submissionItem.description || "",
-            });
-            return;
-        }
-
-        if (submissionItem){
-            const { aliases, description, status } = this.state;
-            const stateDiffersFromIngestionSubmission = this.memoized.checkIfChanged(submissionItem, status, description, aliases);
-            if (stateDiffersFromIngestionSubmission && panelsComplete[2] === true){
-                markCompleted(2, false);
-            } else if (!stateDiffersFromIngestionSubmission && panelIdx === 2 && panelsComplete[2] === false) {
-                // We already completed POST; once submission present, mark this complete also.
-                markCompleted(2, true);
-            }
-        }
-
-    }
-
-    handleStatusChange(status){
-        this.setState({ status });
-    }
-
-    handleAliasChange(nextAlias, aliasIdx){
-        if (typeof aliasIdx === 'undefined'){
-            // New alias
-            this.setState(function({ aliases: pastAliases }){
-                if (!nextAlias) return null;
-                const aliases = pastAliases.slice();
-                aliases.push(nextAlias);
-                return { aliases };
-            });
-        } else {
-            // We don't delete or splices aliases unless is last 1 being unset.
-            this.setState(function({ aliases: pastAliases }){
-                const aliases = pastAliases.slice();
-                if (!nextAlias && aliases.length - 1 === aliasIdx){
-                    aliases.splice(aliasIdx, 1);
-                } else {
-                    aliases[aliasIdx] = nextAlias || null;
-                }
-                return { aliases };
-            });
-        }
-    }
-
-    handleDescriptionChange(e){
-        this.setState({ description: e.target.value });
-    }
-
-    handleSubmit(e){
-        const { submissionItem, onComplete } = this.props;
-        const { description, aliases = [], state } = this.state;
-        const { '@id' : submissionID } = submissionItem;
-        const cb = (res) => {
-            this.setState({ isPatching: false });
-            if (res.status && res.status !== 'success'){
-                throw res;
-            }
-            const [ submissionItemObject ] = res['@graph'];
-            onComplete(submissionItemObject);
-        };
-        const fb = (res) => {
-            this.setState({ isPatching: false });
-            const errorList = res.errors || [ res.detail ];
-            errorList.forEach(function(serverErr, i){
-                let detail = serverErr.description || serverErr || "Unidentified error";
-                if (serverErr.name){
-                    detail += '. ' + serverErr.name;
-                }
-                Alerts.queue({
-                    'title' : "Validation error " + parseInt(i + 1),
-                    'message': detail,
-                    'style': 'danger'
-                });
-            });
-        };
-
-        const postData = { state };
-        if (description){
-            postData.description = description;
-        }
-        const validAliases = aliases.filter(function(a){
-            return a && a !== "ERROR";
-        });
-        if (validAliases.length > 0){
-            postData.aliases = validAliases;
-        }
-
-        this.setState({ isPatching: true }, ()=>{
-            this.request = ajax.load(submissionID, cb, "PATCH", fb, JSON.stringify(postData));
-        });
-    }
-
-    render(){
-        const { panelIdx, schemas, submissionItem, user } = this.props;
-        const { status, description, aliases, isPatching } = this.state;
-
-        if (panelIdx !== 2 || !schemas) {
-            return null;
-        }
-
-        /** Aliases Field */
-        const skipValidateAliases = (submissionItem && submissionItem.aliases) || [];
-        const aliasFields = aliases.map((alias, aliasIdx) => {
-            const rejectAliases = _.filter(aliases.slice(0, aliasIdx));
-            return (
-                <AliasInputFieldContainer onAliasChange={this.handleAliasChange} user={user} value={alias} showErrorMsg
-                    index={aliasIdx} key={aliasIdx} skipValidateAliases={skipValidateAliases}
-                    rejectAliases={rejectAliases} />
-            );
-        });
-        aliasFields.push(
-            <AliasInputFieldContainer onAliasChange={this.handleAliasChange} user={user} showErrorMsg
-                key={aliases.length} rejectAliases={aliases} />
-        );
-
-        /** Status Field */
-        const statusTitle = (
-            <React.Fragment>
-                <i className="status-indicator-dot mr-1" data-status={status}/>
-                { Schemas.Term.toName("status", status) }
-            </React.Fragment>
-        );
-        const statusFieldSchema = schemas['IngestionSubmission'].properties.status;
-        const statusOpts = statusFieldSchema.enum.map(function(statusOpt){
-            return (
-                <DropdownItem key={statusOpt} eventKey={statusOpt}>
-                    <i className="status-indicator-dot mr-1" data-status={statusOpt}/>
-                    { Schemas.Term.toName("status", statusOpt) }
-                </DropdownItem>
-            );
-        });
-
-        const stateDiffersFromIngestionSubmission = this.memoized.checkIfChanged(submissionItem, status, description, aliases);
-
-        return (
-            <div className={"panel-form-container" + (isPatching ? " is-creating" : "")}>
-                <h4 className="text-300 mt-2">Optional Fields</h4>
-                <label className="field-section mt-2 d-block">
-                    <label className="d-block mb-05">Description</label>
-                    <textarea value={description} onChange={this.handleDescriptionChange} className="form-control"
-                        style={{ width: '100%' }}/>
-                </label>
-                <div className="field-section mt-2">
-                    <label className="d-block mb-05">
-                        Alias(es)
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip="Alternate identifiers that this IngestionSubmission can be reached by" />
-                    </label>
-                    { aliasFields }
-                </div>
-                <div className="field-section mt-2">
-                    <label className="d-block mb-05">
-                        IngestionSubmission Status
-                    </label>
-                    <DropdownButton title={statusTitle} variant="outline-dark"
-                        onSelect={this.handleStatusChange}>
-                        { statusOpts }
-                    </DropdownButton>
-                </div>
-                <hr className="mb-1" />
-                <div className="buttons-container text-right">
-                    <button type="button" className={"btn btn-" + (stateDiffersFromIngestionSubmission ? "success" : "outline-success")}
-                        disabled={isPatching} onClick={this.handleSubmit}>
-                        Finish & View IngestionSubmission
-                    </button>
-                </div>
-            </div>
-        );
-    }
-}
 
 
+/**
+ * TODO: May shift PanelTwo functionality to be validation-focused and then have PanelThree be final submission in future.
+ */
+// class PanelThree extends React.PureComponent { }
+
+
+/**
+ * TODO: Maybe replace with SearchAsYouTypeAjax from SPC.
+ */
 const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
     const { title, type, onSelect, selectedID, selectedTitle, variant = "primary", required, searchAsYouType } = props;
 
