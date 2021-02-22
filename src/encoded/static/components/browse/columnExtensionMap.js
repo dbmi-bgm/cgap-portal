@@ -12,6 +12,8 @@ import { basicColumnExtensionMap,
     DisplayTitleColumnUser } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { Schemas, typedefs } from './../util';
 
+import { variantSampleColumnExtensionMap } from './variantSampleColumnExtensionMap';
+
 // eslint-disable-next-line no-unused-vars
 const { Item, ColumnDefinition } = typedefs;
 
@@ -127,6 +129,7 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
 
 export const columnExtensionMap = {
     ...basicColumnExtensionMap,
+    ...variantSampleColumnExtensionMap,
     'display_title' : { // TODO: Look into a better way to do this
         'title' : "Title",
         'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
@@ -147,25 +150,6 @@ export const columnExtensionMap = {
                 <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
                     { renderElem }
                 </DisplayTitleColumnWrapper>
-            );
-        }
-    },
-    // TODO: change to organization
-    'lab.display_title' : {
-        'title' : "Lab",
-        'widthMap' : { 'lg' : 200, 'md' : 180, 'sm' : 160 },
-        'render' : function labTitle(result, props){
-            const { lab, submitted_by : { display_title : submitterTitle } = {} } = result;
-            if (!lab) return null;
-            const labLink = <a href={object.atIdFromObject(lab)}>{ lab.display_title }</a>;
-            if (!submitterTitle){
-                return labLink;
-            }
-            return (
-                <span>
-                    <i className="icon icon-fw icon-user far user-icon" data-html data-tip={'<small>Submitted by</small> ' + result.submitted_by.display_title} />
-                    { labLink }
-                </span>
             );
         }
     },

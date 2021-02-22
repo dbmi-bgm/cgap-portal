@@ -5,7 +5,8 @@ import queryString from 'query-string';
 import moment from 'moment';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-import { variantSampleAdditionalColumnExtensionMap, VariantSampleDisplayTitleColumn } from './CaseViewEmbeddedVariantSampleSearchTable';
+import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
+import { VariantSampleDisplayTitleColumn } from './CaseViewEmbeddedVariantSampleSearchTable';
 
 /**
  * For now, we just re-use the column render func from some VariantSample columns
@@ -16,7 +17,7 @@ const {
     "variant.genes.genes_most_severe_hgvsc": { render: variantRenderFunc },
     "associated_genotype_labels.proband_genotype_label": { render: genotypeLabelRenderFunc },
     "DP": { render: dpRenderFunc },
-} = variantSampleAdditionalColumnExtensionMap;
+} = variantSampleColumnExtensionMap;
 
 
 export const InterpretationTab = React.memo(function InterpretationTab (props) {
