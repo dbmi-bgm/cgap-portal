@@ -13,7 +13,8 @@ import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
  * @todo Potentially move some/all of these definitions into EmbeddedItemSearchTable.defaultProps.columnExtensionMap
  */
 export const variantSampleAdditionalColumnExtensionMap = {
-    "DP" : { // Coverage, VAF column
+    // "Coverage, VAF" column
+    "DP" : {
         widthMap: { 'lg' : 140, 'md' : 120, 'sm' : 70 },
         render: function(result, props) {
             const { DP = null, AF = null } = result;
@@ -24,10 +25,12 @@ export const variantSampleAdditionalColumnExtensionMap = {
             return <StackedRowColumn className="text-center" {...{ rows }}/>;
         }
     },
-    "GT" : { // Genotype Column (numerical, e.g. 0/1)
+    // "Genotype" column I - numerical, e.g. 0/1
+    "GT" : {
         widthMap: { 'lg' : 70, 'md' : 70, 'sm' : 60 }
     },
-    "associated_genotype_labels.proband_genotype_label" : { // Genotype column
+    // "Genotype" column II - genotype labels
+    "associated_genotype_labels.proband_genotype_label" : {
         widthMap: { 'lg' : 240, 'md' : 230, 'sm' : 200 },
         render: function(result, props) {
             const { associated_genotype_labels : { proband_genotype_label = null, mother_genotype_label = null, father_genotype_label = null } = {} } = result;
@@ -46,7 +49,9 @@ export const variantSampleAdditionalColumnExtensionMap = {
             return <StackedRowColumn className="text-center" {...{ rows }}/>;
         }
     },
-    "variant.genes.genes_most_severe_gene.display_title": { // "Gene, Transcript" column
+    // "Gene, Transcript" column
+    "variant.genes.genes_most_severe_gene.display_title": {
+        // Also includes "variant.genes.genes_most_severe_transcript"
         widthMap: { 'lg' : 155, 'md' : 140, 'sm' : 130 },
         render: function(result, props) {
             const { variant : { genes = [] } = {} } = result;
@@ -66,8 +71,9 @@ export const variantSampleAdditionalColumnExtensionMap = {
             return null;
         }
     },
-    "variant.genes.genes_most_severe_hgvsc": { // "Coding & Protein Sequence" col (existing 'Variant' column)
-        // noSort: true,
+    // "Coding & Protein Sequence" col (existing 'Variant' column)
+    "variant.genes.genes_most_severe_hgvsc": {
+        // Also renders "variant.genes.genes_most_severe_hgvsp"
         widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
         render: function(result, props) {
             const { variant : { genes : [ firstGene = null ] = [] } = {} } = result;
