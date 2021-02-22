@@ -1,21 +1,24 @@
 import json
-import pytest
 import mock
+import pytest
 import webtest
 
-from datetime import (datetime, timedelta)
-from dcicutils.misc_utils import Retry
-from dcicutils.qa_utils import local_attrs
+from datetime import datetime, timedelta
+from dcicutils.misc_utils import Retry, ignored
+from dcicutils.qa_utils import notice_pytest_fixtures, local_attrs
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
+from snovault.elasticsearch.indexer_utils import get_namespaced_index
+from snovault.schema_utils import load_schema
+from snovault.util import add_default_embeds
+from webtest import AppError
+from ..commands.run_upgrader_on_inserts import get_inserts
 from ..search import lucene_builder
 from ..search.lucene_builder import LuceneBuilder
 from ..search.search_utils import find_nested_path
-from snovault.elasticsearch.indexer_utils import get_namespaced_index
-from snovault.util import add_default_embeds
-from snovault.schema_utils import load_schema
-from webtest import AppError
+
+
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search]
@@ -42,6 +45,7 @@ def recursively_find_uuids(json, uuids):
 
 def test_search_view(workbook, es_testapp):
     """ Test basic things about search view """
+    notice_pytest_fixtures(workbook)
     res = es_testapp.get('/search/?type=Item').json
     assert res['@type'] == ['ItemSearchResults', 'Search']
     assert res['@id'] == '/search/?type=Item'
@@ -59,6 +63,7 @@ def test_search_with_no_query(workbook, es_testapp):
     using /search/ (with no query) should default to /search/?type=Item
     thus, should satisfy same assertions as test_search_view
     """
+    notice_pytest_fixtures(workbook)
     res = es_testapp.get('/search/').follow(status=200)
     assert res.json['@type'] == ['ItemSearchResults', 'Search']
     assert res.json['@id'] == '/search/?type=Item'
@@ -216,6 +221,7 @@ def dd_dts(es_testapp, workbook):
 
 
 def test_search_date_range_find_within(dd_dts, es_testapp, workbook):
+    notice_pytest_fixtures(workbook)
     # the MboI enzyme should be returned with all the provided pairs
     gres = es_testapp.get('/search/?type=Disorder&disorder_name=Dummy+Disorder').json
     g_uuids = [item['uuid'] for item in gres['@graph'] if 'uuid' in item]
@@ -237,6 +243,7 @@ def test_search_date_range_find_within(dd_dts, es_testapp, workbook):
 
 @pytest.mark.skip # XXX: how to best port?
 def test_search_with_nested_integer(es_testapp, workbook):
+    notice_pytest_fixtures(workbook)
     search0 = '/search/?type=ExperimentHiC'
     s0res = es_testapp.get(search0).json
     s0_uuids = [item['uuid'] for item in s0res['@graph'] if 'uuid' in item]
@@ -257,6 +264,7 @@ def test_search_with_nested_integer(es_testapp, workbook):
 
 
 def test_search_date_range_dontfind_without(dd_dts, es_testapp, workbook):
+    notice_pytest_fixtures(workbook)
     # the MboI enzyme should be returned with all the provided pairs
     dts = {k: v.replace(':', '%3A') for k, v in dd_dts.items()}
     datepairs = [
@@ -348,15 +356,22 @@ def test_search_query_string_with_booleans(workbook, es_testapp):
 #
 #
 #     # run a simple GET query with type=ExperimentSetReplicate
-#     res = htmltestapp.get('/metadata/type=ExperimentSetReplicate/metadata.tsv') # OLD URL FORMAT IS USED -- TESTING REDIRECT TO NEW URL
-#     res = res.maybe_follow() # Follow redirect -- https://docs.pylonsproject.org/projects/webtest/en/latest/api.html#webtest.response.TestResponse.maybe_follow
+#     # OLD URL FORMAT IS USED -- TESTING REDIRECT TO NEW URL
+#     res = htmltestapp.get('/metadata/type=ExperimentSetReplicate/metadata.tsv')
+#     # Follow redirect
+#     # -- https://docs.pylonsproject.org/projects/webtest/en/latest/api.html#webtest.response.TestResponse.maybe_follow
+#     res = res.maybe_follow() 
 #     assert 'text/tsv' in res.content_type
-#     result_rows = [ row.rstrip(' \r').split('\t') for row in res.body.decode('utf-8').split('\n') ] # Strip out carriage returns and whatnot. Make a plain multi-dim array.
+#     # Strip out carriage returns and whatnot. Make a plain multi-dim array.
+#     result_rows = [row.rstrip(' \r').split('\t') for row in res.body.decode('utf-8').split('\n')]
 #
 #     check_tsv(result_rows)
 #
 #     # Perform POST w/ accession triples (main case, for BrowseView downloads)
-#     res2_post_data = { # N.B. '.post', not '.post_json' is used. This dict is converted to POST form values, with key values STRINGIFIED, not to POST JSON request.
+#
+#     # N.B. '.post', not '.post_json' is used. This dict is converted to POST form values,
+#     # with key values STRINGIFIED, not to POST JSON request.
+#     res2_post_data = { 
 #         "accession_triples" : [
 #             ["4DNESAAAAAA1","4DNEXO67APU1","4DNFIO67APU1"],
 #             ["4DNESAAAAAA1","4DNEXO67APU1","4DNFIO67APT1"],
@@ -368,7 +383,9 @@ def test_search_query_string_with_booleans(workbook, es_testapp):
 #         'download_file_name' : 'metadata_TEST.tsv'
 #     }
 #
-#     res2 = htmltestapp.post('/metadata/?type=ExperimentSetReplicate', { k : json.dumps(v) for k,v in res2_post_data.items() }) # NEWER URL FORMAT
+#     res2 = htmltestapp.post('/metadata/?type=ExperimentSetReplicate',  # NEWER URL FORMAT
+#                             {k : json.dumps(v)
+#                              for k,v in res2_post_data.items()})
 #
 #     assert 'text/tsv' in res2.content_type
 #     result_rows = [ row.rstrip(' \r').split('\t') for row in res2.body.decode('utf-8').split('\n') ]
