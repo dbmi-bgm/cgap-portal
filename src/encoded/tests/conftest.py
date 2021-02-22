@@ -8,13 +8,13 @@ import webtest
 
 from dcicutils.qa_utils import notice_pytest_fixtures
 from pyramid.request import apply_request_extensions
-from pyramid.testing import DummyRequest, setUp, tearDown
+from pyramid.testing import DummyRequest
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
 from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
 from snovault.util import generate_indexer_namespace_for_testing
 from .conftest_settings import make_app_settings_dictionary
-from .workbook_support import PersonasCache, WorkbookCache
+from .data_caches import PersonasCache, WorkbookCache
 from .. import main
 
 
@@ -332,14 +332,14 @@ def obsolete_personas(es_testapp, elasticsearch_server_dir, indexer_namespace):
 
 
 @pytest.fixture()
-def workbook(es_testapp, obsolete_workbook, elasticsearch_server_dir, indexer_namespace):
+def workbook(es_testapp, elasticsearch_server_dir, indexer_namespace):
     WorkbookCache.assure_data_loaded(es_testapp,
                                      datadir=elasticsearch_server_dir,
                                      indexer_namespace=indexer_namespace)
 
 
 @pytest.fixture()
-def personas(es_testapp, obsolete_personas, elasticsearch_server_dir, indexer_namespace):
+def personas(es_testapp, elasticsearch_server_dir, indexer_namespace):
     PersonasCache.assure_data_loaded(es_testapp,
                                      datadir=elasticsearch_server_dir,
                                      indexer_namespace=indexer_namespace)
