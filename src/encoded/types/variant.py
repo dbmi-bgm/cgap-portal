@@ -434,7 +434,8 @@ class VariantSampleList(Item):
         'variant_samples.variant_sample_item.*',
         'variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title',
         'variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript',
-        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc'
+        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc',
+        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp'
     ]
 
 
