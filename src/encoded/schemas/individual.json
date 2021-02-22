@@ -629,7 +629,7 @@
                 }
             ]
         },
-        "institutional_id": {
+        "institutional_id.id": {
             "title": "Institutional ID"
         },
         "age": {

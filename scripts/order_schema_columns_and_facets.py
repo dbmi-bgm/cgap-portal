@@ -41,15 +41,6 @@ def main():
             schema["columns"] = new_col_dict
 
         if "facets" in schema:
-            # TODO: Do same thing as for columns, BUT
-            # ensure that take grouping into account.
-            # All facets with "grouping" shall be grouped together
-            # and then be placed directly adjacent to each other in
-            # schema.facets, sorted by their order within the group.
-            # These grouped adjacents facets shall appear relative to
-            # other top-level facets/groups depending on the smallest order
-            # of all of the grouped facets.
-
             schema_facets = schema["facets"].items()
             grouped_facets_by_grouping = {}
             ungrouped_facets = []
