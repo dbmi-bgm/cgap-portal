@@ -4,22 +4,51 @@
     "id": "/profiles/software.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["name", "software_type", "project", "institution"],
-    "additionalProperties": false,
-    "identifyingProperties": ["uuid", "title", "aliases"],
-    "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/static_embeds" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/attribution" }
+    "required": [
+        "name",
+        "software_type",
+        "project",
+        "institution"
     ],
-    "mixinFacets" : [
-        { "$ref": "mixins.json#/facets_common" }
+    "additionalProperties": false,
+    "identifyingProperties": [
+        "uuid",
+        "title",
+        "aliases"
+    ],
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        }
+    ],
+    "mixinFacets": [
+        {
+            "$ref": "mixins.json#/facets_common"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -116,31 +145,34 @@
             }
         },
         "software_relation": {
-              "title": "Related Softwares",
-              "description": "All related software",
-              "ff_flag": "second round",
-              "type": "array",
-              "items": {
-                  "title": "Related Software",
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": ["relationship_type", "software"],
-                  "properties": {
-                      "relationship_type": {
-                          "type": "string",
-                          "description": "A controlled term specifying the type of relationship between the 'parent' software and the one listed here.",
-                          "title": "Relationship Type",
-                          "enum": [
-                              "parent of",
-                              "derived from",
-                              "container for",
-                              "contained in"
-                          ]
-                      },
-                      "software": {
-                      "type": "string",
-                      "description": "The related software",
-                      "linkTo": "Software"
+            "title": "Related Softwares",
+            "description": "All related software",
+            "ff_flag": "second round",
+            "type": "array",
+            "items": {
+                "title": "Related Software",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "relationship_type",
+                    "software"
+                ],
+                "properties": {
+                    "relationship_type": {
+                        "type": "string",
+                        "description": "A controlled term specifying the type of relationship between the 'parent' software and the one listed here.",
+                        "title": "Relationship Type",
+                        "enum": [
+                            "parent of",
+                            "derived from",
+                            "container for",
+                            "contained in"
+                        ]
+                    },
+                    "software": {
+                        "type": "string",
+                        "description": "The related software",
+                        "linkTo": "Software"
                     }
                 }
             }

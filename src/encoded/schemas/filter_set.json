@@ -4,19 +4,44 @@
     "id": "/profiles/filter_set.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["institution", "project", "title"],
-    "identifyingProperties": ["uuid", "aliases"],
+    "required": [
+        "institution",
+        "project",
+        "title"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/notes" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/notes"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -31,7 +56,11 @@
             "title": "Item Type",
             "description": "Item type that the filter set will work on.",
             "type": "string",
-            "enum": ["Variant", "VariantSample", "Cohort"]
+            "enum": [
+                "Variant",
+                "VariantSample",
+                "Cohort"
+            ]
         },
         "filter_blocks": {
             "title": "Filter Blocks",
@@ -88,10 +117,10 @@
             }
         },
         "created_in_case_accession": {
-            "title" : "Created in Case Accession",
+            "title": "Created in Case Accession",
             "description": "Case in context of which this FilterSet was originally created.",
             "notes": "Maybe eventually this could be 'case_accession_contexts' (list of accessions) or something of all Cases this is used for if multiple.",
-            "type" : "string",
+            "type": "string",
             "format": "accession"
         }
     }
