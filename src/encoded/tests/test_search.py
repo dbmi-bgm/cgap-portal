@@ -1,14 +1,15 @@
-import pytest
+import copy
 import mock
+import pytest
 import webtest
 
 from datetime import (datetime, timedelta)
-from dcicutils.misc_utils import Retry
+from dcicutils.misc_utils import Retry, check_true
 from dcicutils.qa_utils import local_attrs
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
-from .workbook_support import WorkbookCache
+from .data_caches import es_data_cache, ExtendedWorkbookCache
 from ..search import lucene_builder
 from ..search.lucene_builder import LuceneBuilder
 from ..search.search_utils import find_nested_path
@@ -946,87 +947,87 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 3)
 
 
-@pytest.fixture()  # (scope='session')
-def hidden_facet_data_one():
-    """ Sample TestingHiddenFacets object we are going to facet on """
-    return {
-        'first_name': 'John',
-        'last_name': 'Doe',
-        'sid': 1,
-        'unfaceted_string': 'hello',
-        'unfaceted_integer': 123,
-        'disabled_string': 'orange',
-        'disabled_integer': 789,
-        'unfaceted_object': {
-            'mother': 'Anne',
-            'father': 'Bob'
+
+
+
+@es_data_cache
+class TestingHiddenFacetsCache(ExtendedWorkbookCache):
+
+    EXTENDED_DATA = [
+        {
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'sid': 1,
+            'unfaceted_string': 'hello',
+            'unfaceted_integer': 123,
+            'disabled_string': 'orange',
+            'disabled_integer': 789,
+            'unfaceted_object': {
+                'mother': 'Anne',
+                'father': 'Bob'
+            },
+            'unfaceted_array_of_objects': [
+                {
+                    'fruit': 'orange',
+                    'color': 'orange',
+                    'uid': 1
+                },
+                {
+                    'fruit': 'banana',
+                    'color': 'yellow',
+                    'uid': 2
+                },
+            ]
         },
-        'unfaceted_array_of_objects': [
-            {
-                'fruit': 'orange',
-                'color': 'orange',
-                'uid': 1
+        {
+            'first_name': 'Boston',
+            'last_name': 'Bruins',
+            'sid': 2,
+            'unfaceted_string': 'world',
+            'unfaceted_integer': 456,
+            'disabled_string': 'apple',
+            'disabled_integer': 101112,
+            'unfaceted_object': {
+                'mother': 'Candice',
+                'father': 'Doug'
             },
-            {
-                'fruit': 'banana',
-                'color': 'yellow',
-                'uid': 2
-            },
-        ]
-    }
+            'unfaceted_array_of_objects': [
+                {
+                    'fruit': 'blueberry',
+                    'color': 'blue',
+                    'uid': 3
+                },
+                {
+                    'fruit': 'mango',
+                    'color': 'yellow',
+                    'uid': 4
+                },
+            ]
+        }
+    ]
 
 
-@pytest.fixture()  # (scope='session')
-def hidden_facet_data_two():
-    """ A second sample TestingHiddenFacets object we are going to facet on """
-    return {
-        'first_name': 'Boston',
-        'last_name': 'Bruins',
-        'sid': 2,
-        'unfaceted_string': 'world',
-        'unfaceted_integer': 456,
-        'disabled_string': 'apple',
-        'disabled_integer': 101112,
-        'unfaceted_object': {
-            'mother': 'Candice',
-            'father': 'Doug'
-        },
-        'unfaceted_array_of_objects': [
-            {
-                'fruit': 'blueberry',
-                'color': 'blue',
-                'uid': 3
-            },
-            {
-                'fruit': 'mango',
-                'color': 'yellow',
-                'uid': 4
-            },
-        ]
-    }
+# I don't think these need to be fixtures. -kmp 15-Feb-2021
+#
+# @pytest.fixture()
+# def hidden_facet_data_one():
+#     """ Sample TestingHiddenFacets object we are going to facet on """
+#     return copy.deepcopy(TestingHiddenFacetsCache.HIDDEN_FACETED_DATA[0])
+#
+#
+# @pytest.fixture()
+# def hidden_facet_data_two():
+#     """ A second sample TestingHiddenFacets object we are going to facet on """
+#     return copy.deepcopy(TestingHiddenFacetsCache.HIDDEN_FACETED_DATA[1])
 
 
-class TestingHiddenFacetsCache(WorkbookCache):
-
-    @classmethod
-    def load_additional_data(cls, es_testapp, other_data=None):
-        if other_data:
-            for hidden_faceted_data_item in other_data:
-                es_testapp.post_json('/TestingHiddenFacets', hidden_faceted_data_item, status=201)
-
-
-
-@pytest.fixture()  # (scope='session')  # XXX: consider scope further - Will 11/5/2020
-def hidden_facet_test_data(workbook, es_testapp, hidden_facet_data_one, hidden_facet_data_two,
+@pytest.fixture()
+def hidden_facet_test_data(# workbook,
+                           es_testapp,  # hidden_facet_data_one, hidden_facet_data_two,
                            elasticsearch_server_dir, indexer_namespace):
     TestingHiddenFacetsCache.assure_data_loaded(es_testapp,
                                                 datadir=elasticsearch_server_dir,
-                                                indexer_namespace=indexer_namespace,
-                                                other_data=[hidden_facet_data_one, hidden_facet_data_two])
-
-    # es_testapp.post_json('/TestingHiddenFacets', hidden_facet_data_one, status=201)
-    # es_testapp.post_json('/TestingHiddenFacets', hidden_facet_data_two, status=201)
-    # es_testapp.post_json('/index', {'record': False})
+                                                indexer_namespace=indexer_namespace)
 
 
 class TestSearchHiddenAndAdditionalFacets:
@@ -1057,18 +1058,21 @@ class TestSearchHiddenAndAdditionalFacets:
             are identical. """
         assert sorted(expected) == sorted([facet['field'] for facet in facets])
 
-    def test_search_default_hidden_facets_dont_show(self, workbook, es_testapp, hidden_facet_test_data):
+    def test_search_default_hidden_facets_dont_show(self,  # workbook,
+                                                    es_testapp, hidden_facet_test_data):
         facets = es_testapp.get('/search/?type=TestingHiddenFacets').json['facets']
         self.assert_facet_set_equal(self.DEFAULT_FACETS, facets)
 
     @pytest.mark.parametrize('facet', ADDITIONAL_FACETS)
-    def test_search_one_additional_facet(self, workbook, es_testapp, hidden_facet_test_data, facet):
+    def test_search_one_additional_facet(self,  # workbook,
+                                         es_testapp, hidden_facet_test_data, facet):
         """ Tests that specifying each of the 'additional' facets works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets&additional_facet=%s' % facet).json['facets']
         expected = self.DEFAULT_FACETS + [facet]
         self.assert_facet_set_equal(expected, facets)
 
-    def test_search_multiple_additional_facets(self, workbook, es_testapp, hidden_facet_test_data):
+    def test_search_multiple_additional_facets(self,  # workbook,
+                                               es_testapp, hidden_facet_test_data):
         """ Tests that enabling multiple additional facets works """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=unfaceted_string'
@@ -1082,13 +1086,15 @@ class TestSearchHiddenAndAdditionalFacets:
                 assert facet['aggregation_type'] == 'terms'
 
     @pytest.mark.parametrize('facet', DEFAULT_HIDDEN_FACETS)
-    def test_search_one_additional_default_hidden_facet(self, workbook, es_testapp, hidden_facet_test_data, facet):
+    def test_search_one_additional_default_hidden_facet(self,  # workbook,
+                                                        es_testapp, hidden_facet_test_data, facet):
         """ Tests that passing default_hidden facets to additional_facets works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets&additional_facet=%s' % facet).json['facets']
         expected = self.DEFAULT_FACETS + [facet]
         self.assert_facet_set_equal(expected, facets)
 
-    def test_search_multiple_additional_default_hidden_facets(self, workbook, es_testapp, hidden_facet_test_data):
+    def test_search_multiple_additional_default_hidden_facets(self, # workbook,
+                                                              es_testapp, hidden_facet_test_data):
         """ Tests that passing multiple hidden_facets as additionals works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=last_name'
@@ -1105,7 +1111,8 @@ class TestSearchHiddenAndAdditionalFacets:
         ['last_name', 'unfaceted_integer'],  # second slot holds number field
         ['unfaceted_string', 'sid']
     ])
-    def test_search_mixing_additional_and_default_hidden(self, workbook, es_testapp, hidden_facet_test_data, _facets):
+    def test_search_mixing_additional_and_default_hidden(self,  # workbook,
+                                                         es_testapp, hidden_facet_test_data, _facets):
         """ Tests that we can mix additional_facets with those both on and off schema """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=%s'
@@ -1119,7 +1126,8 @@ class TestSearchHiddenAndAdditionalFacets:
                 assert facet['aggregation_type'] == 'terms'
 
     @pytest.mark.parametrize('_facet', DISABLED_FACETS)
-    def test_search_disabled_overrides_additional(self, workbook, es_testapp, hidden_facet_test_data, _facet):
+    def test_search_disabled_overrides_additional(self,  # workbook,
+                                                  es_testapp, hidden_facet_test_data, _facet):
         """ Hidden facets should NEVER be faceted on """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets&additional_facet=%s' % _facet).json['facets']
         field_names = [facet['field'] for facet in facets]
@@ -1129,7 +1137,8 @@ class TestSearchHiddenAndAdditionalFacets:
         ('last_name', 'unfaceted_integer', 'disabled_integer'),  # default_hidden second
         ('sid', 'unfaceted_string', 'disabled_string')  # disabled always last
     ])
-    def test_search_additional_mixing_disabled_default_hidden(self, workbook, es_testapp, hidden_facet_test_data, _facets):
+    def test_search_additional_mixing_disabled_default_hidden(self,  # workbook,
+                                                              es_testapp, hidden_facet_test_data, _facets):
         """ Tests that supplying multiple additional facets combined with hidden still respects the
             hidden restriction. """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
@@ -1143,7 +1152,8 @@ class TestSearchHiddenAndAdditionalFacets:
         'unfaceted_object.mother',
         'unfaceted_object.father'
     ])
-    def test_search_additional_object_facets(self, workbook, es_testapp, hidden_facet_test_data, _facet):
+    def test_search_additional_object_facets(self,  # workbook,
+                                             es_testapp, hidden_facet_test_data, _facet):
         """ Tests that specifying an object field as an additional_facet works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
                              '&additional_facet=%s' % _facet).json['facets']
@@ -1155,7 +1165,8 @@ class TestSearchHiddenAndAdditionalFacets:
         ('unfaceted_array_of_objects.color', 3),
         ('unfaceted_array_of_objects.uid', 2.5)  # stats avg
     ])
-    def test_search_additional_nested_facets(self, workbook, es_testapp, hidden_facet_test_data, _facet, n_expected):
+    def test_search_additional_nested_facets(self,  # workbook,
+                                             es_testapp, hidden_facet_test_data, _facet, n_expected):
         """ Tests that specifying an array of object field mapped with nested as an additional_facet
             works correctly. """
         [desired_facet] = [facet for facet in es_testapp.get('/search/?type=TestingHiddenFacets'
@@ -1167,7 +1178,8 @@ class TestSearchHiddenAndAdditionalFacets:
             assert desired_facet['avg'] == n_expected
 
     @pytest.fixture
-    def many_non_nested_facets(self, workbook, es_testapp, hidden_facet_test_data):
+    def many_non_nested_facets(self,  # workbook,
+                               es_testapp, hidden_facet_test_data):
         return es_testapp.get('/search/?type=TestingHiddenFacets'  
                            '&additional_facet=non_nested_array_of_objects.fruit'
                            '&additional_facet=non_nested_array_of_objects.color'
@@ -1197,7 +1209,9 @@ class TestSearchHiddenAndAdditionalFacets:
 
     VARIANT_FACETS_CACHED_RESULT = None
 
-    @pytest.fixture()  # (scope='module')
+    # This used to have module scope, I guess to avoid recomputation. I've changed it to a singleton pattern
+    # so it can have ordinary scope. However, I'm not even sure this gets called. Does it? -kmp 15-Feb-2021
+    @pytest.fixture()
     def variant_facets(self, workbook, es_testapp):
         if self.VARIANT_FACETS_CACHED_RESULT is None:
             self.VARIANT_FACETS_CACHED_RESULT = es_testapp.get('/search/?type=Variant'
@@ -1319,6 +1333,7 @@ class TestSearchBucketRangeFacets:
         pass
 
 
+@pytest.mark.manual
 def test_workbook_restore1(personas, es_testapp):
 
     existing_institutions = es_testapp.get('/institutions/', status=301).follow().json['@graph']
@@ -1357,6 +1372,7 @@ def test_workbook_restore1(personas, es_testapp):
     assert 'cgap-fixture-testing' not in existing_project_names
 
 
+@pytest.mark.manual
 def test_workbook_restore2(obsolete_personas, es_testapp):
 
     existing_institutions = es_testapp.get('/institutions/', status=301).follow().json['@graph']
@@ -1380,6 +1396,7 @@ def test_workbook_restore2(obsolete_personas, es_testapp):
     assert existing_project_names == ['hms-dbmi']
 
 
+@pytest.mark.manual
 def test_workbook_restore3(personas, es_testapp):
 
     existing_institutions = es_testapp.get('/institutions/', status=301).follow().json['@graph']
@@ -1391,5 +1408,3 @@ def test_workbook_restore3(personas, es_testapp):
     existing_project_names = sorted([proj['name'] for proj in existing_projects])
     assert 'cgap-fixture-testing' in existing_project_names
     assert existing_project_names == ['cgap-fixture-testing', 'hms-dbmi']
-
-
