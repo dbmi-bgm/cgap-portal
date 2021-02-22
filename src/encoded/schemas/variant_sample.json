@@ -568,6 +568,22 @@
                 }
             ]
         },
+        "DP": {
+            "title": "Coverage, VAF",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 42,
+            "sort_fields": [
+                {
+                    "field": "DP",
+                    "title": "Coverage"
+                },
+                {
+                    "field": "AF",
+                    "title": "VAF"
+                }
+            ]
+        },
         "variant.csq_gnomadg_af": {
             "title": "gnomAD",
             "aggregation_type": "stats",
@@ -581,22 +597,6 @@
                 {
                     "field": "variant.csq_gnomadg_af_popmax",
                     "title": "gnomad AF Population Max"
-                }
-            ]
-        },
-        "DP": {
-            "title": "Coverage, VAF",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 62,
-            "sort_fields": [
-                {
-                    "field": "DP",
-                    "title": "Coverage"
-                },
-                {
-                    "field": "AF",
-                    "title": "VAF"
                 }
             ]
         },
