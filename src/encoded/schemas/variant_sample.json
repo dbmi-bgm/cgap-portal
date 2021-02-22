@@ -541,14 +541,18 @@
                 }
             ]
         },
+        "variant.genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 30
+        },
         "GT": {
             "title": "Genotype",
-            "order": 30,
+            "order": 32,
             "default_hidden": true
         },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Genotype",
-            "order": 39,
+            "order": 35,
             "sort_fields": [
                 {
                     "field": "associated_genotype_labels.proband_genotype_label",
@@ -563,10 +567,6 @@
                     "title": "Father GT"
                 }
             ]
-        },
-        "variant.genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 40
         },
         "DP": {
             "title": "Coverage, VAF",
