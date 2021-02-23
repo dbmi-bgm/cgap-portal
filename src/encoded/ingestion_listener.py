@@ -254,7 +254,7 @@ def verify_vcf_file_status_is_not_ingested(request, uuid, *, expected=True):
     if isinstance(resp, HTTPMovedPermanently):  # if we hit a redirect, follow it
         subreq = Request.blank(resp.location, **kwargs)
         resp = request.invoke_subrequest(subreq)
-    log.error('VCF File Meta: %s' % resp.json)
+    log.info('VCF File Meta: %s' % resp.json)
     verified = bool(expected) is (resp.json.get('file_ingestion_status', None) != STATUS_INGESTED)
     # if not verified:
     #     import pdb; pdb.set_trace()
