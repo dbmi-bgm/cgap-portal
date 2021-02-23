@@ -903,6 +903,8 @@ def compare_fields(profile, aliases, json_item, db_item):
                         dict([(k, aliases[v]) if v in aliases else (k, v) for k, v in dict_item.items()])
                         for dict_item in json_item[field]
                     ]
+                elif profile['properties'][field].get('items', {}).get('type') == 'string':
+                    val = [v for v in json_item[field]]
             else:
                 val = [v for v in json_item[field]]
             if all(v in db_item.get(field, []) for v in val):
@@ -1015,55 +1017,10 @@ def validate_all_items(virtualapp, json_data):
         return json_data_final, output, True
 
 
-def check_for_output(json_data):
-    """
-    This function is for checking the json_data to be posted/patched and making
-    sure there is something there other than patching the ingestion_id to Case.
-    It first checks for any items to post and returns True if present. If not, it
-    checks for anything to patch other than Case ingestion_id. It returns True if
-    present, or False if not. If False is returned, there are no updates to items
-    and we don't want to patch ingestion_id.
-
-    args:
-        json_data : dict of format
-            {
-                'post': {
-                    itemtype1: [post_data1a, post_data1b, ...],
-                    itemtype2: [post_data2a, post_data2b, ...]
-                },
-                'patch': {
-                    itemtype1: {
-                        id1: patch_data1,
-                        id2, patch_data2,
-                        ...
-                    },
-                    itemtype2: {
-                        id3: patch_data3,
-                        ...
-                    }
-                }
-            }
-
-    returns: bool
-    """
-    for itemtype in json_data['post']:
-        if json_data['post'][itemtype]:
-            return True
-    for itemtype in json_data['patch']:
-        for k, v in json_data['patch'][itemtype]:
-            if itemtype != 'case':
-                if v:
-                    return True
-            else:
-                if len(v.keys()) > 1:  # more to patch than ingestion_id which is always there
-                    return True
-    return False
-
-
 def post_and_patch_all_items(virtualapp, json_data_final):
     output = []
     files = []
-    if not json_data_final or not check_for_output(json_data_final):
+    if not json_data_final:
         return output, 'not run', []
     item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_accession'}
     final_status = {}
