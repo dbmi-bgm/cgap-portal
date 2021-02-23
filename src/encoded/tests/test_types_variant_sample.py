@@ -1,5 +1,6 @@
 import pytest
 import requests  # XXX: C4-211
+import random
 from .variant_fixtures import VARIANT_SAMPLE_URL
 
 
