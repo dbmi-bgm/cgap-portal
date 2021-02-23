@@ -135,7 +135,7 @@ clean-python:
 	pip uninstall -y -r <(pip freeze)
 
 test:
-	poetry run python -m pytest -vv --timeout=200 -m "working and not manual and not broken and not broken_locally and not indexing" && poetry run python -m pytest -vv --timeout=200 -m "working and not manual and not broken and not borken_locally and indexing"
+	poetry run python -m pytest -vv --timeout=200 -m "working and not manual and not broken and not broken_locally and not sloppy and not indexing"; poetry run python -m pytest -vv --timeout=200 -m "working and not manual and not broken and not broken_locally and not sloppy and indexing"
 
 retest:
 	poetry run python -m pytest -vv --last-failed
@@ -144,7 +144,7 @@ test-any:
 	poetry run python -m pytest -vv --timeout=200
 
 travis-test:
-	poetry run python -m pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not manual and not broken and not broken_remotely and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && poetry run python -m pytest -vv --timeout=300 -m "working and not manual and not broken and not broken_remotely and indexing" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+	poetry run python -m pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not manual and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && poetry run python -m pytest -vv --timeout=300 -m "working and not manual and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update
