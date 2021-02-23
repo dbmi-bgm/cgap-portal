@@ -9,7 +9,7 @@ pytestmark = [pytest.mark.working, pytest.mark.schema]
 @pytest.fixture  # NOTE: variant_sample is unused in workbook so this is ok, later on there should be default inserts
 def test_variant_sample():
     return {
-        'variant': 'f6aef055-4c88-4a3e-a306-d37a71535d8b',
+        'variant': 'd654319e-0ede-43b7-9f45-5e358436b694',
         'AD': '1,3',
         'CALL_INFO': 'my_test_sample',
         'file': 'dummy-file-name',
