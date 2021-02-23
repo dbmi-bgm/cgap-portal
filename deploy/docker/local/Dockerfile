@@ -43,7 +43,12 @@ RUN git clone $CGAP_REPO --branch $CGAP_BRANCH
 # Build the application
 WORKDIR /home/cgap-admin/cgap-portal
 RUN pip install --upgrade pip
-RUN make build
+RUN pip install poetry==1.1.4 wheel==0.29.0
+RUN poetry install
+RUN python setup_eb.py develop
+RUN npm install --no-fund --no-progress --python=/opt/venv/bin/python
+RUN npm run build
+RUN npm run build-scss
 RUN make aws-ip-ranges
 RUN cat /dev/urandom | head -c 256 | base64 > session-secret.b64
 
