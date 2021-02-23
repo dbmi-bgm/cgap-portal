@@ -28,5 +28,6 @@ def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     bam_snapshot_location = res['@graph'][0]['bam_snapshot']
     assert bam_snapshot_location == test_variant_sample['file'] + '/bamsnap/chr1_12125898.png'
     download = es_testapp.get('/' + uuid + '/@@download').location
+    print(download)
     resp = requests.get(download)
     assert 'hello world' in resp.content.decode('utf-8')
