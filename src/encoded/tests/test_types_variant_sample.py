@@ -24,7 +24,7 @@ def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     res = es_testapp.post_json(VARIANT_SAMPLE_URL, test_variant_sample, status=[201, 409]).json
     uuid = res['@graph'][0]['uuid']
     bam_snapshot_location = res['@graph'][0]['bam_snapshot']
-    assert bam_snapshot_location == 'dummy-file-name/bamsnap/chr1:12125898.png'
+    assert bam_snapshot_location == 'dummy-file-name/bamsnap/chr1_12125898.png'
     download = es_testapp.get('/' + uuid + '/@@download').location
     resp = requests.get(download)
     assert 'hello world' in resp.content.decode('utf-8')
