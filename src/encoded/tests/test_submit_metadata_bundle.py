@@ -1,4 +1,5 @@
 import json
+import pytest
 import requests
 import webtest
 
@@ -6,10 +7,35 @@ from dcicutils.qa_utils import raises_regexp, override_environ
 from .test_access_key import basic_auth
 
 
+# These tests will work but may leave garbage around from stray submissions.
+# If that causes a problem, we'll need to write some cleanup code. -kmp 21-Feb-2021
+pytestmark = [pytest.mark.setone, pytest.mark.working]
+
+
+def test_old_protocol_content_type(testapp, bgm_access_key):
+    """
+    We used to have an endpoint that is gone now.
+    Except by special exception, all our endpoints need to deal in application/json content.
+    """
+    with raises_regexp(webtest.AppError, "415.*[Uu]nsupported [Mm]edia [Tt]ype"):
+        testapp.post("/submit_for_ingestion")
+
+
 def test_old_protocol_404(testapp):
     """We used to have an endpoint that is gone now. SubmitCGAP expects a 404 in that case, not (for example) a 403."""
-    with raises_regexp(webtest.AppError, "404.*not found"):
-        testapp.post("/submit_for_ingestion")
+
+    # If post_json is used, it arranges a Content-Type header. So we get a 404, with or without auth.
+    # If we hadn't set up Content-Type properly, we'd have gotten a 415.
+    with raises_regexp(webtest.AppError, "404.*[Nn]ot [Ff]ound"):
+        testapp.post_json("/submit_for_ingestion")
+
+    # Here we set the header up manually and get a 404 that way, too, with or without auth.
+    with raises_regexp(webtest.AppError, "404.*[Nn]ot [Ff]ound"):
+        headers = {
+            'Content-type': 'application/json',
+            'Accept':  'application/json',
+        }
+        testapp.post("/submit_for_ingestion", {}, headers=headers)
 
 
 def test_post_ingestion_submission(anontestapp, bgm_user, bgm_project, bgm_access_key, institution):

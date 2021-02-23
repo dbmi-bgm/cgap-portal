@@ -2,6 +2,11 @@ import pytest
 from ..search.lucene_builder import LuceneBuilder
 
 
+# TODO: Check if these work or not.  These tests might or might not be broken,
+#       but they weren't marked working so aren't running on 'make test'. -kmp 21-Feb-2021
+pytestmark = [pytest.mark.setone, pytest.mark.broken]
+
+
 @pytest.fixture
 def type_query_facet_filters():
     """ Simple query that just searches on Variant Sample """

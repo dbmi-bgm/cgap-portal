@@ -5,6 +5,7 @@ import datetime as datetime_module
 import io
 import json
 import os
+import pytest
 import pytz
 import webtest
 
@@ -15,6 +16,11 @@ from unittest import mock
 from .data import TEST_PROJECT, DBMI_INSTITUTION, METADATA_BUNDLE_PATH
 from .. import ingestion_listener as ingestion_listener_module
 from ..types import ingestion as ingestion_module
+
+
+# TODO: Check if these work or not.  These tests might or might not be broken,
+#       but they weren't marked working so aren't running on 'make test'. -kmp 21-Feb-2021
+pytestmark = [pytest.mark.setone, pytest.mark.triage]
 
 
 SUBMIT_FOR_INGESTION = "/submit_for_ingestion"

@@ -105,7 +105,8 @@ def test_collections_anon(anontestapp, item_type):
     assert '@graph' in res.json
 
 
-@pytest.mark.action_fail
+@pytest.mark.broken
+@pytest.mark.skip
 @pytest.mark.parametrize('item_type', [k for k in TYPE_LENGTH if k not in ['user', 'access_key']])
 def test_html_collections_anon(anonhtmltestapp, item_type):
     res = anonhtmltestapp.get('/' + item_type).follow(status=200)
