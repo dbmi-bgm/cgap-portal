@@ -313,10 +313,10 @@ function ConstraintScoresSection({ currentGeneItem, getTipForField }){
                 <tr>
                     <td className="text-600 text-left">S-Het</td>
                     <td>{ fallbackNotImplemented }</td>
+                    <td>{ fallbackNotImplemented }</td>
                     <td>
                         <span data-tip={getTipForField("s_het")}>{ shortenToSignificantDigits(s_het) || fallbackNotPresent }</span>
                     </td>
-                    <td>{ fallbackNotImplemented }</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">RVIS (ExAC)</td>
