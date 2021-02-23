@@ -9,10 +9,10 @@ pytestmark = [pytest.mark.working, pytest.mark.schema]
 @pytest.fixture  # NOTE: variant_sample is unused in workbook so this is ok, later on there should be default inserts
 def test_variant_sample():
     return {
-        'variant': 'd654319e-0ede-43b7-9f45-5e358436b694',
+        'variant': 'f6aef055-4c88-4a3e-a306-d37a71535d8b',
         'AD': '1,3',
         'CALL_INFO': 'my_test_sample',
-        'file': 'dummy-file-name',
+        'file': 'dummy-file-name2',
         'project': 'hms-dbmi',
         'institution': 'hms-dbmi'
     }
@@ -24,7 +24,7 @@ def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     res = es_testapp.post_json(VARIANT_SAMPLE_URL, test_variant_sample, status=[201, 409]).json
     uuid = res['@graph'][0]['uuid']
     bam_snapshot_location = res['@graph'][0]['bam_snapshot']
-    assert bam_snapshot_location == 'dummy-file-name/bamsnap/chr1_12125898.png'
+    assert bam_snapshot_location == 'dummy-file-name2/bamsnap/chr1_12125898.png'
     download = es_testapp.get('/' + uuid + '/@@download').location
     resp = requests.get(download)
     assert 'hello world' in resp.content.decode('utf-8')
