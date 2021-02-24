@@ -1,3 +1,6 @@
+# CGAP-Portal Dockerfile
+
+# TODO: appropriately pin/verify this image
 FROM python:3.6-buster
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"

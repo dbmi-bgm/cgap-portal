@@ -1,7 +1,5 @@
 version: "3.8"
 
-# use this in development.ini
-# sqlalchemy.url = postgresql://postgres:postgres@db:5432/postgres
 services:
 
   # Postgres Component
@@ -15,6 +13,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_PORT: 5432
+    # Enable to get verbose logs
+    # command: ["postgres", "-c", "log_statement=all"]
 
   # ElasticSearch Component
   # Disabled for now as too compute intensive

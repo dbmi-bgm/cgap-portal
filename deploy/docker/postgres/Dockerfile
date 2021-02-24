@@ -1,4 +1,5 @@
-FROM postgres:11.11
+# TODO: upgrade to latest version we can tolerate
+FROM postgres:11.8
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
