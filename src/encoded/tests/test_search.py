@@ -322,81 +322,85 @@ def test_search_query_string_with_booleans(workbook, es_testapp):
     assert tester_uuid not in not_uuids
 
 
-# @pytest.mark.skip  # N/A?
-# def test_metadata_tsv_view(workbook, htmltestapp):
-#
-#     FILE_ACCESSION_COL_INDEX = 3
-#     FILE_DOWNLOAD_URL_COL_INDEX = 0
-#
-#     def check_tsv(result_rows, len_requested = None):
-#         info_row = result_rows.pop(0)
-#         header_row = result_rows.pop(0)
-#
-#         assert header_row[FILE_ACCESSION_COL_INDEX] == 'File Accession'
-#         assert header_row.index('File Download URL') == FILE_DOWNLOAD_URL_COL_INDEX # Ensure we have this column
-#         assert len(result_rows) > 0 # We at least have some rows.
-#
-#         for row_index in range(1):
-#             assert len(result_rows[row_index][FILE_ACCESSION_COL_INDEX]) > 4 # We have a value for File Accession
-#             assert 'http' in result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX] # Make sure it seems like a valid URL.
-#             assert '/@@download/' in result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX]
-#             assert result_rows[row_index][FILE_ACCESSION_COL_INDEX] in result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX] # That File Accession is also in File Download URL of same row.
-#             assert len(result_rows[row_index][FILE_ACCESSION_COL_INDEX]) < len(result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX])
-#
-#         # Last some rows should be 'summary' rows. And have empty spaces for 'Download URL' / first column.
-#         summary_start_row = None
-#         for row_index, row in enumerate(result_rows):
-#             if row[1] == 'Summary':
-#                 summary_start_row = row_index - 1
-#                 break
-#
-#         # Check that summary cells are present, in right place, with some correct-looking values
-#         assert result_rows[summary_start_row + 1][1] == 'Summary'
-#         assert result_rows[summary_start_row + 3][1] == 'Files Selected for Download:'
-#         assert result_rows[summary_start_row + 4][1] == 'Total File Rows:'
-#         assert result_rows[summary_start_row + 5][1] == 'Unique Downloadable Files:'
-#         if len_requested:
-#             assert int(result_rows[summary_start_row + 3][4]) == len_requested
-#         assert int(result_rows[summary_start_row + 4][4]) == summary_start_row
-#         assert int(result_rows[summary_start_row + 5][4]) <= summary_start_row
-#
-#
-#     # run a simple GET query with type=ExperimentSetReplicate
-#     # OLD URL FORMAT IS USED -- TESTING REDIRECT TO NEW URL
-#     res = htmltestapp.get('/metadata/type=ExperimentSetReplicate/metadata.tsv')
-#     # Follow redirect
-#     # -- https://docs.pylonsproject.org/projects/webtest/en/latest/api.html#webtest.response.TestResponse.maybe_follow
-#     res = res.maybe_follow() 
-#     assert 'text/tsv' in res.content_type
-#     # Strip out carriage returns and whatnot. Make a plain multi-dim array.
-#     result_rows = [row.rstrip(' \r').split('\t') for row in res.body.decode('utf-8').split('\n')]
-#
-#     check_tsv(result_rows)
-#
-#     # Perform POST w/ accession triples (main case, for BrowseView downloads)
-#
-#     # N.B. '.post', not '.post_json' is used. This dict is converted to POST form values,
-#     # with key values STRINGIFIED, not to POST JSON request.
-#     res2_post_data = { 
-#         "accession_triples" : [
-#             ["4DNESAAAAAA1","4DNEXO67APU1","4DNFIO67APU1"],
-#             ["4DNESAAAAAA1","4DNEXO67APU1","4DNFIO67APT1"],
-#             ["4DNESAAAAAA1","4DNEXO67APT1","4DNFIO67APV1"],
-#             ["4DNESAAAAAA1","4DNEXO67APT1","4DNFIO67APY1"],
-#             ["4DNESAAAAAA1","4DNEXO67APV1","4DNFIO67APZ1"],
-#             ["4DNESAAAAAA1","4DNEXO67APV1","4DNFIO67AZZ1"]
-#         ],
-#         'download_file_name' : 'metadata_TEST.tsv'
-#     }
-#
-#     res2 = htmltestapp.post('/metadata/?type=ExperimentSetReplicate',  # NEWER URL FORMAT
-#                             {k : json.dumps(v)
-#                              for k,v in res2_post_data.items()})
-#
-#     assert 'text/tsv' in res2.content_type
-#     result_rows = [ row.rstrip(' \r').split('\t') for row in res2.body.decode('utf-8').split('\n') ]
-#
-#     check_tsv(result_rows, len(res2_post_data['accession_triples']))
+@pytest.mark.broken  # test doesn't work, this will keep make from running it
+@pytest.mark.skip  # In case of running the file by name, this still doesn't want to run
+def test_metadata_tsv_view(workbook, html_es_testapp):
+
+    file_accession_col_index = 3
+    file_download_url_col_index = 0
+
+    def check_tsv(result_rows, len_requested=None):
+        info_row = result_rows.pop(0)
+        header_row = result_rows.pop(0)
+        ignored(info_row)
+
+        assert header_row[file_accession_col_index] == 'File Accession'
+        assert header_row.index('File Download URL') == file_download_url_col_index  # Ensure we have this column
+        assert len(result_rows) > 0  # We at least have some rows.
+
+        for row_index in range(1):
+            assert len(result_rows[row_index][file_accession_col_index]) > 4  # We have a value for File Accession
+            assert 'http' in result_rows[row_index][file_download_url_col_index]  # Make sure it seems like a valid URL.
+            assert '/@@download/' in result_rows[row_index][file_download_url_col_index]
+            # That File Accession is also in File Download URL of same row.
+            assert (result_rows[row_index][file_accession_col_index]
+                    in result_rows[row_index][file_download_url_col_index])
+            assert (len(result_rows[row_index][file_accession_col_index])
+                    < len(result_rows[row_index][file_download_url_col_index]))
+
+        # Last some rows should be 'summary' rows. And have empty spaces for 'Download URL' / first column.
+        summary_start_row = None
+        for row_index, row in enumerate(result_rows):
+            if row[1] == 'Summary':
+                summary_start_row = row_index - 1
+                break
+
+        # Check that summary cells are present, in right place, with some correct-looking values
+        assert result_rows[summary_start_row + 1][1] == 'Summary'
+        assert result_rows[summary_start_row + 3][1] == 'Files Selected for Download:'
+        assert result_rows[summary_start_row + 4][1] == 'Total File Rows:'
+        assert result_rows[summary_start_row + 5][1] == 'Unique Downloadable Files:'
+        if len_requested:
+            assert int(result_rows[summary_start_row + 3][4]) == len_requested
+        assert int(result_rows[summary_start_row + 4][4]) == summary_start_row
+        assert int(result_rows[summary_start_row + 5][4]) <= summary_start_row
+
+   # run a simple GET query with type=ExperimentSetReplicate
+    # OLD URL FORMAT IS USED -- TESTING REDIRECT TO NEW URL
+    res = html_es_testapp.get('/metadata/type=ExperimentSetReplicate/metadata.tsv')
+    # Follow redirect
+    # -- https://docs.pylonsproject.org/projects/webtest/en/latest/api.html#webtest.response.TestResponse.maybe_follow
+    res = res.maybe_follow()
+    assert 'text/tsv' in res.content_type
+    # Strip out carriage returns and whatnot. Make a plain multi-dim array.
+    result_rows = [row.rstrip(' \r').split('\t') for row in res.body.decode('utf-8').split('\n')]
+
+    check_tsv(result_rows)
+
+    # Perform POST w/ accession triples (main case, for BrowseView downloads)
+
+    # N.B. '.post', not '.post_json' is used. This dict is converted to POST form values,
+    # with key values STRINGIFIED, not to POST JSON request.
+    res2_post_data = {
+        "accession_triples": [
+            ["4DNESAAAAAA1", "4DNEXO67APU1", "4DNFIO67APU1"],
+            ["4DNESAAAAAA1", "4DNEXO67APU1", "4DNFIO67APT1"],
+            ["4DNESAAAAAA1", "4DNEXO67APT1", "4DNFIO67APV1"],
+            ["4DNESAAAAAA1", "4DNEXO67APT1", "4DNFIO67APY1"],
+            ["4DNESAAAAAA1", "4DNEXO67APV1", "4DNFIO67APZ1"],
+            ["4DNESAAAAAA1", "4DNEXO67APV1", "4DNFIO67AZZ1"]
+        ],
+        'download_file_name': 'metadata_TEST.tsv'
+    }
+
+    res2 = html_es_testapp.post('/metadata/?type=ExperimentSetReplicate',  # NEWER URL FORMAT
+                                {k: json.dumps(v)
+                                 for k, v in res2_post_data.items()})
+
+    assert 'text/tsv' in res2.content_type
+    result_rows = [row.rstrip(' \r').split('\t') for row in res2.body.decode('utf-8').split('\n')]
+
+    check_tsv(result_rows, len(res2_post_data['accession_triples']))
 
 
 def test_default_schema_and_non_schema_facets(workbook, es_testapp):
@@ -623,6 +627,7 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
                 html_res = html_es_testapp.get(item_res['@id'])
                 assert html_res.body.startswith(b'<!DOCTYPE html>')
             except Exception as e:
+                ignored(e)
                 pass
 
 @pytest.mark.manual
