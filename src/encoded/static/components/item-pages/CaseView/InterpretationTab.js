@@ -110,7 +110,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             </label>
                             { dpRenderFunc(variant_sample_item) }
                         </div>
-                        <div className="col col-sm-12 col-lg-3 py-2">
+                        <div className="d-none col col-sm-12 col-lg-3 py-2">
                             <label className="mb-04 text-small">Interpretation</label>
                             <div><em>TODO</em></div>
                         </div>
