@@ -332,8 +332,32 @@ class VariantSample(Item):
                 "title": "Sister Genotype",
                 "type": "string"
             },
+            "sister_II_genotype_label": {
+                "title": "Sister II Genotype",
+                "type": "string"
+            },
+            "sister_III_genotype_label": {
+                "title": "Sister III Genotype",
+                "type": "string"
+            },
+            "sister_IV_genotype_label": {
+                "title": "Sister IV Genotype",
+                "type": "string"
+            },
             "brother_genotype_label": {
                 "title": "Brother Genotype",
+                "type": "string"
+            },
+            "brother_II_genotype_label": {
+                "title": "Brother II Genotype",
+                "type": "string"
+            },
+             "brother_III_genotype_label": {
+                "title": "Brother III Genotype",
+                "type": "string"
+            },
+             "brother_IV_genotype_label": {
+                "title": "Brother IV Genotype",
                 "type": "string"
             },
             "co_parent_genotype_label": {
