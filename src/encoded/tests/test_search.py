@@ -50,6 +50,12 @@ def test_search_view(workbook, es_testapp):
     assert res['title'] == 'Search'
     assert res['total'] > 0
     assert 'facets' in res
+
+    # type facet should always have > 1 option here, even when it is selected
+    for facet in res['facets']:
+        if facet['field'] == 'type':
+            assert len(facet['terms']) > 1
+            break
     assert 'filters' in res
     assert '@graph' in res
 
@@ -544,6 +550,7 @@ class ItemTypeChecker:
             return items_not_deleted
 
 
+@pytest.mark.manual  # this test just loads the workbook, reindexes it and searches
 def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
     es = es_testapp.app.registry['elasticsearch']
     # we need to reindex the collections to make sure numbers are correct
@@ -652,8 +659,8 @@ class MockedRequest(object):
 def hacked_query():
     """ This is valid lucene that will have 'principals_allowed.view' that differs from what is on the request.
         Our helper method should detect such change and throw an error. """
-    return {'query': {'bool': {'filter': [{'bool': {'must': [{'terms':
-                     {'principals_allowed.view': ['system.Everyone', 'group.PERMISSION_YOU_DONT_HAVE']}}]}}]}}}
+    return {'query': {'bool': {'filter': {'bool': {'must': [{'terms':
+                     {'principals_allowed.view': ['system.Everyone', 'group.PERMISSION_YOU_DONT_HAVE']}}]}}}}}
 
 
 def test_search_with_hacked_query(workbook, anon_es_testapp, hacked_query):
@@ -661,13 +668,12 @@ def test_search_with_hacked_query(workbook, anon_es_testapp, hacked_query):
         verification function should throw an exception if there is any delta in the permissions object
         we explicitly attach to every search query.
     """
-    with mock.patch.object(lucene_builder, 'convert_search_to_dictionary', return_value=hacked_query):
-        mocked_request_with_least_permissive_permissions = MockedRequest()
-        with pytest.raises(HTTPBadRequest):
-            LuceneBuilder.verify_search_has_permissions(mocked_request_with_least_permissive_permissions, None)
-        mocked_request_with_same_permissions = MockedRequest(principals_allowed=['system.Everyone',
-                                                                                 'group.PERMISSION_YOU_DONT_HAVE'])
-        LuceneBuilder.verify_search_has_permissions(mocked_request_with_same_permissions, None)
+    mocked_request_with_least_permissive_permissions = MockedRequest()
+    with pytest.raises(HTTPBadRequest):
+        LuceneBuilder.verify_search_has_permissions(mocked_request_with_least_permissive_permissions, hacked_query)
+    mocked_request_with_same_permissions = MockedRequest(principals_allowed=['system.Everyone',
+                                                                             'group.PERMISSION_YOU_DONT_HAVE'])
+    LuceneBuilder.verify_search_has_permissions(mocked_request_with_same_permissions, hacked_query)
 
 
 def test_search_with_principals_allowed_fails(workbook, anon_es_testapp):
