@@ -12,5 +12,8 @@ poetry run create-mapping-on-deploy development.ini --app-name app
 # Load Data (based on development.ini, for now just master-inserts)
 poetry run load-data development.ini --app-name app --prod
 
+# Start nginx proxy
+service nginx start
+
 # Start application
 make deploy2
