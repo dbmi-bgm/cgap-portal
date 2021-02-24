@@ -12,6 +12,7 @@ ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-docker-will-test"}
 # Configure (global) Env
 ENV CGAP_REPO=https://github.com/dbmi-bgm/cgap-portal.git
 ENV CGAP_BRANCH=c4_519
+ENV NGINX_USER=cgap-admin
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 ENV PYTHONFAULTHANDLER=1 \
@@ -62,14 +63,17 @@ RUN cat /dev/urandom | head -c 256 | base64 > session-secret.b64
 
 # Copy config files in (down here for quick debugging)
 # Remove default configuration from Nginx
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+RUN rm /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 COPY development.ini .
 COPY entrypoint.sh .
 RUN chmod 777 entrypoint.sh
 EXPOSE 8000
+RUN nginx -v
+RUN cat /etc/nginx/nginx.conf
+
+RUN service nginx start
 USER cgap-admin
 
-CMD service nginx start
 
 ENTRYPOINT ["/home/cgap-admin/cgap-portal/entrypoint.sh"]

@@ -1,5 +1,5 @@
 # TODO: upgrade to latest version we can tolerate
-FROM postgres:11.8
+FROM postgres:12.3
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 

@@ -458,8 +458,10 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                 # yield bytes to work with Response.app_iter
                 yield str.encode('PATCH: %s\n' % an_item['uuid'])
             except Exception as e:
+                import traceback
                 print('Patching {} failed. Patch body:\n{}\n\nError Message:\n{}'.format(
                       a_type, str(an_item), str(e)))
+                print('Full error: %s' % traceback.format_exc())
                 e_str = str(e).replace('\n', '')
                 # import pdb; pdb.set_trace()
                 yield str.encode('ERROR: %s\n' % e_str)
