@@ -341,7 +341,6 @@ class IngestionListener:
                             (self.vapp, _queue_manager, _update_status))
         self.queue_manager = IngestionQueueManager(registry) if not _queue_manager else _queue_manager
         self.update_status = _update_status
-        self.ingestion_report = IngestionReport()  # collect all errors
 
     @staticmethod
     def should_remain_online(override=None):
@@ -393,13 +392,9 @@ class IngestionListener:
         """ Patches field with value on item uuid """
         self.vapp.patch_json('/' + uuid, {field: value})
 
-    def patch_ingestion_report(self, uuid):
+    def patch_ingestion_report(self, report, uuid):
         """ Sets the file_ingestion_error field of the given uuid """
-        if self.ingestion_report is None:
-            log.error('Tried to set IngestionReport but one was not created!')
-            return
-        self._patch_value(uuid, 'file_ingestion_error', self.ingestion_report.get_errors())
-        self.ingestion_report = IngestionReport()
+        self._patch_value(uuid, 'file_ingestion_error', report.get_errors())
 
     def set_status(self, uuid, status):
         """ Sets the file_ingestion_status of the given uuid """
@@ -507,14 +502,14 @@ class IngestionListener:
                 success, error = variant_builder.ingest_vcf()
 
                 # report results in error_log regardless of status
-                msg = self.ingestion_report.brief_summary()
+                msg = variant_builder.ingestion_report.brief_summary()
                 log.error(msg)
                 self.update_status(msg=msg)
 
                 # if we had no errors, patch the file status to 'Ingested'
                 if error > 0:
                     self.set_status(uuid, STATUS_ERROR)
-                    self.patch_ingestion_report(uuid)
+                    self.patch_ingestion_report(variant_builder.ingestion_report, uuid)
                 else:
                     self.set_status(uuid, STATUS_INGESTED)
 
