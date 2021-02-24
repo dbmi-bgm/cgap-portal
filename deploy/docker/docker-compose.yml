@@ -4,7 +4,7 @@ services:
 
   # Postgres Component
   # Connect to it in development.ini with
-  # sqlalchemy.url = postgresql://postgres:postgres@db:5441/postgres
+  # sqlalchemy.url = postgresql://postgres:postgres@db:5432/postgres
   db:
     build: ./postgres
     container_name: pg1
@@ -44,8 +44,7 @@ services:
       AWS_ACCESS_KEY_ID: "$AWS_ACCESS_KEY_ID"
       AWS_SECRET_ACCESS_KEY: "$AWS_SECRET_ACCESS_KEY"
     ports:
-      #- "6543:6543"  # access app directly
-      - "8000:8000"  # nginx proxy port (not functional currently)
+      - "8000:8000"  # nginx proxy port (note application traffic is not forwarded)
     depends_on:
       - db
       #- es
