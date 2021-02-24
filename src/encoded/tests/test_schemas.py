@@ -1,9 +1,11 @@
 import pytest
 import re
+import json
 
 from pkg_resources import resource_listdir
 from snovault import COLLECTIONS, TYPES
 from snovault.schema_utils import load_schema
+from ....scripts.order_schema_columns_and_facets import order_schema_columns_and_facets
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
@@ -281,3 +283,16 @@ def test_changelogs(testapp, registry):
             res = testapp.get(changelog)
             assert res.status_int == 200, changelog
             assert res.content_type == 'text/markdown'
+
+@pytest.mark.parametrize('schema', SCHEMA_FILES)
+def verify_facets_and_columns_orders(schema):
+    '''This tests depends on Python 3.6's ordered dicts'''
+    loaded_schema = load_schema('encoded:schemas/%s' % schema)
+
+    if "properties" in loaded_schema and ("columns" in loaded_schema or "facets" in loaded_schema):
+        loaded_schema_copy = loaded_schema.deepcopy()
+        order_schema_columns_and_facets(loaded_schema_copy)
+        if "columns" in loaded_schema:
+            assert json.dumps(loaded_schema["columns"]) == json.dumps(loaded_schema_copy["columns"])
+        if "facets" in loaded_schema:
+            assert json.dumps(loaded_schema["facets"]) == json.dumps(loaded_schema_copy["facets"])
