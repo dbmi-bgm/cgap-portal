@@ -1025,18 +1025,18 @@
             "order": 33,
             "grouping": "Constraint Metrics"
         },
-        "variant.genes.genes_most_severe_gene.oe_mis": {
-            "title": "o/e (missense)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 34,
-            "grouping": "Constraint Metrics"
-        },
         "variant.genes.genes_most_severe_gene.oe_lof": {
             "title": "o/e (LoF)",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 35,
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes_most_severe_gene.oe_mis": {
+            "title": "o/e (missense)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 104,
             "grouping": "Constraint Metrics"
         },
         "variant.csq_clinvar_clnsig": {
