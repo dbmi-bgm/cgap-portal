@@ -117,7 +117,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
         # 'access_key' 'secret_key' 'expiration' 'session_token'
         credentials = token.get('Credentials')
         # Convert Expiration datetime object to string via cast
-        # Uncaught serialization error picked up by Docker - Will 2/25/2020
+        # Uncaught serialization error picked up by Docker - Will 2/25/2021
         credentials['Expiration'] = str(credentials['Expiration'])
         credentials.update({
             'upload_url': 's3://{bucket}/{key}'.format(bucket=bucket, key=key),
