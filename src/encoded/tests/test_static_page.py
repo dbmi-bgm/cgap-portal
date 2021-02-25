@@ -62,8 +62,8 @@ def help_page_json_deleted():
     }
 
 
-@pytest.fixture()  # ()
-def posted_help_page_section(es_testapp, workbook, help_page_section_json):
+@pytest.fixture()
+def posted_help_page_section(workbook, es_testapp, help_page_section_json):
     try:
         res = es_testapp.post_json('/static-sections/', help_page_section_json, status=201)
         val = res.json['@graph'][0]
@@ -74,7 +74,7 @@ def posted_help_page_section(es_testapp, workbook, help_page_section_json):
 
 
 @pytest.fixture()
-def help_page(es_testapp, workbook, posted_help_page_section, help_page_json):
+def help_page(workbook, es_testapp, posted_help_page_section, help_page_json):
     try:
         res = es_testapp.post_json('/pages/', help_page_json, status=201)
         val = res.json['@graph'][0]
@@ -85,7 +85,7 @@ def help_page(es_testapp, workbook, posted_help_page_section, help_page_json):
 
 
 @pytest.fixture()
-def help_page_deleted(es_testapp, workbook, posted_help_page_section, help_page_json_deleted):
+def help_page_deleted(workbook, es_testapp, posted_help_page_section, help_page_json_deleted):
     try:
         res = es_testapp.post_json('/pages/', help_page_json_deleted, status=201)
         val = res.json['@graph'][0]
@@ -96,7 +96,7 @@ def help_page_deleted(es_testapp, workbook, posted_help_page_section, help_page_
 
 
 @pytest.fixture()
-def help_page_in_review(es_testapp, workbook, posted_help_page_section, help_page_json_in_review):
+def help_page_in_review(workbook, es_testapp, posted_help_page_section, help_page_json_in_review):
     try:
         res = es_testapp.post_json('/pages/', help_page_json_in_review, status=201)
         val = res.json['@graph'][0]
@@ -106,7 +106,7 @@ def help_page_in_review(es_testapp, workbook, posted_help_page_section, help_pag
     return val
 
 
-def test_get_help_page(es_testapp, workbook, help_page):
+def test_get_help_page(workbook, es_testapp, help_page):
     help_page_url = "/" + help_page['name']
     res = es_testapp.get(help_page_url, status=200)
     assert res.json['@id'] == help_page_url

@@ -2,7 +2,10 @@
 
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
 """
+
+import datetime as datetime_module
 import logging
+import os
 import pytest
 import webtest
 
@@ -34,9 +37,8 @@ def autouse_external_tx(external_tx):
 
 
 @pytest.fixture(scope='session')
-def app_settings(request, wsgi_server_host_port, conn, DBSession):  # noQA - choice of name DBSession wasn't made here
+def app_settings(request, wsgi_server_host_port, conn, DBSession):  # noQA - We didn't choose the fixture name.
     notice_pytest_fixtures(request, wsgi_server_host_port, conn, DBSession)
-
     settings = make_app_settings_dictionary()
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
     # add some here for file testing
@@ -86,7 +88,6 @@ def pytest_configure():
 @pytest.yield_fixture
 def threadlocals(request, dummy_request, registry):
     notice_pytest_fixtures(request, dummy_request, registry)
-
     threadlocal_manager.push({'request': dummy_request, 'registry': registry})
     yield dummy_request
     threadlocal_manager.pop()
@@ -316,6 +317,7 @@ def embed_testapp(app):
 
 @pytest.fixture
 def wsgi_app(wsgi_server):
+    """TestApp for WSGI server."""
     return webtest.TestApp(wsgi_server)
 
 
