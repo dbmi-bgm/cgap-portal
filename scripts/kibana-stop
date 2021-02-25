@@ -1,3 +1,5 @@
+#!/bin/bash
+
 container=`docker ps | grep kibana | cut -f 1 -d ' '`
 
 if [ -z "${container}" ]; then
