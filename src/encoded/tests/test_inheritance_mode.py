@@ -4,6 +4,9 @@ from ..inheritance_mode import InheritanceMode, InheritanceModeError
 from ..util import resolve_file_path
 
 
+pytestmark = [pytest.mark.setone, pytest.mark.working]
+
+
 CSV_TESTS = resolve_file_path('tests/data/variant_workbook/inheritance_mode_test_data.csv')
 
 

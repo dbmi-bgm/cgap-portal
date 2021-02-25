@@ -833,7 +833,6 @@
             "scope": "variant",
             "schema_title": "GnomAD Total Allele Number",
             "facet_order": 20,
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-afr": {
@@ -848,7 +847,6 @@
             "description": "Total number of alleles in samples of African-American/African ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - African-American/African",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-ami": {
@@ -863,7 +861,6 @@
             "description": "Total number of alleles in samples of Amish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Amish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-amr": {
@@ -878,7 +875,6 @@
             "description": "Total number of alleles in samples of Latino ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Latino",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-asj": {
@@ -893,7 +889,6 @@
             "description": "Total number of alleles in samples of Ashkenazi Jewish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Ashkenazi Jewish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-eas": {
@@ -908,7 +903,6 @@
             "description": "Total number of alleles in samples of East Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - East Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-fin": {
@@ -923,7 +917,6 @@
             "description": "Total number of alleles in samples of Finnish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Finnish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-nfe": {
@@ -938,7 +931,6 @@
             "description": "Total number of alleles in samples of Non-Finnish European ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Non-Finnish European",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-oth": {
@@ -953,7 +945,6 @@
             "description": "Total number of alleles in samples of Other ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Other Ancestry",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-sas": {
@@ -968,7 +959,6 @@
             "description": "Total number of alleles in samples of South Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - South Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-xx": {
@@ -983,7 +973,6 @@
             "description": "Total number of alleles in female samples",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - female",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-xy": {
@@ -998,7 +987,6 @@
             "description": "Total number of alleles in male samples",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - male",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt": {
