@@ -116,7 +116,8 @@ def external_creds(bucket, key, name=None, profile_name=None):
         token = conn.get_federation_token(Name=name, Policy=json.dumps(policy))
         # 'access_key' 'secret_key' 'expiration' 'session_token'
         credentials = token.get('Credentials')
-        # XXX: this is a datetime object in docker ???? -Will
+        # Convert Expiration datetime object to string via cast
+        # Uncaught serialization error picked up by Docker - Will 2/25/2020
         credentials['Expiration'] = str(credentials['Expiration'])
         credentials.update({
             'upload_url': 's3://{bucket}/{key}'.format(bucket=bucket, key=key),

@@ -79,7 +79,7 @@ const optimization = {
         //    sourceMap: true
         //})
         new TerserPlugin({
-            parallel: false,  // XXX: this option causes docker build to fail. - Will
+            parallel: false,  // XXX: this option causes docker build to fail - Will 2/25/2020
             sourceMap: true,
             terserOptions:{
                 compress: true,

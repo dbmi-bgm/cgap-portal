@@ -331,6 +331,7 @@ class Item(snovault.Item):
         return False
 
     def _update(self, properties, sheets=None):
+        add_last_modified(properties)
         super(Item, self)._update(properties, sheets)
 
     @snovault.calculated_property(schema={
