@@ -72,9 +72,8 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             </div>
                         </div>
 
-                        {/* temporarily invisible via 'd-none' */}
                         <div className="d-none flex-auto pl-16 d-none">
-                            <DropdownButton size="sm" variant="light" title={
+                            <DropdownButton size="sm" variant="light" disabled title={
                                 <React.Fragment>
                                     <i className="icon icon-bars fas mr-07"/>
                                     Actions
