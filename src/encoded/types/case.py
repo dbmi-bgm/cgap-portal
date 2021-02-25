@@ -344,7 +344,10 @@ class Case(Item):
         if analysis_type and (analysis_type.endswith('-Trio') or analysis_type.endswith('-Group')):
             included_relations = [item.get('relationship') for item in sp_item.get('samples_pedigree', [{}])]
             for relation in ['mother', 'father', 'sister', 'brother', 'co-parent',
-                            'daughter', 'son', 'daughter II', 'son II', 'daughter III', 'son III']:
+                            'daughter', 'son', 'daughter II', 'son II',
+                            'daughter III', 'son III', 'sister II', 
+                            'sister III', 'sister IV', 'brother II', 
+                            'brother III', 'brother IV']:
                 if relation in included_relations:
                     relation = relation.replace(' ', '_').replace('-', '_')
                     fields.append(f'associated_genotype_labels.{relation}_genotype_label')
