@@ -939,7 +939,7 @@
             "title": "GnomAD Homozygous Count",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 21,
+            "order": 27,
             "grouping": "Population Frequency"
         },
         "variant.csq_phylop100way_vertebrate": {
