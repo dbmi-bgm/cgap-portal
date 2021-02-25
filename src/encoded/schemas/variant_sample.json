@@ -1029,7 +1029,7 @@
             "title": "o/e (missense)",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 54,
+            "order": 64,
             "grouping": "Constraint Metrics"
         },
         "variant.genes.genes_most_severe_gene.oe_lof": {
