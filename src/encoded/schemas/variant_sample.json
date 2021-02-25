@@ -932,14 +932,14 @@
             "title": "GnomAD Total Allele Number",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 20,
+            "order": 30,
             "grouping": "Population Frequency"
         },
         "variant.csq_gnomadg_nhomalt": {
             "title": "GnomAD Homozygous Count",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 27,
+            "order": 21,
             "grouping": "Population Frequency"
         },
         "variant.csq_phylop100way_vertebrate": {
