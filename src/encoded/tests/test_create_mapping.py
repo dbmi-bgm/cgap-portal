@@ -65,6 +65,7 @@ def test_get_deployment_config_prod():
 ENV_THAT_WIPES_ES = 'fourfront-cgaptest'
 
 
+@pytest.mark.skip  # cgaptest no longer wipes ES
 @patch('encoded.commands.create_mapping_on_deploy.get_my_env', MagicMock(return_value=ENV_THAT_WIPES_ES))
 def test_get_deployment_config_test():
     """ Tests we correctly configure cgaptest """
