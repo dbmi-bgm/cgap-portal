@@ -72,7 +72,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             </div>
                         </div>
 
-                        <div className="d-none flex-auto pl-16 d-none">
+                        <div className="flex-auto pl-16">
                             <DropdownButton size="sm" variant="light" disabled title={
                                 <React.Fragment>
                                     <i className="icon icon-bars fas mr-07"/>
