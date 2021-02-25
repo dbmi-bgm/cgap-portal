@@ -313,7 +313,7 @@ schemas change.
 
 >    #!/bin/sh
 >
->    CHANGED=`git diff HEAD@{1} --stat -- $GIT_DIR/../src/encoded/schemas/ | wc -l`
+>    CHANGED=`git diff HEAD@{0} --stat -- $GIT_DIR/../src/encoded/schemas/ | wc -l`
 >    if [ $CHANGED -gt 0 ];
 >    then
 >        echo "Schemas have changed! Sorting columns and facets..."
