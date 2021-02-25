@@ -4,7 +4,7 @@
 # from .workbook_support import workbook
 
 # XXX: All need refactor
-# pytestmark = [pytest.mark.working, pytest.mark.indexing]
+# pytestmark = [pytest.mark.working]
 #
 #
 # notice_pytest_fixtures(app_settings, workbook)
