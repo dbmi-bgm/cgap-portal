@@ -428,10 +428,11 @@ class ExtendedWorkbookCache(WorkbookCache):
 
     ABSTRACT_CACHE = True
 
-    EXTENDED_DATA = []
+    EXTENDED_DATA = {}
 
     @classmethod
     def load_additional_data(cls, es_testapp, other_data=None):
         check_true(not other_data, "data not allowed")
-        for hidden_faceted_data_item in cls.EXTENDED_DATA:
-            es_testapp.post_json('/TestingHiddenFacets', hidden_faceted_data_item, status=201)
+        for item_type, items in cls.EXTENDED_DATA.items():
+            for item in items:
+                es_testapp.post_json("/" + item_type, item, status=201)

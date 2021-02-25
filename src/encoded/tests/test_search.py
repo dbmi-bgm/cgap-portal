@@ -959,58 +959,60 @@ class TestNestedSearch(object):
 @es_data_cache
 class TestingHiddenFacetsCache(ExtendedWorkbookCache):
 
-    EXTENDED_DATA = [
-        {
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'sid': 1,
-            'unfaceted_string': 'hello',
-            'unfaceted_integer': 123,
-            'disabled_string': 'orange',
-            'disabled_integer': 789,
-            'unfaceted_object': {
-                'mother': 'Anne',
-                'father': 'Bob'
+    EXTENDED_DATA = {
+        "TestingHiddenFacets": [
+            {
+                'first_name': 'John',
+                'last_name': 'Doe',
+                'sid': 1,
+                'unfaceted_string': 'hello',
+                'unfaceted_integer': 123,
+                'disabled_string': 'orange',
+                'disabled_integer': 789,
+                'unfaceted_object': {
+                    'mother': 'Anne',
+                    'father': 'Bob'
+                },
+                'unfaceted_array_of_objects': [
+                    {
+                        'fruit': 'orange',
+                        'color': 'orange',
+                        'uid': 1
+                    },
+                    {
+                        'fruit': 'banana',
+                        'color': 'yellow',
+                        'uid': 2
+                    },
+                ]
             },
-            'unfaceted_array_of_objects': [
-                {
-                    'fruit': 'orange',
-                    'color': 'orange',
-                    'uid': 1
+            {
+                'first_name': 'Boston',
+                'last_name': 'Bruins',
+                'sid': 2,
+                'unfaceted_string': 'world',
+                'unfaceted_integer': 456,
+                'disabled_string': 'apple',
+                'disabled_integer': 101112,
+                'unfaceted_object': {
+                    'mother': 'Candice',
+                    'father': 'Doug'
                 },
-                {
-                    'fruit': 'banana',
-                    'color': 'yellow',
-                    'uid': 2
-                },
-            ]
-        },
-        {
-            'first_name': 'Boston',
-            'last_name': 'Bruins',
-            'sid': 2,
-            'unfaceted_string': 'world',
-            'unfaceted_integer': 456,
-            'disabled_string': 'apple',
-            'disabled_integer': 101112,
-            'unfaceted_object': {
-                'mother': 'Candice',
-                'father': 'Doug'
-            },
-            'unfaceted_array_of_objects': [
-                {
-                    'fruit': 'blueberry',
-                    'color': 'blue',
-                    'uid': 3
-                },
-                {
-                    'fruit': 'mango',
-                    'color': 'yellow',
-                    'uid': 4
-                },
-            ]
-        }
-    ]
+                'unfaceted_array_of_objects': [
+                    {
+                        'fruit': 'blueberry',
+                        'color': 'blue',
+                        'uid': 3
+                    },
+                    {
+                        'fruit': 'mango',
+                        'color': 'yellow',
+                        'uid': 4
+                    },
+                ]
+            }
+        ]
+    }
 
 
 # I don't think these need to be fixtures. -kmp 15-Feb-2021
