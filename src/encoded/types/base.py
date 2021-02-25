@@ -331,13 +331,6 @@ class Item(snovault.Item):
         return False
 
     def _update(self, properties, sheets=None):
-        props = {}
-        try:
-            props = self.properties
-        except KeyError:
-            pass
-        add_last_modified(properties)
-        print('Updating with props: %s, sheets: %s' % (properties, sheets))
         super(Item, self)._update(properties, sheets)
 
     @snovault.calculated_property(schema={
