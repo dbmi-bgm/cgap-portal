@@ -13,7 +13,7 @@ TODO: Potentially make into a git hook or build step or similar.
 
 
 
-def order_loaded_schema_columns_and_facets(schema):
+def order_schema_columns_and_facets(schema):
     '''
     This assumes a schema which is already copied, if need be,
     and is _edited in place_.
@@ -112,7 +112,7 @@ def main():
             # Skip mixins and such
             continue
 
-        schema = order_loaded_schema_columns_and_facets(schema)
+        schema = order_schema_columns_and_facets(schema)
 
         with open(filename, "w") as fp:
             json.dump(schema, fp, indent=4)

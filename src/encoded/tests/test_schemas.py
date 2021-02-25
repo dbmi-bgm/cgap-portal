@@ -5,7 +5,7 @@ import json
 from pkg_resources import resource_listdir
 from snovault import COLLECTIONS, TYPES
 from snovault.schema_utils import load_schema
-from ....scripts.order_schema_columns_and_facets import order_schema_columns_and_facets
+from ..commands.order_schema_columns_and_facets import order_schema_columns_and_facets
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
@@ -292,7 +292,33 @@ def verify_facets_and_columns_orders(schema):
     if "properties" in loaded_schema and ("columns" in loaded_schema or "facets" in loaded_schema):
         loaded_schema_copy = loaded_schema.deepcopy()
         order_schema_columns_and_facets(loaded_schema_copy)
+        failed = False
+
         if "columns" in loaded_schema:
-            assert json.dumps(loaded_schema["columns"]) == json.dumps(loaded_schema_copy["columns"])
+            failed = json.dumps(loaded_schema["columns"]) == json.dumps(loaded_schema_copy["columns"])
+
         if "facets" in loaded_schema:
-            assert json.dumps(loaded_schema["facets"]) == json.dumps(loaded_schema_copy["facets"])
+            # Avoid running if already failed.
+            failed = failed or json.dumps(loaded_schema["facets"]) == json.dumps(loaded_schema_copy["facets"])
+
+        assert not failed, '''
+        Order of facets or columns in {} file does not match the "order" properties.
+        Please run bin/order-schema-columns-and-facets.
+
+        If you don't want this test to fail ever again, please consider adding the follow as "post-commit"
+        file in your .git/hooks directory in order to automatically amend your commits with proper order when
+        schemas change.
+        
+            #!/bin/sh
+
+            CHANGED=`git diff HEAD@{1} --stat -- $GIT_DIR/../src/encoded/schemas/ | wc -l`
+            if [ $CHANGED -gt 0 ];
+            then
+                echo "Schemas have changed! Sorting columns and facets..."
+                python3 $GIT_DIR/../scripts/order_schema_columns_and_facets.py
+                git add $GIT_DIR/../src/encoded/schemas/
+                git commit --amend -C HEAD --no-verify
+            fi
+
+        '''.format(schema)
+        
