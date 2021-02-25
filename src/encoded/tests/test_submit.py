@@ -174,7 +174,6 @@ def case_with_ingestion_id2(testapp, project, institution, fam, sample_proc_fam)
     }
 
 
-
 @pytest.fixture
 def example_rows():
     return [
@@ -616,7 +615,11 @@ def test_compare_fields_different(testapp, aunt, fam, new_family):
 
 
 def test_compare_fields_array_of_string(testapp, case_with_ingestion_id1, case_with_ingestion_id2):
-    """tests that compare_fields finds differences between json item and db item  when present"""
+    """
+    tests that compare_fields finds differences between json item and db item when present -
+    in this case checks that when the 2 items have a different array, the db array gets extended
+    rather than replaced
+    """
     profile = testapp.get('/profiles/case.json').json
     result = compare_fields(profile, [], case_with_ingestion_id2, case_with_ingestion_id1)
     assert 'ingestion_ids' in result
