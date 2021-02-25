@@ -77,6 +77,7 @@ export class VariantSampleListController extends React.PureComponent {
         }
     }
 
+    /** Fetches datastore=database `@@embedded` representation of 'state.variantSampleListID' */
     fetchVariantSampleListItem(callback = null){
         const { variantSampleListID } = this.state;
 

@@ -72,7 +72,8 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             </div>
                         </div>
 
-                        <div className="flex-auto pl-16">
+                        {/* temporarily invisible via 'd-none' */}
+                        <div className="d-none flex-auto pl-16 d-none">
                             <DropdownButton size="sm" variant="light" title={
                                 <React.Fragment>
                                     <i className="icon icon-bars fas mr-07"/>
@@ -110,6 +111,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             </label>
                             { dpRenderFunc(variant_sample_item) }
                         </div>
+                        {/* the below is temporarily invisible via 'd-none' */}
                         <div className="d-none col col-sm-12 col-lg-3 py-2">
                             <label className="mb-04 text-small">Interpretation</label>
                             <div><em>TODO</em></div>
