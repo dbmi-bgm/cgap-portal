@@ -285,21 +285,22 @@ def test_changelogs(testapp, registry):
             assert res.content_type == 'text/markdown'
 
 @pytest.mark.parametrize('schema', SCHEMA_FILES)
-def verify_facets_and_columns_orders(schema):
+def test_facets_and_columns_orders(schema, testapp):
     '''This tests depends on Python 3.6's ordered dicts'''
+
     loaded_schema = load_schema('encoded:schemas/%s' % schema)
 
     if "properties" in loaded_schema and ("columns" in loaded_schema or "facets" in loaded_schema):
         loaded_schema_copy = loaded_schema.deepcopy()
-        order_schema_columns_and_facets(loaded_schema_copy)
+        loaded_schema_copy = order_schema_columns_and_facets(loaded_schema_copy)
         failed = False
 
         if "columns" in loaded_schema:
             failed = json.dumps(loaded_schema["columns"]) != json.dumps(loaded_schema_copy["columns"])
 
-        if "facets" in loaded_schema:
+        if not failed and "facets" in loaded_schema:
             # Avoid running if already failed.
-            failed = failed or json.dumps(loaded_schema["facets"]) != json.dumps(loaded_schema_copy["facets"])
+            failed = json.dumps(loaded_schema["facets"]) != json.dumps(loaded_schema_copy["facets"])
 
         assert not failed, '''
 Order of facets or columns in %s file does not match the ordering based on "order" values. \

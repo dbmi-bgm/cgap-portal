@@ -95,7 +95,7 @@ def order_schema_columns_and_facets(schema):
 
 def main():
 
-    schemas_dir = path.abspath(path.join(path.dirname(path.realpath(__file__)), "./../src/encoded/schemas"))
+    schemas_dir = path.abspath(path.join(path.dirname(path.realpath(__file__)), "./../schemas"))
     schema_filenames = []
 
     for root, dirs, files in walk(schemas_dir):
