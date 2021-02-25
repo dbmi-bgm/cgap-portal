@@ -295,11 +295,11 @@ def verify_facets_and_columns_orders(schema):
         failed = False
 
         if "columns" in loaded_schema:
-            failed = json.dumps(loaded_schema["columns"]) == json.dumps(loaded_schema_copy["columns"])
+            failed = json.dumps(loaded_schema["columns"]) != json.dumps(loaded_schema_copy["columns"])
 
         if "facets" in loaded_schema:
             # Avoid running if already failed.
-            failed = failed or json.dumps(loaded_schema["facets"]) == json.dumps(loaded_schema_copy["facets"])
+            failed = failed or json.dumps(loaded_schema["facets"]) != json.dumps(loaded_schema_copy["facets"])
 
         assert not failed, '''
 Order of facets or columns in %s file does not match the ordering based on "order" values. \
