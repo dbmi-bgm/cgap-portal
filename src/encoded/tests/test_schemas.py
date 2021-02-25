@@ -1,6 +1,7 @@
 import pytest
 import re
 import json
+from copy import deepcopy
 
 from pkg_resources import resource_listdir
 from snovault import COLLECTIONS, TYPES
@@ -291,7 +292,7 @@ def test_facets_and_columns_orders(schema, testapp):
     loaded_schema = load_schema('encoded:schemas/%s' % schema)
 
     if "properties" in loaded_schema and ("columns" in loaded_schema or "facets" in loaded_schema):
-        loaded_schema_copy = loaded_schema.deepcopy()
+        loaded_schema_copy = deepcopy(loaded_schema)
         loaded_schema_copy = order_schema_columns_and_facets(loaded_schema_copy)
         failed = False
 
