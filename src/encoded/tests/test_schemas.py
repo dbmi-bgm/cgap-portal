@@ -303,7 +303,7 @@ def verify_facets_and_columns_orders(schema):
 
         assert not failed, '''
 Order of facets or columns in %s file does not match the ordering based on "order" values. \
-Please run `bin/order-schema-columns-and-facets`. \
+Please run `poetry run order-schema-columns-and-facets`. \
 
 If you don't want this test to fail ever again, please consider adding the follow as "post-commit" \
 file in your .git/hooks directory in order to automatically amend your commits with proper order when \
@@ -315,7 +315,7 @@ schemas change.
 >    if [ $CHANGED -gt 0 ];
 >    then
 >        echo "Schemas have changed! Sorting columns and facets..."
->        python3 $GIT_DIR/../scripts/order_schema_columns_and_facets.py
+>        poetry run order-schema-columns-and-facets
 >        git add $GIT_DIR/../src/encoded/schemas/
 >        git commit --amend -C HEAD --no-verify
 >    fi
