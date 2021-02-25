@@ -932,7 +932,7 @@
             "title": "GnomAD Total Allele Number",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 30,
+            "order": 20,
             "grouping": "Population Frequency"
         },
         "variant.csq_gnomadg_nhomalt": {
