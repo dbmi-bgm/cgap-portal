@@ -1,3 +1,5 @@
+#!/bin/bash
+
 docker_kibana_image=docker.elastic.co/kibana/kibana-oss:6.8.9
 docker_kibana_port=5601
 local_kibana_port=${docker_kibana_port}
