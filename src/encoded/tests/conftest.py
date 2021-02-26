@@ -37,6 +37,7 @@ def app_settings(request, wsgi_server_host_port, conn, DBSession):
 
     settings = make_app_settings_dictionary()
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
+    settings['sqlalchemy.url'] = 'postgres://postgres:postgres@db:5432/postgres'
     # add some here for file testing
     settings[DBSESSION] = DBSession
     return settings
