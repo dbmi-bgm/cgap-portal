@@ -23,7 +23,9 @@ from ..submit import (
 pytestmark = [pytest.mark.working]
 
 
-TEST_INGESTION_ID = '123456-1243-1234-123456abcdef'
+TEST_INGESTION_ID1 = '123456-1243-1234-123456abcdef'
+TEST_INGESTION_ID2 = 'abcdef-1234-1234-abcdef123456'
+
 
 @pytest.fixture
 def row_dict():
@@ -70,7 +72,7 @@ def submission_info():
         'case': {'test-proj:case1': {
             'individual': 'test-proj:indiv1',
             'families': ['test-proj: fam1'],
-            'ingestion_ids': [TEST_INGESTION_ID]
+            'ingestion_ids': [TEST_INGESTION_ID1]
         }},
         'errors': []
     }
@@ -157,7 +159,7 @@ def case_with_ingestion_id1(testapp, project, institution, fam, sample_proc_fam)
         'family': fam['@id'],
         'individual': 'GAPIDPROBAND',
         'sample_processing': sample_proc_fam['@id'],
-        'ingestion_ids': [TEST_INGESTION_ID]
+        'ingestion_ids': [TEST_INGESTION_ID1]
     }
     res = testapp.post_json('/case', data).json['@graph'][0]
     return res
@@ -170,7 +172,7 @@ def case_with_ingestion_id2(testapp, project, institution, fam, sample_proc_fam)
         'family': fam['@id'],
         'individual': 'GAPIDPROBAND',
         'sample_processing': sample_proc_fam['@id'],
-        'ingestion_ids': ['abcdef-1234-1234-abcdef123456']
+        'ingestion_ids': [TEST_INGESTION_ID2]
     }
 
 
@@ -210,7 +212,7 @@ def big_family_rows():
 
 @pytest.fixture
 def example_rows_obj(example_rows, project, institution):
-    return SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID)
+    return SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
 
 
 @pytest.fixture
@@ -366,7 +368,7 @@ class TestSubmissionMetadata:
         assert a_types['2222'] == 'WGS'
         assert a_types['3333'] == 'WES-Group'
         example_rows[1]['workup type'] = 'WES'
-        new_obj = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID)
+        new_obj = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
         new_a_types = new_obj.analysis_types
         assert new_a_types['1111'] is None
 
@@ -385,7 +387,7 @@ class TestSubmissionMetadata:
                 {k: v for k, v in example_rows[1].items()}
             ]
             data[rowidx]['specimen accepted by ref lab'] = 'Y'
-            submission = SubmissionMetadata(data, project, institution, TEST_INGESTION_ID)
+            submission = SubmissionMetadata(data, project, institution, TEST_INGESTION_ID1)
             assert len(submission.individuals) == 2
             assert len(submission.samples) == 2
             assert 'specimen_accepted' in list(submission.samples.values())[1]
@@ -401,7 +403,7 @@ class TestSubmissionMetadata:
         before modification, fixture contains proband, mother, father, sister.
         """
         big_family_rows[4]['relation to proband'] = last_relation
-        submission = SubmissionMetadata(big_family_rows, project, institution, TEST_INGESTION_ID)
+        submission = SubmissionMetadata(big_family_rows, project, institution, TEST_INGESTION_ID1)
         assert len(submission.families) == 1
         fam = list(submission.families.values())[0]
         assert len(fam['members']) == 5
@@ -411,7 +413,7 @@ class TestSubmissionMetadata:
     def test_add_sample_processing(self, example_rows, project, institution):
         """tests metadata creation for sample_processing item from a set of rows"""
         example_rows[5]['workup type'] = 'WGS'  # analysis 3333 will have mismatched workup type values
-        submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID)
+        submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
         sps = submission.sample_processings
         assert sps['encode-project:analysis-1111']['analysis_type'] == 'WGS-Trio'
         assert sps['encode-project:analysis-2222']['analysis_type'] == 'WGS'
@@ -428,10 +430,10 @@ class TestSubmissionMetadata:
         if not report:
             row_dict['report required'] = 'N'
         row_dict['unique analysis id'] = case_id
-        submission = SubmissionMetadata([row_dict], project, institution, TEST_INGESTION_ID)
+        submission = SubmissionMetadata([row_dict], project, institution, TEST_INGESTION_ID1)
         case = list(submission.cases.values())[0]
         assert row_dict['individual id'] in case['individual']
-        assert case['ingestion_ids'] == [TEST_INGESTION_ID]
+        assert case['ingestion_ids'] == [TEST_INGESTION_ID1]
         assert case['family'] == list(submission.families.keys())[0]
         assert (len(submission.reports) > 0) == report
         case_alias = list(submission.cases.keys())[0]
@@ -446,7 +448,7 @@ class TestSubmissionMetadata:
     def test_add_case_info(self, row_dict, case_id, project, institution):
         """tests that case ID from row gets added to proper dictionary attribute"""
         row_dict['unique analysis id'] = case_id
-        submission = SubmissionMetadata([row_dict], project, institution, TEST_INGESTION_ID)
+        submission = SubmissionMetadata([row_dict], project, institution, TEST_INGESTION_ID1)
         key = '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id'])
         assert submission.case_info.get(key)['case id'] == case_id
 
@@ -455,7 +457,7 @@ class TestSubmissionMetadata:
         tests that correct proband mother and father get added to individual item metadata
         after all rows are processed
         """
-        obj = SubmissionMetadata(big_family_rows, project, institution, TEST_INGESTION_ID)
+        obj = SubmissionMetadata(big_family_rows, project, institution, TEST_INGESTION_ID1)
         proband = obj.individuals['encode-project:individual-456']
         sister = obj.individuals['encode-project:individual-546']
         brother = obj.individuals['encode-project:individual-555']
@@ -500,14 +502,14 @@ class TestSpreadsheetProcessing:
     def test_header_found(self, project, institution, xls_list, remove_row, success_bool):
         """tests that proper header is found when present"""
         data = iter(xls_list[0:remove_row] + xls_list[(remove_row) + 1:])
-        obj = SpreadsheetProcessing(data, project, institution, TEST_INGESTION_ID)
+        obj = SpreadsheetProcessing(data, project, institution, TEST_INGESTION_ID1)
         assert obj.passing == success_bool
         assert (len(obj.errors) == 0) == success_bool
         assert ('Column headers not detected in spreadsheet!' in ''.join(obj.errors)) == (not success_bool)
 
     def test_create_row_dict(self, xls_list, project, institution):
         """tests that dictionary of colname: field value is created for each row"""
-        obj = SpreadsheetProcessing(iter(xls_list), project, institution, TEST_INGESTION_ID)
+        obj = SpreadsheetProcessing(iter(xls_list), project, institution, TEST_INGESTION_ID1)
         assert obj.keys
         assert len(obj.rows) == 3
         for row in obj.rows:
@@ -517,7 +519,7 @@ class TestSpreadsheetProcessing:
         """tests that correct error is returned when a required column header is not in spreadsheet"""
         idx = xls_list[1].index('Specimen ID')
         rows = (row[0:idx] + row[idx+1:] for row in xls_list)
-        obj = SpreadsheetProcessing(rows, project, institution, TEST_INGESTION_ID)
+        obj = SpreadsheetProcessing(rows, project, institution, TEST_INGESTION_ID1)
         assert not obj.passing
         assert 'Column(s) "specimen id" not found in spreadsheet!' in ''.join(obj.errors)
 
@@ -525,7 +527,7 @@ class TestSpreadsheetProcessing:
 def test_xls_to_json(project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
     rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
-    json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID)
+    json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
     assert success
     assert len(json_out['family']) == 1
     assert 'encode-project:family-456' in json_out['family']
@@ -536,7 +538,7 @@ def test_xls_to_json(project, institution):
 def test_xls_to_json_errors(project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
     rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx')
-    json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID)
+    json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
     assert success  # still able to proceed to validation step
 
@@ -550,7 +552,7 @@ def test_xls_to_json_invalid_workup(project, institution, xls_list):
     idx = xls_list[1].index('Workup Type')
     xls_list[4] = xls_list[4][0:idx] + ['Other'] + xls_list[4][idx+1:]
     rows = iter(xls_list)
-    json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID)
+    json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
     assert json_out['errors']
     assert success
     assert ('Row 5 - Samples with analysis ID 55432 contain mis-matched '
