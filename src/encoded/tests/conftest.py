@@ -46,20 +46,19 @@ INDEXER_NAMESPACE_FOR_TESTING = generate_indexer_namespace_for_testing('cgap')
 
 
 @pytest.fixture(scope='session')
-def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_server, aws_auth):
+def es_app_settings(wsgi_server_host_port, aws_auth):
     settings = make_app_settings_dictionary()
     settings['create_tables'] = True
     settings['persona.audiences'] = 'http://%s:%s' % wsgi_server_host_port  # 2-tuple such as: ('localhost', '5000')
-    settings['elasticsearch.server'] = elasticsearch_server
-    settings['sqlalchemy.url'] = postgresql_server
+    settings['elasticsearch.server'] = 'search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443'
+    settings['sqlalchemy.url'] = 'postgres://postgres:postgres@db:5432/postgres'
     settings['collection_datastore'] = 'elasticsearch'
     settings['item_datastore'] = 'elasticsearch'
     settings['indexer'] = True
     settings['indexer.namespace'] = INDEXER_NAMESPACE_FOR_TESTING
 
     # use aws auth to access elasticsearch
-    if aws_auth:
-        settings['elasticsearch.aws_auth'] = aws_auth
+    settings['elasticsearch.aws_auth'] = True
     return settings
 
 
