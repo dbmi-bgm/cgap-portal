@@ -47,7 +47,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN chown nginx /opt/venv
 
 # Copy to /home/nginx/cgap-portal
-RUN git clone $CGAP_REPO --branch c4_519
+RUN git clone $CGAP_REPO --branch $CGAP_BRANCH
 
 # Build the application
 WORKDIR /home/nginx/cgap-portal

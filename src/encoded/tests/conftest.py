@@ -33,7 +33,7 @@ def autouse_external_tx(external_tx):
 
 
 @pytest.fixture(scope='session')
-def app_settings(request, wsgi_server_host_port, conn, DBSession):
+def app_settings(request, wsgi_server_host_port, DBSession):
 
     settings = make_app_settings_dictionary()
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
