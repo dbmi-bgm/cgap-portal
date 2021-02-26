@@ -1,4 +1,5 @@
 # utility functions
+
 import contextlib
 import datetime
 import gzip
@@ -7,7 +8,7 @@ import os
 import pyramid.request
 import tempfile
 
-from dcicutils.misc_utils import check_true
+from dcicutils.misc_utils import check_true, url_path_join
 from io import BytesIO
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden, HTTPServerError
 from snovault import COLLECTIONS, Collection
@@ -355,3 +356,16 @@ def content_type_allowed(request):
                 return True
 
     return False
+
+
+JSON_CONTENT_HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json'}
+
+
+@contextlib.contextmanager
+def posted_temporary_page(testapp, base_url, content):
+    [val] = testapp.post_json(base_url, content, status=(201, 301)).maybe_follow().json['@graph']
+    uuid = val.get('uuid')
+    yield val
+    if uuid:
+        # Note: Without JSON headers, this will get a 415 even if it's not using the result data. -kmp 23-Feb-2021
+        testapp.delete(url_path_join('/', uuid), headers=JSON_CONTENT_HEADERS)

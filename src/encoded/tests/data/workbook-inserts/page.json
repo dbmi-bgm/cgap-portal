@@ -1,0 +1,37 @@
+[
+    {
+        "name": "help/user-guide/rev-links",
+        "title": "Reverse Links",
+        "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
+        "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540d",
+        "table-of-contents": {
+            "enabled": true,
+            "header-depth": 4,
+            "list-styles": ["decimal", "lower-alpha", "lower-roman"]
+        }
+    },
+    {
+        "name": "help/user-guide/rev-links-in-review",
+        "title": "Reverse Links",
+        "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
+        "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540c",
+        "table-of-contents": {
+            "enabled": true,
+            "header-depth": 4,
+            "list-styles": ["decimal", "lower-alpha", "lower-roman"]
+        },
+        "status": "in review"
+    },
+    {
+        "name": "help/user-guide/rev-links-deleted",
+        "title": "Reverse Links",
+        "content": ["442c8aa0-dc6c-43d7-814a-854af460c020"],
+        "uuid": "a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540a",
+        "table-of-contents": {
+            "enabled": true,
+            "header-depth": 4,
+            "list-styles": ["decimal", "lower-alpha", "lower-roman"]
+        },
+        "status": "deleted"
+    }
+]
