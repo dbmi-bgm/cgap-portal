@@ -49,7 +49,7 @@ export class InterpretationSpaceController extends React.Component {
                 <InterpretationHeader {...{ isFullScreen }} toggleFullScreen={this.toggleFullScreen}/>
                 <div className="card-body">
                     <InterpretationTabs {...{ currentTabIdx }} switchToTab={this.switchToTab} />
-                    <GenericInterpretationPanel {...{ noteLabel }}/>
+                    <GenericInterpretationPanel {...{ noteLabel }} { ...this.props }/>
                 </div>
             </div>
         );
@@ -96,28 +96,60 @@ function InterpretationTabs(props) {
 class GenericInterpretationPanel extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            interpretationNote: ""
+        this.state = { // Fields in form. Using snake casing to make it easier to add state data directly to post/patch request
+            note_text: "",
+            acmg_guidelines: [],            // TODO: Unused
+            classification: null,           // TODO: Unused
+            conclusion: "",                 // TODO: Unused
         };
+
+        this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
+        this.saveStateToCase = this.saveStateToCase.bind(this);
+        this.saveStateToKnowledgeBase = this.saveStateToKnowledgeBase.bind(this);
+    }
+
+    // For now using same update fxn for multiple text fields
+    onTextChange(event, stateToChange) {
+        const { value: newValue } = event.target || {};
+        this.setState({ [stateToChange]: newValue });
+    }
+
+    saveStateAsDraft() {
+        const { saveAsDraft } = this.props;
+        saveAsDraft(this.state);
+    }
+
+    saveStateToCase() {
+        const { saveToCase } = this.props;
+        saveToCase(this.state);
+    }
+
+    saveStateToKnowledgeBase(){
+        const { saveToKnowledgeBase } = this.props;
+        saveToKnowledgeBase(this.state);
     }
 
     render() {
-        const { children, noteLabel } = this.props;
+        const { isCurrent, isDraft, interpretationExists, interpretationChanged, noteLabel } = this.props;
+        const { note_text: noteText } = this.state;
+
         return (
             <div className="interpretation-panel">
                 <label className="w-100">
                     { noteLabel }
                 </label>
-                <textarea className="w-100 "/>
-                
-                {/* Not sure how best to handle variable inputs that may or may not be present... as children? */}
-                { children }
-                <GenericInterpretationSubmitButton {...this.props} />
+                <textarea className="w-100" value={noteText} onChange={(e) => this.onTextChange(e, "note_text")}/>
+                <GenericInterpretationSubmitButton {...{ isCurrent, isDraft, interpretationExists, interpretationChanged, noteLabel }}
+                    saveAsDraft={this.saveStateAsDraft} saveToCase={this.saveStateAsDraft} saveToKnowledgeBase={this.saveStateToKnowledgeBase}
+                />
             </div>
         );
     }
 }
 
+/**
+ * Displays and handles different CTAs for various stages in the Interpretation Submission Process
+ */
 function GenericInterpretationSubmitButton(props) {
     const {
         isCurrent,                  // Has note been submitted to case; only cloning enabled -- can save to KB
@@ -125,15 +157,15 @@ function GenericInterpretationSubmitButton(props) {
         interpretationExists,       // Is there text in the interpretation note space
         interpretationChanged,      // Has the text in the interpretation note space changed since last save
         saveAsDraft,                // Fx -- save as Draft
-        saveToCase,                 // Fx -- save to Case
-        saveToKnowledgeBase,         // Fx -- save to KB
+        saveToCase,                 // Fx -- save to Case (handles cloning in response to edits as well as first time additions)
+        saveToKnowledgeBase,        // Fx -- save to KB
         cls
     } = props;
 
     const allButtonsDropsDisabled = !interpretationExists || !interpretationChanged;
     if (isCurrent || isDraft) {
         // If current: no saving as draft; already submitted to case -- save to knowledgebase
-        // In draft status; allow saving to case, but not knowledgebase
+        // In draft status: allow saving to case, re-saving as draft, but no saving to knowledgebase
         return (
             <Dropdown as={ButtonGroup} className={cls}>
                 <Button variant="primary btn-block" onClick={isCurrent ? saveToKnowledgeBase : saveToCase}
@@ -143,12 +175,11 @@ function GenericInterpretationSubmitButton(props) {
                 </Button>
                 <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" disabled={allButtonsDropsDisabled} />
                 <Dropdown.Menu>
-                    <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+                    { isDraft ? <Dropdown.Item onClick={saveAsDraft}>Save as Draft</Dropdown.Item> : null}
+                    { isCurrent ? <Dropdown.Item onClick={saveToCase}>Clone to Case</Dropdown.Item> : null}
                 </Dropdown.Menu>
             </Dropdown>);
-    } else { // brand new note; allow saving as draft or to case, but not knowledgebase
+    } else { // Brand new note; allow saving as draft or to case, but not knowledgebase
         return (
             <Dropdown as={ButtonGroup} className={cls}>
                 <Button variant="primary btn-block" onClick={saveAsDraft}
