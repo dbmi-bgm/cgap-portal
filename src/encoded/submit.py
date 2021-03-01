@@ -121,7 +121,8 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
             results['validation_output'].append(msg)
             return results
         json_data, json_success = xls_to_json(
-            rows, project=project_json, institution=institution_json, ingestion_id=key.split('/')[0]
+            xls_data=rows, project=project_json, institution=institution_json,
+            ingestion_id=key.split('/')[0]
         )
         if not json_success:
             results['validation_output'] = json_data['errors']
@@ -718,8 +719,8 @@ class SpreadsheetProcessing:
     to hold all metadata extracted from spreadsheet.
     """
 
-    def __init__(self, row, project, institution, ingestion_id):
-        self.input = row
+    def __init__(self, xls_data, project, institution, ingestion_id):
+        self.input = xls_data
         self.project = project
         self.institution = institution
         self.ingestion_id = ingestion_id
@@ -776,14 +777,15 @@ class SpreadsheetProcessing:
         self.passing = True
 
 
-def xls_to_json(row, project, institution, ingestion_id):
+def xls_to_json(xls_data, project, institution, ingestion_id):
     """
     Wrapper for SpreadsheetProcessing that returns expected values:
     result.output - metadata to be submitted in json
     result.passing - whether submission "passes" this part of the code and can move
         on to the next step.
     """
-    result = SpreadsheetProcessing(row, project, institution, ingestion_id)
+    result = SpreadsheetProcessing(xls_data=xls_data, project=project, institution=institution,
+                                   ingestion_id=ingestion_id)
     result.output['errors'] = result.errors
     return result.output, result.passing
 
