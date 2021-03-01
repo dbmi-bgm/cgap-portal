@@ -27,3 +27,20 @@ Welcome to CGAP! We are a team of scientists, clinicians, and developers who aim
 * `cgapwolf <http://fourfront-cgapwolf.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for workflow development
 
 Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. For installation and more information on getting started, see our `documentation page <https://cgap-portal.readthedocs.io/en/latest/index.html>`_.
+
+For information on how to run CGAP with Docker, see `here. <./docs/docker-setup.rst>`_
+
+Navigating this Repository
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+    * .ebextensions/ contains Beanstalk deployment scripts
+    * .github/ contains Github Action Workflows
+    * bin/ contains the few remaining executables
+    * deploy/docker contains Docker setups (see docker-compose.yml)
+    * docs/ contains documentation
+    * etc/ is deprecated/unused
+    * examples/ is deprecated/unused
+    * jest/ is deprecated/unused
+    * parts/ contains production WSGI entry points
+    * scripts/ contains misc scripts
+    * src/ where the code is
+    * src-docker/ mount point where container code is

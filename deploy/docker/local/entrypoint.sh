@@ -1,15 +1,19 @@
 #!/bin/sh
 
-if [  -z ${RUN_TEST+x} ]; then
+if [  -z ${TEST+x} ]; then
 
-    # Clear db/es since this is the local entry point
-    poetry run clear-db-es-contents development.ini --app-name app --env $CGAP_ENV_NAME
+    if [ ! -z ${LOAD+x} ]; then
 
-    # Create mapping
-    poetry run create-mapping-on-deploy development.ini --app-name app
+        # Clear db/es since this is the local entry point
+        poetry run clear-db-es-contents development.ini --app-name app --env $CGAP_ENV_NAME
 
-    # Load Data (based on development.ini, for now just master-inserts)
-    poetry run load-data development.ini --app-name app --prod
+        # Create mapping
+        poetry run create-mapping-on-deploy development.ini --app-name app
+
+        # Load Data (based on development.ini, for now just master-inserts)
+        poetry run load-data development.ini --app-name app --prod
+
+    fi
 
     # Start nginx proxy
     service nginx start
@@ -19,6 +23,8 @@ if [  -z ${RUN_TEST+x} ]; then
 
 else
 
-    make test
+    echo "Not starting serving application"
+    echo "Enter the container with docker exec"
+    sleep 100000000
 
 fi

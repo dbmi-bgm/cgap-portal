@@ -41,6 +41,7 @@ Be warned that features are under active development and may not be stable! Visi
     infrastructure_overview
     dataflow_overview
     ingestion
+    docker-local
 
 *Data Model*
 

@@ -7,13 +7,12 @@ MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
 # Build Arguments
 ARG CGAP_ENV_NAME
-ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-docker-will-test"}
-#ARG RUN_TEST
-#ENV RUN_TEST=${RUN_TEST:-1}
+ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"fourfront-cgapmastertest"}
+ARG CGAP_BRANCH
+ENV CGAP_BRANCH=${CGAP_BRANCH:-"master"}
 
 # Configure (global) Env
 ENV CGAP_REPO=https://github.com/dbmi-bgm/cgap-portal.git
-ENV CGAP_BRANCH=c4_519
 ENV NGINX_USER=nginx
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
@@ -55,7 +54,7 @@ RUN pip install poetry==1.1.4 wheel==0.29.0
 RUN poetry install
 RUN python setup_eb.py develop
 RUN make fix-dist-info
-RUN npm ci --no-fund --no-progress --python=/opt/venv/bin/python
+RUN npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/bin/python
 RUN npm run build
 RUN npm run build-scss
 RUN make aws-ip-ranges
@@ -79,12 +78,14 @@ RUN touch /var/log/nginx/error.log && \
         chown -R nginx:nginx /var/log/nginx/error.log
 
 # Copy over ini file, entrypoint
-COPY development.ini .
-COPY development.ini test.ini
+# TODO ini file must be generated
+COPY production.ini .
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 EXPOSE 8000
-# Uncomment this to run as the unprivileged user
-# USER nginx
+# Container does not ever run as root
+# This way even if someone gets access to the container they cannot
+# read production.ini for example
+USER nginx
 
 ENTRYPOINT ["/home/nginx/cgap-portal/entrypoint.sh"]

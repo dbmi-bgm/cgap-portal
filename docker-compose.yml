@@ -36,6 +36,11 @@ services:
   #      - "9200:9200"
 
   # Main Application Component
+  # Options:
+  #   * TEST - Just build (and not serve the app). Comment this to enable local deployment.
+  #   * LOAD - Trigger a reload of the inserts in the database.
+  #            After running once, comment this out so the container will serve without reloading inserts.
+  #            Has no effect if TEST is specified.
   app:
     build: ./deploy/docker/local
     container_name: cgap
@@ -43,10 +48,20 @@ services:
     environment:
       AWS_ACCESS_KEY_ID: "$AWS_ACCESS_KEY_ID"
       AWS_SECRET_ACCESS_KEY: "$AWS_SECRET_ACCESS_KEY"
+      TEST: "true" # default: run local deployment
+      LOAD: "true"  # default: load the inserts (comment this out after first run)
     ports:
       - "8000:8000"  # nginx proxy port (note application traffic is not forwarded)
     volumes:
-      - "./src:/home/cgap-admin/cgap-portal/src"
+      - 'src-docker:/home/nginx/cgap-portal/src'  # mount source directory in container to mount point
     depends_on:
       - db
       #- es
+
+volumes:
+  src-docker:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "./src-docker"

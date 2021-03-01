@@ -150,10 +150,16 @@ update:  # updates dependencies
 	poetry update
 
 build-docker:
-	pushd deploy/docker/ && docker-compose build && popd
+    docker-compose build
+
+build-docker-clean:
+    docker-compose build --no-cache
 
 deploy-docker:
-	pushd deploy/docker/ && docker-compose up
+	docker-compose up
+
+deploy-docker-daemon:
+    docker-compose up -d
 
 help:
 	@make info
@@ -181,3 +187,7 @@ info:
 	   $(info - Use 'make test' to run tests with normal options we use on travis ('-m "working and not manual"').)
 	   $(info - Use 'make test-any' to run tests without marker constraints (i.e., with no '-m' option).)
 	   $(info - Use 'make update' to update dependencies (and the lock file).)
+	   $(info - Use 'make build-docker' to build the local Docker image.)
+	   $(info - Use 'make build-docker-clean' to build the local Docker image with no cache.)
+	   $(info - Use 'make deploy-docker' start up the cluster - pserve output will follow if successful.)
+	   $(info - Use 'make deploy-docker-daemon' will start the cluster in daemon mode.)

@@ -24,7 +24,14 @@ and the client.
 To access the running container::
 
     $ docker ps   # will show running containers
-    $ docker exec -it <app_container_id> /bin/bash
+    $ docker exec -it <app_container_id> bash
+
+Container Development
+---------------------
+
+When the container is first built, a volume is created in the local repository location called ``src-docker``.
+The ``src`` directory of the repository within the container is mounted to this location, allowing you to make
+modifications to the source there and trigger rebuilds via bash as appropriate.
 
 Advanced Usage
 --------------
@@ -32,9 +39,3 @@ Advanced Usage
 There are several useful commands documented below that may be helpful when issues are encountered or changes need to be made.
 
 * ``docker-compose build --no-cache``  # will force a full rebuild of the entire image
-
-Configuration Notes
--------------------
-
-* TODO write me
-

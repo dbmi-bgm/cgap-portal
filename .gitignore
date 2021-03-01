@@ -36,6 +36,8 @@ beanstalk.cfg
 /src/encoded/static/css/style.css
 /src/encoded/static/scss/_variables.original.scss
 
+/src-docker/*
+
 /src/encoded/tests/data/temp-local-inserts/*
 !/src/encoded/tests/data/temp-local-inserts/.gitkeep
 
