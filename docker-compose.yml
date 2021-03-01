@@ -6,7 +6,7 @@ services:
   # Connect to it in development.ini with
   # sqlalchemy.url = postgresql://postgres:postgres@db:5432/postgres
   db:
-    build: ./postgres
+    build: ./deploy/docker/postgres
     container_name: pg1
     environment:
       POSTGRES_DB: postgres
@@ -20,24 +20,24 @@ services:
   # Disabled for now as too compute intensive
   # To connect use:
   # elasticsearch.server = es:9200
-#  es:
-#    build: ./elasticsearch
-#    container_name: es1
-#    environment:
-#      - node.name=es01
-#      - cluster.name=es-docker-cluster
-#      - bootstrap.memory_lock=true
-#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
-#    ports:
-#      - "9200:9200"
+  #  es:
+  #    build: ./elasticsearch
+  #    container_name: es1
+  #    environment:
+  #      - node.name=es01
+  #      - cluster.name=es-docker-cluster
+  #      - bootstrap.memory_lock=true
+  #      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #    ulimits:
+  #      memlock:
+  #        soft: -1
+  #        hard: -1
+  #    ports:
+  #      - "9200:9200"
 
   # Main Application Component
   app:
-    build: ./local
+    build: ./deploy/docker/local
     container_name: cgap
     command: "/home/cgap-admin/cgap-portal/entrypoint.sh"
     environment:
@@ -45,6 +45,8 @@ services:
       AWS_SECRET_ACCESS_KEY: "$AWS_SECRET_ACCESS_KEY"
     ports:
       - "8000:8000"  # nginx proxy port (note application traffic is not forwarded)
+    volumes:
+      - "./src:/home/cgap-admin/cgap-portal/src"
     depends_on:
       - db
       #- es

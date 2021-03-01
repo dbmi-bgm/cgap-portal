@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ $RUN_TEST -eq "0" ]; then
+if [  -z ${RUN_TEST+x} ]; then
 
     # Clear db/es since this is the local entry point
     poetry run clear-db-es-contents development.ini --app-name app --env $CGAP_ENV_NAME
@@ -15,7 +15,7 @@ if [ $RUN_TEST -eq "0" ]; then
     service nginx start
 
     # Start application
-    make deploy2
+    pserve development.ini --reload
 
 else
 

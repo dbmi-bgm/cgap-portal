@@ -8,8 +8,8 @@ MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 # Build Arguments
 ARG CGAP_ENV_NAME
 ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-docker-will-test"}
-ARG RUN_TEST
-ENV RUN_TEST=${RUN_TEST:-1}
+#ARG RUN_TEST
+#ENV RUN_TEST=${RUN_TEST:-1}
 
 # Configure (global) Env
 ENV CGAP_REPO=https://github.com/dbmi-bgm/cgap-portal.git
@@ -25,7 +25,7 @@ ENV PYTHONFAULTHANDLER=1 \
   PIP_DEFAULT_TIMEOUT=100 \
   POETRY_VERSION=1.1.4
 
-# Install nginx (unused for local deployment as this runs as part of `make deploy1`)
+# Install nginx
 COPY install_nginx.sh /
 RUN bash /install_nginx.sh
 
