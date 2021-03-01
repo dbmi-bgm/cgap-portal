@@ -7,7 +7,7 @@ from base64 import b64encode
 from jsonschema_serialize_fork import Draft4Validator
 from pyramid.compat import ascii_native_
 from urllib.parse import urlparse
-from dcicutils.misc_utils import TestApp
+from webtest import TestApp
 from .conftest_settings import ORDER
 
 

@@ -1,6 +1,6 @@
 import pytest
 
-from dcicutils.misc_utils import TestApp
+from webtest import TestApp
 from .conftest_settings import ORDER
 
 
