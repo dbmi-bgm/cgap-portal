@@ -15,6 +15,7 @@ import { GeneTabBody } from './GeneTabBody';
 import { SampleTabBody } from './SampleTabBody';
 import { AnnotationBrowserTabBody } from './AnnotationBrowserTabBody';
 import { BamFileBrowserTabBody } from './BamFileBrowserTabBody';
+import { InterpretationSpaceController } from './InterpretationSpaceController';
 
 
 
@@ -108,9 +109,16 @@ export class VariantSampleOverview extends React.PureComponent {
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading };
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                {/* BA1, BS1, BS2, BS3 etc markers here */}
-                <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
-                <VariantSampleOverviewTabView {...passProps} />
+                <div className="row flex-column-reverse flex-lg-row flex-nowrap">
+                    <div className="col">
+                        {/* BA1, BS1, BS2, BS3 etc markers here */}
+                        <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
+                        <VariantSampleOverviewTabView {...passProps} />
+                    </div>
+                    <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
+                        <InterpretationSpaceController {...passProps} />
+                    </div>
+                </div>
             </div>
         );
     }

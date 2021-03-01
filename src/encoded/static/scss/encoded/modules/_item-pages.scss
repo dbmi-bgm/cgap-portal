@@ -2705,7 +2705,7 @@ $download-button-width : 100px;
 
 
 /**********************************************************
-  VariantSampleView & similar - Annotation Space
+  VariantSampleView & similar - Annotation & Interpretation Space
 **********************************************************/
 
 // TODO maybe move somewhere else
@@ -2843,6 +2843,49 @@ $download-button-width : 100px;
 					color: $primary-dark;
 				}
 				*/
+			}
+		}
+	}
+
+	.interpretation-space {
+
+		.card-header.interpretation-header {
+			background-color: $primary-dark;
+			color: #ffffff;
+			font-size: 1.1em;
+
+			button:focus {
+				outline: thin dotted;
+			}
+		}
+
+		.card-body {
+			ul {
+				list-style-type: none;
+				border:1px solid lightgray;
+				border-radius: 5px;
+				li.interpretation-tab {
+					&[data-active="true"] {
+						background-color: #beccda;
+						color: $primary-dark;
+						border-radius: 3px;
+					}
+					font-size: 13px;
+					padding: 3px 10px;
+				}
+			}
+
+			.interpretation-panel {
+				margin: 10px 0;
+
+				textarea {
+					border-color: lightgrey;
+    				border-radius: 5px;
+				}
+
+				.dropdown.btn-group {
+					width: 100%;
+				}
 			}
 		}
 	}
