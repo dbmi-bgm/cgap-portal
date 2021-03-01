@@ -81,8 +81,8 @@
             }
         },
         "ingestion_ids": {
-            "title": "Submission ID",
-            "description": "uuid of the IngestionSubmission items that created/edited this case",
+            "title": "Submission IDs",
+            "description": "uuids of the IngestionSubmission items that created/edited this case",
             "type": "array",
             "items": {
                 "title": "Submission ID",
