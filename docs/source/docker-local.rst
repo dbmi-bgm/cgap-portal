@@ -2,7 +2,12 @@ CGAP-Docker
 ===========
 
 It is now possible to run a local deployment of CGAP without installing any system level
-dependencies other than Docker. Start by installing Docker::
+dependencies other than Docker. A few important notes on this setup.
+
+* Note this is not ideal for active development as you cannot run unit tests or edit source files in the container on the host machine (in your local editor).
+
+
+Start by installing Docker::
 
     $ brew install docker
 
@@ -10,6 +15,7 @@ dependencies other than Docker. Start by installing Docker::
 Prior to building the image, navigate to deploy/docker/local and open development.ini
 
 * Modify env.name and indexer.namespace - these values must be globally unique (feel free to just replace the name)
+* Consider changing load_prod_data to load_local_data if you need to load more inserts
 
 There are two new Make targets that should be sufficient for normal use. To build the image locally, ensure your
 AWS keys are sourced and run::
@@ -24,18 +30,20 @@ and the client.
 To access the running container::
 
     $ docker ps   # will show running containers
-    $ docker exec -it <app_container_id> bash
+    $ docker exec -it <container_id_prefix> bash
 
-Container Development
----------------------
 
-When the container is first built, a volume is created in the local repository location called ``src-docker``.
-The ``src`` directory of the repository within the container is mounted to this location, allowing you to make
-modifications to the source there and trigger rebuilds via bash as appropriate.
 
-Advanced Usage
---------------
+Docker Command Cheatsheet
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are several useful commands documented below that may be helpful when issues are encountered or changes need to be made.
+Below is a small list of useful Docker commands for advanced users::
 
-* ``docker-compose build --no-cache``  # will force a full rebuild of the entire image
+    $ docker-compose build  # will trigger a build of the local cluster
+    $ docker-compose build --no-cache  # will trigger a fresh build of the entire cluster
+    $ docker-compose down  # will stop cluster
+    $ docker-compose down --volumes  # will remove cluster volumes as well
+    $ docker-compose up  # will start cluster and log all output to console
+    $ docker-compose up -d  # will start cluster in background using existing containers
+    $ docker-compose up -d -V --build  # trigger a rebuild/recreation of cluster containers
+    $ docker system prune  # will cleanup unused Docker components - BE CAREFUL WITH THIS

@@ -48,20 +48,10 @@ services:
     environment:
       AWS_ACCESS_KEY_ID: "$AWS_ACCESS_KEY_ID"
       AWS_SECRET_ACCESS_KEY: "$AWS_SECRET_ACCESS_KEY"
-      TEST: "true" # default: run local deployment
+      # TEST: "true" # default: run local deployment
       LOAD: "true"  # default: load the inserts (comment this out after first run)
     ports:
       - "8000:8000"  # nginx proxy port (note application traffic is not forwarded)
-    volumes:
-      - 'src-docker:/home/nginx/cgap-portal/src'  # mount source directory in container to mount point
     depends_on:
       - db
       #- es
-
-volumes:
-  src-docker:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: "./src-docker"
