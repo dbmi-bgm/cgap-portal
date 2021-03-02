@@ -8,12 +8,13 @@ MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 # Build Arguments
 ARG CGAP_ENV_NAME
 ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-docker-will-test"}
-#ARG RUN_TEST
-#ENV RUN_TEST=${RUN_TEST:-1}
+# Repair the below after this is merged
+#ARG CGAP_BRANCH
+#ENV CGAP_BRANCH=${CGAP_BRANCH:-"master"}
+ENV CGAP_BRANCH=c4_519
 
 # Configure (global) Env
 ENV CGAP_REPO=https://github.com/dbmi-bgm/cgap-portal.git
-ENV CGAP_BRANCH=c4_519
 ENV NGINX_USER=nginx
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
