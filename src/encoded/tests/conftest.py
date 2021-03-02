@@ -47,6 +47,7 @@ def docker_db_conn():
         engine.dispose()
 
 
+@pytest.yield_fixture(scope='session')
 def external_tx(request, docker_db_conn):
     """ Taken from snovault to use Docker conn """
     notice_pytest_fixtures(request)
