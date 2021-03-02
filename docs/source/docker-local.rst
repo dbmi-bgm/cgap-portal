@@ -5,7 +5,8 @@ It is now possible to run a local deployment of CGAP without installing any syst
 dependencies other than Docker. A few important notes on this setup.
 
 * This is not ideal for active development as you cannot run unit tests or edit source files in the container on the host machine (in your local editor).
-* VERY IMPORTANT: Do not upload the local deployment container image to any registry.
+* ElasticSearch is too compute intensive to virtualize on most machines. For this reason we use the CGAP test ES cluster for this deployment instead of spinning up an ES cluster in Docker. If you want to attempt to run containerized ES, see ``docker-compose.yml``.
+* VERY IMPORTANT: Do not upload the local deployment container image to any registry. This utility is in beta - .
 
 
 Start by installing Docker::
@@ -13,7 +14,7 @@ Start by installing Docker::
     $ brew install docker
 
 
-Prior to building the image, navigate to deploy/docker/local and open development.ini
+Prior to building the image, navigate to deploy/docker/local and open docker_development.ini
 
 * Modify env.name and indexer.namespace - these values must be globally unique (feel free to just replace the name)
 * Consider changing load_prod_data to load_local_data if you need to load more inserts
@@ -26,13 +27,14 @@ AWS keys are sourced and run::
 
 The first command will take awhile the first time you run it but should speed up after. Since it is doing a fresh
 rebuild every time it is a little slower than the old local deployment since it has to fully reinstall/rebuild both Python
-and the client.
+and the client. Because of this, it is recommended to continue active development using the existing installation setup.
+Once the branch is ready for integrated testing, set the desired branch in ``docker-compose.yml`` and trigger a build.
+When the app is brought online the behavior should be identical to that of the existing local deployment setup.
 
 To access the running container::
 
     $ docker ps   # will show running containers
     $ docker exec -it <container_id_prefix> bash
-
 
 
 Docker Command Cheatsheet

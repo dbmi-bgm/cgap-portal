@@ -156,10 +156,10 @@ build-docker-clean:
 	docker-compose build --no-cache
 
 deploy-docker:
-	docker-compose up
+	docker-compose up -V
 
 deploy-docker-daemon:
-	docker-compose up -d
+	docker-compose up -d -V
 
 help:
 	@make info

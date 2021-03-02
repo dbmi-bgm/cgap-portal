@@ -19,7 +19,7 @@ if [  -z ${TEST+x} ]; then
     service nginx start
 
     # Start application
-    pserve development.ini --reload
+    make deploy2
 
 else
 
