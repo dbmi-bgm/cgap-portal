@@ -30,7 +30,7 @@ ENV PYTHONFAULTHANDLER=1 \
 COPY install_nginx.sh /
 RUN bash /install_nginx.sh
 
-# Intall things needed for our system
+# Install things needed for our system
 RUN apt-get update
 RUN apt-get install -y curl vim emacs postgresql-client net-tools
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
@@ -72,12 +72,12 @@ RUN chown -R nginx:nginx /var/cache/nginx && \
     chown -R nginx:nginx /var/log/nginx && \
     chown -R nginx:nginx /etc/nginx/conf.d
 RUN touch /var/run/nginx.pid && \
-        chown -R nginx:nginx /var/run/nginx.pid
+    chown -R nginx:nginx /var/run/nginx.pid
 RUN rm -f /var/log/nginx/*
 RUN touch /var/log/nginx/access.log && \
-        chown -R nginx:nginx /var/log/nginx/access.log
+    chown -R nginx:nginx /var/log/nginx/access.log
 RUN touch /var/log/nginx/error.log && \
-        chown -R nginx:nginx /var/log/nginx/error.log
+    chown -R nginx:nginx /var/log/nginx/error.log
 
 # Copy over ini file, entrypoint
 COPY docker_development.ini development.ini
