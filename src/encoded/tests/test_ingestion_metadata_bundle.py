@@ -2,19 +2,25 @@ import boto3
 import botocore.exceptions
 import contextlib
 import datetime as datetime_module
-import io
 import json
 import os
+import pytest
 import pytz
 import webtest
 
 from dcicutils import qa_utils
-from dcicutils.qa_utils import ignored, ControlledTime, MockFileSystem
-from dcicutils.lang_utils import n_of
+from dcicutils.misc_utils import constantly, file_contents
+from dcicutils.qa_utils import ignored, ControlledTime, MockBotoS3Client, MockUUIDModule
 from unittest import mock
 from .data import TEST_PROJECT, DBMI_INSTITUTION, METADATA_BUNDLE_PATH
 from .. import ingestion_listener as ingestion_listener_module
 from ..types import ingestion as ingestion_module
+
+
+# TODO: These auth parts of this are adequately tested in test_submit_metadata_bundle.
+#       There are other tests here of the data pipeline itself that need to be updated.
+#       -kmp 25-Feb-2021
+pytestmark = [pytest.mark.setone, pytest.mark.broken]
 
 
 SUBMIT_FOR_INGESTION = "/submit_for_ingestion"
@@ -26,28 +32,6 @@ def expect_unreachable_in_mock(function_name):
         raise AssertionError("The function %s should not have been called. Its caller should have been mocked."
                              % function_name)
     return fn
-
-
-def constantly(value):
-    def fn(*args, **kwargs):
-        ignored(args, kwargs)
-        return value
-    return fn
-
-
-class FakeGuid:
-
-    def __init__(self):
-        self.counter = 0
-
-    def fake_guid(self):
-        self.counter += 1
-        return self.format_fake_guid(self.counter)
-
-    @classmethod
-    def format_fake_guid(cls, n):
-        digits = str(n).rjust(10, '0')
-        return "%s-%s-%s" % (digits[0:3], digits[3:7], digits[7:10])
 
 
 class MockQueueManager:
@@ -69,7 +53,7 @@ class MockSubmissionFolioClass:
     EXPECTED_PROJECT = TEST_PROJECT
 
     def __init__(self):
-        self.guid_factory = FakeGuid()
+        self.guid_factory = MockUUIDModule()
         self.items_created = []
 
     def create_item(self, request, ingestion_type, institution, project):
@@ -79,7 +63,7 @@ class MockSubmissionFolioClass:
         assert ingestion_type == self.EXPECTED_INGESTION_TYPE
         assert institution == self.EXPECTED_INSTITUTION
         assert project == self.EXPECTED_PROJECT
-        guid = self.guid_factory.fake_guid()
+        guid = self.guid_factory.uuid4()
         self.items_created.append(guid)
         return guid
 
@@ -88,44 +72,41 @@ class MockSubmissionFolioClass:
         return "/ingestion-submissions/" + submission_id
 
 
-class MockBotoS3Client:
-
-    def __init__(self):
-        self.s3_files = MockFileSystem()
-
-    def upload_fileobj(self, input_file_stream, Bucket, Key):  # noqa - Uppercase argument names are chosen by AWS
-        data = input_file_stream.read()
-        print("Uploading %s (%s) to bucket %s key %s"
-              % (input_file_stream, n_of(len(data), "byte"), Bucket, Key))
-        with self.s3_files.open(os.path.join(Bucket, Key), 'wb') as fp:
-            fp.write(data)
-
-
-def test_submit_for_ingestion_anon_rejected(anontestapp):
-
-    post_files = [("datafile", METADATA_BUNDLE_PATH)]
-
-    post_data = {
-        'ingestion_type': 'metadata_bundle',
-        'institution': DBMI_INSTITUTION,
-        'project': TEST_PROJECT,
-        'validate_only': True,
-    }
-
-    response = anontestapp.post_json(
-        SUBMIT_FOR_INGESTION,
-        post_data,
-        upload_files=post_files,
-        content_type='multipart/form-data',
-        status=403  # Forbidden
-    )
-
-    assert response.status_code == 403
-
-
-def file_contents(filename, binary=False):
-    with io.open(filename, 'rb' if binary else 'r') as fp:
-        return fp.read()
+# For the old protocol, this should now be tested in test_submit_metadata_bundle.py by:
+#   * test_old_protocol_content_type
+#     - Shows you get a 415 if you contact /submit_for_ingestion anonymously without proper content type.
+#   * test_old_protocl_404
+#     - Shows you get a 404 if you contact /submit_for_ingestion anonymously or logged-in, assuming proper content type.
+#
+# The new protocol asks you to make a /IngestionSubmission request.
+#   * test_post_ingestion_submission
+#     - Shows you get a 201 if you give the right credentials.
+#     - Shows you get a 403 if you are missing credentials.
+#     - Shows you get a 401 if you give bad credentials.
+#
+# This test has been repaired to check for a 404, but it isn't really the right test any more.
+# I think I will just delete it because it's redundant with other tests. No point in maintaining clutter.
+#
+# def test_obsolete_submit_for_ingestion_anon_rejected(anontestapp):
+#
+#     post_files = [("datafile", METADATA_BUNDLE_PATH)]
+#
+#     post_data = {
+#         'ingestion_type': 'metadata_bundle',
+#         'institution': DBMI_INSTITUTION,
+#         'project': TEST_PROJECT,
+#         'validate_only': True,
+#     }
+#
+#     response = anontestapp.post_json(
+#         SUBMIT_FOR_INGESTION,
+#         post_data,
+#         upload_files=post_files,
+#         content_type='multipart/form-data',
+#         status=404  # Once upon a time, this got a 403. Now it gets a 404 because it's the wrong protocol.
+#     )
+#
+#     assert response.status_code == 404
 
 
 @contextlib.contextmanager
@@ -195,10 +176,10 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
             % (expected_status, response.status_code)
         )
 
-        # The FakeGuid facility makes ids sequentially, so we can predict we'll get
+        # The mocked guid facility makes ids sequentially, so we can predict we'll get
         # one guid added to our mock queue. This test doesn't test the queue processing,
-        # only that something ends up passed off to thq queue.
-        expected_guid = '000-0000-001'
+        # only that something ends up passed off to the queue.
+        expected_guid = '00000000-0000-0000-0000-000000000001'
 
         assert mocked_queue_manager.uuids == [expected_guid]
 
@@ -226,7 +207,7 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
             "filename": METADATA_BUNDLE_PATH,
             "object_name": datafile_key,
             "submission_id": expected_guid,
-            "submission_uri": "/ingestion-submissions/000-0000-001",
+            "submission_uri": "/ingestion-submissions/" + expected_guid,
             "beanstalk_env_is_prd": False,
             "beanstalk_env": test_pseudoenv,
             "bucket": expected_bucket,

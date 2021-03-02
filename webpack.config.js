@@ -74,10 +74,6 @@ const resolve = {
 const optimization = {
     minimize: mode === "production",
     minimizer: [
-        //new UglifyJsPlugin({
-        //    parallel: true,
-        //    sourceMap: true
-        //})
         new TerserPlugin({
             parallel: false,  // XXX: this option causes docker build to fail - Will 2/25/2021
             sourceMap: true,

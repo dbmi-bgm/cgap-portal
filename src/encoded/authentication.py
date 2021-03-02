@@ -4,7 +4,6 @@ from operator import itemgetter
 import jwt
 from base64 import b64decode
 
-from dcicutils.misc_utils import remove_element
 from passlib.context import CryptContext
 from urllib.parse import urlencode
 from pyramid.authentication import (
@@ -35,6 +34,7 @@ from snovault import (
     CONNECTION,
     COLLECTIONS
 )
+from dcicutils.misc_utils import remove_element
 from snovault.validation import ValidationFailure
 from snovault.calculated import calculate_properties
 from snovault.validators import no_validate_item_content_post
@@ -457,8 +457,7 @@ def impersonate_user(context, request):
     }
 
     id_token = jwt.encode(jwt_contents, b64decode(auth0_secret, '-_'),
-                          algorithm=JWT_ENCODING_ALGORITHM
-						  )
+                          algorithm=JWT_ENCODING_ALGORITHM)
     user_properties['id_token'] = id_token.decode('utf-8')
 
     return user_properties

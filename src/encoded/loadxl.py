@@ -10,7 +10,6 @@ import webtest
 import traceback
 
 from base64 import b64encode
-from past.builtins import basestring
 from PIL import Image
 from pkg_resources import resource_filename
 from pyramid.paster import get_app
@@ -154,7 +153,7 @@ def trim(value):
         return {k: trim(v) for k, v in value.items()}
     if isinstance(value, list):
         return [trim(v) for v in value]
-    if isinstance(value, basestring) and len(value) > 160:
+    if isinstance(value, str) and len(value) > 160:
         return value[:77] + '...' + value[-80:]
     return value
 
@@ -327,7 +326,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             files = [inserts]
             # use the item type if provided AND not a list
             # otherwise guess from the filename
-            use_itype = True if (itype and isinstance(itype, basestring)) else False
+            use_itype = True if (itype and isinstance(itype, str)) else False
         else:  # cannot get the file
             err_msg = 'Failure loading inserts from %s. Could not find matching file or directory.' % inserts
             # import pdb; pdb.set_trace()
