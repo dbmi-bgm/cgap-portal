@@ -34,6 +34,7 @@ from snovault import (
     CONNECTION,
     COLLECTIONS
 )
+from dcicutils.misc_utils import remove_element
 from snovault.validation import ValidationFailure
 from snovault.calculated import calculate_properties
 from snovault.validators import no_validate_item_content_post
@@ -42,25 +43,6 @@ from snovault.schema_utils import validate_request
 from snovault.util import debug_log
 
 CRYPT_CONTEXT = __name__ + ':crypt_context'
-
-
-def remove_element(elem, lst, raise_error=True):
-    """
-    Returns a shallow copy of the given list with the first occurrence of the given element removed.
-    If the element doesn't occur in the list, an error is raised unless given raise_error=False,
-    in which case a shallow copy of the original list is returned (with no elements removed).
-    :param elem: an object
-    :param lst: a list
-    :param raise_error: a boolean (default True)
-    """
-
-    result = lst.copy()
-    try:
-        result.remove(elem)
-    except ValueError:
-        if raise_error:
-            raise
-    return result
 
 
 JWT_ENCODING_ALGORITHM = 'HS256'
