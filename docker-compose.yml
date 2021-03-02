@@ -46,8 +46,9 @@ services:
     container_name: cgap
     command: "/home/cgap-admin/cgap-portal/entrypoint.sh"
     environment:
-      AWS_ACCESS_KEY_ID: "$AWS_ACCESS_KEY_ID"
-      AWS_SECRET_ACCESS_KEY: "$AWS_SECRET_ACCESS_KEY"
+      # Default to caller's environment
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
       # TEST: "true" # default: run local deployment
       LOAD: "true"  # default: load the inserts (comment this out after first run)
     ports:

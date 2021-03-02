@@ -224,10 +224,9 @@ def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_mana
             run(es_testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed
 
 
-# def test_test_port():
-#     XXX: pulls in auto-use fixtures from snovault that break Docker tests - Will 3/2/2021
-#     from snovault.tests.test_postgresql_fixture import SNOVAULT_DB_TEST_PORT
-#     assert SNOVAULT_DB_TEST_PORT == 5440
+def test_test_port():
+    from snovault.tests.test_postgresql_fixture import SNOVAULT_DB_TEST_PORT
+    assert SNOVAULT_DB_TEST_PORT == 5440
 
 
 @pytest.mark.parametrize('body, row', [

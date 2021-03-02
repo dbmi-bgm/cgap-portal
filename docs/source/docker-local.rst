@@ -4,7 +4,8 @@ CGAP-Docker
 It is now possible to run a local deployment of CGAP without installing any system level
 dependencies other than Docker. A few important notes on this setup.
 
-* Note this is not ideal for active development as you cannot run unit tests or edit source files in the container on the host machine (in your local editor).
+* This is not ideal for active development as you cannot run unit tests or edit source files in the container on the host machine (in your local editor).
+* VERY IMPORTANT: Do not upload the local deployment container image to any registry.
 
 
 Start by installing Docker::

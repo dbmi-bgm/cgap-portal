@@ -8,14 +8,11 @@ import webtest
 import pkg_resources
 
 from pyramid.request import apply_request_extensions
-from pyramid.testing import DummyRequest, setUp, tearDown
+from pyramid.testing import DummyRequest
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
 from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
 from snovault.util import generate_indexer_namespace_for_testing
-from snovault.storage import Base
-from snovault.app import configure_engine
-from dcicutils.qa_utils import notice_pytest_fixtures
 from .conftest_settings import make_app_settings_dictionary
 from .. import main
 from ..loadxl import load_all

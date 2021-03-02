@@ -79,8 +79,7 @@ RUN touch /var/log/nginx/error.log && \
         chown -R nginx:nginx /var/log/nginx/error.log
 
 # Copy over ini file, entrypoint
-COPY development.ini .
-COPY development.ini test.ini
+COPY docker_development.ini development.ini
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 EXPOSE 8000
