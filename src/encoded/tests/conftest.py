@@ -41,7 +41,7 @@ def app_settings(request, wsgi_server_host_port, conn, DBSession):  # noQA - We 
     notice_pytest_fixtures(request, wsgi_server_host_port, conn, DBSession)
     settings = make_app_settings_dictionary()
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
-    settings[DBSESSION] = DBSession  # set DB connection to Docker
+    settings[DBSESSION] = DBSession
     return settings
 
 
@@ -62,7 +62,7 @@ def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_serv
 
     # use aws auth to access elasticsearch
     if aws_auth:
-        settings['elasticsearch.aws_auth'] = True
+        settings['elasticsearch.aws_auth'] = aws_auth
     return settings
 
 
