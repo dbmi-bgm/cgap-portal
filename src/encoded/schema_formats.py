@@ -16,7 +16,7 @@ from .server_defaults import (
 from uuid import UUID
 
 
-# XXX: This is broken?
+# XXX: This is broken, cannot decode schema files - Will 3/2/2021
 # def compute_accession_codes():
 #     letter_pairs = set()
 #     for file in glob.glob(pkg_resources.resource_filename('encoded', 'schemas/*.json')):
