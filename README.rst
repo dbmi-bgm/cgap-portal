@@ -28,7 +28,7 @@ Welcome to CGAP! We are a team of scientists, clinicians, and developers who aim
 
 Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. For installation and more information on getting started, see our `documentation page <https://cgap-portal.readthedocs.io/en/latest/index.html>`_.
 
-For information on how to run CGAP with Docker, see `here. <./docs/docker-setup.rst>`_
+For information on how to run CGAP with Docker, see `here. <./docs/source/docker-setup.rst>`_
 
 Navigating this Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
