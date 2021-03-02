@@ -93,6 +93,36 @@ function InterpretationTabs(props) {
     );
 }
 
+class VariantInterpretationPanel extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { loading : false };
+    }
+
+    // patchToVariantSample
+
+
+    // postTo
+
+
+    saveAsDraft(note) {
+
+    }
+
+    saveToCase(note) { // Does not save to case; sabes to variantsample if not existing, then 
+
+    }
+
+    saveToKnowledgeBase(note) {
+
+    }
+
+    render(){
+        return <GenericInterpretationPanel saveAsDraft={this.saveAsDraft} saveToCase={this.saveToCase}
+            saveToKnowledgeBase={this.saveToKnowledgeBase}/>;
+    }
+}
+
 class GenericInterpretationPanel extends React.Component {
     constructor(props) {
         super(props);
@@ -114,6 +144,7 @@ class GenericInterpretationPanel extends React.Component {
         this.setState({ [stateToChange]: newValue });
     }
 
+    // Wrapping passed in functions so as to call them with this component's state, then pass down to children
     saveStateAsDraft() {
         const { saveAsDraft } = this.props;
         saveAsDraft(this.state);
@@ -130,8 +161,12 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { isCurrent, isDraft, interpretationExists, interpretationChanged, noteLabel } = this.props;
+        const { note_text: lastDraftNoteText, isCurrent, isDraft, noteLabel } = this.props;
         const { note_text: noteText } = this.state;
+
+        // TODO: move into a function and memoize once checking other values of state, too
+        const interpretationChanged = noteText !== lastDraftNoteText;
+        const interpretationExists = !!noteText;
 
         return (
             <div className="interpretation-panel">
