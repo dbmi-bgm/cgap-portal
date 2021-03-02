@@ -13,6 +13,8 @@ from pyramid.threadlocal import get_current_registry, manager as threadlocal_man
 from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
 from snovault.util import generate_indexer_namespace_for_testing
+from snovault.storage import Base
+from snovault.app import configure_engine
 from .conftest_settings import make_app_settings_dictionary
 from .. import main
 from ..loadxl import load_all
@@ -32,14 +34,31 @@ def autouse_external_tx(external_tx):
     pass
 
 
+@pytest.yield_fixture(scope='session')
+def docker_db_conn():
+    engine_settings = {
+        'sqlalchemy.url': 'postgres://postgres:postgres@db:5432/postgres',  # for local deployment, use default postgres
+    }
+    engine = configure_engine(engine_settings)
+    conn = engine.connect()
+    tx = conn.begin()
+    try:
+        Base.metadata.create_all(bind=conn)
+        yield conn
+    finally:
+        tx.rollback()
+        conn.close()
+        engine.dispose()
+
+
 @pytest.fixture(scope='session')
-def app_settings(request, wsgi_server_host_port, DBSession):
+def app_settings(request, wsgi_server_host_port, docker_db_conn):
 
     settings = make_app_settings_dictionary()
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
     settings['sqlalchemy.url'] = 'postgres://postgres:postgres@db:5432/postgres'
     # add some here for file testing
-    settings[DBSESSION] = DBSession
+    settings[DBSESSION] = docker_db_conn  # TODO fix
     return settings
 
 

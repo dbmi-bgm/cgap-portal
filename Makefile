@@ -150,16 +150,16 @@ update:  # updates dependencies
 	poetry update
 
 build-docker:
-    docker-compose build
+	docker-compose build
 
 build-docker-clean:
-    docker-compose build --no-cache
+	docker-compose build --no-cache
 
 deploy-docker:
 	docker-compose up
 
 deploy-docker-daemon:
-    docker-compose up -d
+	docker-compose up -d
 
 help:
 	@make info
