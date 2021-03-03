@@ -322,7 +322,7 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
                 {'labels': ['Heterozygous'], 'role': 'mother', 'sample_id': 'sample_id_2'},
                 {'labels': ['Heterozygous'], 'role': 'father', 'sample_id': 'sample_id_3'}
             ],
-            'inheritance_modes': ['Recessive']
+            'inheritance_modes': ['Homozygous Recessive']
         }
     ),
     (  # test case 4 (no mother, father)
