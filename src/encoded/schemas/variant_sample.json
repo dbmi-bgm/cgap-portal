@@ -739,30 +739,6 @@
             "grouping": "Genotype",
             "default_hidden": true
         },
-        "novoPP": {
-            "title": "novoCaller PP",
-            "aggregation_type": "range",
-            "number_step": "any",
-            "order": 16,
-            "grouping": "Inheritance",
-            "ranges": [
-                {
-                    "from": 0.1,
-                    "to": 0.9,
-                    "label": "de novo candidate (weak)"
-                },
-                {
-                    "from": 0.9,
-                    "to": 1,
-                    "label": "de novo candidate (strong)"
-                }
-            ]
-        },
-        "cmphet.comhet_impact_gene": {
-            "title": "ComHet Impact",
-            "order": 17,
-            "grouping": "Inheritance"
-        },
         "associated_genotype_labels.co_parent_genotype_label": {
             "title": "Co-Parent Genotype",
             "order": 1000,
@@ -869,6 +845,30 @@
             "title": "Inheritance Modes",
             "extended_description": "src/encoded/docs/extended_description_VariantSample_inheritance_mode.html",
             "order": 15,
+            "grouping": "Inheritance"
+        },
+        "novoPP": {
+            "title": "novoCaller PP",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 16,
+            "grouping": "Inheritance",
+            "ranges": [
+                {
+                    "from": 0.1,
+                    "to": 0.9,
+                    "label": "de novo candidate (weak)"
+                },
+                {
+                    "from": 0.9,
+                    "to": 1,
+                    "label": "de novo candidate (strong)"
+                }
+            ]
+        },
+        "cmphet.comhet_impact_gene": {
+            "title": "ComHet Impact",
+            "order": 17,
             "grouping": "Inheritance"
         },
         "variant.csq_gnomadg_af": {
