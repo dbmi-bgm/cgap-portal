@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+
+  # Production component
+  cgap-production:
+    build: .
+    container_name: cgap
+    command: "/home/nginx/cgap-portal/entrypoint.sh"
+    environment:
+      IDENTITY:
+    ports:
+      - "8000:8000"  # nginx proxy port (note application traffic is not forwarded)

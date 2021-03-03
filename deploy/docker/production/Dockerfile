@@ -77,11 +77,10 @@ RUN touch /var/log/nginx/access.log && \
 RUN touch /var/log/nginx/error.log && \
         chown -R nginx:nginx /var/log/nginx/error.log
 
-# Copy over ini file, entrypoint
-# TODO ini file must be generated
-COPY production.ini .
 COPY entrypoint.sh .
+COPY assume_identity.py .
 RUN chmod +x entrypoint.sh
+RUN chmod +x assume_identity.py
 EXPOSE 8000
 # Container does not ever run as root
 # This way even if someone gets access to the container they cannot

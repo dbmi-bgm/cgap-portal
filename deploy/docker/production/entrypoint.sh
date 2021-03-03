@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Run assume_identity.py to access the desired deployment configuration from
+# secrets manager - this builds production.ini
+python assume_identity.py
+
 # Clear db/es since this is the local entry point
 poetry run clear-db-es-contents production.ini --app-name app --env $CGAP_ENV_NAME
 

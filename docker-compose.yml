@@ -44,7 +44,7 @@ services:
   app:
     build: ./deploy/docker/local
     container_name: cgap
-    command: "/home/cgap-admin/cgap-portal/entrypoint.sh"
+    command: "/home/nginx/cgap-portal/entrypoint.sh"
     environment:
       # Default to caller's environment
       AWS_ACCESS_KEY_ID:
