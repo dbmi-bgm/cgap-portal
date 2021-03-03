@@ -131,7 +131,6 @@ export default class ExcelSubmissionView extends React.PureComponent {
         const { setIsSubmitting } = this.props;
 
         let submissionLink = null;
-        let finishBtn = null;
         if (submissionID && submissionTitle){
             submissionLink = (
                 <h5 className="info-area mb-1 text-400 mt-05">
@@ -143,22 +142,10 @@ export default class ExcelSubmissionView extends React.PureComponent {
                     <i className="icon icon-external-link-alt fas text-smaller ml-05"/>
                 </h5>
             );
-            if (panelIdx !== 2 && state === "done" && outcome === "success"){
-                // Hide when on last panel since that has same button, but which also
-                // performs a PATCH
-                finishBtn = (
-                    <div className="buttons-container finish-row text-right">
-                        <button type="button" className="btn btn-outline-success" onClick={this.handleComplete}>
-                            View New Cases
-                        </button>
-                    </div>
-                );
-            }
         }
 
         return (
             <div className="ingestion-submission-view">
-
                 <div className="container">
 
                     { submissionLink }
@@ -169,12 +156,10 @@ export default class ExcelSubmissionView extends React.PureComponent {
                         onLoadUser={this.handleLoadedUser} onSubmitIngestionSubmission={this.handleLoadedIngestionSubmission} />
 
                     <PanelTwo {...this.props} {...this.state} {...{ setIsSubmitting, userDetails }} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
-                        markCompleted={this.markCompleted} />
+                        markCompleted={this.markCompleted} handleComplete={this.handleComplete}/>
 
                     {/* <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
                         onComplete={this.handleComplete} markCompleted={this.markCompleted} /> */}
-
-                    { finishBtn }
 
                 </div>
             </div>
@@ -188,8 +173,7 @@ function PanelSelectionMenu(props){
     const { onSelect, panelIdx, panelsComplete, submissionItem } = props;
     const steps = [
         "Basic Information",
-        "Upload Files",
-        "Finalize and View"
+        "Upload Files"
     ];
 
     const renderedItems = steps.map(function(stepTitle, stepIdx){
@@ -532,7 +516,7 @@ class PanelTwo extends React.PureComponent {
     }
 
     render(){
-        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission, setIsSubmitting } = this.props;
+        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission, setIsSubmitting, handleComplete } = this.props;
         const { statusIdx } = this.state;
 
         const {
@@ -572,10 +556,19 @@ class PanelTwo extends React.PureComponent {
         } else {
             panelContents = (
                 <React.Fragment>
-                    <h4 className="text-300 mt-2">Successfully processed file.</h4>
-                    <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span>
+                    <div className="d-flex">
+                        <div className="col">
+                            <h4 className="text-300 mt-2">Successfully processed file.</h4>
+                            <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span> 
+                        </div>
+                        <div className="align-self-end">
+                            <button type="button" className="btn btn-success" onClick={handleComplete}>
+                                View New Cases
+                            </button>
+                        </div>
+                    </div>
                     <hr/>
-                    <span>Results:</span>
+                    <span className="pl-1">Results:</span>
                     <CreatedItemsTable aliasToAtIDMap={aliases} />
                 </React.Fragment>
             );
@@ -613,7 +606,7 @@ function CreatedItemsTable(props) {
 
         return <PartialList.Row {...{ label, value }} key={alias} />;
     });
-    return <PartialList {...{ persistent }} />;
+    return <PartialList {...{ persistent }} className="pl-1"/>;
 }
 
 // Custom React Hook by Dan Abramov https://overreacted.io/making-setinterval-declarative-with-react-hooks/
