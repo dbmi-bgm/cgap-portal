@@ -49,7 +49,7 @@ class InheritanceMode:
     INHMODE_LABEL_DE_NOVO_CHRXY = "de novo (chrXY)"
     INHMODE_DOMINANT_FATHER = "Dominant (paternal)"
     INHMODE_DOMINANT_MOTHER = "Dominant (maternal)"
-    INHMODE_LABEL_RECESSIVE = "Homozygous Recessive"
+    INHMODE_LABEL_RECESSIVE = "Homozygous recessive"
     INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER = "X-linked recessive (Maternal)"
     INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER = "X-linked dominant (Maternal)"
     INHMODE_LABEL_X_LINKED_DOMINANT_FATHER = "X-linked dominant (Paternal)"
