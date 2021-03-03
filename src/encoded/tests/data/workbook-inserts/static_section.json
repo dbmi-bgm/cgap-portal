@@ -7,9 +7,9 @@
         "body" : "<ul><li>Workflows define steps and their inputs & outputs. They are structurally similar to Common Workflow Language (CWL) definitions.</li><li><a href=\"/search/?type=WorkflowRun\">Workflow Runs</a> are unique runs of each Workflow and have specific files associated with them.</li></ul>"
     },
     {
-        "name": "help.user-guide.rev-links.rev",
-        "uuid": "442c8aa0-dc6c-43d7-814a-854af460c020",
+        "name": "help.user-guide.rest-api.rest_api_submission",
+        "uuid": "442c8aa0-dc6c-43d7-814a-854af460b020",
         "title": "",
-        "file": "/src/encoded/tests/data/documents/test-static-section.rst"
+        "file": "/docs/source/rest_api_submission.rst"
     }
 ]

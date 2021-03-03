@@ -1,48 +1,48 @@
+import io
+import json
+import pkg_resources
 import pytest
 
+from dcicutils.misc_utils import find_association
 from dcicutils.qa_utils import notice_pytest_fixtures
 
 
 pytestmark = [pytest.mark.working]
 
-JSON_CONTENT_HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json'}
+
+def workbook_lookup(item_type, **attributes):
+    return any_inserts_lookup('workbook-inserts', item_type=item_type, **attributes)
+
+
+def any_inserts_lookup(inserts_directory_name, item_type, **attributes):
+    item_filename = pkg_resources.resource_filename('encoded', 'tests/data/' + inserts_directory_name
+                                                    + "/" + item_type.lower() + ".json")
+    with io.open(item_filename) as fp:
+        data = json.load(fp)
+        return find_association(data, **attributes)
+
 
 def wait_for_index(testapp):
     testapp.post_json("/index", {"record": False})
 
 
-# @pytest.yield_fixture()
-# def posted_help_page_section(workbook, es_testapp, help_page_section_json):
-#     notice_pytest_fixtures(workbook)
-#     with posted_page(es_testapp, '/static-sections', help_page_section_json) as val:
-#         yield val
-
-
-# @pytest.yield_fixture()
-# def posted_help_page(workbook, es_testapp, posted_help_page_section, help_page_json):
-#     notice_pytest_fixtures(workbook, posted_help_page_section)
-#     with posted_page(es_testapp, '/pages', help_page_json) as val:
-#         yield val
-
 @pytest.fixture
-def posted_help_page_default(workbook, es_testapp):
-    notice_pytest_fixtures(workbook)
-    return es_testapp.get('/pages/a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540d',
-                          headers=JSON_CONTENT_HEADERS, status=(200, 301)).maybe_follow().json
+def posted_help_page_default():  # (workbook, es_testapp):
+    return workbook_lookup(item_type='Page', name='help/user-guide/rest-api')
+
+
+def test_posted_help_page_default(posted_help_page_default):
+    return posted_help_page_default['name'] == 'foo'
 
 
 @pytest.fixture
-def posted_help_page_in_review(workbook, es_testapp):
-    notice_pytest_fixtures(workbook)
-    return es_testapp.get('/pages/a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540c',
-                          headers=JSON_CONTENT_HEADERS, status=(200, 301)).maybe_follow().json
+def posted_help_page_in_review():  # (workbook, es_testapp):
+    return workbook_lookup(item_type='Page', name='help/user-guide/rest-api-in-review')
 
 
 @pytest.fixture
-def posted_help_page_deleted(workbook, es_testapp):
-    notice_pytest_fixtures(workbook)
-    return es_testapp.get('/pages/a2aa8bb9-9dd9-4c80-bdb6-2349b7a3540a',
-                          headers=JSON_CONTENT_HEADERS, status=(200, 301)).maybe_follow().json
+def posted_help_page_deleted():  # (workbook, es_testapp):
+    return workbook_lookup(item_type='Page', name='help/user-guide/rest-api-deleted')
 
 
 def test_get_help_page(workbook, es_testapp, posted_help_page_default):
@@ -53,9 +53,9 @@ def test_get_help_page(workbook, es_testapp, posted_help_page_default):
     assert res.json['@context'] == help_page_url
     assert 'HelpPage' in res.json['@type']
     assert 'StaticPage' in res.json['@type']
-    # check what we have embedded on GET request is inside our doc file (test-static-section.rst).
-    assert ('Reverse links\n============================\n\nReverse (rev) links are actually a pretty cool thing.'
-            in res.json['content'][0]['content'])
+    # assert res.json['content'] == help_page['content'] # No longer works latter is set to an @id of static_section
+    # Instead lets check what we have embedded on GET request is inside our doc file (rest_api_submission.md).
+    assert 'Accession and uuid are automatically assigned during initial posting' in res.json['content'][0]['content']
     assert res.json['toc'] == posted_help_page_default['table-of-contents']
 
 
@@ -114,7 +114,10 @@ def check_page_unique_name(testapp, conflicting_page, page_to_patch):
     # Test that POST of a new page with the same name as an existing page is not allowed.
     check_conflict(testapp.post_json('/page', conflicting_document, status=422))
     # Also test PATCH of an existing page with the same name as another existing page is not allowed.
-    check_conflict(testapp.patch_json(page_to_patch['@id'], conflicting_document, status=422))
+    page_to_patch_uuid_url = '/' + page_to_patch['uuid']
+    check_conflict(testapp.patch_json(page_to_patch_uuid_url, conflicting_document, status=422))
+    actual_page_to_patch = testapp.get(page_to_patch_uuid_url).maybe_follow().json
+    check_conflict(testapp.patch_json(actual_page_to_patch['@id'], conflicting_document, status=422))
 
 
 def test_page_unique_name(workbook, es_testapp, posted_help_page_in_review, posted_help_page_default):
