@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "5.2.7"
+version = "5.3.7"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -36,18 +36,17 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.6.1,<3.7"
-awscli = ">=1.18.219"
-boto3 = "^1.16.59"
-botocore = "^1.19.59"
+awscli = ">=1.19.15"
+boto3 = "^1.17.15"
+botocore = "^1.20.15"
 certifi = ">=2020.11.8"
 chardet = "3.0.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
-dcicsnovault = "4.3.1"
-dcicutils = "^1.10.0"
+dcicsnovault = "4.5.0"
+dcicutils = "1.11.0"
 docutils = "0.12"
 elasticsearch = "6.8.1"
-elasticsearch-dsl = "^6.4.0"
 execnet = "1.4.1"
 future = "^0.15.2"
 humanfriendly = "^1.44.9"
@@ -121,7 +120,7 @@ granite-suite = "^0.1.7"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
-boto3-stubs = ">=1.16.59.0"
+boto3-stubs = ">=1.17.15.0"
 coverage = ">=5.3.1"
 codacy-coverage = ">=1.3.11"
 coveralls = ">=3.0.0"
@@ -140,16 +139,15 @@ flask = ">=1.1.1"
 # TODO: Investigate whether this bug is fixed. If it is, update the version.
 #       If not, get a reference to an open bug report here so we can check back periodically.
 moto = "1.3.7"
-# Temporarily repinned to 2.9.2 because of some weird bugs in testing if upgraded. -kmp 28-Jan-2021
-pytest = "2.9.2"
-pytest-cov = "2.2.1"
-pytest-exact-fixtures = "0.1"
-pytest-instafail = "0.3.0"
-pytest-mock = "0.11.0"
-pytest-timeout = "1.0.0"
-pytest-xdist = "1.14"
-"repoze.debug" = "1.0.2"
-# responses = "0.10.14"
+# TODO: Investigate whether a major version upgrade is allowable for 'pytest', which is several versions behind.
+pytest = ">=3.10,<4"
+pytest-cov = ">=2.2.1"
+pytest-exact-fixtures = ">=0.3"
+pytest-instafail = ">=0.3.0"
+pytest-mock = ">=0.11.0"
+pytest-timeout = ">=1.0.0"
+pytest-xdist = ">=1.14"
+"repoze.debug" = ">=1.0.2"
 
 # In pytest 6.0, we'll be able to use this instead of a separate pytest.ini configuration.
 # -kmp 18-Jan-2021
@@ -185,6 +183,7 @@ migrate-attachments-aws = "encoded.commands.migrate_attachments_aws:main"
 migrate-dataset-type = "encoded.commands.migrate_dataset_type:main"
 migrate-files-aws = "encoded.commands.migrate_files_aws:main"
 owl-to-items = "encoded.commands.generate_items_from_owl:main"
+order-schema-columns-and-facets = "encoded.commands.order_schema_columns_and_facets:main"
 profiler = "encoded.commands.profiler:main"
 purge-item-type = "encoded.commands.purge_item_type:main"
 run-upgrade-on-inserts = "encoded.commands.run_upgrader_on_inserts:main"

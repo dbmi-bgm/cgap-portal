@@ -321,20 +321,24 @@ def is_linkto_or_object_array_root_field(field, types, doc_types):
     return False
 
 
-def execute_search(request, search):
+def execute_search(*, es, query, index, from_, size, session_id=None):
     """
     Execute the given Elasticsearch-dsl search. Raise HTTPBadRequest for any
     exceptions that arise.
 
-    :param search: the Elasticsearch-dsl prepared in the search() function
+    :param es: handle to es
+    :param query: dictionary representing ES query
+    :param index: index to search
+    :param from_: search start index
+    :param size: # of records to return
+    :param session_id: session if we are paginating
     :returns: Dictionary search results
     """
     err_exp = None
     es_results = None
     try:
         # set timeout
-        search = search.params(request_timeout=30)
-        es_results = search.execute().to_dict()
+        es_results = es.search(index=index, body=query, from_=from_, size=size, timeout='30s', preference=session_id)
     except ConnectionTimeout:
         err_exp = 'The search failed due to a timeout. Please try a different query.'
     except RequestError as exc:

@@ -190,7 +190,7 @@ def security_tween_factory(handler, registry):
                             response.headers['X-Request-JWT'] = request.cookies.get('jwtToken', '')
                             # TODO: Should user_info be copied before the del? If the user info is shared,
                             #       we are modifying it for other uses. -kmp 24-Jan-2021
-                            user_info = request.user_info  # Re-ified property set in authentication.py
+                            user_info = request.user_info.copy()  # Re-ified property set in authentication.py
                             # Redundant - don't need this in SSR nor browser as get from X-Request-JWT.
                             del user_info["id_token"]
                             response.headers['X-User-Info'] = json.dumps(user_info)

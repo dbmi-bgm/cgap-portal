@@ -4,7 +4,6 @@ from operator import itemgetter
 import jwt
 from base64 import b64decode
 
-from dcicutils.misc_utils import remove_element
 from passlib.context import CryptContext
 from urllib.parse import urlencode, urlparse
 from pyramid.authentication import (
@@ -35,6 +34,7 @@ from snovault import (
     CONNECTION,
     COLLECTIONS
 )
+from dcicutils.misc_utils import remove_element
 from snovault.validation import ValidationFailure
 from snovault.calculated import calculate_properties
 from snovault.validators import no_validate_item_content_post
@@ -290,10 +290,10 @@ def get_jwt_from_auth_header(request):
 
 def get_jwt(request):
 
-    # First try to obtain JWT from headers
+    # First try to obtain JWT from headers (case: some REST API requests)
     token = get_jwt_from_auth_header(request)
 
-    # If the JWT is not in the headers, get it from cookies
+    # If the JWT is not in the headers, get it from cookies (case: AJAX requests from portal & other clients)
     if not token:
         token = request.cookies.get('jwtToken')
 
@@ -524,7 +524,6 @@ def impersonate_user(context, request):
     request.response.set_cookie(
         "jwtToken",
         value=id_token.decode('utf-8'),
-        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
         domain=request_domain,
         path="/",
         httponly=True,
