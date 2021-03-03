@@ -97,6 +97,7 @@ class VariantBuilder:
             log.info('Exception encountered on variant_sample post (attempting patch): %s' % e)
             self.vapp.patch_json('/variant_sample/%s' %
                                  variant_sample['CALL_INFO'] + ':' + variant_sample['variant'],
+                                 variant_sample,
                                  status=200)
 
     def build_variant(self, record):
