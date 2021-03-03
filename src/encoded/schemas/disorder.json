@@ -4,19 +4,44 @@
     "id": "/profiles/disorder.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["disorder_name", "disorder_id"],
-    "identifyingProperties": ["uuid", "aliases", "disorder_id"],
+    "required": [
+        "disorder_name",
+        "disorder_id"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "disorder_id"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/dbxrefs" },
-        { "$ref": "mixins.json#/alternative_ids" },
-        { "$ref": "mixins.json#/static_embeds" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/dbxrefs"
+        },
+        {
+            "$ref": "mixins.json#/alternative_ids"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -25,14 +50,14 @@
         "status": {
             "default": "shared"
         },
-        "disorder_name" : {
-            "title" : "Standard Name of the Disorder",
-            "type" : "string"
+        "disorder_name": {
+            "title": "Standard Name of the Disorder",
+            "type": "string"
         },
-        "disorder_id" : {
-            "title" : "Disorder Identifier",
-            "description" : "Identifier of disorder. E.g. \"MONDO:529962\"",
-            "type" : "string",
+        "disorder_id": {
+            "title": "Disorder Identifier",
+            "description": "Identifier of disorder. E.g. \"MONDO:529962\"",
+            "type": "string",
             "uniqueKey": true
         },
         "associated_genes": {
@@ -40,15 +65,15 @@
             "type": "array",
             "uniqueItems": true,
             "items": {
-                "title" : "Gene",
-                "type" : "string",
+                "title": "Gene",
+                "type": "string",
                 "comment": "Likely a linkTo, but wait until Gene is defined"
             }
         },
-        "definition" : {
-            "title" : "Definition",
+        "definition": {
+            "title": "Definition",
             "description": "Definition of this disorder",
-            "type" : "string"
+            "type": "string"
         },
         "synonyms": {
             "title": "Disorder Synonyms",
@@ -59,9 +84,9 @@
                 "type": "string"
             }
         },
-        "parents" : {
+        "parents": {
             "title": "Parent Disorders",
-            "type" : "array",
+            "type": "array",
             "items": {
                 "title": "Parent",
                 "type": "string",
@@ -74,9 +99,9 @@
             "type": "string",
             "format": "uri"
         },
-        "comment" : {
-            "type" : "string",
-            "title" : "Comment",
+        "comment": {
+            "type": "string",
+            "title": "Comment",
             "formInput": "textarea"
         },
         "curated_dbxrefs": {
