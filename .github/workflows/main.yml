@@ -55,22 +55,17 @@ jobs:
         if: ${{ matrix.test_type == 'NPM' }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
-          TRAVIS_JOB_ID: ${{ matrix.test_type }}-${{ github.run_number }}
+          TRAVIS_JOB_ID: npm-${{ github.run_number }}
         run: |
           npm test
           make travis-test-npm
+          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
       - name: QA (UNIT)
         if: ${{ matrix.test_type == 'UNIT' }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
-          TRAVIS_JOB_ID: ${{ matrix.test_type }}-${{ github.run_number }}
+          TRAVIS_JOB_ID: unit-${{ github.run_number }}
         run: |
           make travis-test-unit
-
-      - name: Cleanup
-        env:
-          S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
-          TRAVIS_JOB_ID: ${{ matrix.test_type}}-${{ github.run_number }}
-        run: |
           poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
