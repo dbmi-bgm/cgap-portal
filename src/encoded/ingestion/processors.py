@@ -5,6 +5,7 @@ from dcicutils.misc_utils import ignored
 from ..ingestion.common import get_parameter
 from ..util import debuglog, s3_local_file
 from ..submit import submit_metadata_bundle
+from ..submit_genelist import submit_genelist
 from .exceptions import UndefinedIngestionProcessorType
 from ..types.ingestion import SubmissionFolio
 
@@ -44,6 +45,51 @@ def handle_data_bundle(submission: SubmissionFolio):
                            " The ingestion_type 'data_bundle' was renamed to 'metadata_bundle'"
                            " prior to the initial release. Your submission program probably needs to be updated."
                            % submission.ingestion_type)
+
+
+@ingestion_processor('genelist')
+def handle_genelist(submission: SubmissionFolio):
+
+    with submission.processing_context():
+        s3_client = submission.s3_client
+        submission_id = submission.submission_id
+        institution = get_parameter(submission.parameters, 'institution')
+        project = get_parameter(submission.parameters, 'project')
+        validate_only = get_parameter(
+                submission.parameters,
+                'validate_only',
+                as_type=bool,
+                default=False
+        )
+        genelist_results = submit_genelist(
+                s3_client=s3_client,
+                bucket=submission.bucket,
+                key=submission.object_name,
+                project=project,
+                institution=institution,
+                vapp=submission.vapp,
+                validate_only=validate_only
+        )
+        debuglog(
+                submission_id,
+                "genelist_result:",
+                json.dumps(genelist_results, indent=2)
+        )
+
+        with submission.s3_output(key_name='validation_report') as fp:
+            submission.show_report_lines(
+                    genelist_results.get('validation_output', []),
+                    fp
+            )
+            submission.note_additional_datum(
+                    'validation_output',
+                    from_dict=genelist_results
+            )
+
+        submission.process_standard_bundle_results(genelist_results)
+
+        if not genelist_results.get('success'):
+            submission.fail()
 
 
 @ingestion_processor('metadata_bundle')
