@@ -589,24 +589,26 @@ function CreatedItemsTable(props) {
 
     const persistent = aliases.map((alias) => {
         const atID = aliasToAtIDMap[alias];
+        const atIDSplit = atID.split("/");
+        const { 1: itemType, 2: accession = null } = atIDSplit || [];
 
+        if (itemType === "sample-processings" || itemType === "reports") {
+            return null; // skip if no accession
+        }
         const label = (
             <React.Fragment>
-                <a className="text-500" href={atID}>{alias}</a>
+                <a className="text-600" href={atID}>{alias}</a>
                 <i className="icon icon-external-link-alt fas text-smaller ml-05"></i>
             </React.Fragment>
         );
 
-        const atIDSplit = atID.split("/");
-        const { 2: accession = null } = atIDSplit || [];
-
         const value = (
-            <object.CopyWrapper className="d-inline" value={accession} key="copy-accession">{ accession }</object.CopyWrapper>
+            <object.CopyWrapper className="d-inline text-monospace" value={accession} key="copy-accession">{ accession }</object.CopyWrapper>
         );
 
-        return <PartialList.Row {...{ label, value }} key={alias} />;
+        return <PartialList.Row {...{ label, value }} key={alias} className="pb-1" />;
     });
-    return <PartialList {...{ persistent }} className="pl-1"/>;
+    return <PartialList {...{ persistent }} className="pl-1 pt-1"/>;
 }
 
 // Custom React Hook by Dan Abramov https://overreacted.io/making-setinterval-declarative-with-react-hooks/
