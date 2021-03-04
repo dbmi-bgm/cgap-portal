@@ -22,6 +22,11 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-18.04
 
+    # Build matrix
+    strategy:
+      matrix:
+        test_type: ['UNIT', 'NPM']
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -32,7 +37,7 @@ jobs:
 
       - name: Install/Link Postgres
         run: |
-          sudo apt-get update -y -q
+          sudo apt update -yq
           sudo apt install -yq --no-install-suggests --no-install-recommends postgresql-common postgresql-11 postgresql-client-11
           echo "/usr/lib/postgresql/11/bin" >> $GITHUB_PATH
           sudo ln -s /usr/lib/postgresql/11/bin/initdb /usr/local/bin/initdb
@@ -46,18 +51,26 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: QA
+      - name: QA (NPM)
+        if: ${{ matrix.test_type == 'NPM' }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
-          TRAVIS_JOB_ID: ${{ github.run_number }}
+          TRAVIS_JOB_ID: ${{ matrix.test_type }}-${{ github.run_number }}
         run: |
-          make travis-test
+          npm test
+          make travis-test-npm
+
+      - name: QA (UNIT)
+        if: ${{ matrix.test_type == 'UNIT' }}
+        env:
+          S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
+          TRAVIS_JOB_ID: ${{ matrix.test_type }}-${{ github.run_number }}
+        run: |
+          make travis-test-unit
 
       - name: Cleanup
-        if: ${{ always() }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
-          TRAVIS_JOB_ID: ${{ github.run_number }}
+          TRAVIS_JOB_ID: ${{ matrix.test_type}}-${{ github.run_number }}
         run: |
           poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
-
