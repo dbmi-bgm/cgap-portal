@@ -117,8 +117,6 @@ class SyncedAccessKeyTable extends React.PureComponent {
     /**
      * Add new access key for user via AJAX.
      *
-     * @todo Determine if we even need to pass in user email, given server can authenticate us.
-     *
      * @param {MouseEvent} e - Click event.
      */
     handleCreate(e) {
@@ -137,7 +135,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
                 "message"   : "Check your internet connection or if you have been logged out due to expired session.",
                 "style"     : 'danger'
             });
-        }, "{}"); // Yep - no post body
+        }, "{}");
     }
 
     showNewSecret(response, reset = false) {

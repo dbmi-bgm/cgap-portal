@@ -5,9 +5,8 @@ import PropTypes from 'prop-types';
 import _ from 'underscore';
 import Modal from 'react-bootstrap/esm/Modal';
 
-import { JWT, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-
-// import UserRegistrationForm from './../../forms/UserRegistrationForm';
+import { analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+/* import UserRegistrationForm from './../../forms/UserRegistrationForm'; */
 
 
 
@@ -64,16 +63,15 @@ export const UserRegistrationModal = React.memo(function UserRegistrationModal(p
     );
 
     return (
-        <Modal show bsSize="large" onHide={onRegistrationCancel}>
+        <Modal show size="lg" onHide={onRegistrationCancel}>
             <Modal.Header closeButton>
                 <Modal.Title>Registration</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {/*
-                <UserRegistrationForm heading={formHeading} schemas={schemas} jwtToken={token}
+                {/* <UserRegistrationForm heading={formHeading} schemas={schemas} unverifiedUserEmail={unverifiedUserEmail}
                     onComplete={onRegistrationComplete} onCancel={onRegistrationCancel} />
                 */}
-                <h4>Will be available sometime in the future.</h4>
+                <h4 className="text-400">Will be available sometime in the future.</h4>
             </Modal.Body>
         </Modal>
     );

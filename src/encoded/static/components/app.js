@@ -17,7 +17,7 @@ import { Footer } from './Footer';
 import { store } from './../store';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse, WindowEventDelegator } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Schemas, SEO, typedefs, navigate } from './util';
 import { responsiveGridState } from './util/layout';
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
@@ -180,7 +180,7 @@ export default class App extends React.PureComponent {
         // (App works as a single-page-application (SPA))
         this.currentNavigationRequest = null;
 
-        console.info("App Initial State: ", this.state);
+        if (!isServerSide()) console.info("App Initial State: ", this.state);
     }
 
     /**
@@ -208,7 +208,7 @@ export default class App extends React.PureComponent {
             store.dispatch({ 'type' : { 'href' : windowHref } });
         }
 
-        // Load up analytics & perform initial pageview track
+        // ANALYTICS INITIALIZATION; Sets userID (if any), performs initial pageview track
         const analyticsID = getGoogleAnalyticsTrackingID(href);
         if (analyticsID){
             analytics.initializeGoogleAnalytics(
@@ -233,7 +233,8 @@ export default class App extends React.PureComponent {
                 window.history.replaceState(null, '', window.location.href);
             }
             // Avoid popState on load, see: http://stackoverflow.com/q/6421769/199100
-            var register = window.addEventListener.bind(window, 'popstate', this.handlePopState, true);
+            // We don't use WindowEventDelegator here since we intend to `useCapture` to prevent default browser handling from being triggered for this.
+            const register = window.addEventListener.bind(window, 'popstate', this.handlePopState, true);
             if (window._onload_event_fired) {
                 register();
             } else {
@@ -243,7 +244,6 @@ export default class App extends React.PureComponent {
             window.onhashchange = this.onHashChange;
         }
 
-        // TODO: We don't need this in here, can be in SubmissionsView itself...
         window.onbeforeunload = this.handleBeforeUnload;
 
         // Save some stuff to global window variables so we can access it in tests:
@@ -392,8 +392,9 @@ export default class App extends React.PureComponent {
 
     /**
      * If no schemas yet stored in our state, we AJAX them in from `/profiles/?format=json`.
+     * Performed after/outside initial page render, because it's a lot of data and sending down alongside
+     * or within html response would significantly increase time to page render.
      *
-     * @public
      * @param {function} [callback=null] - If defined, will be executed upon completion of load, with schemas passed in as first argument.
      * @param {boolean} [forceFetch=false] - If true, will ignore any previously-fetched schemas and fetch new ones.
      * @returns {void}
@@ -408,6 +409,7 @@ export default class App extends React.PureComponent {
         }
         ajax.promise('/profiles/?format=json').then((data) => {
             if (object.isValidJSON(data)){
+                // Performed prior to state update, to be available globally immediately after state update.
                 Schemas.set(data);
                 this.setState({ 'schemas' : data }, () => {
                     // Rebuild tooltips because they likely use descriptions from schemas
@@ -624,25 +626,28 @@ export default class App extends React.PureComponent {
         // We definitively use Cookies for JWT.
         // It can be unset via response headers from back-end.
         // const currentToken = JWT.get('cookie');
-        const session = !!(userInfo); // cast to bool
+        const { session: existingSession } = this.state;
+        const nextSession = !!(userInfo); // cast to bool
 
-        this.setState(function({ session : existingSession }){
-            if (session === existingSession) {
-                return null;
-            }
+        if (nextSession === existingSession) {
+            return null;
+        }
+
+        this.setState({ "session": nextSession }, () => {
+            const { session } = this.state;
             if (session === false && existingSession === true){
                 Alerts.queue(Alerts.LoggedOut);
-                // Clear out remaining auth/JWT stuff from localStorage if any
+                // Clear out remaining auth/JWT stuff from localStorage if any.
                 JWT.remove();
             } else if (session === true && existingSession === false){
+                // Remove lingering 'logged out' alerts if have logged in.
                 Alerts.deQueue([ Alerts.LoggedOut, NotLoggedInAlert ]);
             }
-            return { session };
-        }, () => {
             if (typeof callback === 'function'){
                 callback(session, userInfo);
             }
         });
+
     }
 
     /**
@@ -1342,13 +1347,11 @@ class BodyElement extends React.PureComponent {
     /**
      * Initializes scroll event handler & loading of help menu tree.
      *
-     * @private
      * @returns {void}
      */
     componentDidMount(){
-        if (window && window.fourfront) window.fourfront.bodyElem = this;
         this.setupScrollHandler();
-        window.addEventListener('resize', this.onResize);
+        WindowEventDelegator.addHandler("resize", this.onResize);
         this.onResize();
     }
 
@@ -1364,13 +1367,12 @@ class BodyElement extends React.PureComponent {
      * Unbinds event listeners.
      * Probably not needed but lets be safe & cleanup.
      *
-     * @private
      * @returns {void}
      */
     componentWillUnmount(){
-        window.removeEventListener("scroll", this.throttledScrollHandler);
+        WindowEventDelegator.removeHandler("scroll", this.throttledScrollHandler);
         delete this.throttledScrollHandler;
-        window.removeEventListener('resize', this.onResize);
+        WindowEventDelegator.addHandler("resize", this.onResize);
     }
 
     /**
@@ -1597,7 +1599,8 @@ class BodyElement extends React.PureComponent {
         // We add as property of class instance so we can remove event listener on unmount, for example.
         this.throttledScrollHandler = _.throttle(raf.bind(window, handleScroll), 10);
 
-        window.addEventListener("scroll", this.throttledScrollHandler);
+        WindowEventDelegator.addHandler("scroll", this.throttledScrollHandler);
+
         setTimeout(this.throttledScrollHandler, 100, null);
     }
 

@@ -334,7 +334,6 @@ def login(context, request):
     request.response.set_cookie(
         "jwtToken",
         value=request_token,
-        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
         domain=request_domain,
         path="/",
         httponly=True,
@@ -361,10 +360,14 @@ def logout(context, request):
     browser cookies and re-requesting the current 4DN URL.
     """
 
+    request_parts = urlparse(request.referrer)
+    request_domain = request_parts.hostname
+
     # Deletes the cookie
     request.response.set_cookie(
         name='jwtToken',
         value=None,
+        domain=request_domain,
         max_age=0,
         path='/',
         overwrite=True
