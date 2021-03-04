@@ -43,6 +43,7 @@ jobs:
           sudo ln -s /usr/lib/postgresql/11/bin/initdb /usr/local/bin/initdb
       - name: Install Deps
         run: |
+          node --version
           make build
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
