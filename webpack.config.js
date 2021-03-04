@@ -75,9 +75,7 @@ const optimization = {
     minimize: mode === "production",
     minimizer: [
         new TerserPlugin({
-            // This was causing problems in other areas, maybe it will fix our deploy problems? -kmp 2-Mar-2021
-            // parallel: true,
-            parallel: false,
+            parallel: true,
             sourceMap: true,
             terserOptions:{
                 compress: true,
