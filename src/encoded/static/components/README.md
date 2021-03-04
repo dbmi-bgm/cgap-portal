@@ -58,13 +58,6 @@ The ultimate example of this is the `ChartDataController` and its synchronized `
 **³** The Redux store wraps the App component as a parent and could technically be considered the "root" "component" as well by some, though it does not have a render method.
 
 
-## Generating this documentation
-
-To generate this documentation locally, with NPM, node, and all dependencies installed, run this from root directory: `./node_modules/.bin/esdoc`.
-This should generate this documentation into `/docs/javascript-reference/` folder.
-
-We are currently working on improving configuration of the root-level .esdoc.json file so that we can have the [ESDoc Hosting Service (beta)](https://doc.esdoc.org/) generate and host these docs.
-
 ## Future
 
 New features are added, old ones are cleaned up. Certain components which were written in a rush ought to be re-factored, simplified, and/or redesigned to large extents.

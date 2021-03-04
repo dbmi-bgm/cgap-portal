@@ -119,7 +119,7 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         'csq_gnomadg_af-xx': gnomad_af_female,
         'csq_gnomadg_af-xy': gnomad_af_male,
         // Allele Numbers
-        csq_gnomadg_af: gnomad_an,
+        csq_gnomadg_an: gnomad_an,
         'csq_gnomadg_an-xx': gnomad_an_female,
         'csq_gnomadg_an-xy': gnomad_an_male,
         // Homozygote Numbers
@@ -335,9 +335,9 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
         csq_phylop100way_vertebrate = fallbackElem,
         csq_cadd_phred = fallbackElem,
         transcript = [],
-        spliceai_maxds = fallbackElem,
+        spliceaiMaxds = fallbackElem,
         csq_primateai_score = fallbackElem,
-        csq_sift = fallbackElem,
+        csq_sift_score = fallbackElem,
         csq_polyphen2_hvar_score = fallbackElem
     } = variant;
 
@@ -396,9 +396,9 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_sift")}>SIFT</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_sift_score")}>SIFT</label>
                             </td>
-                            <td className="text-left">{ csq_sift }</td>
+                            <td className="text-left">{ csq_sift_score }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
@@ -429,9 +429,9 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("spliceai_maxds")}>SpliceAI</label>
+                                <label className="mb-0" data-tip={getTipForField("spliceaiMaxds")}>SpliceAI</label>
                             </td>
-                            <td className="text-left">{ spliceai_maxds }</td>
+                            <td className="text-left">{ spliceaiMaxds }</td>
                         </tr>
                     </tbody>
                 </table>

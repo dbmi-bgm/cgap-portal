@@ -190,7 +190,7 @@ def security_tween_factory(handler, registry):
                             response.headers['X-Request-JWT'] = request.cookies.get('jwtToken', '')
                             # TODO: Should user_info be copied before the del? If the user info is shared,
                             #       we are modifying it for other uses. -kmp 24-Jan-2021
-                            user_info = request.user_info  # Re-ified property set in authentication.py
+                            user_info = request.user_info.copy()  # Re-ified property set in authentication.py
                             # Redundant - don't need this in SSR nor browser as get from X-Request-JWT.
                             del user_info["id_token"]
                             response.headers['X-User-Info'] = json.dumps(user_info)
@@ -327,14 +327,15 @@ MIME_TYPE_HTML = 'text/html'
 MIME_TYPE_JSON = 'application/json'
 MIME_TYPE_LD_JSON = 'application/ld+json'
 
-MIME_TYPES_SUPPORTED = [MIME_TYPE_HTML, MIME_TYPE_JSON, MIME_TYPE_LD_JSON]
-MIME_TYPE_DEFAULT = MIME_TYPE_JSON
+MIME_TYPES_SUPPORTED = [MIME_TYPE_JSON, MIME_TYPE_HTML, MIME_TYPE_LD_JSON]
+MIME_TYPE_DEFAULT = MIME_TYPES_SUPPORTED[0]
 MIME_TYPE_TRIAGE_MODE = 'modern'  # if this doesn't work, fall back to 'legacy'
 
 DEBUG_MIME_TYPES = environ_bool("DEBUG_MIME_TYPES", default=False)
 
 
 def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
+    # TODO: I think this function does nothing but return MIME_TYPES_SUPPORTED[0] -kmp 3-Feb-2021
     """
     Given a request, tries to figure out the best kind of MIME type to use in response
     based on what kinds of responses we support and what was requested.
@@ -378,10 +379,21 @@ def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
 def should_transform(request, response):
     """
     Determines whether to transform the response from JSON->HTML/JS depending on type of response
-    and what the request is looking for to be returned via e.g. request Accept, Authorization header.
-    In case of no Accept header, attempts to guess.
+    and what the request is looking for to be returned via these criteria, which are tried in order
+    until one succeeds:
 
-    Memoized via `lru_cache`. Cache size is set to be 16 (> 1) in case sub-requests fired off during handling.
+    * If the request method is other than GET or HEAD, returns False.
+    * If the response.content_type is other than 'application/json', returns False.
+    * If a 'frame=' query param is given and not 'page' (the default), returns False.
+    * If a 'format=json' query param is given explicitly,
+        * For 'format=html', returns True.
+        * For 'format=json', returns False.
+      This rule does not match if 'format=' is not given explicitly.
+      If 'format=' is given an explicit value of ther than 'html' or 'json', an HTTPNotAcceptable error will be raised.
+    * If the first element of MIME_TYPES_SUPPORTED[0] is 'text/html', returns True.
+    * Otherwise, in all remaining cases, returns False.
+
+    NOTE: Memoized via `lru_cache`. Cache size is set to be 16 (> 1) in case sub-requests fired off during handling.
     """
     # We always return JSON in response to POST, PATCH, etc.
     if request.method not in ('GET', 'HEAD'):

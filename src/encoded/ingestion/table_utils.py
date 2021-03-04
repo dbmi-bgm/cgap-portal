@@ -556,32 +556,242 @@ class VariantTableParser(object):
 
     @staticmethod
     def add_extra_variant_sample_facets(facs):
-        facs["variant.genes.genes_most_severe_gene.gene_lists.display_title"] = {
-            "title": "Gene List",
+        '''
+        Order of a Facet Group within top-level FacetList is determined by `min(grouped facet 1, grouped facet 2, ...)`
+        which is then used for sorting relative to all other top-level facets' and facet groups' orders.
+        Facets within a group are sorted relative to each other.
+        '''
+        facs["variant.genes.genes_most_severe_gene.display_title"] = {
+            "title": "Gene",
             "order": 1,
-            # "grouping": "Genes",                  # Currently ungrouped (no siblings with grouping:Genes), may be changed later.
+            "grouping": "Genes",
             "search_type": "sayt_without_terms",    # Enables search-as-you-type via AJAX (SAYT-AJAX) for this facet
             "sayt_item_type": "Gene"                # Required if "search_type" == "sayt_without_terms"
         }
-        facs['associated_genotype_labels.proband_genotype_label'] = {
-            'title': 'Proband Genotype',
-            'order': 12,
-            'grouping': 'Genotype',
+        facs["variant.genes.genes_most_severe_gene.gene_lists.display_title"] = {
+            "title": "Gene List",
+            "order": 2,
+            "grouping": "Genes",
+            "description": "Groups of genes that are relevant for a disease or condition"
         }
-        facs['associated_genotype_labels.mother_genotype_label'] = {
-            'title': 'Mother Genotype',
-            'order': 13,
-            'grouping': 'Genotype',
-        }
-        facs['associated_genotype_labels.father_genotype_label'] = {
-            'title': 'Father Genotype',
-            'order': 14,
-            'grouping': 'Genotype',
-        }
+
         facs['inheritance_modes'] = {
             'title': 'Inheritance Modes',
             'order': 15,
         }
+
+        # Range facets using range aggregation_type (ranges will be defined from Q2Q tab in future)
+        facs['variant.csq_gnomadg_af'] = {
+            "title": "GnomAD Alt Allele Frequency",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 18,
+            "grouping": "Population Frequency",
+            "ranges": [	
+                { "from": 0, "to": 0, "label": "unobserved" }, 	
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },	
+                { "from": 0.001, "to": 0.01, "label": "rare" },	
+                { "from": 0.01, "to": 1, "label": "common" }	
+            ]
+        }
+        facs['variant.csq_gnomadg_af_popmax'] = {
+            "title": "GnomAD Alt AF - PopMax",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 19,
+            "grouping": "Population Frequency",
+            "ranges": [	
+                { "from": 0, "to": 0, "label": "unobserved" }, 	
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },	
+                { "from": 0.001, "to": 0.01, "label": "rare" },	
+                { "from": 0.01, "to": 1, "label": "common" }	
+            ]
+        }
+        facs['variant.csq_phylop100way_vertebrate'] = {
+            "title": "PhyloP (100 Vertebrates)",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 22,
+            "grouping": "Effect Predictors",
+            "ranges": [	
+                { "from": -20, "to": -3, "label": "strong positive selection" },	
+                { "from": -3, "to": -2, "label": "positive selection" },	
+                { "from": -2, "to": 2, "label": "low selection" },	
+                { "from": 2, "to": 3, "label": "conserved" },	
+                { "from": 3, "to": 10, "label": "highly conserved"}	
+            ]
+        }
+        facs['FS'] = {
+            "title": "Strand Fisher Score",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 12,
+            "grouping": "Variant Quality",
+            "ranges": [
+                { "to": 20, "label": "Low Strand Bias (P ≥ 0.01)" },	
+                { "from": 20, "label": "High Strand Bias (P < 0.01)" }	
+            ]
+        }
+        facs['AD_ALT'] = {
+            "title": "AD (Alt)",
+            "aggregation_type": "range",
+            "number_step": 1,
+            "order": 10,
+            "grouping": "Variant Quality",
+            "ranges": [	
+                { "from": 1, "to": 4, "label": "Very Low" },	
+                { "from": 5, "to": 9, "label": "Low" },	
+                { "from": 10, "to": 19, "label": "Medium" },	
+                { "from": 20, "label": "High" }	
+            ]
+        }
+        facs['novoPP'] = {
+            "title": "novoCaller PP",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 16,
+            "grouping": "Genotype",
+            "ranges": [	
+                { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },	
+                { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }	
+            ]
+        }
+
+        # Genotype labels (calculated properties)
+        facs.update({
+            "associated_genotype_labels.proband_genotype_label": {
+                "title": "Proband Genotype",
+                "order": 12,
+                "grouping": "Genotype"
+            },
+            "associated_genotype_labels.mother_genotype_label": {
+                "title": "Mother Genotype",
+                "order": 13,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.father_genotype_label": {
+                "title": "Father Genotype",
+                "order": 14,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+
+            # Below facets are default-hidden unless e.g. additional_facet=associated_genotype_labels.co_parent_genotype_label
+            # URL param is supplied in filter block flags or search href.
+
+            "associated_genotype_labels.co_parent_genotype_label": {
+                "title": "Co-Parent Genotype",
+                "order": 1000,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+
+
+            "associated_genotype_labels.sister_genotype_label": {
+                "title": "Sister Genotype",
+                "order": 1001,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.sister_II_genotype_label": {
+                "title": "Sister II Genotype",
+                "order": 1002,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.sister_III_genotype_label": {
+                "title": "Sister III Genotype",
+                "order": 1003,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.sister_IV_genotype_label": {
+                "title": "Sister IV Genotype",
+                "order": 1004,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+
+
+            "associated_genotype_labels.brother_genotype_label": {
+                "title": "Brother Genotype",
+                "order": 1005,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.brother_II_genotype_label": {
+                "title": "Brother II Genotype",
+                "order": 1006,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.brother_III_genotype_label": {
+                "title": "Brother III Genotype",
+                "order": 1007,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.brother_IV_genotype_label": {
+                "title": "Brother IV Genotype",
+                "order": 1008,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+
+
+            "associated_genotype_labels.daughter_genotype_label": {
+                "title": "Daughter Genotype",
+                "order": 1009,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.daughter_II_genotype_label": {
+                "title": "Daughter II Genotype",
+                "order": 1010,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.daughter_III_genotype_label": {
+                "title": "Daughter III Genotype",
+                "order": 1011,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.daughter_IV_genotype_label": {
+                "title": "Daughter IV Genotype",
+                "order": 1012,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+
+
+            "associated_genotype_labels.son_genotype_label": {
+                "title": "Son Genotype",
+                "order": 1013,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.son_II_genotype_label": {
+                "title": "Son II Genotype",
+                "order": 1014,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.son_III_genotype_label": {
+                "title": "Son III Genotype",
+                "order": 1015,
+                "grouping": "Genotype",
+                "default_hidden": True
+            },
+            "associated_genotype_labels.son_IV_genotype_label": {
+                "title": "Son IV Genotype",
+                "order": 1016,
+                "grouping": "Genotype",
+                "default_hidden": True
+            }
+        })
+        
 
     @staticmethod
     def extend_variant_sample_facets(facs):
@@ -651,7 +861,7 @@ class VariantTableParser(object):
             'title': 'Familial Relation',
             'description': 'Relationship of the person who submitted this sample relative to the proband',
             'type': 'string',
-            'enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling',
+            'suggested_enum': ['proband', 'father', 'mother', 'brother', 'sister', 'sibling',
                      'half-brother', 'half-sister', 'half-sibling', 'wife', 'husband',
                      'son', 'daughter', 'child', 'grandson', 'granddaughter', 'grandchild',
                      'grandmother', 'family-in-law', 'extended-family', 'not linked'],
@@ -678,10 +888,10 @@ class VariantTableParser(object):
         variant_facs = format_variant_cols_or_facs(variant_facs)
         cols.update(variant_cols)  # add variant stuff since we are embedding this info
         facs.update(variant_facs)
-        MappingTableHeader.add_extra_variant_sample_columns(cols)
-        MappingTableHeader.extend_variant_sample_columns(cols)
-        MappingTableHeader.add_extra_variant_sample_facets(facs)
-        MappingTableHeader.extend_variant_sample_facets(facs)
+        self.add_extra_variant_sample_columns(cols)
+        self.extend_variant_sample_columns(cols)
+        self.add_extra_variant_sample_facets(facs)
+        self.extend_variant_sample_facets(facs)
         schema['columns'] = cols
         schema['facets'] = facs
         schema['facets'] = self.sort_schema_properties(schema, key='facets')

@@ -135,7 +135,8 @@ clean-python:
 	pip uninstall -y -r <(pip freeze)
 
 test:
-	poetry run python -m pytest -vv --timeout=200 -m "working and not indexing" && poetry run python -m pytest -vv --timeout=200 -m "working and indexing"
+	make test-npm
+	make test-unit
 
 retest:
 	poetry run python -m pytest -vv --last-failed
@@ -143,8 +144,29 @@ retest:
 test-any:
 	poetry run python -m pytest -vv --timeout=200
 
-travis-test:
-	poetry run python -m pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not indexing and not action_fail" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && poetry run python -m pytest -vv --timeout=300 -m "working and indexing and not action_fail" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+test-npm:
+	poetry run python -m pytest -vv --timeout=200 -m "working and not manual and not integratedx and not performance and not broken and not broken_locally and not sloppy and not indexing"
+
+test-unit:
+	poetry run python -m pytest -vv --timeout=200 -m "working and not manual and not integratedx and not performance and not broken and not broken_locally and not sloppy and indexing"
+
+test-performance:
+	poetry run python -m pytest -vv --timeout=200 -m "working and not manual and not integratedx and performance and not broken and not broken_locally and not sloppy"
+
+test-integrated:
+	poetry run python -m pytest -vv --timeout=200 -m "working and not manual and (integrated or integratedx) and not performance and not broken and not broken_locally and not sloppy"
+
+travis-test:  # We don't use this target on Travis/GA. We call each as separate jobs.
+	make travis-test-npm
+	make travis-test-unit
+
+travis-test-npm:  # Note this only does the 'not indexing' tests
+	poetry run python -m pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+
+travis-test-unit:  # Note this does the 'indexing' tests
+	poetry run python -m pytest -vv --timeout=300 -m "working and not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+
+
 
 update:  # updates dependencies
 	poetry update
@@ -172,6 +194,6 @@ info:
 	   $(info - Use 'make psql-dev' to start psql on data associated with an active 'make deploy1'.)
 	   $(info - Use 'make psql-test' to start psql on data associated with an active test.)
 	   $(info - Use 'make retest' to run failing tests from the previous test run.)
-	   $(info - Use 'make test' to run tests with normal options we use on travis ('-m "working and not performance"').)
+	   $(info - Use 'make test' to run tests with normal options similar to what we use on GitHub Actions.)
 	   $(info - Use 'make test-any' to run tests without marker constraints (i.e., with no '-m' option).)
 	   $(info - Use 'make update' to update dependencies (and the lock file).)
