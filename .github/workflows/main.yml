@@ -37,7 +37,7 @@ jobs:
       # https://github.com/actions/setup-node#usage
       - uses: actions/setup-node@v2
         with:
-          node-version: '10'
+          node-version: '12'
           check-latest: false
       - name: Install/Link Postgres
         run: |
