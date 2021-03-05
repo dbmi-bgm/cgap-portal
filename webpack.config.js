@@ -75,7 +75,7 @@ const optimization = {
     minimize: mode === "production",
     minimizer: [
         new TerserPlugin({
-            parallel: true,
+            parallel: false,
             sourceMap: true,
             terserOptions:{
                 compress: true,
