@@ -5,7 +5,7 @@ from tqdm import tqdm
 from ..inheritance_mode import InheritanceMode
 from ..server_defaults import add_last_modified
 from ..loadxl import LOADXL_USER_UUID
-from ..types.variant import build_variant_display_title, ANNOTATION_ID_SEP
+from ..types.variant import build_variant_display_title, ANNOTATION_ID_SEP, build_variant_sample_annotation_id
 from ..util import resolve_file_path
 from .common import CGAP_CORE_PROJECT, CGAP_CORE_INSTITUTION, IngestionReport
 
@@ -100,7 +100,8 @@ class VariantBuilder:
         except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
             log.info('Exception encountered on variant_sample post (attempting patch): %s' % e)
             self.vapp.patch_json('/variant_sample/%s' %
-                                 variant_sample['CALL_INFO'] + ':' + variant_uuid + ':' + self.file,  # annotation_id
+                                 build_variant_sample_annotation_id(variant_sample['CALL_INFO'],
+                                                                    variant_uuid, self.file),
                                  variant_sample,
                                  status=200)
 
