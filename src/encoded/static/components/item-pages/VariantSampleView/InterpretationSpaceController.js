@@ -49,7 +49,9 @@ export class InterpretationSpaceController extends React.Component {
                 <InterpretationHeader {...{ isFullScreen }} toggleFullScreen={this.toggleFullScreen}/>
                 <div className="card-body">
                     <InterpretationTabs {...{ currentTabIdx }} switchToTab={this.switchToTab} />
-                    <GenericInterpretationPanel {...{ noteLabel }} { ...this.props }/>
+                    {/** Eventually, there will be 3 separate instances of GenericInterperetationPanelController; each with different
+                     * props/options that show/hide according to currently selected tab. -- right now same one is being shared for all */}
+                    <GenericInterpretationPanelController {...{ noteLabel }} { ...this.props }/>
                 </div>
             </div>
         );
@@ -93,44 +95,163 @@ function InterpretationTabs(props) {
     );
 }
 
-class VariantInterpretationPanel extends React.Component {
+class GenericInterpretationPanelController extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { loading : false };
+
+        const { 0: note, 1: noteSource } = this.getMostRecentNoteInterpretation() || [];
+
+        this.state = {
+            loading : false,
+            interpretationNote: note, // Check after mount for last saved version of interpretation note
+            noteSource : noteSource   // Currently just VariantSample... eventually could be KnowledgeBase, Gene
+        };
+
+        this.saveAsDraft = this.saveAsDraft.bind(this);
+        this.saveToCase = this.saveToCase.bind(this);
+        this.saveToKnowledgeBase = this.saveToKnowledgeBase.bind(this);
     }
 
-    // patchToVariantSample
+    /**
+     * Used on initialization to find the most recent note attached to the current VS (will need tweaking
+     * to check other locations for gene items, interpretation notes, etc)
+     */
+    getMostRecentNoteInterpretation() {
+        const { context: { interpretations = [] } = {} } = this.props;
 
+        // Determine which interpretation note to load into state
+        if (interpretations.length !== 0) { // Check for saved notes on Variant first
+            // TODO: See if this needs to be sorted or if most recent will always be the last one
+            const mostRecentInterpretation = interpretations[interpretations.length-1];
+            return [mostRecentInterpretation, "VariantSample"];
+        }
+        return null; // Can assume there are no notes
+    }
 
-    // postTo
+    /**
+     * Can be used for cloning+updating notes OR creating new drafts
+     * @param {Object} note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
+     */
+    postNewNoteInterpretation(note, version = 1) {
+        const { context: { institution = null, project = null } = {} } = this.props;
+        const { '@id': institutionID } = institution || {};
+        const { '@id': projectID } = project || {};
 
+        const noteToSubmit = { ...note };
+
+        // Prune keys with incomplete values
+        if (noteToSubmit.classification === null) {
+            delete noteToSubmit.classification;
+        }
+
+        noteToSubmit.institution = institutionID;
+        noteToSubmit.project = projectID;
+        noteToSubmit.version = version;
+
+        return ajax.promise('/note_interpretation/', 'POST', {}, JSON.stringify(noteToSubmit));
+    }
+
+    patchNewNoteToVS(noteResp) {
+        const { context: { '@id': vsAtID = null } = {} } = this.props;
+        const { '@id': noteAtID } = noteResp;
+        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ interpretations: [noteAtID] }));
+    }
+
+    patchPreviouslySavedNote(noteAtID, noteToPatch) { // ONLY USED FOR DRAFTS -- other notes are cloned
+        return ajax.promise(noteAtID, 'PATCH', {}, JSON.stringify(noteToPatch));
+    }
 
     saveAsDraft(note) {
+        const { interpretationNote } = this.state;
 
+        // Does a draft already exist?
+        if (interpretationNote) { // Patch the pre-existing draft item & overwrite it
+            console.log("Note already exists... need to patch pre-existing draft", interpretationNote);
+            const {
+                '@id': noteAtID, version,
+            } = interpretationNote;
+
+            const noteToSubmit = { ...note };
+
+            // Prune keys with incomplete values
+            if (noteToSubmit.classification === null) {
+                delete noteToSubmit.classification;
+            }
+
+            // Bump version number
+            noteToSubmit.version = version + 1;
+
+            console.log("noteToSubmit", noteToSubmit);
+
+            this.setState({ loading: true }, () => {
+                this.patchPreviouslySavedNote(noteAtID, noteToSubmit)
+                    .then((response) => {
+                        const { '@graph': graph } = response;
+                        const { 0: newlySavedDraft } = graph || [];
+                        // TODO: Some handling for various fail responses/codes
+                        this.setState({ loading: false, interpretationNote: newlySavedDraft, noteSource: "VariantSample" });
+                        console.log("Successfully overwritten previous draft of note", response);
+                    })
+                    .catch((err) => {
+                        // TODO: Error handling
+                        console.log(err);
+                        this.setState({ loading: false });
+                    });
+            });
+        } else { // Create a whole new item, and patch to VS
+            this.setState({ loading: true }, () => {
+                this.postNewNoteInterpretation(note)
+                    .then((response) => {
+                        // TODO: Some handling for various fail responses/codes
+                        console.log(response);
+                        const { '@graph': noteItem } = response;
+
+                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
+                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
+                        this.setState({ loading: false, interpretationNote: noteItem[0], noteSource: "VariantSample" });
+                        return this.patchNewNoteToVS(noteItem[0]);
+                    })
+                    .then((resp) => {
+                        console.log("Successfully linked note object to variant sample", resp);
+                        // const { '@graph': noteItem } = response;
+                        // TODO: Find way to update state with new interpretation note here instead
+                    })
+                    .catch((err) => {
+                        // TODO: Error handling
+                        console.log(err);
+                        this.setState({ loading: false });
+                    });
+            });
+        }
     }
 
-    saveToCase(note) { // Does not save to case; sabes to variantsample if not existing, then 
-
+    saveToCase(note) { // Does not save to case; saves to variantsample if not existing -- status change?
+        console.log("saveToCase", note);
     }
 
     saveToKnowledgeBase(note) {
-
+        console.log("saveToKB", note);
     }
 
     render(){
+        const { interpretationNote } = this.state;
         return <GenericInterpretationPanel saveAsDraft={this.saveAsDraft} saveToCase={this.saveToCase}
-            saveToKnowledgeBase={this.saveToKnowledgeBase}/>;
+            lastSavedNote={interpretationNote} saveToKnowledgeBase={this.saveToKnowledgeBase}/>;
     }
 }
 
 class GenericInterpretationPanel extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { // Fields in form. Using snake casing to make it easier to add state data directly to post/patch request
-            note_text: "",
-            acmg_guidelines: [],            // TODO: Unused
-            classification: null,           // TODO: Unused
-            conclusion: "",                 // TODO: Unused
+
+        // Defaults to most recent note (as determined by InterpretationPanelController)
+        const { note_text = "", acmg_guidelines = [], classification = null, conclusion =  "" } = props.lastSavedNote || {};
+        this.state = {
+            // Fields in form. Using snake casing to make it easier to add state data directly to post/patch request
+            note_text,
+            acmg_guidelines,            // TODO: Currently Unused
+            classification,             // TODO: Currently Unused
+            conclusion,                 // TODO: Currently Unused
         };
 
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
@@ -138,7 +259,7 @@ class GenericInterpretationPanel extends React.Component {
         this.saveStateToKnowledgeBase = this.saveStateToKnowledgeBase.bind(this);
     }
 
-    // For now using same update fxn for multiple text fields
+    // Will use same update fxn for multiple text fields
     onTextChange(event, stateToChange) {
         const { value: newValue } = event.target || {};
         this.setState({ [stateToChange]: newValue });
@@ -161,11 +282,11 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { note_text: lastDraftNoteText, isCurrent, isDraft, noteLabel } = this.props;
+        const { lastSavedNote: { note_text : savedNoteText = null } = {}, isCurrent, isDraft, noteLabel } = this.props;
         const { note_text: noteText } = this.state;
 
         // TODO: move into a function and memoize once checking other values of state, too
-        const interpretationChanged = noteText !== lastDraftNoteText;
+        const interpretationChanged = noteText !== savedNoteText;
         const interpretationExists = !!noteText;
 
         return (
