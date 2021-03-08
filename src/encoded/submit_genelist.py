@@ -44,7 +44,11 @@ def submit_genelist(
             if genelist.post_output:
                 results['success'] = True
                 results['validation_output'] = genelist.validation_output
-                results['result'] = ''
+                results['result'] = {
+                        'Gene list title': genelist.title,
+                        'Number of genes in gene list': len(genelist.gene_ids),
+                        'Document title': ''
+                }
                 results['post_output'] = genelist.post_output
                 return results
             else:
@@ -63,10 +67,10 @@ class GeneListSubmission:
 
     def __init__(self, filename, project, institution, vapp):
         self.filename = filename
-        self.project = project
-        self.instutition = institution
+        self.project = project['@id']
+        self.instutition = institution['@id']
         self.vapp = vapp
-        self.genes = self.parse_genelist()
+        self.genes, self.title = self.parse_genelist()
         self.gene_ids = self.match_genes()
         self.jsons_to_post = self.create_jsons_to_post()
         self.validation_output = self.validate_postings()
@@ -77,16 +81,33 @@ class GeneListSubmission:
         """
         Parses gene list file and removes any duplicates.
 
+        Assumes gene list is txt file with line-separated title/genes.
+
         Returns one of:
-            - a unique gene list
-            - None if gene list is empty
+            - a unique gene list & gene list title
+            - None & None if gene list is empty or no title found
         """
 
-        genelist_raw = self.filename.read()
-        for delimiter in [' ', '\t', '\n', ':', ';']:
-            if delimiter in genelist_raw:
-                genelist_raw = genelist_raw.replace(delimiter, ',')
-        genelist = genelist_raw.split(',')
+        with open(self.filename, 'r') as genelist_file:
+            genelist_raw = genelist_file.readlines()
+        for line in genelist_raw:
+            if 'Title' in line:
+                title_line = line
+                title_idx = title_line.index('Title')
+                title_line = title_line[title_idx+5:]
+                title_line = title_line.translate(
+                        {ord(i): None for i in ':;"\n"'}
+                )
+                title = title_line.strip()
+                genelist_raw.remove(line)
+                break
+        if not title:
+            self.errors.append('No title found for the gene list.')
+            return None, None
+        genelist = []
+        for line in genelist_raw:
+            line = line.translate({ord(i): None for i in '"\t""\n":;'})
+            genelist.append(line.strip())
         while '' in genelist:
             genelist.remove('')
         if len(genelist) != len(set(genelist)):
@@ -96,11 +117,9 @@ class GeneListSubmission:
                     unique_genes.append(gene)
             genelist = unique_genes
         if not genelist:
-            self.errors.append(
-                    'The gene list appears to be empty.'
-            )
-            return None
-        return genelist
+            self.errors.append('The gene list appears to be empty.')
+            return None, None
+        return genelist, title
 
     def match_genes(self):
         """
@@ -122,8 +141,8 @@ class GeneListSubmission:
         unmatched_genes = {}
         for gene in self.genes:
             response = self.vapp.get(
-                    'search/?type=Gene&gene_symbol=' + gene + '&field=@id',
-            )
+                    '/search/?type=Gene&gene_symbol=' + gene + '&field=@id',
+            ).json
             if len(response) == 1:
                 if response[0]['@id'] in gene_ids:
                     continue
@@ -135,7 +154,9 @@ class GeneListSubmission:
             genes_without_options = []
             genes_with_options = []
             for gene in unmatched_genes.copy():
-                response = self.vapp.get('search/?type=Gene&q=' + gene)
+                response = self.vapp.get('/search/?type=Gene&q=' + gene).json
+                import pdb
+                pdb.set_trace()
                 if len(response) >= 1:
                     search_order = [
                             'alias_symbol',
@@ -171,8 +192,8 @@ class GeneListSubmission:
                 for gene in genes_with_options:
                     self.errors.append(
                             'No perfect match found for gene %s. '
-                            'Consider replacing with one of the following: %s'
-                            % (gene, ', '.join(genes_with_options[gene]))
+                            'Consider replacing with one of the following: %s.'
+                            % (gene, ', '.join(genes_with_options[gene])))
             return None
         gene_ids = {
             dict_key: gene_ids[dict_key]
@@ -210,7 +231,7 @@ class GeneListSubmission:
         )
         genelist_post_body = json.dumps(
             {
-                # 'title': title + " (%s)" % str(len(gene_uuids))
+                'title': self.title + ' (%s)' % len(self.gene_ids),
                 # 'source_file': ?
                 'institution': self.institution,
                 'project': self.project,
@@ -272,7 +293,7 @@ class GeneListSubmission:
         try:
             self.vapp.post_json('/GeneList/', genelist_json)
         except Exception:
-            self.errors.append('Posting gene list failed.'
+            self.errors.append('Posting gene list failed.')
             return None
         return 'success'
 
