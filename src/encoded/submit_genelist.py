@@ -140,6 +140,8 @@ class GeneListSubmission:
         gene_ids = {}
         unmatched_genes = {}
         for gene in self.genes:
+            import pdb
+            pdb.set_trace()
             response = self.vapp.get(
                     '/search/?type=Gene&gene_symbol=' + gene + '&field=@id',
             ).json

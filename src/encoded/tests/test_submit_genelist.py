@@ -6,11 +6,42 @@ from ..submit_genelist import (
 )
 
 
+@pytest.fixture
+def genes(testapp, project, institution):
+    gene1 = {
+            'institution': institution['@id'],
+            'project': project['@id'],
+            'gene_symbol': 'NLGN4Y',
+            'ensgid': 'ENSG00000165246'
+    }
+    gene2 = {
+            'institution': institution['@id'],
+            'project': project['@id'],
+            'gene_symbol': 'USP9Y',
+            'ensgid': 'ENSG00000165247'
+    }
+    gene3 = {
+            'institution': institution['@id'],
+            'project': project['@id'],
+            'gene_symbol': 'TSPY8',
+            'ensgid': 'ENSG00000165248'
+    }
+    genes = [gene1, gene2, gene3]
+    for gene in genes:
+        resp = testapp.post_json(
+                '/search/?type=Gene&gene_symbol=' + gene['gene_symbol'] +
+                '&field=@id',
+                gene
+        )
+        print(resp)
+    return
+
+
 class TestGeneListSubmission:
 
-    def test_parse_genelist(self, project, institution, testapp):
+    def test_parse_genelist(self, project, institution, testapp, genes):
         genelist = GeneListSubmission(
-                '/Users/drioux/CGAP/cgap_wrangling/data/gene_lists/DRR_test_gene_list.txt',
+                'src/encoded/tests/data/documents/gene_lists/DRR_test_gene_list.txt',
                 project,
                 institution,
                 testapp
