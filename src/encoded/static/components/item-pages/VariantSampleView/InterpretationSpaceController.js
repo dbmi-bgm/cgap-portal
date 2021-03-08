@@ -181,7 +181,7 @@ class GenericInterpretationPanelController extends React.Component {
             // Bump version number
             noteToSubmit.version = version + 1;
 
-            console.log("noteToSubmit", noteToSubmit);
+            // console.log("noteToSubmit", noteToSubmit);
 
             this.setState({ loading: true }, () => {
                 this.patchPreviouslySavedNote(noteAtID, noteToSubmit)
@@ -203,7 +203,7 @@ class GenericInterpretationPanelController extends React.Component {
                 this.postNewNoteInterpretation(note)
                     .then((response) => {
                         // TODO: Some handling for various fail responses/codes
-                        console.log(response);
+                        console.log("Successfully created new item", response);
                         const { '@graph': noteItem } = response;
 
                         // Temporarily try to update state here... since 'response' with note item is not accessible in next step
@@ -235,8 +235,9 @@ class GenericInterpretationPanelController extends React.Component {
 
     render(){
         const { interpretationNote } = this.state;
+        const { noteLabel } = this.props;
         return <GenericInterpretationPanel saveAsDraft={this.saveAsDraft} saveToCase={this.saveToCase}
-            lastSavedNote={interpretationNote} saveToKnowledgeBase={this.saveToKnowledgeBase}/>;
+            lastSavedNote={interpretationNote} saveToKnowledgeBase={this.saveToKnowledgeBase} {...{ noteLabel }} />;
     }
 }
 
@@ -282,12 +283,14 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { lastSavedNote: { note_text : savedNoteText = null } = {}, isCurrent, isDraft, noteLabel } = this.props;
+        const { lastSavedNote: { note_text : savedNoteText = null, status: savedNoteStatus } = {}, noteLabel } = this.props;
         const { note_text: noteText } = this.state;
 
         // TODO: move into a function and memoize once checking other values of state, too
         const interpretationChanged = noteText !== savedNoteText;
         const interpretationExists = !!noteText;
+        const isDraft = savedNoteStatus === "in review";
+        const isCurrent = savedNoteStatus === "current";
 
         return (
             <div className="interpretation-panel">
@@ -296,7 +299,7 @@ class GenericInterpretationPanel extends React.Component {
                 </label>
                 <textarea className="w-100" value={noteText} onChange={(e) => this.onTextChange(e, "note_text")}/>
                 <GenericInterpretationSubmitButton {...{ isCurrent, isDraft, interpretationExists, interpretationChanged, noteLabel }}
-                    saveAsDraft={this.saveStateAsDraft} saveToCase={this.saveStateAsDraft} saveToKnowledgeBase={this.saveStateToKnowledgeBase}
+                    saveAsDraft={this.saveStateAsDraft} saveToCase={this.saveStateToCase} saveToKnowledgeBase={this.saveStateToKnowledgeBase}
                 />
             </div>
         );
@@ -319,20 +322,23 @@ function GenericInterpretationSubmitButton(props) {
     } = props;
 
     const allButtonsDropsDisabled = !interpretationExists || !interpretationChanged;
+
+    // TODO: Add additional conditions to check for is inKnowledgeBase
     if (isCurrent || isDraft) {
         // If current: no saving as draft; already submitted to case -- save to knowledgebase
         // In draft status: allow saving to case, re-saving as draft, but no saving to knowledgebase
         return (
             <Dropdown as={ButtonGroup} className={cls}>
                 <Button variant="primary btn-block" onClick={isCurrent ? saveToKnowledgeBase : saveToCase}
-                    disabled={allButtonsDropsDisabled}
+                    disabled={!isDraft && allButtonsDropsDisabled}
                 >
                     { isCurrent ? "Save to Knowledge Base" : "Approve for Case" }
                 </Button>
                 <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" disabled={allButtonsDropsDisabled} />
                 <Dropdown.Menu>
-                    { isDraft ? <Dropdown.Item onClick={saveAsDraft}>Save as Draft</Dropdown.Item> : null}
+                    { isDraft ? <Dropdown.Item onClick={saveAsDraft} disabled={allButtonsDropsDisabled}>Save as Draft</Dropdown.Item> : null}
                     { isCurrent ? <Dropdown.Item onClick={saveToCase}>Clone to Case</Dropdown.Item> : null}
+                    { isDraft ? <Dropdown.Item disabled>Send to Knowledgebase</Dropdown.Item> : null}
                 </Dropdown.Menu>
             </Dropdown>);
     } else { // Brand new note; allow saving as draft or to case, but not knowledgebase
