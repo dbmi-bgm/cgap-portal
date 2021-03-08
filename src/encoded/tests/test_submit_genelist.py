@@ -29,8 +29,7 @@ def genes(testapp, project, institution):
     genes = [gene1, gene2, gene3]
     for gene in genes:
         resp = testapp.post_json(
-                '/search/?type=Gene&gene_symbol=' + gene['gene_symbol'] +
-                '&field=@id',
+                '/genes/',
                 gene
         )
         print(resp)

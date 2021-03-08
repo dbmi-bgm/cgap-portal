@@ -143,7 +143,7 @@ class GeneListSubmission:
             import pdb
             pdb.set_trace()
             response = self.vapp.get(
-                    '/search/?type=Gene&gene_symbol=' + gene + '&field=@id',
+                    '/search/?type=Gene&gene_symbol=' + gene,
             ).json
             if len(response) == 1:
                 if response[0]['@id'] in gene_ids:
@@ -157,8 +157,6 @@ class GeneListSubmission:
             genes_with_options = []
             for gene in unmatched_genes.copy():
                 response = self.vapp.get('/search/?type=Gene&q=' + gene).json
-                import pdb
-                pdb.set_trace()
                 if len(response) >= 1:
                     search_order = [
                             'alias_symbol',
