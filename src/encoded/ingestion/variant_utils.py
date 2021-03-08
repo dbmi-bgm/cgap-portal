@@ -5,7 +5,7 @@ from tqdm import tqdm
 from ..inheritance_mode import InheritanceMode
 from ..server_defaults import add_last_modified
 from ..loadxl import LOADXL_USER_UUID
-from ..types.variant import build_variant_display_title, ANNOTATION_ID_SEP
+from ..types.variant import build_variant_display_title, ANNOTATION_ID_SEP, build_variant_sample_annotation_id
 from ..util import resolve_file_path
 from .common import CGAP_CORE_PROJECT, CGAP_CORE_INSTITUTION, IngestionReport
 
@@ -76,19 +76,23 @@ class VariantBuilder:
             NOTE: snovault does not implement standard HTTP PUT.
         """
         try:
-            self.vapp.post_json('/variant', variant, status=201)
+            res = self.vapp.post_json('/variant', variant, status=201)
         except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
             log.info('Exception encountered on variant post (attempting patch): %s' % e)
-            self.vapp.patch_json('/variant/%s' % build_variant_display_title(
+            res = self.vapp.patch_json('/variant/%s' % build_variant_display_title(
                 variant['CHROM'],
                 variant['POS'],
                 variant['REF'],
                 variant['ALT'],
                 sep=ANNOTATION_ID_SEP
             ), variant, status=200)
+        return res.json
 
-    def _post_or_patch_variant_sample(self, variant_sample):
+    def _post_or_patch_variant_sample(self, variant_sample, variant_uuid):
         """ POST/PATCH the variant_sample ie: create it if it doesn't exist, or update existing.
+            The VariantSample annotation_id format is (see variant.py):
+                "CALL_INFO:variant_uuid:file_accession"
+
             NOTE: snovault does not implement standard HTTP PUT.
         """
         try:
@@ -96,7 +100,8 @@ class VariantBuilder:
         except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
             log.info('Exception encountered on variant_sample post (attempting patch): %s' % e)
             self.vapp.patch_json('/variant_sample/%s' %
-                                 variant_sample['CALL_INFO'] + ':' + variant_sample['variant'],
+                                 build_variant_sample_annotation_id(variant_sample['CALL_INFO'],
+                                                                    variant_uuid, self.file),
                                  variant_sample,
                                  status=200)
 
@@ -195,11 +200,12 @@ class VariantBuilder:
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
                 continue
 
-            # PUT the items
+            # Post/Patch Variants/Samples
             try:
-                self._post_or_patch_variant(variant)
+                variant_response = self._post_or_patch_variant(variant)
+                variant_uuid = variant_response['@graph'][0]['uuid']
                 for sample in variant_samples:
-                    self._post_or_patch_variant_sample(sample)
+                    self._post_or_patch_variant_sample(sample, variant_uuid)
                 self.ingestion_report.mark_success()
             except Exception as e:
                 log.info('Error encountered posting variant/variant_sample: %s' % e)
