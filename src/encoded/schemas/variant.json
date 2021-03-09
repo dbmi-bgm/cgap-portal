@@ -44,6 +44,9 @@
             "$ref": "mixins.json#/interpretations"
         },
         {
+            "$ref": "mixins.json#/variant_notes"
+        },
+        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
