@@ -13,6 +13,21 @@
             "type": "string",
             "description": "The text of the note for this item"
         },
+        "approved_by": {
+            "title": "Approved By",
+            "type": "string",
+            "description": "The user who approved this note for a case",
+            "linkTo": "User"
+        },
+        "approved_date": {
+            "title": "Approved At",
+            "type": "string",
+            "description": "Timestamp when this note was approved for a case",
+            "anyOf": [
+                {"format": "date-time"},
+                {"format": "date"}
+            ]
+        },
         "associated_items": {
             "title": "Associated Items",
             "description": "Items associated with this Note",
