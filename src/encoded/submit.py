@@ -16,7 +16,14 @@ GENERIC_FIELD_MAPPING = {  # for spreadsheet column names that are different fro
         'mother id': 'mother',
         'father id': 'father',
         'hpo terms': 'phenotypic_features',
-        'mondo terms': 'disorders'
+        'mondo terms': 'disorders',
+        'deceased': 'is_deceased',
+        'termination of pregnancy': 'is_termination_of_pregnancy',
+        'still birth': 'is_still_birth',
+        'pregnancy': 'is_pregnancy',
+        'spontaneous abortion': 'is_spontaneous_abortion',
+        'infertile': 'is_infertile',
+        'no children by choice': 'is_no_children_by_choice'
     },
     'family': {},
     'sample': {
@@ -61,14 +68,15 @@ YES_VALS = ['y', 'yes']
 # vars for those at any point.
 SS_INDIVIDUAL_ID = 'individual id'
 SS_FAMILY_ID = 'family id'
+SS_SEX = 'sex'
 SS_SPECIMEN_ID = 'specimen id'
 SS_ANALYSIS_ID = 'analysis id'
 SS_RELATION = 'relation to proband'
 SS_REPORT_REQUIRED = 'report required'
 
 REQUIRED_CASE_COLS = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
-REQUIRED_COLUMNS_ACCESSIONING =  REQUIRED_CASE_COLS + [SS_INDIVIDUAL_ID, SS_RELATION, SS_REPORT_REQUIRED]
-REQUIRED_COLUMNS_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID]
+REQUIRED_COLUMNS_ACCESSIONING =  REQUIRED_CASE_COLS + [SS_INDIVIDUAL_ID, SS_SEX, SS_RELATION, SS_REPORT_REQUIRED]
+REQUIRED_COLUMNS_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID, SS_SEX]
 
 # half-siblings not currently supported, because pedigree info is needed to know
 # which parent is shared. Can come back to this after pedigree processing is integrated.
@@ -459,7 +467,13 @@ class PedigreeRow:
 
     def extract_individual_metadata(self):
         info = {'aliases': [self.indiv_alias]}
-        info = map_fields(self.metadata, info, ['individual_id', 'family_id'], 'individual')
+        simple_fields = ['family_id', 'individual_id', 'clinic_notes', 'ancestry',
+                         'quantity', 'life_status', 'cause_of_death', 'age_at_death',
+                         'age_at_death_units', 'gestational_age', 'cause_of_infertility']
+        info = map_fields(self.metadata, info, simple_fields, 'individual')
+        for field in info:
+            if field.startswith('is_'):
+                info[field] = is_yes_value(info[field])
         info['phenotypic_features'] = self.reformat_phenotypic_features(info.get('phenotypic_features', []))
         return MetadataItem(info, self.row, 'individual')
 
@@ -790,22 +804,26 @@ class PedigreeMetadata:
             family_metadata[item.metadata['family_id']]['members'].append(alias)
             if item.isproband():
                 family_metadata[item.metadata['family_id']]['proband'] = alias
+                family_metadata['aliases'] = [f'{self.project}:family-{item.metadata["individual_id"]}']
         # TODO: family_phenotypic_features - change to calculated property?
         # TODO: get family aliases
-        for key in family_metadata.keys():
+        for key, value in family_metadata.items():
             try:
                 family_matches = self.virtualapp.get(f'/search/?type=Family&family_id={key}')
-                for match in family_matches.json['@graph'][0]:
-                    family_metadata[match['@id']] = family_metadata[key]
-                    if family_metadata[key].get('proband'):
-                        del family_metadata[match['@id']]['proband']
-                        phenotypes = [item['phenotypic_feature'] for item in
-                                      self.individuals[family_metadata[key]['proband']].get('phenotypic_features', [])]
-                        if phenotypes:
-                            family_metadata[match['@id']]['family_phenotyic_features'] = phenotypes[:4]
             except Exception:
-                print('error')
-                self.errors.append('get request failed')
+                # TODO: handling for no matches
+                family_metadata[value['aliases'][0]] = value
+            else:
+                for match in family_matches.json['@graph'][0]:
+                    family_metadata[match['aliases'][0]] = value
+                    if value.get('proband'):
+                        del family_metadata[match['aliases'][0]]['proband']
+                        phenotypes = [item['phenotypic_feature'] for item in
+                                      self.individuals[value['proband']].get('phenotypic_features', [])]
+                        if phenotypes:
+                            family_metadata[match['aliases'][0]]['family_phenotyic_features'] = phenotypes[:4]
+            del family_metadata[key]
+        return family_metadata
 
 
     def process_rows(self):
