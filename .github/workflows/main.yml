@@ -49,7 +49,10 @@ jobs:
       - name: QA
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
-          TRAVIS_JOB_ID: ${{ github.run_number }}
+          # The need for this old environment variable name will go away soon.
+          TRAVIS_JOB_ID: cgap-x-test-${{ github.run_number }}-
+          # This will be the new environment variable name.
+          TEST_JOB_ID: cgap-test-${{ github.run_number }}-
         run: |
           make travis-test
 
@@ -57,7 +60,10 @@ jobs:
         if: ${{ always() }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
-          TRAVIS_JOB_ID: ${{ github.run_number }}
+          # The need for this old environment variable name will go away soon.
+          TRAVIS_JOB_ID: cgap-x-test-${{ github.run_number }}-
+          # This will be the new environment variable name.
+          TEST_JOB_ID: cgap-test-${{ github.run_number }}-
         run: |
           poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
