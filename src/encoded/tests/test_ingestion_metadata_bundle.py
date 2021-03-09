@@ -18,7 +18,7 @@ from ..types import ingestion as ingestion_module
 from .helpers import assure_related_items_for_testing
 
 
-pytestmark = [pytest.mark.setone, pytest.mark.working]
+pytestmark = [pytest.mark.indexing, pytest.mark.working]
 
 
 SUBMIT_FOR_INGESTION = "/submit_for_ingestion"
@@ -175,7 +175,7 @@ DBMI_COMMUNITY = {
 
 
 # This runs the standard test pretty much as expected.
-def test_submit_for_ingestion_authorized(es_testapp):  # , workbook
+def test_submit_for_ingestion_authorized(es_testapp):
     with assure_related_items_for_testing(testapp=es_testapp, item_dict=DBMI_COMMUNITY):
         check_submit_for_ingestion_authorized(es_testapp, MockBotoS3Client())
 
@@ -216,7 +216,7 @@ def test_submit_for_ingestion_authorized_but_failed_first_s3_interaction(es_test
             raise AssertionError("An expected webtest.AppError was not raised.")
 
 
-def test_submit_for_ingestion_authorized_but_failed_second_s3_interaction(es_testapp):  # workbook
+def test_submit_for_ingestion_authorized_but_failed_second_s3_interaction(es_testapp):
     with assure_related_items_for_testing(testapp=es_testapp, item_dict=DBMI_COMMUNITY):
         try:
             check_submit_for_ingestion_authorized(es_testapp, MockBuggyBotoS3Client(allowed_ok=1), expected_status=400)
