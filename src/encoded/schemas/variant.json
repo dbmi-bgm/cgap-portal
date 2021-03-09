@@ -2171,17 +2171,25 @@
             "order": 2,
             "grouping": "Position"
         },
-        "csq_cadd_phred": {
-            "title": "CADD Phred score",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 23,
-            "grouping": "Effect Predictors"
+        "variantClass": {
+            "title": "Variant Type",
+            "order": 4,
+            "grouping": "Variant Type"
         },
-        "csq_clinvar_clnsig": {
-            "title": "Clinvar",
-            "order": 36,
-            "grouping": "variant database"
+        "genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 5,
+            "grouping": "Consequence"
+        },
+        "genes.genes_most_severe_consequence.location": {
+            "title": "Location",
+            "order": 6,
+            "grouping": "Consequence"
+        },
+        "genes.genes_most_severe_consequence.impact": {
+            "title": "Impact",
+            "order": 7,
+            "grouping": "Consequence"
         },
         "csq_gnomadg_af": {
             "title": "GnomAD Alt Allele Frequency",
@@ -2218,31 +2226,46 @@
             "order": 22,
             "grouping": "Effect Predictors"
         },
-        "genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 5,
-            "grouping": "Consequence"
-        },
-        "genes.genes_most_severe_consequence.impact": {
-            "title": "Impact",
-            "order": 7,
-            "grouping": "Consequence"
-        },
-        "genes.genes_most_severe_consequence.location": {
-            "title": "Location",
-            "order": 6,
-            "grouping": "Consequence"
-        },
-        "genes.genes_most_severe_gene.gene_lists.display_title": {
-            "title": "Gene List",
-            "order": 99,
-            "grouping": "Genes"
-        },
-        "genes.genes_most_severe_gene.oe_lof": {
-            "title": "o/e (LoF)",
+        "csq_cadd_phred": {
+            "title": "CADD Phred score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 35,
+            "order": 23,
+            "grouping": "Effect Predictors"
+        },
+        "genes.genes_most_severe_sift_score": {
+            "title": "SIFT score",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 24,
+            "grouping": "Effect Predictors"
+        },
+        "genes.genes_most_severe_polyphen_score": {
+            "title": "PolyPhen score",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 25,
+            "grouping": "Effect Predictors"
+        },
+        "spliceaiMaxds": {
+            "title": "SpliceAI Max Delta",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 27,
+            "grouping": "Effect Predictors"
+        },
+        "genes.genes_most_severe_maxentscan_diff": {
+            "title": "MaxEntScan Diff",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 31,
+            "grouping": "Effect Predictors"
+        },
+        "genes.genes_most_severe_gene.s_het": {
+            "title": "S_het",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 32,
             "grouping": "Constraint Metrics"
         },
         "genes.genes_most_severe_gene.oe_lof_upper": {
@@ -2259,73 +2282,25 @@
             "order": 34,
             "grouping": "Constraint Metrics"
         },
-        "genes.genes_most_severe_gene.s_het": {
-            "title": "S_het",
+        "genes.genes_most_severe_gene.oe_lof": {
+            "title": "o/e (LoF)",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 32,
+            "order": 35,
             "grouping": "Constraint Metrics"
         },
-        "genes.genes_most_severe_maxentscan_diff": {
-            "title": "MaxEntScan Diff",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 31,
-            "grouping": "Effect Predictors"
+        "csq_clinvar_clnsig": {
+            "title": "Clinvar",
+            "order": 36,
+            "grouping": "variant database"
         },
-        "genes.genes_most_severe_polyphen_score": {
-            "title": "PolyPhen score",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 25,
-            "grouping": "Effect Predictors"
-        },
-        "genes.genes_most_severe_sift_score": {
-            "title": "SIFT score",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 24,
-            "grouping": "Effect Predictors"
-        },
-        "spliceaiMaxds": {
-            "title": "SpliceAI Max Delta",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 27,
-            "grouping": "Effect Predictors"
-        },
-        "variantClass": {
-            "title": "Variant Type",
-            "order": 4,
-            "grouping": "Variant Type"
+        "genes.genes_most_severe_gene.gene_lists.display_title": {
+            "title": "Gene List",
+            "order": 99,
+            "grouping": "Genes"
         }
     },
     "columns": {
-        "csq_clinvar": {
-            "title": "Clinvar ID",
-            "order": 70,
-            "default_hidden": true
-        },
-        "csq_gnomadg_af": {
-            "title": "gnomAD",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 60,
-            "sort_fields": [
-                {
-                    "field": "variant.csq_gnomadg_af",
-                    "title": "gnomad AF"
-                },
-                {
-                    "field": "variant.csq_gnomadg_af_popmax",
-                    "title": "gnomad AF Population Max"
-                }
-            ]
-        },
-        "genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 51
-        },
         "genes.genes_most_severe_gene.display_title": {
             "title": "Gene, Transcript",
             "order": 40,
@@ -2353,6 +2328,31 @@
                     "title": "Protein Sequence"
                 }
             ]
+        },
+        "genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 51
+        },
+        "csq_gnomadg_af": {
+            "title": "gnomAD",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 60,
+            "sort_fields": [
+                {
+                    "field": "variant.csq_gnomadg_af",
+                    "title": "gnomad AF"
+                },
+                {
+                    "field": "variant.csq_gnomadg_af_popmax",
+                    "title": "gnomad AF Population Max"
+                }
+            ]
+        },
+        "csq_clinvar": {
+            "title": "Clinvar ID",
+            "order": 70,
+            "default_hidden": true
         }
     }
 }
