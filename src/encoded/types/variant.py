@@ -64,10 +64,10 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = [
-        "interpretations.classification",
-        "interpretations.acmg_guidelines",
-        "interpretations.conclusion",
-        "interpretations.note_text"
+        "interpretation.classification",
+        "interpretation.acmg_guidelines",
+        "interpretation.conclusion",
+        "interpretation.note_text"
     ]
     with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
@@ -85,10 +85,10 @@ def build_variant_sample_embedded_list():
     embedded_list = [
         "cmphet.*",
         "variant_sample_list.created_for_case",
-        "interpretations.classification",
-        "interpretations.acmg_guidelines",
-        "interpretations.conclusion",
-        "interpretations.note_text"
+        "interpretation.classification",
+        "interpretation.acmg_guidelines",
+        "interpretation.conclusion",
+        "interpretation.note_text"
     ]
     with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')

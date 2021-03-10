@@ -117,14 +117,14 @@ def test_link_standard_note_to_report(workbook, es_testapp, new_standard_note, t
 def test_add_note_to_gene(workbook, es_testapp, gene1_es):
     """ test linking note to gene """
     note_info = es_testapp.get(f'/notes-interpretation/{note1_uuid}/', status=200).json
-    patch = {'interpretations': [note1_uuid]}
+    patch = {'interpretation': note1_uuid}
     resp = es_testapp.patch_json('/' + gene1_es['@id'], patch, status=200).json['@graph'][0]
-    assert resp['interpretations'] == [note_info['@id']]
+    assert resp['interpretation'] == note_info['@id']
 
 def test_add_note_to_variant_sample(workbook, es_testapp, test_variant_sample):
     """ test linking note to variant sample item """
     note_info = es_testapp.get(f'/notes-interpretation/{note1_uuid}/', status=200).json
     vs = es_testapp.post_json('/variant_sample', test_variant_sample, status=201).json['@graph'][0]
-    patch = {'interpretations': [note1_uuid]}
+    patch = {'interpretation': note1_uuid}
     vs_patch = es_testapp.patch_json('/' + vs['@id'], patch, status=200).json['@graph'][0]
-    assert vs_patch['interpretations'] == [note_info['@id']]
+    assert vs_patch['interpretation'] == note_info['@id']

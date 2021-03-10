@@ -618,7 +618,7 @@
             "title": "Genome Snapshot",
             "order": 81
         },
-        "interpretations.classification": {
+        "interpretation.classification": {
             "title": "Classification",
             "default_hidden": true
         }

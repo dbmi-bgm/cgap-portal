@@ -2293,7 +2293,7 @@
             "order": 4,
             "grouping": "Variant Type"
         },
-        "interpretations.classification": {
+        "interpretation.classification": {
             "title": "Classification",
             "order": 100
         }
@@ -2337,7 +2337,7 @@
                 }
             ]
         },
-        "interpretations.classification": {
+        "interpretation.classification": {
             "title": "Classification",
             "order": 100
         },

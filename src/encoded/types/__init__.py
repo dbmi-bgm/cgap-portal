@@ -41,10 +41,10 @@ class Report(Item):
     item_type = 'report'
     schema = load_schema('encoded:schemas/report.json')
     embedded_list = [
-        "variant_samples.interpretations.classification",
-        "variant_samples.interpretations.conclusion",
-        "variant_samples.interpretations.acmg_guidelines",
-        "variant_samples.interpretations.note_text",
+        "variant_samples.interpretation.classification",
+        "variant_samples.interpretation.conclusion",
+        "variant_samples.interpretation.acmg_guidelines",
+        "variant_samples.interpretation.note_text",
         "extra_notes.note_text"
     ]
     rev = {'case': ('Case', 'report')}

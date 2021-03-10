@@ -174,8 +174,7 @@ def bgm_variant(bgm_user_testapp, bgm_project, institution):
             "hg19_hgvsg": "NC_000001.11:g.12185956del"
         }
         ],
-        "CHROM": "1",
-        "topmed_an": 125568
+        "CHROM": "1"
     }
     return bgm_user_testapp.post_json('/variants', item).json['@graph'][0]
 

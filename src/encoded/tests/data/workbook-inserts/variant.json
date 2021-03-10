@@ -15,8 +15,7 @@
       }
     ],
     "CHROM": "1",
-    "topmed_an": 125568,
-    "interpretations": ["ab5e1c89-4c88-4a3e-a306-d37a12defd8b"]
+    "interpretation": "ab5e1c89-4c88-4a3e-a306-d37a12defd8b"
   },
   {
     "project": "hms-dbmi",
