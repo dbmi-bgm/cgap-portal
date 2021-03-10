@@ -1,5 +1,6 @@
 import contextlib
 import datetime
+import jwt
 import os
 import pytest
 import requests
@@ -7,8 +8,11 @@ import time
 
 from dcicutils.misc_utils import Retry
 from dcicutils.qa_utils import override_dict
+from http import cookies
 from pyramid.testing import DummyRequest
 from ..authentication import get_jwt
+from ..edw_hash import EDWHash
+from ..util import get_trusted_email
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.indexing]
@@ -317,17 +321,58 @@ def test_impersonate_user(anontestapp, admin, submitter):
 
     res = anontestapp.post_json('/impersonate-user',
                                 {'userid': submitter['email']},
-                                extra_environ={'REMOTE_USER': str(admin['email'])})
+                                extra_environ={'REMOTE_USER': str(admin['email'])},
+                                status=200)
 
     # we should get back a new token
     assert 'user_actions' in res.json
-    assert 'id_token' in res.json
+    try:
+        # This try tries to assure that if an error occurs, we don't leave a bunch of JWT in the open
+        # on an error message for someone to pick up and use. The try will catch the error and issue
+        # a different, cleaner error if we don't get the data we expect to get. -kmp 9-Mar-2021
+        c = cookies.SimpleCookie()
+        c.load(res.headers['Set-Cookie'])
+        returned_jwt_hashed = EDWHash.hash(c['jwtToken'].value)
+        jwt_headers = jwt.get_unverified_header(c['jwtToken'].value)
+        email_from_jwt = jwt.decode(c['jwtToken'].value, verify=False)['email']
+        c = None
+    except Exception:
+        raise AssertionError("jwtToken cookie not found in first return value.")
 
-    # and we should be able to use that token as the new user
+    assert jwt_headers['typ'] == 'JWT'
+    assert jwt_headers['alg'] == 'HS256'
+    assert email_from_jwt == submitter['email']
+
+    # We used to get back an id_token as part of the result JSON and we had to pass that token as part of the
+    # Authorization on the next request ('Authorization': 'Bearer ' + res.json['id_token'])
+    # but now it comes back as a protected cookie that is passed through on subsequent requests mostly
+    # invisibly. We test that here, but try to do so carefully. -kmp 9-Mar-2021
     headers = {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + res.json['id_token']
+        'Content-Type': 'application/json'
     }
-    res2 = anontestapp.get('/users/', headers=headers)
-    assert '@id' in res2.json['@graph'][0]
+    res2 = anontestapp.get('/users/', headers=headers, status=200)
+    users2 = res2.json['@graph']
+    users2_0 = users2[0]
+    assert '@id' in users2_0
+    try:
+        sent_jwt_hashed = EDWHash.hash(res2.request.cookies['jwtToken'])
+    except Exception:
+        raise AssertionError("jwtToken cookie not found in second request.")
+    assert sent_jwt_hashed == returned_jwt_hashed, "The jwtToken returned from first request wasn't sent on the second."
+
+    res3 = anontestapp.get('/me', status=307)
+    me = res3.json
+    assert submitter['title'] == "ENCODE Submitter"
+    assert me['title'] == "ENCODE Submitter"
+
+
+def test_impersonate_user_simple(anontestapp, admin, submitter):
+    if not os.environ.get('Auth0Secret'):
+        pytest.skip("need the keys to impersonate user, which aren't here")
+
+    anontestapp.post_json('/impersonate-user', {'userid': submitter['email']},
+                          extra_environ={'REMOTE_USER': str(admin['email'])},
+                          status=200)
+
+    assert anontestapp.get('/me', status=307).json['title'] == submitter['title']
