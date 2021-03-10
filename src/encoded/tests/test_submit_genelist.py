@@ -1,4 +1,8 @@
+import pytest
+
 from ..submit_genelist import GeneListSubmission
+
+pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 class TestGeneListSubmission:
