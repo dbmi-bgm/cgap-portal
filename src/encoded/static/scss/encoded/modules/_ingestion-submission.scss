@@ -1,9 +1,10 @@
-/** Stylesheet for Case Submission View/Wizard **/
+/** Stylesheet for Ingestion Submission View/Wizard **/
 
 body[data-current-action="add"] {
 
-    .case-submission-view {
-
+    
+    .ingestion-submission-view {
+        margin-bottom: 10px;
 
         /** Menu to select step **/
         .panel-selection {
@@ -49,9 +50,9 @@ body[data-current-action="add"] {
                     }
                 }
 
-                &:not(.disabled):not([disabled]) {
+                /*&:not(.disabled):not([disabled]):not(.completed) {
                     cursor: pointer;
-                }
+                }*/
 
                 > .row {
                     flex-wrap: nowrap;
