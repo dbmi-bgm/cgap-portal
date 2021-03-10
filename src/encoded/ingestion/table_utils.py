@@ -1022,7 +1022,7 @@ class VariantTableParser(object):
             new_variant_sample_schema['columns'] = variant_sample_schema['columns']
             self.write_schema(new_variant_sample_schema, vs_out)
 
-            variant_schema = json.load(open(vs_out))
+            variant_schema = json.load(open(v_out))
             new_variant_schema['facets'] = variant_schema['facets']
             new_variant_schema['columns'] = variant_schema['columns']
             self.write_schema(variant_schema, v_out)
