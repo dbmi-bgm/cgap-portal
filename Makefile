@@ -39,7 +39,7 @@ macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an e
 	bin/macpoetry-install
 
 configure:  # does any pre-requisite installs
-	pip install --upgrade pip
+	pip install --upgrade pip==21.0.1
 	pip install poetry==1.1.4  # poetry latest as of 1/25/2021 seemed to work but apparantly does not
 
 build:  # builds
