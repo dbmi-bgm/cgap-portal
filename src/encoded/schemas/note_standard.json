@@ -1,22 +1,46 @@
 {
-    "title" : "Standard Note",
+    "title": "Standard Note",
     "description": "Schema for standard note items",
     "id": "/profiles/note_standard.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": [ "project", "institution"],
+    "required": [
+        "project",
+        "institution"
+    ],
     "additionalProperties": false,
-    "identifyingProperties": ["uuid", "aliases"],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "note.json#/properties" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "note.json#/properties"
+        }
     ],
     "properties": {
         "schema_version": {

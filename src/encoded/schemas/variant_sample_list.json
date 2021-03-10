@@ -4,19 +4,43 @@
     "id": "/profiles/variant_sample_list.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["institution", "project"],
-    "identifyingProperties": ["uuid", "aliases"],
+    "required": [
+        "institution",
+        "project"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/notes" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/notes"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -35,7 +59,7 @@
                         "type": "string",
                         "linkTo": "VariantSample"
                     },
-                    "filter_blocks_request_at_time_of_selection" : {
+                    "filter_blocks_request_at_time_of_selection": {
                         "title": "Filter Block Request",
                         "type": "string",
                         "description": "Stringified JSON representing the compound filter block request made when this Variant Sample was selected"
@@ -52,8 +76,12 @@
                         "type": "string",
                         "serverDefault": "now",
                         "anyOf": [
-                            {"format": "date-time"},
-                            {"format": "date"}
+                            {
+                                "format": "date-time"
+                            },
+                            {
+                                "format": "date"
+                            }
                         ]
                     }
                 }

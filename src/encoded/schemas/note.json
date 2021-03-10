@@ -1,12 +1,18 @@
 {
-    "title" : "Note",
+    "title": "Note",
     "description": "Schema for note items",
     "id": "/profiles/note.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": [ "project", "institution"],
+    "required": [
+        "project",
+        "institution"
+    ],
     "additionalProperties": false,
-    "identifyingProperties": ["uuid", "aliases"],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
     "properties": {
         "note_text": {
             "title": "Note Text",
@@ -24,8 +30,12 @@
             "type": "string",
             "description": "Timestamp when this note was approved for a case",
             "anyOf": [
-                {"format": "date-time"},
-                {"format": "date"}
+                {
+                    "format": "date-time"
+                },
+                {
+                    "format": "date"
+                }
             ]
         },
         "associated_items": {
