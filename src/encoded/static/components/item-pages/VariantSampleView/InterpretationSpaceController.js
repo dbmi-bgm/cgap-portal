@@ -117,13 +117,12 @@ class GenericInterpretationPanelController extends React.Component {
      * to check other locations for gene items, interpretation notes, etc)
      */
     getMostRecentNoteInterpretation() {
-        const { context: { interpretations = [] } = {} } = this.props;
+        const { context: { interpretation = null } = {} } = this.props;
 
         // Determine which interpretation note to load into state
-        if (interpretations.length !== 0) { // Check for saved notes on Variant first
+        if (interpretation) { // Check for saved notes on Variant first
             // TODO: See if this needs to be sorted or if most recent will always be the last one
-            const mostRecentInterpretation = interpretations[interpretations.length-1];
-            return [mostRecentInterpretation, "VariantSample"];
+            return [interpretation, "VariantSample"];
         }
         return null; // Can assume there are no notes
     }
@@ -154,7 +153,7 @@ class GenericInterpretationPanelController extends React.Component {
     patchNewNoteToVS(noteResp) {
         const { context: { '@id': vsAtID = null } = {} } = this.props;
         const { '@id': noteAtID } = noteResp;
-        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ interpretations: [noteAtID] }));
+        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ interpretation: noteAtID }));
     }
 
     patchPreviouslySavedNote(noteAtID, noteToPatch) { // ONLY USED FOR DRAFTS -- other notes are cloned
