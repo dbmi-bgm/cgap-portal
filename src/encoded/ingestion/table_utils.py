@@ -111,7 +111,7 @@ class VariantTableParser(object):
                 elif row_idx == 2:
                     fields = self.process_fields(row)
                 else:
-                    break # we are done with this step
+                    break  # we are done with this step
         logger.info('Mapping table Version: %s, Date: %s\n' % (version, date))
         logger.info('Mapping table fields: %s\n' % (", ".join(fields)))
         return version, date, fields
@@ -179,15 +179,16 @@ class VariantTableParser(object):
         """
         return [field for field in inserts if field.get('scope', '') == 'variant']
 
-    def update_embeds(self, item, typ):
+    def update_embeds(self, item, scope):
         """ Updates the EMBEDDED_FIELDS location JSON containing the embeds for Variant.
             NOTE: the files are overwritten every time you run the process!
 
         :param item: embedded field to be written
+        :param scope: which item type this embed is for
         """
         # XXX: This does NOT work properly if for linkTos, embeds required .keyword!
         for t, f in self.EMBEDS_TO_GENERATE:
-            if typ == t:
+            if scope == t:
                 with io.open(f, 'rb') as fd:
                     embeds = json.load(fd)
                     link_type = 'embedded_field'
@@ -203,22 +204,22 @@ class VariantTableParser(object):
                     wfd.write('\n')  # write newline at EOF
 
     @staticmethod
-    def format_sub_embedding_group_name(json_or_str, type='key'):
+    def format_sub_embedding_group_name(json_or_str, t='key'):
         """ Helper method that will extract the appropriate value from sub_embedding_group
 
         :param json_or_str: entry in mapping table, could be string or json, so we try both
-        :param type: one of key or title
+        :param t: one of key or title
         :return: title that you wanted based on inputs
         """
-        if type not in ['key', 'title']:
+        if t not in ['key', 'title']:
             raise MappingTableIntakeException('Tried to parse sub_embedded_group with'
-                                              'key other than "key" or "title": %s ' % type)
+                                              'key other than "key" or "title": %s ' % t)
         try:
             fmt = json.loads(json_or_str)
         except Exception:  # just a string is given, use for both name and title
             return json_or_str
         else:
-            return fmt[type]
+            return fmt[t]
 
     def generate_properties(self, inserts, variant=True):
         """ Generates variant/variant sample properties.
@@ -388,7 +389,7 @@ class VariantTableParser(object):
             if is_sub_embedded_object(o):
                 if is_link_to(o):  # add .display_title if we are a linkTo
                     d[self.format_sub_embedding_group_name(o.get('sub_embedding_group')) + '.'
-                      + o[self.NAME_FIELD] + '.display_title'] = val  # XXX: when new mapping table comes in check embedded field
+                      + o[self.NAME_FIELD] + '.display_title'] = val
                 else:
                     d[self.format_sub_embedding_group_name(o.get('sub_embedding_group')) + '.'
                       + o[self.NAME_FIELD]] = val
@@ -792,14 +793,16 @@ class VariantTableParser(object):
             }
         })
 
-
     @staticmethod
     def extend_variant_sample_facets(facs):
         pass
 
     def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):
         """ Builds the variant_sample.json schema based on sample_props. Will also add variant columns and
-            facets since this information is embedded
+            facets since this information is embedded.
+
+            NOTE: the output of this function is intended to have columns/facets overwritten.
+            Ensure not to remove the original schema!
 
         Args:
             sample_props: first output of generate_properties
@@ -903,7 +906,7 @@ class VariantTableParser(object):
         """  Builds the variant.json schema based on var_props
 
         Args:
-            sample_props: first output of generate_properties for variant
+            var_props: first output of generate_properties for variant
             cols: second output of generate_properties for variant
             facs: third output of generate_properties for variant
 
