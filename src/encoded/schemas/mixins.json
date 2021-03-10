@@ -273,17 +273,13 @@
             }
         }
     },
-    "interpretations": {
-        "interpretations": {
-            "title": "Interpretations",
+    "interpretation": {
+        "interpretation": {
+            "title": "Interpretation",
             "description": "Interpretation connected to this item",
             "comment": "For VariantSample, Variant, or Gene",
-            "type": "array",
-            "items": {
-                "title": "Interpretation",
-                "type": "string",
-                "linkTo": "NoteInterpretation"
-            }
+            "type": "string",
+            "linkTo": "NoteInterpretation"
         }
     },
     "gene_notes": {
@@ -291,12 +287,8 @@
             "title": "Gene Notes",
             "description": "Notes related to the relevant Gene",
             "comment": "For VariantSample or Gene",
-            "type": "array",
-            "items": {
-                "title": "Gene Note",
-                "type": "string",
-                "linkTo": "NoteStandard"
-            }
+            "type": "string",
+            "linkTo": "NoteStandard"
         }
     },
     "variant_notes": {
@@ -304,12 +296,8 @@
             "title": "Variant Notes",
             "description": "Notes related to the relevant Variant",
             "comment": "For VariantSample or Variant",
-            "type": "array",
-            "items": {
-                "title": "Variant Note",
-                "type": "string",
-                "linkTo": "NoteStandard"
-            }
+            "type": "string",
+            "linkTo": "NoteStandard"
         }
     },
     "alternative_ids": {

@@ -38,7 +38,7 @@
             "$ref": "mixins.json#/notes"
         },
         {
-            "$ref": "mixins.json#/interpretations"
+            "$ref": "mixins.json#/interpretation"
         },
         {
             "$ref": "mixins.json#/gene_notes"
