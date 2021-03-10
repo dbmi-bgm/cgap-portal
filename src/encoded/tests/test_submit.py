@@ -27,6 +27,12 @@ TEST_INGESTION_ID1 = '123456-1243-1234-123456abcdef'
 TEST_INGESTION_ID2 = 'abcdef-1234-1234-abcdef123456'
 
 
+# TODO: Check if these work or not.  These tests seem to be working, but they may do posting
+#       that could affect other tests, so I have marked this as requiring manual invocation until we
+#       investigate that. -kmp 21-Feb-2021
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.manual]
+
+
 @pytest.fixture
 def row_dict():
     return {

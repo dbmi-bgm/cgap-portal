@@ -4,7 +4,7 @@ from dcicutils.misc_utils import TestApp
 from .conftest_settings import ORDER
 
 
-pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
+pytestmark = [pytest.mark.setone, pytest.mark.broken, pytest.mark.schema, pytest.mark.indexing, pytest.mark.sloppy]
 
 
 @pytest.yield_fixture(scope='session')
