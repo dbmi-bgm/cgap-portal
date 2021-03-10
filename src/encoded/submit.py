@@ -455,7 +455,7 @@ class PedigreeRow:
         self.metadata = metadata
         self.indiv_alias = '{}:individual-{}'.format(project, remove_spaces_in_id(metadata['individual id']))
         self.individual = self.extract_individual_metadata()
-        self.family = None
+        # self.family = None
         self.proband = self.is_proband()
         self.errors = []
 
@@ -471,6 +471,7 @@ class PedigreeRow:
                          'quantity', 'life_status', 'cause_of_death', 'age_at_death',
                          'age_at_death_units', 'gestational_age', 'cause_of_infertility']
         info = map_fields(self.metadata, info, simple_fields, 'individual')
+        # TODO: handle life status enum 
         for field in info:
             if field.startswith('is_'):
                 info[field] = is_yes_value(info[field])
@@ -805,6 +806,7 @@ class PedigreeMetadata:
             if item.isproband():
                 family_metadata[item.metadata['family_id']]['proband'] = alias
                 family_metadata['aliases'] = [f'{self.project}:family-{item.metadata["individual_id"]}']
+            del item.metadata['family_id']
         # TODO: family_phenotypic_features - change to calculated property?
         # TODO: get family aliases
         for key, value in family_metadata.items():
@@ -825,7 +827,6 @@ class PedigreeMetadata:
             del family_metadata[key]
         return family_metadata
 
-
     def process_rows(self):
         """
         Method for iterating over spreadsheet rows to process each one and compare it to previous rows.
@@ -836,7 +837,7 @@ class PedigreeMetadata:
                 simple_add_items = [processed_row.individual, processed_row.family]
                 for item in simple_add_items:
                     self.add_metadata_single_item(item)
-                # self.add_family_metadata(processed_row.row, processed_row.family, processed_row.individual)
+                self.families = self.add_family_metadata()
                 self.errors.extend(processed_row.errors)
             except AttributeError:
                 self.errors.extend(processed_row.errors)
