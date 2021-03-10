@@ -15,7 +15,7 @@ export class InterpretationSpaceController extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentTabIdx: 0,   // 0: Variant Notes, 1: Gene Notes, 2: Interpretation (Research/Discovery), 3: Interpretation (Clinical/ACMG)
+            currentTab: "Variant Notes",   // 0: Variant Notes, 1: Gene Notes, 2: Interpretation (Research/Discovery), 3: Interpretation (Clinical/ACMG)
             isFullScreen: false // TODO - currently unused
         };
         this.toggleFullScreen = this.toggleFullScreen.bind(this);
@@ -29,29 +29,26 @@ export class InterpretationSpaceController extends React.Component {
         this.setState({ isFullScreen: !isFullScreen });
     }
 
-    switchToTab(idx) {
-        const { currentTabIdx } = this.state;
+    switchToTab(newTab) {
+        const { currentTab } = this.state;
         // TODO: may need some componentWillUnmount in panels to save unsaved items before dismount completes
-        if (currentTabIdx !== idx) {
-            console.log("is setting current tab to idx #", idx);
-            this.setState({ currentTabIdx: idx });
+        if (currentTab !== newTab) {
+            console.log("is setting current tab to", newTab);
+            this.setState({ currentTab: newTab });
         }
     }
 
     render() {
-        const { isFullScreen, currentTabIdx } = this.state;
-
-        // Temp until create separate unique versions of the panels for each tab
-        const noteLabel = currentTabIdx === 0 ? "Variant Notes" : (currentTabIdx === 1 ? "Gene Notes" : "Interpretation Notes");
+        const { isFullScreen, currentTab } = this.state;
 
         return (
             <div className="card interpretation-space">
                 <InterpretationHeader {...{ isFullScreen }} toggleFullScreen={this.toggleFullScreen}/>
                 <div className="card-body">
-                    <InterpretationTabs {...{ currentTabIdx }} switchToTab={this.switchToTab} />
+                    <InterpretationTabs {...{ currentTab }} switchToTab={this.switchToTab} />
                     {/** Eventually, there will be 3 separate instances of GenericInterperetationPanelController; each with different
                      * props/options that show/hide according to currently selected tab. -- right now same one is being shared for all */}
-                    <GenericInterpretationPanelController {...{ noteLabel }} { ...this.props }/>
+                    <GenericInterpretationPanelController noteLabel={currentTab} { ...this.props }/>
                 </div>
             </div>
         );
@@ -72,22 +69,22 @@ function InterpretationHeader(props) {
 }
 
 function InterpretationTabs(props) {
-    const { currentTabIdx, switchToTab } = props;
+    const { currentTab, switchToTab } = props;
 
-    const variantNotesActive = currentTabIdx === 0 ? true : false;
-    const geneNotesActive = currentTabIdx === 1 ? true : false;
-    const interpretationActive = currentTabIdx === 2 ? true : false;
+    const variantNotesActive = currentTab === "Variant Notes" ? true : false;
+    const geneNotesActive = currentTab === "Gene Notes" ? true : false;
+    const interpretationActive = currentTab === "Interpretation" ? true : false;
     return (
         <ul className="p-1 d-flex align-items-center justify-content-between">
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab(0)}
+            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Variant Notes")}
                 data-active={variantNotesActive}>
                 Variant Notes
             </li>
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab(1)}
+            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Gene Notes")}
                 data-active={geneNotesActive}>
                 Gene Notes
             </li>
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab(2)}
+            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Interpretation")}
                 data-active={interpretationActive}>
                 Interpretation
             </li>
