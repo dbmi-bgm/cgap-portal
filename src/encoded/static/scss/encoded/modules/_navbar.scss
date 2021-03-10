@@ -24,6 +24,7 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     padding-right: 15px;
     display: flex;
     align-items: center;
+    transition: opacity .3s ease-in-out;
 
     @include navbar-fixed-position {
         height: inherit;
@@ -52,12 +53,10 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     }
 
     &[disabled] {
-        color: $gray-300;
-
+        opacity: 0.5;
         &:focus,
         &:hover {
             background-color: transparent;
-            color: $gray-300;
             cursor: default;
         }
     }

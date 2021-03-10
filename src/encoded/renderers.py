@@ -21,7 +21,7 @@ from pyramid.settings import asbool
 from pyramid.threadlocal import manager
 from pyramid.traversal import split_path_info, _join_path_tuple
 from subprocess_middleware.worker import TransformWorker
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from webob.cookies import Cookie
 from .util import content_type_allowed
 
@@ -169,8 +169,15 @@ def security_tween_factory(handler, registry):
                 # Especially for initial document requests by browser, but also desired for AJAX and other requests,
                 # unset jwtToken cookie so initial client-side React render has App(instance).state.session = false
                 # to be synced w/ server-side
-                response.set_cookie(name='jwtToken',
-                                    value=None, max_age=0, path='/')  # = Same as response.delete_cookie(..)
+                request_parts = urlparse(request.referrer)
+                request_domain = request_parts.hostname
+                response.set_cookie(
+                    name='jwtToken',
+                    value=None,
+                    domain=request_domain,
+                    max_age=0,
+                    path='/'
+                )  # = Same as response.delete_cookie(..)
                 response.status_code = 401
                 response.headers['WWW-Authenticate'] = (
                     "Bearer realm=\"{}\", title=\"Session Expired\"; Basic realm=\"{}\""
@@ -190,7 +197,7 @@ def security_tween_factory(handler, registry):
                             response.headers['X-Request-JWT'] = request.cookies.get('jwtToken', '')
                             # TODO: Should user_info be copied before the del? If the user info is shared,
                             #       we are modifying it for other uses. -kmp 24-Jan-2021
-                            user_info = request.user_info  # Re-ified property set in authentication.py
+                            user_info = request.user_info.copy()  # Re-ified property set in authentication.py
                             # Redundant - don't need this in SSR nor browser as get from X-Request-JWT.
                             del user_info["id_token"]
                             response.headers['X-User-Info'] = json.dumps(user_info)

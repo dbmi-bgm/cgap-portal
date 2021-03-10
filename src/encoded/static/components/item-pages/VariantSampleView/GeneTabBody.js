@@ -252,52 +252,52 @@ function ConstraintScoresSection({ currentGeneItem, getTipForField }){
                 <tr>
                     <td className="text-600 text-left">Expected</td>
                     <td>
-                        <span data-tip={getTipForField("exp_syn")}>{ exp_syn || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("exp_syn")}>{ falsyZeroCheck(exp_syn, fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("exp_mis")}>{ exp_mis || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("exp_mis")}>{ falsyZeroCheck(exp_mis, fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("exp_lof")}>{ exp_lof || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("exp_lof")}>{ falsyZeroCheck(exp_lof, fallbackNotPresent)}</span>
                     </td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Observed</td>
                     <td>
-                        <span data-tip={getTipForField("obs_syn")}>{ obs_syn || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("obs_syn")}>{ falsyZeroCheck(obs_syn, fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("obs_mis")}>{ obs_mis || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("obs_mis")}>{ falsyZeroCheck(obs_mis, fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("obs_lof")}>{ obs_lof || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("obs_lof")}>{ falsyZeroCheck(obs_lof, fallbackNotPresent)}</span>
                     </td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">O/E (range)</td>
                     <td>
-                        <span data-tip={getTipForField("oe_syn")}>{ shortenToSignificantDigits(oe_syn) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("oe_syn")}>{ falsyZeroCheck(shortenToSignificantDigits(oe_syn), fallbackNotPresent)}</span>
                         { oe_syn_lower !== null && oe_syn_upper !== null ? ` (${oe_syn_lower} - ${oe_syn_upper})` : null }
                     </td>
                     <td>
-                        <span data-tip={getTipForField("oe_mis")}>{ shortenToSignificantDigits(oe_mis) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("oe_mis")}>{ falsyZeroCheck(shortenToSignificantDigits(oe_mis), fallbackNotPresent)}</span>
                         { oe_mis_lower !== null && oe_mis_upper !== null ? ` (${oe_mis_lower} - ${oe_mis_upper})` : null }
                     </td>
                     <td>
-                        <span data-tip={getTipForField("oe_lof")}>{ shortenToSignificantDigits(oe_lof) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("oe_lof")}>{ falsyZeroCheck(shortenToSignificantDigits(oe_lof), fallbackNotPresent)}</span>
                         { oe_lof_lower !== null && oe_lof_upper !== null ? ` (${oe_lof_lower} - ${oe_lof_upper})` : null }
                     </td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Z-score</td>
                     <td>
-                        <span data-tip={getTipForField("syn_z")}>{ shortenToSignificantDigits(syn_z) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("syn_z")}>{ falsyZeroCheck(shortenToSignificantDigits(syn_z), fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("mis_z")}>{ shortenToSignificantDigits(mis_z) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("mis_z")}>{ falsyZeroCheck(shortenToSignificantDigits(mis_z), fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("lof_z")}>{ shortenToSignificantDigits(lof_z) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("lof_z")}>{ falsyZeroCheck(shortenToSignificantDigits(lof_z), fallbackNotPresent)}</span>
                     </td>
                 </tr>
                 <tr>
@@ -305,28 +305,38 @@ function ConstraintScoresSection({ currentGeneItem, getTipForField }){
                     <td>{ fallbackNotImplemented }</td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
-                        <span data-tip={getTipForField("oe_lof_upper")}>{ oe_lof_upper || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("oe_lof_upper")}>{ falsyZeroCheck(oe_lof_upper, fallbackNotPresent)}</span>
                     </td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">S-Het</td>
                     <td>{ fallbackNotImplemented }</td>
-                    <td>
-                        <span data-tip={getTipForField("s_het")}>{ shortenToSignificantDigits(s_het) || fallbackNotPresent }</span>
-                    </td>
                     <td>{ fallbackNotImplemented }</td>
+                    <td>
+                        <span data-tip={getTipForField("s_het")}>{ falsyZeroCheck(shortenToSignificantDigits(s_het), fallbackNotPresent)}</span>
+                    </td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">RVIS (ExAC)</td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
-                        <span data-tip={getTipForField("rvis_exac")}>{ shortenToSignificantDigits(rvis_exac) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("rvis_exac")}>{ falsyZeroCheck(shortenToSignificantDigits(rvis_exac), fallbackNotPresent)}</span>
                     </td>
                     <td>{ fallbackNotImplemented }</td>
                 </tr>
             </tbody>
         </table>
     );
+}
+
+/**
+ * Takes in a potentially falsy (0) string or number value and if actually not present, returns fallback
+ */
+function falsyZeroCheck(value, fallback) {
+    if (value || value === "0" || value === 0) {
+        return value;
+    }
+    return fallback;
 }
 
 /**
