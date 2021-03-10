@@ -4,24 +4,57 @@
     "id": "/profiles/workflow.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["title", "name", "project", "institution"],
-    "additionalProperties": false,
-    "identifyingProperties": ["uuid", "aliases", "accession"],
-    "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/documents" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/static_embeds" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/accession" }
+    "required": [
+        "title",
+        "name",
+        "project",
+        "institution"
     ],
-    "mixinFacets" : [
-        { "$ref": "mixins.json#/facets_common" }
+    "additionalProperties": false,
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "accession"
+    ],
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/documents"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        }
+    ],
+    "mixinFacets": [
+        {
+            "$ref": "mixins.json#/facets_common"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -64,7 +97,7 @@
                 "title": "Category",
                 "description": "the workflow's category",
                 "type": "string",
-                "enum" : [
+                "enum": [
                     "processing",
                     "QC",
                     "format conversion",
@@ -254,7 +287,9 @@
             "title": "Workflow Arguments",
             "description": "arguments of the workflow.",
             "type": "array",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "items": {
                 "title": "argument",
                 "description": "An argument of the workflow.",
@@ -271,9 +306,9 @@
                         "description": "Alternative argument names, in case argument names may vary depending on condition",
                         "type": "array",
                         "items": {
-                             "title": "Alternative Conditional Argument Name",
-                             "description": "An alternative argument name, in case argument names may vary depending on condition",
-                             "type": "string"
+                            "title": "Alternative Conditional Argument Name",
+                            "description": "An alternative argument name, in case argument names may vary depending on condition",
+                            "type": "string"
                         }
                     },
                     "secondary_file_formats": {
@@ -281,10 +316,10 @@
                         "description": "formats for secondary files",
                         "type": "array",
                         "items": {
-                             "title": "secondary_file_format",
-                             "description": "formats for secondary file",
-                             "type": "string",
-                             "linkTo": "FileFormat"
+                            "title": "secondary_file_format",
+                            "description": "formats for secondary file",
+                            "type": "string",
+                            "linkTo": "FileFormat"
                         }
                     },
                     "is_primaryfile": {
@@ -298,11 +333,11 @@
                         "type": "string",
                         "linkTo": "File"
                     },
-                    "argument_type":{
+                    "argument_type": {
                         "title": "Type",
                         "description": "Argument Type",
                         "type": "string",
-                        "suggested_enum" : [
+                        "suggested_enum": [
                             "Input file",
                             "Output processed file",
                             "Output QC file",
@@ -312,12 +347,12 @@
                             "NA"
                         ]
                     },
-                    "argument_format":{
+                    "argument_format": {
                         "title": "Format",
                         "description": "Argument Format",
                         "type": "string",
                         "linkTo": "FileFormat",
-                        "suggested_enum" : [
+                        "suggested_enum": [
                             "fastq",
                             "bam",
                             "bai",
@@ -383,9 +418,9 @@
                         "description": "Names or suffices of QC table files in the zipped file",
                         "type": "array",
                         "items": {
-                             "title": "QC Datafile",
-                             "description": "Name or suffix of QC table file in the zipped file",
-                             "type": "string"
+                            "title": "QC Datafile",
+                            "description": "Name or suffix of QC table file in the zipped file",
+                            "type": "string"
                         }
                     },
                     "qc_unzip_from_ec2": {
@@ -424,39 +459,41 @@
                 }
             }
         },
-        "steps" : {
+        "steps": {
             "title": "Workflow Steps",
             "type": "array",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "items": {
                 "title": "Step",
                 "type": "object",
                 "additionalProperties": true,
                 "properties": {
-                    "name" : {
-                        "title" : "Step Name",
-                        "description" : "Unique name (or other identifier) of step within this Workflow.",
-                        "type" : "string"
+                    "name": {
+                        "title": "Step Name",
+                        "description": "Unique name (or other identifier) of step within this Workflow.",
+                        "type": "string"
                     },
-                    "inputs" : {
-                        "title" : "Step Inputs",
-                        "type" : "array",
-                        "items" : {
-                            "type" : "object",
-                            "properties" : {
-                                "name" : {
-                                    "title" : "Input Name",
-                                    "type" : "string"
+                    "inputs": {
+                        "title": "Step Inputs",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "title": "Input Name",
+                                    "type": "string"
                                 },
-                                "meta" : {
-                                    "type" : "object",
-                                    "title" : "Additional metadata for input argument",
-                                    "description" : "Additional info that might be relavent to the input argument itself, such as argument_cardinality.",
+                                "meta": {
+                                    "type": "object",
+                                    "title": "Additional metadata for input argument",
+                                    "description": "Additional info that might be relavent to the input argument itself, such as argument_cardinality.",
                                     "additionalProperties": true,
                                     "properties": {
-                                        "type" : {
-                                            "title" : "Input Type",
-                                            "type" : "string",
+                                        "type": {
+                                            "title": "Input Type",
+                                            "type": "string",
                                             "enum": [
                                                 "data file",
                                                 "report",
@@ -465,19 +502,22 @@
                                                 "reference file"
                                             ]
                                         },
-                                        "file_format" : {
-                                            "title" : "File Format",
-                                            "type" : "string",
+                                        "file_format": {
+                                            "title": "File Format",
+                                            "type": "string",
                                             "linkTo": "FileFormat"
                                         },
-                                        "cardinality" : {
-                                            "title" : "Cardinality",
-                                            "type" : "string",
-                                            "enum" : ["single", "array"]
+                                        "cardinality": {
+                                            "title": "Cardinality",
+                                            "type": "string",
+                                            "enum": [
+                                                "single",
+                                                "array"
+                                            ]
                                         },
-                                        "global" : {
-                                            "title" : "Global Argument",
-                                            "type" : "boolean"
+                                        "global": {
+                                            "title": "Global Argument",
+                                            "type": "boolean"
                                         },
                                         "notes": {
                                             "description": "internal notes",
@@ -485,80 +525,92 @@
                                         }
                                     }
                                 },
-                                "source" : {
-                                    "title" : "Source Step",
-                                    "description" : "Where this input file came from.",
-                                    "type" : "array",
-                                    "items" : {
-                                        "type" : "object",
-                                        "properties" : {
-                                            "name" : { "type" : "string" },
-                                            "type" : { "type" : "string" },
-                                            "step" : { "type" : "string" }
+                                "source": {
+                                    "title": "Source Step",
+                                    "description": "Where this input file came from.",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "type": {
+                                                "type": "string"
+                                            },
+                                            "step": {
+                                                "type": "string"
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     },
-                    "outputs" : {
-                        "title" : "Step Outputs",
-                        "type" : "array",
-                        "items" : {
-                            "type" : "object",
-                            "properties" : {
-                                "name" : {
-                                    "title" : "Output Name",
-                                    "type" : "string"
+                    "outputs": {
+                        "title": "Step Outputs",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "title": "Output Name",
+                                    "type": "string"
                                 },
-                                "meta" : {
-                                    "type" : "object",
-                                    "title" : "Additional metadata for output argument",
-                                    "description" : "Additional info that might be relavent to the output argument itself, such as argument_cardinality."
+                                "meta": {
+                                    "type": "object",
+                                    "title": "Additional metadata for output argument",
+                                    "description": "Additional info that might be relavent to the output argument itself, such as argument_cardinality."
                                 },
-                                "target" : {
-                                    "title" : "Target Step",
-                                    "description" : "Where this output file should go next.",
-                                    "type" : "array",
-                                    "items" : {
-                                        "type" : "object",
-                                        "properties" : {
-                                            "name" : { "type" : "string" },
-                                            "type" : { "type" : "string" },
-                                            "step" : { "type" : "string" }
+                                "target": {
+                                    "title": "Target Step",
+                                    "description": "Where this output file should go next.",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "type": {
+                                                "type": "string"
+                                            },
+                                            "step": {
+                                                "type": "string"
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     },
-                    "meta" : {
-                        "type" : "object",
-                        "title" : "Step Metadata",
-                        "description" : "Various properties which might be a subset of the Item represented by this step, e.g. uuid, @type, workflow, etc.",
-                        "additionalProperties" : true,
-                        "properties" : {
+                    "meta": {
+                        "type": "object",
+                        "title": "Step Metadata",
+                        "description": "Various properties which might be a subset of the Item represented by this step, e.g. uuid, @type, workflow, etc.",
+                        "additionalProperties": true,
+                        "properties": {
                             "software_used": {
                                 "title": "Software Used",
                                 "description": "List of References to Software Used",
                                 "type": "array",
                                 "items": {
-                                  "type": "string",
-                                  "title": "Software Used",
-                                  "description": "Reference to Software Used",
-                                  "linkTo" : "Software"
+                                    "type": "string",
+                                    "title": "Software Used",
+                                    "description": "Reference to Software Used",
+                                    "linkTo": "Software"
                                 }
                             },
-                            "@id" : {
-                                "title" : "Unique identifier of Item in database represented by this step node. If present, will be loaded in via AJAX upon node click.",
-                                "type" : "string"
+                            "@id": {
+                                "title": "Unique identifier of Item in database represented by this step node. If present, will be loaded in via AJAX upon node click.",
+                                "type": "string"
                             },
-                            "analysis_step_types" : {
-                                "title" : "Step Purposes",
+                            "analysis_step_types": {
+                                "title": "Step Purposes",
                                 "description": "List of step purposes which may be shown above the Node in Workflow graphs.",
-                                "type" : "array",
-                                "items" : {
-                                    "type" : "string"
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
                                 }
                             }
                         }
@@ -567,48 +619,48 @@
             }
         }
     },
-    "facets" : {
+    "facets": {
         "category": {
             "title": "Workflow Category"
         },
         "experiment_types": {
             "title": "Experiment Type",
-            "comment" : "TODO: Update to `experiment_types.display_title` once becomes a linkTo"
+            "comment": "TODO: Update to `experiment_types.display_title` once becomes a linkTo"
         },
-        "steps.meta.analysis_step_types" : {
-            "title" : "Analysis Step Type"
+        "steps.meta.analysis_step_types": {
+            "title": "Analysis Step Type"
         },
-        "steps.inputs.meta.file_format.display_title" : {
-            "title" : "Input File Format"
+        "steps.inputs.meta.file_format.display_title": {
+            "title": "Input File Format"
         },
-        "steps.outputs.meta.file_format.display_title" : {
-            "title" : "Output File Format"
+        "steps.outputs.meta.file_format.display_title": {
+            "title": "Output File Format"
         },
-        "workflow_language" : {
-            "title" : "Workflow Language"
+        "workflow_language": {
+            "title": "Workflow Language"
         }
     },
-    "columns" : {
+    "columns": {
         "category": {
             "title": "Workflow Category",
             "colTitle": "Category",
-            "default_hidden" : true
+            "default_hidden": true
         },
         "experiment_types": {
             "title": "Experiment Types",
-            "comment" : "TODO: Update to `experiment_types.display_title` once becomes a linkTo"
+            "comment": "TODO: Update to `experiment_types.display_title` once becomes a linkTo"
         },
         "app_name": {
             "title": "App Name"
         },
         "app_version": {
             "title": "App Version",
-            "colTitle" : "App Ver."
+            "colTitle": "App Ver."
         },
-        "workflow_language" : {
-            "title" : "Workflow Language",
-            "colTitle" : "Lang.",
-            "default_hidden" : true
+        "workflow_language": {
+            "title": "Workflow Language",
+            "colTitle": "Lang.",
+            "default_hidden": true
         }
     }
 }

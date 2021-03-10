@@ -4,19 +4,45 @@
     "id": "/profiles/file_format.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["file_format", "standard_file_extension","project", "institution"],
-    "identifyingProperties": ["uuid", "file_format"],
+    "required": [
+        "file_format",
+        "standard_file_extension",
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "file_format"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/static_embeds" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/attribution" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -72,13 +98,13 @@
             "properties": {
                 "download": {
                     "title": "File Name",
-                    "description" : "File Name of the attachment.",
+                    "description": "File Name of the attachment.",
                     "type": "string"
                 },
                 "href": {
                     "internal_comment": "Internal webapp URL for document file",
-                    "title" : "href",
-                    "description" : "Path to download the file attached to this Item.",
+                    "title": "href",
+                    "description": "Path to download the file attached to this Item.",
                     "type": "string"
                 },
                 "type": {
@@ -92,16 +118,16 @@
                 },
                 "md5sum": {
                     "title": "MD5 Checksum",
-                    "description" : "Use this to ensure that your file was downloaded without errors or corruption.",
+                    "description": "Use this to ensure that your file was downloaded without errors or corruption.",
                     "type": "string",
                     "format": "md5sum"
                 },
                 "size": {
                     "title": "File size",
-                    "description" : "Size of the file on disk",
+                    "description": "Size of the file on disk",
                     "type": "integer"
                 },
-                "blob_id":{
+                "blob_id": {
                     "title": "Blob ID",
                     "type": "string",
                     "internal_comment": "blob storage ID. Use to like with s3/rds"
@@ -121,9 +147,9 @@
         }
     },
     "facets": {
-        "valid_item_types" : {
-            "title" : "Valid item types",
-            "disabled" : true
+        "valid_item_types": {
+            "title": "Valid item types",
+            "disabled": true
         }
     }
 }

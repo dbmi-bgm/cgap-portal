@@ -404,6 +404,13 @@ body.is-full-screen {
 	}
 }
 
+.unclickable {
+	cursor: not-allowed;
+	> label {
+		cursor: not-allowed;
+	}
+}
+
 /** Equal Height Columns in Bootstrap Row on IE9+ **/
 
 .row.row-eq-height-xs {

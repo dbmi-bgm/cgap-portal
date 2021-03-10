@@ -3,26 +3,51 @@
     "id": "/profiles/case.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["project", "institution"],
-    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "required": [
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "accession",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/accession" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/attribution" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        }
     ],
     "properties": {
         "schema_version": {
             "default": "1"
         },
-        "accession" : {
-            "accessionType" : "CA"
+        "accession": {
+            "accessionType": "CA"
         },
         "case_id": {
             "title": "Case ID",
@@ -59,19 +84,19 @@
             "linkTo": "Report"
         },
         "cohort": {
-            "title" : "Cohort",
+            "title": "Cohort",
             "description": "Cohort of the family",
-            "type" : "string",
+            "type": "string",
             "linkTo": "Nexus"
         },
-        "active_filterset" : {
+        "active_filterset": {
             "title": "Active Filterset",
             "description": "Current FilterSet used for this Case",
             "type": "string",
             "linkTo": "FilterSet",
             "notes": "We could maybe have this be a sub-embedded object and save related metadata like date_changed or something, idk."
         },
-        "extra_variant_sample_facets" : {
+        "extra_variant_sample_facets": {
             "title": "Extra Variant Sample Facets",
             "description": "List of user-specified additional fields to show in FacetList",
             "type": "array",
@@ -79,40 +104,74 @@
                 "title": "Extra Variant Sample Facet",
                 "type": "string"
             }
+        },
+        "ingestion_ids": {
+            "title": "Submission IDs",
+            "description": "uuids of the IngestionSubmission items that created/edited this case",
+            "type": "array",
+            "items": {
+                "title": "Submission ID",
+                "description": "an IngestionSubmission item that created or edited this case",
+                "type": "string"
+            }
         }
     },
-    "facets" : {
-        "project.display_title" : {
-            "title" : "Project"
+    "facets": {
+        "project.display_title": {
+            "title": "Project"
         },
-        "individual.sex" : {
-            "title" : "Gender",
+        "individual.sex": {
+            "title": "Gender",
             "grouping": "Individual"
         }
     },
-    "columns" : {
-        "display_title" : {
-            "title" : "Case",
-            "sort_fields" : [
-                { "field" : "accession", "title" : "Accession (CGAP ID)" },
-                { "field" : "aliases", "title": "User-Defined Alias" }
+    "columns": {
+        "display_title": {
+            "title": "Case",
+            "sort_fields": [
+                {
+                    "field": "accession",
+                    "title": "Accession (CGAP ID)"
+                },
+                {
+                    "field": "aliases",
+                    "title": "User-Defined Alias"
+                }
             ]
         },
-        "family" : {
-            "title" : "Family",
-            "sort_fields" : [
-                { "field" : "family.accession", "title": "Family Accession (CGAP ID)" },
-                { "field" : "family.title", "title" : "Family Title" },
-                { "field" : "family.family_id", "title" : "Family ID" }
+        "family": {
+            "title": "Family",
+            "sort_fields": [
+                {
+                    "field": "family.accession",
+                    "title": "Family Accession (CGAP ID)"
+                },
+                {
+                    "field": "family.title",
+                    "title": "Family Title"
+                },
+                {
+                    "field": "family.family_id",
+                    "title": "Family ID"
+                }
             ]
         },
-        "individual" : {
-            "title" : "Individual",
-            "description" : "Proband Individual of this Case",
-            "sort_fields" : [
-                { "field" : "individual.accession", "title" : "Individual Accession (CGAP ID)" },
-                { "field" : "individual.aliases", "title": "User-Defined Alias" },
-                { "field" : "individual.uuid", "title": "UUID"}
+        "individual": {
+            "title": "Individual",
+            "description": "Proband Individual of this Case",
+            "sort_fields": [
+                {
+                    "field": "individual.accession",
+                    "title": "Individual Accession (CGAP ID)"
+                },
+                {
+                    "field": "individual.aliases",
+                    "title": "User-Defined Alias"
+                },
+                {
+                    "field": "individual.uuid",
+                    "title": "UUID"
+                }
             ]
         },
         "sample.specimen_type": {
@@ -121,12 +180,18 @@
         "sample": {
             "title": "Sequencing",
             "notes": "The primary sample calculated for a particular case.",
-            "sort_fields" : [
-                { "field" : "sample.specimen_collection_date", "title": "Sample Collection Date" },
-                { "field" : "sample.accession", "title": "Sample Accession (CGAP ID)"}
+            "sort_fields": [
+                {
+                    "field": "sample.specimen_collection_date",
+                    "title": "Sample Collection Date"
+                },
+                {
+                    "field": "sample.accession",
+                    "title": "Sample Accession (CGAP ID)"
+                }
             ]
         },
-        "sample_processing.analysis_type" :  {
+        "sample_processing.analysis_type": {
             "title": "Bioinformatics"
         },
         "report": {
