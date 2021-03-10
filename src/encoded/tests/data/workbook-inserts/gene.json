@@ -1,0 +1,28 @@
+[
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "gene_symbol": "NLGN4Y",
+        "uuid": "ad9883a2-6886-4ca0-9402-7c49734c12fb",
+        "ensgid" : "ENSG00000165246",
+	"omim_id": ["516020"],
+	"alias_symbol": ["KIAA0951"]
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "gene_symbol": "USP9Y",
+        "uuid": "ad9883a2-6886-4ca0-9402-7c49734c12fc",
+        "ensgid" : "ENSG00000165247",
+	"entrez_id": "4519"
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "gene_symbol": "TSPY8",
+        "uuid": "ad9883a2-6886-4ca0-9402-7c49734c12fd",
+        "ensgid" : "ENSG00000165248",
+	"uniprot_ids": ["P00156"],
+	"prev_symbol": ["TPY8"]
+    }
+]
