@@ -16,7 +16,7 @@ def bgm_test_variant_sample2(bgm_test_variant_sample):
 
 
 @pytest.mark.integrated  # uses s3
-def test_bam_snapshot_download(bgm_user_testapp, bgm_test_variant_sample):
+def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     """ Tests that we can correctly download an IGV image from the wfoutput bucket. """
     test_variant_sample['file'] += '2'
     res = es_testapp.post_json(VARIANT_SAMPLE_URL, test_variant_sample, status=[201, 409]).json
