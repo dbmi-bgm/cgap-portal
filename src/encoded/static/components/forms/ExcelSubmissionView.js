@@ -35,7 +35,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
             submissionItem: null,
             user: null
         };
-        console.log('excelsubmissionview props', props);
+        // console.log('excelsubmissionview props', props);
     }
 
     componentDidUpdate(pastState){
@@ -495,7 +495,7 @@ class PanelTwo extends React.PureComponent {
     onAddedFile(response){
         const json = JSON.parse(response);
         const { filename, submission_uri } = json;
-        console.log("json", json);
+        // console.log("json", json);
 
         let message = null;
         if (submission_uri) {
@@ -597,7 +597,7 @@ function CreatedItemsTable(props) {
         }
         const label = (
             <React.Fragment>
-                <a className="text-600" href={atID}>{alias}</a>
+                <a className="text-600" href={atID} target="_blank" rel="noreferrer">{alias}</a>
                 <i className="icon icon-external-link-alt fas text-smaller ml-05"></i>
             </React.Fragment>
         );
@@ -645,7 +645,7 @@ function Poller(props){
         console.log("Checking if processing status is updated.");
         ajax.promise(getURL, "GET")
             .then((response)=> {
-                console.log("response", response);
+                // console.log("response", response);
                 const {
                     processing_status : { outcome, state, progress } = {},
                     validation_errors = [],
