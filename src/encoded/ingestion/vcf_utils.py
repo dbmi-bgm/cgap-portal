@@ -566,12 +566,13 @@ class VCFParser(object):
                     genotypes = record.INFO.get('SAMPLEGENO')
                     s['samplegeno'] = []
                     for gt in genotypes:
-                        numgt, gt, ad, sample_id = gt.split('|')
+                        numgt, gt, ad, sample_id, ac = gt.split('|')
                         tmp = dict()
                         tmp['samplegeno_numgt'] = numgt
                         tmp['samplegeno_gt'] = gt
                         tmp['samplegeno_ad'] = ad
                         tmp['samplegeno_sampleid'] = sample_id
+                        tmp['samplegeno_ac'] = ac
                         s['samplegeno'].append(tmp)
                 elif field == 'cmphet':
                     comhet = record.INFO.get('comHet', None)

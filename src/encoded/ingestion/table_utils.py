@@ -28,8 +28,8 @@ class MappingTableHeader:
     """ Constant class that holds information on the structure of the mapping table (csv) that does
         not vary across . """
     HEADER_ROW_INDEX = 2
-    INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_order', 'facet_order', 'default', 'min', 'max']
-    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field', 'do_import', 'facet_default_hidden']
+    INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'default', 'min', 'max']
+    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field', 'do_import']
     STRING_FIELDS = ['field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
                      'annotation_category', 'separator', 'description',
                      'scope', 'schema_title', 'pattern', 'link', 'abbreviation']
@@ -587,11 +587,11 @@ class VariantTableParser(object):
             "number_step": "any",
             "order": 18,
             "grouping": "Population Frequency",
-            "ranges": [	
-                { "from": 0, "to": 0, "label": "unobserved" }, 	
-                { "from": 0, "to": 0.001, "label": "ultra-rare" },	
-                { "from": 0.001, "to": 0.01, "label": "rare" },	
-                { "from": 0.01, "to": 1, "label": "common" }	
+            "ranges": [
+                { "from": 0, "to": 0, "label": "unobserved" },
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },
+                { "from": 0.001, "to": 0.01, "label": "rare" },
+                { "from": 0.01, "to": 1, "label": "common" }
             ]
         }
         facs['variant.csq_gnomadg_af_popmax'] = {
@@ -600,11 +600,11 @@ class VariantTableParser(object):
             "number_step": "any",
             "order": 19,
             "grouping": "Population Frequency",
-            "ranges": [	
-                { "from": 0, "to": 0, "label": "unobserved" }, 	
-                { "from": 0, "to": 0.001, "label": "ultra-rare" },	
-                { "from": 0.001, "to": 0.01, "label": "rare" },	
-                { "from": 0.01, "to": 1, "label": "common" }	
+            "ranges": [
+                { "from": 0, "to": 0, "label": "unobserved" },
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },
+                { "from": 0.001, "to": 0.01, "label": "rare" },
+                { "from": 0.01, "to": 1, "label": "common" }
             ]
         }
         facs['variant.csq_phylop100way_vertebrate'] = {
@@ -613,12 +613,12 @@ class VariantTableParser(object):
             "number_step": "any",
             "order": 22,
             "grouping": "Effect Predictors",
-            "ranges": [	
-                { "from": -20, "to": -3, "label": "strong positive selection" },	
-                { "from": -3, "to": -2, "label": "positive selection" },	
-                { "from": -2, "to": 2, "label": "low selection" },	
-                { "from": 2, "to": 3, "label": "conserved" },	
-                { "from": 3, "to": 10, "label": "highly conserved"}	
+            "ranges": [
+                { "from": -20, "to": -3, "label": "strong positive selection" },
+                { "from": -3, "to": -2, "label": "positive selection" },
+                { "from": -2, "to": 2, "label": "low selection" },
+                { "from": 2, "to": 3, "label": "conserved" },
+                { "from": 3, "to": 10, "label": "highly conserved"}
             ]
         }
         facs['FS'] = {
@@ -628,8 +628,8 @@ class VariantTableParser(object):
             "order": 12,
             "grouping": "Variant Quality",
             "ranges": [
-                { "to": 20, "label": "Low Strand Bias (P ≥ 0.01)" },	
-                { "from": 20, "label": "High Strand Bias (P < 0.01)" }	
+                { "to": 20, "label": "Low Strand Bias (P ≥ 0.01)" },
+                { "from": 20, "label": "High Strand Bias (P < 0.01)" }
             ]
         }
         facs['AD_ALT'] = {
@@ -638,11 +638,11 @@ class VariantTableParser(object):
             "number_step": 1,
             "order": 10,
             "grouping": "Variant Quality",
-            "ranges": [	
-                { "from": 1, "to": 4, "label": "Very Low" },	
-                { "from": 5, "to": 9, "label": "Low" },	
-                { "from": 10, "to": 19, "label": "Medium" },	
-                { "from": 20, "label": "High" }	
+            "ranges": [
+                { "from": 1, "to": 4, "label": "Very Low" },
+                { "from": 5, "to": 9, "label": "Low" },
+                { "from": 10, "to": 19, "label": "Medium" },
+                { "from": 20, "label": "High" }
             ]
         }
         facs['novoPP'] = {
@@ -651,9 +651,9 @@ class VariantTableParser(object):
             "number_step": "any",
             "order": 16,
             "grouping": "Genotype",
-            "ranges": [	
-                { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },	
-                { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }	
+            "ranges": [
+                { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },
+                { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }
             ]
         }
 
@@ -791,7 +791,7 @@ class VariantTableParser(object):
                 "default_hidden": True
             }
         })
-        
+
 
     @staticmethod
     def extend_variant_sample_facets(facs):
@@ -999,15 +999,32 @@ class VariantTableParser(object):
             inserts: annotation field inserts
         """
         inserts = self.process_annotation_field_inserts()
-        variant_sample_props, vs_cols, vs_facs = self.generate_properties(self.filter_fields_by_sample(inserts), variant=False)
-        variant_props, v_cols, v_facs = self.generate_properties(self.filter_fields_by_variant(inserts))
-        variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props, cols=vs_cols, facs=vs_facs,
-                                                                    variant_cols=v_cols, variant_facs=v_facs)
-        variant_schema = self.generate_variant_schema(variant_props, cols=v_cols, facs=v_facs)
+        variant_sample_props, _, _ = self.generate_properties(self.filter_fields_by_sample(inserts), variant=False)
+        variant_props, _, _ = self.generate_properties(self.filter_fields_by_variant(inserts))
+        # as of 3/9/2021, this is now just the 'properties' of the schema
+        # columns/facets are edited directly - they are read in here from the
+        # output location (read in schema/overwrite when done, don't touch columns/facets)
+        new_variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props,
+                                                                        cols={}, facs={}, variant_cols={},
+                                                                        variant_facs={})
+        new_variant_schema = self.generate_variant_schema(variant_props, cols={}, facs={})
         if write:
             if not vs_out or not v_out:
                 raise MappingTableIntakeException('Write specified but no output file given')
-            self.write_schema(variant_sample_schema, vs_out)
+
+            # Read/replace columns/facets
+            # NOTE: This will not function correctly if you wipe the schemas!
+            # Although this isn't ideal, I'm not convinced it's a good use of time to do
+            # the refactoring necessary to pull the column/facet logic out. It's much easier
+            # to just ignore that info.
+            variant_sample_schema = json.load(open(vs_out))
+            new_variant_sample_schema['facets'] = variant_sample_schema['facets']
+            new_variant_sample_schema['columns'] = variant_sample_schema['columns']
+            self.write_schema(new_variant_sample_schema, vs_out)
+
+            variant_schema = json.load(open(vs_out))
+            new_variant_schema['facets'] = variant_schema['facets']
+            new_variant_schema['columns'] = variant_schema['columns']
             self.write_schema(variant_schema, v_out)
             logger.info('Successfully wrote schemas')
         if project or institution:
