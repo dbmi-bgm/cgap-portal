@@ -98,6 +98,11 @@ def build_variant_display_title(chrom, pos, ref, alt, sep='>'):
     )
 
 
+def build_variant_sample_annotation_id(call_info, variant_uuid, file_accession):
+    """ Helper function that builds a variant sample annotation ID from the required parts. """
+    return ':'.join([call_info, variant_uuid, file_accession])
+
+
 def load_extended_descriptions_in_schemas(schema_object, depth=0):
     '''
     MODIFIES SCHEMA_OBJECT **IN PLACE** RECURSIVELY
