@@ -194,7 +194,7 @@ class VariantTableParser(object):
                     link_type = 'embedded_field'
                     prefix = ''
                     if item.get('sub_embedding_group', None):
-                        prefix = self.format_sub_embedding_group_name(item.get('sub_embedding_group'), type='key') + '.'
+                        prefix = self.format_sub_embedding_group_name(item.get('sub_embedding_group'), t='key') + '.'
                     if link_type not in embeds[t]:
                         embeds[t][link_type] = [prefix + item[self.NAME_FIELD]]
                     else:
@@ -278,8 +278,8 @@ class VariantTableParser(object):
             if item.get('sub_embedding_group'):
                 sub_temp = {}
                 prop = {}
-                sum_ob_name = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='key')
-                sub_title = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='title')
+                sum_ob_name = self.format_sub_embedding_group_name(item['sub_embedding_group'], t='key')
+                sub_title = self.format_sub_embedding_group_name(item['sub_embedding_group'], t='title')
 
                 # handle sub-embedded object that is an array
                 if item.get('is_list'):
@@ -1028,7 +1028,7 @@ class VariantTableParser(object):
             variant_schema = json.load(open(v_out))
             new_variant_schema['facets'] = variant_schema['facets']
             new_variant_schema['columns'] = variant_schema['columns']
-            self.write_schema(variant_schema, v_out)
+            self.write_schema(new_variant_schema, v_out)
             logger.info('Successfully wrote schemas')
         if project or institution:
             for insert in inserts:
