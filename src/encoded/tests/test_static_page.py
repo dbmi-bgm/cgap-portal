@@ -1,25 +1,10 @@
-import io
-import json
-import pkg_resources
 import pytest
 
-from dcicutils.misc_utils import find_association
 from dcicutils.qa_utils import notice_pytest_fixtures
+from .helpers import workbook_lookup
 
 
 pytestmark = [pytest.mark.working]
-
-
-def workbook_lookup(item_type, **attributes):
-    return any_inserts_lookup('workbook-inserts', item_type=item_type, **attributes)
-
-
-def any_inserts_lookup(inserts_directory_name, item_type, **attributes):
-    item_filename = pkg_resources.resource_filename('encoded', 'tests/data/' + inserts_directory_name
-                                                    + "/" + item_type.lower() + ".json")
-    with io.open(item_filename) as fp:
-        data = json.load(fp)
-        return find_association(data, **attributes)
 
 
 def wait_for_index(testapp):
@@ -27,27 +12,27 @@ def wait_for_index(testapp):
 
 
 @pytest.fixture
-def posted_help_page_default():  # (workbook, es_testapp):
+def static_help_page_default():
     return workbook_lookup(item_type='Page', name='help/user-guide/rest-api')
 
 
-def test_posted_help_page_default(posted_help_page_default):
-    return posted_help_page_default['name'] == 'foo'
+def test_static_help_page_default(static_help_page_default):
+    assert static_help_page_default['name'] == 'help/user-guide/rest-api'
 
 
 @pytest.fixture
-def posted_help_page_in_review():  # (workbook, es_testapp):
+def static_help_page_in_review():
     return workbook_lookup(item_type='Page', name='help/user-guide/rest-api-in-review')
 
 
 @pytest.fixture
-def posted_help_page_deleted():  # (workbook, es_testapp):
+def static_help_page_deleted():
     return workbook_lookup(item_type='Page', name='help/user-guide/rest-api-deleted')
 
 
-def test_get_help_page(workbook, es_testapp, posted_help_page_default):
+def test_get_help_page(workbook, es_testapp, static_help_page_default):
     wait_for_index(es_testapp)
-    help_page_url = "/" + posted_help_page_default['name']
+    help_page_url = "/" + static_help_page_default['name']
     res = es_testapp.get(help_page_url, status=200)
     assert res.json['@id'] == help_page_url
     assert res.json['@context'] == help_page_url
@@ -56,25 +41,25 @@ def test_get_help_page(workbook, es_testapp, posted_help_page_default):
     # assert res.json['content'] == help_page['content'] # No longer works latter is set to an @id of static_section
     # Instead lets check what we have embedded on GET request is inside our doc file (rest_api_submission.md).
     assert 'Accession and uuid are automatically assigned during initial posting' in res.json['content'][0]['content']
-    assert res.json['toc'] == posted_help_page_default['table-of-contents']
+    assert res.json['toc'] == static_help_page_default['table-of-contents']
 
 
-def test_get_help_page_in_review(workbook, anon_html_es_testapp, html_es_testapp, posted_help_page_in_review):
+def test_get_help_page_in_review(workbook, anon_html_es_testapp, html_es_testapp, static_help_page_in_review):
     wait_for_index(html_es_testapp)
-    help_page_url = "/" + posted_help_page_in_review['name']
+    help_page_url = "/" + static_help_page_in_review['name']
     anon_html_es_testapp.get(help_page_url, status=403)
     html_es_testapp.get(help_page_url, status=200)
 
 
-def test_get_help_page_deleted(workbook, anon_html_es_testapp, html_es_testapp, posted_help_page_deleted):
+def test_get_help_page_deleted(workbook, anon_html_es_testapp, html_es_testapp, static_help_page_deleted):
     wait_for_index(html_es_testapp)
-    help_page_url = "/" + posted_help_page_deleted['name']
+    help_page_url = "/" + static_help_page_deleted['name']
     anon_html_es_testapp.get(help_page_url, status=403)
     html_es_testapp.get(help_page_url, status=200)  # Why 200 and not 404? -kmp 23-Feb-2021
 
 
 def test_get_help_page_no_access(workbook, anon_es_testapp, es_testapp, anon_html_es_testapp, html_es_testapp,
-                                 posted_help_page_default, posted_help_page_in_review, posted_help_page_deleted):
+                                 static_help_page_default, static_help_page_in_review, static_help_page_deleted):
     notice_pytest_fixtures(workbook)
     wait_for_index(es_testapp)
     success = True
@@ -82,9 +67,9 @@ def test_get_help_page_no_access(workbook, anon_es_testapp, es_testapp, anon_htm
                                     ("es", es_testapp, 'system'),
                                     ("anon_html_es", anon_html_es_testapp, 'anon'),
                                     ("html_es", html_es_testapp, 'system')]:
-        for help_page, is_public in [(posted_help_page_default, False),
-                                     (posted_help_page_in_review, False),
-                                     (posted_help_page_deleted, False)]:
+        for help_page, is_public in [(static_help_page_default, False),
+                                     (static_help_page_in_review, False),
+                                     (static_help_page_deleted, False)]:
             expected_code = 200 if is_public else (403 if role == 'anon' else 200)
             page_name = help_page['name']
             help_page_url = "/" + page_name
@@ -120,13 +105,13 @@ def check_page_unique_name(testapp, conflicting_page, page_to_patch):
     check_conflict(testapp.patch_json(actual_page_to_patch['@id'], conflicting_document, status=422))
 
 
-def test_page_unique_name(workbook, es_testapp, posted_help_page_in_review, posted_help_page_default):
+def test_page_unique_name(workbook, es_testapp, static_help_page_in_review, static_help_page_default):
     check_page_unique_name(testapp=es_testapp,
-                           conflicting_page=posted_help_page_default,
-                           page_to_patch=posted_help_page_in_review)
+                           conflicting_page=static_help_page_default,
+                           page_to_patch=static_help_page_in_review)
 
 
-def test_page_unique_name_deleted(workbook, es_testapp, posted_help_page_in_review, posted_help_page_deleted):
+def test_page_unique_name_deleted(workbook, es_testapp, static_help_page_in_review, static_help_page_deleted):
     check_page_unique_name(testapp=es_testapp,
-                           conflicting_page=posted_help_page_deleted,
-                           page_to_patch=posted_help_page_in_review)
+                           conflicting_page=static_help_page_deleted,
+                           page_to_patch=static_help_page_in_review)
