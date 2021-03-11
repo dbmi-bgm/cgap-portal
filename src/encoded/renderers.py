@@ -212,6 +212,8 @@ def security_tween_factory(handler, registry):
         # requests from Authorization header which acts like a CSRF token.
         # See authentication.py - get_jwt()
 
+        # Alex notes that we do not use request.session so this is probably very old. -kmp 4-Mar-2021
+ 
         # token = request.headers.get('X-CSRF-Token')
         # if token is not None:
         #     # Avoid dirtying the session and adding a Set-Cookie header
