@@ -20,6 +20,9 @@ clean-npm-caches:
 clean-node-modules:
 	rm -rf node_modules
 
+clear-poetry-cache:  # only to be done explicitly by user - never automatically. safe, but forces much slow recaching.
+	poetry cache clear pypi --all
+
 aws-ip-ranges:
 	curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
 
