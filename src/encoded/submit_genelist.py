@@ -142,10 +142,10 @@ class GeneListSubmission:
                     "/search/?type=Gene&gene_symbol=" + gene,
                 ).json["@graph"]
                 if len(response) == 1:
-                    if response[0]["@id"] in gene_ids:
+                    if response[0]["uuid"] in gene_ids:
                         continue
                     else:
-                        gene_ids[gene] = response[0]["@id"]
+                        gene_ids[gene] = response[0]["uuid"]
             except Exception:
                 unmatched_genes.append(gene)
         for gene in unmatched_genes.copy():
@@ -169,11 +169,13 @@ class GeneListSubmission:
                             search_term in response_item.keys()
                             and gene in response_item[search_term]
                         ):
-                            if response_item["@id"] in list(gene_ids.values()):
+                            if response_item["uuid"] in list(
+                                gene_ids.values()
+                            ):
                                 unmatched_genes.remove(gene)
                                 break
                             else:
-                                gene_ids[gene] = response_item["@id"]
+                                gene_ids[gene] = response_item["uuid"]
                                 unmatched_genes.remove(gene)
                     if gene in unmatched_genes:
                         options = []
@@ -368,38 +370,45 @@ class GeneListSubmission:
         variants_to_index = []
         variant_samples_to_index = []
         for gene_id in self.gene_ids:
-            variant_search = self.vapp.get(
-                "/search/?type=Variant"
-                "&genes.genes_most_severe_gene.%40id="
-                + gene_id
-                + "&field=uuid"
-            ).json
-            if variant_search["@graph"]:
-                for variant_response in variant_search:
-                    variants_to_index.append(variant_response["uuid"])
-            variant_sample_search = self.vapp.get(
-                "/search/?type=VariantSample"
-                "&variant.genes.genes_most_severe_gene.%40id="
-                + gene_id
-                + "&field=uuid"
-            ).json
-            if variant_sample_search["@graph"]:
-                for variant_sample_response in variant_sample_search:
-                    variant_samples_to_index.append(
-                        variant_sample_response["uuid"]
-                    )
-        items_to_index = list(
-            set(variants_to_index + variant_samples_to_index)
-        )
-        index_queue_post = {
-            "uuids": items_to_index,
-            "target_queue": "primary",
-            "strict": True,
-        }
-        post_response = self.vapp.post_json(
-            "/queue_indexing", index_queue_post
-        )
-        if post_response.json["status"] == "success":
-            return "success"
+            try:
+                variant_search = self.vapp.get(
+                    "/search/?type=Variant"
+                    "&genes.genes_most_severe_gene.uuid="
+                    + gene_id
+                    + "&field=uuid"
+                ).json
+                if variant_search["@graph"]:
+                    for variant_response in variant_search["@graph"]:
+                        variants_to_index.append(variant_response["uuid"])
+            except Exception:
+                pass
+            try:
+                variant_sample_search = self.vapp.get(
+                    "/search/?type=VariantSample"
+                    "&variant.genes.genes_most_severe_gene.uuid="
+                    + gene_id
+                    + "&field=uuid"
+                ).json
+                if variant_sample_search["@graph"]:
+                    for variant_sample_response in variant_sample_search[
+                        "@graph"
+                    ]:
+                        variant_samples_to_index.append(
+                            variant_sample_response["uuid"]
+                        )
+            except Exception:
+                pass
+        items_to_index = variants_to_index + variant_samples_to_index
+        if items_to_index:
+            index_queue_post = {
+                "uuids": items_to_index,
+                "target_queue": "primary",
+                "strict": True,
+            }
+            post_response = self.vapp.post_json(
+                "/queue_indexing", index_queue_post
+            )
+            if post_response.json["notification"] == "Success":
+                return "success"
         else:
             return None
