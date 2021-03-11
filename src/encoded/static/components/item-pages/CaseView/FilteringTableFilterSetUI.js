@@ -787,7 +787,7 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
         );
     }
 
-    const { correctedQuery, sortedFields } = useMemo(function(){
+    const { correctedQuery, sortedFields, fieldSchemas } = useMemo(function(){
 
         const origQs = queryString.parse(filterStrQuery);
 
@@ -854,16 +854,31 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
         });
 
 
+        // TODO: Consider moving this up to where facetDict is created, but would be
+        // bit more complexy to memoize well (and need to ensure removal of .from and .to for ranges).
+        const allFieldSchemas = {};
+
         // Transform rangeQs numbers into values.
         Object.keys(rangeQs).forEach(function(field){
             const { from = null, to = null } = rangeQs[field];
+            const fieldSchema = allFieldSchemas[field] = getSchemaProperty(field, schemas, "VariantSample");
+            const facet = facetDict[field];
+            const { title: facetTitle, abbreviation: facetAbbreviation = null } = facet;
+            const { abbreviation: fieldAbbreviation = null } = fieldSchema || {};
+            const title = facetAbbreviation || fieldAbbreviation || (facetTitle.length > 5 ? <em>N</em> : facetTitle);
             rangeQs[field] = [
-                <FormattedToFromRangeValue {...{ from, to }} facet={facetDict[field]} termTransformFxn={Schemas.Term.toName} key={0} />
+                <FormattedToFromRangeValue {...{ from, to, facet, title }} termTransformFxn={Schemas.Term.toName} key={0} />
             ];
         });
 
-        const sortedFields = Object.keys(termQs).concat(Object.keys(rangeQs)).sort(function(fA, fB){
-            // Sort keys by schema.facet.order, if any.
+        // Get rest of field schemas for term facets
+        const termFields = Object.keys(termQs);
+        termFields.forEach(function(field){
+            allFieldSchemas[field] = getSchemaProperty(field, schemas, "VariantSample");
+        });
+
+        // Combine & sort all filtered-on fields by their schema.facet.order, if any.
+        const sortedFields = termFields.concat(Object.keys(rangeQs)).sort(function(fA, fB){
             const fsA = facetDict[fA];
             const fsB = facetDict[fB];
             if (fsA && !fsB) return -1;
@@ -872,34 +887,29 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
             return (fsA.order || 10000) - (fsB.order || 10000);
         });
 
-        return { sortedFields, "correctedQuery" : { ...termQs, ...rangeQs } };
-    }, [ filterBlock, facetDict ]);
-
+        return {
+            sortedFields,
+            "fieldSchemas": allFieldSchemas,
+            "correctedQuery" : { ...termQs, ...rangeQs }
+        };
+    }, [ filterBlock, facetDict, schemas ]);
 
     return (
         <div className="d-flex flex-wrap filter-query-viz-blocks px-2">
             { sortedFields.map(function(field, index){
-                return <FieldBlock {...{ field, facetDict, schemas }} terms={correctedQuery[field]} key={field} />;
+                return <FieldBlock {...{ field }} fieldFacet={facetDict[field]} fieldSchema={fieldSchemas[field]} terms={correctedQuery[field]} key={field} />;
             }) }
         </div>
     );
 }
 
-function FieldBlock({ field, terms, facetDict, schemas }){
-
-    const fieldFacet = facetDict[field];
+function FieldBlock({ field, terms, fieldFacet, fieldSchema }){
     const {
         title: facetTitle = null,
         // description: facetDescription = null,
         // aggregation_type = "terms"
     } = fieldFacet || {};
 
-
-    // if (aggregation_type === "stats") {
-    //     // TODO: Show single > or < or something.
-    // }
-
-    const fieldSchema = getSchemaProperty(field, schemas, "VariantSample");
     const {
         // Used primarily as fallback, we expect/hope for fieldFacet to be present/used primarily instead.
         title: fieldTitle = null,
