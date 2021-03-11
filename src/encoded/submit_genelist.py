@@ -68,6 +68,7 @@ class GeneListSubmission:
         self.post_bodies = self.create_post_bodies()
         self.validation_output = self.validate_postings()
         self.post_output = self.post_items()
+        self.variants_queued = self.queue_associated_variants()
 
     def parse_genelist(self):
         """
@@ -87,7 +88,7 @@ class GeneListSubmission:
             if "title" in line.lower():
                 title_line = line
                 title_idx = title_line.lower().index("title")
-                title_line = title_line[title_idx + 5:]
+                title_line = title_line[title_idx + 5 :]
                 title_line = title_line.translate(
                     {ord(i): None for i in ':;"\n"'}
                 )
@@ -352,3 +353,53 @@ class GeneListSubmission:
                 self.errors.append("Posting gene list failed: " + str(e))
                 result = None
         return result
+
+    def queue_associated_variants(self):
+        """
+        If gene list successfully posted, queue variant(sample)s for indexing
+        so they can be updated to reflect the new gene list.
+
+        Returns one of:
+            - 'success' if variants found and queued for indexing
+            - None if otherwise
+        """
+        if not self.post_output:
+            return None
+        variants_to_index = []
+        variant_samples_to_index = []
+        for gene_id in self.gene_ids:
+            variant_search = self.vapp.get(
+                "/search/?type=Variant"
+                "&genes.genes_most_severe_gene.%40id="
+                + gene_id
+                + "&field=uuid"
+            ).json
+            if variant_search["@graph"]:
+                for variant_response in variant_search:
+                    variants_to_index.append(variant_response["uuid"])
+            variant_sample_search = self.vapp.get(
+                "/search/?type=VariantSample"
+                "&variant.genes.genes_most_severe_gene.%40id="
+                + gene_id
+                + "&field=uuid"
+            ).json
+            if variant_sample_search["@graph"]:
+                for variant_sample_response in variant_sample_search:
+                    variant_samples_to_index.append(
+                        variant_sample_response["uuid"]
+                    )
+        items_to_index = list(
+            set(variants_to_index + variant_samples_to_index)
+        )
+        index_queue_post = {
+            "uuids": items_to_index,
+            "target_queue": "primary",
+            "strict": True,
+        }
+        post_response = self.vapp.post_json(
+            "/queue_indexing", index_queue_post
+        )
+        if post_response.json["status"] == "success":
+            return "success"
+        else:
+            return None
