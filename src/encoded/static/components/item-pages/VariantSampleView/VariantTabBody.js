@@ -138,6 +138,7 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         ["fin", "Finnish"],
         ["nfe", "Non-Finnish European"],
         ["sas", "South Asian"],
+        ["mid", "Middle Eastern"],
         ["oth", "Other Ancestry"]
     ];
     const ancestryRowData = _.sortBy(
