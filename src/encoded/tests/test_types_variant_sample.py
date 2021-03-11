@@ -1,6 +1,7 @@
 import pytest
 import requests  # XXX: C4-211
 from .variant_fixtures import VARIANT_SAMPLE_URL
+from encoded.types.variant import build_variant_sample_annotation_id
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]
@@ -30,3 +31,15 @@ def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     # download location is https://test-wfout-bucket.s3.amazonaws.com/dummy-file-name2/bamsnap/chr1_12125898.png
     resp = requests.get(download)
     assert 'hello world' in resp.content.decode('utf-8')
+
+
+@pytest.mark.parametrize('call_info,variant_uuid,file_accession', [
+    ('NA1278_SAMPLE', 'uuid1', 'GAPIDFIABC'),
+    ('NA1279_SAMPLE', 'uuid1', 'GAPIDFIABC'),
+    ('NA1279_SAMPLE', 'uuid2', 'GAPIDFIABC'),
+])
+def test_build_variant_sample_annotation_id(call_info, variant_uuid, file_accession):
+    """ Some sanity checks for this helper function, which will cause variant sample
+        patches to fail if not working correctly """
+    assert build_variant_sample_annotation_id(call_info, variant_uuid, file_accession) == (
+            call_info + ':' + variant_uuid + ':' + file_accession)

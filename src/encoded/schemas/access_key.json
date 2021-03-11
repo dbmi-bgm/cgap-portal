@@ -5,10 +5,18 @@
     "required": [],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        }
     ],
     "type": "object",
     "properties": {
@@ -19,7 +27,7 @@
             "title": "Status",
             "type": "string",
             "default": "current",
-            "enum" : [
+            "enum": [
                 "current",
                 "deleted"
             ]
@@ -47,9 +55,9 @@
             "type": "string"
         }
     },
-    "facets" : {
-        "user.display_title" : {
-            "title" : "User Name"
+    "facets": {
+        "user.display_title": {
+            "title": "User Name"
         }
     }
 }

@@ -98,9 +98,9 @@ function AboveCasesTableOptions(props){
                         </div>
                     </h3>
                     <div className="btn-container">
-                        <a className="btn btn-primary btn-block" href="/search/?type=Case&currentAction=add">
+                        <a className="btn btn-primary btn-block" href="/search/?type=IngestionSubmission&currentAction=add">
                             <i className="icon icon-plus fas" />
-                            <span className="ml-1 d-none d-sm-inline">New Case</span>
+                            <span className="ml-1 d-none d-sm-inline">Submit New Case(s)</span>
                         </a>
                     </div>
                 </div>
