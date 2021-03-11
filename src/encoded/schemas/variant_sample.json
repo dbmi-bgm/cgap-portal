@@ -492,7 +492,7 @@
                     "title": "Variant Display Title"
                 },
                 {
-                    "field": "variant.csq_rs_dbsnp151",
+                    "field": "variant.ID",
                     "title": "dbSNP RS Number"
                 }
             ]

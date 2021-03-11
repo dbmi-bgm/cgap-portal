@@ -573,7 +573,7 @@ class VCFParser(object):
                         tmp['samplegeno_gt'] = gt
                         tmp['samplegeno_ad'] = ad
                         tmp['samplegeno_sampleid'] = sample_id
-                        tmp['samplegeno_ac'] = ac
+                        tmp['samplegeno_ac'] = int(ac)  # must be cast to int
                         s['samplegeno'].append(tmp)
                 elif field == 'cmphet':
                     comhet = record.INFO.get('comHet', None)
