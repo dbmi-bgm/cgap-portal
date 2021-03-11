@@ -254,20 +254,20 @@ class SubmissionRow:
     class used to hold metadata parsed from one row of spreadsheet at a time
     """
 
-    def __init__(self, row, idx, family_alias, project, institution):
+    def __init__(self, metadata, idx, family_alias, project, institution):
         self.project = project
         self.institution = institution
-        self.metadata = row
+        self.metadata = metadata
         self.row = idx
         self.errors = []
         if not self.found_missing_values():
             self.indiv_alias = '{}:individual-{}'.format(
-                project, remove_spaces_in_id(row[SS_INDIVIDUAL_ID])
+                project, remove_spaces_in_id(metadata[SS_INDIVIDUAL_ID])
             )
             self.fam_alias = family_alias
-            self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(row[SS_SPECIMEN_ID]))
-            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row[SS_ANALYSIS_ID]))
-            self.case_name = remove_spaces_in_id(row.get('unique analysis id'))
+            self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(metadata[SS_SPECIMEN_ID]))
+            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(metadata[SS_ANALYSIS_ID]))
+            self.case_name = remove_spaces_in_id(metadata.get('unique analysis id'))
             self.individual = self.extract_individual_metadata()
             self.family = self.extract_family_metadata()
             self.sample, self.analysis = self.extract_sample_metadata()
@@ -447,10 +447,10 @@ class SubmissionRow:
 
 class PedigreeRow:
 
-    def __init__(self, row, metadata, project, institution):
+    def __init__(self, metadata, idx, project, institution):
         self.project = project
         self.institution = institution
-        self.row = row
+        self.row = idx
         self.metadata = metadata
         self.indiv_alias = '{}:individual-{}'.format(project, remove_spaces_in_id(metadata['individual id']))
         self.individual = self.extract_individual_metadata()
@@ -466,15 +466,19 @@ class PedigreeRow:
 
     def extract_individual_metadata(self):
         info = {'aliases': [self.indiv_alias]}
-        simple_fields = ['family_id', 'individual_id', 'clinic_notes', 'ancestry',
+        simple_fields = ['family_id', 'individual_id', 'sex', 'clinic_notes', 'ancestry',
                          'quantity', 'life_status', 'cause_of_death', 'age_at_death',
                          'age_at_death_units', 'gestational_age', 'cause_of_infertility']
         info = map_fields(self.metadata, info, simple_fields, 'individual')
-        # TODO: handle life status enum
         for field in info:
             if field.startswith('is_'):
                 info[field] = is_yes_value(info[field])
+        info['phenotypic_features'] = [item.strip() for item in info['phenotypic_features'].split(',')]
+        info['disorders'] = [item.strip() for item in info['disorders'].split(',')]
         info['phenotypic_features'] = self.reformat_phenotypic_features(info.get('phenotypic_features', []))
+        for col in ['age', 'birth_year', 'age_at_death', 'gestational_age', 'quantity']:
+            if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
+                info[col] = int(info[col])
         return MetadataItem(info, self.row, 'individual')
 
     def is_proband(self):

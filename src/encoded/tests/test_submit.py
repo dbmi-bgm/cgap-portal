@@ -10,6 +10,8 @@ from ..submit import (
     MetadataItem,
     SubmissionRow,
     SubmissionMetadata,
+    PedigreeRow,
+    PedigreeMetadata,
     SpreadsheetProcessing,
     map_fields,
     parse_exception,
@@ -53,8 +55,8 @@ def row_dict_pedigree():
     return {
         'family id': '333',
         'individual id': '456',
-        'mother': '123',
-        'father': '789',
+        'mother id': '123',
+        'father id': '789',
         'sex': 'M',
         'proband': 'Y',
         'hpo terms': 'HP:123, HP:999',
@@ -523,30 +525,36 @@ class TestSubmissionMetadata:
 
 class TestPedigreeRow:
 
-    def test_extract_individual_metadata(self, row_dict, project, institution):
-        obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+    def test_extract_individual_metadata(self, row_dict_pedigree, project, institution):
+        obj = PedigreeRow(row_dict_pedigree, 1, project['name'], institution['name'])
         assert obj.indiv_alias == 'encode-project:individual-456'
         assert obj.individual.metadata['aliases'] == [obj.indiv_alias]
-        assert obj.individual.metadata['individual_id'] == row_dict['individual id']
+        assert obj.individual.metadata['individual_id'] == row_dict_pedigree['individual id']
+        for item in ['family_id', 'individual_id', 'mother', 'father', 'sex', 'proband',
+                     'phenotypic_features', 'disorders', 'ancestry', 'life_status', 'is_deceased',
+                     'is_termination_of_pregnancy', 'is_still_birth', 'is_pregnancy',
+                     'is_spontaneous_abortion', 'is_infertile', 'no_children_by_choice']:
+            assert item in obj.individual.metadata
+            print(obj.individual.metadata)
 
-    @pytest.mark.parametrize('field, error', [
-        ('workup type', False),
-        ('specimen id', True),
-        ('individual id', True),
-        ('family id', False),
-        ('relation to proband', True),
-        ('analysis id', True),
-        ('report required', True),
-        ('specimen type', False),
-        ('alsdkjfdk', False)
-    ])
-    def test_found_missing_values(self, row_dict, project, institution, field, error):
-        """some columns are required for spreadsheet submission, others are optional."""
-        row_dict[field] = None
-        obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
-        assert (len(obj.errors) > 0) == error
-        assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
-                ''.format(field) in obj.errors) == error
+    # @pytest.mark.parametrize('field, error', [
+    #     ('workup type', False),
+    #     ('specimen id', True),
+    #     ('individual id', True),
+    #     ('family id', False),
+    #     ('relation to proband', True),
+    #     ('analysis id', True),
+    #     ('report required', True),
+    #     ('specimen type', False),
+    #     ('alsdkjfdk', False)
+    # ])
+    # def test_found_missing_values(self, row_dict, project, institution, field, error):
+    #     """some columns are required for spreadsheet submission, others are optional."""
+    #     row_dict[field] = None
+    #     obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+    #     assert (len(obj.errors) > 0) == error
+    #     assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
+    #             ''.format(field) in obj.errors) == error
 
 
 class TestSpreadsheetProcessing:
