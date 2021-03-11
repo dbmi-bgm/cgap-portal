@@ -40,15 +40,28 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isFullScreen, currentTab } = this.state;
+        console.log(currentTab);
 
+        let panelToDisplay = null;
+        switch(currentTab) {
+            case "Variant Notes":
+                panelToDisplay = <GenericInterpretationPanelController noteLabel={currentTab} key={0} saveToField="variant_notes" noteType="note_standard" { ...this.props }/>;
+                break;
+            case "Gene Notes":
+                panelToDisplay = <GenericInterpretationPanelController noteLabel={currentTab} key={1} saveToField="gene_notes" noteType="note_standard" { ...this.props }/>;
+                break;
+            case "Interpretation":
+                panelToDisplay = <GenericInterpretationPanelController noteLabel={currentTab} key={2} saveToField="interpretation" noteType="note_interpretation" { ...this.props }/>;
+                break;
+            default:
+                break;
+        }
         return (
             <div className="card interpretation-space">
                 <InterpretationHeader {...{ isFullScreen }} toggleFullScreen={this.toggleFullScreen}/>
                 <div className="card-body">
                     <InterpretationTabs {...{ currentTab }} switchToTab={this.switchToTab} />
-                    {/** Eventually, there will be 3 separate instances of GenericInterperetationPanelController; each with different
-                     * props/options that show/hide according to currently selected tab. -- right now same one is being shared for all */}
-                    <GenericInterpretationPanelController noteLabel={currentTab} { ...this.props }/>
+                    { panelToDisplay }
                 </div>
             </div>
         );
@@ -114,12 +127,14 @@ class GenericInterpretationPanelController extends React.Component {
      * to check other locations for gene items, interpretation notes, etc)
      */
     getMostRecentNoteInterpretation() {
-        const { context: { interpretation = null } = {} } = this.props;
+        const { context, saveToField } = this.props;
+        console.log("saveToField", saveToField);
+        const { [saveToField]: note = null } = context || {};
 
         // Determine which interpretation note to load into state
-        if (interpretation) { // Check for saved notes on Variant first
+        if (note) { // Check for saved notes on Variant first
             // TODO: See if this needs to be sorted or if most recent will always be the last one
-            return [interpretation, "VariantSample"];
+            return [note, "VariantSample"];
         }
         return null; // Can assume there are no notes
     }
@@ -129,14 +144,21 @@ class GenericInterpretationPanelController extends React.Component {
      * @param {Object} note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
      */
     postNewNoteInterpretation(note, version = 1) {
-        const { context: { institution = null, project = null } = {} } = this.props;
+        const { context: { institution = null, project = null } = {}, noteType } = this.props;
         const { '@id': institutionID } = institution || {};
         const { '@id': projectID } = project || {};
 
         const noteToSubmit = { ...note };
 
-        // Prune keys with incomplete values
-        if (noteToSubmit.classification === null) {
+        if (noteType === "note_interpretation") {
+            // Prune keys with incomplete values
+            if (noteToSubmit.classification === null) {
+                delete noteToSubmit.classification;
+            }
+        } else {
+            // Prune unused keys
+            delete noteToSubmit.acmg_guidelines;
+            delete noteToSubmit.conclusion;
             delete noteToSubmit.classification;
         }
 
@@ -144,13 +166,14 @@ class GenericInterpretationPanelController extends React.Component {
         noteToSubmit.project = projectID;
         noteToSubmit.version = version;
 
-        return ajax.promise('/note_interpretation/', 'POST', {}, JSON.stringify(noteToSubmit));
+        return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(noteToSubmit));
     }
 
     patchNewNoteToVS(noteResp) {
-        const { context: { '@id': vsAtID = null } = {} } = this.props;
+        console.log("noteResp", noteResp);
+        const { context: { '@id': vsAtID = null } = {}, saveToField } = this.props;
         const { '@id': noteAtID } = noteResp;
-        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ interpretation: noteAtID }));
+        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteAtID }));
     }
 
     patchPreviouslySavedNote(noteAtID, noteToPatch) { // ONLY USED FOR DRAFTS -- other notes are cloned
@@ -159,6 +182,7 @@ class GenericInterpretationPanelController extends React.Component {
 
     saveAsDraft(note) {
         const { interpretationNote } = this.state;
+        const { noteType } = this.props;
 
         // Does a draft already exist?
         if (interpretationNote) { // Patch the pre-existing draft item & overwrite it
@@ -169,8 +193,15 @@ class GenericInterpretationPanelController extends React.Component {
 
             const noteToSubmit = { ...note };
 
-            // Prune keys with incomplete values
-            if (noteToSubmit.classification === null) {
+            if (noteType === "note_interpretation") {
+                // Prune keys with incomplete values
+                if (noteToSubmit.classification === null) {
+                    delete noteToSubmit.classification;
+                }
+            } else {
+                // Prune unused keys
+                delete noteToSubmit.acmg_guidelines;
+                delete noteToSubmit.conclusion;
                 delete noteToSubmit.classification;
             }
 
@@ -200,11 +231,11 @@ class GenericInterpretationPanelController extends React.Component {
                     .then((response) => {
                         // TODO: Some handling for various fail responses/codes
                         console.log("Successfully created new item", response);
-                        const { '@graph': noteItem } = response;
+                        const { '@graph': noteItem = {} } = response;
 
                         // Temporarily try to update state here... since 'response' with note item is not accessible in next step
                         // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
-                        this.setState({ loading: false, interpretationNote: noteItem[0], noteSource: "VariantSample" });
+                        this.setState({ loading: false, interpretationNote: noteItem, noteSource: "VariantSample" });
                         return this.patchNewNoteToVS(noteItem[0]);
                     })
                     .then((resp) => {
