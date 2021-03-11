@@ -45,6 +45,17 @@
     "properties": {
         "schema_version": {
             "default": "1"
+        },
+        "version": {
+            "title": "Version",
+            "type": "number",
+            "description": "Version of this particular note"
+        },
+        "previous_note": {
+            "title": "Previous Note",
+            "description": "If not version 1, the previous note this is modified from",
+            "type": "string",
+            "linkTo": "NoteInterpretation"
         }
     },
     "facets": {},
