@@ -14,6 +14,7 @@ import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { getSchemaProperty } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/schema-transforms';
+import { FormattedToFromRangeValue } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/FacetList/RangeFacet';
 
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 
@@ -615,7 +616,7 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
     );
 });
 
-
+/** Shown temporarily while initial FilterSet is still loading */
 const DummyLoadingFilterBlock = React.memo(function DummyLoadingFilterBlock(){
     // dummyObject & filterBlock, though are objects which wouldn't === each other in prop comparisons, are not emitted from a useMemo since entire component is memoized and doesn't receive any [changes in] props.
     const dummyObject = {};
@@ -788,47 +789,18 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
 
     const { correctedQuery, sortedFields } = useMemo(function(){
 
-        // Taken from SPC/RangeFacet roughly (maybe in future can be pulled out/reusable SPC func)
-        function formatRangeVal(field, rangeVal){
-            const fieldFacet = facetDict[field];
-            const { field_type } = fieldFacet;
-
-            if (field_type === "date") {
-                return <LocalizedTime timestamp={value} localize={false} />;
-            }
-            if (field_type === "number"){
-                rangeVal = parseFloat(rangeVal);
-            }
-
-            let valToShow = Schemas.Term.toName(field, rangeVal, false);
-            if (typeof valToShow === "number") {
-                const absVal = Math.abs(valToShow);
-                if (absVal.toString().length <= 7){
-                    // Else is too long and will go thru toPrecision or toExponential.
-                    if (absVal >= 1000) {
-                        valToShow = decorateNumberWithCommas(valToShow);
-                    } else {
-                        // keep valToShow
-                    }
-                } else {
-                    valToShow = valToShow.toExponential(3);
-                }
-            } // else is assumed to be valid JSX already
-            return valToShow;
-        }
-
         const origQs = queryString.parse(filterStrQuery);
-        const qs = {};
-        Object.keys(origQs).forEach(function(k){
 
-            // Standardize vals into arrays (w. len 1 if needed).
-            let v = origQs[k];
-            if (!Array.isArray(v)) {
-                v = [v];
-            }
+        const termQs = {};
+        // Will fill this with `{ field: { from, to } }` and create combined items for them afterwards.
+        const rangeQs = {};
+
+        Object.keys(origQs).forEach(function(k){
 
             // Remove .from or .to if needed, confirm aggregation_type === stats, and transform/merge values
             let field = k;
+            let v = origQs[k];
+
             let removedRangeFacetAppendage = false;
             if (k.slice(-5) === ".from"){
                 field = k.slice(0, -5);
@@ -839,9 +811,8 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
                     console.error("Attempted to remove 'from' from field but couldn't succeed", field, facetDict);
                 } else {
                     removedRangeFacetAppendage = true;
-                    v = v.map(function(rangeVal, i){
-                        return <span key={i}><i className="icon icon-fw icon-greater-than-equal small fas mr-08"/>{ formatRangeVal(field, rangeVal) }</span>;
-                    });
+                    rangeQs[field] = rangeQs[field] || {};
+                    rangeQs[field].from = v;
                 }
 
             } else if (k.slice(-3) === ".to") {
@@ -853,28 +824,45 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
                     console.error("Attempted to remove 'to' from field but couldn't succeed", field, facetDict);
                 } else {
                     removedRangeFacetAppendage = true;
-                    v = v.map(function(rangeVal, i){
-                        return <span key={i}><i className="icon icon-fw icon-less-than-equal fas small mr-08"/>{ formatRangeVal(field, rangeVal) }</span>;
-                    });
+                    rangeQs[field] = rangeQs[field] || {};
+                    rangeQs[field].to = v;
                 }
             }
 
-            if (!removedRangeFacetAppendage) {
-                // If not range facet, transform vals to proper names.
-                v = v.map(function(termVal){
-                    return Schemas.Term.toName(field, termVal);
-                });
+            if (removedRangeFacetAppendage) {
+                return;
             }
+
+
+            // Standardize term values of the parsed query object into arrays (including w. length=1).
+            if (!Array.isArray(v)) {
+                v = [v];
+            }
+            // If not range facet, transform vals to proper names.
+            // (formatRangeVal will do same if necessary)
+            v = v.map(function(termVal){
+                return Schemas.Term.toName(field, termVal);
+            });
 
             // Merge, e.g. if a from and a to
             if (typeof qs[field] !== "undefined") {
-                qs[field] = qs[field].concat(v);
+                termQs[field] = qs[field].concat(v);
             } else {
-                qs[field] = v;
+                termQs[field] = v;
             }
+
         });
 
-        const sortedFields = Object.keys(qs).sort(function(fA, fB){
+
+        // Transform rangeQs numbers into values.
+        Object.keys(rangeQs).forEach(function(field){
+            const { from = null, to = null } = rangeQs[field];
+            rangeQs[field] = [
+                <FormattedToFromRangeValue {...{ from, to }} facet={facetDict[field]} termTransformFxn={Schemas.Term.toName} key={0} />
+            ];
+        });
+
+        const sortedFields = Object.keys(termQs).concat(Object.keys(rangeQs)).sort(function(fA, fB){
             // Sort keys by schema.facet.order, if any.
             const fsA = facetDict[fA];
             const fsB = facetDict[fB];
@@ -884,7 +872,7 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
             return (fsA.order || 10000) - (fsB.order || 10000);
         });
 
-        return { sortedFields, "correctedQuery" : qs, };
+        return { sortedFields, "correctedQuery" : { ...termQs, ...rangeQs } };
     }, [ filterBlock, facetDict ]);
 
 
