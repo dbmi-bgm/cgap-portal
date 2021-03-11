@@ -17,7 +17,6 @@ from snovault.schema_utils import load_schema
 from snovault.util import add_default_embeds
 from webtest import AppError
 from .data_caches import es_data_cache, ExtendedWorkbookCache
-from .data_caches import WorkbookCache, workbook, personas
 from ..commands.run_upgrader_on_inserts import get_inserts
 from ..search import lucene_builder
 from ..search.lucene_builder import LuceneBuilder
