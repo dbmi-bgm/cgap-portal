@@ -496,6 +496,18 @@
             "default": 0,
             "min": 0
         },
+        "csq_gnomadg_ac-mid": {
+            "title": "GnomAD Alt AC - Middle Eastern",
+            "field_name": "csq_gnomadg_ac-mid",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "csq_gnomadg_ac-mid",
+            "source_name": "gnomAD",
+            "source_version": "v3.1",
+            "description": "Alternate allele count for samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - Middle Eastern"
+        },
         "csq_gnomadg_ac-nfe": {
             "title": "GnomAD Alt AC - Non-Finnish European",
             "field_name": "csq_gnomadg_ac-nfe",
@@ -671,6 +683,18 @@
             "default": 0,
             "min": 0,
             "max": 1
+        },
+        "csq_gnomadg_af-mid": {
+            "title": "GnomAD Alt AF - Middle Eastern",
+            "field_name": "csq_gnomadg_af-mid",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_gnomadg_af-mid",
+            "source_name": "gnomAD",
+            "source_version": "v3.1",
+            "description": "Alternate allele frequency in samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AF - Middle Eastern"
         },
         "csq_gnomadg_af-nfe": {
             "title": "GnomAD Alt AF - Non-Finnish European",
@@ -854,6 +878,18 @@
             "schema_title": "GnomAD Total AN - Finnish",
             "min": 0
         },
+        "csq_gnomadg_an-mid": {
+            "title": "GnomAD Total AN - Middle Eastern",
+            "field_name": "csq_gnomadg_an-mid",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "csq_gnomadg_an-mid",
+            "source_name": "gnomAD",
+            "source_version": "v3.1",
+            "description": "Total number of alleles in samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - Middle Eastern"
+        },
         "csq_gnomadg_an-nfe": {
             "title": "GnomAD Total AN - Non-Finnish European",
             "field_name": "csq_gnomadg_an-nfe",
@@ -1016,6 +1052,18 @@
             "schema_title": "GnomAD Homozygous Count - Finnish",
             "default": 0,
             "min": 0
+        },
+        "csq_gnomadg_nhomalt-mid": {
+            "title": "GnomAD Homozygous Count - Middle Eastern",
+            "field_name": "csq_gnomadg_nhomalt-mid",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "csq_gnomadg_nhomalt-mid",
+            "source_name": "gnomAD",
+            "source_version": "v3.1",
+            "description": "Count of homozygous individuals in samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "GnomAD Homozygous Count - Middle Eastern"
         },
         "csq_gnomadg_nhomalt-nfe": {
             "title": "GnomAD Homozygous Count - Non-Finnish European",
