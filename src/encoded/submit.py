@@ -225,6 +225,10 @@ def remove_spaces_in_id(id_value):
     return id_value.replace(' ', '_')
 
 
+def generate_individual_alias(project_name, individual_id):
+    return '{}:individual-{}'.format(project_name, remove_spaces_in_id(individual_id))
+
+
 def is_yes_value(str_value):
     """
     Determines whether the value of a field means 'yes'.
@@ -261,9 +265,7 @@ class SubmissionRow:
         self.row = idx
         self.errors = []
         if not self.found_missing_values():
-            self.indiv_alias = '{}:individual-{}'.format(
-                project, remove_spaces_in_id(metadata[SS_INDIVIDUAL_ID])
-            )
+            self.indiv_alias = generate_individual_alias(project, metadata[SS_INDIVIDUAL_ID])
             self.fam_alias = family_alias
             self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(metadata[SS_SPECIMEN_ID]))
             self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(metadata[SS_ANALYSIS_ID]))
@@ -452,11 +454,23 @@ class PedigreeRow:
         self.institution = institution
         self.row = idx
         self.metadata = metadata
-        self.indiv_alias = '{}:individual-{}'.format(project, remove_spaces_in_id(metadata['individual id']))
-        self.individual = self.extract_individual_metadata()
-        # self.family = None
-        self.proband = self.is_proband()
         self.errors = []
+        if not self.found_missing_values():
+            self.indiv_alias = generate_individual_alias(project, metadata[SS_INDIVIDUAL_ID])
+            self.individual = self.extract_individual_metadata()
+            # self.family = None
+            self.proband = self.is_proband()
+
+    def found_missing_values(self):
+        # makes sure no required values from spreadsheet are missing
+        missing_required = [col for col in REQUIRED_COLUMNS_PEDIGREE
+                            if col not in self.metadata or not self.metadata[col]]
+        if missing_required:
+            self.errors.append(
+                'Row {} - missing required field(s) {}. This row cannot be processed.'
+                ''.format(self.row, ', '.join(missing_required))
+            )
+        return len(self.errors) > 0
 
     @staticmethod
     def reformat_phenotypic_features(feature_list):
@@ -473,8 +487,13 @@ class PedigreeRow:
         for field in info:
             if field.startswith('is_'):
                 info[field] = is_yes_value(info[field])
-        info['phenotypic_features'] = [item.strip() for item in info['phenotypic_features'].split(',')]
-        info['disorders'] = [item.strip() for item in info['disorders'].split(',')]
+        for field in ['mother', 'father']:  # turn mother and father IDs into item aliases
+            if field in info:
+                info[field] = generate_individual_alias(self.project, info[field])
+        if info.get('phenotypic_features'):
+            info['phenotypic_features'] = [item.strip() for item in info['phenotypic_features'].split(',')]
+        if info.get('disorders'):
+            info['disorders'] = [item.strip() for item in info['disorders'].split(',')]
         info['phenotypic_features'] = self.reformat_phenotypic_features(info.get('phenotypic_features', []))
         for col in ['age', 'birth_year', 'age_at_death', 'gestational_age', 'quantity']:
             if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
