@@ -58,9 +58,9 @@ export class InterpretationSpaceController extends React.Component {
         }
         return (
             <div className="card interpretation-space">
-                <InterpretationHeader {...{ isFullScreen }} toggleFullScreen={this.toggleFullScreen}/>
+                <InterpretationSpaceHeader {...{ isFullScreen }} toggleFullScreen={this.toggleFullScreen}/>
                 <div className="card-body">
-                    <InterpretationTabs {...{ currentTab }} switchToTab={this.switchToTab} />
+                    <InterpretationSpaceTabs {...{ currentTab }} switchToTab={this.switchToTab} />
                     { panelToDisplay }
                 </div>
             </div>
@@ -68,7 +68,7 @@ export class InterpretationSpaceController extends React.Component {
     }
 }
 
-function InterpretationHeader(props) {
+function InterpretationSpaceHeader(props) {
     const { toggleFullScreen, isFullScreen } = props;
     return (
         <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
@@ -81,7 +81,7 @@ function InterpretationHeader(props) {
     );
 }
 
-function InterpretationTabs(props) {
+function InterpretationSpaceTabs(props) {
     const { currentTab, switchToTab } = props;
 
     const variantNotesActive = currentTab === "Variant Notes" ? true : false;
@@ -109,11 +109,11 @@ class GenericInterpretationPanelController extends React.Component {
     constructor(props) {
         super(props);
 
-        const { 0: note, 1: noteSource } = this.getMostRecentNoteInterpretation() || [];
+        const { 0: note, 1: noteSource } = this.getMostRecentNote() || [];
 
         this.state = {
             loading : false,
-            interpretationNote: note, // Check after mount for last saved version of interpretation note
+            lastSavedNote: note, // Check after mount for last saved version of interpretation note
             noteSource : noteSource   // Currently just VariantSample... eventually could be KnowledgeBase, Gene
         };
 
@@ -126,7 +126,7 @@ class GenericInterpretationPanelController extends React.Component {
      * Used on initialization to find the most recent note attached to the current VS (will need tweaking
      * to check other locations for gene items, interpretation notes, etc)
      */
-    getMostRecentNoteInterpretation() {
+    getMostRecentNote() {
         const { context, saveToField } = this.props;
         console.log("saveToField", saveToField);
         const { [saveToField]: note = null } = context || {};
@@ -143,7 +143,7 @@ class GenericInterpretationPanelController extends React.Component {
      * Can be used for cloning+updating notes OR creating new drafts
      * @param {Object} note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
      */
-    postNewNoteInterpretation(note, version = 1) {
+    postNewNote(note, version = 1) {
         const { context: { institution = null, project = null } = {}, noteType } = this.props;
         const { '@id': institutionID } = institution || {};
         const { '@id': projectID } = project || {};
@@ -181,15 +181,15 @@ class GenericInterpretationPanelController extends React.Component {
     }
 
     saveAsDraft(note) {
-        const { interpretationNote } = this.state;
+        const { lastSavedNote } = this.state;
         const { noteType } = this.props;
 
         // Does a draft already exist?
-        if (interpretationNote) { // Patch the pre-existing draft item & overwrite it
-            console.log("Note already exists... need to patch pre-existing draft", interpretationNote);
+        if (lastSavedNote) { // Patch the pre-existing draft item & overwrite it
+            console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
             const {
                 '@id': noteAtID, version,
-            } = interpretationNote;
+            } = lastSavedNote;
 
             const noteToSubmit = { ...note };
 
@@ -216,7 +216,7 @@ class GenericInterpretationPanelController extends React.Component {
                         const { '@graph': graph } = response;
                         const { 0: newlySavedDraft } = graph || [];
                         // TODO: Some handling for various fail responses/codes
-                        this.setState({ loading: false, interpretationNote: newlySavedDraft, noteSource: "VariantSample" });
+                        this.setState({ loading: false, lastSavedNote: newlySavedDraft, noteSource: "VariantSample" });
                         console.log("Successfully overwritten previous draft of note", response);
                     })
                     .catch((err) => {
@@ -227,7 +227,7 @@ class GenericInterpretationPanelController extends React.Component {
             });
         } else { // Create a whole new item, and patch to VS
             this.setState({ loading: true }, () => {
-                this.postNewNoteInterpretation(note)
+                this.postNewNote(note)
                     .then((response) => {
                         // TODO: Some handling for various fail responses/codes
                         console.log("Successfully created new item", response);
@@ -235,7 +235,7 @@ class GenericInterpretationPanelController extends React.Component {
 
                         // Temporarily try to update state here... since 'response' with note item is not accessible in next step
                         // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
-                        this.setState({ loading: false, interpretationNote: noteItem, noteSource: "VariantSample" });
+                        this.setState({ loading: false, lastSavedNote: noteItem, noteSource: "VariantSample" });
                         return this.patchNewNoteToVS(noteItem[0]);
                     })
                     .then((resp) => {
@@ -261,10 +261,10 @@ class GenericInterpretationPanelController extends React.Component {
     }
 
     render(){
-        const { interpretationNote } = this.state;
+        const { lastSavedNote } = this.state;
         const { noteLabel } = this.props;
         return <GenericInterpretationPanel saveAsDraft={this.saveAsDraft} saveToCase={this.saveToCase}
-            lastSavedNote={interpretationNote} saveToKnowledgeBase={this.saveToKnowledgeBase} {...{ noteLabel }} />;
+            lastSavedNote={lastSavedNote} saveToKnowledgeBase={this.saveToKnowledgeBase} {...{ noteLabel }} />;
     }
 }
 
@@ -314,8 +314,8 @@ class GenericInterpretationPanel extends React.Component {
         const { note_text: noteText } = this.state;
 
         // TODO: move into a function and memoize once checking other values of state, too
-        const interpretationChanged = noteText !== savedNoteText;
-        const interpretationExists = !!noteText;
+        const noteChangedSinceLastSave = noteText !== savedNoteText;
+        const noteTextPresent = !!noteText;
         const isDraft = savedNoteStatus === "in review";
         const isCurrent = savedNoteStatus === "current";
 
@@ -325,7 +325,7 @@ class GenericInterpretationPanel extends React.Component {
                     { noteLabel }
                 </label>
                 <textarea className="w-100" value={noteText} onChange={(e) => this.onTextChange(e, "note_text")}/>
-                <GenericInterpretationSubmitButton {...{ isCurrent, isDraft, interpretationExists, interpretationChanged, noteLabel }}
+                <GenericInterpretationSubmitButton {...{ isCurrent, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
                     saveAsDraft={this.saveStateAsDraft} saveToCase={this.saveStateToCase} saveToKnowledgeBase={this.saveStateToKnowledgeBase}
                 />
             </div>
@@ -334,21 +334,21 @@ class GenericInterpretationPanel extends React.Component {
 }
 
 /**
- * Displays and handles different CTAs for various stages in the Interpretation Submission Process
+ * Displays and handles different CTAs for various stages in the Note Submission Process
  */
 function GenericInterpretationSubmitButton(props) {
     const {
         isCurrent,                  // Has note been submitted to case; only cloning enabled -- can save to KB
         isDraft,                    // Has previous note been saved, but not submitted;
-        interpretationExists,       // Is there text in the interpretation note space
-        interpretationChanged,      // Has the text in the interpretation note space changed since last save
+        noteTextPresent,            // Is there text in the note space
+        noteChangedSinceLastSave,   // Has the text in the note space changed since last save
         saveAsDraft,                // Fx -- save as Draft
         saveToCase,                 // Fx -- save to Case (handles cloning in response to edits as well as first time additions)
         saveToKnowledgeBase,        // Fx -- save to KB
         cls
     } = props;
 
-    const allButtonsDropsDisabled = !interpretationExists || !interpretationChanged;
+    const allButtonsDropsDisabled = !noteTextPresent || !noteChangedSinceLastSave;
 
     // TODO: Add additional conditions to check for is inKnowledgeBase
     if (isCurrent || isDraft) {
@@ -377,7 +377,7 @@ function GenericInterpretationSubmitButton(props) {
                 </Button>
                 <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" disabled={allButtonsDropsDisabled} />
                 <Dropdown.Menu>
-                    <Dropdown.Item onClick={saveToCase} disabled={!interpretationExists || !interpretationChanged}>
+                    <Dropdown.Item onClick={saveToCase} disabled={!noteTextPresent || !noteChangedSinceLastSave}>
                         Approve for Case
                     </Dropdown.Item>
                     <Dropdown.Item disabled>
