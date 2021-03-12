@@ -535,9 +535,12 @@ class SubmissionMetadata:
         if item.alias not in prev:
             previous[item.alias] = item.metadata
         else:
-            for key in item.metadata:
+            for key, value in item.metadata.items():
                 if key not in previous[item.alias]:
-                    previous[item.alias][key] = item.metadata[key]
+                    previous[item.alias][key] = value
+                # extend list field (e.g. combine samples in diff rows for Individual item)
+                elif key != 'aliases' and isinstance(value, list):
+                    previous[item.alias][key].extend(value)
 
     def add_family_metadata(self, idx, family, individual):
         """
