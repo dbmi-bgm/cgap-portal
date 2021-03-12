@@ -497,7 +497,7 @@ class IngestionListener:
                 reformat_vcf(reformat_args)
 
                 # Add altcounts by gene
-                formatted_with_alt_counts = tempfile.NamedTemporaryFile()
+                formatted_with_alt_counts = tempfile.NamedTemporaryFile(mode='w+')  # cannot pass bytes to vcf.Reader()
                 alt_counts_args = {
                     'inputfile': formatted.name,
                     'outputfile': formatted_with_alt_counts.name
