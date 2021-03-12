@@ -541,6 +541,7 @@ class SubmissionMetadata:
                 # extend list field (e.g. combine samples in diff rows for Individual item)
                 elif key != 'aliases' and isinstance(value, list):
                     previous[item.alias][key].extend(value)
+                    previous[item.alias][key] = list(set(previous[item.alias][key]))
 
     def add_family_metadata(self, idx, family, individual):
         """
