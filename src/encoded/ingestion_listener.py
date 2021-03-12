@@ -488,7 +488,7 @@ class IngestionListener:
                 # Apply VCF reformat
                 vcf_to_be_formatted = tempfile.NamedTemporaryFile(suffix='.gz')
                 vcf_to_be_formatted.write(raw_content)
-                formatted = tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8')
+                formatted = tempfile.NamedTemporaryFile()
                 reformat_args = {
                     'inputfile': vcf_to_be_formatted.name,
                     'outputfile': formatted.name,
@@ -497,7 +497,7 @@ class IngestionListener:
                 reformat_vcf(reformat_args)
 
                 # Add altcounts by gene
-                formatted_with_alt_counts = tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8')
+                formatted_with_alt_counts = tempfile.NamedTemporaryFile()
                 alt_counts_args = {
                     'inputfile': formatted.name,
                     'outputfile': formatted_with_alt_counts.name
