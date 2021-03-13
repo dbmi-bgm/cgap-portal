@@ -231,12 +231,13 @@ class GenericInterpretationPanelController extends React.Component {
                     .then((response) => {
                         // TODO: Some handling for various fail responses/codes
                         console.log("Successfully created new item", response);
-                        const { '@graph': noteItem = {} } = response;
+                        const { '@graph': noteItems = [] } = response;
+                        const { 0: noteItem } = noteItems;
 
                         // Temporarily try to update state here... since 'response' with note item is not accessible in next step
                         // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
                         this.setState({ loading: false, lastSavedNote: noteItem, noteSource: "VariantSample" });
-                        return this.patchNewNoteToVS(noteItem[0]);
+                        return this.patchNewNoteToVS(noteItem);
                     })
                     .then((resp) => {
                         console.log("Successfully linked note object to variant sample", resp);
