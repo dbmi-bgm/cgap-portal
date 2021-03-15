@@ -23,7 +23,7 @@
             "title": "Previous Note",
             "description": "If not version 1, the previous note this is modified from",
             "type": "string",
-            "linkTo": "NoteInterpretation"
+            "linkTo": "Note"
         },
         "note_text": {
             "title": "Note Text",

@@ -100,6 +100,9 @@
             "title": "Conclusion",
             "description": "concluding statement summarizing this interpretation",
             "type": "string"
+        },
+        "previous_note": {
+            "linkTo": "NoteInterpretation"
         }
     },
     "facets": {
