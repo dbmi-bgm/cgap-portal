@@ -38,7 +38,7 @@
         "institution": "hms-dbmi",
         "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afc00",
         "attachment": {
-            "download": "DRR_test-previous-doc_gene_list.txt",
+            "download": "Test_gene_list_genelist.txt",
             "type": "text/plain",
 	    "href": "data:text/plain;base64,UHl0aG9u"
         }
