@@ -141,9 +141,11 @@ class GenericInterpretationPanelController extends React.Component {
 
     /**
      * Can be used for cloning+updating notes OR creating new drafts
-     * @param {Object} note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
+     * @param {Object}   note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
+     * @param {Integer}  version  Number to set version to
+     * @param {String}   status   Should be "in review" or "current"; newly created notes shouldn't be "approved"
      */
-    postNewNote(note, version = 1) {
+    postNewNote(note, version = 1, status = null) {
         const { context: { institution = null, project = null } = {}, noteType } = this.props;
         const { '@id': institutionID } = institution || {};
         const { '@id': projectID } = project || {};
@@ -162,6 +164,10 @@ class GenericInterpretationPanelController extends React.Component {
             delete noteToSubmit.classification;
         }
 
+        if (status !== null) {
+            noteToSubmit.status = status;
+        }
+
         noteToSubmit.institution = institutionID;
         noteToSubmit.project = projectID;
         noteToSubmit.version = version;
@@ -176,7 +182,13 @@ class GenericInterpretationPanelController extends React.Component {
         return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteAtID }));
     }
 
-    patchPreviouslySavedNote(noteAtID, noteToPatch) { // ONLY USED FOR DRAFTS -- other notes are cloned
+    patchPreviouslySavedNote(noteAtID, noteToPatch, status = null) { // ONLY USED FOR DRAFTS -- other notes are cloned
+        if (status === "current") { // only used to convert "in review" to "current" (draft -> approved for case)
+            noteToPatch.status = status;
+            // TODO: add approved_by and approved_date stamps
+            // newNote.approved_date = Date.now();
+            // newNote.approved_by = ; // get user @id
+        }
         return ajax.promise(noteAtID, 'PATCH', {}, JSON.stringify(noteToPatch));
     }
 
@@ -184,7 +196,7 @@ class GenericInterpretationPanelController extends React.Component {
         const { lastSavedNote } = this.state;
         const { noteType } = this.props;
 
-        // Does a draft already exist?
+        // Does a draft already exist? TODO: Update this to actually check that draft is status = in review
         if (lastSavedNote) { // Patch the pre-existing draft item & overwrite it
             console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
             const {
@@ -254,7 +266,106 @@ class GenericInterpretationPanelController extends React.Component {
     }
 
     saveToCase(note) { // Does not save to case; saves to variantsample if not existing -- status change?
-        console.log("saveToCase", note);
+        const { lastSavedNote } = this.state;
+        const { noteType } = this.props;
+
+        if (lastSavedNote) {
+            const { status, version, '@id': noteAtID } = lastSavedNote;
+            if (status === "current") { // approved for case; future saves must be cloned
+                const newNote = { ...note };
+                newNote.previous_note = noteAtID;
+                console.log("newNote", newNote);
+                // newNote.approved_by =  ; // pull user ID from context
+                // newNote.approved_date = Date.now();
+
+                this.postNewNote(note, version + 1, "current")
+                    .then((response) => {
+                        // TODO: Some handling for various fail responses/codes
+                        console.log("Successfully created new item", response);
+                        const { '@graph': noteItems = [] } = response;
+                        const { 0: noteItem } = noteItems;
+
+                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
+                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
+                        this.setState({ loading: false, lastSavedNote: noteItem, noteSource: "VariantSample" });
+                        return this.patchNewNoteToVS(noteItem);
+                    })
+                    .then((resp) => {
+                        console.log("Successfully linked note object to variant sample", resp);
+                        // const { '@graph': noteItem } = response;
+                        // TODO: Find way to update state with new interpretation note here instead
+                    })
+                    .catch((err) => {
+                        // TODO: Error handling
+                        console.log(err);
+                        this.setState({ loading: false });
+                    });
+
+
+
+            } else if (status === "in review") { // patch draft to approve for case
+                console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
+
+                const noteToSubmit = { ...note };
+
+                if (noteType === "note_interpretation") {
+                    // Prune keys with incomplete values
+                    if (noteToSubmit.classification === null) {
+                        delete noteToSubmit.classification;
+                    }
+                } else {
+                    // Prune unused keys
+                    delete noteToSubmit.acmg_guidelines;
+                    delete noteToSubmit.conclusion;
+                    delete noteToSubmit.classification;
+                }
+
+                // Bump version number
+                noteToSubmit.version = version + 1;
+
+                this.setState({ loading: true }, () => {
+                    this.patchPreviouslySavedNote(noteAtID, noteToSubmit, "current")
+                        .then((response) => {
+                            const { '@graph': graph } = response;
+                            const { 0: newlySavedDraft } = graph || [];
+                            // TODO: Some handling for various fail responses/codes
+                            this.setState({ loading: false, lastSavedNote: newlySavedDraft, noteSource: "VariantSample" });
+                            console.log("Successfully overwritten previous draft of note", response);
+                        })
+                        .catch((err) => {
+                            // TODO: Error handling
+                            console.log(err);
+                            this.setState({ loading: false });
+                        });
+                });
+            }
+        } else { // No drafts or previous versions exist -- post with status of current
+            this.setState({ loading: true }, () => {
+                console.log("note", note);
+                this.postNewNote(note, undefined, "current")
+                    .then((response) => {
+                        // TODO: Some handling for various fail responses/codes
+                        console.log("Successfully created new item", response);
+                        const { '@graph': noteItems = [] } = response;
+                        const { 0: noteItem } = noteItems;
+
+                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
+                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
+                        this.setState({ loading: false, lastSavedNote: noteItem, noteSource: "VariantSample" });
+                        return this.patchNewNoteToVS(noteItem);
+                    })
+                    .then((resp) => {
+                        console.log("Successfully linked note object to variant sample", resp);
+                        // const { '@graph': noteItem } = response;
+                        // TODO: Find way to update state with new interpretation note here instead
+                    })
+                    .catch((err) => {
+                        // TODO: Error handling
+                        console.log(err);
+                        this.setState({ loading: false });
+                    });
+            });
+        }
     }
 
     saveToKnowledgeBase(note) {
@@ -358,7 +469,7 @@ function GenericInterpretationSubmitButton(props) {
         return (
             <Dropdown as={ButtonGroup} className={cls}>
                 <Button variant="primary btn-block" onClick={isCurrent ? saveToKnowledgeBase : saveToCase}
-                    disabled={!isDraft && allButtonsDropsDisabled}
+                    // disabled={(!isDraft && allButtonsDropsDisabled) || (!isCurrent && allButtonDrops)}
                 >
                     { isCurrent ? "Save to Knowledge Base" : "Approve for Case" }
                 </Button>
