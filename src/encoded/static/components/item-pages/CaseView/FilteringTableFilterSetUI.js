@@ -845,8 +845,8 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
             });
 
             // Merge, e.g. if a from and a to
-            if (typeof qs[field] !== "undefined") {
-                termQs[field] = qs[field].concat(v);
+            if (typeof termQs[field] !== "undefined") {
+                termQs[field] = termQs[field].concat(v);
             } else {
                 termQs[field] = v;
             }
