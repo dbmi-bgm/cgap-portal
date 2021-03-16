@@ -2,7 +2,7 @@
 
 ################################################
 #
-#   Add alt allele counts on most sever gene
+#   Add alt allele counts on most severe gene
 #       per sample
 #
 #   Michele Berselli
