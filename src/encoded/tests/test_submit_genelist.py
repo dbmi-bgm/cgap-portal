@@ -26,8 +26,8 @@ class TestGeneListSubmission:
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
             "DRR_test-parse_gene_list.txt",
-            project['@id'],
-            institution['@id'],
+            project["@id"],
+            institution["@id"],
             es_testapp,
         )
         assert len(genelist.genes) == 3
@@ -42,15 +42,17 @@ class TestGeneListSubmission:
         assert genelist.post_output
         assert genelist.variants_queued == "success"
 
-    def test_parse_empty_genelist(self, es_testapp, workbook, project, institution):
+    def test_parse_empty_genelist(
+        self, es_testapp, workbook, project, institution
+    ):
         """
         Tests for detection of empty gene list and no title.
         """
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
             "DRR_test-empty_gene_list.txt",
-            project['@id'],
-            institution['@id'],
+            project["@id"],
+            institution["@id"],
             es_testapp,
         )
         assert not genelist.title
@@ -67,8 +69,8 @@ class TestGeneListSubmission:
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
             "DRR_test-match_gene_list.txt",
-            project['@id'],
-            institution['@id'],
+            project["@id"],
+            institution["@id"],
             es_testapp,
         )
         assert len(genelist.gene_ids) == 3
@@ -82,15 +84,17 @@ class TestGeneListSubmission:
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
             "DRR_test-no-match_gene_list.txt",
-            project['@id'],
-            institution['@id'],
+            project["@id"],
+            institution["@id"],
             es_testapp,
         )
         assert len(genelist.gene_ids) == 3
         assert genelist.errors
         assert not genelist.post_output
 
-    def test_validate_and_post(self, es_testapp, workbook, project, institution):
+    def test_validate_and_post(
+        self, es_testapp, workbook, project, institution
+    ):
         """
         Test for correct validation but no posting of document and gene list
         when some genes are not identified in the database.
@@ -98,8 +102,8 @@ class TestGeneListSubmission:
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
             "DRR_test-no-match_gene_list.txt",
-            project['@id'],
-            institution['@id'],
+            project["@id"],
+            institution["@id"],
             es_testapp,
         )
         assert genelist.validation_output
@@ -114,8 +118,8 @@ class TestGeneListSubmission:
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
             "DRR_test-previous-title_gene_list.txt",
-            project['@id'],
-            institution['@id'],
+            project["@id"],
+            institution["@id"],
             es_testapp,
         )
         assert genelist.patch_genelist_uuid

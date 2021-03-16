@@ -38,10 +38,14 @@ def submit_genelist(
                 filename, project, institution, vapp, validate_only
             )
             if validate_only:
-                results["validation_output"] = genelist.validation_output + genelist.notes
+                results["validation_output"] = (
+                    genelist.validation_output + genelist.notes
+                )
             elif genelist.post_output:
                 results["success"] = True
-                results["validation_output"] = genelist.validation_output + genelist.notes
+                results["validation_output"] = (
+                    genelist.validation_output + genelist.notes
+                )
                 results["post_output"] = genelist.post_output
             else:
                 results["validation_output"] = genelist.errors
@@ -88,7 +92,7 @@ class GeneListSubmission:
             if "title" in line.lower():
                 title_line = line
                 title_idx = title_line.lower().index("title")
-                title_line = title_line[title_idx + 5:]
+                title_line = title_line[title_idx + 5 :]
                 title_line = title_line.translate(
                     {ord(i): None for i in ':;"\n"'}
                 )
@@ -181,8 +185,8 @@ class GeneListSubmission:
                         if gene in gene_ids:
                             gene_ids[gene].append(response_item["uuid"])
                             self.notes.append(
-                                    'Note: gene %s refers to multiple genes in our '
-                                    'database.' % gene
+                                "Note: gene %s refers to multiple genes in our "
+                                "database." % gene
                             )
                         else:
                             gene_ids[gene] = [response_item["uuid"]]
@@ -212,14 +216,17 @@ class GeneListSubmission:
                             and gene in response_item[search_term]
                         ):
                             current_gene_uuids = [
-                                uuid for sublist in gene_ids.values()
+                                uuid
+                                for sublist in gene_ids.values()
                                 for uuid in sublist
                             ]
                             if response_item["uuid"] in current_gene_uuids:
                                 unmatched_genes.remove(gene)
                                 break
                             else:
-                                gene_ids[response_item["gene_symbol"]] = response_item["uuid"]
+                                gene_ids[
+                                    response_item["gene_symbol"]
+                                ] = response_item["uuid"]
                                 unmatched_genes.remove(gene)
                     if gene in unmatched_genes:
                         options = []
