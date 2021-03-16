@@ -251,7 +251,8 @@ table.matrix {
 						So, to improve visual appeal, we can and should align the label to top edge.
 						This is done with an align-items override below.
 					*/
-					align-items: stretch; /* overrides default align-items: center */
+
+					/* align-items: stretch; */ /* overrides default align-items: center */
 				}
 	
 			}
