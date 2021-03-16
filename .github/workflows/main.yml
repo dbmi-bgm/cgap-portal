@@ -74,7 +74,7 @@ jobs:
           make travis-test-npm
 
       - name: Cleanup (NPM)
-        if: ${{ matrix.test_type == 'NPM' }}
+        if: ${{ always() && matrix.test_type == 'NPM' }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
           # The need for this old environment variable name will go away soon.
@@ -102,7 +102,7 @@ jobs:
           make travis-test-unit
 
       - name: Cleanup (UNIT)
-        if: ${{ matrix.test_type == 'UNIT' }}
+        if: ${{ always() && matrix.test_type == 'UNIT' }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
           # The need for this old environment variable name will go away soon.

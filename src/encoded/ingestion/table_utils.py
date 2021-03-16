@@ -801,9 +801,6 @@ class VariantTableParser(object):
         """ Builds the variant_sample.json schema based on sample_props. Will also add variant columns and
             facets since this information is embedded.
 
-            NOTE: the output of this function is intended to have columns/facets overwritten.
-            Ensure not to remove the original schema!
-
         Args:
             sample_props: first output of generate_properties
 
@@ -1015,7 +1012,7 @@ class VariantTableParser(object):
             if not vs_out or not v_out:
                 raise MappingTableIntakeException('Write specified but no output file given')
 
-            # Read/replace columns/facets
+            # Read/replace columns/facets and update properties
             # NOTE: This will not function correctly if you wipe the schemas!
             # Although this isn't ideal, I'm not convinced it's a good use of time to do
             # the refactoring necessary to pull the column/facet logic out. It's much easier
