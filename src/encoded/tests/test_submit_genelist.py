@@ -53,8 +53,8 @@ class TestGeneListSubmission:
             institution['@id'],
             es_testapp,
         )
-        assert genelist.title is None
-        assert genelist.genes is None
+        assert not genelist.title
+        assert not genelist.genes
         assert genelist.errors
 
     def test_match_genes(self, es_testapp, workbook, project, institution):

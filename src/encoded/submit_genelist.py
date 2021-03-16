@@ -1,6 +1,7 @@
 import itertools
 import re
 from base64 import b64encode
+from openpyxl import load_workbook
 
 from .util import s3_local_file
 
@@ -32,15 +33,15 @@ def submit_genelist(
             "post_output": [],
             "upload_info": [],
         }
-        if filename.endswith(".txt"):
+        if filename.endswith((".txt", ".xlsx")):
             genelist = GeneListSubmission(
-                    filename, project, institution, vapp, validate_only
+                filename, project, institution, vapp, validate_only
             )
             if validate_only:
-                results["validation_output"] = genelist.validation_output
+                results["validation_output"] = genelist.validation_output + genelist.notes
             elif genelist.post_output:
                 results["success"] = True
-                results["validation_output"] = genelist.validation_output
+                results["validation_output"] = genelist.validation_output + genelist.notes
                 results["post_output"] = genelist.post_output
             else:
                 results["validation_output"] = genelist.errors
@@ -55,34 +56,33 @@ class GeneListSubmission:
     Class to handle processing of submitted gene list.
     """
 
-    def __init__(self, filename, project, institution, vapp,
-                 validate_only=False):
+    def __init__(
+        self, filename, project, institution, vapp, validate_only=False
+    ):
         self.filename = filename
         self.project = project
         self.institution = institution
         self.vapp = vapp
         self.errors = []
+        self.notes = []
         self.genes, self.title = self.parse_genelist()
         self.gene_ids = self.match_genes()
         self.post_bodies = self.create_post_bodies()
-        self.validation_output, self.patch_genelist_uuid, self.patch_document_uuid = self.validate_postings()
+        (
+            self.validation_output,
+            self.patch_genelist_uuid,
+            self.patch_document_uuid,
+            self.previous_gene_ids,
+        ) = self.validate_postings()
         if not validate_only:
             self.post_output = self.post_items()
             self.variants_queued = self.queue_associated_variants()
 
-    def parse_genelist(self):
-        """
-        Parses gene list file, extracts title, and removes any duplicate genes.
-
-        Assumes gene list is txt file with line-separated title/genes.
-
-        Returns:
-            - a unique gene list (None if empty)
-            - gene list title (None if not found or project already has a gene
-              list of the same title)
-        """
-
-        with open(self.filename, "r") as genelist_file:
+    @staticmethod
+    def extract_txt_file(txt_file):
+        title = None
+        genelist = []
+        with open(txt_file, "r") as genelist_file:
             genelist_raw = genelist_file.readlines()
         for line in genelist_raw:
             if "title" in line.lower():
@@ -93,26 +93,61 @@ class GeneListSubmission:
                     {ord(i): None for i in ':;"\n"'}
                 )
                 title = title_line.strip()
+                if title == "":
+                    title = None
                 genelist_raw.remove(line)
                 break
-        if not title:
-            title = None
-            self.errors.append("No title found for the gene list.")
-        genelist = []
         for line in genelist_raw:
             line = line.translate({ord(i): None for i in '"\t""\n":;'})
             genelist.append(line.strip())
+        return title, genelist
+
+    @staticmethod
+    def extract_xlsx_file(xlsx_file):
+        title = None
+        genelist = []
+        wb = load_workbook(xlsx_file)
+        sheet = wb.worksheets[0]
+        for col in sheet.iter_cols(values_only=True):
+            if col[0] is not None:
+                if "Title" in col[0]:
+                    title = col[1]
+                if "Genes" in col[0]:
+                    for cell in col[1:]:
+                        if cell is not None:
+                            genelist.append(cell)
+        return title, genelist
+
+    def parse_genelist(self):
+        """
+        Parses gene list file, extracts title, and removes any duplicate genes.
+
+        Assumes gene list is txt file with line-separated title/genes or an
+        xlsx file with standard formatting defined.
+
+        Returns:
+            - gene list title (None if not found)
+            - a unique gene list (possibly empty)
+        """
+
+        title = None
+        genelist = []
+        if self.filename.endswith(".txt"):
+            title, genelist = self.extract_txt_file(self.filename)
+        elif self.filename.endswith(".xlsx"):
+            title, genelist = self.extract_xlsx_file(self.filename)
+        if not title:
+            self.errors.append("No title found for the gene list.")
         while "" in genelist:
             genelist.remove("")
+        if not genelist:
+            self.errors.append("The gene list appears to be empty.")
         if len(genelist) != len(set(genelist)):
             unique_genes = []
             for gene in genelist:
                 if gene not in unique_genes:
                     unique_genes.append(gene)
             genelist = unique_genes
-        if not genelist:
-            genelist = None
-            self.errors.append("The gene list appears to be empty.")
         return genelist, title
 
     def match_genes(self):
@@ -120,13 +155,13 @@ class GeneListSubmission:
         Attempts to match every gene to unique gene item in CGAP.
 
         Matches by gene symbol, alias symbol, previous symbol, genereviews
-        symbol, Ensembl ID, OMIM ID, Entrez ID, and UniProt ID, in that order.
+        symbol, OMIM ID, Entrez ID, and UniProt ID, in that order.
         If multiple genes in the given gene list direct to the same gene item,
         only one instance is included, so the gene list produced may be shorter
         than the one submitted.
 
         Returns one of:
-            - list of gene uuids in alphabetical order
+            - list of gene uuids in CGAP gene title alphabetical order
             - None if no genes were passed in or >= 1 gene could not be matched
         """
 
@@ -141,11 +176,18 @@ class GeneListSubmission:
                 response = self.vapp.get(
                     "/search/?type=Gene&gene_symbol=" + gene,
                 ).json["@graph"]
-                if len(response) == 1:
-                    if response[0]["uuid"] in gene_ids:
-                        continue
-                    else:
-                        gene_ids[gene] = response[0]["uuid"]
+                if len(response) >= 1:
+                    for response_item in response:
+                        if gene in gene_ids:
+                            gene_ids[gene].append(response_item["uuid"])
+                            self.notes.append(
+                                    'Note: gene %s refers to multiple genes in our '
+                                    'database.' % gene
+                            )
+                        else:
+                            gene_ids[gene] = [response_item["uuid"]]
+                else:
+                    unmatched_genes.append(gene)
             except Exception:
                 unmatched_genes.append(gene)
         for gene in unmatched_genes.copy():
@@ -169,13 +211,15 @@ class GeneListSubmission:
                             search_term in response_item.keys()
                             and gene in response_item[search_term]
                         ):
-                            if response_item["uuid"] in list(
-                                gene_ids.values()
-                            ):
+                            current_gene_uuids = [
+                                uuid for sublist in gene_ids.values()
+                                for uuid in sublist
+                            ]
+                            if response_item["uuid"] in current_gene_uuids:
                                 unmatched_genes.remove(gene)
                                 break
                             else:
-                                gene_ids[gene] = response_item["uuid"]
+                                gene_ids[response_item["gene_symbol"]] = response_item["uuid"]
                                 unmatched_genes.remove(gene)
                     if gene in unmatched_genes:
                         options = []
@@ -201,11 +245,11 @@ class GeneListSubmission:
                         "Consider replacing with one of the following: %s."
                         % (gene, ", ".join(unmatched_genes_with_options[gene]))
                     )
-        gene_ids = {
-            dict_key: gene_ids[dict_key]
-            for dict_key in sorted(gene_ids.keys())
-        }
-        return list(gene_ids.values())
+        sorted_gene_names = sorted(gene_ids)
+        matched_gene_uuids = []
+        for gene_name in sorted_gene_names:
+            matched_gene_uuids += gene_ids[gene_name]
+        return matched_gene_uuids
 
     def create_post_bodies(self):
         """
@@ -219,18 +263,44 @@ class GeneListSubmission:
         if not self.gene_ids:
             return None
         with open(self.filename, "rb") as stream:
-            attach = {
-                "download": (
-                    self.title.replace(' ', '_').replace("'", "")
-                    + '_genelist.txt'
-                    if self.title
-                    else 'Stand_in_genelist.txt'),
-                "type": "text/plain",
-                "href": (
-                    "data:%s;base64,%s"
-                    % ("text/plain", b64encode(stream.read()).decode("ascii"))
-                ),
-            }
+            if self.filename.endswith("txt"):
+                attach = {
+                    "download": (
+                        self.title.replace(" ", "_").replace("'", "")
+                        + "_genelist.txt"
+                        if self.title
+                        else "Stand_in_genelist.txt"
+                    ),
+                    "type": "text/plain",
+                    "href": (
+                        "data:%s;base64,%s"
+                        % (
+                            "text/plain",
+                            b64encode(stream.read()).decode("ascii"),
+                        )
+                    ),
+                }
+            elif self.filename.endswith("xlsx"):
+                attach = {
+                    "download": (
+                        self.title.replace(" ", "_").replace("'", "")
+                        + "_genelist.xlsx"
+                        if self.title
+                        else "Stand_in_genelist.xlsx"
+                    ),
+                    "type": (
+                        "application/vnd.openxmlformats-officedocument."
+                        "spreadsheetml.sheet"
+                    ),
+                    "href": (
+                        "data:%s;base64,%s"
+                        % (
+                            "application/vnd.openxmlformats-officedocument."
+                            "spreadsheetml.sheet",
+                            b64encode(stream.read()).decode("ascii"),
+                        )
+                    ),
+                }
         document_post_body = {
             "institution": self.institution,
             "project": self.project,
@@ -238,7 +308,11 @@ class GeneListSubmission:
             "attachment": attach,
         }
         genelist_post_body = {
-            "title": self.title + " (%s)" % len(self.gene_ids),
+            "title": (
+                self.title + " (%s)" % len(self.gene_ids)
+                if self.title
+                else "Stand in title"
+            ),
             "institution": self.institution,
             "project": self.project,
             "genes": self.gene_ids,
@@ -251,26 +325,33 @@ class GeneListSubmission:
         Attempts to validate document and gene list jsons provided by
         post_bodies.
 
-        May need to be updated when handling overwriting of previous files as
-        is only set to post at the moment.
+        Gene lists of the same title belonging to the same project will be
+        searched for, and if a match is discovered, the gene list and document
+        will be patched and updated. If no match is found, a new document and
+        gene list will be posted.
 
         Returns one of:
-            - 'success' if both documents validated
-            - None if no jsons were created or validation failed
+            - Dict with information on validation, previously existing gene
+              list uuid (None if no match), previously existing document
+              uuid (None if no match), and list of genes that were removed from
+              the previous gene list (None if not applicable).
+            - None, None, None, None if no jsons were created in previous step
         """
 
         if not self.post_bodies:
-            return None, None, None
+            return None, None, None, None
         validate_result = {}
         genelist_uuid = None
         document_uuid = None
+        previous_genelist_gene_ids = []
         document_json = self.post_bodies[0]
         genelist_json = self.post_bodies[1]
         if self.title:
             try:
                 project_genelists = self.vapp.get(
                     "/search/?type=GeneList"
-                    "&project.%40id=" + self.project.replace('/', '%2F')
+                    "&project.%40id="
+                    + self.project.replace("/", "%2F")
                     + "&field=title&field=uuid&field=genes.uuid"
                 ).json["@graph"]
                 project_titles = [x["title"] for x in project_genelists]
@@ -279,10 +360,16 @@ class GeneListSubmission:
                     if not title_count:
                         if self.title == previous_title:
                             genelist_idx = project_titles.index(previous_title)
-                            genelist_uuid = project_genelists[genelist_idx]["uuid"]
-                            genelist_gene_uuids = project_genelists[genelist_idx]["genes"]
+                            genelist_uuid = project_genelists[genelist_idx][
+                                "uuid"
+                            ]
+                            genelist_gene_uuids = project_genelists[
+                                genelist_idx
+                            ]["genes"]
                             for gene_uuid in genelist_gene_uuids:
-                                self.gene_ids.append(gene_uuid['uuid'])
+                                previous_genelist_gene_ids.append(
+                                    gene_uuid["uuid"]
+                                )
                             break
                         else:
                             continue
@@ -294,6 +381,13 @@ class GeneListSubmission:
                     if self.title == previous_title_stripped:
                         genelist_idx = project_titles.index(previous_title)
                         genelist_uuid = project_genelists[genelist_idx]["uuid"]
+                        genelist_gene_uuids = project_genelists[genelist_idx][
+                            "genes"
+                        ]
+                        for gene_uuid in genelist_gene_uuids:
+                            previous_genelist_gene_ids.append(
+                                gene_uuid["uuid"]
+                            )
                         break
                     else:
                         continue
@@ -302,63 +396,83 @@ class GeneListSubmission:
         try:
             project_documents = self.vapp.get(
                 "/search/?type=Document"
-                "&project.%40id=" + self.project.replace('/', '%2F')
+                "&project.%40id="
+                + self.project.replace("/", "%2F")
                 + "&field=display_title&field=uuid"
             ).json["@graph"]
             project_docs = [x["display_title"] for x in project_documents]
             if document_json["attachment"]["download"] in project_docs:
-                document_idx = project_docs.index(document_json["attachment"]["download"])
+                document_idx = project_docs.index(
+                    document_json["attachment"]["download"]
+                )
                 document_uuid = project_documents[document_idx]["uuid"]
         except Exception:
             pass
         if document_uuid:
             try:
                 self.vapp.patch_json(
-                        "/Document/" + document_uuid + "?check_only=true",
-                        {"attachment": document_json["attachment"]}
+                    "/Document/" + document_uuid + "?check_only=true",
+                    {"attachment": document_json["attachment"]},
                 )
-                validate_result['Document'] = 'success'
+                validate_result["Document"] = "success"
             except Exception as e:
                 self.errors.append("Document validation failed: " + str(e))
         else:
             try:
-                self.vapp.post_json("/Document/?check_only=true", document_json)
-                validate_result['Document'] = 'success'
+                self.vapp.post_json(
+                    "/Document/?check_only=true", document_json
+                )
+                validate_result["Document"] = "success"
             except Exception as e:
                 self.errors.append("Document validation failed: " + str(e))
         if genelist_uuid:
             try:
                 self.vapp.patch_json(
-                        "/GeneList/" + genelist_uuid + "?check_only=true",
-                        {
-                            "title": genelist_json["title"],
-                            "genes": genelist_json["genes"]
-                        }
+                    "/GeneList/" + genelist_uuid + "?check_only=true",
+                    {
+                        "title": genelist_json["title"],
+                        "genes": genelist_json["genes"],
+                    },
                 )
-                validate_result['Gene list'] = 'success'
+                validate_result["Gene list"] = "success"
+                validate_result["Title"] = self.title
+                validate_result["Number of genes"] = len(
+                    genelist_json["genes"]
+                )
             except Exception as e:
                 self.errors.append("Gene list validation failed: " + str(e))
         else:
             try:
-                self.vapp.post_json("/GeneList/?check_only=true", genelist_json)
-                validate_result['Gene list'] = 'success'
+                self.vapp.post_json(
+                    "/GeneList/?check_only=true", genelist_json
+                )
+                validate_result["Gene list"] = "success"
+                validate_result["Title"] = self.title
+                validate_result["Number of genes"] = len(
+                    genelist_json["genes"]
+                )
             except Exception as e:
                 self.errors.append("Gene list validation failed: " + str(e))
         if validate_result:
             validate_display = []
             for key in validate_result:
-                validate_display.append('%s: %s' % (key, validate_result[key]))
+                validate_display.append("%s: %s" % (key, validate_result[key]))
             validate_result = validate_display
-        return validate_result, genelist_uuid, document_uuid
+        return (
+            validate_result,
+            genelist_uuid,
+            document_uuid,
+            previous_genelist_gene_ids,
+        )
 
     def post_items(self):
         """
         Attempts to post document and gene list.
 
         Returns one of:
-            - 'success'
-            - None if validation failed (or didn't occur) or other errors
-              occurred during processing
+            - Dict with posting information
+            - None if post failed (or didn't occur) or other errors
+              occurred during prior processing
         """
 
         if self.errors or not self.validation_output:
@@ -369,18 +483,18 @@ class GeneListSubmission:
         if self.patch_document_uuid:
             try:
                 document_post = self.vapp.patch_json(
-                        "/Document/" + self.patch_document_uuid,
-                        {"attachment": document_json["attachment"]}
+                    "/Document/" + self.patch_document_uuid,
+                    {"attachment": document_json["attachment"]},
                 ).json
-                post_result['Document'] = 'success'
+                post_result["Document"] = "success"
             except Exception as e:
                 self.errors.append("Document posting failed: " + str(e))
         else:
             try:
                 document_post = self.vapp.post_json(
-                        "/Document/", document_json
+                    "/Document/", document_json
                 ).json
-                post_result['Document'] = 'success'
+                post_result["Document"] = "success"
             except Exception as e:
                 self.errors.append("Document posting failed: " + str(e))
         if document_post["status"] == "success":
@@ -388,26 +502,26 @@ class GeneListSubmission:
             if self.patch_genelist_uuid:
                 try:
                     self.vapp.patch_json(
-                            "/GeneList/" + self.patch_genelist_uuid,
-                            {
-                                "title": genelist_json["title"],
-                                "genes": genelist_json["genes"],
-                                "source_file": genelist_json["source_file"]
-                            }
+                        "/GeneList/" + self.patch_genelist_uuid,
+                        {
+                            "title": genelist_json["title"],
+                            "genes": genelist_json["genes"],
+                            "source_file": genelist_json["source_file"],
+                        },
                     )
-                    post_result['Gene list'] = 'success'
+                    post_result["Gene list"] = "success"
                 except Exception as e:
                     self.errors.append("Gene list posting failed: " + str(e))
             else:
                 try:
                     self.vapp.post_json("/GeneList/", genelist_json)
-                    post_result['Gene list'] = 'success'
+                    post_result["Gene list"] = "success"
                 except Exception as e:
                     self.errors.append("Gene list posting failed: " + str(e))
         if post_result:
             post_display = []
             for key in post_result:
-                post_display.append('%s: %s' % (key, post_result[key]))
+                post_display.append("%s: %s" % (key, post_result[key]))
             post_result = post_display
         return post_result
 
@@ -424,7 +538,8 @@ class GeneListSubmission:
             return None
         variants_to_index = []
         variant_samples_to_index = []
-        for gene_id in list(set(self.gene_ids)):
+        genes_to_search = list(set(self.gene_ids + self.previous_gene_ids))
+        for gene_id in genes_to_search:
             try:
                 variant_search = self.vapp.get(
                     "/search/?type=Variant"
