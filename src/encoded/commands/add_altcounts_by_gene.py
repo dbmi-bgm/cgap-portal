@@ -15,7 +15,7 @@ from granite.lib import vcf_parser
 
 
 def get_most_severe(vnt_obj, VEPtag, ENSG_idx, most_severe_idx):
-    ''' TODO docstring '''
+    """ TODO docstring """
     try:
         val_get = vnt_obj.get_tag_value(VEPtag)
     except Exception:
