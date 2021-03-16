@@ -2,7 +2,7 @@
 
 ################################################
 #
-#   Add alt allele counts on most sever gene
+#   Add alt allele counts on most severe gene
 #       per sample
 #
 #   Michele Berselli
@@ -15,7 +15,7 @@ from granite.lib import vcf_parser
 
 
 def get_most_severe(vnt_obj, VEPtag, ENSG_idx, most_severe_idx):
-    ''' TODO docstring '''
+    """ TODO docstring """
     try:
         val_get = vnt_obj.get_tag_value(VEPtag)
     except Exception:
