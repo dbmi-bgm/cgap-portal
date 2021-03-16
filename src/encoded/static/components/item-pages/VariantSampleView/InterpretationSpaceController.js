@@ -11,6 +11,281 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
+/**
+ * Stores and manages global note state for interpretation space.
+ */
+export class InterpretationSpaceWrapper extends React.Component {
+    /**
+     * Crawls context to find the most recently saved notes (the ones attached to the current VS)
+     * and returns an object to use to initialize state.
+     * returns { "variant_notes": <note_obj>, "gene_notes": <note obj>... etc. }
+     */
+    static initializeNoteState(context = {}) {
+        const fields = ["variant_notes", "gene_notes", "interpretation"];
+        const newState = {};
+        fields.forEach((field) => {
+            const { [field]: note = null } = context;
+            newState[field] = note;
+        });
+        newState.loading = false;
+        return newState;
+    }
+
+    constructor(props) {
+        super(props);
+        const { context = null } = props;
+        this.state = InterpretationSpaceWrapper.initializeNoteState(context); // Ex. { variantNotes: <note linkto>, loading: false }
+        this.saveAsDraft = this.saveAsDraft.bind(this);
+        this.saveToCase = this.saveToCase.bind(this);
+        this.saveToKnowledgeBase = this.saveToKnowledgeBase.bind(this);
+    }
+
+    /**
+     * Can be used for cloning+updating notes OR creating new drafts
+     * @param {Object}   note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
+     * @param {String}   noteType "note_interpretation" or "note_standard"
+     * @param {Integer}  version  Number to set version to
+     * @param {String}   status   Should be "in review" or "current"; newly created notes shouldn't be "approved"
+     */
+    postNewNote(note, noteType, version = 1, status = null) {
+        const { context: { institution = null, project = null } = {} } = this.props;
+        const { '@id': institutionID } = institution || {};
+        const { '@id': projectID } = project || {};
+
+        const noteToSubmit = { ...note };
+
+        if (noteType === "note_interpretation") {
+            // Prune keys with incomplete values
+            if (noteToSubmit.classification === null) {
+                delete noteToSubmit.classification;
+            }
+        } else {
+            // Prune unused keys
+            delete noteToSubmit.acmg_guidelines;
+            delete noteToSubmit.conclusion;
+            delete noteToSubmit.classification;
+        }
+
+        if (status !== null) {
+            noteToSubmit.status = status;
+        }
+
+        noteToSubmit.institution = institutionID;
+        noteToSubmit.project = projectID;
+        noteToSubmit.version = version;
+
+        return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(noteToSubmit));
+    }
+
+    patchNewNoteToVS(noteResp, saveToField) {
+        console.log("noteResp", noteResp);
+        const { context: { '@id': vsAtID = null } = {} } = this.props;
+        const { '@id': noteAtID } = noteResp;
+        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteAtID }));
+    }
+
+    patchPreviouslySavedNote(noteAtID, noteToPatch, status = null) { // ONLY USED FOR DRAFTS -- other notes are cloned
+        if (status === "current") { // only used to convert "in review" to "current" (draft -> approved for case)
+            noteToPatch.status = status;
+            // TODO: add approved_by and approved_date stamps
+            // newNote.approved_date = Date.now();
+            // newNote.approved_by = ; // get user @id
+        }
+        return ajax.promise(noteAtID, 'PATCH', {}, JSON.stringify(noteToPatch));
+    }
+
+    saveAsDraft(note, stateFieldToUpdate, noteType) {
+        const { [stateFieldToUpdate]: lastSavedNote } = this.state;
+
+        // Does a draft already exist? TODO: Update this to actually check that draft is status = in review
+        if (lastSavedNote) { // Patch the pre-existing draft item & overwrite it
+            console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
+            const {
+                '@id': noteAtID, version,
+            } = lastSavedNote;
+
+            const noteToSubmit = { ...note };
+
+            if (noteType === "note_interpretation") {
+                // Prune keys with incomplete values
+                if (noteToSubmit.classification === null) {
+                    delete noteToSubmit.classification;
+                }
+            } else {
+                // Prune unused keys
+                delete noteToSubmit.acmg_guidelines;
+                delete noteToSubmit.conclusion;
+                delete noteToSubmit.classification;
+            }
+
+            // Bump version number
+            noteToSubmit.version = version + 1;
+
+            // console.log("noteToSubmit", noteToSubmit);
+
+            this.setState({ loading: true }, () => {
+                this.patchPreviouslySavedNote(noteAtID, noteToSubmit)
+                    .then((response) => {
+                        if (status === "error") {
+                            throw new Error(response);
+                        }
+                        const { '@graph': graph } = response;
+                        const { 0: newlySavedDraft } = graph || [];
+                        // TODO: Some handling for various fail responses/codes
+                        this.setState({ loading: false, [stateFieldToUpdate]: newlySavedDraft });
+
+                        console.log("Successfully overwritten previous draft of note", response);
+                    })
+                    .catch((err) => {
+                        // TODO: Error handling
+                        console.log(err);
+                        this.setState({ loading: false });
+                    });
+            });
+        } else { // Create a whole new item, and patch to VS
+            this.setState({ loading: true }, () => {
+                this.postNewNote(note, noteType)
+                    .then((response) => {
+                        // TODO: Some handling for various fail responses/codes
+                        console.log("Successfully created new item", response);
+                        const { '@graph': noteItems = [] } = response;
+                        const { 0: noteItem } = noteItems;
+                        console.log("newly created note Item", noteItem);
+
+                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
+                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
+                        this.setState({ loading: false, [stateFieldToUpdate]: noteItem });
+                        return this.patchNewNoteToVS(noteItem, stateFieldToUpdate);
+                    })
+                    .then((resp) => {
+                        console.log("Successfully linked note object to variant sample", resp);
+                        // const { '@graph': noteItem } = response;
+                        // TODO: Find way to update state with new interpretation note here instead
+                    })
+                    .catch((err) => {
+                        // TODO: Error handling
+                        console.log(err);
+                        this.setState({ loading: false });
+                    });
+            });
+        }
+    }
+
+    saveToCase(note, stateFieldToUpdate, noteType) { // Does not save to case; saves to variantsample if not existing -- status change?
+        const { [stateFieldToUpdate]: lastSavedNote } = this.state;
+
+        if (lastSavedNote) {
+            const { status, version, '@id': noteAtID } = lastSavedNote;
+            if (status === "current") { // approved for case; future saves must be cloned
+                const newNote = { ...note };
+                newNote.previous_note = noteAtID;
+                console.log("newNote", newNote);
+                // newNote.approved_by =  ; // pull user ID from context
+                // newNote.approved_date = Date.now();
+
+                this.postNewNote(note, noteType, version + 1, "current")
+                    .then((response) => {
+                        // TODO: Some handling for various fail responses/codes
+                        console.log("Successfully created new item", response);
+                        const { '@graph': noteItems = [] } = response;
+                        const { 0: noteItem } = noteItems;
+
+                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
+                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
+                        this.setState({ loading: false, [stateFieldToUpdate]: noteItem });
+                        return this.patchNewNoteToVS(noteItem, stateFieldToUpdate);
+                    })
+                    .then((resp) => {
+                        console.log("Successfully linked note object to variant sample", resp);
+                        // const { '@graph': noteItem } = response;
+                        // TODO: Find way to update state with new interpretation note here instead
+                    })
+                    .catch((err) => {
+                        // TODO: Error handling
+                        console.log(err);
+                        this.setState({ loading: false });
+                    });
+
+
+
+            } else if (status === "in review") { // patch draft to approve for case
+                console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
+
+                const noteToSubmit = { ...note };
+
+                if (noteType === "note_interpretation") {
+                    // Prune keys with incomplete values
+                    if (noteToSubmit.classification === null) {
+                        delete noteToSubmit.classification;
+                    }
+                } else {
+                    // Prune unused keys
+                    delete noteToSubmit.acmg_guidelines;
+                    delete noteToSubmit.conclusion;
+                    delete noteToSubmit.classification;
+                }
+
+                // Bump version number
+                noteToSubmit.version = version + 1;
+
+                this.setState({ loading: true }, () => {
+                    this.patchPreviouslySavedNote(noteAtID, noteToSubmit, "current")
+                        .then((response) => {
+                            const { '@graph': graph } = response;
+                            const { 0: newlySavedDraft } = graph || [];
+                            // TODO: Some handling for various fail responses/codes
+                            this.setState({ loading: false, [stateFieldToUpdate]: newlySavedDraft });
+                            console.log("Successfully overwritten previous draft of note", response);
+                        })
+                        .catch((err) => {
+                            // TODO: Error handling
+                            console.log(err);
+                            this.setState({ loading: false });
+                        });
+                });
+            }
+        } else { // No drafts or previous versions exist -- post with status of current
+            this.setState({ loading: true }, () => {
+                console.log("note", note);
+                this.postNewNote(note, noteType, undefined, "current")
+                    .then((response) => {
+                        // TODO: Some handling for various fail responses/codes
+                        console.log("Successfully created new item", response);
+                        const { '@graph': noteItems = [] } = response;
+                        const { 0: noteItem } = noteItems;
+
+                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
+                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
+                        this.setState({ loading: false, [stateFieldToUpdate]: noteItem });
+                        return this.patchNewNoteToVS(noteItem, stateFieldToUpdate);
+                    })
+                    .then((resp) => {
+                        console.log("Successfully linked note object to variant sample", resp);
+                        // const { '@graph': noteItem } = response;
+                        // TODO: Find way to update state with new interpretation note here instead
+                    })
+                    .catch((err) => {
+                        // TODO: Error handling
+                        console.log(err);
+                        this.setState({ loading: false });
+                    });
+            });
+        }
+    }
+
+    saveToKnowledgeBase(note) {
+        console.log("saveToKB", note);
+    }
+
+    render() {
+        const { variant_notes, gene_notes, interpretation } = this.state;
+        return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
+            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation} saveToCase={this.saveToCase}
+            saveToKnowledgeBase={this.saveToKnowledgeBase} saveAsDraft={this.saveAsDraft}/>;
+    }
+}
+
+
 export class InterpretationSpaceController extends React.Component {
     constructor(props) {
         super(props);
@@ -40,18 +315,21 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isFullScreen, currentTab } = this.state;
-        console.log(currentTab);
+        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
+
+        const passProps = _.pick(this.props, 'saveAsDraft', 'saveToCase', 'saveToKnowledgeBase');
+        //TODO: cleanup past props
 
         let panelToDisplay = null;
         switch(currentTab) {
             case "Variant Notes":
-                panelToDisplay = <GenericInterpretationPanelController noteLabel={currentTab} key={0} saveToField="variant_notes" noteType="note_standard" { ...this.props }/>;
+                panelToDisplay = <GenericInterpretationPanel lastSavedNote={lastSavedVariantNote} noteLabel={currentTab} key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }/>;
                 break;
             case "Gene Notes":
-                panelToDisplay = <GenericInterpretationPanelController noteLabel={currentTab} key={1} saveToField="gene_notes" noteType="note_standard" { ...this.props }/>;
+                panelToDisplay = <GenericInterpretationPanel lastSavedNote={lastSavedGeneNote} noteLabel={currentTab} key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }/>;
                 break;
             case "Interpretation":
-                panelToDisplay = <GenericInterpretationPanelController noteLabel={currentTab} key={2} saveToField="interpretation" noteType="note_interpretation" { ...this.props }/>;
+                panelToDisplay = <GenericInterpretationPanel lastSavedNote={lastSavedInterpretation} noteLabel={currentTab} key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }/>;
                 break;
             default:
                 break;
@@ -105,281 +383,6 @@ function InterpretationSpaceTabs(props) {
     );
 }
 
-class GenericInterpretationPanelController extends React.Component {
-    constructor(props) {
-        super(props);
-
-        const { 0: note, 1: noteSource } = this.getMostRecentNote() || [];
-
-        this.state = {
-            loading : false,
-            lastSavedNote: note, // Check after mount for last saved version of interpretation note
-            noteSource : noteSource   // Currently just VariantSample... eventually could be KnowledgeBase, Gene
-        };
-
-        this.saveAsDraft = this.saveAsDraft.bind(this);
-        this.saveToCase = this.saveToCase.bind(this);
-        this.saveToKnowledgeBase = this.saveToKnowledgeBase.bind(this);
-    }
-
-    /**
-     * Used on initialization to find the most recent note attached to the current VS (will need tweaking
-     * to check other locations for gene items, interpretation notes, etc)
-     */
-    getMostRecentNote() {
-        const { context, saveToField } = this.props;
-        console.log("saveToField", saveToField);
-        const { [saveToField]: note = null } = context || {};
-
-        // Determine which interpretation note to load into state
-        if (note) { // Check for saved notes on Variant first
-            // TODO: See if this needs to be sorted or if most recent will always be the last one
-            return [note, "VariantSample"];
-        }
-        return null; // Can assume there are no notes
-    }
-
-    /**
-     * Can be used for cloning+updating notes OR creating new drafts
-     * @param {Object}   note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
-     * @param {Integer}  version  Number to set version to
-     * @param {String}   status   Should be "in review" or "current"; newly created notes shouldn't be "approved"
-     */
-    postNewNote(note, version = 1, status = null) {
-        const { context: { institution = null, project = null } = {}, noteType } = this.props;
-        const { '@id': institutionID } = institution || {};
-        const { '@id': projectID } = project || {};
-
-        const noteToSubmit = { ...note };
-
-        if (noteType === "note_interpretation") {
-            // Prune keys with incomplete values
-            if (noteToSubmit.classification === null) {
-                delete noteToSubmit.classification;
-            }
-        } else {
-            // Prune unused keys
-            delete noteToSubmit.acmg_guidelines;
-            delete noteToSubmit.conclusion;
-            delete noteToSubmit.classification;
-        }
-
-        if (status !== null) {
-            noteToSubmit.status = status;
-        }
-
-        noteToSubmit.institution = institutionID;
-        noteToSubmit.project = projectID;
-        noteToSubmit.version = version;
-
-        return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(noteToSubmit));
-    }
-
-    patchNewNoteToVS(noteResp) {
-        console.log("noteResp", noteResp);
-        const { context: { '@id': vsAtID = null } = {}, saveToField } = this.props;
-        const { '@id': noteAtID } = noteResp;
-        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteAtID }));
-    }
-
-    patchPreviouslySavedNote(noteAtID, noteToPatch, status = null) { // ONLY USED FOR DRAFTS -- other notes are cloned
-        if (status === "current") { // only used to convert "in review" to "current" (draft -> approved for case)
-            noteToPatch.status = status;
-            // TODO: add approved_by and approved_date stamps
-            // newNote.approved_date = Date.now();
-            // newNote.approved_by = ; // get user @id
-        }
-        return ajax.promise(noteAtID, 'PATCH', {}, JSON.stringify(noteToPatch));
-    }
-
-    saveAsDraft(note) {
-        const { lastSavedNote } = this.state;
-        const { noteType } = this.props;
-
-        // Does a draft already exist? TODO: Update this to actually check that draft is status = in review
-        if (lastSavedNote) { // Patch the pre-existing draft item & overwrite it
-            console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
-            const {
-                '@id': noteAtID, version,
-            } = lastSavedNote;
-
-            const noteToSubmit = { ...note };
-
-            if (noteType === "note_interpretation") {
-                // Prune keys with incomplete values
-                if (noteToSubmit.classification === null) {
-                    delete noteToSubmit.classification;
-                }
-            } else {
-                // Prune unused keys
-                delete noteToSubmit.acmg_guidelines;
-                delete noteToSubmit.conclusion;
-                delete noteToSubmit.classification;
-            }
-
-            // Bump version number
-            noteToSubmit.version = version + 1;
-
-            // console.log("noteToSubmit", noteToSubmit);
-
-            this.setState({ loading: true }, () => {
-                this.patchPreviouslySavedNote(noteAtID, noteToSubmit)
-                    .then((response) => {
-                        const { '@graph': graph } = response;
-                        const { 0: newlySavedDraft } = graph || [];
-                        // TODO: Some handling for various fail responses/codes
-                        this.setState({ loading: false, lastSavedNote: newlySavedDraft, noteSource: "VariantSample" });
-                        console.log("Successfully overwritten previous draft of note", response);
-                    })
-                    .catch((err) => {
-                        // TODO: Error handling
-                        console.log(err);
-                        this.setState({ loading: false });
-                    });
-            });
-        } else { // Create a whole new item, and patch to VS
-            this.setState({ loading: true }, () => {
-                this.postNewNote(note)
-                    .then((response) => {
-                        // TODO: Some handling for various fail responses/codes
-                        console.log("Successfully created new item", response);
-                        const { '@graph': noteItems = [] } = response;
-                        const { 0: noteItem } = noteItems;
-
-                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
-                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
-                        this.setState({ loading: false, lastSavedNote: noteItem, noteSource: "VariantSample" });
-                        return this.patchNewNoteToVS(noteItem);
-                    })
-                    .then((resp) => {
-                        console.log("Successfully linked note object to variant sample", resp);
-                        // const { '@graph': noteItem } = response;
-                        // TODO: Find way to update state with new interpretation note here instead
-                    })
-                    .catch((err) => {
-                        // TODO: Error handling
-                        console.log(err);
-                        this.setState({ loading: false });
-                    });
-            });
-        }
-    }
-
-    saveToCase(note) { // Does not save to case; saves to variantsample if not existing -- status change?
-        const { lastSavedNote } = this.state;
-        const { noteType } = this.props;
-
-        if (lastSavedNote) {
-            const { status, version, '@id': noteAtID } = lastSavedNote;
-            if (status === "current") { // approved for case; future saves must be cloned
-                const newNote = { ...note };
-                newNote.previous_note = noteAtID;
-                console.log("newNote", newNote);
-                // newNote.approved_by =  ; // pull user ID from context
-                // newNote.approved_date = Date.now();
-
-                this.postNewNote(note, version + 1, "current")
-                    .then((response) => {
-                        // TODO: Some handling for various fail responses/codes
-                        console.log("Successfully created new item", response);
-                        const { '@graph': noteItems = [] } = response;
-                        const { 0: noteItem } = noteItems;
-
-                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
-                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
-                        this.setState({ loading: false, lastSavedNote: noteItem, noteSource: "VariantSample" });
-                        return this.patchNewNoteToVS(noteItem);
-                    })
-                    .then((resp) => {
-                        console.log("Successfully linked note object to variant sample", resp);
-                        // const { '@graph': noteItem } = response;
-                        // TODO: Find way to update state with new interpretation note here instead
-                    })
-                    .catch((err) => {
-                        // TODO: Error handling
-                        console.log(err);
-                        this.setState({ loading: false });
-                    });
-
-
-
-            } else if (status === "in review") { // patch draft to approve for case
-                console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
-
-                const noteToSubmit = { ...note };
-
-                if (noteType === "note_interpretation") {
-                    // Prune keys with incomplete values
-                    if (noteToSubmit.classification === null) {
-                        delete noteToSubmit.classification;
-                    }
-                } else {
-                    // Prune unused keys
-                    delete noteToSubmit.acmg_guidelines;
-                    delete noteToSubmit.conclusion;
-                    delete noteToSubmit.classification;
-                }
-
-                // Bump version number
-                noteToSubmit.version = version + 1;
-
-                this.setState({ loading: true }, () => {
-                    this.patchPreviouslySavedNote(noteAtID, noteToSubmit, "current")
-                        .then((response) => {
-                            const { '@graph': graph } = response;
-                            const { 0: newlySavedDraft } = graph || [];
-                            // TODO: Some handling for various fail responses/codes
-                            this.setState({ loading: false, lastSavedNote: newlySavedDraft, noteSource: "VariantSample" });
-                            console.log("Successfully overwritten previous draft of note", response);
-                        })
-                        .catch((err) => {
-                            // TODO: Error handling
-                            console.log(err);
-                            this.setState({ loading: false });
-                        });
-                });
-            }
-        } else { // No drafts or previous versions exist -- post with status of current
-            this.setState({ loading: true }, () => {
-                console.log("note", note);
-                this.postNewNote(note, undefined, "current")
-                    .then((response) => {
-                        // TODO: Some handling for various fail responses/codes
-                        console.log("Successfully created new item", response);
-                        const { '@graph': noteItems = [] } = response;
-                        const { 0: noteItem } = noteItems;
-
-                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
-                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
-                        this.setState({ loading: false, lastSavedNote: noteItem, noteSource: "VariantSample" });
-                        return this.patchNewNoteToVS(noteItem);
-                    })
-                    .then((resp) => {
-                        console.log("Successfully linked note object to variant sample", resp);
-                        // const { '@graph': noteItem } = response;
-                        // TODO: Find way to update state with new interpretation note here instead
-                    })
-                    .catch((err) => {
-                        // TODO: Error handling
-                        console.log(err);
-                        this.setState({ loading: false });
-                    });
-            });
-        }
-    }
-
-    saveToKnowledgeBase(note) {
-        console.log("saveToKB", note);
-    }
-
-    render(){
-        const { lastSavedNote } = this.state;
-        const { noteLabel } = this.props;
-        return <GenericInterpretationPanel saveAsDraft={this.saveAsDraft} saveToCase={this.saveToCase}
-            lastSavedNote={lastSavedNote} saveToKnowledgeBase={this.saveToKnowledgeBase} {...{ noteLabel }} />;
-    }
-}
-
 class GenericInterpretationPanel extends React.Component {
     constructor(props) {
         super(props);
@@ -407,13 +410,13 @@ class GenericInterpretationPanel extends React.Component {
 
     // Wrapping passed in functions so as to call them with this component's state, then pass down to children
     saveStateAsDraft() {
-        const { saveAsDraft } = this.props;
-        saveAsDraft(this.state);
+        const { saveAsDraft, noteType, saveToField } = this.props;
+        saveAsDraft(this.state, saveToField , noteType);
     }
 
     saveStateToCase() {
-        const { saveToCase } = this.props;
-        saveToCase(this.state);
+        const { saveToCase, noteType, saveToField } = this.props;
+        saveToCase(this.state, saveToField, noteType);
     }
 
     saveStateToKnowledgeBase(){
@@ -422,7 +425,8 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { lastSavedNote: { note_text : savedNoteText = null, status: savedNoteStatus } = {}, noteLabel } = this.props;
+        const { lastSavedNote = null, noteLabel } = this.props;
+        const { note_text : savedNoteText = null, status: savedNoteStatus } = lastSavedNote || {};
         const { note_text: noteText } = this.state;
 
         // TODO: move into a function and memoize once checking other values of state, too

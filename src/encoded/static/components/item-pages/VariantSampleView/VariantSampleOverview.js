@@ -15,7 +15,7 @@ import { GeneTabBody } from './GeneTabBody';
 import { SampleTabBody } from './SampleTabBody';
 import { AnnotationBrowserTabBody } from './AnnotationBrowserTabBody';
 import { BamFileBrowserTabBody } from './BamFileBrowserTabBody';
-import { InterpretationSpaceController } from './InterpretationSpaceController';
+import { InterpretationSpaceController, InterpretationSpaceWrapper } from './InterpretationSpaceController';
 
 
 
@@ -116,7 +116,8 @@ export class VariantSampleOverview extends React.PureComponent {
                         <VariantSampleOverviewTabView {...passProps} />
                     </div>
                     <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                        <InterpretationSpaceController {...passProps} />
+                        {/* <InterpretationSpaceController {...passProps} /> */}
+                        <InterpretationSpaceWrapper {...passProps} />
                     </div>
                 </div>
             </div>
