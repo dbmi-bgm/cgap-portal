@@ -251,7 +251,13 @@ class SubmissionRow:
                 project, remove_spaces_in_id(row[SS_INDIVIDUAL_ID])
             )
             self.fam_alias = family_alias
-            self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(row[SS_SPECIMEN_ID]))
+            self.sample_alias = '{}:sample-{}-{}'.format(
+                project,
+                remove_spaces_in_id(row[SS_SPECIMEN_ID]),
+                remove_spaces_in_id(row[get_column_name(row, ['workup type', 'test requested'])])
+            )
+            if self.metadata.get('test number'):
+                self.sample_alias = self.sample_alias + '-' + self.metadata['test number']
             self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row[SS_ANALYSIS_ID]))
             self.case_name = remove_spaces_in_id(row.get('unique analysis id'))
             self.individual = self.extract_individual_metadata()
@@ -341,6 +347,8 @@ class SubmissionRow:
         # handle bam sample ID
         if not info.get('bam_sample_id'):
             info['bam_sample_id'] = info.get('specimen_accession')
+        if info.get('specimen_type'):
+            info['specimen_type'] = info['specimen_type'].lower().replace('_', ' ')
         # SEO
         if self.metadata.get('second specimen id'):
             other_id = {'id': self.metadata['second specimen id'], 'id_type': self.project}  # add proj info?
