@@ -43,8 +43,9 @@ def row_dict():
         'analysis id': '999',
         'report required': 'Y',
         'specimen id': '3464467',
-        'specimen type': 'saliva',
-        'workup type': 'WGS'
+        'specimen type': 'Peripheral_Blood',
+        'test requested': 'WGS',
+        'test number': '2'
     }
 
 
@@ -138,7 +139,7 @@ def post_data(project, institution):
 @pytest.fixture
 def sample_info():
     return {
-        'workup type': 'WES',
+        'test requested': 'WES',
         'specimen id': '9034',
         'date collected': '2020-01-06'
     }
@@ -186,19 +187,19 @@ def case_with_ingestion_id2(testapp, project, institution, fam, sample_proc_fam)
 def example_rows():
     return [
         {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband',
-         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
+         'report required': 'Y', 'test requested': 'WGS', 'specimen id': '1'},
         {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother',
-         'report required': 'N', 'workup type': 'WGS', 'specimen id': '2'},
+         'report required': 'N', 'test requested': 'WGS', 'specimen id': '2'},
         {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father',
-         'report required': 'N', 'workup type': 'WGS', 'specimen id': '3'},
+         'report required': 'N', 'test requested': 'WGS', 'specimen id': '3'},
         {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband',
-         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
+         'report required': 'Y', 'test requested': 'WGS', 'specimen id': '1'},
         {'individual id': '456', 'analysis id': '4444', 'relation to proband': 'proband',
-         'report required': 'Y', 'workup type': 'WES', 'specimen id': '7'},
+         'report required': 'Y', 'test requested': 'WES', 'specimen id': '7'},
         {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband',
-         'report required': 'Y', 'workup type': 'WES', 'specimen id': '5'},
+         'report required': 'Y', 'test requested': 'WES', 'specimen id': '5'},
         {'individual id': '546', 'analysis id': '3333', 'relation to proband': 'mother',
-         'report required': 'N', 'workup type': 'WES', 'specimen id': '6'}
+         'report required': 'N', 'test requested': 'WES', 'specimen id': '6'}
     ]
 
 
@@ -206,15 +207,15 @@ def example_rows():
 def big_family_rows():
     return [
         {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband',
-         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
+         'report required': 'Y', 'test requested': 'WGS', 'specimen id': '1'},
         {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother',
-         'report required': 'N', 'workup type': 'WGS', 'specimen id': '2'},
+         'report required': 'N', 'test requested': 'WGS', 'specimen id': '2'},
         {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father',
-         'report required': 'N', 'workup type': 'WGS', 'specimen id': '3'},
+         'report required': 'N', 'test requested': 'WGS', 'specimen id': '3'},
         {'individual id': '546', 'analysis id': '1111', 'relation to proband': 'sister',
-         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '4'},
+         'report required': 'Y', 'test requested': 'WGS', 'specimen id': '4'},
         {'individual id': '555', 'analysis id': '1111', 'relation to proband': 'full brother 1',
-         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '5'}
+         'report required': 'Y', 'test requested': 'WGS', 'specimen id': '5'}
     ]
 
 
@@ -238,7 +239,7 @@ def new_family(child, mother, father):
 
 def test_map_fields(sample_info):
     # tests spreadsheet fields are mapped to correct cgap property
-    result = map_fields(sample_info, {}, ['workup_type'], 'sample')
+    result = map_fields(sample_info, {}, [], 'sample')
     assert result['workup_type'] == 'WES'
     assert result['specimen_accession'] == '9034'
     assert result['specimen_collection_date'] == '2020-01-06'
@@ -246,6 +247,18 @@ def test_map_fields(sample_info):
 
 
 class TestSubmissionRow:
+
+    @pytest.mark.parametrize('col, val, sample_alias', [
+        (None, None, 'encode-project:sample-3464467-WGS-2'),
+        ('test requested', 'WES', 'encode-project:sample-3464467-WES-2'),
+        ('test number', '1', 'encode-project:sample-3464467-WGS-1'),
+        ('test number', None, 'encode-project:sample-3464467-WGS')
+    ])
+    def test_row_sample_aliases(self, row_dict, col, val, sample_alias, project, institution):
+        if col:
+            row_dict[col] = val
+        obj = SubmissionRow(row_dict, 1, 'test-proj:fam', project['name'], institution['name'])
+        assert obj.sample_alias == sample_alias
 
     def test_extract_individual_metadata(self, row_dict, project, institution):
         obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
@@ -300,6 +313,7 @@ class TestSubmissionRow:
         obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert obj.sample.metadata['specimen_accession'] == row_dict['specimen id']
         assert obj.sample.metadata['specimen_accepted'] == 'No'
+        assert obj.sample.metadata['specimen_type'] == 'peripheral blood'
         assert obj.sample.metadata['requisition_acceptance']['accepted_rejected'] == 'Accepted'
         assert obj.analysis.metadata['samples'] == [obj.sample.alias]
         assert obj.individual.metadata['samples'] == [obj.sample.alias]
@@ -375,7 +389,7 @@ class TestSubmissionMetadata:
         assert a_types['1111'] == 'WGS-Trio'
         assert a_types['2222'] == 'WGS'
         assert a_types['3333'] == 'WES-Group'
-        example_rows[1]['workup type'] = 'WES'
+        example_rows[1]['test requested'] = 'WES'
         new_obj = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
         new_a_types = new_obj.analysis_types
         assert new_a_types['1111'] is None
@@ -420,15 +434,15 @@ class TestSubmissionMetadata:
 
     def test_add_sample_processing(self, example_rows, project, institution):
         """tests metadata creation for sample_processing item from a set of rows"""
-        example_rows[5]['workup type'] = 'WGS'  # analysis 3333 will have mismatched workup type values
+        example_rows[6]['test requested'] = 'WGS'  # analysis 3333 will have mismatched workup type values
         submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
         sps = submission.sample_processings
         assert sps['encode-project:analysis-1111']['analysis_type'] == 'WGS-Trio'
         assert sps['encode-project:analysis-2222']['analysis_type'] == 'WGS'
         assert sps['encode-project:analysis-1111']['samples'] == [
-            'encode-project:sample-1', 'encode-project:sample-2', 'encode-project:sample-3'
+            'encode-project:sample-1-WGS', 'encode-project:sample-2-WGS', 'encode-project:sample-3-WGS'
         ]
-        assert sps['encode-project:analysis-2222']['samples'] == ['encode-project:sample-1']
+        assert sps['encode-project:analysis-2222']['samples'] == ['encode-project:sample-1-WGS']
         assert not sps['encode-project:analysis-3333']['analysis_type']
         assert '3333 contain mis-matched or invalid workup type values' in ''.join(submission.errors)
 
