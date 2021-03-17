@@ -71,7 +71,7 @@ jobs:
           TEST_JOB_ID: cgap-npm-test-${{ github.run_number }}-
         run: |
           # npm test
-          make travis-test-npm
+          make remote-test-npm
           poetry run wipe-test-indices $TEST_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
           poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
@@ -86,7 +86,7 @@ jobs:
           # This will be the new environment variable name.
           TEST_JOB_ID: cgap-unit-test-${{ github.run_number }}-
         run: |
-          make travis-test-unit
+          make remote-test-unit
           poetry run wipe-test-indices $TEST_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
           poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
