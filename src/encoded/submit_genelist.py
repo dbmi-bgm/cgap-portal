@@ -92,7 +92,7 @@ class GeneListSubmission:
             if "title" in line.lower():
                 title_line = line
                 title_idx = title_line.lower().index("title")
-                title_line = title_line[title_idx + 5 :]
+                title_line = title_line[title_idx + 5:]
                 title_line = title_line.translate(
                     {ord(i): None for i in ':;"\n"'}
                 )
@@ -226,7 +226,7 @@ class GeneListSubmission:
                             else:
                                 gene_ids[
                                     response_item["gene_symbol"]
-                                ] = response_item["uuid"]
+                                ] = [response_item["uuid"]]
                                 unmatched_genes.remove(gene)
                     if gene in unmatched_genes:
                         options = []
