@@ -14,7 +14,9 @@ from ..ingestion.common import IngestionReport, IngestionError
 from ..util import debuglog
 
 
-pytestmark = [pytest.mark.working, pytest.mark.ingestion]
+pytestmark = [pytest.mark.working, pytest.mark.ingestion, pytest.mark.workbook]
+
+
 QUEUE_INGESTION_URL = '/queue_ingestion'
 INGESTION_STATUS_URL = '/ingestion_status'
 INGESTED_ACCESSION = 'GAPFIZ123456'
