@@ -53,9 +53,12 @@ class CompoundSearchBuilder:
         # so the "+" become urlencoded into 'plus-sign' encodings (%2B) (rather than space - %20), and previous 'plus-sign'
         # encodings go from `%2B` to `%252B` (the percent sign gets encoded). So essentially is an encoding of an encoding.
         # But it works once goes into snovault's `make_subreq` downstream.
-        query = urllib.parse.quote(query, safe="&=")
-        if '?' not in query:
+        if len(query) > 0 and query[0] != "?":
             query = '?' + query
+
+        # If any '?', '&', or '=' in search term, should have been pre-encoded.
+        # Meant to handle "+" especially.
+        query = urllib.parse.quote(query, safe="?&=")
 
         subreq = make_search_subreq(request, route + '%s&from=%s&limit=%s' % (query, from_, to))
         subreq.headers['Accept'] = 'application/json'
@@ -139,7 +142,11 @@ class CompoundSearchBuilder:
         :return: query string that combines the two, if type requirement isn't already there
         """
         if type_flag not in flags or type_flag.lower() not in flags:
-            flags += '&' + type_flag
+            if len(flags) > 0:
+                flags += '&' + type_flag
+            else:
+                flags = type_flag
+
         return flags
 
     @classmethod

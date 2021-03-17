@@ -162,7 +162,7 @@ class FamilySection extends React.Component {
                 </h4>
                 { open ? (
                     <FamilyReportStackedTable
-                        {...{ result, family }} preventExpand={false}
+                        {...{ result, family }} preventExpand={true}
                         width={containerWidth ? (Math.max(containerWidth - paddingWidth, minimumWidth) /* account for padding of pane */) : null}
                         fadeIn={false} collapseLongLists
                     />
@@ -267,10 +267,9 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     </span>
                 </StackedBlockName>
                 <StackedBlockList className="analysis" title="Analysis">
-                    {analysisGroups.filter(function(group){
-                        const { samples = [] } = group || {};
-                        if (samples.length > 0) {
-                            if (_.any(samples, function({ "@id": agSampleID }){
+                    { analysisGroups.filter(function({ samples: analysisGroupSamples = [] }){
+                        if (analysisGroupSamples.length > 0) {
+                            if (_.any(analysisGroupSamples, function({ "@id": agSampleID }){
                                 return agSampleID === atId;
                             })) {
                                 return true;
@@ -279,29 +278,30 @@ export class FamilyReportStackedTable extends React.PureComponent {
                             }
                         }
                         return true;
-                    }).map((group) => {
-                        const { analysis_type = null, cases = [] } = group || {};
-                        let reportBlock = null;
+                    }).map((analysisGroup) => {
+                        const { analysis_type = null, cases: groupCases = [] } = analysisGroup || {};
 
                         // Figure out which report is associated with the current analysis group & sample
-                        cases.forEach((groupCase) => {
-                            const { '@id': thisCaseAtId = null, sample: caseSample = null } = groupCase || {};
-                            const { '@id': sampleAtId = null } = caseSample || {};
-                            if (sampleAtId === atId) {
-
-                                const reportBlockId = caseToReportMap[thisCaseAtId];
-                                const fallbackKey = 'case-' + thisCaseAtId;
-
-                                if (reportBlockId) {
-                                    reportBlock = reportBlockMapping[reportBlockId];
-                                // TODO: Rework this entire method of passing case through; didn't realize case was necessary early on and needed this
-                                } else if (
-                                    reportBlockMapping[fallbackKey]
-                                ) {
-                                    reportBlock = reportBlockMapping[fallbackKey] || null;
-                                }
+                        const groupCase = groupCases.find(function(groupCase){
+                            const { sample: { '@id': groupCaseSampleAtId = null } = {} } = groupCase || {};
+                            if (groupCaseSampleAtId === atId) {
+                                return true;
                             }
+                            return false;
                         });
+
+                        const { '@id': groupCaseAtId = null } = groupCase || {};
+
+                        const reportBlockId = caseToReportMap[groupCaseAtId];
+                        const fallbackKey = 'case-' + groupCaseAtId;
+                        let reportBlock = null;
+
+                        if (reportBlockId) {
+                            reportBlock = reportBlockMapping[reportBlockId];
+                        // TODO: Rework this entire method of passing case through; didn't realize case was necessary early on and needed this
+                        } else if (reportBlockMapping[fallbackKey]) {
+                            reportBlock = reportBlockMapping[fallbackKey] || null;
+                        }
 
                         return (
                             <StackedBlock key={analysis_type} columnClass="analysis" hideNameOnHover={false}
@@ -312,9 +312,9 @@ export class FamilyReportStackedTable extends React.PureComponent {
                                 <StackedBlockList className="report" title="Report">
                                     { reportBlock ? <StackedBlockList className="report" title="Report">{reportBlock}</StackedBlockList> : FamilyReportStackedTable.renderEmptyBlock("report") }
                                 </StackedBlockList>
-                            </StackedBlock>);
-                    }
-                    )}
+                            </StackedBlock>
+                        );
+                    }) }
                 </StackedBlockList>
             </StackedBlock>
         );
