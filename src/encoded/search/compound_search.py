@@ -1,5 +1,5 @@
 import json
-import urllib
+import urllib.parse
 from pyramid.view import view_config
 from pyramid.request import Request
 from pyramid.httpexceptions import HTTPBadRequest
