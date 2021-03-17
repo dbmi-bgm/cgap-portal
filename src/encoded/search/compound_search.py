@@ -49,7 +49,7 @@ class CompoundSearchBuilder:
         if '?' not in query:  # do some sanitization
             query = '?' + query
 
-        subreq = make_search_subreq(request, route + '%s&from=%s&limit=%s' % (query, from_, to))
+        subreq = make_search_subreq(request, route + '%s&from=%s&limit=%s' % (urllib.parse.quote(query), from_, to))
         subreq.headers['Accept'] = 'application/json'
 
         return subreq
