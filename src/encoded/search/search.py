@@ -6,7 +6,6 @@ import structlog
 from pyramid.view import view_config
 from webob.multidict import MultiDict
 from functools import reduce
-from elasticsearch.exceptions import NotFoundError
 from pyramid.httpexceptions import HTTPBadRequest
 from urllib.parse import urlencode
 from collections import OrderedDict
@@ -18,7 +17,6 @@ from snovault import (
     STORAGE
 )
 from snovault.elasticsearch import ELASTIC_SEARCH
-from snovault.elasticsearch.create_mapping import determine_if_is_date_field
 from snovault.util import (
     debug_log,
 )
@@ -136,17 +134,17 @@ class SearchBuilder:
         return self.forced_type.lower()
 
     @classmethod
-    def from_search(cls, context, request, search):
+    def from_search(cls, context, request, s):
         """ Builds a SearchBuilder object with a pre-built search by skipping the bootstrap
             initialization and setting self.query directly.
 
         :param context: context from request
         :param request: current request
-        :param search: dictionary of lucene query
+        :param s: dictionary of lucene query
         :return: instance of this class with the search query dropped in
         """
         search_builder_instance = cls(context, request, skip_bootstrap=True)  # bypass (most of) bootstrap
-        search_builder_instance.query = search  # parse compound query
+        search_builder_instance.query = s  # parse compound query
         return search_builder_instance
 
     @staticmethod
@@ -181,7 +179,8 @@ class SearchBuilder:
             search_types.append("ItemSearchResults")
         return search_types
 
-    def normalize_query(self, request, types, doc_types):
+    @staticmethod
+    def normalize_query(request, types, doc_types):
         """
         Normalize the query by calculating and setting request.normalized_params
         (a webob MultiDict) that is derived from custom query rules and also
@@ -210,7 +209,7 @@ class SearchBuilder:
             """
             # type param is a special case. use the name from TypeInfo
             if key == 'type' and val in types:
-                return (key, types[val].name)
+                return key, types[val].name
 
             # if key is sort, pass val as the key to this function
             # if it appends display title we know its a linkTo and
@@ -221,7 +220,7 @@ class SearchBuilder:
                 new_val, _ = normalize_param(sort_val, None)
                 if new_val != sort_val:
                     val = val.replace(sort_val, new_val)
-                return (key, val)
+                return key, val
 
             # find schema for field parameter and drill down into arrays/subobjects
             field_schema = schema_for_field(key, request, doc_types)
@@ -237,10 +236,10 @@ class SearchBuilder:
             if field_schema and 'linkTo' in field_schema:
                 # add display_title to terminal linkTo query fields
                 if key.endswith('!'):  # handle NOT
-                    return (key[:-1] + '.display_title!', val)
-                return (key + '.display_title', val)
+                    return key[:-1] + '.display_title!', val
+                return key + '.display_title', val
             else:
-                return (key, val)
+                return key, val
 
         # use a MultiDict to emulate request.params
         # TODO: Evaluate whether or not MultiDict is really useful here -Will 6/24/2020
@@ -990,7 +989,6 @@ class SearchBuilder:
                     any_abstract_types = True
                     break
 
-
         # Add type column if any abstract types in search
         if any_abstract_types:
             columns['@type'] = {
@@ -1031,7 +1029,7 @@ class SearchBuilder:
                 yield frame_result
             return
 
-    def get_all_subsequent_results(self, initial_search_result, extra_requests_needed_count, size_increment):
+    def get_all_subsequent_results(self, extra_requests_needed_count, size_increment):
         """
         Calls `execute_search` in paginated manner iteratively until all results have been yielded.
         """
@@ -1070,9 +1068,7 @@ class SearchBuilder:
             # Theoretical but unnecessary future: Consider allowing to return HTTP Stream of results w. return_generator=true (?)
             es_result['hits']['hits'] = itertools.chain(
                 es_result['hits']['hits'],
-                self.get_all_subsequent_results(
-                    es_result, self.query, extra_requests_needed_count, size_increment
-                )
+                self.get_all_subsequent_results(extra_requests_needed_count, size_increment)
             )
         return es_result
 
@@ -1249,7 +1245,7 @@ def get_iterable_search_results(request, search_path='/search/', param_lists=Non
     param_lists = deepcopy(param_lists)
     param_lists['limit'] = ['all']
     param_lists['from'] = [0]
-    param_lists['sort'] = param_lists.get('sort','uuid')
+    param_lists['sort'] = param_lists.get('sort', 'uuid')
     subreq = make_search_subreq(request, '{}?{}'.format(search_path, urlencode(param_lists, True)) )
     return iter_search_results(None, subreq, **kwargs)
 
