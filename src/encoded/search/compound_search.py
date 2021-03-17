@@ -46,10 +46,18 @@ class CompoundSearchBuilder:
         :return: new Request
         """
 
-        if '?' not in query:  # do some sanitization
+        # do some sanitization
+        # This will actually urlencode the entire previous string, so:
+        # `&inheritance_modes=Neurodev+2500%2B+%282598%29` will become:
+        # `&inheritance_modes=Neurodev%2B2500%252B%2B%25282598%2529` (the "&" & "=" chars can be encoded too, but left intact)
+        # so the "+" become urlencoded into 'plus-sign' encodings (%2B) (rather than space - %20), and previous 'plus-sign'
+        # encodings go from `%2B` to `%252B` (the percent sign gets encoded). So essentially is an encoding of an encoding.
+        # But it works once goes into snovault's `make_subreq` downstream.
+        query = urllib.parse.quote(query, safe="&=")
+        if '?' not in query:
             query = '?' + query
 
-        subreq = make_search_subreq(request, route + '%s&from=%s&limit=%s' % (urllib.parse.quote(query), from_, to))
+        subreq = make_search_subreq(request, route + '%s&from=%s&limit=%s' % (query, from_, to))
         subreq.headers['Accept'] = 'application/json'
 
         return subreq
