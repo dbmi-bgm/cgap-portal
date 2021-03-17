@@ -1,3 +1,4 @@
+import ast
 import itertools
 import re
 from base64 import b64encode
@@ -142,16 +143,10 @@ class GeneListSubmission:
             title, genelist = self.extract_xlsx_file(self.filename)
         if not title:
             self.errors.append("No title found for the gene list.")
-        while "" in genelist:
-            genelist.remove("")
+        genelist = [x for x in genelist if x != ""]
         if not genelist:
             self.errors.append("The gene list appears to be empty.")
-        if len(genelist) != len(set(genelist)):
-            unique_genes = []
-            for gene in genelist:
-                if gene not in unique_genes:
-                    unique_genes.append(gene)
-            genelist = unique_genes
+        genelist = list(set(genelist))
         return genelist, title
 
     def match_genes(self):
@@ -172,28 +167,52 @@ class GeneListSubmission:
         if not self.genes:
             return None
         gene_ids = {}
+        gene_ensgids = {}
         unmatched_genes = []
         unmatched_genes_without_options = []
         unmatched_genes_with_options = {}
         for gene in self.genes:
-            try:
-                response = self.vapp.get(
-                    "/search/?type=Gene&gene_symbol=" + gene,
-                ).json["@graph"]
-                if len(response) >= 1:
-                    for response_item in response:
-                        if gene in gene_ids:
-                            gene_ids[gene].append(response_item["uuid"])
-                            self.notes.append(
-                                "Note: gene %s refers to multiple genes in our "
-                                "database." % gene
-                            )
-                        else:
-                            gene_ids[gene] = [response_item["uuid"]]
-                else:
+            if re.fullmatch(r'ENSG\d{11}', gene):
+                try:
+                    response = self.vapp.get(
+                            "/search/?type=Gene&ensgid=" + gene,
+                    ).json["@graph"]
+                    gene_ids[response["gene_symbol"]] = [response["uuid"]]
+                    gene_ensgids[response["gene_symbol"]] = [
+                            response["ensgid"]
+                    ]
+                except Exception:
+                    unmatched_genes_without_options.append(gene)
+            else:
+                try:
+                    response = self.vapp.get(
+                        "/search/?type=Gene&gene_symbol=" + gene,
+                    ).json["@graph"]
+                    if len(response) >= 1:
+                        for response_item in response:
+                            if gene in gene_ids:
+                                gene_ids[gene].append(response_item["uuid"])
+                                gene_ensgids[gene].append(
+                                        response_item["ensgid"]
+                                )
+                                self.notes.append(
+                                    "Note: gene %s refers to multiple genes "
+                                    "in our database, including genes with "
+                                    "the following Ensembl IDs: %s. If you "
+                                    "would prefer to "
+                                    "only include one of these genes in this "
+                                    "gene list, please resubmit and replace "
+                                    "the gene %s with one of "
+                                    "the Ensembl IDs above."
+                                    % (gene, gene_ensgids[gene], gene)
+                                )
+                            else:
+                                gene_ids[gene] = [response_item["uuid"]]
+                                gene_ensgids[gene] = [response_item["ensgid"]]
+                    else:
+                        unmatched_genes.append(gene)
+                except Exception:
                     unmatched_genes.append(gene)
-            except Exception:
-                unmatched_genes.append(gene)
         for gene in unmatched_genes.copy():
             try:
                 response = self.vapp.get("/search/?type=Gene&q=" + gene).json[
@@ -235,10 +254,8 @@ class GeneListSubmission:
                         unmatched_genes_with_options[gene] = options
                 else:
                     unmatched_genes_without_options.append(gene)
-            except Exception as e:
+            except Exception:
                 unmatched_genes_without_options.append(gene)
-                msg = "Error when searching for gene %s." % gene
-                self.errors.append(msg + str(e))
         if unmatched_genes:
             if unmatched_genes_without_options:
                 self.errors.append(
@@ -589,3 +606,18 @@ class GeneListSubmission:
                 return "success"
         else:
             return None
+
+
+def parse_exception(e):
+    """
+    Attempts to return a cleaner version of an exception for users to see.
+    Adapted from Submit4DN.
+    """
+    try:
+        text = e.args[0]
+        index = text.index('Reason: ')
+        resp_text = text[index + 8:]
+        resp_dict = ast.literal_eval(resp_text)
+        return resp_dict
+    except Exception:
+        return e
