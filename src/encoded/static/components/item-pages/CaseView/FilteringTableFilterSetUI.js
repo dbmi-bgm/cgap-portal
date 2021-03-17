@@ -344,6 +344,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             cachedCounts = {},
             addNewFilterBlock, selectedFilterBlockIndices, selectFilterBlockIdx, removeFilterBlockAtIdx,
             setNameOfFilterBlockAtIdx, setTitleOfFilterSet, isSettingFilterBlockIdx,
+            intersectFilterBlocks = false, toggleIntersectFilterBlocks,
 
             // From ajax.FetchedItem
             isFetchingInitialFilterSetItem = false
@@ -382,6 +383,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 singleSelectedFilterBlockIdx, selectedFilterBlockIndices, allFilterBlocksSelected, selectedFilterBlockIdxCount,
                 addNewFilterBlock, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
                 cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx,
+                intersectFilterBlocks, toggleIntersectFilterBlocks
             };
             body = <FilterSetUIBlocks {...bodyProps} />;
         }
@@ -400,12 +402,17 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
                     panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
                     <h4 className="text-400 col my-0">
-                        <span className="text-600 mr-1">{ totalCount }</span>
+                        <strong className="mr-1">{ totalCount }</strong>
                         <span>
                             Variant Matches for { currentFilterBlockName ?
                                 <em>{ currentFilterBlockName }</em>
                                 // TODO: Allow to toggle Union vs Intersection in FilterSetController
-                                : `Union of ${selectedFilterBlockCount} Filter Blocks` }
+                                : (
+                                    <React.Fragment>
+                                        <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
+                                        { ` of ${selectedFilterBlockCount} Filter Blocks` }
+                                    </React.Fragment>
+                                ) }
                         </span>
                     </h4>
                 </AboveTableControlsBase>
@@ -537,11 +544,11 @@ function FilterSetUIHeader(props){
 
 const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
     const {
-        filterSet, filterBlocksLen, facetDict,
+        filterSet, filterBlocksLen, facetDict, schemas,
         singleSelectedFilterBlockIdx, selectedFilterBlockIndices, allFilterBlocksSelected, selectedFilterBlockIdxCount,
         addNewFilterBlock, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
         cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
-        schemas
+        intersectFilterBlocks = false, toggleIntersectFilterBlocks
     } = props;
     const { filter_blocks = [] } = filterSet || {};
     const { query: currentSingleBlockQuery = null } = (singleSelectedFilterBlockIdx !== null && filter_blocks[singleSelectedFilterBlockIdx]) || {};
@@ -560,6 +567,12 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         e.stopPropagation();
         e.preventDefault();
         selectFilterBlockIdx(null);
+    }
+
+    function onToggleIntersectFilterBlocksBtnClick(e){
+        e.stopPropagation();
+        e.preventDefault();
+        toggleIntersectFilterBlocks();
     }
 
     const commonProps = {
@@ -593,22 +606,28 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
             ) }
             <div className="row">
                 <div className="col">
-                    <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
-                        <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
-                        Select All
-                    </button>
+                    <div className="btn-group" role="group" aria-label="Selection Controls">
+                        <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
+                            <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
+                            Select All
+                        </button>
+                        <button type="button" className="btn btn-primary-dark" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
+                            data-tip="Toggle whether search results from multiple selected filter blocks are intersected or merged">
+                            <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
+                            Intersect
+                        </button>
+                    </div>
                 </div>
                 <div className="col-auto">
-                    <div className="btn-group" role="group" aria-label="Basic example">
+                    <div className="btn-group" role="group" aria-label="Creation Controls">
                         <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
                             <i className="icon icon-fw icon-plus fas mr-1" />
                             Add Filter Block
                         </button>
-                        { currentSingleBlockQuery ?
-                            <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} data-tip="Copy currently-selected filter block">
-                                <i className="icon icon-fw icon-clone far" />
-                            </button>
-                            : null }
+                        <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} disabled={!currentSingleBlockQuery}
+                            data-tip="Copy currently-selected filter block">
+                            <i className="icon icon-fw icon-clone far" />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1174,6 +1193,7 @@ export class FilterSetController extends React.PureComponent {
             // "selectedFilterBlockIdx": null,
             selectedFilterBlockIndices,
             "isSettingFilterBlockIdx": true,
+            "intersectFilterBlocks": false,
             "cachedCounts": {} // Using indices as keys here, but keeping as object (keys are strings)
         };
     }
@@ -1189,6 +1209,7 @@ export class FilterSetController extends React.PureComponent {
         this.removeFilterBlockAtIdx =  _.throttle(this.removeFilterBlockAtIdx.bind(this), 250, { trailing: false });
         this.setNameOfFilterBlockAtIdx = this.setNameOfFilterBlockAtIdx.bind(this);
         this.setTitleOfFilterSet = this.setTitleOfFilterSet.bind(this);
+        this.toggleIntersectFilterBlocks = _.throttle(this.toggleIntersectFilterBlocks.bind(this), 250, { trailing: false });
 
         this.state = FilterSetController.resetState(this.props);
     }
@@ -1343,9 +1364,17 @@ export class FilterSetController extends React.PureComponent {
         });
     }
 
+    toggleIntersectFilterBlocks(){
+        this.setState(function({ intersectFilterBlocks }){
+            return {
+                "intersectFilterBlocks": !intersectFilterBlocks
+            };
+        }, this.navigateToCurrentBlock);
+    }
+
     navigateToCurrentBlock(){
         const { navigate: virtualNavigate, searchHrefBase, context: searchContext } = this.props; // props.navigate passed down in from SPC EmbeddedSearchView VirtualHrefController
-        const { selectedFilterBlockIndices, currFilterSet } = this.state;
+        const { selectedFilterBlockIndices, currFilterSet, intersectFilterBlocks } = this.state;
 
         const selectedIdxList = Object.keys(selectedFilterBlockIndices);
         const selectedIdxCount = selectedIdxList.length;
@@ -1366,7 +1395,8 @@ export class FilterSetController extends React.PureComponent {
 
             let global_flags = url.parse(searchHrefBase, false).search;
             if (global_flags) {
-                global_flags = global_flags.slice(1).replace("type=VariantSample&", ""); // .replace("&sort=date_created", "");
+                // Not particularly necessary but helps make less redundant since we have `search_type` already.
+                global_flags = global_flags.slice(1).replace("type=VariantSample&", "");
             }
 
             const selectedFilterBlocks = selectedIdxCount === 0 ? filter_blocks : filter_blocks.filter(function(fb, fbIdx){
@@ -1379,7 +1409,7 @@ export class FilterSetController extends React.PureComponent {
             const virtualCompoundFilterSet = {
                 search_type,
                 global_flags,
-                "intersect" : false,
+                "intersect": intersectFilterBlocks,
                 // "flags": [
                 //     {
                 //         "name": "CurrentFilterSet",
@@ -1460,18 +1490,20 @@ export class FilterSetController extends React.PureComponent {
     render(){
         // eslint-disable-next-line no-unused-vars
         const { children, initialFilterSetItem, ...passProps } = this.props;
-        const { currFilterSet, selectedFilterBlockIndices, cachedCounts, isSettingFilterBlockIdx } = this.state;
+        const { currFilterSet, selectedFilterBlockIndices, cachedCounts, isSettingFilterBlockIdx, intersectFilterBlocks } = this.state;
         const childProps = {
             ...passProps,
             currFilterSet,
             isSettingFilterBlockIdx,
             selectedFilterBlockIndices,
             cachedCounts,
+            intersectFilterBlocks,
             addNewFilterBlock: this.addNewFilterBlock,
             removeFilterBlockAtIdx: this.removeFilterBlockAtIdx,
             selectFilterBlockIdx: this.selectFilterBlockIdx,
             setNameOfFilterBlockAtIdx: this.setNameOfFilterBlockAtIdx,
-            setTitleOfFilterSet: this.setTitleOfFilterSet
+            setTitleOfFilterSet: this.setTitleOfFilterSet,
+            toggleIntersectFilterBlocks: this.toggleIntersectFilterBlocks
         };
 
         return React.Children.map(children, (child)=>{
