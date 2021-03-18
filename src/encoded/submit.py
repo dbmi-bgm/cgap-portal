@@ -346,7 +346,7 @@ class SubmissionRow:
         replace_cell_contents(info, 'specimen_accepted', y='Yes', n='No')
         # handle bam sample ID
         if not info.get('bam_sample_id'):
-            info['bam_sample_id'] = info.get('specimen_accession')
+            info['bam_sample_id'] = self.sample_alias.split(':sample-')[-1]
         if info.get('specimen_type'):
             info['specimen_type'] = info['specimen_type'].lower().replace('_', ' ')
         # SEO
@@ -799,6 +799,7 @@ def xls_to_json(xls_data, project, institution, ingestion_id):
     result = SpreadsheetProcessing(xls_data=xls_data, project=project, institution=institution,
                                    ingestion_id=ingestion_id)
     result.output['errors'] = result.errors
+    print(json.dumps(result.output, indent=4))
     return result.output, result.passing
 
 
