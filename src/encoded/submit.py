@@ -518,7 +518,6 @@ class SubmissionMetadata:
     """
 
     def __init__(self, rows, project, institution, ingestion_id, counter=1):
-        # import pdb; pdb.set_trace()
         self.rows = rows
         self.project = project.get('name')
         self.project_atid = project.get('@id')
@@ -843,14 +842,12 @@ class PedigreeMetadata:
             del item['family_id']
         # TODO: family_phenotypic_features - change to calculated property?
         # TODO: get family aliases
-        print(family_metadata)
         final_family_dict = {}
         for key, value in family_metadata.items():
             try:
                 family_matches = self.virtualapp.get(f'/search/?type=Family&family_id={key}')
             except Exception:
                 # TODO: handling for no matches
-                print(value)
                 final_family_dict[value['aliases'][0]] = value
             else:
                 for match in family_matches.json['@graph'][0]:
@@ -862,7 +859,6 @@ class PedigreeMetadata:
                         if phenotypes:
                             final_family_dict[match['aliases'][0]]['family_phenotyic_features'] = phenotypes[:4]
             # del family_metadata[key]
-        print(final_family_dict)
         return final_family_dict
 
     def process_rows(self):
@@ -872,12 +868,9 @@ class PedigreeMetadata:
         for i, row in enumerate(self.rows):
             try:
                 processed_row = PedigreeRow(row, i + 1 + self.counter, self.project, self.institution)
-                simple_add_items = [processed_row.individual]
-                for item in simple_add_items:
-                    self.add_metadata_single_item(item)
+                self.add_individual_metadata(processed_row.individual)
                 self.errors.extend(processed_row.errors)
             except AttributeError as e:
-                print(e)
                 self.errors.append(e)
                 continue
         self.families = self.add_family_metadata()
@@ -966,9 +959,10 @@ class SpreadsheetProcessing:
 
     def extract_metadata(self):
         if self.submission_type == 'accessioning':
-            result = SubmissionMetadata(self.rows, self.project, self.institution, self.counter)
+            result = SubmissionMetadata(self.rows, self.project, self.institution, self.ingestion_id, self.counter)
         elif self.submission_type == 'pedigree':
-            result = PedigreeMetadata(self.virtualapp, self.rows, self.project, self.institution, self.counter)
+            result = PedigreeMetadata(self.virtualapp, self.rows, self.project,
+                                      self.institution, self.ingestion_id, self.counter)
         else:
             pass
             # TODO: handle this case

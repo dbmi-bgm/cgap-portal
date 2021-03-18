@@ -216,11 +216,11 @@ def example_rows():
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '2'},
         {'individual id': '789', 'sex': 'M', 'analysis id': '1111', 'relation to proband': 'father',
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '3'},
-        {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband',
+        {'individual id': '456', 'sex': 'F', 'analysis id': '2222', 'relation to proband': 'proband',
          'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
-        {'individual id': '456', 'analysis id': '4444', 'relation to proband': 'proband',
+        {'individual id': '456', 'sex': 'F', 'analysis id': '4444', 'relation to proband': 'proband',
          'report required': 'Y', 'workup type': 'WES', 'specimen id': '7'},
-        {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband',
+        {'individual id': '555', 'sex': 'M', 'analysis id': '3333', 'relation to proband': 'proband',
          'report required': 'Y', 'workup type': 'WES', 'specimen id': '5'},
         {'individual id': '546', 'sex': 'F', 'analysis id': '3333', 'relation to proband': 'mother',
          'report required': 'N', 'workup type': 'WES', 'specimen id': '6'}
@@ -230,15 +230,15 @@ def example_rows():
 @pytest.fixture
 def big_family_rows():
     return [
-        {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband',
+        {'individual id': '456', 'sex': 'M', 'analysis id': '1111', 'relation to proband': 'proband',
          'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
-        {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother',
+        {'individual id': '123', 'sex': 'F', 'analysis id': '1111', 'relation to proband': 'mother',
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '2'},
-        {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father',
+        {'individual id': '789', 'sex': 'M', 'analysis id': '1111', 'relation to proband': 'father',
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '3'},
-        {'individual id': '546', 'analysis id': '1111', 'relation to proband': 'sister',
+        {'individual id': '546', 'sex': 'F', 'analysis id': '1111', 'relation to proband': 'sister',
          'report required': 'Y', 'workup type': 'WGS', 'specimen id': '4'},
-        {'individual id': '555', 'analysis id': '1111', 'relation to proband': 'full brother 1',
+        {'individual id': '555', 'sex': 'M', 'analysis id': '1111', 'relation to proband': 'full brother 1',
          'report required': 'Y', 'workup type': 'WGS', 'specimen id': '5'}
     ]
 
@@ -641,35 +641,35 @@ class TestSpreadsheetProcessing:
         (1, False),  # main header missing should cause a caught error
         (2, True)  # missing comment row should work ok
     ])
-    def test_header_found(self, project, institution, xls_list, remove_row, success_bool):
+    def test_header_found(self, testapp, project, institution, xls_list, remove_row, success_bool):
         """tests that proper header is found when present"""
         data = iter(xls_list[0:remove_row] + xls_list[(remove_row) + 1:])
-        obj = SpreadsheetProcessing(data, project, institution, TEST_INGESTION_ID1)
+        obj = SpreadsheetProcessing(testapp, data, project, institution, TEST_INGESTION_ID1)
         assert obj.passing == success_bool
         assert (len(obj.errors) == 0) == success_bool
         assert ('Column headers not detected in spreadsheet!' in ''.join(obj.errors)) == (not success_bool)
 
-    def test_create_row_dict(self, xls_list, project, institution):
+    def test_create_row_dict(self, testapp, xls_list, project, institution):
         """tests that dictionary of colname: field value is created for each row"""
-        obj = SpreadsheetProcessing(iter(xls_list), project, institution, TEST_INGESTION_ID1)
+        obj = SpreadsheetProcessing(testapp, iter(xls_list), project, institution, TEST_INGESTION_ID1)
         assert obj.keys
         assert len(obj.rows) == 3
         for row in obj.rows:
             assert all(key in row for key in obj.keys)
 
-    def test_create_row_dict_missing_col(self, xls_list, project, institution):
+    def test_create_row_dict_missing_col(self, testapp, xls_list, project, institution):
         """tests that correct error is returned when a required column header is not in spreadsheet"""
         idx = xls_list[1].index('Specimen ID')
         rows = (row[0:idx] + row[idx+1:] for row in xls_list)
-        obj = SpreadsheetProcessing(rows, project, institution, TEST_INGESTION_ID1)
+        obj = SpreadsheetProcessing(testapp, rows, project, institution, TEST_INGESTION_ID1)
         assert not obj.passing
         assert 'Column(s) "specimen id" not found in spreadsheet!' in ''.join(obj.errors)
 
 
-def test_xls_to_json(project, institution):
+def test_xls_to_json(testapp, project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
     rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
-    json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
+    json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'accessioning')
     assert success
     assert len(json_out['family']) == 1
     assert 'encode-project:family-456' in json_out['family']
@@ -677,15 +677,15 @@ def test_xls_to_json(project, institution):
     assert all(['encode-project:individual-' + x in json_out['individual'] for x in ['123', '456', '789']])
 
 
-def test_xls_to_json_errors(project, institution):
+def test_xls_to_json_errors(testapp, project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
     rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx')
-    json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
+    json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'accessioning')
     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
     assert success  # still able to proceed to validation step
 
 
-def test_xls_to_json_invalid_workup(project, institution, xls_list):
+def test_xls_to_json_invalid_workup(testapp, project, institution, xls_list):
     """
     tests that an invalid workup type is caught as an error -
     tested via xls_to_json to ensure that errors generated in child objects are passed
@@ -694,7 +694,7 @@ def test_xls_to_json_invalid_workup(project, institution, xls_list):
     idx = xls_list[1].index('Workup Type')
     xls_list[4] = xls_list[4][0:idx] + ['Other'] + xls_list[4][idx+1:]
     rows = iter(xls_list)
-    json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
+    json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'accessioning')
     assert json_out['errors']
     assert success
     assert ('Row 5 - Samples with analysis ID 55432 contain mis-matched '
