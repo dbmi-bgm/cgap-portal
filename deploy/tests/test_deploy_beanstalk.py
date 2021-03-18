@@ -1,5 +1,6 @@
+import pytest
+
 from unittest import mock
-from pytest import fixture
 from ..deploy_beanstalk import previous_git_commit, parse
 
 
@@ -10,6 +11,9 @@ Date:   Thu Sep 22 22:23:54 2016 -0400
     we need .aws for both master and production
 
 '''
+
+
+pytestmark = [pytest.mark.working, pytest.mark.unit]
 
 
 def test_parse_git_commit():
