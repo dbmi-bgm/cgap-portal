@@ -591,6 +591,7 @@ h3.submission-subtitle {
 	&[data-status="in progress"]:before, 					// Applicable to columnExtensionMap columns
 	&[data-status="incomplete"]:before, 					// Applicable to columnExtensionMap columns
 	&[data-status="uncertain significance"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="VUS"]:before,							// Applicable to SampleVariant Interpretation Classification
 	&[data-status="associaton"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #d8bd22;
@@ -601,6 +602,7 @@ h3.submission-subtitle {
 	&[data-status="inactive"]:before,						// Applicable to Item.status
 	&[data-status="revoked"]:before,						// Applicable to User.status
 	&[data-status="probable-pathogenic"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="likely pathogenic"]:before,				// Applicable to SampleVariant Interpretation Classification
 	&[data-status="affects"]:before,						// Applicable to ClinVar Clinical Significance
 	&[data-status="restricted"]:before {					// Deprecated?
 		color: #fff;

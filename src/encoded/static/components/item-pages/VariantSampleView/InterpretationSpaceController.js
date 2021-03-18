@@ -8,7 +8,7 @@ import Dropdown from 'react-bootstrap/esm/Dropdown';
 import Button from 'react-bootstrap/esm/Button';
 import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 /**
@@ -296,6 +296,12 @@ export class InterpretationSpaceController extends React.Component {
         this.toggleFullScreen = this.toggleFullScreen.bind(this);
         this.switchToTab = this.switchToTab.bind(this);
     }
+    componentDidUpdate(pastState) {
+        const { currentTab } = this.state;
+        if (currentTab !== pastState.currentTab){
+            ReactTooltip.rebuild();
+        }
+    }
 
     toggleFullScreen() {
         // TODO
@@ -317,7 +323,7 @@ export class InterpretationSpaceController extends React.Component {
         const { isFullScreen, currentTab } = this.state;
         const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
 
-        const passProps = _.pick(this.props, 'saveAsDraft', 'saveToCase', 'saveToKnowledgeBase');
+        const passProps = _.pick(this.props, 'saveAsDraft', 'saveToCase', 'saveToKnowledgeBase', 'schemas');
         //TODO: cleanup past props
 
         let panelToDisplay = null;
@@ -400,11 +406,17 @@ class GenericInterpretationPanel extends React.Component {
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
         this.saveStateToCase = this.saveStateToCase.bind(this);
         this.saveStateToKnowledgeBase = this.saveStateToKnowledgeBase.bind(this);
+        this.onDropOptionChange = this.onDropOptionChange.bind(this);
     }
 
     // Will use same update fxn for multiple text fields
     onTextChange(event, stateToChange) {
         const { value: newValue } = event.target || {};
+        this.setState({ [stateToChange]: newValue });
+    }
+
+    // Using same update fxn for multiple dropdowns
+    onDropOptionChange(stateToChange, newValue) {
         this.setState({ [stateToChange]: newValue });
     }
 
@@ -425,9 +437,9 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { lastSavedNote = null, noteLabel } = this.props;
+        const { lastSavedNote = null, noteLabel, noteType, schemas } = this.props;
         const { note_text : savedNoteText = null, status: savedNoteStatus } = lastSavedNote || {};
-        const { note_text: noteText } = this.state;
+        const { note_text: noteText, acmg_guidelines, classification, conclusion } = this.state;
 
         // TODO: move into a function and memoize once checking other values of state, too
         const noteChangedSinceLastSave = noteText !== savedNoteText;
@@ -441,12 +453,74 @@ class GenericInterpretationPanel extends React.Component {
                     { noteLabel }
                 </label>
                 <textarea className="w-100" value={noteText} onChange={(e) => this.onTextChange(e, "note_text")}/>
+                { noteType === "note_interpretation" ?
+                    <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    : null }
                 <GenericInterpretationSubmitButton {...{ isCurrent, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
                     saveAsDraft={this.saveStateAsDraft} saveToCase={this.saveStateToCase} saveToKnowledgeBase={this.saveStateToKnowledgeBase}
                 />
             </div>
         );
     }
+}
+
+function NoteFieldDrop(props) { /** For classification, variant/gene candidacy dropdowns */
+    const { value = null, schemas = null, field = null, noteType = null, onOptionChange, cls="mb-1", getFieldProperties } = props;
+    if (!schemas) {
+        return 'loading...'; // TODO: actually implement a load spinner
+    }
+
+    const fieldSchema = getFieldProperties(field);
+
+    const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
+    console.log("fieldSchema", fieldSchema, field);
+
+    let dropOptions;
+    if (static_enum.length > 0) {
+        dropOptions = static_enum.map((option) => (
+            <Dropdown.Item onClick={() => onOptionChange(field, option)} key={option}>
+                <i className="interpretation-indicator-dot mr-07" data-status={value}/>{option}
+            </Dropdown.Item>
+        ));
+    }
+
+    return (
+        <React.Fragment>
+            <label className="w-100">
+                { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
+            </label>
+            <Dropdown as={ButtonGroup} className={cls}>
+                <Dropdown.Toggle variant="outline-secondary btn-block" id="dropdown-basic">
+                    { value ? <><i className="status-indicator-dot mr-07" data-status={value} /> { value }</> : "Select an option..."}
+                </Dropdown.Toggle>
+                <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
+            </Dropdown>
+        </React.Fragment>
+    );
+}
+
+/** Display additional form fields for ACMG Interpretation */
+function ACMGInterpretationForm(props) {
+    const { schemas, acmg_guidelines = [], classification = null, conclusion = null, noteType, onDropOptionChange } = props;
+
+    const getFieldProperties = useMemo(function(){
+        if (!schemas) return function(){ return null; };
+        console.log("getting field properties");
+        // Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`.
+        return function(field){
+            console.log("field", field);
+            const noteItem = noteType === "note_interpretation" ? "NoteInterpretation" : "NoteStandard";
+            const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, noteItem);
+            console.log("schemaProperty", schemaProperty);
+            return (schemaProperty || {});
+        };
+    }, [ schemas ]);
+
+    return (
+        <React.Fragment>
+            <NoteFieldDrop {...{ schemas, noteType }} getFieldProperties={getFieldProperties} onOptionChange={onDropOptionChange} field="classification" value={classification}/>
+        </React.Fragment>
+    );
 }
 
 /**
