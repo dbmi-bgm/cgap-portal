@@ -209,15 +209,15 @@ function StackedRowColumn(props) {
 const VSDisplayTitleColumnDefault = React.memo(function VSDisplayTitleColumnDefault(props) {
     const { result = null, link, onClick, className = null } = props;
     const { variant = null } = result || {};
-    const { display_title = null, csq_rs_dbsnp151 = null } = variant;
+    const { display_title = null, ID = null } = variant;
 
     const cls = ("title-block" + (className ? " " + className : ""));
     const rows = [
         <span key="variant-title" className="d-block text-600 text-truncate">{display_title}</span>
     ];
 
-    if (csq_rs_dbsnp151) {
-        rows.push(<span key="dbsnp" className="font-italic">{csq_rs_dbsnp151}</span>);
+    if (ID) {
+        rows.push(<span key="dbsnp" className="font-italic">{ID}</span>);
     }
 
     return (
