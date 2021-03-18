@@ -210,17 +210,17 @@ def case_with_ingestion_id2(testapp, project, institution, fam, sample_proc_fam)
 @pytest.fixture
 def example_rows():
     return [
-        {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband',
+        {'individual id': '456', 'sex': 'F', 'analysis id': '1111', 'relation to proband': 'proband',
          'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
-        {'individual id': '123', 'analysis id': '1111', 'relation to proband': 'mother',
+        {'individual id': '123', 'sex': 'F', 'analysis id': '1111', 'relation to proband': 'mother',
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '2'},
-        {'individual id': '789', 'analysis id': '1111', 'relation to proband': 'father',
+        {'individual id': '789', 'sex': 'M', 'analysis id': '1111', 'relation to proband': 'father',
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '3'},
-        {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband',
+        {'individual id': '456', 'sex': 'F', 'analysis id': '2222', 'relation to proband': 'proband',
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '1'},
-        {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband',
+        {'individual id': '555', 'sex': 'M', 'analysis id': '3333', 'relation to proband': 'proband',
          'report required': 'Y', 'workup type': 'WES', 'specimen id': '5'},
-        {'individual id': '546', 'analysis id': '3333', 'relation to proband': 'mother',
+        {'individual id': '546', 'sex': 'F', 'analysis id': '3333', 'relation to proband': 'mother',
          'report required': 'N', 'workup type': 'WES', 'specimen id': '6'}
     ]
 
@@ -244,6 +244,27 @@ def big_family_rows():
 @pytest.fixture
 def example_rows_obj(example_rows, project, institution):
     return SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+
+
+@pytest.fixture
+def example_rows_pedigree():
+    return [
+        {'family id': '0101', 'individual id': '456', 'mother id': '123', 'father id': '789',
+         'sex': 'F', 'proband': 'Y', 'hpo terms': 'HPO:000001, HPO:099994', 'mondo terms': 'MONDO:012345'},
+        {'family id': '0101', 'individual id': '123', 'mother id': '223', 'father id': '323',
+         'sex': 'F', 'proband': 'N', 'hpo terms': 'HPO:099994', 'mondo terms': ''},
+        {'family id': '0101', 'individual id': '789', 'mother id': '', 'father id': '',
+         'sex': 'M', 'proband': 'N', 'hpo terms': '', 'mondo terms': ''},
+        {'family id': '0101', 'individual id': '423', 'mother id': '223', 'father id': '323',
+         'sex': 'M', 'proband': 'N', 'hpo terms': '', 'mondo terms': ''},
+        {'family id': '0101', 'individual id': '223', 'mother id': '', 'father id': '',
+         'sex': 'F', 'proband': 'N', 'hpo terms': 'HPO:099994, HPO:012345', 'mondo terms': ''},
+        {'family id': '0101', 'individual id': '323', 'mother id': '', 'father id': '',
+         'sex': 'F', 'proband': 'N', 'hpo terms': '', 'mondo terms': 'MONDO:045732, MONDO:043872'},
+        {'family id': '0101', 'individual id': '156', 'mother id': '456', 'father id': '',
+         'sex': 'F', 'proband': 'N', 'hpo terms': '', 'mondo terms': '',
+         'pregnancy': 'y', 'gestational age': '25', 'gestational age units': 'week'}
+    ]
 
 
 @pytest.fixture
@@ -418,10 +439,10 @@ class TestSubmissionMetadata:
                 {k: v for k, v in example_rows[1].items()}
             ]
             data[rowidx]['specimen accepted by ref lab'] = 'Y'
-            submission = SubmissionMetadata(data, project, institution, TEST_INGESTION_ID1)
-            assert len(submission.individuals) == 2
-            assert len(submission.samples) == 2
-            assert 'specimen_accepted' in list(submission.samples.values())[1]
+        submission = SubmissionMetadata(data, project, institution, TEST_INGESTION_ID1)
+        assert len(submission.individuals) == 2
+        assert len(submission.samples) == 2
+        assert 'specimen_accepted' in list(submission.samples.values())[1]
 
     @pytest.mark.parametrize('last_relation, error', [
         ('brother', False),  # not a duplicate relation
@@ -555,10 +576,58 @@ class TestPedigreeRow:
         assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
                 ''.format(field) in obj.errors) == error
 
-    def test_reformat_phenotypic_features(self):
+    @pytest.mark.parametrize('feat_list, length', [
+        ([], 0),
+        (['HPO:000001'], 1),
+        (['HPO:094732', 'HPO:239843', 'HPO:000001'], 3)
+    ])
+    def test_reformat_phenotypic_features(self, feat_list, length):
+        result = PedigreeRow.reformat_phenotypic_features(feat_list)
+        assert len(result) == length
+        for item in result:
+            assert isinstance(item, dict)
+            assert list(item.keys()) == ['phenotypic_feature']
+
+    @pytest.mark.parametrize('proband_val, result', [
+        ('Y', True),
+        ('N', False),
+        ('U', False)
+    ])
+    def test_is_proband(self, row_dict_pedigree, project, institution, proband_val, result):
+        row_dict_pedigree['proband'] = proband_val
+        obj = PedigreeRow(row_dict_pedigree, 1, project['name'], institution['name'])
+        assert obj.proband == result
+
+
+class TestPedigreeMetadata:
+
+    def test_add_individual_metadata(self, testapp, example_rows_pedigree, project, institution):
+        """
+        if json for an item was already created in a previous row, any new fields for that
+        item in the current row should be added to the existing json.
+        if the current row has less information than the previous json item, the fields in
+        the previous json item won't get overwritten.
+        """
+        for rowidx in (1, 2):
+            data = [
+                {k: v for k, v in example_rows_pedigree[0].items()},
+                # 2 rows have same sample
+                {k: v for k, v in example_rows_pedigree[6].items()},
+                {k: v for k, v in example_rows_pedigree[6].items()}
+            ]
+            submission = PedigreeMetadata(testapp, data, project, institution, TEST_INGESTION_ID1)
+            assert len(submission.individuals) == 2
+            # assert len(submission.families) == 1
+            assert 'is_pregnancy' in list(submission.individuals.values())[1]
+            assert list(submission.individuals.values())[1]['is_pregnancy'] == True
+
+    def test_add_family_metadata(self):
         pass
 
-    def test_is_proband(self):
+    def test_process_rows(self):
+        pass
+
+    def test_json_out(self):
         pass
 
 
