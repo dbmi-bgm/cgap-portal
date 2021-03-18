@@ -204,6 +204,13 @@ def example_rows():
 
 
 @pytest.fixture
+def example_rows_with_test_number(example_rows):
+    example_rows[0]['test number'] = '1'
+    example_rows[3]['test number'] = '2'
+    return example_rows
+
+
+@pytest.fixture
 def big_family_rows():
     return [
         {'individual id': '456', 'analysis id': '1111', 'relation to proband': 'proband',
@@ -413,6 +420,19 @@ class TestSubmissionMetadata:
             assert len(submission.individuals) == 2
             assert len(submission.samples) == 2
             assert 'specimen_accepted' in list(submission.samples.values())[1]
+
+    def test_add_metadata_single_item_same_sample_accession(self, example_rows_with_test_number,
+                                                            project, institution):
+        """
+        if samples have the same specimen_accession but different test number, the bam_sample_id
+        should be unique but the specimen_accession should stay the same.
+        """
+        submission = SubmissionMetadata(example_rows_with_test_number,
+                                        project, institution, TEST_INGESTION_ID1)
+        print(submission.samples)
+        accession1 = [item for item in submission.samples.values() if item['specimen_accession'] == '1']
+        assert accession1[0]['specimen_accession'] == accession1[1]['specimen_accession']
+        assert accession1[0]['bam_sample_id'] != accession1[1]['bam_sample_id']
 
     @pytest.mark.parametrize('last_relation, error', [
         ('brother', False),  # not a duplicate relation
