@@ -107,7 +107,7 @@ deploy2:  # spins up waittress to serve the application
 	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini
 
 deploy3:  # Uploads genes, consequences then ingests the VCF below
-	poetry run ingest-vcf src/encoded/annotations/GAPFIAI7IZ9Y.reformat.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
+	poetry run ingest-vcf src/encoded/annotations/GAPFIAI7IZ9Y.reformat.altcounts.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
 
 psql-dev:  # starts psql with the url after 'sqlalchemy.url =' in development.ini
 	@scripts/psql-start dev
@@ -165,8 +165,6 @@ travis-test-npm:  # Note this only does the 'not indexing' tests
 
 travis-test-unit:  # Note this does the 'indexing' tests
 	poetry run python -m pytest -vv --timeout=300 -m "working and not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
-
-
 
 update:  # updates dependencies
 	poetry update

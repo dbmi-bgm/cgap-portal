@@ -216,9 +216,11 @@ def example_rows():
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '2'},
         {'individual id': '789', 'sex': 'M', 'analysis id': '1111', 'relation to proband': 'father',
          'report required': 'N', 'workup type': 'WGS', 'specimen id': '3'},
-        {'individual id': '456', 'sex': 'F', 'analysis id': '2222', 'relation to proband': 'proband',
-         'report required': 'N', 'workup type': 'WGS', 'specimen id': '1'},
-        {'individual id': '555', 'sex': 'M', 'analysis id': '3333', 'relation to proband': 'proband',
+        {'individual id': '456', 'analysis id': '2222', 'relation to proband': 'proband',
+         'report required': 'Y', 'workup type': 'WGS', 'specimen id': '1'},
+        {'individual id': '456', 'analysis id': '4444', 'relation to proband': 'proband',
+         'report required': 'Y', 'workup type': 'WES', 'specimen id': '7'},
+        {'individual id': '555', 'analysis id': '3333', 'relation to proband': 'proband',
          'report required': 'Y', 'workup type': 'WES', 'specimen id': '5'},
         {'individual id': '546', 'sex': 'F', 'analysis id': '3333', 'relation to proband': 'mother',
          'report required': 'N', 'workup type': 'WES', 'specimen id': '6'}
@@ -408,7 +410,7 @@ class TestSubmissionMetadata:
         """test family aliases are named after proband individual ids"""
         proj_name = project['name'] + ':'
         fams = example_rows_obj.family_dict
-        assert sorted(list(fams.keys())) == ['1111', '2222', '3333']
+        assert sorted(list(fams.keys())) == ['1111', '2222', '3333', '4444']
         assert fams['1111'] == proj_name + 'family-456'
         assert fams['2222'] == proj_name + 'family-456'
         assert fams['3333'] == proj_name + 'family-555'
@@ -526,10 +528,11 @@ class TestSubmissionMetadata:
         assert example_rows_obj.json_out
         assert len(example_rows_obj.individuals) == 5
         assert len(example_rows_obj.families) == 2
-        assert len(example_rows_obj.samples) == 5
-        assert len(example_rows_obj.sample_processings) == 3
-        assert len(example_rows_obj.cases) == 6
-        assert len(example_rows_obj.reports) == 2
+        assert len(example_rows_obj.samples) == 6
+        assert len(example_rows_obj.sample_processings) == 4
+        assert len(example_rows_obj.cases) == 7
+        assert len(example_rows_obj.reports) == 4
+        assert len(example_rows_obj.individuals['encode-project:individual-456']['samples']) == 2
 
     def test_create_json_out(self, example_rows_obj, project, institution):
         """tests that all expected items are present in final json as well as
