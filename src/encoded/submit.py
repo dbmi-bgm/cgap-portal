@@ -490,6 +490,7 @@ class PedigreeRow:
         for field in ['mother', 'father']:  # turn mother and father IDs into item aliases
             if field in info:
                 info[field] = generate_individual_alias(self.project, info[field])
+        info['proband'] = self.is_proband()
         if info.get('phenotypic_features'):
             info['phenotypic_features'] = [item.strip() for item in info['phenotypic_features'].split(',')]
         if info.get('disorders'):
@@ -517,6 +518,7 @@ class SubmissionMetadata:
     """
 
     def __init__(self, rows, project, institution, ingestion_id, counter=1):
+        # import pdb; pdb.set_trace()
         self.rows = rows
         self.project = project.get('name')
         self.project_atid = project.get('@id')
@@ -789,13 +791,14 @@ class SubmissionMetadata:
 
 class PedigreeMetadata:
 
-    def __init__(self, vapp, rows, project, institution, counter=1):
+    def __init__(self, vapp, rows, project, institution, ingestion_id, counter=1):
         self.virtualapp = vapp
         self.rows = rows
         self.project = project.get('name')
         self.project_atid = project.get('@id')
         self.institution = institution.get('name')
         self.institution_atid = institution.get('@id')
+        self.ingestion_id = ingestion_id
         self.counter = counter
         self.metadata = []
         self.individuals = {}
@@ -809,13 +812,12 @@ class PedigreeMetadata:
         self.process_rows()
         self.create_json_out()
 
-    def add_metadata_single_item(self, item):
+    def add_individual_metadata(self, item):
         """
         Looks at metadata from a PedigreeRow object, one DB itemtype at a time
         and compares and adds it. If each item is not
         already represented in metadata for current SubmissionMetadata instance,
         it is added; if it is represented, missing fields are added to item.
-        Currently used for Individual and Sample items
         """
         previous = self.itemtype_dict[item.itemtype]
         prev = [p for p in previous.keys()]
@@ -829,31 +831,35 @@ class PedigreeMetadata:
     def add_family_metadata(self):
         family_metadata = {}
         for alias, item in self.individuals.items():
-            family_metadata.setdefault(item.metadata['family_id'], {'members': []})
-            family_metadata[item.metadata['family_id']]['members'].append(alias)
-            if item.isproband():
-                family_metadata[item.metadata['family_id']]['proband'] = alias
-                family_metadata['aliases'] = [f'{self.project}:family-{item.metadata["individual_id"]}']
-            del item.metadata['family_id']
+            family_metadata.setdefault(item['family_id'], {'members': []})
+            family_metadata[item['family_id']]['members'].append(alias)
+            if item.get('proband', False):
+                family_metadata[item['family_id']]['proband'] = alias
+                family_metadata[item['family_id']]['aliases'] = [self.project + ':family-' + item['individual_id']]
+            del item['family_id']
         # TODO: family_phenotypic_features - change to calculated property?
         # TODO: get family aliases
+        print(family_metadata)
+        final_family_dict = {}
         for key, value in family_metadata.items():
             try:
                 family_matches = self.virtualapp.get(f'/search/?type=Family&family_id={key}')
             except Exception:
                 # TODO: handling for no matches
-                family_metadata[value['aliases'][0]] = value
+                print(value)
+                final_family_dict[value['aliases'][0]] = value
             else:
                 for match in family_matches.json['@graph'][0]:
-                    family_metadata[match['aliases'][0]] = value
+                    final_family_dict[match['aliases'][0]] = value
                     if value.get('proband'):
-                        del family_metadata[match['aliases'][0]]['proband']
+                        del final_family_dict[match['aliases'][0]]['proband']
                         phenotypes = [item['phenotypic_feature'] for item in
                                       self.individuals[value['proband']].get('phenotypic_features', [])]
                         if phenotypes:
-                            family_metadata[match['aliases'][0]]['family_phenotyic_features'] = phenotypes[:4]
-            del family_metadata[key]
-        return family_metadata
+                            final_family_dict[match['aliases'][0]]['family_phenotyic_features'] = phenotypes[:4]
+            # del family_metadata[key]
+        print(final_family_dict)
+        return final_family_dict
 
     def process_rows(self):
         """
@@ -861,15 +867,16 @@ class PedigreeMetadata:
         """
         for i, row in enumerate(self.rows):
             try:
-                processed_row = PedigreeRow(i + 1 + self.counter, row, self.project, self.institution)
-                simple_add_items = [processed_row.individual, processed_row.family]
+                processed_row = PedigreeRow(row, i + 1 + self.counter, self.project, self.institution)
+                simple_add_items = [processed_row.individual]
                 for item in simple_add_items:
                     self.add_metadata_single_item(item)
-                self.families = self.add_family_metadata()
                 self.errors.extend(processed_row.errors)
-            except AttributeError:
-                self.errors.extend(processed_row.errors)
+            except AttributeError as e:
+                print(e)
+                self.errors.append(e)
                 continue
+        self.families = self.add_family_metadata()
 
     def create_json_out(self):
         """
