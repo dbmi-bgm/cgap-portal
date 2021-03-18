@@ -1,5 +1,4 @@
 import ast
-import itertools
 import re
 from base64 import b64encode
 from openpyxl import load_workbook
@@ -51,7 +50,7 @@ def submit_genelist(
             else:
                 results["validation_output"] = genelist.errors
         else:
-            msg = "Gene list must be a .txt file."
+            msg = "Gene list must be a .txt or .xlsx file."
             results["validation_output"].append(msg)
         return results
 
@@ -81,7 +80,7 @@ class GeneListSubmission:
         ) = self.validate_postings()
         if not validate_only:
             self.post_output = self.post_items()
-            self.variants_queued = self.queue_associated_variants()
+            self.queue_associated_variants()
 
     @staticmethod
     def extract_txt_file(txt_file):
@@ -149,12 +148,34 @@ class GeneListSubmission:
         genelist = list(set(genelist))
         return genelist, title
 
+    @staticmethod
+    def batch_search(item_list, search_term, app, item_type='Gene'):
+        batch = []
+        results = []
+        flat_result = []
+        for item in item_list:
+            batch.append(item)
+            if item == item_list[-1] or len(batch) == 100:
+                batch_string = ('&' + search_term + '=').join(batch)
+                try:
+                    response = app.get(
+                            '/search/?type=' + item_type
+                            + '&' + search_term + '=' + batch_string
+                    )
+                    results.append(response.json['@graph'])
+                except Exception:
+                    continue
+        flat_result = [x for sublist in results for x in sublist]
+        return flat_result
+
     def match_genes(self):
         """
-        Attempts to match every gene to unique gene item in CGAP.
+        Attempts to match every unique gene to unique gene item in CGAP.
 
         Matches by gene symbol, alias symbol, previous symbol, genereviews
         symbol, OMIM ID, Entrez ID, and UniProt ID, in that order.
+        If an Ensembl ID is given, searches for a direct match, and if not
+        found no additional search done given strange query behavior.
         If multiple genes in the given gene list direct to the same gene item,
         only one instance is included, so the gene list produced may be shorter
         than the one submitted.
@@ -166,122 +187,227 @@ class GeneListSubmission:
 
         if not self.genes:
             return None
+        ensgids = []
+        non_ensgids = []
         gene_ids = {}
         gene_ensgids = {}
-        unmatched_genes = []
         unmatched_genes_without_options = []
-        unmatched_genes_with_options = {}
         for gene in self.genes:
             if re.fullmatch(r'ENSG\d{11}', gene):
-                try:
-                    response = self.vapp.get(
-                            "/search/?type=Gene&ensgid=" + gene,
-                    ).json["@graph"]
-                    gene_ids[response["gene_symbol"]] = [response["uuid"]]
-                    gene_ensgids[response["gene_symbol"]] = [
-                            response["ensgid"]
-                    ]
-                except Exception:
-                    unmatched_genes_without_options.append(gene)
+                ensgids.append(gene)
             else:
-                try:
-                    response = self.vapp.get(
-                        "/search/?type=Gene&gene_symbol=" + gene,
-                    ).json["@graph"]
-                    if len(response) >= 1:
-                        for response_item in response:
-                            if gene in gene_ids:
-                                gene_ids[gene].append(response_item["uuid"])
-                                gene_ensgids[gene].append(
-                                        response_item["ensgid"]
-                                )
-                                self.notes.append(
-                                    "Note: gene %s refers to multiple genes "
-                                    "in our database, including genes with "
-                                    "the following Ensembl IDs: %s. If you "
-                                    "would prefer to "
-                                    "only include one of these genes in this "
-                                    "gene list, please resubmit and replace "
-                                    "the gene %s with one of "
-                                    "the Ensembl IDs above."
-                                    % (gene, gene_ensgids[gene], gene)
-                                )
-                            else:
-                                gene_ids[gene] = [response_item["uuid"]]
-                                gene_ensgids[gene] = [response_item["ensgid"]]
-                    else:
-                        unmatched_genes.append(gene)
-                except Exception:
-                    unmatched_genes.append(gene)
-        for gene in unmatched_genes.copy():
-            try:
-                response = self.vapp.get("/search/?type=Gene&q=" + gene).json[
-                    "@graph"
-                ]
-                if len(response) >= 1:
-                    search_order = [
-                        "alias_symbol",
-                        "prev_symbol",
-                        "genereviews",
-                        "omim_id",
-                        "entrez_id",
-                        "uniprot_ids",
-                    ]
-                    for search_term, response_item in itertools.product(
-                        search_order, response
-                    ):
-                        if (
-                            search_term in response_item.keys()
-                            and gene in response_item[search_term]
-                        ):
-                            current_gene_uuids = [
-                                uuid
-                                for sublist in gene_ids.values()
-                                for uuid in sublist
-                            ]
-                            if response_item["uuid"] in current_gene_uuids:
-                                unmatched_genes.remove(gene)
-                                break
-                            else:
-                                gene_ids[
-                                    response_item["gene_symbol"]
-                                ] = [response_item["uuid"]]
-                                unmatched_genes.remove(gene)
-                    if gene in unmatched_genes:
-                        options = []
-                        for possible_match in response:
-                            options.append(possible_match["gene_symbol"])
-                        unmatched_genes_with_options[gene] = options
+                non_ensgids.append(gene)
+        if ensgids:
+            ensgid_search = self.batch_search(ensgids, 'ensgid', self.vapp)
+            for response in ensgid_search:
+                if response['gene_symbol'] in gene_ids:
+                    gene_ids[response['gene_symbol']].append(response['uuid'])
+                    gene_ensgids[response['gene_symbol']].append(
+                            response['ensgid']
+                    )
                 else:
-                    unmatched_genes_without_options.append(gene)
-            except Exception:
-                unmatched_genes_without_options.append(gene)
-        if unmatched_genes:
-            if unmatched_genes_without_options:
-                self.errors.append(
-                    "The gene(s) %s could not be found in our database."
-                    % ", ".join(unmatched_genes_without_options)
-                )
-            if unmatched_genes_with_options:
-                for gene in unmatched_genes_with_options:
+                    gene_ids[response['gene_symbol']] = [response['uuid']]
+                    gene_ensgids[response['gene_symbol']] = [
+                            response['ensgid']
+                    ]
+                ensgids.remove(response['ensgid'])
+            if ensgids:
+                unmatched_genes_without_options += ensgids
+        if non_ensgids:
+            search_order = [
+                "gene_symbol",
+                "alias_symbol",
+                "prev_symbol",
+                "genereviews",
+                "omim_id",
+                "entrez_id",
+                "uniprot_ids",
+            ]
+            for search_type in search_order:
+                if not non_ensgids:
+                    break
+                search = self.batch_search(non_ensgids, search_type, self.vapp)
+                for response in search:
+                    if (
+                            response['gene_symbol'] in gene_ids
+                            and response['uuid'] not in
+                            gene_ids[response['gene_symbol']]
+                    ):
+                        gene_ids[response['gene_symbol']].append(
+                                response['uuid']
+                        )
+                        gene_ensgids[response['gene_symbol']].append(
+                                response['ensgid']
+                        )
+                        responsible_gene = response[search_type]
+                        if type(response[search_type]) is list:
+                            for item in response[search_type]:
+                                if item in gene_ensgids:
+                                    responsible_gene = item
+                                    break
+                        self.notes.append(
+                            "Note: gene %s refers to multiple genes "
+                            "in our database, including genes with "
+                            "the following Ensembl IDs: %s. If you "
+                            "would prefer to "
+                            "only include one of these genes in this "
+                            "gene list, please resubmit and replace "
+                            "the gene %s with one of "
+                            "the Ensembl IDs above."
+                            % (responsible_gene,
+                                gene_ensgids[response[search_type]],
+                                responsible_gene)
+                        )
+                    else:
+                        gene_ids[response['gene_symbol']] = [response['uuid']]
+                        gene_ensgids[response['gene_symbol']] = [
+                                response['ensgid']
+                        ]
+                    if type(response[search_type]) is str:
+                        non_ensgids.remove(response[search_type])
+                    elif type(response[search_type]) is list:
+                        for item in response[search_type]:
+                            if item in non_ensgids:
+                                non_ensgids.remove(item)
+                                break
+        if non_ensgids:
+            for gene in non_ensgids:
+                try:
+                    response = self.vapp.get("/search/?type=Gene&q=" + gene).json[
+                        "@graph"
+                    ]
+                    options = [
+                            option['gene_symbol'] for option in response
+                    ]
                     self.errors.append(
                         "No perfect match found for gene %s. "
                         "Consider replacing with one of the following: %s."
-                        % (gene, ", ".join(unmatched_genes_with_options[gene]))
+                        % (gene, ", ".join(options))
                     )
+                except Exception:
+                    unmatched_genes_without_options.append(gene)
+        if unmatched_genes_without_options:
+            self.errors.append(
+                "The gene(s) %s could not be found in our database. "
+                "Consider replacement with an alias name or an Ensembl ID."
+                % ", ".join(unmatched_genes_without_options)
+            )
         sorted_gene_names = sorted(gene_ids)
         matched_gene_uuids = []
         for gene_name in sorted_gene_names:
             matched_gene_uuids += gene_ids[gene_name]
         return matched_gene_uuids
 
+#           if re.fullmatch(r'ENSG\d{11}', gene):
+#                try:
+#                    response = self.vapp.get(
+#                            "/search/?type=Gene&ensgid=" + gene,
+#                    ).json["@graph"]
+#                    gene_ids[response["gene_symbol"]] = [response["uuid"]]
+#                    gene_ensgids[response["gene_symbol"]] = [
+#                            response["ensgid"]
+#                    ]
+#                except Exception:
+#                    unmatched_genes_without_options.append(gene)
+#            else:
+#                try:
+#                    response = self.vapp.get(
+#                        "/search/?type=Gene&gene_symbol=" + gene,
+#                    ).json["@graph"]
+#                    if len(response) >= 1:
+#                        for response_item in response:
+#                            if gene in gene_ids:
+#                                gene_ids[gene].append(response_item["uuid"])
+#                                gene_ensgids[gene].append(
+#                                        response_item["ensgid"]
+#                                )
+#                                self.notes.append(
+#                                    "Note: gene %s refers to multiple genes "
+#                                    "in our database, including genes with "
+#                                    "the following Ensembl IDs: %s. If you "
+#                                    "would prefer to "
+#                                    "only include one of these genes in this "
+#                                    "gene list, please resubmit and replace "
+#                                    "the gene %s with one of "
+#                                    "the Ensembl IDs above."
+#                                    % (gene, gene_ensgids[gene], gene)
+#                                )
+#                            else:
+#                                gene_ids[gene] = [response_item["uuid"]]
+#                                gene_ensgids[gene] = [response_item["ensgid"]]
+#                    else:
+#                        unmatched_genes.append(gene)
+#                except Exception:
+#                    unmatched_genes.append(gene)
+#        for gene in unmatched_genes.copy():
+#            try:
+#                response = self.vapp.get("/search/?type=Gene&q=" + gene).json[
+#                    "@graph"
+#                ]
+#                if len(response) >= 1:
+#                    search_order = [
+#                        "alias_symbol",
+#                        "prev_symbol",
+#                        "genereviews",
+#                        "omim_id",
+#                        "entrez_id",
+#                        "uniprot_ids",
+#                    ]
+#                    for search_term, response_item in itertools.product(
+#                        search_order, response
+#                    ):
+#                        if (
+#                            search_term in response_item.keys()
+#                            and gene in response_item[search_term]
+#                        ):
+#                            current_gene_uuids = [
+#                                uuid
+#                                for sublist in gene_ids.values()
+#                                for uuid in sublist
+#                            ]
+#                            if response_item["uuid"] in current_gene_uuids:
+#                                unmatched_genes.remove(gene)
+#                                break
+#                            else:
+#                                gene_ids[
+#                                    response_item["gene_symbol"]
+#                                ] = [response_item["uuid"]]
+#                                unmatched_genes.remove(gene)
+#                    if gene in unmatched_genes:
+#                        options = []
+#                        for possible_match in response:
+#                            options.append(possible_match["gene_symbol"])
+#                        unmatched_genes_with_options[gene] = options
+#                else:
+#                    unmatched_genes_without_options.append(gene)
+#            except Exception:
+#                unmatched_genes_without_options.append(gene)
+#        if unmatched_genes:
+#            if unmatched_genes_without_options:
+#                self.errors.append(
+#                    "The gene(s) %s could not be found in our database."
+#                    % ", ".join(unmatched_genes_without_options)
+#                )
+#            if unmatched_genes_with_options:
+#                for gene in unmatched_genes_with_options:
+#                    self.errors.append(
+#                        "No perfect match found for gene %s. "
+#                        "Consider replacing with one of the following: %s."
+#                        % (gene, ", ".join(unmatched_genes_with_options[gene]))
+#                    )
+#        sorted_gene_names = sorted(gene_ids)
+#        matched_gene_uuids = []
+#        for gene_name in sorted_gene_names:
+#            matched_gene_uuids += gene_ids[gene_name]
+#        return matched_gene_uuids
+#
     def create_post_bodies(self):
         """
         Creates gene list and document bodies for posting.
 
         Returns one of:
             - List of bodies to post: [document, gene list]
-            - None if no input
+            - None if no input genes
         """
 
         if not self.gene_ids:
@@ -354,12 +480,13 @@ class GeneListSubmission:
         will be patched and updated. If no match is found, a new document and
         gene list will be posted.
 
-        Returns one of:
-            - Dict with information on validation, previously existing gene
-              list uuid (None if no match), previously existing document
-              uuid (None if no match), and list of genes that were removed from
-              the previous gene list (None if not applicable).
-            - None, None, None, None if no jsons were created in previous step
+        Returns:
+            - Dict with information on validation (None if no json bodies
+              created)
+            - Previously existing gene list uuid (None if no match)
+            - Previously existing document uuid (None if no match)
+            - List of genes that were removed from the previous gene list (None
+              if not applicable).
         """
 
         if not self.post_bodies:
@@ -493,10 +620,9 @@ class GeneListSubmission:
         """
         Attempts to post document and gene list.
 
-        Returns one of:
-            - Dict with posting information
-            - None if post failed (or didn't occur) or other errors
-              occurred during prior processing
+        Returns:
+            - List with posting information (None if post failed or didn't
+              occur)
         """
 
         if self.errors or not self.validation_output:
@@ -554,44 +680,30 @@ class GeneListSubmission:
         If gene list successfully posted, queue variant(sample)s for indexing
         so they can be updated to reflect the new gene list.
 
-        Returns one of:
-            - 'success' if variants found and queued for indexing
-            - None if otherwise
+        Updates self.post_output with message regarding success or
+        failure.
         """
         if not self.post_output:
-            return None
+            return
         variants_to_index = []
         variant_samples_to_index = []
         genes_to_search = list(set(self.gene_ids + self.previous_gene_ids))
-        for gene_id in genes_to_search:
-            try:
-                variant_search = self.vapp.get(
-                    "/search/?type=Variant"
-                    "&genes.genes_most_severe_gene.uuid="
-                    + gene_id
-                    + "&field=uuid"
-                ).json
-                if variant_search["@graph"]:
-                    for variant_response in variant_search["@graph"]:
-                        variants_to_index.append(variant_response["uuid"])
-            except Exception:
-                pass
-            try:
-                variant_sample_search = self.vapp.get(
-                    "/search/?type=VariantSample"
-                    "&variant.genes.genes_most_severe_gene.uuid="
-                    + gene_id
-                    + "&field=uuid"
-                ).json
-                if variant_sample_search["@graph"]:
-                    for variant_sample_response in variant_sample_search[
-                        "@graph"
-                    ]:
-                        variant_samples_to_index.append(
-                            variant_sample_response["uuid"]
-                        )
-            except Exception:
-                pass
+        variant_search = self.batch_search(
+                genes_to_search,
+                'genes.genes_most_severe_gene.uuid',
+                self.vapp,
+                item_type='Variant'
+        )
+        for variant_response in variant_search:
+            variants_to_index.append(variant_response['uuid'])
+        variant_sample_search = self.batch_search(
+                genes_to_search,
+                'variant.genes.genes_most_severe_gene.uuid',
+                self.vapp,
+                item_type='VariantSample'
+        )
+        for variant_sample_response in variant_sample_search:
+            variant_samples_to_index.append(variant_sample_response['uuid'])
         items_to_index = variants_to_index + variant_samples_to_index
         if items_to_index:
             index_queue_post = {
@@ -603,9 +715,55 @@ class GeneListSubmission:
                 "/queue_indexing", index_queue_post
             )
             if post_response.json["notification"] == "Success":
-                return "success"
-        else:
-            return None
+                self.post_output.append(
+                        "Variants will start to be updated shortly."
+                )
+        return
+
+#        for gene_id in genes_to_search:
+#            try:
+#                variant_search = self.vapp.get(
+#                    "/search/?type=Variant"
+#                    "&genes.genes_most_severe_gene.uuid="
+#                    + gene_id
+#                    + "&field=uuid"
+#                ).json
+#                if variant_search["@graph"]:
+#                    for variant_response in variant_search["@graph"]:
+#                        variants_to_index.append(variant_response["uuid"])
+#            except Exception:
+#                pass
+#            try:
+#                variant_sample_search = self.vapp.get(
+#                    "/search/?type=VariantSample"
+#                    "&variant.genes.genes_most_severe_gene.uuid="
+#                    + gene_id
+#                    + "&field=uuid"
+#                ).json
+#                if variant_sample_search["@graph"]:
+#                    for variant_sample_response in variant_sample_search[
+#                        "@graph"
+#                    ]:
+#                        variant_samples_to_index.append(
+#                            variant_sample_response["uuid"]
+#                        )
+#            except Exception:
+#                pass
+#        items_to_index = variants_to_index + variant_samples_to_index
+#        if items_to_index:
+#            index_queue_post = {
+#                "uuids": items_to_index,
+#                "target_queue": "primary",
+#                "strict": True,
+#            }
+#            post_response = self.vapp.post_json(
+#                "/queue_indexing", index_queue_post
+#            )
+#            if post_response.json["notification"] == "Success":
+#                self.post_output.append(
+#                        "Variants will start to be updated shortly."
+#                )
+#        return
 
 
 def parse_exception(e):
@@ -620,4 +778,4 @@ def parse_exception(e):
         resp_dict = ast.literal_eval(resp_text)
         return resp_dict
     except Exception:
-        return e
+        return str(e)

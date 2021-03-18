@@ -40,7 +40,6 @@ class TestGeneListSubmission:
         assert genelist.title in genelist.post_bodies[1]["title"]
         assert genelist.validation_output
         assert genelist.post_output
-        assert genelist.variants_queued == "success"
 
     def test_parse_empty_genelist(
         self, es_testapp, workbook, project, institution
