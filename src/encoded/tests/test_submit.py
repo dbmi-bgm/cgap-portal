@@ -429,7 +429,6 @@ class TestSubmissionMetadata:
         """
         submission = SubmissionMetadata(example_rows_with_test_number,
                                         project, institution, TEST_INGESTION_ID1)
-        print(submission.samples)
         accession1 = [item for item in submission.samples.values() if item['specimen_accession'] == '1']
         assert accession1[0]['specimen_accession'] == accession1[1]['specimen_accession']
         assert accession1[0]['bam_sample_id'] != accession1[1]['bam_sample_id']

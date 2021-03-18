@@ -799,7 +799,6 @@ def xls_to_json(xls_data, project, institution, ingestion_id):
     result = SpreadsheetProcessing(xls_data=xls_data, project=project, institution=institution,
                                    ingestion_id=ingestion_id)
     result.output['errors'] = result.errors
-    print(json.dumps(result.output, indent=4))
     return result.output, result.passing
 
 
@@ -1037,7 +1036,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
     files = []
     if not json_data_final:
         return output, 'not run', []
-    item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_accession'}
+    item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'bam_sample_id'}
     final_status = {}
     no_errors = True
     if json_data_final.get('post'):
