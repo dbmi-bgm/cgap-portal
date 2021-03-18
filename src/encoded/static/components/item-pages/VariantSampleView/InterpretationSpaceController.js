@@ -66,13 +66,14 @@ export class InterpretationSpaceWrapper extends React.Component {
             delete noteToSubmit.classification;
         }
 
-        if (status !== null) {
-            noteToSubmit.status = status;
+        // Don't set initial version for drafts
+        if (status === "current") {
+            noteToSubmit.version = version;
         }
 
         noteToSubmit.institution = institutionID;
         noteToSubmit.project = projectID;
-        noteToSubmit.version = version;
+        noteToSubmit.status = status;
 
         return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(noteToSubmit));
     }
@@ -87,6 +88,11 @@ export class InterpretationSpaceWrapper extends React.Component {
     patchPreviouslySavedNote(noteAtID, noteToPatch, status = null) { // ONLY USED FOR DRAFTS -- other notes are cloned
         if (status === "current") { // only used to convert "in review" to "current" (draft -> approved for case)
             noteToPatch.status = status;
+            if (noteToPatch.version) {
+                noteToPatch.version++;
+            } else {
+                noteToPatch.version = 1;
+            }
             // TODO: add approved_by and approved_date stamps
             // newNote.approved_date = Date.now();
             // newNote.approved_by = ; // get user @id
@@ -118,8 +124,10 @@ export class InterpretationSpaceWrapper extends React.Component {
                 delete noteToSubmit.classification;
             }
 
-            // Bump version number
-            noteToSubmit.version = version + 1;
+            // Bump version number only if already has one (draft autosave/clone of a pre-existing approved note)
+            if (noteToSubmit.version) {
+                noteToSubmit.version = version + 1;
+            }
 
             // console.log("noteToSubmit", noteToSubmit);
 
@@ -144,7 +152,7 @@ export class InterpretationSpaceWrapper extends React.Component {
             });
         } else { // Create a whole new item, and patch to VS
             this.setState({ loading: true }, () => {
-                this.postNewNote(note, noteType)
+                this.postNewNote(note, noteType, null, "in review")
                     .then((response) => {
                         // TODO: Some handling for various fail responses/codes
                         console.log("Successfully created new item", response);
@@ -206,8 +214,6 @@ export class InterpretationSpaceWrapper extends React.Component {
                         this.setState({ loading: false });
                     });
 
-
-
             } else if (status === "in review") { // patch draft to approve for case
                 console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
 
@@ -225,8 +231,10 @@ export class InterpretationSpaceWrapper extends React.Component {
                     delete noteToSubmit.classification;
                 }
 
-                // Bump version number
-                noteToSubmit.version = version + 1;
+                // Bump version number only if already has one (draft autosave/clone of a pre-existing approved note)
+                if (noteToSubmit.version) {
+                    noteToSubmit.version = version + 1;
+                }
 
                 this.setState({ loading: true }, () => {
                     this.patchPreviouslySavedNote(noteAtID, noteToSubmit, "current")
@@ -291,11 +299,12 @@ export class InterpretationSpaceController extends React.Component {
         super(props);
         this.state = {
             currentTab: "Variant Notes",   // 0: Variant Notes, 1: Gene Notes, 2: Interpretation (Research/Discovery), 3: Interpretation (Clinical/ACMG)
-            isFullScreen: false // TODO - currently unused
+            isExpanded: false // TODO - currently unused
         };
-        this.toggleFullScreen = this.toggleFullScreen.bind(this);
+        this.toggleExpanded = this.toggleExpanded.bind(this);
         this.switchToTab = this.switchToTab.bind(this);
     }
+
     componentDidUpdate(pastState) {
         const { currentTab } = this.state;
         if (currentTab !== pastState.currentTab){
@@ -303,11 +312,11 @@ export class InterpretationSpaceController extends React.Component {
         }
     }
 
-    toggleFullScreen() {
+    toggleExpanded() {
         // TODO
-        const { isFullScreen } = this.state;
-        console.log("is setting fullscreen", isFullScreen);
-        this.setState({ isFullScreen: !isFullScreen });
+        const { isExpanded } = this.state;
+        console.log("is setting fullscreen", isExpanded);
+        this.setState({ isExpanded: !isExpanded });
     }
 
     switchToTab(newTab) {
@@ -320,7 +329,7 @@ export class InterpretationSpaceController extends React.Component {
     }
 
     render() {
-        const { isFullScreen, currentTab } = this.state;
+        const { isExpanded, currentTab } = this.state;
         const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'saveToCase', 'saveToKnowledgeBase', 'schemas');
@@ -342,7 +351,7 @@ export class InterpretationSpaceController extends React.Component {
         }
         return (
             <div className="card interpretation-space">
-                <InterpretationSpaceHeader {...{ isFullScreen }} toggleFullScreen={this.toggleFullScreen}/>
+                <InterpretationSpaceHeader {...{ isExpanded }} toggleExpanded={this.toggleExpanded}/>
                 <div className="card-body">
                     <InterpretationSpaceTabs {...{ currentTab }} switchToTab={this.switchToTab} />
                     { panelToDisplay }
@@ -353,13 +362,13 @@ export class InterpretationSpaceController extends React.Component {
 }
 
 function InterpretationSpaceHeader(props) {
-    const { toggleFullScreen, isFullScreen } = props;
+    const { toggleExpanded, isExpanded } = props;
     return (
         <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
             <i className="icon icon-sort-amount-down fas"></i>
             Variant Interpretation
-            <button type="button" className="btn btn-link" onClick={toggleFullScreen || undefined}>
-                { isFullScreen ? <i className="icon icon-compress fas"></i> : <i className="icon icon-expand fas"></i> }
+            <button type="button" className="btn btn-link" onClick={toggleExpanded || undefined}>
+                { isExpanded ? <i className="icon icon-compress fas"></i> : <i className="icon icon-expand fas"></i> }
             </button>
         </div>
     );
@@ -480,7 +489,7 @@ function NoteFieldDrop(props) { /** For classification, variant/gene candidacy d
     if (static_enum.length > 0) {
         dropOptions = static_enum.map((option) => (
             <Dropdown.Item onClick={() => onOptionChange(field, option)} key={option}>
-                <i className="interpretation-indicator-dot mr-07" data-status={value}/>{option}
+                <i className="status-indicator-dot mr-07" data-status={option}/>{option}
             </Dropdown.Item>
         ));
     }
