@@ -406,6 +406,7 @@ class GenericInterpretationPanel extends React.Component {
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
         this.saveStateToCase = this.saveStateToCase.bind(this);
         this.saveStateToKnowledgeBase = this.saveStateToKnowledgeBase.bind(this);
+        this.onTextChange = this.onTextChange.bind(this);
         this.onDropOptionChange = this.onDropOptionChange.bind(this);
     }
 
@@ -452,7 +453,7 @@ class GenericInterpretationPanel extends React.Component {
                 <label className="w-100">
                     { noteLabel }
                 </label>
-                <textarea className="w-100" value={noteText} onChange={(e) => this.onTextChange(e, "note_text")}/>
+                <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
                     <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
@@ -486,18 +487,83 @@ function NoteFieldDrop(props) { /** For classification, variant/gene candidacy d
 
     return (
         <React.Fragment>
-            <label className="w-100">
+            <label className="w-100 text-small">
                 { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
             </label>
             <Dropdown as={ButtonGroup} className={cls}>
-                <Dropdown.Toggle variant="outline-secondary btn-block" id="dropdown-basic">
-                    { value ? <><i className="status-indicator-dot mr-07" data-status={value} /> { value }</> : "Select an option..."}
+                <Dropdown.Toggle variant="outline-secondary btn-block text-left" id="dropdown-basic">
+                    { value ? <><i className="status-indicator-dot ml-1 mr-07" data-status={value} /> { value }</> : "Select an option..."}
                 </Dropdown.Toggle>
                 <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
             </Dropdown>
         </React.Fragment>
     );
 }
+
+
+class AutoGrowTextArea extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = { textAreaHeight: "100%", parentHeight: "auto" };
+        this.textAreaRef = React.createRef(null);
+
+        this.onChangeWrapper = this.onChangeWrapper.bind(this);
+    }
+
+    componentDidMount() {
+        const { minHeight } = this.props;
+
+        const currScrollHeight = this.textAreaRef.current.scrollHeight;
+        if (minHeight > currScrollHeight) {
+            this.setState({
+                parentHeight: `${minHeight}px`,
+                textAreaHeight: `${minHeight}}px`
+            });
+        } else {
+            this.setState({
+                parentHeight: `${currScrollHeight}px`,
+                textAreaHeight: `${currScrollHeight}px`
+            });
+        }
+    }
+
+    onChangeWrapper(e) {
+        const { onTextChange, field, minHeight } = this.props;
+
+        onTextChange(e, field);
+
+        const currScrollHeight = this.textAreaRef.current.scrollHeight;
+        if (minHeight && minHeight > currScrollHeight) {
+            this.setState({
+                parentHeight: `${minHeight}px`,
+                textAreaHeight: `${minHeight}}px`
+            });
+        } else {
+            this.setState({ textAreaHeight: "auto", parentHeight: `${currScrollHeight}px` }, () => {
+                this.setState({
+                    parentHeight: `${currScrollHeight}px`,
+                    textAreaHeight: `${currScrollHeight}px`
+                });
+            });
+        }
+    }
+
+    render() {
+        const { text, cls } = this.props;
+        const { textAreaHeight, parentHeight } = this.state;
+        return (
+            <div style={{ minHeight: parentHeight, height: parentHeight }} className={cls}>
+                <textarea value={text} ref={this.textAreaRef} rows={1} style={{ height: textAreaHeight, resize: "none" }} className="w-100"
+                    onChange={this.onChangeWrapper} />
+            </div>
+        );
+    }
+}
+AutoGrowTextArea.defaultProps = {
+    minHeight: 150
+};
+
 
 /** Display additional form fields for ACMG Interpretation */
 function ACMGInterpretationForm(props) {
