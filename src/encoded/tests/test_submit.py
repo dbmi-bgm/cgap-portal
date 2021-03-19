@@ -421,6 +421,36 @@ class TestSubmissionMetadata:
             assert len(submission.samples) == 2
             assert 'specimen_accepted' in list(submission.samples.values())[1]
 
+    def test_add_metadata_single_item_fastq(self, example_rows, project, institution):
+        """
+        if fastq files appear multiple times in the sheet, the related_file array prop shouldn't be
+        duplicated if it is consistent.
+        """
+        # for rowidx in (1, 2):
+        example_rows[0]['files'] = 'f1.fastq.gz, f2.fastq.gz'
+        example_rows[1]['files'] = 'f1.fastq.gz, f2.fastq.gz'
+        submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        fastqs = list(submission.files_fastq.values())
+        assert len(fastqs[1]['related_files']) == 1
+
+    @pytest.mark.parametrize('files1, files2', [
+        ('f1.fastq.gz, f2.fastq.gz', 'f1.fastq.gz, f3.fastq.gz'),  # inconsistent pairing on first
+        ('f1.fastq.gz, f2.fastq.gz', 'f4.fastq.gz, f2.fastq.gz')  # inconsistent pairing on second
+    ])
+    def test_add_metadata_single_item_fastq_inconsistent(self, example_rows, files1, files2,
+                                                         project, institution):
+        """
+        if fastq files appear multiple times in the sheet, the related_file array prop shouldn't be
+        duplicated if it is consistent.
+        """
+        # for rowidx in (1, 2):
+        example_rows[0]['files'] = files1
+        example_rows[1]['files'] = files2
+        submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        assert 'Please ensure fastq is paired with correct file in all rows' in ''.join(submission.errors)
+        # fastqs = list(submission.files_fastq.values())
+        # assert len(fastqs[1]['related_files']) == 1
+
     def test_add_metadata_single_item_same_sample_accession(self, example_rows_with_test_number,
                                                             project, institution):
         """
