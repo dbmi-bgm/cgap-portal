@@ -392,7 +392,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                 # file format is required for files, but its usability depends this field
                 if a_type in ['file_format', 'experiment_type']:
                     req_fields.append('valid_item_types')
-                first_fields = list(set(req_fields+ids))
+                first_fields = list(set(req_fields + ids))
             skip_existing_items = set()
             posted = 0
             skip_exist = 0
@@ -419,7 +419,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                         to_post = {key: value for (key, value) in an_item.items() if key in first_fields}
                     to_post = format_for_attachment(to_post, docsdir)
                     try:
-                        res = testapp.post_json('/'+a_type, to_post)
+                        res = testapp.post_json('/' + a_type, to_post)
                         assert res.status_code == 201
                         posted += 1
                         # yield bytes to work with Response.app_iter
