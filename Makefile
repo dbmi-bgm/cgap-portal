@@ -110,7 +110,7 @@ deploy2:  # spins up waittress to serve the application
 	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini
 
 deploy3:  # Uploads genes, consequences then ingests the VCF below
-	poetry run ingest-vcf src/encoded/annotations/GAPFIAI7IZ9Y.reformat.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
+	poetry run ingest-vcf src/encoded/annotations/GAPFIAI7IZ9Y.reformat.altcounts.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
 
 psql-dev:  # starts psql with the url after 'sqlalchemy.url =' in development.ini
 	@scripts/psql-start dev
@@ -138,8 +138,8 @@ clean-python:
 	pip uninstall -y -r <(pip freeze)
 
 test:
-	make test-npm
 	make test-unit
+	make test-npm
 
 retest:
 	poetry run python -m pytest -vv -r w --last-failed
@@ -160,8 +160,8 @@ test-integrated:
 	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and (integrated or integratedx) and not performance and not broken and not sloppy"
 
 remote-test:  # Actually, we don't normally use this. Instead the GA workflow sets up two parallel tests.
-	make remote-test-npm
 	make remote-test-unit
+	make remote-test-npm
 
 remote-test-npm:  # Note this only does the 'not indexing' tests
 	poetry run python -m pytest -vv -r w --instafail --force-flaky --max-runs=3 --timeout=400 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
