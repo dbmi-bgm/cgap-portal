@@ -4,6 +4,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
+import memoize from 'memoize-one';
 import Dropdown from 'react-bootstrap/esm/Dropdown';
 import Button from 'react-bootstrap/esm/Button';
 import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
@@ -323,7 +324,6 @@ export class InterpretationSpaceController extends React.Component {
         const { currentTab } = this.state;
         // TODO: may need some componentWillUnmount in panels to save unsaved items before dismount completes
         if (currentTab !== newTab) {
-            console.log("is setting current tab to", newTab);
             this.setState({ currentTab: newTab });
         }
     }
@@ -333,7 +333,6 @@ export class InterpretationSpaceController extends React.Component {
         const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'saveToCase', 'saveToKnowledgeBase', 'schemas');
-        //TODO: cleanup past props
 
         let panelToDisplay = null;
         switch(currentTab) {
@@ -399,6 +398,24 @@ function InterpretationSpaceTabs(props) {
 }
 
 class GenericInterpretationPanel extends React.Component {
+    static hasNoteChanged(lastSavedNote = null, currNote = null) {
+        const fieldsToCompare = ["note_text", "acmg_guidelines", "classification", "conclusion"];
+
+        const blankNote = { note_text: "", acmg_guidelines: [], classification: null, conclusion:  "" };
+
+        if (!lastSavedNote) { // Compare against blank note if lastSavedNote is null
+            return !_.isEqual(
+                _.pick(currNote, ...fieldsToCompare),
+                _.pick(blankNote, ...fieldsToCompare)
+            );
+        }
+
+        return !_.isEqual(
+            _.pick(currNote, ...fieldsToCompare),
+            _.pick(lastSavedNote, ...fieldsToCompare)
+        );
+    }
+
     constructor(props) {
         super(props);
 
@@ -408,7 +425,7 @@ class GenericInterpretationPanel extends React.Component {
             // Fields in form. Using snake casing to make it easier to add state data directly to post/patch request
             note_text,
             acmg_guidelines,            // TODO: Currently Unused
-            classification,             // TODO: Currently Unused
+            classification,
             conclusion,                 // TODO: Currently Unused
         };
 
@@ -417,6 +434,10 @@ class GenericInterpretationPanel extends React.Component {
         this.saveStateToKnowledgeBase = this.saveStateToKnowledgeBase.bind(this);
         this.onTextChange = this.onTextChange.bind(this);
         this.onDropOptionChange = this.onDropOptionChange.bind(this);
+
+        this.memoized = {
+            hasNoteChanged: memoize(GenericInterpretationPanel.hasNoteChanged)
+        };
     }
 
     // Will use same update fxn for multiple text fields
@@ -452,7 +473,7 @@ class GenericInterpretationPanel extends React.Component {
         const { note_text: noteText, acmg_guidelines, classification, conclusion } = this.state;
 
         // TODO: move into a function and memoize once checking other values of state, too
-        const noteChangedSinceLastSave = noteText !== savedNoteText;
+        const noteChangedSinceLastSave = this.memoized.hasNoteChanged(lastSavedNote, this.state);
         const noteTextPresent = !!noteText;
         const isDraft = savedNoteStatus === "in review";
         const isCurrent = savedNoteStatus === "current";
@@ -483,7 +504,6 @@ function NoteFieldDrop(props) { /** For classification, variant/gene candidacy d
     const fieldSchema = getFieldProperties(field);
 
     const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
-    console.log("fieldSchema", fieldSchema, field);
 
     let dropOptions;
     if (static_enum.length > 0) {
@@ -580,13 +600,10 @@ function ACMGInterpretationForm(props) {
 
     const getFieldProperties = useMemo(function(){
         if (!schemas) return function(){ return null; };
-        console.log("getting field properties");
         // Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`.
         return function(field){
-            console.log("field", field);
             const noteItem = noteType === "note_interpretation" ? "NoteInterpretation" : "NoteStandard";
             const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, noteItem);
-            console.log("schemaProperty", schemaProperty);
             return (schemaProperty || {});
         };
     }, [ schemas ]);
