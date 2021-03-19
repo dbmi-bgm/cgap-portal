@@ -126,6 +126,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         windowWidth,
         windowHeight,
         idToGraphIdentifier,
+        setIsSubmitting,
         PedigreeVizLibrary = null
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
@@ -280,7 +281,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
-                        <FilteringTab {...{ context, windowHeight, session, schemas }} />
+                        <FilteringTab {...{ context, windowHeight, session, schemas, setIsSubmitting }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
                         <InterpretationTab {...props} />

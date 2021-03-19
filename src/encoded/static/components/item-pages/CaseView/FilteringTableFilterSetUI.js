@@ -151,6 +151,10 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         return { duplicateQueryIndices, duplicateNameIndices };
     }
 
+    static haveEditPermission(caseActions){
+        return _.findWhere(caseActions, { "name" : "edit" });
+    }
+
     static deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices){
         let singleSelectedFilterBlockIdx = null;
         const selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices);
@@ -180,7 +184,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             }),
             hasFilterSetChanged: memoize(FilteringTableFilterSetUI.hasFilterSetChanged),
             findDuplicateBlocks: memoize(FilteringTableFilterSetUI.findDuplicateBlocks),
-            deriveSelectedFilterBlockIdxInfo: memoize(FilteringTableFilterSetUI.deriveSelectedFilterBlockIdxInfo)
+            deriveSelectedFilterBlockIdxInfo: memoize(FilteringTableFilterSetUI.deriveSelectedFilterBlockIdxInfo),
+            haveEditPermission: memoize(FilteringTableFilterSetUI.haveEditPermission)
         };
 
         this.state = {
@@ -199,14 +204,24 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             cachedCounts: pastCachedCounts
         } = pastProps;
         const { bodyOpen: pastBodyOpen } = pastState;
-        const { currFilterSet, selectedFilterBlockIndices, cachedCounts } = this.props;
-        const { bodyOpen } = this.props;
+        const { currFilterSet, selectedFilterBlockIndices, cachedCounts, setIsSubmitting, caseItem: { actions: caseActions = [] } } = this.props;
+        const { bodyOpen, lastSavedFilterSet } = this.state;
 
         if (currFilterSet && !pastFilterSet) {
             // This should only occur upon initialization, as otherwise even a blank/unsaved filterset would be present.
             if (currFilterSet["@id"]) {
                 this.setState({ "lastSavedFilterSet": currFilterSet });
             }
+        }
+
+        const haveEditPermission = this.memoized.haveEditPermission(caseActions);
+        const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
+
+        // Is OK if called frequently with same value, as will be compared by App.setState
+        if (haveEditPermission && hasFilterSetChanged) {
+            setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the Filtering tab to be lost. Proceed?");
+        } else {
+            setIsSubmitting(false);
         }
 
         if ( // Rebuild tooltips after stuff that affects tooltips changes.
@@ -335,7 +350,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             context: searchContext, // Current Search Response (not that of this filterSet, necessarily)
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
 
-            // From FilteringTab:
+            // From FilteringTab (or higher):
             caseItem, schemas,
 
             // From FilterSetController:
@@ -349,15 +364,17 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             // From ajax.FetchedItem
             isFetchingInitialFilterSetItem = false
         } = this.props;
+        const { actions: caseActions = [] } = caseItem;
         const { total: totalCount, facets = null } = searchContext || {};
         const { filter_blocks = [] } = filterSet || {};
         const { bodyOpen, bodyMounted, lastSavedFilterSet, isSavingFilterSet } = this.state;
 
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
-        const facetDict = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets);
-        const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, filterSet);
-        const { duplicateQueryIndices, duplicateNameIndices } = this.memoized.findDuplicateBlocks(filter_blocks);
+        const facetDict                                                     = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets);
+        const hasFilterSetChanged                                           = this.memoized.hasFilterSetChanged(lastSavedFilterSet, filterSet);
+        const { duplicateQueryIndices, duplicateNameIndices }               = this.memoized.findDuplicateBlocks(filter_blocks);
         const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices);
+        const haveEditPermission                                            = this.memoized.haveEditPermission(caseActions);
 
         const filterBlocksLen = filter_blocks.length;
         const allFilterBlocksSelected = filterBlocksLen > 0 && (selectedFilterBlockIdxCount === 0 || selectedFilterBlockIdxCount === filterBlocksLen);
@@ -373,7 +390,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         const headerProps = {
             filterSet, bodyOpen, caseItem, duplicateQueryIndices, duplicateNameIndices, hasFilterSetChanged, isSavingFilterSet,
-            setTitleOfFilterSet, isFetchingInitialFilterSetItem
+            setTitleOfFilterSet, isFetchingInitialFilterSetItem, haveEditPermission
         };
 
         let body = null;
@@ -426,19 +443,15 @@ function FilterSetUIHeader(props){
     const {
         filterSet, caseItem,
         toggleOpen, bodyOpen, hasFilterSetChanged, duplicateQueryIndices, duplicateNameIndices,
-        saveFilterSet, isSavingFilterSet, setTitleOfFilterSet, isFetchingInitialFilterSetItem = false
+        saveFilterSet, isSavingFilterSet, setTitleOfFilterSet, isFetchingInitialFilterSetItem = false,
+        haveEditPermission
     } = props;
-    const { actions: ctxActions = [] } = caseItem || {};
     const {
         '@id': filterSetID,
         error: fsError = null,
         title: fsTitle = null,
         display_title: fsDisplayTitle = null
     } = filterSet || {};
-
-    const haveEditPermission = useMemo(function(){
-        return _.findWhere(ctxActions, { "name" : "edit" });
-    }, [ ctxActions ]);
 
     const [ isEditingTitle, setIsEditingTitle ] = useState(false);
 
