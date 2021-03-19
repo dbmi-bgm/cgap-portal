@@ -549,7 +549,42 @@ class SubmissionMetadata:
                 # extend list field (e.g. combine samples in diff rows for Individual item)
                 elif key != 'aliases' and isinstance(value, list):
                     previous[item.alias][key].extend(value)
-                    previous[item.alias][key] = list(set(previous[item.alias][key]))
+                    # special handling for list of dict rather than list of string
+                    if all(isinstance(item, dict) for item in previous[item.alias][key]):
+                        vals = [item.values() for item in previous[item.alias][key]]
+                        unique = [dict(t) for t in {tuple(d.items()) for d in previous[item.alias][key]}]
+                        # error if fastq file (paired end 2) has conflicting 'paired with' relations
+                        if key == 'related_files' and (all('paired with' in val for val in vals) and
+                                                       len(unique) > 1):
+                            msg = ('Fastq file {} appears multiple times in sheet'
+                                   ' with inconsistent paired file. Please ensure fastq is'
+                                   ' paired with correct file in all rows where it appears.'
+                                   ''.format(item.metadata.get('filename', '')))
+                            self.errors.append(msg)
+                        else:
+                            previous[item.alias][key] = unique
+                    else:
+                        previous[item.alias][key] = list(set(previous[item.alias][key]))
+
+    def check_fastq_paired_info(self):
+        """
+        Makes sure fastq files appearing more than once have consistent paired with
+        information. Specifically, checks that paired end 1 files have consistent
+        pairing info.
+        """
+        paired_info = {}
+        for val in self.files_fastq.values():
+            if 'related_files' in val:
+                for file_dict in val['related_files']:
+                    if file_dict['file'] not in paired_info:
+                        paired_info[file_dict['file']] = val['filename']
+                    elif paired_info[file_dict['file']] != val['filename']:
+                        msg = ('Fastq file {} appears multiple times in sheet'
+                               ' with inconsistent paired file. Please ensure fastq is'
+                               ' paired with correct file in all rows where it appears.'
+                               ''.format(file_dict['file']))
+                        self.errors.append(msg)
+        return
 
     def add_family_metadata(self, idx, family, individual):
         """
@@ -699,6 +734,7 @@ class SubmissionMetadata:
                 simple_add_items.extend(processed_row.files_processed)
                 for item in simple_add_items:
                     self.add_metadata_single_item(item)
+                self.check_fastq_paired_info()
                 self.add_family_metadata(processed_row.row, processed_row.family, processed_row.individual)
                 self.add_sample_processing(processed_row.analysis, processed_row.metadata.get('analysis id'))
                 self.add_case_info(processed_row)
