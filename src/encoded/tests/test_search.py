@@ -976,9 +976,6 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 3)
 
 
-
-
-
 @es_data_cache
 class TestingHiddenFacetsCache(ExtendedWorkbookCache):
 
