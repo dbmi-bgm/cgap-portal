@@ -3,10 +3,7 @@
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
 """
 
-import datetime as datetime_module
 import logging
-import os
-import pkg_resources
 import pytest
 import webtest
 
