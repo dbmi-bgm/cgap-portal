@@ -216,7 +216,19 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     </span>
                 </StackedBlockName>
                 <StackedBlockList className="analysis" title="Analysis">
-                    {analysisGroups.map((group) => {
+                    {analysisGroups.filter(function(group){
+                        const { samples = [] } = group || {};
+                        if (samples.length > 0) {
+                            if (_.any(samples, function({ "@id": agSampleID }){
+                                return agSampleID === atId;
+                            })) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }).map((group) => {
                         const { analysis_type = null, cases = [] } = group || {};
                         let reportBlock = null;
 

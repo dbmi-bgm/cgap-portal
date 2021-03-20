@@ -9,6 +9,7 @@ import structlog
 import webtest
 
 from base64 import b64encode
+from dcicutils.misc_utils import ignored
 from PIL import Image
 from pkg_resources import resource_filename
 from pyramid.paster import get_app
@@ -77,7 +78,7 @@ class LoadGenWrapper(object):
 @view_config(route_name='load_data', request_method='POST', permission='add')
 @debug_log
 def load_data_view(context, request):
-    '''
+    """
     expected input data
 
     {'local_path': path to a directory or file in file system
@@ -93,7 +94,8 @@ def load_data_view(context, request):
        itype can be optionally used to specify type of items loaded from files
     2) store in form of {'item_type': [items], 'item_type2': [items]}
        item_type should be same as insert file names i.e. file_fastq
-    '''
+    """
+    ignored(context)
     # this is a bit wierd but want to reuse load_data functionality so I'm rolling with it
     config_uri = request.json.get('config_uri', 'production.ini')
     patch_only = request.json.get('patch_only', False)
@@ -285,7 +287,8 @@ def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=Fa
         return Exception(gen.caught)
 
 
-def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False, post_only=False):
+def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False,
+                 patch_only=False, post_only=False):
     """
     Generator function that yields bytes information about each item POSTed/PATCHed.
     Is the base functionality of load_all function.
@@ -301,7 +304,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         itype (list or str): limit selection to certain type/types
         from_json (bool)   : if set to true, inserts should be dict instead of folder name
         patch_only (bool)  : if set to true will only do second round patch - no posts
-        post_only (bool)   : if set to true posts full item no second round or lookup - use with care - will not work if linkTos to items not in db yet
+        post_only (bool)   : if set to true posts full item no second round or lookup -
+                             use with care - will not work if linkTos to items not in db yet
     Yields:
         Bytes with information on POSTed/PATCHed items
 
@@ -388,10 +392,9 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                 # file format is required for files, but its usability depends this field
                 if a_type in ['file_format', 'experiment_type']:
                     req_fields.append('valid_item_types')
-                first_fields = list(set(req_fields+ids))
+                first_fields = list(set(req_fields + ids))
             skip_existing_items = set()
             posted = 0
-            patched = 0
             skip_exist = 0
             for an_item in store[a_type]:
                 exists = False
@@ -416,7 +419,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                         to_post = {key: value for (key, value) in an_item.items() if key in first_fields}
                     to_post = format_for_attachment(to_post, docsdir)
                     try:
-                        res = testapp.post_json('/'+a_type, to_post)
+                        res = testapp.post_json('/' + a_type, to_post)
                         assert res.status_code == 201
                         posted += 1
                         # yield bytes to work with Response.app_iter
@@ -433,12 +436,14 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             if not post_only:
                 second_round_items[a_type] = [i for i in store[a_type] if i['uuid'] not in skip_existing_items]
             logger.info('{} 1st: {} items posted, {} items exists.'.format(a_type, posted, skip_exist))
-            logger.info('{} 1st: {} items will be patched in second round'.format(a_type, str(len(second_round_items.get(a_type, [])))))
+            logger.info('{} 1st: {} items will be patched in second round'
+                        .format(a_type, str(len(second_round_items.get(a_type, [])))))
     elif overwrite and not post_only:
         logger.info('Posting round skipped')
         for a_type in all_types:
             second_round_items[a_type] = [i for i in store[a_type]]
-            logger.info('{}: {} items will be patched in second round'.format(a_type, str(len(second_round_items.get(a_type, [])))))
+            logger.info('{}: {} items will be patched in second round'
+                        .format(a_type, str(len(second_round_items.get(a_type, [])))))
 
     # Round II - patch the rest of the metadata
     rnd = ' 2nd' if not patch_only else ''
@@ -541,12 +546,11 @@ def load_local_data(app, overwrite=False):
         for (dirpath, dirnames, filenames) in os.walk(chk_dir):
             if any([fn for fn in filenames if fn.endswith('.json')]):
                 logger.info('Loading inserts from "{}" directory.'.format(test_insert_dir))
-                return load_data(app, docsdir='documents', indir=test_insert_dir,
-                            use_master_inserts=True, overwrite=overwrite)
+                return load_data(app, docsdir='documents', indir=test_insert_dir, use_master_inserts=True,
+                                 overwrite=overwrite)
 
     # Default to 'inserts' if no temp inserts found.
-    return load_data(app, docsdir='documents', indir='inserts',
-                         use_master_inserts=True, overwrite=overwrite)
+    return load_data(app, docsdir='documents', indir='inserts', use_master_inserts=True, overwrite=overwrite)
 
 
 def load_prod_data(app, overwrite=False):
