@@ -1265,36 +1265,42 @@ class TestSearchHiddenAndAdditionalFacets:
         self.check_and_verify_result(res, _facet, n_expected)
 
 
-@pytest.fixture()  # (scope='session')
-def bucket_range_data_raw():
-    """ 10 objects with a numerical field we will bucket on.
-            'special_integer' has i in it.
-            'special_object_that_holds_integer' holds a single integer field with i as well
-            'array_of_objects_that_holds_integer' holds 2 objects that are mirrors of one another
+@es_data_cache
+class TestingBucketRangeCache(ExtendedWorkbookCache):
     """
-    return [{
-        'special_integer': i,
-        'special_object_that_holds_integer': {
-            'embedded_integer': i
-        },
-        'array_of_objects_that_holds_integer': [
+    10 objects with a numerical field we will bucket on.
+        'special_integer' has i in it.
+        'special_object_that_holds_integer' holds a single integer field with i as well
+        'array_of_objects_that_holds_integer' holds 2 objects that are mirrors of one another
+    """
+    EXTENDED_DATA = {
+        'TestingBucketRangeFacets': [
             {
-                'embedded_identifier': 'forward',
-                'embedded_integer': 0 if i < 5 else 9
-            },
-            {
-                'embedded_identifier': 'reverse',
-                'embedded_integer': 9 if i < 5 else 0
-            },
+                'special_integer': i,
+                'special_object_that_holds_integer': {
+                    'embedded_integer': i
+                },
+                'array_of_objects_that_holds_integer': [
+                    {
+                        'embedded_identifier': 'forward',
+                        'embedded_integer': 0 if i < 5 else 9
+                    },
+                    {
+                        'embedded_identifier': 'reverse',
+                        'embedded_integer': 9 if i < 5 else 0
+                    },
+                ]
+            }
+            for i in range(10)
         ]
-    } for i in range(10)]
+    }
 
 
-@pytest.fixture()  # (scope='session')  # XXX: consider scope further - Will 11/5/2020
-def bucket_range_data(workbook, es_testapp, bucket_range_data_raw):
-    for entry in bucket_range_data_raw:
-        es_testapp.post_json('/TestingBucketRangeFacets', entry, status=201)
-    es_testapp.post_json('/index', {'record': False})
+@pytest.fixture()
+def bucket_range_data(es_testapp, elasticsearch_server_dir, indexer_namespace):
+    TestingBucketRangeCache.assure_data_loaded(es_testapp,
+                                               datadir=elasticsearch_server_dir,
+                                               indexer_namespace=indexer_namespace)
 
 
 class TestSearchBucketRangeFacets:
