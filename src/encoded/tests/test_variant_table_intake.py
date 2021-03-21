@@ -239,6 +239,10 @@ def test_post_inserts_via_run(MTParser, project, institution, testapp):
                            # enable to generate schemas
                            write=True)
     for item in inserts:
+        # NOTE: The ACTUAL test going on here is to assure these get 201 responses.
+        #       Everything else in this test before the 'inserts =' above or after
+        #       this 'for' loop is instrumentation for the purpose of tracking C4-636. 
+        #       -kmp 21-Mar-2021
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)
 
     variant_schema2 = json.loads(file_contents(_VARIANT_EMBEDS_FILENAME))
