@@ -601,7 +601,7 @@ xlrd = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "dcicutils"
-version = "1.11.1.1b10"
+version = "1.11.1.1b11"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
@@ -2062,7 +2062,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<3.7"
-content-hash = "eb1fe719d70fbdcd6052ba576d007017c02e44d38bbbf2167d1094feef994c2b"
+content-hash = "e610f1042dd152bba7827798a68f40e261448be2a64d782c4e45a7948974f218"
 
 [metadata.files]
 apipkg = [
@@ -2263,8 +2263,8 @@ dcicsnovault = [
     {file = "dcicsnovault-4.6.0.tar.gz", hash = "sha256:78dc99c5f59da2a7bcb4a83de0c255cea467f216aaadc39ba2453c8e85491cc1"},
 ]
 dcicutils = [
-    {file = "dcicutils-1.11.1.1b10-py3-none-any.whl", hash = "sha256:194bf63b40aac25937ac9c2d6125c5ef6060fc8c49138fe60fb99e1584a34745"},
-    {file = "dcicutils-1.11.1.1b10.tar.gz", hash = "sha256:215c3b2444095359f097178910bac0315f8414cc91ceaa7277a8559599c1d9c8"},
+    {file = "dcicutils-1.11.1.1b11-py3-none-any.whl", hash = "sha256:0224af9fad17fa4c99d49d7e9cbe8cc47a48408366a14c2725325f1ec83fa6cf"},
+    {file = "dcicutils-1.11.1.1b11.tar.gz", hash = "sha256:dfb309803e53f75df028c30fd65c94998c9165a63a1c5ce12c1d93977922c71c"},
 ]
 docker = [
     {file = "docker-4.4.4-py2.py3-none-any.whl", hash = "sha256:f3607d5695be025fa405a12aca2e5df702a57db63790c73b927eb6a94aac60af"},
