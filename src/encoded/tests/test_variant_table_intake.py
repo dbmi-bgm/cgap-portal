@@ -40,12 +40,6 @@ VARIANT_FIELDS_EXPECTED = 165
 TRANSCRIPT_FIELDS_EXPECTED = 30
 
 
-@pytest.yield_fixture
-def mocked_file_system():
-    with MockFileSystem(auto_mirror_files_for_read=True).mock_exists_open_remove():
-        yield
-
-
 @pytest.fixture
 def MTParser(mocked_file_system):
     notice_pytest_fixtures(mocked_file_system)
