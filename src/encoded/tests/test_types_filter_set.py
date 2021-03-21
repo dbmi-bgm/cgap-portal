@@ -10,7 +10,7 @@ VARIANT_URL = '/variant'
 
 
 @pytest.fixture
-def barebones_filter_set(workbook):
+def barebones_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
         'title': 'Test filter set',
@@ -61,7 +61,7 @@ def test_filter_set_barebones(workbook, es_testapp, barebones_filter_set):
 
 
 @pytest.fixture
-def simple_filter_set(workbook):
+def simple_filter_set():
     """ A filter set with only the flag that designates the type """
     return {
         'title': 'Test filter set',
@@ -133,7 +133,7 @@ def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
 
 
 @pytest.fixture
-def typical_filter_set(workbook):
+def typical_filter_set():
     """ A filter set with two filter blocks, a flag, and preset/
     default assignments"""
     return {
@@ -182,7 +182,7 @@ def test_filter_set_typical(workbook, es_testapp, typical_filter_set):
 
 
 @pytest.fixture
-def complex_filter_set(workbook):
+def complex_filter_set():
     """ A filter set with 3 filter_blocks and a flag """
     return {
         'title': 'Test filter set',
@@ -256,7 +256,7 @@ def test_filter_set_intersection(workbook, es_testapp, complex_filter_set):
 
 
 @pytest.fixture
-def filter_set_with_many_flags(workbook):
+def filter_set_with_many_flags():
     """ A filter set with 2 filter blocks and 3 flags applied differently across blocks """
     return {
         'title': 'Test filter set',
@@ -326,7 +326,7 @@ def test_filter_set_selectively_apply_flags(workbook, es_testapp, filter_set_wit
 
 
 @pytest.fixture
-def filter_set_with_only_flags(workbook):
+def filter_set_with_only_flags():
     return {
         'search_type': 'Variant',
         'global_flags': 'CHROM=1'
@@ -343,7 +343,7 @@ def test_compound_search_only_global_flags(workbook, es_testapp, filter_set_with
 
 
 @pytest.fixture
-def filter_set_with_single_filter_block(workbook):
+def filter_set_with_single_filter_block():
     return {
         'search_type': 'Variant',
         'filter_blocks': [{
@@ -364,7 +364,7 @@ def test_compound_search_single_filter_block(workbook, es_testapp, filter_set_wi
 
 
 @pytest.fixture
-def filter_set_with_single_filter_block_and_flags(workbook):
+def filter_set_with_single_filter_block_and_flags():
     return {
         'search_type': 'Variant',
         'filter_blocks': [{
@@ -381,8 +381,7 @@ def filter_set_with_single_filter_block_and_flags(workbook):
     }
 
 
-def test_compound_search_filter_and_flags(workbook, es_testapp,
-                                          filter_set_with_single_filter_block_and_flags):
+def test_compound_search_filter_and_flags(workbook, es_testapp, filter_set_with_single_filter_block_and_flags):
     """ Tests compound search with a filter set that has one filter block and flags
         /search redirect is functioning if we get facets on the response.
     """
@@ -392,19 +391,17 @@ def test_compound_search_filter_and_flags(workbook, es_testapp,
 
 
 @pytest.fixture
-def filter_set_with_multiple_disabled_flags(workbook):
+def filter_set_with_multiple_disabled_flags():
     return {
         'search_type': 'Variant',
-        'filter_blocks': [
-            {
-                'query': 'POS.from=0&POS.to=10000000',
-                'flags_applied': []
-            },
-            {
-                'query': 'REF=A',
-                'flags_applied': []
-            }
-        ],
+        'filter_blocks': [{
+            'query': 'POS.from=0&POS.to=10000000',
+            'flags_applied': []
+        },
+        {
+            'query': 'REF=A',
+            'flags_applied': []
+        }],
         'global_flags': '?type=Variant',
         'flags': [
             {
@@ -422,7 +419,7 @@ def test_compound_search_disabled_flags(workbook, es_testapp, filter_set_with_mu
 
 
 @pytest.fixture
-def request_with_lots_of_results(workbook):
+def request_with_lots_of_results():
     return {
         'search_type': 'Item',
     }
@@ -430,7 +427,7 @@ def request_with_lots_of_results(workbook):
 
 def test_compound_search_from_to(workbook, es_testapp, request_with_lots_of_results):
     """ Tests pagination + generator with compound searches """
-    paginated_request: dict = request_with_lots_of_results  # since we have a lot of results, paginate through them
+    paginated_request = request_with_lots_of_results  # since we have a lot of results, paginate through them
 
     # first, test failures
     def test_failure(from_, limit):
@@ -451,7 +448,7 @@ def test_compound_search_from_to(workbook, es_testapp, request_with_lots_of_resu
 
 def test_compound_search_rejects_malformed_filter_sets(workbook, es_testapp):
     """ Tests passing a bunch of malformed filter_sets raises an error. """
-    filter_set_without_filter_block_sub_fields: dict = {
+    filter_set_without_filter_block_sub_fields = {
         'search_type': 'Variant',
         'filter_blocks': [
             {
@@ -469,7 +466,7 @@ def test_compound_search_rejects_malformed_filter_sets(workbook, es_testapp):
     with pytest.raises(AppError):
         es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_without_filter_block_sub_fields)
 
-    filter_set_without_flag_sub_fields: dict = {
+    filter_set_without_flag_sub_fields = {
         'search_type': 'Variant',
         'flags': [
             {
