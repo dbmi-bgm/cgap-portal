@@ -1,6 +1,10 @@
+import io
 import json
 import pytest
 
+from dcicutils.diff_utils import DiffManager
+from dcicutils.misc_utils import file_contents
+from dcicutils.qa_utils import MockFileSystem, notice_pytest_fixtures
 from ..util import resolve_file_path
 from ..ingestion.table_utils import VariantTableParser, MappingTableHeader
 from .variant_fixtures import ANNOTATION_FIELD_URL
@@ -36,8 +40,15 @@ VARIANT_FIELDS_EXPECTED = 165
 TRANSCRIPT_FIELDS_EXPECTED = 30
 
 
+@pytest.yield_fixture
+def mocked_file_system():
+    with MockFileSystem(auto_mirror_files_for_read=True).mock_exists_open_remove():
+        yield
+
+
 @pytest.fixture
-def MTParser():
+def MTParser(mocked_file_system):
+    notice_pytest_fixtures(mocked_file_system)
     parser = VariantTableParser(MT_LOC, ANNOTATION_FIELD_SCHEMA)
     return parser
 
@@ -218,10 +229,32 @@ def test_post_variant_annotation_field_inserts(inserts, project, institution, te
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)
 
 
+_VARIANT_EMBEDS_FILENAME = resolve_file_path('schemas/variant.json')
+_VARIANT_SAMPLE_EMBEDS_FILENAME = resolve_file_path('schemas/variant_sample.json')
+
+
 def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
+
+    variant_schema = json.loads(file_contents(_VARIANT_EMBEDS_FILENAME))
+    variant_sample_schema = json.loads(file_contents(_VARIANT_SAMPLE_EMBEDS_FILENAME))
+
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
-                           vs_out=resolve_file_path('schemas/variant_sample.json'),
-                           v_out=resolve_file_path('schemas/variant.json'), write=True)  # enable to generate schemas
+                           vs_out=_VARIANT_SAMPLE_EMBEDS_FILENAME,
+                           v_out=_VARIANT_EMBEDS_FILENAME,
+                           # enable to generate schemas
+                           write=True)
     for item in inserts:
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)
+
+    variant_schema2 = json.loads(file_contents(_VARIANT_EMBEDS_FILENAME))
+    variant_sample_schema2 = json.loads(file_contents(_VARIANT_SAMPLE_EMBEDS_FILENAME))
+
+    dm = DiffManager(label="<schema>")
+
+    variant_schema_delta = dm.comparison(variant_schema, variant_schema2)
+    variant_sample_schema_delta = dm.comparison(variant_sample_schema, variant_sample_schema2)
+
+    assert variant_schema_delta == ['<schema>.properties.schema_version.default : "2" => "1"']
+
+    assert not variant_sample_schema_delta
