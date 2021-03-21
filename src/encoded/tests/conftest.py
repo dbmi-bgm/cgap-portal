@@ -7,7 +7,7 @@ import logging
 import pytest
 import webtest
 
-from dcicutils.qa_utils import notice_pytest_fixtures
+from dcicutils.qa_utils import notice_pytest_fixtures, MockFileSystem
 from pyramid.request import apply_request_extensions
 from pyramid.testing import DummyRequest
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
@@ -354,3 +354,9 @@ def personas(es_testapp, elasticsearch_server_dir, indexer_namespace):
     PersonasCache.assure_data_loaded(es_testapp,
                                      datadir=elasticsearch_server_dir,
                                      indexer_namespace=indexer_namespace)
+
+
+@pytest.yield_fixture
+def mocked_file_system():
+    with MockFileSystem(auto_mirror_files_for_read=True).mock_exists_open_remove():
+        yield
