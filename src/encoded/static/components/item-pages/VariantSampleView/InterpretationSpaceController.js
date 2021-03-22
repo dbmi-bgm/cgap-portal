@@ -544,17 +544,17 @@ class AutoGrowTextArea extends React.Component {
         const { minHeight } = this.props;
 
         const currScrollHeight = this.textAreaRef.current.scrollHeight;
-        if (minHeight > currScrollHeight) {
-            this.setState({
-                parentHeight: `${minHeight}px`,
-                textAreaHeight: `${minHeight}}px`
-            });
-        } else {
-            this.setState({
-                parentHeight: `${currScrollHeight}px`,
-                textAreaHeight: `${currScrollHeight}px`
-            });
-        }
+        // if (minHeight > currScrollHeight) {
+        //     this.setState({
+        //         parentHeight: `${minHeight}px`,
+        //         textAreaHeight: `${minHeight}}px`
+        //     });
+        // } else {
+        this.setState({
+            parentHeight: `${currScrollHeight}px`,
+            textAreaHeight: `${currScrollHeight}px`
+        });
+        // }
     }
 
     onChangeWrapper(e) {
@@ -563,26 +563,35 @@ class AutoGrowTextArea extends React.Component {
         onTextChange(e, field);
 
         const currScrollHeight = this.textAreaRef.current.scrollHeight;
-        if (minHeight && minHeight > currScrollHeight) {
+        // if (minHeight && minHeight > currScrollHeight) {
+        //     this.setState({ textAreaHeight: "auto", parentHeight: `${minHeight}px` }, () => {
+        //         const newScrollHeight = this.textAreaRef.current.scrollHeight;
+        //         if (minHeight > newScrollHeight) {
+        //             this.setState({
+        //                 parentHeight: `${minHeight}px`,
+        //                 textAreaHeight: `${minHeight}}px`
+        //             });
+        //         }
+        //     });
+        // } else {
+        this.setState({ textAreaHeight: "auto", parentHeight: `${currScrollHeight}px` }, () => {
+            const newScrollHeight = this.textAreaRef.current.scrollHeight;
             this.setState({
-                parentHeight: `${minHeight}px`,
-                textAreaHeight: `${minHeight}}px`
+                parentHeight: `${newScrollHeight}px`,
+                textAreaHeight: `${newScrollHeight}px`
             });
-        } else {
-            this.setState({ textAreaHeight: "auto", parentHeight: `${currScrollHeight}px` }, () => {
-                this.setState({
-                    parentHeight: `${currScrollHeight}px`,
-                    textAreaHeight: `${currScrollHeight}px`
-                });
-            });
-        }
+        });
+        // }
     }
 
     render() {
-        const { text, cls } = this.props;
+        const { text, cls, minHeight } = this.props;
         const { textAreaHeight, parentHeight } = this.state;
         return (
-            <div style={{ minHeight: parentHeight, height: parentHeight }} className={cls}>
+            <div style={{
+                minHeight: parentHeight,
+                // height: parentHeight
+            }} className={cls}>
                 <textarea value={text} ref={this.textAreaRef} rows={1} style={{ height: textAreaHeight, resize: "none" }} className="w-100"
                     onChange={this.onChangeWrapper} />
             </div>
