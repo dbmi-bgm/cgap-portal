@@ -9,7 +9,7 @@ import Dropdown from 'react-bootstrap/esm/Dropdown';
 import Button from 'react-bootstrap/esm/Button';
 import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, layout, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, JWT, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 /**
@@ -19,7 +19,12 @@ export class InterpretationSpaceWrapper extends React.Component {
     /**
      * Crawls context to find the most recently saved notes (the ones attached to the current VS)
      * and returns an object to use to initialize state.
-     * returns { "variant_notes": <note_obj>, "gene_notes": <note obj>... etc. }
+     * returns {
+     *      "variant_notes": <note_obj>,
+     *      "gene_notes": <note obj>,
+     *      "interpretation": <note obj>,
+     *      "loading": ,
+     *      "user": null || <user obj>... etc. }
      */
     static initializeNoteState(context = {}) {
         const fields = ["variant_notes", "gene_notes", "interpretation"];
@@ -29,7 +34,20 @@ export class InterpretationSpaceWrapper extends React.Component {
             newState[field] = note;
         });
         newState.loading = false;
+        newState.user = null;
         return newState;
+    }
+
+    /**
+     * Adds approved by user from JWT session details, and current date/time as approved date
+     * @param {Object} note     Note to update with user and date info (will be edited in place)
+     */
+    static populateNoteWithApprovedDateUser(note) { // edits note in-place
+        const userDetails = JWT.getUserDetails();
+        const { uuid } = userDetails || {};
+        note.approved_date = new Date(Date.now()).toISOString();
+        note.approved_by = uuid;
+        return note;
     }
 
     constructor(props) {
@@ -40,6 +58,30 @@ export class InterpretationSpaceWrapper extends React.Component {
         this.saveToCase = this.saveToCase.bind(this);
         this.saveToKnowledgeBase = this.saveToKnowledgeBase.bind(this);
     }
+
+    /* May need user info more globally eventually...
+    componentDidMount() {
+        // get user details on mount, trigger load
+        const userDetails = JWT.getUserDetails();
+        const { uuid } = userDetails || {};
+        console.log("userDetails", userDetails);
+        if (uuid) {
+            this.loadUser(uuid);
+        } else {
+            console.error("Couldn't find session details. Please log in.");
+        }
+    }
+
+    loadUser(uuid){
+        ajax.load("/users/" + uuid + "/", (res)=>{
+            if (!(res && res['@id'])) {
+                throw new Error("Couldn't fetch user info, make sure you're logged in.");
+            }
+            console.log("user loaded,",res);
+            this.setState({ user: res });
+        });
+    }
+    */
 
     /**
      * Can be used for cloning+updating notes OR creating new drafts
@@ -67,9 +109,11 @@ export class InterpretationSpaceWrapper extends React.Component {
             delete noteToSubmit.classification;
         }
 
-        // Don't set initial version for drafts
+        // Set initial version for approved cases, but not drafts
         if (status === "current") {
             noteToSubmit.version = version;
+            // Add approved_by and approved_date stamps
+            InterpretationSpaceWrapper.populateNoteWithApprovedDateUser(noteToSubmit);
         }
 
         noteToSubmit.institution = institutionID;
@@ -86,17 +130,16 @@ export class InterpretationSpaceWrapper extends React.Component {
         return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteAtID }));
     }
 
-    patchPreviouslySavedNote(noteAtID, noteToPatch, status = null) { // ONLY USED FOR DRAFTS -- other notes are cloned
-        if (status === "current") { // only used to convert "in review" to "current" (draft -> approved for case)
-            noteToPatch.status = status;
+    patchPreviouslySavedNote(noteAtID, noteToPatch, newStatus = null) { // ONLY USED FOR DRAFTS -- other notes are cloned
+        if (newStatus === "current") { // Only used to convert "in review" to "current" (draft -> approved for case)
+            noteToPatch.status = newStatus;
             if (noteToPatch.version) {
                 noteToPatch.version++;
             } else {
                 noteToPatch.version = 1;
             }
-            // TODO: add approved_by and approved_date stamps
-            // newNote.approved_date = Date.now();
-            // newNote.approved_by = ; // get user @id
+            // Add approved_by and approved_date stamps
+            InterpretationSpaceWrapper.populateNoteWithApprovedDateUser(noteToPatch);
         }
         return ajax.promise(noteAtID, 'PATCH', {}, JSON.stringify(noteToPatch));
     }
@@ -135,10 +178,11 @@ export class InterpretationSpaceWrapper extends React.Component {
             this.setState({ loading: true }, () => {
                 this.patchPreviouslySavedNote(noteAtID, noteToSubmit)
                     .then((response) => {
-                        if (status === "error") {
+                        const { '@graph': graph = [], status } = response;
+                        if (graph.length === 0 || status === "error") {
                             throw new Error(response);
                         }
-                        const { '@graph': graph } = response;
+
                         const { 0: newlySavedDraft } = graph || [];
                         // TODO: Some handling for various fail responses/codes
                         this.setState({ loading: false, [stateFieldToUpdate]: newlySavedDraft });
@@ -155,11 +199,16 @@ export class InterpretationSpaceWrapper extends React.Component {
             this.setState({ loading: true }, () => {
                 this.postNewNote(note, noteType, null, "in review")
                     .then((response) => {
-                        // TODO: Some handling for various fail responses/codes
+                        const { '@graph': noteItems = [], status } = response;
+
+                        // Some handling for various fail responses/codes
+                        if (noteItems.length === 0 || status === "error") {
+                            throw new Error(response);
+                        }
+
                         console.log("Successfully created new item", response);
-                        const { '@graph': noteItems = [] } = response;
+                        
                         const { 0: noteItem } = noteItems;
-                        console.log("newly created note Item", noteItem);
 
                         // Temporarily try to update state here... since 'response' with note item is not accessible in next step
                         // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
@@ -172,7 +221,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                         // TODO: Find way to update state with new interpretation note here instead
                     })
                     .catch((err) => {
-                        // TODO: Error handling
+                        // TODO: Error handling/alerting
                         console.log(err);
                         this.setState({ loading: false });
                     });
@@ -189,14 +238,16 @@ export class InterpretationSpaceWrapper extends React.Component {
                 const newNote = { ...note };
                 newNote.previous_note = noteAtID;
                 console.log("newNote", newNote);
-                // newNote.approved_by =  ; // pull user ID from context
-                // newNote.approved_date = Date.now();
 
                 this.postNewNote(note, noteType, version + 1, "current")
                     .then((response) => {
-                        // TODO: Some handling for various fail responses/codes
+                        // Some handling for various fail responses/codes
+                        const { '@graph': noteItems = [], status } = response;
+                        if (noteItems.length === 0 || status === "error") {
+                            throw new Error(response);
+                        }
+
                         console.log("Successfully created new item", response);
-                        const { '@graph': noteItems = [] } = response;
                         const { 0: noteItem } = noteItems;
 
                         // Temporarily try to update state here... since 'response' with note item is not accessible in next step
@@ -210,7 +261,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                         // TODO: Find way to update state with new interpretation note here instead
                     })
                     .catch((err) => {
-                        // TODO: Error handling
+                        // TODO: Error handling/alerting
                         console.log(err);
                         this.setState({ loading: false });
                     });
@@ -240,7 +291,10 @@ export class InterpretationSpaceWrapper extends React.Component {
                 this.setState({ loading: true }, () => {
                     this.patchPreviouslySavedNote(noteAtID, noteToSubmit, "current")
                         .then((response) => {
-                            const { '@graph': graph } = response;
+                            const { '@graph': graph, status } = response;
+                            if (graph.length === 0 || status === "error") {
+                                throw new Error(response);
+                            }
                             const { 0: newlySavedDraft } = graph || [];
                             // TODO: Some handling for various fail responses/codes
                             this.setState({ loading: false, [stateFieldToUpdate]: newlySavedDraft });
@@ -258,9 +312,13 @@ export class InterpretationSpaceWrapper extends React.Component {
                 console.log("note", note);
                 this.postNewNote(note, noteType, undefined, "current")
                     .then((response) => {
-                        // TODO: Some handling for various fail responses/codes
-                        console.log("Successfully created new item", response);
+                        // Some handling for various fail responses/codes
                         const { '@graph': noteItems = [] } = response;
+                        if (noteItems.length === 0 || status === "error") {
+                            throw new Error(response);
+                        }
+
+                        console.log("Successfully created new item", response);
                         const { 0: noteItem } = noteItems;
 
                         // Temporarily try to update state here... since 'response' with note item is not accessible in next step
