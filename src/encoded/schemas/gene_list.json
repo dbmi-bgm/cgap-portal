@@ -4,19 +4,44 @@
     "id": "/profiles/gene_list.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["institution", "project", "title"],
-    "identifyingProperties": ["uuid", "aliases"],
+    "required": [
+        "institution",
+        "project",
+        "title"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/notes" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/notes"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -28,31 +53,31 @@
             "uniqueItems": true,
             "type": "string"
         },
-        "genes" : {
-            "title" : "Genes",
-            "type" : "array",
+        "genes": {
+            "title": "Genes",
+            "type": "array",
             "uniqueItems": true,
-            "items" : {
-                "title" : "Gene",
-                "type" : "string",
-                "linkTo" : "Gene"
+            "items": {
+                "title": "Gene",
+                "type": "string",
+                "linkTo": "Gene"
             }
         },
-        "disorders" : {
-            "title" : "Related Disorders",
+        "disorders": {
+            "title": "Related Disorders",
             "description": "Disorders that are related to this gene list",
-            "type" : "array",
+            "type": "array",
             "uniqueItems": true,
-            "items" : {
-                "title" : "Disorder",
-                "type" : "string",
-                "linkTo" : "Disorder"
+            "items": {
+                "title": "Disorder",
+                "type": "string",
+                "linkTo": "Disorder"
             }
         },
         "source_file": {
-            "title" : "Source File",
+            "title": "Source File",
             "description": "The original gene list file used for generating this gene list item",
-            "type" : "string",
+            "type": "string",
             "linkTo": "Document"
         }
     }

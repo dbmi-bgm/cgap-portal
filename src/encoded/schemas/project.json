@@ -2,18 +2,42 @@
     "title": "Project",
     "id": "/profiles/project.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "required": ["name", "title"],
-    "identifyingProperties": ["uuid", "name", "title", "aliases"],
+    "required": [
+        "name",
+        "title"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "name",
+        "title",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/static_embeds" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        }
     ],
     "type": "object",
     "properties": {
@@ -51,19 +75,27 @@
             "type": "string",
             "lookup": 50,
             "anyOf": [
-                {"format": "date-time"},
-                {"format": "date"}
+                {
+                    "format": "date-time"
+                },
+                {
+                    "format": "date"
+                }
             ]
         },
         "end_date": {
             "title": "End date",
             "description": "YYYY-MM-DD formatted date.",
-             "comment": "Date can be submitted as YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSTZD (TZD is the time zone designator; use Z to express time in UTC or for time expressed in local time add a time zone offset from UTC +HH:MM or -HH:MM).",
+            "comment": "Date can be submitted as YYYY-MM-DD or YYYY-MM-DDTHH:MM:SSTZD (TZD is the time zone designator; use Z to express time in UTC or for time expressed in local time add a time zone offset from UTC +HH:MM or -HH:MM).",
             "type": "string",
             "lookup": 60,
             "anyOf": [
-                {"format": "date-time"},
-                {"format": "date"}
+                {
+                    "format": "date-time"
+                },
+                {
+                    "format": "date"
+                }
             ]
         },
         "url": {

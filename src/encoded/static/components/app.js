@@ -17,7 +17,7 @@ import { Footer } from './Footer';
 import { store } from './../store';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse, WindowEventDelegator } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Schemas, SEO, typedefs, navigate } from './util';
 import { responsiveGridState } from './util/layout';
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
@@ -125,13 +125,6 @@ export default class App extends React.PureComponent {
         });
     }
 
-    /**
-     * @property {boolean} initialSession - Whether user is logged in upon initial render. Only passed in on server-side render.
-     */
-    static defaultProps = {
-        'initialSession' : null
-    };
-
     static debouncedOnNavigationTooltipRebuild = _.debounce(ReactTooltip.rebuild, 500);
 
     /**
@@ -141,13 +134,13 @@ export default class App extends React.PureComponent {
     constructor(props){
         super(props);
         _.bindAll(this, 'currentAction', 'loadSchemas',
-            'setIsSubmitting', 'stayOnSubmissionsPage', 'authenticateUser',
-            'updateUserInfo', 'confirmNavigation', 'navigate',
+            'setIsSubmitting', 'stayOnSubmissionsPage',
+            'updateAppSessionState', 'confirmNavigation', 'navigate',
             // Global event handlers. These will catch events unless they are caught and prevented from bubbling up earlier.
             'handleClick', 'handleSubmit', 'handlePopState', 'handleBeforeUnload'
         );
 
-        const { context, initialSession } = props;
+        const { context } = props;
 
         Alerts.setStore(store);
 
@@ -160,21 +153,12 @@ export default class App extends React.PureComponent {
         this.historyEnabled = !!(typeof window != 'undefined' && window.history && window.history.pushState);
 
         // Todo: Migrate session & user_actions to redux store?
-        let session = false;
-        if (typeof initialSession === 'boolean'){
-            // Only provided from server
-            session = initialSession;
-        } else {
-            // Only available client-side. Same cookie sent to server-side to authenticate initialSession, so it must match.
-            session = !!(JWT.get('cookie'));
-        }
+        const session = !!(JWT.getUserInfo());
 
         // Save navigate fxn and other req'd stuffs to GLOBAL navigate obj.
         // So that we may call it from anywhere if necessary without passing through props.
         navigate.initializeFromApp(this);
         navigate.registerCallbackFunction(Alerts.updateCurrentAlertsTitleMap.bind(this, null));
-
-        if (context.schemas) Schemas.set(context.schemas);
 
         /**
          * Initial state of application.
@@ -196,7 +180,7 @@ export default class App extends React.PureComponent {
         // (App works as a single-page-application (SPA))
         this.currentNavigationRequest = null;
 
-        console.info("App Initial State: ", this.state);
+        if (!isServerSide()) console.info("App Initial State: ", this.state);
     }
 
     /**
@@ -215,6 +199,8 @@ export default class App extends React.PureComponent {
         const { href, context } = this.props;
         const { session } = this.state;
 
+        ajax.AJAXSettings.addSessionExpiredCallback(this.updateAppSessionState);
+
         // The href prop we have was from serverside. It would not have a hash in it, and might be shortened.
         // Here we grab full-length href from window and then update props.href (via Redux), if it is different.
         const windowHref = (window && window.location && window.location.href) || href;
@@ -222,7 +208,7 @@ export default class App extends React.PureComponent {
             store.dispatch({ 'type' : { 'href' : windowHref } });
         }
 
-        // Load up analytics & perform initial pageview track
+        // ANALYTICS INITIALIZATION; Sets userID (if any), performs initial pageview track
         const analyticsID = getGoogleAnalyticsTrackingID(href);
         if (analyticsID){
             analytics.initializeGoogleAnalytics(
@@ -236,9 +222,6 @@ export default class App extends React.PureComponent {
             );
         }
 
-        // Authenticate user if not yet handled server-side w/ cookie and rendering props.
-        this.authenticateUser();
-
         // Load schemas into app.state, access them where needed via props (preferred, safer) or this.context.
         this.loadSchemas();
 
@@ -250,7 +233,8 @@ export default class App extends React.PureComponent {
                 window.history.replaceState(null, '', window.location.href);
             }
             // Avoid popState on load, see: http://stackoverflow.com/q/6421769/199100
-            var register = window.addEventListener.bind(window, 'popstate', this.handlePopState, true);
+            // We don't use WindowEventDelegator here since we intend to `useCapture` to prevent default browser handling from being triggered for this.
+            const register = window.addEventListener.bind(window, 'popstate', this.handlePopState, true);
             if (window._onload_event_fired) {
                 register();
             } else {
@@ -408,8 +392,9 @@ export default class App extends React.PureComponent {
 
     /**
      * If no schemas yet stored in our state, we AJAX them in from `/profiles/?format=json`.
+     * Performed after/outside initial page render, because it's a lot of data and sending down alongside
+     * or within html response would significantly increase time to page render.
      *
-     * @public
      * @param {function} [callback=null] - If defined, will be executed upon completion of load, with schemas passed in as first argument.
      * @param {boolean} [forceFetch=false] - If true, will ignore any previously-fetched schemas and fetch new ones.
      * @returns {void}
@@ -424,6 +409,7 @@ export default class App extends React.PureComponent {
         }
         ajax.promise('/profiles/?format=json').then((data) => {
             if (object.isValidJSON(data)){
+                // Performed prior to state update, to be available globally immediately after state update.
                 Schemas.set(data);
                 this.setState({ 'schemas' : data }, () => {
                     // Rebuild tooltips because they likely use descriptions from schemas
@@ -627,55 +613,6 @@ export default class App extends React.PureComponent {
     }
 
     /**
-     * Grabs JWT from local cookie and, if not already authenticated or are missing 'user_actions',
-     * perform authentication via AJAX to grab user actions, updated JWT token, and save to localStorage.
-     *
-     * @deprecated (?) Since browser.js calls JWT.remove() + reloads as anonymous user
-     * @private
-     * @param {function} [callback=null] Optional callback to be ran upon completing authentication.
-     * @returns {void}
-     */
-    authenticateUser(callback = null){
-        const { session } = this.state;
-        const idToken = JWT.get();
-        const userInfo = JWT.getUserInfo();
-        const userActions = (userInfo && userInfo.user_actions) || null;
-
-        if (idToken && (!session || !userActions)){
-            // if JWT present, and session not yet set (from back-end), try to authenticate
-            // This is very unlikely due to us rendering re: session server-side. Mostly a remnant.
-            console.info('AUTHENTICATING USER; JWT PRESENT BUT NO STATE.SESSION OR USER_ACTIONS');
-            ajax.promise('/login', 'POST', { 'Authorization' : 'Bearer ' + idToken }, JSON.stringify({ 'id_token' : idToken }))
-                .then((response) => {
-                    if (response.code || response.status || response.id_token !== idToken) throw response;
-                    return response;
-                })
-                .then(
-                    (response) => {
-                        JWT.saveUserInfo(response);
-                        this.updateUserInfo(callback);
-                        analytics.event('Authentication', 'ExistingSessionLogin', {
-                            'eventLabel' : 'Authenticated ClientSide'
-                        });
-                    },
-                    (error) => {
-                        // error, clear JWT token from cookie & user_info from localStorage (via JWT.remove())
-                        // and unset state.session (via this.updateUserInfo())
-                        JWT.remove();
-                        this.updateUserInfo(callback);
-                    }
-                );
-            return idToken;
-        } else if (idToken && session && userActions){
-            console.info('User is logged in already, continuing session.');
-            analytics.event('Authentication', 'ExistingSessionLogin', {
-                'eventLabel' : 'Authenticated ServerSide'
-            });
-        }
-        return null;
-    }
-
-    /**
      * Tests that JWT is present along with user info and user actions, and if so, updates `state.session`.
      * Called by `authenticateUser` as well as Login.
      *
@@ -683,31 +620,34 @@ export default class App extends React.PureComponent {
      * @param {function} [callback=null] Optional callback to be ran upon completing authentication.
      * @returns {void}
      */
-    updateUserInfo(callback = null){
+    updateAppSessionState(callback = null){
         // get user actions (a function of log in) from local storage
         const userInfo  = JWT.getUserInfo();
         // We definitively use Cookies for JWT.
         // It can be unset via response headers from back-end.
-        const currentToken = JWT.get('cookie');
-        const session = !!(userInfo && currentToken); // cast to bool
+        // const currentToken = JWT.get('cookie');
+        const { session: existingSession } = this.state;
+        const nextSession = !!(userInfo); // cast to bool
 
-        this.setState(function({ session : existingSession }){
-            if (session === existingSession) {
-                return null;
-            }
+        if (nextSession === existingSession) {
+            return null;
+        }
+
+        this.setState({ "session": nextSession }, () => {
+            const { session } = this.state;
             if (session === false && existingSession === true){
                 Alerts.queue(Alerts.LoggedOut);
-                // Clear out remaining auth/JWT stuff from localStorage if any
+                // Clear out remaining auth/JWT stuff from localStorage if any.
                 JWT.remove();
             } else if (session === true && existingSession === false){
+                // Remove lingering 'logged out' alerts if have logged in.
                 Alerts.deQueue([ Alerts.LoggedOut, NotLoggedInAlert ]);
             }
-            return { session };
-        }, () => {
             if (typeof callback === 'function'){
                 callback(session, userInfo);
             }
         });
+
     }
 
     /**
@@ -894,7 +834,7 @@ export default class App extends React.PureComponent {
                 return false;
             }
 
-            this.currentNavigationRequest = ajax.fetch(targetHref, { 'cache' : options.cache === false ? false : true });
+            this.currentNavigationRequest = ajax.fetch(targetHref);
             // Keep a reference in current scope to later assert if same request instance (vs new superceding one).
             const currentRequestInThisScope = this.currentNavigationRequest;
             const timeout = new Timeout(App.SLOW_REQUEST_TIME);
@@ -912,10 +852,6 @@ export default class App extends React.PureComponent {
             currentRequestInThisScope
                 .then((response)=>{
                     console.info("Fetched new context", response);
-
-                    // Update `state.session` after (possibly) removing expired JWT. Backend does this via set cookie header.
-                    // Also, may have been logged out in different browser window so keep state.session up-to-date BEFORE a re-request
-                    this.updateUserInfo();
 
                     if (!object.isValidJSON(response)) { // Probably only if 500 server error or similar. Or link to xml or image etc.
                         // navigate normally to URL of unexpected non-JSON response so back button works.
@@ -1157,7 +1093,7 @@ export default class App extends React.PureComponent {
             routeLeaf,
             hrefParts,
             'updateUploads'  : this.updateUploads,
-            'updateUserInfo' : this.updateUserInfo,
+            'updateAppSessionState' : this.updateAppSessionState,
             'setIsSubmitting': this.setIsSubmitting,
             'onBodyClick'    : this.handleClick,
             'onBodySubmit'   : this.handleSubmit,
@@ -1175,8 +1111,8 @@ export default class App extends React.PureComponent {
                     <meta name="google-site-verification" content="sia9P1_R16tk3XW93WBFeJZvlTt3h0qL00aAJd3QknU" />
                     <HTMLTitle {...{ context, currentAction, canonical, status }} />
                     {base ? <base href={base}/> : null}
-                    <script data-prop-name="user_details" type="application/json" dangerouslySetInnerHTML={{
-                        __html: jsonScriptEscape(JSON.stringify(JWT.getUserDetails())) /* Kept up-to-date in browser.js */
+                    <script data-prop-name="user_info" type="application/json" dangerouslySetInnerHTML={{
+                        __html: jsonScriptEscape(JSON.stringify(JWT.getUserInfo())) /* Kept up-to-date in browser.js */
                     }}/>
                     <script data-prop-name="lastCSSBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastCSSBuildTime }}/>
                     <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastCSSBuildTime || 0)} />
@@ -1260,7 +1196,7 @@ const ContentRenderer = React.memo(function ContentRenderer(props){
     const commonContentViewProps = _.pick(props,
         // Props from App:
         'schemas', 'session', 'href', 'navigate', 'uploads', 'updateUploads', 'alerts',
-        'browseBaseState', 'setIsSubmitting', 'updateUserInfo', 'context', 'currentAction',
+        'browseBaseState', 'setIsSubmitting', 'updateAppSessionState', 'context', 'currentAction',
         // Props from BodyElement:
         'windowWidth', 'windowHeight', 'registerWindowOnResizeHandler', 'registerWindowOnScrollHandler',
         'addToBodyClassList', 'removeFromBodyClassList', 'toggleFullScreen', 'isFullscreen',
@@ -1411,13 +1347,11 @@ class BodyElement extends React.PureComponent {
     /**
      * Initializes scroll event handler & loading of help menu tree.
      *
-     * @private
      * @returns {void}
      */
     componentDidMount(){
-        if (window && window.fourfront) window.fourfront.bodyElem = this;
         this.setupScrollHandler();
-        window.addEventListener('resize', this.onResize);
+        WindowEventDelegator.addHandler("resize", this.onResize);
         this.onResize();
     }
 
@@ -1433,13 +1367,12 @@ class BodyElement extends React.PureComponent {
      * Unbinds event listeners.
      * Probably not needed but lets be safe & cleanup.
      *
-     * @private
      * @returns {void}
      */
     componentWillUnmount(){
-        window.removeEventListener("scroll", this.throttledScrollHandler);
+        WindowEventDelegator.removeHandler("scroll", this.throttledScrollHandler);
         delete this.throttledScrollHandler;
-        window.removeEventListener('resize', this.onResize);
+        WindowEventDelegator.addHandler("resize", this.onResize);
     }
 
     /**
@@ -1666,7 +1599,8 @@ class BodyElement extends React.PureComponent {
         // We add as property of class instance so we can remove event listener on unmount, for example.
         this.throttledScrollHandler = _.throttle(raf.bind(window, handleScroll), 10);
 
-        window.addEventListener("scroll", this.throttledScrollHandler);
+        WindowEventDelegator.addHandler("scroll", this.throttledScrollHandler);
+
         setTimeout(this.throttledScrollHandler, 100, null);
     }
 
@@ -1745,7 +1679,7 @@ class BodyElement extends React.PureComponent {
      * TestWarning stuff is _possibly_ deprecated and for 4DN only.
      */
     render(){
-        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas, browseBaseState, updateUserInfo } = this.props;
+        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas, browseBaseState, updateAppSessionState } = this.props;
         const { windowWidth, windowHeight, classList, hasError, isFullscreen, testWarningPresent } = this.state;
         const { registerWindowOnResizeHandler, registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen } = this;
         const appClass = slowLoad ? 'communicating' : 'done';
@@ -1771,7 +1705,7 @@ class BodyElement extends React.PureComponent {
             isFullscreen, toggleFullScreen, overlaysContainer,
             testWarningPresent, hideTestWarning: this.hideTestWarning,
             context, href, currentAction, session, schemas,
-            browseBaseState, updateUserInfo
+            browseBaseState, updateAppSessionState
         };
 
         const propsPassedToAllViews = {

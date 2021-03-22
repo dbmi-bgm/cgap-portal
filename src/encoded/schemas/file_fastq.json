@@ -4,28 +4,64 @@
     "id": "/profiles/file_fastq.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["file_format", "project", "institution"],
-    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "required": [
+        "file_format",
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "accession",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/accession" },
-        { "$ref": "mixins.json#/dbxrefs" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/static_embeds" },
-        { "$ref": "file.json#/properties" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/dbxrefs"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "file.json#/properties"
+        }
     ],
     "mixinFacets": [
-        { "$ref": "file.json#/facets"},
-        { "$ref": "mixins.json#/facets_common" }
+        {
+            "$ref": "file.json#/facets"
+        },
+        {
+            "$ref": "mixins.json#/facets_common"
+        }
     ],
     "mixinColumns": [
-        { "$ref": "file.json#/columns"}
+        {
+            "$ref": "file.json#/columns"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -35,7 +71,9 @@
             "title": "File Type",
             "description": "The type of file based on the information in the file.",
             "default": "reads",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "enum": [
                 "WGS reads",
                 "WES reads",
@@ -49,13 +87,17 @@
             "title": "General Classification",
             "type": "string",
             "default": "raw file",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "enum": [
                 "raw file"
-              ]
+            ]
         },
         "extra_files": {
-            "exclude_from": ["FFedit-create"]
+            "exclude_from": [
+                "FFedit-create"
+            ]
         },
         "read_length": {
             "title": "Sequencing Read Length (bp)",
@@ -87,7 +129,9 @@
             "items": {
                 "title": "Flowcell details",
                 "type": "object",
-                "required": ["machine"],
+                "required": [
+                    "machine"
+                ],
                 "additionalProperties": true,
                 "properties": {
                     "machine": {

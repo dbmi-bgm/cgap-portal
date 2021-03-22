@@ -120,7 +120,10 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
                    'Please submit a file of the proper type.')
             results['validation_output'].append(msg)
             return results
-        json_data, json_success = xls_to_json(rows, project=project_json, institution=institution_json)
+        json_data, json_success = xls_to_json(
+            xls_data=rows, project=project_json, institution=institution_json,
+            ingestion_id=key.split('/')[0]
+        )
         if not json_success:
             results['validation_output'] = json_data['errors']
             return results
@@ -438,12 +441,13 @@ class SubmissionMetadata:
     have metadata that occurs across multiple rows.
     """
 
-    def __init__(self, rows, project, institution, counter=1):
+    def __init__(self, rows, project, institution, ingestion_id, counter=1):
         self.rows = rows
         self.project = project.get('name')
         self.project_atid = project.get('@id')
         self.institution = institution.get('name')
         self.institution_atid = institution.get('@id')
+        self.ingestion_id = ingestion_id
         self.counter = counter
         self.proband_rows = [row for row in rows if row.get(SS_RELATION).lower() == 'proband']
         self.family_dict = {
@@ -531,9 +535,13 @@ class SubmissionMetadata:
         if item.alias not in prev:
             previous[item.alias] = item.metadata
         else:
-            for key in item.metadata:
+            for key, value in item.metadata.items():
                 if key not in previous[item.alias]:
-                    previous[item.alias][key] = item.metadata[key]
+                    previous[item.alias][key] = value
+                # extend list field (e.g. combine samples in diff rows for Individual item)
+                elif key != 'aliases' and isinstance(value, list):
+                    previous[item.alias][key].extend(value)
+                    previous[item.alias][key] = list(set(previous[item.alias][key]))
 
     def add_family_metadata(self, idx, family, individual):
         """
@@ -602,7 +610,12 @@ class SubmissionMetadata:
                     indiv = [ikey for ikey, ival in self.individuals.items() if sample in ival.get('samples', [])][0]
                 except IndexError:
                     indiv = ''
-                case_info = {'aliases': [case_alias],'sample_processing': k,'individual': indiv}
+                case_info = {
+                    'aliases': [case_alias],
+                    'sample_processing': k,
+                    'individual': indiv,
+                    'ingestion_ids': [self.ingestion_id]
+                }
                 for fam in v.get('families', []):
                     if fam in self.families and indiv in self.families[fam]['members']:
                         case_info['family'] = fam
@@ -710,10 +723,11 @@ class SpreadsheetProcessing:
     to hold all metadata extracted from spreadsheet.
     """
 
-    def __init__(self, row, project, institution):
-        self.input = row
+    def __init__(self, xls_data, project, institution, ingestion_id):
+        self.input = xls_data
         self.project = project
         self.institution = institution
+        self.ingestion_id = ingestion_id
         self.output = {}
         self.errors = []
         self.keys = []
@@ -761,20 +775,21 @@ class SpreadsheetProcessing:
                 self.rows.append(row_dict)
 
     def extract_metadata(self):
-        result = SubmissionMetadata(self.rows, self.project, self.institution, self.counter)
+        result = SubmissionMetadata(self.rows, self.project, self.institution, self.ingestion_id, self.counter)
         self.output = result.json_out
         self.errors.extend(result.errors)
         self.passing = True
 
 
-def xls_to_json(row, project, institution):
+def xls_to_json(xls_data, project, institution, ingestion_id):
     """
     Wrapper for SpreadsheetProcessing that returns expected values:
     result.output - metadata to be submitted in json
     result.passing - whether submission "passes" this part of the code and can move
         on to the next step.
     """
-    result = SpreadsheetProcessing(row, project, institution)
+    result = SpreadsheetProcessing(xls_data=xls_data, project=project, institution=institution,
+                                   ingestion_id=ingestion_id)
     result.output['errors'] = result.errors
     return result.output, result.passing
 
@@ -894,6 +909,8 @@ def compare_fields(profile, aliases, json_item, db_item):
                         dict([(k, aliases[v]) if v in aliases else (k, v) for k, v in dict_item.items()])
                         for dict_item in json_item[field]
                     ]
+                elif profile['properties'][field].get('items', {}).get('type') == 'string':
+                    val = [v for v in json_item[field]]
             else:
                 val = [v for v in json_item[field]]
             if all(v in db_item.get(field, []) for v in val):

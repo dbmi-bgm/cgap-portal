@@ -16,6 +16,9 @@ from ..util import (
 from .. import util as util_module
 
 
+pytestmark = [pytest.mark.setone, pytest.mark.working]
+
+
 def test_deduplicate_list():
 
     def sort_somehow(seq):

@@ -16,23 +16,22 @@ from .server_defaults import (
 from uuid import UUID
 
 
-def compute_accession_codes():
-    letter_pairs = set()
-    for file in glob.glob(pkg_resources.resource_filename('encoded', 'schemas/*.json')):
-        with io.open(file) as fp:
-            schema = json.load(fp)
-        letter_pair = schema.get('properties', {}).get('accession', {}).get('accessionType')
-        if letter_pair:
-            if not isinstance(letter_pair, str) or len(letter_pair) != 2:
-                raise RuntimeError("accession_type in %s is not a 2-character string:", letter_pair)
-            letter_pairs.add(letter_pair)
-    return "|".join(sorted(letter_pairs))
+# XXX: This is broken, cannot decode schema files - Will 3/2/2021
+# def compute_accession_codes():
+#     letter_pairs = set()
+#     for file in glob.glob(pkg_resources.resource_filename('encoded', 'schemas/*.json')):
+#         with io.open(file) as fp:
+#             schema = json.load(fp)
+#         letter_pair = schema.get('properties', {}).get('accession', {}).get('accessionType')
+#         if letter_pair:
+#             if not isinstance(letter_pair, str) or len(letter_pair) != 2:
+#                 raise RuntimeError("accession_type in %s is not a 2-character string:", letter_pair)
+#             letter_pairs.add(letter_pair)
+#     return "|".join(sorted(letter_pairs))
 
 
-ACCESSION_CODES = compute_accession_codes()
-
-accession_re = re.compile(r'^%s(%s)[1-9A-Z]{7}$' % (ACCESSION_PREFIX, ACCESSION_CODES))
-test_accession_re = re.compile(r'^%s(%s)[0-9]{4}([0-9][0-9][0-9]|[A-Z][A-Z][A-Z])$' % (TEST_PREFIX, ACCESSION_CODES))
+accession_re = re.compile(r'^%s[1-9A-Z]{9}$' % ACCESSION_PREFIX)
+test_accession_re = re.compile(r'^TST(EX|ES|FI|FS|SR|BS|IN|WF)[0-9]{4}([0-9][0-9][0-9]|[A-Z][A-Z][A-Z])$')
 uuid_re = re.compile(r'(?i)\{?(?:[0-9a-f]{4}-?){8}\}?')
 
 

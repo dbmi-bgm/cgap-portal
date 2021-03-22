@@ -23,7 +23,7 @@ export class NavigationBar extends React.PureComponent {
     static propTypes = {
         'href'              : PropTypes.string,
         'session'           : PropTypes.bool,
-        'updateUserInfo'    : PropTypes.func.isRequired,
+        'updateAppSessionState' : PropTypes.func.isRequired,
         'context'           : PropTypes.object,
         'schemas'           : PropTypes.any,
         'browseBaseState'   : PropTypes.string

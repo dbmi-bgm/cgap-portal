@@ -98,6 +98,11 @@ def build_variant_display_title(chrom, pos, ref, alt, sep='>'):
     )
 
 
+def build_variant_sample_annotation_id(call_info, variant_uuid, file_accession):
+    """ Helper function that builds a variant sample annotation ID from the required parts. """
+    return ':'.join([call_info, variant_uuid, file_accession])
+
+
 def load_extended_descriptions_in_schemas(schema_object, depth=0):
     '''
     MODIFIES SCHEMA_OBJECT **IN PLACE** RECURSIVELY
@@ -305,7 +310,7 @@ class VariantSample(Item):
         variant_props = get_item_or_none(request, variant, 'Variant', frame='raw')
         if variant_props is None:
             raise RuntimeError('Got none for something that definitely exists')
-        file_path = '%s/bamsnap/chr%s:%s.png' % (  # file = accession of associated VCF file
+        file_path = '%s/bamsnap/chr%s_%s.png' % (  # file = accession of associated VCF file
             file, variant_props['CHROM'], variant_props['POS']
         )
         return file_path
@@ -332,8 +337,32 @@ class VariantSample(Item):
                 "title": "Sister Genotype",
                 "type": "string"
             },
+            "sister_II_genotype_label": {
+                "title": "Sister II Genotype",
+                "type": "string"
+            },
+            "sister_III_genotype_label": {
+                "title": "Sister III Genotype",
+                "type": "string"
+            },
+            "sister_IV_genotype_label": {
+                "title": "Sister IV Genotype",
+                "type": "string"
+            },
             "brother_genotype_label": {
                 "title": "Brother Genotype",
+                "type": "string"
+            },
+            "brother_II_genotype_label": {
+                "title": "Brother II Genotype",
+                "type": "string"
+            },
+             "brother_III_genotype_label": {
+                "title": "Brother III Genotype",
+                "type": "string"
+            },
+             "brother_IV_genotype_label": {
+                "title": "Brother IV Genotype",
                 "type": "string"
             },
             "co_parent_genotype_label": {

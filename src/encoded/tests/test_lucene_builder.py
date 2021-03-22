@@ -2,6 +2,9 @@ import pytest
 from ..search.lucene_builder import LuceneBuilder
 
 
+pytestmark = [pytest.mark.setone, pytest.mark.broken]
+
+
 @pytest.fixture
 def type_query_facet_filters():
     """ Simple query that just searches on Variant Sample """
