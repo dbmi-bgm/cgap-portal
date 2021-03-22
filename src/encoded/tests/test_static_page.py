@@ -4,7 +4,7 @@ from dcicutils.qa_utils import notice_pytest_fixtures
 from .helpers import workbook_lookup
 
 
-pytestmark = [pytest.mark.working]
+pytestmark = [pytest.mark.working, pytest.mark.workbook]
 
 
 def wait_for_index(testapp):

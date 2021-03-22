@@ -59,9 +59,9 @@ def app(es_app_settings, request):
 
     yield app
 
-    DBSession = app.registry[DBSESSION]
+    db_session = app.registry[DBSESSION]
     # Dispose connections so postgres can tear down.
-    DBSession.bind.pool.dispose()
+    db_session.bind.pool.dispose()
 
 
 @pytest.yield_fixture(autouse=True)
@@ -147,7 +147,7 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
     item_types = TEST_COLLECTIONS
     # check that mappings and settings are in index
     for item_type in item_types:
-        item_mapping = type_mapping(registry[TYPES], item_type)
+        type_mapping(registry[TYPES], item_type)
         try:
             namespaced_index = get_namespaced_index(app, item_type)
             item_index = es.indices.get(index=namespaced_index)
@@ -175,7 +175,7 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, project, institu
     }
     fp_res = testapp.post_json('/file_processed', item)
     test_fp_uuid = fp_res.json['@graph'][0]['uuid']
-    res = testapp.post_json('/file_processed', item)
+    testapp.post_json('/file_processed', item)
     indexer_testapp.post_json('/index', {'record': True})
 
     # Todo, input a list of accessions / uuids:
@@ -260,10 +260,11 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution, proje
     assert val_err_view['validation_errors'] == es_res['_source']['validation_errors']
 
 
+# TODO: This might need to use es_testapp now. -kmp 14-Mar-2021
 @pytest.mark.performance
 @pytest.mark.skip(reason="need to update perf-testing inserts")
 def test_load_and_index_perf_data(testapp, indexer_testapp):
-    '''
+    """
     ~~ CURRENTLY NOT WORKING ~~
 
     PERFORMANCE TESTING
@@ -274,7 +275,7 @@ def test_load_and_index_perf_data(testapp, indexer_testapp):
     nightly through the mastertest_deployment process in the torb repo
     it takes roughly 25 to run.
     Note: run with bin/test -s -m performance to see the prints from the test
-    '''
+    """
 
     insert_dir = pkg_resources.resource_filename('encoded', 'tests/data/perf-testing/')
     inserts = [f for f in os.listdir(insert_dir) if os.path.isfile(os.path.join(insert_dir, f))]
@@ -308,16 +309,16 @@ def test_load_and_index_perf_data(testapp, indexer_testapp):
     # check a couple random inserts
     for item in test_inserts:
         start = timer()
-        assert testapp.get("/" + item['data']['uuid'] + "?frame=raw").json['uuid']
+        assert testapp.get("/" + item['data']['uuid'] + "?frame=raw").json['uuid']  # noQA
         stop = timer()
         frame_time = stop - start
 
         start = timer()
-        assert testapp.get("/" + item['data']['uuid']).follow().json['uuid']
+        assert testapp.get("/" + item['data']['uuid']).follow().json['uuid']  # noQA
         stop = timer()
         embed_time = stop - start
 
-        print("PERFORMANCE: Time to query item %s - %s raw: %s embed %s" % (item['type_name'], item['data']['uuid'],
+        print("PERFORMANCE: Time to query item %s - %s raw: %s embed %s" % (item['type_name'], item['data']['uuid'],  # noQA
                                                                             frame_time, embed_time))
     # userful for seeing debug messages
     # assert False

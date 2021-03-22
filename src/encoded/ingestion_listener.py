@@ -30,6 +30,7 @@ from snovault.util import debug_log
 from vcf import Reader
 from .ingestion.vcf_utils import VCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
+from .commands.add_altcounts_by_gene import main as add_altcounts
 from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure, BadParameter
 from .ingestion.processors import get_ingestion_processor
@@ -514,18 +515,26 @@ class IngestionListener:
                 # decoded_content = gunzip_content(raw_content)
                 # debuglog('Got decoded content: %s' % decoded_content[:20])
 
-                # reformat VCF
+                # Apply VCF reformat
                 vcf_to_be_formatted = tempfile.NamedTemporaryFile(suffix='.gz')
                 vcf_to_be_formatted.write(raw_content)
-                formatted = tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8')
+                formatted = tempfile.NamedTemporaryFile()
                 reformat_args = {
                     'inputfile': vcf_to_be_formatted.name,
                     'outputfile': formatted.name,
                     'verbose': False
                 }
                 reformat_vcf(reformat_args)
+
+                # Add altcounts by gene
+                formatted_with_alt_counts = tempfile.NamedTemporaryFile(mode='w+')  # cannot pass bytes to vcf.Reader()
+                alt_counts_args = {
+                    'inputfile': formatted.name,
+                    'outputfile': formatted_with_alt_counts.name
+                }
+                add_altcounts(alt_counts_args)
                 parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
-                                   reader=Reader(formatted))
+                                   reader=Reader(formatted_with_alt_counts))
                 variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
                                                  project=file_meta['project']['@id'],
                                                  institution=file_meta['institution']['@id'])

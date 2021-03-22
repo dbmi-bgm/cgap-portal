@@ -28,8 +28,8 @@ class MappingTableHeader:
     """ Constant class that holds information on the structure of the mapping table (csv) that does
         not vary across . """
     HEADER_ROW_INDEX = 2
-    INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'column_order', 'facet_order', 'default', 'min', 'max']
-    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field', 'do_import', 'facet_default_hidden']
+    INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'default', 'min', 'max']
+    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field', 'do_import']
     STRING_FIELDS = ['field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
                      'annotation_category', 'separator', 'description',
                      'scope', 'schema_title', 'pattern', 'link', 'abbreviation']
@@ -111,7 +111,7 @@ class VariantTableParser(object):
                 elif row_idx == 2:
                     fields = self.process_fields(row)
                 else:
-                    break # we are done with this step
+                    break  # we are done with this step
         logger.info('Mapping table Version: %s, Date: %s\n' % (version, date))
         logger.info('Mapping table fields: %s\n' % (", ".join(fields)))
         return version, date, fields
@@ -179,21 +179,22 @@ class VariantTableParser(object):
         """
         return [field for field in inserts if field.get('scope', '') == 'variant']
 
-    def update_embeds(self, item, typ):
+    def update_embeds(self, item, scope):
         """ Updates the EMBEDDED_FIELDS location JSON containing the embeds for Variant.
             NOTE: the files are overwritten every time you run the process!
 
         :param item: embedded field to be written
+        :param scope: which item type this embed is for
         """
         # XXX: This does NOT work properly if for linkTos, embeds required .keyword!
         for t, f in self.EMBEDS_TO_GENERATE:
-            if typ == t:
+            if scope == t:
                 with io.open(f, 'rb') as fd:
                     embeds = json.load(fd)
                     link_type = 'embedded_field'
                     prefix = ''
                     if item.get('sub_embedding_group', None):
-                        prefix = self.format_sub_embedding_group_name(item.get('sub_embedding_group'), type='key') + '.'
+                        prefix = self.format_sub_embedding_group_name(item.get('sub_embedding_group'), t='key') + '.'
                     if link_type not in embeds[t]:
                         embeds[t][link_type] = [prefix + item[self.NAME_FIELD]]
                     else:
@@ -203,22 +204,22 @@ class VariantTableParser(object):
                     wfd.write('\n')  # write newline at EOF
 
     @staticmethod
-    def format_sub_embedding_group_name(json_or_str, type='key'):
+    def format_sub_embedding_group_name(json_or_str, t='key'):
         """ Helper method that will extract the appropriate value from sub_embedding_group
 
         :param json_or_str: entry in mapping table, could be string or json, so we try both
-        :param type: one of key or title
+        :param t: one of key or title
         :return: title that you wanted based on inputs
         """
-        if type not in ['key', 'title']:
+        if t not in ['key', 'title']:
             raise MappingTableIntakeException('Tried to parse sub_embedded_group with'
-                                              'key other than "key" or "title": %s ' % type)
+                                              'key other than "key" or "title": %s ' % t)
         try:
             fmt = json.loads(json_or_str)
         except Exception:  # just a string is given, use for both name and title
             return json_or_str
         else:
-            return fmt[type]
+            return fmt[t]
 
     def generate_properties(self, inserts, variant=True):
         """ Generates variant/variant sample properties.
@@ -277,8 +278,8 @@ class VariantTableParser(object):
             if item.get('sub_embedding_group'):
                 sub_temp = {}
                 prop = {}
-                sum_ob_name = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='key')
-                sub_title = self.format_sub_embedding_group_name(item['sub_embedding_group'], type='title')
+                sum_ob_name = self.format_sub_embedding_group_name(item['sub_embedding_group'], t='key')
+                sub_title = self.format_sub_embedding_group_name(item['sub_embedding_group'], t='title')
 
                 # handle sub-embedded object that is an array
                 if item.get('is_list'):
@@ -388,7 +389,7 @@ class VariantTableParser(object):
             if is_sub_embedded_object(o):
                 if is_link_to(o):  # add .display_title if we are a linkTo
                     d[self.format_sub_embedding_group_name(o.get('sub_embedding_group')) + '.'
-                      + o[self.NAME_FIELD] + '.display_title'] = val  # XXX: when new mapping table comes in check embedded field
+                      + o[self.NAME_FIELD] + '.display_title'] = val
                 else:
                     d[self.format_sub_embedding_group_name(o.get('sub_embedding_group')) + '.'
                       + o[self.NAME_FIELD]] = val
@@ -587,11 +588,11 @@ class VariantTableParser(object):
             "number_step": "any",
             "order": 18,
             "grouping": "Population Frequency",
-            "ranges": [	
-                { "from": 0, "to": 0, "label": "unobserved" }, 	
-                { "from": 0, "to": 0.001, "label": "ultra-rare" },	
-                { "from": 0.001, "to": 0.01, "label": "rare" },	
-                { "from": 0.01, "to": 1, "label": "common" }	
+            "ranges": [
+                { "from": 0, "to": 0, "label": "unobserved" },
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },
+                { "from": 0.001, "to": 0.01, "label": "rare" },
+                { "from": 0.01, "to": 1, "label": "common" }
             ]
         }
         facs['variant.csq_gnomadg_af_popmax'] = {
@@ -600,11 +601,11 @@ class VariantTableParser(object):
             "number_step": "any",
             "order": 19,
             "grouping": "Population Frequency",
-            "ranges": [	
-                { "from": 0, "to": 0, "label": "unobserved" }, 	
-                { "from": 0, "to": 0.001, "label": "ultra-rare" },	
-                { "from": 0.001, "to": 0.01, "label": "rare" },	
-                { "from": 0.01, "to": 1, "label": "common" }	
+            "ranges": [
+                { "from": 0, "to": 0, "label": "unobserved" },
+                { "from": 0, "to": 0.001, "label": "ultra-rare" },
+                { "from": 0.001, "to": 0.01, "label": "rare" },
+                { "from": 0.01, "to": 1, "label": "common" }
             ]
         }
         facs['variant.csq_phylop100way_vertebrate'] = {
@@ -613,12 +614,12 @@ class VariantTableParser(object):
             "number_step": "any",
             "order": 22,
             "grouping": "Effect Predictors",
-            "ranges": [	
-                { "from": -20, "to": -3, "label": "strong positive selection" },	
-                { "from": -3, "to": -2, "label": "positive selection" },	
-                { "from": -2, "to": 2, "label": "low selection" },	
-                { "from": 2, "to": 3, "label": "conserved" },	
-                { "from": 3, "to": 10, "label": "highly conserved"}	
+            "ranges": [
+                { "from": -20, "to": -3, "label": "strong positive selection" },
+                { "from": -3, "to": -2, "label": "positive selection" },
+                { "from": -2, "to": 2, "label": "low selection" },
+                { "from": 2, "to": 3, "label": "conserved" },
+                { "from": 3, "to": 10, "label": "highly conserved"}
             ]
         }
         facs['FS'] = {
@@ -628,8 +629,8 @@ class VariantTableParser(object):
             "order": 12,
             "grouping": "Variant Quality",
             "ranges": [
-                { "to": 20, "label": "Low Strand Bias (P ≥ 0.01)" },	
-                { "from": 20, "label": "High Strand Bias (P < 0.01)" }	
+                { "to": 20, "label": "Low Strand Bias (P ≥ 0.01)" },
+                { "from": 20, "label": "High Strand Bias (P < 0.01)" }
             ]
         }
         facs['AD_ALT'] = {
@@ -638,11 +639,11 @@ class VariantTableParser(object):
             "number_step": 1,
             "order": 10,
             "grouping": "Variant Quality",
-            "ranges": [	
-                { "from": 1, "to": 4, "label": "Very Low" },	
-                { "from": 5, "to": 9, "label": "Low" },	
-                { "from": 10, "to": 19, "label": "Medium" },	
-                { "from": 20, "label": "High" }	
+            "ranges": [
+                { "from": 1, "to": 4, "label": "Very Low" },
+                { "from": 5, "to": 9, "label": "Low" },
+                { "from": 10, "to": 19, "label": "Medium" },
+                { "from": 20, "label": "High" }
             ]
         }
         facs['novoPP'] = {
@@ -651,9 +652,9 @@ class VariantTableParser(object):
             "number_step": "any",
             "order": 16,
             "grouping": "Genotype",
-            "ranges": [	
-                { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },	
-                { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }	
+            "ranges": [
+                { "from": 0.1, "to": 0.9, "label": "de novo candidate (weak)" },
+                { "from": 0.9, "to": 1, "label": "de novo candidate (strong)" }
             ]
         }
 
@@ -791,7 +792,6 @@ class VariantTableParser(object):
                 "default_hidden": True
             }
         })
-        
 
     @staticmethod
     def extend_variant_sample_facets(facs):
@@ -799,7 +799,7 @@ class VariantTableParser(object):
 
     def generate_variant_sample_schema(self, sample_props, cols, facs, variant_cols, variant_facs):
         """ Builds the variant_sample.json schema based on sample_props. Will also add variant columns and
-            facets since this information is embedded
+            facets since this information is embedded.
 
         Args:
             sample_props: first output of generate_properties
@@ -903,7 +903,7 @@ class VariantTableParser(object):
         """  Builds the variant.json schema based on var_props
 
         Args:
-            sample_props: first output of generate_properties for variant
+            var_props: first output of generate_properties for variant
             cols: second output of generate_properties for variant
             facs: third output of generate_properties for variant
 
@@ -999,16 +999,33 @@ class VariantTableParser(object):
             inserts: annotation field inserts
         """
         inserts = self.process_annotation_field_inserts()
-        variant_sample_props, vs_cols, vs_facs = self.generate_properties(self.filter_fields_by_sample(inserts), variant=False)
-        variant_props, v_cols, v_facs = self.generate_properties(self.filter_fields_by_variant(inserts))
-        variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props, cols=vs_cols, facs=vs_facs,
-                                                                    variant_cols=v_cols, variant_facs=v_facs)
-        variant_schema = self.generate_variant_schema(variant_props, cols=v_cols, facs=v_facs)
+        variant_sample_props, _, _ = self.generate_properties(self.filter_fields_by_sample(inserts), variant=False)
+        variant_props, _, _ = self.generate_properties(self.filter_fields_by_variant(inserts))
+        # as of 3/9/2021, this is now just the 'properties' of the schema
+        # columns/facets are edited directly - they are read in here from the
+        # output location (read in schema/overwrite when done, don't touch columns/facets)
+        new_variant_sample_schema = self.generate_variant_sample_schema(variant_sample_props,
+                                                                        cols={}, facs={}, variant_cols={},
+                                                                        variant_facs={})
+        new_variant_schema = self.generate_variant_schema(variant_props, cols={}, facs={})
         if write:
             if not vs_out or not v_out:
                 raise MappingTableIntakeException('Write specified but no output file given')
-            self.write_schema(variant_sample_schema, vs_out)
-            self.write_schema(variant_schema, v_out)
+
+            # Read/replace columns/facets and update properties
+            # NOTE: This will not function correctly if you wipe the schemas!
+            # Although this isn't ideal, I'm not convinced it's a good use of time to do
+            # the refactoring necessary to pull the column/facet logic out. It's much easier
+            # to just ignore that info.
+            variant_sample_schema = json.load(open(vs_out))
+            new_variant_sample_schema['facets'] = variant_sample_schema['facets']
+            new_variant_sample_schema['columns'] = variant_sample_schema['columns']
+            self.write_schema(new_variant_sample_schema, vs_out)
+
+            variant_schema = json.load(open(v_out))
+            new_variant_schema['facets'] = variant_schema['facets']
+            new_variant_schema['columns'] = variant_schema['columns']
+            self.write_schema(new_variant_schema, v_out)
             logger.info('Successfully wrote schemas')
         if project or institution:
             for insert in inserts:
