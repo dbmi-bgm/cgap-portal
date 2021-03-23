@@ -60,6 +60,7 @@ def groupfinder(login, request):
             return None
 
     elif namespace == 'accesskey':
+
         access_keys = collections.by_item_type['access_key']
         try:
             access_key = access_keys[localname]

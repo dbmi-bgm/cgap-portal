@@ -3,7 +3,7 @@
 # from .workbook_fixtures import app_settings, workbook
 
 # XXX: All need refactor
-# pytestmark = [pytest.mark.working]
+# pytestmark = [pytest.mark.working, pytest.mark.workbook]
 #
 #
 # notice_pytest_fixtures(app_settings, workbook)

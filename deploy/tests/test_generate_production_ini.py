@@ -4,27 +4,31 @@ import os
 import pytest
 import re
 import subprocess
+import typing
 
-from contextlib import contextmanager
 from io import StringIO
 from unittest import mock
 
 from dcicutils.qa_utils import override_environ
-from .. import generate_production_ini
-from ..generate_production_ini import CGAPIniFileManager
+from dcicutils.env_utils import data_set_for_env
+from ..generate_production_ini import ProductionIniFileManager
 
-TEMPLATE_DIR = CGAPIniFileManager.TEMPLATE_DIR
-build_ini_file_from_template = CGAPIniFileManager.build_ini_file_from_template
-build_ini_stream_from_template = CGAPIniFileManager.build_ini_stream_from_template
-any_environment_template_filename = CGAPIniFileManager.any_environment_template_filename
-environment_template_filename = CGAPIniFileManager.environment_template_filename
-template_environment_names = CGAPIniFileManager.template_environment_names
-get_local_git_version = CGAPIniFileManager.get_local_git_version
-get_eb_bundled_version = CGAPIniFileManager.get_eb_bundled_version
-get_app_version = CGAPIniFileManager.get_app_version
-EB_MANIFEST_FILENAME = CGAPIniFileManager.EB_MANIFEST_FILENAME
-PYPROJECT_FILE_NAME = CGAPIniFileManager.PYPROJECT_FILE_NAME
-omittable = CGAPIniFileManager.omittable
+
+pytestmark = [pytest.mark.unit, pytest.mark.working]
+
+
+TEMPLATE_DIR = ProductionIniFileManager.TEMPLATE_DIR
+build_ini_file_from_template = ProductionIniFileManager.build_ini_file_from_template
+build_ini_stream_from_template = ProductionIniFileManager.build_ini_stream_from_template
+any_environment_template_filename = ProductionIniFileManager.any_environment_template_filename
+environment_template_filename = ProductionIniFileManager.environment_template_filename
+template_environment_names = ProductionIniFileManager.template_environment_names
+get_local_git_version = ProductionIniFileManager.get_local_git_version
+get_eb_bundled_version = ProductionIniFileManager.get_eb_bundled_version
+get_app_version = ProductionIniFileManager.get_app_version
+EB_MANIFEST_FILENAME = ProductionIniFileManager.EB_MANIFEST_FILENAME
+PYPROJECT_FILE_NAME = ProductionIniFileManager.PYPROJECT_FILE_NAME
+omittable = ProductionIniFileManager.omittable
 
 # TODO: Maybe this should move to env_utils? If not, at least to a non-test file.
 #       Then again, if we used the "single parameterized ini file" we could side-step that. -kmp 3-Apr-2020
@@ -316,6 +320,14 @@ def test_transitional_equivalence():
 
     def tester(ref_ini, bs_env, data_set, es_server, es_namespace=None, line_checker=None):
 
+        print("tester entered.")
+        print(" ref_ini=", ref_ini)
+        print(" bs_env=", bs_env)
+        print(" data_set=", data_set)
+        print(" es_server=", es_server)
+        print(" es_namespace=", es_namespace)
+        print(" line_checker=", line_checker)
+
         assert ref_ini[:-4] == bs_env[10:]  # "xxx.ini" needs to match "fourfront-xxx"
 
         es_namespace = es_namespace or bs_env
@@ -326,7 +338,8 @@ def test_transitional_equivalence():
         old_output = StringIO()
         new_output = StringIO()
 
-        build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, ref_ini), old_output)
+        build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, ref_ini), old_output,
+                                       bs_env=bs_env, es_server=es_server)
         build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, "any.ini"), new_output,
                                        # data_env and es_namespace are something we should be able to default
                                        bs_env=bs_env, es_server=es_server)
@@ -338,11 +351,11 @@ def test_transitional_equivalence():
         # Test of build_ini_from_template with all 4 keyword arguments explicitly supplied (bs_env, data_set,
         # es_server, es_namespace), none defaulted.
 
-
         old_output = StringIO()
         new_output = StringIO()
 
-        build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, ref_ini), old_output)
+        build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, ref_ini), old_output,
+                                       bs_env=bs_env, data_set=data_set, es_server=es_server, es_namespace=es_namespace)
         build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, "any.ini"), new_output,
                                        bs_env=bs_env, data_set=data_set, es_server=es_server, es_namespace=es_namespace)
 
@@ -364,12 +377,14 @@ def test_transitional_equivalence():
 
             assert problems == [], "Problems found:\n%s" % "\n".join(problems)
 
-    with mock.patch.object(CGAPIniFileManager, "get_app_version", return_value=MOCKED_PROJECT_VERSION):
+        print("tester succeeded.")
+
+    with mock.patch.object(ProductionIniFileManager, "get_app_version", return_value=MOCKED_PROJECT_VERSION):
         with mock.patch("toml.load", return_value={"tool": {"poetry": {"version": MOCKED_LOCAL_GIT_VERSION}}}):
 
             class Checker:
 
-                def __init__(self, expect_indexer="true"):
+                def __init__(self, expect_indexer: typing.Optional[str] = "true"):
                     self.indexer = None
                     self.expect_indexer = expect_indexer
 
@@ -397,19 +412,27 @@ def test_transitional_equivalence():
 
             with override_environ(ENCODED_INDEXER=None):  # Make sure any global settings are masked.
 
-                tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
+                bs_env = "fourfront-cgap"
+                data_set = data_set_for_env(bs_env)
+                tester(ref_ini="cgap.ini", bs_env=bs_env, data_set=data_set,
                        es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80",
                        line_checker=ProdChecker())
 
-                tester(ref_ini="cgapdev.ini", bs_env="fourfront-cgapdev", data_set="test",
+                bs_env = "fourfront-cgapdev"
+                data_set = data_set_for_env(bs_env)
+                tester(ref_ini="cgapdev.ini", bs_env=bs_env, data_set=data_set,
                        es_server="search-fourfront-cgapdev-gnv2sgdngkjbcemdadmaoxcsae.us-east-1.es.amazonaws.com:80",
                        line_checker=Checker())
 
-                tester(ref_ini="cgaptest.ini", bs_env="fourfront-cgaptest", data_set="test",
+                bs_env = "fourfront-cgaptest"
+                data_set = data_set_for_env(bs_env)
+                tester(ref_ini="cgaptest.ini", bs_env=bs_env, data_set=data_set,
                        es_server="search-fourfront-cgaptest-dxiczz2zv7f3nshshvevcvmpmy.us-east-1.es.amazonaws.com:80",
                        line_checker=Checker())
 
-                tester(ref_ini="cgapwolf.ini", bs_env="fourfront-cgapwolf", data_set="test",
+                bs_env = "fourfront-cgapwolf"
+                data_set = data_set_for_env(bs_env)
+                tester(ref_ini="cgapwolf.ini", bs_env=bs_env, data_set=data_set,
                        es_server="search-fourfront-cgapwolf-r5kkbokabymtguuwjzspt2kiqa.us-east-1.es.amazonaws.com:80",
                        line_checker=Checker())
 
