@@ -554,6 +554,18 @@ h3.submission-subtitle {
 
 @mixin statusColorStyles {
 
+	// Blue
+	&[data-status="benign"]:before {						// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: $primary;
+	}
+
+	// Dark Blue
+	&[data-status="likely benign"]:before {					// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: $primary-dark;
+	}
+
 	// Green
 	&[data-status="current"]:before,						// Applicable to Item.status
 	&[data-status="shared"]:before,							// Applicable to Item.status
@@ -561,7 +573,6 @@ h3.submission-subtitle {
 	&[data-status="uploaded"]:before,						// Applicable to File.status
 	&[data-status="public"]:before,							// Applicable to Pages & UserContent
 	&[data-status="complete"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
-	&[data-status="benign"]:before,							// Applicable to ClinVar Clinical Significance
 	&[data-status="protective"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #308756;
@@ -578,8 +589,7 @@ h3.submission-subtitle {
 	&[data-status="in public review"]:before,				// Applicable to Item.status
 	&[data-status="uploading"]:before,						// Applicable to File.status
 	&[data-status="output_files_transferring"]:before,		// Applicable to WorkflowRun.run_status
-	&[data-status="output_file_transfer_finished"]:before,	// Applicable to WorkflowRun.run_status
-	&[data-status="likely benign"]:before {					// Applicable to ClinVar Clinical Significance
+	&[data-status="output_file_transfer_finished"]:before {	// Applicable to WorkflowRun.run_status
 		color: #fff;
 		background-color: #80921c;
 	}
@@ -591,7 +601,6 @@ h3.submission-subtitle {
 	&[data-status="in progress"]:before, 					// Applicable to columnExtensionMap columns
 	&[data-status="incomplete"]:before, 					// Applicable to columnExtensionMap columns
 	&[data-status="uncertain significance"]:before,			// Applicable to ClinVar Clinical Significance
-	&[data-status="VUS"]:before,							// Applicable to SampleVariant Interpretation Classification
 	&[data-status="associaton"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #d8bd22;
@@ -632,6 +641,7 @@ h3.submission-subtitle {
 	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
 	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
 	&[data-status="not provided"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="VUS"]:before,							// Applicable to SampleVariant Interpretation Classification
 	&[data-status="unspecified"]:before {					// Deprecated? Fallback for lack of status in some cases?
 		color: #fff;
 		background-color: #7b7b7b;
