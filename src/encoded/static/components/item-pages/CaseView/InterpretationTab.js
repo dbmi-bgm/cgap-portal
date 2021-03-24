@@ -63,7 +63,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             <div className="flex-auto">
                                 <VariantSampleDisplayTitleColumn result={variant_sample_item} link={vsID} />
                             </div>
-                            <div className="flex-grow-1 d-none d-sm-block">
+                            <div className="flex-grow-1  d-sm-block">
                                 &nbsp;
                             </div>
                             <div className="flex-auto text-secondary text-small" data-tip="Date Selected">
@@ -110,8 +110,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             </label>
                             { dpRenderFunc(variant_sample_item) }
                         </div>
-                        {/* the below is temporarily invisible via 'd-none' */}
-                        <div className="d-none col col-sm-12 col-lg-3 py-2">
+                        <div className="col col-sm-12 col-lg-3 py-2">
                             <label className="mb-04 text-small">Interpretation</label>
                             <div><em>TODO</em></div>
                         </div>
