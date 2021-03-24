@@ -71,7 +71,8 @@
                 "metadata_bundle",
                 "simulated_bundle",
                 "vcf",
-                "genelist"
+                "genelist",
+                "variant_update"
             ]
         },
         "submission_id": {
