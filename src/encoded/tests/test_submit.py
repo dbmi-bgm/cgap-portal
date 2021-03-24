@@ -59,8 +59,8 @@ def row_dict_pedigree():
         'father id': '789',
         'sex': 'M',
         'proband': 'Y',
-        'hpo terms': 'HP:123, HP:999',
-        'mondo terms': 'MONDO:555',
+        'hpo terms': 'HP:0000123, HP:0000999',
+        'mondo terms': 'MONDO:0000555',
         'ancestry': 'European',
         'life status': 'alive and well',
         'deceased': 'N',
@@ -268,6 +268,17 @@ def example_rows_pedigree():
          'pregnancy': 'y', 'gestational age': '25', 'gestational age units': 'week'}
     ]
 
+@pytest.fixture
+def example_rows_pedigree_obj(testapp, example_rows_pedigree, project, institution):
+    return PedigreeMetadata(testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
+
+@pytest.fixture
+def first_family():
+    return {'@graph': [{
+        'aliases': ['encode-project:family-456'],
+        'proband': 'encode-project:individual-456',
+        'members': ['encode-project:individual-456']
+    }]}
 
 @pytest.fixture
 def new_family(child, mother, father):
@@ -601,6 +612,24 @@ class TestPedigreeRow:
         obj = PedigreeRow(row_dict_pedigree, 1, project['name'], institution['name'])
         assert obj.proband == result
 
+    @pytest.mark.parametrize('key, val, is_error', [
+        ('hpo terms', 'HP:123456', True),
+        ('hpo terms', 'HP:0000137', False),
+        ('hpo terms', 'ataxia', True),
+        ('mondo terms', 'mondo:0001230', False),
+        ('mondo terms', 'MONDO:99900', True),
+        ('mondo terms', 'MONDO_0001256', False)
+    ])
+    def test_format_atid(self, row_dict_pedigree, project, institution, key, val, is_error):
+        row_dict_pedigree[key] = val
+        obj = PedigreeRow(row_dict_pedigree, 2, project['name'], institution['name'])
+        assert (obj.errors != []) == is_error
+        if obj.errors:
+            text = ('Row 2 - term {} does not match the format for an '
+                    'HPO or MONDO ontology term.'.format(val))
+            assert text in ''.join(obj.errors)
+
+
 
 class TestPedigreeMetadata:
 
@@ -624,14 +653,39 @@ class TestPedigreeMetadata:
             assert 'is_pregnancy' in list(submission.individuals.values())[1]
             assert list(submission.individuals.values())[1]['is_pregnancy'] == True
 
-    def test_add_family_metadata(self):
+    def test_add_family_metadata(self, testapp, example_rows_pedigree, example_rows_pedigree_obj,
+                                 project, institution):
+        assert len(example_rows_pedigree_obj.families) == 1
+        fam = list(example_rows_pedigree_obj.families.values())[0]
+        assert fam['proband'] == 'encode-project:individual-456'
+        assert len(fam['members']) == len(example_rows_pedigree)
+
+    def test_add_family_metadata_db_single(self, testapp, example_rows_pedigree, project, institution,
+                                           first_family):
+        # family item found  in db
+        # family item has all members and has proband
+        # with mock.patch('webtest.Testapp.get') as mock_get:
+        #     mock_get.return_value = first_family
+        #     submission = PedigreeMetadata(testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
+        #     assert first_family['aliases'][0] in submission.families
         pass
 
-    def test_process_rows(self):
+
+    def test_add_family_metadata_db_multi(self, testapp, example_rows_pedigree, project, institution):
+        # two family items found  in db
+        # family items have all members and have proband
         pass
 
-    def test_json_out(self):
-        pass
+    def test_process_rows(self, example_rows_pedigree_obj):
+        assert len(example_rows_pedigree_obj.families) == 1
+        assert len(example_rows_pedigree_obj.individuals) == 7
+        assert not example_rows_pedigree_obj.errors
+
+    def test_json_out(self, example_rows_pedigree_obj):
+        assert sorted(list(example_rows_pedigree_obj.json_out.keys())) == ['errors', 'family', 'individual']
+        assert not example_rows_pedigree_obj.json_out['errors']
+        assert len(example_rows_pedigree_obj.json_out['family']) == 1
+        assert len(example_rows_pedigree_obj.json_out['individual']) == 7
 
 
 class TestSpreadsheetProcessing:

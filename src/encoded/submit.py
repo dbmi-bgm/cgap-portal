@@ -2,6 +2,7 @@ from copy import deepcopy
 import csv
 import datetime
 import json
+import re
 import xlrd
 
 from dcicutils.lang_utils import n_of
@@ -472,11 +473,23 @@ class PedigreeRow:
             )
         return len(self.errors) > 0
 
-    @staticmethod
-    def reformat_phenotypic_features(feature_list):
+    def format_atid(self, term):
+        """turns HPO or MONDO term IDs into the corresponding @id in the database."""
+        term_id = term.upper().replace('_', ':') if term else ''
+        if re.match(r'^HP:[0-9]{7}$', term_id):
+            return f'/phenotypes/{term_id}/'
+        elif re.match(r'^MONDO:[0-9]{7}$', term_id):
+            return f'/disorders/{term_id}/'
+        else:
+            msg = ('Row {} - term {} does not match the format for an HPO or MONDO '
+                   'ontology term. Please edit and resubmit.'.format(self.row, term))
+            self.errors.append(msg)
+            return term
+
+    def reformat_phenotypic_features(self, feature_list):
         if not feature_list:
             return []
-        return [{'phenotypic_feature': feature} for feature in feature_list]
+        return [{'phenotypic_feature': self.format_atid(feature)} for feature in feature_list if feature]
 
     def extract_individual_metadata(self):
         info = {'aliases': [self.indiv_alias]}
@@ -494,7 +507,7 @@ class PedigreeRow:
         if info.get('phenotypic_features'):
             info['phenotypic_features'] = [item.strip() for item in info['phenotypic_features'].split(',')]
         if info.get('disorders'):
-            info['disorders'] = [item.strip() for item in info['disorders'].split(',')]
+            info['disorders'] = [self.format_atid(item.strip()) for item in info['disorders'].split(',')]
         info['phenotypic_features'] = self.reformat_phenotypic_features(info.get('phenotypic_features', []))
         for col in ['age', 'birth_year', 'age_at_death', 'gestational_age', 'quantity']:
             if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
@@ -808,10 +821,6 @@ class PedigreeMetadata:
         self.families = {}
         self.errors = []
         self.json_out = {}
-        self.itemtype_dict = {
-            'individual': self.individuals,
-            'family': self.families,
-        }
         self.process_rows()
         self.create_json_out()
 
@@ -822,7 +831,7 @@ class PedigreeMetadata:
         already represented in metadata for current SubmissionMetadata instance,
         it is added; if it is represented, missing fields are added to item.
         """
-        previous = self.itemtype_dict[item.itemtype]
+        previous = self.individuals
         prev = [p for p in previous.keys()]
         if item.alias not in prev:
             previous[item.alias] = item.metadata
@@ -873,20 +882,24 @@ class PedigreeMetadata:
             except AttributeError as e:
                 self.errors.append(e)
                 continue
+        print('i')
         self.families = self.add_family_metadata()
 
     def create_json_out(self):
         """
         Creates final json that can be used for subsequent validation function.
         """
-        for key in self.itemtype_dict:
+        itemtype_dict = {
+            'family': self.families,
+            'individual': self.individuals
+        }
+        for key in itemtype_dict:
             self.json_out[key] = {}
-            for alias, metadata in self.itemtype_dict[key].items():
+            for alias, metadata in itemtype_dict[key].items():
                 new_metadata = {k: v for k, v in metadata.items() if v}
                 new_metadata['project'] = self.project_atid
                 new_metadata['institution'] = self.institution_atid
                 self.json_out[key][alias] = new_metadata
-            # self.json_out[key] = self.itemtype_dict[key]
             self.json_out['errors'] = self.errors
 
 
