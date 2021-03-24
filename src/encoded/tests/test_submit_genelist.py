@@ -129,11 +129,11 @@ class TestGeneListSubmission:
         Test for correct parsing of excel-formatted gene list.
         """
         genelist = GeneListSubmission(
-                'src/encoded/tests/data/documents/gene_lists/'
-                'DRR_test-match_gene_list.xlsx',
-                project['@id'],
-                institution['@id'],
-                es_testapp,
+            "src/encoded/tests/data/documents/gene_lists/"
+            "DRR_test-match_gene_list.xlsx",
+            project["@id"],
+            institution["@id"],
+            es_testapp,
         )
         assert len(genelist.gene_ids) == 2
         assert genelist.post_output
@@ -146,11 +146,11 @@ class TestVariantUpdateSubmission:
         and queues associated variant samples for indexing.
         """
         variant_update = VariantUpdateSubmission(
-                'src/encoded/tests/data/documents/'
-                'DRR_test-variant-update.txt',
-                project['@id'],
-                institution['@id'],
-                es_testapp)
+            "src/encoded/tests/data/documents/" "DRR_test-variant-update.txt",
+            project["@id"],
+            institution["@id"],
+            es_testapp,
+        )
         assert len(variant_update.gene_uuids) == 3
         assert len(variant_update.variant_samples) == 1
         assert variant_update.json_post

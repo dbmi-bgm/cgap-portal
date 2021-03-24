@@ -164,20 +164,20 @@ class GeneListSubmission:
             title = title.translate({ord(i): None for i in "'+&!?=%/"}).strip()
         else:
             self.errors.append(
-                    "No title was found in the gene list. Please check the "
-                    "formatting of the submitted document."
+                "No title was found in the gene list. Please check the "
+                "formatting of the submitted document."
             )
         genelist = [x for x in genelist if x != ""]
         if not genelist:
             self.errors.append(
-                    "No genes were found in the gene list. Please check the "
-                    "formatting of the submitted document"
+                "No genes were found in the gene list. Please check the "
+                "formatting of the submitted document"
             )
         genelist = list(set(genelist))
         return genelist, title
 
     @staticmethod
-    def batch_search(item_list, search_term, app, item_type='Gene'):
+    def batch_search(item_list, search_term, app, item_type="Gene"):
         """
         Performs get requests in batches to decrease the number of
         API calls and improve class performance.
@@ -188,13 +188,17 @@ class GeneListSubmission:
         for item in item_list:
             batch.append(item)
             if item == item_list[-1] or len(batch) == 10:
-                batch_string = ('&' + search_term + '=').join(batch)
+                batch_string = ("&" + search_term + "=").join(batch)
                 try:
                     response = app.get(
-                            '/search/?type=' + item_type
-                            + '&' + search_term + '=' + batch_string
+                        "/search/?type="
+                        + item_type
+                        + "&"
+                        + search_term
+                        + "="
+                        + batch_string
                     )
-                    results.append(response.json['@graph'])
+                    results.append(response.json["@graph"])
                 except (VirtualAppError, AppError):
                     pass
                 batch = []
@@ -226,24 +230,24 @@ class GeneListSubmission:
         gene_ensgids = {}
         unmatched_genes_without_options = []
         for gene in self.genes:
-            if re.fullmatch(r'ENSG\d{11}', gene):
+            if re.fullmatch(r"ENSG\d{11}", gene):
                 ensgids.append(gene)
             else:
                 non_ensgids.append(gene)
         if ensgids:
-            ensgid_search = self.batch_search(ensgids, 'ensgid', self.vapp)
+            ensgid_search = self.batch_search(ensgids, "ensgid", self.vapp)
             for response in ensgid_search:
-                if response['gene_symbol'] in gene_ids:
-                    gene_ids[response['gene_symbol']].append(response['uuid'])
-                    gene_ensgids[response['gene_symbol']].append(
-                            response['ensgid']
+                if response["gene_symbol"] in gene_ids:
+                    gene_ids[response["gene_symbol"]].append(response["uuid"])
+                    gene_ensgids[response["gene_symbol"]].append(
+                        response["ensgid"]
                     )
                 else:
-                    gene_ids[response['gene_symbol']] = [response['uuid']]
-                    gene_ensgids[response['gene_symbol']] = [
-                            response['ensgid']
+                    gene_ids[response["gene_symbol"]] = [response["uuid"]]
+                    gene_ensgids[response["gene_symbol"]] = [
+                        response["ensgid"]
                     ]
-                ensgids.remove(response['ensgid'])
+                ensgids.remove(response["ensgid"])
             if ensgids:
                 unmatched_genes_without_options += ensgids
         if non_ensgids:
@@ -262,15 +266,15 @@ class GeneListSubmission:
                 search = self.batch_search(non_ensgids, search_type, self.vapp)
                 for response in search:
                     if (
-                            response['gene_symbol'] in gene_ids
-                            and response['uuid'] not in
-                            gene_ids[response['gene_symbol']]
+                        response["gene_symbol"] in gene_ids
+                        and response["uuid"]
+                        not in gene_ids[response["gene_symbol"]]
                     ):
-                        gene_ids[response['gene_symbol']].append(
-                                response['uuid']
+                        gene_ids[response["gene_symbol"]].append(
+                            response["uuid"]
                         )
-                        gene_ensgids[response['gene_symbol']].append(
-                                response['ensgid']
+                        gene_ensgids[response["gene_symbol"]].append(
+                            response["ensgid"]
                         )
                         responsible_gene = response[search_type]
                         if type(response[search_type]) is list:
@@ -287,15 +291,17 @@ class GeneListSubmission:
                             "gene list, please resubmit and replace "
                             "the gene %s with one of "
                             "the Ensembl IDs above."
-                            % (responsible_gene,
-                                ', '.join(gene_ensgids[responsible_gene]),
-                                responsible_gene)
+                            % (
+                                responsible_gene,
+                                ", ".join(gene_ensgids[responsible_gene]),
+                                responsible_gene,
+                            )
                         )
                         continue
                     else:
-                        gene_ids[response['gene_symbol']] = [response['uuid']]
-                        gene_ensgids[response['gene_symbol']] = [
-                                response['ensgid']
+                        gene_ids[response["gene_symbol"]] = [response["uuid"]]
+                        gene_ensgids[response["gene_symbol"]] = [
+                            response["ensgid"]
                         ]
                     if type(response[search_type]) is str:
                         non_ensgids.remove(response[search_type])
@@ -307,12 +313,10 @@ class GeneListSubmission:
         if non_ensgids:
             for gene in non_ensgids:
                 try:
-                    response = self.vapp.get("/search/?type=Gene&q=" + gene).json[
-                        "@graph"
-                    ]
-                    options = [
-                            option['gene_symbol'] for option in response
-                    ]
+                    response = self.vapp.get(
+                        "/search/?type=Gene&q=" + gene
+                    ).json["@graph"]
+                    options = [option["gene_symbol"] for option in response]
                     self.errors.append(
                         "No perfect match found for gene %s. "
                         "Consider replacing with one of the following: %s."
@@ -345,10 +349,10 @@ class GeneListSubmission:
             return None
         with open(self.filename, "rb") as stream:
             if not self.title:
-                self.title = 'Stand_in_genelist'
+                self.title = "Stand_in_genelist"
             if self.filename.endswith("txt"):
                 attach = {
-                    "download": self.title.replace(' ', '_') + '_genelist.txt',
+                    "download": self.title.replace(" ", "_") + "_genelist.txt",
                     "type": "text/plain",
                     "href": (
                         "data:%s;base64,%s"
@@ -360,7 +364,8 @@ class GeneListSubmission:
                 }
             elif self.filename.endswith("xlsx"):
                 attach = {
-                    "download": self.title.replace(' ', '_') + '_genelist.xlsx',
+                    "download": self.title.replace(" ", "_")
+                    + "_genelist.xlsx",
                     "type": (
                         "application/vnd.openxmlformats-officedocument."
                         "spreadsheetml.sheet"
@@ -474,10 +479,10 @@ class GeneListSubmission:
                 + "&field=display_title&field=uuid"
             ).json["@graph"]
             project_docs = [
-                    x["display_title"].replace('.txt', '').replace('.xlsx', '')
-                    for x in project_documents
+                x["display_title"].replace(".txt", "").replace(".xlsx", "")
+                for x in project_documents
             ]
-            doc_title = self.title.replace(' ', '_') + '_genelist'
+            doc_title = self.title.replace(" ", "_") + "_genelist"
             if doc_title in project_docs:
                 document_idx = project_docs.index(doc_title)
                 document_uuid = project_documents[document_idx]["uuid"]
@@ -490,9 +495,7 @@ class GeneListSubmission:
             )
             validate_result["Document"] = "validated"
         else:
-            self.vapp.post_json(
-                "/Document/?check_only=true", document_json
-            )
+            self.vapp.post_json("/Document/?check_only=true", document_json)
             validate_result["Document"] = "validated"
         if genelist_uuid:
             self.vapp.patch_json(
@@ -504,18 +507,12 @@ class GeneListSubmission:
             )
             validate_result["Gene list"] = "validated"
             validate_result["Title"] = self.title
-            validate_result["Number of genes"] = len(
-                genelist_json["genes"]
-            )
+            validate_result["Number of genes"] = len(genelist_json["genes"])
         else:
-            self.vapp.post_json(
-                "/GeneList/?check_only=true", genelist_json
-            )
+            self.vapp.post_json("/GeneList/?check_only=true", genelist_json)
             validate_result["Gene list"] = "validated"
             validate_result["Title"] = self.title
-            validate_result["Number of genes"] = len(
-                genelist_json["genes"]
-            )
+            validate_result["Number of genes"] = len(genelist_json["genes"])
         if validate_result:
             validate_display = []
             for key in validate_result:
@@ -552,8 +549,7 @@ class GeneListSubmission:
                 "/Document/", document_json
             ).json
         post_result["Document"] = (
-                "posted with uuid "
-                + document_post['@graph'][0]['uuid']
+            "posted with uuid " + document_post["@graph"][0]["uuid"]
         )
         if document_post["status"] == "success":
             genelist_json["source_file"] = document_post["@graph"][0]["@id"]
@@ -568,11 +564,10 @@ class GeneListSubmission:
                 ).json
             else:
                 genelist_post = self.vapp.post_json(
-                        "/GeneList/", genelist_json
+                    "/GeneList/", genelist_json
                 ).json
-            post_result['Gene list'] = (
-                    'posted with uuid '
-                    + genelist_post['@graph'][0]['uuid']
+            post_result["Gene list"] = (
+                "posted with uuid " + genelist_post["@graph"][0]["uuid"]
             )
         post_display = []
         for key in post_result:
@@ -590,50 +585,48 @@ class GeneListSubmission:
         """
         if not self.post_output:
             return
-        creation_post_url = '/IngestionSubmission'
+        creation_post_url = "/IngestionSubmission"
         creation_post_data = {
-                'ingestion_type': 'variant_update',
-                'project': self.project,
-                'institution': self.institution,
-                'processing_status': {
-                    'state': 'submitted'
-                }
+            "ingestion_type": "variant_update",
+            "project": self.project,
+            "institution": self.institution,
+            "processing_status": {"state": "submitted"},
         }
         creation_response = self.vapp.post_json(
-                creation_post_url,
-                creation_post_data,
-                content_type='application/json'
+            creation_post_url,
+            creation_post_data,
+            content_type="application/json",
         ).json
-        submission_id = creation_response['@graph'][0]['@id']
-        submission_post_url = submission_id + 'submit_for_ingestion'
-        submission_post_data = {'validate_only': False}
+        submission_id = creation_response["@graph"][0]["@id"]
+        submission_post_url = submission_id + "submit_for_ingestion"
+        submission_post_data = {"validate_only": False}
         upload_file = [
-                (
-                    'datafile',
-                    self.title.replace(' ', '_') + '_gene_ids',
-                    bytes('\n'.join(self.gene_ids), encoding='utf-8')
-                )
+            (
+                "datafile",
+                self.title.replace(" ", "_") + "_gene_ids",
+                bytes("\n".join(self.gene_ids), encoding="utf-8"),
+            )
         ]
         try:
             submission_response = self.vapp.wrapped_app.post(
-                    submission_post_url,
-                    submission_post_data,
-                    upload_files=upload_file,
-                    content_type='multipart/form-data'
+                submission_post_url,
+                submission_post_data,
+                upload_files=upload_file,
+                content_type="multipart/form-data",
             ).json
         except AttributeError:  # Catch unit test error
             submission_response = self.vapp.post(
-                    submission_post_url,
-                    submission_post_data,
-                    upload_files=upload_file,
-                    content_type='multipart/form-data'
+                submission_post_url,
+                submission_post_data,
+                upload_files=upload_file,
+                content_type="multipart/form-data",
             ).json
-        if submission_response['success']:
-            self.post_output.append('Variants will begin updating shortly')
+        if submission_response["success"]:
+            self.post_output.append("Variants will begin updating shortly")
         else:
             self.post_output.append(
-                    'Variants were not queued for updating. Please reach out '
-                    'to the CGAP team and alert them of this issue.'
+                "Variants were not queued for updating. Please reach out "
+                "to the CGAP team and alert them of this issue."
             )
         return
 
@@ -713,20 +706,18 @@ class VariantUpdateSubmission:
             - List of gene uuids
         """
         gene_uuids = []
-        with open(self.filename, 'r') as genelist_file:
+        with open(self.filename, "r") as genelist_file:
             genelist = genelist_file.readlines()
         for line in genelist:
-            if line.endswith('\n'):
+            if line.endswith("\n"):
                 line = line[:-1]
             gene_uuids.append(line)
         if not gene_uuids:
-            self.errors.append(
-                    'No gene uuids were found in the input file'
-            )
+            self.errors.append("No gene uuids were found in the input file")
         return gene_uuids
 
     @staticmethod
-    def batch_search(item_list, search_term, app, item_type='VariantSample'):
+    def batch_search(item_list, search_term, app, item_type="VariantSample"):
         """
         Performs get requests in batches to decrease the number of
         API calls and improve class performance.
@@ -740,13 +731,17 @@ class VariantUpdateSubmission:
         for item in item_list:
             batch.append(item)
             if item == item_list[-1] or len(batch) == 5:
-                batch_string = ('&' + search_term + '=').join(batch)
+                batch_string = ("&" + search_term + "=").join(batch)
                 try:
                     response = app.get(
-                            '/search/?type=' + item_type
-                            + '&' + search_term + '=' + batch_string
+                        "/search/?type="
+                        + item_type
+                        + "&"
+                        + search_term
+                        + "="
+                        + batch_string
                     )
-                    results.append(response.json['@graph'])
+                    results.append(response.json["@graph"])
                 except VirtualAppError:
                     pass
                 batch = []
@@ -767,15 +762,15 @@ class VariantUpdateSubmission:
         variant_samples_to_index = []
         genes_to_search = list(set(self.gene_uuids))
         variant_sample_search = self.batch_search(
-                genes_to_search,
-                'variant.genes.genes_most_severe_gene.uuid',
-                self.vapp
+            genes_to_search,
+            "variant.genes.genes_most_severe_gene.uuid",
+            self.vapp,
         )
         for variant_sample_response in variant_sample_search:
-            variant_samples_to_index.append(variant_sample_response['uuid'])
+            variant_samples_to_index.append(variant_sample_response["uuid"])
         to_index = list(set(variant_samples_to_index))
         if not to_index:
-            self.errors.append('No variant samples found for the given genes.')
+            self.errors.append("No variant samples found for the given genes.")
         return to_index
 
     def create_post(self):
@@ -808,11 +803,11 @@ class VariantUpdateSubmission:
         )
         if validate_response.json["notification"] == "Success":
             validate_output = (
-                    '%s variant samples were validated for '
-                    're-indexing' % str(len(self.variant_samples))
+                "%s variant samples were validated for "
+                "re-indexing" % str(len(self.variant_samples))
             )
         else:
-            self.errors.append('Validation failed: ' + validate_response.json)
+            self.errors.append("Validation failed: " + validate_response.json)
             validate_output = None
         return validate_output
 
@@ -826,15 +821,13 @@ class VariantUpdateSubmission:
         """
         if not self.validate_output:
             return None
-        post_response = self.vapp.post_json(
-            "/queue_indexing", self.json_post
-        )
+        post_response = self.vapp.post_json("/queue_indexing", self.json_post)
         if post_response.json["notification"] == "Success":
             post_output = (
-                    '%s variant samples were queued for '
-                    're-indexing' % str(len(self.variant_samples))
+                "%s variant samples were queued for "
+                "re-indexing" % str(len(self.variant_samples))
             )
         else:
-            self.errors.append('Posting failed: ' + post_response.json)
+            self.errors.append("Posting failed: " + post_response.json)
             post_output = None
         return post_output
