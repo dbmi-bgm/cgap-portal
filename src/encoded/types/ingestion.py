@@ -192,6 +192,7 @@ class SubmissionFolio:
         for line in lines or ([default] if default else []):
             print(line, file=fp)
 
+
 @collection(
     name='ingestion-submissions',
     # acl=ALLOW_SUBMITTER_VIEW_ACL,
