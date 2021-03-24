@@ -21,7 +21,7 @@ from ..search.search_utils import find_nested_path
 
 
 
-pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search]
+pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search, pytest.mark.workbook]
 
 
 ### IMPORTANT
