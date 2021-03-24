@@ -126,6 +126,7 @@ class TestGeneListSubmission:
 
     def test_excel_format(self, es_testapp, workbook, project, institution):
         """
+        Test for correct parsing of excel-formatted gene list.
         """
         genelist = GeneListSubmission(
                 'src/encoded/tests/data/documents/gene_lists/'
@@ -136,8 +137,23 @@ class TestGeneListSubmission:
         )
         assert len(genelist.gene_ids) == 2
         assert genelist.post_output
-#
-#
-#class TestVariantUpdateSubmission:
-#    def 
-#
+
+
+class TestVariantUpdateSubmission:
+    def test_variant_update(self, es_testapp, workbook, project, institution):
+        """
+        Ensure variant_update ingestion class parses file of input gene uuids
+        and queues associated variant samples for indexing.
+        """
+        variant_update = VariantUpdateSubmission(
+                'src/encoded/tests/data/documents/'
+                'DRR_test-variant-update.txt',
+                project['@id'],
+                institution['@id'],
+                es_testapp)
+        assert len(variant_update.gene_uuids) == 3
+        assert len(variant_update.variant_samples) == 1
+        assert variant_update.json_post
+        assert variant_update.validate_output
+        assert variant_update.post_output
+        assert not variant_update.errors
