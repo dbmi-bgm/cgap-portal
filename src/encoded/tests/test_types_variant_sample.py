@@ -4,7 +4,7 @@ from .variant_fixtures import VARIANT_SAMPLE_URL
 from encoded.types.variant import build_variant_sample_annotation_id
 
 
-pytestmark = [pytest.mark.working, pytest.mark.schema]
+pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.workbook]
 
 
 @pytest.fixture  # NOTE: variant_sample is unused in workbook so this is ok, later on there should be default inserts

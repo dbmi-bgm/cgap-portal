@@ -251,7 +251,13 @@ class SubmissionRow:
                 project, remove_spaces_in_id(row[SS_INDIVIDUAL_ID])
             )
             self.fam_alias = family_alias
-            self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(row[SS_SPECIMEN_ID]))
+            self.sample_alias = '{}:sample-{}-{}'.format(
+                project,
+                remove_spaces_in_id(row[SS_SPECIMEN_ID]),
+                remove_spaces_in_id(row[get_column_name(row, ['workup type', 'test requested'])])
+            )
+            if self.metadata.get('test number'):
+                self.sample_alias = self.sample_alias + '-' + self.metadata['test number']
             self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row[SS_ANALYSIS_ID]))
             self.case_name = remove_spaces_in_id(row.get('unique analysis id'))
             self.individual = self.extract_individual_metadata()
@@ -340,7 +346,9 @@ class SubmissionRow:
         replace_cell_contents(info, 'specimen_accepted', y='Yes', n='No')
         # handle bam sample ID
         if not info.get('bam_sample_id'):
-            info['bam_sample_id'] = info.get('specimen_accession')
+            info['bam_sample_id'] = self.sample_alias.split(':sample-')[-1]
+        if info.get('specimen_type'):
+            info['specimen_type'] = info['specimen_type'].lower().replace('_', ' ')
         # SEO
         if self.metadata.get('second specimen id'):
             other_id = {'id': self.metadata['second specimen id'], 'id_type': self.project}  # add proj info?
@@ -535,9 +543,48 @@ class SubmissionMetadata:
         if item.alias not in prev:
             previous[item.alias] = item.metadata
         else:
-            for key in item.metadata:
+            for key, value in item.metadata.items():
                 if key not in previous[item.alias]:
-                    previous[item.alias][key] = item.metadata[key]
+                    previous[item.alias][key] = value
+                # extend list field (e.g. combine samples in diff rows for Individual item)
+                elif key != 'aliases' and isinstance(value, list):
+                    previous[item.alias][key].extend(value)
+                    # special handling for list of dict rather than list of string
+                    if all(isinstance(item, dict) for item in previous[item.alias][key]):
+                        vals = [item.values() for item in previous[item.alias][key]]
+                        unique = [dict(t) for t in {tuple(d.items()) for d in previous[item.alias][key]}]
+                        # error if fastq file (paired end 2) has conflicting 'paired with' relations
+                        if key == 'related_files' and (all('paired with' in val for val in vals) and
+                                                       len(unique) > 1):
+                            msg = ('Fastq file {} appears multiple times in sheet'
+                                   ' with inconsistent paired file. Please ensure fastq is'
+                                   ' paired with correct file in all rows where it appears.'
+                                   ''.format(item.metadata.get('filename', '')))
+                            self.errors.append(msg)
+                        else:
+                            previous[item.alias][key] = unique
+                    else:
+                        previous[item.alias][key] = list(set(previous[item.alias][key]))
+
+    def check_fastq_paired_info(self):
+        """
+        Makes sure fastq files appearing more than once have consistent paired with
+        information. Specifically, checks that paired end 1 files have consistent
+        pairing info.
+        """
+        paired_info = {}
+        for val in self.files_fastq.values():
+            if 'related_files' in val:
+                for file_dict in val['related_files']:
+                    if file_dict['file'] not in paired_info:
+                        paired_info[file_dict['file']] = val['filename']
+                    elif paired_info[file_dict['file']] != val['filename']:
+                        msg = ('Fastq file {} appears multiple times in sheet'
+                               ' with inconsistent paired file. Please ensure fastq is'
+                               ' paired with correct file in all rows where it appears.'
+                               ''.format(file_dict['file']))
+                        self.errors.append(msg)
+        return
 
     def add_family_metadata(self, idx, family, individual):
         """
@@ -687,6 +734,7 @@ class SubmissionMetadata:
                 simple_add_items.extend(processed_row.files_processed)
                 for item in simple_add_items:
                     self.add_metadata_single_item(item)
+                self.check_fastq_paired_info()
                 self.add_family_metadata(processed_row.row, processed_row.family, processed_row.individual)
                 self.add_sample_processing(processed_row.analysis, processed_row.metadata.get('analysis id'))
                 self.add_case_info(processed_row)
@@ -1024,7 +1072,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
     files = []
     if not json_data_final:
         return output, 'not run', []
-    item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_accession'}
+    item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'bam_sample_id'}
     final_status = {}
     no_errors = True
     if json_data_final.get('post'):

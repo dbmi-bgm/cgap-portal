@@ -195,8 +195,6 @@ def security_tween_factory(handler, registry):
                             # by libs/react-middleware.js which is imported by server.js and compiled into
                             # renderer.js. Is used to get access to User Info on initial web page render.
                             response.headers['X-Request-JWT'] = request.cookies.get('jwtToken', '')
-                            # TODO: Should user_info be copied before the del? If the user info is shared,
-                            #       we are modifying it for other uses. -kmp 24-Jan-2021
                             user_info = request.user_info.copy()  # Re-ified property set in authentication.py
                             # Redundant - don't need this in SSR nor browser as get from X-Request-JWT.
                             del user_info["id_token"]
@@ -211,6 +209,8 @@ def security_tween_factory(handler, registry):
         # Theoretically we mitigate CSRF requests now by grabbing JWT for transactional
         # requests from Authorization header which acts like a CSRF token.
         # See authentication.py - get_jwt()
+
+        # Alex notes that we do not use request.session so this is probably very old. -kmp 4-Mar-2021
 
         # token = request.headers.get('X-CSRF-Token')
         # if token is not None:

@@ -4,7 +4,7 @@ import structlog
 from dcicutils.qa_utils import override_environ
 from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.beanstalk_utils import get_beanstalk_environment_variables
-from deploy.generate_production_ini import CGAPIniFileManager
+from deploy.generate_production_ini import ProductionIniFileManager
 
 
 logger = structlog.getLogger(__name__)
@@ -21,9 +21,9 @@ def build_ini_file(environment, use_prod):
     if is_stg_or_prd_env(environment) and not use_prod:
         raise Exception('Tried to run on production env %s without prod identifier!' % environment)
     beanstalk_env = get_beanstalk_environment_variables(environment)
-    template_file_name = CGAPIniFileManager.environment_template_filename(environment)
+    template_file_name = ProductionIniFileManager.environment_template_filename(environment)
     with override_environ(**beanstalk_env):
-        CGAPIniFileManager.build_ini_file_from_template(template_file_name, 'production.ini')
+        ProductionIniFileManager.build_ini_file_from_template(template_file_name, 'production.ini')
     return True
 
 

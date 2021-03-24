@@ -1,4 +1,5 @@
 # utility functions
+
 import contextlib
 import datetime
 import gzip
@@ -7,7 +8,7 @@ import os
 import pyramid.request
 import tempfile
 
-from dcicutils.misc_utils import check_true
+from dcicutils.misc_utils import check_true, url_path_join
 from io import BytesIO
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden, HTTPServerError
 from snovault import COLLECTIONS, Collection

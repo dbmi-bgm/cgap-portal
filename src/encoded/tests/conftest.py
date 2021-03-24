@@ -6,9 +6,10 @@ http://pyramid.readthedocs.org/en/latest/narr/testing.html
 import datetime as datetime_module
 import logging
 import os
+import pkg_resources
 import pytest
 import webtest
-import pkg_resources
+
 
 from dcicutils.qa_utils import notice_pytest_fixtures
 from pyramid.request import apply_request_extensions
