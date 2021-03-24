@@ -340,7 +340,15 @@ export class InterpretationSpaceWrapper extends React.Component {
         }
     }
 
-    saveToKnowledgeBase(note) {
+    saveToKnowledgeBase(note, stateFieldToUpdate, noteType) {
+        const { interpretation = null } = this.state;
+        console.log("interpretation", interpretation);
+        if (noteType === "note_interpretation" && stateFieldToUpdate === "interpretation") {
+            const clonedNote = _.clone(interpretation);
+            clonedNote.status = "approved";
+            console.log("clonedNote", clonedNote);
+            this.setState({ interpretation: clonedNote });
+        }
         console.log("saveToKB", note);
     }
 
@@ -521,8 +529,8 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     saveStateToKnowledgeBase(){
-        const { saveToKnowledgeBase } = this.props;
-        saveToKnowledgeBase(this.state);
+        const { saveToKnowledgeBase, noteType, saveToField } = this.props;
+        saveToKnowledgeBase(this.state, saveToField, noteType);
     }
 
     render() {
@@ -535,6 +543,7 @@ class GenericInterpretationPanel extends React.Component {
         const noteTextPresent = !!noteText;
         const isDraft = savedNoteStatus === "in review";
         const isCurrent = savedNoteStatus === "current";
+        const isApproved = savedNoteStatus === "approved";
 
         return (
             <div className="interpretation-panel">
@@ -545,9 +554,10 @@ class GenericInterpretationPanel extends React.Component {
                 { noteType === "note_interpretation" ?
                     <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
-                <GenericInterpretationSubmitButton {...{ isCurrent, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
+                <GenericInterpretationSubmitButton {...{ isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
                     saveAsDraft={this.saveStateAsDraft} saveToCase={this.saveStateToCase} saveToKnowledgeBase={this.saveStateToKnowledgeBase}
                 />
+                { noteType === "note_interpretation" && isApproved ? <button type="button" className="btn btn-primary btn-block mt-05">Close &amp; Return to Case</button>: null}
             </div>
         );
     }
@@ -689,6 +699,7 @@ function GenericInterpretationSubmitButton(props) {
     const {
         isCurrent,                  // Has note been submitted to case; only cloning enabled -- can save to KB
         isDraft,                    // Has previous note been saved, but not submitted;
+        isApproved,                 // Has saved to knowledge base
         noteTextPresent,            // Is there text in the note space
         noteChangedSinceLastSave,   // Has the text in the note space changed since last save
         saveAsDraft,                // Fx -- save as Draft
@@ -700,7 +711,7 @@ function GenericInterpretationSubmitButton(props) {
     const allButtonsDropsDisabled = !noteTextPresent || !noteChangedSinceLastSave;
 
     // TODO: Add additional conditions to check for is inKnowledgeBase
-    if (isCurrent || isDraft) {
+    if (isCurrent || isDraft || isApproved) {
         // If current: no saving as draft; already submitted to case -- save to knowledgebase
         // In draft status: allow saving to case, re-saving as draft, but no saving to knowledgebase
         return (
@@ -708,9 +719,9 @@ function GenericInterpretationSubmitButton(props) {
                 <Button variant="primary btn-block" onClick={isCurrent ? saveToKnowledgeBase : saveToCase}
                     // disabled={(!isDraft && allButtonsDropsDisabled) || (!isCurrent && allButtonDrops)}
                 >
-                    { isCurrent ? "Save to Knowledge Base" : "Approve for Case" }
+                    { isCurrent || isApproved  ? "Save to Knowledge Base" : "Approve for Case" }
                 </Button>
-                <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" disabled={allButtonsDropsDisabled} />
+                <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" disabled={allButtonsDropsDisabled || isApproved} />
                 <Dropdown.Menu>
                     { isDraft ? <Dropdown.Item onClick={saveAsDraft} disabled={allButtonsDropsDisabled}>Save as Draft</Dropdown.Item> : null}
                     { isCurrent ? <Dropdown.Item onClick={saveToCase}>Clone to Case</Dropdown.Item> : null}
