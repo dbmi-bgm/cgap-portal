@@ -5,13 +5,13 @@ elasticsearch running as subprocesses.
 """
 import json
 import os
+import pkg_resources
 import pytest
 import re
 import time
 import transaction
 import uuid
 
-from pkg_resources import resource_filename
 from snovault import DBSESSION, TYPES
 from snovault.elasticsearch import create_mapping, ELASTIC_SEARCH
 from snovault.elasticsearch.create_mapping import (
@@ -20,8 +20,8 @@ from snovault.elasticsearch.create_mapping import (
     build_index_record,
     compare_against_existing_mapping
 )
-from snovault.elasticsearch.interfaces import INDEXER_QUEUE
 from snovault.elasticsearch.indexer_utils import get_namespaced_index
+from snovault.elasticsearch.interfaces import INDEXER_QUEUE
 from sqlalchemy import MetaData, func
 from timeit import default_timer as timer
 from unittest import mock
@@ -52,14 +52,16 @@ TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
 def app(es_app_settings, request):
     # for now, don't run with mpindexer. Add `True` to params above to do so
     if request.param:
-        es_app_settings['mpindexer'] = True
+        # we disable the MPIndexer since the build runs on a small machine
+        # snovault should be testing the mpindexer - Will 12/12/2020
+        es_app_settings['mpindexer'] = False
     app = main({}, **es_app_settings)
 
     yield app
 
-    DBSession = app.registry[DBSESSION]
+    db_session = app.registry[DBSESSION]
     # Dispose connections so postgres can tear down.
-    DBSession.bind.pool.dispose()
+    db_session.bind.pool.dispose()
 
 
 @pytest.yield_fixture(autouse=True)
@@ -68,6 +70,7 @@ def setup_and_teardown(app):
     Run create mapping and purge queue before tests and clear out the
     DB tables after the test
     """
+
     # BEFORE THE TEST - run create mapping for tests types and clear queues
     create_mapping.run(app, collections=TEST_COLLECTIONS, skip_indexing=True)
     app.registry[INDEXER_QUEUE].clear_queue()
@@ -144,7 +147,7 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
     item_types = TEST_COLLECTIONS
     # check that mappings and settings are in index
     for item_type in item_types:
-        item_mapping = type_mapping(registry[TYPES], item_type)
+        type_mapping(registry[TYPES], item_type)
         try:
             namespaced_index = get_namespaced_index(app, item_type)
             item_index = es.indices.get(index=namespaced_index)
@@ -161,8 +164,7 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
         assert compare_against_existing_mapping(es, namespaced_index, item_type, item_record, True)
 
 
-def test_file_processed_detailed(app, testapp, indexer_testapp, project,
-                                 institution, file_formats):
+def test_file_processed_detailed(app, testapp, indexer_testapp, project, institution, file_formats):
     # post file_processed
     item = {
         'institution': institution['uuid'],
@@ -173,7 +175,7 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, project,
     }
     fp_res = testapp.post_json('/file_processed', item)
     test_fp_uuid = fp_res.json['@graph'][0]['uuid']
-    res = testapp.post_json('/file_processed', item)
+    testapp.post_json('/file_processed', item)
     indexer_testapp.post_json('/index', {'record': True})
 
     # Todo, input a list of accessions / uuids:
@@ -222,8 +224,7 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, project,
     assert found_rel_sid > found_fp_sid  # sid of related file is greater
 
 
-def test_real_validation_error(app, indexer_testapp, testapp, institution,
-                               project, file_formats):
+def test_real_validation_error(app, indexer_testapp, testapp, institution, project, file_formats):
     """
     Create an item (file-processed) with a validation error and index,
     to ensure that validation errors work
@@ -239,14 +240,15 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution,
         # 'higlass_uid': 1  # validation error -- higlass_uid should be string
     }
     res = testapp.post_json('/files-processed/?validate=false&upgrade=False',
-                                  fp_body, status=201).json
+                            fp_body, status=201).json
     fp_id = res['@graph'][0]['@id']
     val_err_view = testapp.get(fp_id + '@@validation-errors', status=200).json
     assert val_err_view['@id'] == fp_id
     assert val_err_view['validation_errors'] == []
 
-    # call to /index will throw MissingIndexItemException multiple times, since
-    # associated file_format, institution, and project are not indexed. That's okay
+    # call to /index will throw MissingIndexItemException multiple times,
+    # since associated file_format, institution, and project are not indexed.
+    # That's okay if we don't detect that it succeeded, keep trying until it does
     indexer_testapp.post_json('/index', {'record': True})
     time.sleep(2)
     namespaced_fp = get_namespaced_index(app, 'file_processed')
@@ -258,10 +260,11 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution,
     assert val_err_view['validation_errors'] == es_res['_source']['validation_errors']
 
 
+# TODO: This might need to use es_testapp now. -kmp 14-Mar-2021
 @pytest.mark.performance
 @pytest.mark.skip(reason="need to update perf-testing inserts")
 def test_load_and_index_perf_data(testapp, indexer_testapp):
-    '''
+    """
     ~~ CURRENTLY NOT WORKING ~~
 
     PERFORMANCE TESTING
@@ -272,9 +275,9 @@ def test_load_and_index_perf_data(testapp, indexer_testapp):
     nightly through the mastertest_deployment process in the torb repo
     it takes roughly 25 to run.
     Note: run with bin/test -s -m performance to see the prints from the test
-    '''
+    """
 
-    insert_dir = resource_filename('encoded', 'tests/data/perf-testing/')
+    insert_dir = pkg_resources.resource_filename('encoded', 'tests/data/perf-testing/')
     inserts = [f for f in os.listdir(insert_dir) if os.path.isfile(os.path.join(insert_dir, f))]
     json_inserts = {}
 
@@ -306,16 +309,16 @@ def test_load_and_index_perf_data(testapp, indexer_testapp):
     # check a couple random inserts
     for item in test_inserts:
         start = timer()
-        assert testapp.get("/" + item['data']['uuid'] + "?frame=raw").json['uuid']
+        assert testapp.get("/" + item['data']['uuid'] + "?frame=raw").json['uuid']  # noQA
         stop = timer()
         frame_time = stop - start
 
         start = timer()
-        assert testapp.get("/" + item['data']['uuid']).follow().json['uuid']
+        assert testapp.get("/" + item['data']['uuid']).follow().json['uuid']  # noQA
         stop = timer()
         embed_time = stop - start
 
-        print("PERFORMANCE: Time to query item %s - %s raw: %s embed %s" % (item['type_name'], item['data']['uuid'],
+        print("PERFORMANCE: Time to query item %s - %s raw: %s embed %s" % (item['type_name'], item['data']['uuid'],  # noQA
                                                                             frame_time, embed_time))
     # userful for seeing debug messages
     # assert False

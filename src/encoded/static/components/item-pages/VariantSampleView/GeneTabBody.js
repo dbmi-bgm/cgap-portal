@@ -93,88 +93,88 @@ export function GeneTabBody(props){
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.name" className="mb-0" data-tip={getTipForField("name")}>
+                                    <label htmlFor="variant.transcript.csq_gene.name" className="mb-0" data-tip={getTipForField("name")}>
                                         Gene Name:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.name">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.name">
                                     { name }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.gene_symbol" className="mb-0" data-tip={getTipForField("gene_symbol")}>
+                                    <label htmlFor="variant.transcript.csq_gene.gene_symbol" className="mb-0" data-tip={getTipForField("gene_symbol")}>
                                         Symbol:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.gene_symbol">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.gene_symbol">
                                     { gene_symbol }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.todo1" className="mb-0" data-tip={null}>
+                                    <label htmlFor="variant.transcript.csq_gene.todo1" className="mb-0" data-tip={null}>
                                         Gene Location:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.todo1">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.todo1">
                                     { geneLocation }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.gene_biotype" className="mb-0" data-tip={getTipForField("gene_biotype")}>
+                                    <label htmlFor="variant.transcript.csq_gene.gene_biotype" className="mb-0" data-tip={getTipForField("gene_biotype")}>
                                         Gene Type:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.gene_biotype">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.gene_biotype">
                                     { Schemas.Term.toName("gene_biotype", gene_biotype) }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.alias_symbol" className="mb-0" data-tip={null}>
+                                    <label htmlFor="variant.transcript.csq_gene.alias_symbol" className="mb-0" data-tip={null}>
                                         Alias Symbol:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.alias_symbol">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.alias_symbol">
                                     { aliasSymbolRendered }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.prev_symbol" className="mb-0" data-tip={null}>
+                                    <label htmlFor="variant.transcript.csq_gene.prev_symbol" className="mb-0" data-tip={null}>
                                         Previous Symbol:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.prev_symbol">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.prev_symbol">
                                     { prevSymbolRendered }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.todo3" className="mb-0" data-tip={null}>
+                                    <label htmlFor="variant.transcript.csq_gene.todo3" className="mb-0" data-tip={null}>
                                         Alias Names:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.todo3">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.todo3">
                                     { alias_name }
                                 </div>
                             </div>
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-3">
-                                    <label htmlFor="variant.transcript.vep_gene.gene_summary" className="mb-0" data-tip={getTipForField("gene_summary")}>
+                                    <label htmlFor="variant.transcript.csq_gene.gene_summary" className="mb-0" data-tip={getTipForField("gene_summary")}>
                                         Gene Summary:
                                     </label>
                                 </div>
-                                <div className="col-12 col-xl-9" id="variant.transcript.vep_gene.gene_summary">
+                                <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.gene_summary">
                                     { gene_summary }
                                 </div>
                             </div>
@@ -254,52 +254,52 @@ function ConstraintScoresSection({ currentGeneItem, getTipForField }){
                 <tr>
                     <td className="text-600 text-left">Expected</td>
                     <td>
-                        <span data-tip={getTipForField("exp_syn")}>{ exp_syn || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("exp_syn")}>{ falsyZeroCheck(exp_syn, fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("exp_mis")}>{ exp_mis || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("exp_mis")}>{ falsyZeroCheck(exp_mis, fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("exp_lof")}>{ exp_lof || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("exp_lof")}>{ falsyZeroCheck(exp_lof, fallbackNotPresent)}</span>
                     </td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Observed</td>
                     <td>
-                        <span data-tip={getTipForField("obs_syn")}>{ obs_syn || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("obs_syn")}>{ falsyZeroCheck(obs_syn, fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("obs_mis")}>{ obs_mis || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("obs_mis")}>{ falsyZeroCheck(obs_mis, fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("obs_lof")}>{ obs_lof || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("obs_lof")}>{ falsyZeroCheck(obs_lof, fallbackNotPresent)}</span>
                     </td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">O/E (range)</td>
                     <td>
-                        <span data-tip={getTipForField("oe_syn")}>{ shortenToSignificantDigits(oe_syn) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("oe_syn")}>{ falsyZeroCheck(shortenToSignificantDigits(oe_syn), fallbackNotPresent)}</span>
                         { oe_syn_lower !== null && oe_syn_upper !== null ? ` (${oe_syn_lower} - ${oe_syn_upper})` : null }
                     </td>
                     <td>
-                        <span data-tip={getTipForField("oe_mis")}>{ shortenToSignificantDigits(oe_mis) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("oe_mis")}>{ falsyZeroCheck(shortenToSignificantDigits(oe_mis), fallbackNotPresent)}</span>
                         { oe_mis_lower !== null && oe_mis_upper !== null ? ` (${oe_mis_lower} - ${oe_mis_upper})` : null }
                     </td>
                     <td>
-                        <span data-tip={getTipForField("oe_lof")}>{ shortenToSignificantDigits(oe_lof) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("oe_lof")}>{ falsyZeroCheck(shortenToSignificantDigits(oe_lof), fallbackNotPresent)}</span>
                         { oe_lof_lower !== null && oe_lof_upper !== null ? ` (${oe_lof_lower} - ${oe_lof_upper})` : null }
                     </td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Z-score</td>
                     <td>
-                        <span data-tip={getTipForField("syn_z")}>{ shortenToSignificantDigits(syn_z) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("syn_z")}>{ falsyZeroCheck(shortenToSignificantDigits(syn_z), fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("mis_z")}>{ shortenToSignificantDigits(mis_z) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("mis_z")}>{ falsyZeroCheck(shortenToSignificantDigits(mis_z), fallbackNotPresent)}</span>
                     </td>
                     <td>
-                        <span data-tip={getTipForField("lof_z")}>{ shortenToSignificantDigits(lof_z) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("lof_z")}>{ falsyZeroCheck(shortenToSignificantDigits(lof_z), fallbackNotPresent)}</span>
                     </td>
                 </tr>
                 <tr>
@@ -307,28 +307,38 @@ function ConstraintScoresSection({ currentGeneItem, getTipForField }){
                     <td>{ fallbackNotImplemented }</td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
-                        <span data-tip={getTipForField("oe_lof_upper")}>{ oe_lof_upper || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("oe_lof_upper")}>{ falsyZeroCheck(oe_lof_upper, fallbackNotPresent)}</span>
                     </td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">S-Het</td>
                     <td>{ fallbackNotImplemented }</td>
-                    <td>
-                        <span data-tip={getTipForField("s_het")}>{ shortenToSignificantDigits(s_het) || fallbackNotPresent }</span>
-                    </td>
                     <td>{ fallbackNotImplemented }</td>
+                    <td>
+                        <span data-tip={getTipForField("s_het")}>{ falsyZeroCheck(shortenToSignificantDigits(s_het), fallbackNotPresent)}</span>
+                    </td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">RVIS (ExAC)</td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
-                        <span data-tip={getTipForField("rvis_exac")}>{ shortenToSignificantDigits(rvis_exac) || fallbackNotPresent }</span>
+                        <span data-tip={getTipForField("rvis_exac")}>{ falsyZeroCheck(shortenToSignificantDigits(rvis_exac), fallbackNotPresent)}</span>
                     </td>
                     <td>{ fallbackNotImplemented }</td>
                 </tr>
             </tbody>
         </table>
     );
+}
+
+/**
+ * Takes in a potentially falsy (0) string or number value and if actually not present, returns fallback
+ */
+function falsyZeroCheck(value, fallback) {
+    if (value || value === "0" || value === 0) {
+        return value;
+    }
+    return fallback;
 }
 
 /**

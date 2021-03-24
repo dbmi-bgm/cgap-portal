@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import { layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -8,18 +8,19 @@ import { UserRegistrationModal } from './UserRegistrationModal';
 
 
 export const LoginNavItem = React.memo(function LoginNavItem(props){
-    const { id =  "loginbtn", isRegistrationModalVisible, showLock, isLoading } = props;
-    const onClick = useMemo(function(){
-        return function(e){
-            // Prevent setting URL to '#' as might cause navigation away from tab.
-            e.preventDefault();
-            showLock();
-            return false;
-        };
+    const { id = "loginbtn", unverifiedUserEmail, showLock, isLoading, isAuth0LibraryLoaded = true } = props;
+    const onClick = useCallback(function(e){
+        // Prevent setting URL to '#' as might cause navigation away from tab.
+        // `useCallback(fn, deps)` is equivalent to `useMemo(() => fn, deps)`
+        // See https://reactjs.org/docs/hooks-reference.html#usecallback
+        e.preventDefault();
+        showLock();
+        return false;
     }, [ showLock ]);
     return (
         <React.Fragment>
-            <a role="button" href="#" key="login-reg-btn" active={isRegistrationModalVisible} onClick={onClick} className="nav-link user-account-item" id={id}>
+            <a role="button" href="#" className="nav-link user-account-item" id={id}
+                active={!!(unverifiedUserEmail)} onClick={onClick} disabled={!isAuth0LibraryLoaded}>
                 { isLoading ? (
                     <span className="pull-right">
                         <i className="account-icon icon icon-spin icon-circle-notch fas align-middle"/>
@@ -32,7 +33,7 @@ export const LoginNavItem = React.memo(function LoginNavItem(props){
                     </React.Fragment>
                 )}
             </a>
-            { isRegistrationModalVisible ? <UserRegistrationModal {...props} /> : null }
+            { unverifiedUserEmail ? <UserRegistrationModal {...props} /> : null }
         </React.Fragment>
     );
 });

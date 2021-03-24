@@ -40,4 +40,4 @@ else
     echo "NOTE: Using existing TRAVIS_JOB_ID."
 fi
 
-python $(dirname $0)/test.py "$@"
+poetry run python $(dirname $0)/test.py "$@"

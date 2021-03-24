@@ -895,7 +895,7 @@ i.status-indicator-dot {
 /** JSON Tree Wrapper (e.g. fallback view) **/
 
 .json-tree-wrapper {
-	border-radius: $border-radius-large;
+	border-radius: $border-radius-lg;
 	overflow: hidden;
 	> ul {
 		padding: 8px 16px 16px !important;
@@ -1712,7 +1712,8 @@ $download-button-width : 100px;
 
 
 /**********************************************************
-			Processing Summary Table (CaseView > Bioinfo Tab)
+	Processing Summary Table (CaseView > Bioinfo Tab)
+	Move into own file?
 **********************************************************/
 
 .item-page-container {
@@ -1896,7 +1897,7 @@ $download-button-width : 100px;
 				display: flex;
 				justify-content: space-evenly;
 
-				@include media-breakpoint-down(sm) {
+				@include media-breakpoint-down(md) {
 					flex-direction: column;
 				}
 
@@ -1905,7 +1906,7 @@ $download-button-width : 100px;
 					display: flex;
 					height: $search-results-header-row-height; // Eh why not re-use this, can change always in future.
 
-					@include media-breakpoint-down(sm) {
+					@include media-breakpoint-down(md) {
 						margin-bottom: 5px;
 					}
 					
@@ -1956,12 +1957,12 @@ $download-button-width : 100px;
 							}
 						}
 
-						@include media-breakpoint-down(sm) {
+						@include media-breakpoint-down(md) {
 							display: none;
 						}
 					}
 
-					@include media-breakpoint-up(md) {
+					@include media-breakpoint-up(lg) {
 
 						&:first-child {
 							> .btn-prepend {
@@ -2037,6 +2038,8 @@ $download-button-width : 100px;
 			}
 
 			h1 {
+				/* todo: consider using an h2 instead, as is 2.1rem by default (close to the 2rem set here) and */
+				/* possibly more semantically accurate (i.e. is a section title, not page title) (subjective) */
 				font-size: 2rem;
 				margin-bottom: 20px;
 				font-weight: 500;
@@ -2060,33 +2063,18 @@ $download-button-width : 100px;
 				font-weight: 400;
 			}
 
-			.embedded-search-view-outer-container {
-				// background-color: #ffffff;
-				.facets-container {
-					background: #ffffff;
-				}
-			}
-
 			.tab-inner-container {
-				background-color: #ffffff;
 				margin-bottom: 20px;
-				padding: 20px;
-				border-radius: $border-radius-large;
-				box-shadow: 0 1px 5px #0002;
-				border-color: #d6d6d6;
 
 				&.qc-status {
 					font-size: 19px;
 				}
 
-				h2.section-header {
+				.card-header.section-header {
 					background-color: $primary-dark;
-					width: calc( 100% + 40px);
-					padding: 10px 10px 10px 20px;
 					color: #ffff;
-					margin-left: -20px;
-					margin-right: -40px;
-					margin-top: -20px;
+					font-weight: 400;
+					margin: 0; /* overrides the default `margin: 10px 0` of header (h1, h2, ..) elems */
 				}
 
 				.processing-summary-table {
@@ -2127,8 +2115,8 @@ $download-button-width : 100px;
 					}
 				}
 
-				.row.qc-summary {
-					padding: 2px 0;
+				.row.qc-summary:not(:last-child) {
+					padding-bottom: 5px;
 				}
 
 				.processing-summary-table-container {
@@ -2275,6 +2263,224 @@ $download-button-width : 100px;
 			}
 		}
 
+	}
+
+}
+
+
+/**********************************************************
+	CaseView -> FilterSetUI
+	N.B. Some of the dimensions, i.e. padding top of ampersand,
+	are dependent on font-size/face that we use.
+**********************************************************/
+
+@mixin clickable-hoverable-icon {
+	opacity: 0.5;
+	&:hover {
+		opacity: 1;
+	}
+	&.disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+	}
+}
+
+
+.filterset-outer-container {
+	// TODO CHANGE
+	// border: 1px solid #999;
+	/* background-color: desaturate(lighten($primary-dark, 45%), 30%); */ // #b4c8d8; // $gray-300;
+	background-color: #dedede;
+	border-radius: $border-radius-lg;
+	border: 4px solid transparent;
+	transition: background-color .5s ease-out;
+
+	h4 i.icon.clickable {
+		@include clickable-hoverable-icon;
+	}
+
+	
+
+	.filter-set-ui-header {
+		/** Header **/
+		/** Margins are negatively offset from parent elem's border - tho maybe dif layouting in future to be adopted **/
+		margin: -4px;
+		background-color: $primary-dark;
+		h4 {
+			color: #fff;
+		}
+	}
+
+	&[data-is-open="false"] {
+		.filter-set-ui-header {
+			/* Appear more as button when closed */
+			/* Same as parent .filterset-outer-container above */
+			border-radius: inherit;
+		}
+	}
+
+	.blocks-container {
+
+		.filterset-block {
+			border-radius: $border-radius-lg;
+			border: 1px solid #8e8e8e;
+			padding: 2px;
+
+			background-color: #f1f1f1;
+			/* background-color: desaturate(lighten($primary, 50%), 15%); */ // #dce4f5; // TODO: Codify somewhere
+			
+			// border-color: desaturate(lighten($primary-dark, 40%), 25%); /* Same as .filterset-outer-container background-color */
+			// margin: 0 -3px; /* Subtract border-width to align left + right unselected edges properly w. other UI elements */
+			/* transition: border-color .5s, background-color .5s; */
+
+			transition: background-color .5s ease-out;
+
+
+			/* box-shadow: 0 1px 6px -3px black; */
+
+			&.selected {
+				border-width: 3px;
+				padding: 0px;
+				border-radius: $border-radius-lg + 2px;
+				border-color: $primary-dark;
+				background-color: lighten($primary, 50%);
+				&.clickable:hover {
+					@include user-select(none);
+					// background-color: desaturate(lighten($primary, 50%), 15%);
+					// transition: none;
+				}
+			}
+
+			&.clickable:not(.selected):hover {
+				// background-color: lighten($primary, 45%);
+				border-width: 2px;
+				padding: 1px;
+				border-radius: $border-radius-lg + 1px;
+				border-color: $primary-dark;
+				transition: none;
+			}
+
+
+			&[data-duplicate-query="true"] {
+				background-color: desaturate(lighten($danger, 45%), 10%);
+				&.selected {
+					border-color: desaturate(lighten($danger, 10%), 20%);
+				}
+			}
+
+			.title-controls-row {
+
+				i.icon.clickable {
+					@include clickable-hoverable-icon;
+				}
+
+				.cached-counts-value {
+					height: 24px;
+					line-height: 20px;
+					min-width: 24px;
+					border: 2px solid transparent;
+					padding: 0 3px;
+					text-align: center;
+					font-size: 0.75em;
+					border-radius: 50%;
+					&[data-count-exists="true"] {
+						border-color: #0005;
+					}
+				}
+
+			}
+
+			.filter-query-viz-blocks {
+				
+				.field-block {
+					position: relative;
+
+					.value-blocks {
+						.value-block {
+							border-radius: 25px;
+							padding: 5px 10px;
+							background-color: #fff;
+							position: relative;
+							/* box-shadow: 0 2px 8px -3px #000; */
+							white-space: nowrap;
+							margin: 3px 0;
+							flex-grow: 1;
+							text-align: center;
+							&:not(:last-child) {
+								margin-right: 7px;
+								&:after {
+									content: "";
+									height: 16px;
+									top: 10px;
+									top: calc(50% - 8px);
+									border-right: 1px solid $gray-700;
+									//transform: scale3d(0.75, 0.75, 0.75);
+									right: -4px;
+									position: absolute;
+								}
+							}
+						}
+					}
+
+					.field-name {
+						position: relative;
+						padding-top: 5px;
+						font-size: .925em;
+						&:before {
+							content: " ";
+							position: absolute;
+							top: -2px;
+							height: 5px;
+							border: 1px solid #444;
+							left: -4px;
+							right: -4px;
+							border-top: none;
+						}
+					}
+
+					&:not(:last-child) {
+						margin-right: 15px;
+						&:after {
+							content: "&";
+							transform: scale3d(0.75, 0.75, 0.75);
+							right: -12px;
+							top: 10px;
+							top: calc(50% - 24px);
+							position: absolute;
+						}
+
+					}
+
+				}
+			}
+
+		}
+
+	}
+
+	&[data-all-selected="true"] {
+		border-color: $primary-dark;
+		background-color: desaturate(lighten($primary-dark, 40%), 25%);
+		.blocks-container {
+
+		 	.filterset-block.selected {
+		 		border-width: 1px;
+				padding: 2px;
+				border-radius: $border-radius-lg;
+				border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+			}
+
+			&:hover {
+				.filterset-block.clickable.selected {
+					&:hover {
+						border-width: 2px;
+						padding: 1px;
+						border-radius: $border-radius-lg + 1px;
+						border-color: $primary-dark;
+					}
+				}
+			}
+		}
 	}
 
 }
@@ -2454,28 +2660,32 @@ $download-button-width : 100px;
 
 	}
 
-	/** Dropdown for selecting diseases/features -- CGAP-specific **/
+	/** DetailPane Legend Body for selecting diseases/features -- CGAP-specific **/
 
-	.tabview-title-controls-container {
+	.detail-pane-container {
 		.disease-option {
-			padding: 1px 10px;
 			display: flex;
 			align-items: center;
+
 			.checkbox-with-label {
 				flex: 1;
 				> label {
 					cursor: pointer;
+					> input {
+						// Override default mr-08
+						margin-right: 16px !important;
+					}
 				}
 			}
 			.disease-color-patch {
-				height: 16px;
-				width: 16px;
+				height: 20px;
+				width: 20px;
+				line-height: 20px;
 				border-radius: 50%;
 				transition: background-color .3s;
 				text-align: center;
-				line-height: 1;
 				> span {
-					font-size: 0.675rem;
+					font-size: 0.75rem;
 					font-weight: 600;
 					top: -2px;
 					position: relative;
@@ -2582,8 +2792,6 @@ $download-button-width : 100px;
 					color: #fff8;
 				}
 				&[data-active="true"] {
-					// background-color: $primary-dark;
-					// color: #fff;
 					@extend .card;
 					color: $primary-dark;
 					display: initial;

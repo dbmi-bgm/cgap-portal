@@ -4,23 +4,52 @@
     "id": "/profiles/workflow_run.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["workflow", "project", "institution"],
-    "additionalProperties": false,
-    "identifyingProperties": ["uuid", "aliases"],
-    "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/documents" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/static_embeds" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/modified" }
+    "required": [
+        "workflow",
+        "project",
+        "institution"
     ],
-    "mixinFacets" : [
-        { "$ref": "mixins.json#/facets_common" }
+    "additionalProperties": false,
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/documents"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        }
+    ],
+    "mixinFacets": [
+        {
+            "$ref": "mixins.json#/facets_common"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -39,14 +68,16 @@
         "metadata_only": {
             "title": "File Provenance Graph",
             "description": "When True the file provenance graph was generated without a run of a 4dn-dcic pipeline.",
-		        "type": "boolean",
-			      "default": false
+            "type": "boolean",
+            "default": false
         },
         "description_only": {
             "title": "File Provenance Graph",
             "description": "When True the file provenance graph was generated without a run of a 4dn-dcic pipeline.",
             "type": "boolean",
-            "exclude_from": ["FFedit-create"]
+            "exclude_from": [
+                "FFedit-create"
+            ]
         },
         "input_files": {
             "title": "Input files",
@@ -178,7 +209,7 @@
             "title": "Run Status",
             "type": "string",
             "default": "started",
-            "enum" : [
+            "enum": [
                 "started",
                 "running",
                 "output_files_transferring",
@@ -217,42 +248,42 @@
             }
         }
     },
-    "facets" : {
+    "facets": {
         "workflow.title": {
             "title": "Workflow"
         },
         "run_status": {
             "title": "Run Status"
         },
-        "input_files.value.file_format.display_title" : {
-            "title" : "File Format (Input)"
+        "input_files.value.file_format.display_title": {
+            "title": "File Format (Input)"
         },
-        "output_files.value.file_format.display_title" : {
-            "title" : "File Format (Output)"
+        "output_files.value.file_format.display_title": {
+            "title": "File Format (Output)"
         }
     },
-    "columns" : {
-        "workflow.title" : {
-            "title" : "Workflow"
+    "columns": {
+        "workflow.title": {
+            "title": "Workflow"
         },
         "workflow.category": {
             "title": "Workflow Category",
             "colTitle": "Category",
-            "default_hidden" : true
+            "default_hidden": true
         },
         "workflow.experiment_types": {
             "title": "Experiment Types",
-            "comment" : "TODO: Update to `workflow.experiment_types.display_title` once becomes a linkTo"
+            "comment": "TODO: Update to `workflow.experiment_types.display_title` once becomes a linkTo"
         },
         "workflow.app_name": {
             "title": "Application Name",
-            "colTitle" : "App Name",
-            "default_hidden" : true
+            "colTitle": "App Name",
+            "default_hidden": true
         },
         "run_platform": {
             "title": "Run Platform",
             "colTitle": "Platform",
-            "default_hidden" : true
+            "default_hidden": true
         }
     }
 }

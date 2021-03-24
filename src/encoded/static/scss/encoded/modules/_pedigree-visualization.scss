@@ -1,4 +1,5 @@
-$pedigree-viz-bg-color: #ffffff !default;
+$pedigree-viz-bg-color: #f8f8f8 !default;
+$pedigree-viz-node-bg-color: #fff !default;
 $pedigree-viz-node-stroke-color: #444 !default;
 
 
@@ -316,7 +317,7 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
 
             .bg-shape-copy {
                 stroke-width: 0px;
-                fill: $pedigree-viz-bg-color;
+                fill: $pedigree-viz-node-bg-color;
             }
 
             .fg-shape {
@@ -364,7 +365,8 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
 
             g.text-box {
                 // Could be above or below node
-                transition: transform .25s linear;
+                transition: transform .25s linear, opacity .3s ease-out;
+                opacity: 1;
                 rect.bg-rect {
                     stroke: none;
                     fill: transparentize($pedigree-viz-bg-color, 0.25);
@@ -435,3 +437,23 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
     }
 }
 
+
+svg.pedigree-viz-shapes-layer.shapes-layer[data-is-node-selected="true"]:not([data-is-node-hovered-over="true"]) {
+    > .individuals-bg-shape-layer {
+        > g.pedigree-individual-shape:not(.is-selected):not(.is-hovered-over) {
+            g.text-box {
+                opacity: 0.6;
+            }
+        }
+    }
+}
+
+svg.pedigree-viz-shapes-layer.shapes-layer[data-is-node-hovered-over="true"] {
+    > .individuals-bg-shape-layer {
+        > g.pedigree-individual-shape:not(.is-hovered-over) {
+            g.text-box {
+                opacity: 0.15;
+            }
+        }
+    }
+}

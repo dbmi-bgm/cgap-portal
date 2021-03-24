@@ -1,10 +1,9 @@
 import pytest
 import time
-from .workbook_fixtures import app, workbook
 from ..commands.purge_item_type import purge_item_type_from_storage
 
 
-pytestmark = [pytest.mark.broken]
+pytestmark = [pytest.mark.broken, pytest.mark.workbook]
 
 
 @pytest.fixture

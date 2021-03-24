@@ -1,19 +1,24 @@
 import boto3
 import botocore.exceptions
+import contextlib
 import datetime as datetime_module
-import io
 import json
 import os
+import pytest
 import pytz
 import webtest
 
 from dcicutils import qa_utils
-from dcicutils.qa_utils import ignored, ControlledTime, MockFileSystem
-from dcicutils.lang_utils import n_of
+from dcicutils.misc_utils import constantly, file_contents
+from dcicutils.qa_utils import ignored, ControlledTime, MockBotoS3Client
 from unittest import mock
-from .data import TEST_PROJECT, DBMI_INSTITUTION, METADATA_BUNDLE_PATH
+from .data import DBMI_PROJECT_ID, DBMI_PROJECT, DBMI_INSTITUTION_ID, DBMI_INSTITUTION, METADATA_BUNDLE_PATH, DBMI_PI
 from .. import ingestion_listener as ingestion_listener_module
 from ..types import ingestion as ingestion_module
+from .helpers import assure_related_items_for_testing
+
+
+pytestmark = [pytest.mark.indexing, pytest.mark.working]
 
 
 SUBMIT_FOR_INGESTION = "/submit_for_ingestion"
@@ -25,28 +30,6 @@ def expect_unreachable_in_mock(function_name):
         raise AssertionError("The function %s should not have been called. Its caller should have been mocked."
                              % function_name)
     return fn
-
-
-def constantly(value):
-    def fn(*args, **kwargs):
-        ignored(args, kwargs)
-        return value
-    return fn
-
-
-class FakeGuid:
-
-    def __init__(self):
-        self.counter = 0
-
-    def fake_guid(self):
-        self.counter += 1
-        return self.format_fake_guid(self.counter)
-
-    @classmethod
-    def format_fake_guid(cls, n):
-        digits = str(n).rjust(10, '0')
-        return "%s-%s-%s" % (digits[0:3], digits[3:7], digits[7:10])
 
 
 class MockQueueManager:
@@ -61,70 +44,28 @@ class MockQueueManager:
         return uuids, []
 
 
-class MockSubmissionFolioClass:
+@contextlib.contextmanager
+def authorized_ingestion_simulation(mocked_queue_manager, mocked_s3_client, test_pseudoenv, fake_tester_email, dt):
 
-    EXPECTED_INGESTION_TYPE = 'metadata_bundle'
-    EXPECTED_INSTITUTION = DBMI_INSTITUTION
-    EXPECTED_PROJECT = TEST_PROJECT
+    def mocked_get_trusted_email(request, context, raise_errors):
+        assert context is "Submission"
+        assert raise_errors is False
+        if request.remote_user == 'TEST':
+            return fake_tester_email
+        else:
+            return None
 
-    def __init__(self):
-        self.guid_factory = FakeGuid()
-        self.items_created = []
-
-    def create_item(self, request, ingestion_type, institution, project):
-        # This is ordinarily a class method, but an instance of this class will be used as a class stand-in
-        # so this is an instance method.
-        ignored(request)
-        assert ingestion_type == self.EXPECTED_INGESTION_TYPE
-        assert institution == self.EXPECTED_INSTITUTION
-        assert project == self.EXPECTED_PROJECT
-        guid = self.guid_factory.fake_guid()
-        self.items_created.append(guid)
-        return guid
-
-    @classmethod
-    def make_submission_uri(cls, submission_id):
-        return "/ingestion-submissions/" + submission_id
-
-
-class MockBotoS3Client:
-
-    def __init__(self):
-        self.s3_files = MockFileSystem()
-
-    def upload_fileobj(self, input_file_stream, Bucket, Key):  # noqa - Uppercase argument names are chosen by AWS
-        data = input_file_stream.read()
-        print("Uploading %s (%s) to bucket %s key %s"
-              % (input_file_stream, n_of(len(data), "byte"), Bucket, Key))
-        with self.s3_files.open(os.path.join(Bucket, Key), 'wb') as fp:
-            fp.write(data)
-
-
-def test_submit_for_ingestion_anon_rejected(anontestapp):
-
-    post_files = [("datafile", METADATA_BUNDLE_PATH)]
-
-    post_data = {
-        'ingestion_type': 'metadata_bundle',
-        'institution': DBMI_INSTITUTION,
-        'project': TEST_PROJECT,
-        'validate_only': True,
-    }
-
-    response = anontestapp.post_json(
-        SUBMIT_FOR_INGESTION,
-        post_data,
-        upload_files=post_files,
-        content_type='multipart/form-data',
-        status=403  # Forbidden
-    )
-
-    assert response.status_code == 403
-
-
-def file_contents(filename, binary=False):
-    with io.open(filename, 'rb' if binary else 'r') as fp:
-        return fp.read()
+    with mock.patch.object(ingestion_listener_module, "get_trusted_email", mocked_get_trusted_email):
+        with mock.patch.object(datetime_module, "datetime", dt):
+            with mock.patch.object(ingestion_listener_module, "beanstalk_env_from_request",
+                                   return_value=test_pseudoenv):
+                with mock.patch.object(qa_utils, "FILE_SYSTEM_VERBOSE", False):  # This should be a parameter but isn't
+                    with mock.patch.object(boto3, "client", constantly(mocked_s3_client)):
+                        with mock.patch.object(ingestion_listener_module, "get_queue_manager",
+                                               constantly(mocked_queue_manager)):
+                            with mock.patch.object(ingestion_module, "subrequest_item_creation",
+                                                   expect_unreachable_in_mock("subrequest_item_creation")):
+                                yield
 
 
 def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_status=200):
@@ -136,110 +77,107 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
 
     dt = ControlledTimeWithFix()
 
-    ingestion_type = 'metadata_bundle'
-
     mocked_queue_manager = MockQueueManager(expected_ingestion_type='metadata_bundle')
-
-    post_files = [("datafile", METADATA_BUNDLE_PATH)]
-
-    post_data = {
-        'ingestion_type': ingestion_type,
-        'institution': DBMI_INSTITUTION,
-        'project': TEST_PROJECT,
-        'validate_only': True,
-    }
-
-    fake_tester_email = "test@cgap.hms.harvard.edu"
-
-    def mocked_get_trusted_email(request, context, raise_errors):
-        assert context is "Submission"
-        assert raise_errors is False
-        if request.remote_user == 'TEST':
-            return fake_tester_email
-        else:
-            return None
 
     test_pseudoenv = "fourfront-cgaplocal-test"
 
-    with mock.patch.object(ingestion_listener_module, "get_trusted_email", mocked_get_trusted_email):
-        with mock.patch.object(datetime_module, "datetime", dt):
-            with mock.patch.object(ingestion_listener_module, "beanstalk_env_from_request",
-                                   return_value=test_pseudoenv):
-                with mock.patch.object(qa_utils, "FILE_SYSTEM_VERBOSE", False):  # This should be a parameter but isn't
-                    mock_submission_folio_class = MockSubmissionFolioClass()
-                    with mock.patch.object(ingestion_listener_module, "SubmissionFolio", mock_submission_folio_class):
-                        with mock.patch.object(boto3, "client", constantly(mocked_s3_client)):
-                            with mock.patch.object(ingestion_listener_module, "get_queue_manager",
-                                                   constantly(mocked_queue_manager)):
-                                with mock.patch.object(ingestion_module, "subrequest_item_creation",
-                                                       expect_unreachable_in_mock("subrequest_item_creation")):
+    fake_tester_email = "test@cgap.hms.harvard.edu"
 
-                                    response = testapp.post(SUBMIT_FOR_INGESTION, post_data, upload_files=post_files,
-                                                            content_type='multipart/form-data', status=expected_status)
+    with authorized_ingestion_simulation(mocked_queue_manager=mocked_queue_manager,
+                                         mocked_s3_client=mocked_s3_client,
+                                         dt=dt,
+                                         test_pseudoenv=test_pseudoenv,
+                                         fake_tester_email=fake_tester_email):
 
-                                    assert response.status_code == expected_status, (
-                                        "Expected response status %s but got %s."
-                                        % (expected_status, response.status_code)
-                                    )
+        ingestion_type = 'metadata_bundle'
 
-                                    # The FakeGuid facility makes ids sequentially, so we can predict we'll get
-                                    # one guid added to our mock queue. This test doesn't test the queue processing,
-                                    # only that something ends up passed off to thq queue.
-                                    expected_guid = '000-0000-001'
+        post_files = [("datafile", METADATA_BUNDLE_PATH)]
 
-                                    assert mocked_queue_manager.uuids == [expected_guid]
+        creation_post_data = {
+            'ingestion_type': ingestion_type,
+            'institution': DBMI_INSTITUTION_ID,
+            'project': DBMI_PROJECT_ID,
+            "processing_status": {
+                "state": "submitted"
+            }
+        }
 
-                                    assert mock_submission_folio_class.items_created == [expected_guid]
+        submission_post_data = {
+            'validate_only': True,
+        }
 
-                                    s3_file_system = mocked_s3_client.s3_files.files
+        creation_response = testapp.post_json("/IngestionSubmission", creation_post_data,
+                                              status=201).maybe_follow().json
+        [submission] = creation_response['@graph']
+        uuid = submission['uuid']
 
-                                    expected_bucket = "elasticbeanstalk-fourfront-cgaplocal-test-metadata-bundles"
+        response = testapp.post("/ingestion-submissions/%s/submit_for_ingestion" % uuid,
+                                submission_post_data, upload_files=post_files,
+                                content_type='multipart/form-data', status=expected_status)
 
-                                    datafile_short_name = "datafile.xlsx"
-                                    manifest_short_name = "manifest.json"
+        assert response.status_code == expected_status, (
+            "Expected response status %s but got %s."
+            % (expected_status, response.status_code)
+        )
 
-                                    datafile_key = os.path.join(expected_guid, datafile_short_name)
-                                    manifest_key = os.path.join(expected_guid, manifest_short_name)
+        [submission_guid] = mocked_queue_manager.uuids
 
-                                    datafile_name = os.path.join(expected_bucket, datafile_key)
-                                    manifest_name = os.path.join(expected_bucket, manifest_key)
+        s3_file_system = mocked_s3_client.s3_files.files
 
-                                    assert set(s3_file_system.keys()) == {datafile_name, manifest_name}
+        expected_bucket = "elasticbeanstalk-fourfront-cgaplocal-test-metadata-bundles"
 
-                                    assert s3_file_system[datafile_name] == file_contents(METADATA_BUNDLE_PATH,
-                                                                                          binary=True)
+        datafile_short_name = "datafile.xlsx"
+        manifest_short_name = "manifest.json"
 
-                                    assert json.loads(s3_file_system[manifest_name].decode('utf-8')) == {
-                                        "filename": METADATA_BUNDLE_PATH,
-                                        "object_name": datafile_key,
-                                        "submission_id": expected_guid,
-                                        "submission_uri": "/ingestion-submissions/000-0000-001",
-                                        "beanstalk_env_is_prd": False,
-                                        "beanstalk_env": test_pseudoenv,
-                                        "bucket": expected_bucket,
-                                        "authenticated_userid": "remoteuser.TEST",
-                                        "email": fake_tester_email,
-                                        "success": True,
-                                        "message": "Uploaded successfully.",
+        datafile_key = os.path.join(submission_guid, datafile_short_name)
+        manifest_key = os.path.join(submission_guid, manifest_short_name)
 
-                                        "upload_time": dt.just_utcnow().isoformat(),
-                                        "parameters": {
-                                            "ingestion_type": ingestion_type,
-                                            "institution": DBMI_INSTITUTION,
-                                            "project": TEST_PROJECT,
-                                            "validate_only": "True",
-                                            "datafile": METADATA_BUNDLE_PATH,
-                                        },
-                                    }
+        datafile_name = os.path.join(expected_bucket, datafile_key)
+        manifest_name = os.path.join(expected_bucket, manifest_key)
 
-                                    # Make sure we report success from the endpoint
-                                    assert response.status_code == 200
+        assert set(s3_file_system.keys()) == {datafile_name, manifest_name}
+
+        assert s3_file_system[datafile_name] == file_contents(METADATA_BUNDLE_PATH,
+                                                              binary=True)
+
+        assert json.loads(s3_file_system[manifest_name].decode('utf-8')) == {
+            "filename": METADATA_BUNDLE_PATH,
+            "object_name": datafile_key,
+            "submission_id": submission_guid,
+            "submission_uri": "/ingestion-submissions/" + submission_guid,
+            "beanstalk_env_is_prd": False,
+            "beanstalk_env": test_pseudoenv,
+            "bucket": expected_bucket,
+            "authenticated_userid": "remoteuser.TEST",
+            "email": fake_tester_email,
+            "success": True,
+            "message": "Uploaded successfully.",
+
+            "upload_time": dt.just_utcnow().isoformat(),
+            "parameters": {
+                "ingestion_type": ingestion_type,
+                "institution": DBMI_INSTITUTION_ID,
+                "project": DBMI_PROJECT_ID,
+                "validate_only": "True",
+                "datafile": METADATA_BUNDLE_PATH,
+            },
+        }
+
+        # Make sure we report success from the endpoint
+        assert response.status_code == 200
+
+
+DBMI_COMMUNITY = {
+    'Project': [DBMI_PROJECT],
+    'Institution': [DBMI_INSTITUTION],
+    'User': [DBMI_PI]
+}
 
 
 # This runs the standard test pretty much as expected.
-def test_submit_for_ingestion_authorized(testapp):
-
-    check_submit_for_ingestion_authorized(testapp, MockBotoS3Client())
+def test_submit_for_ingestion_authorized(es_testapp):
+    with assure_related_items_for_testing(testapp=es_testapp, item_dict=DBMI_COMMUNITY):
+        check_submit_for_ingestion_authorized(es_testapp, MockBotoS3Client())
 
 
 # The next couple of tests are small variations in which the first or second interaction with S3 fails
@@ -260,35 +198,37 @@ class MockBuggyBotoS3Client(MockBotoS3Client):
                                                   'upload_fileobj')
 
 
-def test_submit_for_ingestion_authorized_but_failed_first_s3_interaction(testapp):
+def test_submit_for_ingestion_authorized_but_failed_first_s3_interaction(es_testapp):
+    with assure_related_items_for_testing(testapp=es_testapp, item_dict=DBMI_COMMUNITY):
+        try:
+            check_submit_for_ingestion_authorized(es_testapp, MockBuggyBotoS3Client(), expected_status=400)
+        except webtest.AppError as e:
+            assert str(e) == ('Bad response: 500 Internal Server Error (not 400)\n'
+                              'b\'{"@type": ["SubmissionFailure", "Error"],'
+                              ' "status": "error",'
+                              ' "code": 500,'
+                              ' "title": "Internal Server Error",'
+                              ' "description": "",'
+                              ' "detail": "botocore.exceptions.ClientError:'
+                              ' An error occurred (400) when calling the upload_fileobj operation:'
+                              ' Simulated error."}\'')
+        else:
+            raise AssertionError("An expected webtest.AppError was not raised.")
 
-    try:
-        check_submit_for_ingestion_authorized(testapp, MockBuggyBotoS3Client(), expected_status=400)
-    except webtest.AppError as e:
-        assert str(e) == ('Bad response: 500 Internal Server Error (not 400)\n'
-                          'b\'{"@type": ["SubmissionFailure", "Error"],'
-                          ' "status": "error",'
-                          ' "code": 500,'
-                          ' "title": "Internal Server Error",'
-                          ' "description": "",'
-                          ' "detail": "botocore.exceptions.ClientError:'
-                          ' An error occurred (400) when calling the upload_fileobj operation: Simulated error."}\'')
-    else:
-        raise AssertionError("An expected webtest.AppError was not raised.")
 
-
-def test_submit_for_ingestion_authorized_but_failed_second_s3_interaction(testapp):
-
-    try:
-        check_submit_for_ingestion_authorized(testapp, MockBuggyBotoS3Client(allowed_ok=1), expected_status=400)
-    except webtest.AppError as e:
-        assert str(e) == ('Bad response: 500 Internal Server Error (not 400)\n'
-                          'b\'{"@type": ["SubmissionFailure", "Error"],'
-                          ' "status": "error",'
-                          ' "code": 500,'
-                          ' "title": "Internal Server Error",'
-                          ' "description": "",'
-                          ' "detail": "botocore.exceptions.ClientError (while uploading metadata):'
-                          ' An error occurred (400) when calling the upload_fileobj operation: Simulated error."}\'')
-    else:
-        raise AssertionError("An expected webtest.AppError was not raised.")
+def test_submit_for_ingestion_authorized_but_failed_second_s3_interaction(es_testapp):
+    with assure_related_items_for_testing(testapp=es_testapp, item_dict=DBMI_COMMUNITY):
+        try:
+            check_submit_for_ingestion_authorized(es_testapp, MockBuggyBotoS3Client(allowed_ok=1), expected_status=400)
+        except webtest.AppError as e:
+            assert str(e) == ('Bad response: 500 Internal Server Error (not 400)\n'
+                              'b\'{"@type": ["SubmissionFailure", "Error"],'
+                              ' "status": "error",'
+                              ' "code": 500,'
+                              ' "title": "Internal Server Error",'
+                              ' "description": "",'
+                              ' "detail": "botocore.exceptions.ClientError (while uploading metadata):'
+                              ' An error occurred (400) when calling the upload_fileobj operation:'
+                              ' Simulated error."}\'')
+        else:
+            raise AssertionError("An expected webtest.AppError was not raised.")

@@ -4,27 +4,61 @@
     "id": "/profiles/file_processed.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["file_format", "project", "institution"],
-    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "required": [
+        "file_format",
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "accession",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/accession" },
-        { "$ref": "mixins.json#/dbxrefs" },
-        { "$ref": "mixins.json#/static_embeds" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "file.json#/properties" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/dbxrefs"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "file.json#/properties"
+        }
     ],
     "mixinFacets": [
-        { "$ref": "file.json#/facets"}
+        {
+            "$ref": "file.json#/facets"
+        }
     ],
     "mixinColumns": [
-        { "$ref": "file.json#/columns"}
+        {
+            "$ref": "file.json#/columns"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -64,14 +98,31 @@
         "file_ingestion_error": {
             "title": "Ingestion Error Report",
             "description": "This field is set when an error occurred in ingestion with the first error encountered",
-            "type": "string"
+            "type": "array",
+            "items": {
+                "title": "Ingestion Error",
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "index": false
+                    },
+                    "row": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "file_classification": {
             "title": "General Classification",
             "type": "string",
             "default": "processed file",
-            "exclude_from": ["FFedit-create"],
-            "enum": ["processed file"]
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "enum": [
+                "processed file"
+            ]
         },
         "source_samples": {
             "title": "Source Samples",
@@ -82,14 +133,16 @@
                 "title": "Source Sample",
                 "type": "string"
             }
-       },
+        },
         "genome_assembly": {
             "title": "Genome Assembly",
             "description": "The genome assembly associated with the file - for processing or reference",
             "type": "string",
             "default": "GRCh38",
             "lookup": 30,
-            "enum": ["GRCh38"]
+            "enum": [
+                "GRCh38"
+            ]
         },
         "produced_from": {
             "title": "Produced From",
@@ -105,15 +158,17 @@
             "title": "Disable wfr inputs field",
             "description": "Do not compute workflow_run_inputs field for files used as control",
             "type": "boolean",
-            "exclude_from": ["FFedit-create"]
+            "exclude_from": [
+                "FFedit-create"
+            ]
         }
-     },
-    "facets" : {
-        "workflow_run_inputs.workflow.title" : {
-            "title" : "Input of Workflow"
+    },
+    "facets": {
+        "workflow_run_inputs.workflow.title": {
+            "title": "Input of Workflow"
         },
-        "workflow_run_outputs.workflow.title" : {
-            "title" : "Output of Workflow"
+        "workflow_run_outputs.workflow.title": {
+            "title": "Output of Workflow"
         }
     }
 }

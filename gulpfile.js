@@ -23,6 +23,60 @@ function setDevelopment(done){
     done();
 }
 
+function cleanBuildDirectory(done){
+    const buildDir = "./src/encoded/static/build/";
+    const pathsToDelete = [];
+    fs.readdir(buildDir, function(err, files){
+        files.forEach(function(fileName){
+            if (fileName === ".gitignore") { // Skip
+                return;
+            }
+            const filePath = path.resolve(buildDir, fileName);
+            pathsToDelete.push(filePath);
+        });
+
+        const filesToDeleteLen = pathsToDelete.length;
+
+        if (filesToDeleteLen === 0) {
+            done();
+            return;
+        }
+
+        var countDeleted = 0;
+        pathsToDelete.forEach(function(filePath){
+            fs.unlink(filePath, function(err){
+                countDeleted++;
+                if (countDeleted === filesToDeleteLen) {
+                    console.log("Cleaned " + countDeleted + " files from " + buildDir);
+                    done();
+                }
+            });
+        });
+    });
+}
+
+//Moving Higlass workers from node_modules to static/build/
+function copyHiGlassBamFetcherWorker(done){
+    // dest will be created or overwritten by default.
+    const source = "./node_modules/higlass-pileup/dist/0.higlass-pileup.min.worker.js";
+    const dest = "./src/encoded/static/build/bam-fetcher-worker.js";
+    fs.copyFile(source, dest, function(err){
+        if (err) throw err;
+        done();
+    });
+}
+
+//Moving Higlass workers from node_modules to static/build/
+function copyHiGlassGnomadFetcherWorker(done){
+    // dest will be created or overwritten by default.
+    const source = "./node_modules/higlass-gnomad/dist/0.higlass-gnomad.min.worker.js";
+    const dest = "./src/encoded/static/build/vcf-fetcher-worker.js";
+    fs.copyFile(source, dest, function(err){
+        if (err) throw err;
+        done();
+    });
+}
+
 function webpackOnBuild(done) {
     const start = Date.now();
     return function (err, stats) {
@@ -50,21 +104,19 @@ function watch(done){
 
 function getLinkedSharedComponentsPath(){
     let sharedComponentPath = path.resolve(__dirname, 'node_modules/@hms-dbmi-bgm/shared-portal-components');
-    let isLinked = false;
-    try { // Get exact path to dir, else leave. Used to avoid needing to webpack dependency itself.
-        for (var i = 0; i < 10; i++) { // Incase multiple links.
-            sharedComponentPath = fs.readlinkSync(sharedComponentPath);
-            isLinked = true;
-        }
-    } catch (e){
-        // ... not linked
-    }
+    const origPath = sharedComponentPath;
+
+    // Follow any symlinks to get to real path.
+    sharedComponentPath = fs.realpathSync(sharedComponentPath);
+
+    const isLinked = origPath !== sharedComponentPath;
 
     console.log(
         "`@hms-dbmi-bgm/shared-portal-components` directory is",
         isLinked ? "sym-linked to `" + sharedComponentPath + "`." : "NOT sym-linked."
     );
-    return { isLinked, sharedComponentPath : isLinked ? sharedComponentPath : null };
+
+    return { isLinked, sharedComponentPath: isLinked ? sharedComponentPath : null };
 }
 
 function buildSharedPortalComponents(done){
@@ -88,7 +140,13 @@ function buildSharedPortalComponents(done){
         { stdio: "inherit" }
     );
 
+    subP.on("error", (err)=>{
+        console.log(`buildSharedPortalComponents errored - ${err}`);
+        return;
+    });
+
     subP.on("close", (code)=>{
+        console.log(`buildSharedPortalComponents process exited with code ${code}`);
         done();
     });
 
@@ -116,7 +174,13 @@ function watchSharedPortalComponents(done){
         { stdio: "inherit" }
     );
 
+    subP.on("error", (err)=>{
+        console.log(`watchSharedPortalComponents errored - ${err}`);
+        return;
+    });
+
     subP.on("close", (code)=>{
+        console.log(`watchSharedPortalComponents process exited with code ${code}`);
         done();
     });
 
@@ -175,18 +239,30 @@ function doSassBuild(done, options = {}) {
 
 
 const devQuick = gulp.series(
+    cleanBuildDirectory,
+    copyHiGlassBamFetcherWorker,
+    copyHiGlassGnomadFetcherWorker,
     setQuick,
     doWebpack,
     gulp.parallel(watch, watchSharedPortalComponents)
 );
 
 const devAnalyzed = gulp.series(
+    cleanBuildDirectory,
+    copyHiGlassBamFetcherWorker,
+    copyHiGlassGnomadFetcherWorker,
     setDevelopment,
     buildSharedPortalComponents,
     doWebpack
 );
 
-const build = gulp.series(setProduction, doWebpack);
+const build = gulp.series(
+    cleanBuildDirectory,
+    copyHiGlassBamFetcherWorker,
+    copyHiGlassGnomadFetcherWorker,
+    setProduction,
+    doWebpack
+);
 
 
 //gulp.task('dev', devSlow);

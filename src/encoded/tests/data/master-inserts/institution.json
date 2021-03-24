@@ -52,5 +52,12 @@
         "contact_persons": [
             "dvuzman@research.bwh.harvard.edu"
         ]
+    },
+    {
+        "name": "msa-coalition",
+        "title": "Multiple System Atrophy Coalition",
+        "aliases": ["msa:msa-institution"],
+        "date_created": "2020-11-03T22:19:15.807261+00:00",
+        "uuid": "232539d0-41aa-4cdc-835d-7f164f1462ea"
     }
 ]

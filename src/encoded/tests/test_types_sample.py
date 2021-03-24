@@ -125,3 +125,11 @@ def test_sample_processing_pedigree(testapp, sample_proc_fam):
         expected_value = expected_values[a_sample['individual']]
         for a_key in expected_value:
             assert a_sample[a_key] == expected_value[a_key]
+
+
+def test_sample_processing_pedigree_bam_location(testapp, sample_proc_fam, proband_processed_file):
+    """This is an end to end test for calculating relationships Test for roles"""
+    bam_upload_key = proband_processed_file['upload_key']
+    calculated_values = sample_proc_fam['samples_pedigree']
+    proband_info = [i for i in calculated_values if i['individual'] == 'GAPIDPROBAND'][0]
+    assert proband_info['bam_location'] == bam_upload_key

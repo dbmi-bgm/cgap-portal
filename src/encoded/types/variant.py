@@ -3,6 +3,7 @@ import os
 import boto3
 import pytz
 import datetime
+import structlog
 from pyramid.view import view_config
 from pyramid.settings import asbool
 from urllib.parse import (
@@ -28,6 +29,7 @@ from .base import (
 import negspy.coordinates as nc
 
 
+log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
 ANNOTATION_ID_SEP = '_'
 
@@ -94,6 +96,11 @@ def build_variant_display_title(chrom, pos, ref, alt, sep='>'):
         sep,
         alt
     )
+
+
+def build_variant_sample_annotation_id(call_info, variant_uuid, file_accession):
+    """ Helper function that builds a variant sample annotation ID from the required parts. """
+    return ':'.join([call_info, variant_uuid, file_accession])
 
 
 def load_extended_descriptions_in_schemas(schema_object, depth=0):
@@ -223,6 +230,17 @@ class VariantSample(Item):
         }
     }
 
+    POSSIBLE_GENOTYPE_LABEL_FIELDS = [
+        'proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
+        'sister_genotype_label', 'sister_II_genotype_label', 'sister_III_genotype_label',
+        'sister_IV_genotype_label',
+        'brother_genotype_label', 'brother_II_genotype_label', 'brother_III_genotype_label',
+        'brother_IV_genotype_label'
+        'co_parent_genotype_label',
+        'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
+        'son_II_genotype_label'
+    ]
+
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
         """ Sets the annotation_id field on this variant_sample prior to passing on. """
@@ -292,7 +310,7 @@ class VariantSample(Item):
         variant_props = get_item_or_none(request, variant, 'Variant', frame='raw')
         if variant_props is None:
             raise RuntimeError('Got none for something that definitely exists')
-        file_path = '%s/bamsnap/chr%s:%s.png' % (  # file = accession of associated VCF file
+        file_path = '%s/bamsnap/chr%s_%s.png' % (  # file = accession of associated VCF file
             file, variant_props['CHROM'], variant_props['POS']
         )
         return file_path
@@ -301,6 +319,7 @@ class VariantSample(Item):
         "title": "Associated Genotype Labels",
         "description": "Named Genotype Label fields that can be searched on",
         "type": "object",
+        "additional_properties": True,
         "properties": {
             "proband_genotype_label": {
                 "title": "Proband Genotype",
@@ -318,8 +337,32 @@ class VariantSample(Item):
                 "title": "Sister Genotype",
                 "type": "string"
             },
+            "sister_II_genotype_label": {
+                "title": "Sister II Genotype",
+                "type": "string"
+            },
+            "sister_III_genotype_label": {
+                "title": "Sister III Genotype",
+                "type": "string"
+            },
+            "sister_IV_genotype_label": {
+                "title": "Sister IV Genotype",
+                "type": "string"
+            },
             "brother_genotype_label": {
                 "title": "Brother Genotype",
+                "type": "string"
+            },
+            "brother_II_genotype_label": {
+                "title": "Brother II Genotype",
+                "type": "string"
+            },
+             "brother_III_genotype_label": {
+                "title": "Brother III Genotype",
+                "type": "string"
+            },
+             "brother_IV_genotype_label": {
+                "title": "Brother IV Genotype",
                 "type": "string"
             },
             "co_parent_genotype_label": {
@@ -347,10 +390,7 @@ class VariantSample(Item):
     def associated_genotype_labels(self, variant, CALL_INFO, samplegeno=None, genotype_labels=None):
         """ Builds the above sub-embedded object so we can search on the genotype labels """
 
-        possible_keys = ['proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
-                         'sister_genotype_label', 'brother_genotype_label', 'co_parent_genotype_label',
-                         'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
-                         'son_II_genotype_label']
+        possible_keys_set = set(VariantSample.POSSIBLE_GENOTYPE_LABEL_FIELDS)
 
         # XXX: will be useful if we want to have this field be "centric" WRT the
         # person who submitted this variant_sample
@@ -376,7 +416,7 @@ class VariantSample(Item):
             role = entry.get('role', '')
             label = entry.get('labels', [])
             role_key = infer_key_from_role(role)
-            if role_key not in possible_keys:
+            if role_key not in possible_keys_set:
                 continue
             elif len(label) == 1:
                 new_labels[role_key] = label[0]

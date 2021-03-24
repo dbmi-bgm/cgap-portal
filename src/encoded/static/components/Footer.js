@@ -14,9 +14,17 @@ export const Footer = React.memo(function Footer(){
             <div className="page-footer px-4">
                 {/* <div className="container"> */}
                 <div className="row">
-                    <div className="col-12 col-md-6">
-                        <div className="footer-section copy-notice">
-                            { "Harvard Medical School | Brigham & Women's Hospital" }
+                    <div className="col-12 col-xl-6">
+                        <div className="footer-section copy-notice d-flex align-items-center">
+                            <div>
+                                Harvard Medical School
+                            </div>
+                            <div className="px-2">
+                                |
+                            </div>
+                            <div>
+                                {"Brigham & Women's Hospital" }
+                            </div>
                         </div>
                     </div>
                     {/*

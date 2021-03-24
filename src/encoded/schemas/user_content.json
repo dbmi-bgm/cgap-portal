@@ -4,14 +4,30 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "additionalProperties": false,
-    "identifyingProperties": ["uuid", "name", "aliases"],
+    "identifyingProperties": [
+        "uuid",
+        "name",
+        "aliases"
+    ],
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/attribution" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -34,56 +50,58 @@
         "name": {
             "title": "Unique Identifier",
             "description": "Unique name or ID of this section.",
-            "comment" : "If used as a page section, ideally should be page path with slashes converted to dots, plus hash ('#'), plus unique CSS-compatible identifier (for HTML element ID), e.g. 'help.faq#how_do_i_setup_account'. If is a Search Info Header, should be URL-compatible so can request e.g. search-info-header.WorkflowRun --> '/static-section/search-info-header.WorkflowRun'.",
+            "comment": "If used as a page section, ideally should be page path with slashes converted to dots, plus hash ('#'), plus unique CSS-compatible identifier (for HTML element ID), e.g. 'help.faq#how_do_i_setup_account'. If is a Search Info Header, should be URL-compatible so can request e.g. search-info-header.WorkflowRun --> '/static-section/search-info-header.WorkflowRun'.",
             "type": "string",
             "uniqueKey": "user_content:name",
-            "lookup" : 1
+            "lookup": 1
         },
         "title": {
             "title": "Title",
             "description": "Title for the section. Optional.",
             "type": "string",
-            "lookup" : 5
+            "lookup": 5
         },
         "description": {
             "title": "Description",
             "type": "string",
-            "formInput" : "textarea",
-            "lookup" : 21
+            "formInput": "textarea",
+            "lookup": 21
         },
-        "options" : {
+        "options": {
             "title": "Options",
             "type": "object",
             "description": "Options for section display.",
-            "properties" : {
-                "collapsible" : {
-                    "title" : "Is Collapsible",
-                    "type" : "boolean",
+            "properties": {
+                "collapsible": {
+                    "title": "Is Collapsible",
+                    "type": "boolean",
                     "description": "Whether this StaticSection should be collapsible (wherever collapsibility is an option). This property is ignored in some places, e.g. lists where all sections are explicitly collapsible.",
                     "lookup": 2,
-                    "default" : false
+                    "default": false
                 },
-                "default_open" : {
-                    "title" : "Is Expanded by Default",
-                    "type" : "boolean",
+                "default_open": {
+                    "title": "Is Expanded by Default",
+                    "type": "boolean",
                     "description": "Whether this StaticSection should appear as expanded by default (in places where it may be collapsible). Does not necessarily depend on 'collapsible' being true, e.g. in lists where all sections are explicitly collapsible.",
                     "lookup": 3,
                     "default": true
                 },
-                "title_icon" : {
-                    "title" : "Title Icon",
+                "title_icon": {
+                    "title": "Title Icon",
                     "description": "Icon to be showed next to title in selected places.",
-                    "type" : "string",
-                    "lookup" : 5
+                    "type": "string",
+                    "lookup": 5
                 },
-                "image" : {
-                    "title" : "Preview Image",
+                "image": {
+                    "title": "Preview Image",
                     "description": "Image or screenshot URL for this Item to use as a preview.",
-                    "type" : "string",
-                    "lookup" : 7
+                    "type": "string",
+                    "lookup": 7
                 }
             }
         }
     },
-    "excludedColumns" : ["institution.display_title"]
+    "excludedColumns": [
+        "institution.display_title"
+    ]
 }

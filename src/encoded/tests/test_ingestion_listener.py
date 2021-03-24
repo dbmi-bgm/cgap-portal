@@ -2,33 +2,41 @@ import datetime
 import json
 import mock
 import pytest
-import requests   # XXX: C4-211 this should NOT be necessary - there is a bug somewhere
 import time
 
-from dcicutils.qa_utils import ignored, notice_pytest_fixtures
+from dcicutils.qa_utils import ignored
 from uuid import uuid4
 from pyramid.testing import DummyRequest
-from ..ingestion_listener import IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested
-from ..util import gunzip_content
-from .variant_fixtures import gene_workbook, post_variant_consequence_items
-from .workbook_fixtures import workbook, app
+from ..ingestion_listener import (
+    IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
+)
+from ..ingestion.common import IngestionReport, IngestionError
+from ..util import debuglog
 
 
-pytestmark = [pytest.mark.working, pytest.mark.ingestion]
+pytestmark = [pytest.mark.working, pytest.mark.ingestion, pytest.mark.workbook]
+
+
 QUEUE_INGESTION_URL = '/queue_ingestion'
 INGESTION_STATUS_URL = '/ingestion_status'
 INGESTED_ACCESSION = 'GAPFIZ123456'
 NA_ACCESSION = 'GAPFIZ654321'
-notice_pytest_fixtures(gene_workbook, post_variant_consequence_items)
+
+
+QUEUE_CATCH_UP_WAIT_SECONDS = 3
 
 
 def wait_for_queue_to_catch_up(queue_manager, n, initially=False):
-    """ Wait until queue has done the things we told it to do. Right now this just sleeps for 10 seconds
-        assuming most operations should complete within that amount of time.
+    """
+    Wait until queue has done the things we told it to do.
+
+    Right now this just sleeps for QUEUE_CATCH_UP_WAIT_SECONDS seconds
+    in any non-initial situation (i.e., where initially is False),
+    assuming most operations should complete within that amount of time.
     """
     ignored(queue_manager, n)
     if not initially:
-        time.sleep(3)
+        time.sleep(QUEUE_CATCH_UP_WAIT_SECONDS)
 
 
 class MockedEnv:
@@ -136,7 +144,7 @@ def test_ingestion_queue_add_and_receive(fresh_ingestion_queue_manager_for_testi
     _expect_message_uuids(queue_manager, test_uuids)
 
 
-def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing, testapp):
+def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing, workbook, es_testapp):
     """ Tests adding uuids to the queue via /queue_ingestion """
     queue_manager = fresh_ingestion_queue_manager_for_testing
     test_uuids = [str(uuid4()), str(uuid4())]
@@ -146,21 +154,21 @@ def test_ingestion_queue_add_via_route(fresh_ingestion_queue_manager_for_testing
         'uuids': test_uuids,
         'override_name': queue_manager.queue_name
     }
-    response = testapp.post_json(QUEUE_INGESTION_URL, request_body).json
+    response = es_testapp.post_json(QUEUE_INGESTION_URL, request_body).json
     print(json.dumps(response, indent=2))
     assert response['notification'] == 'Success'
     assert response['number_queued'] == 2
     _expect_message_uuids(queue_manager, test_uuids)
 
 
-def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, testapp):
+def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, workbook, es_testapp):
     """ Tests deleting messages from SQS results in no messages being there. """
     queue_manager = fresh_ingestion_queue_manager_for_testing
     request_body = {
         'uuids': [str(uuid4()), str(uuid4())],
         'override_name': queue_manager.queue_name
     }
-    testapp.post_json(QUEUE_INGESTION_URL, request_body, status=200)
+    es_testapp.post_json(QUEUE_INGESTION_URL, request_body, status=200)
     msgs = queue_manager.receive_messages()
     failed = queue_manager.delete_messages(msgs)
     assert failed == []
@@ -169,7 +177,8 @@ def test_ingestion_queue_delete(fresh_ingestion_queue_manager_for_testing, testa
 
 def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_for_testing):
     """ Tests that the 'should_remain_online' method works """
-    _await = lambda: time.sleep(3)
+    def _await():
+        time.sleep(3)
     before = datetime.datetime.utcnow()
     end_delta = datetime.timedelta(seconds=2)  # this diff should not occur if _await is not executed
     IngestionListener.should_remain_online(override=_await)
@@ -177,50 +186,17 @@ def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_f
     assert after > (before + end_delta)
 
 
-@pytest.fixture
-def mocked_familial_relations():
-    return [{'samples_pedigree': [
-                {
-                    'sample_name': 'sample_one',
-                    'relationship': 'mother',
-                    'sex': 'F'
-                },
-                {
-                    'sample_name': 'sample_two',
-                    'relationship': 'father',
-                    'sex': 'M'
-                },
-                {
-                    'sample_name': 'sample_three',
-                    'relationship': 'proband',
-                    'sex': 'M'
-                }
-    ]}]
-
-
-def test_ingestion_listener_build_familial_relations(testapp, mocked_familial_relations):
-    """ Tests that we correctly extract familial relations from a mocked object that has the correct structure """
-    with mock.patch.object(IngestionListener, 'search_for_sample_relations', new=lambda x, y: mocked_familial_relations):
-        listener = IngestionListener(testapp)
-        relations = listener.extract_sample_relations('dummy')
-        assert relations['sample_one']['samplegeno_role'] == 'mother'
-        assert relations['sample_two']['samplegeno_role'] == 'father'
-        assert relations['sample_three']['samplegeno_role'] == 'proband'
-        assert relations['sample_one']['samplegeno_sex'] == 'F'
-        assert relations['sample_two']['samplegeno_sex'] == 'M'
-        assert relations['sample_three']['samplegeno_sex'] == 'M'
-
-
-def test_ingestion_listener_verify_vcf_status_is_not_ingested(authenticated_testapp, app, workbook):
+@pytest.mark.skip
+def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testapp):
     """ Posts a minimal processed file to be checked """
-    request = DummyRequest(environ={'REMOTE_USER': 'EMBED'})
-    request.invoke_subrequest = app.invoke_subrequest
-    assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION) is False
-    assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION) is True
+    request = DummyRequest(environ={'REMOTE_USER': 'TEST', 'HTTP_ACCEPT': 'application/json'})
+    request.invoke_subrequest = es_testapp.app.invoke_subrequest
+    assert verify_vcf_file_status_is_not_ingested(request, INGESTED_ACCESSION, expected=False)
+    assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION, expected=True)
 
 
-def test_ingestion_listener_run(testapp, fresh_ingestion_queue_manager_for_testing, workbook, project, institution,
-                                post_variant_consequence_items, gene_workbook):
+@pytest.mark.skip
+def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_manager_for_testing):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
     """
@@ -232,21 +208,49 @@ def test_ingestion_listener_run(testapp, fresh_ingestion_queue_manager_for_testi
     # configure run for 10 seconds
     start_time = datetime.datetime.utcnow()
     end_delta = datetime.timedelta(seconds=10)
+    end_time = start_time + end_delta
+    debuglog("start_time [%s] + end_delta [%s] = end_time [%s]" % (start_time, end_delta, end_time))
 
     def mocked_should_remain_online(override=None):
         ignored(override)
         current_time = datetime.datetime.utcnow()
-        return current_time < (start_time + end_delta)
+        recommendation = current_time < end_time
+        debuglog("At %s, should_remain_online=%s" % (current_time, recommendation))
+        return recommendation
 
     # XXX: This is a really hard thing to test, but take my word for it that this is doing "something" -Will
     #      If you do not get ValueError here, it means the VCF wasn't processed in the run method or a different
     #      error occurred.
     with mock.patch.object(IngestionListener, 'should_remain_online', new=mocked_should_remain_online):
         with pytest.raises(ValueError):
-            run(testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed
+            run(es_testapp, _queue_manager=queue_manager)  # expected in this test since the source VCF is malformed
 
 
 def test_test_port():
 
     from snovault.tests.test_postgresql_fixture import SNOVAULT_DB_TEST_PORT
     assert SNOVAULT_DB_TEST_PORT == 5440
+
+
+@pytest.mark.parametrize('body, row', [
+    ({'foo': 'bar'}, 1),
+    ('Success', 2)
+])
+def test_ingestion_error_basic(body, row):
+    """ Tests basic functionality of the error class """
+    test_error = IngestionError(body, row)
+    test_error_dict = test_error.to_dict()
+    assert test_error_dict['body'] == str(body)
+    assert test_error_dict['row'] == row
+
+
+@pytest.mark.parametrize('success', [5, 10])
+def test_ingestion_report_basic(success):
+    """ Tests basic functionality of the Report class, which is just a collection of errors """
+    report = IngestionReport()
+    for _ in range(success):
+        report.mark_success()
+    report.mark_failure(body={'hello': 'world'}, row=1)
+    assert report.grand_total == success + 1
+    assert report.total_successful() == success
+    assert report.total_errors() == 1

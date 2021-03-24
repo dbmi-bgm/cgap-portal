@@ -9,15 +9,12 @@ from unittest import mock
 from dcicutils.qa_utils import ControlledTime, ignored
 from ..util import (
     debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, get_trusted_email,
-    full_class_name, check_user_is_logged_in
+    check_user_is_logged_in,
 )
 from .. import util as util_module
 
 
-def test_full_class_name():
-
-    assert full_class_name(3) == 'int'
-    assert full_class_name(pyramid.httpexceptions.HTTPClientError("Oops")) == "pyramid.httpexceptions.HTTPClientError"
+pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 def test_deduplicate_list():

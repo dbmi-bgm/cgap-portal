@@ -1,16 +1,34 @@
 import React from 'react';
 import memoize from 'memoize-one';
-import _ from 'underscore';
 
 import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-
-import { store } from './../../../store';
-
-import { buildPedigreeGraphData } from './../../viz/PedigreeViz';
 
 import { parseFamilyIntoDataset } from './family-parsing';
-import { idToGraphIdentifier } from './PedigreeTabViewBody';
+
+
+
+
+/**
+ * Creates Object mapping Individual `@id` to
+ * the generational identifier (or `orderBasedName`)
+ * that is present for that Individual node in graph
+ * data.
+ *
+ * @param {{ id: string, orderBasedName: string }[]} objectGraph
+ * @returns {Object.<string, string>}
+ */
+function calculateIdToGraphIdentifier(objectGraph, isRelationshipNodeFunc){
+    const mapping = {};
+    objectGraph.forEach(function(node){
+        if (isRelationshipNodeFunc(node)) return;
+        // We use Individual's `@id` as their dataset entry `id`.
+        // If this changes, can change to get from `node.data.individualItem['@id']` instead.
+        console.log("id mapped to ", node.id, " : ", node.orderBasedName);
+        mapping[node.id] = node.orderBasedName;
+    });
+    return mapping;
+}
+
 
 
 /**
@@ -39,6 +57,11 @@ export class CurrentFamilyController extends React.PureComponent {
         return true;
     }
 
+    static buildGraphData(dataset, buildFunc){
+        if (!buildFunc) return null;
+        return buildFunc(dataset);
+    }
+
     constructor(props) {
         super(props);
         // this.onAddedFamily = this.onAddedFamily.bind(this);
@@ -50,9 +73,9 @@ export class CurrentFamilyController extends React.PureComponent {
         // };
         this.memoized = {
             haveFullViewPermissionForFamily: memoize(CurrentFamilyController.haveFullViewPermissionForFamily),
-            buildPedigreeGraphData: memoize(buildPedigreeGraphData),
+            buildGraphData: memoize(CurrentFamilyController.buildGraphData),
             parseFamilyIntoDataset: memoize(parseFamilyIntoDataset),
-            idToGraphIdentifier: memoize(idToGraphIdentifier)
+            calculateIdToGraphIdentifier: memoize(calculateIdToGraphIdentifier)
         };
     }
 
@@ -132,7 +155,8 @@ export class CurrentFamilyController extends React.PureComponent {
     // }
 
     render(){
-        const { children, context, ...passProps } = this.props;
+        const { children, context, PedigreeVizLibrary, ...passProps } = this.props;
+        const { buildPedigreeGraphData = null, isRelationshipNode } = PedigreeVizLibrary || {};
         // const { pedigreeFamilies = [], pedigreeFamiliesIdx } = this.state;
         // const familiesLen = pedigreeFamilies.length;
         // let currFamily, graphData, idToGraphIdentifier;
@@ -146,12 +170,19 @@ export class CurrentFamilyController extends React.PureComponent {
         let currFamily = null, graphData, idToGraphIdentifier;
         if (this.memoized.haveFullViewPermissionForFamily(family)) {
             currFamily = family;
-            graphData = this.memoized.buildPedigreeGraphData(this.memoized.parseFamilyIntoDataset(currFamily));
-            idToGraphIdentifier = this.memoized.idToGraphIdentifier(graphData.objectGraph);
+            graphData = this.memoized.buildGraphData(
+                this.memoized.parseFamilyIntoDataset(currFamily),
+                buildPedigreeGraphData
+            );
+            idToGraphIdentifier = graphData && isRelationshipNode ? this.memoized.calculateIdToGraphIdentifier(
+                graphData.objectGraph,
+                isRelationshipNode
+            ) : {};
         }
 
         const childProps = {
             ...passProps,
+            PedigreeVizLibrary,
             context,
             currFamily,
             graphData,

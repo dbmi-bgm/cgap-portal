@@ -465,43 +465,45 @@ function UnderNodeText(props){
     //const textYStart = 18;
     const showTitle = showOrderBasedName ? orderBasedName : (name || id);
 
-    const textRows = [[ showTitle, "title" ]];
+    //const textRows = [[ showTitle, "title" ]];
+    const textRows = [
+        <text key="title" data-describing="title" textAnchor="middle" x={halfWidth}
+            className={showOrderBasedName ? "showing-order-based-name" : null}>
+            { showTitle }
+        </text>
+    ];
     if (ageString){
-        textRows.push([ ageString, "age" ]);
+        textRows.push(
+            <text key="age" data-describing="age" textAnchor="middle" x={halfWidth}>
+                { ageString }
+            </text>
+        );
     }
 
     if (showNotes) {
         // Eventually could have more stuff here, maybe have showNotes be enum of various opts to display.. idk.
+        /*
         diseases.filter(function(disease){
             return !diseaseToIndex[disease];
-        }).forEach(function(disease, i){
-            textRows.push([
-                <React.Fragment key={i}>
-                    &bull; { disease }
-                </React.Fragment>,
-                "disease"
-            ]);
+        })
+        */
+        diseases.forEach(function(disease, i){
+            textRows.push(
+                <text key={"d-" + i} data-describing="disease">&bull; { disease }</text>
+            );
+            // textRows.push([
+            //     // unicode (if need to convert to text text in future) - `\u2B24`
+            //     "\u2B24 "+ disease,
+            //     <React.Fragment key={i}>
+            //         &bull; { disease }
+            //     </React.Fragment>,
+            //     "disease"
+            // ]);
         });
     }
 
-    const renderedTexts = textRows.map(function([ content, desc ], idx){
-        const txtProps = {
-            "y": 18 + (20 * idx),
-            "data-describing" : desc
-        };
-        if (desc === "title" && showOrderBasedName){
-            txtProps.className = (txtProps.className || "") + " showing-order-based-name";
-        }
-        if (desc === "title" || desc === "age"){
-            // Center text
-            txtProps.textAnchor = "middle";
-            txtProps.x = halfWidth;
-        }
-        if (desc === "disease"){
-            // Left align text, but from midpoint
-            // txtProps.x = halfWidth;
-        }
-        return <text {...txtProps} key={desc + "-" + idx}>{ content }</text>;
+    const textRowsWithPositions = React.Children.map(textRows, function(t, idx){
+        return React.cloneElement(t, { "y": 18 + (20 * idx) });
     });
 
     // todo maybe make an array of 'rows' to map to <text>s with incremented y coord.
@@ -511,7 +513,7 @@ function UnderNodeText(props){
     return (
         <g className="text-box" style={{ transformOrigin: halfWidth + "px 0", transform: rectTransform3d }} transform={rectTransform}>
             {/* <rect width={width + 4} x={-2} height={dims.individualYSpacing / 3} className="bg-rect" rx={5} /> */}
-            { renderedTexts }
+            { textRowsWithPositions }
         </g>
     );
 }

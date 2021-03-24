@@ -4,7 +4,7 @@ from snovault import COLLECTIONS, TYPES
 from snovault.elasticsearch.create_mapping import type_mapping
 from snovault.util import add_default_embeds
 from unittest.mock import patch, MagicMock
-from .datafixtures import ORDER
+from .conftest_settings import ORDER
 from ..commands.create_mapping_on_deploy import ITEM_INDEX_ORDER, get_deployment_config
 
 
@@ -65,6 +65,7 @@ def test_get_deployment_config_prod():
 ENV_THAT_WIPES_ES = 'fourfront-cgaptest'
 
 
+@pytest.mark.skip  # cgaptest no longer wipes ES
 @patch('encoded.commands.create_mapping_on_deploy.get_my_env', MagicMock(return_value=ENV_THAT_WIPES_ES))
 def test_get_deployment_config_test():
     """ Tests we correctly configure cgaptest """

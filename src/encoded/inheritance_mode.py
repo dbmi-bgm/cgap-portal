@@ -49,7 +49,7 @@ class InheritanceMode:
     INHMODE_LABEL_DE_NOVO_CHRXY = "de novo (chrXY)"
     INHMODE_DOMINANT_FATHER = "Dominant (paternal)"
     INHMODE_DOMINANT_MOTHER = "Dominant (maternal)"
-    INHMODE_LABEL_RECESSIVE = "Recessive"
+    INHMODE_LABEL_RECESSIVE = "Homozygous recessive"
     INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER = "X-linked recessive (Maternal)"
     INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER = "X-linked dominant (Maternal)"
     INHMODE_LABEL_X_LINKED_DOMINANT_FATHER = "X-linked dominant (Paternal)"
@@ -339,6 +339,8 @@ class InheritanceMode:
                 2. inheritance_modes
         """
         sample_geno = variant_sample.get('samplegeno', [])
+        if not sample_geno:
+            return {}
         try:
             sample_ids = {s["samplegeno_role"]: s["samplegeno_sampleid"] for s in sample_geno}
             genotypes = {s["samplegeno_role"]: s["samplegeno_numgt"] for s in sample_geno}

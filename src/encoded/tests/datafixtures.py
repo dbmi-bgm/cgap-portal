@@ -3,23 +3,6 @@ import pytest
 from uuid import uuid4
 
 
-ORDER = [
-    'user', 'project', 'institution', 'filter_set', 'nexus',
-    'file_format', 'variant_consequence', 'phenotype',
-    'cohort', 'family', 'individual', 'sample', 'workflow',
-    'access_key', 'disorder', 'document', 'file_fastq',
-    'file_processed', 'file_reference', 'gene', 'gene_list', 'sample_processing',
-    'case', 'report', 'page', 'quality_metric_fastqc', 'evidence_dis_pheno',
-    'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
-    'quality_metric_cmphet', 'quality_metric_vcfcheck', 'quality_metric_workflowrun',
-    'quality_metric_vcfqc', 'quality_metric_bamqc', 'quality_metric_peddyqc',
-    'software', 'static_section', 'tracking_item', 'workflow_mapping',
-    'workflow_run_awsem', 'workflow_run', 'annotation_field', 'variant_sample',
-    'variant', 'gene_annotation_field', 'gene', 'higlass_view_config',
-    'ingestion_submission',
-]
-
-
 class MockedLogger(object):
 
     def info(self, msg):
@@ -44,16 +27,6 @@ def connection():
         "key": "testkey",
         "secret": "testsecret"
     }
-
-
-@pytest.fixture
-def wrangler_testapp(wrangler, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, wrangler['uuid'])
-
-
-@pytest.fixture
-def submitter_testapp(submitter, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, submitter['uuid'])
 
 
 @pytest.fixture
@@ -149,6 +122,8 @@ def bgm_user(testapp, institution, bgm_project):
         'first_name': 'BGM',
         'last_name': 'user',
         'email': 'bgmuser@example.org',
+        # Does it break tests to add this? -kmp 9-Dec-2020
+        'user_institution': institution['name'],
         'institution': institution['name'],
         'project_roles': [
             {
@@ -169,6 +144,58 @@ def access_key(testapp, bgm_user):
     description = 'My programmatic key'
     item = {
         'user': bgm_user['@id'],
+        'description': description,
+    }
+    res = testapp.post_json('/access_key', item)
+    result = res.json['@graph'][0].copy()
+    result['secret_access_key'] = res.json['secret_access_key']
+    return result
+
+
+@pytest.fixture
+def bgm_access_key(access_key):
+    # An alias for access_key, useful for emphasis to compare to non_bgm_access_key
+    return access_key
+
+
+@pytest.fixture
+def non_bgm_project(testapp):
+    item = {
+        'name': 'not-bgm-project',
+        'title': 'Not BGM Project',
+        'description': 'Not Brigham Genomic Medicine'
+    }
+    return testapp.post_json('/project', item).json['@graph'][0]
+
+
+@pytest.fixture
+def non_bgm_user(testapp, institution, non_bgm_project):
+    item = {
+        'first_name': 'Not-BGM',
+        'last_name': 'user',
+        'email': 'notbgmuser@example.org',
+        # Whether we have 'user_institution' should depend on whether bgm_user does. -kmp 9-Dec-2020
+        'user_institution': institution['name'],  # bgm_project and non_bgm_project are both at same user_institution
+        'institution': institution['name'],  # bgm_project and non_bgm_project are both at same institution
+        'project_roles': [
+            {
+                'project': non_bgm_project['@id'],
+                'role': 'project_member'  # XXX: you probably want this
+            }
+        ],
+        'project': non_bgm_project['@id'],
+        'status': 'current'
+    }
+    # User @@object view has keys omitted.
+    res = testapp.post_json('/user', item)
+    return testapp.get(res.location).json
+
+
+@pytest.fixture
+def non_bgm_access_key(testapp, non_bgm_user):
+    description = 'My non-BGM programmatic key'
+    item = {
+        'user': non_bgm_user['@id'],
         'description': description,
     }
     res = testapp.post_json('/access_key', item)
@@ -239,13 +266,26 @@ def uncle_sample(testapp, project, institution):
 
 
 @pytest.fixture
-def child_sample(testapp, project, institution):
+def proband_processed_file(testapp, project, institution, file_formats):
+    """Add a bam file to test the samples_pedigree"""
+    item = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'file_format': file_formats.get('bam').get('uuid'),
+        'filename': 'test_proband_file.bam'
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
+
+
+@pytest.fixture
+def child_sample(testapp, project, institution, proband_processed_file):
     item = {
         "accession": "GAPSAPROBAND",
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_006",
-        "status": "shared"
+        "status": "shared",
+        "processed_files": [proband_processed_file['@id'], ]
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -828,6 +868,8 @@ def workflow_mapping(testapp, workflow_bam, institution, project):
         "data_input_type": "experiment",
         'institution': institution['@id'],
         'project': project['@id'],
+        # TODO: This value of "workflow_parameters" is duplicated and should be removed or merged with the other.
+        #       Probably only the second value is being used right now. - Will and Kent 17-Dec-2020
         "workflow_parameters": [
             {"parameter": "bowtie_index", "value": "some value"}
         ],

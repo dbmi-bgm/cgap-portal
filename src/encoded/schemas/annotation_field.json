@@ -4,19 +4,44 @@
     "id": "/profiles/annotation_field.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["field_name", "field_type"],
-    "identifyingProperties": ["uuid", "aliases", "field_name"],
+    "required": [
+        "field_name",
+        "field_type"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "field_name"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-      { "$ref": "mixins.json#/schema_version" },
-      { "$ref": "mixins.json#/uuid" },
-      { "$ref": "mixins.json#/aliases" },
-      { "$ref": "mixins.json#/submitted" },
-      { "$ref": "mixins.json#/modified" },
-      { "$ref": "mixins.json#/status" },
-      { "$ref": "mixins.json#/attribution" },
-      { "$ref": "mixins.json#/notes" },
-      { "$ref": "mixins.json#/static_embeds" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/notes"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -24,9 +49,14 @@
         },
         "field_name": {
             "title": "Field Name",
-            "description": "Original name of the annotation field name on vcf file",
+            "description": "Name of the annotation field in the CGAP Metadata DB",
             "type": "string",
             "uniqueKey": true
+        },
+        "vcf_field": {
+            "title": "VCF Field",
+            "description": "Name of the annotation field on the annotated VCF.",
+            "type": "string"
         },
         "source_name": {
             "title": "Source Name",
@@ -123,21 +153,6 @@
                 "type": "string"
             }
         },
-        "annotation_category": {
-            "title": "Annotation Category",
-            "description": "Category used for this annotation, could be used for grouping",
-            "type": "string"
-        },
-        "facet_order": {
-            "title": "Facet Order",
-            "description": "Ranking number of the field wrt to Facets, lower is better",
-            "type": "integer"
-        },
-        "column_order": {
-            "title": "Column order",
-            "description": "Ranking number of the field for Column in search view (lower is better)",
-            "type": "integer"
-        },
         "scope": {
             "title": "Scope",
             "description": "Scope that this field belongs to",
@@ -149,7 +164,7 @@
                 "sample_variant"
             ]
         },
-         "schema_title": {
+        "schema_title": {
             "title": "Schema Title",
             "description": "Title to be used in the variant schema for the field",
             "type": "string"
@@ -168,6 +183,11 @@
             "title": "Calculated Property",
             "description": "Boolean on whether or not this field is a calculated property of a variant",
             "type": "boolean"
+        },
+        "abbreviation": {
+            "title": "Abbreviation",
+            "description": "A shorter name for this field, used by the UI",
+            "type": "string"
         }
     },
     "facets": {
