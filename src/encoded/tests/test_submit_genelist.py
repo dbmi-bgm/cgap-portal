@@ -1,6 +1,6 @@
 import pytest
 
-from ..submit_genelist import GeneListSubmission
+from ..submit_genelist import GeneListSubmission, VariantUpdateSubmission
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
@@ -123,3 +123,21 @@ class TestGeneListSubmission:
         )
         assert genelist.patch_genelist_uuid
         assert genelist.patch_document_uuid
+
+    def test_excel_format(self, es_testapp, workbook, project, institution):
+        """
+        """
+        genelist = GeneListSubmission(
+                'src/encoded/tests/data/documents/gene_lists/'
+                'DRR_test-match_gene_list.xlsx',
+                project['@id'],
+                institution['@id'],
+                es_testapp,
+        )
+        assert len(genelist.gene_ids) == 2
+        assert genelist.post_output
+#
+#
+#class TestVariantUpdateSubmission:
+#    def 
+#

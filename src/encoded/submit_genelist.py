@@ -139,7 +139,7 @@ class GeneListSubmission:
                 if "Genes" in col[0]:
                     for cell in col[1:]:
                         if cell is not None:
-                            genelist.append(cell)
+                            genelist.append(str(cell))
         return title, genelist
 
     def parse_genelist(self):
