@@ -217,7 +217,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const haveEditPermission = this.memoized.haveEditPermission(caseActions);
         const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
 
-        // Is OK if called frequently with same value, as will be compared by App.setState
+        // Is OK if called frequently with same value, as App is a PureComponent
+        // and won't update if state/prop value is unchanged.
         if (haveEditPermission && hasFilterSetChanged) {
             setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the Filtering tab to be lost. Proceed?");
         } else {
