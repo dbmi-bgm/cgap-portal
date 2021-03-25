@@ -799,7 +799,7 @@ class VariantUpdateSubmission:
         if not self.json_post:
             return None
         validate_response = self.vapp.post_json(
-            "/queue_indexing/?validate_only=True", self.json_post
+            "/queue_indexing?validate_only=True", self.json_post
         )
         if validate_response.json["notification"] == "Success":
             validate_output = (
