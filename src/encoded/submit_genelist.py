@@ -1,9 +1,10 @@
 import re
 from base64 import b64encode
+
+from dcicutils.misc_utils import VirtualAppError
 from openpyxl import load_workbook
 from webtest import AppError
 
-from dcicutils.misc_utils import VirtualAppError
 from .util import s3_local_file
 
 
