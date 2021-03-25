@@ -1,12 +1,12 @@
+import openpyxl
 import pytest
-import xlrd
 
 from copy import deepcopy
 from unittest import mock
 from .. import submit
 from ..submit import (
     compare_fields,
-    digest_xls,
+    digest_xlsx,
     MetadataItem,
     SubmissionRow,
     SubmissionMetadata,
@@ -51,8 +51,8 @@ def row_dict():
 
 @pytest.fixture
 def xls_list():
-    book = xlrd.open_workbook('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
-    sheet, = book.sheets()
+    book = openpyxl.load_workbook('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
+    sheet = book.worksheets[0]
     row = row_generator(sheet)
     return list(row)
 
@@ -598,7 +598,7 @@ class TestSpreadsheetProcessing:
 
 def test_xls_to_json(project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
-    rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
+    rows = digest_xlsx('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
     json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
     assert success
     assert len(json_out['family']) == 1
@@ -609,7 +609,7 @@ def test_xls_to_json(project, institution):
 
 def test_xls_to_json_errors(project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
-    rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx')
+    rows = digest_xlsx('src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx')
     json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
     assert success  # still able to proceed to validation step

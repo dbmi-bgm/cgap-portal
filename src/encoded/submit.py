@@ -2,7 +2,7 @@ from copy import deepcopy
 import csv
 import datetime
 import json
-import xlrd
+import openpyxl
 
 from dcicutils.lang_utils import n_of
 from dcicutils.qa_utils import ignored
@@ -110,13 +110,13 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
             'post_output': [],
             'upload_info': []
         }
-        if filename.endswith('.xls') or filename.endswith('.xlsx'):
-            rows = digest_xls(filename)
+        if filename.endswith('.xlsx'):
+            rows = digest_xlsx(filename)
         elif filename.endswith('.csv') or filename.endswith('.tsv'):
             delim = ',' if filename.endswith('csv') else '\t'
             rows = digest_csv(filename, delim=delim)
         else:
-            msg = ('Metadata bundle must be a file of type .xls, .xlsx, .csv, or .tsv.'
+            msg = ('Metadata bundle must be a file of type .xlsx, .csv, or .tsv. '
                    'Please submit a file of the proper type.')
             results['validation_output'].append(msg)
             return results
@@ -186,9 +186,9 @@ def get_column_name(row, columns):
     return columns[-1]
 
 
-def digest_xls(xls_data):
-    book = xlrd.open_workbook(xls_data)
-    sheet, = book.sheets()
+def digest_xlsx(xlsx_data):
+    book = openpyxl.load_workbook(xlsx_data)
+    sheet = book.worksheets[0]
     return row_generator(sheet)
 
 
@@ -1148,32 +1148,33 @@ def post_and_patch_all_items(virtualapp, json_data_final):
     return output, no_errors, files
 
 
-def cell_value(cell, datemode):
+def cell_value(cell):
     """Get cell value from excel. [From Submit4DN]"""
     # This should be always returning text format
-    ctype = cell.ctype
+    ctype = cell.data_type
     value = cell.value
-    if ctype == xlrd.XL_CELL_ERROR:  # pragma: no cover
+    if ctype == openpyxl.cell.cell.TYPE_ERROR:  # pragma: no cover
         raise ValueError(repr(cell), 'cell error')
-    elif ctype == xlrd.XL_CELL_BOOLEAN:
+    elif ctype == openpyxl.cell.cell.TYPE_BOOL:
         return str(value).upper().strip()
-    elif ctype == xlrd.XL_CELL_NUMBER:
-        if value.is_integer():
-            value = int(value)
+    elif ctype in (openpyxl.cell.cell.TYPE_NUMERIC, openpyxl.cell.cell.TYPE_NULL):
+        if not value:
+            value = ''
         return str(value).strip()
-    elif ctype == xlrd.XL_CELL_DATE:
-        value = xlrd.xldate_as_tuple(value, datemode)
-        if value[3:] == (0, 0, 0):
-            return datetime.date(*value[:3]).isoformat()
-        else:  # pragma: no cover
-            return datetime.datetime(*value).isoformat()
-    elif ctype in (xlrd.XL_CELL_TEXT, xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK):
+    elif isinstance(value, openpyxl.cell.cell.TIME_TYPES):
+        if isinstance(value, datetime.datetime):
+            if value.time() == datetime.time(0, 0, 0):
+                return value.date().isoformat()
+            else:  # pragma: no cover
+                return value.isoformat()
+        else:
+            return value.isoformat()
+    elif ctype in (openpyxl.cell.cell.TYPE_STRING, openpyxl.cell.cell.TYPE_INLINE):
         return value.strip()
-    raise ValueError(repr(cell), 'unknown cell type')  # pragma: no cover
+    raise ValueError(repr(cell), 'not an acceptable cell type')  # pragma: no cover
 
 
 def row_generator(sheet):
     """Generator that gets rows from excel sheet [From Submit4DN]"""
-    datemode = sheet.book.datemode
-    for index in range(sheet.nrows):
-        yield [cell_value(cell, datemode) for cell in sheet.row(index)]
+    for row in sheet.rows:
+        yield [cell_value(cell) for cell in row]
