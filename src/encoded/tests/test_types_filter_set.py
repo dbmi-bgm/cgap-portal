@@ -2,7 +2,8 @@ import pytest
 from webtest import AppError
 
 
-pytestmark = [pytest.mark.working, pytest.mark.search]
+pytestmark = [pytest.mark.working, pytest.mark.search, pytest.mark.workbook]
+
 COMPOUND_SEARCH_URL = '/compound_search'
 FILTER_SET_URL = '/filter_set'
 VARIANT_URL = '/variant'

@@ -111,8 +111,6 @@ def auth0_existing_4dn_user_profile(testapp, auth0_4dn_user_profile):
     return user  # Now that it exists
 
 
-# I am not sure this should have session scope. It makes side-effects to this visible to other tests.
-# -kmp 23-Jan-2021
 @pytest.fixture()
 def headers(auth0_access_token):
     return {
@@ -244,7 +242,8 @@ def test_invalid_auth_token(anontestapp, headers):
 #     assert 'id_token' not in res.json
 #     assert 'user_actions' not in res.json
 
-@pytest.mark.skip  # XXX: This is failing for reasons we don't understand, BUT it was always not run on Travis
+
+@pytest.mark.skip  # XXX: needs refactor
 def test_404_keeps_auth_info(testapp, anontestapp, headers,
                              auth0_existing_4dn_user_profile,
                              auth0_4dn_user_token):
