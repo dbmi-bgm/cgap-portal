@@ -125,6 +125,7 @@ def post_data(project, institution):
             }],
             'sample': [{
                 'aliases': ['test-proj:samp1'],
+                'bam_sample_id': 'samp1-WGS',
                 'workup_type': 'WGS',
                 'specimen_accession': 'samp1',
                 'project': project['@id'],
