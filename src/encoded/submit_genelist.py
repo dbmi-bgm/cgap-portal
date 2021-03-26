@@ -177,35 +177,6 @@ class GeneListSubmission:
         genelist = list(set(genelist))
         return genelist, title
 
-    @staticmethod
-    def batch_search(item_list, search_term, app, item_type="Gene"):
-        """
-        Performs get requests in batches to decrease the number of
-        API calls and improve class performance.
-        """
-        batch = []
-        results = []
-        flat_result = []
-        for item in item_list:
-            batch.append(item)
-            if item == item_list[-1] or len(batch) == 10:
-                batch_string = ("&" + search_term + "=").join(batch)
-                try:
-                    response = app.get(
-                        "/search/?type="
-                        + item_type
-                        + "&"
-                        + search_term
-                        + "="
-                        + batch_string
-                    )
-                    results.append(response.json["@graph"])
-                except (VirtualAppError, AppError):
-                    pass
-                batch = []
-        flat_result = [x for sublist in results for x in sublist]
-        return flat_result
-
     def match_genes(self):
         """
         Attempts to match every unique gene to unique gene item in CGAP.
@@ -236,7 +207,7 @@ class GeneListSubmission:
             else:
                 non_ensgids.append(gene)
         if ensgids:
-            ensgid_search = self.batch_search(ensgids, "ensgid", self.vapp)
+            ensgid_search = CommonUtils.batch_search(ensgids, "ensgid", self.vapp)
             for response in ensgid_search:
                 if response["gene_symbol"] in gene_ids:
                     gene_ids[response["gene_symbol"]].append(response["uuid"])
@@ -264,7 +235,7 @@ class GeneListSubmission:
             for search_type in search_order:
                 if not non_ensgids:
                     break
-                search = self.batch_search(non_ensgids, search_type, self.vapp)
+                search = CommonUtils.batch_search(non_ensgids, search_type, self.vapp)
                 for response in search:
                     if (
                         response["gene_symbol"] in gene_ids
@@ -494,10 +465,9 @@ class GeneListSubmission:
                 "/Document/" + document_uuid + "?check_only=true",
                 {"attachment": document_json["attachment"]},
             )
-            validate_result["Document"] = "validated"
         else:
             self.vapp.post_json("/Document/?check_only=true", document_json)
-            validate_result["Document"] = "validated"
+        validate_result["Document"] = "validated"
         if genelist_uuid:
             self.vapp.patch_json(
                 "/GeneList/" + genelist_uuid + "?check_only=true",
@@ -506,19 +476,15 @@ class GeneListSubmission:
                     "genes": genelist_json["genes"],
                 },
             )
-            validate_result["Gene list"] = "validated"
-            validate_result["Title"] = self.title
-            validate_result["Number of genes"] = len(genelist_json["genes"])
         else:
             self.vapp.post_json("/GeneList/?check_only=true", genelist_json)
-            validate_result["Gene list"] = "validated"
-            validate_result["Title"] = self.title
-            validate_result["Number of genes"] = len(genelist_json["genes"])
-        if validate_result:
-            validate_display = []
-            for key in validate_result:
-                validate_display.append("%s: %s" % (key, validate_result[key]))
-            validate_result = validate_display
+        validate_result["Gene list"] = "validated"
+        validate_result["Title"] = self.title
+        validate_result["Number of genes"] = len(genelist_json["genes"])
+        validate_display = []
+        for key in validate_result:
+            validate_display.append("%s: %s" % (key, validate_result[key]))
+        validate_result = validate_display
         return (
             validate_result,
             genelist_uuid,
@@ -720,38 +686,6 @@ class VariantUpdateSubmission:
             self.errors.append("No gene uuids were found in the input file")
         return gene_uuids
 
-    @staticmethod
-    def batch_search(item_list, search_term, app, item_type="VariantSample"):
-        """
-        Performs get requests in batches to decrease the number of
-        API calls and improve class performance.
-
-        Returns:
-            - List of all items found by search
-        """
-        batch = []
-        results = []
-        flat_result = []
-        for item in item_list:
-            batch.append(item)
-            if item == item_list[-1] or len(batch) == 5:
-                batch_string = ("&" + search_term + "=").join(batch)
-                try:
-                    response = app.get(
-                        "/search/?type="
-                        + item_type
-                        + "&"
-                        + search_term
-                        + "="
-                        + batch_string
-                    )
-                    results.append(response.json["@graph"])
-                except VirtualAppError:
-                    pass
-                batch = []
-        flat_result = [x for sublist in results for x in sublist]
-        return flat_result
-
     def find_associated_variants(self):
         """
         Finds associated variants and variant samples for the genes of
@@ -765,10 +699,11 @@ class VariantUpdateSubmission:
             return None
         variant_samples_to_index = []
         genes_to_search = list(set(self.gene_uuids))
-        variant_sample_search = self.batch_search(
+        variant_sample_search = CommonUtils.batch_search(
             genes_to_search,
             "variant.genes.genes_most_severe_gene.uuid",
             self.vapp,
+            item_type="VariantSample"
         )
         for variant_sample_response in variant_sample_search:
             variant_samples_to_index.append(variant_sample_response["uuid"])
@@ -835,3 +770,44 @@ class VariantUpdateSubmission:
             self.errors.append("Posting failed: " + post_response.json)
             post_output = None
         return post_output
+
+
+class CommonUtils:
+    """
+    For methods common to both submission endpoints above.
+    """
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def batch_search(item_list, search_term, app, item_type="Gene"):
+        """
+        Performs get requests in batches to decrease the number of
+        API calls and improve performance.
+
+        Returns:
+            - List of all items found by search
+        """
+        batch = []
+        results = []
+        flat_result = []
+        for item in item_list:
+            batch.append(item)
+            if item == item_list[-1] or len(batch) == 5:
+                batch_string = ("&" + search_term + "=").join(batch)
+                try:
+                    response = app.get(
+                        "/search/?type="
+                        + item_type
+                        + "&"
+                        + search_term
+                        + "="
+                        + batch_string
+                    )
+                    results.append(response.json["@graph"])
+                except (VirtualAppError, AppError):
+                    pass
+                batch = []
+        flat_result = [x for sublist in results for x in sublist]
+        return flat_result
