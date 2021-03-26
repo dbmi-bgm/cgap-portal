@@ -55,8 +55,6 @@ export class InterpretationSpaceWrapper extends React.Component {
         const { context = null } = props;
         this.state = InterpretationSpaceWrapper.initializeNoteState(context); // Ex. { variantNotes: <note linkto>, loading: false }
         this.saveAsDraft = this.saveAsDraft.bind(this);
-        this.saveToCase = this.saveToCase.bind(this);
-        this.saveToKnowledgeBase = this.saveToKnowledgeBase.bind(this);
     }
 
     /* May need user info more globally eventually...
@@ -229,134 +227,11 @@ export class InterpretationSpaceWrapper extends React.Component {
         }
     }
 
-    saveToCase(note, stateFieldToUpdate, noteType) { // Does not save to case; saves to variantsample if not existing -- status change?
-        const { [stateFieldToUpdate]: lastSavedNote } = this.state;
-
-        if (lastSavedNote) {
-            const { status, version, '@id': noteAtID } = lastSavedNote;
-            if (status === "current") { // approved for case; future saves must be cloned
-                const newNote = { ...note };
-                newNote.previous_note = noteAtID;
-                console.log("newNote", newNote);
-
-                this.postNewNote(note, noteType, version + 1, "current")
-                    .then((response) => {
-                        // Some handling for various fail responses/codes
-                        const { '@graph': noteItems = [], status } = response;
-                        if (noteItems.length === 0 || status === "error") {
-                            throw new Error(response);
-                        }
-
-                        console.log("Successfully created new item", response);
-                        const { 0: noteItem } = noteItems;
-
-                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
-                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
-                        this.setState({ loading: false, [stateFieldToUpdate]: noteItem });
-                        return this.patchNewNoteToVS(noteItem, stateFieldToUpdate);
-                    })
-                    .then((resp) => {
-                        console.log("Successfully linked note object to variant sample", resp);
-                        // const { '@graph': noteItem } = response;
-                        // TODO: Find way to update state with new interpretation note here instead
-                    })
-                    .catch((err) => {
-                        // TODO: Error handling/alerting
-                        console.log(err);
-                        this.setState({ loading: false });
-                    });
-
-            } else if (status === "in review") { // patch draft to approve for case
-                console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
-
-                const noteToSubmit = { ...note };
-
-                if (noteType === "note_interpretation") {
-                    // Prune keys with incomplete values
-                    if (noteToSubmit.classification === null) {
-                        delete noteToSubmit.classification;
-                    }
-                } else {
-                    // Prune unused keys
-                    delete noteToSubmit.acmg_guidelines;
-                    delete noteToSubmit.conclusion;
-                    delete noteToSubmit.classification;
-                }
-
-                // Bump version number only if already has one (draft autosave/clone of a pre-existing approved note)
-                if (noteToSubmit.version) {
-                    noteToSubmit.version = version + 1;
-                }
-
-                this.setState({ loading: true }, () => {
-                    this.patchPreviouslySavedNote(noteAtID, noteToSubmit, "current")
-                        .then((response) => {
-                            const { '@graph': graph, status } = response;
-                            if (graph.length === 0 || status === "error") {
-                                throw new Error(response);
-                            }
-                            const { 0: newlySavedDraft } = graph || [];
-                            // TODO: Some handling for various fail responses/codes
-                            this.setState({ loading: false, [stateFieldToUpdate]: newlySavedDraft });
-                            console.log("Successfully overwritten previous draft of note", response);
-                        })
-                        .catch((err) => {
-                            // TODO: Error handling
-                            console.log(err);
-                            this.setState({ loading: false });
-                        });
-                });
-            }
-        } else { // No drafts or previous versions exist -- post with status of current
-            this.setState({ loading: true }, () => {
-                console.log("note", note);
-                this.postNewNote(note, noteType, undefined, "current")
-                    .then((response) => {
-                        // Some handling for various fail responses/codes
-                        const { '@graph': noteItems = [] } = response;
-                        if (noteItems.length === 0 || status === "error") {
-                            throw new Error(response);
-                        }
-
-                        console.log("Successfully created new item", response);
-                        const { 0: noteItem } = noteItems;
-
-                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
-                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
-                        this.setState({ loading: false, [stateFieldToUpdate]: noteItem });
-                        return this.patchNewNoteToVS(noteItem, stateFieldToUpdate);
-                    })
-                    .then((resp) => {
-                        console.log("Successfully linked note object to variant sample", resp);
-                        // const { '@graph': noteItem } = response;
-                        // TODO: Find way to update state with new interpretation note here instead
-                    })
-                    .catch((err) => {
-                        // TODO: Error handling
-                        console.log(err);
-                        this.setState({ loading: false });
-                    });
-            });
-        }
-    }
-
-    saveToKnowledgeBase(note, stateFieldToUpdate, noteType) {
-        const { interpretation = null } = this.state;
-        console.log("interpretation", interpretation);
-        if (noteType === "note_interpretation" && stateFieldToUpdate === "interpretation") {
-            const clonedNote = _.clone(interpretation);
-            clonedNote.status = "approved";
-            console.log("clonedNote", clonedNote);
-            this.setState({ interpretation: clonedNote });
-        }
-        console.log("saveToKB", note);
-    }
-
     render() {
         const { variant_notes, gene_notes, interpretation } = this.state;
         return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
-            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation} saveToCase={this.saveToCase}
-            saveToKnowledgeBase={this.saveToKnowledgeBase} saveAsDraft={this.saveAsDraft}/>;
+            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation} 
+            saveAsDraft={this.saveAsDraft}/>;
     }
 }
 
@@ -398,7 +273,7 @@ export class InterpretationSpaceController extends React.Component {
         const { isExpanded, currentTab } = this.state;
         const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
 
-        const passProps = _.pick(this.props, 'saveAsDraft', 'saveToCase', 'saveToKnowledgeBase', 'schemas');
+        const passProps = _.pick(this.props, 'saveAsDraft', 'schemas');
 
         let panelToDisplay = null;
         switch(currentTab) {
@@ -496,8 +371,6 @@ class GenericInterpretationPanel extends React.Component {
         };
 
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
-        this.saveStateToCase = this.saveStateToCase.bind(this);
-        this.saveStateToKnowledgeBase = this.saveStateToKnowledgeBase.bind(this);
         this.onTextChange = this.onTextChange.bind(this);
         this.onDropOptionChange = this.onDropOptionChange.bind(this);
 
@@ -523,16 +396,6 @@ class GenericInterpretationPanel extends React.Component {
         saveAsDraft(this.state, saveToField , noteType);
     }
 
-    saveStateToCase() {
-        const { saveToCase, noteType, saveToField } = this.props;
-        saveToCase(this.state, saveToField, noteType);
-    }
-
-    saveStateToKnowledgeBase(){
-        const { saveToKnowledgeBase, noteType, saveToField } = this.props;
-        saveToKnowledgeBase(this.state, saveToField, noteType);
-    }
-
     render() {
         const { lastSavedNote = null, noteLabel, noteType, schemas } = this.props;
         const { note_text : savedNoteText = null, status: savedNoteStatus } = lastSavedNote || {};
@@ -555,9 +418,10 @@ class GenericInterpretationPanel extends React.Component {
                     <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
                 <GenericInterpretationSubmitButton {...{ isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
-                    saveAsDraft={this.saveStateAsDraft} saveToCase={this.saveStateToCase} saveToKnowledgeBase={this.saveStateToKnowledgeBase}
+                    saveAsDraft={this.saveStateAsDraft}
                 />
-                { noteType === "note_interpretation" && isApproved ? <button type="button" className="btn btn-primary btn-block mt-05">Close &amp; Return to Case</button>: null}
+                {/* May want to re-implement something like this
+                 { noteType === "note_interpretation" && isApproved ? <button type="button" className="btn btn-primary btn-block mt-05">Close &amp; Return to Case</button>: null} */}
             </div>
         );
     }
@@ -703,47 +567,23 @@ function GenericInterpretationSubmitButton(props) {
         noteTextPresent,            // Is there text in the note space
         noteChangedSinceLastSave,   // Has the text in the note space changed since last save
         saveAsDraft,                // Fx -- save as Draft
-        saveToCase,                 // Fx -- save to Case (handles cloning in response to edits as well as first time additions)
-        saveToKnowledgeBase,        // Fx -- save to KB
         cls
     } = props;
 
     const allButtonsDropsDisabled = !noteTextPresent || !noteChangedSinceLastSave;
 
-    // TODO: Add additional conditions to check for is inKnowledgeBase
-    if (isCurrent || isDraft || isApproved) {
-        // If current: no saving as draft; already submitted to case -- save to knowledgebase
-        // In draft status: allow saving to case, re-saving as draft, but no saving to knowledgebase
+    if (isCurrent || isApproved) {
+        // No further steps allowed; saving to knowledgebase or approving to case
         return (
-            <Dropdown as={ButtonGroup} className={cls}>
-                <Button variant="primary btn-block" onClick={isCurrent ? saveToKnowledgeBase : saveToCase}
-                    // disabled={(!isDraft && allButtonsDropsDisabled) || (!isCurrent && allButtonDrops)}
-                >
-                    { isCurrent || isApproved  ? "Save to Knowledge Base" : "Approve for Case" }
-                </Button>
-                <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" disabled={allButtonsDropsDisabled || isApproved} />
-                <Dropdown.Menu>
-                    { isDraft ? <Dropdown.Item onClick={saveAsDraft} disabled={allButtonsDropsDisabled}>Save as Draft</Dropdown.Item> : null}
-                    { isCurrent ? <Dropdown.Item onClick={saveToCase}>Clone to Case</Dropdown.Item> : null}
-                    { isDraft ? <Dropdown.Item disabled>Send to Knowledgebase</Dropdown.Item> : null}
-                </Dropdown.Menu>
-            </Dropdown>);
-    } else { // Brand new note; allow saving as draft or to case, but not knowledgebase
+            <Button variant="primary btn-block" disabled={isCur} onClick={saveAsDraft} className={cls}>
+                { isCurrent || isApproved  ? "Cannot edit - already approved" : null}
+            </Button>);
+    } else { // Brand new note OR previous draft; allow saving or re-saving as draft
         return (
-            <Dropdown as={ButtonGroup} className={cls}>
-                <Button variant="primary btn-block" onClick={saveAsDraft}
-                    disabled={allButtonsDropsDisabled}>
-                    Save Draft
-                </Button>
-                <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" disabled={allButtonsDropsDisabled} />
-                <Dropdown.Menu>
-                    <Dropdown.Item onClick={saveToCase} disabled={!noteTextPresent || !noteChangedSinceLastSave}>
-                        Approve for Case
-                    </Dropdown.Item>
-                    <Dropdown.Item disabled>
-                        Send to Knowledgebase
-                    </Dropdown.Item>
-                </Dropdown.Menu>
-            </Dropdown>);
+            <Button variant="primary btn-block" onClick={saveAsDraft}
+                disabled={allButtonsDropsDisabled}>
+                { isDraft ? "Re-save as Draft": "Save as Draft" }
+            </Button>
+        );
     }
 }
