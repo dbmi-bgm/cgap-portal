@@ -74,10 +74,11 @@ SS_SPECIMEN_ID = 'specimen id'
 SS_ANALYSIS_ID = 'analysis id'
 SS_RELATION = 'relation to proband'
 SS_REPORT_REQUIRED = 'report required'
+SS_PROBAND = 'proband'
 
 REQUIRED_CASE_COLS = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
 REQUIRED_COLUMNS_ACCESSIONING =  REQUIRED_CASE_COLS + [SS_INDIVIDUAL_ID, SS_SEX, SS_RELATION, SS_REPORT_REQUIRED]
-REQUIRED_COLUMNS_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID, SS_SEX]
+REQUIRED_COLUMNS_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID, SS_PROBAND]
 
 # half-siblings not currently supported, because pedigree info is needed to know
 # which parent is shared. Can come back to this after pedigree processing is integrated.
@@ -492,6 +493,7 @@ class PedigreeRow:
         return [{'phenotypic_feature': self.format_atid(feature)} for feature in feature_list if feature]
 
     def extract_individual_metadata(self):
+        print(self.metadata)
         info = {'aliases': [self.indiv_alias]}
         simple_fields = ['family_id', 'individual_id', 'sex', 'clinic_notes', 'ancestry',
                          'quantity', 'life_status', 'cause_of_death', 'age_at_death',
@@ -501,7 +503,7 @@ class PedigreeRow:
             if field.startswith('is_'):
                 info[field] = is_yes_value(info[field])
         for field in ['mother', 'father']:  # turn mother and father IDs into item aliases
-            if field in info:
+            if info.get(field):
                 info[field] = generate_individual_alias(self.project, info[field])
         info['proband'] = self.is_proband()
         if info.get('phenotypic_features'):
@@ -512,6 +514,7 @@ class PedigreeRow:
         for col in ['age', 'birth_year', 'age_at_death', 'gestational_age', 'quantity']:
             if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
                 info[col] = int(info[col])
+        print(info)
         return MetadataItem(info, self.row, 'individual')
 
     def is_proband(self):
@@ -843,20 +846,24 @@ class PedigreeMetadata:
     def add_family_metadata(self):
         family_metadata = {}
         for alias, item in self.individuals.items():
-            family_metadata.setdefault(item['family_id'], {'members': []})
+            family_metadata.setdefault(item['family_id'],
+                                       {'family_id': item['family_id'], 'members': []})
             family_metadata[item['family_id']]['members'].append(alias)
             if item.get('proband', False):
                 family_metadata[item['family_id']]['proband'] = alias
                 family_metadata[item['family_id']]['aliases'] = [self.project + ':family-' + item['individual_id']]
             del item['family_id']
-        # TODO: family_phenotypic_features - change to calculated property?
-        # TODO: get family aliases
+        # make sure a proband is indicated for each family
+        for v in family_metadata.values():
+            if not v.get('proband'):
+                msg = ('No proband indicated for family {}. Please edit and resubmit'.format(v['family_id']))
+                self.errors.append(msg)
         final_family_dict = {}
         for key, value in family_metadata.items():
             try:
                 family_matches = self.virtualapp.get(f'/search/?type=Family&family_id={key}')
             except Exception:
-                # TODO: handling for no matches
+                # if family not in DB, create a new one
                 final_family_dict[value['aliases'][0]] = value
             else:
                 for match in family_matches.json['@graph'][0]:
@@ -865,10 +872,28 @@ class PedigreeMetadata:
                         del final_family_dict[match['aliases'][0]]['proband']
                         phenotypes = [item['phenotypic_feature'] for item in
                                       self.individuals[value['proband']].get('phenotypic_features', [])]
+                        # TODO: Add other family member phenotypes if proband phenotypes < 4
                         if phenotypes:
                             final_family_dict[match['aliases'][0]]['family_phenotyic_features'] = phenotypes[:4]
-            # del family_metadata[key]
         return final_family_dict
+
+    def check_individuals(self):
+        """Make sure that every value in mother ID or father ID columns are also in sheet in same family.
+        If a mother or father ID does not have a line in the sheet, just create minimal metadata for it
+        and add it to the family."""
+        parent_dict = {'mother': 'F', 'father': 'M'}
+        for fam_alias, fam_metadata in self.families.items():
+            for member in fam_metadata['members']:
+                individual = self.individuals[member]
+                for parent in ['mother', 'father']:
+                    if individual.get(parent):
+                        if individual[parent] not in fam_metadata['members']:
+                            info = {
+                                'individual_id': individual[parent],
+                                'sex': parent_dict[parent]
+                            }
+                            self.individuals[individual[parent]] = info
+                            fam_metadata['members'].append(individual[parent])
 
     def process_rows(self):
         """
@@ -882,8 +907,8 @@ class PedigreeMetadata:
             except AttributeError as e:
                 self.errors.append(e)
                 continue
-        print('i')
         self.families = self.add_family_metadata()
+        self.check_individuals()
 
     def create_json_out(self):
         """
@@ -899,6 +924,8 @@ class PedigreeMetadata:
                 new_metadata = {k: v for k, v in metadata.items() if v}
                 new_metadata['project'] = self.project_atid
                 new_metadata['institution'] = self.institution_atid
+                if key == 'individual' and 'proband' in new_metadata:
+                    del new_metadata['proband']
                 self.json_out[key][alias] = new_metadata
             self.json_out['errors'] = self.errors
 
@@ -1074,6 +1101,11 @@ def parse_exception(e, aliases):
                     if not field:
                         field = field_name.replace('_', ' ')
                     error = 'field: ' + error.replace(field_name, field)
+                    if 'phenotypic feature' in field:
+                        hpo_idx = error.index('/phenotypes/' + 12)
+                        hpo_term = error[hpo_idx:error.index('/', hpo_idx)]
+                        msg = ('HPO terms - HPO term {} not found in database.'
+                               ' Please check HPO ID and resubmit.'.format(hpo_term))
                     keep.append(error)
                 elif 'Additional properties are not allowed' in error:
                     keep.append(error[2:])
