@@ -150,7 +150,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                         }
 
                         console.log("Successfully created new item", response);
-                        
+
                         const { 0: noteItem } = noteItems;
 
                         // Temporarily try to update state here... since 'response' with note item is not accessible in next step
@@ -186,7 +186,7 @@ export class InterpretationSpaceController extends React.Component {
         super(props);
         this.state = {
             currentTab: "Variant Notes",   // 0: Variant Notes, 1: Gene Notes, 2: Interpretation (Research/Discovery), 3: Interpretation (Clinical/ACMG)
-            isExpanded: false // TODO - currently unused
+            isExpanded: false // TODO - currently unused; V2
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
         this.switchToTab = this.switchToTab.bind(this);
@@ -199,8 +199,7 @@ export class InterpretationSpaceController extends React.Component {
         }
     }
 
-    toggleExpanded() {
-        // TODO for V2
+    toggleExpanded() { // TODO for V2
         const { isExpanded } = this.state;
         console.log("is setting fullscreen", isExpanded);
         this.setState({ isExpanded: !isExpanded });
@@ -346,7 +345,6 @@ class GenericInterpretationPanel extends React.Component {
         const { note_text : savedNoteText = null, status: savedNoteStatus } = lastSavedNote || {};
         const { note_text: noteText, acmg_guidelines, classification, conclusion } = this.state;
 
-        // TODO: move into a function and memoize once checking other values of state, too
         const noteChangedSinceLastSave = this.memoized.hasNoteChanged(lastSavedNote, this.state);
         const noteTextPresent = !!noteText;
         const isDraft = savedNoteStatus === "in review";
