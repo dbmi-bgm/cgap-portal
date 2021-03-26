@@ -82,6 +82,14 @@ def xls_list():
 
 
 @pytest.fixture
+def xls_list_pedigree():
+    book = xlrd.open_workbook('src/encoded/tests/data/documents/pedigree_test_example.xlsx')
+    sheet, = book.sheets()
+    row = row_generator(sheet)
+    return list(row)
+
+
+@pytest.fixture
 def empty_items():
     return {
         'individual': {}, 'family': {}, 'file_fastq': {},
@@ -252,17 +260,17 @@ def example_rows_obj(example_rows, project, institution):
 def example_rows_pedigree():
     return [
         {'family id': '0101', 'individual id': '456', 'mother id': '123', 'father id': '789',
-         'sex': 'F', 'proband': 'Y', 'hpo terms': 'HPO:000001, HPO:099994', 'mondo terms': 'MONDO:012345'},
+         'sex': 'F', 'proband': 'Y', 'hpo terms': 'HP:0000001, HP:0099994', 'mondo terms': 'MONDO:0012345'},
         {'family id': '0101', 'individual id': '123', 'mother id': '223', 'father id': '323',
-         'sex': 'F', 'proband': 'N', 'hpo terms': 'HPO:099994', 'mondo terms': ''},
+         'sex': 'F', 'proband': 'N', 'hpo terms': 'HP:0099994', 'mondo terms': ''},
         {'family id': '0101', 'individual id': '789', 'mother id': '', 'father id': '',
          'sex': 'M', 'proband': 'N', 'hpo terms': '', 'mondo terms': ''},
         {'family id': '0101', 'individual id': '423', 'mother id': '223', 'father id': '323',
          'sex': 'M', 'proband': 'N', 'hpo terms': '', 'mondo terms': ''},
         {'family id': '0101', 'individual id': '223', 'mother id': '', 'father id': '',
-         'sex': 'F', 'proband': 'N', 'hpo terms': 'HPO:099994, HPO:012345', 'mondo terms': ''},
+         'sex': 'F', 'proband': 'N', 'hpo terms': 'HP:0099994, HP:0012345', 'mondo terms': ''},
         {'family id': '0101', 'individual id': '323', 'mother id': '', 'father id': '',
-         'sex': 'F', 'proband': 'N', 'hpo terms': '', 'mondo terms': 'MONDO:045732, MONDO:043872'},
+         'sex': 'F', 'proband': 'N', 'hpo terms': '', 'mondo terms': 'MONDO:0045732, MONDO:0043872'},
         {'family id': '0101', 'individual id': '156', 'mother id': '456', 'father id': '',
          'sex': 'F', 'proband': 'N', 'hpo terms': '', 'mondo terms': '',
          'pregnancy': 'y', 'gestational age': '25', 'gestational age units': 'week'}
@@ -687,6 +695,14 @@ class TestPedigreeMetadata:
         assert len(example_rows_pedigree_obj.json_out['family']) == 1
         assert len(example_rows_pedigree_obj.json_out['individual']) == 7
 
+    def test_check_individuals(self, testapp, example_rows_pedigree, project, institution):
+        submission = PedigreeMetadata(testapp, [example_rows_pedigree[0]], project, institution,
+                                      TEST_INGESTION_ID1)
+        assert sorted(list(submission.json_out.keys())) == ['errors', 'family', 'individual']
+        assert not submission.json_out['errors']
+        assert len(submission.json_out['family']) == 1
+        assert len(submission.json_out['individual']) == 3
+
 
 class TestSpreadsheetProcessing:
 
@@ -719,8 +735,47 @@ class TestSpreadsheetProcessing:
         assert not obj.passing
         assert 'Column(s) "specimen id" not found in spreadsheet!' in ''.join(obj.errors)
 
+    @pytest.mark.parametrize('remove_row, success_bool', [
+        (0, False),  # main header missing should cause a caught error
+        (8, True),  # last data row missing shouldn't cause issues
+    ])
+    def test_header_found_pedigree(self, testapp, project, institution,
+                                   xls_list_pedigree, remove_row, success_bool):
+        """tests that proper header is found when present"""
+        data = iter(xls_list_pedigree[0:remove_row] + xls_list_pedigree[(remove_row) + 1:])
+        obj = SpreadsheetProcessing(testapp, data, project, institution, TEST_INGESTION_ID1,
+                                    submission_type='pedigree')
+        assert obj.passing == success_bool
+        assert (len(obj.errors) == 0) == success_bool
+        assert ('Column headers not detected in spreadsheet!' in ''.join(obj.errors)) == (not success_bool)
 
-def test_xls_to_json(testapp, project, institution):
+    def test_create_row_dict_pedigree(self, testapp, xls_list_pedigree, project, institution):
+        """tests that dictionary of colname: field value is created for each row"""
+        obj = SpreadsheetProcessing(testapp, iter(xls_list_pedigree), project, institution,
+                                    TEST_INGESTION_ID1, submission_type='pedigree')
+        assert obj.keys
+        assert len(obj.rows) == 8
+        for row in obj.rows:
+            assert all(key in row for key in obj.keys)
+
+    @pytest.mark.parametrize('col, success_bool', [
+        ('Sex', False),  # required column
+        ('Family ID:', False),  # required column
+        ('HPO terms', True)  # not required
+    ])
+    def test_create_row_dict_pedigree_missing_col(self, testapp, xls_list_pedigree,
+                                                  project, institution, col, success_bool):
+        """tests that correct error is returned when a required column header is not in spreadsheet"""
+        idx = xls_list_pedigree[0].index(col)
+        rows = (row[0:idx] + row[idx+1:] for row in xls_list_pedigree)
+        obj = SpreadsheetProcessing(testapp, rows, project, institution, TEST_INGESTION_ID1,
+                                    submission_type='pedigree')
+        assert obj.passing == success_bool
+        if not success_bool:
+            assert 'Column(s) "{}" not found in spreadsheet!'.format(col.lower().strip(':')) in ''.join(obj.errors)
+
+
+def test_xls_to_json_accessioning(testapp, project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
     rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'accessioning')
@@ -729,6 +784,18 @@ def test_xls_to_json(testapp, project, institution):
     assert 'encode-project:family-456' in json_out['family']
     assert len(json_out['individual']) == 3
     assert all(['encode-project:individual-' + x in json_out['individual'] for x in ['123', '456', '789']])
+
+def test_xls_to_json_pedigree(testapp, project, institution):
+    """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
+    rows = digest_xls('src/encoded/tests/data/documents/pedigree_test_example.xlsx')
+    json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'pedigree')
+    assert success
+    assert len(json_out['family']) == 1
+    assert 'encode-project:family-IND201' in json_out['family']
+    assert len(json_out['individual']) == 8
+    assert all(['encode-project:individual-' + x in json_out['individual'] for x in [
+        'IND201', 'IND202', 'IND203', 'IND204', 'IND205', 'IND206', 'IND207', 'IND208'
+    ]])
 
 
 def test_xls_to_json_errors(testapp, project, institution):
@@ -754,6 +821,12 @@ def test_xls_to_json_invalid_workup(testapp, project, institution, xls_list):
     assert ('Row 5 - Samples with analysis ID 55432 contain mis-matched '
             'or invalid workup type values.') in ''.join(json_out['errors'])
 
+# def test_xls_to_json_errors_pedigree(testapp, project, institution):
+#     """tests for expected output when spreadsheet is not formatted correctly"""
+#     rows = digest_xls('src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx')
+#     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'pedigree')
+#     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
+#     assert success  # still able to proceed to validation step
 
 def test_parse_exception_invalid_alias(testapp, a_case):
     a_case['invalid_field'] = 'value'
