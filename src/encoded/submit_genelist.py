@@ -623,7 +623,10 @@ class GeneListSubmission:
                 content_type="multipart/form-data",
             ).json
         if submission_response["success"]:
-            self.post_output.append("Variants will begin updating shortly")
+            self.post_output.append(
+                "Variants should begin updating shortly but may take a few "
+                "hours depending on server load."
+            )
         else:
             self.post_output.append(
                 "Variants were not queued for updating. Please reach out "
