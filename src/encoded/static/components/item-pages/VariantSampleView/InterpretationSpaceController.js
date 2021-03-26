@@ -38,18 +38,6 @@ export class InterpretationSpaceWrapper extends React.Component {
         return newState;
     }
 
-    /**
-     * Adds approved by user from JWT session details, and current date/time as approved date
-     * @param {Object} note     Note to update with user and date info (will be edited in place)
-     */
-    static populateNoteWithApprovedDateUser(note) { // edits note in-place
-        const userDetails = JWT.getUserDetails();
-        const { uuid } = userDetails || {};
-        note.approved_date = new Date(Date.now()).toISOString();
-        note.approved_by = uuid;
-        return note;
-    }
-
     constructor(props) {
         super(props);
         const { context = null } = props;
@@ -57,38 +45,14 @@ export class InterpretationSpaceWrapper extends React.Component {
         this.saveAsDraft = this.saveAsDraft.bind(this);
     }
 
-    /* May need user info more globally eventually...
-    componentDidMount() {
-        // get user details on mount, trigger load
-        const userDetails = JWT.getUserDetails();
-        const { uuid } = userDetails || {};
-        console.log("userDetails", userDetails);
-        if (uuid) {
-            this.loadUser(uuid);
-        } else {
-            console.error("Couldn't find session details. Please log in.");
-        }
-    }
-
-    loadUser(uuid){
-        ajax.load("/users/" + uuid + "/", (res)=>{
-            if (!(res && res['@id'])) {
-                throw new Error("Couldn't fetch user info, make sure you're logged in.");
-            }
-            console.log("user loaded,",res);
-            this.setState({ user: res });
-        });
-    }
-    */
-
     /**
-     * Can be used for cloning+updating notes OR creating new drafts
+     * Can be used for creating new drafts
      * @param {Object}   note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
      * @param {String}   noteType "note_interpretation" or "note_standard"
-     * @param {Integer}  version  Number to set version to
-     * @param {String}   status   Should be "in review" or "current"; newly created notes shouldn't be "approved"
+     * @param {Integer}  version  Number to set version to (not in use currently... may need if expand for case in future)
+     * @param {String}   status   Should be "in review" (not in use currently... may expand if expand for case in future)
      */
-    postNewNote(note, noteType, version = 1, status = null) {
+    postNewNote(note, noteType, version = 1, status = "in review") {
         const { context: { institution = null, project = null } = {} } = this.props;
         const { '@id': institutionID } = institution || {};
         const { '@id': projectID } = project || {};
@@ -107,13 +71,6 @@ export class InterpretationSpaceWrapper extends React.Component {
             delete noteToSubmit.classification;
         }
 
-        // Set initial version for approved cases, but not drafts
-        if (status === "current") {
-            noteToSubmit.version = version;
-            // Add approved_by and approved_date stamps
-            InterpretationSpaceWrapper.populateNoteWithApprovedDateUser(noteToSubmit);
-        }
-
         noteToSubmit.institution = institutionID;
         noteToSubmit.project = projectID;
         noteToSubmit.status = status;
@@ -128,24 +85,14 @@ export class InterpretationSpaceWrapper extends React.Component {
         return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteAtID }));
     }
 
-    patchPreviouslySavedNote(noteAtID, noteToPatch, newStatus = null) { // ONLY USED FOR DRAFTS -- other notes are cloned
-        if (newStatus === "current") { // Only used to convert "in review" to "current" (draft -> approved for case)
-            noteToPatch.status = newStatus;
-            if (noteToPatch.version) {
-                noteToPatch.version++;
-            } else {
-                noteToPatch.version = 1;
-            }
-            // Add approved_by and approved_date stamps
-            InterpretationSpaceWrapper.populateNoteWithApprovedDateUser(noteToPatch);
-        }
+    patchPreviouslySavedNote(noteAtID, noteToPatch) { // ONLY USED FOR DRAFTS -- other notes are cloned
         return ajax.promise(noteAtID, 'PATCH', {}, JSON.stringify(noteToPatch));
     }
 
     saveAsDraft(note, stateFieldToUpdate, noteType) {
         const { [stateFieldToUpdate]: lastSavedNote } = this.state;
 
-        // Does a draft already exist? TODO: Update this to actually check that draft is status = in review
+        // Does a draft already exist?
         if (lastSavedNote) { // Patch the pre-existing draft item & overwrite it
             console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
             const {
@@ -171,24 +118,22 @@ export class InterpretationSpaceWrapper extends React.Component {
                 noteToSubmit.version = version + 1;
             }
 
-            // console.log("noteToSubmit", noteToSubmit);
-
             this.setState({ loading: true }, () => {
                 this.patchPreviouslySavedNote(noteAtID, noteToSubmit)
                     .then((response) => {
                         const { '@graph': graph = [], status } = response;
+                        // Some handling for various fail responses/codes
                         if (graph.length === 0 || status === "error") {
                             throw new Error(response);
                         }
 
                         const { 0: newlySavedDraft } = graph || [];
-                        // TODO: Some handling for various fail responses/codes
                         this.setState({ loading: false, [stateFieldToUpdate]: newlySavedDraft });
 
                         console.log("Successfully overwritten previous draft of note", response);
                     })
                     .catch((err) => {
-                        // TODO: Error handling
+                        // TODO: Error handling/alerting
                         console.log(err);
                         this.setState({ loading: false });
                     });
@@ -216,7 +161,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                     .then((resp) => {
                         console.log("Successfully linked note object to variant sample", resp);
                         // const { '@graph': noteItem } = response;
-                        // TODO: Find way to update state with new interpretation note here instead
+                        // TODO: Check integrity of @graph before stating successful
                     })
                     .catch((err) => {
                         // TODO: Error handling/alerting
@@ -255,7 +200,7 @@ export class InterpretationSpaceController extends React.Component {
     }
 
     toggleExpanded() {
-        // TODO
+        // TODO for V2
         const { isExpanded } = this.state;
         console.log("is setting fullscreen", isExpanded);
         this.setState({ isExpanded: !isExpanded });
@@ -301,15 +246,15 @@ export class InterpretationSpaceController extends React.Component {
     }
 }
 
-function InterpretationSpaceHeader(props) {
-    const { toggleExpanded, isExpanded } = props;
+function InterpretationSpaceHeader(props) { // Expanded items commented out until V2
+    // const { toggleExpanded, isExpanded } = props;
     return (
         <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
             <i className="icon icon-sort-amount-down fas"></i>
             Variant Interpretation
-            <button type="button" className="btn btn-link" onClick={toggleExpanded || undefined}>
+            {/* <button type="button" className="btn btn-link" onClick={toggleExpanded || undefined}>
                 { isExpanded ? <i className="icon icon-compress fas"></i> : <i className="icon icon-expand fas"></i> }
-            </button>
+            </button> */}
         </div>
     );
 }
@@ -573,7 +518,7 @@ function GenericInterpretationSubmitButton(props) {
     const allButtonsDropsDisabled = !noteTextPresent || !noteChangedSinceLastSave;
 
     if (isCurrent || isApproved) {
-        // No further steps allowed; saving to knowledgebase or approving to case
+        // No further steps allowed; saved to knowledgebase or approved to case
         return (
             <Button variant="primary btn-block" disabled={isCur} onClick={saveAsDraft} className={cls}>
                 { isCurrent || isApproved  ? "Cannot edit - already approved" : null}
