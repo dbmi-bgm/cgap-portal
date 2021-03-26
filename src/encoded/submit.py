@@ -1158,6 +1158,9 @@ def cell_value(cell):
     elif ctype == openpyxl.cell.cell.TYPE_BOOL:
         return str(value).upper().strip()
     elif ctype in (openpyxl.cell.cell.TYPE_NUMERIC, openpyxl.cell.cell.TYPE_NULL):
+        if isinstance(value, float):
+            if value.is_integer():
+                value = int(value)
         if not value:
             value = ''
         return str(value).strip()
