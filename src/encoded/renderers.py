@@ -417,12 +417,12 @@ def should_transform(request, response):
         return False
 
     # The `format` URI param allows us to override request's 'Accept' header.
-    format = request.params.get('format')
-    if format is not None:
-        format = format.lower()
-        if format == 'json':
+    format_param = request.params.get('format')
+    if format_param is not None:
+        format_param = format_param.lower()
+        if format_param == 'json':
             return False
-        if format == 'html':
+        if format_param == 'html':
             return True
         else:
             raise HTTPNotAcceptable("Improper format URI parameter",
@@ -431,17 +431,14 @@ def should_transform(request, response):
     # Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
     # which should contain 'text/html'
     # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
-    mime_type = best_mime_type(request)
-    format = mime_type.split('/', 1)[1]  # Will be 1 of 'html', 'json', 'json-ld'
+    mime_type = best_mime_type(request)  # Result will be one of MIME_TYPES_SUPPORTED
 
     # N.B. ld+json (JSON-LD) is likely more unique case and might be sent by search engines (?)
     # which can parse JSON-LDs. At some point we could maybe have it to be same as
     # making an `@@object` or `?frame=object` request (?) esp if fill
     # out @context response w/ schema(s) (or link to schema)
 
-    if format == 'html':
-        return True
-    return False
+    return mime_type == MIME_TYPE_HTML
 
 
 def render_page_html_tween_factory(handler, registry):
