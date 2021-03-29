@@ -493,7 +493,6 @@ class PedigreeRow:
         return [{'phenotypic_feature': self.format_atid(feature)} for feature in feature_list if feature]
 
     def extract_individual_metadata(self):
-        print(self.metadata)
         info = {'aliases': [self.indiv_alias]}
         simple_fields = ['family_id', 'individual_id', 'sex', 'clinic_notes', 'ancestry',
                          'quantity', 'life_status', 'cause_of_death', 'age_at_death',
@@ -514,7 +513,6 @@ class PedigreeRow:
         for col in ['age', 'birth_year', 'age_at_death', 'gestational_age', 'quantity']:
             if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
                 info[col] = int(info[col])
-        print(info)
         return MetadataItem(info, self.row, 'individual')
 
     def is_proband(self):
@@ -866,15 +864,16 @@ class PedigreeMetadata:
                 # if family not in DB, create a new one
                 final_family_dict[value['aliases'][0]] = value
             else:
-                for match in family_matches.json['@graph'][0]:
+                for match in family_matches.json['@graph']:
+                    value['aliases'].extend(match.get('aliases', []))
                     final_family_dict[match['aliases'][0]] = value
                     if value.get('proband'):
-                        del final_family_dict[match['aliases'][0]]['proband']
                         phenotypes = [item['phenotypic_feature'] for item in
                                       self.individuals[value['proband']].get('phenotypic_features', [])]
                         # TODO: Add other family member phenotypes if proband phenotypes < 4
                         if phenotypes:
                             final_family_dict[match['aliases'][0]]['family_phenotyic_features'] = phenotypes[:4]
+                        del final_family_dict[match['aliases'][0]]['proband']
         return final_family_dict
 
     def check_individuals(self):
@@ -902,10 +901,9 @@ class PedigreeMetadata:
         for i, row in enumerate(self.rows):
             try:
                 processed_row = PedigreeRow(row, i + 1 + self.counter, self.project, self.institution)
-                self.add_individual_metadata(processed_row.individual)
                 self.errors.extend(processed_row.errors)
+                self.add_individual_metadata(processed_row.individual)
             except AttributeError as e:
-                self.errors.append(e)
                 continue
         self.families = self.add_family_metadata()
         self.check_individuals()

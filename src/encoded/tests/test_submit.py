@@ -668,16 +668,14 @@ class TestPedigreeMetadata:
         assert fam['proband'] == 'encode-project:individual-456'
         assert len(fam['members']) == len(example_rows_pedigree)
 
-    def test_add_family_metadata_db_single(self, testapp, example_rows_pedigree, project, institution,
-                                           first_family):
-        # family item found  in db
-        # family item has all members and has proband
-        # with mock.patch('webtest.Testapp.get') as mock_get:
-        #     mock_get.return_value = first_family
-        #     submission = PedigreeMetadata(testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
-        #     assert first_family['aliases'][0] in submission.families
-        pass
-
+    def test_add_family_metadata_db_single(self, workbook, es_testapp, example_rows_pedigree,
+                                           project, institution):
+        submission = PedigreeMetadata(es_testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
+        assert len(submission.families) == 1
+        fam = list(submission.families.values())[0]
+        assert 'hms-dbmi:0101' in fam['aliases']
+        assert list(submission.families.keys())[0] == 'hms-dbmi:0101'
+        assert len(fam['members']) == len(example_rows_pedigree)
 
     def test_add_family_metadata_db_multi(self, testapp, example_rows_pedigree, project, institution):
         # two family items found  in db
@@ -798,12 +796,21 @@ def test_xls_to_json_pedigree(testapp, project, institution):
     ]])
 
 
-def test_xls_to_json_errors(testapp, project, institution):
+def test_xls_to_json_accessioning_errors(testapp, project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
     rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx')
     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'accessioning')
     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
     assert success  # still able to proceed to validation step
+
+
+def test_xls_to_json_pedigree_errors(testapp, project, institution):
+    """tests for expected output when spreadsheet is not formatted correctly"""
+    rows = digest_xls('src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx')
+    json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'pedigree')
+    assert 'Row 5 - term HP:00000821 does not match the format' in ''.join(json_out['errors'])
+    assert 'Row 9 - missing required field(s) family id.' in ''.join(json_out['errors'])
+    assert success
 
 
 def test_xls_to_json_invalid_workup(testapp, project, institution, xls_list):
