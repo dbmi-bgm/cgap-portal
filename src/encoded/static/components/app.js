@@ -1043,7 +1043,7 @@ export default class App extends React.PureComponent {
     handleBeforeUnload(e){
         const { isSubmitting } = this.state;
         if (isSubmitting){
-            const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?"; "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
+            const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
             e.returnValue = confirmMessage;
             return confirmMessage;
         }
