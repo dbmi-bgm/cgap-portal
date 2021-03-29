@@ -328,17 +328,8 @@ class WorkbookCache:
 
     @classmethod
     def initialize_if_needed(cls, es_app):
-        if cls.done:
-            cls.get_saved_workbook()
-        else:
+        if not cls.done:
             cls.done = cls.make_fresh_workbook(es_app)
-
-    @classmethod
-    def get_saved_workbook(cls, es_app):
-
-        es = es_app.app.registry['elasticsearch']
-
-        es.get("/_snapshot/my_backup/snapshot_1", wait_for_completion=True)
 
     @classmethod
     def make_fresh_workbook(cls, es_app):
@@ -358,11 +349,6 @@ class WorkbookCache:
             raise RuntimeError("load_all returned a true value that was not an exception.")
 
         testapp.post_json('/index', {})
-
-        es = es_app.app.registry['elasticsearch']
-
-        es.put("/_snapshot/my_backup/snapshot_1", wait_for_completion=True, verify=False)
-
         return True
 
 
