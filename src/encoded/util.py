@@ -357,68 +357,8 @@ def content_type_allowed(request):
 
     return False
 
+from dcicutils.misc_utils import  count, count_if, find_associations, find_association
 
-# TODO: Move to misc_utils
-class _ConstantValuedFunction:
-
-    def __init__(self, value):
-        self._value = value
-
-    def __str__(self):
-        return repr(self)
-
-    def __repr__(self):
-        return "constantly(%r)" % self._value
-
-    def __call__(self, *args, **kwargs):
-        ignored(args, kwargs)
-        return self._value
-
-    @property
-    def __doc__(self):
-        return "A function that always returns a constant value: %r" % self._value
-
-
-# TODO: Move to misc_utils
-def constantly(x):
-    """Given any constant x, returns a function that always returns the constant x."""
-    return _ConstantValuedFunction(x)
-
-
-# TODO: Move to misc_utils
-def identity(x):
-    """Returns its argument."""
-    return x
-
-
-# TODO: Move to misc_utils
-def count_if(filter, seq):
-    return sum(1 for x in seq if filter(x))
-
-
-# TODO: Move to misc_utils
-def count(seq, filter=None):
-    return count_if(filter or identity, seq)
-
-
-# TODO: Move to misc_utils
-def find_associations(data, **kwargs):
-    found = []
-    for datum in data:
-        mismatch = False
-        for k, v in kwargs.items():
-            defaulted_val = datum.get(k)
-            if not (v(defaulted_val) if callable(v) else (v == defaulted_val)):
-                mismatch = True
-                break
-        if not mismatch:
-            found.append(datum)
-    return found
-
-
-def find_association(data, **kwargs):
-    [result] = find_associations(data, **kwargs)
-    return result
 
 
 @contextlib.contextmanager
