@@ -7,6 +7,7 @@ import ReactTooltip from 'react-tooltip';
 import memoize from 'memoize-one';
 import Dropdown from 'react-bootstrap/esm/Dropdown';
 import Button from 'react-bootstrap/esm/Button';
+import Modal from 'react-bootstrap/esm/Modal';
 import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, layout, JWT, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -256,14 +257,14 @@ export class InterpretationSpaceController extends React.Component {
 }
 
 function InterpretationSpaceHeader(props) { // Expanded items commented out until V2
-    // const { toggleExpanded, isExpanded } = props;
+    const { toggleExpanded, isExpanded } = props;
     return (
         <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
             <i className="icon icon-sort-amount-down fas"></i>
             Variant Interpretation
-            {/* <button type="button" className="btn btn-link" onClick={toggleExpanded || undefined}>
+            <button type="button" className="btn btn-link" onClick={toggleExpanded || undefined} style={{ visibility: "hidden" }}>
                 { isExpanded ? <i className="icon icon-compress fas"></i> : <i className="icon icon-expand fas"></i> }
-            </button> */}
+            </button>
         </div>
     );
 }
@@ -351,8 +352,13 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     componentWillUnmount() { // Before unmounting (as in switching tabs), save unsaved changes in controller state
-        const { saveToField, retainWIPStateOnUnmount } = this.props;
-        retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
+        const { saveToField, retainWIPStateOnUnmount, lastWIPNote } = this.props;
+
+        // Only trigger if note has changed since last save to state
+        if (this.memoized.hasNoteChanged(lastWIPNote, this.state)) {
+            console.log("note has changed... saving");
+            retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
+        }
     }
 
     render() {
@@ -378,8 +384,7 @@ class GenericInterpretationPanel extends React.Component {
                 <GenericInterpretationSubmitButton {...{ isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
-                {/* May want to re-implement something like this
-                 { noteType === "note_interpretation" && isApproved ? <button type="button" className="btn btn-primary btn-block mt-05">Close &amp; Return to Case</button>: null} */}
+                <UnsavedInterpretationModal />
             </div>
         );
     }
@@ -544,4 +549,41 @@ function GenericInterpretationSubmitButton(props) {
             </Button>
         );
     }
+}
+
+function UnsavedInterpretationModal(props) {
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    return (
+        <React.Fragment>
+            <Button variant="primary btn-block mt-05" onClick={handleShow}>
+                Close &amp; Return to Case
+            </Button>
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton style={{ backgroundColor: "#cdd6e6" }}>
+                    <Modal.Title>
+                        <div className="modal-title font-italic text-600 h4">
+                            Variant Interpretation: <span className="text-300">Unsaved Changes</span>
+                        </div>
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="text-small text-center mt-2">This variant interpretation is <u>incomplete</u> and contains:</div>
+                    <div className="font-italic text-center text-600 h3 my-3">1 Unsaved Variant Classification</div>
+                    <div className="text-small text-center mb-2">Are you sure you want to navigate away?</div>
+                </Modal.Body>
+                <Modal.Footer style={{ backgroundColor: "#efefef" }}>
+                    <Button variant="outline-secondary" onClick={handleClose}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handleClose}>
+                        Discard Changes and Continue Navigation
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </React.Fragment>
+    );
 }
