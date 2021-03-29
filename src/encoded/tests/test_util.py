@@ -11,7 +11,7 @@ from dcicutils.misc_utils import constantly
 from dcicutils.qa_utils import ControlledTime, ignored
 from ..util import (
     debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, get_trusted_email,
-    check_user_is_logged_in, count, count_if, find_association, find_associations, identity, vapp_for_email,
+    check_user_is_logged_in, vapp_for_email,
 )
 from .. import util as util_module
 
@@ -262,92 +262,6 @@ def test_check_user_is_logged_in(principals, expect_logged_in):
     else:
         with pytest.raises(pyramid.httpexceptions.HTTPForbidden):
             check_user_is_logged_in(req)
-
-
-def test_find_associations():
-
-    one = {'value': 1, 'english': 'one', 'spanish': 'uno'}
-    two = {'value': 2, 'english': 'two', 'spanish': 'dos'}
-    three = {'value': 3, 'english': 'three', 'spanish': 'tres'}
-
-    things = [one, two, three]
-    assert find_associations(things, value=1) == [one]
-    assert find_associations(things, spanish='dos') == [two]
-    assert find_associations(things, spanish='dos', value=2) == [two]
-    assert find_associations(things, spanish='dos', value=3) == []
-
-    assert find_associations(things, value=lambda x: x % 2 == 1) == [one, three]
-
-
-def test_find_association():
-
-    one = {'value': 1, 'english': 'one', 'spanish': 'uno'}
-    two = {'value': 2, 'english': 'two', 'spanish': 'dos'}
-    three = {'value': 3, 'english': 'three', 'spanish': 'tres'}
-
-    things = [one, two, three]
-    assert find_association(things, value=1) == one
-    assert find_association(things, spanish='dos') == two
-    assert find_association(things, spanish='dos', value=2) == two
-
-    with pytest.raises(Exception):
-        find_association(things, spanish='dos', value=3)  # find_associations would return []
-
-    with pytest.raises(Exception):
-        find_association(things, value=lambda x: x % 2 == 1)   # find_associations would return [one, three]
-
-
-def test_identity():
-    for x in [1, 'foo', ['x', 17]]:
-        assert x == identity(x)
-
-
-def test_count_if():
-
-    list_of_numbers = [0, 10, 20, 30]
-    list_of_things = [None, 1, '', 'foo', 'False', [1, 2, 3]]
-
-    list_of_non_zero_numbers = list_of_numbers.copy()
-    list_of_non_zero_numbers.remove(0)
-
-    assert count_if(constantly(True), list_of_numbers) == len(list_of_numbers)
-    assert count_if(constantly(True), list_of_things) == len(list_of_things)
-    assert count_if(constantly(True), []) == 0
-
-    assert count_if(constantly(False), list_of_numbers) == 0
-    assert count_if(constantly(False), list_of_things) == 0
-    assert count_if(constantly(False), []) == 0
-
-    assert count_if(identity, list_of_numbers) == len([x for x in list_of_numbers if x])
-    assert count_if(identity, list_of_things) == len([x for x in list_of_things if x])
-    assert count_if(identity, []) == 0
-
-    with pytest.raises(Exception):
-        count_if(identity, None)
-
-
-def test_count():
-
-    list_of_numbers = [0, 10, 20, 30]
-    list_of_things = [None, 1, '', 'foo', 'False', [1, 2, 3]]
-
-    list_of_non_zero_numbers = list_of_numbers.copy()
-    list_of_non_zero_numbers.remove(0)
-
-    assert count(list_of_numbers, filter=constantly(True)) == len(list_of_numbers)
-    assert count(list_of_things, filter=constantly(True)) == len(list_of_things)
-    assert count([], filter=constantly(True)) == 0
-
-    assert count(list_of_numbers, filter=constantly(False)) == 0
-    assert count(list_of_things, filter=constantly(False)) == 0
-    assert count([], filter=constantly(False)) == 0
-
-    assert count(list_of_numbers) == len([x for x in list_of_numbers if x])
-    assert count(list_of_things) == len([x for x in list_of_things if x])
-    assert count([]) == 0
-
-    with pytest.raises(Exception):
-        count(None)
 
 
 @pytest.fixture()
