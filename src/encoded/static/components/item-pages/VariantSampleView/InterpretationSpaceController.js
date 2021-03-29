@@ -186,19 +186,19 @@ export class InterpretationSpaceController extends React.Component {
         super(props);
         const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation } = props;
         this.state = {
-            // Initialize draft states to prop notes
-            variant_notes_draft: lastSavedVariantNote,
-            gene_notes_draft: lastSavedGeneNote,
-            interpretation_draft: lastSavedInterpretation,
-            currentTab: "Variant Notes",   // 0: Variant Notes, 1: Gene Notes, 2: Interpretation (Research/Discovery), 3: Interpretation (Clinical/ACMG)
+            // Initialize WIP states to last saved - if a tab is closed WIP progress is temporarily saved here
+            variant_notes_wip: lastSavedVariantNote,
+            gene_notes_wip: lastSavedGeneNote,
+            interpretation_wip: lastSavedInterpretation,
+            currentTab: "Variant Notes",
             isExpanded: false // TODO - currently unused; V2
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
         this.switchToTab = this.switchToTab.bind(this);
-        this.saveDraftToStateBeforeUnmount = this.saveDraftToStateBeforeUnmount.bind(this);
+        this.retainWIPStateOnUnmount = this.retainWIPStateOnUnmount.bind(this);
     }
 
-    saveDraftToStateBeforeUnmount(note, state) {
+    retainWIPStateOnUnmount(note, state) {
         this.setState({ [state]: note });
     }
 
@@ -224,7 +224,7 @@ export class InterpretationSpaceController extends React.Component {
     }
 
     render() {
-        const { isExpanded, currentTab, variant_notes_draft, gene_notes_draft, interpretation_draft } = this.state;
+        const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip } = this.state;
         const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas');
@@ -232,13 +232,13 @@ export class InterpretationSpaceController extends React.Component {
         let panelToDisplay = null;
         switch(currentTab) {
             case "Variant Notes":
-                panelToDisplay = <GenericInterpretationPanel saveDraftToStateBeforeUnmount={this.saveDraftToStateBeforeUnmount} lastWIPNote={variant_notes_draft} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab} key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }/>;
+                panelToDisplay = <GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab} key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }/>;
                 break;
             case "Gene Notes":
-                panelToDisplay = <GenericInterpretationPanel saveDraftToStateBeforeUnmount={this.saveDraftToStateBeforeUnmount} lastWIPNote={gene_notes_draft} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab} key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }/>;
+                panelToDisplay = <GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab} key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }/>;
                 break;
             case "Interpretation":
-                panelToDisplay = <GenericInterpretationPanel saveDraftToStateBeforeUnmount={this.saveDraftToStateBeforeUnmount} lastWIPNote={interpretation_draft} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab} key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }/>;
+                panelToDisplay = <GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab} key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }/>;
                 break;
             default:
                 break;
@@ -314,23 +314,7 @@ class GenericInterpretationPanel extends React.Component {
     constructor(props) {
         super(props);
 
-        // Defaults to most recent draft note; if no draft, defaults to last saved note (as determined by InterpretationPanelController)
-        let note_text, acmg_guidelines, classification, conclusion;
-        if (props.lastWIPNote) {
-            console.log("WIP note exists... populating", props.lastWIPNote);
-            const { note_text: this_note_text = "", acmg_guidelines: this_acmg_guidelines = [], classification: this_classification = null, conclusion: this_conclusion =  "" } = props.lastWIPNote;
-            note_text = this_note_text;
-            acmg_guidelines = this_acmg_guidelines;
-            classification = this_classification;
-            conclusion = this_conclusion;
-        } else {
-            console.log("WIP note does not exist... populating with last saved");
-            const { note_text: this_note_text = "", acmg_guidelines: this_acmg_guidelines = [], classification: this_classification = null, conclusion: this_conclusion =  "" } = props.lastSavedNote || {};
-            note_text = this_note_text;
-            acmg_guidelines = this_acmg_guidelines;
-            classification = this_classification;
-            conclusion = this_conclusion;
-        }
+        const { note_text = "", acmg_guidelines = [], classification = null, conclusion =  "" } = props.lastWIPNote || props.lastSavedNote || {};
 
         this.state = {
             // Fields in form. Using snake casing to make it easier to add state data directly to post/patch request
@@ -367,8 +351,8 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     componentWillUnmount() { // Before unmounting (as in switching tabs), save unsaved changes in controller state
-        const { saveToField, saveDraftToStateBeforeUnmount } = this.props;
-        saveDraftToStateBeforeUnmount(this.state, `${saveToField}_draft`);
+        const { saveToField, retainWIPStateOnUnmount } = this.props;
+        retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
     }
 
     render() {
