@@ -40,9 +40,13 @@ def submit_genelist(
                 filename, project, institution, vapp, validate_only
             )
             if validate_only:
-                results["validation_output"] = (
-                    genelist.validation_output + genelist.notes
-                )
+                if genelist.errors:
+                    results["validation_output"] = genelist.errors
+                else:
+                    results["success"] = True
+                    results["validation_output"] = (
+                        genelist.validation_output + genelist.notes
+                    )
             elif genelist.post_output:
                 results["success"] = True
                 results["validation_output"] = (
