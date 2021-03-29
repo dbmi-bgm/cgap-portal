@@ -23,8 +23,8 @@ export class InterpretationSpaceWrapper extends React.Component {
      *      "variant_notes": <note_obj>,
      *      "gene_notes": <note obj>,
      *      "interpretation": <note obj>,
-     *      "loading": ,
-     *      "user": null || <user obj>... etc. }
+     *      "loading": false,
+     *      "user": null... etc. }
      */
     static initializeNoteState(context = {}) {
         const fields = ["variant_notes", "gene_notes", "interpretation"];
@@ -175,7 +175,7 @@ export class InterpretationSpaceWrapper extends React.Component {
     render() {
         const { variant_notes, gene_notes, interpretation } = this.state;
         return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
-            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation} 
+            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation}
             saveAsDraft={this.saveAsDraft}/>;
     }
 }
@@ -184,12 +184,22 @@ export class InterpretationSpaceWrapper extends React.Component {
 export class InterpretationSpaceController extends React.Component {
     constructor(props) {
         super(props);
+        const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation } = props;
         this.state = {
+            // Initialize draft states to prop notes
+            variant_notes_draft: lastSavedVariantNote,
+            gene_notes_draft: lastSavedGeneNote,
+            interpretation_draft: lastSavedInterpretation,
             currentTab: "Variant Notes",   // 0: Variant Notes, 1: Gene Notes, 2: Interpretation (Research/Discovery), 3: Interpretation (Clinical/ACMG)
             isExpanded: false // TODO - currently unused; V2
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
         this.switchToTab = this.switchToTab.bind(this);
+        this.saveDraftToStateBeforeUnmount = this.saveDraftToStateBeforeUnmount.bind(this);
+    }
+
+    saveDraftToStateBeforeUnmount(note, state) {
+        this.setState({ [state]: note });
     }
 
     componentDidUpdate(pastState) {
@@ -214,7 +224,7 @@ export class InterpretationSpaceController extends React.Component {
     }
 
     render() {
-        const { isExpanded, currentTab } = this.state;
+        const { isExpanded, currentTab, variant_notes_draft, gene_notes_draft, interpretation_draft } = this.state;
         const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas');
@@ -222,13 +232,13 @@ export class InterpretationSpaceController extends React.Component {
         let panelToDisplay = null;
         switch(currentTab) {
             case "Variant Notes":
-                panelToDisplay = <GenericInterpretationPanel lastSavedNote={lastSavedVariantNote} noteLabel={currentTab} key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }/>;
+                panelToDisplay = <GenericInterpretationPanel saveDraftToStateBeforeUnmount={this.saveDraftToStateBeforeUnmount} lastWIPNote={variant_notes_draft} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab} key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }/>;
                 break;
             case "Gene Notes":
-                panelToDisplay = <GenericInterpretationPanel lastSavedNote={lastSavedGeneNote} noteLabel={currentTab} key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }/>;
+                panelToDisplay = <GenericInterpretationPanel saveDraftToStateBeforeUnmount={this.saveDraftToStateBeforeUnmount} lastWIPNote={gene_notes_draft} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab} key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }/>;
                 break;
             case "Interpretation":
-                panelToDisplay = <GenericInterpretationPanel lastSavedNote={lastSavedInterpretation} noteLabel={currentTab} key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }/>;
+                panelToDisplay = <GenericInterpretationPanel saveDraftToStateBeforeUnmount={this.saveDraftToStateBeforeUnmount} lastWIPNote={interpretation_draft} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab} key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }/>;
                 break;
             default:
                 break;
@@ -304,8 +314,24 @@ class GenericInterpretationPanel extends React.Component {
     constructor(props) {
         super(props);
 
-        // Defaults to most recent note (as determined by InterpretationPanelController)
-        const { note_text = "", acmg_guidelines = [], classification = null, conclusion =  "" } = props.lastSavedNote || {};
+        // Defaults to most recent draft note; if no draft, defaults to last saved note (as determined by InterpretationPanelController)
+        let note_text, acmg_guidelines, classification, conclusion;
+        if (props.lastWIPNote) {
+            console.log("WIP note exists... populating", props.lastWIPNote);
+            const { note_text: this_note_text = "", acmg_guidelines: this_acmg_guidelines = [], classification: this_classification = null, conclusion: this_conclusion =  "" } = props.lastWIPNote;
+            note_text = this_note_text;
+            acmg_guidelines = this_acmg_guidelines;
+            classification = this_classification;
+            conclusion = this_conclusion;
+        } else {
+            console.log("WIP note does not exist... populating with last saved");
+            const { note_text: this_note_text = "", acmg_guidelines: this_acmg_guidelines = [], classification: this_classification = null, conclusion: this_conclusion =  "" } = props.lastSavedNote || {};
+            note_text = this_note_text;
+            acmg_guidelines = this_acmg_guidelines;
+            classification = this_classification;
+            conclusion = this_conclusion;
+        }
+
         this.state = {
             // Fields in form. Using snake casing to make it easier to add state data directly to post/patch request
             note_text,
@@ -338,6 +364,11 @@ class GenericInterpretationPanel extends React.Component {
     saveStateAsDraft() {
         const { saveAsDraft, noteType, saveToField } = this.props;
         saveAsDraft(this.state, saveToField , noteType);
+    }
+
+    componentWillUnmount() { // Before unmounting (as in switching tabs), save unsaved changes in controller state
+        const { saveToField, saveDraftToStateBeforeUnmount } = this.props;
+        saveDraftToStateBeforeUnmount(this.state, `${saveToField}_draft`);
     }
 
     render() {
