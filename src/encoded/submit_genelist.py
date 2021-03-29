@@ -298,7 +298,7 @@ class GeneListSubmission:
                         "Consider replacing with one of the following: %s."
                         % (gene, ", ".join(options))
                     )
-                except (VirtualAppError, AppError):
+                except (VirtualAppError, AppError, KeyError):
                     unmatched_genes_without_options.append(gene)
         if unmatched_genes_without_options:
             self.errors.append(
