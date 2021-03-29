@@ -626,7 +626,7 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
                             Select All
                         </button>
                         <button type="button" className="btn btn-primary-dark" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
-                            data-tip="Toggle whether search results from multiple selected filter blocks are intersected or merged">
+                            data-tip="Toggle whether to compute the union or intersection of filter blocks">
                             <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
                             Intersect
                         </button>
