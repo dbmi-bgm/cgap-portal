@@ -1035,17 +1035,19 @@ export default class App extends React.PureComponent {
 
     /**
      * Catch and alert user navigating away from page if in submission process.
+     * (This doesn't always print the message, and instead returns browser's default one, e.g. in Chrome)
+     * See: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload (esp Browser Compatibility for custom text support)
      *
-     * @private
      * @param {React.SyntheticEvent} e Window beforeunload event.
      * @returns {string|void} Dialog text which is to be shown to user.
      */
     handleBeforeUnload(e){
         const { isSubmitting } = this.state;
         if (isSubmitting){
-            const dialogText = "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
-            e.returnValue = dialogText;
-            return dialogText;
+            e.preventDefault();
+            const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
+            e.returnValue = confirmMessage;
+            return confirmMessage;
         }
     }
 
