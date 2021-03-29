@@ -11,7 +11,7 @@ import pytest
 import webtest
 
 
-from dcicutils.qa_utils import notice_pytest_fixtures
+from dcicutils.qa_utils import notice_pytest_fixtures, MockFileSystem
 from pyramid.request import apply_request_extensions
 from pyramid.testing import DummyRequest  # , setUp, tearDown
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
@@ -371,3 +371,9 @@ def workbook(es_app):
     """ Loads a bunch of data (tests/data/workbook-inserts) into the system on first run
         (session scope doesn't work). """
     WorkbookCache.initialize_if_needed(es_app)
+
+
+@pytest.yield_fixture
+def mocked_file_system():
+    with MockFileSystem(auto_mirror_files_for_read=True).mock_exists_open_remove():
+        yield
