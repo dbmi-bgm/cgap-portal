@@ -606,8 +606,13 @@ export function ImpersonateUserForm({ updateAppSessionState }) {
                 <div className="col-12 col-lg-6">
                     <form onSubmit={onSubmit}>
                         <input type="text" className="mt-08 form-control" placeholder="Enter an email to impersonate..." ref={inputFieldRef} />
-                        <button type="submit" className="btn btn-primary btn-md mt-15">
-                            <i className="icon icon-fw icon-user icon-user-ninja fas"/>&nbsp; Impersonate
+                        <a href="/search/?type=User" target="_blank" className="btn btn-secondary btn-md mt-2 mr-2">
+                            <i className="icon icon-fw icon-users fas mr-08"/>
+                            View Users
+                        </a>
+                        <button type="submit" className="btn btn-primary btn-md mt-2">
+                            <i className="icon icon-fw icon-user-ninja fas mr-08"/>
+                            Impersonate
                         </button>
                     </form>
                 </div>
