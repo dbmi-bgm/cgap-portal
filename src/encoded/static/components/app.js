@@ -1036,7 +1036,7 @@ export default class App extends React.PureComponent {
     /**
      * Catch and alert user navigating away from page if in submission process.
      * (This doesn't always print the message, and instead returns browser's default one, e.g. in Chrome)
-     * See: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
+     * See: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload (esp Browser Compatibility for custom text support)
      *
      * @param {React.SyntheticEvent} e Window beforeunload event.
      * @returns {string|void} Dialog text which is to be shown to user.
