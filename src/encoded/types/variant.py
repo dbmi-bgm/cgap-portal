@@ -1,32 +1,22 @@
-import json
-import os
 import boto3
-import pytz
 import datetime
+import io
+import json
+import negspy.coordinates as nc
+import os
+import pytz
 import structlog
-from pyramid.view import view_config
+
+from pyramid.httpexceptions import HTTPTemporaryRedirect
 from pyramid.settings import asbool
-from urllib.parse import (
-    parse_qs,
-    urlparse,
-)
-from pyramid.httpexceptions import (
-    HTTPTemporaryRedirect
-)
+from pyramid.view import view_config
+from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
+from urllib.parse import parse_qs, urlparse
 from ..util import resolve_file_path
 from ..inheritance_mode import InheritanceMode
-from snovault import (
-    calculated_property,
-    collection,
-    load_schema,
-)
-from .base import (
-    Item,
-    get_item_or_none,
-)
-import negspy.coordinates as nc
+from .base import Item, get_item_or_none
 
 
 log = structlog.getLogger(__name__)
@@ -64,7 +54,7 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = []
-    with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
+    with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
     return embedded_list + Item.embedded_list
 
@@ -80,9 +70,9 @@ def build_variant_sample_embedded_list():
     embedded_list = [
         "cmphet.*"
     ]
-    with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
+    with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
-    with open(resolve_file_path('schemas/variant_sample_embeds.json'), 'r') as fd:
+    with io.open(resolve_file_path('schemas/variant_sample_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant_sample')
     return ['variant.*'] + embedded_list + Item.embedded_list
 
@@ -104,14 +94,15 @@ def build_variant_sample_annotation_id(call_info, variant_uuid, file_accession):
 
 
 def load_extended_descriptions_in_schemas(schema_object, depth=0):
-    '''
+    """
     MODIFIES SCHEMA_OBJECT **IN PLACE** RECURSIVELY
-    :param schema_object: A dictionary of any type that might have 'extended_description', 'properties', or 'items.properties'. Should be an Item schema initially.
+    :param schema_object: A dictionary of any type that might have 'extended_description', 'properties',
+        or 'items.properties'. Should be an Item schema initially.
     :param depth: Don't supply this. Used to check/optimize at depth=0 where schema_object is root of schema.
     TODO:
         Maybe reuse and/or move somewhere more global/easy-to-import-from?
         Maybe in base.py?
-    '''
+    """
 
     if depth == 0:
         # Root of Item schema, no extended_description here, but maybe facets or columns
@@ -128,8 +119,10 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
     for field_name, field_schema in schema_object.items():
         if "extended_description" in field_schema:
             if field_schema["extended_description"][-5:] == ".html":
-                html_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../..", field_schema["extended_description"])
-                with open(html_file_path) as open_file:
+                html_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                              "../../..",
+                                              field_schema["extended_description"])
+                with io.open(html_file_path) as open_file:
                     field_schema["extended_description"] = "".join([ l.strip() for l in open_file.readlines() ])
 
         # Applicable only to "properties" of Item schema, not columns or facets:
@@ -138,7 +131,10 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                 load_extended_descriptions_in_schemas(field_schema["properties"], depth + 1)
                 continue
 
-            if field_schema["type"] == "array" and "items" in field_schema and field_schema["items"]["type"] == "object" and "properties" in field_schema["items"]:
+            if (field_schema["type"] == "array"
+                    and "items" in field_schema
+                    and field_schema["items"]["type"] == "object"
+                    and "properties" in field_schema["items"]):
                 load_extended_descriptions_in_schemas(field_schema["items"]["properties"], depth + 1)
                 continue
 
@@ -357,11 +353,11 @@ class VariantSample(Item):
                 "title": "Brother II Genotype",
                 "type": "string"
             },
-             "brother_III_genotype_label": {
+            "brother_III_genotype_label": {
                 "title": "Brother III Genotype",
                 "type": "string"
             },
-             "brother_IV_genotype_label": {
+            "brother_IV_genotype_label": {
                 "title": "Brother IV Genotype",
                 "type": "string"
             },
