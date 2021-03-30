@@ -94,11 +94,15 @@ def build_variant_sample_embedded_list():
         "variant_notes.project",
         "variant_notes.institution",
         "variant_notes.status",
+        "variant_notes.last_modified.date_modified",
+        "variant_notes.last_modified.modified_by.display_title",
         "gene_notes.note_text",
         "gene_notes.version",
         "gene_notes.project",
         "gene_notes.institution",
         "gene_notes.status",
+        "gene_notes.last_modified.date_modified",
+        "gene_notes.last_modified.modified_by.display_title",
         "interpretation.classification",
         "interpretation.acmg_guidelines",
         "interpretation.conclusion",
@@ -106,7 +110,9 @@ def build_variant_sample_embedded_list():
         "interpretation.version",
         "interpretation.project",
         "interpretation.institution",
-        "interpretation.status"
+        "interpretation.status",
+        "interpretation.last_modified.date_modified",
+        "interpretation.last_modified.modified_by.display_title"
     ]
     with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
