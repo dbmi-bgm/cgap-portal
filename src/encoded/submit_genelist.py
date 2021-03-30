@@ -140,11 +140,11 @@ class GeneListSubmission:
         for col in sheet.iter_cols(values_only=True):
             if col[0] is not None:
                 if "Title" in col[0]:
-                    title = col[1]
+                    title = str(col[1]).strip()
                 if "Genes" in col[0]:
                     for cell in col[1:]:
                         if cell is not None:
-                            genelist.append(str(cell))
+                            genelist.append(str(cell).strip())
         return title, genelist
 
     def parse_genelist(self):
@@ -173,6 +173,16 @@ class GeneListSubmission:
                 "formatting of the submitted document."
             )
         genelist = [x for x in genelist if x != ""]
+        genes_with_spaces = []
+        for gene in genelist.copy():
+            if ' ' in gene:
+                genelist.remove(gene)
+                genes_with_spaces.append(gene)
+        if genes_with_spaces:
+            self.errors.append(
+                "Gene symbols/IDs should not contain spaces. Please reformat "
+                "the following gene entries: %s" % ', '.join(genes_with_spaces)
+            )
         if not genelist:
             self.errors.append(
                 "No genes were found in the gene list. Please check the "
@@ -298,7 +308,7 @@ class GeneListSubmission:
                         "Consider replacing with one of the following: %s."
                         % (gene, ", ".join(options))
                     )
-                except (VirtualAppError, AppError, KeyError):
+                except (VirtualAppError, AppError):
                     unmatched_genes_without_options.append(gene)
         if unmatched_genes_without_options:
             self.errors.append(
