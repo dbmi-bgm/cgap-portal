@@ -12,6 +12,7 @@ import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, layout, JWT, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 
 /**
  * Stores and manages global note state for interpretation space.
@@ -300,13 +301,13 @@ class GenericInterpretationPanel extends React.Component {
         const blankNote = { note_text: "", acmg_guidelines: [], classification: null, conclusion:  "" };
 
         if (!lastSavedNote) { // Compare against blank note if lastSavedNote is null
-            return !_.isEqual(
+            return !_.isMatch(
                 _.pick(currNote, ...fieldsToCompare),
                 _.pick(blankNote, ...fieldsToCompare)
             );
         }
 
-        return !_.isEqual(
+        return !_.isMatch(
             _.pick(currNote, ...fieldsToCompare),
             _.pick(lastSavedNote, ...fieldsToCompare)
         );
@@ -363,7 +364,12 @@ class GenericInterpretationPanel extends React.Component {
 
     render() {
         const { lastSavedNote = null, noteLabel, noteType, schemas } = this.props;
-        const { note_text : savedNoteText = null, status: savedNoteStatus } = lastSavedNote || {};
+        const {
+            note_text : savedNoteText = null,
+            status: savedNoteStatus,
+            last_modified: lastModified = null
+        } = lastSavedNote || {};
+        const { modified_by: { display_title : lastModUsername } = {}, date_modified = null } = lastModified || {};
         const { note_text: noteText, acmg_guidelines, classification, conclusion } = this.state;
 
         const noteChangedSinceLastSave = this.memoized.hasNoteChanged(lastSavedNote, this.state);
@@ -374,9 +380,12 @@ class GenericInterpretationPanel extends React.Component {
 
         return (
             <div className="interpretation-panel">
-                <label className="w-100">
+                <label className={`w-100 ${lastModUsername ? "mb-0" : ""}`}>
                     { noteLabel }
                 </label>
+                { lastModUsername ?
+                    <div className="text-muted text-smaller my-1">Last Modified: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsername} </div>
+                    : null}
                 <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
                     <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
@@ -579,7 +588,7 @@ function UnsavedInterpretationModal(props) {
                     <Button variant="outline-secondary" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={handleClose}>
+                    <Button variant="danger" onClick={handleClose}>
                         Discard Changes and Continue Navigation
                     </Button>
                 </Modal.Footer>
