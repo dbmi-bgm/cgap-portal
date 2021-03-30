@@ -61,7 +61,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
 
                         <div className="flex-grow-1 d-flex flex-column flex-sm-row">
                             <div className="flex-auto">
-                                <VariantSampleDisplayTitleColumn result={variant_sample_item} link={vsID} />
+                                <VariantSampleDisplayTitleColumn result={variant_sample_item} link={vsID + '?showInterpretation=True'} />
                             </div>
                             <div className="flex-grow-1  d-sm-block">
                                 &nbsp;

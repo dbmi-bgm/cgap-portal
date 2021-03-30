@@ -42,6 +42,7 @@ export class InterpretationSpaceWrapper extends React.Component {
 
     constructor(props) {
         super(props);
+        console.log("InterpretationSpaceWrapper props", props);
         const { context = null } = props;
         this.state = InterpretationSpaceWrapper.initializeNoteState(context); // Ex. { variantNotes: <note linkto>, loading: false }
         this.saveAsDraft = this.saveAsDraft.bind(this);
@@ -175,10 +176,11 @@ export class InterpretationSpaceWrapper extends React.Component {
     }
 
     render() {
+        const { defaultTab } = this.props;
         const { variant_notes, gene_notes, interpretation } = this.state;
         return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
             lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation}
-            saveAsDraft={this.saveAsDraft}/>;
+            saveAsDraft={this.saveAsDraft} {...{ defaultTab }} />;
     }
 }
 
@@ -186,13 +188,13 @@ export class InterpretationSpaceWrapper extends React.Component {
 export class InterpretationSpaceController extends React.Component {
     constructor(props) {
         super(props);
-        const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation } = props;
+        const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation, defaultTab } = props;
         this.state = {
             // Initialize WIP states to last saved - if a tab is closed WIP progress is temporarily saved here
             variant_notes_wip: lastSavedVariantNote,
             gene_notes_wip: lastSavedGeneNote,
             interpretation_wip: lastSavedInterpretation,
-            currentTab: "Variant Notes",
+            currentTab: defaultTab || "Variant Notes", // TODO: validate defaultTab values via propTypes
             isExpanded: false // TODO - currently unused; V2
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);

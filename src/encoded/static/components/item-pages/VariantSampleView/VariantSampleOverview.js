@@ -108,7 +108,7 @@ export class VariantSampleOverview extends React.PureComponent {
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
 
-        const { query: { showInterpretation = true, annotationTab = "Variant", interpretationTab = "Variant", caseSource = null } } = memoizedUrlParse(href);
+        const { query: { showInterpretation = true, annotationTab = "Variant", interpretationTab = null, caseSource = null } } = memoizedUrlParse(href);
         console.log("hrefParts", showInterpretation, annotationTab, interpretationTab, caseSource);
 
         return (
@@ -117,12 +117,11 @@ export class VariantSampleOverview extends React.PureComponent {
                     <div className="col">
                         {/* BA1, BS1, BS2, BS3 etc markers here */}
                         <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
-                        <VariantSampleOverviewTabView {...passProps} />
+                        <VariantSampleOverviewTabView {...passProps} defaultTab={annotationTab} />
                     </div>
                     { showInterpretation == 'True' ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            {/* <InterpretationSpaceController {...passProps} /> */}
-                            <InterpretationSpaceWrapper {...passProps} />
+                            <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource }}/>
                         </div> : null
                     }
                 </div>
