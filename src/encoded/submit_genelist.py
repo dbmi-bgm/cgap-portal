@@ -107,7 +107,7 @@ class GeneListSubmission:
             if "title" in line.lower():
                 title_line = line
                 title_idx = title_line.lower().index("title")
-                title_line = title_line[title_idx + 5:]
+                title_line = title_line[title_idx + 5 :]
                 title_line = title_line.translate(
                     {ord(i): None for i in ':;"\n"'}
                 )
@@ -175,13 +175,13 @@ class GeneListSubmission:
         genelist = [x for x in genelist if x != ""]
         genes_with_spaces = []
         for gene in genelist.copy():
-            if ' ' in gene:
+            if " " in gene:
                 genelist.remove(gene)
                 genes_with_spaces.append(gene)
         if genes_with_spaces:
             self.errors.append(
                 "Gene symbols/IDs should not contain spaces. Please reformat "
-                "the following gene entries: %s" % ', '.join(genes_with_spaces)
+                "the following gene entries: %s" % ", ".join(genes_with_spaces)
             )
         if not genelist:
             self.errors.append(
@@ -221,7 +221,9 @@ class GeneListSubmission:
             else:
                 non_ensgids.append(gene)
         if ensgids:
-            ensgid_search = CommonUtils.batch_search(ensgids, "ensgid", self.vapp)
+            ensgid_search = CommonUtils.batch_search(
+                ensgids, "ensgid", self.vapp, batch_size=10
+            )
             for response in ensgid_search:
                 if response["gene_symbol"] in gene_ids:
                     gene_ids[response["gene_symbol"]].append(response["uuid"])
@@ -249,7 +251,9 @@ class GeneListSubmission:
             for search_type in search_order:
                 if not non_ensgids:
                     break
-                search = CommonUtils.batch_search(non_ensgids, search_type, self.vapp)
+                search = CommonUtils.batch_search(
+                    non_ensgids, search_type, self.vapp, batch_size=10
+                )
                 for response in search:
                     if (
                         response["gene_symbol"] in gene_ids
@@ -717,7 +721,7 @@ class VariantUpdateSubmission:
             genes_to_search,
             "variant.genes.genes_most_severe_gene.uuid",
             self.vapp,
-            item_type="VariantSample"
+            item_type="VariantSample",
         )
         for variant_sample_response in variant_sample_search:
             variant_samples_to_index.append(variant_sample_response["uuid"])
@@ -795,7 +799,9 @@ class CommonUtils:
         pass
 
     @staticmethod
-    def batch_search(item_list, search_term, app, item_type="Gene"):
+    def batch_search(
+        item_list, search_term, app, item_type="Gene", batch_size=5
+    ):
         """
         Performs get requests in batches to decrease the number of
         API calls and improve performance.
@@ -808,7 +814,7 @@ class CommonUtils:
         flat_result = []
         for item in item_list:
             batch.append(item)
-            if item == item_list[-1] or len(batch) == 5:
+            if item == item_list[-1] or len(batch) == batch_size:
                 batch_string = ("&" + search_term + "=").join(batch)
                 try:
                     response = app.get(
