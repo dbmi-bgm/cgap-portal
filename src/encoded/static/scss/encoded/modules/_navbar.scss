@@ -188,7 +188,7 @@ div#top-nav.navbar-fixed-top {
             // margin-left: -50px !important;
             color: $navbar-default-brand-color;
             min-width: 270px;
-            height: inherit;
+            height: 100%;
             max-height: $navbar-full-height;
             margin-left: 0px;
             text-decoration: none;
@@ -205,7 +205,7 @@ div#top-nav.navbar-fixed-top {
 
             > .img-container {
                 position: relative;
-                height: inherit;
+                height: 100%;
                 display: flex;
                 align-items: center;
                 padding-right: 20px;
@@ -308,7 +308,7 @@ div#top-nav.navbar-fixed-top {
         > .navbar-collapse {
 
             @include navbar-fixed-position {
-                height: inherit;
+                height: 100%;
             }
 
             @include navbar-static-position {

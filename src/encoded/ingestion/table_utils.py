@@ -50,7 +50,7 @@ class VariantTableParser(object):
 
     def __init__(self, _mp, schema, skip_embeds=False):
         self.mapping_table = _mp
-        self.annotation_field_schema = json.load(open(schema, 'r'))
+        self.annotation_field_schema = json.load(io.open(schema, 'r'))
         self.version, self.date, self.fields = self.read_mp_meta()
         if not skip_embeds:  # if calling from gene, do not wipe variant/variant_sample embeds
             self.provision_embeds()
@@ -101,7 +101,7 @@ class VariantTableParser(object):
             3 tuple - version, date, fields
         """
         version, date, fields = None, None, None
-        with open(self.mapping_table, 'r', encoding='utf-8-sig') as f:
+        with io.open(self.mapping_table, 'r', encoding='utf-8-sig') as f:
             reader = csv.reader(f)
             for row_idx, row in enumerate(reader):
                 if row_idx == 0:
@@ -124,7 +124,7 @@ class VariantTableParser(object):
         :returns: list of annotation field inserts
         """
         inserts = []
-        with open(self.mapping_table, 'r', encoding='utf-8-sig') as f:
+        with io.open(self.mapping_table, 'r', encoding='utf-8-sig') as f:
             reader = csv.reader(f)
             for row_idx, row in enumerate(reader):
                 insert = {}
@@ -1017,12 +1017,12 @@ class VariantTableParser(object):
             # Although this isn't ideal, I'm not convinced it's a good use of time to do
             # the refactoring necessary to pull the column/facet logic out. It's much easier
             # to just ignore that info.
-            variant_sample_schema = json.load(open(vs_out))
+            variant_sample_schema = json.load(io.open(vs_out))
             new_variant_sample_schema['facets'] = variant_sample_schema['facets']
             new_variant_sample_schema['columns'] = variant_sample_schema['columns']
             self.write_schema(new_variant_sample_schema, vs_out)
 
-            variant_schema = json.load(open(v_out))
+            variant_schema = json.load(io.open(v_out))
             new_variant_schema['facets'] = variant_schema['facets']
             new_variant_schema['columns'] = variant_schema['columns']
             self.write_schema(new_variant_schema, v_out)

@@ -328,8 +328,8 @@ def test_filter_set_selectively_apply_flags(workbook, es_testapp, filter_set_wit
 @pytest.fixture
 def filter_set_with_only_flags():
     return {
-        'search_type': 'Variant',
-        'global_flags': 'CHROM=1'
+        "search_type": "Variant",
+        "global_flags": "CHROM=1"
     }
 
 
