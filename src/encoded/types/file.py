@@ -166,7 +166,6 @@ class File(Item):
         # File linkTo
         'related_files.relationship_type',
         'related_files.file.accession',
-        'related_files.file.external_accession',
         'related_files.file.file_format.file_format',
 
         # QC

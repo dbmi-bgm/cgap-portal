@@ -29,14 +29,12 @@ class Individual(Item):
     embedded_list = [
         # Individual linkTo
         'father.accession',
-        'father.bgm_id',
         'father.other_id',
         'father.is_deceased',
         'father.sex',
 
         # Individual linkTo
         'mother.accession',
-        'mother.bgm_id',
         'mother.other_id',
         'mother.is_deceased',
         'mother.sex'
