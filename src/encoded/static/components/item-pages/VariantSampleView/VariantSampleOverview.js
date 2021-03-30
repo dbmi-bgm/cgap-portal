@@ -6,7 +6,7 @@ import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
@@ -104,9 +104,13 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas } = this.props;
+        const { context, schemas, href } = this.props;
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
-        const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading };
+        const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
+
+        const { query: { showInterpretation = true, annotationTab = "Variant", interpretationTab = "Variant", caseSource = null } } = memoizedUrlParse(href);
+        console.log("hrefParts", showInterpretation, annotationTab, interpretationTab, caseSource);
+
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
@@ -115,15 +119,16 @@ export class VariantSampleOverview extends React.PureComponent {
                         <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
                         <VariantSampleOverviewTabView {...passProps} />
                     </div>
-                    <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                        {/* <InterpretationSpaceController {...passProps} /> */}
-                        <InterpretationSpaceWrapper {...passProps} />
-                    </div>
+                    { showInterpretation == 'True' ?
+                        <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
+                            {/* <InterpretationSpaceController {...passProps} /> */}
+                            <InterpretationSpaceWrapper {...passProps} />
+                        </div> : null
+                    }
                 </div>
             </div>
         );
     }
-
 }
 
 function getCurrentTranscriptGeneID(context, transcriptIndex){
