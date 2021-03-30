@@ -31,7 +31,7 @@ def _build_family_embeds(*, base_path):
         "family_phenotypic_features.phenotype_name",
 
         # Individual linkTo
-        "fmembers.*",
+        "members.*",
         # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
 
         # Case linkTo
