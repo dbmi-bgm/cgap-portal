@@ -160,13 +160,14 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         const showAlleleCount = typeof alleleCount === "number" ? alleleCount : fallbackElem;
         const showAlleleNum = typeof alleleNum === "number" ? alleleNum : fallbackElem;
         const showHomozygoteNum = typeof homozygoteNum === "number" ? homozygoteNum : fallbackElem;
+        const showAlleleFreq = typeof alleleFreq === "number" ? (alleleFreq || "0.0000") : fallbackElem;
         return (
             <tr key={populationTitle}>
                 <td className="text-600 text-left">{ populationTitle }</td>
                 <td>{ showAlleleCount }</td>
                 <td>{ showAlleleNum }</td>
                 <td>{ showHomozygoteNum }</td>
-                <td className="text-left">{ alleleFreq || "0.0000" }</td>
+                <td className="text-left">{ showAlleleFreq }</td>
             </tr>
         );
     });
@@ -186,24 +187,24 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
                 { ancestryTableRows }
                 <tr className="border-top">
                     <td className="text-600 text-left">Female</td>
-                    <td>{ gnomad_ac_female }</td>
-                    <td>{ gnomad_an_female }</td>
-                    <td>{ gnomad_nhomalt_female }</td>
-                    <td className="text-left">{ gnomad_af_female || "0.0000" }</td>
+                    <td>{ typeof gnomad_ac_female === "number" ? gnomad_ac_female : fallbackElem }</td>
+                    <td>{ typeof gnomad_an_female === "number" ? gnomad_an_female : fallbackElem }</td>
+                    <td>{ typeof gnomad_nhomalt_female === "number" ? gnomad_nhomalt_female : fallbackElem }</td>
+                    <td className="text-left">{ typeof gnomad_af_female === "number" ? (gnomad_af_female || "0.0000") : fallbackElem }</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Male</td>
-                    <td>{ gnomad_ac_male }</td>
-                    <td>{ gnomad_an_male }</td>
-                    <td>{ gnomad_nhomalt_male }</td>
-                    <td className="text-left">{ gnomad_af_male || "0.0000" }</td>
+                    <td>{ typeof gnomad_ac_male === "number" ? gnomad_ac_male : fallbackElem }</td>
+                    <td>{ typeof gnomad_an_male === "number" ? gnomad_an_male : fallbackElem }</td>
+                    <td>{ typeof gnomad_nhomalt_male === "number" ? gnomad_nhomalt_male : fallbackElem }</td>
+                    <td className="text-left">{ typeof gnomad_af_male === "number" ? (gnomad_af_male || "0.0000") : fallbackElem }</td>
                 </tr>
                 <tr className="border-top">
                     <td className="bg-light text-left"><strong>Total</strong></td>
-                    <td className="bg-light text-600">{ gnomad_ac }</td>
-                    <td className="bg-light text-600">{ gnomad_an }</td>
-                    <td className="bg-light text-600">{ gnomad_nhomalt }</td>
-                    <td className="bg-light text-600 text-left">{ gnomad_af || "0.0000" }</td>
+                    <td className="bg-light text-600">{ typeof gnomad_ac === "number" ? gnomad_ac : fallbackElem }</td>
+                    <td className="bg-light text-600">{ typeof gnomad_an === "number" ? gnomad_an : fallbackElem }</td>
+                    <td className="bg-light text-600">{ typeof gnomad_nhomalt === "number" ? gnomad_nhomalt : fallbackElem }</td>
+                    <td className="bg-light text-600 text-left">{ typeof gnomad_af === "number" ? (gnomad_af || "0.0000") : fallbackElem }</td>
                 </tr>
             </tbody>
         </table>
