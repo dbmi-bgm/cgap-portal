@@ -9,6 +9,8 @@ import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
 
 import Collapse from "react-bootstrap/esm/Collapse";
+import DropdownButton from "react-bootstrap/esm/DropdownButton";
+import SplitButton from "react-bootstrap/esm/SplitButton";
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
@@ -220,7 +222,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         // Is OK if called frequently with same value, as App is a PureComponent
         // and won't update if state/prop value is unchanged.
         if (haveEditPermission && hasFilterSetChanged) {
-            setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the Filtering tab to be lost. Proceed?");
+            setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the \"Filtering\" tab to be lost. Proceed?");
         } else {
             setIsSubmitting(false);
         }
@@ -249,6 +251,11 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         });
     }
 
+    /**
+     * PATCHes the current filterset, if active_filterset
+     * exists on caseItem. Else POSTs new FilterSet and then
+     * sets it as the active_filterset of Case.
+     */
     saveFilterSet(){
         const { currFilterSet: filterSet, caseItem } = this.props;
         const { lastSavedFilterSet } = this.state;
@@ -343,6 +350,26 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             }
         });
 
+    }
+
+    /**
+     * Copies the current FilterSet and creates new one, with
+     * "preset_for_project", "preset_for_user", and/or
+     * "default_for_project" fields set accordingly.
+     */
+    saveFilterSetPreset(){
+        const { caseItem, currFilterSet } = props;
+        const {
+            project: {
+                "@id": caseProjectID,
+                "display_title": caseProjectTitle
+            }
+        } = caseItem;
+
+        const clonedFilterSet = { ...currFilterSet };
+
+
+        // TODO.
     }
 
     render(){
@@ -447,6 +474,7 @@ function FilterSetUIHeader(props){
         saveFilterSet, isSavingFilterSet, setTitleOfFilterSet, isFetchingInitialFilterSetItem = false,
         haveEditPermission
     } = props;
+
     const {
         '@id': filterSetID,
         error: fsError = null,
@@ -454,9 +482,15 @@ function FilterSetUIHeader(props){
         display_title: fsDisplayTitle = null
     } = filterSet || {};
 
+    const {
+        project: {
+            display_title: caseProjectTitle
+        }
+    } = caseItem;
+
     const [ isEditingTitle, setIsEditingTitle ] = useState(false);
 
-    function onEditClick(e){
+    function onClickEditTitle(e){
         e.stopPropagation();
         e.preventDefault();
         setIsEditingTitle(true);
@@ -510,7 +544,7 @@ function FilterSetUIHeader(props){
             <h4 className="text-400 clickable my-0 d-inline-block" onClick={toggleOpen}>
                 <i className={"small icon icon-fw fas mr-07 icon-" + (bodyOpen ? "minus" : "plus")} />
                 { fsTitle || fsDisplayTitle || <em>No Title Set</em> }
-                { bodyOpen ? <i className="icon icon-pencil-alt fas ml-1 clickable text-small" onClick={onEditClick} /> : null }
+                { bodyOpen ? <i className="icon icon-pencil-alt fas ml-1 clickable text-small" onClick={onClickEditTitle} /> : null }
             </h4>
         );
     }
@@ -522,6 +556,7 @@ function FilterSetUIHeader(props){
 
     function onSaveBtnClick(e){
         e.stopPropagation();
+        e.preventDefault();
         if (editBtnDisabled) {
             // Report analytics maybe.
             return false;
@@ -538,16 +573,62 @@ function FilterSetUIHeader(props){
                     <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-secondary"
                         data-tip={`Filter blocks with duplicate ${haveDuplicateQueries ? "queries" : "names"} exist below`} />
                     : null }
-                <button type="button" className="btn btn-sm btn-outline-light" disabled={editBtnDisabled} onClick={onSaveBtnClick}>
-                    { isSavingFilterSet ?
-                        <i className="icon icon-spin icon-circle-notch fas" />
-                        : (
-                            <React.Fragment>
-                                <i className="icon icon-save fas mr-07"/>
-                                Save
-                            </React.Fragment>
-                        )}
-                </button>
+
+                <div role="group" className="dropdown btn-group">
+                    <button type="button" className="btn btn-sm btn-outline-light" disabled={editBtnDisabled} onClick={onSaveBtnClick}>
+                        { isSavingFilterSet ?
+                            <i className="icon icon-spin icon-circle-notch fas" />
+                            : (
+                                <React.Fragment>
+                                    <i className="icon icon-save fas mr-07"/>
+                                    Save
+                                </React.Fragment>
+                            )}
+                    </button>
+
+                    <DropdownButton title="Save as..." variant="outline-light" size="sm"
+                        data-tip="Create copy of this current FilterSet and set it as a preset for...">
+                        <a href="#" className="dropdown-item" role="button" onClick={function(e){ e.preventDefault(); e.stopPropagation(); console.log("HEllo"); }}
+                            data-tip="Create a copy of this current FilterSet and set it as a preset for yourself">
+                            A preset for <span className="text-600">yourself</span> only
+                        </a>
+                        <a href="#" className="dropdown-item" role="button" onClick={function(e){ e.preventDefault(); e.stopPropagation(); console.log("HEllo"); }}
+                            data-tip="Create a copy of this current FilterSet and set it as a preset for this project">
+                            A preset for project <span className="text-600">{ caseProjectTitle }</span>
+                        </a>
+                        <a href="#" className="dropdown-item" role="button" onClick={function(e){ e.preventDefault(); e.stopPropagation(); console.log("HEllo"); }}
+                            data-tip="Create a copy of this current FilterSet and set it as the default FilterSet for this project, to be basis for FilterSets of new Cases going forward">
+                            Default FilterSet for project <span className="text-600">{ caseProjectTitle }</span>
+                        </a>
+                    </DropdownButton>
+                </div>
+
+
+
+                {/*
+                <SplitButton variant="outline-light" size="sm" onClick={onSaveBtnClick} disabled={editBtnDisabled}
+                    title={isSavingFilterSet ? <i className="icon icon-spin icon-circle-notch fas" /> : (
+                        <React.Fragment>
+                            <i className="icon icon-save fas mr-07"/>
+                            Save
+                        </React.Fragment>
+                    )}>
+                    <a href="#" className="dropdown-item text-600" role="button" onClick={onSaveBtnClick} disabled={editBtnDisabled}
+                        data-tip="Save and update the blocks in this FilterSet that's associated with this Case">
+                        Save this FilterSet
+                    </a>
+                    <div className="dropdown-divider" role="separator" />
+                    <a href="#" className="dropdown-item" role="button" onClick={function(e){ e.preventDefault(); e.stopPropagation(); console.log("HEllo"); }}
+                        data-tip="Create a copy of this current FilterSet and set it as a preset for yourself">
+                        Save Copy of this FilterSet as Preset for User
+                    </a>
+                    <a href="#" className="dropdown-item" role="button" onClick={console.log.bind(console, "World")}
+                        data-tip="Create a copy of this current FilterSet and set it as a preset for this project">
+                        Save Copy of this FilterSet as Preset for Project
+                    </a>
+                </SplitButton>
+                */}
+
             </div>
         </div>
     );
@@ -785,6 +866,7 @@ const FilterBlock = React.memo(function FilterBlock(props){
             </React.Fragment>
         );
     }
+
     const cls = (
         "filterset-block mb-16" +
         (selected ? " selected" : "") +

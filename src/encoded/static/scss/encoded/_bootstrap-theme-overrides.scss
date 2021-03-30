@@ -117,6 +117,36 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 }
 
 
+
+// /* Except if is a split button -- */
+// .dropdown.btn-group > .dropdown-toggle.btn {
+// 	padding-right: 20px;
+// 	&.btn-sm {
+// 		padding-right: 18px;
+// 	}
+// }
+
+/* Copy of Bootstrap's own SCSS adjusted for react-bootstrap's DropdownButton which is .btn wrapped in div.dropdown */
+.btn-group {
+	// Prevent double borders when buttons are next to each other
+	> div.dropdown:not(:first-child) > .btn {
+	  margin-left: -$btn-border-width;
+	}
+  
+	// Reset rounded corners
+	> div.dropdown:not(:last-child) > .btn:not(.dropdown-toggle) {
+	  @include border-right-radius(0);
+	}
+  
+	> div.dropdown:not(:first-child) > .btn {
+	  @include border-left-radius(0);
+	}
+  }
+  
+/* Copy of Bootstrap's own SCSS adjusted for react-bootstrap's DropdownButton which is .btn wrapped in div.dropdown */
+.btn-group-sm > .dropdown > .btn { @extend .btn-sm; }
+.btn-group-lg > .dropdown > .btn { @extend .btn-lg; }
+
 /* Override sizing of btn-sm button re: our font */
 .btn.btn-sm {
 	padding-bottom: 4px;
