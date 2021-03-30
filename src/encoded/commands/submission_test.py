@@ -4,7 +4,7 @@ import os
 
 from dcicutils.misc_utils import VirtualApp
 from pyramid.paster import get_app
-from ..submit import digest_xls, xls_to_json, validate_all_items, post_and_patch_all_items
+from ..submit import digest_xlsx, xls_to_json, validate_all_items, post_and_patch_all_items
 from ..tests.data import DBMI_INSTITUTION_ID, DBMI_PROJECT_ID, METADATA_BUNDLE_PATH
 
 
@@ -54,7 +54,7 @@ def main():
     virtualapp = VirtualApp(app, environ)
     proj = virtualapp.get(DBMI_PROJECT_ID).json
     inst = virtualapp.get(DBMI_INSTITUTION_ID).json
-    rows = digest_xls(METADATA_BUNDLE_PATH)
+    rows = digest_xlsx(METADATA_BUNDLE_PATH)
     json_data, passing = xls_to_json(rows, proj, inst)
     print('JSON data (to validate):', json.dumps(json_data))
     assert json_data == TEST_DATA_TO_VALIDATE
