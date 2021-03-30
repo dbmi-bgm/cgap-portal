@@ -104,12 +104,12 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             </label>
                             { genotypeLabelRenderFunc(variant_sample_item) }
                         </div>
-                        <div className="col col-sm-5 col-lg-2 py-2" data-field="DP">
+                        {/* <div className="col col-sm-5 col-lg-2 py-2" data-field="DP">
                             <label className="mb-04 text-small" data-tip={dpColDescription}>
                                 { dpColTitle || "Coverage, VAF" }
                             </label>
                             { dpRenderFunc(variant_sample_item) }
-                        </div>
+                        </div> */}
                         <div className="col col-sm-12 col-lg-3 py-2">
                             <label className="mb-04 text-small">Interpretation</label>
                             <div><em>TODO</em></div>
