@@ -23,8 +23,22 @@ class Sample(Item):
     schema = load_schema('encoded:schemas/sample.json')
     rev = {'indiv': ('Individual', 'samples')}
     embedded_list = [
+        # File linkTo
         "files.status",
+        "files.file_format.file_format",
+        "files.accession",
+        "files.external_accession",
+
+        # File linkTo
         "cram_files.status",
+        "cram_files.accession",
+        "cram_files.external_accession",
+        "cram_files.file_format.file_format",
+
+        # File linkTo
+        "processed_files.accession",
+        "processed_files.external_accession"
+        "processed_files.file_format.file_format",
         "processed_files.workflow_run_outputs"
     ]
 

@@ -22,21 +22,10 @@ from ..util import get_trusted_email
 log = structlog.getLogger(__name__)
 
 
-@collection(
-    name='families',
-    unique_key='accession',
-    properties={
-        'title': 'Families',
-        'description': 'Listing of Families',
-    })
-class Family(Item):
-    item_type = 'family'
-    name_key = 'accession'
-    schema = load_schema('encoded:schemas/family.json')
-    rev = {'sample_procs': ('SampleProcessing', 'families'),
-           'case': ('Case', 'family')}
+def _build_family_embedded_list():
+    return [
 
-    embedded_list = [
+        # Individual linkTo
         "members.accession",
         "members.father",
         "members.mother",
@@ -57,16 +46,22 @@ class Family(Item):
         "members.cause_of_infertility",
         "members.ancestry",
         "members.clinic_notes",
+
+        # TODO phenotype linkTo
         "members.phenotypic_features.phenotypic_feature",
         "members.phenotypic_features.onset_age",
         "members.phenotypic_features.onset_age_units",
+
+        # Sample linkTo
         "members.samples.status",
         "members.samples.bam_sample_id",
         "members.samples.specimen_type",
         "members.samples.specimen_notes",
         "members.samples.specimen_collection_date",
         "members.samples.workup_type",
-        "members.samples.processed_files",
+        "members.samples.completed_processes",
+
+        # File linkTo / QC
         "members.samples.processed_files.workflow_run_outputs",
         "members.samples.processed_files.quality_metric",
         "members.samples.processed_files.quality_metric.qc_list.qc_type",
@@ -76,6 +71,8 @@ class Family(Item):
         "members.samples.processed_files.quality_metric.overall_quality_status",
         "members.samples.processed_files.quality_metric.url",
         "members.samples.processed_files.quality_metric.status",
+
+        # QC
         "members.samples.files.quality_metric",
         "members.samples.files.quality_metric.qc_list.qc_type",
         "members.samples.files.quality_metric.qc_list.value.overall_quality_status",
@@ -84,8 +81,11 @@ class Family(Item):
         "members.samples.files.quality_metric.overall_quality_status",
         "members.samples.files.quality_metric.url",
         "members.samples.files.quality_metric.status",
-        "members.samples.completed_processes",
+
+        # Sample linkTo
         "analysis_groups.samples.accession",
+
+        # QC
         "analysis_groups.processed_files",
         "analysis_groups.processed_files.quality_metric",
         "analysis_groups.processed_files.quality_metric.qc_list.qc_type",
@@ -95,6 +95,8 @@ class Family(Item):
         "analysis_groups.processed_files.quality_metric.overall_quality_status",
         "analysis_groups.processed_files.quality_metric.url",
         "analysis_groups.processed_files.quality_metric.status",
+
+        # QC
         "analysis_groups.sample_processed_files",
         "analysis_groups.sample_processed_files.sample.accession",
         "analysis_groups.sample_processed_files.processed_files.quality_metric",
@@ -107,6 +109,23 @@ class Family(Item):
         "analysis_groups.sample_processed_files.processed_files.quality_metric.status",
         "analysis_groups.completed_processes",
     ]
+
+
+@collection(
+    name='families',
+    unique_key='accession',
+    properties={
+        'title': 'Families',
+        'description': 'Listing of Families',
+    })
+class Family(Item):
+    item_type = 'family'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/family.json')
+    rev = {'sample_procs': ('SampleProcessing', 'families'),
+           'case': ('Case', 'family')}
+
+    embedded_list = _build_family_embedded_list()
 
     @calculated_property(schema={
         "title": "Cases",
