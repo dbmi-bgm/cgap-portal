@@ -169,7 +169,6 @@ class File(Item):
         'related_files.file.file_format.file_format',
 
         # QC
-        'quality_metric.accession',
         'quality_metric.@type',
         'quality_metric.qc_list.qc_type',
         'quality_metric.qc_list.value.uuid'

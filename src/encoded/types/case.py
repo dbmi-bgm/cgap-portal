@@ -25,7 +25,6 @@ def _build_family_embeds(*, base_path):
 
         # Individual linkTo
         "proband.accession",
-        "proband.other_id",
 
         # Array of phenotypes linkTo
         "family_phenotypic_features.hpo_id",
@@ -123,8 +122,6 @@ def _build_case_embedded_list():
 
         # Individual linkTo
         "individual.father.accession",
-        "individual.father.bgm_id",
-        "individual.father.other_id",
 
         # TODO fixme samples linkTo
         "individual.father.samples.library_info",
@@ -133,8 +130,6 @@ def _build_case_embedded_list():
 
         # Individual linkTo
         "individual.mother.accession",
-        "individual.mother.bgm_id",
-        "individual.mother.other_id",
 
         # Samples linkTo
         "individual.mother.samples.library_info",
@@ -234,26 +229,18 @@ def _build_case_embedded_list():
 
         # Individual linkTo
         "sample_processing.families.proband.accession",
-        "sample_processing.families.proband.bgm_id",
-        "sample_processing.families.proband.other_id",
         "sample_processing.families.proband.individual_id",
 
         # Individual linkTo
         "sample_processing.families.mother.accession",
-        "sample_processing.families.mother.bgm_id",
-        "sample_processing.families.mother.other_id",
         "sample_processing.families.mother.individual_id",
 
         # Individual linkTo
         "sample_processing.families.father.accession",
-        "sample_processing.families.father.bgm_id",
-        "sample_processing.families.father.other_id",
         "sample_processing.families.father.individual_id",
 
         # Individual linkTo
         "sample_processing.families.members.accession",
-        "sample_processing.families.members.bgm_id",
-        "sample_processing.families.members.other_id",
         "sample_processing.families.members.individual_id",
 
         # Sample linkTo

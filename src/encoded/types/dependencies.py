@@ -28,8 +28,6 @@ class DependencyEmbedder:
         ],
         INDIVIDUAL: [
             'accession',
-            'bgm_id',
-            'other_id'
         ],
         FILE: [
             'file_format.file_format',
