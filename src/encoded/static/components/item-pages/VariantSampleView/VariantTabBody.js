@@ -108,6 +108,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
 });
 
 const GnomADTable = React.memo(function GnomADTable({ context, getTipForField }){
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
     const { variant } = context;
     const {
         // Allele Counts
@@ -156,12 +157,15 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         }
     );
     const ancestryTableRows = ancestryRowData.map(function({ popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum }){
+        const showAlleleCount = typeof alleleCount === "number" ? alleleCount : fallbackElem;
+        const showAlleleNum = typeof alleleNum === "number" ? alleleNum : fallbackElem;
+        const showHomozygoteNum = typeof homozygoteNum === "number" ? homozygoteNum : fallbackElem;
         return (
             <tr key={populationTitle}>
                 <td className="text-600 text-left">{ populationTitle }</td>
-                <td>{ alleleCount }</td>
-                <td>{ alleleNum }</td>
-                <td>{ homozygoteNum }</td>
+                <td>{ showAlleleCount }</td>
+                <td>{ showAlleleNum }</td>
+                <td>{ showHomozygoteNum }</td>
                 <td className="text-left">{ alleleFreq || "0.0000" }</td>
             </tr>
         );
