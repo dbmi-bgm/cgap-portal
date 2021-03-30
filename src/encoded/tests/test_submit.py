@@ -22,9 +22,11 @@ from ..submit import (
 
 pytestmark = [pytest.mark.working]
 
-
 TEST_INGESTION_ID1 = '123456-1243-1234-123456abcdef'
 TEST_INGESTION_ID2 = 'abcdef-1234-1234-abcdef123456'
+
+TEST_WORKBOOK = 'src/encoded/tests/data/documents/cgap_submit_test.xlsx'
+TEST_WORKBOOK_WITH_ERRORS = 'src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx'
 
 
 # TODO: Check if these work or not.  These tests seem to be working, but they may do posting
@@ -51,10 +53,10 @@ def row_dict():
 
 @pytest.fixture
 def xls_list():
-    book = openpyxl.load_workbook('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
+    book = openpyxl.load_workbook(TEST_WORKBOOK)
     sheet = book.worksheets[0]
-    row = row_generator(sheet)
-    return list(row)
+    rows = row_generator(sheet)
+    return list(rows)
 
 
 @pytest.fixture
@@ -599,7 +601,7 @@ class TestSpreadsheetProcessing:
 
 def test_xls_to_json(project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
-    rows = digest_xlsx('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
+    rows = digest_xlsx(TEST_WORKBOOK)
     json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
     assert success
     assert len(json_out['family']) == 1
@@ -610,7 +612,7 @@ def test_xls_to_json(project, institution):
 
 def test_xls_to_json_errors(project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
-    rows = digest_xlsx('src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx')
+    rows = digest_xlsx(TEST_WORKBOOK_WITH_ERRORS)
     json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
     assert success  # still able to proceed to validation step

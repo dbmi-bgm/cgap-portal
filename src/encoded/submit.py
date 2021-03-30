@@ -1154,7 +1154,7 @@ def cell_value(cell):
     ctype = cell.data_type
     value = cell.value
     if ctype == openpyxl.cell.cell.TYPE_ERROR:  # pragma: no cover
-        raise ValueError(repr(cell), 'cell error')
+        raise ValueError('Cell %s contains a cell error' % str(cell.coordinate))
     elif ctype == openpyxl.cell.cell.TYPE_BOOL:
         return str(value).upper().strip()
     elif ctype in (openpyxl.cell.cell.TYPE_NUMERIC, openpyxl.cell.cell.TYPE_NULL):
@@ -1174,7 +1174,9 @@ def cell_value(cell):
             return value.isoformat()
     elif ctype in (openpyxl.cell.cell.TYPE_STRING, openpyxl.cell.cell.TYPE_INLINE):
         return value.strip()
-    raise ValueError(repr(cell), 'not an acceptable cell type')  # pragma: no cover
+    raise ValueError(
+        'Cell %s is not an acceptable cell type' % str(cell.coordinate)
+    )  # pragma: no cover
 
 
 def row_generator(sheet):
