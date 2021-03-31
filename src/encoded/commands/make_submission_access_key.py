@@ -4,7 +4,7 @@ import json
 import os
 
 from dcicutils.misc_utils import PRINT, full_class_name, check_true
-from encoded.standalone_dev import make_dev_vapp
+from snovault.standalone_dev import make_dev_vapp
 
 EPILOG = __doc__
 
