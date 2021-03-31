@@ -409,7 +409,6 @@
             "description": "Alternate allele count for samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt Allele Count",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-afr": {
@@ -423,7 +422,6 @@
             "description": "Alternate allele count for samples of African-American/African ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - African-American/African",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-ami": {
@@ -437,7 +435,6 @@
             "description": "Alternate allele count for samples of Amish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Amish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-amr": {
@@ -451,7 +448,6 @@
             "description": "Alternate allele count for samples of Latino ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Latino",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-asj": {
@@ -465,7 +461,6 @@
             "description": "Alternate allele count for samples of Ashkenazi Jewish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Ashkenazi Jewish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-eas": {
@@ -479,7 +474,6 @@
             "description": "Alternate allele count for samples of East Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - East Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-fin": {
@@ -493,7 +487,6 @@
             "description": "Alternate allele count for samples of Finnish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Finnish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-mid": {
@@ -519,7 +512,6 @@
             "description": "Alternate allele count for samples of Non-Finnish European ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Non-Finnish European",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-oth": {
@@ -533,7 +525,6 @@
             "description": "Alternate allele count for samples of Other ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Other Ancestry",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-sas": {
@@ -547,7 +538,6 @@
             "description": "Alternate allele count for samples of South Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - South Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-xx": {
@@ -561,7 +551,6 @@
             "description": "Alternate allele count for female samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - female",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-xy": {
@@ -575,7 +564,6 @@
             "description": "Alternate allele count for male samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - male",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_af": {
@@ -589,7 +577,6 @@
             "description": "Alternate allele frequency in samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt Allele Frequency",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -604,7 +591,6 @@
             "description": "Alternate allele frequency in samples of African-American/African ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - African-American/African",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -619,7 +605,6 @@
             "description": "Alternate allele frequency in samples of Amish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Amish",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -634,7 +619,6 @@
             "description": "Alternate allele frequency in samples of Latino ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Latino",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -650,7 +634,6 @@
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Ashkenazi Jewish",
             "abbreviation": "AF",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -665,7 +648,6 @@
             "description": "Alternate allele frequency in samples of East Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - East Asian",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -680,7 +662,6 @@
             "description": "Alternate allele frequency in samples of Finnish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Finnish",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -707,7 +688,6 @@
             "description": "Alternate allele frequency in samples of Non-Finnish European ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Non-Finnish European",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -722,7 +702,6 @@
             "description": "Alternate allele frequency in samples of Other ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Other Ancestry",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -737,7 +716,6 @@
             "description": "Alternate allele frequency in samples of South Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - South Asian",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -752,7 +730,6 @@
             "description": "Alternate allele frequency in female samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - female",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -767,7 +744,6 @@
             "description": "Alternate allele frequency in male samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - male",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -783,7 +759,6 @@
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - PopMax",
             "abbreviation": "PopMax AF",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -966,7 +941,6 @@
             "description": "Count of homozygous individuals in samples",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-afr": {
@@ -980,7 +954,6 @@
             "description": "Count of homozygous individuals in samples of African-American/African ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - African-American/African",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-ami": {
@@ -994,7 +967,6 @@
             "description": "Count of homozygous individuals in samples of Amish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Amish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-amr": {
@@ -1008,7 +980,6 @@
             "description": "Count of homozygous individuals in samples of Latino ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Latino",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-asj": {
@@ -1022,7 +993,6 @@
             "description": "Count of homozygous individuals in samples of Ashkenazi Jewish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Ashkenazi Jewish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-eas": {
@@ -1036,7 +1006,6 @@
             "description": "Count of homozygous individuals in samples of East Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - East Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-fin": {
@@ -1050,7 +1019,6 @@
             "description": "Count of homozygous individuals in samples of Finnish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Finnish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-mid": {
@@ -1076,7 +1044,6 @@
             "description": "Count of homozygous individuals in samples of Non-Finnish European ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Non-Finnish European",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-oth": {
@@ -1090,7 +1057,6 @@
             "description": "Count of homozygous individuals in samples of Other ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Other Ancestry",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-sas": {
@@ -1104,7 +1070,6 @@
             "description": "Count of homozygous individuals in samples of South Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - South Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-xx": {
@@ -1118,7 +1083,6 @@
             "description": "Count of homozygous individuals in female samples",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - female",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-xy": {
@@ -1132,7 +1096,6 @@
             "description": "Count of homozygous individuals in male samples",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - male",
-            "default": 0,
             "min": 0
         },
         "csq_hg19_chr": {
