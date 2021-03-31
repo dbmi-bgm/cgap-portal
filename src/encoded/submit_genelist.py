@@ -53,6 +53,7 @@ def submit_genelist(
                     genelist.validation_output + genelist.notes
                 )
                 results["post_output"] = genelist.post_output
+                results["result"] = genelist.at_id
             else:
                 results["validation_output"] = genelist.errors
         else:
@@ -85,7 +86,7 @@ class GeneListSubmission:
             self.previous_gene_ids,
         ) = self.validate_postings()
         if not validate_only:
-            self.post_output = self.post_items()
+            self.post_output, self.at_id = self.post_items()
             self.submit_variant_update()
 
     @staticmethod
@@ -517,6 +518,7 @@ class GeneListSubmission:
         Returns:
             - List with posting information (None if errors earlier in
               processing).
+            - @id of gene list posted/patched
         """
 
         if self.errors:
@@ -554,11 +556,12 @@ class GeneListSubmission:
             post_result["Gene list"] = (
                 "posted with uuid " + genelist_post["@graph"][0]["uuid"]
             )
+            genelist_at_id = genelist_post["@graph"][0]["@id"]
         post_display = []
         for key in post_result:
             post_display.append("%s: %s" % (key, post_result[key]))
         post_result = post_display
-        return post_result
+        return post_result, genelist_at_id
 
     def submit_variant_update(self):
         """
