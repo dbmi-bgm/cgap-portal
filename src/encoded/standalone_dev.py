@@ -2,6 +2,9 @@ from dcicutils.misc_utils import VirtualApp
 from pyramid.paster import get_app
 
 
+# TODO: Once we use snovault 4.7.1, we can use the standalone_dev.py there. -kmp 31-Mar-2021
+
+
 def make_standalone_app():
     return get_app('development.ini', 'app')
 
