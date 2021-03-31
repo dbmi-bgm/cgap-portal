@@ -53,7 +53,7 @@ def submit_genelist(
                     genelist.validation_output + genelist.notes
                 )
                 results["post_output"] = genelist.post_output
-                results["result"] = genelist.at_id
+                results["result"] = {"genelist": genelist.at_id}
             else:
                 results["validation_output"] = genelist.errors
         else:
@@ -503,6 +503,11 @@ class GeneListSubmission:
         validate_display = []
         for key in validate_result:
             validate_display.append("%s: %s" % (key, validate_result[key]))
+        if genelist_uuid:
+            validate_display.append(
+                "Existing gene list with the same title was found and will be "
+                "overwritten."
+            )
         validate_result = validate_display
         return (
             validate_result,
