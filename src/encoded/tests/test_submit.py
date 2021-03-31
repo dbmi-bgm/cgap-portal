@@ -1,12 +1,12 @@
+import openpyxl
 import pytest
-import xlrd
 
 from copy import deepcopy
 from unittest import mock
 from .. import submit
 from ..submit import (
     compare_fields,
-    digest_xls,
+    digest_xlsx,
     MetadataItem,
     SubmissionRow,
     SubmissionMetadata,
@@ -22,9 +22,11 @@ from ..submit import (
 
 pytestmark = [pytest.mark.working]
 
-
 TEST_INGESTION_ID1 = '123456-1243-1234-123456abcdef'
 TEST_INGESTION_ID2 = 'abcdef-1234-1234-abcdef123456'
+
+TEST_WORKBOOK = 'src/encoded/tests/data/documents/cgap_submit_test.xlsx'
+TEST_WORKBOOK_WITH_ERRORS = 'src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx'
 
 
 # TODO: Check if these work or not.  These tests seem to be working, but they may do posting
@@ -51,10 +53,10 @@ def row_dict():
 
 @pytest.fixture
 def xls_list():
-    book = xlrd.open_workbook('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
-    sheet, = book.sheets()
-    row = row_generator(sheet)
-    return list(row)
+    book = openpyxl.load_workbook(TEST_WORKBOOK)
+    sheet = book.worksheets[0]
+    rows = row_generator(sheet)
+    return list(rows)
 
 
 @pytest.fixture
@@ -125,6 +127,7 @@ def post_data(project, institution):
             }],
             'sample': [{
                 'aliases': ['test-proj:samp1'],
+                'bam_sample_id': 'samp1-WGS',
                 'workup_type': 'WGS',
                 'specimen_accession': 'samp1',
                 'project': project['@id'],
@@ -598,7 +601,7 @@ class TestSpreadsheetProcessing:
 
 def test_xls_to_json(project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
-    rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
+    rows = digest_xlsx(TEST_WORKBOOK)
     json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
     assert success
     assert len(json_out['family']) == 1
@@ -609,7 +612,7 @@ def test_xls_to_json(project, institution):
 
 def test_xls_to_json_errors(project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
-    rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx')
+    rows = digest_xlsx(TEST_WORKBOOK_WITH_ERRORS)
     json_out, success = xls_to_json(rows, project, institution, TEST_INGESTION_ID1)
     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
     assert success  # still able to proceed to validation step
