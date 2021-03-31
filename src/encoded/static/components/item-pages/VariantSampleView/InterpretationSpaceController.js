@@ -189,12 +189,16 @@ export class InterpretationSpaceController extends React.Component {
     constructor(props) {
         super(props);
         const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation, defaultTab } = props;
+
+        // use to validate passed in defaultTab prop
+        const acceptableTabNames = ["Variant Notes", "Gene Notes", "Interpretation"];
+
         this.state = {
             // Initialize WIP states to last saved - if a tab is closed WIP progress is temporarily saved here
             variant_notes_wip: lastSavedVariantNote,
             gene_notes_wip: lastSavedGeneNote,
             interpretation_wip: lastSavedInterpretation,
-            currentTab: defaultTab || "Variant Notes", // TODO: validate defaultTab values via propTypes
+            currentTab: _.contains(acceptableTabNames, defaultTab) ? defaultTab : "Variant Notes",
             isExpanded: false // TODO - currently unused; V2
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);

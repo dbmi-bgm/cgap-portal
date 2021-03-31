@@ -108,7 +108,13 @@ export class VariantSampleOverview extends React.PureComponent {
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
 
-        const { query: { showInterpretation = true, annotationTab = "Variant", interpretationTab = null, caseSource = null } } = memoizedUrlParse(href);
+        const { query: {
+            showInterpretation = true,      // used only if "True" (toggles showing of interpretation sidebar/pane)
+            annotationTab = null,           // used only if can be parsed to integer (Variant = 0, Gene = 1, Sample = 2, AnnotationBrowser = 3, BAM Browser = 4)
+            interpretationTab = null,       // used only if one of "Variant Notes", "Gene Notes", "Interpretation"
+            caseSource = null
+        } } = memoizedUrlParse(href);
+
         console.log("hrefParts", showInterpretation, annotationTab, interpretationTab, caseSource);
 
         return (
@@ -117,7 +123,7 @@ export class VariantSampleOverview extends React.PureComponent {
                     <div className="col">
                         {/* BA1, BS1, BS2, BS3 etc markers here */}
                         <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
-                        <VariantSampleOverviewTabView {...passProps} defaultTab={annotationTab} />
+                        <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
                     </div>
                     { showInterpretation == 'True' ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
@@ -159,8 +165,11 @@ class VariantSampleOverviewTabView extends React.PureComponent {
 
     constructor(props){
         super(props);
+        const { defaultTab = null } = props;
         this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
-        this.state = { "currentTab" : 0 };
+        this.state = {
+            "currentTab" : defaultTab < 5 ? defaultTab : 0 // Validate that is 0-5
+        };
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
