@@ -527,7 +527,7 @@ class GeneListSubmission:
         """
 
         if self.errors:
-            return None
+            return None, None
         post_result = {}
         document_json = self.post_bodies[0]
         genelist_json = self.post_bodies[1]
