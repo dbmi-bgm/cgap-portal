@@ -297,7 +297,7 @@ export function filterQueryByQuery(query1, query2){
 
 
 export const FilteringTab = React.memo(function FilteringTab(props) {
-    const { context = null, windowHeight, session = false, schemas } = props;
+    const { context = null, windowHeight, session = false, schemas, setIsSubmitting } = props;
     const {
         accession: caseAccession,
         initial_search_href_filter_addon = "",
@@ -377,14 +377,14 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     const embeddedTableHeader = activeFilterSetID ? (
         <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
             <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets}>
-                <FilteringTableFilterSetUI caseItem={context} schemas={schemas} />
+                <FilteringTableFilterSetUI caseItem={context} schemas={schemas} setIsSubmitting={setIsSubmitting} />
             </FilterSetController>
         </ajax.FetchedItem>
     ) : (
         // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
         // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
         <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
-            <FilteringTableFilterSetUI caseItem={context} />
+            <FilteringTableFilterSetUI caseItem={context} setIsSubmitting={setIsSubmitting} />
         </FilterSetController>
     );
 
