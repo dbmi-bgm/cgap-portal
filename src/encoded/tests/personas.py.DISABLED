@@ -3,8 +3,8 @@ import json
 import os
 import pytest
 
-from dcicutils.misc_utils import constantly, check_true
-from ..util import ENCODED_ROOT_DIR, find_associations
+from dcicutils.misc_utils import constantly, check_true, find_associations
+from ..util import ENCODED_ROOT_DIR
 
 
 PERSONA_INSTITUTION = 'cgap-unit-testing-institution'
