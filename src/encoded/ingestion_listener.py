@@ -19,9 +19,9 @@ import webtest
 import tempfile
 
 from dcicutils.env_utils import is_stg_or_prd_env
-from dcicutils.misc_utils import VirtualApp, ignored, check_true, full_class_name
+from dcicutils.misc_utils import VirtualApp, ignored, check_true, full_class_name, environ_bool, PRINT
 from pyramid import paster
-from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently, HTTPServerError
+from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently  # , HTTPServerError
 from pyramid.request import Request
 # Possibly still needed by some commented-out code.
 # from pyramid.response import Response
@@ -31,14 +31,15 @@ from vcf import Reader
 from .ingestion.vcf_utils import VCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
 from .commands.add_altcounts_by_gene import main as add_altcounts
-from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
-from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure, BadParameter
+from .ingestion.common import metadata_bundles_bucket, get_parameter  # , IngestionReport
+from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure  # , BadParameter
 from .ingestion.processors import get_ingestion_processor
-from .types.base import get_item_or_none
+# from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
-    resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request,
-    subrequest_object, register_path_content_type, vapp_for_email,
+    resolve_file_path,  # gunzip_content,
+    debuglog, get_trusted_email, beanstalk_env_from_request,
+    subrequest_object, register_path_content_type, vapp_for_email, vapp_for_ingestion,
 )
 from .ingestion.queue_utils import IngestionQueueManager
 from .ingestion.variant_utils import VariantBuilder
@@ -61,7 +62,6 @@ def includeme(config):
     # config.add_route('process_ingestion', '/process_ingestion')
     config.add_route('queue_ingestion', '/queue_ingestion')
     config.add_route('ingestion_status', '/ingestion_status')
-    # config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
     config.add_route('submit_for_ingestion', '/submit_for_ingestion')
     config.registry[INGESTION_QUEUE] = IngestionQueueManager(config.registry)
     config.scan(__name__)
@@ -124,7 +124,8 @@ def submit_for_ingestion(context, request):
     # if bogus_trusted_email:
     #     raise BadParameter(parameter_name='trusted_email', parameter_value=bogus_trusted_email,
     #                        extra_detail="The parameter name 'trusted_email' is reserved and may not be specified.")
-    # parameters['trusted_email'] = get_trusted_email(request=request, context="submit_for_ingestion", raise_errors=False)
+    # parameters['trusted_email'] = get_trusted_email(request=request, context="submit_for_ingestion",
+    #                                                 raise_errors=False)
     parameters['datafile'] = filename
 
     # Other parameters, like validate_only, will ride in on parameters via the manifest on s3
@@ -253,15 +254,30 @@ def ingestion_status(context, request):
     }
 
 
+DEBUG_SUBMISSIONS = environ_bool("DEBUG_SUBMISSIONS", default=False)
+
+
 def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=None, s3_client=None):
     bundles_bucket = bundles_bucket or metadata_bundles_bucket(app.registry)
     s3_client = s3_client or boto3.client('s3')
     manifest_name = "{id}/manifest.json".format(id=submission_id)
-    data = s3_client.get_object(Bucket=bundles_bucket, Key=manifest_name)
-    with vapp_for_email(data['email'], app=app) as vapp:
+    data = json.load(s3_client.get_object(Bucket=bundles_bucket, Key=manifest_name)['Body'])
+    email = None
+    try:
+        email = data['email']
+    except KeyError as e:
+        debuglog("Manifest data is missing 'email' field.")
+        if DEBUG_SUBMISSIONS:
+            import pdb; pdb.set_trace()
+    debuglog("processing submission %s with email %s" % (submission_id, email))
+    with vapp_for_email(email=email, app=app) as vapp:
+        if DEBUG_SUBMISSIONS:
+            PRINT("PROCESSING FOR %s" % email)
         submission = SubmissionFolio(vapp=vapp, ingestion_type=ingestion_type, submission_id=submission_id, log=None)
         handler = get_ingestion_processor(ingestion_type)
         result = handler(submission)
+        if DEBUG_SUBMISSIONS:
+            PRINT("DONE PROCESSING FOR %s" % email)
         return {
             "result": result,
             "ingestion_type": ingestion_type,
@@ -429,6 +445,8 @@ class IngestionListener:
         """ Sets the file_ingestion_status of the given uuid """
         self._patch_value(uuid, 'file_ingestion_status', status)
 
+    INGEST_AS_USER = environ_bool('INGEST_AS_USER', default=True)  # The new way, but possible to disable for now
+
     def run(self):
         """ Main process for this class. Runs forever doing ingestion as needed.
 
@@ -472,16 +490,26 @@ class IngestionListener:
                 if ingestion_type != 'vcf':
                     # Let's minimally disrupt things for now. We can refactor this later
                     # to make all the parts work the same -kmp
-                    submission = SubmissionFolio(vapp=self.vapp, ingestion_type=ingestion_type, submission_id=uuid)
-                    try:
-                        debuglog("REQUESTING RESTRICTED PROCESSING:", uuid)
-                        process_submission(submission_id=uuid,
-                                           ingestion_type=ingestion_type,
-                                           # bundles_bucket=submission.bucket,
-                                           app=self.vapp.app)
-                        debuglog("RESTRICTED PROCESSING DONE:", uuid)
-                    except Exception as e:
-                        log.error(e)
+                    if self.INGEST_AS_USER:
+                        try:
+                            debuglog("REQUESTING RESTRICTED PROCESSING:", uuid)
+                            process_submission(submission_id=uuid,
+                                               ingestion_type=ingestion_type,
+                                               # bundles_bucket=submission.bucket,
+                                               app=self.vapp.app)
+                            debuglog("RESTRICTED PROCESSING DONE:", uuid)
+                        except Exception as e:
+                            log.error(e)
+                    else:
+                        submission = SubmissionFolio(vapp=self.vapp, ingestion_type=ingestion_type,
+                                                     submission_id=uuid)
+                        handler = get_ingestion_processor(ingestion_type)
+                        try:
+                            debuglog("HANDLING:", uuid)
+                            handler(submission)
+                            debuglog("HANDLED:", uuid)
+                        except Exception as e:
+                            log.error(e)
                     # If we suceeded, we don't need to do it again, and if we failed we don't need to fail again.
                     discard(message)
                     continue
@@ -691,88 +719,6 @@ def main():
     vapp = VirtualApp(app, config)
     return run(vapp)
 
-
-PROMPT_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Submit for Ingestion</title>
-    <style>
-  body { background-color: <COLOR>; font-size: 14pt; font-weight: bold; margin-left: 25px; }
-  div.banner { margin-bottom: 25px; padding: 10px; text-align: center;
-                   border: 1px solid black; background-color: #ffeeff; width: 50%;
-         }
-      table { border-spacing: 5px; margin-left: 25px; }
-      td.formlabel { text-align: right; }
-      td.formsubmit { text-align: center; padding-top: 10px; }
-      td, input, select { font-size: 14pt; font-weight: bold; }
-      select { padding: 4px; }
-      input { padding: 10px; }
-      input.submit { border: 2px solid black; border-radius: 8px; padding: 10px; width: 100%; }
-    </style>
-  </head>
-  <body>
-    <div class="banner">
-      <p>This page is a demonstration of the ability to kick off an ingestion by form.</p>
-    </div>
-    <h1>Submit for Ingestion</h1>
-    <form action="<TARGET-URL>" method="post" accept-charset="utf-8"
-          enctype="multipart/form-data">
-      <table>
-        <tr>
-          <td class="formlabel">
-            <label for="ingestion_type">Ingestion Type:</label>
-          </td>
-          <td>
-            <select id="ingestion_type" name="ingestion_type">
-              <option value="metadata_bundle">MetaData Bundle&nbsp;</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td class="formlabel">
-            <label for="project">Project:</label>
-          </td>
-          <td>
-            <input type="text" id="project" name="project" value="/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/" />
-          </td>
-        </tr>
-        <tr>
-          <td class="formlabel">
-            <label for="institution">Institution:</label>
-          </td>
-          <td>
-            <input type="text" id="institution" name="institution" value="/institutions/hms-dbmi/" />
-          </td>
-        </tr>
-        <tr>
-          <td class="formlabel">
-            <label for="datafile">Submit Datafile:</label>
-          </td>
-          <td>
-            <input type="file" id="datafile" name="datafile" value="" />
-          </td>
-        </tr>
-        <tr>
-          <td><i>Special Options:</i><br /></td>
-          <td>
-            <input type="checkbox" id="validate_only" name="validate_only" value="true" />
-            <label for="validate_only"> Validate Only</label>
-          </td>
-        </tr>
-        <tr>
-          <td class="formsubmit" colspan="2">
-            <input class="submit" id="submit" type="submit" value="Submit" />
-          </td>
-        </tr>
-      </table>
-    </form>
-  </body>
-</html>
-"""
-
-PROMPT_FOR_INGESTION = PROMPT_TEMPLATE.replace("<TARGET-URL>", "/submit_for_ingestion").replace("<COLOR>", "#eeddee")
-PROMPT_FOR_SUBREQUEST = PROMPT_TEMPLATE.replace("<TARGET-URL>", "/submit_subrequest").replace("<COLOR>", "#ddeedd")
 
 if __name__ == '__main__':
     main()
