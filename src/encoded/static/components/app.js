@@ -719,16 +719,32 @@ export default class App extends React.PureComponent {
      * @returns {boolean}
      */
     stayOnSubmissionsPage(nextHref = null) {
+        const { href } = this.props;
         const { isSubmitting } = this.state;
         // can override state in options
         // override with replace, which occurs on back button navigation
         if (isSubmitting){
-            var nextAction = this.currentAction(nextHref);
-            if (nextAction && ['edit', 'create', 'clone'].indexOf(nextAction) > -1){
+
+            // Allow if changing hash, since generally navigates around a view while preserving it.
+            const tHrefParts = url.parse(nextHref, false);
+            const pHrefParts = memoizedUrlParse(href);
+            const { path: tPath, search: tSearch } = tHrefParts; // Returns search: null if no query
+            const { path, search } = pHrefParts; // Returns search: "" if no query (b.c. memoizedUrlParse does query:true in its call to url.parse)
+
+            // Allow if only changing hash, since generally navigates around a view while preserving it.
+            if (path === tPath && (search || "") === (tSearch || "")) {
+                return false;
+            }
+
+            const nextAction = this.currentAction(nextHref);
+            if (nextAction && { 'edit':1, 'create':1, 'clone':1 }[nextAction]){
                 // Cancel out if we are "returning" to edit or create (submissions page) href.
                 return false;
             }
-            if (window.confirm('Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?')){
+
+            const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
+
+            if (window.confirm(confirmMessage)){
                 // we are no longer submitting
                 this.setIsSubmitting(false);
                 return false;
@@ -1010,26 +1026,28 @@ export default class App extends React.PureComponent {
     /**
      * Set 'isSubmitting' in state. works with handleBeforeUnload
      *
-     * @param {boolean} bool - Value to set.
+     * @param {boolean|string} bool - Value to set. If string is provided, will show as text in popup.
      * @param {function} [callback=null] - Optional callback to execute after updating state.
      */
-    setIsSubmitting(bool, callback=null){
-        this.setState({ 'isSubmitting': bool }, callback);
+    setIsSubmitting(value, callback=null){
+        this.setState({ 'isSubmitting': value }, callback);
     }
 
     /**
      * Catch and alert user navigating away from page if in submission process.
+     * (This doesn't always print the message, and instead returns browser's default one, e.g. in Chrome)
+     * See: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload (esp Browser Compatibility for custom text support)
      *
-     * @private
      * @param {React.SyntheticEvent} e Window beforeunload event.
      * @returns {string|void} Dialog text which is to be shown to user.
      */
     handleBeforeUnload(e){
         const { isSubmitting } = this.state;
         if (isSubmitting){
-            const dialogText = "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
-            e.returnValue = dialogText;
-            return dialogText;
+            e.preventDefault();
+            const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
+            e.returnValue = confirmMessage;
+            return confirmMessage;
         }
     }
 

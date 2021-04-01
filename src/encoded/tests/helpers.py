@@ -3,10 +3,10 @@ import io
 import json
 import pkg_resources
 
-from dcicutils.misc_utils import find_association, ignorable
+from dcicutils.misc_utils import find_association, find_associations, ignorable
 
 
-def master_lookup(item_type, **attributes):
+def master_lookup(item_type, multiple=False, **attributes):
     """
     Given an item type and a set of attributes, looks up the master insert of that type matching
     the given attribute details.
@@ -16,10 +16,10 @@ def master_lookup(item_type, **attributes):
     :return: the JSON for a matching insert
     """
 
-    return any_inserts_lookup('master-inserts', item_type=item_type, **attributes)
+    return any_inserts_lookup('master-inserts', item_type=item_type, multiple=multiple, **attributes)
 
 
-def workbook_lookup(item_type, **attributes):
+def workbook_lookup(item_type, multiple=False, **attributes):
     """
     Given an item type and a set of attributes, looks up the workbook insert of that type matching
     the given attribute details.
@@ -29,10 +29,10 @@ def workbook_lookup(item_type, **attributes):
     :return: the JSON for a matching insert
     """
 
-    return any_inserts_lookup('workbook-inserts', item_type=item_type, **attributes)
+    return any_inserts_lookup('workbook-inserts', item_type=item_type, multiple=multiple, **attributes)
 
 
-def any_inserts_lookup(inserts_directory_name, item_type, **attributes):
+def any_inserts_lookup(inserts_directory_name, item_type, multiple=False, **attributes):
     """
     Given an item type and a set of attributes, looks up the master insert of that type matching
     the given attribute details.
@@ -47,7 +47,8 @@ def any_inserts_lookup(inserts_directory_name, item_type, **attributes):
                                                     + "/" + item_type.lower() + ".json")
     with io.open(item_filename) as fp:
         data = json.load(fp)
-        return find_association(data, **attributes)
+        finder = find_associations if multiple else find_association
+        return finder(data, **attributes)
 
 
 def _required_field_set(item_type):
@@ -134,10 +135,13 @@ def post_related_items_for_testing(testapp, item_dict, undo_dict):
                       of the items.
     :return: None
     """
+    result = {}
     for item_type, items in item_dict.items():
+        result[item_type] = []
         for item in items:
             try:
-                testapp.post_json('/' + item_type, _core_portion(item_type, item))
+                response = testapp.post_json('/' + item_type, _core_portion(item_type, item)).maybe_follow().json
+                result[item_type].append(response['@graph'][0])
             except Exception as e:
                 ignorable(e)
                 try:
@@ -152,7 +156,7 @@ def post_related_items_for_testing(testapp, item_dict, undo_dict):
                     # If there was data there before, remember how to restore it.
                     undo_dict[item_type].append(trimmed)
     _carefully_patch_related_items_for_testing(testapp=testapp, item_dict=item_dict)
-    return undo_dict
+    return result
 
 
 _FIELD_MISSING = object()
@@ -209,7 +213,7 @@ def assure_related_items_for_testing(testapp, item_dict):
     # to confusion in later tests. -kmp 10-Mar-2021
     undo_dict = {}
     try:
-        post_related_items_for_testing(testapp=testapp, item_dict=item_dict, undo_dict=undo_dict)
-        yield
+        posted = post_related_items_for_testing(testapp=testapp, item_dict=item_dict, undo_dict=undo_dict)
+        yield posted
     finally:
         _carefully_patch_related_items_for_testing(testapp=testapp, item_dict=undo_dict)

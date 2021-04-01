@@ -120,6 +120,7 @@ class SubmissionFolio:
 
         self.object_name = object_name = manifest['object_name']
         self.parameters = parameters = manifest['parameters']
+        email = manifest['email']
 
         debuglog(submission_id, "object_name:", object_name)
         debuglog(submission_id, "parameters:", parameters)
@@ -137,10 +138,16 @@ class SubmissionFolio:
         }
 
         try:
+
+            other_keys = {}
+            if email:
+                other_keys['submitted_by'] = email
+
             self.patch_item(submission_id=submission_id,
                             object_name=object_name,
                             parameters=parameters,
-                            processing_status={"state": "processing"})
+                            processing_status={"state": "processing"},
+                            **other_keys)
 
             self.resolution = resolution
 

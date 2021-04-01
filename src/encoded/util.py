@@ -369,6 +369,19 @@ def _app_from_clues(app=None, registry=None, context=None):
 
 EMAIL_PATTERN = re.compile(r'[^@]+[@][^@]+')
 
+import webtest
+from dcicutils.misc_utils import VirtualAppError
+
+# class MyVirtualApp(VirtualApp):
+#     def post(self, url, obj, **kwargs):
+#         try:
+#             return self.wrapped_app.post(url, obj, **kwargs)
+#         except webtest.AppError as e:
+#             raise VirtualAppError(msg='HTTP POST failed.', url=url, body=obj, raw_exception=e)
+#
+
+
+
 def make_vapp_for_email(*, email, app=None, registry=None, context=None):
     app = _app_from_clues(app=app, registry=registry, context=context)
     if not isinstance(email, str) or not EMAIL_PATTERN.match(email):
