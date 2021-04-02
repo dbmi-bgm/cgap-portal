@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "5.6.1"
+version = "5.6.2"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -152,7 +152,7 @@ pytest-xdist = ">=1.14"
 # -kmp 18-Jan-2021
 #
 # [tool.pytest.ini_options]
-# minversion = "6.1"
+# minversion = "6.0"
 # ...etc.
 # See details at https://pytest.org/en/stable/customize.html
 
