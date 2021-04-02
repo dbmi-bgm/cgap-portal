@@ -250,10 +250,20 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         //     this.props
         // );
 
+
+        const haveDuplicateQueries = _.keys(duplicateQueryIndices).length > 0;
+        const haveDuplicateNames = _.keys(duplicateNameIndices) > 0;
+
+        // Always disable if any of following conditions:
+        const isEditDisabled = !bodyOpen || !haveEditPermission || haveDuplicateQueries || haveDuplicateNames || !filterSet;
+
         const headerProps = {
-            filterSet, bodyOpen, caseItem, duplicateQueryIndices, duplicateNameIndices,
-            setTitleOfFilterSet, isFetchingInitialFilterSetItem,
-            hasCurrentFilterSetChanged, haveEditPermission, isSavingFilterSet, saveFilterSet
+            filterSet, bodyOpen, caseItem,
+            haveDuplicateQueries, haveDuplicateNames,
+            isEditDisabled,
+            // setTitleOfFilterSet,
+            isFetchingInitialFilterSetItem,
+            hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet
         };
 
         let body = null;
@@ -263,7 +273,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 singleSelectedFilterBlockIdx, selectedFilterBlockIndices, allFilterBlocksSelected, selectedFilterBlockIdxCount,
                 addNewFilterBlock, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
                 cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx,
-                intersectFilterBlocks, toggleIntersectFilterBlocks
+                intersectFilterBlocks, toggleIntersectFilterBlocks,
+                // Props for Save btn:
+                saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged
             };
             body = <FilterSetUIBlocks {...bodyProps} />;
         }
@@ -285,7 +297,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
                 <div className="above-variantsample-table-ui">
                     <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
-                        <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
+                        <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} />
                         <Collapse in={bodyOpen}>
                             <div className="filterset-blocks-container">
                                 { body }
@@ -489,8 +501,6 @@ function AddToVariantSampleListButton(props){
 
             // We shouldn't have any duplicates since prev-selected VSes should appear as checked+disabled in table.
             // But maybe should still check to be safer (todo later)
-
-
         }
 
     };
@@ -509,9 +519,11 @@ function AddToVariantSampleListButton(props){
 function FilterSetUIHeader(props){
     const {
         filterSet, caseItem,
-        hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet, haveEditPermission,
-        toggleOpen, bodyOpen, duplicateQueryIndices, duplicateNameIndices,
-        setTitleOfFilterSet, isFetchingInitialFilterSetItem = false
+        hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,
+        toggleOpen, bodyOpen,
+        isEditDisabled,
+        haveDuplicateQueries, haveDuplicateNames,
+        isFetchingInitialFilterSetItem = false
     } = props;
 
     const {
@@ -582,12 +594,6 @@ function FilterSetUIHeader(props){
         );
     }
 
-    const haveDuplicateQueries = _.keys(duplicateQueryIndices).length > 0;
-    const haveDuplicateNames = _.keys(duplicateNameIndices) > 0;
-
-    // Always disable if any of following conditions:
-    const isEditDisabled = !bodyOpen || !haveEditPermission || haveDuplicateQueries || haveDuplicateNames || !filterSet;
-
     // todo if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
     return (
         <div className="row filter-set-ui-header align-items-center px-3 py-3">
@@ -599,7 +605,7 @@ function FilterSetUIHeader(props){
                     : null }
 
                 <div role="group" className="dropdown btn-group">
-                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} />
+                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-sm btn-outline-light" />
                     <SaveFilterSetPresetDropdownButton {...{ filterSet, caseItem, isEditDisabled }} />
                 </div>
             </div>
@@ -816,7 +822,20 @@ export class SaveFilterSetButtonController extends React.Component {
 }
 
 
-function SaveFilterSetButton({ isEditDisabled, saveFilterSet, isSavingFilterSet, hasCurrentFilterSetChanged }){
+function SaveFilterSetButton(props){
+    const {
+        isEditDisabled,
+        saveFilterSet,
+        isSavingFilterSet,
+        hasCurrentFilterSetChanged,
+        className = "btn btn-primary",
+        children = (
+            <React.Fragment>
+                <i className="icon icon-save fas mr-07"/>
+                Save
+            </React.Fragment>
+        )
+    } = props;
     const disabled = isEditDisabled || isSavingFilterSet || !hasCurrentFilterSetChanged;
 
     function onSaveBtnClick(e){
@@ -827,16 +846,11 @@ function SaveFilterSetButton({ isEditDisabled, saveFilterSet, isSavingFilterSet,
     }
 
     return (
-        <button type="button" className="btn btn-sm btn-outline-light" disabled={disabled}
-            onClick={onSaveBtnClick}>
+        <button type="button" className={className} disabled={disabled}
+            onClick={onSaveBtnClick} data-tip="Save this Case FilterSet">
             { isSavingFilterSet ?
                 <i className="icon icon-spin icon-circle-notch fas" />
-                : (
-                    <React.Fragment>
-                        <i className="icon icon-save fas mr-07"/>
-                        Save
-                    </React.Fragment>
-                )}
+                : children }
         </button>
     );
 }
@@ -1109,7 +1123,8 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         singleSelectedFilterBlockIdx, selectedFilterBlockIndices, allFilterBlocksSelected, selectedFilterBlockIdxCount,
         addNewFilterBlock, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
         cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
-        intersectFilterBlocks = false, toggleIntersectFilterBlocks
+        intersectFilterBlocks = false, toggleIntersectFilterBlocks,
+        saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged
     } = props;
     const { filter_blocks = [] } = filterSet || {};
     const { query: currentSingleBlockQuery = null } = (singleSelectedFilterBlockIdx !== null && filter_blocks[singleSelectedFilterBlockIdx]) || {};
@@ -1167,7 +1182,7 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
             ) }
             <div className="row">
                 <div className="col">
-                    <div className="btn-group" role="group" aria-label="Selection Controls">
+                    <div className="btn-group mr-08" role="group" aria-label="Selection Controls">
                         <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
                             <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
                             Select All
@@ -1178,11 +1193,10 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
                             Intersect
                         </button>
                     </div>
-                    <button type="button" className="btn btn-primary-dark" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
-                        data-tip="Toggle whether to compute the union or intersection of filter blocks">
-                        <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
-                        Intersect
-                    </button>
+                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark">
+                        <i className="icon icon-save fas mr-07"/>
+                        Save FilterSet
+                    </SaveFilterSetButton>
                 </div>
                 <div className="col-auto">
                     <div className="btn-group" role="group" aria-label="Creation Controls">
