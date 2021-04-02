@@ -27,6 +27,9 @@ pytestmark = [pytest.mark.working]
 
 TEST_INGESTION_ID1 = '123456-1243-1234-123456abcdef'
 TEST_INGESTION_ID2 = 'abcdef-1234-1234-abcdef123456'
+WORKBOOK_FAMILY_ID1 = '/families/GAPFA59JKS1Y/'
+WORKBOOK_FAMILY_ID2 = '/families/GAPFAYUV203P/'
+WORKBOOK_FAMILY_ID3 = '/families/GAPFAZ3V21Q8/'
 
 
 # TODO: Check if these work or not.  These tests seem to be working, but they may do posting
@@ -674,13 +677,20 @@ class TestPedigreeMetadata:
         assert len(submission.families) == 1
         fam = list(submission.families.values())[0]
         assert 'hms-dbmi:0101' in fam['aliases']
-        assert list(submission.families.keys())[0] == 'hms-dbmi:0101'
+        assert list(submission.families.keys())[0] == WORKBOOK_FAMILY_ID1
         assert len(fam['members']) == len(example_rows_pedigree)
 
-    def test_add_family_metadata_db_multi(self, testapp, example_rows_pedigree, project, institution):
+    def test_add_family_metadata_db_multi(self, workbook, es_testapp, example_rows_pedigree, project, institution):
         # two family items found  in db
-        # family items have all members and have proband
-        pass
+        # family items have all members and proband isn't changed
+        for row in example_rows_pedigree:
+            row['family id'] = '0102'
+        submission = PedigreeMetadata(es_testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
+        assert len(submission.families) == 2
+        assert sorted(list(submission.families.keys())) == sorted([WORKBOOK_FAMILY_ID2, WORKBOOK_FAMILY_ID3])
+        for fam in submission.families.values():
+            assert len(fam['members']) == len(example_rows_pedigree)
+            assert 'proband' not in fam
 
     def test_process_rows(self, example_rows_pedigree_obj):
         assert len(example_rows_pedigree_obj.families) == 1
