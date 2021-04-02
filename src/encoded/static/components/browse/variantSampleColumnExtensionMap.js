@@ -153,6 +153,28 @@ export function StackedRowColumn(props) {
     );
 }
 
+/** An edited version of SPC's DisplayTitleColumnDefault */
+export const VariantSampleDisplayTitleColumn = React.memo(function VariantSampleDisplayTitleColumn(props) {
+    const { result = null, link, onClick, className = null } = props;
+    const { variant = null } = result || {};
+    const { display_title = null, ID = null } = variant;
+
+    const cls = ("title-block" + (className ? " " + className : ""));
+    const rows = [
+        <span key="variant-title" className="d-block text-600 text-truncate">{display_title}</span>
+    ];
+
+    if (ID) {
+        rows.push(<span key="dbsnp" className="font-italic">{ ID }</span>);
+    }
+
+    return (
+        <a key="title" href={link || '#'} onClick={onClick} className="d-block text-truncate">
+            <StackedRowColumn className={cls} {...{ rows }}  />
+        </a>
+    );
+});
+
 const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene }){
     const {
         genes_most_severe_hgvsc = null,

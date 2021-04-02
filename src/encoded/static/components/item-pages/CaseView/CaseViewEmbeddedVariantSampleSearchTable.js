@@ -5,7 +5,7 @@ import React, { useMemo, useCallback, useEffect } from 'react';
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
-import { StackedRowColumn } from './../../browse/variantSampleColumnExtensionMap';
+import { VariantSampleDisplayTitleColumn } from './../../browse/variantSampleColumnExtensionMap';
 
 /* Used in FilteringTab */
 
@@ -72,27 +72,6 @@ export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleS
 });
 
 
-/** An edited version of SPC's DisplayTitleColumnDefault */
-export const VariantSampleDisplayTitleColumn = React.memo(function VariantSampleDisplayTitleColumn(props) {
-    const { result = null, link, onClick, className = null } = props;
-    const { variant = null } = result || {};
-    const { display_title = null, ID = null } = variant;
-
-    const cls = ("title-block" + (className ? " " + className : ""));
-    const rows = [
-        <span key="variant-title" className="d-block text-600 text-truncate">{display_title}</span>
-    ];
-
-    if (ID) {
-        rows.push(<span key="dbsnp" className="font-italic">{ ID }</span>);
-    }
-
-    return (
-        <a key="title" href={link || '#'} onClick={onClick} className="d-block text-truncate">
-            <StackedRowColumn className={cls} {...{ rows }}  />
-        </a>
-    );
-});
 
 // function SelectableTitle({ onSelectVariant, result, link }){
 //     // DisplayTitleColumnWrapper passes own 'onClick' func as prop to this component which would navigate to Item URL; don't use it here; intercept and instead use onSelectVariant from FilteringTab (or wherever).

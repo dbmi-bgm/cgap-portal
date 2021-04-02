@@ -12,7 +12,7 @@ import { basicColumnExtensionMap,
     DisplayTitleColumnUser } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { Schemas, typedefs } from './../util';
 
-import { variantSampleColumnExtensionMap } from './variantSampleColumnExtensionMap';
+import { variantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './variantSampleColumnExtensionMap';
 
 // eslint-disable-next-line no-unused-vars
 const { Item, ColumnDefinition } = typedefs;
@@ -137,12 +137,14 @@ export const columnExtensionMap = {
         'order' : -100,
         'render' : function renderDisplayTitleColumn(result, parentProps){
             const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-            const { '@type' : itemTypeList = ["Item"] } = result;
+            const { '@type': itemTypeList = ["Item"] } = result;
             let renderElem;
             if (itemTypeList[0] === "User") {
                 renderElem = <DisplayTitleColumnUser {...{ result }}/>;
             } else if (itemTypeList[0] === "Case") {
                 renderElem = <DisplayTitleColumnCase {...{ result }}/>;
+            } else if (itemTypeList[0] === "VariantSample") {
+                renderElem = <VariantSampleDisplayTitleColumn {...{ result }} />;
             } else {
                 renderElem = <DisplayTitleColumnDefault {...{ result }}/>;
             }
