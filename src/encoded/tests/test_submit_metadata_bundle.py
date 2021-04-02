@@ -4,16 +4,11 @@ import pytest
 import re
 import webtest
 
-from dcicutils.qa_utils import raises_regexp, override_environ, notice_pytest_fixtures
+from dcicutils.qa_utils import raises_regexp, override_environ
 from ..util import make_vapp_for_email
-from .personas import (
-    personas, posted_personas, personas_ecosystem, posted_personas_ecosystem,
-)
 from .test_access_key import basic_auth
 from ..util import ENCODED_ROOT_DIR
 
-
-notice_pytest_fixtures(personas, posted_personas, personas_ecosystem, posted_personas_ecosystem)
 
 # These tests will work but may leave garbage around from stray submissions.
 # If that causes a problem, we'll need to write some cleanup code. -kmp 21-Feb-2021

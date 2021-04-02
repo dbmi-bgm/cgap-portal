@@ -1,11 +1,5 @@
 import json
 
-from dcicutils.qa_utils import notice_pytest_fixtures
-from .personas import personas, posted_personas, personas_ecosystem, posted_personas_ecosystem
-
-
-notice_pytest_fixtures(personas)
-
 
 def test_personas_fixture(personas):
     """

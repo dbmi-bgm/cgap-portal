@@ -120,12 +120,6 @@ def submit_for_ingestion(context, request):
     filename = datafile.filename
     override_name = request.POST.get('override_name', None)
     parameters = dict(request.POST)  # Convert to regular dictionary, which is also a copy
-    # bogus_trusted_email = parameters.get('trusted_email')
-    # if bogus_trusted_email:
-    #     raise BadParameter(parameter_name='trusted_email', parameter_value=bogus_trusted_email,
-    #                        extra_detail="The parameter name 'trusted_email' is reserved and may not be specified.")
-    # parameters['trusted_email'] = get_trusted_email(request=request, context="submit_for_ingestion",
-    #                                                 raise_errors=False)
     parameters['datafile'] = filename
 
     # Other parameters, like validate_only, will ride in on parameters via the manifest on s3

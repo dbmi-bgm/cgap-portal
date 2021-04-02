@@ -7,16 +7,12 @@ import pytest
 import tempfile
 
 from unittest import mock
-from dcicutils.qa_utils import ControlledTime, ignored, notice_pytest_fixtures
-from .personas import personas, personas_ecosystem, posted_personas, posted_personas_ecosystem
+from dcicutils.qa_utils import ControlledTime, ignored
 from ..util import (
     debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, get_trusted_email,
     check_user_is_logged_in, vapp_for_email,
 )
 from .. import util as util_module
-
-
-notice_pytest_fixtures(personas, personas_ecosystem, posted_personas, posted_personas_ecosystem)
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
