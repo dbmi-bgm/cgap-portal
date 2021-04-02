@@ -76,15 +76,15 @@ export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleS
 export const VariantSampleDisplayTitleColumn = React.memo(function VariantSampleDisplayTitleColumn(props) {
     const { result = null, link, onClick, className = null } = props;
     const { variant = null } = result || {};
-    const { display_title = null, dbsnp_rs_number = null } = variant;
+    const { display_title = null, ID = null } = variant;
 
     const cls = ("title-block" + (className ? " " + className : ""));
     const rows = [
         <span key="variant-title" className="d-block text-600 text-truncate">{display_title}</span>
     ];
 
-    if (dbsnp_rs_number) {
-        rows.push(<span key="dbsnp" className="font-italic">{dbsnp_rs_number}</span>);
+    if (ID) {
+        rows.push(<span key="dbsnp" className="font-italic">{ ID }</span>);
     }
 
     return (
