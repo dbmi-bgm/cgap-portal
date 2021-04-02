@@ -20,6 +20,9 @@ clean-npm-caches:
 clean-node-modules:
 	rm -rf node_modules
 
+clear-poetry-cache:  # clear poetry/pypi cache. for user to do explicitly, never automatic
+	poetry cache clear pypi --all
+
 aws-ip-ranges:
 	curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
 
@@ -40,7 +43,7 @@ macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an e
 
 configure:  # does any pre-requisite installs
 	pip install --upgrade pip==21.0.1
-	pip install poetry==1.1.4  # poetry latest as of 1/25/2021 seemed to work but apparantly does not
+	pip install poetry==1.1.4  # this version is known to work. -kmp 11-Mar-2021
 
 build:  # builds
 	make configure
@@ -107,7 +110,7 @@ deploy2:  # spins up waittress to serve the application
 	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini
 
 deploy3:  # Uploads genes, consequences then ingests the VCF below
-	poetry run ingest-vcf src/encoded/annotations/GAPFIAI7IZ9Y.reformat.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
+	poetry run ingest-vcf src/encoded/annotations/GAPFIAI7IZ9Y.reformat.altcounts.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
 
 psql-dev:  # starts psql with the url after 'sqlalchemy.url =' in development.ini
 	@scripts/psql-start dev
@@ -135,38 +138,36 @@ clean-python:
 	pip uninstall -y -r <(pip freeze)
 
 test:
-	make test-npm
 	make test-unit
+	make test-npm
 
 retest:
-	poetry run python -m pytest -vv --last-failed
+	poetry run python -m pytest -vv -r w --last-failed
 
 test-any:
-	poetry run python -m pytest -vv --timeout=200
+	poetry run python -m pytest -vv -r w --timeout=200
 
 test-npm:
-	poetry run python -m pytest -vv --timeout=200 -m "working and not manual and not integratedx and not performance and not broken and not broken_locally and not sloppy and not indexing"
+	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and not indexing"
 
 test-unit:
-	poetry run python -m pytest -vv --timeout=200 -m "working and not manual and not integratedx and not performance and not broken and not broken_locally and not sloppy and indexing"
+	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and indexing"
 
 test-performance:
-	poetry run python -m pytest -vv --timeout=200 -m "working and not manual and not integratedx and performance and not broken and not broken_locally and not sloppy"
+	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and performance and not broken and not sloppy"
 
 test-integrated:
-	poetry run python -m pytest -vv --timeout=200 -m "working and not manual and (integrated or integratedx) and not performance and not broken and not broken_locally and not sloppy"
+	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and (integrated or integratedx) and not performance and not broken and not sloppy"
 
-travis-test:  # We don't use this target on Travis/GA. We call each as separate jobs.
-	make travis-test-npm
-	make travis-test-unit
+remote-test:  # Actually, we don't normally use this. Instead the GA workflow sets up two parallel tests.
+	make remote-test-unit
+	make remote-test-npm
 
-travis-test-npm:  # Note this only does the 'not indexing' tests
-	poetry run python -m pytest -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+remote-test-npm:  # Note this only does the 'not indexing' tests
+	poetry run python -m pytest -vv -r w --instafail --force-flaky --max-runs=3 --timeout=400 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
-travis-test-unit:  # Note this does the 'indexing' tests
-	poetry run python -m pytest -vv --timeout=300 -m "working and not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
-
-
+remote-test-unit:  # Note this does the 'indexing' tests
+	poetry run python -m pytest -vv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update
@@ -182,6 +183,7 @@ info:
 	   $(info - Use 'make build-locust' to install locust. Do not do this unless you know what you are doing.)
 	   $(info - Use 'make clean' to clear out (non-python) dependencies.)
 	   $(info - Use 'make clean-python' to clear python virtualenv for fresh poetry install.)
+	   $(info - Use 'make clear-poetry-cache' to clear the poetry pypi cache if in a bad state. (Safe, but later recaching can be slow.))
 	   $(info - Use 'make configure' to install poetry. You should not have to do this directly.)
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts.)
 	   $(info - Use 'make deploy2' to spin up the application server.)

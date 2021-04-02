@@ -288,8 +288,7 @@
             "description": "Accession of specimen from sequencing lab",
             "label": "requisition",
             "type": "string",
-            "lookup": 80,
-            "uniqueKey": true
+            "lookup": 80
         },
         "priority": {
             "title": "Priority",
