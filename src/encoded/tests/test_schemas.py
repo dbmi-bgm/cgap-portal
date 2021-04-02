@@ -130,7 +130,7 @@ def camel_case(name):
 def pluralize(name):
     name = name.replace('_', '-')
     # deal with a few special cases explicitly
-    specials = ['file', 'quality-metric', 'summary-statistic', 'workflow-run']
+    specials = ['file', 'quality-metric', 'summary-statistic', 'workflow-run', 'note']
     for sp in specials:
         if name.startswith(sp) and re.search('-(set|flag|format|type)', name) is None:
             return name.replace(sp, sp + 's')
@@ -149,12 +149,10 @@ def pluralize(name):
 def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
 
     abstract = [
-        'microscope_setting.json',
-        'experiment.json',
         'file.json',
         'individual.json',
         'quality_metric.json',
-        'treatment.json',
+        'note.json',
         'workflow_run.json',
         'user_content.json',
         'evidence.json',

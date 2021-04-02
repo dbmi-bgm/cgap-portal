@@ -26,7 +26,13 @@ class Gene(Item):
     name_key = 'ensgid'  # use the ENSEMBL Gene ID as the identifier
     schema = load_schema('encoded:schemas/gene.json')
     rev = {'gene_lists': ('GeneList', 'genes')}
-    embedded_list = ['gene_lists.title']
+    embedded_list = [
+        'gene_lists.title',
+        'interpretation.classification',
+        'interpretation.acmg_guidelines',
+        'interpretation.conclusion',
+        'interpretation.note_text'
+    ]
 
     @calculated_property(schema={
         "title": "Display Title",
