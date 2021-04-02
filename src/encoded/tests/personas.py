@@ -104,3 +104,4 @@ def non_admin_user(posted_personas):
     # We could actually even search for a user with the cleanest set of perms,
     # but it doesn't change often and this should suffice for now. -kmp 2-Apr-2021
     assert not result.get("groups", [])
+    return result
