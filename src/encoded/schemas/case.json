@@ -105,6 +105,11 @@
                 "type": "string"
             }
         },
+        "variant_sample_list_id": {
+            "title": "Variant Sample List Identifier",
+            "description": "uuid of associated VariantSampleList item",
+            "type": "string"
+        },
         "ingestion_ids": {
             "title": "Submission IDs",
             "description": "uuids of the IngestionSubmission items that created/edited this case",
