@@ -152,7 +152,7 @@ pytest-xdist = ">=1.14"
 # -kmp 18-Jan-2021
 #
 # [tool.pytest.ini_options]
-# minversion = "6.0"
+# minversion = "6.1"
 # ...etc.
 # See details at https://pytest.org/en/stable/customize.html
 
