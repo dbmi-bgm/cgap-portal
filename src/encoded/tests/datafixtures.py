@@ -29,13 +29,25 @@ def connection():
     }
 
 
+def post_if_needed(testapp, item_type_url, item):
+    http_created = 201
+    http_conflict = 409
+    res = testapp.post_json(item_type_url, item, status=(http_created, http_conflict))
+    if res.status_code == http_conflict:
+        import pdb; pdb.set_trace()
+        return testapp.get(item_type_url + '/' + item['name'] + '/').json
+    else:
+        return res.json['@graph'][0]
+
+
 @pytest.fixture
 def project(testapp):
     item = {
         'name': 'encode-project',
         'title': 'ENCODE Project'
     }
-    return testapp.post_json('/project', item).json['@graph'][0]
+    return post_if_needed(testapp, '/project', item)
+    # return testapp.post_json('/project', item).json['@graph'][0]
 
 
 @pytest.fixture
@@ -44,7 +56,8 @@ def institution(testapp):
         'name': 'encode-institution',
         'title': 'ENCODE Institution'
     }
-    return testapp.post_json('/institution', item).json['@graph'][0]
+    return post_if_needed(testapp, '/institution', item)
+    # return testapp.post_json('/institution', item).json['@graph'][0]
 
 
 @pytest.fixture
@@ -53,7 +66,8 @@ def another_institution(testapp):
         'name': 'encode-institution2',
         'title': 'ENCODE Institution 2'
     }
-    return testapp.post_json('/institution', item).json['@graph'][0]
+    return post_if_needed(testapp, '/institution', item)
+    # return testapp.post_json('/institution', item).json['@graph'][0]
 
 
 @pytest.fixture

@@ -63,8 +63,8 @@ def authorized_ingestion_simulation(mocked_queue_manager, mocked_s3_client, test
                     with mock.patch.object(boto3, "client", constantly(mocked_s3_client)):
                         with mock.patch.object(ingestion_listener_module, "get_queue_manager",
                                                constantly(mocked_queue_manager)):
-                            with mock.patch.object(ingestion_module, "subrequest_item_creation",
-                                                   expect_unreachable_in_mock("subrequest_item_creation")):
+                            # with mock.patch.object(ingestion_module, "subrequest_item_creation",
+                            #                        expect_unreachable_in_mock("subrequest_item_creation")):
                                 yield
 
 

@@ -1,9 +1,11 @@
 import json
 import pytest
 
-from dcicutils.misc_utils import constantly
-from dcicutils.lang_utils import string_pluralize
+from dcicutils.misc_utils import constantly, ignorable
 from .helpers import master_lookup, assure_related_items_for_testing
+
+
+ignorable(constantly)
 
 
 # def name_matcher(name):
@@ -30,11 +32,13 @@ PERSONAS_INSTITUTION = 'cgap-backend-team'
 
 @pytest.fixture
 def personas_ecosystem():
-    return {
+    ecosystem = {
         'User': master_lookup(item_type='User', last_name='Persona', multiple=True),
         'Institution': master_lookup(item_type='Institution', name=PERSONAS_INSTITUTION, multiple=True),
         'Project': master_lookup(item_type='Project', name=PERSONAS_PROJECT, multiple=True),
     }
+    print("personas_ecosystem =", json.dumps(ecosystem, indent=2))
+    return ecosystem
 
 @pytest.yield_fixture
 def posted_personas_ecosystem(testapp, personas_ecosystem):

@@ -7,13 +7,16 @@ import pytest
 import tempfile
 
 from unittest import mock
-from dcicutils.misc_utils import constantly
-from dcicutils.qa_utils import ControlledTime, ignored
+from dcicutils.qa_utils import ControlledTime, ignored, notice_pytest_fixtures
+from .personas import personas, personas_ecosystem, posted_personas, posted_personas_ecosystem
 from ..util import (
     debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, get_trusted_email,
     check_user_is_logged_in, vapp_for_email,
 )
 from .. import util as util_module
+
+
+notice_pytest_fixtures(personas, personas_ecosystem, posted_personas, posted_personas_ecosystem)
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
@@ -306,8 +309,26 @@ def hms_dbmi_institution(testapp):
     raise RuntimeError("No suitable non-admin user was found.")
 
 
+@pytest.fixture
+def non_admin_user(posted_personas):
+    return posted_personas['developer']
+
+
 def test_vapp_for_email(testapp, non_admin_user):
     email = non_admin_user['email']
+    def check_me(context):
+        """We use this just to make sure that the vapp_for_email context manager isn't leaking state."""
+        try:
+            my_uuid = testapp.get("/me").json['uuid']
+            assert my_uuid != non_admin_user['uuid']  # If there is a dfeault /me page, it must not be my user id's /me
+            print("%s /me = %s" % (context, my_uuid))
+        except:
+            print("%s has no /me by default" % context)
+            pass  # But it's fine if there just isn't a defaul identity, too.
+    check_me('global')
     with vapp_for_email(email=email, app=testapp.app) as vapp:
-        assert vapp.get("/me") == non_admin_user
-
+        check_me('local')
+        my_uuid = vapp.get("/me").json['uuid']
+        assert my_uuid == non_admin_user['uuid']
+        print("vapp has proper identity")
+    check_me('global')
