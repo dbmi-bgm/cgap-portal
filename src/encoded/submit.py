@@ -842,6 +842,14 @@ class PedigreeMetadata:
                     previous[item.alias][key] = item.metadata[key]
 
     def add_family_metadata(self):
+        """
+        Creates family metadata based on family_id for each individual in sheet.
+
+        In some scenarios we will have multiple Family items in the DB for the same family,
+        if the proband needs to be changed (e.g. the family has 2 affected siblings). In these cases
+        we want to update the family history for both families, so we will look up the family ID and patch
+        all families with the ID.
+        """
         family_metadata = {}
         for alias, item in self.individuals.items():
             family_metadata.setdefault(item['family_id'],
@@ -866,14 +874,14 @@ class PedigreeMetadata:
             else:
                 for match in family_matches.json['@graph']:
                     value['aliases'].extend(match.get('aliases', []))
-                    final_family_dict[match['aliases'][0]] = value
+                    final_family_dict[match['@id']] = value
                     if value.get('proband'):
                         phenotypes = [item['phenotypic_feature'] for item in
                                       self.individuals[value['proband']].get('phenotypic_features', [])]
-                        # TODO: Add other family member phenotypes if proband phenotypes < 4
+                        # TODO: Add other family member phenotypes if proband phenotypes < 4 ?
                         if phenotypes:
-                            final_family_dict[match['aliases'][0]]['family_phenotyic_features'] = phenotypes[:4]
-                        del final_family_dict[match['aliases'][0]]['proband']
+                            final_family_dict[match['@id']]['family_phenotyic_features'] = phenotypes[:4]
+                        del final_family_dict[match['@id']]['proband']
         return final_family_dict
 
     def check_individuals(self):
