@@ -5,13 +5,13 @@ from uuid import uuid4
 
 class MockedLogger(object):
 
-    def info(self, msg):
+    def info(self, msg):  # noQA - for mock it doesn't matter it could be static
         print('INFO: ' + msg)
 
-    def warn(self, msg):
+    def warn(self, msg):  # noQA - for mock it doesn't matter it could be static
         print('WARNING: ' + msg)
 
-    def error(self, msg):
+    def error(self, msg):  # noQA - for mock it doesn't matter it could be static
         print('ERROR: ' + msg)
 
 
@@ -29,12 +29,12 @@ def connection():
     }
 
 
+# I'm not even sure this is needed, but can debug that later. -kmp 2-Apr-2021
 def post_if_needed(testapp, item_type_url, item):
     http_created = 201
     http_conflict = 409
     res = testapp.post_json(item_type_url, item, status=(http_created, http_conflict))
     if res.status_code == http_conflict:
-        import pdb; pdb.set_trace()
         return testapp.get(item_type_url + '/' + item['name'] + '/').json
     else:
         return res.json['@graph'][0]
@@ -884,9 +884,9 @@ def workflow_mapping(testapp, workflow_bam, institution, project):
         'project': project['@id'],
         # TODO: This value of "workflow_parameters" is duplicated and should be removed or merged with the other.
         #       Probably only the second value is being used right now. - Will and Kent 17-Dec-2020
-        "workflow_parameters": [
-            {"parameter": "bowtie_index", "value": "some value"}
-        ],
+        # "workflow_parameters": [
+        #    {"parameter": "bowtie_index", "value": "some value"}
+        # ],
         "experiment_parameters": [
             {"parameter": "biosample.biosource.individual.organism", "value": "mouse"}
         ],
@@ -899,7 +899,9 @@ def workflow_mapping(testapp, workflow_bam, institution, project):
 
 @pytest.fixture
 def gene_item(testapp, institution, project):
-    return testapp.post_json('/gene', {'institution': institution['@id'], 'project': project['@id'], 'geneid': '5885'}).json['@graph'][0]
+    return testapp.post_json('/gene',
+                             {'institution': institution['@id'], 'project': project['@id'], 'geneid': '5885'}
+                             ).json['@graph'][0]
 
 
 @pytest.fixture

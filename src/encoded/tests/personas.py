@@ -1,34 +1,20 @@
 import json
 import pytest
 
-from dcicutils.misc_utils import constantly, ignorable
 from .helpers import master_lookup, assure_related_items_for_testing
-
-
-ignorable(constantly)
-
-
-# def name_matcher(name):
-#     """
-#     Given a string name, returns a predicate that returns True if given that name (in any case), and False otherwise.
-#     """
-#     return lambda n: n.lower() == name
-#
-#
-# def any_name_matcher(*names):
-#     """
-#     Given a list of string names, returns a predicate that matches those names. Given no names, it matches any name.
-#     The matcher returned is incase-sensitive.
-#     """
-#     if names:
-#         canonical_names = [name.lower() for name in names]
-#         return lambda name: name.lower() in canonical_names
-#     else:
-#         return constantly(True)
 
 
 PERSONAS_PROJECT = 'cgap-unit-testing-project'
 PERSONAS_INSTITUTION = 'cgap-backend-team'
+
+
+# The personas_ecosystem fixture is looked up from the inserts, but not posted. It looks like:
+#
+# {
+#     "User": [user1, user2, ...],
+#     "Institution": [institution],
+#     "Project": [project],
+# }
 
 @pytest.fixture
 def personas_ecosystem():
@@ -40,6 +26,15 @@ def personas_ecosystem():
     print("personas_ecosystem =", json.dumps(ecosystem, indent=2))
     return ecosystem
 
+
+# The posted_personas_ecosystem fixture is looked up from the inserts, and then posted. It looks like:
+#
+# {
+#     "User": [user1, user2, ...],
+#     "Institution": [institution],
+#     "Project": [project],
+# }
+
 @pytest.yield_fixture
 def posted_personas_ecosystem(testapp, personas_ecosystem):
     for item_type, items in personas_ecosystem.items():
@@ -48,15 +43,36 @@ def posted_personas_ecosystem(testapp, personas_ecosystem):
             res = testapp.get('/' + uuid, status=(200, 404))
             if res.status_code == 200:
                 pass
-                import pdb; pdb.set_trace()
     with assure_related_items_for_testing(testapp, personas_ecosystem) as posted:
         yield posted
 
+
+# The personas fixture is looked up from the inserts, but not posted. It looks like:
+#
+# {
+#     "institution": institution,  # <-- by special exception, this item is not a user
+#     "project": project,  # <-- by special exception, this item is not a user
+#     # All others are users items...
+#     "persona_name_1": {"first_name": "Persona_name_1", "last_name": "Persona", ...other fields...},
+#     "persona_name_2": {"first_name": "Persona_name_1", "last_name": "Persona", ...other fields...},
+# }
+#
 
 @pytest.fixture
 def personas(personas_ecosystem):
     return _make_personas_dictionary(personas_ecosystem)
 
+
+# The personas fixture is looked up from the inserts, and then posted. It looks like:
+#
+# {
+#     "institution": institution,  # <-- by special exception, this item is not a user
+#     "project": project,  # <-- by special exception, this item is not a user
+#     # All others are users items...
+#     "persona_name_1": {"first_name": "Persona_name_1", "last_name": "Persona", ...other fields...},
+#     "persona_name_2": {"first_name": "Persona_name_1", "last_name": "Persona", ...other fields...},
+# }
+#
 
 @pytest.fixture
 def posted_personas(posted_personas_ecosystem):
@@ -75,3 +91,16 @@ def _make_personas_dictionary(ecosystem):
     [project] = ecosystem['Project']
     result['project'] = project
     return result
+
+
+# This fixture is intended to be an arbitrary choice among persona users that is NOT a group administrator.
+
+@pytest.fixture
+def non_admin_user(posted_personas):
+    result = posted_personas['developer']
+    # Really we probably only care that "admin" not in result.get("groups", [])
+    # but for now we have users that are clean of groups, so look for the stronger
+    # constraint just to be sure we don't have a user with any special perms.
+    # We could actually even search for a user with the cleanest set of perms,
+    # but it doesn't change often and this should suffice for now. -kmp 2-Apr-2021
+    assert not result.get("groups", [])

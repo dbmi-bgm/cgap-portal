@@ -369,18 +369,6 @@ def _app_from_clues(app=None, registry=None, context=None):
 
 EMAIL_PATTERN = re.compile(r'[^@]+[@][^@]+')
 
-import webtest
-from dcicutils.misc_utils import VirtualAppError
-
-# class MyVirtualApp(VirtualApp):
-#     def post(self, url, obj, **kwargs):
-#         try:
-#             return self.wrapped_app.post(url, obj, **kwargs)
-#         except webtest.AppError as e:
-#             raise VirtualAppError(msg='HTTP POST failed.', url=url, body=obj, raw_exception=e)
-#
-
-
 
 def make_vapp_for_email(*, email, app=None, registry=None, context=None):
     app = _app_from_clues(app=app, registry=registry, context=context)
@@ -413,3 +401,25 @@ def make_vapp_for_ingestion(*, app=None, registry=None, context=None):
 @contextlib.contextmanager
 def vapp_for_ingestion(app=None, registry=None, context=None):
     yield make_vapp_for_ingestion(app=app, registry=registry, context=context)
+
+
+# I didn't need these for persona matching, but might in the future so am going to hold them for a little while.
+# -kmp 2-Apr-2021
+#
+# def name_matcher(name):
+#     """
+#     Given a string name, returns a predicate that returns True if given that name (in any case), and False otherwise.
+#     """
+#     return lambda n: n.lower() == name
+#
+#
+# def any_name_matcher(*names):
+#     """
+#     Given a list of string names, returns a predicate that matches those names. Given no names, it matches any name.
+#     The matcher returned is incase-sensitive.
+#     """
+#     if names:
+#         canonical_names = [name.lower() for name in names]
+#         return lambda name: name.lower() in canonical_names
+#     else:
+#         return constantly(True)

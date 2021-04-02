@@ -67,19 +67,6 @@ def includeme(config):
     config.scan(__name__)
 
 
-# The new protocol requires a two-phase action, first creating the IngestionSubmission
-# and then using that object to do the submission. We don't need this for debugging right now,
-# so I've just disabled it to avoid confusion. We should decide later whether to fix this or
-# just flush it as having served its purpose. -kmp 2-Dec-2020
-#
-# # This endpoint is intended only for debugging. Use the command line tool.
-# @view_config(route_name='prompt_for_ingestion', request_method='GET')
-# @debug_log
-# def prompt_for_ingestion(context, request):
-#     ignored(context, request)
-#     return Response(PROMPT_FOR_INGESTION)
-
-
 SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)(|/.*)$')
 
 register_path_content_type(path='/submit_for_ingestion', content_type='multipart/form-data')
