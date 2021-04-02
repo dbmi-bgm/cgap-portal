@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import url from 'url';
@@ -10,9 +10,10 @@ import ReactTooltip from 'react-tooltip';
 
 import Collapse from "react-bootstrap/esm/Collapse";
 import DropdownButton from "react-bootstrap/esm/DropdownButton";
-import SplitButton from "react-bootstrap/esm/SplitButton";
+import DropdownItem from "react-bootstrap/esm/DropdownItem";
+import Modal from 'react-bootstrap/esm/Modal';
 
-import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, JWT, valueTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { getSchemaProperty } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/schema-transforms';
@@ -86,46 +87,6 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         return dict;
     }
 
-    static hasFilterSetChanged(savedFilterSet = null, currFilterSet = null) {
-
-        if (!savedFilterSet && currFilterSet) {
-            // If is just initialized, then skip, even if new names/title.
-            const { filter_blocks: currFilterBlocks = [] } = currFilterSet;
-            if (currFilterBlocks.length > 1) {
-                return true;
-            }
-            if (currFilterBlocks[0].query || currFilterBlocks[0].name !== "Filter Block 1" ) {
-                return true;
-            }
-            return false;
-        }
-
-        if (!savedFilterSet && !currFilterSet) {
-            return false;
-        }
-
-        if (savedFilterSet && !currFilterSet) {
-            // Probably means is still loading currFilterSet,
-            // will NOT be counted as new/changed filterset.
-            return false;
-        }
-
-        // Eventually can add 'status' to this as well, if UI to edit it added.
-        // In part we limit fields greatly because of differences between
-        // @@embedded and other potential representations (i.e. @@object returned
-        // on PATCH/POST).
-        // Could be expanded/simplified if we get @@embedded back on PATCH/POST and
-        // maybe AJAX in initial filter set (w all fields, not just those embedded
-        // on Case Item.)
-        const fieldsToCompare = ["filter_blocks", "title", "flags"];
-
-        return !_.isEqual(
-            // Skip over comparing fields that differ between frame=embed and frame=raw
-            _.pick(savedFilterSet, ...fieldsToCompare),
-            _.pick(currFilterSet, ...fieldsToCompare)
-        );
-    }
-
     /**
      * Validation - find any duplicates.
      * Not super performant calculation but we only usually have < 10 blocks so should be ok.
@@ -153,9 +114,13 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         return { duplicateQueryIndices, duplicateNameIndices };
     }
 
-    static haveEditPermission(caseActions){
-        return _.findWhere(caseActions, { "name" : "edit" });
-    }
+    /**
+     * IMPORTANT:
+     * We remove any calculated or linkTo things from PATCH/POST payload.
+     * linkTos must be transformed to UUIDs before POST as well.
+     * Hardcoded here since UI is pretty specific to it.
+     */
+    static fieldsToKeepPrePatch = ["title", "filter_blocks", "search_type", "flags", "created_in_case_accession", "uuid", "status"];
 
     static deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices){
         let singleSelectedFilterBlockIdx = null;
@@ -169,9 +134,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
     constructor(props){
         super(props);
-        const { currFilterSet: filterSet, defaultOpen = true } = props;
+        const { defaultOpen = true } = props;
         this.toggleOpen = _.throttle(this.toggleOpen.bind(this), 750);
-        this.saveFilterSet = _.throttle(this.saveFilterSet.bind(this), 1500);
 
         this.memoized = {
             buildFacetDictionary: memoize(FilteringTableFilterSetUI.buildFacetDictionary, function(newArgs, lastArgs){
@@ -184,18 +148,13 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 }
                 return true; // 'is equal'
             }),
-            hasFilterSetChanged: memoize(FilteringTableFilterSetUI.hasFilterSetChanged),
             findDuplicateBlocks: memoize(FilteringTableFilterSetUI.findDuplicateBlocks),
-            deriveSelectedFilterBlockIdxInfo: memoize(FilteringTableFilterSetUI.deriveSelectedFilterBlockIdxInfo),
-            haveEditPermission: memoize(FilteringTableFilterSetUI.haveEditPermission)
+            deriveSelectedFilterBlockIdxInfo: memoize(FilteringTableFilterSetUI.deriveSelectedFilterBlockIdxInfo)
         };
 
         this.state = {
             "bodyOpen": defaultOpen,
             "bodyMounted": defaultOpen, // Is set to true for 750ms after closing to help keep contents visible until collapsed.
-            // DEPRECATED: active_filterset is likely to lack some.. stuff..
-            "lastSavedFilterSet": (filterSet && filterSet['@id']) ? filterSet : null, // active_filterset,
-            "isSavingFilterSet": false
         };
     }
 
@@ -206,25 +165,14 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             cachedCounts: pastCachedCounts
         } = pastProps;
         const { bodyOpen: pastBodyOpen } = pastState;
-        const { currFilterSet, selectedFilterBlockIndices, cachedCounts, setIsSubmitting, caseItem: { actions: caseActions = [] } } = this.props;
-        const { bodyOpen, lastSavedFilterSet } = this.state;
+        const { currFilterSet, selectedFilterBlockIndices, cachedCounts } = this.props;
+        const { bodyOpen } = this.state;
 
         if (currFilterSet && !pastFilterSet) {
             // This should only occur upon initialization, as otherwise even a blank/unsaved filterset would be present.
             if (currFilterSet["@id"]) {
                 this.setState({ "lastSavedFilterSet": currFilterSet });
             }
-        }
-
-        const haveEditPermission = this.memoized.haveEditPermission(caseActions);
-        const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
-
-        // Is OK if called frequently with same value, as App is a PureComponent
-        // and won't update if state/prop value is unchanged.
-        if (haveEditPermission && hasFilterSetChanged) {
-            setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the \"Filtering\" tab to be lost. Proceed?");
-        } else {
-            setIsSubmitting(false);
         }
 
         if ( // Rebuild tooltips after stuff that affects tooltips changes.
@@ -251,135 +199,17 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         });
     }
 
-    /**
-     * PATCHes the current filterset, if active_filterset
-     * exists on caseItem. Else POSTs new FilterSet and then
-     * sets it as the active_filterset of Case.
-     */
-    saveFilterSet(){
-        const { currFilterSet: filterSet, caseItem } = this.props;
-        const { lastSavedFilterSet } = this.state;
-        const {
-            "@id": caseAtID,
-            project: {
-                "@id": caseProjectID
-            } = {},
-            institution: {
-                "@id" : caseInstitutionID
-            } = {}
-        } = caseItem;
-
-        const { "@id": existingFilterSetID } = lastSavedFilterSet || {};
-
-        // No error handling (e.g. lastSavedFilterSet not having view permissions for) done here
-        // as assumed `saveFilterSet` inaccessible if no permission, etc.
-
-        /**
-         * IMPORTANT:
-         * We remove any calculated or linkTo things from PATCH/POST payload.
-         * linkTos must be transformed to UUIDs before POST as well.
-         * Hardcoded here since UI is pretty specific to it.
-         */
-        const fieldsToKeepPrePatch = ["title", "filter_blocks", "search_type", "flags", "created_in_case_accession", "uuid", "status"];
-
-
-        const patchFilterSet = () => {
-            ajax.load(existingFilterSetID, (res) => {
-                const { "@graph" : [ existingFilterSetItem ] } = res;
-                this.setState({
-                    "lastSavedFilterSet": existingFilterSetItem,
-                    "isSavingFilterSet": false
-                });
-                // callback(existingFilterSetItem);
-            }, "PATCH", (err) => {
-                console.error("Error PATCHing existing FilterSet", err);
-                Alerts.queue({
-                    "title" : "Error PATCHing existing FilterSet",
-                    "message" : JSON.stringify(err),
-                    "style" : "danger"
-                });
-                this.setState({ "isSavingFilterSet" : false });
-            }, JSON.stringify(
-                _.pick(filterSet, ...fieldsToKeepPrePatch)
-            ));
-        };
-
-        const createFilterSet = () => {
-            const payload = _.pick(filterSet, ...fieldsToKeepPrePatch);
-            // `institution` & `project` are set only upon create.
-            payload.institution = caseInstitutionID;
-            payload.project = caseProjectID;
-            ajax.load("/filter-sets/", (res) => {
-                const { "@graph" : [ newFilterSetItemRes ] } = res;
-                const { uuid: nextFilterSetUUID } = newFilterSetItemRes;
-
-                // Next, patch caseItem.active_filterset
-                console.info("Setting 'active_filterset'", newFilterSetItemRes);
-                ajax.load(caseAtID, (casePatchResponse) => {
-                    console.info("PATCHed Case Item", casePatchResponse);
-                    this.setState({
-                        "lastSavedFilterSet": newFilterSetItemRes,
-                        "isSavingFilterSet": false
-                    });
-                }, "PATCH", (err) => {
-                    console.error("Error PATCHing Case", err);
-                    Alerts.queue({
-                        "title" : "Error PATCHing Case",
-                        "message" : JSON.stringify(err),
-                        "style" : "danger"
-                    });
-                    this.setState({ "isSavingFilterSet" : false });
-                }, JSON.stringify({ "active_filterset" : nextFilterSetUUID }));
-
-            }, "POST", (err) => {
-                console.error("Error POSTing new FilterSet", err);
-                Alerts.queue({
-                    "title" : "Error POSTing new FilterSet",
-                    "message" : JSON.stringify(err),
-                    "style" : "danger"
-                });
-                this.setState({ "isSavingFilterSet" : false });
-            }, JSON.stringify(payload));
-        };
-
-        this.setState({ "isSavingFilterSet" : true }, function(){
-            if (existingFilterSetID) {
-                patchFilterSet();
-            } else {
-                createFilterSet();
-            }
-        });
-
-    }
-
-    /**
-     * Copies the current FilterSet and creates new one, with
-     * "preset_for_project", "preset_for_user", and/or
-     * "default_for_project" fields set accordingly.
-     */
-    saveFilterSetPreset(){
-        const { caseItem, currFilterSet } = props;
-        const {
-            project: {
-                "@id": caseProjectID,
-                "display_title": caseProjectTitle
-            }
-        } = caseItem;
-
-        const clonedFilterSet = { ...currFilterSet };
-
-
-        // TODO.
-    }
-
     render(){
         const {
             // From EmbeddedSearchView:
             context: searchContext, // Current Search Response (not that of this filterSet, necessarily)
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
 
-            // From FilteringTab (or higher):
+            // From FilteringTab (& higher, e.g. App/redux-store):
             caseItem, schemas,
+
+            // From SaveFilterSetButtonController:
+            hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet, haveEditPermission,
 
             // From FilterSetController:
             currFilterSet: filterSet = null,
@@ -395,14 +225,12 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const { actions: caseActions = [] } = caseItem;
         const { total: totalCount, facets = null } = searchContext || {};
         const { filter_blocks = [] } = filterSet || {};
-        const { bodyOpen, bodyMounted, lastSavedFilterSet, isSavingFilterSet } = this.state;
+        const { bodyOpen, bodyMounted } = this.state;
 
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
         const facetDict                                                     = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets);
-        const hasFilterSetChanged                                           = this.memoized.hasFilterSetChanged(lastSavedFilterSet, filterSet);
         const { duplicateQueryIndices, duplicateNameIndices }               = this.memoized.findDuplicateBlocks(filter_blocks);
         const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices);
-        const haveEditPermission                                            = this.memoized.haveEditPermission(caseActions);
 
         const filterBlocksLen = filter_blocks.length;
         const allFilterBlocksSelected = filterBlocksLen > 0 && (selectedFilterBlockIdxCount === 0 || selectedFilterBlockIdxCount === filterBlocksLen);
@@ -417,8 +245,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         // );
 
         const headerProps = {
-            filterSet, bodyOpen, caseItem, duplicateQueryIndices, duplicateNameIndices, hasFilterSetChanged, isSavingFilterSet,
-            setTitleOfFilterSet, isFetchingInitialFilterSetItem, haveEditPermission
+            filterSet, bodyOpen, caseItem, duplicateQueryIndices, duplicateNameIndices,
+            setTitleOfFilterSet, isFetchingInitialFilterSetItem,
+            hasCurrentFilterSetChanged, haveEditPermission, isSavingFilterSet, saveFilterSet
         };
 
         let body = null;
@@ -437,7 +266,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             // TODO Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
             <div className="above-variantsample-table-ui">
                 <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
-                    <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
+                    <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} />
                     <Collapse in={bodyOpen}>
                         <div className="filterset-blocks-container">
                             { body }
@@ -470,9 +299,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 function FilterSetUIHeader(props){
     const {
         filterSet, caseItem,
-        toggleOpen, bodyOpen, hasFilterSetChanged, duplicateQueryIndices, duplicateNameIndices,
-        saveFilterSet, isSavingFilterSet, setTitleOfFilterSet, isFetchingInitialFilterSetItem = false,
-        haveEditPermission
+        hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet, haveEditPermission,
+        toggleOpen, bodyOpen, duplicateQueryIndices, duplicateNameIndices,
+        setTitleOfFilterSet, isFetchingInitialFilterSetItem = false
     } = props;
 
     const {
@@ -482,19 +311,13 @@ function FilterSetUIHeader(props){
         display_title: fsDisplayTitle = null
     } = filterSet || {};
 
-    const {
-        project: {
-            display_title: caseProjectTitle
-        }
-    } = caseItem;
+    // const [ isEditingTitle, setIsEditingTitle ] = useState(false);
 
-    const [ isEditingTitle, setIsEditingTitle ] = useState(false);
-
-    function onClickEditTitle(e){
-        e.stopPropagation();
-        e.preventDefault();
-        setIsEditingTitle(true);
-    }
+    // function onClickEditTitle(e){
+    //     e.stopPropagation();
+    //     e.preventDefault();
+    //     setIsEditingTitle(true);
+    // }
 
     if (fsError && !filterSetID) {
         // No view permission - shouldn't occur anymore since would get blankFilterSetItem in FilteringTab as initialFilterSetItem
@@ -518,7 +341,7 @@ function FilterSetUIHeader(props){
                 <em>Loading Filter Set</em>
             </h4>
         );
-    } else if (isEditingTitle) {
+    }/* else if (isEditingTitle) {
         titleBlock = (
             <form className="d-flex align-items-center mb-0" action="#case-info.filtering" onSubmit={function(e){
                 e.stopPropagation();
@@ -539,12 +362,12 @@ function FilterSetUIHeader(props){
                 <button type="submit" className="btn btn-sm btn-outline-success ml-08"><i className="icon icon-fw icon-check fas" /></button>
             </form>
         );
-    } else {
+    } */ else {
         titleBlock = (
             <h4 className="text-400 clickable my-0 d-inline-block" onClick={toggleOpen}>
                 <i className={"small icon icon-fw fas mr-07 icon-" + (bodyOpen ? "minus" : "plus")} />
                 { fsTitle || fsDisplayTitle || <em>No Title Set</em> }
-                { bodyOpen ? <i className="icon icon-pencil-alt fas ml-1 clickable text-small" onClick={onClickEditTitle} /> : null }
+                {/* bodyOpen ? <i className="icon icon-pencil-alt fas ml-1 clickable text-small" onClick={onClickEditTitle} /> : null */}
             </h4>
         );
     }
@@ -552,17 +375,8 @@ function FilterSetUIHeader(props){
     const haveDuplicateQueries = _.keys(duplicateQueryIndices).length > 0;
     const haveDuplicateNames = _.keys(duplicateNameIndices) > 0;
 
-    const editBtnDisabled = !bodyOpen || !hasFilterSetChanged || !haveEditPermission || haveDuplicateQueries || haveDuplicateNames || isSavingFilterSet || !filterSet;
-
-    function onSaveBtnClick(e){
-        e.stopPropagation();
-        e.preventDefault();
-        if (editBtnDisabled) {
-            // Report analytics maybe.
-            return false;
-        }
-        saveFilterSet();
-    }
+    // Always disable if any of following conditions:
+    const isEditDisabled = !bodyOpen || !haveEditPermission || haveDuplicateQueries || haveDuplicateNames || !filterSet;
 
     // todo if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
     return (
@@ -570,69 +384,511 @@ function FilterSetUIHeader(props){
             <div className="col pl-0">{ titleBlock }</div>
             <div className="col-auto pr-0">
                 { haveDuplicateQueries || haveDuplicateNames ?
-                    <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-secondary"
+                    <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-danger"
                         data-tip={`Filter blocks with duplicate ${haveDuplicateQueries ? "queries" : "names"} exist below`} />
                     : null }
 
                 <div role="group" className="dropdown btn-group">
-                    <button type="button" className="btn btn-sm btn-outline-light" disabled={editBtnDisabled} onClick={onSaveBtnClick}>
-                        { isSavingFilterSet ?
-                            <i className="icon icon-spin icon-circle-notch fas" />
-                            : (
-                                <React.Fragment>
-                                    <i className="icon icon-save fas mr-07"/>
-                                    Save
-                                </React.Fragment>
-                            )}
-                    </button>
-
-                    <DropdownButton title="Save as..." variant="outline-light" size="sm"
-                        data-tip="Create copy of this current FilterSet and set it as a preset for...">
-                        <a href="#" className="dropdown-item" role="button" onClick={function(e){ e.preventDefault(); e.stopPropagation(); console.log("HEllo"); }}
-                            data-tip="Create a copy of this current FilterSet and set it as a preset for yourself">
-                            A preset for <span className="text-600">yourself</span> only
-                        </a>
-                        <a href="#" className="dropdown-item" role="button" onClick={function(e){ e.preventDefault(); e.stopPropagation(); console.log("HEllo"); }}
-                            data-tip="Create a copy of this current FilterSet and set it as a preset for this project">
-                            A preset for project <span className="text-600">{ caseProjectTitle }</span>
-                        </a>
-                        <a href="#" className="dropdown-item" role="button" onClick={function(e){ e.preventDefault(); e.stopPropagation(); console.log("HEllo"); }}
-                            data-tip="Create a copy of this current FilterSet and set it as the default FilterSet for this project, to be basis for FilterSets of new Cases going forward">
-                            Default FilterSet for project <span className="text-600">{ caseProjectTitle }</span>
-                        </a>
-                    </DropdownButton>
+                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} />
+                    <SaveFilterSetPresetDropdownButton {...{ filterSet, caseItem, isEditDisabled }} />
                 </div>
-
-
-
-                {/*
-                <SplitButton variant="outline-light" size="sm" onClick={onSaveBtnClick} disabled={editBtnDisabled}
-                    title={isSavingFilterSet ? <i className="icon icon-spin icon-circle-notch fas" /> : (
-                        <React.Fragment>
-                            <i className="icon icon-save fas mr-07"/>
-                            Save
-                        </React.Fragment>
-                    )}>
-                    <a href="#" className="dropdown-item text-600" role="button" onClick={onSaveBtnClick} disabled={editBtnDisabled}
-                        data-tip="Save and update the blocks in this FilterSet that's associated with this Case">
-                        Save this FilterSet
-                    </a>
-                    <div className="dropdown-divider" role="separator" />
-                    <a href="#" className="dropdown-item" role="button" onClick={function(e){ e.preventDefault(); e.stopPropagation(); console.log("HEllo"); }}
-                        data-tip="Create a copy of this current FilterSet and set it as a preset for yourself">
-                        Save Copy of this FilterSet as Preset for User
-                    </a>
-                    <a href="#" className="dropdown-item" role="button" onClick={console.log.bind(console, "World")}
-                        data-tip="Create a copy of this current FilterSet and set it as a preset for this project">
-                        Save Copy of this FilterSet as Preset for Project
-                    </a>
-                </SplitButton>
-                */}
-
             </div>
         </div>
     );
 }
+
+/**
+ * Unlike SaveFilterSetPresetDropdownButton, this logic is split out from the SaveFilterSetButton,
+ * because we want to have 2+ copies of this button potentially in the UI.
+ */
+export class SaveFilterSetButtonController extends React.Component {
+
+    static haveEditPermission(caseActions){
+        return _.findWhere(caseActions, { "name" : "edit" });
+    }
+
+    /**
+     * Re: fieldsToCompare -
+     * Eventually can add 'status' to this as well, if UI to edit it added.
+     * In part we limit fields greatly because of differences between
+     * `@@embedded` and other potential representations (i.e. `@@object` returned
+     * on PATCH/POST).
+     * Could be expanded/simplified if we get `@@embedded` back on PATCH/POST and
+     * maybe AJAX in initial filter set (w all fields, not just those embedded
+     * on Case Item.)
+     *
+     * @param {{ filter_blocks: Object[] }} savedFilterSet
+     * @param {{ filter_blocks: Object[] }} currFilterSet
+     * @param {string[]} fieldsToCompare - List of fields of FilterSet Item to compare.
+     */
+    static hasFilterSetChanged(savedFilterSet = null, currFilterSet = null, fieldsToCompare = ["filter_blocks", "title", "flags"]) {
+
+        if (!savedFilterSet && currFilterSet) {
+            // If is just initialized, then skip, even if new names/title.
+            const { filter_blocks: currFilterBlocks = [] } = currFilterSet;
+            if (currFilterBlocks.length > 1) {
+                return true;
+            }
+            if (currFilterBlocks[0].query || currFilterBlocks[0].name !== "Filter Block 1" ) {
+                return true;
+            }
+            return false;
+        }
+
+        if (!savedFilterSet && !currFilterSet) {
+            return false;
+        }
+
+        if (savedFilterSet && !currFilterSet) {
+            // Probably means is still loading currFilterSet,
+            // will NOT be counted as new/changed filterset.
+            return false;
+        }
+
+        // Eventually can add 'status' to this as well, if UI to edit it added.
+        // In part we limit fields greatly because of differences between
+        // @@embedded and other potential representations (i.e. @@object returned
+        // on PATCH/POST).
+        // Could be expanded/simplified if we get @@embedded back on PATCH/POST and
+        // maybe AJAX in initial filter set (w all fields, not just those embedded
+        // on Case Item.)
+
+        return !_.isEqual(
+            // Skip over comparing fields that differ between frame=embed and frame=raw
+            _.pick(savedFilterSet, ...fieldsToCompare),
+            _.pick(currFilterSet, ...fieldsToCompare)
+        );
+    }
+
+    constructor(props){
+        super(props);
+        const { currFilterSet: filterSet } = props;
+        this.saveFilterSet = _.throttle(this.saveFilterSet.bind(this), 1500);
+
+        this.memoized = {
+            hasFilterSetChanged: memoize(SaveFilterSetButtonController.hasFilterSetChanged),
+            haveEditPermission: memoize(SaveFilterSetButtonController.haveEditPermission)
+
+        };
+
+        this.state = {
+            // Initially is blank or Case.active_filterset (once AJAXed in)
+            "lastSavedFilterSet": (filterSet && filterSet['@id']) ? filterSet : null,
+            "isSavingFilterSet": false
+        };
+    }
+
+    componentDidUpdate({ currFilterSet: pastFilterSet }){
+        const { currFilterSet, setIsSubmitting } = this.props;
+        const { lastSavedFilterSet } = this.state;
+
+        if (currFilterSet && !pastFilterSet) {
+            // This should only occur upon initialization, as otherwise even a blank/unsaved filterset would be present.
+            if (currFilterSet["@id"]) {
+                this.setState({ "lastSavedFilterSet": currFilterSet });
+            }
+        }
+
+        const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
+
+        if (currFilterSet && hasFilterSetChanged) {
+            setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the \"Filtering\" tab to be lost. Proceed?");
+        } else {
+            // Is OK if called frequently with same value, as App is a PureComponent
+            // and won't update if state/prop value is unchanged.
+            setIsSubmitting(false);
+        }
+    }
+
+    /**
+     * PATCHes the current filterset, if active_filterset
+     * exists on caseItem. Else POSTs new FilterSet and then
+     * sets it as the active_filterset of Case.
+     */
+    saveFilterSet(){
+        const { currFilterSet: filterSet, caseItem } = this.props;
+        const { lastSavedFilterSet } = this.state;
+        const {
+            "@id": caseAtID,
+            project: { "@id": caseProjectID } = {},
+            institution: { "@id": caseInstitutionID } = {}
+        } = caseItem;
+
+        const { "@id": existingFilterSetID } = lastSavedFilterSet || {};
+
+        // No error handling (e.g. lastSavedFilterSet not having view permissions for) done here
+        // as assumed `saveFilterSet` inaccessible if no permission, etc.
+
+        this.setState({ "isSavingFilterSet" : true }, () => {
+            if (existingFilterSetID) {
+                // PATCH
+
+                ajax.load(existingFilterSetID, (res) => {
+                    const { "@graph" : [ existingFilterSetItem ] } = res;
+                    this.setState({
+                        // Get back and save @@object representation
+                        "lastSavedFilterSet": existingFilterSetItem,
+                        "isSavingFilterSet": false
+                    });
+                }, "PATCH", (err) => {
+                    console.error("Error PATCHing existing FilterSet", err);
+                    Alerts.queue({
+                        "title" : "Error PATCHing existing FilterSet",
+                        "message" : JSON.stringify(err),
+                        "style" : "danger"
+                    });
+                    this.setState({ "isSavingFilterSet" : false });
+                }, JSON.stringify(
+                    _.pick(filterSet, ...FilteringTableFilterSetUI.fieldsToKeepPrePatch)
+                ));
+
+            } else {
+                // POST
+
+                const payload = _.pick(filterSet, ...FilteringTableFilterSetUI.fieldsToKeepPrePatch);
+                // `institution` & `project` are set only upon create.
+                payload.institution = caseInstitutionID;
+                payload.project = caseProjectID;
+
+                let newFilterSetItemFromPostResponse;
+
+                ajax.promise("/filter-sets/", "POST", {}, JSON.stringify(payload))
+                    .then((response)=>{
+                        const { "@graph" : [ newFilterSetItemFromResponse ] } = response;
+                        newFilterSetItemFromPostResponse = newFilterSetItemFromResponse;
+                        const { uuid: nextFilterSetUUID } = newFilterSetItemFromResponse;
+
+                        console.info("POSTed FilterSet, proceeding to PATCH Case.active_filterset", newFilterSetItemFromResponse);
+
+                        return ajax.promise(caseAtID, "PATCH", {}, JSON.stringify({ "active_filterset" : nextFilterSetUUID }));
+                    }).then((casePatchResponse)=>{
+                        console.info("PATCHed Case Item", casePatchResponse);
+                        this.setState({
+                            // Get back and save @@object representation
+                            "lastSavedFilterSet": newFilterSetItemFromPostResponse,
+                            "isSavingFilterSet": false
+                        });
+                    }).catch((err)=>{
+                        console.error("Error POSTing new FilterSet or PATCHing Case", err);
+                        Alerts.queue({
+                            "title" : "Error POSTing new FilterSet",
+                            "message" : JSON.stringify(err),
+                            "style" : "danger"
+                        });
+                        this.setState({ "isSavingFilterSet" : false });
+                    });
+
+            }
+        });
+
+    }
+
+    render(){
+        const { children, currFilterSet, caseItem, ...passProps } = this.props;
+        const { isSavingFilterSet, lastSavedFilterSet } = this.state;
+        const { actions: caseActions = [] } = caseItem || {};
+        const hasCurrentFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
+        const haveEditPermission = this.memoized.haveEditPermission(caseActions);
+        const childProps = {
+            ...passProps,
+            currFilterSet,
+            caseItem,
+            isSavingFilterSet,
+            hasCurrentFilterSetChanged,
+            haveEditPermission,
+            saveFilterSet: this.saveFilterSet
+        };
+        return React.Children.map(children, function(child){
+            return React.cloneElement(child, childProps);
+        });
+    }
+
+}
+
+
+function SaveFilterSetButton({ isEditDisabled, saveFilterSet, isSavingFilterSet, hasCurrentFilterSetChanged }){
+    const disabled = isEditDisabled || isSavingFilterSet || !hasCurrentFilterSetChanged;
+
+    function onSaveBtnClick(e){
+        e.stopPropagation();
+        e.preventDefault();
+        if (disabled) return false;
+        saveFilterSet();
+    }
+
+    return (
+        <button type="button" className="btn btn-sm btn-outline-light" disabled={disabled}
+            onClick={onSaveBtnClick}>
+            { isSavingFilterSet ?
+                <i className="icon icon-spin icon-circle-notch fas" />
+                : (
+                    <React.Fragment>
+                        <i className="icon icon-save fas mr-07"/>
+                        Save
+                    </React.Fragment>
+                )}
+        </button>
+    );
+}
+
+
+/**
+ * @todo or defer:
+ * Making 'Save As...' btn disabled if unchanged from previous preset.
+ * Hard to figure out in good definitive way if changed, esp. if then save new preset.
+ */
+class SaveFilterSetPresetDropdownButton extends React.Component {
+
+    constructor(props){
+        super(props);
+        this.onSelectPresetOption = this.onSelectPresetOption.bind(this);
+        this.onHideModal = this.onHideModal.bind(this);
+        this.onPresetTitleInputChange = this.onPresetTitleInputChange.bind(this);
+        this.onPresetFormSubmit = this.onPresetFormSubmit.bind(this);
+
+        this.state = {
+            showingModalForEventKey: null,
+            presetTitle: "",
+            // Loaded in via getDerivedFromFilterSetIfPresent
+            originalPresetFilterSet: null,
+            // Stored after POSTing new FilterSet to allow to prevent immediate re-submits.
+            lastSavedPresetFilterSet: null,
+            loadingStatus: 0 // 0 = not loading; 1 = loading; 2 = load succeeded.
+        };
+
+        this.memoized = {
+            hasFilterSetChangedFromOriginal: memoize(function(arg1, arg2){
+                return SaveFilterSetButtonController.hasFilterSetChanged(arg1, arg2, ["filter_blocks"]);
+            }),
+            hasFilterSetChangedFromLastSaved: memoize(function(arg1, arg2){
+                return SaveFilterSetButtonController.hasFilterSetChanged(arg1, arg2, ["filter_blocks"]);
+            })
+        };
+    }
+
+    /**
+     * If `filterSet.derived_from_preset_filterset` exists,
+     * grab & save it to compare against.
+     */
+    componentDidMount(){
+        this.getDerivedFromFilterSetIfPresent();
+    }
+
+    componentDidUpdate({ filterSet: pastFilterSet }){
+        const { filterSet: currentFilterSet } = this.props;
+        if (currentFilterSet && !pastFilterSet) {
+            // If initial filterSet is null (due to being loaded in still), then
+            // check+fetch `filterSet.derived_from_preset_filterset` once filterSet
+            // gets loaded & passed-in.
+            this.getDerivedFromFilterSetIfPresent();
+        }
+    }
+
+    getDerivedFromFilterSetIfPresent(){
+        const { filterSet } = this.props;
+        const { derived_from_preset_filterset = null } = filterSet || {};
+        if (derived_from_preset_filterset){
+            // derived_from_preset_filterset has format 'uuid'
+            ajax.load("/filter-sets/" + derived_from_preset_filterset, (res)=>{
+                const { "@id" : origPresetFSID } = res;
+                if (!origPresetFSID) {
+                    // Some error likely.
+                    console.error("Error (a) in getDerivedFromFilterSetIfPresent, perhaps no view permission", res);
+                    return;
+                }
+                this.setState({ "originalPresetFilterSet": res });
+            }, "GET", (err)=>{
+                console.error("Error (b) in getDerivedFromFilterSetIfPresent, perhaps no view permission", err);
+            });
+        }
+    }
+
+    onSelectPresetOption(eventKey, e) {
+        e.stopPropagation();
+        e.preventDefault();
+        // Open title editing modal on first click.
+        // Save info about clicked option to state (eventKey)
+        this.setState({ "showingModalForEventKey": eventKey });
+        return;
+    }
+
+    onHideModal(){
+        const { loadingStatus } = this.state;
+        if (loadingStatus === 1) {
+            // Prevent if in middle of POST.
+            return false;
+        }
+        this.setState({ "showingModalForEventKey": null });
+    }
+
+    onPresetTitleInputChange(e) {
+        this.setState({ "presetTitle": e.target.value });
+    }
+
+    /**
+     * Copies the current FilterSet and creates new one, with
+     * "preset_for_project", "preset_for_user", and/or
+     * "default_for_project" fields set accordingly.
+     */
+    onPresetFormSubmit(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const { caseItem, filterSet } = this.props;
+        const { showingModalForEventKey = null, presetTitle } = this.state;
+        const {
+            project: {
+                "@id": caseProjectID,
+                uuid: caseProjectUUID
+            } = {},
+            institution: {
+                "@id": caseInstitutionID
+            }
+        } = caseItem;
+
+        const [ modalOptionItemType = null, modalOptionType = null ] = showingModalForEventKey ? showingModalForEventKey.split(":") : [];
+
+        this.setState({ "loadingStatus": 1 }, () => {
+
+            const payload = {
+                ..._.omit(
+                    _.pick(filterSet, ...FilteringTableFilterSetUI.fieldsToKeepPrePatch),
+                    "uuid" // We'll POST this as new FilterSet; delete existing UUID if any.
+                ),
+                title: presetTitle,
+                institution: caseInstitutionID,
+                project: caseProjectID
+            };
+
+            console.log("modalOptionType, modalOptionItemType", modalOptionType, modalOptionItemType);
+
+            // TODO (figure out performant approach for, ideally so can get this info in render/memoized.hasFilterSetChanged):
+            // Check previous filtersets in the context (e.g. /search/?type=FilterSet&preset_for_projects=...)
+            // and prevent saving if _any_ matches. Kind of difficult given the size of filtersets...
+
+            if (modalOptionType === "preset" && modalOptionItemType === "user") {
+                const { uuid: userUUID = null } = JWT.getUserDetails() || {};
+                payload.preset_for_users = [ userUUID ];
+            } else if (modalOptionType === "preset" && modalOptionItemType === "project") {
+                payload.preset_for_projects = [ caseProjectUUID ];
+            } else if (modalOptionType === "default" && modalOptionItemType === "project") {
+                payload.default_for_projects = [ caseProjectUUID ];
+            }
+
+            console.log("Preset FilterSet Payload", payload);
+
+            ajax.promise("/filter-sets/", "POST", {}, JSON.stringify(payload))
+                .then((res) => {
+                    console.info("Created new FilterSet", res);
+                    const { "@graph": [ newPresetFilterSetItem ] } = res;
+                    this.setState({
+                        "loadingStatus": 2,
+                        "lastSavedPresetFilterSet": newPresetFilterSetItem
+                    });
+                });
+        });
+
+        return false;
+    }
+
+    render(){
+        const { caseItem, filterSet, isEditDisabled } = this.props;
+        const { showingModalForEventKey, presetTitle, originalPresetFilterSet, lastSavedPresetFilterSet, loadingStatus } = this.state;
+        const {
+            project: {
+                "@id": caseProjectID,
+                "display_title": caseProjectTitle
+            }
+        } = caseItem;
+        const {
+            title: filterSetTitle = null
+        } = filterSet || {}; // May be null while loading initially in FilterSetController
+
+        // const { uuid: userUUID = null } = JWT.getUserDetails() || {};
+
+        const disabled = (
+            loadingStatus !== 0
+            || showingModalForEventKey
+            || isEditDisabled
+            // TODO: consider disabling if not saved yet?
+            // || hasCurrentFilterSetChanged
+            || !this.memoized.hasFilterSetChangedFromOriginal(originalPresetFilterSet, filterSet)
+            || !this.memoized.hasFilterSetChangedFromLastSaved(lastSavedPresetFilterSet, filterSet)
+        );
+
+        const [ modalOptionItemType = null, modalOptionType = null ] = showingModalForEventKey ? showingModalForEventKey.split(":") : [];
+
+        // // All disabled by default if no userUUID (not logged in).
+        // // (maybe todo: pass down props.session)
+        // let isPresetForUserDisabled = !userUUID;
+        // let isPresetForProjectDisabled = !userUUID;
+        // let isDefaultForProjectDisabled = !userUUID;
+        // if (originalPresetFilterSet && !hasPresetChanged) {
+        //     // Even if preset hasn't changed, we can allow user to set a project preset as their own preset.
+        //     const { preset_for_users, preset_for_projects, default_for_projects } = originalPresetFilterSet;
+        //     if (!isPresetForUserDisabled && preset_for_users.indexOf(userUUID) ) {
+
+        //     }
+        // }
+
+        // const isEntireButtonDisabled = isLoading || (isPresetForUserDisabled && isPresetForProjectDisabled && isDefaultForProjectDisabled);
+
+        return (
+            <React.Fragment>
+
+                { modalOptionItemType ? (
+                    <Modal show onHide={this.onHideModal}>
+                        <Modal.Header closeButton>
+                            <Modal.Title className="text-400">
+                                Creating { modalOptionType } FilterSet for { modalOptionItemType }
+                            </Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            { loadingStatus === 0 ?
+                                <form onSubmit={this.onPresetFormSubmit} className="d-block">
+                                    <label htmlFor="new-preset-fs-id">Preset FilterSet Title</label>
+                                    <input id="new-preset-fs-id" type="text" placeholder={filterSetTitle + "..."} onChange={this.onPresetTitleInputChange} value={presetTitle} className="form-control mb-1" />
+                                    <button type="submit" className="btn btn-success" disabled={!presetTitle}>
+                                        Create
+                                    </button>
+                                </form>
+                                : loadingStatus === 1 ?
+                                    <div className="text-center py-4 text-larger">
+                                        <i className="icon icon-spin icon-circle-notch fas mt-1 mb-1" />
+                                    </div>
+                                    : loadingStatus === 2 ?
+                                        <div>
+                                            <h5 className="text-400 mt-0 mb-16">
+                                                { valueTransforms.capitalize(modalOptionType) } FilterSet Created
+                                            </h5>
+                                            <button type="button" className="btn btn-success btn-block" onClick={this.onHideModal}>
+                                                OK
+                                            </button>
+                                        </div>
+                                        : null }
+                        </Modal.Body>
+                    </Modal>
+                ) : null }
+
+                <DropdownButton title={loadingStatus === 1 ? <i className="icon icon-circle-notch icon-spin fas"/> : "Save as..."}
+                    variant="outline-light" size="sm" onSelect={this.onSelectPresetOption}
+                    data-tip="Create copy of this current FilterSet and set it as a preset for..." disabled={disabled}>
+                    <DropdownItem data-tip="Create a copy of this current FilterSet and set it as a preset for yourself" eventKey="user:preset">
+                        A preset for <span className="text-600">yourself</span> only
+                    </DropdownItem>
+                    <DropdownItem data-tip="Create a copy of this current FilterSet and set it as a preset for this project" eventKey="project:preset">
+                        A preset for project <span className="text-600">{ caseProjectTitle }</span>
+                    </DropdownItem>
+                    <DropdownItem data-tip="Create a copy of this current FilterSet and set it as the default FilterSet for this project, to be basis for FilterSets of new Cases going forward" eventKey="project:default">
+                        Default FilterSet for project <span className="text-600">{ caseProjectTitle }</span>
+                    </DropdownItem>
+                </DropdownButton>
+            </React.Fragment>
+        );
+    }
+
+}
+
 
 
 /** Renders the Blocks */
@@ -712,6 +968,11 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
                             Intersect
                         </button>
                     </div>
+                    <button type="button" className="btn btn-primary-dark" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
+                        data-tip="Toggle whether to compute the union or intersection of filter blocks">
+                        <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
+                        Intersect
+                    </button>
                 </div>
                 <div className="col-auto">
                     <div className="btn-group" role="group" aria-label="Creation Controls">

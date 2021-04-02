@@ -8,7 +8,7 @@ import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-component
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
-import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
+import { FilteringTableFilterSetUI, FilterSetController, SaveFilterSetButtonController } from './FilteringTableFilterSetUI';
 
 const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene }){
     const {
@@ -351,6 +351,8 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             ]
         };
 
+        // We preserve this, but don't utilize it in FilterSetController at moment
+        // since FilterSets may be re-used for many different Cases.
         if (initial_search_href_filter_addon) {
             blankFilterSetItem.flags = [
                 {
@@ -377,14 +379,18 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     const embeddedTableHeader = activeFilterSetID ? (
         <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
             <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets}>
-                <FilteringTableFilterSetUI caseItem={context} schemas={schemas} setIsSubmitting={setIsSubmitting} />
+                <SaveFilterSetButtonController caseItem={context} setIsSubmitting={setIsSubmitting}>
+                    <FilteringTableFilterSetUI schemas={schemas} />
+                </SaveFilterSetButtonController>
             </FilterSetController>
         </ajax.FetchedItem>
     ) : (
         // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
         // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
         <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
-            <FilteringTableFilterSetUI caseItem={context} setIsSubmitting={setIsSubmitting} />
+            <SaveFilterSetButtonController caseItem={context} setIsSubmitting={setIsSubmitting}>
+                <FilteringTableFilterSetUI schemas={schemas} />
+            </SaveFilterSetButtonController>
         </FilterSetController>
     );
 
