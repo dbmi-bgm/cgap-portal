@@ -262,48 +262,6 @@ def test_check_user_is_logged_in(principals, expect_logged_in):
             check_user_is_logged_in(req)
 
 
-# @pytest.fixture()
-# def hms_dbmi_institution(testapp):
-#     [item] = testapp.post_json('/Institution',
-#                       {
-#         "address2": "10 Schattuck Street",
-#         "address1": "Biomedical Bioinfomatics",
-#         "city": "Boston",
-#         "country": "USA",
-#         "fax": "000-000-0000",
-#         "name": "hms-dbmi",
-#         "phone1": "000-000-0000",
-#         "phone2": "000-000-0000",
-#         "pi": "dvuzman@research.bwh.harvard.edu",
-#         "postal_code": "02115",
-#         "state": "MA",
-#         "title": "HMS DBMI",
-#         "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-#         "contact_persons" : [
-#             "dvuzman@research.bwh.harvard.edu"
-#         ]
-#     }, status=200).json['@graph']
-#
-#
-#
-#     print("non_admin_user entered.")
-#     res = testapp.get("/users/", status=200)
-#     print("res.json=", json.dumps(res.json, indent=2))
-#     users = res.json['@graph']
-#     for i, user in enumerate(users, start=1):
-#         print("%s. Considering" % i, json.dumps(user, indent=2))
-#         if "admin" not in user.get("groups", []):  # We don't want an admin!
-#             if user.get("user_institution"):  # Make sure the entry has a proper institution specified
-#                 project = user.get("project")  # This isn't used for permissions, but again it's good to have it
-#                 if project:
-#                     project_roles = user.get("project_roles", [])
-#                     # Really any project roles would be fine, but it's easier if the role matches the project.
-#                     if any(project_role.get('project') == project for project_role in project_roles):
-#                         return user
-#     print("No more users to consider")
-#     raise RuntimeError("No suitable non-admin user was found.")
-
-
 def test_vapp_for_email(testapp, non_admin_user):
     email = non_admin_user['email']
 
