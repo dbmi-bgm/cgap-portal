@@ -59,12 +59,22 @@ $pedigree-disease-colors :
         $color: nth($pedigree-disease-colors, $i);
         &[data-disease-index="#{$pedigree-colors-length + $i}"] {
             background-color: darken($color, 10%);
+            @if lightness(darken($color, 10%)) > 70% {
+                color: #000;
+            } @else {
+                color: #fff;
+            }
         }
     }
     @for $i from 1 through $pedigree-colors-length {
         $color: nth($pedigree-disease-colors, $i);
         &[data-disease-index="#{2 * $pedigree-colors-length + $i}"] {
             background-color: lighten($color, 10%);
+            @if lightness(lighten($color, 10%)) > 70% {
+                color: #000;
+            } @else {
+                color: #fff;
+            }
         }
     }
 }

@@ -40,7 +40,13 @@ def includeme(config):
 class Report(Item):
     item_type = 'report'
     schema = load_schema('encoded:schemas/report.json')
-    embedded_list = []
+    embedded_list = [
+        "variant_samples.interpretation.classification",
+        "variant_samples.interpretation.conclusion",
+        "variant_samples.interpretation.acmg_guidelines",
+        "variant_samples.interpretation.note_text",
+        "extra_notes.note_text"
+    ]
     rev = {'case': ('Case', 'report')}
 
     @calculated_property(schema={
