@@ -262,14 +262,14 @@ def test_check_user_is_logged_in(principals, expect_logged_in):
             check_user_is_logged_in(req)
 
 
-def test_vapp_for_email(testapp, non_admin_user):
-    email = non_admin_user['email']
+def test_vapp_for_email(testapp, non_admin_persona):
+    email = non_admin_persona['email']
 
     def check_me(context):
         """We use this just to make sure that the vapp_for_email context manager isn't leaking state."""
         try:
             my_uuid = testapp.get("/me").json['uuid']
-            assert my_uuid != non_admin_user['uuid']  # If there is a dfeault /me page, it must not be my user id's /me
+            assert my_uuid != non_admin_persona['uuid']  # If there is a dfeault /me page, it must not be my user id's /me
             print("%s /me = %s" % (context, my_uuid))
         except Exception:
             print("%s has no /me by default" % context)
@@ -279,6 +279,6 @@ def test_vapp_for_email(testapp, non_admin_user):
     with vapp_for_email(email=email, app=testapp.app) as vapp:
         check_me('local')
         my_uuid = vapp.get("/me").json['uuid']
-        assert my_uuid == non_admin_user['uuid']
+        assert my_uuid == non_admin_persona['uuid']
         print("vapp has proper identity")
     check_me('global')

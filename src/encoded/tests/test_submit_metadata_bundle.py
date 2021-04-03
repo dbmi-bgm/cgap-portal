@@ -170,13 +170,13 @@ def test_post_ingestion_submission_wrong_project(anontestapp, institution,
         # assert response.status_code == 403
 
 
-def test_process_ingestion(testapp, posted_personas):
+def test_process_ingestion(testapp, posted_personas_etc):
 
-    project = posted_personas['project']
+    project = posted_personas_etc['project']
     project_name = project['name']
-    institution = posted_personas['institution']
+    institution = posted_personas_etc['institution']
     institution_name = institution['name']
-    developer = posted_personas['developer']
+    developer = posted_personas_etc['developer']
     email = developer['email']
     developer_testapp = make_vapp_for_email(email=email, app=testapp.app)
 
