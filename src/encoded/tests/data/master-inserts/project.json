@@ -7,10 +7,10 @@
         "date_created": "2020-07-15T02:26:28.509115+00:00"
     },
     {
-        "title": "CGAP Unit Testing Project",
+        "title": "CGAP Personas Testing",
         "uuid": "f586dc9e-64eb-47fe-b140-624fd504d549",
-        "name": "cgap-unit-testing-project",
-        "description": "Project only for use of CGAP unit testing",
+        "name": "cgap-personas-testing",
+        "description": "Project reserved for use of CGAP testing using personas",
         "date_created": "2021-02-06T23:10:00.000000+00:00"
     },
     {
