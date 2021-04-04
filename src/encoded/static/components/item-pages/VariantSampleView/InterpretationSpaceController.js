@@ -81,25 +81,32 @@ export class InterpretationSpaceWrapper extends React.Component {
         return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(noteToSubmit));
     }
 
-    patchNewNoteToVS(noteResp, saveToField) {
-        console.log("noteResp", noteResp);
+    patchNewNoteToVS(noteID, saveToField) {
         const { context: { '@id': vsAtID = null } = {} } = this.props;
-        const { '@id': noteAtID } = noteResp;
-        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteAtID }));
+        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteID }));
     }
 
     patchPreviouslySavedNote(noteAtID, noteToPatch) { // ONLY USED FOR DRAFTS -- other notes are cloned
         return ajax.promise(noteAtID, 'PATCH', {}, JSON.stringify(noteToPatch));
     }
 
-    saveAsDraft(note, stateFieldToUpdate, noteType) {
+    getNote(uuid, noteType) {
+        console.log("Fetching @@embedded representation of " + uuid + " with " + noteType);
+        const path = `/${noteType}/${uuid}/?datastore=database`;
+        console.log("path", path);
+        return ajax.promise(path, 'GET');
+    }
+
+    saveAsDraft(note, stateFieldToUpdate, noteType = "note_standard") {
         const { [stateFieldToUpdate]: lastSavedNote } = this.state;
+        const urlFormattedNoteType = noteType.split('_').join('s-');
 
         // Does a draft already exist?
         if (lastSavedNote) { // Patch the pre-existing draft item & overwrite it
             console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
             const {
-                '@id': noteAtID, version,
+                '@id': noteAtID,
+                uuid: noteUUID, version,
             } = lastSavedNote;
 
             const noteToSubmit = { ...note };
@@ -130,10 +137,12 @@ export class InterpretationSpaceWrapper extends React.Component {
                             throw new Error(response);
                         }
 
-                        const { 0: newlySavedDraft } = graph || [];
-                        this.setState({ loading: false, [stateFieldToUpdate]: newlySavedDraft });
-
                         console.log("Successfully overwritten previous draft of note", response);
+                        return this.getNote(noteUUID, urlFormattedNoteType);
+                    })
+                    .then((noteWithEmbeds) => {
+                        console.log("Successfully retrieved @@embedded representation of note", noteWithEmbeds);
+                        this.setState({ loading: false, [stateFieldToUpdate]: noteWithEmbeds });
                     })
                     .catch((err) => {
                         // TODO: Error handling/alerting
@@ -142,6 +151,8 @@ export class InterpretationSpaceWrapper extends React.Component {
                     });
             });
         } else { // Create a whole new item, and patch to VS
+            let newNoteID;
+
             this.setState({ loading: true }, () => {
                 this.postNewNote(note, noteType, null, "in review")
                     .then((response) => {
@@ -152,19 +163,28 @@ export class InterpretationSpaceWrapper extends React.Component {
                             throw new Error(response);
                         }
 
-                        console.log("Successfully created new item", response);
-
                         const { 0: noteItem } = noteItems;
+                        newNoteID = noteItem.uuid;
+                        console.log("Successfully created new item", noteItem);
 
-                        // Temporarily try to update state here... since 'response' with note item is not accessible in next step
-                        // TODO: Figure out a better way so if an item is created but not successfully attached, that is rectified before state update
-                        this.setState({ loading: false, [stateFieldToUpdate]: noteItem });
-                        return this.patchNewNoteToVS(noteItem, stateFieldToUpdate);
+                        return this.patchNewNoteToVS(newNoteID, stateFieldToUpdate);
                     })
                     .then((resp) => {
+                        const { '@graph': noteItem, status } = resp;
+
+                        if (status === "error") {
+                            // TODO: Check integrity of @graph
+                            throw new Error(resp);
+                        }
                         console.log("Successfully linked note object to variant sample", resp);
-                        // const { '@graph': noteItem } = response;
-                        // TODO: Check integrity of @graph before stating successful
+
+                        return this.getNote(newNoteID, urlFormattedNoteType);
+                    })
+                    .then((noteWithEmbeds) => {
+                        console.log("Successfully retrieved @@embedded representation of note: ", noteWithEmbeds);
+
+                        // Full representation of item fetched... add this to state
+                        this.setState({ loading: false, [stateFieldToUpdate]: noteWithEmbeds });
                     })
                     .catch((err) => {
                         // TODO: Error handling/alerting
