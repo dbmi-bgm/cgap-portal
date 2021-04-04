@@ -4,6 +4,7 @@ import pytest
 import re
 import webtest
 
+from dcicutils.misc_utils import ignorable
 from dcicutils.qa_utils import raises_regexp, override_environ
 from ..util import make_vapp_for_email
 from .test_access_key import basic_auth
@@ -95,7 +96,8 @@ def test_post_ingestion_submission(anontestapp, bgm_user, bgm_project, bgm_acces
         'Accept':  'application/json',
         'Authorization': basic_auth(bgm_access_key['access_key_id'], 'hopefully this will not work'),
     }
-    # NOTE: The headers have WRONG credentials. Using anontestapp means we'll need some, so will get a 403 rejection.
+    # NOTE: The headers have WRONG credentials. Using anontestapp means we'll need some,
+    #       so will get a 401 (Unauthorized) rejection.
     response = anontestapp.post_json("/IngestionSubmission", creation_post_data,
                                      headers=creation_post_headers_with_bad_password, status=401)
     assert response.status_code == 401
@@ -118,7 +120,8 @@ def test_post_ingestion_submission_other_project(anontestapp, non_bgm_user, non_
         'Accept':  'application/json',
         'Authorization': basic_auth(non_bgm_access_key['access_key_id'], non_bgm_access_key['secret_access_key']),
     }
-    response = anontestapp.post_json("/IngestionSubmission", creation_post_data, headers=creation_post_headers, status=201)
+    response = anontestapp.post_json("/IngestionSubmission", creation_post_data, headers=creation_post_headers,
+                                     status=201)
     [submission] = response.json['@graph']
     assert submission.get('@id')
 
@@ -146,6 +149,7 @@ def test_post_ingestion_submission_wrong_project(anontestapp, institution,
             'Accept':  'application/json',
             'Authorization': basic_auth(*keypair),
         }
+
         def dbg(label, x, *props):
             if not props:
                 print("%s: %s" % (label, json.dumps(x, indent=2, default=str)))
@@ -153,6 +157,7 @@ def test_post_ingestion_submission_wrong_project(anontestapp, institution,
                 for prop in props:
                     print("%s[%r]: %s"
                           % (label, prop, json.dumps(x.get(prop, "<MISSING>"), indent=2, default=str)))
+
         dbg("bgm_user", bgm_user, '@id', 'user_institution', 'project_roles')
         dbg("non_bgm_user", non_bgm_user, '@id', 'user_institution', 'project_roles')
         dbg("bgm_project", bgm_project, '@id', 'uuid', 'name')
@@ -161,9 +166,11 @@ def test_post_ingestion_submission_wrong_project(anontestapp, institution,
         dbg("non_bgm_access_key", non_bgm_access_key, 'access_key_id', 'secret_access_key')
         dbg("post data", creation_post_data)
         dbg("post headers", creation_post_headers)
+
         print("posting /IngestionSubmission, expecting 403, with keypair", keypair)
         response = anontestapp.post_json("/IngestionSubmission", creation_post_data, headers=creation_post_headers,
                                          status=403)
+        ignorable(response)
         # response = requests.post("/IngestionSubmission", creation_post_data, headers=creation_post_headers)
         # dbg("response.status_code", response.status_code)
         # dbg("response.json", response.json)
@@ -201,17 +208,17 @@ def test_process_ingestion(testapp, posted_personas_etc):
     [submitted_item] = res.json['@graph']
     submission_id = submitted_item['uuid']
 
+    submission_body = {
+        "ingestion_type": ingestion_type,
+        # We don't have to send these (though we could as long as they're consistent).
+        # "institution": institution_name,
+        # "project": project_name,
+        "validate_only": False
+    }
     res = developer_testapp.post("/ingestion-submissions/%s/submit_for_ingestion" % submission_id,
-                       {
-                           "ingestion_type": ingestion_type,
-                           # "institution": institution_name,
-                           # "project": project_name,
-                           "validate_only": False
-                       },
-                       content_type='multipart/form-data',
-                       status=200,
-                       upload_files=[("datafile", sample_bundle_filename)],
-    )
+                                 submission_body, content_type='multipart/form-data',
+                                 upload_files=[("datafile", sample_bundle_filename)],
+                                 status=200)
 
     submission_uri = '/ingestion-submissions/' + submission_id
 
@@ -240,7 +247,6 @@ def test_process_ingestion(testapp, posted_personas_etc):
     # Processing has not yet begun
     assert not res.json.get('additional_data')
     assert not res.json.get('processing_status')
-
 
     submission = developer_testapp.get(submission_uri).maybe_follow().json
     assert submission.get('processing_status') == {
