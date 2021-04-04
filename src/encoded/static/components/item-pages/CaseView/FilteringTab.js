@@ -10,7 +10,6 @@ import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es
 import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
 import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
 
-
 /**
  * @todo maybe reuse somewhere
  * // This... more or less should handle "NOT" (!=), where the "!" will be last char of field.
@@ -74,21 +73,24 @@ export function filterQueryByQuery(query1, query2){
 
 
 export const FilteringTab = React.memo(function FilteringTab(props) {
+
     const {
         context = null,
         windowHeight,
         session = false,
         schemas,
-        onCancelSelection,      // Not used -- passed in from SelectedItemsController and would close window.
-        onCompleteSelection,    // Not used -- passed in from SelectedItemsController and would send selected items back to parent window.
-        selectedItems,          // passed in from SelectedItemsController
-        onSelectItem,           // passed in from SelectedItemsController
-        onResetSelectedItems,   // passed in from SelectedItemsController
-        variantSampleListItem,  // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
-        updateVariantSampleListID, // Passed in from VariantSampleListController
-        savedVariantSampleIDMap,// Passed in from VariantSampleListController
+        onCancelSelection,          // Not used -- passed in from SelectedItemsController and would close window.
+        onCompleteSelection,        // Not used -- passed in from SelectedItemsController and would send selected items back to parent window.
+        selectedItems,              // passed in from SelectedItemsController
+        onSelectItem,               // passed in from SelectedItemsController
+        onResetSelectedItems,       // passed in from SelectedItemsController
+        variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
+        updateVariantSampleListID,  // Passed in from VariantSampleListController
+        savedVariantSampleIDMap,    // Passed in from VariantSampleListController
         refreshExistingVariantSampleListItem, // Passed in from VariantSampleListController
+        setIsSubmitting             // Passed in from App
     } = props;
+
     const {
         accession: caseAccession,
         initial_search_href_filter_addon = "",
@@ -157,8 +159,12 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedItems there.
     const fsuiProps = {
         schemas,
-        variantSampleListItem, updateVariantSampleListID, refreshExistingVariantSampleListItem,
-        selectedItems, onResetSelectedItems,
+        variantSampleListItem,
+        updateVariantSampleListID,
+        refreshExistingVariantSampleListItem,
+        selectedItems,
+        onResetSelectedItems,
+        setIsSubmitting,
         "caseItem": context
     };
 

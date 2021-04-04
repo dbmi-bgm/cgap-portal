@@ -334,6 +334,7 @@ def login(context, request):
     request.response.set_cookie(
         "jwtToken",
         value=request_token,
+        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
         domain=request_domain,
         path="/",
         httponly=True,
@@ -527,6 +528,7 @@ def impersonate_user(context, request):
     request.response.set_cookie(
         "jwtToken",
         value=id_token.decode('utf-8'),
+        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
         domain=request_domain,
         path="/",
         httponly=True,

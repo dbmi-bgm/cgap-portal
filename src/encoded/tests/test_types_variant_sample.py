@@ -5,7 +5,7 @@ from .variant_fixtures import VARIANT_SAMPLE_URL
 from encoded.types.variant import build_variant_sample_annotation_id
 
 
-pytestmark = [pytest.mark.working, pytest.mark.schema]
+pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.workbook]
 
 @pytest.fixture
 def bgm_test_variant_sample2(bgm_test_variant_sample):

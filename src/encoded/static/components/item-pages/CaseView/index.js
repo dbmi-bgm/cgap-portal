@@ -130,6 +130,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         windowWidth,
         windowHeight,
         idToGraphIdentifier,
+        setIsSubmitting,
         PedigreeVizLibrary = null,
         // Passed in from VariantSampleListController which wraps this component in `getTabObject`
         variantSampleListItem = null,
@@ -293,7 +294,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
                         <SelectedItemsController isMultiselect>
-                            <FilteringTab {...{ context, windowHeight, session, schemas, variantSampleListItem,
+                            <FilteringTab {...{ context, windowHeight, session, schemas, setIsSubmitting, variantSampleListItem,
                                 updateVariantSampleListID, savedVariantSampleIDMap, refreshExistingVariantSampleListItem }} />
                         </SelectedItemsController>
                     </DotRouterTab>

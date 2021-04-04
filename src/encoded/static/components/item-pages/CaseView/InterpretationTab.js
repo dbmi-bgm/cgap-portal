@@ -5,8 +5,7 @@ import queryString from 'query-string';
 import moment from 'moment';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
-import { VariantSampleDisplayTitleColumn } from './CaseViewEmbeddedVariantSampleSearchTable';
+import { variantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './../../browse/variantSampleColumnExtensionMap';
 
 /**
  * For now, we just re-use the column render func from some VariantSample columns
