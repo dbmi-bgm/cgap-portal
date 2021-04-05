@@ -164,16 +164,18 @@ export default class App extends React.PureComponent {
          * Initial state of application.
          *
          * @type {Object}
-         * @property {boolean}  state.session       Whether user is currently logged in or not. User details are retrieved using JWT utility.
-         * @property {Object[]} state.schemas       Current schemas; null until AJAX-ed in (may change).
-         * @property {boolean}  state.isSubmitting  Whether there's a submission in progress. If true, alert is shown to prevent user from accidentally navigating away.
-         * @property {boolean}  state.mounted       Whether app has been mounted into DOM in browser yet.
+         * @property {boolean}      state.session               Whether user is currently logged in or not. User details are retrieved using JWT utility.
+         * @property {Object[]}     state.schemas               Current schemas; null until AJAX-ed in (may change).
+         * @property {string|JSX}   state.isSubmitting          Whether there's a submission in progress. If string, browser alert is shown to prevent user from accidentally navigating away.
+         * @property {boolean}      state.mounted               Whether app has been mounted into DOM in browser yet.
+         * @property {boolean}      state.isSubmittingModalOpen
          */
         this.state = {
             session,
-            'schemas'           : context.schemas || null,
-            'isSubmitting'      : false,
-            'mounted'           : false
+            'schemas'                     : context.schemas || null,
+            'isSubmitting'                : false,
+            'mounted'                     : false,
+            'isSubmittingModalOpen'       : false,
         };
 
         // Holds a reference to current navigation request for `context`.
@@ -720,7 +722,7 @@ export default class App extends React.PureComponent {
      */
     stayOnSubmissionsPage(nextHref = null) {
         const { href } = this.props;
-        const { isSubmitting } = this.state;
+        const { isSubmitting, isSubmittingModalOpen } = this.state;
         // can override state in options
         // override with replace, which occurs on back button navigation
         if (isSubmitting){
@@ -1214,7 +1216,7 @@ const ContentRenderer = React.memo(function ContentRenderer(props){
     const commonContentViewProps = _.pick(props,
         // Props from App:
         'schemas', 'session', 'href', 'navigate', 'uploads', 'updateUploads', 'alerts',
-        'browseBaseState', 'setIsSubmitting', 'updateAppSessionState', 'context', 'currentAction',
+        'browseBaseState', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen', 'updateAppSessionState', 'context', 'currentAction',
         // Props from BodyElement:
         'windowWidth', 'windowHeight', 'registerWindowOnResizeHandler', 'registerWindowOnScrollHandler',
         'addToBodyClassList', 'removeFromBodyClassList', 'toggleFullScreen', 'isFullscreen',

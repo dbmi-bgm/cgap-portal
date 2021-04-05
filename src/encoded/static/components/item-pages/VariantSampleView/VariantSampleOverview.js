@@ -104,7 +104,7 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, href } = this.props;
+        const { context, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
 
@@ -116,6 +116,7 @@ export class VariantSampleOverview extends React.PureComponent {
         } } = memoizedUrlParse(href);
 
         console.log("hrefParts", showInterpretation, annotationTab, interpretationTab, caseSource);
+        console.log("VariantSampleOverview", isSubmitting, isSubmittingModalOpen);
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
@@ -127,7 +128,7 @@ export class VariantSampleOverview extends React.PureComponent {
                     </div>
                     { showInterpretation == 'True' ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource }}/>
+                            <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}/>
                         </div> : null
                     }
                 </div>
