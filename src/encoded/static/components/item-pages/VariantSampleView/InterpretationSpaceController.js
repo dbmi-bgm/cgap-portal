@@ -208,21 +208,36 @@ export class InterpretationSpaceWrapper extends React.Component {
 export class InterpretationSpaceController extends React.Component {
 
     static hasNoteChanged(lastSavedNote = null, currNote = null) {
-        const fieldsToCompare = ["note_text", "acmg_guidelines", "classification", "conclusion"];
-
-        const blankNote = { note_text: "", acmg_guidelines: [], classification: null, conclusion:  "" };
-
-        if (!lastSavedNote) { // Compare against blank note if lastSavedNote is null
-            return !_.isMatch(
-                _.pick(currNote, ...fieldsToCompare),
-                _.pick(blankNote, ...fieldsToCompare)
-            );
+        if (lastSavedNote === null && currNote === null) {
+            return false;
         }
 
-        return !_.isMatch(
-            _.pick(currNote, ...fieldsToCompare),
-            _.pick(lastSavedNote, ...fieldsToCompare)
-        );
+        const fieldsToCompare = ["note_text", "acmg_guidelines", "conclusion"];
+
+        const fieldsFromLastSavedNote = _.pick(lastSavedNote || {}, ...fieldsToCompare);
+        const fieldsFromCurrNote = _.pick(currNote || {}, ...fieldsToCompare);
+
+        // Manually compare classification & note text (it's not added to embed if not present, which can confuse comparisons)
+        // TODO: Figure out a way to use _.isMatch/_.isEqual for future versions. Kicking this can down the road slightly.
+        const {
+            classification: lastSavedClassification = null,
+            note_text: lastSavedNoteText = ""
+        } = fieldsFromLastSavedNote;
+        const {
+            classification: currClassification = null,
+            note_text: currNoteText = "" } = fieldsFromCurrNote;
+
+        if (currClassification !== lastSavedClassification) {
+            console.log("classifications do not match:", currClassification, lastSavedClassification);
+            return true;
+        }
+
+        if (lastSavedNoteText !== currNoteText) {
+            console.log("text does not match");
+            return true;
+        }
+
+        return false;
     }
 
     constructor(props) {
@@ -386,14 +401,13 @@ class GenericInterpretationPanel extends React.Component {
 
         const isThisNoteUnsaved = memoizedHasNoteChanged(lastSavedNote, this.state);
         const anyNotesUnsaved = otherDraftsUnsaved || isThisNoteUnsaved;
-        console.log("isThisNoteUnsaved", isThisNoteUnsaved);
-        console.log("anyNotesUnsaved", anyNotesUnsaved);
-        console.log("isSubmitting", isSubmitting);
 
         // Only trigger if switching from no unsaved to unsaved present or vice versa
         if (!isSubmitting && anyNotesUnsaved) {
+            console.log("started submitting (warning will appear)");
             setIsSubmitting("You have unsaved notes. Are you sure you want to navigate away without saving?"); // set isSubmitting
         } else if (isSubmitting && !anyNotesUnsaved) {
+            console.log("no longer submitting (warning will no longer appear)");
             setIsSubmitting(false); // unset
         }
     }
