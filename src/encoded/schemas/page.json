@@ -25,9 +25,6 @@
         },
         {
             "$ref": "mixins.json#/modified"
-        },
-        {
-            "$ref": "mixins.json#/aliases"
         }
     ],
     "type": "object",

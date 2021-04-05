@@ -41,6 +41,12 @@
             "$ref": "mixins.json#/notes"
         },
         {
+            "$ref": "mixins.json#/interpretation"
+        },
+        {
+            "$ref": "mixins.json#/variant_notes"
+        },
+        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
@@ -2172,22 +2178,9 @@
             "order": 34,
             "grouping": "Constraint Metrics"
         },
-        "genes.genes_most_severe_gene.oe_lof": {
-            "title": "o/e (LoF)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 35,
-            "grouping": "Constraint Metrics"
-        },
-        "csq_clinvar_clnsig": {
-            "title": "Clinvar",
-            "order": 36,
-            "grouping": "variant database"
-        },
-        "genes.genes_most_severe_gene.gene_lists.display_title": {
-            "title": "Gene List",
-            "order": 99,
-            "grouping": "Genes"
+        "interpretation.classification": {
+            "title": "Classification",
+            "order": 100
         }
     },
     "columns": {
@@ -2243,6 +2236,10 @@
             "title": "Clinvar ID",
             "order": 70,
             "default_hidden": true
+        },
+        "interpretation.classification": {
+            "title": "Classification",
+            "order": 100
         }
     }
 }
