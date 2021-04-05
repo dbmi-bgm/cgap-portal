@@ -2900,7 +2900,7 @@ $download-button-width : 100px;
 				}
 
 				.dropdown.btn-group {
-					width: 100%;
+					flex-grow: 1;
 				}
 			}
 		}
