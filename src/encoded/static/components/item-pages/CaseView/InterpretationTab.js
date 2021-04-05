@@ -116,7 +116,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                         </div> */}
                         <div className="col col-sm-12 col-lg-3 py-2">
                             <label className="mb-04 text-small">Interpretation</label>
-                            <div><em className="text-muted">Pending</em></div>
+                            <div className="w-100 text-center"><em className="text-muted">Pending</em></div>
                         </div>
                     </div>
                 </div>
