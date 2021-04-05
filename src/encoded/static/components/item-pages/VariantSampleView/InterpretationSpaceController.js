@@ -212,20 +212,16 @@ export class InterpretationSpaceController extends React.Component {
             return false;
         }
 
-        const fieldsToCompare = ["note_text", "acmg_guidelines", "conclusion"];
-
-        const fieldsFromLastSavedNote = _.pick(lastSavedNote || {}, ...fieldsToCompare);
-        const fieldsFromCurrNote = _.pick(currNote || {}, ...fieldsToCompare);
-
-        // Manually compare classification & note text (it's not added to embed if not present, which can confuse comparisons)
+        // Manually compare classification & note text (not added to embed if not present, which can confuse _'s comparisons)
         // TODO: Figure out a way to use _.isMatch/_.isEqual for future versions. Kicking this can down the road slightly.
         const {
             classification: lastSavedClassification = null,
             note_text: lastSavedNoteText = ""
-        } = fieldsFromLastSavedNote;
+        } = lastSavedNote || {};
         const {
             classification: currClassification = null,
-            note_text: currNoteText = "" } = fieldsFromCurrNote;
+            note_text: currNoteText = ""
+        } = currNote || {};
 
         if (currClassification !== lastSavedClassification) {
             console.log("classifications do not match:", currClassification, lastSavedClassification);
