@@ -10,10 +10,9 @@ import Button from 'react-bootstrap/esm/Button';
 import Modal from 'react-bootstrap/esm/Modal';
 import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, layout, JWT, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, navigate, layout, JWT, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-
 /**
  * Stores and manages global note state for interpretation space.
  */
@@ -145,8 +144,13 @@ export class InterpretationSpaceWrapper extends React.Component {
                         this.setState({ loading: false, [stateFieldToUpdate]: noteWithEmbeds });
                     })
                     .catch((err) => {
-                        // TODO: Error handling/alerting
+                        const { error: { message = null } = {} } = err || {};
                         console.log(err);
+                        Alerts.queue({
+                            title: "Error: Something went wrong while patching.",
+                            message: message || "Your changes may not be saved.",
+                            style: "danger"
+                        });
                         this.setState({ loading: false });
                     });
             });
@@ -224,12 +228,12 @@ export class InterpretationSpaceController extends React.Component {
         } = currNote || {};
 
         if (currClassification !== lastSavedClassification) {
-            console.log("classifications do not match:", currClassification, lastSavedClassification);
+            // console.log("classifications do not match:", currClassification, lastSavedClassification);
             return true;
         }
 
         if (lastSavedNoteText !== currNoteText) {
-            console.log("text does not match");
+            // console.log("text does not match");
             return true;
         }
 
@@ -283,6 +287,11 @@ export class InterpretationSpaceController extends React.Component {
         if (currentTab !== newTab) {
             this.setState({ currentTab: newTab });
         }
+    }
+
+    componentWillUnmount() {
+        const { setIsSubmitting } = this.props;
+        setIsSubmitting(false, null, false);
     }
 
     render() {
@@ -393,7 +402,7 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { setIsSubmitting, isSubmitting, memoizedHasNoteChanged, lastSavedNote, otherDraftsUnsaved } = this.props;
+        const { setIsSubmitting, isSubmitting, isSubmittingModalOpen, memoizedHasNoteChanged, lastSavedNote, otherDraftsUnsaved } = this.props;
 
         const isThisNoteUnsaved = memoizedHasNoteChanged(lastSavedNote, this.state);
         const anyNotesUnsaved = otherDraftsUnsaved || isThisNoteUnsaved;
@@ -401,7 +410,9 @@ class GenericInterpretationPanel extends React.Component {
         // Only trigger if switching from no unsaved to unsaved present or vice versa
         if (!isSubmitting && anyNotesUnsaved) {
             console.log("started submitting (warning will appear)");
-            setIsSubmitting("You have unsaved notes. Are you sure you want to navigate away without saving?"); // set isSubmitting
+            setIsSubmitting({
+                modal: <UnsavedInterpretationModal {...{ isSubmittingModalOpen, setIsSubmitting, isSubmitting }}/>
+            });
         } else if (isSubmitting && !anyNotesUnsaved) {
             console.log("no longer submitting (warning will no longer appear)");
             setIsSubmitting(false); // unset
@@ -436,7 +447,7 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged } = this.props;
+        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged, isSubmittingModalOpen, isSubmitting, setIsSubmitting } = this.props;
         const {
             note_text : savedNoteText = null,
             status: savedNoteStatus,
@@ -466,7 +477,9 @@ class GenericInterpretationPanel extends React.Component {
                 <GenericInterpretationSubmitButton {...{ isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
-                <UnsavedInterpretationModal />
+                <Button variant="primary btn-block mt-05" /*onClick=Navigate back to case*/>
+                    Close &amp; Return to Case
+                </Button>
             </div>
         );
     }
@@ -634,17 +647,17 @@ function GenericInterpretationSubmitButton(props) {
 }
 
 function UnsavedInterpretationModal(props) {
-    const [show, setShow] = useState(false);
+    const { href, isSubmittingModalOpen, isSubmitting, setIsSubmitting, setSubmittingModalClosed } = props;
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    console.log("href", href);
+
+    function discardAndNavigate() {
+        setIsSubmitting(false, () => navigate(href, { 'skipRequest' : false, 'replace' : true }), false);
+    }
 
     return (
         <React.Fragment>
-            <Button variant="primary btn-block mt-05" onClick={handleShow}>
-                Close &amp; Return to Case
-            </Button>
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={true} onHide={() => setIsSubmitting(false, null, false)}>
                 <Modal.Header closeButton style={{ backgroundColor: "#cdd6e6" }}>
                     <Modal.Title>
                         <div className="modal-title font-italic text-600 h4">
@@ -653,15 +666,15 @@ function UnsavedInterpretationModal(props) {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className="text-small text-center mt-2">This variant interpretation is <u>incomplete</u> and contains:</div>
-                    <div className="font-italic text-center text-600 h3 my-3">1 Unsaved Variant Classification</div>
+                    <div className="text-small text-center mt-2">This variant interpretation is <u>incomplete</u> and contains at least 1:</div>
+                    <div className="font-italic text-center text-600 h3 my-3">Unsaved Variant Classification</div>
                     <div className="text-small text-center mb-2">Are you sure you want to navigate away?</div>
                 </Modal.Body>
                 <Modal.Footer style={{ backgroundColor: "#efefef" }}>
-                    <Button variant="outline-secondary" onClick={handleClose}>
+                    <Button variant="outline-secondary" onClick={() => setIsSubmitting(false, null, false)}>
                         Cancel
                     </Button>
-                    <Button variant="danger" onClick={handleClose}>
+                    <Button variant="danger" onClick={discardAndNavigate}>
                         Discard Changes and Continue Navigation
                     </Button>
                 </Modal.Footer>

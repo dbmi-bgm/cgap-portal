@@ -115,9 +115,6 @@ export class VariantSampleOverview extends React.PureComponent {
             caseSource = null
         } } = memoizedUrlParse(href);
 
-        console.log("hrefParts", showInterpretation, annotationTab, interpretationTab, caseSource);
-        console.log("VariantSampleOverview", isSubmitting, isSubmittingModalOpen);
-
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">

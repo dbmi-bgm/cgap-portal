@@ -744,15 +744,25 @@ export default class App extends React.PureComponent {
                 return false;
             }
 
-            const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
+            if (typeof isSubmitting === "object" && isSubmitting.modal) {
 
-            if (window.confirm(confirmMessage)){
-                // we are no longer submitting
-                this.setIsSubmitting(false);
-                return false;
-            } else {
-                // stay
+                // Add navigation href to modal props
+                const modalClone = React.cloneElement(isSubmitting.modal, { href: nextHref });
+
+                this.setState({ isSubmitting: { modal: modalClone }, isSubmittingModalOpen: true }, function(state) {console.log(state);});
                 return true;
+
+            } else {
+                const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
+
+                if (window.confirm(confirmMessage)){
+                    // we are no longer submitting
+                    this.setIsSubmitting(false);
+                    return false;
+                } else {
+                    // stay
+                    return true;
+                }
             }
         } else {
             return false;
@@ -1028,11 +1038,18 @@ export default class App extends React.PureComponent {
     /**
      * Set 'isSubmitting' in state. works with handleBeforeUnload
      *
-     * @param {boolean|string} bool - Value to set. If string is provided, will show as text in popup.
+     * @param {boolean|string|object} value - Value to set. If string is provided, will show as text in popup.
      * @param {function} [callback=null] - Optional callback to execute after updating state.
+     * @param {boolean} showModalOpen - Optional setting to also close/open modal
      */
-    setIsSubmitting(value, callback=null){
-        this.setState({ 'isSubmitting': value }, callback);
+    setIsSubmitting(value, callback=null, showModalOpen){
+        console.log("value, ", value);
+        console.log("showModalOpen", showModalOpen);
+        if (showModalOpen === true || showModalOpen === false) {
+            this.setState({ 'isSubmitting': value, 'isSubmittingModalOpen': showModalOpen }, callback);
+        } else {
+            this.setState({ 'isSubmitting': value }, callback);
+        }
     }
 
     /**
@@ -1699,7 +1716,8 @@ class BodyElement extends React.PureComponent {
      * TestWarning stuff is _possibly_ deprecated and for 4DN only.
      */
     render(){
-        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas, browseBaseState, updateAppSessionState } = this.props;
+        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas,
+            browseBaseState, updateAppSessionState, isSubmitting, isSubmittingModalOpen } = this.props;
         const { windowWidth, windowHeight, classList, hasError, isFullscreen, testWarningPresent } = this.state;
         const { registerWindowOnResizeHandler, registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen } = this;
         const appClass = slowLoad ? 'communicating' : 'done';
@@ -1718,6 +1736,11 @@ class BodyElement extends React.PureComponent {
                     windowHeight - ((testWarningPresent && 52) || 0)
                 );
             }
+        }
+
+        if (typeof isSubmitting === "object") {
+            const { modal } = isSubmitting || {};
+            console.log("isSubmitting, isSubmittingModalOpen", isSubmitting, isSubmittingModalOpen);
         }
 
         const navbarProps = {
@@ -1762,6 +1785,7 @@ class BodyElement extends React.PureComponent {
                 <div id="slot-application">
                     <div id="application" className={appClass}>
                         <div id="layout">
+                            { (isSubmitting && isSubmitting.modal) && isSubmittingModalOpen ? isSubmitting.modal : null}
 
                             <NavigationBar {...navbarProps} />
 
