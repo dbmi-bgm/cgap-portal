@@ -20,7 +20,7 @@ const {
 
 
 export const InterpretationTab = React.memo(function InterpretationTab (props) {
-    const { variantSampleListItem, schemas } = props;
+    const { variantSampleListItem, schemas, caseAccession } = props;
     const { variant_samples: vsSelections = [] } = variantSampleListItem;
 
     const {
@@ -60,7 +60,8 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
 
                         <div className="flex-grow-1 d-flex flex-column flex-sm-row">
                             <div className="flex-auto">
-                                <VariantSampleDisplayTitleColumn result={variant_sample_item} link={vsID + '?showInterpretation=True'} />
+                                <VariantSampleDisplayTitleColumn result={variant_sample_item}
+                                    link={`${vsID}?showInterpretation=True${caseAccession ? '&caseSource=' + caseAccession : ""}`} />
                             </div>
                             <div className="flex-grow-1  d-sm-block">
                                 &nbsp;

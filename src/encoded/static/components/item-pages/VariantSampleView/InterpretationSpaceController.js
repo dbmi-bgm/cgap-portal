@@ -204,7 +204,7 @@ export class InterpretationSpaceWrapper extends React.Component {
         const { variant_notes, gene_notes, interpretation } = this.state;
         return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
             lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation}
-            saveAsDraft={this.saveAsDraft} {...{ defaultTab, setIsSubmitting, isSubmitting, isSubmittingModalOpen }} />;
+            saveAsDraft={this.saveAsDraft} />;
     }
 }
 
@@ -296,9 +296,9 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip } = this.state;
-        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
 
-        const passProps = _.pick(this.props, 'saveAsDraft', 'schemas');
+        const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
 
         const isDraftVariantNoteUnsaved = this.memoized.hasNoteChanged(variant_notes_wip, lastSavedVariantNote);
         const isDraftGeneNoteUnsaved = this.memoized.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
@@ -310,7 +310,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab}
                     key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ setIsSubmitting, isSubmitting, isSubmittingModalOpen }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved} />
                 );
                 break;
@@ -318,7 +318,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab}
                     key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ setIsSubmitting, isSubmitting, isSubmittingModalOpen }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved} />
                 );
                 break;
@@ -326,7 +326,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab}
                     key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ setIsSubmitting, isSubmitting, isSubmittingModalOpen }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved} />
                 );
                 break;
@@ -447,7 +447,7 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged, isSubmittingModalOpen, isSubmitting, setIsSubmitting } = this.props;
+        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource } = this.props;
         const {
             note_text : savedNoteText = null,
             status: savedNoteStatus,
@@ -477,9 +477,10 @@ class GenericInterpretationPanel extends React.Component {
                 <GenericInterpretationSubmitButton {...{ isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
-                <Button variant="primary btn-block mt-05" /*onClick=Navigate back to case*/>
-                    Close &amp; Return to Case
-                </Button>
+                { caseSource ?
+                    <Button variant="primary btn-block mt-05" onClick={() => { navigate(`/cases/${caseSource}/#case-info.interpretation`)}}>
+                        Return to Case
+                    </Button>: null}
             </div>
         );
     }
