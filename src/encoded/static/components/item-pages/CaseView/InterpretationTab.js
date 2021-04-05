@@ -55,17 +55,17 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         const { "@id": vsID } = variant_sample_item;
         return (
             <div className="card mb-1" key={idx}>
-                <div className="card-header">
+                <div className="card-header section-header">
                     <div className="d-flex align-items-center">
 
                         <div className="flex-grow-1 d-flex flex-column flex-sm-row">
                             <div className="flex-auto">
-                                <VariantSampleDisplayTitleColumn result={variant_sample_item} link={vsID + '?showInterpretation=True'} />
+                                <VariantSampleDisplayTitleColumn className={"text-light"} result={variant_sample_item} link={vsID + '?showInterpretation=True'} />
                             </div>
                             <div className="flex-grow-1  d-sm-block">
                                 &nbsp;
                             </div>
-                            <div className="flex-auto text-secondary text-small" data-tip="Date Selected">
+                            <div className="flex-auto text-white text-small" data-tip="Date Selected">
                                 <i className="icon icon-calendar far mr-07"/>
                                 <LocalizedTime timestamp={date_selected} />
                             </div>
@@ -85,19 +85,23 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                 </div>
                 <div className="card-body pt-0 pb-08">
                     <div className="row flex-column flex-sm-row">
-                        <div className="col col-sm-7 col-lg-2 py-2">
+                        <div className="col col-sm-4 col-lg-3 py-2">
                             <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
                                 { geneTranscriptColTitle || "Gene, Transcript" }
                             </label>
-                            { geneTranscriptRenderFunc(variant_sample_item) }
+                            <a href={vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=Gene%20Notes'}>
+                                { geneTranscriptRenderFunc(variant_sample_item) }
+                            </a>
                         </div>
-                        <div className="col col-sm-5 col-lg-2 py-2">
+                        <div className="col col-sm-4 col-lg-3 py-2">
                             <label className="mb-04 text-small" data-tip={variantColDescription}>
                                 { variantColTitle || "Variant" }
                             </label>
-                            { variantRenderFunc(variant_sample_item) }
+                            <a href={vsID + '?showInterpretation=True&annotationTab=0'}>
+                                { variantRenderFunc(variant_sample_item) }
+                            </a>
                         </div>
-                        <div className="col col-sm-7 col-lg-3 py-2">
+                        <div className="col col-sm-4 col-lg-3 py-2">
                             <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
                                 { genotypeLabelColTitle || "Genotype" }
                             </label>
@@ -111,7 +115,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                         </div> */}
                         <div className="col col-sm-12 col-lg-3 py-2">
                             <label className="mb-04 text-small">Interpretation</label>
-                            <div><em>TODO</em></div>
+                            <div><em className="text-muted">Pending</em></div>
                         </div>
                     </div>
                 </div>
