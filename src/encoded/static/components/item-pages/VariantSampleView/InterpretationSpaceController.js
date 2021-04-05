@@ -510,12 +510,19 @@ function NoteFieldDrop(props) { /** For classification, variant/gene candidacy d
             <label className="w-100 text-small">
                 { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
             </label>
-            <Dropdown as={ButtonGroup} className={cls}>
-                <Dropdown.Toggle variant="outline-secondary btn-block text-left" id="dropdown-basic">
-                    { value ? <><i className="status-indicator-dot ml-1 mr-07" data-status={value} /> { value }</> : "Select an option..."}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
-            </Dropdown>
+            <div className="d-flex">
+                <Dropdown as={ButtonGroup} className={cls}>
+                    <Dropdown.Toggle variant="outline-secondary text-left" id="dropdown-basic">
+                        { value ? <><i className="status-indicator-dot ml-1 mr-07" data-status={value} /> { value }</> : "Select an option..."}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
+                </Dropdown>
+                { value ?
+                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => onOptionChange(field, null)}>
+                        <i className="icon icon-trash-alt fas" />
+                    </Button>
+                    : null}
+            </div>
         </React.Fragment>
     );
 }
