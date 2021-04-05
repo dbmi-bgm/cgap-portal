@@ -196,16 +196,35 @@ export class InterpretationSpaceWrapper extends React.Component {
     }
 
     render() {
-        const { defaultTab } = this.props;
+        const { defaultTab, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const { variant_notes, gene_notes, interpretation } = this.state;
         return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
             lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation}
-            saveAsDraft={this.saveAsDraft} {...{ defaultTab }} />;
+            saveAsDraft={this.saveAsDraft} {...{ defaultTab, setIsSubmitting, isSubmitting, isSubmittingModalOpen }} />;
     }
 }
 
 
 export class InterpretationSpaceController extends React.Component {
+
+    static hasNoteChanged(lastSavedNote = null, currNote = null) {
+        const fieldsToCompare = ["note_text", "acmg_guidelines", "classification", "conclusion"];
+
+        const blankNote = { note_text: "", acmg_guidelines: [], classification: null, conclusion:  "" };
+
+        if (!lastSavedNote) { // Compare against blank note if lastSavedNote is null
+            return !_.isMatch(
+                _.pick(currNote, ...fieldsToCompare),
+                _.pick(blankNote, ...fieldsToCompare)
+            );
+        }
+
+        return !_.isMatch(
+            _.pick(currNote, ...fieldsToCompare),
+            _.pick(lastSavedNote, ...fieldsToCompare)
+        );
+    }
+
     constructor(props) {
         super(props);
         const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation, defaultTab } = props;
@@ -224,6 +243,10 @@ export class InterpretationSpaceController extends React.Component {
         this.toggleExpanded = this.toggleExpanded.bind(this);
         this.switchToTab = this.switchToTab.bind(this);
         this.retainWIPStateOnUnmount = this.retainWIPStateOnUnmount.bind(this);
+
+        this.memoized = {
+            hasNoteChanged: memoize(InterpretationSpaceController.hasNoteChanged)
+        };
     }
 
     retainWIPStateOnUnmount(note, state) {
@@ -253,20 +276,39 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip } = this.state;
-        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
+        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas');
+
+        const isDraftVariantNoteUnsaved = this.memoized.hasNoteChanged(variant_notes_wip, lastSavedVariantNote);
+        const isDraftGeneNoteUnsaved = this.memoized.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
+        const isDraftInterpretationUnsaved = this.memoized.hasNoteChanged(interpretation_wip, lastSavedInterpretation);
 
         let panelToDisplay = null;
         switch(currentTab) {
             case "Variant Notes":
-                panelToDisplay = <GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab} key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }/>;
+                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
+                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab}
+                    key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ setIsSubmitting, isSubmitting, isSubmittingModalOpen }}
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved} />
+                );
                 break;
             case "Gene Notes":
-                panelToDisplay = <GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab} key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }/>;
+                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
+                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab}
+                    key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ setIsSubmitting, isSubmitting, isSubmittingModalOpen }}
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved} />
+                );
                 break;
             case "Interpretation":
-                panelToDisplay = <GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab} key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }/>;
+                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
+                    lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab}
+                    key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ setIsSubmitting, isSubmitting, isSubmittingModalOpen }}
+                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved} />
+                );
                 break;
             default:
                 break;
@@ -321,24 +363,6 @@ function InterpretationSpaceTabs(props) {
 }
 
 class GenericInterpretationPanel extends React.Component {
-    static hasNoteChanged(lastSavedNote = null, currNote = null) {
-        const fieldsToCompare = ["note_text", "acmg_guidelines", "classification", "conclusion"];
-
-        const blankNote = { note_text: "", acmg_guidelines: [], classification: null, conclusion:  "" };
-
-        if (!lastSavedNote) { // Compare against blank note if lastSavedNote is null
-            return !_.isMatch(
-                _.pick(currNote, ...fieldsToCompare),
-                _.pick(blankNote, ...fieldsToCompare)
-            );
-        }
-
-        return !_.isMatch(
-            _.pick(currNote, ...fieldsToCompare),
-            _.pick(lastSavedNote, ...fieldsToCompare)
-        );
-    }
-
     constructor(props) {
         super(props);
 
@@ -355,10 +379,23 @@ class GenericInterpretationPanel extends React.Component {
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
         this.onTextChange = this.onTextChange.bind(this);
         this.onDropOptionChange = this.onDropOptionChange.bind(this);
+    }
 
-        this.memoized = {
-            hasNoteChanged: memoize(GenericInterpretationPanel.hasNoteChanged)
-        };
+    componentDidUpdate(prevProps, prevState) {
+        const { setIsSubmitting, isSubmitting, memoizedHasNoteChanged, lastSavedNote, otherDraftsUnsaved } = this.props;
+
+        const isThisNoteUnsaved = memoizedHasNoteChanged(lastSavedNote, this.state);
+        const anyNotesUnsaved = otherDraftsUnsaved || isThisNoteUnsaved;
+        console.log("isThisNoteUnsaved", isThisNoteUnsaved);
+        console.log("anyNotesUnsaved", anyNotesUnsaved);
+        console.log("isSubmitting", isSubmitting);
+
+        // Only trigger if switching from no unsaved to unsaved present or vice versa
+        if (!isSubmitting && anyNotesUnsaved) {
+            setIsSubmitting("You have unsaved notes. Are you sure you want to navigate away without saving?"); // set isSubmitting
+        } else if (isSubmitting && !anyNotesUnsaved) {
+            setIsSubmitting(false); // unset
+        }
     }
 
     // Will use same update fxn for multiple text fields
@@ -375,21 +412,21 @@ class GenericInterpretationPanel extends React.Component {
     // Wrapping passed in functions so as to call them with this component's state, then pass down to children
     saveStateAsDraft() {
         const { saveAsDraft, noteType, saveToField } = this.props;
-        saveAsDraft(this.state, saveToField , noteType);
+        saveAsDraft(this.state, saveToField, noteType);
     }
 
     componentWillUnmount() { // Before unmounting (as in switching tabs), save unsaved changes in controller state
-        const { saveToField, retainWIPStateOnUnmount, lastWIPNote } = this.props;
+        const { saveToField, retainWIPStateOnUnmount, lastWIPNote, memoizedHasNoteChanged } = this.props;
 
         // Only trigger if note has changed since last save to state
-        if (this.memoized.hasNoteChanged(lastWIPNote, this.state)) {
+        if (memoizedHasNoteChanged(lastWIPNote, this.state)) {
             console.log("note has changed... saving");
             retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
         }
     }
 
     render() {
-        const { lastSavedNote = null, noteLabel, noteType, schemas } = this.props;
+        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged } = this.props;
         const {
             note_text : savedNoteText = null,
             status: savedNoteStatus,
@@ -398,7 +435,7 @@ class GenericInterpretationPanel extends React.Component {
         const { modified_by: { display_title : lastModUsername } = {}, date_modified = null } = lastModified || {};
         const { note_text: noteText, acmg_guidelines, classification, conclusion } = this.state;
 
-        const noteChangedSinceLastSave = this.memoized.hasNoteChanged(lastSavedNote, this.state);
+        const noteChangedSinceLastSave = memoizedHasNoteChanged(lastSavedNote, this.state);
         const noteTextPresent = !!noteText;
         const isDraft = savedNoteStatus === "in review";
         const isCurrent = savedNoteStatus === "current";
