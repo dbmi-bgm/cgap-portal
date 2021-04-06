@@ -104,21 +104,19 @@ function watch(done){
 
 function getLinkedSharedComponentsPath(){
     let sharedComponentPath = path.resolve(__dirname, 'node_modules/@hms-dbmi-bgm/shared-portal-components');
-    let isLinked = false;
-    try { // Get exact path to dir, else leave. Used to avoid needing to webpack dependency itself.
-        for (var i = 0; i < 10; i++) { // Incase multiple links.
-            sharedComponentPath = fs.readlinkSync(sharedComponentPath);
-            isLinked = true;
-        }
-    } catch (e){
-        // ... not linked
-    }
+    const origPath = sharedComponentPath;
+
+    // Follow any symlinks to get to real path.
+    sharedComponentPath = fs.realpathSync(sharedComponentPath);
+
+    const isLinked = origPath !== sharedComponentPath;
 
     console.log(
         "`@hms-dbmi-bgm/shared-portal-components` directory is",
         isLinked ? "sym-linked to `" + sharedComponentPath + "`." : "NOT sym-linked."
     );
-    return { isLinked, sharedComponentPath : isLinked ? sharedComponentPath : null };
+
+    return { isLinked, sharedComponentPath: isLinked ? sharedComponentPath : null };
 }
 
 function buildSharedPortalComponents(done){
@@ -142,7 +140,13 @@ function buildSharedPortalComponents(done){
         { stdio: "inherit" }
     );
 
+    subP.on("error", (err)=>{
+        console.log(`buildSharedPortalComponents errored - ${err}`);
+        return;
+    });
+
     subP.on("close", (code)=>{
+        console.log(`buildSharedPortalComponents process exited with code ${code}`);
         done();
     });
 
@@ -170,7 +174,13 @@ function watchSharedPortalComponents(done){
         { stdio: "inherit" }
     );
 
+    subP.on("error", (err)=>{
+        console.log(`watchSharedPortalComponents errored - ${err}`);
+        return;
+    });
+
     subP.on("close", (code)=>{
+        console.log(`watchSharedPortalComponents process exited with code ${code}`);
         done();
     });
 

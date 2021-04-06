@@ -96,7 +96,7 @@ export class ScaleController extends React.PureComponent {
 
         if (this.innerElemReference){
             if (listenNow && !listenBefore){
-                this.innerElemReference.addEventListener("wheel", this.handleWheelMove);
+                this.innerElemReference.addEventListener("wheel", this.handleWheelMove, { "passive": false, "capture": true });
             } else if (!listenNow && listenBefore){
                 this.innerElemReference.removeEventListener("wheel", this.handleWheelMove);
             }
@@ -222,7 +222,8 @@ export class ScaleController extends React.PureComponent {
         // We need to listen to `wheel` events directly (not thru React)
         // as react doesn't handle these (it seems / afaik).
         if (enableMouseWheelZoom || enablePinchZoom) {
-            innerElem.addEventListener("wheel", this.handleWheelMove);
+            // Chrome & some other browsers set passive:true by default.
+            innerElem.addEventListener("wheel", this.handleWheelMove, { "passive": false, "capture": true });
         }
     }
 

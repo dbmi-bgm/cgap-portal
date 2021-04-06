@@ -1,0 +1,97 @@
+{
+    "title": "Variant Sample List",
+    "description": "List of Variant Samples Saved to a Case",
+    "id": "/profiles/variant_sample_list.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "institution",
+        "project"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
+    "additionalProperties": false,
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/notes"
+        }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "variant_samples": {
+            "title": "Variant Samples",
+            "description": "VariantSample items saved to this list",
+            "type": "array",
+            "items": {
+                "title": "Variant Sample Selection",
+                "type": "object",
+                "properties": {
+                    "variant_sample_item": {
+                        "title": "Variant Sample",
+                        "type": "string",
+                        "linkTo": "VariantSample"
+                    },
+                    "filter_blocks_request_at_time_of_selection": {
+                        "title": "Filter Block Request",
+                        "type": "string",
+                        "description": "Stringified JSON representing the compound filter block request made when this Variant Sample was selected"
+                    },
+                    "userid": {
+                        "title": "User ID",
+                        "type": "string",
+                        "description": "User ID of person who made this selection",
+                        "serverDefault": "userid",
+                        "format": "uuid"
+                    },
+                    "date_selected": {
+                        "title": "Date Selected",
+                        "type": "string",
+                        "serverDefault": "now",
+                        "anyOf": [
+                            {
+                                "format": "date-time"
+                            },
+                            {
+                                "format": "date"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "created_for_case": {
+            "title": "Created for Case",
+            "description": "Accession of the case this variant sample list was created for",
+            "type": "string",
+            "format": "accession"
+        }
+    }
+}

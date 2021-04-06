@@ -18,7 +18,7 @@ from .variant_fixtures import (  # noqa
 )
 
 
-pytestmark = [pytest.mark.working, pytest.mark.ingestion]
+pytestmark = [pytest.mark.working, pytest.mark.ingestion, pytest.mark.workbook]
 
 
 @pytest.fixture

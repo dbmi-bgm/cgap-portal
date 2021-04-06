@@ -26,7 +26,7 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
         overlaysContainer, windowWidth, windowHeight,
         browseBaseState, testWarningVisible,
         addToBodyClassList, removeFromBodyClassList,
-        schemas, updateUserInfo
+        schemas, updateAppSessionState
     } = props;
 
     const leftNavProps = {
@@ -37,7 +37,7 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
 
     const userActionNavProps = {
         windowWidth, windowHeight, href, mounted, overlaysContainer, session,
-        schemas, updateUserInfo, testWarningVisible
+        schemas, updateAppSessionState, testWarningVisible
     };
 
     // We'll probably keep using NavbarCollapse for a bit since simpler than implementing own

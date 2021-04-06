@@ -1913,7 +1913,7 @@ $download-button-width : 100px;
 					> button {
 						// TODO store color in variable, ideally bootstrap one, for re-use in places.
 						background-color: cornflowerblue;
-						transition: background-color .25s, box-shadow .5s;
+						transition: background-color .25s ease-out, box-shadow .5s;
 						color: #ffff;
 						height: 100%;
 						display: block;
@@ -1953,7 +1953,7 @@ $download-button-width : 100px;
 							width: auto;
 							path {
 								fill: cornflowerblue;
-								transition: fill .25s;
+								transition: fill .25s ease-out;
 							}
 						}
 
@@ -2042,7 +2042,7 @@ $download-button-width : 100px;
 				/* possibly more semantically accurate (i.e. is a section title, not page title) (subjective) */
 				font-size: 2rem;
 				margin-bottom: 20px;
-				font-weight: 500;
+				margin-top: 0px;
 			}
 
 			/* 'Current Case' selection marker/styling */

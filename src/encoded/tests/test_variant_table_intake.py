@@ -1,6 +1,9 @@
+import io
 import json
 import pytest
 
+from dcicutils.diff_utils import DiffManager
+from dcicutils.misc_utils import file_contents
 from ..util import resolve_file_path
 from ..ingestion.table_utils import VariantTableParser, MappingTableHeader
 from .variant_fixtures import ANNOTATION_FIELD_URL
@@ -8,20 +11,18 @@ from .variant_fixtures import ANNOTATION_FIELD_URL
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = resolve_file_path('annotations/variant_table_v0.5.2.csv')
+MT_LOC = resolve_file_path('annotations/v0.5.3_variant_table.csv')
 ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
 EXPECTED_FIELDS = ['no', 'field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
-                   'field_type', 'is_list', 'facet_default_hidden', 'priority', 'source',
+                   'field_type', 'is_list', 'priority', 'source',
                    'description', 'value_example', 'enum_list', 'do_import',
-                   'facet_order', 'column_order', 'annotation_category',
                    'scope', 'schema_title', 'links_to', 'embedded_field',
                    'calculated_property', 'pattern', 'default', 'min', 'max', 'link', 'comments',
                    'annotation_space_location', 'abbreviation']
 EXPECTED_INSERT = {'field_name': 'CHROM', 'vcf_field': 'CHROM', 'schema_title': 'Chromosome',
                    'do_import': True, 'scope': 'variant', 'source_name': 'VCF',
                    'source_version': 'VCFv4.2', 'description': 'Chromosome',
-                   'field_type': 'string', 'is_list': False, 'annotation_category': 'Position',
-                   'facet_order': 1,
+                   'field_type': 'string', 'is_list': False,
                    'enum_list': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
                                  '11', '12', '13', '14', '15', '16', '17', '18', '19',
                                  '20', '21', '22', 'X', 'Y', 'M']}
@@ -30,11 +31,11 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid',
                           'transcript.vep_consequence.var_conseq_name']
-VARIANT_TABLE_VERSION = 'annV0.5.2'
-VARIANT_TABLE_DATE = '01.25.2021'
-NUMBER_ANNOTATION_FIELDS = 185
-SAMPLE_FIELDS_EXPECTED = 25
-VARIANT_FIELDS_EXPECTED = 160
+VARIANT_TABLE_VERSION = 'annV0.5.3'
+VARIANT_TABLE_DATE = '03.09.2021'
+NUMBER_ANNOTATION_FIELDS = 191
+SAMPLE_FIELDS_EXPECTED = 26
+VARIANT_FIELDS_EXPECTED = 165
 TRANSCRIPT_FIELDS_EXPECTED = 30
 
 
@@ -113,11 +114,6 @@ def test_generate_sample_json_items(MTParser, inserts):
     assert 'cmphet' in sample_props
     assert 'ALT' not in sample_props
 
-    # check cols/facs
-    assert 'DP' in cols
-    assert 'GQ' in facs
-    assert 'novoPP' in facs
-
 
 def test_generate_variant_json_items(MTParser, inserts):
     """ Tests that variant JSON along with columns and facets are produced """
@@ -144,16 +140,6 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert sub_obj_props['csq_consequence']['items']['type'] == 'string'
     assert sub_obj_props['csq_consequence']['items']['linkTo'] == 'VariantConsequence'
 
-    # check cols/facs
-    assert 'genes.genes_most_severe_hgvsc' in cols
-    assert 'csq_gnomadg_af' in facs
-    assert facs['CHROM']['title'] == 'Chromosome'
-    assert facs['CHROM']['grouping'] == 'Position'
-    assert facs['CHROM']['order'] == 1
-    assert cols['csq_gnomadg_af']['order'] == 60
-    assert cols['genes.genes_most_severe_gene.display_title']['order'] == 40
-    assert cols['genes.genes_most_severe_consequence.coding_effect']['order'] == 51
-
 
 def test_generate_variant_sample_schema(MTParser, sample_variant_items):
     """ Tests some aspects of the variant_sample schema """
@@ -172,24 +158,11 @@ def test_generate_variant_sample_schema(MTParser, sample_variant_items):
 
     # check comhet sub-embedded obj
     assert 'cmphet' in properties
-    assert 'comhet_gene'in properties['cmphet']['items']['properties']
+    assert 'comhet_gene' in properties['cmphet']['items']['properties']
 
     assert 'GT' in properties
     assert 'GQ' in properties
     assert properties['AF']['type'] == 'number'
-    assert 'columns' in schema
-    assert 'AF' in schema['facets']
-    assert 'facets' in schema
-    assert 'variant' in properties
-    assert 'file' in properties
-    assert facs['DP']['order'] == 8
-    assert facs['AF']['order'] == 11
-    assert cols['DP']['order'] == 40
-    assert cols['GT']['order'] == 30
-    assert facs['cmphet.comhet_impact_gene']['order'] == 17
-    assert facs['inheritance_modes']['order'] == 15
-    for fac in facs:  # no default_hidden facets yet
-        assert 'default_hidden' not in fac
 
 
 def test_generate_variant_schema(MTParser, variant_items):
@@ -226,16 +199,8 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert properties['hg19']['type'] == 'array'
     assert properties['csq_clinvar_clnsigconf']['type'] == 'array'
 
-    # check cols/facs
-    assert 'AF' not in schema['columns']
-    assert 'CHROM' in schema['facets']
-    assert 'POS' in schema['facets']
-    assert 'order' in schema['facets']['POS']
-    assert cols['genes.genes_most_severe_gene.display_title']['order'] == 40
-    assert cols['csq_clinvar']['order'] == 70
-
     # check embedded fields are there
-    with open(MTParser.EMBEDDED_VARIANT_FIELDS, 'r') as fd:
+    with io.open(MTParser.EMBEDDED_VARIANT_FIELDS, 'r') as fd:
         embeds_to_check = json.load(fd)
         for embed in embeds_to_check['variant']['embedded_field']:
             if 'vep' in embed:
@@ -256,10 +221,35 @@ def test_post_variant_annotation_field_inserts(inserts, project, institution, te
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)
 
 
+_VARIANT_SCHEMA_FILENAME = resolve_file_path('schemas/variant.json')
+_VARIANT_SAMPLE_SCHEMA_FILENAME = resolve_file_path('schemas/variant_sample.json')
+
+
 def test_post_inserts_via_run(MTParser, project, institution, testapp):
     """ Tests that we can run the above test using the 'run' method """
+
+    variant_schema = json.loads(file_contents(_VARIANT_SCHEMA_FILENAME))
+    variant_sample_schema = json.loads(file_contents(_VARIANT_SAMPLE_SCHEMA_FILENAME))
+
     inserts = MTParser.run(institution='encode-institution', project='encode-project',
-                           vs_out=resolve_file_path('schemas/variant_sample.json'),
-                           v_out=resolve_file_path('schemas/variant.json'), write=False)  # enable to generate schemas
+                           vs_out=_VARIANT_SAMPLE_SCHEMA_FILENAME,
+                           v_out=_VARIANT_SCHEMA_FILENAME,
+                           # enable to generate schemas
+                           write=False)
     for item in inserts:
+        # NOTE: The ACTUAL test going on here is to assure these get 201 responses.
+        #       Everything else in this test before the 'inserts =' above or after
+        #       this 'for' loop is instrumentation for the purpose of tracking C4-636.
+        #       -kmp 21-Mar-2021
         testapp.post_json(ANNOTATION_FIELD_URL, item, status=201)
+
+    variant_schema_afterward = json.loads(file_contents(_VARIANT_SCHEMA_FILENAME))
+    variant_sample_schema_afterward = json.loads(file_contents(_VARIANT_SAMPLE_SCHEMA_FILENAME))
+
+    dm = DiffManager(label="<schema>")
+
+    variant_schema_delta = dm.comparison(variant_schema, variant_schema_afterward)
+    variant_sample_schema_delta = dm.comparison(variant_sample_schema, variant_sample_schema_afterward)
+
+    assert not variant_schema_delta
+    assert not variant_sample_schema_delta

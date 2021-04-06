@@ -1,4 +1,5 @@
 import pytest
+import webtest
 
 from uuid import uuid4
 
@@ -13,6 +14,15 @@ class MockedLogger(object):
 
     def error(self, msg):
         print('ERROR: ' + msg)
+
+
+def remote_user_testapp(app, remote_user):
+    '''Use this to generate testapp fixtures acting as different users'''
+    environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': str(remote_user),
+    }
+    return webtest.TestApp(app, environ)
 
 
 @pytest.fixture
@@ -140,6 +150,47 @@ def bgm_user(testapp, institution, bgm_project):
 
 
 @pytest.fixture
+def bgm_user_testapp(bgm_user, app, external_tx, zsa_savepoints):
+    '''TODO: maybe bring in more permissions-related fixtures into here'''
+    return remote_user_testapp(app, bgm_user['uuid'])
+
+@pytest.fixture
+def bgm_variant(bgm_user_testapp, bgm_project, institution):
+    '''Same thing as workbook inserts, but different project stuff'''
+    item = {
+        'project': bgm_project['@id'],
+        'institution': institution["name"],
+        # We do not supply an explicit UUID here anymore because it says we need "permission restricted items"
+        # Might be some other way of getting it in here, but idk nor have time to rly explore atm.
+        # "uuid": "f6aef055-4c88-4a3e-a306-d37a71535d8b",
+        "ID": "rs564328546",
+        "ALT": "T",
+        "POS": 12125898,
+        "REF": "TG",
+        "hg19": [
+        {
+            "hg19_pos": 12185955,
+            "hg19_chrom": "chr1",
+            "hg19_hgvsg": "NC_000001.11:g.12185956del"
+        }
+        ],
+        "CHROM": "1"
+    }
+    return bgm_user_testapp.post_json('/variants', item).json['@graph'][0]
+
+@pytest.fixture
+def bgm_test_variant_sample(bgm_variant, institution, bgm_project):
+    # IS NOT pre-POSTed into DB.
+    return {
+        'variant': bgm_variant['@id'],
+        'AD': '1,3',
+        'CALL_INFO': 'my_test_sample',
+        'file': 'dummy-file-name',
+        'project': bgm_project['@id'],
+        'institution': institution['@id']
+    }
+
+@pytest.fixture
 def access_key(testapp, bgm_user):
     description = 'My programmatic key'
     item = {
@@ -156,6 +207,7 @@ def access_key(testapp, bgm_user):
 def bgm_access_key(access_key):
     # An alias for access_key, useful for emphasis to compare to non_bgm_access_key
     return access_key
+
 
 
 @pytest.fixture
@@ -604,6 +656,18 @@ def a_case(project, institution, child, sample_proc):
     }
 
 
+@pytest.fixture  # NOTE: variant_sample is unused in workbook so this is ok, later on there should be default inserts
+def test_variant_sample():
+    return {
+        'variant': 'f6aef055-4c88-4a3e-a306-d37a71535d8b',
+        'AD': '1,3',
+        'CALL_INFO': 'my_test_sample',
+        'file': 'dummy-file-name',
+        'project': 'hms-dbmi',
+        'institution': 'hms-dbmi'
+    }
+
+
 @pytest.fixture
 def protocol_data(institution, project):
     return {'description': 'A Protocol',
@@ -881,11 +945,6 @@ def workflow_mapping(testapp, workflow_bam, institution, project):
         ]
     }
     return testapp.post_json('/workflow_mapping', item).json['@graph'][0]
-
-
-@pytest.fixture
-def gene_item(testapp, institution, project):
-    return testapp.post_json('/gene', {'institution': institution['@id'], 'project': project['@id'], 'geneid': '5885'}).json['@graph'][0]
 
 
 @pytest.fixture
