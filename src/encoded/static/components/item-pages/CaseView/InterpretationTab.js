@@ -90,7 +90,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
                                 { geneTranscriptColTitle || "Gene, Transcript" }
                             </label>
-                            <a href={vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=Gene%20Notes' + (caseAccession ? '&caseSource=' + caseAccession : '')}>
+                            <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=Gene%20Notes' + (caseAccession ? '&caseSource=' + caseAccession : '')}>
                                 { geneTranscriptRenderFunc(variant_sample_item) }
                             </a>
                         </div>
@@ -98,7 +98,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             <label className="mb-04 text-small" data-tip={variantColDescription}>
                                 { variantColTitle || "Variant" }
                             </label>
-                            <a href={vsID + '?showInterpretation=True&annotationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '')}>
+                            <a href={vsID + '?showInterpretation=True&annotationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '')}>
                                 { variantRenderFunc(variant_sample_item) }
                             </a>
                         </div>
