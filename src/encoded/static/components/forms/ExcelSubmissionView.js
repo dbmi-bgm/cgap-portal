@@ -102,9 +102,19 @@ export default class ExcelSubmissionView extends React.PureComponent {
     }
 
     handleComplete(e){
-        const { submissionItem } = this.state;
-        const { uuid } = submissionItem || {};
-        navigate(`/search/?type=Case&ingestion_ids=${uuid}`);
+        const { submissionItem: { uuid, ingestion_type: ingestionType, additional_data = null } = {} } = this.state;
+        const { result: { genelist = '/search/?type=GeneList' } = {} } = additional_data || {};
+
+        switch(ingestionType) {
+            case "metadata_bundle":
+                navigate(`/search/?type=Case&ingestion_ids=${uuid}`);
+                break;
+            case "genelist":
+                navigate(genelist);
+                break;
+            default:
+                break;
+        }
     }
 
     markCompleted(panelIdx, setTo = true){
@@ -524,7 +534,8 @@ class PanelTwo extends React.PureComponent {
 
         const {
             '@id': atID,
-            additional_data: { result: { aliases = {} } = {} } = {}
+            additional_data: { result: { aliases = {} } = {} } = {},
+            ingestion_type: ingestionType = null
         } = submissionItem || {};
 
         if (panelIdx !== 1) {
@@ -566,7 +577,7 @@ class PanelTwo extends React.PureComponent {
                         </div>
                         <div className="align-self-end">
                             <button type="button" className="btn btn-success" onClick={handleComplete}>
-                                View New Cases
+                                {ingestionType === "metadata_bundle" ? "View New Cases" : "View Gene List" }
                             </button>
                         </div>
                     </div>
