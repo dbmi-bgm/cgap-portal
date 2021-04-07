@@ -550,7 +550,7 @@ class PanelTwo extends React.PureComponent {
                         Attach a file to this IngestionSubmission
                     </h4>
                     <div className="mt-1">
-                        Click <a href="https://hms-dbmi.atlassian.net/browse/C4-505" target="_blank" rel="noreferrer">here</a> for more on how to format your document.
+                        Click <a href="/help/uploading_cohort" target="_blank" rel="noreferrer">here</a> for more on how to format your document.
                     </div>
                     <hr className="mb-1"/>
                     <div className="field-section mt-2">
