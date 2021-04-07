@@ -468,7 +468,7 @@ class GenericInterpretationPanel extends React.Component {
                     { noteLabel }
                 </label>
                 { lastModUsername ?
-                    <div className="text-muted text-smaller my-1">Last Modified: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsername} </div>
+                    <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsername} </div>
                     : null}
                 <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
