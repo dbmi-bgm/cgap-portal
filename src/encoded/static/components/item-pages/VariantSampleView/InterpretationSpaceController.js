@@ -676,7 +676,7 @@ function GenericInterpretationSubmitButton(props) {
 }
 
 function UnsavedInterpretationModal(props) {
-    const { href, isSubmittingModalOpen, isSubmitting, setIsSubmitting, setSubmittingModalClosed } = props;
+    const { href, isSubmittingModalOpen, isSubmitting, setIsSubmitting } = props;
 
     console.log("href", href);
 
@@ -686,8 +686,8 @@ function UnsavedInterpretationModal(props) {
 
     return (
         <React.Fragment>
-            <Modal show={true} onHide={() => setIsSubmitting(false, null, false)}>
-                <Modal.Header closeButton style={{ backgroundColor: "#cdd6e6" }}>
+            <Modal show={true} onHide={() => setIsSubmitting(false, null, false)} centered>
+                <Modal.Header closeButton style={{ backgroundColor: "#bdcbd9", color: "#1e435e" }}>
                     <Modal.Title>
                         <div className="modal-title font-italic text-600 h4">
                             Variant Interpretation: <span className="text-300">Unsaved Changes</span>
@@ -696,15 +696,15 @@ function UnsavedInterpretationModal(props) {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="text-small text-center mt-2">This variant interpretation is <u>incomplete</u> and contains at least 1:</div>
-                    <div className="font-italic text-center text-600 h3 my-3">Unsaved Variant Classification</div>
+                    <div className="font-italic text-center text-600 h3 my-3" style={{ color: "#1e435e" }}>Unsaved Variant Classification</div>
                     <div className="text-small text-center mb-2">Are you sure you want to navigate away?</div>
                 </Modal.Body>
-                <Modal.Footer style={{ backgroundColor: "#efefef" }}>
-                    <Button variant="outline-secondary" onClick={() => setIsSubmitting(false, null, false)}>
-                        Cancel
+                <Modal.Footer className="d-flex" style={{ backgroundColor: "#eff0f0" }}>
+                    <Button className="flex-grow-1" variant="danger" onClick={discardAndNavigate}>
+                        Discard Notes
                     </Button>
-                    <Button variant="danger" onClick={discardAndNavigate}>
-                        Discard Changes and Continue Navigation
+                    <Button className="flex-grow-1" variant="primary" onClick={() => setIsSubmitting(false, null, false)}>
+                        Continue Editing
                     </Button>
                 </Modal.Footer>
             </Modal>
