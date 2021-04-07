@@ -50,9 +50,10 @@ export const variantSampleColumnExtensionMap = {
     // "Gene, Transcript" column
     "variant.genes.genes_most_severe_gene.display_title": {
         // Also includes "variant.genes.genes_most_severe_transcript"
+        // TODO: Update with onclick to handle google analytics tracking
         widthMap: { 'lg' : 155, 'md' : 140, 'sm' : 130 },
         render: function(result, props) {
-            const { variant : { genes = [] } = {} } = result;
+            const { "@id" : link = null, variant : { genes = [] } = {} } = result;
 
             const geneTitles = genes.map((geneItem) => {
                 const { genes_most_severe_gene: { display_title = null } = {} } = geneItem || {};
@@ -64,7 +65,10 @@ export const variantSampleColumnExtensionMap = {
                     <span key="genes_ensg" className="font-italic d-block text-truncate">{ geneTitles.length > 1 ? geneTitles.join() : geneTitles } </span>,
                     <span data-tip="Most Severe Transcript" key="genes_severe_transcript" className="font-italic d-block text-truncate">{ genes_most_severe_transcript}</span>
                 ];
-                return <StackedRowColumn className="text-center" {...{ rows }} />;
+                return (
+                    <a href={link ? link + '?annotationTab=0' : "#"}>
+                        <StackedRowColumn className="text-center" {...{ rows }} />
+                    </a>);
             }
             return null;
         }
@@ -72,16 +76,20 @@ export const variantSampleColumnExtensionMap = {
     // "Coding & Protein Sequence" col (existing 'Variant' column)
     "variant.genes.genes_most_severe_hgvsc": {
         // Also renders "variant.genes.genes_most_severe_hgvsp"
+        // TODO: Update with onclick to handle google analytics tracking
         widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
         render: function(result, props) {
-            const { variant : { genes : [ firstGene = null ] = [] } = {} } = result;
+            const { "@id" : link = null, variant : { genes : [ firstGene = null ] = [] } = {} } = result;
             const { genes_most_severe_hgvsc = null, genes_most_severe_hgvsp = null } = firstGene || {};
 
             if (!genes_most_severe_hgvsc && !genes_most_severe_hgvsp) {
                 return null;
             }
-
-            return <GenesMostSevereHGVSCColumn gene={firstGene} />;
+                    
+            return (
+                <a href={link ? link + '?annotationTab=1' : "#"}>
+                    <GenesMostSevereHGVSCColumn gene={firstGene} />
+                </a>);
         }
     },
     "variant.genes.genes_most_severe_consequence.coding_effect": { // Coding Effect column
