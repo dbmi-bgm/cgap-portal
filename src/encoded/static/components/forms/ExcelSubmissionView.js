@@ -336,7 +336,8 @@ class PanelOne extends React.PureComponent {
         const {
             institutionID: institution,
             projectID: project,
-            isCreating = false
+            isCreating = false,
+            submissionType = "Accessioning"
         } = this.state;
 
         e.preventDefault();
@@ -384,7 +385,9 @@ class PanelOne extends React.PureComponent {
             });
         };
 
-        const postData = { institution, project, ingestion_type: "metadata_bundle", processing_status: { state: "created" } };
+        const ingestionTypeToSubmissionTypeMap = { "Accessioning" : "metadata_bundle", "Gene List": "genelist" };
+
+        const postData = { institution, project, ingestion_type: ingestionTypeToSubmissionTypeMap[submissionType], processing_status: { state: "created" } };
 
         this.setState({ isCreating: true }, ()=>{
             this.request = ajax.load(
@@ -439,8 +442,8 @@ class PanelOne extends React.PureComponent {
                                 id="submission-type"
                             >
                                 <Dropdown.Item eventKey="Accessioning" onSelect={this.handleSelectSubmissionType}>Accessioning</Dropdown.Item>
+                                <Dropdown.Item eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List</Dropdown.Item>
                                 <Dropdown.Item disabled class="unclickable" eventKey="Family History" onSelect={this.handleSelectSubmissionType}>Family History (coming soon)</Dropdown.Item>
-                                <Dropdown.Item disabled class="unclickable" eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List (coming soon)</Dropdown.Item>
                             </DropdownButton>
                         </div>
                     </div>
