@@ -534,7 +534,7 @@ class PanelTwo extends React.PureComponent {
 
         const {
             '@id': atID,
-            additional_data: { result: { aliases = {} } = {} } = {},
+            additional_data: { result: { aliases = {} } = {}, post_output = [] } = {},
             ingestion_type: ingestionType = null
         } = submissionItem || {};
 
@@ -573,7 +573,7 @@ class PanelTwo extends React.PureComponent {
                     <div className="d-flex">
                         <div className="col">
                             <h4 className="text-300 mt-2">Successfully processed file.</h4>
-                            <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span> 
+                            <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span>
                         </div>
                         <div className="align-self-end">
                             <button type="button" className="btn btn-success" onClick={handleComplete}>
@@ -581,9 +581,21 @@ class PanelTwo extends React.PureComponent {
                             </button>
                         </div>
                     </div>
-                    <hr/>
-                    <span className="pl-1">Results:</span>
-                    <CreatedItemsTable aliasToAtIDMap={aliases} />
+                    { ingestionType !== "metadata_bundle" ? null : (
+                        <>
+                            <hr/>
+                            <span className="pl-1">Results:</span>
+                            <CreatedItemsTable aliasToAtIDMap={aliases} />
+                        </>)}
+
+                    { ingestionType === "genelist" ?
+                        <>
+                            <hr/>
+                            <ul>
+                                {post_output.map((item) => <li key="item">{item}</li>)}
+                            </ul>
+                        </>
+                        : null}
                 </React.Fragment>
             );
         }
