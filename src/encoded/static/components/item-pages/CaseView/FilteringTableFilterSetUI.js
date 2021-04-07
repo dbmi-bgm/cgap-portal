@@ -7,6 +7,7 @@ import url from 'url';
 import queryString from 'query-string';
 import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
+import Infinite from 'react-infinite';
 
 import Collapse from "react-bootstrap/esm/Collapse";
 import DropdownButton from "react-bootstrap/esm/DropdownButton";
@@ -15,9 +16,10 @@ import Modal from 'react-bootstrap/esm/Modal';
 
 import { console, ajax, JWT, valueTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { LocalizedTime, format as formatDateTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { getSchemaProperty } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/schema-transforms';
 import { FormattedToFromRangeValue } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/FacetList/RangeFacet';
+import { CountIndicator } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/FacetList/FacetTermsList';
 
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 
@@ -120,7 +122,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
      * linkTos must be transformed to UUIDs before POST as well.
      * Hardcoded here since UI is pretty specific to it.
      */
-    static fieldsToKeepPrePatch = ["title", "filter_blocks", "search_type", "flags", "created_in_case_accession", "uuid", "status"];
+    static fieldsToKeepPrePatch = ["title", "filter_blocks", "search_type", "flags", "created_in_case_accession", "uuid", "status", "derived_from_preset_filterset"];
 
     static deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices){
         let singleSelectedFilterBlockIdx = null;
@@ -206,7 +208,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
 
             // From FilteringTab (& higher, e.g. App/redux-store):
-            caseItem, schemas,
+            caseItem, schemas, session,
 
             // From SaveFilterSetButtonController:
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet, haveEditPermission,
@@ -215,6 +217,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             currFilterSet: filterSet = null,
             excludeFacets,
             cachedCounts = {},
+            importFromPresetFilterSet,
             addNewFilterBlock, selectedFilterBlockIndices, selectFilterBlockIdx, removeFilterBlockAtIdx,
             setNameOfFilterBlockAtIdx, setTitleOfFilterSet, isSettingFilterBlockIdx,
             intersectFilterBlocks = false, toggleIntersectFilterBlocks,
@@ -228,7 +231,6 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             // From VariantSampleListController (in index.js, wraps CaseInfoTabView)
             variantSampleListItem, updateVariantSampleListID, refreshExistingVariantSampleListItem
         } = this.props;
-        const { actions: caseActions = [] } = caseItem;
         const { total: totalCount, facets = null } = searchContext || {};
         const { filter_blocks = [] } = filterSet || {};
         const { bodyOpen, bodyMounted } = this.state;
@@ -266,7 +268,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet
         };
 
-        let body = null;
+        let fsuiBlocksBody = null;
         if (bodyMounted) {
             const bodyProps = {
                 filterSet, filterBlocksLen, facetDict, excludeFacets, searchContext, schemas, isFetchingInitialFilterSetItem,
@@ -277,7 +279,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 // Props for Save btn:
                 saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged
             };
-            body = <FilterSetUIBlocks {...bodyProps} />;
+            fsuiBlocksBody = <FilterSetUIBlocks {...bodyProps} />;
         }
 
         return (
@@ -291,14 +293,26 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 </div>
 
                 <div className="above-variantsample-table-ui">
-                    <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
+
+                    <div className="filterset-outer-container" data-is-open={bodyOpen}>
                         <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} />
-                        <Collapse in={bodyOpen}>
-                            <div className="filterset-blocks-container">
-                                { body }
+                        <Collapse in={bodyOpen} appear>
+                            <div>
+                                <div className="d-flex flex-column flex-md-row">
+                                    <div className="filterset-preset-selection-outer-column">
+                                        <PresetFilterSetSelectionUI {...{ caseItem, bodyOpen, session, importFromPresetFilterSet, hasCurrentFilterSetChanged, isEditDisabled }}
+                                            currentCaseFilterSet={filterSet} />
+                                    </div>
+                                    <div className="flex-grow-1">
+                                        <div className="filterset-blocks-container" data-all-selected={allFilterBlocksSelected}>
+                                            { fsuiBlocksBody }
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </Collapse>
                     </div>
+
                     <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
                         panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
                         <h4 className="text-400 col my-0">
@@ -326,6 +340,210 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             </React.Fragment>
         );
     }
+}
+
+/**
+ * @todo Pass in props.importFromPresetFilterSet from FilterSetController (and create it)
+ * @todo Consider using react-virtualized or react-window library for this later.
+ * @todo (CSS) Match width of FacetList
+ */
+class PresetFilterSetSelectionUI extends React.PureComponent {
+
+    /** Builds a compound search request for all FilterSets with relevant `preset_for_users`, `preset_for_projects`,  & `default_for_projects`  */
+    static makeCompoundSearchRequest(caseItem){
+        const { project: { uuid: projectUUID } } = caseItem || {};
+        const { uuid: userUUID = null } = JWT.getUserDetails() || {};
+
+        const compoundFS = {
+            "search_type": "FilterSet",
+            "filter_blocks": [],
+            "intersect": false,
+            "global_flags": "sort=default_for_projects&sort=-date_created&limit=250"
+        };
+
+        if (userUUID) {
+            compoundFS.filter_blocks.push({ "query": "preset_for_users=" + encodeURIComponent(userUUID), "flags_applied": [] });
+        }
+
+        if (projectUUID) {
+            compoundFS.filter_blocks.push({ "query": "preset_for_projects=" + encodeURIComponent(projectUUID), "flags_applied": [] });
+            compoundFS.filter_blocks.push({ "query": "default_for_projects=" + encodeURIComponent(projectUUID), "flags_applied": [] });
+        }
+
+        return compoundFS;
+    }
+
+    constructor(props){
+        super(props);
+        this.loadInitialResults = this.loadInitialResults.bind(this);
+        this.state = {
+            presetResults: null, // Can be blank array (no results found), null (not yet loaded), or array of results.
+            isLoadingPresets: true
+        };
+    }
+
+    componentDidMount(){
+        this.loadInitialResults();
+    }
+
+    // TODO: componentDidUpdate({ pastSession }) { if changed, then reset results & reload (?) }
+
+    loadInitialResults(){
+        const { caseItem } = this.props;
+        const compoundRequest = PresetFilterSetSelectionUI.makeCompoundSearchRequest(caseItem);
+        ajax.promise("/compound_search", "POST", {}, JSON.stringify(compoundRequest)).then((res) => {
+            const {
+                "@graph": presetResults,
+                total: totalResultCount
+            } = res;
+            this.setState({
+                presetResults,
+                totalResultCount,
+                "isLoadingPresets": false
+            });
+        });
+    }
+
+    render(){
+        const { importFromPresetFilterSet, caseItem, isEditDisabled, hasCurrentFilterSetChanged } = this.props;
+        const { isLoadingPresets, presetResults, totalResultCount } = this.state;
+
+        let body = null;
+        if (isLoadingPresets) {
+            body = (
+                <div className="text-center text-large py-2">
+                    <i className="icon icon-spin icon-circle-notch fas"/>
+                </div>
+            );
+        } else if (presetResults) {
+            const commonProps = { caseItem, importFromPresetFilterSet, isEditDisabled, hasCurrentFilterSetChanged };
+            body = (
+                <div className="results-container overflow-auto border-top">
+                    { presetResults.map(function(fs, idx){
+                        return <PresetFilterSetResult {...commonProps} presetFilterSet={fs} key={idx} />;
+                    }) }
+                </div>
+            );
+        }
+
+        // TODO wrap results in infinite scroll of some sort later on,
+        // once figure out strategy for replacing or removing the
+        // deprecated react-infinite library.
+
+        return (
+            <div className="filterset-preset-selection-body h-100">
+                <div className="results-heading my-0 py-2 px-2 bg-light">
+                    <div className="row align-items-center">
+                        <h5 className="col text-400 my-0">
+                            <i className="icon icon-copy far mr-08"/>
+                            <a href="/search/?type=FilterSet" className="text-body" target="_blank" data-delay-show={1000} data-tip="View all saved FilterSets">Presets</a>
+                        </h5>
+                        <div className="col-auto text-small">
+                            { totalResultCount } total
+                            { totalResultCount >= 250 ?
+                                <i className="icon icon-exclamation-triangle fas ml-1" data-tip="Showing most recent 250 results only.<br/><small>(Eventually we'll show more)</small>" data-html />
+                                : null }
+                        </div>
+                    </div>
+                </div>
+                { body }
+            </div>
+        );
+    }
+}
+
+
+
+function PresetFilterSetResult (props) {
+    const { presetFilterSet, caseItem, importFromPresetFilterSet, isEditDisabled, hasCurrentFilterSetChanged } = props;
+    const {
+        "@id": presetFSID,
+        "display_title": presetFSTitle,
+        "submitted_by": presetFSAuthor,
+        date_created,
+        filter_blocks = []
+    } = presetFilterSet;
+
+    const { display_title: presetFSAuthorTitle } = presetFSAuthor;
+    const presetFBLen = filter_blocks.length;
+
+    const { isPresetForUser, isPresetForProject, isDefaultForProject } = useMemo(function(){
+        const { project: { uuid: projectUUID } } = caseItem || {};
+        const {
+            preset_for_users = [],
+            preset_for_projects = [],
+            default_for_projects = []
+        } = presetFilterSet;
+        // We keep this within useMemo b.c. we assume is invisible if logged out.
+        // TODO: reconsider, or use props.session.
+        const { uuid: userUUID = null } = JWT.getUserDetails() || {}; // ( internally calls JSON.parse(localStorage..) )
+        return {
+            "isPresetForUser": userUUID && preset_for_users.indexOf(userUUID) > -1,
+            "isPresetForProject": projectUUID && preset_for_projects.indexOf(projectUUID) > -1,
+            "isDefaultForProject":  projectUUID && default_for_projects.indexOf(projectUUID) > -1
+        };
+    }, [ presetFilterSet, caseItem ]);
+
+    const warnBeforeImport = (!isEditDisabled && hasCurrentFilterSetChanged);
+
+    const onSelectPresetFilterSet = useCallback(function(e){
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (warnBeforeImport) {
+            const confResult = window.confirm("You have unsaved changes in your Case FilterSet; copying over blocks from this preset will destroy and overwrite them, continue?");
+            if (!confResult) {
+                return false;
+            }
+        }
+
+        importFromPresetFilterSet(presetFilterSet);
+    }, [ presetFilterSet, importFromPresetFilterSet, warnBeforeImport ]);
+
+
+    const presetIconsToShow = (
+        <React.Fragment>
+            { isPresetForProject ?
+                <i className="mr-08 icon icon-fw icon-users fas text-secondary" data-tip="Project preset" />
+                : null }
+            { isPresetForUser ?
+                <i className="mr-08 icon icon-fw icon-user fas text-secondary" data-tip="User preset" />
+                : null }
+            { isDefaultForProject ?
+                <i className="mr-08 icon icon-fw icon-star fas text-secondary" data-tip="Project default" />
+                : null }
+        </React.Fragment>
+    );
+
+    return (
+        // These should all have same exact height.
+        // And then that height later on will be plugged
+        // into (new replacement for) react-infinite rowHeight.
+        <div className="preset-filterset-result" data-id={presetFSID}>
+            <div className="title px-2">
+                <h5 className="my-0 text-600 flex-grow-1 text-truncate text-right" title={presetFSTitle}>
+                    { presetFSTitle }
+                </h5>
+                <div className="pl-08 flex-shrink-0 title-icon-container clickable" onClick={onSelectPresetFilterSet}
+                    data-tip="Copy filter blocks to current Case FilterSet">
+                    <i className="icon icon-file-export icon-fw fas" />
+                </div>
+            </div>
+            <div className="info px-2 text-small pb-08">
+                { presetIconsToShow }
+                <span className="flex-grow-1 count-indicator-wrapper">
+                    <CountIndicator count={presetFBLen} ltr data-tip={"Contains " + presetFBLen + " filter blocks"}
+                        height={18} />
+                </span>
+                <span data-tip={"Created " + formatDateTime(date_created, "date-time-md") + " by " + presetFSAuthorTitle} data-delay-show={750}>
+                    <LocalizedTime timestamp={date_created} formatType="date-md" />
+                </span>
+                <a href={presetFSID} target="_blank" rel="noopener noreferrer">
+                    <i className="icon icon-file-alt icon-fw far text-secondary ml-05 mr-03" data-tip="Open detail/edit page"/>
+                </a>
+            </div>
+        </div>
+    );
 }
 
 
@@ -590,9 +808,9 @@ function FilterSetUIHeader(props){
 
     // todo if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
     return (
-        <div className="row filter-set-ui-header align-items-center px-3 py-3">
-            <div className="col pl-0">{ titleBlock }</div>
-            <div className="col-auto pr-0">
+        <div className="d-flex filter-set-ui-header align-items-center px-3 py-3">
+            <div className="flex-grow-1">{ titleBlock }</div>
+            <div className="ml-16">
                 { haveDuplicateQueries || haveDuplicateNames ?
                     <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-danger"
                         data-tip={`Filter blocks with duplicate ${haveDuplicateQueries ? "queries" : "names"} exist below`} />
@@ -662,6 +880,8 @@ export class SaveFilterSetButtonController extends React.Component {
         // Could be expanded/simplified if we get @@embedded back on PATCH/POST and
         // maybe AJAX in initial filter set (w all fields, not just those embedded
         // on Case Item.)
+
+        console.log("TTT", savedFilterSet.filter_blocks, currFilterSet.filter_blocks);
 
         return !_.isEqual(
             // Skip over comparing fields that differ between frame=embed and frame=raw
@@ -933,10 +1153,10 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
     onHideModal(){
         const { loadingStatus } = this.state;
         if (loadingStatus === 1) {
-            // Prevent if in middle of POST.
+            // Prevent if in middle of POST request.
             return false;
         }
-        this.setState({ "showingModalForEventKey": null });
+        this.setState({ "showingModalForEventKey": null, "loadingStatus": 0 });
     }
 
     onPresetTitleInputChange(e) {
@@ -1024,6 +1244,7 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
                 "display_title": caseProjectTitle
             }
         } = caseItem;
+
         const {
             title: filterSetTitle = null
         } = filterSet || {}; // May be null while loading initially in FilterSetController
@@ -1057,56 +1278,78 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
 
         // const isEntireButtonDisabled = isLoading || (isPresetForUserDisabled && isPresetForProjectDisabled && isDefaultForProjectDisabled);
 
+
+        // TODO: Put into own component possibly, once split apart FilteringTableFilterSetUI into directory of files.
+        let modal = null;
+        if (modalOptionItemType) {
+            let modalBody = null;
+            if (loadingStatus === 0) {
+                // POST not started
+                modalBody = (
+                    <form onSubmit={this.onPresetFormSubmit} className="d-block">
+                        <label htmlFor="new-preset-fs-id">Preset FilterSet Title</label>
+                        <input id="new-preset-fs-id" type="text" placeholder={filterSetTitle + "..."} onChange={this.onPresetTitleInputChange} value={presetTitle} className="form-control mb-1" />
+                        <button type="submit" className="btn btn-success" disabled={!presetTitle}>
+                            Create
+                        </button>
+                    </form>
+                );
+            }
+            else if (loadingStatus === 1) {
+                // Is POSTing
+                modalBody = (
+                    <div className="text-center py-4 text-larger">
+                        <i className="icon icon-spin icon-circle-notch fas mt-1 mb-1" />
+                    </div>
+                );
+            }
+            else if (loadingStatus === 2) {
+                // POST succeeded
+                const { title: lastSavedPresetTile, "@id": lastSavedPresetID } = lastSavedPresetFilterSet; // Is in @@object representation
+                modalBody = (
+                    <div>
+                        <h5 className="text-400 my-0">
+                            { valueTransforms.capitalize(modalOptionType) } FilterSet Created
+                        </h5>
+                        <a className="text-600 d-inline-block mb-16" href={lastSavedPresetID} target="_blank" rel="noopener noreferrer">{ lastSavedPresetTile }</a>
+                        <p className="mb-16">It may be some minutes before the preset is available to import.</p>
+                        <button type="button" className="btn btn-success btn-block" onClick={this.onHideModal}>
+                            OK
+                        </button>
+                    </div>
+                );
+            }
+            else if (loadingStatus === -1) {
+                // POST failed
+                modalBody = (
+                    <div>
+                        <h4 className="text-400 mt-0 mb-16">
+                            Failed to create preset FilterSet
+                        </h4>
+                        <p className="mb-16 mt-0">You may not have permission yet to create new FilterSets. Check back again later or report to developers.</p>
+                        <button type="button" className="btn btn-warning btn-block" onClick={this.onHideModal}>
+                            Close
+                        </button>
+                    </div>
+                );
+            }
+
+            modal = (
+                <Modal show onHide={this.onHideModal}>
+                    <Modal.Header closeButton>
+                        <Modal.Title className="text-400">
+                            Creating { modalOptionType } FilterSet for { modalOptionItemType }
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>{ modalBody }</Modal.Body>
+                </Modal>
+            );
+        }
+
         return (
             <React.Fragment>
 
-                { modalOptionItemType ? (
-                    <Modal show onHide={this.onHideModal}>
-                        <Modal.Header closeButton>
-                            <Modal.Title className="text-400">
-                                Creating { modalOptionType } FilterSet for { modalOptionItemType }
-                            </Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            { loadingStatus === 0 ?
-                                // POST not started
-                                <form onSubmit={this.onPresetFormSubmit} className="d-block">
-                                    <label htmlFor="new-preset-fs-id">Preset FilterSet Title</label>
-                                    <input id="new-preset-fs-id" type="text" placeholder={filterSetTitle + "..."} onChange={this.onPresetTitleInputChange} value={presetTitle} className="form-control mb-1" />
-                                    <button type="submit" className="btn btn-success" disabled={!presetTitle}>
-                                        Create
-                                    </button>
-                                </form>
-                                : loadingStatus === 1 ?
-                                    // Is POSTing
-                                    <div className="text-center py-4 text-larger">
-                                        <i className="icon icon-spin icon-circle-notch fas mt-1 mb-1" />
-                                    </div>
-                                    : loadingStatus === 2 ?
-                                    // POST succeeded
-                                        <div>
-                                            <h5 className="text-400 mt-0 mb-16">
-                                                { valueTransforms.capitalize(modalOptionType) } FilterSet Created
-                                            </h5>
-                                            <button type="button" className="btn btn-success btn-block" onClick={this.onHideModal}>
-                                                OK
-                                            </button>
-                                        </div>
-                                        : loadingStatus === -1 ?
-                                            // POST failed
-                                            <div>
-                                                <h4 className="text-400 mt-0 mb-16">
-                                                    Failed to create preset FilterSet
-                                                </h4>
-                                                <p className="mb-16 mt-0">You may not have permission yet to create new FilterSets. Check back again later or report to developers.</p>
-                                                <button type="button" className="btn btn-warning btn-block" onClick={this.onHideModal}>
-                                                    Close
-                                                </button>
-                                            </div>
-                                            : null}
-                        </Modal.Body>
-                    </Modal>
-                ) : null }
+                { modal }
 
                 <DropdownButton title={loadingStatus === 1 ? <i className="icon icon-circle-notch icon-spin fas"/> : "Save as..."}
                     variant="outline-light" size="sm" onSelect={this.onSelectPresetOption}
@@ -1135,13 +1378,74 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
     const {
         filterSet, filterBlocksLen, facetDict, schemas,
         singleSelectedFilterBlockIdx, selectedFilterBlockIndices, allFilterBlocksSelected, selectedFilterBlockIdxCount,
-        addNewFilterBlock, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
+        selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
         cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
-        intersectFilterBlocks = false, toggleIntersectFilterBlocks,
-        saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged
+        ...remainingProps // Contains: addNewFilterBlock, toggleIntersectFilterBlocks, intersectFilterBlocks, saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged,
     } = props;
     const { filter_blocks = [] } = filterSet || {};
     const { query: currentSingleBlockQuery = null } = (singleSelectedFilterBlockIdx !== null && filter_blocks[singleSelectedFilterBlockIdx]) || {};
+
+    const commonProps = {
+        facetDict, filterBlocksLen, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, isSettingFilterBlockIdx,
+        duplicateQueryIndices, duplicateNameIndices, cachedCounts, schemas
+    };
+
+
+    return (
+        <div className="blocks-container px-3 pb-16 pt-08">
+
+            { typeof selectFilterBlockIdx === "function" ?
+                // If selectFilterBlockIdx is not provided from FilterSetController, act as read-only view & don't show interaction-related elements.
+                <div className="row pb-06 small">
+                    <div className="col-12 pb-02 col-sm">
+                        { filterBlocksLen === 1 ? null
+                            : allFilterBlocksSelected ?
+                                "Click on a filter block to only search its query and/or edit its filters"
+                                : "Shift+Click to select an additional filter block"
+                        }
+                    </div>
+                    <div className="col-12 pb-02 col-sm text-sm-right">
+                        { (allFilterBlocksSelected ? "All" : selectedFilterBlockIdxCount + "/" + filterBlocksLen) + " filter blocks selected" }
+                    </div>
+                </div>
+                : null }
+
+            { filterBlocksLen > 0 ? filter_blocks.map(function(filterBlock, index){
+                const selected = allFilterBlocksSelected || selectedFilterBlockIndices[index];
+                return (
+                    <FilterBlock {...commonProps} {...{ filterBlock, index, selected }} key={index} />
+                );
+            }) : isFetchingInitialFilterSetItem ? (
+                <DummyLoadingFilterBlock/>
+            ) : (
+                <div className="py-3 px-3">
+                    <h4 className="text-400 text-center text-danger my-0">No Blocks Defined</h4>
+                </div>
+            ) }
+
+            <FilterSetUIBlockBottomUI {...remainingProps} {...{ selectFilterBlockIdx, allFilterBlocksSelected, filterBlocksLen, singleSelectedFilterBlockIdx, currentSingleBlockQuery }} />
+
+        </div>
+    );
+});
+
+function FilterSetUIBlockBottomUI(props){
+    const {
+        addNewFilterBlock,
+        selectFilterBlockIdx,
+        toggleIntersectFilterBlocks,
+        allFilterBlocksSelected,
+        filterBlocksLen,
+        singleSelectedFilterBlockIdx,
+        currentSingleBlockQuery,
+        saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged,
+        intersectFilterBlocks = false
+    } = props;
+
+    if (!saveFilterSet || !toggleIntersectFilterBlocks || !selectFilterBlockIdx) {
+        // No function(s) present from FilterSet Controller. Don't show this UI and act as read-only.
+        return null;
+    }
 
     function onAddBtnClick(e){
         e.stopPropagation();
@@ -1165,69 +1469,40 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         toggleIntersectFilterBlocks();
     }
 
-    const commonProps = {
-        facetDict, filterBlocksLen, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, isSettingFilterBlockIdx,
-        duplicateQueryIndices, duplicateNameIndices, cachedCounts, schemas
-    };
-
     return (
-        <div className="blocks-container px-3 pb-16 pt-12">
-            <div className="row pb-06 small">
-                <div className="col-12 pb-02 col-sm">
-                    { filterBlocksLen === 1 ? null
-                        : allFilterBlocksSelected ?
-                            "Click on a filter block to only search its query and/or edit its filters"
-                            : "Shift+Click to select an additional filter block"
-                    }
+        <div className="row">
+            <div className="col">
+                <div className="btn-group mr-08" role="group" aria-label="Selection Controls">
+                    <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
+                        <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
+                        Select All
+                    </button>
+                    <button type="button" className="btn btn-primary-dark" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
+                        data-tip="Toggle whether to compute the union or intersection of filter blocks">
+                        <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
+                        Intersect
+                    </button>
                 </div>
-                <div className="col-12 pb-02 col-sm text-sm-right">
-                    { (allFilterBlocksSelected ? "All" : selectedFilterBlockIdxCount + "/" + filterBlocksLen) + " filter blocks selected" }
-                </div>
+                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark">
+                    <i className="icon icon-save fas mr-07"/>
+                    Save FilterSet
+                </SaveFilterSetButton>
             </div>
-            { filterBlocksLen > 0 ? filter_blocks.map(function(fb, index){
-                const selected = allFilterBlocksSelected || selectedFilterBlockIndices[index];
-                return <FilterBlock {...commonProps} filterBlock={fb} index={index} key={index} selected={selected} />;
-            }) : isFetchingInitialFilterSetItem ? (
-                <DummyLoadingFilterBlock/>
-            ) : (
-                <div className="py-3 px-3">
-                    <h4 className="text-400 text-center text-danger my-0">No Blocks Defined</h4>
-                </div>
-            ) }
-            <div className="row">
-                <div className="col">
-                    <div className="btn-group mr-08" role="group" aria-label="Selection Controls">
-                        <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
-                            <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
-                            Select All
-                        </button>
-                        <button type="button" className="btn btn-primary-dark" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
-                            data-tip="Toggle whether to compute the union or intersection of filter blocks">
-                            <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
-                            Intersect
-                        </button>
-                    </div>
-                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark">
-                        <i className="icon icon-save fas mr-07"/>
-                        Save FilterSet
-                    </SaveFilterSetButton>
-                </div>
-                <div className="col-auto">
-                    <div className="btn-group" role="group" aria-label="Creation Controls">
-                        <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
-                            <i className="icon icon-fw icon-plus fas mr-1" />
-                            Add Filter Block
-                        </button>
-                        <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} disabled={!currentSingleBlockQuery}
-                            data-tip="Copy currently-selected filter block">
-                            <i className="icon icon-fw icon-clone far" />
-                        </button>
-                    </div>
+            <div className="col-auto">
+                <div className="btn-group" role="group" aria-label="Creation Controls">
+                    <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
+                        <i className="icon icon-fw icon-plus fas mr-1" />
+                        Add Filter Block
+                    </button>
+                    <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} disabled={!currentSingleBlockQuery}
+                        data-tip="Copy currently-selected filter block">
+                        <i className="icon icon-fw icon-clone far" />
+                    </button>
                 </div>
             </div>
         </div>
     );
-});
+}
 
 /** Shown temporarily while initial FilterSet is still loading */
 const DummyLoadingFilterBlock = React.memo(function DummyLoadingFilterBlock(){
@@ -1778,6 +2053,10 @@ export class FilterSetController extends React.PureComponent {
 
     static resetState(props){
         const { initialFilterSetItem, initialSelectedFilterBlockIndices = [] } = props;
+
+        // By default, all filter blocks are selected.
+        // TODO: Consider saving selectedFilterBlockIndices into FilterSet property/field,
+        // or, more likely, into localStorage.
         const selectedFilterBlockIndices = {};
         initialSelectedFilterBlockIndices.forEach(function(selectedIndx){
             // `selectedIndx` is cast to str when becomes key in `selectedFilterBlockIndices`.
@@ -1797,6 +2076,7 @@ export class FilterSetController extends React.PureComponent {
     constructor(props) {
         super(props);
         this.navigateToCurrentBlock = this.navigateToCurrentBlock.bind(this);
+        this.importFromPresetFilterSet = this.importFromPresetFilterSet.bind(this);
         // Throttled since usually don't want to add that many so fast..
         this.addNewFilterBlock = _.throttle(this.addNewFilterBlock.bind(this), 750, { trailing: false });
         // Throttled, but func itself throttles/prevents-update if still loading last-selected search results.
@@ -1847,6 +2127,10 @@ export class FilterSetController extends React.PureComponent {
             return;
         }
 
+    }
+
+    importFromPresetFilterSet(presetFilterSet){
+        console.log('Test', presetFilterSet);
     }
 
     addNewFilterBlock(newFilterBlock = null){
@@ -2098,12 +2382,13 @@ export class FilterSetController extends React.PureComponent {
             selectedFilterBlockIndices,
             cachedCounts,
             intersectFilterBlocks,
-            addNewFilterBlock: this.addNewFilterBlock,
-            removeFilterBlockAtIdx: this.removeFilterBlockAtIdx,
-            selectFilterBlockIdx: this.selectFilterBlockIdx,
-            setNameOfFilterBlockAtIdx: this.setNameOfFilterBlockAtIdx,
-            setTitleOfFilterSet: this.setTitleOfFilterSet,
-            toggleIntersectFilterBlocks: this.toggleIntersectFilterBlocks
+            "addNewFilterBlock": this.addNewFilterBlock,
+            "removeFilterBlockAtIdx": this.removeFilterBlockAtIdx,
+            "selectFilterBlockIdx": this.selectFilterBlockIdx,
+            "setNameOfFilterBlockAtIdx": this.setNameOfFilterBlockAtIdx,
+            "setTitleOfFilterSet": this.setTitleOfFilterSet,
+            "toggleIntersectFilterBlocks": this.toggleIntersectFilterBlocks,
+            "importFromPresetFilterSet": this.importFromPresetFilterSet
         };
 
         return React.Children.map(children, (child)=>{

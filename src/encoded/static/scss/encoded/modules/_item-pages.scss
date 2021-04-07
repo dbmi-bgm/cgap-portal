@@ -2285,24 +2285,95 @@ $download-button-width : 100px;
 	}
 }
 
-#case-info.filtering .embedded-search-view-outer-container {
-	.above-results-table-row {
-		margin-top: 16px;
-		padding-bottom: 16px;
+#case-info {
+
+	.embedded-search-view-outer-container {
+
+		// (Stylistic) increase whitespace around this components/elems
+		.above-results-table-row {
+			margin-top: 16px;
+			padding-bottom: 16px;
+		}
+
 	}
 }
 
 
+.filterset-preset-selection-outer-column {
+	/** Responsive styling copied over from .facet-column in _search.scss **/
+	/* (todo: maybe consider making it a mixin) */
 
+	@include navbar-static-position {
+		width: 100%;
+	}
+
+	@include navbar-fixed-position {
+		// Minus 20 from that of facet-column, given lack of padding.
+		width: 300px;
+	}
+
+	/** -- **/
+
+	.filterset-preset-selection-body {
+
+		/** Is located within the .filterset-outer-container **/
+		/* border-right: 1px solid #777; */
+		display: flex;
+		flex-direction: column;
+
+		.results-container {
+
+			flex-basis: 140px; /* <- Min height, essentially */
+			min-height: 140px;
+			flex-grow: 1;
+			flex-shrink: 1;
+
+			.preset-filterset-result {
+
+				background-color: #fff;
+				border-bottom: 1px solid #ddd;
+
+				.title {
+					height: 36px;
+					padding-top: 8px;
+					display: flex;
+					align-items: center;
+
+					.title-icon-container {
+						color: $secondary;
+						&:hover {
+							color: $primary-dark;
+						}
+					}
+
+				}
+
+				.info {
+					height: 36px;
+					display: flex;
+					align-items: center;
+
+					.count-indicator-wrapper {
+						svg circle {
+							fill: #999;
+						}
+					}
+				}
+
+			}
+		}
+	}
+}
 
 .filterset-outer-container {
 	// TODO CHANGE
 	// border: 1px solid #999;
 	/* background-color: desaturate(lighten($primary-dark, 45%), 30%); */ // #b4c8d8; // $gray-300;
-	background-color: #dedede;
+
+	// background-color: #dedede;
 	border-radius: $border-radius-lg;
-	border: 4px solid transparent;
-	transition: background-color .5s ease-out;
+	// border: 4px solid transparent;
+	// transition: background-color .5s ease-out;
 
 	h4 i.icon.clickable {
 		@include clickable-hoverable-icon;
@@ -2312,9 +2383,10 @@ $download-button-width : 100px;
 
 	.filter-set-ui-header {
 		/** Header **/
-		/** Margins are negatively offset from parent elem's border - tho maybe dif layouting in future to be adopted **/
-		margin: -4px;
+		/* Looks nice, enough to accomodate Save | Save As buttons, and gives us a concrete number to match FS preset selection UI header height to. */
+		min-height: 65px;
 		background-color: $primary-dark;
+		color: #fff;
 		h4 {
 			color: #fff;
 		}
@@ -2327,6 +2399,7 @@ $download-button-width : 100px;
 			border-radius: inherit;
 		}
 	}
+
 
 	.blocks-container {
 
@@ -2342,7 +2415,8 @@ $download-button-width : 100px;
 			// margin: 0 -3px; /* Subtract border-width to align left + right unselected edges properly w. other UI elements */
 			/* transition: border-color .5s, background-color .5s; */
 
-			transition: background-color .5s ease-out;
+			/* Disabled for now - sometimes can be slow: */
+			/* transition: background-color .5s ease-out; */
 
 
 			/* box-shadow: 0 1px 6px -3px black; */
@@ -2467,30 +2541,64 @@ $download-button-width : 100px;
 
 	}
 
-	&[data-all-selected="true"] {
-		border-color: $primary-dark;
-		background-color: desaturate(lighten($primary-dark, 40%), 25%);
-		.blocks-container {
+	.filterset-blocks-container {
 
-		 	.filterset-block.selected {
-		 		border-width: 1px;
-				padding: 2px;
-				border-radius: $border-radius-lg;
-				border-color: desaturate(lighten($primary-dark, 15%), 25%);;
-			}
+		background-color: #dedede;
+		// border-radius: $border-radius-lg;
+		border: 4px solid transparent;
+		border-top: none;
+		transition: background-color .4s .1s ease-in;
 
-			&:hover {
-				.filterset-block.clickable.selected {
-					&:hover {
-						border-width: 2px;
-						padding: 1px;
-						border-radius: $border-radius-lg + 1px;
-						border-color: $primary-dark;
+		&[data-all-selected="true"] {
+			border-color: $primary-dark;
+			background-color: desaturate(lighten($primary-dark, 40%), 25%);
+			.blocks-container {
+	
+				 .filterset-block.selected {
+					 border-width: 1px;
+					padding: 2px;
+					border-radius: $border-radius-lg;
+					border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+				}
+	
+				&:hover {
+					.filterset-block.clickable.selected {
+						&:hover {
+							border-width: 2px;
+							padding: 1px;
+							border-radius: $border-radius-lg + 1px;
+							border-color: $primary-dark;
+						}
 					}
 				}
 			}
 		}
 	}
+
+	// &[data-all-selected="true"] {
+	// 	border-color: $primary-dark;
+	// 	background-color: desaturate(lighten($primary-dark, 40%), 25%);
+	// 	.blocks-container {
+
+	// 	 	.filterset-block.selected {
+	// 	 		border-width: 1px;
+	// 			padding: 2px;
+	// 			border-radius: $border-radius-lg;
+	// 			border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+	// 		}
+
+	// 		&:hover {
+	// 			.filterset-block.clickable.selected {
+	// 				&:hover {
+	// 					border-width: 2px;
+	// 					padding: 1px;
+	// 					border-radius: $border-radius-lg + 1px;
+	// 					border-color: $primary-dark;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 }
 

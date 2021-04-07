@@ -76,9 +76,10 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     const {
         context = null,
-        windowHeight,
         session = false,
         schemas,
+        windowHeight,
+        windowWidth,
         onCancelSelection,          // Not used -- passed in from SelectedItemsController and would close window.
         onCompleteSelection,        // Not used -- passed in from SelectedItemsController and would send selected items back to parent window.
         selectedItems,              // passed in from SelectedItemsController
@@ -160,7 +161,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedItems there.
     const fsuiProps = {
-        schemas,
+        schemas, session,
         variantSampleListItem,
         updateVariantSampleListID,
         refreshExistingVariantSampleListItem,
