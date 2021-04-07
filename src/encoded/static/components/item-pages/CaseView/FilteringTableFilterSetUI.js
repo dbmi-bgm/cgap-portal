@@ -288,11 +288,6 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                     <h1 className="col my-0">
                         <span className="text-300">Variant Filtering and Technical Review</span>
                     </h1>
-                    { selectedItems instanceof Map ?
-                        <div className="col-auto">
-                            <AddToVariantSampleListButton {...{ selectedItems, onResetSelectedItems, variantSampleListItem, updateVariantSampleListID, refreshExistingVariantSampleListItem, caseItem, filterSet, selectedFilterBlockIndices }} />
-                        </div>
-                        : null }
                 </div>
 
                 <div className="above-variantsample-table-ui">
@@ -320,6 +315,11 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                                     ) }
                             </span>
                         </h4>
+                        { selectedItems instanceof Map ?
+                            <div className="col-auto pr-06">
+                                <AddToVariantSampleListButton {...{ selectedItems, onResetSelectedItems, variantSampleListItem, updateVariantSampleListID, refreshExistingVariantSampleListItem, caseItem, filterSet, selectedFilterBlockIndices }} />
+                            </div>
+                            : null }
                     </AboveTableControlsBase>
                 </div>
 
@@ -388,6 +388,8 @@ function AddToVariantSampleListButton(props){
             });
         }
 
+        let requestPromiseChain;
+
 
         if (!variantSampleListItem) {
             // Create new Item, then PATCH its @id to `Case.variant_sample_list_id` field.
@@ -396,60 +398,47 @@ function AddToVariantSampleListButton(props){
                 "institution": caseInstitutionID,
                 "project": caseProjectID
             };
+
             if (caseAccession) {
                 createVSLPayload.created_for_case = caseAccession;
             }
 
             addToSelectionsList(createVSLPayload.variant_samples);
 
-            ajax.promise(
-                "/variant-sample-lists/",
-                "POST",
-                {},
-                JSON.stringify(createVSLPayload)
-            ).then(function(respVSL){
-                console.log('respVSL', respVSL);
-                const {
-                    "@graph": [{
-                        "@id": vslAtID
-                    }],
-                    error: vslError
-                } = respVSL;
+            requestPromiseChain = ajax.promise("/variant-sample-lists/", "POST", {}, JSON.stringify(createVSLPayload))
+                .then(function(respVSL){
+                    console.log('respVSL', respVSL);
+                    const {
+                        "@graph": [{
+                            "@id": vslAtID
+                        }],
+                        error: vslError
+                    } = respVSL;
 
-                if (vslError || !vslAtID) {
-                    console.error(respVSL);
-                    throw new Error("Didn't succeed in creating new VSL Item");
-                }
+                    if (vslError || !vslAtID) {
+                        throw new Error("Didn't succeed in creating new VSL Item");
+                    }
 
-                onResetSelectedItems();
-                updateVariantSampleListID(vslAtID);
+                    onResetSelectedItems();
+                    updateVariantSampleListID(vslAtID);
 
-                return ajax.promise(
-                    caseAtID,
-                    "PATCH",
-                    {},
-                    JSON.stringify({ "variant_sample_list_id": vslAtID })
-                );
-            }).then(function(respCase){
-                console.log('respVSL', respCase);
-                const {
-                    "@graph": [{
-                        "@id": respCaseAtID
-                    }],
-                    error: caseError
-                } = respCase;
-                if (caseError || !respCaseAtID) {
-                    console.error(respCase);
-                    throw new Error("Didn't succeed in PATCHing Case Item");
-                }
-                console.info("Updated Case.variant_sample_list_id", respCase);
+                    // PATCH Case w. variant_sample_list_id
+                    return ajax.promise(caseAtID, "PATCH", {}, JSON.stringify({ "variant_sample_list_id": vslAtID }));
+                }).then(function(respCase){
+                    console.log('respCase', respCase);
+                    const {
+                        "@graph": [{
+                            "@id": respCaseAtID
+                        }],
+                        error: caseError
+                    } = respCase;
+                    if (caseError || !respCaseAtID) {
+                        throw new Error("Didn't succeed in PATCHing Case Item");
+                    }
+                    console.info("Updated Case.variant_sample_list_id", respCase);
 
-                // TODO Maybe local-patch in-redux-store Case with new last_modified + variant_sample_list_id stuff? Idk.
-            }).catch(function(error){
-                console.error(error);
-            }).finally(function(){
-                setIsLoading(false);
-            });
+                    // TODO Maybe local-patch in-redux-store Case with new last_modified + variant_sample_list_id stuff? Idk.
+                });
 
         } else {
             // patch existing
@@ -472,36 +461,41 @@ function AddToVariantSampleListButton(props){
             // Add in new selections
             addToSelectionsList(patchVSLPayload.variant_samples);
 
-            ajax.promise(
-                vslAtID,
-                "PATCH",
-                {},
-                JSON.stringify(patchVSLPayload)
-            ).then(function(respVSL){
-                console.log('respVSL', respVSL);
-                const {
-                    "@graph": [{
-                        "@id": vslAtID
-                    }],
-                    error: vslError
-                } = respVSL;
+            requestPromiseChain = ajax.promise(vslAtID, "PATCH", {}, JSON.stringify(patchVSLPayload) )
+                .then(function(respVSL){
+                    console.log('respVSL', respVSL);
+                    const {
+                        "@graph": [{
+                            "@id": vslAtID
+                        }],
+                        error: vslError
+                    } = respVSL;
 
-                if (vslError || !vslAtID) {
-                    console.error(respVSL);
-                    throw new Error("Didn't succeed in patching VSL Item");
-                }
+                    if (vslError || !vslAtID) {
+                        throw new Error("Didn't succeed in patching VSL Item");
+                    }
 
-                onResetSelectedItems();
-                refreshExistingVariantSampleListItem();
-            }).catch(function(error){
-                console.error(error);
-            }).finally(function(){
-                setIsLoading(false);
-            });
+                    onResetSelectedItems();
+                    refreshExistingVariantSampleListItem();
+                });
 
             // We shouldn't have any duplicates since prev-selected VSes should appear as checked+disabled in table.
             // But maybe should still check to be safer (todo later)
         }
+
+
+        // Show any errors using an alert and unset isLoading state on completion.
+        requestPromiseChain.catch(function(error){
+            // TODO: add analytics exception event for this
+            console.error(error);
+            Alerts.queue({
+                "title" : "Error PATCHing or POSTing VariantSampleList",
+                "message" : JSON.stringify(err),
+                "style" : "danger"
+            });
+        }).finally(function(){
+            setIsLoading(false);
+        });
 
     };
 
@@ -509,7 +503,7 @@ function AddToVariantSampleListButton(props){
     return (
         <button type="button" className="btn btn-primary" disabled={isLoading || selectedItems.size === 0} onClick={onButtonClick}>
             { isLoading ? <i className="icon icon-circle-notch icon-spin fas mr-1"/> : null }
-            Add { selectedItems.size } Variant Samples to Interpretation Tab
+            Add <strong>{ selectedItems.size }</strong> selected Variant Samples to Interpretation
         </button>
     );
 }
@@ -877,7 +871,7 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
             originalPresetFilterSet: null,
             // Stored after POSTing new FilterSet to allow to prevent immediate re-submits.
             lastSavedPresetFilterSet: null,
-            loadingStatus: 0 // 0 = not loading; 1 = loading; 2 = load succeeded.
+            loadingStatus: 0 // 0 = not loading; 1 = loading; 2 = load succeeded; -1 = load failed.
         };
 
         this.memoized = {
@@ -1009,7 +1003,13 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
                         "loadingStatus": 2,
                         "lastSavedPresetFilterSet": newPresetFilterSetItem
                     });
+                })
+                .catch((err)=>{
+                    // TODO: Add analytics.
+                    console.error("Error POSTing new preset FilterSet", err);
+                    this.setState({ "loadingStatus" : -1 });
                 });
+
         });
 
         return false;
@@ -1069,6 +1069,7 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
                         </Modal.Header>
                         <Modal.Body>
                             { loadingStatus === 0 ?
+                                // POST not started
                                 <form onSubmit={this.onPresetFormSubmit} className="d-block">
                                     <label htmlFor="new-preset-fs-id">Preset FilterSet Title</label>
                                     <input id="new-preset-fs-id" type="text" placeholder={filterSetTitle + "..."} onChange={this.onPresetTitleInputChange} value={presetTitle} className="form-control mb-1" />
@@ -1077,10 +1078,12 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
                                     </button>
                                 </form>
                                 : loadingStatus === 1 ?
+                                    // Is POSTing
                                     <div className="text-center py-4 text-larger">
                                         <i className="icon icon-spin icon-circle-notch fas mt-1 mb-1" />
                                     </div>
                                     : loadingStatus === 2 ?
+                                    // POST succeeded
                                         <div>
                                             <h5 className="text-400 mt-0 mb-16">
                                                 { valueTransforms.capitalize(modalOptionType) } FilterSet Created
@@ -1089,7 +1092,18 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
                                                 OK
                                             </button>
                                         </div>
-                                        : null }
+                                        : loadingStatus === -1 ?
+                                            // POST failed
+                                            <div>
+                                                <h4 className="text-400 mt-0 mb-16">
+                                                    Failed to create preset FilterSet
+                                                </h4>
+                                                <p className="mb-16 mt-0">You may not have permission yet to create new FilterSets. Check back again later or report to developers.</p>
+                                                <button type="button" className="btn btn-warning btn-block" onClick={this.onHideModal}>
+                                                    Close
+                                                </button>
+                                            </div>
+                                            : null}
                         </Modal.Body>
                     </Modal>
                 ) : null }
