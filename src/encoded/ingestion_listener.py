@@ -510,7 +510,16 @@ class IngestionListener:
                 variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
                                                  project=file_meta['project']['@id'],
                                                  institution=file_meta['institution']['@id'])
-                success, error = variant_builder.ingest_vcf()
+                try:
+                    success, error = variant_builder.ingest_vcf()
+                except Exception as e:
+                    # if exception caught here, we encountered an error reading the actual
+                    # VCF - this should not happen but can in certain circumstances. In this
+                    # case we need to patch error status and discard the current message.
+                    log.error('Caught error in VCF processing in ingestion listener: %s' % e)
+                    self.set_status(uuid, STATUS_ERROR)
+                    discard(message)
+                    continue
 
                 # report results in error_log regardless of status
                 msg = variant_builder.ingestion_report.brief_summary()
