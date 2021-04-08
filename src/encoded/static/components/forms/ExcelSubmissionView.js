@@ -576,7 +576,13 @@ class PanelTwo extends React.PureComponent {
                     <div className="d-flex">
                         <div className="col">
                             <h4 className="text-300 mt-2">Successfully processed file.</h4>
-                            <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span>
+                            { ingestionType === "genelist" ?
+                                <>
+                                    <span className="text-300 text-large">
+                                        Variants should begin updating shortly, but may take a few hours depending on server load.
+                                    </span>
+                                </>
+                                : <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span>}
                         </div>
                         <div className="align-self-end">
                             <button type="button" className="btn btn-success" onClick={handleComplete}>
@@ -590,15 +596,6 @@ class PanelTwo extends React.PureComponent {
                             <span className="pl-1">Results:</span>
                             <CreatedItemsTable aliasToAtIDMap={aliases} />
                         </>)}
-
-                    { ingestionType === "genelist" ?
-                        <>
-                            <hr/>
-                            <ul>
-                                {post_output.map((item) => <li key="item">{item}</li>)}
-                            </ul>
-                        </>
-                        : null}
                 </React.Fragment>
             );
         }
