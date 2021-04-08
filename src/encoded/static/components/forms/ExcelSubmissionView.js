@@ -559,7 +559,7 @@ class PanelTwo extends React.PureComponent {
                             <i className="icon icon-info-circle fas icon-fw ml-05"
                                 data-tip="Select & upload files generated in Proband and other pedigree software" />
                         </label>
-                        <AttachmentInputController href={href} context={submissionItem} onAddedFile={this.onAddedFile}>
+                        <AttachmentInputController {...{ ingestionType, href }} context={submissionItem} onAddedFile={this.onAddedFile}>
                             <FileAttachmentBtn/>
                         </AttachmentInputController>
                     </div>
@@ -736,17 +736,23 @@ function Poller(props){
 }
 
 function FileAttachmentBtn(props){
-    const { loadingFileResult, postFileSuccess, onFileInputChange } = props;
+    const { loadingFileResult, postFileSuccess, onFileInputChange, ingestionType } = props;
     const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
+
+    let acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
+    if (ingestionType === "genelist") {
+        acceptedTypes += ", .txt";
+    }
+
     return (
         <React.Fragment>
             <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
                 className={"btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
                 <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
                     disabled={loadingFileResult || postFileSuccess === true}
-                    accept=".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                    accept={acceptedTypes} />
                 <i className={"mr-08 icon icon-fw icon-" + icon} />
-                <span>Select Excel File...</span>
+                <span>{ ingestionType === "metadata_bundle" ? "Select Excel File..." : "Select Excel or Text File..." }</span>
             </label>
             { !loadingFileResult && postFileSuccess ? <span className="ml-1 text-success">Success! <i className="icon icon-check fas"></i></span> : null}
             { !loadingFileResult && postFileSuccess === false ? <span className="ml-1 text-danger">Failure! <i className="icon icon-times-circle fas"></i></span> : null}
