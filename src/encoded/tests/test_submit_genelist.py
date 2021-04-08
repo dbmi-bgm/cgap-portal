@@ -20,7 +20,7 @@ def wb_institution(es_testapp, workbook):
 
 class TestGeneListSubmission:
     def test_genelist_endpoint(
-            self, testapp, bgm_project, bgm_access_key, institution
+        self, testapp, bgm_project, bgm_access_key, institution
     ):
         """
         Test for valid posting to genelist endpoint via ingestion listener.
@@ -37,14 +37,14 @@ class TestGeneListSubmission:
             "Accept": "application/json",
             "Authorization": basic_auth(
                 bgm_access_key["access_key_id"],
-                bgm_access_key["secret_access_key"]
-            )
+                bgm_access_key["secret_access_key"],
+            ),
         }
         creation_response = testapp.post_json(
             creation_post_url,
             creation_post_data,
             headers=creation_post_headers,
-            status=201
+            status=201,
         ).json
         submission_id = creation_response["@graph"][0]["@id"]
         submission_post_url = submission_id + "submit_for_ingestion"
@@ -52,7 +52,7 @@ class TestGeneListSubmission:
         submission_post_headers = {
             "Authorization": basic_auth(
                 bgm_access_key["access_key_id"],
-                bgm_access_key["secret_access_key"]
+                bgm_access_key["secret_access_key"],
             )
         }
         upload_file = [
@@ -67,19 +67,21 @@ class TestGeneListSubmission:
             submission_post_data,
             upload_files=upload_file,
             headers=submission_post_headers,
-            status=200
+            status=200,
         ).json
         assert creation_response["status"] == "success"
         assert submission_response["success"]
 
-    def test_normal_genelist(self, es_testapp, workbook, project, wb_institution):
+    def test_normal_genelist(
+        self, es_testapp, workbook, project, wb_institution
+    ):
         """
         Tests for full gene list functionality given gene list with all genes
         identifiable in the database.
         """
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
-            "DRR_test-parse_gene_list.txt",
+            "test-parse_gene_list.txt",
             project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -103,7 +105,25 @@ class TestGeneListSubmission:
         """
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
-            "DRR_test-empty_gene_list.txt",
+            "test-empty_gene_list.txt",
+            project["@id"],
+            wb_institution["@id"],
+            es_testapp,
+        )
+        assert not genelist.title
+        assert not genelist.genes
+        assert genelist.errors
+
+    def test_parse_empty_genelist_excel(
+        self, es_testapp, workbook, project, wb_institution
+    ):
+        """
+        Tests for correct detection of no title and no genes provided when
+        given an excel gene list.
+        """
+        genelist = GeneListSubmission(
+            "src/encoded/tests/data/documents/gene_lists/"
+            "test_empty_gene_list.xlsx",
             project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -121,14 +141,16 @@ class TestGeneListSubmission:
         """
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
-            "DRR_test-match_gene_list.txt",
+            "test-match_gene_list.txt",
             project["@id"],
             wb_institution["@id"],
             es_testapp,
         )
         assert len(genelist.gene_ids) == 3
 
-    def test_no_match_genes(self, es_testapp, workbook, project, wb_institution):
+    def test_no_match_genes(
+        self, es_testapp, workbook, project, wb_institution
+    ):
         """
         Ensure genes that don't match any existing genes are identified and
         possible alternative genes are provided, if applicable. Also, no
@@ -136,7 +158,7 @@ class TestGeneListSubmission:
         """
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
-            "DRR_test-no-match_gene_list.txt",
+            "test-no-match_gene_list.txt",
             project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -154,7 +176,7 @@ class TestGeneListSubmission:
         """
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
-            "DRR_test-no-match_gene_list.txt",
+            "test-no-match_gene_list.txt",
             project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -162,7 +184,9 @@ class TestGeneListSubmission:
         assert genelist.validation_output
         assert not genelist.post_output
 
-    def test_existing_title(self, es_testapp, workbook, project, wb_institution):
+    def test_existing_title(
+        self, es_testapp, workbook, project, wb_institution
+    ):
         """
         Ensure gene list and document are patched if attempting to submit gene
         list with title identical to the title of a previously created gene
@@ -170,7 +194,7 @@ class TestGeneListSubmission:
         """
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
-            "DRR_test-previous-title_gene_list.txt",
+            "test-previous-title_gene_list.txt",
             project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -184,7 +208,7 @@ class TestGeneListSubmission:
         """
         genelist = GeneListSubmission(
             "src/encoded/tests/data/documents/gene_lists/"
-            "DRR_test-match_gene_list.xlsx",
+            "test-match_gene_list.xlsx",
             project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -194,13 +218,15 @@ class TestGeneListSubmission:
 
 
 class TestVariantUpdateSubmission:
-    def test_variant_update(self, es_testapp, workbook, project, wb_institution):
+    def test_variant_update(
+        self, es_testapp, workbook, project, wb_institution
+    ):
         """
         Ensure variant_update ingestion class parses file of input gene uuids
         and queues associated variant samples for indexing.
         """
         variant_update = VariantUpdateSubmission(
-            "src/encoded/tests/data/documents/" "DRR_test-variant-update.txt",
+            "src/encoded/tests/data/documents/test-variant-update.txt",
             project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -213,7 +239,7 @@ class TestVariantUpdateSubmission:
         assert not variant_update.errors
 
     def test_variant_update_endpoint(
-            self, testapp, bgm_project, bgm_access_key, institution
+        self, testapp, bgm_project, bgm_access_key, institution
     ):
         """
         Test for valid posting to variant_endpoint endpoint via ingestion listener.
@@ -230,14 +256,14 @@ class TestVariantUpdateSubmission:
             "Accept": "application/json",
             "Authorization": basic_auth(
                 bgm_access_key["access_key_id"],
-                bgm_access_key["secret_access_key"]
-            )
+                bgm_access_key["secret_access_key"],
+            ),
         }
         creation_response = testapp.post_json(
             creation_post_url,
             creation_post_data,
             headers=creation_post_headers,
-            status=201
+            status=201,
         ).json
         submission_id = creation_response["@graph"][0]["@id"]
         submission_post_url = submission_id + "submit_for_ingestion"
@@ -245,7 +271,7 @@ class TestVariantUpdateSubmission:
         submission_post_headers = {
             "Authorization": basic_auth(
                 bgm_access_key["access_key_id"],
-                bgm_access_key["secret_access_key"]
+                bgm_access_key["secret_access_key"],
             )
         }
         upload_file = [
@@ -260,7 +286,7 @@ class TestVariantUpdateSubmission:
             submission_post_data,
             upload_files=upload_file,
             headers=submission_post_headers,
-            status=200
+            status=200,
         ).json
         assert creation_response["status"] == "success"
         assert submission_response["success"]
