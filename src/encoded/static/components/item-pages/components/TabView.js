@@ -236,24 +236,31 @@ export class TabView extends React.PureComponent {
         this.setState({ 'currentTabKey' : nextKey });
     }
 
+    /**
+     * Returns null if on same tab as href.
+     * @todo Maybe consider moving that ^.
+     */
     getTabByHref(){
         const { contents, href } = this.props;
-        const hrefParts = memoizedUrlParse(href);
-        const hash = typeof hrefParts.hash === 'string' && hrefParts.hash.length > 0 && hrefParts.hash.slice(1);
+        const { hash } = memoizedUrlParse(href);
         const currKey = this.getActiveKey();
 
-        if (currKey === hash){
+        let firstHashPart = null;
+        if (typeof hash === "string" && hash.length > 1) {
+            [ firstHashPart ] = hash.slice(1).split(".");
+        }
+
+        if (currKey === firstHashPart){
             return null;
         }
 
-        const allContentObjs = hash && TabView.combineSystemAndCustomTabs(this.additionalTabs(), contents);
-        const foundContent = Array.isArray(allContentObjs) && _.findWhere(allContentObjs, { 'key' : hash });
+        const allContentObjs = (hash && TabView.combineSystemAndCustomTabs(this.additionalTabs(), contents)) || [];
+        const foundContent = allContentObjs.find(function({ key }){
+            const [ keyFirstHashPart ] = key.split(".");
+            return firstHashPart === keyFirstHashPart;
+        });
 
-        if (!foundContent){
-            return null;
-        }
-
-        return foundContent;
+        return foundContent || null;
     }
 
     maybeSwitchTabAccordingToHref(){
