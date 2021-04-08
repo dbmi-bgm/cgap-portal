@@ -9,7 +9,7 @@ import ReactTooltip from 'react-tooltip';
 import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 
-import { console, ajax, JWT, navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, JWT, navigate, object, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { LinkToDropdown } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/LinkToDropdown';
@@ -253,9 +253,12 @@ class PanelOne extends React.PureComponent {
         this.handleCreate = this.handleCreate.bind(this);
         this.handleSelectSubmissionType = this.handleSelectSubmissionType.bind(this);
 
+        const { href } = props;
+        const { query: { submissionType = null } = {} } = memoizedUrlParse(href);
+
         this.state = {
             selectingField: null,
-            submissionType: null,
+            submissionType: (submissionType && _.contains(["Accessioning", "Gene List"], submissionType) ? submissionType : null),
             error: null,
             isCreating: false,
             ...PanelOne.flatFieldsFromUser(props.user)
