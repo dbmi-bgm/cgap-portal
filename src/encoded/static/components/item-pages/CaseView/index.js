@@ -299,7 +299,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         </SelectedItemsController>
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled={vsSelections.length === 0} cache={false}>
-                        <InterpretationTab {...{ variantSampleListItem, schemas }} />
+                        <InterpretationTab {...{ variantSampleListItem, schemas, caseAccession }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
                         <ReportingTab {...props} />

@@ -2070,6 +2070,19 @@ $download-button-width : 100px;
 				}
 			}
 
+			/* Interpretation styles*/
+			&#case-info\.interpretation {
+				.card-header.section-header {
+					background-color: $primary-dark;
+					font-weight: 400;
+					margin: 0; /* overrides the default `margin: 10px 0` of header (h1, h2, ..) elems */
+					
+					a:hover > div.title-block > span {
+						text-decoration: underline;
+					}
+				}
+			}
+
 			h2 {
 				font-size: 1.5rem;
 				font-weight: 400;
@@ -2900,7 +2913,7 @@ $download-button-width : 100px;
 				}
 
 				.dropdown.btn-group {
-					width: 100%;
+					flex-grow: 1;
 				}
 			}
 		}

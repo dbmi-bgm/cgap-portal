@@ -104,7 +104,7 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, href } = this.props;
+        const { context, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
 
@@ -114,8 +114,6 @@ export class VariantSampleOverview extends React.PureComponent {
             interpretationTab = null,       // used only if one of "Variant Notes", "Gene Notes", "Interpretation"
             caseSource = null
         } } = memoizedUrlParse(href);
-
-        console.log("hrefParts", showInterpretation, annotationTab, interpretationTab, caseSource);
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
@@ -127,7 +125,7 @@ export class VariantSampleOverview extends React.PureComponent {
                     </div>
                     { showInterpretation == 'True' ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource }}/>
+                            <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}/>
                         </div> : null
                     }
                 </div>
@@ -156,8 +154,8 @@ function getCurrentTranscriptGeneID(context, transcriptIndex){
 class VariantSampleOverviewTabView extends React.PureComponent {
 
     static tabNames = [
-        "Variant",
         "Gene",
+        "Variant",
         "Sample",
         "Annotation Browser",
         "BAM File Browser"
@@ -168,7 +166,7 @@ class VariantSampleOverviewTabView extends React.PureComponent {
         const { defaultTab = null } = props;
         this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
         this.state = {
-            "currentTab" : defaultTab < 5 ? defaultTab : 0 // Validate that is 0-5
+            "currentTab" : defaultTab < 5 ? defaultTab : 1 // Validate that is 0-5
         };
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
@@ -220,10 +218,10 @@ class VariantSampleOverviewTabView extends React.PureComponent {
                 const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
                 switch (index) {
                     case 0:
-                        tabBodyElements.push(<VariantTabBody {...commonBodyProps} {...{ currentTranscriptIdx }} />);
+                        tabBodyElements.push(<GeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
                         break;
                     case 1:
-                        tabBodyElements.push(<GeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
+                        tabBodyElements.push(<VariantTabBody {...commonBodyProps} {...{ currentTranscriptIdx }} />);
                         break;
                     case 2:
                         tabBodyElements.push(<SampleTabBody {...commonBodyProps} />);

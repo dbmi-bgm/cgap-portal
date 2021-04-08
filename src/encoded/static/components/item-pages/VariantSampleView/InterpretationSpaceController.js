@@ -10,10 +10,9 @@ import Button from 'react-bootstrap/esm/Button';
 import Modal from 'react-bootstrap/esm/Modal';
 import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, layout, JWT, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, navigate, layout, JWT, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-
 /**
  * Stores and manages global note state for interpretation space.
  */
@@ -145,8 +144,13 @@ export class InterpretationSpaceWrapper extends React.Component {
                         this.setState({ loading: false, [stateFieldToUpdate]: noteWithEmbeds });
                     })
                     .catch((err) => {
-                        // TODO: Error handling/alerting
+                        const { error: { message = null } = {} } = err || {};
                         console.log(err);
+                        Alerts.queue({
+                            title: "Error: Something went wrong while patching.",
+                            message: message || "Your changes may not be saved.",
+                            style: "danger"
+                        });
                         this.setState({ loading: false });
                     });
             });
@@ -196,16 +200,46 @@ export class InterpretationSpaceWrapper extends React.Component {
     }
 
     render() {
-        const { defaultTab } = this.props;
+        const { defaultTab, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const { variant_notes, gene_notes, interpretation } = this.state;
         return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
             lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation}
-            saveAsDraft={this.saveAsDraft} {...{ defaultTab }} />;
+            saveAsDraft={this.saveAsDraft} />;
     }
 }
 
 
 export class InterpretationSpaceController extends React.Component {
+
+    static hasNoteChanged(lastSavedNote = null, currNote = null) {
+        if (lastSavedNote === null && currNote === null) {
+            return false;
+        }
+
+        // Manually compare classification & note text (not added to embed if not present, which can confuse _'s comparisons)
+        // TODO: Figure out a way to use _.isMatch/_.isEqual for future versions. Kicking this can down the road slightly.
+        const {
+            classification: lastSavedClassification = null,
+            note_text: lastSavedNoteText = ""
+        } = lastSavedNote || {};
+        const {
+            classification: currClassification = null,
+            note_text: currNoteText = ""
+        } = currNote || {};
+
+        if (currClassification !== lastSavedClassification) {
+            // console.log("classifications do not match:", currClassification, lastSavedClassification);
+            return true;
+        }
+
+        if (lastSavedNoteText !== currNoteText) {
+            // console.log("text does not match");
+            return true;
+        }
+
+        return false;
+    }
+
     constructor(props) {
         super(props);
         const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation, defaultTab } = props;
@@ -224,6 +258,10 @@ export class InterpretationSpaceController extends React.Component {
         this.toggleExpanded = this.toggleExpanded.bind(this);
         this.switchToTab = this.switchToTab.bind(this);
         this.retainWIPStateOnUnmount = this.retainWIPStateOnUnmount.bind(this);
+
+        this.memoized = {
+            hasNoteChanged: memoize(InterpretationSpaceController.hasNoteChanged)
+        };
     }
 
     retainWIPStateOnUnmount(note, state) {
@@ -251,22 +289,46 @@ export class InterpretationSpaceController extends React.Component {
         }
     }
 
+    componentWillUnmount() {
+        const { setIsSubmitting } = this.props;
+        setIsSubmitting(false, null, false);
+    }
+
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip } = this.state;
         const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
 
-        const passProps = _.pick(this.props, 'saveAsDraft', 'schemas');
+        const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
+
+        const isDraftVariantNoteUnsaved = this.memoized.hasNoteChanged(variant_notes_wip, lastSavedVariantNote);
+        const isDraftGeneNoteUnsaved = this.memoized.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
+        const isDraftInterpretationUnsaved = this.memoized.hasNoteChanged(interpretation_wip, lastSavedInterpretation);
 
         let panelToDisplay = null;
         switch(currentTab) {
             case "Variant Notes":
-                panelToDisplay = <GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab} key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }/>;
+                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
+                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab}
+                    key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged}
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved} />
+                );
                 break;
             case "Gene Notes":
-                panelToDisplay = <GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab} key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }/>;
+                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
+                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab}
+                    key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged}
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved} />
+                );
                 break;
             case "Interpretation":
-                panelToDisplay = <GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab} key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }/>;
+                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
+                    lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab}
+                    key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged}
+                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved} />
+                );
                 break;
             default:
                 break;
@@ -287,7 +349,7 @@ function InterpretationSpaceHeader(props) { // Expanded items commented out unti
     const { toggleExpanded, isExpanded } = props;
     return (
         <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
-            <i className="icon icon-sort-amount-down fas"></i>
+            <i className="icon icon-poll-h fas"></i>
             Variant Interpretation
             <button type="button" className="btn btn-link" onClick={toggleExpanded || undefined} style={{ visibility: "hidden" }}>
                 { isExpanded ? <i className="icon icon-compress fas"></i> : <i className="icon icon-expand fas"></i> }
@@ -321,24 +383,6 @@ function InterpretationSpaceTabs(props) {
 }
 
 class GenericInterpretationPanel extends React.Component {
-    static hasNoteChanged(lastSavedNote = null, currNote = null) {
-        const fieldsToCompare = ["note_text", "acmg_guidelines", "classification", "conclusion"];
-
-        const blankNote = { note_text: "", acmg_guidelines: [], classification: null, conclusion:  "" };
-
-        if (!lastSavedNote) { // Compare against blank note if lastSavedNote is null
-            return !_.isMatch(
-                _.pick(currNote, ...fieldsToCompare),
-                _.pick(blankNote, ...fieldsToCompare)
-            );
-        }
-
-        return !_.isMatch(
-            _.pick(currNote, ...fieldsToCompare),
-            _.pick(lastSavedNote, ...fieldsToCompare)
-        );
-    }
-
     constructor(props) {
         super(props);
 
@@ -355,10 +399,24 @@ class GenericInterpretationPanel extends React.Component {
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
         this.onTextChange = this.onTextChange.bind(this);
         this.onDropOptionChange = this.onDropOptionChange.bind(this);
+    }
 
-        this.memoized = {
-            hasNoteChanged: memoize(GenericInterpretationPanel.hasNoteChanged)
-        };
+    componentDidUpdate(prevProps, prevState) {
+        const { setIsSubmitting, isSubmitting, isSubmittingModalOpen, memoizedHasNoteChanged, lastSavedNote, otherDraftsUnsaved } = this.props;
+
+        const isThisNoteUnsaved = memoizedHasNoteChanged(lastSavedNote, this.state);
+        const anyNotesUnsaved = otherDraftsUnsaved || isThisNoteUnsaved;
+
+        // Only trigger if switching from no unsaved to unsaved present or vice versa
+        if (!isSubmitting && anyNotesUnsaved) {
+            console.log("started submitting (warning will appear)");
+            setIsSubmitting({
+                modal: <UnsavedInterpretationModal {...{ isSubmittingModalOpen, setIsSubmitting, isSubmitting }}/>
+            });
+        } else if (isSubmitting && !anyNotesUnsaved) {
+            console.log("no longer submitting (warning will no longer appear)");
+            setIsSubmitting(false); // unset
+        }
     }
 
     // Will use same update fxn for multiple text fields
@@ -375,21 +433,21 @@ class GenericInterpretationPanel extends React.Component {
     // Wrapping passed in functions so as to call them with this component's state, then pass down to children
     saveStateAsDraft() {
         const { saveAsDraft, noteType, saveToField } = this.props;
-        saveAsDraft(this.state, saveToField , noteType);
+        saveAsDraft(this.state, saveToField, noteType);
     }
 
     componentWillUnmount() { // Before unmounting (as in switching tabs), save unsaved changes in controller state
-        const { saveToField, retainWIPStateOnUnmount, lastWIPNote } = this.props;
+        const { saveToField, retainWIPStateOnUnmount, lastWIPNote, memoizedHasNoteChanged } = this.props;
 
         // Only trigger if note has changed since last save to state
-        if (this.memoized.hasNoteChanged(lastWIPNote, this.state)) {
+        if (memoizedHasNoteChanged(lastWIPNote, this.state)) {
             console.log("note has changed... saving");
             retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
         }
     }
 
     render() {
-        const { lastSavedNote = null, noteLabel, noteType, schemas } = this.props;
+        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource } = this.props;
         const {
             note_text : savedNoteText = null,
             status: savedNoteStatus,
@@ -398,7 +456,7 @@ class GenericInterpretationPanel extends React.Component {
         const { modified_by: { display_title : lastModUsername } = {}, date_modified = null } = lastModified || {};
         const { note_text: noteText, acmg_guidelines, classification, conclusion } = this.state;
 
-        const noteChangedSinceLastSave = this.memoized.hasNoteChanged(lastSavedNote, this.state);
+        const noteChangedSinceLastSave = memoizedHasNoteChanged(lastSavedNote, this.state);
         const noteTextPresent = !!noteText;
         const isDraft = savedNoteStatus === "in review";
         const isCurrent = savedNoteStatus === "current";
@@ -410,7 +468,7 @@ class GenericInterpretationPanel extends React.Component {
                     { noteLabel }
                 </label>
                 { lastModUsername ?
-                    <div className="text-muted text-smaller my-1">Last Modified: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsername} </div>
+                    <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsername} </div>
                     : null}
                 <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
@@ -419,7 +477,10 @@ class GenericInterpretationPanel extends React.Component {
                 <GenericInterpretationSubmitButton {...{ isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
-                <UnsavedInterpretationModal />
+                { caseSource ?
+                    <Button variant="primary btn-block mt-05" onClick={() => { navigate(`/cases/${caseSource}/#case-info.interpretation`)}}>
+                        Return to Case
+                    </Button>: null}
             </div>
         );
     }
@@ -449,16 +510,43 @@ function NoteFieldDrop(props) { /** For classification, variant/gene candidacy d
             <label className="w-100 text-small">
                 { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
             </label>
-            <Dropdown as={ButtonGroup} className={cls}>
-                <Dropdown.Toggle variant="outline-secondary btn-block text-left" id="dropdown-basic">
-                    { value ? <><i className="status-indicator-dot ml-1 mr-07" data-status={value} /> { value }</> : "Select an option..."}
-                </Dropdown.Toggle>
-                <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
-            </Dropdown>
+            <div className="d-flex">
+                <Dropdown as={ButtonGroup} className={cls}>
+                    <Dropdown.Toggle variant="outline-secondary text-left" id="dropdown-basic">
+                        { value ? <><i className="status-indicator-dot ml-1 mr-07" data-status={value} /> { value }</> : "Select an option..."}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
+                </Dropdown>
+                { value ?
+                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => onOptionChange(field, null)}>
+                        <i className="icon icon-trash-alt fas" />
+                    </Button>
+                    : null}
+            </div>
         </React.Fragment>
     );
 }
 
+/** Currently unused; may decide to use a static sized window & style with CSS to autogrow */
+class NoGrowTextArea extends React.Component {
+    constructor(props) {
+        super(props);
+        this.onChangeWrapper = this.onChangeWrapper.bind(this);
+    }
+    onChangeWrapper(e) {
+        const { onTextChange, field } = this.props;
+        onTextChange(e, field);
+    }
+    render() {
+        const { text, cls = "w-100 mb-1 flex-grow-1" } = this.props;
+        return (
+            <div className={cls} style={{ minHeight: "135px" }}>
+                <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: "100%", resize: "none", minHeight: "70px" }} className="w-100"
+                    onChange={this.onChangeWrapper} />
+            </div>
+        );
+    }
+}
 
 class AutoGrowTextArea extends React.Component {
     constructor(props) {
@@ -471,7 +559,7 @@ class AutoGrowTextArea extends React.Component {
     }
 
     componentDidMount() {
-        const { minHeight } = this.props;
+        const { minHeight, maxHeight } = this.props;
 
         const currScrollHeight = this.textAreaRef.current.scrollHeight;
         // if (minHeight > currScrollHeight) {
@@ -481,14 +569,14 @@ class AutoGrowTextArea extends React.Component {
         //     });
         // } else {
         this.setState({
-            parentHeight: `${currScrollHeight}px`,
-            textAreaHeight: `${currScrollHeight}px`
+            parentHeight: `${currScrollHeight > maxHeight ? maxHeight: currScrollHeight}px`,
+            textAreaHeight: `${currScrollHeight > maxHeight ? maxHeight: currScrollHeight}px`
         });
         // }
     }
 
     onChangeWrapper(e) {
-        const { onTextChange, field, minHeight } = this.props;
+        const { onTextChange, field, minHeight, maxHeight } = this.props;
 
         onTextChange(e, field);
 
@@ -504,32 +592,33 @@ class AutoGrowTextArea extends React.Component {
         //         }
         //     });
         // } else {
-        this.setState({ textAreaHeight: "auto", parentHeight: `${currScrollHeight}px` }, () => {
+        this.setState({ textAreaHeight: "auto", parentHeight: `${currScrollHeight < maxHeight ? currScrollHeight : maxHeight}px` }, () => {
             const newScrollHeight = this.textAreaRef.current.scrollHeight;
             this.setState({
-                parentHeight: `${newScrollHeight}px`,
-                textAreaHeight: `${newScrollHeight}px`
+                parentHeight: `${newScrollHeight < maxHeight ? newScrollHeight: maxHeight}px`,
+                textAreaHeight: `${newScrollHeight < maxHeight ? newScrollHeight: maxHeight}px`
             });
         });
         // }
     }
 
     render() {
-        const { text, cls, minHeight } = this.props;
+        const { text, cls, minHeight, maxHeight } = this.props;
         const { textAreaHeight, parentHeight } = this.state;
         return (
             <div style={{
-                minHeight: parentHeight,
+                minHeight: parentHeight > maxHeight ? maxHeight: parentHeight,
                 // height: parentHeight
             }} className={cls}>
-                <textarea value={text} ref={this.textAreaRef} rows={1} style={{ height: textAreaHeight, resize: "none" }} className="w-100"
+                <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: textAreaHeight > maxHeight ? maxHeight: textAreaHeight, resize: "none" }} className="w-100"
                     onChange={this.onChangeWrapper} />
             </div>
         );
     }
 }
 AutoGrowTextArea.defaultProps = {
-    minHeight: 150
+    minHeight: 150,
+    maxHeight: 325
 };
 
 
@@ -587,18 +676,18 @@ function GenericInterpretationSubmitButton(props) {
 }
 
 function UnsavedInterpretationModal(props) {
-    const [show, setShow] = useState(false);
+    const { href, isSubmittingModalOpen, isSubmitting, setIsSubmitting } = props;
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    console.log("href", href);
+
+    function discardAndNavigate() {
+        setIsSubmitting(false, () => navigate(href, { 'skipRequest' : false, 'replace' : true }), false);
+    }
 
     return (
         <React.Fragment>
-            <Button variant="primary btn-block mt-05" onClick={handleShow}>
-                Close &amp; Return to Case
-            </Button>
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton style={{ backgroundColor: "#cdd6e6" }}>
+            <Modal show={true} onHide={() => setIsSubmitting(false, null, false)} centered>
+                <Modal.Header closeButton style={{ backgroundColor: "#bdcbd9", color: "#1e435e" }}>
                     <Modal.Title>
                         <div className="modal-title font-italic text-600 h4">
                             Variant Interpretation: <span className="text-300">Unsaved Changes</span>
@@ -606,16 +695,16 @@ function UnsavedInterpretationModal(props) {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className="text-small text-center mt-2">This variant interpretation is <u>incomplete</u> and contains:</div>
-                    <div className="font-italic text-center text-600 h3 my-3">1 Unsaved Variant Classification</div>
+                    <div className="text-small text-center mt-2">This variant interpretation is <u>incomplete</u> and contains at least 1:</div>
+                    <div className="font-italic text-center text-600 h3 my-3" style={{ color: "#1e435e" }}>Unsaved Variant Classification</div>
                     <div className="text-small text-center mb-2">Are you sure you want to navigate away?</div>
                 </Modal.Body>
-                <Modal.Footer style={{ backgroundColor: "#efefef" }}>
-                    <Button variant="outline-secondary" onClick={handleClose}>
-                        Cancel
+                <Modal.Footer className="d-flex" style={{ backgroundColor: "#eff0f0" }}>
+                    <Button className="flex-grow-1" variant="danger" onClick={discardAndNavigate}>
+                        Discard Notes
                     </Button>
-                    <Button variant="danger" onClick={handleClose}>
-                        Discard Changes and Continue Navigation
+                    <Button className="flex-grow-1" variant="primary" onClick={() => setIsSubmitting(false, null, false)}>
+                        Continue Editing
                     </Button>
                 </Modal.Footer>
             </Modal>
