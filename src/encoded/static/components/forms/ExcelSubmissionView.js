@@ -549,9 +549,9 @@ class PanelTwo extends React.PureComponent {
                     <h4 className="text-300 mt-2">
                         Attach a file to this IngestionSubmission
                     </h4>
-                    <div className="mt-1">
+                    {/* <div className="mt-1">
                         Click <a href="/help/uploading_cohort" target="_blank" rel="noreferrer">here</a> for more on how to format your document.
-                    </div>
+                    </div> */}
                     <hr className="mb-1"/>
                     <div className="field-section mt-2">
                         <label className="d-block mb-05">
