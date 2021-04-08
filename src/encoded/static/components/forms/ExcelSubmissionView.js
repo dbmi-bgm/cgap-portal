@@ -350,7 +350,7 @@ class PanelOne extends React.PureComponent {
             institutionID: institution,
             projectID: project,
             isCreating = false,
-            submissionType = "Accessioning"
+            submissionType = null
         } = this.state;
 
         e.preventDefault();
@@ -400,7 +400,10 @@ class PanelOne extends React.PureComponent {
 
         const ingestionTypeToSubmissionTypeMap = { "Accessioning" : "metadata_bundle", "Gene List": "genelist" };
 
-        const postData = { institution, project, ingestion_type: ingestionTypeToSubmissionTypeMap[submissionType], processing_status: { state: "created" } };
+        const postData = {
+            institution, project, processing_status: { state: "created" },
+            ingestion_type: submissionType ? ingestionTypeToSubmissionTypeMap[submissionType] : "metadata_bundle"
+        };
 
         this.setState({ isCreating: true }, ()=>{
             this.request = ajax.load(
