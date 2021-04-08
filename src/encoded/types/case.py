@@ -61,13 +61,11 @@ def _build_family_embeds(*, base_path):
         # File linkTo
         "members.samples.processed_files.last_modified.*",
         "members.samples.processed_files.accession",
-        "members.samples.processed_files.external_accession",
 
         # File linkTo
         "members.samples.files.last_modified.*",
         "members.samples.files.file_format.file_format",
         "members.samples.files.accession",
-        "members.samples.files.external_accession",
 
         # TODO review QC
         "members.samples.files.quality_metric",
@@ -97,7 +95,7 @@ def _build_case_embedded_list():
     """ Helper function intended to be used to create the embedded list for case.
         All types should implement a function like this going forward.
     """
-    return _build_family_embeds(base_path='family') + _build_family_embeds(base_path='secondary_family') + [
+    return _build_family_embeds(base_path='family') + [
         # Individual linkTo
         "individual.accession",
         "individual.date_created",
@@ -158,7 +156,6 @@ def _build_case_embedded_list():
         # TODO fixme file linkTo
         "individual.samples.processed_files.file_format.file_format",
         "individual.samples.processed_files.accession",
-        "individual.samples.processed_files.external_accession",
         "individual.samples.processed_files.workflow_run_outputs",
 
         # QC
@@ -174,7 +171,6 @@ def _build_case_embedded_list():
         # File linkTo
         "individual.samples.files.file_format.file_format",
         "individual.samples.files.accession",
-        "individual.samples.files.external_accession",
 
         # QC
         "individual.samples.files.quality_metric",
@@ -204,7 +200,6 @@ def _build_case_embedded_list():
         "sample.files.status",
         "sample.files.accession",
         "sample.files.file_format.file_format",
-        "sample.files.external_accession",
 
         # FileFormat linkTo
         "sample.processed_files.file_format.file_format",
@@ -260,7 +255,6 @@ def _build_case_embedded_list():
         "sample_processing.samples.bam_sample_id",
 
         # File linkTo
-        "sample_processing.samples.processed_files.external_accession",
         "sample_processing.samples.processed_files.accession",
         "sample_processing.samples.processed_files.file_format.file_format",
         "sample_processing.samples.processed_files.last_modified.*",
@@ -268,11 +262,9 @@ def _build_case_embedded_list():
         # File linkTo
         "sample_processing.processed_files.file_format.file_format",
         "sample_processing.processed_files.accession",
-        "sample_processing.processed_files.external_accession",
 
         # File linkTo
         "sample_processing.sample_processed_files.processed_files.accession",
-        "sample_processing.sample_processed_files.processed_files.external_accession",
         "sample_processing.sample_processed_files.processed_files.file_format.file_format",
         "sample_processing.sample_processed_files.processed_files.last_modified.*",
 

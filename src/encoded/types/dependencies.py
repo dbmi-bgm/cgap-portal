@@ -32,7 +32,6 @@ class DependencyEmbedder:
         FILE: [
             'file_format.file_format',
             'accession',
-            'external_accession'
         ]
 
     }
