@@ -19,9 +19,7 @@ def wb_institution(es_testapp, workbook):
 
 
 class TestGeneListSubmission:
-    def test_genelist_endpoint(
-        self, testapp, bgm_project, bgm_access_key, institution
-    ):
+    def test_genelist_endpoint(self, testapp, bgm_project, bgm_access_key, institution):
         """
         Test for valid posting to genelist endpoint via ingestion listener.
         """
@@ -72,9 +70,7 @@ class TestGeneListSubmission:
         assert creation_response["status"] == "success"
         assert submission_response["success"]
 
-    def test_normal_genelist(
-        self, es_testapp, workbook, project, wb_institution
-    ):
+    def test_normal_genelist(self, es_testapp, workbook, project, wb_institution):
         """
         Tests for full gene list functionality given gene list with all genes
         identifiable in the database.
@@ -97,9 +93,7 @@ class TestGeneListSubmission:
         assert genelist.validation_output
         assert genelist.post_output
 
-    def test_parse_empty_genelist(
-        self, es_testapp, workbook, project, wb_institution
-    ):
+    def test_parse_empty_genelist(self, es_testapp, workbook, project, wb_institution):
         """
         Tests for detection of empty gene list and no title.
         """
@@ -114,9 +108,7 @@ class TestGeneListSubmission:
         assert not genelist.genes
         assert genelist.errors
 
-    def test_parse_empty_genelist_excel(
-        self, es_testapp, workbook, project, wb_institution
-    ):
+    def test_parse_empty_genelist_excel(self, es_testapp, workbook, project, wb_institution):
         """
         Tests for correct detection of no title and no genes provided when
         given an excel gene list.
@@ -148,9 +140,7 @@ class TestGeneListSubmission:
         )
         assert len(genelist.gene_ids) == 3
 
-    def test_no_match_genes(
-        self, es_testapp, workbook, project, wb_institution
-    ):
+    def test_no_match_genes(self, es_testapp, workbook, project, wb_institution):
         """
         Ensure genes that don't match any existing genes are identified and
         possible alternative genes are provided, if applicable. Also, no
@@ -167,9 +157,7 @@ class TestGeneListSubmission:
         assert genelist.errors
         assert not genelist.post_output
 
-    def test_validate_and_post(
-        self, es_testapp, workbook, project, wb_institution
-    ):
+    def test_validate_and_post(self, es_testapp, workbook, project, wb_institution):
         """
         Test for correct validation but no posting of document and gene list
         when some genes are not identified in the database.
@@ -184,9 +172,7 @@ class TestGeneListSubmission:
         assert genelist.validation_output
         assert not genelist.post_output
 
-    def test_existing_title(
-        self, es_testapp, workbook, project, wb_institution
-    ):
+    def test_existing_title(self, es_testapp, workbook, project, wb_institution):
         """
         Ensure gene list and document are patched if attempting to submit gene
         list with title identical to the title of a previously created gene
@@ -218,9 +204,7 @@ class TestGeneListSubmission:
 
 
 class TestVariantUpdateSubmission:
-    def test_variant_update(
-        self, es_testapp, workbook, project, wb_institution
-    ):
+    def test_variant_update(self, es_testapp, workbook, project, wb_institution):
         """
         Ensure variant_update ingestion class parses file of input gene uuids
         and queues associated variant samples for indexing.
@@ -238,9 +222,7 @@ class TestVariantUpdateSubmission:
         assert variant_update.post_output
         assert not variant_update.errors
 
-    def test_variant_update_endpoint(
-        self, testapp, bgm_project, bgm_access_key, institution
-    ):
+    def test_variant_update_endpoint(self, testapp, bgm_project, bgm_access_key, institution):
         """
         Test for valid posting to variant_endpoint endpoint via ingestion listener.
         """
