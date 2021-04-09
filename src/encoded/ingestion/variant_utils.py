@@ -211,5 +211,4 @@ class VariantBuilder:
             except Exception as e:
                 log.info('Error encountered posting variant/variant_sample: %s' % e)
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
-
         return self.ingestion_report.total_successful(), self.ingestion_report.total_errors()
