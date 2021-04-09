@@ -395,11 +395,27 @@ class IngestionListener:
 
     def patch_ingestion_report(self, report, uuid):
         """ Sets the file_ingestion_error field of the given uuid """
-        self._patch_value(uuid, 'file_ingestion_error', report.get_errors())
+        if isinstance(report, IngestionReport):  # handle normal case
+            self._patch_value(uuid, 'file_ingestion_error', report.get_errors())
+        elif isinstance(report, list):  # handle when build_ingestion_error_report result is passed
+            self._patch_value(uuid, 'file_ingestion_error', report)
+        else:
+            raise TypeError('Got bad type for ingestion error report: %s' % report)
 
     def set_status(self, uuid, status):
         """ Sets the file_ingestion_status of the given uuid """
         self._patch_value(uuid, 'file_ingestion_status', status)
+
+    @staticmethod
+    def build_ingestion_error_report(msg):
+        """ Builds an ingestion error report in case an error is encountered that cannot be recovered from
+            in VCF ingestion - see file_processed.json for structure definition. """
+        return [
+            {
+                'body': msg,
+                'row': -1  # this exception may have occurred on a particular row but since it could not be recovered
+            }              # from we assume the msg has sufficient info to work backwards from - Will 4/9/21
+        ]
 
     def run(self):
         """ Main process for this class. Runs forever doing ingestion as needed.
@@ -518,6 +534,7 @@ class IngestionListener:
                     # case we need to patch error status and discard the current message.
                     log.error('Caught error in VCF processing in ingestion listener: %s' % e)
                     self.set_status(uuid, STATUS_ERROR)
+                    self.patch_ingestion_report(self.build_ingestion_error_report(msg=e), uuid)
                     discard(message)
                     continue
 
