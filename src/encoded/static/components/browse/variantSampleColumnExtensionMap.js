@@ -53,7 +53,8 @@ export const variantSampleColumnExtensionMap = {
         // TODO: Update with onclick to handle google analytics tracking
         widthMap: { 'lg' : 155, 'md' : 140, 'sm' : 130 },
         render: function(result, props) {
-            const { "@id" : link = null, variant : { genes = [] } = {} } = result;
+            const { "@id" : atID = null, variant : { genes = [] } = {} } = result;
+            const { link = null } = props;
 
             const geneTitles = genes.map((geneItem) => {
                 const { genes_most_severe_gene: { display_title = null } = {} } = geneItem || {};
@@ -66,7 +67,7 @@ export const variantSampleColumnExtensionMap = {
                     <span data-tip="Most Severe Transcript" key="genes_severe_transcript" className="font-italic d-block text-truncate">{ genes_most_severe_transcript}</span>
                 ];
                 return (
-                    <a href={link ? link + '?annotationTab=0' : "#"}>
+                    <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"}>
                         <StackedRowColumn className="text-center" {...{ rows }} />
                     </a>);
             }
@@ -79,15 +80,16 @@ export const variantSampleColumnExtensionMap = {
         // TODO: Update with onclick to handle google analytics tracking
         widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
         render: function(result, props) {
-            const { "@id" : link = null, variant : { genes : [ firstGene = null ] = [] } = {} } = result;
+            const { link = null } = props;
+            const { "@id" : atID = null, variant : { genes : [ firstGene = null ] = [] } = {} } = result;
             const { genes_most_severe_hgvsc = null, genes_most_severe_hgvsp = null } = firstGene || {};
 
             if (!genes_most_severe_hgvsc && !genes_most_severe_hgvsp) {
                 return null;
             }
-                    
+
             return (
-                <a href={link ? link + '?annotationTab=1' : "#"}>
+                <a href={link ? link: atID ? atID + '?annotationTab=1' : "#"}>
                     <GenesMostSevereHGVSCColumn gene={firstGene} />
                 </a>);
         }
