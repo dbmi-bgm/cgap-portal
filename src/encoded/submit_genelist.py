@@ -383,7 +383,6 @@ class GeneListSubmission:
         document_post_body = {
             "institution": self.institution,
             "project": self.project,
-            "status": "shared",
             "attachment": attach,
         }
         genelist_post_body = {
@@ -395,7 +394,6 @@ class GeneListSubmission:
             "institution": self.institution,
             "project": self.project,
             "genes": self.gene_ids,
-            "status": "shared",
         }
         return [document_post_body, genelist_post_body]
 
