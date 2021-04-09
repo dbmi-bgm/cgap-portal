@@ -33,7 +33,7 @@ def groupfinder(login, request):
 
         if localname in ['EMBED', 'INDEXER']:
             synthetic_result = []
-        elif localname in ['TEST', 'IMPORT', 'UPGRADE']:
+        elif localname in ['TEST', 'IMPORT', 'UPGRADE', 'INGESTION']:
             synthetic_result = ['group.admin']
         elif localname in ['TEST_SUBMITTER']:
             synthetic_result = ['group.submitter']

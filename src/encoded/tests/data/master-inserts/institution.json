@@ -18,6 +18,16 @@
         ]
     },
     {
+        "name": "cgap-personas",
+        "title": "CGAP Personas",
+        "uuid": "59024e8e-eaea-477c-8f9b-df0bd722cfcb"
+    },
+    {
+        "name": "cgap-backend-team",
+        "title": "CGAP Backend Team",
+        "uuid": "87199845-51b5-4352-bdea-583edae4bb6a"
+    },
+    {
         "address2": "75 Francis Street",
         "address1": "Brigham and Women's Hospital",
         "city": "Boston",
