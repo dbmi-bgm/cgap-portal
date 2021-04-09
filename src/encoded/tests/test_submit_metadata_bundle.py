@@ -1,10 +1,14 @@
 import json
+import os
 import pytest
 import re
 import webtest
 
+from dcicutils.misc_utils import ignorable
 from dcicutils.qa_utils import raises_regexp, override_environ
+from ..util import make_vapp_for_email
 from .test_access_key import basic_auth
+from ..util import ENCODED_ROOT_DIR
 
 
 # These tests will work but may leave garbage around from stray submissions.
@@ -12,6 +16,7 @@ from .test_access_key import basic_auth
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
+@pytest.mark.unit
 def test_old_protocol_content_type(testapp, bgm_access_key):
     """
     We used to have an endpoint that is gone now.
@@ -21,6 +26,7 @@ def test_old_protocol_content_type(testapp, bgm_access_key):
         testapp.post("/submit_for_ingestion")
 
 
+@pytest.mark.unit
 def test_old_protocol_404(testapp, anontestapp):
     """We used to have an endpoint that is gone now. SubmitCGAP expects a 404 in that case, not (for example) a 403."""
 
@@ -48,7 +54,9 @@ def test_old_protocol_404(testapp, anontestapp):
         anontestapp.post("/submit_for_ingestion", {}, headers=headers)
 
 
+@pytest.mark.sloppy
 def test_post_ingestion_submission(anontestapp, bgm_user, bgm_project, bgm_access_key, institution):
+
     creation_post_data = {
         "ingestion_type": "metadata_bundle",
         "institution": institution['name'],
@@ -62,7 +70,9 @@ def test_post_ingestion_submission(anontestapp, bgm_user, bgm_project, bgm_acces
         'Accept':  'application/json',
         'Authorization': basic_auth(bgm_access_key['access_key_id'], bgm_access_key['secret_access_key']),
     }
-    response = anontestapp.post_json("/IngestionSubmission", creation_post_data, headers=creation_post_headers, status=201)
+    # NOTE: The headers contain credentials. Using anontestapp makes sure we rely on those credentials to get in.
+    response = anontestapp.post_json("/IngestionSubmission", creation_post_data, headers=creation_post_headers,
+                                     status=201)
     [submission] = response.json['@graph']
     assert submission.get('@id')
 
@@ -72,6 +82,7 @@ def test_post_ingestion_submission(anontestapp, bgm_user, bgm_project, bgm_acces
         'Content-type': 'application/json',
         'Accept':  'application/json',
     }
+    # NOTE: The headers LACK credentials. Using anontestapp means we'll need some, so will get a 403 rejection.
     response = anontestapp.post_json("/IngestionSubmission", creation_post_data,
                                      headers=creation_post_headers_with_missing_auth, status=403)
     assert response.status_code == 403
@@ -85,6 +96,8 @@ def test_post_ingestion_submission(anontestapp, bgm_user, bgm_project, bgm_acces
         'Accept':  'application/json',
         'Authorization': basic_auth(bgm_access_key['access_key_id'], 'hopefully this will not work'),
     }
+    # NOTE: The headers have WRONG credentials. Using anontestapp means we'll need some,
+    #       so will get a 401 (Unauthorized) rejection.
     response = anontestapp.post_json("/IngestionSubmission", creation_post_data,
                                      headers=creation_post_headers_with_bad_password, status=401)
     assert response.status_code == 401
@@ -107,7 +120,8 @@ def test_post_ingestion_submission_other_project(anontestapp, non_bgm_user, non_
         'Accept':  'application/json',
         'Authorization': basic_auth(non_bgm_access_key['access_key_id'], non_bgm_access_key['secret_access_key']),
     }
-    response = anontestapp.post_json("/IngestionSubmission", creation_post_data, headers=creation_post_headers, status=201)
+    response = anontestapp.post_json("/IngestionSubmission", creation_post_data, headers=creation_post_headers,
+                                     status=201)
     [submission] = response.json['@graph']
     assert submission.get('@id')
 
@@ -135,12 +149,15 @@ def test_post_ingestion_submission_wrong_project(anontestapp, institution,
             'Accept':  'application/json',
             'Authorization': basic_auth(*keypair),
         }
+
         def dbg(label, x, *props):
             if not props:
                 print("%s: %s" % (label, json.dumps(x, indent=2, default=str)))
             else:
                 for prop in props:
-                    print("%s[%r]: %s" % (label, prop, json.dumps(x.get(prop, "<MISSING>"), indent=2, default=str)))
+                    print("%s[%r]: %s"
+                          % (label, prop, json.dumps(x.get(prop, "<MISSING>"), indent=2, default=str)))
+
         dbg("bgm_user", bgm_user, '@id', 'user_institution', 'project_roles')
         dbg("non_bgm_user", non_bgm_user, '@id', 'user_institution', 'project_roles')
         dbg("bgm_project", bgm_project, '@id', 'uuid', 'name')
@@ -149,10 +166,91 @@ def test_post_ingestion_submission_wrong_project(anontestapp, institution,
         dbg("non_bgm_access_key", non_bgm_access_key, 'access_key_id', 'secret_access_key')
         dbg("post data", creation_post_data)
         dbg("post headers", creation_post_headers)
+
         print("posting /IngestionSubmission, expecting 403, with keypair", keypair)
         response = anontestapp.post_json("/IngestionSubmission", creation_post_data, headers=creation_post_headers,
                                          status=403)
+        ignorable(response)
         # response = requests.post("/IngestionSubmission", creation_post_data, headers=creation_post_headers)
         # dbg("response.status_code", response.status_code)
         # dbg("response.json", response.json)
         # assert response.status_code == 403
+
+
+def test_process_ingestion(testapp, posted_personas_etc):
+
+    project = posted_personas_etc['project']
+    project_name = project['name']
+    institution = posted_personas_etc['institution']
+    institution_name = institution['name']
+    developer = posted_personas_etc['developer']
+    email = developer['email']
+    developer_testapp = make_vapp_for_email(email=email, app=testapp.app)
+
+    sample_bundle_filename = os.path.join(ENCODED_ROOT_DIR, "tests/data/documents/simulated_bundle.json")
+
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+    ingestion_type = 'simulated_bundle'
+    json_data = {
+        'ingestion_type': ingestion_type,
+        'institution': institution_name,
+        'project': project_name,
+        "processing_status": {
+            "state": "submitted"
+        }
+    }
+    print("json_data=", json_data)
+
+    res = developer_testapp.post_json('/IngestionSubmission', json_data, headers=headers, status=201)
+    [submitted_item] = res.json['@graph']
+    submission_id = submitted_item['uuid']
+
+    submission_body = {
+        "ingestion_type": ingestion_type,
+        # We don't have to send these (though we could as long as they're consistent).
+        # "institution": institution_name,
+        # "project": project_name,
+        "validate_only": False
+    }
+    res = developer_testapp.post("/ingestion-submissions/%s/submit_for_ingestion" % submission_id,
+                                 submission_body, content_type='multipart/form-data',
+                                 upload_files=[("datafile", sample_bundle_filename)],
+                                 status=200)
+
+    submission_uri = '/ingestion-submissions/' + submission_id
+
+    assert res.json['success'] is True
+    assert res.json['message'] == "Uploaded successfully."
+    assert res.json['filename'] == sample_bundle_filename
+    assert re.match("elasticbeanstalk-.*-metadata-bundles", res.json['bucket'])
+    assert res.json['object_name'] == submission_id + "/datafile.json"
+    assert res.json['submission_id'] == submission_id
+    assert res.json['authenticated_userid'] == "remoteuser." + email
+    assert res.json['email'] == email
+    assert res.json['submission_uri'] == submission_uri
+    # These next two are artifacts of our test env's incomplete nature:
+    assert res.json['beanstalk_env_is_prd'] is False
+    assert res.json['beanstalk_env'] is None
+    assert re.match("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]"
+                    "T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]"
+                    "[.][0-9][0-9][0-9][0-9][0-9][0-9]", res.json['upload_time'])
+    assert res.json['parameters'] == {
+        "ingestion_type": "simulated_bundle",
+        "validate_only": "False",
+        "datafile": sample_bundle_filename,
+        "institution": '/institutions/%s/' % institution_name,
+        "project": '/projects/%s/' % project_name,
+    }
+    # Processing has not yet begun
+    assert not res.json.get('additional_data')
+    assert not res.json.get('processing_status')
+
+    submission = developer_testapp.get(submission_uri).maybe_follow().json
+    assert submission.get('processing_status') == {
+        'outcome': 'unknown',
+        'progress': 'unavailable',
+        'state': 'submitted'
+    }

@@ -108,7 +108,7 @@ class GeneListSubmission:
             if "title" in line.lower():
                 title_line = line
                 title_idx = title_line.lower().index("title")
-                title_line = title_line[title_idx + 5 :]
+                title_line = title_line[title_idx + 5:]
                 title_line = title_line.translate(
                     {ord(i): None for i in ':;"\n"'}
                 )
@@ -139,8 +139,8 @@ class GeneListSubmission:
         wb = load_workbook(xlsx_file)
         sheet = wb.worksheets[0]
         for col in sheet.iter_cols(values_only=True):
-            if col[0] is not None:
-                if "Title" in col[0]:
+            if col[0] is not None and len(col) > 1:
+                if "Title" in col[0] and col[1] is not None:
                     title = str(col[1]).strip()
                 if "Genes" in col[0]:
                     for cell in col[1:]:
@@ -162,6 +162,8 @@ class GeneListSubmission:
 
         title = None
         genelist = []
+        genes_with_spaces = []
+        non_ascii_genes = []
         if self.filename.endswith(".txt"):
             title, genelist = self.extract_txt_file(self.filename)
         elif self.filename.endswith(".xlsx"):
@@ -174,20 +176,28 @@ class GeneListSubmission:
                 "formatting of the submitted document."
             )
         genelist = [x for x in genelist if x != ""]
-        genes_with_spaces = []
         for gene in genelist.copy():
             if " " in gene:
                 genelist.remove(gene)
                 genes_with_spaces.append(gene)
+            if not CommonUtils.is_ascii(gene):
+                genelist.remove(gene)
+                non_ascii_genes.append(gene)
         if genes_with_spaces:
             self.errors.append(
                 "Gene symbols/IDs should not contain spaces. Please reformat "
                 "the following gene entries: %s" % ", ".join(genes_with_spaces)
             )
+        if non_ascii_genes:
+            self.errors.append(
+                "The following gene(s) contain non-ascii characters: %s. "
+                "Please re-enter the genes using only ascii characters."
+                % ", ".join(non_ascii_genes)
+            )
         if not genelist:
             self.errors.append(
                 "No genes were found in the gene list. Please check the "
-                "formatting of the submitted document"
+                "formatting of the submitted document."
             )
         genelist = list(set(genelist))
         return genelist, title
@@ -223,7 +233,7 @@ class GeneListSubmission:
                 non_ensgids.append(gene)
         if ensgids:
             ensgid_search = CommonUtils.batch_search(
-                ensgids, "ensgid", self.vapp, batch_size=10
+                ensgids, "ensgid", self.vapp, batch_size=20
             )
             for response in ensgid_search:
                 if response["gene_symbol"] in gene_ids:
@@ -839,3 +849,12 @@ class CommonUtils:
                 batch = []
         flat_result = [x for sublist in results for x in sublist]
         return flat_result
+
+    @staticmethod
+    def is_ascii(s):
+        """
+        Check if characters in string s are ascii.
+        """
+        if not isinstance(s, str):
+            return False
+        return len(s) == len(s.encode())
