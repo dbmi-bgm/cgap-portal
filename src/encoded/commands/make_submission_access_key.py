@@ -7,6 +7,7 @@ from dcicutils.misc_utils import PRINT, full_class_name, check_true
 # TODO: In snovault 4.7.1 there'll be a snovault.standalone_dev we can use. -kmp 31-Mar-2021
 from ..standalone_dev import make_dev_vapp
 
+
 EPILOG = __doc__
 
 
