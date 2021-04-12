@@ -483,6 +483,17 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
                     <i className="icon icon-spin icon-2x icon-circle-notch fas"/>
                 </div>
             );
+        } else if (!presetResults || presetResults.length === 0){
+            body = (
+                <div className="py-4 px-3 bg-white border-bottom">
+                    <h4 className="my-0 text-400">
+                        No presets saved yet
+                    </h4>
+                    <p>
+                        Create a FilterSet and then click <em>Save As...</em> to create a preset.
+                    </p>
+                </div>
+            );
         } else if (presetResults) {
             const commonProps = { caseItem, importFromPresetFilterSet, isEditDisabled, hasCurrentFilterSetChanged, hasFilterSetChangedFromOriginalPreset, isOriginalPresetFilterSetLoading };
             const { derived_from_preset_filterset: currentCaseDerivedFromPresetUUID = null } = currentCaseFilterSet || {};
