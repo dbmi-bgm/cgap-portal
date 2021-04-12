@@ -701,7 +701,7 @@ function UnsavedInterpretationModal(props) {
                 </Modal.Body>
                 <Modal.Footer className="d-flex" style={{ backgroundColor: "#eff0f0" }}>
                     <Button className="flex-grow-1" variant="danger" onClick={discardAndNavigate}>
-                        Discard Notes
+                        Navigate Away & Discard Notes
                     </Button>
                     <Button className="flex-grow-1" variant="primary" onClick={() => setIsSubmitting(false, null, false)}>
                         Continue Editing
