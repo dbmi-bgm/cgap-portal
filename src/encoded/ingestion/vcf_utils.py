@@ -2,7 +2,7 @@ import vcf
 import json
 import logging
 from collections import OrderedDict
-
+# from granite.lib import vcf_parser
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +13,13 @@ class VCFParserException(Exception):
     wrong at this stage of Variant Ingestion
     """
     pass
+
+
+class GraniteVCFParser(object):
+    """ Wrapper class for granite.lib.vcf_parser that implements the same functionality
+        as VCFParser but using the granite parser instead of the vcf parser.
+    """
+    pass  # TODO implement me
 
 
 class VCFParser(object):

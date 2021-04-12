@@ -6,9 +6,10 @@ import gzip
 import io
 import os
 import pyramid.request
+import re
 import tempfile
 
-from dcicutils.misc_utils import check_true, url_path_join
+from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity
 from io import BytesIO
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden, HTTPServerError
 from snovault import COLLECTIONS, Collection
@@ -356,3 +357,69 @@ def content_type_allowed(request):
                 return True
 
     return False
+
+
+def _app_from_clues(app=None, registry=None, context=None):
+    if count_if(identity, [app, registry, context]) != 1:
+        raise RuntimeError("Expected exactly one of app, registry, or context.")
+    if not app:
+        app = (registry or context).app
+    return app
+
+
+EMAIL_PATTERN = re.compile(r'[^@]+[@][^@]+')
+
+
+def make_vapp_for_email(*, email, app=None, registry=None, context=None):
+    app = _app_from_clues(app=app, registry=registry, context=context)
+    if not isinstance(email, str) or not EMAIL_PATTERN.match(email):
+        # It's critical to check that the pattern has an '@' so we know it's not a system account (injection).
+        raise RuntimeError("Expected email to be a string of the form 'user@host'.")
+    user_environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': email,
+    }
+    vapp = VirtualApp(app, user_environ)
+    return vapp
+
+
+@contextlib.contextmanager
+def vapp_for_email(email, app=None, registry=None, context=None):
+    yield make_vapp_for_email(email=email, app=app, registry=registry, context=context)
+
+
+def make_vapp_for_ingestion(*, app=None, registry=None, context=None):
+    app = _app_from_clues(app=app, registry=registry, context=context)
+    user_environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': 'INGESTION',
+    }
+    vapp = VirtualApp(app, user_environ)
+    return vapp
+
+
+@contextlib.contextmanager
+def vapp_for_ingestion(app=None, registry=None, context=None):
+    yield make_vapp_for_ingestion(app=app, registry=registry, context=context)
+
+
+# I didn't need these for persona matching, but might in the future so am going to hold them for a little while.
+# -kmp 2-Apr-2021
+#
+# def name_matcher(name):
+#     """
+#     Given a string name, returns a predicate that returns True if given that name (in any case), and False otherwise.
+#     """
+#     return lambda n: n.lower() == name
+#
+#
+# def any_name_matcher(*names):
+#     """
+#     Given a list of string names, returns a predicate that matches those names. Given no names, it matches any name.
+#     The matcher returned is incase-sensitive.
+#     """
+#     if names:
+#         canonical_names = [name.lower() for name in names]
+#         return lambda name: name.lower() in canonical_names
+#     else:
+#         return constantly(True)

@@ -14,7 +14,7 @@ from dcicutils.qa_utils import ignored, ControlledTime, MockBotoS3Client
 from unittest import mock
 from .data import DBMI_PROJECT_ID, DBMI_PROJECT, DBMI_INSTITUTION_ID, DBMI_INSTITUTION, METADATA_BUNDLE_PATH, DBMI_PI
 from .. import ingestion_listener as ingestion_listener_module
-from ..types import ingestion as ingestion_module
+from .. import util as util_module
 from .helpers import assure_related_items_for_testing
 
 
@@ -63,7 +63,7 @@ def authorized_ingestion_simulation(mocked_queue_manager, mocked_s3_client, test
                     with mock.patch.object(boto3, "client", constantly(mocked_s3_client)):
                         with mock.patch.object(ingestion_listener_module, "get_queue_manager",
                                                constantly(mocked_queue_manager)):
-                            with mock.patch.object(ingestion_module, "subrequest_item_creation",
+                            with mock.patch.object(util_module, "subrequest_item_creation",
                                                    expect_unreachable_in_mock("subrequest_item_creation")):
                                 yield
 
