@@ -204,7 +204,11 @@ class SubmissionFolio:
     @staticmethod
     def show_report_lines(lines, fp, default="Nothing to report."):
         for line in lines or ([default] if default else []):
-            print(line, file=fp)
+            try:
+                print(line, file=fp)
+            except UnicodeEncodeError:
+                newline = [ascii(x) for x in line]
+                print(newline, file=fp)
 
 
 @collection(
