@@ -2308,8 +2308,7 @@ $download-button-width : 100px;
 	}
 
 	@include navbar-fixed-position {
-		// Minus 20 from that of facet-column, given lack of padding.
-		width: 300px;
+		width: 320px;
 	}
 
 	/** -- **/
@@ -2327,6 +2326,8 @@ $download-button-width : 100px;
 			min-height: 140px;
 			flex-grow: 1;
 			flex-shrink: 1;
+			/** keep scrollbar always visible for layout consistency (instd of overflow:auto) **/
+			overflow-y: scroll;
 
 			.preset-filterset-result {
 
@@ -2338,14 +2339,17 @@ $download-button-width : 100px;
 					padding-top: 8px;
 					display: flex;
 					align-items: center;
+				}
 
-					.title-icon-container {
-						color: $secondary;
+				.title-icon-container {
+					color: $secondary;
+					font-size: 1rem; /* Unset from parent elem's .text-small */
+					&.clickable {
+						color: $primary;
 						&:hover {
 							color: $primary-dark;
 						}
 					}
-
 				}
 
 				.info {
@@ -2354,10 +2358,35 @@ $download-button-width : 100px;
 					align-items: center;
 
 					.count-indicator-wrapper {
+
+						svg {
+							/** This seems to work well visually here. **/
+							vertical-align: sub;
+						}
+
 						svg circle {
 							fill: #999;
 						}
 					}
+				}
+
+				&[data-is-origin-of-current-case-filterset="true"] {
+					background-color: $light;
+
+					.title-icon-container {
+						// "resets" the blocks, unless unchanged (below)
+						color: $primary;
+					}
+
+					&[data-is-current-case-filterset-unchanged="true"] {
+						/* Similar color to filterset-block below, but lighter */
+						background-color: lighten($primary, 55%);
+
+						.title-icon-container {
+							color: $secondary;
+						}
+					}
+					
 				}
 
 			}
@@ -2403,6 +2432,9 @@ $download-button-width : 100px;
 
 	.blocks-container {
 
+		min-height: 400px;
+		overflow: auto;
+
 		.filterset-block {
 			border-radius: $border-radius-lg;
 			border: 1px solid #8e8e8e;
@@ -2420,6 +2452,10 @@ $download-button-width : 100px;
 
 
 			/* box-shadow: 0 1px 6px -3px black; */
+
+			&:not(:last-child) {
+				margin-bottom: 16px;
+			}
 
 			&.selected {
 				border-width: 3px;
