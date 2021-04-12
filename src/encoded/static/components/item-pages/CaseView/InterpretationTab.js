@@ -55,18 +55,18 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         const { "@id": vsID } = variant_sample_item;
         return (
             <div className="card mb-1" key={idx}>
-                <div className="card-header section-header">
+                <div className="card-header">
                     <div className="d-flex align-items-center">
 
                         <div className="flex-grow-1 d-flex flex-column flex-sm-row">
                             <div className="flex-auto">
-                                <VariantSampleDisplayTitleColumn className={"text-light"} result={variant_sample_item}
+                                <VariantSampleDisplayTitleColumn result={variant_sample_item}
                                     link={`${vsID}?showInterpretation=True${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
                             </div>
                             <div className="flex-grow-1  d-sm-block">
                                 &nbsp;
                             </div>
-                            <div className="flex-auto text-white text-small" data-tip="Date Selected">
+                            <div className="flex-auto text-small" data-tip="Date Selected">
                                 <i className="icon icon-calendar far mr-07"/>
                                 <LocalizedTime timestamp={date_selected} />
                             </div>
