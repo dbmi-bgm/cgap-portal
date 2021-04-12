@@ -15,7 +15,6 @@ const {
     "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFunc },
     "variant.genes.genes_most_severe_hgvsc": { render: variantRenderFunc },
     "associated_genotype_labels.proband_genotype_label": { render: genotypeLabelRenderFunc },
-    "DP": { render: dpRenderFunc },
 } = variantSampleColumnExtensionMap;
 
 
@@ -37,11 +36,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                 "associated_genotype_labels.proband_genotype_label": {
                     title: genotypeLabelColTitle,
                     description: genotypeLabelColDescription
-                } = {},
-                "DP": {
-                    title: dpColTitle,
-                    description: dpColDescription
-                } = {},
+                } = {}
             } = {}
         } = {}
     } = schemas || {};
@@ -104,12 +99,6 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             </label>
                             { genotypeLabelRenderFunc(variant_sample_item, { align: 'left' }) }
                         </div>
-                        {/* <div className="col col-sm-5 col-lg-2 py-2" data-field="DP">
-                            <label className="mb-04 text-small" data-tip={dpColDescription}>
-                                { dpColTitle || "Coverage, VAF" }
-                            </label>
-                            { dpRenderFunc(variant_sample_item) }
-                        </div> */}
                         <div className="col col-sm-12 col-lg-3 py-2">
                             <label className="mb-04 text-small">Interpretation</label>
                             <div className="w-100 text-left text-muted">Pending</div>

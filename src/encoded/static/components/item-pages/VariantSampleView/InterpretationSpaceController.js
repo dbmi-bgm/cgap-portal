@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
@@ -9,12 +9,14 @@ import Dropdown from 'react-bootstrap/esm/Dropdown';
 import Button from 'react-bootstrap/esm/Button';
 import Modal from 'react-bootstrap/esm/Modal';
 import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
-import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, navigate, layout, JWT, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, navigate, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+
+
 /**
- * Stores and manages global note state for interpretation space.
+ * Stores and manages global note state for interpretation space. Handles AJAX
+ * requests for posting and patching notes.
  */
 export class InterpretationSpaceWrapper extends React.Component {
     /**
@@ -52,7 +54,7 @@ export class InterpretationSpaceWrapper extends React.Component {
      * @param {Object}   note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
      * @param {String}   noteType "note_interpretation" or "note_standard"
      * @param {Integer}  version  Number to set version to (not in use currently... may need if expand for case in future)
-     * @param {String}   status   Should be "in review" (not in use currently... may expand if expand for case in future)
+     * @param {String}   status   Should be "in review" (not really in use currently... may expand if expand for case in future)
      */
     postNewNote(note, noteType, version = 1, status = "in review") {
         const { context: { institution = null, project = null } = {} } = this.props;
@@ -92,7 +94,6 @@ export class InterpretationSpaceWrapper extends React.Component {
     getNote(uuid, noteType) {
         console.log("Fetching @@embedded representation of " + uuid + " with " + noteType);
         const path = `/${noteType}/${uuid}/?datastore=database`;
-        console.log("path", path);
         return ajax.promise(path, 'GET');
     }
 
@@ -145,7 +146,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                     })
                     .catch((err) => {
                         const { error: { message = null } = {} } = err || {};
-                        console.log(err);
+                        console.error(err);
                         Alerts.queue({
                             title: "Error: Something went wrong while patching.",
                             message: message || "Your changes may not be saved.",
@@ -191,8 +192,13 @@ export class InterpretationSpaceWrapper extends React.Component {
                         this.setState({ loading: false, [stateFieldToUpdate]: noteWithEmbeds });
                     })
                     .catch((err) => {
-                        // TODO: Error handling/alerting
-                        console.log(err);
+                        const { error: { message = null } = {} } = err || {};
+                        console.error(err);
+                        Alerts.queue({
+                            title: "Error: Something went wrong while patching.",
+                            message: message || "Your changes may not be saved.",
+                            style: "danger"
+                        });
                         this.setState({ loading: false });
                     });
             });
@@ -209,6 +215,12 @@ export class InterpretationSpaceWrapper extends React.Component {
 }
 
 
+/**
+ * Manages tab routing, and checking for changes between notes. Also keeps a 'soft' save in state of any edits made
+ * to an unsaved draft note in state so that changes are retained when switching between tabs. (This 'soft-saving' is
+ * auto-triggered in GenericPanelController's ComponentWillUnmount if there are changes between last 'soft-saved' wip note
+ * and the draft held in state there.)
+ */
 export class InterpretationSpaceController extends React.Component {
 
     static hasNoteChanged(lastSavedNote = null, currNote = null) {
@@ -283,13 +295,14 @@ export class InterpretationSpaceController extends React.Component {
 
     switchToTab(newTab) {
         const { currentTab } = this.state;
-        // TODO: may need some componentWillUnmount in panels to save unsaved items before dismount completes
+        // componentWillUnmount in panel saves unsaved items before dismount completes
         if (currentTab !== newTab) {
             this.setState({ currentTab: newTab });
         }
     }
 
     componentWillUnmount() {
+        // Failsafe to ensure setIsSubmitting is always set back to false after navigating away
         const { setIsSubmitting } = this.props;
         setIsSubmitting(false, null, false);
     }
@@ -402,19 +415,19 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { setIsSubmitting, isSubmitting, isSubmittingModalOpen, memoizedHasNoteChanged, lastSavedNote, otherDraftsUnsaved } = this.props;
+        const { setIsSubmitting, isSubmitting, memoizedHasNoteChanged, lastSavedNote, otherDraftsUnsaved } = this.props;
 
         const isThisNoteUnsaved = memoizedHasNoteChanged(lastSavedNote, this.state);
         const anyNotesUnsaved = otherDraftsUnsaved || isThisNoteUnsaved;
 
         // Only trigger if switching from no unsaved to unsaved present or vice versa
         if (!isSubmitting && anyNotesUnsaved) {
-            console.log("started submitting (warning will appear)");
+            // started submitting (warning will appear on navigate)
             setIsSubmitting({
-                modal: <UnsavedInterpretationModal {...{ isSubmittingModalOpen, setIsSubmitting, isSubmitting }}/>
+                modal: <UnsavedInterpretationModal {...{ setIsSubmitting }}/>
             });
         } else if (isSubmitting && !anyNotesUnsaved) {
-            console.log("no longer submitting (warning will no longer appear)");
+            // no longer submitting (warning will no longer appear on navigate)
             setIsSubmitting(false); // unset
         }
     }
@@ -439,9 +452,8 @@ class GenericInterpretationPanel extends React.Component {
     componentWillUnmount() { // Before unmounting (as in switching tabs), save unsaved changes in controller state
         const { saveToField, retainWIPStateOnUnmount, lastWIPNote, memoizedHasNoteChanged } = this.props;
 
-        // Only trigger if note has changed since last save to state
+        // Only trigger if note has changed since last soft save (WIP)
         if (memoizedHasNoteChanged(lastWIPNote, this.state)) {
-            console.log("note has changed... saving");
             retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
         }
     }
@@ -449,7 +461,6 @@ class GenericInterpretationPanel extends React.Component {
     render() {
         const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource } = this.props;
         const {
-            note_text : savedNoteText = null,
             status: savedNoteStatus,
             last_modified: lastModified = null
         } = lastSavedNote || {};
@@ -486,7 +497,11 @@ class GenericInterpretationPanel extends React.Component {
     }
 }
 
-function NoteFieldDrop(props) { /** For classification, variant/gene candidacy dropdowns */
+/**
+ * Generates a dropdown with options from schema enums for a particular field, w/clear button and status indicator dots.
+ * Currently only used for classification, but can be used in future for variant/gene candidacy dropdowns (and maybe as a stopgap for ACMG).
+ */
+function NoteFieldDrop(props) {
     const { value = null, schemas = null, field = null, noteType = null, onOptionChange, cls="mb-1", getFieldProperties } = props;
     if (!schemas) {
         return 'loading...'; // TODO: actually implement a load spinner
@@ -649,10 +664,10 @@ function ACMGInterpretationForm(props) {
 function GenericInterpretationSubmitButton(props) {
     const {
         isCurrent,                  // Has note been submitted to case; only cloning enabled -- can save to KB
-        isDraft,                    // Has previous note been saved, but not submitted;
+        isDraft,                    // Has previous note been saved, but not submitted to case
         isApproved,                 // Has saved to knowledge base
-        noteTextPresent,            // Is there text in the note space
-        noteChangedSinceLastSave,   // Has the text in the note space changed since last save
+        noteTextPresent,            // Is there text in the note space?
+        noteChangedSinceLastSave,   // Has the text in the note space changed since last save?
         saveAsDraft,                // Fx -- save as Draft
         cls
     } = props;
@@ -662,10 +677,10 @@ function GenericInterpretationSubmitButton(props) {
     if (isCurrent || isApproved) {
         // No further steps allowed; saved to knowledgebase or approved to case
         return (
-            <Button variant="primary btn-block" disabled={isCur} onClick={saveAsDraft} className={cls}>
-                { isCurrent || isApproved  ? "Cannot edit - already approved" : null}
+            <Button variant="primary btn-block" disabled onClick={saveAsDraft} className={cls}>
+                Cannot edit - already approved
             </Button>);
-    } else { // Brand new note OR previous draft; allow saving or re-saving as draft
+    } else { // Brand new draft OR previous draft; allow saving or re-saving as draft
         return (
             <Button variant="primary btn-block" onClick={saveAsDraft}
                 disabled={allButtonsDropsDisabled}>
@@ -676,12 +691,10 @@ function GenericInterpretationSubmitButton(props) {
 }
 
 function UnsavedInterpretationModal(props) {
-    const { href, isSubmittingModalOpen, isSubmitting, setIsSubmitting } = props;
-
-    console.log("href", href);
+    const { href, setIsSubmitting } = props;
 
     function discardAndNavigate() {
-        setIsSubmitting(false, () => navigate(href, { 'skipRequest' : false, 'replace' : true }), false);
+        setIsSubmitting(false, () => navigate(href, { 'skipRequest' : false, 'replace': false }), false);
     }
 
     return (

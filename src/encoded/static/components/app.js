@@ -164,11 +164,11 @@ export default class App extends React.PureComponent {
          * Initial state of application.
          *
          * @type {Object}
-         * @property {boolean}      state.session               Whether user is currently logged in or not. User details are retrieved using JWT utility.
-         * @property {Object[]}     state.schemas               Current schemas; null until AJAX-ed in (may change).
-         * @property {string|JSX}   state.isSubmitting          Whether there's a submission in progress. If string, browser alert is shown to prevent user from accidentally navigating away.
-         * @property {boolean}      state.mounted               Whether app has been mounted into DOM in browser yet.
-         * @property {boolean}      state.isSubmittingModalOpen
+         * @property {boolean}         state.session               Whether user is currently logged in or not. User details are retrieved using JWT utility.
+         * @property {Object[]}        state.schemas               Current schemas; null until AJAX-ed in (may change).
+         * @property {string|Object}   state.isSubmitting          Whether there's a submission in progress. If string, browser alert is shown to prevent user from accidentally navigating away. If object & modal key has a value, that JSX will be rendered when isSubmittingModalOpen = true
+         * @property {boolean}         state.mounted               Whether app has been mounted into DOM in browser yet.
+         * @property {boolean}         state.isSubmittingModalOpen Whether or not a submitting modal is currently open (rendered in BodyElement)
          */
         this.state = {
             session,
@@ -722,7 +722,7 @@ export default class App extends React.PureComponent {
      */
     stayOnSubmissionsPage(nextHref = null) {
         const { href } = this.props;
-        const { isSubmitting, isSubmittingModalOpen } = this.state;
+        const { isSubmitting } = this.state;
         // can override state in options
         // override with replace, which occurs on back button navigation
         if (isSubmitting){
@@ -744,15 +744,17 @@ export default class App extends React.PureComponent {
                 return false;
             }
 
-            if (typeof isSubmitting === "object" && isSubmitting.modal) {
+            // If a custom modal is passed through in an object, use that to prompt user before navigating away
+            if (typeof isSubmitting === "object" && isSubmitting.modal && React.isValidElement(isSubmitting.modal)) {
 
-                // Add navigation href to modal props
+                // Feed navigation href to modal via prop
                 const modalClone = React.cloneElement(isSubmitting.modal, { href: nextHref });
 
-                this.setState({ isSubmitting: { modal: modalClone }, isSubmittingModalOpen: true }, function(state) {console.log(state);});
-                return true;
+                this.setState({ isSubmitting: { modal: modalClone }, isSubmittingModalOpen: true });
 
-            } else {
+                return true; // Do not navigate yet
+
+            } else { // Render the browser confirm alert
                 const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
 
                 if (window.confirm(confirmMessage)){
@@ -1038,13 +1040,11 @@ export default class App extends React.PureComponent {
     /**
      * Set 'isSubmitting' in state. works with handleBeforeUnload
      *
-     * @param {boolean|string|object} value - Value to set. If string is provided, will show as text in popup.
+     * @param {boolean|string|object} value - Value to set. If string is provided, will show as text in popup. If object is provided and modal key contains JSX, isSubmittingModalOpen opened/closed according to value for showModelOpen
      * @param {function} [callback=null] - Optional callback to execute after updating state.
      * @param {boolean} showModalOpen - Optional setting to also close/open modal
      */
     setIsSubmitting(value, callback=null, showModalOpen){
-        console.log("value, ", value);
-        console.log("showModalOpen", showModalOpen);
         if (showModalOpen === true || showModalOpen === false) {
             this.setState({ 'isSubmitting': value, 'isSubmittingModalOpen': showModalOpen }, callback);
         } else {
@@ -1736,11 +1736,6 @@ class BodyElement extends React.PureComponent {
                     windowHeight - ((testWarningPresent && 52) || 0)
                 );
             }
-        }
-
-        if (typeof isSubmitting === "object") {
-            const { modal } = isSubmitting || {};
-            console.log("isSubmitting, isSubmittingModalOpen", isSubmitting, isSubmittingModalOpen);
         }
 
         const navbarProps = {
