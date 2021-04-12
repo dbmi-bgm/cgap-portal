@@ -488,10 +488,10 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
             const { derived_from_preset_filterset: currentCaseDerivedFromPresetUUID = null } = currentCaseFilterSet || {};
             body = (
                 <div className="results-container border-top">
-                    { presetResults.map(function(fs, idx){
-                        const { uuid: thisPresetFSUUID } = fs;
-                        const isOrigin = currentCaseDerivedFromPresetUUID === thisPresetFSUUID;
-                        return <PresetFilterSetResult {...commonProps} presetFilterSet={fs} key={idx} isOriginOfCurrentCaseFilterSet={isOrigin} />;
+                    { presetResults.map(function(presetFilterSet, idx){
+                        const { uuid: thisPresetFSUUID } = presetFilterSet;
+                        const isOriginOfCurrentCaseFilterSet = currentCaseDerivedFromPresetUUID === thisPresetFSUUID;
+                        return <PresetFilterSetResult {...commonProps} {...{ presetFilterSet, isOriginOfCurrentCaseFilterSet }} key={idx}  />;
                     }) }
                 </div>
             );
@@ -723,7 +723,7 @@ function AddToVariantSampleListButton(props){
 
             requestPromiseChain = ajax.promise("/variant-sample-lists/", "POST", {}, JSON.stringify(createVSLPayload))
                 .then(function(respVSL){
-                    console.log('respVSL', respVSL);
+                    console.log('VSL POST response', respVSL);
                     const {
                         "@graph": [{
                             "@id": vslAtID
@@ -741,7 +741,7 @@ function AddToVariantSampleListButton(props){
                     // PATCH Case w. variant_sample_list_id
                     return ajax.promise(caseAtID, "PATCH", {}, JSON.stringify({ "variant_sample_list_id": vslAtID }));
                 }).then(function(respCase){
-                    console.log('respCase', respCase);
+                    console.log('Case PATCH response from after VSL POST', respCase);
                     const {
                         "@graph": [{
                             "@id": respCaseAtID
@@ -752,7 +752,6 @@ function AddToVariantSampleListButton(props){
                         throw new Error("Didn't succeed in PATCHing Case Item");
                     }
                     console.info("Updated Case.variant_sample_list_id", respCase);
-
                     // TODO Maybe local-patch in-redux-store Case with new last_modified + variant_sample_list_id stuff? Idk.
                 });
 
@@ -779,7 +778,7 @@ function AddToVariantSampleListButton(props){
 
             requestPromiseChain = ajax.promise(vslAtID, "PATCH", {}, JSON.stringify(patchVSLPayload) )
                 .then(function(respVSL){
-                    console.log('respVSL', respVSL);
+                    console.log('VSP PATCH resposne', respVSL);
                     const {
                         "@graph": [{
                             "@id": vslAtID
@@ -1219,12 +1218,12 @@ export class SaveFilterSetPresetDropdownButtonController extends React.Component
 
                     this.setState({ "originalPresetFilterSet": res, "isOriginalPresetFilterSetLoading": false });
                 }, "GET", (err)=>{
-                    console.log("DDD", currScopedRequest.readyState, currScopedRequest.aborted, currScopedRequest);
 
                     // Don't unset state.isOriginalPresetFilterSetLoading if request was aborted/superceded
                     if (currScopedRequest.aborted === true) {
                         return;
                     }
+
                     console.error("Error (b) in getDerivedFromFilterSetIfPresent, perhaps no view permission", err);
                     this.setState({ "isOriginalPresetFilterSetLoading": false });
                 });
@@ -1384,7 +1383,7 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
                 "project": caseProjectID
             };
 
-            console.log("modalOptionType, modalOptionItemType", modalOptionType, modalOptionItemType);
+            console.log("Submitted Preset Modal Form; modalOptionType, modalOptionItemType ==", modalOptionType, modalOptionItemType);
 
             // TODO (figure out performant approach for, ideally so can get this info in render/memoized.hasFilterSetChanged):
             // Check previous filtersets in the context (e.g. /search/?type=FilterSet&preset_for_projects=...)
@@ -1403,7 +1402,7 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
 
             ajax.promise("/filter-sets/", "POST", {}, JSON.stringify(payload))
                 .then((res) => {
-                    console.info("Created new FilterSet", res);
+                    console.info("Created new Preset FilterSet; response:", res);
                     const { "@graph": [ newPresetFilterSetItem ] } = res;
                     setLastSavedPresetFilterSet(newPresetFilterSetItem, ()=>{
                         this.setState({ "savingStatus": 2 });
@@ -1449,8 +1448,6 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
             title: filterSetTitle = null
         } = filterSet || {}; // May be null while loading initially in FilterSetController
 
-        // const { uuid: userUUID = null } = JWT.getUserDetails() || {};
-
         const disabled = (
             savingStatus !== 0
             || isOriginalPresetFilterSetLoading
@@ -1463,21 +1460,6 @@ class SaveFilterSetPresetDropdownButton extends React.Component {
         );
 
         const [ modalOptionItemType = null, modalOptionType = null ] = showingModalForEventKey ? showingModalForEventKey.split(":") : [];
-
-        // // All disabled by default if no userUUID (not logged in).
-        // // (maybe todo: pass down props.session)
-        // let isPresetForUserDisabled = !userUUID;
-        // let isPresetForProjectDisabled = !userUUID;
-        // let isDefaultForProjectDisabled = !userUUID;
-        // if (originalPresetFilterSet && !hasPresetChanged) {
-        //     // Even if preset hasn't changed, we can allow user to set a project preset as their own preset.
-        //     const { preset_for_users, preset_for_projects, default_for_projects } = originalPresetFilterSet;
-        //     if (!isPresetForUserDisabled && preset_for_users.indexOf(userUUID) ) {
-
-        //     }
-        // }
-
-        // const isEntireButtonDisabled = isLoading || (isPresetForUserDisabled && isPresetForProjectDisabled && isDefaultForProjectDisabled);
 
 
         // TODO: Put into own component possibly, once split apart FilteringTableFilterSetUI into directory of files.
@@ -2274,8 +2256,6 @@ export class FilterSetController extends React.PureComponent {
         });
         return {
             "currFilterSet": initialFilterSetItem ? { ...initialFilterSetItem } : null,
-            // todo: maybe change to allow multiple in future?
-            // "selectedFilterBlockIdx": null,
             selectedFilterBlockIndices,
             "isSettingFilterBlockIdx": true,
             "intersectFilterBlocks": false,
@@ -2542,7 +2522,6 @@ export class FilterSetController extends React.PureComponent {
             console.log("WILL USE virtualCompoundFilterSet", global_flags, virtualCompoundFilterSet);
 
             virtualNavigate(virtualCompoundFilterSet, null, (res)=>{
-                console.log("TTT1", res);
                 this.setState({ "isSettingFilterBlockIdx": false });
             });
 
@@ -2563,7 +2542,6 @@ export class FilterSetController extends React.PureComponent {
 
             if (haveSearchParamsChanged) {
                 virtualNavigate(nextSearchHref, null, (res)=>{
-                    console.log("TTT2", res);
                     this.setState({ "isSettingFilterBlockIdx": false });
                 });
             } else {
