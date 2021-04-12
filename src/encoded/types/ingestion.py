@@ -207,7 +207,7 @@ class SubmissionFolio:
             try:
                 print(line, file=fp)
             except UnicodeEncodeError:
-                newline = [ascii(x) for x in line]
+                newline = ascii(line)
                 print(newline, file=fp)
 
 
