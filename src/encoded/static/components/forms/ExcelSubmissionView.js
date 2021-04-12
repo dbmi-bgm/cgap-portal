@@ -9,7 +9,7 @@ import ReactTooltip from 'react-tooltip';
 import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 
-import { console, ajax, JWT, navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, JWT, navigate, object, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { LinkToDropdown } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/LinkToDropdown';
@@ -102,9 +102,19 @@ export default class ExcelSubmissionView extends React.PureComponent {
     }
 
     handleComplete(e){
-        const { submissionItem } = this.state;
-        const { uuid } = submissionItem || {};
-        navigate(`/search/?type=Case&ingestion_ids=${uuid}`);
+        const { submissionItem: { uuid, ingestion_type: ingestionType, additional_data = null } = {} } = this.state;
+        const { result: { genelist = '/search/?type=GeneList' } = {} } = additional_data || {};
+
+        switch(ingestionType) {
+            case "metadata_bundle":
+                navigate(`/search/?type=Case&ingestion_ids=${uuid}`);
+                break;
+            case "genelist":
+                navigate(genelist);
+                break;
+            default:
+                break;
+        }
     }
 
     markCompleted(panelIdx, setTo = true){
@@ -243,9 +253,12 @@ class PanelOne extends React.PureComponent {
         this.handleCreate = this.handleCreate.bind(this);
         this.handleSelectSubmissionType = this.handleSelectSubmissionType.bind(this);
 
+        const { href } = props;
+        const { query: { submissionType = null } = {} } = memoizedUrlParse(href);
+
         this.state = {
             selectingField: null,
-            submissionType: null,
+            submissionType: (submissionType && _.contains(["Accessioning", "Gene List"], submissionType) ? submissionType : null),
             error: null,
             isCreating: false,
             ...PanelOne.flatFieldsFromUser(props.user)
@@ -336,7 +349,8 @@ class PanelOne extends React.PureComponent {
         const {
             institutionID: institution,
             projectID: project,
-            isCreating = false
+            isCreating = false,
+            submissionType = null
         } = this.state;
 
         e.preventDefault();
@@ -384,7 +398,12 @@ class PanelOne extends React.PureComponent {
             });
         };
 
-        const postData = { institution, project, ingestion_type: "metadata_bundle", processing_status: { state: "created" } };
+        const ingestionTypeToSubmissionTypeMap = { "Accessioning" : "metadata_bundle", "Gene List": "genelist" };
+
+        const postData = {
+            institution, project, processing_status: { state: "created" },
+            ingestion_type: submissionType ? ingestionTypeToSubmissionTypeMap[submissionType] : "metadata_bundle"
+        };
 
         this.setState({ isCreating: true }, ()=>{
             this.request = ajax.load(
@@ -439,8 +458,8 @@ class PanelOne extends React.PureComponent {
                                 id="submission-type"
                             >
                                 <Dropdown.Item eventKey="Accessioning" onSelect={this.handleSelectSubmissionType}>Accessioning</Dropdown.Item>
+                                <Dropdown.Item eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List</Dropdown.Item>
                                 <Dropdown.Item disabled class="unclickable" eventKey="Family History" onSelect={this.handleSelectSubmissionType}>Family History (coming soon)</Dropdown.Item>
-                                <Dropdown.Item disabled class="unclickable" eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List (coming soon)</Dropdown.Item>
                             </DropdownButton>
                         </div>
                     </div>
@@ -521,7 +540,8 @@ class PanelTwo extends React.PureComponent {
 
         const {
             '@id': atID,
-            additional_data: { result: { aliases = {} } = {} } = {}
+            additional_data: { result: { aliases = {} } = {}, post_output = [] } = {},
+            ingestion_type: ingestionType = null
         } = submissionItem || {};
 
         if (panelIdx !== 1) {
@@ -535,9 +555,9 @@ class PanelTwo extends React.PureComponent {
                     <h4 className="text-300 mt-2">
                         Attach a file to this IngestionSubmission
                     </h4>
-                    <div className="mt-1">
-                        Click <a href="https://hms-dbmi.atlassian.net/browse/C4-505" target="_blank" rel="noreferrer">here</a> for more on how to format your document.
-                    </div>
+                    {/* <div className="mt-1">
+                        Click <a href="/help/uploading_cohort" target="_blank" rel="noreferrer">here</a> for more on how to format your document.
+                    </div> */}
                     <hr className="mb-1"/>
                     <div className="field-section mt-2">
                         <label className="d-block mb-05">
@@ -545,7 +565,7 @@ class PanelTwo extends React.PureComponent {
                             <i className="icon icon-info-circle fas icon-fw ml-05"
                                 data-tip="Select & upload files generated in Proband and other pedigree software" />
                         </label>
-                        <AttachmentInputController href={href} context={submissionItem} onAddedFile={this.onAddedFile}>
+                        <AttachmentInputController {...{ ingestionType, href }} context={submissionItem} onAddedFile={this.onAddedFile}>
                             <FileAttachmentBtn/>
                         </AttachmentInputController>
                     </div>
@@ -559,17 +579,26 @@ class PanelTwo extends React.PureComponent {
                     <div className="d-flex">
                         <div className="col">
                             <h4 className="text-300 mt-2">Successfully processed file.</h4>
-                            <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span> 
+                            { ingestionType === "genelist" ?
+                                <>
+                                    <span className="text-300 text-large">
+                                        Variants should begin updating shortly, but may take a few hours depending on server load.
+                                    </span>
+                                </>
+                                : <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span>}
                         </div>
                         <div className="align-self-end">
                             <button type="button" className="btn btn-success" onClick={handleComplete}>
-                                View New Cases
+                                {ingestionType === "metadata_bundle" ? "View New Cases" : "View Gene List" }
                             </button>
                         </div>
                     </div>
-                    <hr/>
-                    <span className="pl-1">Results:</span>
-                    <CreatedItemsTable aliasToAtIDMap={aliases} />
+                    { ingestionType !== "metadata_bundle" ? null : (
+                        <>
+                            <hr/>
+                            <span className="pl-1">Results:</span>
+                            <CreatedItemsTable aliasToAtIDMap={aliases} />
+                        </>)}
                 </React.Fragment>
             );
         }
@@ -710,17 +739,23 @@ function Poller(props){
 }
 
 function FileAttachmentBtn(props){
-    const { loadingFileResult, postFileSuccess, onFileInputChange } = props;
+    const { loadingFileResult, postFileSuccess, onFileInputChange, ingestionType } = props;
     const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
+
+    let acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
+    if (ingestionType === "genelist") {
+        acceptedTypes += ", .txt";
+    }
+
     return (
         <React.Fragment>
             <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
                 className={"btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
                 <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
                     disabled={loadingFileResult || postFileSuccess === true}
-                    accept=".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                    accept={acceptedTypes} />
                 <i className={"mr-08 icon icon-fw icon-" + icon} />
-                <span>Select Excel File...</span>
+                <span>{ ingestionType === "metadata_bundle" ? "Select Excel File..." : "Select Excel or Text File..." }</span>
             </label>
             { !loadingFileResult && postFileSuccess ? <span className="ml-1 text-success">Success! <i className="icon icon-check fas"></i></span> : null}
             { !loadingFileResult && postFileSuccess === false ? <span className="ml-1 text-danger">Failure! <i className="icon icon-times-circle fas"></i></span> : null}
