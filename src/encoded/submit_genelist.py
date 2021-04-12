@@ -102,7 +102,7 @@ class GeneListSubmission:
         """
         title = None
         genelist = []
-        with open(txt_file, "r") as genelist_file:
+        with open(txt_file, "r", encoding="utf-8") as genelist_file:
             genelist_raw = genelist_file.readlines()
         for line in genelist_raw:
             if "title" in line.lower():
@@ -189,9 +189,10 @@ class GeneListSubmission:
                 "the following gene entries: %s" % ", ".join(genes_with_spaces)
             )
         if non_ascii_genes:
+#            non_ascii_genes = [ascii(x) for x in non_ascii_genes]
             self.errors.append(
-                "The following gene(s) contain non-ascii characters: %s. "
-                "Please re-enter the genes using only ascii characters."
+                "The following gene(s) contain non-ASCII characters: %s. "
+                "Please re-enter the genes using only ASCII characters."
                 % ", ".join(non_ascii_genes)
             )
         if not genelist:
