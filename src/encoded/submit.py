@@ -934,7 +934,6 @@ def compare_fields(profile, aliases, json_item, db_item):
             if (db_item.get('status') in ['uploading', 'upload failed', 'to be uploaded by workflow']
                     or json_item['filename'].split('/')[-1] != db_item.get('filename')):
                 to_patch['filename'] = json_item['filename']
-                to_patch['status'] = 'uploading'
             continue
         # if not an array, patch field gets overwritten (if different from db)
         if profile['properties'][field]['type'] != 'array':
@@ -1015,17 +1014,12 @@ def validate_all_items(virtualapp, json_data):
                         if fname:
                             if fname in ''.join(json_data['errors']):
                                 validation_results[itemtype]['errors'] += 1
-                            else:
-                                json_data[itemtype][alias]['status'] = 'uploading'
                         json_data_final['post'].setdefault(itemtype, [])
                         json_data_final['post'][itemtype].append(json_data[itemtype][alias])
                         validation_results[itemtype]['validated'] += 1
                 else:
                     # patch if item exists in db
                     patch_data = compare_fields(profile, alias_dict, data, db_results[alias])
-                    if itemtype in ['file_fastq', 'file_processed']:
-                        if 'filename' in patch_data:
-                            patch_data['status'] = 'uploading'
                     error = validate_item(virtualapp, patch_data, 'patch', itemtype,
                                           all_aliases, atid=db_results[alias]['@id'])
                     if error:  # report validation errors
@@ -1101,7 +1095,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                             json_data_final['patch'][k][atid] = patch_info
                         if k in item_names:
                             output.append('Success - {} {} posted'.format(k, item[item_names[k]]))
-                        if fname and item.get('status') == 'uploading':
+                        if fname:
                             files.append({
                                 'uuid': response.json['@graph'][0]['uuid'],
                                 'filename': fname
@@ -1128,7 +1122,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                 response = virtualapp.patch_json('/' + item_id, patch_data, status=200)
                 if response.json['status'] == 'success':
                     final_status[k]['patched'] += 1
-                    if fname and patch_data.get('status') == 'uploading':
+                    if fname:
                         files.append({
                             'uuid': response.json['@graph'][0]['uuid'],
                             'filename': fname

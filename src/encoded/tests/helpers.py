@@ -3,51 +3,56 @@ import io
 import json
 import pkg_resources
 
-from dcicutils.misc_utils import find_association, ignorable
+from dcicutils.misc_utils import find_association, find_associations, ignorable
+from dcicutils.lang_utils import string_pluralize
 
 
-def master_lookup(item_type, **attributes):
+def master_lookup(item_type, multiple=False, **attributes):
     """
     Given an item type and a set of attributes, looks up the master insert of that type matching
     the given attribute details.
 
     :param item_type: an item type (such as 'User' or 'Project')
+    :param multiple: True if the result should be a list of multiple objects, or False if it should be a single object
     :param attributes: a set of keywords and values (or keywords and predicate functions).
-    :return: the JSON for a matching insert
+    :return: the JSON for a matching insert (if multiple=False) or a list of such items (if multiple=True)
     """
 
-    return any_inserts_lookup('master-inserts', item_type=item_type, **attributes)
+    return any_inserts_lookup('master-inserts', item_type=item_type, multiple=multiple, **attributes)
 
 
-def workbook_lookup(item_type, **attributes):
+def workbook_lookup(item_type, multiple=False, **attributes):
     """
     Given an item type and a set of attributes, looks up the workbook insert of that type matching
     the given attribute details.
 
     :param item_type: an item type (such as 'User' or 'Project')
+    :param multiple: True if the result should be a list of multiple objects, or False if it should be a single object
     :param attributes: a set of keywords and values (or keywords and predicate functions).
-    :return: the JSON for a matching insert
+    :return: the JSON for a matching insert (if multiple=False) or a list of such items (if multiple=True)
     """
 
-    return any_inserts_lookup('workbook-inserts', item_type=item_type, **attributes)
+    return any_inserts_lookup('workbook-inserts', item_type=item_type, multiple=multiple, **attributes)
 
 
-def any_inserts_lookup(inserts_directory_name, item_type, **attributes):
+def any_inserts_lookup(inserts_directory_name, item_type, multiple=False, **attributes):
     """
     Given an item type and a set of attributes, looks up the master insert of that type matching
     the given attribute details.
 
     :param inserts_directory_name: The name of an inserts directory (such as 'master-inserts' or 'workbook-inserts')
     :param item_type: an item type (such as 'User' or 'Project')
+    :param multiple: True if the result should be a list of multiple objects, or False if it should be a single object
     :param attributes: a set of keywords and values (or keywords and predicate functions).
-    :return: the JSON for a matching insert
+    :return: the JSON for a matching insert (if multiple=False) or a list of such items (if multiple=True)
     """
 
     item_filename = pkg_resources.resource_filename('encoded', 'tests/data/' + inserts_directory_name
                                                     + "/" + item_type.lower() + ".json")
     with io.open(item_filename) as fp:
         data = json.load(fp)
-        return find_association(data, **attributes)
+        finder = find_associations if multiple else find_association
+        return finder(data, **attributes)
 
 
 def _required_field_set(item_type):
@@ -132,27 +137,26 @@ def post_related_items_for_testing(testapp, item_dict, undo_dict):
     :param item_dict: the item dictionary
     :param undo_dict: a dictionary that will be augmented with undo information to undo patching (but not posting)
                       of the items.
-    :return: None
+    :return: an item_dict representing the posted objects
     """
     for item_type, items in item_dict.items():
         for item in items:
+            already_posted = False
             try:
+                # This post is done for side-effect.
                 testapp.post_json('/' + item_type, _core_portion(item_type, item))
             except Exception as e:
+                already_posted = True
                 ignorable(e)
-                try:
-                    found = testapp.get('/%ss/%s/' % (item_type.lower(), item['uuid'])).maybe_follow().json
-                except Exception as ee:
-                    ignorable(ee)
-                    found = None
-                if found:
-                    trimmed = _trim_item_for_undo(item_type, found, item.keys())
-                    if item_type not in undo_dict:
-                        undo_dict[item_type] = []
-                    # If there was data there before, remember how to restore it.
-                    undo_dict[item_type].append(trimmed)
-    _carefully_patch_related_items_for_testing(testapp=testapp, item_dict=item_dict)
-    return undo_dict
+            items_type = string_pluralize(item_type.lower())
+            found = testapp.get('/%s/%s/' % (items_type, item['uuid'])).maybe_follow().json
+            if already_posted:
+                trimmed = _trim_item_for_undo(item_type, found, item.keys())
+                if item_type not in undo_dict:
+                    undo_dict[item_type] = []
+                # If there was data there before, remember how to restore it.
+                undo_dict[item_type].append(trimmed)
+    return _carefully_patch_related_items_for_testing(testapp=testapp, item_dict=item_dict)
 
 
 _FIELD_MISSING = object()
@@ -179,9 +183,12 @@ def _carefully_patch_related_items_for_testing(testapp, item_dict):
     :param item_dict: the item dictionary
     :return: None
     """
+    result = {}
     for item_type, items in item_dict.items():
+        result[item_type] = []
         for item in items:
-            url = '/%ss/%s/' % (item_type.lower(), item['uuid'])
+            items_type = string_pluralize(item_type.lower())
+            url = '/%s/%s/' % (items_type, item['uuid'])
             delta = {}
             current = testapp.get(url).maybe_follow().json
             for k, desired_v in item.items():
@@ -189,19 +196,24 @@ def _carefully_patch_related_items_for_testing(testapp, item_dict):
                 if desired_v != current_v:
                     delta[k] = desired_v
             if delta:
-                testapp.patch_json(url, delta)
+                res = testapp.patch_json(url, delta).maybe_follow().json['@graph'][0]
+                # print("Patching", url, delta)
+                # print(" =>", res)
+                result[item_type] = res
+            else:
+                result[item_type] = current
+    return result
 
 
 @contextlib.contextmanager
 def assure_related_items_for_testing(testapp, item_dict):
     """
     A context manager that posts a given set of cooperating items for testing. Something like the workbook,
-    but on smaller scale and more modular.
+    but on smaller scale and more modular. But also, upon return it try to undo changes to previously-existing items.
 
     :param testapp: a testapp or es_testapp to post to
     :param item_dict: an item dict of the form {item_type1: [item1_1, item1_2, ...], item_type2: [item_2_1, ...]}
-
-
+    :yield: a set of items that have been posted
     """
     # Note that this undo_dict is created in advance and passed in so that if an error occurs during posting,
     # there may be a list of partial attempts that can still be undone.  (If we had accumulated a full return value
@@ -209,7 +221,7 @@ def assure_related_items_for_testing(testapp, item_dict):
     # to confusion in later tests. -kmp 10-Mar-2021
     undo_dict = {}
     try:
-        post_related_items_for_testing(testapp=testapp, item_dict=item_dict, undo_dict=undo_dict)
-        yield
+        posted = post_related_items_for_testing(testapp=testapp, item_dict=item_dict, undo_dict=undo_dict)
+        yield posted
     finally:
         _carefully_patch_related_items_for_testing(testapp=testapp, item_dict=undo_dict)

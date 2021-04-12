@@ -863,11 +863,6 @@
                 }
             ]
         },
-        "cmphet.comhet_impact_gene": {
-            "title": "ComHet Impact",
-            "order": 17,
-            "grouping": "Inheritance"
-        },
         "variant.csq_gnomadg_af": {
             "title": "GnomAD Alt Allele Frequency",
             "aggregation_type": "range",
