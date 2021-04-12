@@ -207,8 +207,10 @@ class SubmissionFolio:
             try:
                 print(line, file=fp)
             except UnicodeEncodeError:
-                newline = ascii(line)
-                print(newline, file=fp)
+                ascii_line = line.encode(
+                    encoding="ascii", errors="backslashreplace"
+                ).decode(encoding="ascii")
+                print(ascii_line, file=fp)
 
 
 @collection(
