@@ -90,19 +90,19 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
                                 { geneTranscriptColTitle || "Gene, Transcript" }
                             </label>
-                            { geneTranscriptRenderFunc(variant_sample_item, { link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=Gene%20Notes' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                            { geneTranscriptRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=Gene%20Notes' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                         </div>
                         <div className="col col-sm-4 col-lg-3 py-2">
                             <label className="mb-04 text-small" data-tip={variantColDescription}>
                                 { variantColTitle || "Variant" }
                             </label>
-                            { variantRenderFunc(variant_sample_item, { link: vsID + '?showInterpretation=True&annotationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                            { variantRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                         </div>
                         <div className="col col-sm-4 col-lg-3 py-2">
                             <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
                                 { genotypeLabelColTitle || "Genotype" }
                             </label>
-                            { genotypeLabelRenderFunc(variant_sample_item) }
+                            { genotypeLabelRenderFunc(variant_sample_item, { align: 'left' }) }
                         </div>
                         {/* <div className="col col-sm-5 col-lg-2 py-2" data-field="DP">
                             <label className="mb-04 text-small" data-tip={dpColDescription}>
@@ -112,7 +112,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                         </div> */}
                         <div className="col col-sm-12 col-lg-3 py-2">
                             <label className="mb-04 text-small">Interpretation</label>
-                            <div className="w-100 text-center"><em className="text-muted">Pending</em></div>
+                            <div className="w-100 text-left text-muted">Pending</div>
                         </div>
                     </div>
                 </div>
