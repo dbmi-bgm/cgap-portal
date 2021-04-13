@@ -189,13 +189,12 @@ class GeneListSubmission:
                 "the following gene entries: %s" % ", ".join(genes_with_spaces)
             )
         if non_ascii_genes:
-#            non_ascii_genes = [ascii(x) for x in non_ascii_genes]
             self.errors.append(
                 "The following gene(s) contain non-ASCII characters: %s. "
                 "Please re-enter the genes using only ASCII characters."
                 % ", ".join(non_ascii_genes)
             )
-        if not genelist:
+        if not genelist and not genes_with_spaces and not non_ascii_genes:
             self.errors.append(
                 "No genes were found in the gene list. Please check the "
                 "formatting of the submitted document."
