@@ -242,6 +242,11 @@ def is_yes_value(str_value):
     return False
 
 
+def string_to_array(str_value):
+    """converts cell contents to list, splitting by commas"""
+    return [item.strip() for item in str_value.split(',')]
+
+
 class MetadataItem:
     """
     class for single DB-item-worth of json
@@ -494,9 +499,11 @@ class PedigreeRow:
 
     def extract_individual_metadata(self):
         info = {'aliases': [self.indiv_alias]}
-        simple_fields = ['family_id', 'individual_id', 'sex', 'clinic_notes', 'ancestry',
-                         'quantity', 'life_status', 'cause_of_death', 'age_at_death',
-                         'age_at_death_units', 'gestational_age', 'cause_of_infertility']
+        simple_fields = [
+            'family_id', 'individual_id', 'sex', 'age', 'age_units', 'clinic_notes',
+            'ancestry', 'quantity', 'life_status', 'cause_of_death', 'age_at_death',
+            'age_at_death_units', 'gestational_age', 'cause_of_infertility'
+        ]
         info = map_fields(self.metadata, info, simple_fields, 'individual')
         for field in info:
             if field.startswith('is_'):
@@ -505,8 +512,12 @@ class PedigreeRow:
             if info.get(field):
                 info[field] = generate_individual_alias(self.project, info[field])
         info['proband'] = self.is_proband()
+        if info.get('age') and not info.get('age_units'):
+            info['age_units'] = 'year'
+        if info.get('ancestry'):
+            info['ancestry'] = string_to_array(info['ancestry'])
         if info.get('phenotypic_features'):
-            info['phenotypic_features'] = [item.strip() for item in info['phenotypic_features'].split(',')]
+            info['phenotypic_features'] = string_to_array(info['phenotypic_features'])
         if info.get('disorders'):
             info['disorders'] = [self.format_atid(item.strip()) for item in info['disorders'].split(',')]
         info['phenotypic_features'] = self.reformat_phenotypic_features(info.get('phenotypic_features', []))
@@ -859,28 +870,38 @@ class PedigreeMetadata:
                 family_metadata[item['family_id']]['proband'] = alias
                 family_metadata[item['family_id']]['aliases'] = [self.project + ':family-' + item['individual_id']]
             del item['family_id']
-        # make sure a proband is indicated for each family
-        for v in family_metadata.values():
-            if not v.get('proband'):
-                msg = ('No proband indicated for family {}. Please edit and resubmit'.format(v['family_id']))
-                self.errors.append(msg)
         final_family_dict = {}
         for key, value in family_metadata.items():
             try:
                 family_matches = self.virtualapp.get(f'/search/?type=Family&family_id={key}')
             except Exception:
                 # if family not in DB, create a new one
-                final_family_dict[value['aliases'][0]] = value
+                # first make sure a proband is indicated for a family if its not already in DB
+                if not value.get('proband'):
+                    msg = ('No proband indicated for family {}. Please edit and resubmit'.format(value['family_id']))
+                    self.errors.append(msg)
+                else:
+                    final_family_dict[value['aliases'][0]] = value
             else:
                 for match in family_matches.json['@graph']:
+                    value.setdefault('aliases', [])
                     value['aliases'].extend(match.get('aliases', []))
                     final_family_dict[match['@id']] = value
                     if value.get('proband'):
-                        phenotypes = [item['phenotypic_feature'] for item in
-                                      self.individuals[value['proband']].get('phenotypic_features', [])]
-                        # TODO: Add other family member phenotypes if proband phenotypes < 4 ?
+                        phenotypes = list(set([item['phenotypic_feature'] for item in
+                                      self.individuals[value['proband']].get('phenotypic_features', [])]))
+                        # Add other family member phenotypes if proband phenotypes < 4
+                        if len(phenotypes) < 4:
+                            for member in value['members']:
+                                if member != value['proband']:
+                                    member_phenotypes = [item['phenotypic_feature'] for item in
+                                                         self.individuals[member].get('phenotypic_features', [])]
+                                    phenotypes.extend(member_phenotypes)
+                                    phenotypes = list(set(phenotypes))
+                                    if len(phenotypes) >= 4:
+                                        break
                         if phenotypes:
-                            final_family_dict[match['@id']]['family_phenotyic_features'] = phenotypes[:4]
+                            final_family_dict[match['@id']]['family_phenotypic_features'] = phenotypes[:4]
                         del final_family_dict[match['@id']]['proband']
         return final_family_dict
 
@@ -1108,7 +1129,7 @@ def parse_exception(e, aliases):
                         field = field_name.replace('_', ' ')
                     error = 'field: ' + error.replace(field_name, field)
                     if 'phenotypic feature' in field:
-                        hpo_idx = error.index('/phenotypes/' + 12)
+                        hpo_idx = error.index('/phenotypes/') + 12
                         hpo_term = error[hpo_idx:error.index('/', hpo_idx)]
                         msg = ('HPO terms - HPO term {} not found in database.'
                                ' Please check HPO ID and resubmit.'.format(hpo_term))
