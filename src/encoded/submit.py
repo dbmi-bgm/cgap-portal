@@ -2,12 +2,8 @@ from copy import deepcopy
 import csv
 import datetime
 import json
-<<<<<<< HEAD
 import re
-import xlrd
-=======
 import openpyxl
->>>>>>> master
 
 from dcicutils.lang_utils import n_of
 from dcicutils.qa_utils import ignored
