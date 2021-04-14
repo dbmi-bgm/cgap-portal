@@ -462,83 +462,6 @@ class SubmissionRow:
                 self.files_processed.append(MetadataItem(file_info, self.row, 'file_processed'))
 
 
-class PedigreeRow:
-
-    def __init__(self, metadata, idx, project, institution):
-        self.project = project
-        self.institution = institution
-        self.row = idx
-        self.metadata = metadata
-        self.errors = []
-        if not self.found_missing_values():
-            self.indiv_alias = generate_individual_alias(project, metadata[SS_INDIVIDUAL_ID])
-            self.individual = self.extract_individual_metadata()
-            self.proband = self.is_proband()
-
-    def found_missing_values(self):
-        # makes sure no required values from spreadsheet are missing
-        missing_required = [col for col in REQUIRED_COLUMNS_PEDIGREE
-                            if col not in self.metadata or not self.metadata[col]]
-        if missing_required:
-            self.errors.append(
-                'Row {} - missing required field(s) {}. This row cannot be processed.'
-                ''.format(self.row, ', '.join(missing_required))
-            )
-        return len(self.errors) > 0
-
-    def format_atid(self, term):
-        """turns HPO or MONDO term IDs into the corresponding @id in the database."""
-        term_id = term.upper().replace('_', ':') if term else ''
-        if re.match(r'^HP:[0-9]{7}$', term_id):
-            return f'/phenotypes/{term_id}/'
-        elif re.match(r'^MONDO:[0-9]{7}$', term_id):
-            return f'/disorders/{term_id}/'
-        else:
-            msg = ('Row {} - term {} does not match the format for an HPO or MONDO '
-                   'ontology term. Please edit and resubmit.'.format(self.row, term))
-            self.errors.append(msg)
-            return term
-
-    def reformat_phenotypic_features(self, feature_list):
-        if not feature_list:
-            return []
-        return [{'phenotypic_feature': self.format_atid(feature)} for feature in feature_list if feature]
-
-    def extract_individual_metadata(self):
-        info = {'aliases': [self.indiv_alias]}
-        simple_fields = [
-            'family_id', 'individual_id', 'sex', 'age', 'age_units', 'clinic_notes',
-            'ancestry', 'quantity', 'life_status', 'cause_of_death', 'age_at_death',
-            'age_at_death_units', 'gestational_age', 'cause_of_infertility'
-        ]
-        info = map_fields(self.metadata, info, simple_fields, 'individual')
-        for field in info:
-            if field.startswith('is_'):
-                info[field] = is_yes_value(info[field])
-        for field in ['mother', 'father']:  # turn mother and father IDs into item aliases
-            if info.get(field):
-                info[field] = generate_individual_alias(self.project, info[field])
-        info['proband'] = self.is_proband()
-        if info.get('age') and not info.get('age_units'):
-            info['age_units'] = 'year'
-        if info.get('ancestry'):
-            info['ancestry'] = string_to_array(info['ancestry'])
-        if info.get('phenotypic_features'):
-            info['phenotypic_features'] = string_to_array(info['phenotypic_features'])
-        if info.get('disorders'):
-            info['disorders'] = [self.format_atid(item.strip()) for item in info['disorders'].split(',')]
-        info['phenotypic_features'] = self.reformat_phenotypic_features(info.get('phenotypic_features', []))
-        for col in ['age', 'birth_year', 'age_at_death', 'gestational_age', 'quantity']:
-            if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
-                info[col] = int(info[col])
-        return MetadataItem(info, self.row, 'individual')
-
-    def is_proband(self):
-        if self.metadata['proband'].lower().startswith('y'):
-            return True
-        return False
-
-
 class SubmissionMetadata:
     """
     class to hold info parsed from one spreadsheet.
@@ -858,6 +781,83 @@ class SubmissionMetadata:
                 self.json_out[key][alias] = new_metadata
             # self.json_out[key] = self.itemtype_dict[key]
             self.json_out['errors'] = self.errors
+
+
+class PedigreeRow:
+
+    def __init__(self, metadata, idx, project, institution):
+        self.project = project
+        self.institution = institution
+        self.row = idx
+        self.metadata = metadata
+        self.errors = []
+        if not self.found_missing_values():
+            self.indiv_alias = generate_individual_alias(project, metadata[SS_INDIVIDUAL_ID])
+            self.individual = self.extract_individual_metadata()
+            self.proband = self.is_proband()
+
+    def found_missing_values(self):
+        # makes sure no required values from spreadsheet are missing
+        missing_required = [col for col in REQUIRED_COLUMNS_PEDIGREE
+                            if col not in self.metadata or not self.metadata[col]]
+        if missing_required:
+            self.errors.append(
+                'Row {} - missing required field(s) {}. This row cannot be processed.'
+                ''.format(self.row, ', '.join(missing_required))
+            )
+        return len(self.errors) > 0
+
+    def format_atid(self, term):
+        """turns HPO or MONDO term IDs into the corresponding @id in the database."""
+        term_id = term.upper().replace('_', ':') if term else ''
+        if re.match(r'^HP:[0-9]{7}$', term_id):
+            return f'/phenotypes/{term_id}/'
+        elif re.match(r'^MONDO:[0-9]{7}$', term_id):
+            return f'/disorders/{term_id}/'
+        else:
+            msg = ('Row {} - term {} does not match the format for an HPO or MONDO '
+                   'ontology term. Please edit and resubmit.'.format(self.row, term))
+            self.errors.append(msg)
+            return term
+
+    def reformat_phenotypic_features(self, feature_list):
+        if not feature_list:
+            return []
+        return [{'phenotypic_feature': self.format_atid(feature)} for feature in feature_list if feature]
+
+    def extract_individual_metadata(self):
+        info = {'aliases': [self.indiv_alias]}
+        simple_fields = [
+            'family_id', 'individual_id', 'sex', 'age', 'age_units', 'clinic_notes',
+            'ancestry', 'quantity', 'life_status', 'cause_of_death', 'age_at_death',
+            'age_at_death_units', 'gestational_age', 'cause_of_infertility'
+        ]
+        info = map_fields(self.metadata, info, simple_fields, 'individual')
+        for field in info:
+            if field.startswith('is_'):
+                info[field] = is_yes_value(info[field])
+        for field in ['mother', 'father']:  # turn mother and father IDs into item aliases
+            if info.get(field):
+                info[field] = generate_individual_alias(self.project, info[field])
+        info['proband'] = self.is_proband()
+        if info.get('age') and not info.get('age_units'):
+            info['age_units'] = 'year'
+        if info.get('ancestry'):
+            info['ancestry'] = string_to_array(info['ancestry'])
+        if info.get('phenotypic_features'):
+            info['phenotypic_features'] = string_to_array(info['phenotypic_features'])
+        if info.get('disorders'):
+            info['disorders'] = [self.format_atid(item.strip()) for item in info['disorders'].split(',')]
+        info['phenotypic_features'] = self.reformat_phenotypic_features(info.get('phenotypic_features', []))
+        for col in ['age', 'birth_year', 'age_at_death', 'gestational_age', 'quantity']:
+            if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
+                info[col] = int(info[col])
+        return MetadataItem(info, self.row, 'individual')
+
+    def is_proband(self):
+        if self.metadata['proband'].lower().startswith('y'):
+            return True
+        return False
 
 
 class PedigreeMetadata:
