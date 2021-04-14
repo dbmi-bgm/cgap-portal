@@ -609,13 +609,6 @@ class GeneListSubmission:
             )
         ]
         try:
-            submission_response = self.vapp.wrapped_app.post(
-                submission_post_url,
-                submission_post_data,
-                upload_files=upload_file,
-                content_type="multipart/form-data",
-            ).json
-        except AttributeError:  # Catch unit test error
             submission_response = self.vapp.post(
                 submission_post_url,
                 submission_post_data,
