@@ -608,13 +608,12 @@ class GeneListSubmission:
                 bytes("\n".join(self.gene_ids), encoding="utf-8"),
             )
         ]
-        try:
-            submission_response = self.vapp.post(
-                submission_post_url,
-                submission_post_data,
-                upload_files=upload_file,
-                content_type="multipart/form-data",
-            ).json
+        submission_response = self.vapp.post(
+            submission_post_url,
+            submission_post_data,
+            upload_files=upload_file,
+            content_type="multipart/form-data",
+        ).json
         if submission_response["success"]:
             self.post_output.append(
                 "Variants should begin updating shortly but may take a few "
@@ -663,13 +662,19 @@ def submit_variant_update(
             filename, project, institution, vapp, validate_only
         )
         if validate_only:
-            results["validation_output"] = variant_update.validate_output
+            results["validation_output"] = (
+                variant_update.validate_output + variant_update.errors
+                if variant_update.errors
+                else variant_update.validate_output
+            )
         elif variant_update.post_output:
             results["success"] = True
             results["validation_output"] = variant_update.validate_output
             results["post_output"] = variant_update.post_output
         else:
-            results["validation_output"] = variant_update.errors
+            results["validation_output"] = (
+                variant_update.errors + variant_update.validate_output
+            )
         return results
 
 
@@ -689,8 +694,7 @@ class VariantUpdateSubmission:
         self.errors = []
         self.gene_uuids = self.genes_from_file()
         self.variant_samples = self.find_associated_variants()
-        self.json_post = self.create_post()
-        self.validate_output = self.validate_post()
+        self.validate_output = self.validate_patch()
         if not validate_only:
             self.post_output = self.queue_variants_for_indexing()
 
@@ -715,16 +719,16 @@ class VariantUpdateSubmission:
 
     def find_associated_variants(self):
         """
-        Finds associated variants and variant samples for the genes of
+        Finds associated variant samples for the genes of
         interest.
 
         Returns:
-            - List of unique variant and variant sample uuids (None if no gene
+            - List of unique variant sample uuids (None if no gene
             uuids)
         """
         if not self.gene_uuids:
             return None
-        variant_samples_to_index = []
+        variant_samples_to_invalidate = []
         genes_to_search = list(set(self.gene_uuids))
         variant_sample_search = CommonUtils.batch_search(
             genes_to_search,
@@ -733,69 +737,56 @@ class VariantUpdateSubmission:
             item_type="VariantSample",
         )
         for variant_sample_response in variant_sample_search:
-            variant_samples_to_index.append(variant_sample_response["uuid"])
-        to_index = list(set(variant_samples_to_index))
-        if not to_index:
-            self.errors.append("No variant samples found for the given genes.")
-        return to_index
+            variant_samples_to_invalidate.append(variant_sample_response["uuid"])
+        to_invalidate = list(set(variant_samples_to_invalidate))
+        return to_invalidate
 
-    def create_post(self):
+    def validate_patch(self):
         """
+        Validates empty patching of variant samples.
+
         Returns:
-            - Dict to post containing variant sample uuids (None if no
-              variant samples found previously)
+            - String info about validation
         """
         if not self.variant_samples:
-            return None
-        index_queue_post = {
-            "uuids": self.variant_samples,
-            "target_queue": "primary",
-            "strict": True,
-        }
-        return index_queue_post
-
-    def validate_post(self):
-        """
-        Validates posting to indexing queue.
-
-        Returns:
-            - String info about validation (None if no post created or
-              validation failed)
-        """
-        if not self.json_post:
-            return None
-        validate_response = self.vapp.post_json(
-            "/queue_indexing?validate_only=True", self.json_post
-        )
-        if validate_response.json["notification"] == "Success":
             validate_output = (
-                "%s variant samples were validated for "
-                "re-indexing" % str(len(self.variant_samples))
+                "No variant samples were found for the given genes"
             )
-        else:
-            self.errors.append("Validation failed: " + validate_response.json)
-            validate_output = None
+            return validate_output
+        not_validated = []
+        for uuid in self.variant_samples:
+            validate_response = self.vapp.patch_json(
+                "/" + uuid + "?validate_only", {}
+            )
+            if validate_response.json["status"] != "success":
+                not_validated.append(uuid)
+        if not_validated:
+            self.errors.append(
+                "Validation failed for the following variant samples: %s."
+                % ", ".join(not_validated)
+            )
+        validate_output = (
+            "%s variant samples for validated for indexing."
+            % str(len(self.variant_samples) - len(not_validated))
+        )
         return validate_output
 
     def queue_variants_for_indexing(self):
         """
-        Posts variant samples to indexing queue.
+        Queues all variant samples for indexing by empty patching.
 
         Returns:
             - String info about post (None if validation failed or posting
               failed)
         """
-        if not self.validate_output:
+        if not self.variant_samples or self.errors:
             return None
-        post_response = self.vapp.post_json("/queue_indexing", self.json_post)
-        if post_response.json["notification"] == "Success":
-            post_output = (
-                "%s variant samples were queued for "
-                "re-indexing" % str(len(self.variant_samples))
-            )
-        else:
-            self.errors.append("Posting failed: " + post_response.json)
-            post_output = None
+        for uuid in self.variant_samples:
+            self.vapp.patch_json("/" + uuid, {})
+        post_output = (
+            "%s variant samples for validated for invalidation."
+            % str(len(self.variant_samples))
+        )
         return post_output
 
 
