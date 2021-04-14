@@ -754,7 +754,6 @@ class VariantUpdateSubmission:
             validate_output = (
                 "No variant samples were found for the given genes"
             )
-            return validate_output
         not_validated = []
         for uuid in self.variant_samples:
             validate_response = self.vapp.patch_json(
@@ -780,7 +779,7 @@ class VariantUpdateSubmission:
             - String info about post (None if validation failed or posting
               failed)
         """
-        if not self.variant_samples or self.errors:
+        if self.errors:
             return None
         for uuid in self.variant_samples:
             self.vapp.patch_json("/" + uuid, {})
