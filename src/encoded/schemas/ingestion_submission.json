@@ -72,7 +72,8 @@
                 "simulated_bundle",
                 "vcf",
                 "genelist",
-                "variant_update"
+                "variant_update",
+                "family_history"
             ]
         },
         "submission_id": {

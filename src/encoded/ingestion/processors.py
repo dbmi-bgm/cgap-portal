@@ -139,6 +139,7 @@ def handle_variant_update(submission: SubmissionFolio):
 
 
 @ingestion_processor('metadata_bundle')
+@ingestion_processor('family_history')
 def handle_metadata_bundle(submission: SubmissionFolio):
 
     with submission.processing_context():
@@ -148,7 +149,7 @@ def handle_metadata_bundle(submission: SubmissionFolio):
 
         institution = get_parameter(submission.parameters, 'institution')
         project = get_parameter(submission.parameters, 'project')
-        submission_type = get_parameter(submission.parameters, 'submission_type', default='accessioning')
+        # submission_type = get_parameter(submission.parameters, 'submission_type', default='accessioning')
         validate_only = get_parameter(submission.parameters, 'validate_only', as_type=bool, default=False)
 
         bundle_results = submit_metadata_bundle(s3_client=s3_client,
@@ -156,7 +157,7 @@ def handle_metadata_bundle(submission: SubmissionFolio):
                                                 key=submission.object_name,
                                                 project=project,
                                                 institution=institution,
-                                                submission_type=submission_type,
+                                                submission_type=submission.ingestion_type,
                                                 vapp=submission.vapp,
                                                 validate_only=validate_only)
 
@@ -170,6 +171,11 @@ def handle_metadata_bundle(submission: SubmissionFolio):
 
         if not bundle_results.get('success'):
             submission.fail()
+
+
+# @ingestion_processor('family_history')
+# def handle_family_history(submission: SubmissionFolio):
+#     return handle_metadata_bundle(submission)
 
 
 @ingestion_processor('simulated_bundle')

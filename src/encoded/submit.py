@@ -1016,7 +1016,7 @@ class SpreadsheetProcessing:
         self.submission_type = submission_type
         if self.submission_type == 'accessioning':
             self.required_columns = REQUIRED_COLUMNS_ACCESSIONING
-        elif self.submission_type == 'pedigree':
+        elif self.submission_type == 'family_history':
             self.required_columns = REQUIRED_COLUMNS_PEDIGREE
         else:
             pass
@@ -1070,7 +1070,7 @@ class SpreadsheetProcessing:
     def extract_metadata(self):
         if self.submission_type == 'accessioning':
             result = SubmissionMetadata(self.rows, self.project, self.institution, self.ingestion_id, self.counter)
-        elif self.submission_type == 'pedigree':
+        elif self.submission_type == 'family_history':
             result = PedigreeMetadata(self.virtualapp, self.rows, self.project,
                                       self.institution, self.ingestion_id, self.counter)
         else:
@@ -1088,7 +1088,7 @@ def xls_to_json(vapp, xls_data, project, institution, ingestion_id, submission_t
     result.passing - whether submission "passes" this part of the code and can move
         on to the next step.
     """
-    if submission_type not in ['accessioning', 'pedigree']:
+    if submission_type not in ['accessioning', 'family_history']:
         pass
         # TODO: handle this case
     else:
