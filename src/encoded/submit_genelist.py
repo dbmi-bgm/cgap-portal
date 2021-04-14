@@ -737,7 +737,9 @@ class VariantUpdateSubmission:
             item_type="VariantSample",
         )
         for variant_sample_response in variant_sample_search:
-            variant_samples_to_invalidate.append(variant_sample_response["uuid"])
+            variant_samples_to_invalidate.append(
+                variant_sample_response["uuid"]
+            )
         to_invalidate = list(set(variant_samples_to_invalidate))
         return to_invalidate
 
@@ -765,9 +767,8 @@ class VariantUpdateSubmission:
                 "Validation failed for the following variant samples: %s."
                 % ", ".join(not_validated)
             )
-        validate_output = (
-            "%s variant samples for validated for indexing."
-            % str(len(self.variant_samples) - len(not_validated))
+        validate_output = "%s variant samples validated for updating." % str(
+            len(self.variant_samples) - len(not_validated)
         )
         return validate_output
 
@@ -783,9 +784,8 @@ class VariantUpdateSubmission:
             return None
         for uuid in self.variant_samples:
             self.vapp.patch_json("/" + uuid, {})
-        post_output = (
-            "%s variant samples for validated for invalidation."
-            % str(len(self.variant_samples))
+        post_output = "%s variant samples successfully updated." % str(
+            len(self.variant_samples)
         )
         return post_output
 
