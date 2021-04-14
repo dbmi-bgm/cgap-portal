@@ -40,6 +40,15 @@
             "$ref": "mixins.json#/notes"
         },
         {
+            "$ref": "mixins.json#/interpretation"
+        },
+        {
+            "$ref": "mixins.json#/variant_notes"
+        },
+        {
+            "$ref": "mixins.json#/gene_notes"
+        },
+        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
@@ -592,6 +601,10 @@
         "bam_snapshot": {
             "title": "Genome Snapshot",
             "order": 81
+        },
+        "interpretation.classification": {
+            "title": "Classification",
+            "default_hidden": true
         }
     },
     "facets": {
@@ -849,11 +862,6 @@
                     "label": "de novo candidate (strong)"
                 }
             ]
-        },
-        "cmphet.comhet_impact_gene": {
-            "title": "ComHet Impact",
-            "order": 17,
-            "grouping": "Inheritance"
         },
         "variant.csq_gnomadg_af": {
             "title": "GnomAD Alt Allele Frequency",

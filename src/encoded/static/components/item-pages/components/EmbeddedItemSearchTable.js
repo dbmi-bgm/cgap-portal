@@ -1,15 +1,13 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import url from 'url';
-import memoize from 'memoize-one';
-import queryString from 'querystring';
 import { get as getSchemas, Term } from './../../util/Schemas';
 import { object, ajax, layout, isServerSide, schemaTransforms, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { columnExtensionMap as columnExtensionMapCGAP } from './../../browse/columnExtensionMap';
 import { CaseDetailPane } from './../../browse/CaseDetailPane';
+import { DetailPaneStateCache } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/DetailPaneStateCache';
 
 import { EmbeddedSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/EmbeddedSearchView';
 //import { transformedFacets } from './../../../browse/SearchView';
@@ -40,6 +38,7 @@ export function EmbeddedItemSearchTable (props){
         isClearFiltersBtnVisible,
         onLoad,
         rowHeight = 90, // Keep in sync w CSS
+        openRowHeight = 90,
         tableColumnClassName: propTableColumnClassName,
         facetColumnClassName: propFacetColumnClassName
     } = props;
@@ -58,7 +57,8 @@ export function EmbeddedItemSearchTable (props){
     const passProps = {
         facets, columns, columnExtensionMap, searchHref, session,
         schemas, renderDetailPane, defaultOpenIndices, maxHeight,
-        rowHeight, onClearFiltersVirtual, isClearFiltersBtnVisible,
+        rowHeight, openRowHeight,
+        onClearFiltersVirtual, isClearFiltersBtnVisible,
         aboveTableComponent, aboveFacetListComponent,
         embeddedTableHeader, embeddedTableFooter,
         // TODO: belowTableComponent, belowFacetListComponent,
@@ -83,13 +83,25 @@ EmbeddedItemSearchTable.defaultProps = {
     "facets" : undefined // Default to those from search response.
 };
 
-export function EmbeddedCaseSearchTable (props){
-    const renderDetailPane = useMemo(function(){
-        return function renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable){
-            return <CaseDetailPane {...{ result, containerWidth, rowNumber }} paddingWidth={57} />;
-        };
-    }, []);
+
+export function EmbeddedCaseSearchTable (props) {
     return (
-        <EmbeddedItemSearchTable {...props} renderDetailPane={renderDetailPane} />
+        <DetailPaneStateCache>
+            <EmbeddedCaseSearchTableDetailPaneProvider {...props} />
+        </DetailPaneStateCache>
     );
+}
+
+export function EmbeddedCaseSearchTableDetailPaneProvider (props) {
+    const {
+        detailPaneStateCache,       // Passed from DetailPaneStateCache
+        updateDetailPaneStateCache, // Passed from DetailPaneStateCache
+        ...passProps
+    } = props;
+
+    const renderDetailPane = useCallback(function(result, rowNumber, containerWidth, propsFromTable){
+        return <CaseDetailPane { ...propsFromTable } {...{ result, containerWidth, rowNumber, detailPaneStateCache, updateDetailPaneStateCache }} paddingWidth={57} />;
+    }, [ detailPaneStateCache ]);
+
+    return <EmbeddedItemSearchTable {...passProps} renderDetailPane={renderDetailPane} />;
 }

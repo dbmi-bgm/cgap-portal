@@ -1,3 +1,4 @@
+import io
 import os
 import json
 import structlog
@@ -175,7 +176,7 @@ class VariantBuilder:
         :param project: project to post under
         :param institution: institution to post under
 =       """
-        with open(resolve_file_path('annotations/variant_consequence.json'), 'r') as f:
+        with io.open(resolve_file_path('annotations/variant_consequence.json'), 'r') as f:
             vcs = json.load(f)
             for entry in vcs:
                 entry['project'] = self.project
@@ -210,5 +211,4 @@ class VariantBuilder:
             except Exception as e:
                 log.info('Error encountered posting variant/variant_sample: %s' % e)
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
-
         return self.ingestion_report.total_successful(), self.ingestion_report.total_errors()

@@ -108,6 +108,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
 });
 
 const GnomADTable = React.memo(function GnomADTable({ context, getTipForField }){
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
     const { variant } = context;
     const {
         // Allele Counts
@@ -138,6 +139,7 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         ["fin", "Finnish"],
         ["nfe", "Non-Finnish European"],
         ["sas", "South Asian"],
+        ["mid", "Middle Eastern"],
         ["oth", "Other Ancestry"]
     ];
     const ancestryRowData = _.sortBy(
@@ -155,13 +157,17 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         }
     );
     const ancestryTableRows = ancestryRowData.map(function({ popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum }){
+        const showAlleleCount = typeof alleleCount === "number" ? alleleCount : fallbackElem;
+        const showAlleleNum = typeof alleleNum === "number" ? alleleNum : fallbackElem;
+        const showHomozygoteNum = typeof homozygoteNum === "number" ? homozygoteNum : fallbackElem;
+        const showAlleleFreq = typeof alleleFreq === "number" ? (alleleFreq || "0.0000") : fallbackElem;
         return (
             <tr key={populationTitle}>
                 <td className="text-600 text-left">{ populationTitle }</td>
-                <td>{ alleleCount }</td>
-                <td>{ alleleNum }</td>
-                <td>{ homozygoteNum }</td>
-                <td className="text-left">{ alleleFreq || "0.0000" }</td>
+                <td>{ showAlleleCount }</td>
+                <td>{ showAlleleNum }</td>
+                <td>{ showHomozygoteNum }</td>
+                <td className="text-left">{ showAlleleFreq }</td>
             </tr>
         );
     });
@@ -181,24 +187,24 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
                 { ancestryTableRows }
                 <tr className="border-top">
                     <td className="text-600 text-left">Female</td>
-                    <td>{ gnomad_ac_female }</td>
-                    <td>{ gnomad_an_female }</td>
-                    <td>{ gnomad_nhomalt_female }</td>
-                    <td className="text-left">{ gnomad_af_female || "0.0000" }</td>
+                    <td>{ typeof gnomad_ac_female === "number" ? gnomad_ac_female : fallbackElem }</td>
+                    <td>{ typeof gnomad_an_female === "number" ? gnomad_an_female : fallbackElem }</td>
+                    <td>{ typeof gnomad_nhomalt_female === "number" ? gnomad_nhomalt_female : fallbackElem }</td>
+                    <td className="text-left">{ typeof gnomad_af_female === "number" ? (gnomad_af_female || "0.0000") : fallbackElem }</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Male</td>
-                    <td>{ gnomad_ac_male }</td>
-                    <td>{ gnomad_an_male }</td>
-                    <td>{ gnomad_nhomalt_male }</td>
-                    <td className="text-left">{ gnomad_af_male || "0.0000" }</td>
+                    <td>{ typeof gnomad_ac_male === "number" ? gnomad_ac_male : fallbackElem }</td>
+                    <td>{ typeof gnomad_an_male === "number" ? gnomad_an_male : fallbackElem }</td>
+                    <td>{ typeof gnomad_nhomalt_male === "number" ? gnomad_nhomalt_male : fallbackElem }</td>
+                    <td className="text-left">{ typeof gnomad_af_male === "number" ? (gnomad_af_male || "0.0000") : fallbackElem }</td>
                 </tr>
                 <tr className="border-top">
                     <td className="bg-light text-left"><strong>Total</strong></td>
-                    <td className="bg-light text-600">{ gnomad_ac }</td>
-                    <td className="bg-light text-600">{ gnomad_an }</td>
-                    <td className="bg-light text-600">{ gnomad_nhomalt }</td>
-                    <td className="bg-light text-600 text-left">{ gnomad_af || "0.0000" }</td>
+                    <td className="bg-light text-600">{ typeof gnomad_ac === "number" ? gnomad_ac : fallbackElem }</td>
+                    <td className="bg-light text-600">{ typeof gnomad_an === "number" ? gnomad_an : fallbackElem }</td>
+                    <td className="bg-light text-600">{ typeof gnomad_nhomalt === "number" ? gnomad_nhomalt : fallbackElem }</td>
+                    <td className="bg-light text-600 text-left">{ typeof gnomad_af === "number" ? (gnomad_af || "0.0000") : fallbackElem }</td>
                 </tr>
             </tbody>
         </table>
@@ -331,14 +337,23 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
-        csq_gerp_rs: gerp = fallbackElem,
+        csq_gerp_rs = fallbackElem,
+        csq_gerp_rs_rankscore = fallbackElem,
         csq_phylop100way_vertebrate = fallbackElem,
+        csq_phylop100way_vertebrate_rankscore = fallbackElem,
         csq_cadd_phred = fallbackElem,
+        csq_cadd_raw_rankscore = fallbackElem,
         transcript = [],
         spliceaiMaxds = fallbackElem,
+        csq_primateai_pred = fallbackElem,
         csq_primateai_score = fallbackElem,
+        csq_primateai_rankscore = fallbackElem,
         csq_sift_score = fallbackElem,
-        csq_polyphen2_hvar_score = fallbackElem
+        csq_sift_pred = fallbackElem,
+        csq_sift_converted_rankscore = fallbackElem,
+        csq_polyphen2_hvar_score = fallbackElem,
+        csq_polyphen2_hvar_pred = fallbackElem,
+        csq_polyphen2_hvar_rankscore = fallbackElem
     } = variant;
 
     // Not too sure whether to use table or <row> and <cols> here..
@@ -361,17 +376,17 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                             <td className="text-left">
                                 <label className="mb-0" data-tip={getTipForField("csq_gerp_rs")}>GERP++</label>
                             </td>
-                            <td className="text-left">{ gerp }</td>
-                            {/* TODO for all:
-                            <td className="text-left">{ prediction }/td>
-                            <td className="text-left">{ score }</td>
-                            */}
+                            <td className="text-left">{ csq_gerp_rs }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ csq_gerp_rs_rankscore }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
                                 <label className="mb-0" data-tip={getTipForField("csq_phylop100way_vertebrate")}>PhyloP (100 Vertebrates)</label>
                             </td>
                             <td className="text-left">{ csq_phylop100way_vertebrate }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ csq_phylop100way_vertebrate_rankscore }</td>
                         </tr>
                     </tbody>
                 </table>
@@ -393,24 +408,32 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                                 <label className="mb-0" data-tip={getTipForField("csq_cadd_phred")}>CADD</label>
                             </td>
                             <td className="text-left">{ csq_cadd_phred }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ csq_cadd_raw_rankscore }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
                                 <label className="mb-0" data-tip={getTipForField("csq_sift_score")}>SIFT</label>
                             </td>
                             <td className="text-left">{ csq_sift_score }</td>
+                            <td className="text-left">{ csq_sift_pred }</td>
+                            <td className="text-left">{ csq_sift_converted_rankscore }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
                                 <label className="mb-0" data-tip={getTipForField("csq_polyphen2_hvar_score")}>PolyPhen2</label>
                             </td>
                             <td className="text-left">{ csq_polyphen2_hvar_score }</td>
+                            <td className="text-left">{ csq_polyphen2_hvar_pred }</td>
+                            <td className="text-left">{ csq_polyphen2_hvar_rankscore }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
                                 <label className="mb-0" data-tip={getTipForField("csq_primateai_score")}>PrimateAI DL Score</label>
                             </td>
                             <td className="text-left">{ csq_primateai_score }</td>
+                            <td className="text-left">{ csq_primateai_pred }</td>
+                            <td className="text-left">{ csq_primateai_rankscore }</td>
                         </tr>
                     </tbody>
                 </table>
@@ -425,7 +448,12 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
 
             <div className="table-container">
                 <table className="w-100">
-                    <PredictorsTableHeading/>
+                    <thead>
+                        <tr>
+                            <th className="text-left w-25">Prediction Tool</th>
+                            <th className="text-left w-75">Score</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <tr>
                             <td className="text-left">
@@ -443,14 +471,12 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
 
 function PredictorsTableHeading(){
     return (
-        <thead className="bg-transparent">
+        <thead>
             <tr>
-                <th className="text-left w-75">Prediction Tool</th>
+                <th className="text-left w-25">Prediction Tool</th>
                 <th className="text-left w-25">Score</th>
-                {/* TODO (and change all to w-25):
                 <th className="text-left w-25">Prediction</th>
                 <th className="text-left w-25">Rank Score (0 to 1)</th>
-                */}
             </tr>
         </thead>
     );

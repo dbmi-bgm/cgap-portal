@@ -2,8 +2,12 @@ from copy import deepcopy
 import csv
 import datetime
 import json
+<<<<<<< HEAD
 import re
 import xlrd
+=======
+import openpyxl
+>>>>>>> master
 
 from dcicutils.lang_utils import n_of
 from dcicutils.qa_utils import ignored
@@ -127,13 +131,13 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, subm
             'post_output': [],
             'upload_info': []
         }
-        if filename.endswith('.xls') or filename.endswith('.xlsx'):
-            rows = digest_xls(filename)
+        if filename.endswith('.xlsx'):
+            rows = digest_xlsx(filename)
         elif filename.endswith('.csv') or filename.endswith('.tsv'):
             delim = ',' if filename.endswith('csv') else '\t'
             rows = digest_csv(filename, delim=delim)
         else:
-            msg = ('Metadata bundle must be a file of type .xls, .xlsx, .csv, or .tsv.'
+            msg = ('Metadata bundle must be a file of type .xlsx, .csv, or .tsv. '
                    'Please submit a file of the proper type.')
             results['validation_output'].append(msg)
             return results
@@ -202,9 +206,9 @@ def get_column_name(row, columns):
     return columns[-1]
 
 
-def digest_xls(xls_data):
-    book = xlrd.open_workbook(xls_data)
-    sheet, = book.sheets()
+def digest_xlsx(xlsx_data):
+    book = openpyxl.load_workbook(xlsx_data)
+    sheet = book.worksheets[0]
     return row_generator(sheet)
 
 
@@ -274,9 +278,15 @@ class SubmissionRow:
         if not self.found_missing_values():
             self.indiv_alias = generate_individual_alias(project, metadata[SS_INDIVIDUAL_ID])
             self.fam_alias = family_alias
-            self.sample_alias = '{}:sample-{}'.format(project, remove_spaces_in_id(metadata[SS_SPECIMEN_ID]))
-            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(metadata[SS_ANALYSIS_ID]))
-            self.case_name = remove_spaces_in_id(metadata.get('unique analysis id'))
+            self.sample_alias = '{}:sample-{}-{}'.format(
+                project,
+                remove_spaces_in_id(row[SS_SPECIMEN_ID]),
+                remove_spaces_in_id(row[get_column_name(row, ['workup type', 'test requested'])])
+            )
+            if self.metadata.get('test number'):
+                self.sample_alias = self.sample_alias + '-' + self.metadata['test number']
+            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row[SS_ANALYSIS_ID]))
+            self.case_name = remove_spaces_in_id(row.get('unique analysis id'))
             self.individual = self.extract_individual_metadata()
             self.family = self.extract_family_metadata()
             self.sample, self.analysis = self.extract_sample_metadata()
@@ -363,7 +373,9 @@ class SubmissionRow:
         replace_cell_contents(info, 'specimen_accepted', y='Yes', n='No')
         # handle bam sample ID
         if not info.get('bam_sample_id'):
-            info['bam_sample_id'] = info.get('specimen_accession')
+            info['bam_sample_id'] = self.sample_alias.split(':sample-')[-1]
+        if info.get('specimen_type'):
+            info['specimen_type'] = info['specimen_type'].lower().replace('_', ' ')
         # SEO
         if self.metadata.get('second specimen id'):
             other_id = {'id': self.metadata['second specimen id'], 'id_type': self.project}  # add proj info?
@@ -641,7 +653,42 @@ class SubmissionMetadata:
                 # extend list field (e.g. combine samples in diff rows for Individual item)
                 elif key != 'aliases' and isinstance(value, list):
                     previous[item.alias][key].extend(value)
-                    previous[item.alias][key] = list(set(previous[item.alias][key]))
+                    # special handling for list of dict rather than list of string
+                    if all(isinstance(item, dict) for item in previous[item.alias][key]):
+                        vals = [item.values() for item in previous[item.alias][key]]
+                        unique = [dict(t) for t in {tuple(d.items()) for d in previous[item.alias][key]}]
+                        # error if fastq file (paired end 2) has conflicting 'paired with' relations
+                        if key == 'related_files' and (all('paired with' in val for val in vals) and
+                                                       len(unique) > 1):
+                            msg = ('Fastq file {} appears multiple times in sheet'
+                                   ' with inconsistent paired file. Please ensure fastq is'
+                                   ' paired with correct file in all rows where it appears.'
+                                   ''.format(item.metadata.get('filename', '')))
+                            self.errors.append(msg)
+                        else:
+                            previous[item.alias][key] = unique
+                    else:
+                        previous[item.alias][key] = list(set(previous[item.alias][key]))
+
+    def check_fastq_paired_info(self):
+        """
+        Makes sure fastq files appearing more than once have consistent paired with
+        information. Specifically, checks that paired end 1 files have consistent
+        pairing info.
+        """
+        paired_info = {}
+        for val in self.files_fastq.values():
+            if 'related_files' in val:
+                for file_dict in val['related_files']:
+                    if file_dict['file'] not in paired_info:
+                        paired_info[file_dict['file']] = val['filename']
+                    elif paired_info[file_dict['file']] != val['filename']:
+                        msg = ('Fastq file {} appears multiple times in sheet'
+                               ' with inconsistent paired file. Please ensure fastq is'
+                               ' paired with correct file in all rows where it appears.'
+                               ''.format(file_dict['file']))
+                        self.errors.append(msg)
+        return
 
     def add_family_metadata(self, idx, family, individual):
         """
@@ -791,6 +838,7 @@ class SubmissionMetadata:
                 simple_add_items.extend(processed_row.files_processed)
                 for item in simple_add_items:
                     self.add_metadata_single_item(item)
+                self.check_fastq_paired_info()
                 self.add_family_metadata(processed_row.row, processed_row.family, processed_row.individual)
                 self.add_sample_processing(processed_row.analysis, processed_row.metadata.get('analysis id'))
                 self.add_case_info(processed_row)
@@ -1155,7 +1203,6 @@ def compare_fields(profile, aliases, json_item, db_item):
             if (db_item.get('status') in ['uploading', 'upload failed', 'to be uploaded by workflow']
                     or json_item['filename'].split('/')[-1] != db_item.get('filename')):
                 to_patch['filename'] = json_item['filename']
-                to_patch['status'] = 'uploading'
             continue
         # if not an array, patch field gets overwritten (if different from db)
         if profile['properties'][field]['type'] != 'array':
@@ -1236,17 +1283,12 @@ def validate_all_items(virtualapp, json_data):
                         if fname:
                             if fname in ''.join(json_data['errors']):
                                 validation_results[itemtype]['errors'] += 1
-                            else:
-                                json_data[itemtype][alias]['status'] = 'uploading'
                         json_data_final['post'].setdefault(itemtype, [])
                         json_data_final['post'][itemtype].append(json_data[itemtype][alias])
                         validation_results[itemtype]['validated'] += 1
                 else:
                     # patch if item exists in db
                     patch_data = compare_fields(profile, alias_dict, data, db_results[alias])
-                    if itemtype in ['file_fastq', 'file_processed']:
-                        if 'filename' in patch_data:
-                            patch_data['status'] = 'uploading'
                     error = validate_item(virtualapp, patch_data, 'patch', itemtype,
                                           all_aliases, atid=db_results[alias]['@id'])
                     if error:  # report validation errors
@@ -1293,7 +1335,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
     files = []
     if not json_data_final:
         return output, 'not run', []
-    item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'specimen_accession'}
+    item_names = {'individual': 'individual_id', 'family': 'family_id', 'sample': 'bam_sample_id'}
     final_status = {}
     no_errors = True
     if json_data_final.get('post'):
@@ -1322,7 +1364,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                             json_data_final['patch'][k][atid] = patch_info
                         if k in item_names:
                             output.append('Success - {} {} posted'.format(k, item[item_names[k]]))
-                        if fname and item.get('status') == 'uploading':
+                        if fname:
                             files.append({
                                 'uuid': response.json['@graph'][0]['uuid'],
                                 'filename': fname
@@ -1349,7 +1391,7 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                 response = virtualapp.patch_json('/' + item_id, patch_data, status=200)
                 if response.json['status'] == 'success':
                     final_status[k]['patched'] += 1
-                    if fname and patch_data.get('status') == 'uploading':
+                    if fname:
                         files.append({
                             'uuid': response.json['@graph'][0]['uuid'],
                             'filename': fname
@@ -1369,32 +1411,38 @@ def post_and_patch_all_items(virtualapp, json_data_final):
     return output, no_errors, files
 
 
-def cell_value(cell, datemode):
+def cell_value(cell):
     """Get cell value from excel. [From Submit4DN]"""
     # This should be always returning text format
-    ctype = cell.ctype
+    ctype = cell.data_type
     value = cell.value
-    if ctype == xlrd.XL_CELL_ERROR:  # pragma: no cover
-        raise ValueError(repr(cell), 'cell error')
-    elif ctype == xlrd.XL_CELL_BOOLEAN:
+    if ctype == openpyxl.cell.cell.TYPE_ERROR:  # pragma: no cover
+        raise ValueError('Cell %s contains a cell error' % str(cell.coordinate))
+    elif ctype == openpyxl.cell.cell.TYPE_BOOL:
         return str(value).upper().strip()
-    elif ctype == xlrd.XL_CELL_NUMBER:
-        if value.is_integer():
-            value = int(value)
+    elif ctype in (openpyxl.cell.cell.TYPE_NUMERIC, openpyxl.cell.cell.TYPE_NULL):
+        if isinstance(value, float):
+            if value.is_integer():
+                value = int(value)
+        if not value:
+            value = ''
         return str(value).strip()
-    elif ctype == xlrd.XL_CELL_DATE:
-        value = xlrd.xldate_as_tuple(value, datemode)
-        if value[3:] == (0, 0, 0):
-            return datetime.date(*value[:3]).isoformat()
-        else:  # pragma: no cover
-            return datetime.datetime(*value).isoformat()
-    elif ctype in (xlrd.XL_CELL_TEXT, xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK):
+    elif isinstance(value, openpyxl.cell.cell.TIME_TYPES):
+        if isinstance(value, datetime.datetime):
+            if value.time() == datetime.time(0, 0, 0):
+                return value.date().isoformat()
+            else:  # pragma: no cover
+                return value.isoformat()
+        else:
+            return value.isoformat()
+    elif ctype in (openpyxl.cell.cell.TYPE_STRING, openpyxl.cell.cell.TYPE_INLINE):
         return value.strip()
-    raise ValueError(repr(cell), 'unknown cell type')  # pragma: no cover
+    raise ValueError(
+        'Cell %s is not an acceptable cell type' % str(cell.coordinate)
+    )  # pragma: no cover
 
 
 def row_generator(sheet):
     """Generator that gets rows from excel sheet [From Submit4DN]"""
-    datemode = sheet.book.datemode
-    for index in range(sheet.nrows):
-        yield [cell_value(cell, datemode) for cell in sheet.row(index)]
+    for row in sheet.rows:
+        yield [cell_value(cell) for cell in row]

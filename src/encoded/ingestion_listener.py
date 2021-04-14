@@ -19,9 +19,9 @@ import webtest
 import tempfile
 
 from dcicutils.env_utils import is_stg_or_prd_env
-from dcicutils.misc_utils import VirtualApp, ignored, check_true, full_class_name
+from dcicutils.misc_utils import VirtualApp, ignored, check_true, full_class_name, environ_bool, PRINT
 from pyramid import paster
-from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently, HTTPServerError
+from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently  # , HTTPServerError
 from pyramid.request import Request
 # Possibly still needed by some commented-out code.
 # from pyramid.response import Response
@@ -31,13 +31,15 @@ from vcf import Reader
 from .ingestion.vcf_utils import VCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
 from .commands.add_altcounts_by_gene import main as add_altcounts
-from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
-from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure
+from .ingestion.common import metadata_bundles_bucket, get_parameter  # , IngestionReport
+from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure  # , BadParameter
 from .ingestion.processors import get_ingestion_processor
+# from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
-    resolve_file_path, gunzip_content, debuglog, get_trusted_email, beanstalk_env_from_request,
-    subrequest_object, register_path_content_type,
+    resolve_file_path,  # gunzip_content,
+    debuglog, get_trusted_email, beanstalk_env_from_request,
+    subrequest_object, register_path_content_type, vapp_for_email, vapp_for_ingestion,
 )
 from .ingestion.queue_utils import IngestionQueueManager
 from .ingestion.variant_utils import VariantBuilder
@@ -57,30 +59,28 @@ SHARED = 'shared'
 
 
 def includeme(config):
+    # config.add_route('process_ingestion', '/process_ingestion')
     config.add_route('queue_ingestion', '/queue_ingestion')
     config.add_route('ingestion_status', '/ingestion_status')
-    # config.add_route('prompt_for_ingestion', '/prompt_for_ingestion')
     config.add_route('submit_for_ingestion', '/submit_for_ingestion')
     config.registry[INGESTION_QUEUE] = IngestionQueueManager(config.registry)
     config.scan(__name__)
 
 
-# The new protocol requires a two-phase action, first creating the IngestionSubmission
-# and then using that object to do the submission. We don't need this for debugging right now,
-# so I've just disabled it to avoid confusion. We should decide later whether to fix this or
-# just flush it as having served its purpose. -kmp 2-Dec-2020
-#
-# # This endpoint is intended only for debugging. Use the command line tool.
-# @view_config(route_name='prompt_for_ingestion', request_method='GET')
-# @debug_log
-# def prompt_for_ingestion(context, request):
-#     ignored(context, request)
-#     return Response(PROMPT_FOR_INGESTION)
-
-
 SUBMISSION_PATTERN = re.compile(r'^/ingestion-submissions/([0-9a-fA-F-]+)(|/.*)$')
 
 register_path_content_type(path='/submit_for_ingestion', content_type='multipart/form-data')
+
+
+def extract_submission_info(request):
+    matched = SUBMISSION_PATTERN.match(request.path_info)
+    if matched:
+        submission_id = matched.group(1)
+    else:
+        raise SubmissionFailure("request.path_info is not in the expected form: %s" % request.path_info)
+
+    instance = subrequest_object(request, submission_id)
+    return submission_id, instance
 
 
 @view_config(name='submit_for_ingestion', request_method='POST', context=IngestionSubmission,
@@ -106,18 +106,12 @@ def submit_for_ingestion(context, request):
         raise UnspecifiedFormParameter('datafile')
     filename = datafile.filename
     override_name = request.POST.get('override_name', None)
-    parameters = dict(request.POST)
+    parameters = dict(request.POST)  # Convert to regular dictionary, which is also a copy
     parameters['datafile'] = filename
 
     # Other parameters, like validate_only, will ride in on parameters via the manifest on s3
 
-    matched = SUBMISSION_PATTERN.match(request.path_info)
-    if matched:
-        submission_id = matched.group(1)
-    else:
-        raise SubmissionFailure("request.path_info is not in the expected form: %s" % request.path_info)
-
-    instance = subrequest_object(request, submission_id)
+    submission_id, instance = extract_submission_info(request)
 
     # The three arguments institution, project, and ingestion_type were needed in the old protocol
     # but are not needed in the new protocol because someone will have set up the IngestionSubmission
@@ -241,6 +235,37 @@ def ingestion_status(context, request):
     }
 
 
+DEBUG_SUBMISSIONS = environ_bool("DEBUG_SUBMISSIONS", default=False)
+
+
+def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=None, s3_client=None):
+    bundles_bucket = bundles_bucket or metadata_bundles_bucket(app.registry)
+    s3_client = s3_client or boto3.client('s3')
+    manifest_name = "{id}/manifest.json".format(id=submission_id)
+    data = json.load(s3_client.get_object(Bucket=bundles_bucket, Key=manifest_name)['Body'])
+    email = None
+    try:
+        email = data['email']
+    except KeyError as e:
+        debuglog("Manifest data is missing 'email' field.")
+        if DEBUG_SUBMISSIONS:
+            import pdb; pdb.set_trace()
+    debuglog("processing submission %s with email %s" % (submission_id, email))
+    with vapp_for_email(email=email, app=app) as vapp:
+        if DEBUG_SUBMISSIONS:
+            PRINT("PROCESSING FOR %s" % email)
+        submission = SubmissionFolio(vapp=vapp, ingestion_type=ingestion_type, submission_id=submission_id, log=None)
+        handler = get_ingestion_processor(ingestion_type)
+        result = handler(submission)
+        if DEBUG_SUBMISSIONS:
+            PRINT("DONE PROCESSING FOR %s" % email)
+        return {
+            "result": result,
+            "ingestion_type": ingestion_type,
+            "submission_id": submission_id,
+        }
+
+
 def verify_vcf_file_status_is_not_ingested(request, uuid, *, expected=True):
     """ Verifies the given VCF file has not already been ingested by checking
         'file_ingestion_status'
@@ -329,6 +354,7 @@ def get_queue_manager(request, *, override_name):
 class IngestionListener:
     """ Organizes helper functions for the ingestion listener """
     POLL_INTERVAL = 10  # seconds between each poll
+    INGEST_AS_USER = environ_bool('INGEST_AS_USER', default=True)  # The new way, but possible to disable for now
 
     def __init__(self, vapp, _queue_manager=None, _update_status=None):
         self.vapp = vapp
@@ -395,11 +421,27 @@ class IngestionListener:
 
     def patch_ingestion_report(self, report, uuid):
         """ Sets the file_ingestion_error field of the given uuid """
-        self._patch_value(uuid, 'file_ingestion_error', report.get_errors())
+        if isinstance(report, IngestionReport):  # handle normal case
+            self._patch_value(uuid, 'file_ingestion_error', report.get_errors())
+        elif isinstance(report, list):  # handle when build_ingestion_error_report result is passed
+            self._patch_value(uuid, 'file_ingestion_error', report)
+        else:
+            raise TypeError('Got bad type for ingestion error report: %s' % report)
 
     def set_status(self, uuid, status):
         """ Sets the file_ingestion_status of the given uuid """
         self._patch_value(uuid, 'file_ingestion_status', status)
+
+    @staticmethod
+    def build_ingestion_error_report(msg):
+        """ Builds an ingestion error report in case an error is encountered that cannot be recovered from
+            in VCF ingestion - see file_processed.json for structure definition. """
+        return [
+            {
+                'body': msg,
+                'row': -1  # this exception may have occurred on a particular row but since it could not be recovered
+            }              # from we assume the msg has sufficient info to work backwards from - Will 4/9/21
+        ]
 
     def run(self):
         """ Main process for this class. Runs forever doing ingestion as needed.
@@ -444,14 +486,26 @@ class IngestionListener:
                 if ingestion_type != 'vcf':
                     # Let's minimally disrupt things for now. We can refactor this later
                     # to make all the parts work the same -kmp
-                    submission = SubmissionFolio(vapp=self.vapp, ingestion_type=ingestion_type, submission_id=uuid)
-                    handler = get_ingestion_processor(ingestion_type)
-                    try:
-                        debuglog("HANDLING:", uuid)
-                        handler(submission)
-                        debuglog("HANDLED:", uuid)
-                    except Exception as e:
-                        log.error(e)
+                    if self.INGEST_AS_USER:
+                        try:
+                            debuglog("REQUESTING RESTRICTED PROCESSING:", uuid)
+                            process_submission(submission_id=uuid,
+                                               ingestion_type=ingestion_type,
+                                               # bundles_bucket=submission.bucket,
+                                               app=self.vapp.app)
+                            debuglog("RESTRICTED PROCESSING DONE:", uuid)
+                        except Exception as e:
+                            log.error(e)
+                    else:
+                        submission = SubmissionFolio(vapp=self.vapp, ingestion_type=ingestion_type,
+                                                     submission_id=uuid)
+                        handler = get_ingestion_processor(ingestion_type)
+                        try:
+                            debuglog("HANDLING:", uuid)
+                            handler(submission)
+                            debuglog("HANDLED:", uuid)
+                        except Exception as e:
+                            log.error(e)
                     # If we suceeded, we don't need to do it again, and if we failed we don't need to fail again.
                     discard(message)
                     continue
@@ -497,7 +551,9 @@ class IngestionListener:
                 reformat_vcf(reformat_args)
 
                 # Add altcounts by gene
-                formatted_with_alt_counts = tempfile.NamedTemporaryFile(mode='w+')  # cannot pass bytes to vcf.Reader()
+                # Note: you cannot pass this file object to vcf.Reader if it's in rb mode
+                # It's also not guaranteed that it reads utf-8, so pass explicitly
+                formatted_with_alt_counts = tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8')
                 alt_counts_args = {
                     'inputfile': formatted.name,
                     'outputfile': formatted_with_alt_counts.name
@@ -508,7 +564,17 @@ class IngestionListener:
                 variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
                                                  project=file_meta['project']['@id'],
                                                  institution=file_meta['institution']['@id'])
-                success, error = variant_builder.ingest_vcf()
+                try:
+                    success, error = variant_builder.ingest_vcf()
+                except Exception as e:
+                    # if exception caught here, we encountered an error reading the actual
+                    # VCF - this should not happen but can in certain circumstances. In this
+                    # case we need to patch error status and discard the current message.
+                    log.error('Caught error in VCF processing in ingestion listener: %s' % e)
+                    self.set_status(uuid, STATUS_ERROR)
+                    self.patch_ingestion_report(self.build_ingestion_error_report(msg=e), uuid)
+                    discard(message)
+                    continue
 
                 # report results in error_log regardless of status
                 msg = variant_builder.ingestion_report.brief_summary()
@@ -661,88 +727,6 @@ def main():
     vapp = VirtualApp(app, config)
     return run(vapp)
 
-
-PROMPT_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Submit for Ingestion</title>
-    <style>
-  body { background-color: <COLOR>; font-size: 14pt; font-weight: bold; margin-left: 25px; }
-  div.banner { margin-bottom: 25px; padding: 10px; text-align: center;
-                   border: 1px solid black; background-color: #ffeeff; width: 50%;
-         }
-      table { border-spacing: 5px; margin-left: 25px; }
-      td.formlabel { text-align: right; }
-      td.formsubmit { text-align: center; padding-top: 10px; }
-      td, input, select { font-size: 14pt; font-weight: bold; }
-      select { padding: 4px; }
-      input { padding: 10px; }
-      input.submit { border: 2px solid black; border-radius: 8px; padding: 10px; width: 100%; }
-    </style>
-  </head>
-  <body>
-    <div class="banner">
-      <p>This page is a demonstration of the ability to kick off an ingestion by form.</p>
-    </div>
-    <h1>Submit for Ingestion</h1>
-    <form action="<TARGET-URL>" method="post" accept-charset="utf-8"
-          enctype="multipart/form-data">
-      <table>
-        <tr>
-          <td class="formlabel">
-            <label for="ingestion_type">Ingestion Type:</label>
-          </td>
-          <td>
-            <select id="ingestion_type" name="ingestion_type">
-              <option value="metadata_bundle">MetaData Bundle&nbsp;</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td class="formlabel">
-            <label for="project">Project:</label>
-          </td>
-          <td>
-            <input type="text" id="project" name="project" value="/projects/12a92962-8265-4fc0-b2f8-cf14f05db58b/" />
-          </td>
-        </tr>
-        <tr>
-          <td class="formlabel">
-            <label for="institution">Institution:</label>
-          </td>
-          <td>
-            <input type="text" id="institution" name="institution" value="/institutions/hms-dbmi/" />
-          </td>
-        </tr>
-        <tr>
-          <td class="formlabel">
-            <label for="datafile">Submit Datafile:</label>
-          </td>
-          <td>
-            <input type="file" id="datafile" name="datafile" value="" />
-          </td>
-        </tr>
-        <tr>
-          <td><i>Special Options:</i><br /></td>
-          <td>
-            <input type="checkbox" id="validate_only" name="validate_only" value="true" />
-            <label for="validate_only"> Validate Only</label>
-          </td>
-        </tr>
-        <tr>
-          <td class="formsubmit" colspan="2">
-            <input class="submit" id="submit" type="submit" value="Submit" />
-          </td>
-        </tr>
-      </table>
-    </form>
-  </body>
-</html>
-"""
-
-PROMPT_FOR_INGESTION = PROMPT_TEMPLATE.replace("<TARGET-URL>", "/submit_for_ingestion").replace("<COLOR>", "#eeddee")
-PROMPT_FOR_SUBREQUEST = PROMPT_TEMPLATE.replace("<TARGET-URL>", "/submit_subrequest").replace("<COLOR>", "#ddeedd")
 
 if __name__ == '__main__':
     main()

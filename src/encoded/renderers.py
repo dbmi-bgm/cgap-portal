@@ -195,8 +195,6 @@ def security_tween_factory(handler, registry):
                             # by libs/react-middleware.js which is imported by server.js and compiled into
                             # renderer.js. Is used to get access to User Info on initial web page render.
                             response.headers['X-Request-JWT'] = request.cookies.get('jwtToken', '')
-                            # TODO: Should user_info be copied before the del? If the user info is shared,
-                            #       we are modifying it for other uses. -kmp 24-Jan-2021
                             user_info = request.user_info.copy()  # Re-ified property set in authentication.py
                             # Redundant - don't need this in SSR nor browser as get from X-Request-JWT.
                             del user_info["id_token"]
@@ -213,7 +211,7 @@ def security_tween_factory(handler, registry):
         # See authentication.py - get_jwt()
 
         # Alex notes that we do not use request.session so this is probably very old. -kmp 4-Mar-2021
- 
+
         # token = request.headers.get('X-CSRF-Token')
         # if token is not None:
         #     # Avoid dirtying the session and adding a Set-Cookie header
@@ -419,12 +417,12 @@ def should_transform(request, response):
         return False
 
     # The `format` URI param allows us to override request's 'Accept' header.
-    format = request.params.get('format')
-    if format is not None:
-        format = format.lower()
-        if format == 'json':
+    format_param = request.params.get('format')
+    if format_param is not None:
+        format_param = format_param.lower()
+        if format_param == 'json':
             return False
-        if format == 'html':
+        if format_param == 'html':
             return True
         else:
             raise HTTPNotAcceptable("Improper format URI parameter",
@@ -433,17 +431,14 @@ def should_transform(request, response):
     # Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
     # which should contain 'text/html'
     # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
-    mime_type = best_mime_type(request)
-    format = mime_type.split('/', 1)[1]  # Will be 1 of 'html', 'json', 'json-ld'
+    mime_type = best_mime_type(request)  # Result will be one of MIME_TYPES_SUPPORTED
 
     # N.B. ld+json (JSON-LD) is likely more unique case and might be sent by search engines (?)
     # which can parse JSON-LDs. At some point we could maybe have it to be same as
     # making an `@@object` or `?frame=object` request (?) esp if fill
     # out @context response w/ schema(s) (or link to schema)
 
-    if format == 'html':
-        return True
-    return False
+    return mime_type == MIME_TYPE_HTML
 
 
 def render_page_html_tween_factory(handler, registry):

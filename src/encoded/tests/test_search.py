@@ -21,7 +21,7 @@ from ..search.search_utils import find_nested_path
 
 
 
-pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search]
+pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search, pytest.mark.workbook]
 
 
 ### IMPORTANT
@@ -721,10 +721,10 @@ def test_search_debug_parameter(workbook, es_testapp, anon_es_testapp, authentic
     resp_with_debug = es_testapp.get('/search/?type=Family&debug=true', status=200).json
     assert 'query' in resp_with_debug
     # no results should still show query
-    resp_with_debug = es_testapp.get('/search/?type=Gene&debug=true', status=404).json
+    resp_with_debug = es_testapp.get('/search/?type=Phenotype&debug=true', status=404).json
     assert 'query' in resp_with_debug
     # doesn't matter what you pass
-    resp_with_debug = es_testapp.get('/search/?type=Gene&debug=blah', status=404).json
+    resp_with_debug = es_testapp.get('/search/?type=Phenotype&debug=blah', status=404).json
     assert 'query' in resp_with_debug
     # no results, no admin, no query
     resp_without_debug = anon_es_testapp.get('/search/?type=Family&debug=true', status=404).json

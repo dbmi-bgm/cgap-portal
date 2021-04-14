@@ -1,12 +1,12 @@
+import openpyxl
 import pytest
-import xlrd
 
 from copy import deepcopy
 from unittest import mock
 from .. import submit
 from ..submit import (
     compare_fields,
-    digest_xls,
+    digest_xlsx,
     MetadataItem,
     SubmissionRow,
     SubmissionMetadata,
@@ -24,12 +24,14 @@ from ..submit import (
 
 pytestmark = [pytest.mark.working]
 
-
 TEST_INGESTION_ID1 = '123456-1243-1234-123456abcdef'
 TEST_INGESTION_ID2 = 'abcdef-1234-1234-abcdef123456'
 WORKBOOK_FAMILY_ID1 = '/families/GAPFA59JKS1Y/'
 WORKBOOK_FAMILY_ID2 = '/families/GAPFAYUV203P/'
 WORKBOOK_FAMILY_ID3 = '/families/GAPFAZ3V21Q8/'
+
+TEST_WORKBOOK = 'src/encoded/tests/data/documents/cgap_submit_test.xlsx'
+TEST_WORKBOOK_WITH_ERRORS = 'src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx'
 
 
 # TODO: Check if these work or not.  These tests seem to be working, but they may do posting
@@ -48,8 +50,9 @@ def row_dict():
         'analysis id': '999',
         'report required': 'Y',
         'specimen id': '3464467',
-        'specimen type': 'saliva',
-        'workup type': 'WGS'
+        'specimen type': 'Peripheral_Blood',
+        'test requested': 'WGS',
+        'test number': '2'
     }
 
 
@@ -78,10 +81,10 @@ def row_dict_pedigree():
 
 @pytest.fixture
 def xls_list():
-    book = xlrd.open_workbook('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
-    sheet, = book.sheets()
-    row = row_generator(sheet)
-    return list(row)
+    book = openpyxl.load_workbook(TEST_WORKBOOK)
+    sheet = book.worksheets[0]
+    rows = row_generator(sheet)
+    return list(rows)
 
 
 @pytest.fixture
@@ -160,6 +163,7 @@ def post_data(project, institution):
             }],
             'sample': [{
                 'aliases': ['test-proj:samp1'],
+                'bam_sample_id': 'samp1-WGS',
                 'workup_type': 'WGS',
                 'specimen_accession': 'samp1',
                 'project': project['@id'],
@@ -174,7 +178,7 @@ def post_data(project, institution):
 @pytest.fixture
 def sample_info():
     return {
-        'workup type': 'WES',
+        'test requested': 'WES',
         'specimen id': '9034',
         'date collected': '2020-01-06'
     }
@@ -236,6 +240,13 @@ def example_rows():
         {'individual id': '546', 'sex': 'F', 'analysis id': '3333', 'relation to proband': 'mother',
          'report required': 'N', 'workup type': 'WES', 'specimen id': '6'}
     ]
+
+
+@pytest.fixture
+def example_rows_with_test_number(example_rows):
+    example_rows[0]['test number'] = '1'
+    example_rows[3]['test number'] = '2'
+    return example_rows
 
 
 @pytest.fixture
@@ -306,7 +317,7 @@ def new_family(child, mother, father):
 
 def test_map_fields(sample_info):
     # tests spreadsheet fields are mapped to correct cgap property
-    result = map_fields(sample_info, {}, ['workup_type'], 'sample')
+    result = map_fields(sample_info, {}, [], 'sample')
     assert result['workup_type'] == 'WES'
     assert result['specimen_accession'] == '9034'
     assert result['specimen_collection_date'] == '2020-01-06'
@@ -314,6 +325,18 @@ def test_map_fields(sample_info):
 
 
 class TestSubmissionRow:
+
+    @pytest.mark.parametrize('col, val, sample_alias', [
+        (None, None, 'encode-project:sample-3464467-WGS-2'),
+        ('test requested', 'WES', 'encode-project:sample-3464467-WES-2'),
+        ('test number', '1', 'encode-project:sample-3464467-WGS-1'),
+        ('test number', None, 'encode-project:sample-3464467-WGS')
+    ])
+    def test_row_sample_aliases(self, row_dict, col, val, sample_alias, project, institution):
+        if col:
+            row_dict[col] = val
+        obj = SubmissionRow(row_dict, 1, 'test-proj:fam', project['name'], institution['name'])
+        assert obj.sample_alias == sample_alias
 
     def test_extract_individual_metadata(self, row_dict, project, institution):
         obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
@@ -368,6 +391,7 @@ class TestSubmissionRow:
         obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert obj.sample.metadata['specimen_accession'] == row_dict['specimen id']
         assert obj.sample.metadata['specimen_accepted'] == 'No'
+        assert obj.sample.metadata['specimen_type'] == 'peripheral blood'
         assert obj.sample.metadata['requisition_acceptance']['accepted_rejected'] == 'Accepted'
         assert obj.analysis.metadata['samples'] == [obj.sample.alias]
         assert obj.individual.metadata['samples'] == [obj.sample.alias]
@@ -443,7 +467,7 @@ class TestSubmissionMetadata:
         assert a_types['1111'] == 'WGS-Trio'
         assert a_types['2222'] == 'WGS'
         assert a_types['3333'] == 'WES-Group'
-        example_rows[1]['workup type'] = 'WES'
+        example_rows[1]['test requested'] = 'WES'
         new_obj = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
         new_a_types = new_obj.analysis_types
         assert new_a_types['1111'] is None
@@ -468,6 +492,48 @@ class TestSubmissionMetadata:
         assert len(submission.samples) == 2
         assert 'specimen_accepted' in list(submission.samples.values())[1]
 
+    def test_add_metadata_single_item_fastq(self, example_rows, project, institution):
+        """
+        if fastq files appear multiple times in the sheet, the related_file array prop shouldn't be
+        duplicated if it is consistent.
+        """
+        # for rowidx in (1, 2):
+        example_rows[0]['files'] = 'f1.fastq.gz, f2.fastq.gz'
+        example_rows[1]['files'] = 'f1.fastq.gz, f2.fastq.gz'
+        submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        fastqs = list(submission.files_fastq.values())
+        assert len(fastqs[1]['related_files']) == 1
+
+    @pytest.mark.parametrize('files1, files2', [
+        ('f1.fastq.gz, f2.fastq.gz', 'f1.fastq.gz, f3.fastq.gz'),  # inconsistent pairing on first
+        ('f1.fastq.gz, f2.fastq.gz', 'f4.fastq.gz, f2.fastq.gz')  # inconsistent pairing on second
+    ])
+    def test_add_metadata_single_item_fastq_inconsistent(self, example_rows, files1, files2,
+                                                         project, institution):
+        """
+        if fastq files appear multiple times in the sheet, the related_file array prop shouldn't be
+        duplicated if it is consistent.
+        """
+        # for rowidx in (1, 2):
+        example_rows[0]['files'] = files1
+        example_rows[1]['files'] = files2
+        submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        assert 'Please ensure fastq is paired with correct file in all rows' in ''.join(submission.errors)
+        # fastqs = list(submission.files_fastq.values())
+        # assert len(fastqs[1]['related_files']) == 1
+
+    def test_add_metadata_single_item_same_sample_accession(self, example_rows_with_test_number,
+                                                            project, institution):
+        """
+        if samples have the same specimen_accession but different test number, the bam_sample_id
+        should be unique but the specimen_accession should stay the same.
+        """
+        submission = SubmissionMetadata(example_rows_with_test_number,
+                                        project, institution, TEST_INGESTION_ID1)
+        accession1 = [item for item in submission.samples.values() if item['specimen_accession'] == '1']
+        assert accession1[0]['specimen_accession'] == accession1[1]['specimen_accession']
+        assert accession1[0]['bam_sample_id'] != accession1[1]['bam_sample_id']
+
     @pytest.mark.parametrize('last_relation, error', [
         ('brother', False),  # not a duplicate relation
         ('mother', True),  # error if two members of family have same parental relation
@@ -488,15 +554,15 @@ class TestSubmissionMetadata:
 
     def test_add_sample_processing(self, example_rows, project, institution):
         """tests metadata creation for sample_processing item from a set of rows"""
-        example_rows[5]['workup type'] = 'WGS'  # analysis 3333 will have mismatched workup type values
+        example_rows[6]['test requested'] = 'WGS'  # analysis 3333 will have mismatched workup type values
         submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
         sps = submission.sample_processings
         assert sps['encode-project:analysis-1111']['analysis_type'] == 'WGS-Trio'
         assert sps['encode-project:analysis-2222']['analysis_type'] == 'WGS'
         assert sps['encode-project:analysis-1111']['samples'] == [
-            'encode-project:sample-1', 'encode-project:sample-2', 'encode-project:sample-3'
+            'encode-project:sample-1-WGS', 'encode-project:sample-2-WGS', 'encode-project:sample-3-WGS'
         ]
-        assert sps['encode-project:analysis-2222']['samples'] == ['encode-project:sample-1']
+        assert sps['encode-project:analysis-2222']['samples'] == ['encode-project:sample-1-WGS']
         assert not sps['encode-project:analysis-3333']['analysis_type']
         assert '3333 contain mis-matched or invalid workup type values' in ''.join(submission.errors)
 
@@ -800,7 +866,7 @@ class TestSpreadsheetProcessing:
 
 def test_xls_to_json_accessioning(testapp, project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
-    rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test.xlsx')
+    rows = digest_xlsx(TEST_WORKBOOK)
     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'accessioning')
     assert success
     assert len(json_out['family']) == 1
@@ -823,7 +889,7 @@ def test_xls_to_json_pedigree(testapp, project, institution):
 
 def test_xls_to_json_accessioning_errors(testapp, project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
-    rows = digest_xls('src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx')
+    rows = digest_xls(TEST_WORKBOOK_WITH_ERRORS)
     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'accessioning')
     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
     assert success  # still able to proceed to validation step

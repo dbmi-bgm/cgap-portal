@@ -14,6 +14,7 @@ import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { getSchemaProperty } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/schema-transforms';
+import { FormattedToFromRangeValue } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/FacetList/RangeFacet';
 
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 
@@ -150,6 +151,10 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         return { duplicateQueryIndices, duplicateNameIndices };
     }
 
+    static haveEditPermission(caseActions){
+        return _.findWhere(caseActions, { "name" : "edit" });
+    }
+
     static deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices){
         let singleSelectedFilterBlockIdx = null;
         const selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices);
@@ -179,7 +184,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             }),
             hasFilterSetChanged: memoize(FilteringTableFilterSetUI.hasFilterSetChanged),
             findDuplicateBlocks: memoize(FilteringTableFilterSetUI.findDuplicateBlocks),
-            deriveSelectedFilterBlockIdxInfo: memoize(FilteringTableFilterSetUI.deriveSelectedFilterBlockIdxInfo)
+            deriveSelectedFilterBlockIdxInfo: memoize(FilteringTableFilterSetUI.deriveSelectedFilterBlockIdxInfo),
+            haveEditPermission: memoize(FilteringTableFilterSetUI.haveEditPermission)
         };
 
         this.state = {
@@ -198,14 +204,25 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             cachedCounts: pastCachedCounts
         } = pastProps;
         const { bodyOpen: pastBodyOpen } = pastState;
-        const { currFilterSet, selectedFilterBlockIndices, cachedCounts } = this.props;
-        const { bodyOpen } = this.props;
+        const { currFilterSet, selectedFilterBlockIndices, cachedCounts, setIsSubmitting, caseItem: { actions: caseActions = [] } } = this.props;
+        const { bodyOpen, lastSavedFilterSet } = this.state;
 
         if (currFilterSet && !pastFilterSet) {
             // This should only occur upon initialization, as otherwise even a blank/unsaved filterset would be present.
             if (currFilterSet["@id"]) {
                 this.setState({ "lastSavedFilterSet": currFilterSet });
             }
+        }
+
+        const haveEditPermission = this.memoized.haveEditPermission(caseActions);
+        const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
+
+        // Is OK if called frequently with same value, as App is a PureComponent
+        // and won't update if state/prop value is unchanged.
+        if (haveEditPermission && hasFilterSetChanged) {
+            setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the Filtering tab to be lost. Proceed?");
+        } else {
+            setIsSubmitting(false);
         }
 
         if ( // Rebuild tooltips after stuff that affects tooltips changes.
@@ -334,7 +351,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             context: searchContext, // Current Search Response (not that of this filterSet, necessarily)
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
 
-            // From FilteringTab:
+            // From FilteringTab (or higher):
             caseItem, schemas,
 
             // From FilterSetController:
@@ -343,19 +360,28 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             cachedCounts = {},
             addNewFilterBlock, selectedFilterBlockIndices, selectFilterBlockIdx, removeFilterBlockAtIdx,
             setNameOfFilterBlockAtIdx, setTitleOfFilterSet, isSettingFilterBlockIdx,
+            intersectFilterBlocks = false, toggleIntersectFilterBlocks,
 
-            // From ajax.FetchedItem
-            isFetchingInitialFilterSetItem = false
+            // From ajax.FetchedItem:
+            isFetchingInitialFilterSetItem = false,
+
+            // From SelectedItemsController:
+            selectedItems, onResetSelectedItems,
+
+            // From VariantSampleListController (in index.js, wraps CaseInfoTabView)
+            variantSampleListItem, updateVariantSampleListID, refreshExistingVariantSampleListItem
         } = this.props;
+        const { actions: caseActions = [] } = caseItem;
         const { total: totalCount, facets = null } = searchContext || {};
         const { filter_blocks = [] } = filterSet || {};
         const { bodyOpen, bodyMounted, lastSavedFilterSet, isSavingFilterSet } = this.state;
 
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
-        const facetDict = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets);
-        const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, filterSet);
-        const { duplicateQueryIndices, duplicateNameIndices } = this.memoized.findDuplicateBlocks(filter_blocks);
+        const facetDict                                                     = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets);
+        const hasFilterSetChanged                                           = this.memoized.hasFilterSetChanged(lastSavedFilterSet, filterSet);
+        const { duplicateQueryIndices, duplicateNameIndices }               = this.memoized.findDuplicateBlocks(filter_blocks);
         const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices);
+        const haveEditPermission                                            = this.memoized.haveEditPermission(caseActions);
 
         const filterBlocksLen = filter_blocks.length;
         const allFilterBlocksSelected = filterBlocksLen > 0 && (selectedFilterBlockIdxCount === 0 || selectedFilterBlockIdxCount === filterBlocksLen);
@@ -371,7 +397,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         const headerProps = {
             filterSet, bodyOpen, caseItem, duplicateQueryIndices, duplicateNameIndices, hasFilterSetChanged, isSavingFilterSet,
-            setTitleOfFilterSet, isFetchingInitialFilterSetItem
+            setTitleOfFilterSet, isFetchingInitialFilterSetItem, haveEditPermission
         };
 
         let body = null;
@@ -381,56 +407,262 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 singleSelectedFilterBlockIdx, selectedFilterBlockIndices, allFilterBlocksSelected, selectedFilterBlockIdxCount,
                 addNewFilterBlock, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
                 cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx,
+                intersectFilterBlocks, toggleIntersectFilterBlocks
             };
             body = <FilterSetUIBlocks {...bodyProps} />;
         }
 
         return (
-            // TODO Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
-            <div className="above-variantsample-table-ui">
-                <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
-                    <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
-                    <Collapse in={bodyOpen}>
-                        <div className="filterset-blocks-container">
-                            { body }
+            // TODO 1: Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
+            <React.Fragment>
+
+                <div className="row mb-24 mt-0">
+                    <h1 className="col my-0">
+                        <span className="text-300">Variant Filtering and Technical Review</span>
+                    </h1>
+                    { selectedItems instanceof Map ?
+                        <div className="col-auto">
+                            <AddToVariantSampleListButton {...{ selectedItems, onResetSelectedItems, variantSampleListItem, updateVariantSampleListID, refreshExistingVariantSampleListItem, caseItem, filterSet, selectedFilterBlockIndices }} />
                         </div>
-                    </Collapse>
+                        : null }
                 </div>
-                <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
-                    panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
-                    <h4 className="text-400 col my-0">
-                        <span className="text-600 mr-1">{ totalCount }</span>
-                        <span>
-                            Variant Matches for { currentFilterBlockName ?
-                                <em>{ currentFilterBlockName }</em>
-                                // TODO: Allow to toggle Union vs Intersection in FilterSetController
-                                : `Union of ${selectedFilterBlockCount} Filter Blocks` }
-                        </span>
-                    </h4>
-                </AboveTableControlsBase>
-            </div>
+
+                <div className="above-variantsample-table-ui">
+                    <div className="filterset-outer-container" data-all-selected={allFilterBlocksSelected} data-is-open={bodyOpen}>
+                        <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} saveFilterSet={this.saveFilterSet} />
+                        <Collapse in={bodyOpen}>
+                            <div className="filterset-blocks-container">
+                                { body }
+                            </div>
+                        </Collapse>
+                    </div>
+                    <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
+                        panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
+                        <h4 className="text-400 col my-0">
+                            <strong className="mr-1">{ totalCount }</strong>
+                            <span>
+                                Variant Matches for { currentFilterBlockName ?
+                                    <em>{ currentFilterBlockName }</em>
+                                    // TODO: Allow to toggle Union vs Intersection in FilterSetController
+                                    : (
+                                        <React.Fragment>
+                                            <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
+                                            { ` of ${selectedFilterBlockCount} Filter Blocks` }
+                                        </React.Fragment>
+                                    ) }
+                            </span>
+                        </h4>
+                    </AboveTableControlsBase>
+                </div>
+
+            </React.Fragment>
         );
     }
-
 }
+
+
+
+function AddToVariantSampleListButton(props){
+    const {
+        selectedItems,
+        onResetSelectedItems,
+        variantSampleListItem = null,
+        updateVariantSampleListID,
+        caseItem = null,
+        filterSet,
+        selectedFilterBlockIndices = {},
+        refreshExistingVariantSampleListItem
+    } = props;
+
+    const {
+        "@id": caseAtID,
+        project: { "@id": caseProjectID } = {},
+        institution: { "@id" : caseInstitutionID } = {},
+        accession: caseAccession = null
+    } = caseItem;
+
+    const [ isLoading, setIsLoading ] = useState(false);
+
+    /** PATCH or create new VariantSampleList w. additions */
+
+    const onButtonClick = function(){
+
+        if (!filterSet) {
+            throw new Error("Expected some filterSet to be present");
+        }
+
+        if (selectedItems.size === 0) {
+            throw new Error("Expected selected items");
+        }
+
+        setIsLoading(true);
+
+        function addToSelectionsList(variantSampleSelectionsList){
+
+            let filterBlocksRequestData = _.pick(filterSet, "filter_blocks", "flags", "uuid");
+
+            // Only keep filter_blocks which were used in this query --
+            filterBlocksRequestData.filter_blocks = filterBlocksRequestData.filter_blocks.filter(function(fb, fbIdx){
+                return selectedFilterBlockIndices[fbIdx];
+            });
+
+            // Convert to string (avoid needing to add to schema for now)
+            filterBlocksRequestData = JSON.stringify(filterBlocksRequestData);
+
+            // selectedItems is type (literal) Map, so param signature is `value, key, map`
+            // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
+            selectedItems.forEach(function(variantSampleItem, variantSampleATID){
+                variantSampleSelectionsList.push({
+                    "variant_sample_item": variantSampleATID, // Will become linkTo (embedded),
+                    "filter_blocks_request_at_time_of_selection": filterBlocksRequestData
+                    // "userid" & "date_selected" are filled in by serverDefaults on backend.
+                });
+            });
+        }
+
+
+        if (!variantSampleListItem) {
+            // Create new Item, then PATCH its @id to `Case.variant_sample_list_id` field.
+            const createVSLPayload = {
+                "variant_samples": [],
+                "institution": caseInstitutionID,
+                "project": caseProjectID
+            };
+            if (caseAccession) {
+                createVSLPayload.created_for_case = caseAccession;
+            }
+
+            addToSelectionsList(createVSLPayload.variant_samples);
+
+            ajax.promise(
+                "/variant-sample-lists/",
+                "POST",
+                {},
+                JSON.stringify(createVSLPayload)
+            ).then(function(respVSL){
+                console.log('respVSL', respVSL);
+                const {
+                    "@graph": [{
+                        "@id": vslAtID
+                    }],
+                    error: vslError
+                } = respVSL;
+
+                if (vslError || !vslAtID) {
+                    console.error(respVSL);
+                    throw new Error("Didn't succeed in creating new VSL Item");
+                }
+
+                onResetSelectedItems();
+                updateVariantSampleListID(vslAtID);
+
+                return ajax.promise(
+                    caseAtID,
+                    "PATCH",
+                    {},
+                    JSON.stringify({ "variant_sample_list_id": vslAtID })
+                );
+            }).then(function(respCase){
+                console.log('respVSL', respCase);
+                const {
+                    "@graph": [{
+                        "@id": respCaseAtID
+                    }],
+                    error: caseError
+                } = respCase;
+                if (caseError || !respCaseAtID) {
+                    console.error(respCase);
+                    throw new Error("Didn't succeed in PATCHing Case Item");
+                }
+                console.info("Updated Case.variant_sample_list_id", respCase);
+
+                // TODO Maybe local-patch in-redux-store Case with new last_modified + variant_sample_list_id stuff? Idk.
+            }).catch(function(error){
+                console.error(error);
+            }).finally(function(){
+                setIsLoading(false);
+            });
+
+        } else {
+            // patch existing
+            const {
+                "@id": vslAtID,
+                variant_samples: existingVariantSampleSelections
+            } = variantSampleListItem;
+
+            const patchVSLPayload = { "variant_samples": [ ...existingVariantSampleSelections ] };
+
+            // Need to convert embedded linkTos into just @ids before PATCHing -
+            patchVSLPayload.variant_samples = existingVariantSampleSelections.map(function(existingSelection){
+                const { variant_sample_item: { "@id": vsItemID } } = existingSelection;
+                if (!vsItemID) {
+                    throw new Error("Expected all variant samples to have an ID -- likely a view permissions issue.");
+                }
+                return { ...existingSelection, "variant_sample_item": vsItemID };
+            });
+
+            // Add in new selections
+            addToSelectionsList(patchVSLPayload.variant_samples);
+
+            ajax.promise(
+                vslAtID,
+                "PATCH",
+                {},
+                JSON.stringify(patchVSLPayload)
+            ).then(function(respVSL){
+                console.log('respVSL', respVSL);
+                const {
+                    "@graph": [{
+                        "@id": vslAtID
+                    }],
+                    error: vslError
+                } = respVSL;
+
+                if (vslError || !vslAtID) {
+                    console.error(respVSL);
+                    throw new Error("Didn't succeed in patching VSL Item");
+                }
+
+                onResetSelectedItems();
+                refreshExistingVariantSampleListItem();
+            }).catch(function(error){
+                console.error(error);
+            }).finally(function(){
+                setIsLoading(false);
+            });
+
+            // We shouldn't have any duplicates since prev-selected VSes should appear as checked+disabled in table.
+            // But maybe should still check to be safer (todo later)
+
+
+        }
+
+    };
+
+
+    return (
+        <button type="button" className="btn btn-primary" disabled={isLoading || selectedItems.size === 0} onClick={onButtonClick}>
+            { isLoading ? <i className="icon icon-circle-notch icon-spin fas mr-1"/> : null }
+            Add { selectedItems.size } Variant Samples to Interpretation Tab
+        </button>
+    );
+}
+
+
 
 function FilterSetUIHeader(props){
     const {
         filterSet, caseItem,
         toggleOpen, bodyOpen, hasFilterSetChanged, duplicateQueryIndices, duplicateNameIndices,
-        saveFilterSet, isSavingFilterSet, setTitleOfFilterSet, isFetchingInitialFilterSetItem = false
+        saveFilterSet, isSavingFilterSet, setTitleOfFilterSet, isFetchingInitialFilterSetItem = false,
+        haveEditPermission
     } = props;
-    const { actions: ctxActions = [] } = caseItem || {};
     const {
         '@id': filterSetID,
         error: fsError = null,
         title: fsTitle = null,
         display_title: fsDisplayTitle = null
     } = filterSet || {};
-
-    const haveEditPermission = useMemo(function(){
-        return _.findWhere(ctxActions, { "name" : "edit" });
-    }, [ ctxActions ]);
 
     const [ isEditingTitle, setIsEditingTitle ] = useState(false);
 
@@ -536,11 +768,11 @@ function FilterSetUIHeader(props){
 
 const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
     const {
-        filterSet, filterBlocksLen, facetDict,
+        filterSet, filterBlocksLen, facetDict, schemas,
         singleSelectedFilterBlockIdx, selectedFilterBlockIndices, allFilterBlocksSelected, selectedFilterBlockIdxCount,
         addNewFilterBlock, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
         cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
-        schemas
+        intersectFilterBlocks = false, toggleIntersectFilterBlocks
     } = props;
     const { filter_blocks = [] } = filterSet || {};
     const { query: currentSingleBlockQuery = null } = (singleSelectedFilterBlockIdx !== null && filter_blocks[singleSelectedFilterBlockIdx]) || {};
@@ -559,6 +791,12 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         e.stopPropagation();
         e.preventDefault();
         selectFilterBlockIdx(null);
+    }
+
+    function onToggleIntersectFilterBlocksBtnClick(e){
+        e.stopPropagation();
+        e.preventDefault();
+        toggleIntersectFilterBlocks();
     }
 
     const commonProps = {
@@ -592,22 +830,28 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
             ) }
             <div className="row">
                 <div className="col">
-                    <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
-                        <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
-                        Select All
-                    </button>
+                    <div className="btn-group" role="group" aria-label="Selection Controls">
+                        <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
+                            <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
+                            Select All
+                        </button>
+                        <button type="button" className="btn btn-primary-dark" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
+                            data-tip="Toggle whether to compute the union or intersection of filter blocks">
+                            <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
+                            Intersect
+                        </button>
+                    </div>
                 </div>
                 <div className="col-auto">
-                    <div className="btn-group" role="group" aria-label="Basic example">
+                    <div className="btn-group" role="group" aria-label="Creation Controls">
                         <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
                             <i className="icon icon-fw icon-plus fas mr-1" />
                             Add Filter Block
                         </button>
-                        { currentSingleBlockQuery ?
-                            <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} data-tip="Copy currently-selected filter block">
-                                <i className="icon icon-fw icon-clone far" />
-                            </button>
-                            : null }
+                        <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} disabled={!currentSingleBlockQuery}
+                            data-tip="Copy currently-selected filter block">
+                            <i className="icon icon-fw icon-clone far" />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -615,7 +859,7 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
     );
 });
 
-
+/** Shown temporarily while initial FilterSet is still loading */
 const DummyLoadingFilterBlock = React.memo(function DummyLoadingFilterBlock(){
     // dummyObject & filterBlock, though are objects which wouldn't === each other in prop comparisons, are not emitted from a useMemo since entire component is memoized and doesn't receive any [changes in] props.
     const dummyObject = {};
@@ -786,49 +1030,20 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
         );
     }
 
-    const { correctedQuery, sortedFields } = useMemo(function(){
-
-        // Taken from SPC/RangeFacet roughly (maybe in future can be pulled out/reusable SPC func)
-        function formatRangeVal(field, rangeVal){
-            const fieldFacet = facetDict[field];
-            const { field_type } = fieldFacet;
-
-            if (field_type === "date") {
-                return <LocalizedTime timestamp={value} localize={false} />;
-            }
-            if (field_type === "number"){
-                rangeVal = parseFloat(rangeVal);
-            }
-
-            let valToShow = Schemas.Term.toName(field, rangeVal, false);
-            if (typeof valToShow === "number") {
-                const absVal = Math.abs(valToShow);
-                if (absVal.toString().length <= 7){
-                    // Else is too long and will go thru toPrecision or toExponential.
-                    if (absVal >= 1000) {
-                        valToShow = decorateNumberWithCommas(valToShow);
-                    } else {
-                        // keep valToShow
-                    }
-                } else {
-                    valToShow = valToShow.toExponential(3);
-                }
-            } // else is assumed to be valid JSX already
-            return valToShow;
-        }
+    const { correctedQuery, sortedFields, fieldSchemas } = useMemo(function(){
 
         const origQs = queryString.parse(filterStrQuery);
-        const qs = {};
-        Object.keys(origQs).forEach(function(k){
 
-            // Standardize vals into arrays (w. len 1 if needed).
-            let v = origQs[k];
-            if (!Array.isArray(v)) {
-                v = [v];
-            }
+        const termQs = {};
+        // Will fill this with `{ field: { from, to } }` and create combined items for them afterwards.
+        const rangeQs = {};
+
+        Object.keys(origQs).forEach(function(k){
 
             // Remove .from or .to if needed, confirm aggregation_type === stats, and transform/merge values
             let field = k;
+            let v = origQs[k];
+
             let removedRangeFacetAppendage = false;
             if (k.slice(-5) === ".from"){
                 field = k.slice(0, -5);
@@ -839,9 +1054,8 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
                     console.error("Attempted to remove 'from' from field but couldn't succeed", field, facetDict);
                 } else {
                     removedRangeFacetAppendage = true;
-                    v = v.map(function(rangeVal, i){
-                        return <span key={i}><i className="icon icon-fw icon-greater-than-equal small fas mr-08"/>{ formatRangeVal(field, rangeVal) }</span>;
-                    });
+                    rangeQs[field] = rangeQs[field] || {};
+                    rangeQs[field].from = v;
                 }
 
             } else if (k.slice(-3) === ".to") {
@@ -853,29 +1067,61 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
                     console.error("Attempted to remove 'to' from field but couldn't succeed", field, facetDict);
                 } else {
                     removedRangeFacetAppendage = true;
-                    v = v.map(function(rangeVal, i){
-                        return <span key={i}><i className="icon icon-fw icon-less-than-equal fas small mr-08"/>{ formatRangeVal(field, rangeVal) }</span>;
-                    });
+                    rangeQs[field] = rangeQs[field] || {};
+                    rangeQs[field].to = v;
                 }
             }
 
-            if (!removedRangeFacetAppendage) {
-                // If not range facet, transform vals to proper names.
-                v = v.map(function(termVal){
-                    return Schemas.Term.toName(field, termVal);
-                });
+            if (removedRangeFacetAppendage) {
+                return;
             }
+
+
+            // Standardize term values of the parsed query object into arrays (including w. length=1).
+            if (!Array.isArray(v)) {
+                v = [v];
+            }
+            // If not range facet, transform vals to proper names.
+            // (formatRangeVal will do same if necessary)
+            v = v.map(function(termVal){
+                return Schemas.Term.toName(field, termVal);
+            });
 
             // Merge, e.g. if a from and a to
-            if (typeof qs[field] !== "undefined") {
-                qs[field] = qs[field].concat(v);
+            if (typeof termQs[field] !== "undefined") {
+                termQs[field] = termQs[field].concat(v);
             } else {
-                qs[field] = v;
+                termQs[field] = v;
             }
+
         });
 
-        const sortedFields = Object.keys(qs).sort(function(fA, fB){
-            // Sort keys by schema.facet.order, if any.
+
+        // TODO: Consider moving this up to where facetDict is created, but would be
+        // bit more complexy to memoize well (and need to ensure removal of .from and .to for ranges).
+        const allFieldSchemas = {};
+
+        // Transform rangeQs numbers into values.
+        Object.keys(rangeQs).forEach(function(field){
+            const { from = null, to = null } = rangeQs[field];
+            const fieldSchema = allFieldSchemas[field] = getSchemaProperty(field, schemas, "VariantSample");
+            const facet = facetDict[field];
+            const { title: facetTitle, abbreviation: facetAbbreviation = null } = facet;
+            const { abbreviation: fieldAbbreviation = null } = fieldSchema || {};
+            const title = facetAbbreviation || fieldAbbreviation || (facetTitle.length > 5 ? <em>N</em> : facetTitle);
+            rangeQs[field] = [
+                <FormattedToFromRangeValue {...{ from, to, facet, title }} termTransformFxn={Schemas.Term.toName} key={0} />
+            ];
+        });
+
+        // Get rest of field schemas for term facets
+        const termFields = Object.keys(termQs);
+        termFields.forEach(function(field){
+            allFieldSchemas[field] = getSchemaProperty(field, schemas, "VariantSample");
+        });
+
+        // Combine & sort all filtered-on fields by their schema.facet.order, if any.
+        const sortedFields = termFields.concat(Object.keys(rangeQs)).sort(function(fA, fB){
             const fsA = facetDict[fA];
             const fsB = facetDict[fB];
             if (fsA && !fsB) return -1;
@@ -884,34 +1130,29 @@ function FieldBlocks({ filterBlock, facetDict, schemas }) {
             return (fsA.order || 10000) - (fsB.order || 10000);
         });
 
-        return { sortedFields, "correctedQuery" : qs, };
-    }, [ filterBlock, facetDict ]);
-
+        return {
+            sortedFields,
+            "fieldSchemas": allFieldSchemas,
+            "correctedQuery" : { ...termQs, ...rangeQs }
+        };
+    }, [ filterBlock, facetDict, schemas ]);
 
     return (
         <div className="d-flex flex-wrap filter-query-viz-blocks px-2">
             { sortedFields.map(function(field, index){
-                return <FieldBlock {...{ field, facetDict, schemas }} terms={correctedQuery[field]} key={field} />;
+                return <FieldBlock {...{ field }} fieldFacet={facetDict[field]} fieldSchema={fieldSchemas[field]} terms={correctedQuery[field]} key={field} />;
             }) }
         </div>
     );
 }
 
-function FieldBlock({ field, terms, facetDict, schemas }){
-
-    const fieldFacet = facetDict[field];
+function FieldBlock({ field, terms, fieldFacet, fieldSchema }){
     const {
         title: facetTitle = null,
         // description: facetDescription = null,
         // aggregation_type = "terms"
     } = fieldFacet || {};
 
-
-    // if (aggregation_type === "stats") {
-    //     // TODO: Show single > or < or something.
-    // }
-
-    const fieldSchema = getSchemaProperty(field, schemas, "VariantSample");
     const {
         // Used primarily as fallback, we expect/hope for fieldFacet to be present/used primarily instead.
         title: fieldTitle = null,
@@ -969,7 +1210,8 @@ export class FilterSetController extends React.PureComponent {
         "searchHrefBase" : PropTypes.string.isRequired,
         "navigate" : PropTypes.func.isRequired,
         "initialSelectedFilterBlockIndices" : PropTypes.arrayOf(PropTypes.number),
-        "isFetchingInitialFilterSetItem" : PropTypes.bool
+        "isFetchingInitialFilterSetItem" : PropTypes.bool,
+        "onResetSelectedItems": PropTypes.func
     };
 
     static defaultProps = {
@@ -1176,6 +1418,7 @@ export class FilterSetController extends React.PureComponent {
             // "selectedFilterBlockIdx": null,
             selectedFilterBlockIndices,
             "isSettingFilterBlockIdx": true,
+            "intersectFilterBlocks": false,
             "cachedCounts": {} // Using indices as keys here, but keeping as object (keys are strings)
         };
     }
@@ -1191,6 +1434,7 @@ export class FilterSetController extends React.PureComponent {
         this.removeFilterBlockAtIdx =  _.throttle(this.removeFilterBlockAtIdx.bind(this), 250, { trailing: false });
         this.setNameOfFilterBlockAtIdx = this.setNameOfFilterBlockAtIdx.bind(this);
         this.setTitleOfFilterSet = this.setTitleOfFilterSet.bind(this);
+        this.toggleIntersectFilterBlocks = _.throttle(this.toggleIntersectFilterBlocks.bind(this), 250, { trailing: false });
 
         this.state = FilterSetController.resetState(this.props);
     }
@@ -1200,27 +1444,31 @@ export class FilterSetController extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
-        const { initialFilterSetItem } = this.props;
-        const { initialFilterSetItem: pastInitialFilterSet } = pastProps;
+        const { initialFilterSetItem, context: searchContext, onResetSelectedItems } = this.props;
+        const { initialFilterSetItem: pastInitialFilterSet, context: pastSearchContext } = pastProps;
 
         // Just some debugging for dev environments.
-        if (console.isDebugging()){
-            var key;
-            for (key in this.props) {
-                // eslint-disable-next-line react/destructuring-assignment
-                if (this.props[key] !== pastProps[key]) {
-                    // eslint-disable-next-line react/destructuring-assignment
-                    console.log('FilterSetController changed props: %s', key, pastProps[key], this.props[key]);
-                }
-            }
+        // if (console.isDebugging()){
+        //     var key;
+        //     for (key in this.props) {
+        //         // eslint-disable-next-line react/destructuring-assignment
+        //         if (this.props[key] !== pastProps[key]) {
+        //             // eslint-disable-next-line react/destructuring-assignment
+        //             console.log('FilterSetController changed props: %s', key, pastProps[key], this.props[key]);
+        //         }
+        //     }
 
-            for (key in this.state) {
-                // eslint-disable-next-line react/destructuring-assignment
-                if (this.state[key] !== pastState[key]) {
-                    // eslint-disable-next-line react/destructuring-assignment
-                    console.log('FilterSetController changed state: %s', key, pastState[key], this.state[key]);
-                }
-            }
+        //     for (key in this.state) {
+        //         // eslint-disable-next-line react/destructuring-assignment
+        //         if (this.state[key] !== pastState[key]) {
+        //             // eslint-disable-next-line react/destructuring-assignment
+        //             console.log('FilterSetController changed state: %s', key, pastState[key], this.state[key]);
+        //         }
+        //     }
+        // }
+
+        if (onResetSelectedItems && searchContext !== pastSearchContext) {
+            onResetSelectedItems();
         }
 
         if (initialFilterSetItem !== pastInitialFilterSet) {
@@ -1345,9 +1593,17 @@ export class FilterSetController extends React.PureComponent {
         });
     }
 
+    toggleIntersectFilterBlocks(){
+        this.setState(function({ intersectFilterBlocks }){
+            return {
+                "intersectFilterBlocks": !intersectFilterBlocks
+            };
+        }, this.navigateToCurrentBlock);
+    }
+
     navigateToCurrentBlock(){
         const { navigate: virtualNavigate, searchHrefBase, context: searchContext } = this.props; // props.navigate passed down in from SPC EmbeddedSearchView VirtualHrefController
-        const { selectedFilterBlockIndices, currFilterSet } = this.state;
+        const { selectedFilterBlockIndices, currFilterSet, intersectFilterBlocks } = this.state;
 
         const selectedIdxList = Object.keys(selectedFilterBlockIndices);
         const selectedIdxCount = selectedIdxList.length;
@@ -1368,7 +1624,8 @@ export class FilterSetController extends React.PureComponent {
 
             let global_flags = url.parse(searchHrefBase, false).search;
             if (global_flags) {
-                global_flags = global_flags.slice(1).replace("type=VariantSample&", ""); // .replace("&sort=date_created", "");
+                // Not particularly necessary but helps make less redundant since we have `search_type` already.
+                global_flags = global_flags.slice(1).replace("type=VariantSample&", "");
             }
 
             const selectedFilterBlocks = selectedIdxCount === 0 ? filter_blocks : filter_blocks.filter(function(fb, fbIdx){
@@ -1381,7 +1638,7 @@ export class FilterSetController extends React.PureComponent {
             const virtualCompoundFilterSet = {
                 search_type,
                 global_flags,
-                "intersect" : false,
+                "intersect": intersectFilterBlocks,
                 // "flags": [
                 //     {
                 //         "name": "CurrentFilterSet",
@@ -1462,18 +1719,20 @@ export class FilterSetController extends React.PureComponent {
     render(){
         // eslint-disable-next-line no-unused-vars
         const { children, initialFilterSetItem, ...passProps } = this.props;
-        const { currFilterSet, selectedFilterBlockIndices, cachedCounts, isSettingFilterBlockIdx } = this.state;
+        const { currFilterSet, selectedFilterBlockIndices, cachedCounts, isSettingFilterBlockIdx, intersectFilterBlocks } = this.state;
         const childProps = {
             ...passProps,
             currFilterSet,
             isSettingFilterBlockIdx,
             selectedFilterBlockIndices,
             cachedCounts,
+            intersectFilterBlocks,
             addNewFilterBlock: this.addNewFilterBlock,
             removeFilterBlockAtIdx: this.removeFilterBlockAtIdx,
             selectFilterBlockIdx: this.selectFilterBlockIdx,
             setNameOfFilterBlockAtIdx: this.setNameOfFilterBlockAtIdx,
-            setTitleOfFilterSet: this.setTitleOfFilterSet
+            setTitleOfFilterSet: this.setTitleOfFilterSet,
+            toggleIntersectFilterBlocks: this.toggleIntersectFilterBlocks
         };
 
         return React.Children.map(children, (child)=>{

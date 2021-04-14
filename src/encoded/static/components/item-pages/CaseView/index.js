@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
@@ -8,12 +8,15 @@ import url from 'url';
 import { console, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
+import { SelectedItemsController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/SelectedItemsController';
 
 import { responsiveGridState } from './../../util/layout';
 import DefaultItemView from './../DefaultItemView';
 import { TabPaneErrorBoundary } from './../components/TabView';
 import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
+import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
+import { VariantSampleListController } from './VariantSampleListController';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -23,8 +26,9 @@ import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
+import { InterpretationTab } from './InterpretationTab';
 import CaseSubmissionView from './CaseSubmissionView';
-import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
+
 
 
 
@@ -126,9 +130,16 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         windowWidth,
         windowHeight,
         idToGraphIdentifier,
-        PedigreeVizLibrary = null
+        setIsSubmitting,
+        PedigreeVizLibrary = null,
+        // Passed in from VariantSampleListController which wraps this component in `getTabObject`
+        variantSampleListItem = null,
+        updateVariantSampleListID,
+        savedVariantSampleIDMap = {},
+        refreshExistingVariantSampleListItem
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
+
     const {
         family: currFamily = null, // Previously selected via CurrentFamilyController.js, now primary from case.
         secondary_families = null,
@@ -139,8 +150,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         accession: caseAccession,
         individual: caseIndividual,
         sample_processing: sampleProcessing = null,
-        initial_search_href_filter_addon: filterHrefAddon = "",
+        initial_search_href_filter_addon: filterHrefAddon = ""
     } = context;
+
+    const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
 
     const {
         countIndividuals: numIndividuals,
@@ -280,10 +293,13 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
-                        <FilteringTab {...{ context, windowHeight, session, schemas }} />
+                        <SelectedItemsController isMultiselect>
+                            <FilteringTab {...{ context, windowHeight, session, schemas, setIsSubmitting, variantSampleListItem,
+                                updateVariantSampleListID, savedVariantSampleIDMap, refreshExistingVariantSampleListItem }} />
+                        </SelectedItemsController>
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
-                        <InterpretationTab {...props} />
+                    <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled={vsSelections.length === 0} cache={false}>
+                        <InterpretationTab {...{ variantSampleListItem, schemas }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
                         <ReportingTab {...props} />
@@ -294,6 +310,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     );
 });
 CaseInfoTabView.getTabObject = function(props){
+    const { context: { variant_sample_list_id } = {} } = props;
     return {
         'tab' : (
             <React.Fragment>
@@ -303,7 +320,11 @@ CaseInfoTabView.getTabObject = function(props){
         ),
         'key' : 'case-info',
         'disabled' : false,
-        'content' : <CaseInfoTabView {...props} />
+        'content' : (
+            <VariantSampleListController id={variant_sample_list_id}>
+                <CaseInfoTabView {...props} />
+            </VariantSampleListController>
+        )
     };
 };
 
@@ -409,22 +430,20 @@ class DotRouter extends React.PureComponent {
 function DotRouterTab(props) {
     const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
 
-    const onClick = useMemo(function(){
-        return function(){
-            const targetDotPath = prependDotPath + dotPath;
-            navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
-                // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
-                // layout.animateScrollTo(targetDotPath);
-            });
-        };
-    }, [ dotPath ]);
+    const onClick = useCallback(function(){
+        const targetDotPath = prependDotPath + dotPath;
+        navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
+            // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
+            // layout.animateScrollTo(targetDotPath);
+        });
+    }, []); // Previously was: [ prependDotPath, dotPath ] -- removed for now since these are hardcoded and don't change. IMPORTANT: REVERT IF THESE BECOME DYNAMIC.
 
     if (!React.isValidElement(children)) {
         throw new Error("Expected children to be present and valid JSX");
     }
 
     return (
-        <div className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")} >
+        <div className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")}>
             <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
@@ -710,7 +729,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
     return (
         <React.Fragment>
-            <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
+            <h1><span className="text-300">Bioinformatics Analysis</span></h1>
             {/* <div className="tab-inner-container clearfix font-italic qc-status">
                 <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
@@ -733,11 +752,6 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 });
 
 
-
-
-function InterpretationTab(props) {
-    return <h1>This is the interpretation tab.</h1>;
-}
 function ReportingTab(props) {
     return <h1>This is the reporting tab</h1>;
 }
