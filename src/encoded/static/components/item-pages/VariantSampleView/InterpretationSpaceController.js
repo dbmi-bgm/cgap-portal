@@ -223,6 +223,10 @@ export class InterpretationSpaceWrapper extends React.Component {
  */
 export class InterpretationSpaceController extends React.Component {
 
+    static haveEditPermission(actions){
+        return _.findWhere(actions, { "name" : "edit" });
+    }
+
     static hasNoteChanged(lastSavedNote = null, currNote = null) {
         if (lastSavedNote === null && currNote === null) {
             return false;
@@ -272,7 +276,8 @@ export class InterpretationSpaceController extends React.Component {
         this.retainWIPStateOnUnmount = this.retainWIPStateOnUnmount.bind(this);
 
         this.memoized = {
-            hasNoteChanged: memoize(InterpretationSpaceController.hasNoteChanged)
+            hasNoteChanged: memoize(InterpretationSpaceController.hasNoteChanged),
+            haveEditPermission: memoize(InterpretationSpaceController.haveEditPermission)
         };
     }
 
@@ -309,7 +314,8 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip } = this.state;
-        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote } = this.props;
+        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, context } = this.props;
+        const { actions = [] } = context || {};
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
 
@@ -317,13 +323,15 @@ export class InterpretationSpaceController extends React.Component {
         const isDraftGeneNoteUnsaved = this.memoized.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
         const isDraftInterpretationUnsaved = this.memoized.hasNoteChanged(interpretation_wip, lastSavedInterpretation);
 
+        const hasEditPermission = this.memoized.haveEditPermission(actions);
+
         let panelToDisplay = null;
         switch(currentTab) {
             case "Variant Notes":
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab}
                     key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved} />
                 );
                 break;
@@ -331,7 +339,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab}
                     key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved} />
                 );
                 break;
@@ -339,7 +347,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab}
                     key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved} />
                 );
                 break;
@@ -459,7 +467,7 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource } = this.props;
+        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource, hasEditPermission } = this.props;
         const {
             status: savedNoteStatus,
             last_modified: lastModified = null
@@ -485,7 +493,7 @@ class GenericInterpretationPanel extends React.Component {
                 { noteType === "note_interpretation" ?
                     <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
-                <GenericInterpretationSubmitButton {...{ isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
+                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
@@ -669,16 +677,17 @@ function GenericInterpretationSubmitButton(props) {
         noteTextPresent,            // Is there text in the note space?
         noteChangedSinceLastSave,   // Has the text in the note space changed since last save?
         saveAsDraft,                // Fx -- save as Draft
-        cls
+        cls,
+        hasEditPermission
     } = props;
 
     const allButtonsDropsDisabled = !noteTextPresent || !noteChangedSinceLastSave;
 
-    if (isCurrent || isApproved) {
+    if (isCurrent || isApproved || !hasEditPermission) {
         // No further steps allowed; saved to knowledgebase or approved to case
         return (
-            <Button variant="primary btn-block" disabled onClick={saveAsDraft} className={cls}>
-                Cannot edit - already approved
+            <Button variant="primary btn-block" disabled className={cls} data-tip={!hasEditPermission ? "You must be added to the project to submit a note for this item." : null}>
+                { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
             </Button>);
     } else { // Brand new draft OR previous draft; allow saving or re-saving as draft
         return (
