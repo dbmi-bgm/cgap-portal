@@ -663,7 +663,7 @@ def submit_variant_update(
         )
         if validate_only:
             results["validation_output"] = (
-                variant_update.validate_output + variant_update.errors
+                [variant_update.validate_output] + variant_update.errors
                 if variant_update.errors
                 else variant_update.validate_output
             )
@@ -673,7 +673,7 @@ def submit_variant_update(
             results["post_output"] = variant_update.post_output
         else:
             results["validation_output"] = (
-                variant_update.errors + variant_update.validate_output
+                variant_update.errors + [variant_update.validate_output]
             )
         return results
 
