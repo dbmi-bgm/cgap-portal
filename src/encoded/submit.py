@@ -276,13 +276,13 @@ class SubmissionRow:
             self.fam_alias = family_alias
             self.sample_alias = '{}:sample-{}-{}'.format(
                 project,
-                remove_spaces_in_id(row[SS_SPECIMEN_ID]),
-                remove_spaces_in_id(row[get_column_name(row, ['workup type', 'test requested'])])
+                remove_spaces_in_id(metadata[SS_SPECIMEN_ID]),
+                remove_spaces_in_id(metadata[get_column_name(metadata, ['workup type', 'test requested'])])
             )
             if self.metadata.get('test number'):
                 self.sample_alias = self.sample_alias + '-' + self.metadata['test number']
-            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row[SS_ANALYSIS_ID]))
-            self.case_name = remove_spaces_in_id(row.get('unique analysis id'))
+            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(metadata[SS_ANALYSIS_ID]))
+            self.case_name = remove_spaces_in_id(metadata.get('unique analysis id'))
             self.individual = self.extract_individual_metadata()
             self.family = self.extract_family_metadata()
             self.sample, self.analysis = self.extract_sample_metadata()

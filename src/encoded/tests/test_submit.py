@@ -32,6 +32,7 @@ WORKBOOK_FAMILY_ID3 = '/families/GAPFAZ3V21Q8/'
 
 TEST_WORKBOOK = 'src/encoded/tests/data/documents/cgap_submit_test.xlsx'
 TEST_WORKBOOK_WITH_ERRORS = 'src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx'
+TEST_WORKBOOK_PEDIGREE = 'src/encoded/tests/data/documents/pedigree_test_example.xlsx'
 
 
 # TODO: Check if these work or not.  These tests seem to be working, but they may do posting
@@ -89,10 +90,10 @@ def xls_list():
 
 @pytest.fixture
 def xls_list_pedigree():
-    book = xlrd.open_workbook('src/encoded/tests/data/documents/pedigree_test_example.xlsx')
-    sheet, = book.sheets()
-    row = row_generator(sheet)
-    return list(row)
+    book = openpyxl.load_workbook(TEST_WORKBOOK_PEDIGREE)
+    sheet = book.worksheets[0]
+    rows = row_generator(sheet)
+    return list(rows)
 
 
 @pytest.fixture
@@ -876,7 +877,7 @@ def test_xls_to_json_accessioning(testapp, project, institution):
 
 def test_xls_to_json_pedigree(testapp, project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
-    rows = digest_xls('src/encoded/tests/data/documents/pedigree_test_example.xlsx')
+    rows = digest_xlsx('src/encoded/tests/data/documents/pedigree_test_example.xlsx')
     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'pedigree')
     assert success
     assert len(json_out['family']) == 1
@@ -889,7 +890,7 @@ def test_xls_to_json_pedigree(testapp, project, institution):
 
 def test_xls_to_json_accessioning_errors(testapp, project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
-    rows = digest_xls(TEST_WORKBOOK_WITH_ERRORS)
+    rows = digest_xlsx(TEST_WORKBOOK_WITH_ERRORS)
     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'accessioning')
     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
     assert success  # still able to proceed to validation step
@@ -897,7 +898,7 @@ def test_xls_to_json_accessioning_errors(testapp, project, institution):
 
 def test_xls_to_json_pedigree_errors(testapp, project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
-    rows = digest_xls('src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx')
+    rows = digest_xlsx('src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx')
     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'pedigree')
     assert 'Row 5 - term HP:00000821 does not match the format' in ''.join(json_out['errors'])
     assert 'Row 9 - missing required field(s) family id.' in ''.join(json_out['errors'])
@@ -921,7 +922,7 @@ def test_xls_to_json_invalid_workup(testapp, project, institution, xls_list):
 
 # def test_xls_to_json_errors_pedigree(testapp, project, institution):
 #     """tests for expected output when spreadsheet is not formatted correctly"""
-#     rows = digest_xls('src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx')
+#     rows = digest_xlsx('src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx')
 #     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'pedigree')
 #     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
 #     assert success  # still able to proceed to validation step
