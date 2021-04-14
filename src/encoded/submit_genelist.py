@@ -754,6 +754,7 @@ class VariantUpdateSubmission:
             validate_output = (
                 "No variant samples were found for the given genes"
             )
+            return validate_output
         not_validated = []
         for uuid in self.variant_samples:
             validate_response = self.vapp.patch_json(
@@ -763,10 +764,10 @@ class VariantUpdateSubmission:
                 not_validated.append(uuid)
         if not_validated:
             self.errors.append(
-                "Validation failed for the following variant samples: %s."
+                "Validation failed for the following variant sample(s): %s."
                 % ", ".join(not_validated)
             )
-        validate_output = "%s variant samples validated for updating." % str(
+        validate_output = "%s variant sample(s) validated for updating." % str(
             len(self.variant_samples) - len(not_validated)
         )
         return validate_output
@@ -783,7 +784,7 @@ class VariantUpdateSubmission:
             return None
         for uuid in self.variant_samples:
             self.vapp.patch_json("/" + uuid, {})
-        post_output = "%s variant samples successfully updated." % str(
+        post_output = "%s variant sample(s) successfully updated." % str(
             len(self.variant_samples)
         )
         return post_output
