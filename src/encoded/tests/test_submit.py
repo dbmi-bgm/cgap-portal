@@ -602,12 +602,14 @@ class TestPedigreeRow:
                 ''.format(field) in obj.errors) == error
 
     @pytest.mark.parametrize('feat_list, length', [
-        ([], 0),
-        (['HPO:000001'], 1),
-        (['HPO:094732', 'HPO:239843', 'HPO:000001'], 3)
+        ('', 0),
+        ('HPO:000001', 1),
+        ('HPO:094732, HPO:239843, HPO:000001', 3)
     ])
-    def test_reformat_phenotypic_features(self, feat_list, length):
-        result = PedigreeRow.reformat_phenotypic_features(feat_list)
+    def test_reformat_phenotypic_features(self, row_dict_pedigree, project, institution, feat_list, length):
+        row_dict_pedigree['hpo terms'] = feat_list
+        obj = PedigreeRow(row_dict_pedigree, 1, project['name'], institution['name'])
+        result = obj.individual.metadata['phenotypic_features']
         assert len(result) == length
         for item in result:
             assert isinstance(item, dict)
@@ -659,7 +661,7 @@ class TestPedigreeMetadata:
                 {k: v for k, v in example_rows_pedigree[6].items()}
             ]
             submission = PedigreeMetadata(testapp, data, project, institution, TEST_INGESTION_ID1)
-            assert len(submission.individuals) == 2
+            assert len(submission.individuals) == 4  # row 0, row 6, + 2 parents of row[0]
             # assert len(submission.families) == 1
             assert 'is_pregnancy' in list(submission.individuals.values())[1]
             assert list(submission.individuals.values())[1]['is_pregnancy'] == True

@@ -78,7 +78,7 @@ SS_PROBAND = 'proband'
 
 REQUIRED_CASE_COLS = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
 REQUIRED_COLUMNS_ACCESSIONING =  REQUIRED_CASE_COLS + [SS_INDIVIDUAL_ID, SS_SEX, SS_RELATION, SS_REPORT_REQUIRED]
-REQUIRED_COLUMNS_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID, SS_PROBAND]
+REQUIRED_COLUMNS_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID, SS_SEX, SS_PROBAND]
 
 # half-siblings not currently supported, because pedigree info is needed to know
 # which parent is shared. Can come back to this after pedigree processing is integrated.
@@ -465,7 +465,6 @@ class PedigreeRow:
         if not self.found_missing_values():
             self.indiv_alias = generate_individual_alias(project, metadata[SS_INDIVIDUAL_ID])
             self.individual = self.extract_individual_metadata()
-            # self.family = None
             self.proband = self.is_proband()
 
     def found_missing_values(self):
