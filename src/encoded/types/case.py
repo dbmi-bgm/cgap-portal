@@ -27,7 +27,6 @@ def _build_family_embeds(*, base_path):
         "proband.accession",
 
         # Array of phenotypes linkTo
-        "family_phenotypic_features.hpo_id",
         "family_phenotypic_features.phenotype_name",
 
         # Individual linkTo
