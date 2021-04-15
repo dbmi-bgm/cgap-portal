@@ -45,7 +45,7 @@ jobs:
         run: |
           sudo apt update -yq
           sudo apt install -yq postgresql-common
-          sudo sh /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+          sudo apt install -yq --no-install-suggests --no-install-recommends postgresql-12 postgresql-client-12
           echo "/usr/lib/postgresql/11/bin" >> $GITHUB_PATH
           sudo ln -s /usr/lib/postgresql/11/bin/initdb /usr/local/bin/initdb
       - name: Install Deps
