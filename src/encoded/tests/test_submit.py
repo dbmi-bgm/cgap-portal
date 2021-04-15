@@ -834,7 +834,7 @@ class TestSpreadsheetProcessing:
         """tests that proper header is found when present"""
         data = iter(xls_list_pedigree[0:remove_row] + xls_list_pedigree[(remove_row) + 1:])
         obj = SpreadsheetProcessing(testapp, data, project, institution, TEST_INGESTION_ID1,
-                                    submission_type='pedigree')
+                                    submission_type='family_history')
         assert obj.passing == success_bool
         assert (len(obj.errors) == 0) == success_bool
         assert ('Column headers not detected in spreadsheet!' in ''.join(obj.errors)) == (not success_bool)
@@ -842,7 +842,7 @@ class TestSpreadsheetProcessing:
     def test_create_row_dict_pedigree(self, testapp, xls_list_pedigree, project, institution):
         """tests that dictionary of colname: field value is created for each row"""
         obj = SpreadsheetProcessing(testapp, iter(xls_list_pedigree), project, institution,
-                                    TEST_INGESTION_ID1, submission_type='pedigree')
+                                    TEST_INGESTION_ID1, submission_type='family_history')
         assert obj.keys
         assert len(obj.rows) == 8
         for row in obj.rows:
@@ -859,7 +859,7 @@ class TestSpreadsheetProcessing:
         idx = xls_list_pedigree[0].index(col)
         rows = (row[0:idx] + row[idx+1:] for row in xls_list_pedigree)
         obj = SpreadsheetProcessing(testapp, rows, project, institution, TEST_INGESTION_ID1,
-                                    submission_type='pedigree')
+                                    submission_type='family_history')
         assert obj.passing == success_bool
         if not success_bool:
             assert 'Column(s) "{}" not found in spreadsheet!'.format(col.lower().strip(':')) in ''.join(obj.errors)
@@ -878,7 +878,7 @@ def test_xls_to_json_accessioning(testapp, project, institution):
 def test_xls_to_json_pedigree(testapp, project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
     rows = digest_xlsx('src/encoded/tests/data/documents/pedigree_test_example.xlsx')
-    json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'pedigree')
+    json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'family_history')
     assert success
     assert len(json_out['family']) == 1
     assert 'encode-project:family-IND201' in json_out['family']
@@ -899,7 +899,7 @@ def test_xls_to_json_accessioning_errors(testapp, project, institution):
 def test_xls_to_json_pedigree_errors(testapp, project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
     rows = digest_xlsx('src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx')
-    json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'pedigree')
+    json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'family_history')
     assert 'Row 5 - term HP:00000821 does not match the format' in ''.join(json_out['errors'])
     assert 'Row 9 - missing required field(s) family id.' in ''.join(json_out['errors'])
     assert success
@@ -920,12 +920,6 @@ def test_xls_to_json_invalid_workup(testapp, project, institution, xls_list):
     assert ('Row 5 - Samples with analysis ID 55432 contain mis-matched '
             'or invalid workup type values.') in ''.join(json_out['errors'])
 
-# def test_xls_to_json_errors_pedigree(testapp, project, institution):
-#     """tests for expected output when spreadsheet is not formatted correctly"""
-#     rows = digest_xlsx('src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx')
-#     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'pedigree')
-#     assert 'Row 4' in ''.join(json_out['errors'])  # row counting info correct
-#     assert success  # still able to proceed to validation step
 
 def test_parse_exception_invalid_alias(testapp, a_case):
     a_case['invalid_field'] = 'value'
