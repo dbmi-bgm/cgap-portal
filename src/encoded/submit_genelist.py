@@ -4,7 +4,7 @@ from base64 import b64encode
 from dcicutils.misc_utils import VirtualAppError
 from openpyxl import load_workbook
 from webtest import AppError
- 
+
 from .util import s3_local_file
 
 
@@ -404,7 +404,7 @@ class GeneListSubmission:
 
         Gene lists of the same title belonging to the same project and
         institution will be searched for, and if a match is discovered, the
-        gene list and document will be patched and updated. If no match is 
+        gene list and document will be patched and updated. If no match is
         found, a new document and gene list will be posted.
 
         Returns:
@@ -676,9 +676,9 @@ def submit_variant_update(
             results["validation_output"] = variant_update.validate_output
             results["post_output"] = variant_update.post_output
         else:
-            results["validation_output"] = (
-                variant_update.errors + [variant_update.validate_output]
-            )
+            results["validation_output"] = variant_update.errors + [
+                variant_update.validate_output
+            ]
         return results
 
 
