@@ -1,0 +1,79 @@
+dist: trusty
+language: python
+sudo: true
+python:
+  - "3.6"
+if: tag IS blank
+cache:
+  directories:
+  - eggs
+  - .npm
+  - ~/.npm
+  - node_modules
+  - /home/travis/.cypress/Cypress
+addons:
+  apt:
+    packages:
+    - bsdtar
+    - build-essential
+    - make
+    - graphviz
+    - nginx
+env:
+  global:
+  - PGPORT=5433
+  - BOTO_CONFIG=/bogus
+  - PATH="/usr/share/elasticsearch/bin:/usr/lib/postgresql/11/bin:$PATH"
+  - ELASTIC_BEANSTALK_LABEL=$TRAVIS_COMMIT
+  - USER="4dn-dcic"
+  - SNO_REPO="snovault"
+before_install:
+- ls -dal /usr/lib/postgresql/*/bin/postgres
+- find /usr/lib/postgresql -name 'postgres' -print
+- ps auxww | grep postgres
+- sudo apt-get install -yq --no-install-suggests --no-install-recommends postgresql-common
+- sudo service postgresql stop
+- sudo apt install -yq --no-install-suggests --no-install-recommends postgresql-11 postgresql-client-11
+- sudo service postgresql status
+- sudo service postgresql start 11
+- sudo service postgresql status
+- python -c "import fcntl; fcntl.fcntl(1, fcntl.F_SETFL, 0)"
+- echo $tibanna_deploy
+- postgres --version
+- initdb --version
+- ls -dal /usr/lib/postgresql/*/bin/postgres
+- find /usr/lib/postgresql -name 'postgres' -print
+- ps auxww | grep postgres
+- nvm install 10 || (echo "Retrying nvm install" && sleep 5 && nvm install 10)
+- node --version
+- npm config set python /usr/bin/python2.7
+install:
+- make build-full
+before_script:
+  - configure-kibana-index --es-endpoint search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 
+script:
+- make travis-test
+after_script:
+- echo leader=$BUILD_LEADER status=$BUILD_AGGREGATE_STATUS
+- wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 
+after_success:
+- coveralls
+- ! "if test -n \"$NPM\"; then \n   cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js\n
+  \  cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage\n   rm -rf ./coverage\nfi\n"
+- if test -n "$UNIT"; then python-codacy-coverage -r coverage.xml; fi
+- python deploy/travis_after_all.py https://api.travis-ci.org
+- export $(cat .to_export_back) >> /dev/null
+- echo $TRAVIS_COMMIT_MESSAGE
+- MSG_NO_WHITESPACE="$(echo -e "${TRAVIS_COMMIT_MSG}" | tr -d '[:space:]')"
+- echo $MSG_NO_WHITESPACE
+- echo $TRAVIS_PULL_REQUEST
+- echo $TRAVIS_BRANCH
+- echo $tibanna_deploy
+- |
+  if  [[ $TRAVIS_BRANCH == 'master' ]]; then
+    echo 'Triggering docs build';
+    curl -X POST -d "branches=master" -d "token=$DOCS_TOKEN" https://readthedocs.org/api/v2/webhook/cgap-portal/100087/;
+  fi
+after_failure:
+- python deploy/travis_after_all.py https://api.travis-ci.org
+- export $(cat .to_export_back) >> /dev/null
