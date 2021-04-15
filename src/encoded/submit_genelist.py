@@ -402,10 +402,10 @@ class GeneListSubmission:
         Attempts to validate document and gene list jsons provided by
         post_bodies.
 
-        Gene lists of the same title belonging to the same project will be
-        searched for, and if a match is discovered, the gene list and document
-        will be patched and updated. If no match is found, a new document and
-        gene list will be posted.
+        Gene lists of the same title belonging to the same project and
+        institution will be searched for, and if a match is discovered, the
+        gene list and document will be patched and updated. If no match is 
+        found, a new document and gene list will be posted.
 
         Returns:
             - List with information on validation (None if no matched genes)
@@ -429,6 +429,8 @@ class GeneListSubmission:
                     "/search/?type=GeneList"
                     "&project.%40id="
                     + self.project.replace("/", "%2F")
+                    + "&institution.%40id="
+                    + self.institution.replace("/", "%2F")
                     + "&field=title&field=uuid&field=genes.uuid"
                 ).json["@graph"]
                 project_titles = [x["title"] for x in project_genelists]
@@ -475,6 +477,8 @@ class GeneListSubmission:
                 "/search/?type=Document"
                 "&project.%40id="
                 + self.project.replace("/", "%2F")
+                + "&institution.%40id="
+                + self.institution.replace("/", "%2F")
                 + "&field=display_title&field=uuid"
             ).json["@graph"]
             project_docs = [
