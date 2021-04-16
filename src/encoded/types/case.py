@@ -134,9 +134,8 @@ def _build_case_embedded_list():
         "individual.mother.samples.accession",
 
         # Phenotype linkTo
-        "individual.phenotypic_features.hpo_id",
-        "individual.phenotypic_features.phenotype_name",
-        "individual.phenotypic_features.phenotypic_feature",
+        "individual.phenotypic_features.phenotypic_feature.phenotype_name",
+        "individual.phenotypic_features.phenotypic_feature.hpo_id",
         "individual.phenotypic_features.onset_age",
         "individual.phenotypic_features.onset_age_units",
 
