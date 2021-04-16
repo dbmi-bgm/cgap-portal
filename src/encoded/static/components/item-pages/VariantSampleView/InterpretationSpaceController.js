@@ -314,8 +314,7 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip } = this.state;
-        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, context } = this.props;
-        const { actions = [] } = context || {};
+        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, context, canEditVariantSample } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
 
@@ -323,15 +322,13 @@ export class InterpretationSpaceController extends React.Component {
         const isDraftGeneNoteUnsaved = this.memoized.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
         const isDraftInterpretationUnsaved = this.memoized.hasNoteChanged(interpretation_wip, lastSavedInterpretation);
 
-        const hasEditPermission = this.memoized.haveEditPermission(actions);
-
         let panelToDisplay = null;
         switch(currentTab) {
             case "Variant Notes":
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab}
                     key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ canEditVariantSample }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved} />
                 );
                 break;
@@ -339,7 +336,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab}
                     key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ canEditVariantSample }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved} />
                 );
                 break;
@@ -347,7 +344,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab}
                     key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ canEditVariantSample }}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved} />
                 );
                 break;
@@ -467,7 +464,7 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource, hasEditPermission } = this.props;
+        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource, canEditVariantSample } = this.props;
         const {
             status: savedNoteStatus,
             last_modified: lastModified = null
@@ -489,11 +486,11 @@ class GenericInterpretationPanel extends React.Component {
                 { lastModUsername ?
                     <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsername} </div>
                     : null}
-                <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
+                <AutoGrowTextArea cls="w-100 mb-1" text={noteText} canEdit={canEditVariantSample} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
-                    <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange} canEdit={canEditVariantSample}/>
                     : null }
-                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
+                <GenericInterpretationSubmitButton {...{ canEditVariantSample, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
@@ -510,7 +507,7 @@ class GenericInterpretationPanel extends React.Component {
  * Currently only used for classification, but can be used in future for variant/gene candidacy dropdowns (and maybe as a stopgap for ACMG).
  */
 function NoteFieldDrop(props) {
-    const { value = null, schemas = null, field = null, noteType = null, onOptionChange, cls="mb-1", getFieldProperties } = props;
+    const { value = null, schemas = null, field = null, noteType = null, onOptionChange, cls="mb-1", getFieldProperties, canEdit } = props;
     if (!schemas) {
         return 'loading...'; // TODO: actually implement a load spinner
     }
@@ -534,13 +531,13 @@ function NoteFieldDrop(props) {
                 { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
             </label>
             <div className="d-flex">
-                <Dropdown as={ButtonGroup} className={cls}>
-                    <Dropdown.Toggle variant="outline-secondary text-left" id="dropdown-basic">
+                <Dropdown as={ButtonGroup} className={cls} disabled={!canEdit}>
+                    <Dropdown.Toggle disabled={!canEdit} variant="outline-secondary text-left" id="dropdown-basic">
                         { value ? <><i className="status-indicator-dot ml-1 mr-07" data-status={value} /> { value }</> : "Select an option..."}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
                 </Dropdown>
-                { value ?
+                { value && canEdit ?
                     <Button variant="danger" className={cls + ' ml-03'} onClick={() => onOptionChange(field, null)}>
                         <i className="icon icon-trash-alt fas" />
                     </Button>
@@ -561,11 +558,11 @@ class NoGrowTextArea extends React.Component {
         onTextChange(e, field);
     }
     render() {
-        const { text, cls = "w-100 mb-1 flex-grow-1" } = this.props;
+        const { text, cls = "w-100 mb-1 flex-grow-1", canEdit } = this.props;
         return (
             <div className={cls} style={{ minHeight: "135px" }}>
                 <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: "100%", resize: "none", minHeight: "70px" }} className="w-100"
-                    onChange={this.onChangeWrapper} />
+                    onChange={this.onChangeWrapper} disabled={!canEdit}/>
             </div>
         );
     }
@@ -626,7 +623,7 @@ class AutoGrowTextArea extends React.Component {
     }
 
     render() {
-        const { text, cls, minHeight, maxHeight } = this.props;
+        const { text, cls, minHeight, maxHeight, canEdit } = this.props;
         const { textAreaHeight, parentHeight } = this.state;
         return (
             <div style={{
@@ -634,7 +631,7 @@ class AutoGrowTextArea extends React.Component {
                 // height: parentHeight
             }} className={cls}>
                 <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: textAreaHeight > maxHeight ? maxHeight: textAreaHeight, resize: "none" }} className="w-100"
-                    onChange={this.onChangeWrapper} />
+                    onChange={this.onChangeWrapper} disabled={!canEdit} />
             </div>
         );
     }
@@ -647,7 +644,7 @@ AutoGrowTextArea.defaultProps = {
 
 /** Display additional form fields for ACMG Interpretation */
 function ACMGInterpretationForm(props) {
-    const { schemas, acmg_guidelines = [], classification = null, conclusion = null, noteType, onDropOptionChange } = props;
+    const { schemas, acmg_guidelines = [], classification = null, conclusion = null, noteType, onDropOptionChange, canEdit } = props;
 
     const getFieldProperties = useMemo(function(){
         if (!schemas) return function(){ return null; };
@@ -661,7 +658,7 @@ function ACMGInterpretationForm(props) {
 
     return (
         <React.Fragment>
-            <NoteFieldDrop {...{ schemas, noteType }} getFieldProperties={getFieldProperties} onOptionChange={onDropOptionChange} field="classification" value={classification}/>
+            <NoteFieldDrop {...{ schemas, noteType, canEdit }} getFieldProperties={getFieldProperties} onOptionChange={onDropOptionChange} field="classification" value={classification}/>
         </React.Fragment>
     );
 }
@@ -678,16 +675,16 @@ function GenericInterpretationSubmitButton(props) {
         noteChangedSinceLastSave,   // Has the text in the note space changed since last save?
         saveAsDraft,                // Fx -- save as Draft
         cls,
-        hasEditPermission
+        canEditVariantSample
     } = props;
 
     const allButtonsDropsDisabled = !noteTextPresent || !noteChangedSinceLastSave;
 
-    if (isCurrent || isApproved || !hasEditPermission) {
+    if (isCurrent || isApproved || !canEditVariantSample) {
         // No further steps allowed; saved to knowledgebase or approved to case
         return (
-            <Button variant="primary btn-block" disabled className={cls} data-tip={!hasEditPermission ? "You must be added to the project to submit a note for this item." : null}>
-                { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
+            <Button variant="primary btn-block" disabled className={cls} data-tip={!canEditVariantSample ? "You must be added to the project to submit a note for this item." : null}>
+                { !canEditVariantSample ? "Need Edit Permission" : "Cannot edit - already approved" }
             </Button>);
     } else { // Brand new draft OR previous draft; allow saving or re-saving as draft
         return (

@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
@@ -20,6 +21,13 @@ import { InterpretationSpaceController, InterpretationSpaceWrapper } from './Int
 
 
 export class VariantSampleOverview extends React.PureComponent {
+
+    static hasViewPermission(arr) {
+        return _.findWhere((arr), { "name": "view" });
+    }
+    static hasEditPermission(arr) {
+        return _.findWhere((arr), { "name": "edit" }) || false;
+    }
 
     constructor(props){
         super(props);
@@ -54,6 +62,10 @@ export class VariantSampleOverview extends React.PureComponent {
             currentGeneItemLoading: false,
         };
         this.loadedGeneCache = {};
+        this.memoized = {
+            hasViewPermission: memoize(VariantSampleOverview.hasViewPermission),
+            hasEditPermission: memoize(VariantSampleOverview.hasEditPermission)
+        };
     }
 
     componentDidMount(){
@@ -104,9 +116,13 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const { context = null, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
+
+        const { actions = [], status = null } = context || {};
+        const canViewVariantSample = this.memoized.hasViewPermission(actions) || status === "shared";
+        const canEditVariantSample = this.memoized.hasEditPermission(actions);
 
         const { query: {
             showInterpretation = true,      // used only if "True" (toggles showing of interpretation sidebar/pane)
@@ -115,20 +131,27 @@ export class VariantSampleOverview extends React.PureComponent {
             caseSource = null
         } } = memoizedUrlParse(href);
 
+        if (canViewVariantSample) {
+            return (
+                <div className="sample-variant-overview sample-variant-annotation-space-body">
+                    <div className="row flex-column-reverse flex-lg-row flex-nowrap">
+                        <div className="col">
+                            {/* BA1, BS1, BS2, BS3 etc markers here */}
+                            <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
+                            <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
+                        </div>
+                        { showInterpretation == 'True' ?
+                            <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
+                                <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, canEditVariantSample }}/>
+                            </div> : null
+                        }
+                    </div>
+                </div>
+            );
+        }
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <div className="row flex-column-reverse flex-lg-row flex-nowrap">
-                    <div className="col">
-                        {/* BA1, BS1, BS2, BS3 etc markers here */}
-                        <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
-                        <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
-                    </div>
-                    { showInterpretation == 'True' ?
-                        <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}/>
-                        </div> : null
-                    }
-                </div>
+                <span>You lack permission to view this item.</span>
             </div>
         );
     }
