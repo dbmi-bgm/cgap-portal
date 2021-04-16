@@ -7,7 +7,7 @@ import moment from 'moment';
 import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
-import { FilteringTableFilterSetUI, FilterSetController, SaveFilterSetButtonController, SaveFilterSetPresetDropdownButtonController } from './FilteringTableFilterSetUI';
+import { FilteringTableFilterSetUI, FilterSetController, SaveFilterSetButtonController, SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI';
 import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
 
 /**
@@ -175,9 +175,9 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     const embeddedTableHeaderBody = (
         <SaveFilterSetButtonController caseItem={context} setIsSubmitting={setIsSubmitting}>
-            <SaveFilterSetPresetDropdownButtonController>
+            <SaveFilterSetPresetButtonController>
                 <FilteringTableFilterSetUI {...fsuiProps} />
-            </SaveFilterSetPresetDropdownButtonController>
+            </SaveFilterSetPresetButtonController>
         </SaveFilterSetButtonController>
     );
 

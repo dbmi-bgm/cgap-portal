@@ -2357,6 +2357,16 @@ $download-button-width : 100px;
 					display: flex;
 					align-items: center;
 
+					.btn-dropdown-icon {
+						/* Todo - make reusable everywhere ? */
+						padding-left: 5px;
+						padding-right: 5px;
+						&:after {
+							/* Hide down 'v' icon */
+							display: none;
+						}
+					}
+
 					.count-indicator-wrapper {
 
 						svg {
@@ -2368,23 +2378,21 @@ $download-button-width : 100px;
 							fill: #999;
 						}
 					}
+
+					.title-icon-container {
+						button.import-preset-btn {
+							line-height: 1.45;
+						}
+					}
 				}
 
 				&[data-is-origin-of-current-case-filterset="true"] {
 					background-color: $light;
 
-					.title-icon-container {
-						// "resets" the blocks, unless unchanged (below)
-						color: $primary;
-					}
-
 					&[data-is-current-case-filterset-unchanged="true"] {
 						/* Similar color to filterset-block below, but lighter */
 						background-color: lighten($primary, 55%);
 
-						.title-icon-container {
-							color: $secondary;
-						}
 					}
 					
 				}

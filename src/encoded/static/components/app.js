@@ -199,6 +199,9 @@ export default class App extends React.PureComponent {
         const { href, context } = this.props;
         const { session } = this.state;
 
+        // This won't refresh current page.
+        // And preserves contents of browser view if are on edit page or similar.
+        // Individual components may add/remove their own session expired callbacks and refresh page (or selves) if needed.
         ajax.AJAXSettings.addSessionExpiredCallback(this.updateAppSessionState);
 
         // The href prop we have was from serverside. It would not have a hash in it, and might be shortened.
