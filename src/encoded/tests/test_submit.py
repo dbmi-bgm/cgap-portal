@@ -33,6 +33,7 @@ WORKBOOK_FAMILY_ID3 = '/families/GAPFAZ3V21Q8/'
 TEST_WORKBOOK = 'src/encoded/tests/data/documents/cgap_submit_test.xlsx'
 TEST_WORKBOOK_WITH_ERRORS = 'src/encoded/tests/data/documents/cgap_submit_test_with_errors.xlsx'
 TEST_WORKBOOK_PEDIGREE = 'src/encoded/tests/data/documents/pedigree_test_example.xlsx'
+TEST_PEDIGREE_WITH_ERRORS = 'src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx'
 
 
 # TODO: Check if these work or not.  These tests seem to be working, but they may do posting
@@ -898,7 +899,7 @@ def test_xls_to_json_accessioning_errors(testapp, project, institution):
 
 def test_xls_to_json_pedigree_errors(testapp, project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
-    rows = digest_xlsx('src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx')
+    rows = digest_xlsx(TEST_PEDIGREE_WITH_ERRORS)
     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'family_history')
     assert 'Row 5 - term HP:00000821 does not match the format' in ''.join(json_out['errors'])
     assert 'Row 9 - missing required field(s) family id.' in ''.join(json_out['errors'])
