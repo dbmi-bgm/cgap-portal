@@ -489,7 +489,17 @@
             "title": "Variant",
             "type": "string",
             "linkTo": "Variant"
-        }
+        },
+        "project_genelists": {
+            "title": "project_genelists",
+            "description": "Gene lists associated with project of variant sample",
+            "type": "array",
+            "items": {
+                "title": "Gene list title",
+                "type": "string",
+                "description": "Gene list title"
+            }
+	}
     },
     "columns": {
         "display_title": {
@@ -627,7 +637,7 @@
             "search_type": "sayt_without_terms",
             "sayt_item_type": "Gene"
         },
-        "variant.genes.genes_most_severe_gene.gene_lists.display_title": {
+        "project_genelists": {
             "title": "Gene List",
             "order": 2,
             "grouping": "Genes",

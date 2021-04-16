@@ -3,6 +3,7 @@ import webtest
 import requests  # XXX: C4-211
 from .variant_fixtures import VARIANT_SAMPLE_URL
 from encoded.types.variant import build_variant_sample_annotation_id
+from ..ingestion.common import CGAP_CORE_PROJECT
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.workbook]
@@ -91,3 +92,45 @@ def test_build_variant_sample_annotation_id(call_info, variant_uuid, file_access
         patches to fail if not working correctly """
     assert build_variant_sample_annotation_id(call_info, variant_uuid, file_accession) == (
             call_info + ':' + variant_uuid + ':' + file_accession)
+
+
+def test_project_specific_variant_sample_genelist(
+    testapp,
+    genelist,
+    cgap_core_genelist,
+    bgm_genelist,
+    variant_sample,
+    cgap_core_variant_sample,
+    bgm_variant_sample,
+):
+    """
+    Ensure variant samples are correctly matched with gene lists based on their
+    respective projects. Institution is irrelevant here.
+
+    Logic is:
+        - If gene list project is variant sample project, then the two are
+          associated (via variant sample's project_genelists property)
+        - If gene list project is cgap_core_project, then the two are
+          associated regardless of variant sample project
+        - If neither of the above apply, the two are not associated
+    """
+    response = testapp.post_json(
+        "/variant-samples", variant_sample
+    ).json["@graph"][0]
+    cgap_core_response = testapp.post_json(
+        "/variant-samples", cgap_core_variant_sample
+    ).json["@graph"][0]
+    bgm_response = testapp.post_json(
+        "/variant-samples", bgm_variant_sample
+    ).json["@graph"][0]
+    assert set(response["project_genelists"]) == {
+        genelist["title"],
+        cgap_core_genelist["title"],
+    }
+    assert set(cgap_core_response["project_genelists"]) == {
+        cgap_core_genelist["title"]
+    }
+    assert set(bgm_response["project_genelists"]) == {
+        bgm_genelist["title"],
+        cgap_core_genelist["title"],
+    }

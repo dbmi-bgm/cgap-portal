@@ -1,23 +1,24 @@
-import boto3
 import datetime
 import io
 import json
-import negspy.coordinates as nc
 import os
+from urllib.parse import parse_qs, urlparse
+
+import boto3
+import negspy.coordinates as nc
 import pytz
 import structlog
-
 from pyramid.httpexceptions import HTTPTemporaryRedirect
 from pyramid.settings import asbool
 from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
-from urllib.parse import parse_qs, urlparse
-from ..util import resolve_file_path
-from ..inheritance_mode import InheritanceMode
-from .base import Item, get_item_or_none
 
+from ..ingestion.common import CGAP_CORE_PROJECT
+from ..inheritance_mode import InheritanceMode
+from ..util import resolve_file_path
+from .base import Item, get_item_or_none
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
@@ -442,6 +443,35 @@ class VariantSample(Item):
                 new_labels[role_key] = ' '.join(label)  # just in case
 
         return new_labels
+
+    @calculated_property(schema={
+        "title": "project_genelists",
+        "description": "List of gene lists associated with project",
+        "type": "array",
+        "items": {
+            "title": "Gene list title",
+            "type": "string",
+            "description": "Gene list title"
+        }
+    })
+    def project_genelists(self, request, project, variant, file, CALL_INFO):
+        variant_props = get_item_or_none(request, variant, frame='embedded')
+        genelist_at_ids = []
+        project_genelists = []
+        core_project = CGAP_CORE_PROJECT + "/"
+        if variant_props.get('genes'):
+            genes = variant_props.get('genes')
+            for gene in genes:
+                most_severe = gene['genes_most_severe_gene']
+                if 'gene_lists' in most_severe:
+                    genelist_at_ids += [
+                        genelist['@id'] for genelist in most_severe['gene_lists']
+                    ]
+        for at_id in genelist_at_ids:
+            genelist_props = get_item_or_none(request, at_id)
+            if genelist_props['project'] in (project, core_project):
+                project_genelists.append(genelist_props['display_title'])
+        return project_genelists
 
 
 @collection(
