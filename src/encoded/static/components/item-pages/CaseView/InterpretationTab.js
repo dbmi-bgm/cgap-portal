@@ -27,19 +27,18 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
     let renderedSections;
 
     const hasViewPermission = memoize(function hasViewPermission(arr) {
-        console.log("hasViewPermission arr", arr);
-        return !_.findWhere((arr), { "name": "view" });
+        return _.findWhere((arr), { "name": "view" });
     });
 
-    // Not currently in use, but may be useful once we add actions
+    // Not currently in use, but may be useful once we add actions (remove from variantsample list, etc.)
     const hasEditPermission = memoize(function hasViewPermission(arr) {
-        return !_.findWhere((arr), { "name": "view" });
+        return _.findWhere((arr), { "name": "view" });
     });
 
     let numWithoutPermissions;
 
     if (!hasViewPermission(actions)) {
-        renderedSections = <div>Sorry, you view permission to view this variant sample list.</div>;
+        renderedSections = <div>Sorry, you lack permission to view this variant sample list.</div>;
     } else {
         const {
             "VariantSample": {
