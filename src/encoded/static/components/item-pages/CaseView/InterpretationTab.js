@@ -22,7 +22,7 @@ const {
 
 export const InterpretationTab = React.memo(function InterpretationTab (props) {
     const { variantSampleListItem, schemas, caseAccession } = props;
-    const { variant_samples: vsSelections = [], actions = [] } = variantSampleListItem;
+    const { variant_samples: vsSelections = [], actions = [], status = null } = variantSampleListItem;
 
     let renderedSections;
 
@@ -31,13 +31,13 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
     });
 
     // Not currently in use, but may be useful once we add actions (remove from variantsample list, etc.)
-    const hasEditPermission = memoize(function hasViewPermission(arr) {
-        return _.findWhere((arr), { "name": "view" });
+    const hasEditPermission = memoize(function hasEditPermission(arr) {
+        return _.findWhere((arr), { "name": "edit" });
     });
 
     let numWithoutPermissions;
 
-    if (!hasViewPermission(actions)) {
+    if (!hasViewPermission(actions) && status !== "shared") {
         renderedSections = <div>Sorry, you lack permission to view this variant sample list.</div>;
     } else {
         const {
@@ -62,9 +62,9 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         // Ensure only the variants the user has permission to view are visible
         const filteredSelections = vsSelections.filter((selection) => {
             const { variant_sample_item } = selection;
-            const { "@id": vsID, actions = [] } = variant_sample_item;
+            const { "@id": vsID, actions = [], status = null } = variant_sample_item;
 
-            if (vsID && hasViewPermission(actions)) {
+            if (vsID && (hasViewPermission(actions) || status === "shared")) {
                 return true;
             }
             return false;
