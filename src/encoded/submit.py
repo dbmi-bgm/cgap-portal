@@ -1019,8 +1019,7 @@ class SpreadsheetProcessing:
         elif self.submission_type == 'family_history':
             self.required_columns = REQUIRED_COLUMNS_PEDIGREE
         else:
-            pass
-            # TODO: raise error
+            raise ValueError(f'{submission_type} not a valid submission_type argument')
         self.output = {}
         self.errors = []
         self.keys = []
@@ -1073,9 +1072,6 @@ class SpreadsheetProcessing:
         elif self.submission_type == 'family_history':
             result = PedigreeMetadata(self.virtualapp, self.rows, self.project,
                                       self.institution, self.ingestion_id, self.counter)
-        else:
-            pass
-            # TODO: handle this case
         self.output = result.json_out
         self.errors.extend(result.errors)
         self.passing = True
@@ -1089,8 +1085,8 @@ def xls_to_json(vapp, xls_data, project, institution, ingestion_id, submission_t
         on to the next step.
     """
     if submission_type not in ['accessioning', 'family_history']:
-        pass
-        # TODO: handle this case
+        raise ValueError(f'{submission_type} not a valid submission_type argument, '
+                         'expected values "accessioning" or "family_history"')
     else:
         result = SpreadsheetProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
                                        ingestion_id=ingestion_id, submission_type=submission_type)
