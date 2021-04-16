@@ -445,8 +445,9 @@ class VariantSample(Item):
         return new_labels
 
     @calculated_property(schema={
-        "title": "project_genelists",
-        "description": "List of gene lists associated with project",
+        "title": "Project Gene Lists",
+        "field_name": "project_genelists",
+        "description": "Gene lists associated with project of variant sample",
         "type": "array",
         "items": {
             "title": "Gene list title",

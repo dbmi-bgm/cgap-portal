@@ -491,7 +491,8 @@
             "linkTo": "Variant"
         },
         "project_genelists": {
-            "title": "project_genelists",
+            "title": "Project Gene Lists",
+            "field_name": "project_genelists",
             "description": "Gene lists associated with project of variant sample",
             "type": "array",
             "items": {
