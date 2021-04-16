@@ -454,23 +454,24 @@ class VariantSample(Item):
             "description": "Gene list title"
         }
     })
-    def project_genelists(self, request, project, variant, file, CALL_INFO):
-        variant_props = get_item_or_none(request, variant, frame='embedded')
+    def project_genelists(self, request, project, variant):
+        variant_props = get_item_or_none(request, variant, frame="embedded")
         genelist_at_ids = []
         project_genelists = []
         core_project = CGAP_CORE_PROJECT + "/"
-        if variant_props.get('genes'):
-            genes = variant_props.get('genes')
+        genes = variant_props.get("genes")
+        if genes:
             for gene in genes:
-                most_severe = gene['genes_most_severe_gene']
-                if 'gene_lists' in most_severe:
+                if "genes_most_severe_gene" in gene:
+                    most_severe = gene["genes_most_severe_gene"]
                     genelist_at_ids += [
-                        genelist['@id'] for genelist in most_severe['gene_lists']
+                        genelist["@id"] for genelist in most_severe["gene_lists"]
+                        if "gene_lists" in most_severe
                     ]
         for at_id in genelist_at_ids:
             genelist_props = get_item_or_none(request, at_id)
-            if genelist_props['project'] in (project, core_project):
-                project_genelists.append(genelist_props['display_title'])
+            if genelist_props["project"] in (project, core_project):
+                project_genelists.append(genelist_props["display_title"])
         return project_genelists
 
 
