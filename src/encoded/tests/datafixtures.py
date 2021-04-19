@@ -1164,6 +1164,17 @@ def gene(testapp, project, institution):
 
 
 @pytest.fixture
+def gene_2(testapp, project, institution):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "gene_symbol": "FBN1",
+        "ensgid": "ENSG00000002222",
+    }
+    return testapp.post_json("/gene", item).json["@graph"][0]
+
+
+@pytest.fixture
 def cgap_core_genelist(testapp, cgap_core_project, institution, gene):
     item = {
         "project": cgap_core_project["@id"],
@@ -1211,6 +1222,20 @@ def variant(testapp, project, institution, gene):
 
 
 @pytest.fixture
+def variant_2(testapp, project, institution, gene_2):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "2",
+        "REF": "T",
+        "ALT": "G",
+        "POS": 45678,
+        "genes": [{"genes_most_severe_gene": gene_2["@id"]}],
+    }
+    return testapp.post_json("/variant", item).json["@graph"][0]
+
+
+@pytest.fixture
 def variant_sample(project, institution, variant):
     """
     This item is not pre-posted to database so gene list association with
@@ -1221,6 +1246,23 @@ def variant_sample(project, institution, variant):
         "project": project["@id"],
         "institution": institution["@id"],
         "variant": variant["@id"],
+        "CALL_INFO": "some_sample",
+        "file": "some_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def variant_sample_2(project, institution, variant_2):
+    """
+    This item is not pre-posted to database so gene list association with
+    variant samples can be tested (due to longer process of associating variant
+    samples with gene lists when the latter is posted after the former).
+    """
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "variant": variant_2["@id"],
         "CALL_INFO": "some_sample",
         "file": "some_vcf_file",
     }
