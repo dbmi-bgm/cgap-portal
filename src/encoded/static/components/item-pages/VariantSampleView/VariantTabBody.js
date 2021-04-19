@@ -388,6 +388,14 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                             <td className="text-left">{ fallbackElem }</td>
                             <td className="text-left">{ csq_phylop100way_vertebrate_rankscore }</td>
                         </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("csq_cadd_phred")}>CADD</label>
+                            </td>
+                            <td className="text-left">{ csq_cadd_phred }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ csq_cadd_raw_rankscore }</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -403,14 +411,6 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                 <table className="w-100">
                     <PredictorsTableHeading/>
                     <tbody>
-                        <tr>
-                            <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_cadd_phred")}>CADD</label>
-                            </td>
-                            <td className="text-left">{ csq_cadd_phred }</td>
-                            <td className="text-left">{ fallbackElem }</td>
-                            <td className="text-left">{ csq_cadd_raw_rankscore }</td>
-                        </tr>
                         <tr>
                             <td className="text-left">
                                 <label className="mb-0" data-tip={getTipForField("csq_sift_score")}>SIFT</label>
