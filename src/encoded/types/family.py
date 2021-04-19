@@ -27,8 +27,6 @@ def _build_family_embedded_list():
 
         # Individual linkTo
         "members.accession",
-        "members.father",
-        "members.mother",
         "members.status",
         "members.sex",
         "members.is_deceased",
@@ -47,8 +45,13 @@ def _build_family_embedded_list():
         "members.ancestry",
         "members.clinic_notes",
 
-        # TODO phenotype linkTo
-        "members.phenotypic_features.phenotypic_feature",
+        # Individual linkTo
+        "members.father.accession",
+        "members.mother.accession",
+
+        # Phenotype linkTo
+        "members.phenotypic_features.phenotypic_feature.hpo_id",
+        "members.phenotypic_features.phenotypic_feature.phenotype_name",
         "members.phenotypic_features.onset_age",
         "members.phenotypic_features.onset_age_units",
 
