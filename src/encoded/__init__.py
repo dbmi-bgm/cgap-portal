@@ -21,6 +21,7 @@ from .local_roles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
 from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
 from snovault.elasticsearch import APP_FACTORY
+from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
 from dcicutils.misc_utils import VirtualApp
 from .ingestion_listener import INGESTION_QUEUE
 from .loadxl import load_all
@@ -147,7 +148,11 @@ def main(global_config, **local_config):
     # set google reCAPTCHA keys
     settings['g.recaptcha.key'] = os.environ.get('reCaptchaKey')
     settings['g.recaptcha.secret'] = os.environ.get('reCaptchaSecret')
+    # enable invalidation scope
+    settings[INVALIDATION_SCOPE_ENABLED] = True
+
     # set mirrored Elasticsearch location (for staging and production servers)
+    # does not exist for CGAP currently
     mirror = get_mirror_env_from_context(settings)
     if mirror is not None:
         settings['mirror.env.name'] = mirror
