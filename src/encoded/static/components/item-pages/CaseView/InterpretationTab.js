@@ -26,13 +26,13 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
 
     let renderedSections;
 
-    const hasViewPermission = memoize(function hasViewPermission(arr) {
-        return _.findWhere((arr), { "name": "view" });
-    });
-
     // Not currently in use, but may be useful once we add actions (remove from variantsample list, etc.)
     const hasEditPermission = memoize(function hasEditPermission(arr) {
-        return _.findWhere((arr), { "name": "edit" });
+        return _.findWhere((arr), { "name": "edit" }) || false;
+    });
+
+    const hasViewPermission = memoize(function hasViewPermission(arr) {
+        return _.findWhere((arr), { "name": "view" }) || hasEditPermission(arr);
     });
 
     let numWithoutPermissions;

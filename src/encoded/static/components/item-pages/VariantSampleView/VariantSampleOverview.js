@@ -23,7 +23,7 @@ import { InterpretationSpaceController, InterpretationSpaceWrapper } from './Int
 export class VariantSampleOverview extends React.PureComponent {
 
     static hasViewPermission(arr) {
-        return _.findWhere((arr), { "name": "view" });
+        return _.findWhere((arr), { "name": "view" }) || VariantSampleOverview.hasEditPermission(arr);
     }
     static hasEditPermission(arr) {
         return _.findWhere((arr), { "name": "edit" }) || false;
@@ -120,9 +120,17 @@ export class VariantSampleOverview extends React.PureComponent {
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
 
-        const { actions = [], status = null } = context || {};
+        const {
+            actions = [], status = null,
+            interpretation: { error: interpError = null } = {},
+            variant_notes: { error: varNoteError = null } = {},
+            gene_notes: { error: geneNoteError = null } = {},
+        } = context || {};
         const canViewVariantSample = this.memoized.hasViewPermission(actions) || status === "shared";
         const canEditVariantSample = this.memoized.hasEditPermission(actions);
+
+        const allNotePermErrors = interpError && varNoteError && geneNoteError;
+        const anyNotePermErrors = interpError || varNoteError || geneNoteError;
 
         const { query: {
             showInterpretation = true,      // used only if "True" (toggles showing of interpretation sidebar/pane)
@@ -140,7 +148,7 @@ export class VariantSampleOverview extends React.PureComponent {
                             <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
                             <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
                         </div>
-                        { showInterpretation == 'True' ?
+                        { showInterpretation == 'True' && !allNotePermErrors ?
                             <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
                                 <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, canEditVariantSample }}/>
                             </div> : null
