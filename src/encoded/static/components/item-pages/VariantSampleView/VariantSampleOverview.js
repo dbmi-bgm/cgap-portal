@@ -104,9 +104,17 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const { context = null, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
+
+        const {
+            interpretation: { error: interpError = null } = {},
+            variant_notes: { error: varNoteError = null } = {},
+            gene_notes: { error: geneNoteError = null } = {},
+        } = context || {};
+
+        const anyNotePermErrors = interpError || varNoteError || geneNoteError;
 
         const { query: {
             showInterpretation = true,      // used only if "True" (toggles showing of interpretation sidebar/pane)
@@ -123,7 +131,7 @@ export class VariantSampleOverview extends React.PureComponent {
                         <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
                         <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
                     </div>
-                    { showInterpretation == 'True' ?
+                    { showInterpretation == 'True' && !anyNotePermErrors ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
                             <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}/>
                         </div> : null
