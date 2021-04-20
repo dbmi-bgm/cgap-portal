@@ -41,6 +41,12 @@
             "$ref": "mixins.json#/notes"
         },
         {
+            "$ref": "mixins.json#/interpretation"
+        },
+        {
+            "$ref": "mixins.json#/variant_notes"
+        },
+        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
