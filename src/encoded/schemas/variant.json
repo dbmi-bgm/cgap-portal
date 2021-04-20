@@ -41,12 +41,6 @@
             "$ref": "mixins.json#/notes"
         },
         {
-            "$ref": "mixins.json#/interpretation"
-        },
-        {
-            "$ref": "mixins.json#/variant_notes"
-        },
-        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
@@ -111,8 +105,8 @@
             "type": "string",
             "do_import": true,
             "vcf_field": "ID",
-            "source_name": "VCF",
-            "source_version": "VCFv4.2",
+            "source_name": "NCBI dbSNP",
+            "source_version": "v151 (all variants)",
             "description": "dbSNP ID",
             "scope": "variant",
             "schema_title": "dbSNP ID"
@@ -153,8 +147,8 @@
             "type": "number",
             "do_import": true,
             "vcf_field": "csq_cadd_phred",
-            "source_name": "dbNSFP",
-            "source_version": "v4.1a",
+            "source_name": "CADD",
+            "source_version": "v1.6",
             "description": "CADD Phred score",
             "scope": "variant",
             "schema_title": "CADD Phred score"
@@ -242,18 +236,6 @@
             "source_version": "v20201101",
             "description": "For included Variant : ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB",
             "scope": "variant"
-        },
-        "csq_clinvar_clnhgvs": {
-            "title": "Variant",
-            "field_name": "csq_clinvar_clnhgvs",
-            "type": "string",
-            "do_import": true,
-            "vcf_field": "csq_clinvar_clnhgvs",
-            "source_name": "ClinVar",
-            "source_version": "v20201101",
-            "description": "HGVS genome sequence name",
-            "scope": "variant",
-            "schema_title": "Variant"
         },
         "csq_clinvar_clnrevstat": {
             "title": "csq_clinvar_clnrevstat",
@@ -403,6 +385,828 @@
             "description": "GERP rankscore",
             "scope": "variant",
             "schema_title": "Gerp++ rankscore"
+        },
+        "csq_gnomade2_ac": {
+            "title": "GnomADv2 Exome Alt Allele Count",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac",
+            "items": {
+                "title": "GnomADv2 Exome Alt Allele Count",
+                "field_name": "csq_gnomade2_ac",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt Allele Count",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_ac-afr": {
+            "title": "GnomADv2 Exome Alt AC - African-American/African",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac-afr",
+            "items": {
+                "title": "GnomADv2 Exome Alt AC - African-American/African",
+                "field_name": "csq_gnomade2_ac-afr",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac_afr",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for samples of African-American/African ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AC - African-American/African",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_ac-amr": {
+            "title": "GnomADv2 Exome Alt AC - Latino",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac-amr",
+            "items": {
+                "title": "GnomADv2 Exome Alt AC - Latino",
+                "field_name": "csq_gnomade2_ac-amr",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac_amr",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for samples of Latino ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AC - Latino",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_ac-asj": {
+            "title": "GnomADv2 Exome Alt AC - Ashkenazi Jewish",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac-asj",
+            "items": {
+                "title": "GnomADv2 Exome Alt AC - Ashkenazi Jewish",
+                "field_name": "csq_gnomade2_ac-asj",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac_asj",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for samples of Ashkenazi Jewish ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AC - Ashkenazi Jewish",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_ac-eas": {
+            "title": "GnomADv2 Exome Alt AC - East Asian",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac-eas",
+            "items": {
+                "title": "GnomADv2 Exome Alt AC - East Asian",
+                "field_name": "csq_gnomade2_ac-eas",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac_eas",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for samples of East Asian ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AC - East Asian",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_ac-fin": {
+            "title": "GnomADv2 Exome Alt AC - Finnish",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac-fin",
+            "items": {
+                "title": "GnomADv2 Exome Alt AC - Finnish",
+                "field_name": "csq_gnomade2_ac-fin",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac_fin",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for samples of Finnish ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AC - Finnish",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_ac-nfe": {
+            "title": "GnomADv2 Exome Alt AC - Non-Finnish European",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac-nfe",
+            "items": {
+                "title": "GnomADv2 Exome Alt AC - Non-Finnish European",
+                "field_name": "csq_gnomade2_ac-nfe",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac_nfe",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for samples of Non-Finnish European ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AC - Non-Finnish European",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_ac-oth": {
+            "title": "GnomADv2 Exome Alt AC - Other Ancestry",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac-oth",
+            "items": {
+                "title": "GnomADv2 Exome Alt AC - Other Ancestry",
+                "field_name": "csq_gnomade2_ac-oth",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac_oth",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for samples of Other ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AC - Other Ancestry",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_ac-sas": {
+            "title": "GnomADv2 Exome Alt AC - South Asian",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac-sas",
+            "items": {
+                "title": "GnomADv2 Exome Alt AC - South Asian",
+                "field_name": "csq_gnomade2_ac-sas",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac_sas",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for samples of South Asian ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AC - South Asian",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_ac-xx": {
+            "title": "GnomADv2 Exome Alt AC - female",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac-xx",
+            "items": {
+                "title": "GnomADv2 Exome Alt AC - female",
+                "field_name": "csq_gnomade2_ac-xx",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac_female",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for female samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AC - female",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_ac-xy": {
+            "title": "GnomADv2 Exome Alt AC - male",
+            "type": "array",
+            "field_name": "csq_gnomade2_ac-xy",
+            "items": {
+                "title": "GnomADv2 Exome Alt AC - male",
+                "field_name": "csq_gnomade2_ac-xy",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_ac_male",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele count for male samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AC - male",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_af": {
+            "title": "GnomADv2 Exome Alt Allele Frequency",
+            "type": "array",
+            "field_name": "csq_gnomade2_af",
+            "items": {
+                "title": "GnomADv2 Exome Alt Allele Frequency",
+                "field_name": "csq_gnomade2_af",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt Allele Frequency",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-afr": {
+            "title": "GnomADv2 Exome Alt AF - African-American/African",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-afr",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - African-American/African",
+                "field_name": "csq_gnomade2_af-afr",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_afr",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in samples of African-American/African ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - African-American/African",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-amr": {
+            "title": "GnomADv2 Exome Alt AF - Latino",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-amr",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - Latino",
+                "field_name": "csq_gnomade2_af-amr",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_amr",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in samples of Latino ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - Latino",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-asj": {
+            "title": "GnomADv2 Exome Alt AF - Ashkenazi Jewish",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-asj",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - Ashkenazi Jewish",
+                "field_name": "csq_gnomade2_af-asj",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_asj",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - Ashkenazi Jewish",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-eas": {
+            "title": "GnomADv2 Exome Alt AF - East Asian",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-eas",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - East Asian",
+                "field_name": "csq_gnomade2_af-eas",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_eas",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in samples of East Asian ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - East Asian",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-fin": {
+            "title": "GnomADv2 Exome Alt AF - Finnish",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-fin",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - Finnish",
+                "field_name": "csq_gnomade2_af-fin",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_fin",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in samples of Finnish ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - Finnish",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-nfe": {
+            "title": "GnomADv2 Exome Alt AF - Non-Finnish European",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-nfe",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - Non-Finnish European",
+                "field_name": "csq_gnomade2_af-nfe",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_nfe",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in samples of Non-Finnish European ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - Non-Finnish European",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-oth": {
+            "title": "GnomADv2 Exome Alt AF - Other Ancestry",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-oth",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - Other Ancestry",
+                "field_name": "csq_gnomade2_af-oth",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_oth",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in samples of Other ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - Other Ancestry",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-popmax": {
+            "title": "GnomADv2 Exome Alt AF - PopMax",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-popmax",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - PopMax",
+                "field_name": "csq_gnomade2_af-popmax",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_popmax",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "maximum population allele frequency in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - PopMax",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-sas": {
+            "title": "GnomADv2 Exome Alt AF - South Asian",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-sas",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - South Asian",
+                "field_name": "csq_gnomade2_af-sas",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_sas",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in samples of South Asian ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - South Asian",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-xx": {
+            "title": "GnomADv2 Exome Alt AF - female",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-xx",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - female",
+                "field_name": "csq_gnomade2_af-xx",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_female",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in female samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - female",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_af-xy": {
+            "title": "GnomADv2 Exome Alt AF - male",
+            "type": "array",
+            "field_name": "csq_gnomade2_af-xy",
+            "items": {
+                "title": "GnomADv2 Exome Alt AF - male",
+                "field_name": "csq_gnomade2_af-xy",
+                "type": "number",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_af_male",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Alternate allele frequency in male samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Alt AF - male",
+                "min": 0,
+                "max": 1
+            }
+        },
+        "csq_gnomade2_an": {
+            "title": "GnomADv2 Exome Total Allele Number",
+            "type": "array",
+            "field_name": "csq_gnomade2_an",
+            "items": {
+                "title": "GnomADv2 Exome Total Allele Number",
+                "field_name": "csq_gnomade2_an",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total Allele Number",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_an-afr": {
+            "title": "GnomADv2 Exome Total AN - African-American/African",
+            "type": "array",
+            "field_name": "csq_gnomade2_an-afr",
+            "items": {
+                "title": "GnomADv2 Exome Total AN - African-American/African",
+                "field_name": "csq_gnomade2_an-afr",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an_afr",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in samples of African-American/African ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total AN - African-American/African",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_an-amr": {
+            "title": "GnomADv2 Exome Total AN - Latino",
+            "type": "array",
+            "field_name": "csq_gnomade2_an-amr",
+            "items": {
+                "title": "GnomADv2 Exome Total AN - Latino",
+                "field_name": "csq_gnomade2_an-amr",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an_amr",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in samples of Latino ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total AN - Latino",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_an-asj": {
+            "title": "GnomADv2 Exome Total AN - Ashkenazi Jewish",
+            "type": "array",
+            "field_name": "csq_gnomade2_an-asj",
+            "items": {
+                "title": "GnomADv2 Exome Total AN - Ashkenazi Jewish",
+                "field_name": "csq_gnomade2_an-asj",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an_asj",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in samples of Ashkenazi Jewish ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total AN - Ashkenazi Jewish",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_an-eas": {
+            "title": "GnomADv2 Exome Total AN - East Asian",
+            "type": "array",
+            "field_name": "csq_gnomade2_an-eas",
+            "items": {
+                "title": "GnomADv2 Exome Total AN - East Asian",
+                "field_name": "csq_gnomade2_an-eas",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an_eas",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in samples of East Asian ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total AN - East Asian",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_an-fin": {
+            "title": "GnomADv2 Exome Total AN - Finnish",
+            "type": "array",
+            "field_name": "csq_gnomade2_an-fin",
+            "items": {
+                "title": "GnomADv2 Exome Total AN - Finnish",
+                "field_name": "csq_gnomade2_an-fin",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an_fin",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in samples of Finnish ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total AN - Finnish",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_an-nfe": {
+            "title": "GnomADv2 Exome Total AN - Non-Finnish European",
+            "type": "array",
+            "field_name": "csq_gnomade2_an-nfe",
+            "items": {
+                "title": "GnomADv2 Exome Total AN - Non-Finnish European",
+                "field_name": "csq_gnomade2_an-nfe",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an_nfe",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in samples of Non-Finnish European ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total AN - Non-Finnish European",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_an-oth": {
+            "title": "GnomADv2 Exome Total AN - Other Ancestry",
+            "type": "array",
+            "field_name": "csq_gnomade2_an-oth",
+            "items": {
+                "title": "GnomADv2 Exome Total AN - Other Ancestry",
+                "field_name": "csq_gnomade2_an-oth",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an_oth",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in samples of Other ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total AN - Other Ancestry",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_an-sas": {
+            "title": "GnomADv2 Exome Total AN - South Asian",
+            "type": "array",
+            "field_name": "csq_gnomade2_an-sas",
+            "items": {
+                "title": "GnomADv2 Exome Total AN - South Asian",
+                "field_name": "csq_gnomade2_an-sas",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an_sas",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in samples of South Asian ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total AN - South Asian",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_an-xx": {
+            "title": "GnomADv2 Exome Total AN - female",
+            "type": "array",
+            "field_name": "csq_gnomade2_an-xx",
+            "items": {
+                "title": "GnomADv2 Exome Total AN - female",
+                "field_name": "csq_gnomade2_an-xx",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an_female",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in female samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total AN - female",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_an-xy": {
+            "title": "GnomADv2 Exome Total AN - male",
+            "type": "array",
+            "field_name": "csq_gnomade2_an-xy",
+            "items": {
+                "title": "GnomADv2 Exome Total AN - male",
+                "field_name": "csq_gnomade2_an-xy",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_an_male",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Total number of alleles in male samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Total AN - male",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt": {
+            "title": "GnomADv2 Exome Homozygous Count",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count",
+                "field_name": "csq_gnomade2_nhomalt",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt-afr": {
+            "title": "GnomADv2 Exome Homozygous Count - African-American/African",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt-afr",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count - African-American/African",
+                "field_name": "csq_gnomade2_nhomalt-afr",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt_afr",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in samples of African-American/African ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count - African-American/African",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt-amr": {
+            "title": "GnomADv2 Exome Homozygous Count - Latino",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt-amr",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count - Latino",
+                "field_name": "csq_gnomade2_nhomalt-amr",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt_amr",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in samples of Latino ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count - Latino",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt-asj": {
+            "title": "GnomADv2 Exome Homozygous Count - Ashkenazi Jewish",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt-asj",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count - Ashkenazi Jewish",
+                "field_name": "csq_gnomade2_nhomalt-asj",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt_asj",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in samples of Ashkenazi Jewish ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count - Ashkenazi Jewish",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt-eas": {
+            "title": "GnomADv2 Exome Homozygous Count - East Asian",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt-eas",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count - East Asian",
+                "field_name": "csq_gnomade2_nhomalt-eas",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt_eas",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in samples of East Asian ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count - East Asian",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt-fin": {
+            "title": "GnomADv2 Exome Homozygous Count - Finnish",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt-fin",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count - Finnish",
+                "field_name": "csq_gnomade2_nhomalt-fin",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt_fin",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in samples of Finnish ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count - Finnish",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt-nfe": {
+            "title": "GnomADv2 Exome Homozygous Count - Non-Finnish European",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt-nfe",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count - Non-Finnish European",
+                "field_name": "csq_gnomade2_nhomalt-nfe",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt_nfe",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in samples of Non-Finnish European ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count - Non-Finnish European",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt-oth": {
+            "title": "GnomADv2 Exome Homozygous Count - Other Ancestry",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt-oth",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count - Other Ancestry",
+                "field_name": "csq_gnomade2_nhomalt-oth",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt_oth",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in samples of Other ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count - Other Ancestry",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt-sas": {
+            "title": "GnomADv2 Exome Homozygous Count - South Asian",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt-sas",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count - South Asian",
+                "field_name": "csq_gnomade2_nhomalt-sas",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt_sas",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in samples of South Asian ancestry in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count - South Asian",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt-xx": {
+            "title": "GnomADv2 Exome Homozygous Count - female",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt-xx",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count - female",
+                "field_name": "csq_gnomade2_nhomalt-xx",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt_female",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in female samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count - female",
+                "min": 0
+            }
+        },
+        "csq_gnomade2_nhomalt-xy": {
+            "title": "GnomADv2 Exome Homozygous Count - male",
+            "type": "array",
+            "field_name": "csq_gnomade2_nhomalt-xy",
+            "items": {
+                "title": "GnomADv2 Exome Homozygous Count - male",
+                "field_name": "csq_gnomade2_nhomalt-xy",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "csq_gnomade2_nhomalt_male",
+                "source_name": "gnomAD",
+                "source_version": "v2.1.1",
+                "description": "Count of homozygous individuals in male samples in gnomAD v2.1.1 exome data",
+                "scope": "variant",
+                "schema_title": "GnomADv2 Exome Homozygous Count - male",
+                "min": 0
+            }
         },
         "csq_gnomadg_ac": {
             "title": "GnomAD Alt Allele Count",
@@ -1104,50 +1908,26 @@
             "schema_title": "GnomAD Homozygous Count - male",
             "min": 0
         },
-        "csq_hg19_chr": {
-            "title": "Chromosome (hg19)",
-            "field_name": "csq_hg19_chr",
-            "type": "string",
-            "do_import": true,
-            "vcf_field": "csq_hg19_chr",
-            "source_name": "dbNSFP",
-            "source_version": "v4.1a",
-            "description": "hg19 coordinate chromosome",
-            "scope": "variant",
-            "schema_title": "Chromosome (hg19)"
-        },
-        "csq_hg19_pos": {
-            "title": "Position (hg19)",
-            "field_name": "csq_hg19_pos",
-            "type": "integer",
-            "do_import": true,
-            "vcf_field": "csq_hg19_pos(1-based)",
-            "source_name": "dbNSFP",
-            "source_version": "v4.1a",
-            "description": "hg19 coordinate position",
-            "scope": "variant",
-            "schema_title": "Position (hg19)"
-        },
-        "csq_phastcons100way_vertebrate": {
+        "csq_phastcons100verts": {
             "title": "PhastCons (100 Vertebrates)",
-            "field_name": "csq_phastcons100way_vertebrate",
+            "field_name": "csq_phastcons100verts",
             "type": "number",
             "do_import": true,
-            "vcf_field": "csq_phastcons100way_vertebrate",
-            "source_name": "dbNSFP",
-            "source_version": "v4.1a",
+            "vcf_field": "csq_phastcons100verts",
+            "source_name": "UCSC - VEP",
+            "source_version": "hg38",
             "description": "PhastCons 100 way score",
             "scope": "variant",
             "schema_title": "PhastCons (100 Vertebrates)"
         },
-        "csq_phylop100way_vertebrate": {
+        "csq_phylop100verts": {
             "title": "PhyloP (100 Vertebrates)",
-            "field_name": "csq_phylop100way_vertebrate",
+            "field_name": "csq_phylop100verts",
             "type": "number",
             "do_import": true,
-            "vcf_field": "csq_phylop100way_vertebrate",
-            "source_name": "dbNSFP",
-            "source_version": "v4.1a",
+            "vcf_field": "csq_phylop100verts",
+            "source_name": "UCSC - VEP",
+            "source_version": "hg38",
             "description": "PhyloP 100 way score",
             "scope": "variant",
             "schema_title": "PhyloP (100 Vertebrates)",
@@ -1167,14 +1947,14 @@
             "scope": "variant",
             "schema_title": "PhyloP (100 Vertebrates) rankscore"
         },
-        "csq_phylop30way_mammalian": {
+        "csq_phylop30mams": {
             "title": "PhyloP (30 Mammals)",
-            "field_name": "csq_phylop30way_mammalian",
+            "field_name": "csq_phylop30mams",
             "type": "number",
             "do_import": true,
-            "vcf_field": "csq_phylop30way_mammalian",
-            "source_name": "dbNSFP",
-            "source_version": "v4.1a",
+            "vcf_field": "csq_phylop30mams",
+            "source_name": "UCSC - VEP",
+            "source_version": "hg38",
             "description": "PhyloP 30 way score",
             "scope": "variant",
             "schema_title": "PhyloP (30 Mammals)"
@@ -1609,8 +2389,44 @@
                 }
             }
         },
+        "hg19_chr": {
+            "title": "Chromosome (hg19)",
+            "field_name": "hg19_chr",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "hg19_chr",
+            "source_name": "pyliftover",
+            "source_version": "v0.4",
+            "description": "hg19 coordinate chromosome",
+            "scope": "variant",
+            "schema_title": "Chromosome (hg19)"
+        },
+        "hg19_pos": {
+            "title": "Position (hg19)",
+            "field_name": "hg19_pos",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "hg19_pos",
+            "source_name": "pyliftover",
+            "source_version": "v0.4",
+            "description": "hg19 coordinate position",
+            "scope": "variant",
+            "schema_title": "Position (hg19)"
+        },
+        "hgvsg": {
+            "title": "Variant",
+            "field_name": "hgvsg",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "hgvsg",
+            "source_name": "hgvsg_creator.py",
+            "source_version": "v1",
+            "description": "HGVS genome sequence name",
+            "scope": "variant",
+            "schema_title": "Variant"
+        },
         "schema_version": {
-            "default": "2"
+            "default": "1"
         },
         "spliceaiMaxds": {
             "title": "SpliceAI Max Delta",
