@@ -295,6 +295,9 @@ class VCFParser(object):
 
     def fix_encoding(self, val):
         """ Decodes restricted characters from val, returning the result"""
+        # uncomment below to enable: tolerate using '.' in vcf spec for single valued fields
+        # if isinstance(val, list) and len(val) == 1 and isinstance(val[0], str):
+        #     val = val[0]
         for encoded, decoded in self.RESTRICTED_CHARACTER_ENCODING.items():
             val = val.replace(encoded, decoded)
         return val
