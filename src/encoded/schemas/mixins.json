@@ -274,12 +274,25 @@
         }
     },
     "interpretation": {
-        "interpretation": {
-            "title": "Interpretation",
-            "description": "Interpretation connected to this item",
-            "comment": "For VariantSample, Variant, or Gene",
-            "type": "string",
-            "linkTo": "NoteInterpretation"
+        "interpretations": {
+            "title": "Clinical Interpretations",
+            "description": "Clinical Interpretation Notes connected to this item",
+            "type": "array",
+            "items": {
+                "title": "Clinical Interpretation",
+                "description": "Interpretation connected to this item",
+                "type": "string",
+                "linkTo": "NoteInterpretation"
+            }
+        },
+        "discovery_interpretations": {
+            "title": "Discovery Interpretations",
+            "type": "array",
+            "items": {
+                "title": "Discovery Interpretation",
+                "type": "string",
+                "linkTo": "NoteDiscovery"
+            }
         }
     },
     "gene_notes": {

@@ -489,6 +489,18 @@
             "title": "Variant",
             "type": "string",
             "linkTo": "Variant"
+        },
+        "interpretation": {
+            "title": "Clinical Interpretation",
+            "description": "Clinical Interpretation Note connected to this item",
+            "type": "string",
+            "linkTo": "NoteInterpretation"
+        },
+        "discovery_interpretation": {
+            "title": "Discovery Interpretation",
+            "description": "Gene/Variant Discovery interpretation note connected to this item",
+            "type": "string",
+            "linkTo": "NoteDiscovery"
         }
     },
     "columns": {
