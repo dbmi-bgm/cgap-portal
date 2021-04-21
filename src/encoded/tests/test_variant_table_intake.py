@@ -71,7 +71,6 @@ def test_add_default_schema_fields(MTParser):
     assert 'required' in schema
     assert 'identifyingProperties' in schema
     assert 'additionalProperties' in schema
-    assert 'mixinProperties' in schema
 
 
 def test_read_variant_table_header(MTParser):
@@ -180,7 +179,7 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert properties['ALT']['type'] == 'string'
     assert properties['csq_gnomadg_af_popmax']['min'] == 0
     assert properties['csq_gnomadg_af_popmax']['max'] == 1
-    assert properties['csq_gnomade2_an']['min'] == 0
+    assert properties['csq_gnomade2_an']['items']['min'] == 0
     assert properties['csq_sift_pred']['type'] == 'string'
 
     # check sub-embedded object fields
