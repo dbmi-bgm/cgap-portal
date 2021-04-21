@@ -608,20 +608,12 @@ class GeneListSubmission:
                 bytes("\n".join(self.gene_ids), encoding="utf-8"),
             )
         ]
-        try:
-            submission_response = self.vapp.wrapped_app.post(
-                submission_post_url,
-                submission_post_data,
-                upload_files=upload_file,
-                content_type="multipart/form-data",
-            ).json
-        except AttributeError:  # Catch unit test error
-            submission_response = self.vapp.post(
-                submission_post_url,
-                submission_post_data,
-                upload_files=upload_file,
-                content_type="multipart/form-data",
-            ).json
+        submission_response = self.vapp.post(
+            submission_post_url,
+            submission_post_data,
+            upload_files=upload_file,
+            content_type="multipart/form-data",
+        ).json
         if submission_response["success"]:
             self.post_output.append(
                 "Variants should begin updating shortly but may take a few "
@@ -738,6 +730,7 @@ class VariantUpdateSubmission:
             "variant.genes.genes_most_severe_gene.uuid",
             self.vapp,
             item_type="VariantSample",
+            project=self.project
         )
         for variant_sample_response in variant_sample_search:
             variant_samples_to_index.append(variant_sample_response["uuid"])
@@ -816,7 +809,7 @@ class CommonUtils:
 
     @staticmethod
     def batch_search(
-        item_list, search_term, app, item_type="Gene", batch_size=5
+        item_list, search_term, app, item_type="Gene", project=None, batch_size=5
     ):
         """
         Performs get requests in batches to decrease the number of
@@ -832,6 +825,10 @@ class CommonUtils:
             batch.append(item)
             if item == item_list[-1] or len(batch) == batch_size:
                 batch_string = ("&" + search_term + "=").join(batch)
+                if project:
+                    import pdb
+                    pdb.set_trace()
+                    batch_string += "&project.%40id=" + project.replace("/", "%2F")
                 try:
                     response = app.get(
                         "/search/?type="
