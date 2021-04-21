@@ -23,7 +23,7 @@ order,genotype_mother,genotype_father,genotype_self,condition,genotype_label_mot
 45,0/1,0/0,0/0,autosome,het,homo ref,homo ref,"['Low relevance, other']",,,
 60,0/1,0/1,0/0,autosome,het,het,homo ref,"['Low relevance, present in both parent(s)']",,,
 65,0/1,0/1,0/1,autosome,het,het,het,"['Low relevance, present in both parent(s)']",,,
-70,0/1,0/1,1/1,autosome,het,het,homo alt,['Recessive'],,,
+70,0/1,0/1,1/1,autosome,het,het,homo alt,['Homozygous recessive'],,,
 1,0/0,0/0,0/1,autosome - novocaller high,homo ref,homo ref,het,['de novo (strong)'],agreed,,
 2,0/0,0/0,0/1,autosome - novocaller low,homo ref,homo ref,het,['de novo (weak)'],agreed,,
 53,0/1,0/0,0/1,chrX - female child,het,hemi ref,het,['Dominant (maternal)'],,,

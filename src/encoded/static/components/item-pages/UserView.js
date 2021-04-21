@@ -120,16 +120,6 @@ class SyncedAccessKeyTable extends React.PureComponent {
      * @param {MouseEvent} e - Click event.
      */
     handleCreate(e) {
-        const item = {};
-        const idToken = JWT.get();
-        if (idToken){
-            const decoded = JWT.decode(idToken);
-            item.user = decoded.email.toLowerCase();
-        } else {
-            console.warn("Access key aborted");
-            return;
-        }
-
         ajax.load('/access-keys/', (resp)=>{
             const [ newKey ] = resp['@graph'];
             this.setState(function({ access_keys : prevKeys }){
@@ -145,7 +135,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
                 "message"   : "Check your internet connection or if you have been logged out due to expired session.",
                 "style"     : 'danger'
             });
-        }, JSON.stringify(item));
+        }, "{}");
     }
 
     showNewSecret(response, reset = false) {
@@ -570,7 +560,7 @@ const ProfileWorkFields = React.memo(function ProfileWorkFields({ user }){
 });
 
 
-export function ImpersonateUserForm({ updateUserInfo }) {
+export function ImpersonateUserForm({ updateAppSessionState }) {
 
     const inputFieldRef = useRef(null);
     /**
@@ -592,11 +582,8 @@ export function ImpersonateUserForm({ updateUserInfo }) {
         const url = "/impersonate-user";
         const postData = { 'userid' : userid };
         const callbackFxn = (resp) => {
-            //if(typeof(Storage) !== 'undefined'){ // check if localStorage supported
-            //    localStorage.setItem("user_info", JSON.stringify(payload));
-            //}
-            JWT.saveUserInfo(resp);
-            updateUserInfo();
+            JWT.saveUserInfoLocalStorage(resp);
+            updateAppSessionState();
             let navTarget = "/";
             const profileAction = resp.user_actions && _.find(resp.user_actions, { 'id' : 'profile' });
             if (profileAction && profileAction.href){
@@ -609,14 +596,8 @@ export function ImpersonateUserForm({ updateUserInfo }) {
             alert('Impersonation unsuccessful.\nPlease check to make sure the provided email is correct.');
         };
 
-        //var userInfo = localStorage.getItem('user_info') || null;
-        //var idToken = userInfo ? JSON.parse(userInfo).id_token : null;
-        //var reqHeaders = {'Accept': 'application/json'};
-        //if(userInfo){
-        //    reqHeaders['Authorization'] = 'Bearer '+idToken;
-        //}
         ajax.load(url, callbackFxn, 'POST', fallbackFxn, JSON.stringify(postData));
-    }, [ updateUserInfo ]);
+    }, [ updateAppSessionState ]);
 
     return (
         <div className="mt-3 container" id="content">

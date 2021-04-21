@@ -9,9 +9,12 @@ from unittest import mock
 from dcicutils.qa_utils import ControlledTime, ignored
 from ..util import (
     debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, get_trusted_email,
-    check_user_is_logged_in,
+    check_user_is_logged_in, vapp_for_email,
 )
 from .. import util as util_module
+
+
+pytestmark = [pytest.mark.setone, pytest.mark.working]
 
 
 def test_deduplicate_list():
@@ -257,3 +260,25 @@ def test_check_user_is_logged_in(principals, expect_logged_in):
     else:
         with pytest.raises(pyramid.httpexceptions.HTTPForbidden):
             check_user_is_logged_in(req)
+
+
+def test_vapp_for_email(testapp, non_admin_persona):
+    email = non_admin_persona['email']
+
+    def check_me(context):
+        """We use this just to make sure that the vapp_for_email context manager isn't leaking state."""
+        try:
+            my_uuid = testapp.get("/me").json['uuid']
+            assert my_uuid != non_admin_persona['uuid']  # If there is a dfeault /me page, it must not be my user id's /me
+            print("%s /me = %s" % (context, my_uuid))
+        except Exception:
+            print("%s has no /me by default" % context)
+            pass  # But it's fine if there just isn't a defaul identity, too.
+
+    check_me('global')
+    with vapp_for_email(email=email, app=testapp.app) as vapp:
+        check_me('local')
+        my_uuid = vapp.get("/me").json['uuid']
+        assert my_uuid == non_admin_persona['uuid']
+        print("vapp has proper identity")
+    check_me('global')

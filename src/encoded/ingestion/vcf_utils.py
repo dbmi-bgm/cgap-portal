@@ -2,7 +2,7 @@ import vcf
 import json
 import logging
 from collections import OrderedDict
-
+# from granite.lib import vcf_parser
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +13,13 @@ class VCFParserException(Exception):
     wrong at this stage of Variant Ingestion
     """
     pass
+
+
+class GraniteVCFParser(object):
+    """ Wrapper class for granite.lib.vcf_parser that implements the same functionality
+        as VCFParser but using the granite parser instead of the vcf parser.
+    """
+    pass  # TODO implement me
 
 
 class VCFParser(object):
@@ -292,13 +299,13 @@ class VCFParser(object):
             val = val.replace(encoded, decoded)
         return val
 
-    def cast_field_value(self, type, value, sub_type=None):
+    def cast_field_value(self, t, value, sub_type=None):
         """ Casts the given value to the type given by 'type'
 
         Args:
-            type: type to cast value to
+            t: type to cast value to
             value: value for the field we processing
-            allow_array: boolean on whether or not we should try to parse an array
+            sub_type: should be present if we're processing an array, otherwise error
 
         Returns:
             casted value
@@ -306,14 +313,14 @@ class VCFParser(object):
         Raises:
             VCFParserException if there is a type we did not expect
         """
-        if type == 'string':
+        if t == 'string':
             return self.fix_encoding(value)
-        elif type == 'integer':
+        elif t == 'integer':
             try:
                 return int(value)
             except ValueError:  # required if casting string->float->int, such as '0.000'
                 return int(float(value))  # throw exception here if need be
-        elif type == 'number':
+        elif t == 'number':
             try:
                 return float(value)
             except Exception:
@@ -321,11 +328,11 @@ class VCFParser(object):
                     return float(value[0])
                 except Exception:  # XXX: This shouldn't happen but does in case of malformed entries, see uk10k_esp_maf
                     return 0.0
-        elif type == 'boolean':
+        elif t == 'boolean':
             if value == '0':
                 return False
             return True
-        elif type == 'array':
+        elif t == 'array':
             if sub_type:
                 if not isinstance(value, list):
                     items = self.fix_encoding(value).split('&') if sub_type == 'string' else value
@@ -362,27 +369,28 @@ class VCFParser(object):
             if sub_embedded_group and sub_embedded_group in props:
                 item_props = props[sub_embedded_group]['items']['properties']
                 if field in item_props:
-                    type = item_props[field]['type']
-                    if type == 'array':
+                    t = item_props[field]['type']
+                    if t == 'array':
                         sub_type = item_props[field]['items']['type']
                 else:
                     return None  # maybe log as well? Special case where key has sub-embedding group but is not in props
             else:
                 if exit_on_validation:
-                    raise VCFParserException('Tried to check a variant field that does not exist on the schema: %s' % field)
+                    raise VCFParserException('Tried to check a variant field that does not exist on the schema: %s'
+                                             % field)
                 else:
                     # enable later maybe
                     # logger.error('Tried to check a variant field that does not exist on the schema: %s' % field)
                     return None
         else:
-            type = props[field]['type']
-            if type == 'array':
+            t = props[field]['type']
+            if t == 'array':
                 sub_type = props[field]['items']['type']
 
         # if this field is specifically disabled (due to formatting error), drop it here
         if field in self.DISABLED_FIELDS:
             return None
-        return self.cast_field_value(type, value, sub_type)
+        return self.cast_field_value(t, value, sub_type)
 
     @staticmethod
     def get_record_attribute(record, field):
@@ -520,7 +528,7 @@ class VCFParser(object):
         """
         result['CALL_INFO'] = sample.sample
         data = sample.data
-        for field in sample.data._fields:  # must peek at structure to know which fields to pass
+        for field in sample.data._fields:  # noQA must peek at structure to know which fields to pass
             if hasattr(data, field) and field in self.variant_sample_schema['properties']:
                 field_value = data.__getattribute__(field)
                 if isinstance(field_value, list):  # could be a list - in this case, force cast to string
@@ -566,12 +574,13 @@ class VCFParser(object):
                     genotypes = record.INFO.get('SAMPLEGENO')
                     s['samplegeno'] = []
                     for gt in genotypes:
-                        numgt, gt, ad, sample_id = gt.split('|')
+                        numgt, gt, ad, sample_id, ac = gt.split('|')
                         tmp = dict()
                         tmp['samplegeno_numgt'] = numgt
                         tmp['samplegeno_gt'] = gt
                         tmp['samplegeno_ad'] = ad
                         tmp['samplegeno_sampleid'] = sample_id
+                        tmp['samplegeno_ac'] = int(ac)  # must be cast to int
                         s['samplegeno'].append(tmp)
                 elif field == 'cmphet':
                     comhet = record.INFO.get('comHet', None)

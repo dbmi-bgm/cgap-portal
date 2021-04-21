@@ -74,12 +74,8 @@ const resolve = {
 const optimization = {
     minimize: mode === "production",
     minimizer: [
-        //new UglifyJsPlugin({
-        //    parallel: true,
-        //    sourceMap: true
-        //})
         new TerserPlugin({
-            parallel: true,
+            parallel: false,
             sourceMap: true,
             terserOptions:{
                 compress: true,

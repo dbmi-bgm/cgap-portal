@@ -24,6 +24,7 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     padding-right: 15px;
     display: flex;
     align-items: center;
+    transition: opacity .3s ease-in-out;
 
     @include navbar-fixed-position {
         height: inherit;
@@ -52,12 +53,10 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     }
 
     &[disabled] {
-        color: $gray-300;
-
+        opacity: 0.5;
         &:focus,
         &:hover {
             background-color: transparent;
-            color: $gray-300;
             cursor: default;
         }
     }
@@ -189,7 +188,7 @@ div#top-nav.navbar-fixed-top {
             // margin-left: -50px !important;
             color: $navbar-default-brand-color;
             min-width: 270px;
-            height: inherit;
+            height: 100%;
             max-height: $navbar-full-height;
             margin-left: 0px;
             text-decoration: none;
@@ -206,7 +205,7 @@ div#top-nav.navbar-fixed-top {
 
             > .img-container {
                 position: relative;
-                height: inherit;
+                height: 100%;
                 display: flex;
                 align-items: center;
                 padding-right: 20px;
@@ -309,7 +308,7 @@ div#top-nav.navbar-fixed-top {
         > .navbar-collapse {
 
             @include navbar-fixed-position {
-                height: inherit;
+                height: 100%;
             }
 
             @include navbar-static-position {

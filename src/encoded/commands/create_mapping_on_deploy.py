@@ -32,6 +32,8 @@ ITEM_INDEX_ORDER = [
     'FileProcessed',
     'FileReference',
     'Image',
+    'NoteInterpretation',
+    'NoteStandard',
     'Gene',
     'GeneList',
     'Phenotype',
@@ -58,6 +60,7 @@ ITEM_INDEX_ORDER = [
     'Page',
     'AnnotationField',
     'Variant',
+    'VariantSampleList',
     'VariantSample',
     'EvidenceDisPheno',
     'Page',
@@ -136,8 +139,9 @@ def get_deployment_config(app):
             log.info('Looks like we are on hotseat/cgapdev -- do not wipe ES')
             deploy_cfg['WIPE_ES'] = False
         else:
-            log.info('Looks like we are on cgaptest -- wipe ES')
-            deploy_cfg['WIPE_ES'] = True
+            # XXX: enable to force cgaptest reindexing
+            log.info('Looks like we are on cgaptest -- normally we would wipe ES but no longer.')
+            deploy_cfg['WIPE_ES'] = False
     else:
         log.warning('This environment is not recognized: %s' % my_env)
         log.warning('Proceeding without wiping ES')

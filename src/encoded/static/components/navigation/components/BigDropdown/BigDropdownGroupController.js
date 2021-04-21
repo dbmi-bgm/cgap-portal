@@ -1,11 +1,8 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import url from 'url';
 import _ from 'underscore';
-import memoize from 'memoize-one';
-import { console, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { WindowEventDelegator } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 
 export class BigDropdownGroupController extends React.PureComponent {
@@ -29,11 +26,11 @@ export class BigDropdownGroupController extends React.PureComponent {
         // SyntheticEvents to event handlers bound directly to JSX elements via props.
         // This occurs at the `document.body` level (?) so clicks that are intercepted
         // via SyntheticEvent handlers (stopPropagation) do not bubble up to window seemingly.
-        window.addEventListener("click", this.onWindowClick);
+        WindowEventDelegator.addHandler("click", this.onWindowClick);
     }
 
     componentWillUnmount(){
-        window.removeEventListener("click", this.onWindowClick);
+        WindowEventDelegator.removeHandler("click", this.onWindowClick);
     }
 
     componentDidUpdate(pastProps, pastState){
@@ -64,7 +61,8 @@ export class BigDropdownGroupController extends React.PureComponent {
      * @param {MouseEvent} mouseEvt - Click event.
      */
     onWindowClick(mouseEvt){
-        if (this.state.visibleDropdownID === null){
+        const { visibleDropdownID } = this.state;
+        if (visibleDropdownID === null){
             return false;
         }
         this.onCloseDropdown(mouseEvt);

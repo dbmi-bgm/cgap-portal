@@ -41,6 +41,12 @@
             "$ref": "mixins.json#/notes"
         },
         {
+            "$ref": "mixins.json#/interpretation"
+        },
+        {
+            "$ref": "mixins.json#/variant_notes"
+        },
+        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
@@ -56,7 +62,6 @@
             "vcf_field": "ALT",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Position",
             "description": "Alternative allele",
             "scope": "variant",
             "schema_title": "Alt"
@@ -96,11 +101,9 @@
             "vcf_field": "CHROM",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Position",
             "description": "Chromosome",
             "scope": "variant",
-            "schema_title": "Chromosome",
-            "facet_order": 1
+            "schema_title": "Chromosome"
         },
         "ID": {
             "title": "dbSNP ID",
@@ -110,7 +113,6 @@
             "vcf_field": "ID",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Position",
             "description": "dbSNP ID",
             "scope": "variant",
             "schema_title": "dbSNP ID"
@@ -123,11 +125,9 @@
             "vcf_field": "POS",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Position",
             "description": "Position",
             "scope": "variant",
             "schema_title": "Position",
-            "facet_order": 2,
             "min": 0
         },
         "REF": {
@@ -138,7 +138,6 @@
             "vcf_field": "REF",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Position",
             "description": "Reference allele",
             "scope": "variant",
             "schema_title": "Ref"
@@ -156,11 +155,9 @@
             "vcf_field": "csq_cadd_phred",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "CADD Phred score",
             "scope": "variant",
-            "schema_title": "CADD Phred score",
-            "facet_order": 23
+            "schema_title": "CADD Phred score"
         },
         "csq_cadd_raw_rankscore": {
             "title": "CADD rankscore",
@@ -170,7 +167,6 @@
             "vcf_field": "csq_cadd_raw_rankscore",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "CADD rankscore",
             "scope": "variant",
             "schema_title": "CADD rankscore"
@@ -183,12 +179,10 @@
             "vcf_field": "csq_clinvar",
             "source_name": "ClinVar",
             "source_version": "v20201101",
-            "annotation_category": "variant database",
             "description": "ClinVar variantion ID",
             "scope": "variant",
             "schema_title": "Clinvar ID",
-            "link": "https://www.ncbi.nlm.nih.gov/clinvar/variation/<ID>/",
-            "column_order": 70
+            "link": "https://www.ncbi.nlm.nih.gov/clinvar/variation/<ID>/"
         },
         "csq_clinvar_clndisdb": {
             "title": "csq_clinvar_clndisdb",
@@ -202,7 +196,6 @@
                 "vcf_field": "csq_clinvar_clndisdb",
                 "source_name": "ClinVar",
                 "source_version": "v20201101",
-                "annotation_category": "variant database",
                 "description": "Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN",
                 "scope": "variant"
             }
@@ -219,7 +212,6 @@
                 "vcf_field": "csq_clinvar_clndisdbincl",
                 "source_name": "ClinVar",
                 "source_version": "v20201101",
-                "annotation_category": "variant database",
                 "description": "For included Variant: Tag-value pairs of disease database name and identifier, e.g. OMIM:NNNNNN",
                 "scope": "variant"
             }
@@ -236,7 +228,6 @@
                 "vcf_field": "csq_clinvar_clndn",
                 "source_name": "ClinVar",
                 "source_version": "v20201101",
-                "annotation_category": "variant database",
                 "description": "ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB",
                 "scope": "variant"
             }
@@ -249,7 +240,6 @@
             "vcf_field": "csq_clinvar_clndnincl",
             "source_name": "ClinVar",
             "source_version": "v20201101",
-            "annotation_category": "variant database",
             "description": "For included Variant : ClinVar's preferred disease name for the concept specified by disease identifiers in CLNDISDB",
             "scope": "variant"
         },
@@ -261,7 +251,6 @@
             "vcf_field": "csq_clinvar_clnhgvs",
             "source_name": "ClinVar",
             "source_version": "v20201101",
-            "annotation_category": "Position",
             "description": "HGVS genome sequence name",
             "scope": "variant",
             "schema_title": "Variant"
@@ -278,7 +267,6 @@
                 "vcf_field": "csq_clinvar_clnrevstat",
                 "source_name": "ClinVar",
                 "source_version": "v20201101",
-                "annotation_category": "variant database",
                 "description": "ClinVar review status for the Variation ID",
                 "scope": "variant"
             }
@@ -291,11 +279,9 @@
             "vcf_field": "csq_clinvar_clnsig",
             "source_name": "ClinVar",
             "source_version": "v20201101",
-            "annotation_category": "variant database",
             "description": "Clinical significance for this single variant",
             "scope": "variant",
-            "schema_title": "Clinvar",
-            "facet_order": 36
+            "schema_title": "Clinvar"
         },
         "csq_clinvar_clnsigconf": {
             "title": "csq_clinvar_clnsigconf",
@@ -309,7 +295,6 @@
                 "vcf_field": "csq_clinvar_clnsigconf",
                 "source_name": "ClinVar",
                 "source_version": "v20201101",
-                "annotation_category": "variant database",
                 "description": "Conflicting clinical significance for this single variant",
                 "scope": "variant"
             }
@@ -326,7 +311,6 @@
                 "vcf_field": "csq_clinvar_clnsigincl",
                 "source_name": "ClinVar",
                 "source_version": "v20201101",
-                "annotation_category": "variant database",
                 "description": "Clinical significance for a haplotype or genotype that includes this variant. Reported as pairs of VariationID:clinical significance.",
                 "scope": "variant"
             }
@@ -339,7 +323,6 @@
             "vcf_field": "csq_clinvar_clnvc",
             "source_name": "ClinVar",
             "source_version": "v20201101",
-            "annotation_category": "variant database",
             "description": "Variant type",
             "scope": "variant"
         },
@@ -351,7 +334,6 @@
             "vcf_field": "csq_clinvar_clnvcso",
             "source_name": "ClinVar",
             "source_version": "v20201101",
-            "annotation_category": "variant database",
             "description": "Sequence Ontology id for variant type",
             "scope": "variant"
         },
@@ -367,7 +349,6 @@
                 "vcf_field": "csq_clinvar_geneinfo",
                 "source_name": "ClinVar",
                 "source_version": "v20201101",
-                "annotation_category": "variant database",
                 "description": "Gene(s) for the variant reported as gene symbol:gene id. The gene symbol and id are delimited by a colon (:) and each pair is delimited by a vertical bar (|)",
                 "scope": "variant"
             }
@@ -384,7 +365,6 @@
                 "vcf_field": "csq_clinvar_mc",
                 "source_name": "ClinVar",
                 "source_version": "v20201101",
-                "annotation_category": "variant database",
                 "description": "Sequence Ontology ID list",
                 "scope": "variant"
             }
@@ -397,7 +377,6 @@
             "vcf_field": "csq_clinvar_origin",
             "source_name": "ClinVar",
             "source_version": "v20201101",
-            "annotation_category": "variant database",
             "description": "Allele origin. One or more of the following values may be added: 0 - unknown; 1 - germline; 2 - somatic; 4 - inherited; 8 - paternal; 16 - maternal; 32 - de-novo; 64 - biparental; 128 - uniparental; 256 - not-tested; 512 - tested-inconclusive; 1073741824 - other",
             "scope": "variant"
         },
@@ -409,7 +388,6 @@
             "vcf_field": "csq_gerp++_rs",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "GERP score",
             "scope": "variant",
             "schema_title": "Gerp++ score"
@@ -422,7 +400,6 @@
             "vcf_field": "csq_gerp++_rs_rankscore",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "GERP rankscore",
             "scope": "variant",
             "schema_title": "Gerp++ rankscore"
@@ -435,11 +412,9 @@
             "vcf_field": "csq_gnomadg_ac",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt Allele Count",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-afr": {
@@ -450,11 +425,9 @@
             "vcf_field": "csq_gnomadg_ac-afr",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of African-American/African ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - African-American/African",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-ami": {
@@ -465,11 +438,9 @@
             "vcf_field": "csq_gnomadg_ac-ami",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Amish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Amish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-amr": {
@@ -480,11 +451,9 @@
             "vcf_field": "csq_gnomadg_ac-amr",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Latino ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Latino",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-asj": {
@@ -495,11 +464,9 @@
             "vcf_field": "csq_gnomadg_ac-asj",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Ashkenazi Jewish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Ashkenazi Jewish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-eas": {
@@ -510,11 +477,9 @@
             "vcf_field": "csq_gnomadg_ac-eas",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of East Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - East Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-fin": {
@@ -525,12 +490,22 @@
             "vcf_field": "csq_gnomadg_ac-fin",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Finnish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Finnish",
-            "default": 0,
             "min": 0
+        },
+        "csq_gnomadg_ac-mid": {
+            "title": "GnomAD Alt AC - Middle Eastern",
+            "field_name": "csq_gnomadg_ac-mid",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "csq_gnomadg_ac-mid",
+            "source_name": "gnomAD",
+            "source_version": "v3.1",
+            "description": "Alternate allele count for samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AC - Middle Eastern"
         },
         "csq_gnomadg_ac-nfe": {
             "title": "GnomAD Alt AC - Non-Finnish European",
@@ -540,11 +515,9 @@
             "vcf_field": "csq_gnomadg_ac-nfe",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Non-Finnish European ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Non-Finnish European",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-oth": {
@@ -555,11 +528,9 @@
             "vcf_field": "csq_gnomadg_ac-oth",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of Other ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - Other Ancestry",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-sas": {
@@ -570,11 +541,9 @@
             "vcf_field": "csq_gnomadg_ac-sas",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for samples of South Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - South Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-xx": {
@@ -585,11 +554,9 @@
             "vcf_field": "csq_gnomadg_ac-xx",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for female samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - female",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_ac-xy": {
@@ -600,11 +567,9 @@
             "vcf_field": "csq_gnomadg_ac-xy",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele count for male samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt AC - male",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_af": {
@@ -615,14 +580,9 @@
             "vcf_field": "csq_gnomadg_af",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt Allele Frequency",
-            "abbreviation": "AF",
-            "column_order": 60,
-            "facet_order": 18,
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -634,11 +594,9 @@
             "vcf_field": "csq_gnomadg_af-afr",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in samples of African-American/African ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - African-American/African",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -650,11 +608,9 @@
             "vcf_field": "csq_gnomadg_af-ami",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in samples of Amish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Amish",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -666,11 +622,9 @@
             "vcf_field": "csq_gnomadg_af-amr",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in samples of Latino ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Latino",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -682,11 +636,10 @@
             "vcf_field": "csq_gnomadg_af-asj",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in samples of Ashkenazi Jewish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Ashkenazi Jewish",
-            "default": 0,
+            "abbreviation": "AF",
             "min": 0,
             "max": 1
         },
@@ -698,11 +651,9 @@
             "vcf_field": "csq_gnomadg_af-eas",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in samples of East Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - East Asian",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -714,13 +665,23 @@
             "vcf_field": "csq_gnomadg_af-fin",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in samples of Finnish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Finnish",
-            "default": 0,
             "min": 0,
             "max": 1
+        },
+        "csq_gnomadg_af-mid": {
+            "title": "GnomAD Alt AF - Middle Eastern",
+            "field_name": "csq_gnomadg_af-mid",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_gnomadg_af-mid",
+            "source_name": "gnomAD",
+            "source_version": "v3.1",
+            "description": "Alternate allele frequency in samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "GnomAD Alt AF - Middle Eastern"
         },
         "csq_gnomadg_af-nfe": {
             "title": "GnomAD Alt AF - Non-Finnish European",
@@ -730,11 +691,9 @@
             "vcf_field": "csq_gnomadg_af-nfe",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in samples of Non-Finnish European ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Non-Finnish European",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -746,11 +705,9 @@
             "vcf_field": "csq_gnomadg_af-oth",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in samples of Other ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - Other Ancestry",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -762,11 +719,9 @@
             "vcf_field": "csq_gnomadg_af-sas",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in samples of South Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - South Asian",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -778,11 +733,9 @@
             "vcf_field": "csq_gnomadg_af-xx",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in female samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - female",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -794,11 +747,9 @@
             "vcf_field": "csq_gnomadg_af-xy",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Alternate allele frequency in male samples",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - male",
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -810,13 +761,10 @@
             "vcf_field": "csq_gnomadg_af_popmax",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "maximum population allele frequency from gnomAD gnome v3.0",
             "scope": "variant",
             "schema_title": "GnomAD Alt AF - PopMax",
             "abbreviation": "PopMax AF",
-            "facet_order": 19,
-            "default": 0,
             "min": 0,
             "max": 1
         },
@@ -828,12 +776,9 @@
             "vcf_field": "csq_gnomadg_an",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples",
             "scope": "variant",
             "schema_title": "GnomAD Total Allele Number",
-            "facet_order": 20,
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-afr": {
@@ -844,11 +789,9 @@
             "vcf_field": "csq_gnomadg_an-afr",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of African-American/African ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - African-American/African",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-ami": {
@@ -859,11 +802,9 @@
             "vcf_field": "csq_gnomadg_an-ami",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Amish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Amish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-amr": {
@@ -874,11 +815,9 @@
             "vcf_field": "csq_gnomadg_an-amr",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Latino ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Latino",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-asj": {
@@ -889,11 +828,9 @@
             "vcf_field": "csq_gnomadg_an-asj",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Ashkenazi Jewish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Ashkenazi Jewish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-eas": {
@@ -904,11 +841,9 @@
             "vcf_field": "csq_gnomadg_an-eas",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of East Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - East Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-fin": {
@@ -919,12 +854,22 @@
             "vcf_field": "csq_gnomadg_an-fin",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Finnish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Finnish",
-            "default": 0,
             "min": 0
+        },
+        "csq_gnomadg_an-mid": {
+            "title": "GnomAD Total AN - Middle Eastern",
+            "field_name": "csq_gnomadg_an-mid",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "csq_gnomadg_an-mid",
+            "source_name": "gnomAD",
+            "source_version": "v3.1",
+            "description": "Total number of alleles in samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "GnomAD Total AN - Middle Eastern"
         },
         "csq_gnomadg_an-nfe": {
             "title": "GnomAD Total AN - Non-Finnish European",
@@ -934,11 +879,9 @@
             "vcf_field": "csq_gnomadg_an-nfe",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Non-Finnish European ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Non-Finnish European",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-oth": {
@@ -949,11 +892,9 @@
             "vcf_field": "csq_gnomadg_an-oth",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of Other ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - Other Ancestry",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-sas": {
@@ -964,11 +905,9 @@
             "vcf_field": "csq_gnomadg_an-sas",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in samples of South Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - South Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-xx": {
@@ -979,11 +918,9 @@
             "vcf_field": "csq_gnomadg_an-xx",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in female samples",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - female",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_an-xy": {
@@ -994,11 +931,9 @@
             "vcf_field": "csq_gnomadg_an-xy",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Total number of alleles in male samples",
             "scope": "variant",
             "schema_title": "GnomAD Total AN - male",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt": {
@@ -1009,12 +944,9 @@
             "vcf_field": "csq_gnomadg_nhomalt",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count",
-            "facet_order": 21,
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-afr": {
@@ -1025,11 +957,9 @@
             "vcf_field": "csq_gnomadg_nhomalt-afr",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of African-American/African ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - African-American/African",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-ami": {
@@ -1040,11 +970,9 @@
             "vcf_field": "csq_gnomadg_nhomalt-ami",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Amish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Amish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-amr": {
@@ -1055,11 +983,9 @@
             "vcf_field": "csq_gnomadg_nhomalt-amr",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Latino ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Latino",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-asj": {
@@ -1070,11 +996,9 @@
             "vcf_field": "csq_gnomadg_nhomalt-asj",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Ashkenazi Jewish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Ashkenazi Jewish",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-eas": {
@@ -1085,11 +1009,9 @@
             "vcf_field": "csq_gnomadg_nhomalt-eas",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of East Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - East Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-fin": {
@@ -1100,12 +1022,22 @@
             "vcf_field": "csq_gnomadg_nhomalt-fin",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Finnish ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Finnish",
-            "default": 0,
             "min": 0
+        },
+        "csq_gnomadg_nhomalt-mid": {
+            "title": "GnomAD Homozygous Count - Middle Eastern",
+            "field_name": "csq_gnomadg_nhomalt-mid",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "csq_gnomadg_nhomalt-mid",
+            "source_name": "gnomAD",
+            "source_version": "v3.1",
+            "description": "Count of homozygous individuals in samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "GnomAD Homozygous Count - Middle Eastern"
         },
         "csq_gnomadg_nhomalt-nfe": {
             "title": "GnomAD Homozygous Count - Non-Finnish European",
@@ -1115,11 +1047,9 @@
             "vcf_field": "csq_gnomadg_nhomalt-nfe",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Non-Finnish European ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Non-Finnish European",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-oth": {
@@ -1130,11 +1060,9 @@
             "vcf_field": "csq_gnomadg_nhomalt-oth",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of Other ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - Other Ancestry",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-sas": {
@@ -1145,11 +1073,9 @@
             "vcf_field": "csq_gnomadg_nhomalt-sas",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in samples of South Asian ancestry",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - South Asian",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-xx": {
@@ -1160,11 +1086,9 @@
             "vcf_field": "csq_gnomadg_nhomalt-xx",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in female samples",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - female",
-            "default": 0,
             "min": 0
         },
         "csq_gnomadg_nhomalt-xy": {
@@ -1175,11 +1099,9 @@
             "vcf_field": "csq_gnomadg_nhomalt-xy",
             "source_name": "gnomAD",
             "source_version": "v3.1",
-            "annotation_category": "Population Frequency",
             "description": "Count of homozygous individuals in male samples",
             "scope": "variant",
             "schema_title": "GnomAD Homozygous Count - male",
-            "default": 0,
             "min": 0
         },
         "csq_hg19_chr": {
@@ -1190,7 +1112,6 @@
             "vcf_field": "csq_hg19_chr",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Position",
             "description": "hg19 coordinate chromosome",
             "scope": "variant",
             "schema_title": "Chromosome (hg19)"
@@ -1203,7 +1124,6 @@
             "vcf_field": "csq_hg19_pos(1-based)",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Position",
             "description": "hg19 coordinate position",
             "scope": "variant",
             "schema_title": "Position (hg19)"
@@ -1216,7 +1136,6 @@
             "vcf_field": "csq_phastcons100way_vertebrate",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "PhastCons 100 way score",
             "scope": "variant",
             "schema_title": "PhastCons (100 Vertebrates)"
@@ -1229,12 +1148,10 @@
             "vcf_field": "csq_phylop100way_vertebrate",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "PhyloP 100 way score",
             "scope": "variant",
             "schema_title": "PhyloP (100 Vertebrates)",
             "abbreviation": "PhyloP100",
-            "facet_order": 22,
             "min": -20,
             "max": 10
         },
@@ -1246,7 +1163,6 @@
             "vcf_field": "csq_phylop100way_vertebrate_rankscore",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "PhyloP 100 way rankscore",
             "scope": "variant",
             "schema_title": "PhyloP (100 Vertebrates) rankscore"
@@ -1259,7 +1175,6 @@
             "vcf_field": "csq_phylop30way_mammalian",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "PhyloP 30 way score",
             "scope": "variant",
             "schema_title": "PhyloP (30 Mammals)"
@@ -1272,7 +1187,6 @@
             "vcf_field": "csq_polyphen2_hvar_pred",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "PolyPhen 2 prediction",
             "scope": "variant",
             "schema_title": "PolyPhen 2 prediction"
@@ -1285,7 +1199,6 @@
             "vcf_field": "csq_polyphen2_hvar_rankscore",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "PolyPhen 2 rankscore",
             "scope": "variant",
             "schema_title": "PolyPhen 2 rankscore"
@@ -1298,7 +1211,6 @@
             "vcf_field": "csq_polyphen2_hvar_score",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "PolyPhen 2 score",
             "scope": "variant",
             "schema_title": "PolyPhen 2 score"
@@ -1311,7 +1223,6 @@
             "vcf_field": "csq_primateai_pred",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "PrimateAI prediction",
             "scope": "variant",
             "schema_title": "PrimateAI prediction"
@@ -1324,7 +1235,6 @@
             "vcf_field": "csq_primateai_rankscore",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "PrimateAI rankscore",
             "scope": "variant",
             "schema_title": "PrimateAI rankscore"
@@ -1337,23 +1247,33 @@
             "vcf_field": "csq_primateai_score",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "PrimateAI score",
             "scope": "variant",
             "schema_title": "PrimateAI score"
         },
-        "csq_rs_dbsnp151": {
-            "title": "dbSNP ID",
-            "field_name": "csq_rs_dbsnp151",
-            "type": "string",
+        "csq_revel_rankscore": {
+            "title": "REVEL rankscore",
+            "field_name": "csq_revel_rankscore",
+            "type": "number",
             "do_import": true,
-            "vcf_field": "csq_rs_dbsnp151",
+            "vcf_field": "csq_revel_rankscore",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Position",
-            "description": "dbSNP RS number",
+            "description": "REVEL rankscore",
             "scope": "variant",
-            "schema_title": "dbSNP ID"
+            "schema_title": "REVEL rankscore"
+        },
+        "csq_revel_score": {
+            "title": "REVEL score",
+            "field_name": "csq_revel_score",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "csq_revel_score",
+            "source_name": "dbNSFP",
+            "source_version": "v4.1a",
+            "description": "REVEL score",
+            "scope": "variant",
+            "schema_title": "REVEL score"
         },
         "csq_sift_converted_rankscore": {
             "title": "SIFT rankscore",
@@ -1363,7 +1283,6 @@
             "vcf_field": "csq_sift_converted_rankscore",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "SIFT rankscore",
             "scope": "variant",
             "schema_title": "SIFT rankscore"
@@ -1376,7 +1295,6 @@
             "vcf_field": "csq_sift_pred",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "SIFT prediction",
             "scope": "variant",
             "schema_title": "SIFT prediction"
@@ -1389,7 +1307,6 @@
             "vcf_field": "csq_sift_score",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "SIFT score",
             "scope": "variant",
             "schema_title": "SIFT score"
@@ -1402,7 +1319,6 @@
             "vcf_field": "csq_siphy_29way_logodds",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "Siphy omega score",
             "scope": "variant",
             "schema_title": "SiPhy (Omega)"
@@ -1415,7 +1331,6 @@
             "vcf_field": "csq_siphy_29way_pi",
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
-            "annotation_category": "Effect Predictors",
             "description": "Siphy p score",
             "scope": "variant",
             "schema_title": "SiPhy (p-value)"
@@ -1428,7 +1343,6 @@
             "vcf_field": "csq_spliceai_pred_dp_ag",
             "source_name": "SpliceAI",
             "source_version": "v1.3",
-            "annotation_category": "Effect Predictors",
             "description": "delta positions (DP) for acceptor gain (AG)",
             "scope": "variant",
             "schema_title": "SpliceAI Delta Position Acceptor Gain"
@@ -1441,7 +1355,6 @@
             "vcf_field": "csq_spliceai_pred_dp_al",
             "source_name": "SpliceAI",
             "source_version": "v1.3",
-            "annotation_category": "Effect Predictors",
             "description": "delta positions (DP) for acceptor loss (AL)",
             "scope": "variant",
             "schema_title": "SpliceAI Delta Position Acceptor Loss"
@@ -1454,7 +1367,6 @@
             "vcf_field": "csq_spliceai_pred_dp_dg",
             "source_name": "SpliceAI",
             "source_version": "v1.3",
-            "annotation_category": "Effect Predictors",
             "description": "delta positions (DP) for donor gain (DG)",
             "scope": "variant",
             "schema_title": "SpliceAI Delta Position Donor Gain"
@@ -1467,7 +1379,6 @@
             "vcf_field": "csq_spliceai_pred_dp_dl",
             "source_name": "SpliceAI",
             "source_version": "v1.3",
-            "annotation_category": "Effect Predictors",
             "description": "delta positions (DP) for donor loss (DL)",
             "scope": "variant",
             "schema_title": "SpliceAI Delta Position Donor Loss"
@@ -1480,7 +1391,6 @@
             "vcf_field": "csq_spliceai_pred_ds_ag",
             "source_name": "SpliceAI",
             "source_version": "v1.3",
-            "annotation_category": "Effect Predictors",
             "description": "delta scores (DS) for acceptor gain (AG)",
             "scope": "variant",
             "schema_title": "SpliceAI Delta Score Acceptor Gain",
@@ -1495,7 +1405,6 @@
             "vcf_field": "csq_spliceai_pred_ds_al",
             "source_name": "SpliceAI",
             "source_version": "v1.3",
-            "annotation_category": "Effect Predictors",
             "description": "delta scores (DS) for acceptor loss (AL)",
             "scope": "variant",
             "schema_title": "SpliceAI Delta Score Acceptor Loss",
@@ -1510,7 +1419,6 @@
             "vcf_field": "csq_spliceai_pred_ds_dg",
             "source_name": "SpliceAI",
             "source_version": "v1.3",
-            "annotation_category": "Effect Predictors",
             "description": "delta scores (DS) for donor gain (DG)",
             "scope": "variant",
             "schema_title": "SpliceAI Delta Score Donor Gain",
@@ -1525,7 +1433,6 @@
             "vcf_field": "csq_spliceai_pred_ds_dl",
             "source_name": "SpliceAI",
             "source_version": "v1.3",
-            "annotation_category": "Effect Predictors",
             "description": "delta scores (DS) for donor loss (DL)",
             "scope": "variant",
             "schema_title": "SpliceAI Delta Score Donor Loss",
@@ -1540,7 +1447,6 @@
             "vcf_field": "csq_spliceai_pred_symbol",
             "source_name": "SpliceAI",
             "source_version": "v1.3",
-            "annotation_category": "Effect Predictors",
             "description": "affected gene symbol",
             "scope": "variant",
             "schema_title": "SpliceAI Gene"
@@ -1562,10 +1468,8 @@
                         "source_name": "GENES",
                         "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
-                        "annotation_category": "Gene",
                         "scope": "variant",
-                        "schema_title": "Gene",
-                        "column_order": 40
+                        "schema_title": "Gene"
                     },
                     "genes_most_severe_transcript": {
                         "title": "Transcript",
@@ -1576,7 +1480,6 @@
                         "source_name": "GENES",
                         "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
-                        "annotation_category": "Gene",
                         "scope": "variant",
                         "schema_title": "Transcript"
                     },
@@ -1600,10 +1503,8 @@
                         "source_name": "GENES",
                         "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
-                        "annotation_category": "Gene",
                         "scope": "variant",
-                        "schema_title": "Coding Sequence",
-                        "column_order": 50
+                        "schema_title": "Coding Sequence"
                     },
                     "genes_most_severe_hgvsp": {
                         "title": "Protein Sequence",
@@ -1614,7 +1515,6 @@
                         "source_name": "GENES",
                         "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
-                        "annotation_category": "Gene",
                         "scope": "variant",
                         "schema_title": "Protein Sequence"
                     },
@@ -1638,10 +1538,8 @@
                         "source_name": "GENES",
                         "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
-                        "annotation_category": "Effect Predictors",
                         "scope": "variant",
-                        "schema_title": "SIFT score",
-                        "facet_order": 24
+                        "schema_title": "SIFT score"
                     },
                     "genes_most_severe_polyphen_score": {
                         "title": "PolyPhen score",
@@ -1652,10 +1550,8 @@
                         "source_name": "GENES",
                         "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
-                        "annotation_category": "Effect Predictors",
                         "scope": "variant",
-                        "schema_title": "PolyPhen score",
-                        "facet_order": 25
+                        "schema_title": "PolyPhen score"
                     },
                     "genes_most_severe_maxentscan_diff": {
                         "title": "MaxEntScan Diff",
@@ -1666,10 +1562,8 @@
                         "source_name": "GENES",
                         "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"genes\", \"title\": \"Gene\"}",
-                        "annotation_category": "Effect Predictors",
                         "scope": "variant",
-                        "schema_title": "MaxEntScan Diff",
-                        "facet_order": 31
+                        "schema_title": "MaxEntScan Diff"
                     },
                     "genes_most_severe_consequence": {
                         "title": "genes_most_severe_consequence",
@@ -1716,7 +1610,7 @@
             }
         },
         "schema_version": {
-            "default": "1"
+            "default": "2"
         },
         "spliceaiMaxds": {
             "title": "SpliceAI Max Delta",
@@ -1724,11 +1618,9 @@
             "type": "number",
             "do_import": true,
             "vcf_field": "spliceaiMaxds",
-            "annotation_category": "Effect Predictors",
             "description": "maximum delta scores",
             "scope": "variant",
             "schema_title": "SpliceAI Max Delta",
-            "facet_order": 27,
             "default": 0
         },
         "transcript": {
@@ -1751,7 +1643,6 @@
                             "source_name": "VEP",
                             "source_version": "v101",
                             "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                            "annotation_category": "Consequence",
                             "description": "Consequence type",
                             "scope": "variant"
                         }
@@ -1766,7 +1657,6 @@
                         "source_name": "VEP",
                         "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Gene Identifiers",
                         "scope": "variant"
                     },
                     "csq_feature": {
@@ -2100,7 +1990,6 @@
                         "source_name": "MaxEnt",
                         "source_version": "v20040421",
                         "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Effect Predictors",
                         "description": "MaxEntScan alternate sequence score",
                         "scope": "variant",
                         "schema_title": "MaxEntScan - Alt"
@@ -2114,7 +2003,6 @@
                         "source_name": "MaxEnt",
                         "source_version": "v20040421",
                         "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Effect Predictors",
                         "description": "MaxEntScan score difference",
                         "scope": "variant",
                         "schema_title": "MaxEntScan"
@@ -2128,7 +2016,6 @@
                         "source_name": "MaxEnt",
                         "source_version": "v20040421",
                         "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Effect Predictors",
                         "description": "MaxEntScan reference sequence score",
                         "scope": "variant",
                         "schema_title": "MaxEntScan - Ref"
@@ -2142,7 +2029,6 @@
                         "source_name": "VEP",
                         "source_version": "v101",
                         "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
-                        "annotation_category": "Consequence",
                         "description": "Distance from the transcription start site",
                         "scope": "variant"
                     }
@@ -2163,11 +2049,9 @@
             "vcf_field": "variantClass",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Variant Type",
             "description": "Variant type (SNV, INS, DEL)",
             "scope": "variant",
-            "schema_title": "Variant Type",
-            "facet_order": 4
+            "schema_title": "Variant Type"
         }
     },
     "facets": {
@@ -2183,17 +2067,25 @@
             "order": 2,
             "grouping": "Position"
         },
-        "csq_cadd_phred": {
-            "title": "CADD Phred score",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 23,
-            "grouping": "Effect Predictors"
+        "variantClass": {
+            "title": "Variant Type",
+            "order": 4,
+            "grouping": "Variant Type"
         },
-        "csq_clinvar_clnsig": {
-            "title": "Clinvar",
-            "order": 36,
-            "grouping": "variant database"
+        "genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 5,
+            "grouping": "Consequence"
+        },
+        "genes.genes_most_severe_consequence.location": {
+            "title": "Location",
+            "order": 6,
+            "grouping": "Consequence"
+        },
+        "genes.genes_most_severe_consequence.impact": {
+            "title": "Impact",
+            "order": 7,
+            "grouping": "Consequence"
         },
         "csq_gnomadg_af": {
             "title": "GnomAD Alt Allele Frequency",
@@ -2230,31 +2122,46 @@
             "order": 22,
             "grouping": "Effect Predictors"
         },
-        "genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 5,
-            "grouping": "Consequence"
-        },
-        "genes.genes_most_severe_consequence.impact": {
-            "title": "Impact",
-            "order": 7,
-            "grouping": "Consequence"
-        },
-        "genes.genes_most_severe_consequence.location": {
-            "title": "Location",
-            "order": 6,
-            "grouping": "Consequence"
-        },
-        "genes.genes_most_severe_gene.gene_lists.display_title": {
-            "title": "Gene List",
-            "order": 99,
-            "grouping": "Genes"
-        },
-        "genes.genes_most_severe_gene.oe_lof": {
-            "title": "o/e (LoF)",
+        "csq_cadd_phred": {
+            "title": "CADD Phred score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 35,
+            "order": 23,
+            "grouping": "Effect Predictors"
+        },
+        "genes.genes_most_severe_sift_score": {
+            "title": "SIFT score",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 24,
+            "grouping": "Effect Predictors"
+        },
+        "genes.genes_most_severe_polyphen_score": {
+            "title": "PolyPhen score",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 25,
+            "grouping": "Effect Predictors"
+        },
+        "spliceaiMaxds": {
+            "title": "SpliceAI Max Delta",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 27,
+            "grouping": "Effect Predictors"
+        },
+        "genes.genes_most_severe_maxentscan_diff": {
+            "title": "MaxEntScan Diff",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 31,
+            "grouping": "Effect Predictors"
+        },
+        "genes.genes_most_severe_gene.s_het": {
+            "title": "S_het",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 32,
             "grouping": "Constraint Metrics"
         },
         "genes.genes_most_severe_gene.oe_lof_upper": {
@@ -2271,73 +2178,12 @@
             "order": 34,
             "grouping": "Constraint Metrics"
         },
-        "genes.genes_most_severe_gene.s_het": {
-            "title": "S_het",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 32,
-            "grouping": "Constraint Metrics"
-        },
-        "genes.genes_most_severe_maxentscan_diff": {
-            "title": "MaxEntScan Diff",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 31,
-            "grouping": "Effect Predictors"
-        },
-        "genes.genes_most_severe_polyphen_score": {
-            "title": "PolyPhen score",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 25,
-            "grouping": "Effect Predictors"
-        },
-        "genes.genes_most_severe_sift_score": {
-            "title": "SIFT score",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 24,
-            "grouping": "Effect Predictors"
-        },
-        "spliceaiMaxds": {
-            "title": "SpliceAI Max Delta",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 27,
-            "grouping": "Effect Predictors"
-        },
-        "variantClass": {
-            "title": "Variant Type",
-            "order": 4,
-            "grouping": "Variant Type"
+        "interpretation.classification": {
+            "title": "Classification",
+            "order": 100
         }
     },
     "columns": {
-        "csq_clinvar": {
-            "title": "Clinvar ID",
-            "order": 70,
-            "default_hidden": true
-        },
-        "csq_gnomadg_af": {
-            "title": "gnomAD",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 60,
-            "sort_fields": [
-                {
-                    "field": "variant.csq_gnomadg_af",
-                    "title": "gnomad AF"
-                },
-                {
-                    "field": "variant.csq_gnomadg_af_popmax",
-                    "title": "gnomad AF Population Max"
-                }
-            ]
-        },
-        "genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 51
-        },
         "genes.genes_most_severe_gene.display_title": {
             "title": "Gene, Transcript",
             "order": 40,
@@ -2365,6 +2211,35 @@
                     "title": "Protein Sequence"
                 }
             ]
+        },
+        "genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 51
+        },
+        "csq_gnomadg_af": {
+            "title": "gnomAD",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 60,
+            "sort_fields": [
+                {
+                    "field": "variant.csq_gnomadg_af",
+                    "title": "gnomad AF"
+                },
+                {
+                    "field": "variant.csq_gnomadg_af_popmax",
+                    "title": "gnomad AF Population Max"
+                }
+            ]
+        },
+        "csq_clinvar": {
+            "title": "Clinvar ID",
+            "order": 70,
+            "default_hidden": true
+        },
+        "interpretation.classification": {
+            "title": "Classification",
+            "order": 100
         }
     }
 }
