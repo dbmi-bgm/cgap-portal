@@ -21,6 +21,8 @@ def load_data_should_proceed(env, allow_prod):
     :param allow_prod: prod argument from argparse, defaults to False
     :return: True if load_data should continue, False otherwise
     """
+    # mastertest id for trial acocunt -- TODO rename
+    CGAP_ENV_MASTERTEST = 'cgap-dev'
     # run on cgaptest -- XXX: this logic should probably be refactored into dcicutils
     if env == CGAP_ENV_MASTERTEST:
         log.info('load_data: proceeding since we are on %s' % env)
