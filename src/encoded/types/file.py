@@ -160,14 +160,19 @@ class File(Item):
     base_types = ['File'] + Item.base_types
     schema = load_schema('encoded:schemas/file.json')
     embedded_list = Item.embedded_list + [
+        # FileFormat linkTo
         'file_format.file_format',
+
+        # File linkTo
         'related_files.relationship_type',
         'related_files.file.accession',
-        'quality_metric.display_title',
+        'related_files.file.file_format.file_format',
+
+        # QC
         'quality_metric.@type',
         'quality_metric.qc_list.qc_type',
         'quality_metric.qc_list.value.uuid'
-    ]  # + lab_award_attribution_embed_list
+    ]
     name_key = 'accession'
 
     @calculated_property(schema={
