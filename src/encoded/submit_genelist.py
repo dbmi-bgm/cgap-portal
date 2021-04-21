@@ -739,7 +739,7 @@ class VariantUpdateSubmission:
             "variant.genes.genes_most_severe_gene.uuid",
             self.vapp,
             item_type="VariantSample",
-            project=self.project
+            project=self.project,
         )
         for variant_sample_response in variant_sample_search:
             variant_samples_to_invalidate.append(
@@ -805,7 +805,12 @@ class CommonUtils:
 
     @staticmethod
     def batch_search(
-        item_list, search_term, app, item_type="Gene", project=None, batch_size=5
+        item_list,
+        search_term,
+        app,
+        item_type="Gene",
+        project=None,
+        batch_size=5,
     ):
         """
         Performs get requests in batches to decrease the number of
@@ -822,9 +827,9 @@ class CommonUtils:
             if item == item_list[-1] or len(batch) == batch_size:
                 batch_string = ("&" + search_term + "=").join(batch)
                 if project:
-                    import pdb
-                    pdb.set_trace()
-                    batch_string += "&project.%40id=" + project.replace("/", "%2F")
+                    batch_string += "&project.%40id=" + project.replace(
+                        "/", "%2F"
+                    )
                 try:
                     response = app.get(
                         "/search/?type="

@@ -456,21 +456,21 @@ class VariantSample(Item):
         }
     })
     def project_genelists(self, request, project, variant):
-        variant_props = get_item_or_none(request, variant, frame="embedded")
-        genelist_at_ids = []
+        genelist_atids = []
         project_genelists = []
         core_project = CGAP_CORE_PROJECT + "/"
-        genes = variant_props.get("genes")
-        if genes:
-            for gene in genes:
-                if "genes_most_severe_gene" in gene:
-                    most_severe = gene["genes_most_severe_gene"]
-                    genelist_at_ids += [
-                        genelist["@id"] for genelist in most_severe["gene_lists"]
-                        if "gene_lists" in most_severe
-                    ]
-        for at_id in genelist_at_ids:
-            genelist_props = get_item_or_none(request, at_id)
+        variant_props = get_item_or_none(request, variant, frame="embedded")
+        genes = variant_props.get("genes", [])
+        for gene in genes:
+            genelists = (
+                gene.get("genes_most_severe_gene", {}).get("gene_lists", [])
+            )
+            genelist_atids += [
+                genelist["@id"] for genelist in genelists
+                if genelist["@id"] not in genelist_atids
+            ]
+        for atid in genelist_atids:
+            genelist_props = get_item_or_none(request, atid)
             if genelist_props["project"] in (project, core_project):
                 project_genelists.append(genelist_props["display_title"])
         return project_genelists
