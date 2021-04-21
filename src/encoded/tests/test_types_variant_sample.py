@@ -102,6 +102,7 @@ def test_project_specific_variant_sample_genelist(
     variant_sample,
     cgap_core_variant_sample,
     bgm_variant_sample,
+    variant_sample_2
 ):
     """
     Ensure variant samples are correctly matched with gene lists based on their
@@ -123,14 +124,18 @@ def test_project_specific_variant_sample_genelist(
     bgm_response = testapp.post_json(
         "/variant-samples", bgm_variant_sample
     ).json["@graph"][0]
+    no_genelists_response = testapp.post_json(
+        "/variant-samples", variant_sample_2
+    ).json["@graph"][0]
     assert set(response["project_genelists"]) == {
-        genelist["title"],
-        cgap_core_genelist["title"],
+        genelist["display_title"],
+        cgap_core_genelist["display_title"],
     }
     assert set(cgap_core_response["project_genelists"]) == {
-        cgap_core_genelist["title"]
+        cgap_core_genelist["display_title"]
     }
     assert set(bgm_response["project_genelists"]) == {
-        bgm_genelist["title"],
-        cgap_core_genelist["title"],
+        bgm_genelist["display_title"],
+        cgap_core_genelist["display_title"],
     }
+    assert not no_genelists_response["project_genelists"]

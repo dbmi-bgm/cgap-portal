@@ -1208,6 +1208,17 @@ def genelist(testapp, project, institution, gene):
 
 
 @pytest.fixture
+def genelist_to_post(testapp, project, institution, gene_2):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "title": "Simple gene list",
+        "genes": [gene_2["@id"]],
+    }
+    return item
+
+
+@pytest.fixture
 def variant(testapp, project, institution, gene):
     item = {
         "project": project["@id"],
