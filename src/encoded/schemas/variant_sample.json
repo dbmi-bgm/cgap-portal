@@ -500,7 +500,7 @@
                 "type": "string",
                 "description": "Gene list title"
             }
-	}
+        }
     },
     "columns": {
         "display_title": {
