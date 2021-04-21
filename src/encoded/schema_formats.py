@@ -4,6 +4,8 @@ import json
 import pkg_resources
 import re
 import rfc3987
+import rfc3986.validators
+import rfc3986.exceptions
 
 from jsonschema_serialize_fork import FormatChecker
 from pyramid.threadlocal import get_current_request
@@ -86,7 +88,27 @@ def is_target_label(instance):
 
 @FormatChecker.cls_checks("uri", raises=ValueError)
 def is_uri(instance):
-    if ':' not in instance:
-        # We want only absolute uris
+    return is_valid_uri(instance)
+
+
+uri_validator = (
+    rfc3986.validators.Validator()
+        # Validation qualifiers
+        .allow_schemes('http', 'https')
+        # TODO: We might want to consider the possibility of forbidding the use of a password. -kmp 20-Apr-2021
+        # .forbid_use_of_password()
+        .require_presence_of('scheme', 'host')
+        .check_validity_of('scheme', 'host', 'path'))
+
+
+def is_valid_uri(text):
+    try:
+        uri_ref = rfc3986.uri_reference(text)
+    except ValueError:
         return False
-    return rfc3987.parse(instance, rule="URI_reference")
+    try:
+        # We do this validation for side-effect. If no error occurs, we have a valid URI.
+        uri_validator.validate(uri_ref)
+        return True
+    except rfc3986.exceptions.ValidationError:
+        return False
