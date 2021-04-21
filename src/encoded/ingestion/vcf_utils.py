@@ -338,7 +338,7 @@ class VCFParser(object):
         elif t == 'array':
             if sub_type:
                 if not isinstance(value, list):
-                    items = self.fix_encoding(value).split('&') if sub_type == 'string' else value
+                    items = self.fix_encoding(value).split('&')
                 else:
                     items = value
                 return list(map(lambda v: self.cast_field_value(sub_type, v, sub_type=None), items))
