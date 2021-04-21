@@ -102,7 +102,7 @@ class GeneListSubmission:
         """
         title = None
         genelist = []
-        with open(txt_file, "r") as genelist_file:
+        with open(txt_file, "r", encoding="utf-8") as genelist_file:
             genelist_raw = genelist_file.readlines()
         for line in genelist_raw:
             if "title" in line.lower():
@@ -190,11 +190,11 @@ class GeneListSubmission:
             )
         if non_ascii_genes:
             self.errors.append(
-                "The following gene(s) contain non-ascii characters: %s. "
-                "Please re-enter the genes using only ascii characters."
+                "The following gene(s) contain non-ASCII characters: %s. "
+                "Please re-enter the genes using only ASCII characters."
                 % ", ".join(non_ascii_genes)
             )
-        if not genelist:
+        if not genelist and not genes_with_spaces and not non_ascii_genes:
             self.errors.append(
                 "No genes were found in the gene list. Please check the "
                 "formatting of the submitted document."
@@ -402,10 +402,10 @@ class GeneListSubmission:
         Attempts to validate document and gene list jsons provided by
         post_bodies.
 
-        Gene lists of the same title belonging to the same project will be
-        searched for, and if a match is discovered, the gene list and document
-        will be patched and updated. If no match is found, a new document and
-        gene list will be posted.
+        Gene lists of the same title belonging to the same project and
+        institution will be searched for, and if a match is discovered, the
+        gene list and document will be patched and updated. If no match is
+        found, a new document and gene list will be posted.
 
         Returns:
             - List with information on validation (None if no matched genes)
@@ -429,6 +429,8 @@ class GeneListSubmission:
                     "/search/?type=GeneList"
                     "&project.%40id="
                     + self.project.replace("/", "%2F")
+                    + "&institution.%40id="
+                    + self.institution.replace("/", "%2F")
                     + "&field=title&field=uuid&field=genes.uuid"
                 ).json["@graph"]
                 project_titles = [x["title"] for x in project_genelists]
@@ -475,6 +477,8 @@ class GeneListSubmission:
                 "/search/?type=Document"
                 "&project.%40id="
                 + self.project.replace("/", "%2F")
+                + "&institution.%40id="
+                + self.institution.replace("/", "%2F")
                 + "&field=display_title&field=uuid"
             ).json["@graph"]
             project_docs = [
@@ -662,13 +666,19 @@ def submit_variant_update(
             filename, project, institution, vapp, validate_only
         )
         if validate_only:
-            results["validation_output"] = variant_update.validate_output
+            results["validation_output"] = (
+                [variant_update.validate_output] + variant_update.errors
+                if variant_update.errors
+                else variant_update.validate_output
+            )
         elif variant_update.post_output:
             results["success"] = True
             results["validation_output"] = variant_update.validate_output
             results["post_output"] = variant_update.post_output
         else:
-            results["validation_output"] = variant_update.errors
+            results["validation_output"] = variant_update.errors + [
+                variant_update.validate_output
+            ]
         return results
 
 
@@ -688,8 +698,7 @@ class VariantUpdateSubmission:
         self.errors = []
         self.gene_uuids = self.genes_from_file()
         self.variant_samples = self.find_associated_variants()
-        self.json_post = self.create_post()
-        self.validate_output = self.validate_post()
+        self.validate_output = self.validate_patch()
         if not validate_only:
             self.post_output = self.queue_variants_for_indexing()
 
@@ -714,16 +723,16 @@ class VariantUpdateSubmission:
 
     def find_associated_variants(self):
         """
-        Finds associated variants and variant samples for the genes of
+        Finds associated variant samples for the genes of
         interest.
 
         Returns:
-            - List of unique variant and variant sample uuids (None if no gene
+            - List of unique variant sample uuids (None if no gene
             uuids)
         """
         if not self.gene_uuids:
             return None
-        variant_samples_to_index = []
+        variant_samples_to_invalidate = []
         genes_to_search = list(set(self.gene_uuids))
         variant_sample_search = CommonUtils.batch_search(
             genes_to_search,
@@ -733,69 +742,56 @@ class VariantUpdateSubmission:
             project=self.project
         )
         for variant_sample_response in variant_sample_search:
-            variant_samples_to_index.append(variant_sample_response["uuid"])
-        to_index = list(set(variant_samples_to_index))
-        if not to_index:
-            self.errors.append("No variant samples found for the given genes.")
-        return to_index
+            variant_samples_to_invalidate.append(
+                variant_sample_response["uuid"]
+            )
+        to_invalidate = list(set(variant_samples_to_invalidate))
+        return to_invalidate
 
-    def create_post(self):
+    def validate_patch(self):
         """
+        Validates empty patching of variant samples.
+
         Returns:
-            - Dict to post containing variant sample uuids (None if no
-              variant samples found previously)
+            - String info about validation
         """
         if not self.variant_samples:
-            return None
-        index_queue_post = {
-            "uuids": self.variant_samples,
-            "target_queue": "primary",
-            "strict": True,
-        }
-        return index_queue_post
-
-    def validate_post(self):
-        """
-        Validates posting to indexing queue.
-
-        Returns:
-            - String info about validation (None if no post created or
-              validation failed)
-        """
-        if not self.json_post:
-            return None
-        validate_response = self.vapp.post_json(
-            "/queue_indexing?validate_only=True", self.json_post
-        )
-        if validate_response.json["notification"] == "Success":
             validate_output = (
-                "%s variant samples were validated for "
-                "re-indexing" % str(len(self.variant_samples))
+                "No variant samples were found for the given genes"
             )
-        else:
-            self.errors.append("Validation failed: " + validate_response.json)
-            validate_output = None
+            return validate_output
+        not_validated = []
+        for uuid in self.variant_samples:
+            validate_response = self.vapp.patch_json(
+                "/" + uuid + "?validate_only", {}
+            )
+            if validate_response.json["status"] != "success":
+                not_validated.append(uuid)
+        if not_validated:
+            self.errors.append(
+                "Validation failed for the following variant sample(s): %s."
+                % ", ".join(not_validated)
+            )
+        validate_output = "%s variant sample(s) validated for updating." % str(
+            len(self.variant_samples) - len(not_validated)
+        )
         return validate_output
 
     def queue_variants_for_indexing(self):
         """
-        Posts variant samples to indexing queue.
+        Queues all variant samples for indexing by empty patching.
 
         Returns:
             - String info about post (None if validation failed or posting
               failed)
         """
-        if not self.validate_output:
+        if self.errors:
             return None
-        post_response = self.vapp.post_json("/queue_indexing", self.json_post)
-        if post_response.json["notification"] == "Success":
-            post_output = (
-                "%s variant samples were queued for "
-                "re-indexing" % str(len(self.variant_samples))
-            )
-        else:
-            self.errors.append("Posting failed: " + post_response.json)
-            post_output = None
+        for uuid in self.variant_samples:
+            self.vapp.patch_json("/" + uuid, {})
+        post_output = "%s variant sample(s) successfully updated." % str(
+            len(self.variant_samples)
+        )
         return post_output
 
 
