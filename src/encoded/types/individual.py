@@ -27,8 +27,13 @@ class Individual(Item):
     }
 
     embedded_list = [
+        # Individual linkTo
+        'father.accession',
         'father.is_deceased',
         'father.sex',
+
+        # Individual linkTo
+        'mother.accession',
         'mother.is_deceased',
         'mother.sex'
     ]
@@ -38,15 +43,9 @@ class Individual(Item):
         "description": "Individual's Identifier",
         "type": "string"
     })
-    def display_title(self, request, accession, bgm_id=None, other_id=None):
-        """Use bgm_id, other_id, or accession (in that order)"""
-        if bgm_id:
-            title = bgm_id
-        elif other_id:
-            title = '%s (%s)' % (other_id['id'], other_id['id_source'])
-        else:
-            title = accession
-        return title
+    def display_title(self, request, accession):
+        """ Use accession """
+        return accession
 
     @calculated_property(schema={
         "title": "Children",

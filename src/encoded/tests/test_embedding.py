@@ -46,20 +46,22 @@ def test_linked_uuids_object(content, dummy_request, threadlocals):
     dummy_request._indexing_view = True
     dummy_request.embed('/testing-link-sources/', sources[0]['uuid'], '@@object')
     # only object visited here is the source itself, hence one _linked_uuid
-    assert dummy_request._linked_uuids == {'16157204-8c8f-4672-a1a4-14f4b8021fcd'}
+    assert dummy_request._linked_uuids == {('16157204-8c8f-4672-a1a4-14f4b8021fcd', 'TestingLinkSource')}
 
 
 def test_linked_uuids_embedded(content, dummy_request, threadlocals):
     # needed to track _linked_uuids
     dummy_request._indexing_view = True
     dummy_request.embed('/testing-link-sources/', sources[0]['uuid'], '@@embedded')
-    assert dummy_request._linked_uuids == {'16157204-8c8f-4672-a1a4-14f4b8021fcd', '775795d3-4410-4114-836b-8eeecf1d0c2f'}
+    assert dummy_request._linked_uuids == {('16157204-8c8f-4672-a1a4-14f4b8021fcd', 'TestingLinkSource'),
+                                           ('775795d3-4410-4114-836b-8eeecf1d0c2f', 'TestingLinkTarget')}
 
 
 def test_target_rev_linked_uuids_indexing_view(es_testapp, content, dummy_request, threadlocals):
     res_target = dummy_request.embed('/testing-link-targets/', targets[0]['uuid'], '@@index-data', as_user='INDEXER')
     # should have the itself and the rev link to source in the _linked_uuids
-    assert dummy_request._linked_uuids == {'16157204-8c8f-4672-a1a4-14f4b8021fcd', '775795d3-4410-4114-836b-8eeecf1d0c2f'}
+    assert dummy_request._linked_uuids == {('16157204-8c8f-4672-a1a4-14f4b8021fcd', 'TestingLinkSource'),
+                                           ('775795d3-4410-4114-836b-8eeecf1d0c2f', 'TestingLinkTarget')}
     assert res_target['rev_link_names'] == {'reverse': [sources[0]['uuid']]}
     assert res_target['rev_linked_to_me'] == []
 
@@ -67,7 +69,8 @@ def test_target_rev_linked_uuids_indexing_view(es_testapp, content, dummy_reques
 def test_source_rev_linked_uuids_indexing_view(es_testapp, content, dummy_request, threadlocals):
     res_target = dummy_request.embed('/testing-link-sources/', sources[0]['uuid'], '@@index-data', as_user='INDEXER')
     # should have the itself and the rev link to source in the _linked_uuids
-    assert dummy_request._linked_uuids == {'16157204-8c8f-4672-a1a4-14f4b8021fcd', '775795d3-4410-4114-836b-8eeecf1d0c2f'}
+    assert dummy_request._linked_uuids == {('16157204-8c8f-4672-a1a4-14f4b8021fcd', 'TestingLinkSource'),
+                                           ('775795d3-4410-4114-836b-8eeecf1d0c2f', 'TestingLinkTarget')}
     assert res_target['rev_link_names'] == {}
     assert res_target['rev_linked_to_me'] == ['775795d3-4410-4114-836b-8eeecf1d0c2f']
 
