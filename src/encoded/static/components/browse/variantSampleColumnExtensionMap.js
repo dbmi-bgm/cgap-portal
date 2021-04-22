@@ -64,8 +64,8 @@ export const variantSampleColumnExtensionMap = {
             if (genes.length > 0) {
                 const { genes_most_severe_transcript = null } = genes[0] || {};
                 const rows = [
-                    <span key="genes_ensg" className="font-italic d-block text-truncate">{ geneTitles.length > 1 ? geneTitles.join() : geneTitles } </span>,
-                    <span data-tip="Most Severe Transcript" key="genes_severe_transcript" className="font-italic d-block text-truncate">{ genes_most_severe_transcript}</span>
+                    <span key="genes_ensg" className="d-block text-truncate">{ geneTitles.length > 1 ? geneTitles.join() : geneTitles } </span>,
+                    <span data-tip="Most Severe Transcript" key="genes_severe_transcript" className="font-italic d-block text-truncate text-small">{ genes_most_severe_transcript}</span>
                 ];
                 return (
                     <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"}>
@@ -168,7 +168,7 @@ export function StackedRowColumn(props) {
 export const VariantSampleDisplayTitleColumn = React.memo(function VariantSampleDisplayTitleColumn(props) {
     const { result = null, link, onClick, className = null } = props;
     const { variant = null } = result || {};
-    const { display_title = null, ID = null } = variant;
+    const { display_title = null, ID = null } = variant || {};
 
     const cls = ("title-block" + (className ? " " + className : ""));
     const rows = [
