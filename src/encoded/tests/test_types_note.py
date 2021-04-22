@@ -18,6 +18,16 @@ def new_interpretation():
 
 
 @pytest.fixture
+def new_discovery_note():
+    return {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "note_text": "This variant is a candidate for association with Syndrome X.",
+        "variant_candidacy": "moderate candidate"
+    }
+
+
+@pytest.fixture
 def new_standard_note():
     return {
         "project": "hms-dbmi",
@@ -83,6 +93,31 @@ def test_patch_note_interpretation_fail(workbook, es_testapp, new_interpretation
     resp = post_note(es_testapp, new_interpretation).json['@graph'][0]
     patch_info = {
         'associated_items': {"item_type": "Variant", "item_identifier": variant_with_note}  # wrong type
+    }
+    es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
+
+def test_add_note_discovery_success(workbook, es_testapp, new_discovery_note):
+    """ test NoteDiscovery item posts successfully """
+    post_note(es_testapp, new_discovery_note, note_type='note_discovery')
+
+def test_add_note_discovery_fail(workbook, es_testapp, new_discovery_note):
+    """ test NoteDiscovery item fails to post when schema isn't followed """
+    new_discovery_note['gene_candidacy'] = 'Tier 1'  # wrong value for enum
+    post_note(es_testapp, new_discovery_note, note_type='note_discovery', expected_status=422)
+
+def test_patch_note_discovery_success(workbook, es_testapp, new_discovery_note):
+    """ test NoteDiscovery item is patched successfully when associated_items SOEA is added """
+    resp = post_note(es_testapp, new_discovery_note, note_type='note_discovery').json['@graph'][0]
+    patch_info = {
+        'associated_items': [{"item_type": "Variant", "item_identifier": variant_with_note}]
+    }
+    es_testapp.patch_json('/' + resp['@id'], patch_info, status=200)
+
+def test_patch_note_discovery_fail(workbook, es_testapp, new_discovery_note):
+    """ test NoteDiscovery item fails to patch with incorrectly formatted prop """
+    resp = post_note(es_testapp, new_discovery_note, note_type='note_discovery').json['@graph'][0]
+    patch_info = {
+        'associated_items': {"item_type": "Variant", "item_identifier": variant_with_note}  # wrong prop type
     }
     es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
 
