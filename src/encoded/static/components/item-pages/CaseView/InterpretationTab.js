@@ -110,8 +110,8 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                                 <div className="w-100 text-left text-muted text-truncate">Pending</div>}
                         </div>
                         <div className="col col-sm-4 col-lg-2 py-2">
-                            <label className="mb-04 text-small text-muted">Discovery</label>
-                            <div className="w-100 text-left">
+                            <label className="mb-04 text-small">Discovery</label>
+                            <div className="w-100 text-left text-muted">
                                 <span className="font-italic">Gene: </span>N/A
                             </div>
                             <div className="w-100 text-left text-muted">
