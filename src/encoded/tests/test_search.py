@@ -13,8 +13,6 @@ from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.schema_utils import load_schema
 from snovault.util import add_default_embeds
 from webtest import AppError
-from ..commands.run_upgrader_on_inserts import get_inserts
-from ..search import lucene_builder
 from ..search.lucene_builder import LuceneBuilder
 from ..search.search_utils import find_nested_path
 
@@ -958,6 +956,10 @@ class TestNestedSearch(object):
         facets_that_shows_limited_options = es_testapp.get(
             '/search/?type=Variant&hg19.hg19_pos=11780388').json['facets']
         self.verify_facet(facets_that_shows_limited_options, 'hg19.hg19_hgvsg', 1)  # reduced to only 1 option
+
+        # rescue terms show up (7 terms + no value, see variant.json -> facets)
+        self.verify_facet(facets, 'genes.genes_most_severe_consequence.coding_effect', 8)
+        self.verify_facet(facets, 'genes.genes_most_severe_consequence.location', 8)
 
     def test_search_nested_exists_query(self, workbook, es_testapp):
         """ Tests doing a !=No+value search on a nested sub-field. """

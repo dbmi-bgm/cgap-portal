@@ -691,10 +691,6 @@ class LuceneBuilder:
                                 cls._check_and_remove_match_from_should(inner_inner_bool[SHOULD], facet_filters,
                                                                         active_filter,
                                                                         query_field, filter_type)
-                        else:
-                            search_log(log_handler=log,
-                                       msg=('Encountered a unexpected nested structure at second level: %s'
-                                            % nested_sub_query[BOOL]))
 
                     # For structure like this:
                     #   {'bool': {'must': {'bool': {'should':
