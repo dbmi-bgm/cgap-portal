@@ -215,7 +215,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
             // From SaveFilterSetPresetButtonController:
             hasFilterSetChangedFromOriginalPreset, hasFilterSetChangedFromLastSavedPreset,
-            lastSavedPresetFilterSet, originalPresetFilterSet, isOriginalPresetFilterSetLoading, setLastSavedPresetFilterSet,
+            lastSavedPresetFilterSet, setLastSavedPresetFilterSet,
+            originalPresetFilterSet, isOriginalPresetFilterSetLoading, refreshOriginalPresetFilterSet,
 
             // From FilterSetController:
             currFilterSet: filterSet = null,
@@ -291,9 +292,13 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         }
 
         const presetSelectionUIProps = {
+            "currentCaseFilterSet": filterSet,
             caseItem, bodyOpen, session, importFromPresetFilterSet, hasCurrentFilterSetChanged, isEditDisabled,
-            isFetchingInitialFilterSetItem, hasFilterSetChangedFromOriginalPreset, isOriginalPresetFilterSetLoading, lastSavedPresetFilterSet
+            originalPresetFilterSet, refreshOriginalPresetFilterSet, hasFilterSetChangedFromOriginalPreset, isOriginalPresetFilterSetLoading,
+            isFetchingInitialFilterSetItem, lastSavedPresetFilterSet
         };
+
+        console.info("Current Case FilterSet:", filterSet);
 
         return (
             // TODO 1: Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
@@ -313,7 +318,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                             <div>
                                 <div className="d-flex flex-column flex-md-row">
                                     <div className="filterset-preset-selection-outer-column">
-                                        <PresetFilterSetSelectionUI {...presetSelectionUIProps} currentCaseFilterSet={filterSet} />
+                                        <PresetFilterSetSelectionUI {...presetSelectionUIProps} />
                                     </div>
                                     <div className="flex-grow-1">
                                         <div className="filterset-blocks-container" data-all-selected={allFilterBlocksSelected}>
@@ -387,12 +392,27 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.loadInitialResults = this.loadInitialResults.bind(this);
+        this.setPatchingPresetResultUUID = this.setPatchingPresetResultUUID.bind(this);
+        this.toggleDeletedPresetUUID = this.toggleDeletedPresetUUID.bind(this);
+        this.loadInitialResults = _.debounce(this.loadInitialResults.bind(this), 5000);
         this.checkForChangedResultsAndRefresh = this.checkForChangedResultsAndRefresh.bind(this);
         this.state = {
-            presetResults: null, // Can be blank array (no results found), null (not yet loaded), or array of results.
-            isLoadingPresets: true
+            // Can be blank array (no results found), null (not yet loaded), or array of results.
+            "presetResults": null,
+            "isLoadingPresets": true,
+            // Will contain { requestNumber: true }
+            "checkingForNewFilterSetRequests": {},
+            // Kept here rather than in PresetFilterSetResult state, to prevent actions on other presets while another is ongoing.
+            // Could be removed in future potentially (or moved down) to allow simultaneous edits to multiple FSes.
+            "patchingPresetResultUUID": null,
+            // Will contain message/tooltip for e.g. if presets list hasn't refreshed within alloted request limit.
+            "errorMessage": null,
+            // Keep track of deleted-but-not-yet-removed-from-results presets to display them as "muted" temporarily in UI.
+            "deletedPresetUUIDs": {}
         };
+        this.checkingForNewFilterSetRequestsCounter = 0; // Used to generate unique IDs in `checkForChangedResultsAndRefresh`.
+
+        this.currentInitialResultsRequest = null;
     }
 
     componentDidMount(){
@@ -401,23 +421,58 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
 
     // TODO: componentDidUpdate({ pastSession }) { if changed, then reset results & reload (?) }
 
-    componentDidUpdate({ lastSavedPresetFilterSet: pastLastSavedPresetFilterSet }){
+    componentDidUpdate({ lastSavedPresetFilterSet: pastLastSavedPresetFilterSet }, { checkingForNewFilterSetRequests: lastCheckingRequests }){
         const { lastSavedPresetFilterSet } = this.props;
+        const { checkingForNewFilterSetRequests } = this.state;
+
+        if (Object.keys(checkingForNewFilterSetRequests).length > 0 && Object.keys(lastCheckingRequests).length === 0) {
+            ReactTooltip.rebuild();
+        }
+
         // TODO: Wait for indexing to complete, maybe eventually via subscribing to pubsub messages
         // from backend or something. For now, doing this thingy:
         if (pastLastSavedPresetFilterSet !== lastSavedPresetFilterSet) {
-            this.checkForChangedResultsAndRefresh();
+            const { uuid: lastSavedPresetUUID } = lastSavedPresetFilterSet;
+            this.checkForChangedResultsAndRefresh(`/search/?type=FilterSet&uuid=${lastSavedPresetUUID}&limit=0`);
         }
+    }
+
+    setPatchingPresetResultUUID(patchingPresetResultUUID) {
+        this.setState({ patchingPresetResultUUID });
+    }
+
+    toggleDeletedPresetUUID(presetUUID){
+        this.setState(function({ deletedPresetUUIDs: existingIDs }){
+            const deletedPresetUUIDs = { ...existingIDs };
+            if (deletedPresetUUIDs[presetUUID]) {
+                delete deletedPresetUUIDs[presetUUID];
+            } else {
+                deletedPresetUUIDs[presetUUID] = true;
+            }
+            return { deletedPresetUUIDs };
+        });
     }
 
     loadInitialResults(){
         const { caseItem } = this.props;
+
+        if (this.currentInitialResultsRequest) {
+            this.currentInitialResultsRequest.aborted = true;
+            this.currentInitialResultsRequest.abort();
+        }
+
         const compoundRequest = PresetFilterSetSelectionUI.makeCompoundSearchRequest(caseItem);
-        ajax.promise("/compound_search", "POST", {}, JSON.stringify(compoundRequest)).then((res) => {
+        const scopedRequest = this.currentInitialResultsRequest = ajax.promise("/compound_search", "POST", {}, JSON.stringify(compoundRequest)).then((res) => {
             const {
                 "@graph": presetResults,
                 total: totalResultCount
             } = res;
+
+            if (scopedRequest !== this.currentInitialResultsRequest) {
+                // Request has been superseded; throw out response and preserve current state.
+                return;
+            }
+
             this.setState({
                 presetResults,
                 totalResultCount,
@@ -427,40 +482,68 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
     }
 
     /**
-     * Checks if `lastSavedPresetFilterSet` has been reindexed
-     * by calling /search/?uuid=lastSavedPresetFilterSet.uuid and
-     * seeing if total > 0; if so, then refresh results.
+     * @todo Change to depend on Redis PubSub server-sent events down the road, rather than polling.
      */
-    checkForChangedResultsAndRefresh(delay = 5000){
+    checkForChangedResultsAndRefresh(
+        requestHref,
+        conditionCheckFunc = function({ total: totalCountForThisSearch }){ return totalCountForThisSearch > 0; },
+        delay = 5000
+    ){
+
+        // Arbitrary limit to terminate after, after this we can assume we might've been logged out or something.
+        // Not overly consistent/stable, since if there's indexing pile-up it might be an hour until this gets re-indexed..
+        const requestLimit = 40;
+        let requestCount = 0;
+        const uniqueRequestID = this.checkingForNewFilterSetRequestsCounter++;
 
         const periodicRequestFunc = () => {
 
-            const { isCheckingForNewTotal } = this.state;
-            if (!isCheckingForNewTotal) {
+            const { checkingForNewFilterSetCount } = this.state;
+            if (checkingForNewFilterSetCount === 0) {
                 return;
             }
 
-            // Should always be present, else `checkForChangedResultsAndRefresh` wouldn't have been called.
-            const { lastSavedPresetFilterSet: { uuid: lastSavedPresetUUID } } = this.props;
+            requestCount++;
 
-            ajax.promise(`/search/?type=FilterSet&uuid=${lastSavedPresetUUID}&limit=0`).then((res) => {
-                const { total: totalCountForThisSearch } = res;
-                if (totalCountForThisSearch > 0) {
-                    // New preset has been indexed. Stop checking & re-request our state.presetResults.
+            ajax.promise(requestHref).then((res) => {
+                if (conditionCheckFunc(res)) {
+                    // Edited/added preset has been indexed. Stop checking & re-request our state.presetResults.
                     this.setState(
-                        { "isLoadingPresets": true, "isCheckingForNewTotal": false },
+                        function({ checkingForNewFilterSetRequests: oldRequestsObj }){
+                            const checkingForNewFilterSetRequests = { ...oldRequestsObj };
+                            delete checkingForNewFilterSetRequests[uniqueRequestID];
+                            return {
+                                "isLoadingPresets": true,
+                                checkingForNewFilterSetRequests
+                            };
+                        },
                         this.loadInitialResults
                     );
-                } else {
+                } else if (requestCount < requestLimit) {
                     // Wait & retry.
                     setTimeout(periodicRequestFunc, delay);
+                } else {
+                    this.setState(function({ checkingForNewFilterSetRequests: oldRequestsObj }){
+                        const checkingForNewFilterSetRequests = { ...oldRequestsObj };
+                        delete checkingForNewFilterSetRequests[uniqueRequestID];
+                        return {
+                            "errorMessage": "Timed out waiting/checking for updated preset results. Please come back later to see your changes.",
+                            checkingForNewFilterSetRequests
+                        };
+                    });
+                    console.error("checkForChangedResultsAndRefresh exceeded request limit", requestCount);
                 }
             });
         };
 
-        this.setState({ "isCheckingForNewTotal" : true }, ()=>{
-            setTimeout(periodicRequestFunc, delay);
-        });
+        this.setState(
+            function({ checkingForNewFilterSetRequests }){
+                return { "checkingForNewFilterSetRequests": { ...checkingForNewFilterSetRequests, [uniqueRequestID]: true } };
+            },
+            ()=>{
+                setTimeout(periodicRequestFunc, delay);
+            }
+        );
     }
 
     render(){
@@ -472,9 +555,18 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
             isFetchingInitialFilterSetItem,
             currentCaseFilterSet,
             hasFilterSetChangedFromOriginalPreset,
-            isOriginalPresetFilterSetLoading
+            isOriginalPresetFilterSetLoading,
+            refreshOriginalPresetFilterSet
         } = this.props;
-        const { isLoadingPresets, presetResults, totalResultCount } = this.state;
+        const {
+            isLoadingPresets,
+            presetResults,
+            totalResultCount,
+            patchingPresetResultUUID,
+            checkingForNewFilterSetRequests,
+            errorMessage = null,
+            deletedPresetUUIDs
+        } = this.state;
 
         let body = null;
         if (isLoadingPresets) {
@@ -495,22 +587,46 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
                 </div>
             );
         } else if (presetResults) {
-            const commonProps = { caseItem, importFromPresetFilterSet, isEditDisabled, hasCurrentFilterSetChanged, hasFilterSetChangedFromOriginalPreset, isOriginalPresetFilterSetLoading };
+
+            // TODO wrap results in infinite scroll of some sort later on,
+            // once figure out strategy for replacing or removing the
+            // deprecated react-infinite library.
+
+            const commonProps = {
+                caseItem, importFromPresetFilterSet, patchingPresetResultUUID,
+                isEditDisabled, hasCurrentFilterSetChanged,
+                hasFilterSetChangedFromOriginalPreset, isOriginalPresetFilterSetLoading, refreshOriginalPresetFilterSet,
+                "setPatchingPresetResultUUID": this.setPatchingPresetResultUUID,
+                "toggleDeletedPresetUUID": this.toggleDeletedPresetUUID,
+                "checkForChangedResultsAndRefresh": this.checkForChangedResultsAndRefresh
+            };
             const { derived_from_preset_filterset: currentCaseDerivedFromPresetUUID = null } = currentCaseFilterSet || {};
             body = (
                 <div className="results-container border-top">
                     { presetResults.map(function(presetFilterSet, idx){
                         const { uuid: thisPresetFSUUID } = presetFilterSet;
                         const isOriginOfCurrentCaseFilterSet = currentCaseDerivedFromPresetUUID === thisPresetFSUUID;
-                        return <PresetFilterSetResult {...commonProps} {...{ presetFilterSet, isOriginOfCurrentCaseFilterSet }} key={thisPresetFSUUID}  />;
+                        const isDeleted = deletedPresetUUIDs[thisPresetFSUUID];
+                        return <PresetFilterSetResult {...commonProps} {...{ presetFilterSet, isOriginOfCurrentCaseFilterSet, isDeleted }} key={thisPresetFSUUID}  />;
                     }) }
                 </div>
             );
         }
 
-        // TODO wrap results in infinite scroll of some sort later on,
-        // once figure out strategy for replacing or removing the
-        // deprecated react-infinite library.
+        const isCheckingForNewFilterSet = Object.keys(checkingForNewFilterSetRequests).length > 0;
+
+
+        let nextToTitleIcon = null;
+        if (errorMessage) {
+            nextToTitleIcon = (
+                <i className="icon icon-exclamation-triangle fas ml-05 text-small" data-tip={errorMessage} data-html />
+
+            );
+        } else if (isCheckingForNewFilterSet) {
+            nextToTitleIcon = (
+                <i className="icon icon-circle-notch icon-spin fas ml-07 text-small text-muted" data-tip="Preset(s) below have been updated but this is not yet reflected." data-html />
+            );
+        }
 
         return (
             <div className="filterset-preset-selection-body h-100">
@@ -519,6 +635,7 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
                         <h5 className="col text-400 my-0">
                             <i className="icon icon-copy far mr-08"/>
                             <a href="/search/?type=FilterSet" className="text-body" target="_blank" data-delay-show={1000} data-tip="View all saved FilterSets">Presets</a>
+                            { nextToTitleIcon }
                         </h5>
                         <div className="col-auto text-small">
                             { totalResultCount } total
@@ -545,10 +662,15 @@ function PresetFilterSetResult (props) {
         hasCurrentFilterSetChanged,
         hasFilterSetChangedFromOriginalPreset,
         isOriginalPresetFilterSetLoading,
-        isOriginOfCurrentCaseFilterSet
+        refreshOriginalPresetFilterSet,
+        isOriginOfCurrentCaseFilterSet,
+        patchingPresetResultUUID, setPatchingPresetResultUUID,
+        checkForChangedResultsAndRefresh,
+        isDeleted, toggleDeletedPresetUUID
     } = props;
     const {
         "@id": presetFSID,
+        uuid: presetFSUUID,
         "display_title": presetFSTitle,
         "submitted_by": presetFSAuthor,
         date_created,
@@ -561,23 +683,30 @@ function PresetFilterSetResult (props) {
     const isCurrentCaseFilterSetUnchanged = isOriginOfCurrentCaseFilterSet && (isOriginalPresetFilterSetLoading || !hasFilterSetChangedFromOriginalPreset);
 
 
+    // We need to AJAX in the ItemView for this FS to determine if have permission to edit or not.
+    const [ loadedItemView, setLoadedItemView ] = useState(null);
+    const [ isLoadingItemView, setIsLoadingItemView ] = useState(false);
+
+    const isPatchingPreset = patchingPresetResultUUID === presetFSUUID;
+
+    // Used to show item as "deleted" in list temporarily until it gets removed from ElasticSearch results.
+    // const [ isDeleted, setIsDeleted ] = useState(false);
+
+    // Separate from import (view) permission (which is implictly allowed for all presets here, else wouldnt have been returned from /search/?type=FilterSet request)
+    const haveEditPermission = !!(loadedItemView && _.findWhere(loadedItemView.actions || [], { "name": "edit" }));
+
+
     // If in uneditable state (no save permissions, duplicate blocks, etc) then don't warn.
     // Don't warn if unchanged from saved Case FS or if from a preset but hasn't changed from preset.
     const warnBeforeImport = (!isEditDisabled && hasCurrentFilterSetChanged && !isOriginalPresetFilterSetLoading && hasFilterSetChangedFromOriginalPreset);
 
-    const importBtnDisabled = isCurrentCaseFilterSetUnchanged; // || isOriginalPresetFilterSetLoading;
-
-    // We need to AJAX in the ItemView for this FS to determine if have permission to edit or not.
-    const [ loadedItemView, setLoadedItemView ] = useState(null);
-    // We re-use this state for a number of different AJAX requests; no simultaneous requests may occur or be canceled.
-    const [ isLoadingItemView, setIsLoadingItemView ] = useState(null);
-    const haveEditPermission = !!(loadedItemView && _.findWhere(loadedItemView.actions || [], { "name": "edit" }));
+    const importBtnDisabled = isCurrentCaseFilterSetUnchanged || isDeleted; // || isOriginalPresetFilterSetLoading;
 
 
 
 
     const { userProjectUUID, isPresetForUser, isPresetForProject, isDefaultForProject } = useMemo(function(){
-        const { project: { uuid: projectUUID } } = caseItem || {};
+        //const { project: { uuid: projectUUID } } = caseItem || {};
         const {
             preset_for_users = [],
             preset_for_projects = [],
@@ -592,8 +721,8 @@ function PresetFilterSetResult (props) {
         return {
             userProjectUUID,
             "isPresetForUser": userUUID && preset_for_users.indexOf(userUUID) > -1,
-            "isPresetForProject": projectUUID && preset_for_projects.indexOf(projectUUID) > -1,
-            "isDefaultForProject":  projectUUID && default_for_projects.indexOf(projectUUID) > -1
+            "isPresetForProject": userProjectUUID && preset_for_projects.indexOf(userProjectUUID) > -1,
+            "isDefaultForProject":  userProjectUUID && default_for_projects.indexOf(userProjectUUID) > -1
         };
     }, [ presetFilterSet, caseItem ]);
 
@@ -624,7 +753,7 @@ function PresetFilterSetResult (props) {
         }).finally(()=>{
             setIsLoadingItemView(false);
         });
-    }, [ loadedItemView, isLoadingItemView ]);
+    }, [ presetFilterSet, loadedItemView, isLoadingItemView ]);
 
 
     const menuOptions = [];
@@ -641,52 +770,111 @@ function PresetFilterSetResult (props) {
                 <i className="icon icon-fw icon-file-alt far mr-12" />
                 View Details
             </a>
-            // <DropdownItem key={0} eventKey="view">View Detail Page</DropdownItem>
-        );
-    }
-
-    if (haveEditPermission) {
-
-        // We use user's project UUID for this --
-        // People may browse Core Project and want to make it preset for their own
-        // projects instead, though.
-
-        menuOptions.push(
-            <a key="edit" href={presetFSID + "?currentAction=edit"} target="_blank" rel="noopener noreferrer" className="dropdown-item">
-                <i className="icon icon-fw icon-pencil-alt fas mr-12" />
-                Edit
-            </a>
         );
 
-        menuOptions.push(
-            <DropdownItem key="delete" eventKey="delete">
-                <i className="icon icon-fw icon-times fas mr-12" />
-                Delete
-            </DropdownItem>
-        );
+        if (haveEditPermission) {
 
-        if (userProjectUUID) {
-            // TODO make sure userProjectUUID not already in FS's `preset_for_projects` before showing or enabling
+            // We use user's project UUID for this --
+            // People may browse Core Project and want to make it preset for their own
+            // projects instead, though.
+
             menuOptions.push(
-                <DropdownItem key="set-project-preset" eventKey="set-project-preset">
-                    <i className="icon icon-fw icon-user-friends fas mr-12" />
-                    Set as preset for my project
+                <a key="edit" href={presetFSID + "?currentAction=edit"} target="_blank" rel="noopener noreferrer" className="dropdown-item">
+                    <i className="icon icon-fw icon-pencil-alt fas mr-12" />
+                    Edit
+                </a>
+            );
+
+            menuOptions.push(
+                <DropdownItem key="delete" eventKey="delete">
+                    <i className="icon icon-fw icon-times fas mr-12" />
+                    Delete
                 </DropdownItem>
             );
+
+            if (userProjectUUID && !isPresetForProject) {
+                // TODO make sure userProjectUUID not already in FS's `preset_for_projects` before showing or enabling
+                menuOptions.push(
+                    <DropdownItem key="set-project-preset" eventKey="set-project-preset">
+                        <i className="icon icon-fw icon-user-friends fas mr-12" />
+                        Set as preset for my project
+                    </DropdownItem>
+                );
+            }
         }
+
     }
 
 
     const onMenuOptionSelect = useCallback(function(eventKey, e){
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (patchingPresetResultUUID !== null) {
+            // Prevent multiple requests/actions from occuring at once.
+            return false;
+        }
+
         if (eventKey === "delete") {
-            // TODO set status=deleted
+            // PATCH status:deleted
+            setPatchingPresetResultUUID(presetFSUUID);
+            ajax.promise(presetFSID, "PATCH", {}, JSON.stringify({ "status" : "deleted" }))
+                .then(function(resp){
+                    console.info("PATCHed FilterSet", presetFSID);
+                    toggleDeletedPresetUUID(presetFSUUID); // Temporarily (until ES results refreshed) show result as dimmed to indicate it's been deleted in Postgres.
+                    if (isOriginOfCurrentCaseFilterSet) {
+                        // Make sure we have the new status available in originalPresetFilterSet upstream so that 'Save as Preset' button becomes functional.
+                        // Uses datastore=database so should be up-to-date by time this is called.
+                        refreshOriginalPresetFilterSet();
+                    }
+                    checkForChangedResultsAndRefresh(
+                        `/search/?type=FilterSet&status=deleted&uuid=${presetFSUUID}&limit=1`,
+                        function(searchResponse){
+                            const { "@graph": [ patchedFSFromSearch ] = [] } = searchResponse;
+                            const { status: statusFromSearch } = patchedFSFromSearch || {};
+                            return statusFromSearch === "deleted";
+                        },
+                        5000,
+                        function(){
+                            // Cleanup/remove presetFSUUID from higher-level state to free up memory.
+                            toggleDeletedPresetUUID(presetFSUUID);
+                        }
+                    );
+                })
+                .finally(function(){
+                    // TODO - error handling?
+                    setPatchingPresetResultUUID(null);
+                });
             return;
         }
 
         if (eventKey === "set-project-preset") {
-            // TODO Patch
+            setPatchingPresetResultUUID(presetFSUUID);
+            const { "preset_for_projects": listOfProjectsPresetFor = [] } = loadedItemView;
+            // We assume this doesn't already have userProjectUUID, else option for 'set-project-preset' wouldn't be
+            // rendered/available.
+            ajax.promise(presetFSID, "PATCH", {}, JSON.stringify({ "preset_for_projects": listOfProjectsPresetFor.concat([userProjectUUID]) }))
+                .then(function(resp){
+                    console.info("PATCHed FilterSet", presetFSID);
+                    checkForChangedResultsAndRefresh(
+                        `/search/?type=FilterSet&uuid=${presetFSUUID}&limit=1`,
+                        function(searchResponse){
+                            const { "@graph": [ patchedFSFromSearch ] = [] } = searchResponse;
+                            const { preset_for_projects: presetForProjectsFromSearch = [] } = patchedFSFromSearch || {};
+                            return presetForProjectsFromSearch.indexOf(userProjectUUID) > -1;
+                        }
+                    );
+                })
+                .finally(function(){
+                    // TODO - error handling?
+                    setPatchingPresetResultUUID(null);
+                });
+            return;
         }
-    });
+
+        return false;
+    }, [ presetFilterSet, isOriginOfCurrentCaseFilterSet, loadedItemView, patchingPresetResultUUID === null ]);
 
 
     const presetIconsToShow = (
@@ -709,7 +897,8 @@ function PresetFilterSetResult (props) {
         // into (new replacement for) react-infinite rowHeight.
         <div className="preset-filterset-result" data-id={presetFSID}
             data-is-origin-of-current-case-filterset={isOriginOfCurrentCaseFilterSet}
-            data-is-current-case-filterset-unchanged={isCurrentCaseFilterSetUnchanged}>
+            data-is-current-case-filterset-unchanged={isCurrentCaseFilterSetUnchanged}
+            data-has-been-deleted={isDeleted}>
             <div className="title pl-12 pr-08">
                 <h5 className="my-0 text-600 flex-grow-1 text-truncate" title={presetFSTitle}>
                     { presetFSTitle }
@@ -717,19 +906,15 @@ function PresetFilterSetResult (props) {
             </div>
             <div className="info pl-12 pr-08 text-small pb-04">
 
-                <DropdownButton variant="default btn-dropdown-icon mr-05" size="xs" onClick={onMenuClick} title={
-                    <i className="icon icon-ellipsis-v fas text-secondary" data-tip="View actions"/>
-                }>
+                <DropdownButton variant="default btn-dropdown-icon mr-05" size="xs" disabled={!!(patchingPresetResultUUID)}
+                    onClick={onMenuClick} onSelect={onMenuOptionSelect}
+                    title={
+                        <i className={"icon text-secondary fas icon-fw icon-" + (isPatchingPreset ? "circle-notch icon-spin" : "ellipsis-v")} data-tip="View actions"/>
+                    }>
                     { menuOptions }
                 </DropdownButton>
 
                 { presetIconsToShow }
-
-                {/*
-                <a href={presetFSID} target="_blank" rel="noopener noreferrer">
-                    <i className="icon icon-file-alt icon-fw far text-secondary mr-05" data-tip="Open detail/edit page"/>
-                </a>
-                */}
 
                 <span data-tip={"Created " + formatDateTime(date_created, "date-time-md") + " by " + presetFSAuthorTitle} data-delay-show={750}>
                     <LocalizedTime timestamp={date_created} formatType="date-md" />
@@ -1021,7 +1206,7 @@ function FilterSetUIHeader(props){
     }
 
     const savePresetDropdownProps = {
-        filterSet, caseItem, isEditDisabled,
+        filterSet, caseItem, isEditDisabled, originalPresetFilterSet,
         hasFilterSetChangedFromOriginalPreset, hasFilterSetChangedFromLastSavedPreset,
         lastSavedPresetFilterSet, isOriginalPresetFilterSetLoading, setLastSavedPresetFilterSet,
     };
@@ -1092,6 +1277,11 @@ export class SaveFilterSetButtonController extends React.Component {
             // Probably means is still loading currFilterSet,
             // will NOT be counted as new/changed filterset.
             return false;
+        }
+
+        if (savedFilterSet.status === "deleted") {
+            // Consider this as always changed (always save-able).
+            return true;
         }
 
         return !_.isEqual(
@@ -1246,6 +1436,8 @@ export class SaveFilterSetButtonController extends React.Component {
 
 }
 
+
+
 /**
  * Stores & loads originalPresetFilterSet, keeps track of lastSavedPresetFilterSet.
  * Useful for informing confirm dialogs (or lack of) & disabling things, outside of
@@ -1296,7 +1488,7 @@ export class SaveFilterSetPresetButtonController extends React.Component {
             // gets loaded & passed-in.
             // Also handles if `derived_from_preset_filterset` has changed due to
             // importing a new Preset FS blocks.
-            this.getDerivedFromFilterSetIfPresent();
+            this.getDerivedFromFilterSetIfPresent(true);
         }
     }
 
@@ -1306,31 +1498,37 @@ export class SaveFilterSetPresetButtonController extends React.Component {
      * Needs thought on how to "send" that filterset context to here from there in a clean way; if not clean then
      * probably not worth doing.
      */
-    getDerivedFromFilterSetIfPresent(){
+    getDerivedFromFilterSetIfPresent(allowFromProp=false){
         const { currFilterSet, originalPresetFilterSetBody } = this.props;
         const { derived_from_preset_filterset = null } = currFilterSet || {};
+
+        console.info("Called `getDerivedFromFilterSetIfPresent`");
+
         if (derived_from_preset_filterset){ // derived_from_preset_filterset has format 'uuid'
 
             // First check if props.originalPresetFilterSetBody matched our UUID, and if so, just use that
             // to avoid AJAX request.
-            const { uuid: propPriginalPresetFilterSetUUID = null } = originalPresetFilterSetBody || {};
-            if (propPriginalPresetFilterSetUUID && propPriginalPresetFilterSetUUID === derived_from_preset_filterset){
-                this.currentOriginalDerivedFromPresetFilterSetRequest = null; // Cancel any existing requests incase any started.
-                this.setState({
-                    "originalPresetFilterSet": originalPresetFilterSetBody,
-                    "isOriginalPresetFilterSetLoading": false
-                });
-                return;
+            if (allowFromProp) {
+                const { uuid: propPriginalPresetFilterSetUUID = null } = originalPresetFilterSetBody || {};
+                if (propPriginalPresetFilterSetUUID && propPriginalPresetFilterSetUUID === derived_from_preset_filterset){
+                    this.currentOriginalDerivedFromPresetFilterSetRequest = null; // Cancel any existing requests incase any started.
+                    this.setState({
+                        "originalPresetFilterSet": originalPresetFilterSetBody,
+                        "isOriginalPresetFilterSetLoading": false
+                    });
+                    return;
+                }
             }
 
-            this.setState({ "isOriginalPresetFilterSetLoading": true }, ()=>{
+            this.setState({ "isOriginalPresetFilterSetLoading": true }, () => {
+
                 if (this.currentOriginalDerivedFromPresetFilterSetRequest) {
                     console.log("Aborting previous request", this.currentOriginalDerivedFromPresetFilterSetRequest);
                     this.currentOriginalDerivedFromPresetFilterSetRequest.aborted = true;
                     this.currentOriginalDerivedFromPresetFilterSetRequest.abort();
                 }
 
-                const currScopedRequest = this.currentOriginalDerivedFromPresetFilterSetRequest = ajax.load("/filter-sets/" + derived_from_preset_filterset, (res)=>{
+                const currScopedRequest = this.currentOriginalDerivedFromPresetFilterSetRequest = ajax.load("/filter-sets/" + derived_from_preset_filterset + "/?datastore=database&frame=object", (res)=>{
                     const { "@id" : origPresetFSID } = res;
 
                     if (currScopedRequest !== this.currentOriginalDerivedFromPresetFilterSetRequest) {
@@ -1388,7 +1586,9 @@ export class SaveFilterSetPresetButtonController extends React.Component {
             isOriginalPresetFilterSetLoading,
             // Loading of it itself is done in SaveFilterSetPresetButton
             // still, until time comes for that logic to be moved up (if ever (unlikely)).
-            setLastSavedPresetFilterSet: this.setLastSavedPresetFilterSet
+            setLastSavedPresetFilterSet: this.setLastSavedPresetFilterSet,
+            // Passed down to allow PresetFilterSetResult to call it after if the originalPresetFilterSet has been edited.
+            refreshOriginalPresetFilterSet: this.getDerivedFromFilterSetIfPresent
         };
         return React.Children.map(children, function(child){
             return React.cloneElement(child, childProps);
@@ -1494,7 +1694,7 @@ class SaveFilterSetPresetButton extends React.Component {
         e.stopPropagation();
         e.preventDefault();
 
-        const { caseItem, filterSet, setLastSavedPresetFilterSet } = this.props;
+        const { caseItem, filterSet, setLastSavedPresetFilterSet, originalPresetFilterSet } = this.props;
         const { showingModalForEventKey = null, presetTitle } = this.state;
         const {
             project: {
@@ -1544,7 +1744,7 @@ class SaveFilterSetPresetButton extends React.Component {
                     const { "@graph": [ newPresetFilterSetItem ] } = res;
                     return new Promise((resolve, reject) => {
                         setLastSavedPresetFilterSet(newPresetFilterSetItem, ()=>{
-                            this.setState({ "savingStatus": 2 }, ()=>{
+                            this.setState({ "savingStatus": 2, "presetTitle": "" }, ()=>{
                                 resolve(newPresetFilterSetItem);
                             });
                         });
@@ -1553,7 +1753,8 @@ class SaveFilterSetPresetButton extends React.Component {
                     // If no "derived_from_preset_filterset" on Case.active_filterset, set it.
                     const { uuid: newPresetFilterSetItemUUID } = newPresetFilterSetItem;
                     const { derived_from_preset_filterset = null, "@id": caseFSID } = filterSet || {};
-                    if (derived_from_preset_filterset === null) {
+                    const { status: originalPresetFSStatus } = originalPresetFilterSet || {};
+                    if (derived_from_preset_filterset === null || originalPresetFSStatus === "deleted") {
                         return ajax.promise(caseFSID, "PATCH", {}, JSON.stringify({ "derived_from_preset_filterset": newPresetFilterSetItemUUID }));
                     } else {
                         return false;
@@ -1651,7 +1852,9 @@ class SaveFilterSetPresetButton extends React.Component {
                             { valueTransforms.capitalize(modalOptionType) } FilterSet Created
                         </h5>
                         <a className="text-600 d-inline-block mb-16" href={lastSavedPresetID} target="_blank" rel="noopener noreferrer">{ lastSavedPresetTile }</a>
-                        <p className="mb-16">It may be some minutes before the preset is available to import.</p>
+                        <p className="mb-16">
+                            It may take some time before the preset is visible in list of presets and available for import.
+                        </p>
                         <button type="button" className="btn btn-success btn-block" onClick={this.onHideModal}>
                             OK
                         </button>

@@ -2397,6 +2397,14 @@ $download-button-width : 100px;
 					
 				}
 
+				&[data-has-been-deleted="true"] {
+					/* background: #fff4f4; */
+					> .title,
+					> .info {
+						opacity: 0.4;
+					}
+				}
+
 			}
 		}
 	}
