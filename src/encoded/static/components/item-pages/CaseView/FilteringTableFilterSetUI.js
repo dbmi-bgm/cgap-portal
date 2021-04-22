@@ -394,7 +394,7 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
         super(props);
         this.setPatchingPresetResultUUID = this.setPatchingPresetResultUUID.bind(this);
         this.toggleDeletedPresetUUID = this.toggleDeletedPresetUUID.bind(this);
-        this.loadInitialResults = _.debounce(this.loadInitialResults.bind(this), 5000);
+        this.loadInitialResults = _.debounce(this.loadInitialResults.bind(this), 3000);
         this.checkForChangedResultsAndRefresh = this.checkForChangedResultsAndRefresh.bind(this);
         this.state = {
             // Can be blank array (no results found), null (not yet loaded), or array of results.
@@ -457,8 +457,7 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
         const { caseItem } = this.props;
 
         if (this.currentInitialResultsRequest) {
-            this.currentInitialResultsRequest.aborted = true;
-            this.currentInitialResultsRequest.abort();
+            console.log('currentInitialResultsRequest superseded (a)');
         }
 
         const compoundRequest = PresetFilterSetSelectionUI.makeCompoundSearchRequest(caseItem);
@@ -470,8 +469,11 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
 
             if (scopedRequest !== this.currentInitialResultsRequest) {
                 // Request has been superseded; throw out response and preserve current state.
-                return;
+                console.log('currentInitialResultsRequest superseded (b)');
+                return false;
             }
+
+            this.currentInitialResultsRequest = null;
 
             this.setState({
                 presetResults,
@@ -1451,10 +1453,10 @@ export class SaveFilterSetPresetButtonController extends React.Component {
         this.getDerivedFromFilterSetIfPresent = this.getDerivedFromFilterSetIfPresent.bind(this);
 
         this.state = {
-            originalPresetFilterSet: null,
-            isOriginalPresetFilterSetLoading: false,
+            "originalPresetFilterSet": null,
+            "isOriginalPresetFilterSetLoading": false,
             // Stored after POSTing new FilterSet to allow to prevent immediate re-submits.
-            lastSavedPresetFilterSet: null
+            "lastSavedPresetFilterSet": null
         };
 
         this.memoized = {
@@ -1672,13 +1674,18 @@ class SaveFilterSetPresetButton extends React.Component {
         return;
     }
 
-    onHideModal(){
+    onHideModal(e){
+        if (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
         const { savingStatus } = this.state;
         if (savingStatus === 1) {
             // Prevent if in middle of POST request.
             return false;
         }
         this.setState({ "showingModalForEventKey": null, "savingStatus": 0 });
+        return false;
     }
 
     onPresetTitleInputChange(e) {
@@ -1855,7 +1862,8 @@ class SaveFilterSetPresetButton extends React.Component {
                         <p className="mb-16">
                             It may take some time before the preset is visible in list of presets and available for import.
                         </p>
-                        <button type="button" className="btn btn-success btn-block" onClick={this.onHideModal}>
+                        <button type="button" className="btn btn-success btn-block"
+                            onClick={this.onHideModal} autoFocus>
                             OK
                         </button>
                     </div>
