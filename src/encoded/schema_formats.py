@@ -1,24 +1,21 @@
-import glob
-import io
-import json
-import pkg_resources
 import re
-import rfc3987
-import rfc3986.validators
-import rfc3986.exceptions
 
+from dcicutils.misc_utils import is_valid_absolute_uri
 from jsonschema_serialize_fork import FormatChecker
 from pyramid.threadlocal import get_current_request
 from .server_defaults import (
     ACCESSION_FACTORY,
     ACCESSION_PREFIX,
-    TEST_PREFIX,
     test_accession,
 )
 from uuid import UUID
 
 
 # XXX: This is broken, cannot decode schema files - Will 3/2/2021
+# import glob
+# import io
+# import json
+# import pkg_resources
 # def compute_accession_codes():
 #     letter_pairs = set()
 #     for file in glob.glob(pkg_resources.resource_filename('encoded', 'schemas/*.json')):
@@ -34,7 +31,7 @@ from uuid import UUID
 
 accession_re = re.compile(r'^%s[1-9A-Z]{9}$' % ACCESSION_PREFIX)
 test_accession_re = re.compile(r'^TST(EX|ES|FI|FS|SR|BS|IN|WF)[0-9]{4}([0-9][0-9][0-9]|[A-Z][A-Z][A-Z])$')
-uuid_re = re.compile(r'(?i)\{?(?:[0-9a-f]{4}-?){8}\}?')
+uuid_re = re.compile(r'(?i)[{]?(?:[0-9a-f]{4}-?){8}[}]?')
 
 
 @FormatChecker.cls_checks("uuid")
@@ -88,27 +85,4 @@ def is_target_label(instance):
 
 @FormatChecker.cls_checks("uri", raises=ValueError)
 def is_uri(instance):
-    return is_valid_uri(instance)
-
-
-uri_validator = (
-    rfc3986.validators.Validator()
-        # Validation qualifiers
-        .allow_schemes('http', 'https')
-        # TODO: We might want to consider the possibility of forbidding the use of a password. -kmp 20-Apr-2021
-        # .forbid_use_of_password()
-        .require_presence_of('scheme', 'host')
-        .check_validity_of('scheme', 'host', 'path'))
-
-
-def is_valid_uri(text):
-    try:
-        uri_ref = rfc3986.uri_reference(text)
-    except ValueError:
-        return False
-    try:
-        # We do this validation for side-effect. If no error occurs, we have a valid URI.
-        uri_validator.validate(uri_ref)
-        return True
-    except rfc3986.exceptions.ValidationError:
-        return False
+    return is_valid_absolute_uri(instance)
