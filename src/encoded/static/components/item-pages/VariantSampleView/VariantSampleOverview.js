@@ -6,7 +6,7 @@ import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
@@ -15,6 +15,7 @@ import { GeneTabBody } from './GeneTabBody';
 import { SampleTabBody } from './SampleTabBody';
 import { AnnotationBrowserTabBody } from './AnnotationBrowserTabBody';
 import { BamFileBrowserTabBody } from './BamFileBrowserTabBody';
+import { InterpretationSpaceController, InterpretationSpaceWrapper } from './InterpretationSpaceController';
 
 
 
@@ -103,18 +104,42 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas } = this.props;
+        const { context = null, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
-        const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading };
+        const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
+
+        const {
+            interpretation: { error: interpError = null } = {},
+            variant_notes: { error: varNoteError = null } = {},
+            gene_notes: { error: geneNoteError = null } = {},
+        } = context || {};
+
+        const anyNotePermErrors = interpError || varNoteError || geneNoteError;
+
+        const { query: {
+            showInterpretation = true,      // used only if "True" (toggles showing of interpretation sidebar/pane)
+            annotationTab = null,           // used only if can be parsed to integer (Variant = 0, Gene = 1, Sample = 2, AnnotationBrowser = 3, BAM Browser = 4)
+            interpretationTab = null,       // used only if one of "Variant Notes", "Gene Notes", "Interpretation"
+            caseSource = null
+        } } = memoizedUrlParse(href);
+
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                {/* BA1, BS1, BS2, BS3 etc markers here */}
-                <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
-                <VariantSampleOverviewTabView {...passProps} />
+                <div className="row flex-column-reverse flex-lg-row flex-nowrap">
+                    <div className="col">
+                        {/* BA1, BS1, BS2, BS3 etc markers here */}
+                        <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
+                        <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
+                    </div>
+                    { showInterpretation == 'True' && !anyNotePermErrors ?
+                        <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
+                            <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}/>
+                        </div> : null
+                    }
+                </div>
             </div>
         );
     }
-
 }
 
 function getCurrentTranscriptGeneID(context, transcriptIndex){
@@ -137,8 +162,8 @@ function getCurrentTranscriptGeneID(context, transcriptIndex){
 class VariantSampleOverviewTabView extends React.PureComponent {
 
     static tabNames = [
-        "Variant",
         "Gene",
+        "Variant",
         "Sample",
         "Annotation Browser",
         "BAM File Browser"
@@ -146,8 +171,11 @@ class VariantSampleOverviewTabView extends React.PureComponent {
 
     constructor(props){
         super(props);
+        const { defaultTab = null } = props;
         this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
-        this.state = { "currentTab" : 0 };
+        this.state = {
+            "currentTab" : defaultTab < 5 ? defaultTab : 1 // Validate that is 0-5
+        };
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
@@ -198,10 +226,10 @@ class VariantSampleOverviewTabView extends React.PureComponent {
                 const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
                 switch (index) {
                     case 0:
-                        tabBodyElements.push(<VariantTabBody {...commonBodyProps} {...{ currentTranscriptIdx }} />);
+                        tabBodyElements.push(<GeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
                         break;
                     case 1:
-                        tabBodyElements.push(<GeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
+                        tabBodyElements.push(<VariantTabBody {...commonBodyProps} {...{ currentTranscriptIdx }} />);
                         break;
                     case 2:
                         tabBodyElements.push(<SampleTabBody {...commonBodyProps} />);
