@@ -164,16 +164,18 @@ export default class App extends React.PureComponent {
          * Initial state of application.
          *
          * @type {Object}
-         * @property {boolean}  state.session       Whether user is currently logged in or not. User details are retrieved using JWT utility.
-         * @property {Object[]} state.schemas       Current schemas; null until AJAX-ed in (may change).
-         * @property {boolean}  state.isSubmitting  Whether there's a submission in progress. If true, alert is shown to prevent user from accidentally navigating away.
-         * @property {boolean}  state.mounted       Whether app has been mounted into DOM in browser yet.
+         * @property {boolean}         state.session               Whether user is currently logged in or not. User details are retrieved using JWT utility.
+         * @property {Object[]}        state.schemas               Current schemas; null until AJAX-ed in (may change).
+         * @property {string|Object}   state.isSubmitting          Whether there's a submission in progress. If string, browser alert is shown to prevent user from accidentally navigating away. If object & modal key has a value, that JSX will be rendered when isSubmittingModalOpen = true
+         * @property {boolean}         state.mounted               Whether app has been mounted into DOM in browser yet.
+         * @property {boolean}         state.isSubmittingModalOpen Whether or not a submitting modal is currently open (rendered in BodyElement)
          */
         this.state = {
             session,
-            'schemas'           : context.schemas || null,
-            'isSubmitting'      : false,
-            'mounted'           : false
+            'schemas'                     : context.schemas || null,
+            'isSubmitting'                : false,
+            'mounted'                     : false,
+            'isSubmittingModalOpen'       : false,
         };
 
         // Holds a reference to current navigation request for `context`.
@@ -745,15 +747,27 @@ export default class App extends React.PureComponent {
                 return false;
             }
 
-            const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
+            // If a custom modal is passed through in an object, use that to prompt user before navigating away
+            if (typeof isSubmitting === "object" && isSubmitting.modal && React.isValidElement(isSubmitting.modal)) {
 
-            if (window.confirm(confirmMessage)){
-                // we are no longer submitting
-                this.setIsSubmitting(false);
-                return false;
-            } else {
-                // stay
-                return true;
+                // Feed navigation href to modal via prop
+                const modalClone = React.cloneElement(isSubmitting.modal, { href: nextHref });
+
+                this.setState({ isSubmitting: { modal: modalClone }, isSubmittingModalOpen: true });
+
+                return true; // Do not navigate yet
+
+            } else { // Render the browser confirm alert
+                const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
+
+                if (window.confirm(confirmMessage)){
+                    // we are no longer submitting
+                    this.setIsSubmitting(false);
+                    return false;
+                } else {
+                    // stay
+                    return true;
+                }
             }
         } else {
             return false;
@@ -1029,11 +1043,16 @@ export default class App extends React.PureComponent {
     /**
      * Set 'isSubmitting' in state. works with handleBeforeUnload
      *
-     * @param {boolean|string} bool - Value to set. If string is provided, will show as text in popup.
+     * @param {boolean|string|object} value - Value to set. If string is provided, will show as text in popup. If object is provided and modal key contains JSX, isSubmittingModalOpen opened/closed according to value for showModelOpen
      * @param {function} [callback=null] - Optional callback to execute after updating state.
+     * @param {boolean} showModalOpen - Optional setting to also close/open modal
      */
-    setIsSubmitting(value, callback=null){
-        this.setState({ 'isSubmitting': value }, callback);
+    setIsSubmitting(value, callback=null, showModalOpen){
+        if (showModalOpen === true || showModalOpen === false) {
+            this.setState({ 'isSubmitting': value, 'isSubmittingModalOpen': showModalOpen }, callback);
+        } else {
+            this.setState({ 'isSubmitting': value }, callback);
+        }
     }
 
     /**
@@ -1217,7 +1236,7 @@ const ContentRenderer = React.memo(function ContentRenderer(props){
     const commonContentViewProps = _.pick(props,
         // Props from App:
         'schemas', 'session', 'href', 'navigate', 'uploads', 'updateUploads', 'alerts',
-        'browseBaseState', 'setIsSubmitting', 'updateAppSessionState', 'context', 'currentAction',
+        'browseBaseState', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen', 'updateAppSessionState', 'context', 'currentAction',
         // Props from BodyElement:
         'windowWidth', 'windowHeight', 'registerWindowOnResizeHandler', 'registerWindowOnScrollHandler',
         'addToBodyClassList', 'removeFromBodyClassList', 'toggleFullScreen', 'isFullscreen',
@@ -1700,7 +1719,8 @@ class BodyElement extends React.PureComponent {
      * TestWarning stuff is _possibly_ deprecated and for 4DN only.
      */
     render(){
-        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas, browseBaseState, updateAppSessionState } = this.props;
+        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas,
+            browseBaseState, updateAppSessionState, isSubmitting, isSubmittingModalOpen } = this.props;
         const { windowWidth, windowHeight, classList, hasError, isFullscreen, testWarningPresent } = this.state;
         const { registerWindowOnResizeHandler, registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen } = this;
         const appClass = slowLoad ? 'communicating' : 'done';
@@ -1763,6 +1783,7 @@ class BodyElement extends React.PureComponent {
                 <div id="slot-application">
                     <div id="application" className={appClass}>
                         <div id="layout">
+                            { (isSubmitting && isSubmitting.modal) && isSubmittingModalOpen ? isSubmitting.modal : null}
 
                             <NavigationBar {...navbarProps} />
 
