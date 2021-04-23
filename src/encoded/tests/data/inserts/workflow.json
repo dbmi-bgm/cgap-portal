@@ -204,8 +204,7 @@
       "docker_registry_url": "https://hub.docker.com/",
       "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
       "name": "test_rcktar_v18",
-      "aliases": ["cgap:test_rcktar_v18",
-                  "cgap:test_rcktar_v17"],
+      "aliases": ["cgap:test_rcktar_v18"],
       "steps": [
           {
               "inputs": [
