@@ -435,41 +435,21 @@ class GeneListSubmission:
                 ).json["@graph"]
                 project_titles = [x["title"] for x in project_genelists]
                 for previous_title in project_titles:
+                    genelist_title = previous_title
                     title_count = re.findall(r"\(\d{1,}\)", previous_title)
-                    if not title_count:
-                        if self.title == previous_title:
-                            genelist_idx = project_titles.index(previous_title)
-                            genelist_uuid = project_genelists[genelist_idx][
-                                "uuid"
-                            ]
-                            genelist_gene_uuids = project_genelists[
-                                genelist_idx
-                            ]["genes"]
-                            for gene_uuid in genelist_gene_uuids:
-                                previous_genelist_gene_ids.append(
-                                    gene_uuid["uuid"]
-                                )
-                            break
-                        else:
-                            continue
-                    title_count = title_count[-1]
-                    title_count_idx = previous_title.index(title_count)
-                    previous_title_stripped = previous_title[
-                        :title_count_idx
-                    ].strip()
-                    if self.title == previous_title_stripped:
-                        genelist_idx = project_titles.index(previous_title)
+                    if title_count:
+                        title_count_idx = previous_title.index(title_count[-1])
+                        previous_title = previous_title[:title_count_idx].strip()
+                    if self.title == previous_title:
+                        genelist_idx = project_titles.index(genelist_title)
                         genelist_uuid = project_genelists[genelist_idx]["uuid"]
                         genelist_gene_uuids = project_genelists[genelist_idx][
                             "genes"
                         ]
-                        for gene_uuid in genelist_gene_uuids:
-                            previous_genelist_gene_ids.append(
-                                gene_uuid["uuid"]
-                            )
+                        previous_genelist_gene_ids += [
+                            gene["uuid"] for gene in genelist_gene_uuids
+                        ]
                         break
-                    else:
-                        continue
             except VirtualAppError:
                 pass
         try:
@@ -590,6 +570,7 @@ class GeneListSubmission:
         """
         if not self.post_output:
             return
+        uuids_to_update = list(set(self.gene_ids + self.previous_gene_ids))
         creation_post_url = "/IngestionSubmission"
         creation_post_data = {
             "ingestion_type": "variant_update",
@@ -609,7 +590,7 @@ class GeneListSubmission:
             (
                 "datafile",
                 self.title.replace(" ", "_") + "_gene_ids",
-                bytes("\n".join(self.gene_ids), encoding="utf-8"),
+                bytes("\n".join(uuids_to_update), encoding="utf-8"),
             )
         ]
         submission_response = self.vapp.post(
