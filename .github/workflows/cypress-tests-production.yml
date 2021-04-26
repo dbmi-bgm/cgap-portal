@@ -1,6 +1,6 @@
 # Action that Runs Cypress Tests
 
-name: Cypress Tests - Data 
+name: Cypress Tests - Production 
 
 # Controls when the action will run. 
 on:
