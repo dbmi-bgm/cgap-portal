@@ -54,10 +54,10 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = [
-        "interpretation.classification",
-        "interpretation.acmg_guidelines",
-        "interpretation.conclusion",
-        "interpretation.note_text"
+        "interpretations.classification",
+        "interpretations.acmg_guidelines",
+        "interpretations.conclusion",
+        "interpretations.note_text"
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
