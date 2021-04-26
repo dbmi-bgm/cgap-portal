@@ -403,8 +403,8 @@ class TestInvalidationScopeViewCGAP:
                              'date_created', 'submitted_by', 'institution', 'project', 'aliases',
                              'schema_version', 'title', 'search_type', 'filter_blocks.name',
                              'filter_blocks.query', 'filter_blocks.flags_applied', 'flags.name',
-                             'flags.query', 'created_in_case_accession', 'is_preset_for_project',
-                             'is_preset_for_users', 'is_default_for_project']
+                             'flags.query', 'created_in_case_accession', 'preset_for_projects',
+                             'preset_for_users', 'default_for_projects']
          ),
         ('Project', 'Case',
             DEFAULT_SCOPE + ['name']
