@@ -1101,7 +1101,6 @@ class GeneTableParser(VariantTableParser):
             {"$ref": "mixins.json#/attribution"},
             {"$ref": "mixins.json#/notes"},
             {"$ref": "mixins.json#/static_embeds"},
-            {"$ref": "mixins.json#/gene_notes"},
             {"$ref": "mixins.json#/interpretation"}
         ]
 
@@ -1122,6 +1121,16 @@ class GeneTableParser(VariantTableParser):
         gene_props['ensgid']['uniqueKey'] = True  # XXX: This is required for genes
         schema['properties'] = gene_props
         schema['properties']['schema_version'] = {'default': '1'}
+        schema['properties']['gene_notes'] = {
+            "title": "Gene Notes",
+            "description": "Notes related to this Gene",
+            "type": "array",
+            "items": {
+                "title": "Gene Note",
+                "type": "string",
+                "linkTo": "NoteStandard"
+            }
+        }
         schema['facets'] = facets
         schema['columns'] = columns
         logger.info('Build gene schema')

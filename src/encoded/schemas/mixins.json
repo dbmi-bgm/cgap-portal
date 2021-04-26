@@ -295,30 +295,6 @@
             }
         }
     },
-    "gene_notes": {
-        "gene_notes": {
-            "title": "Gene Notes",
-            "description": "Notes related to this Gene",
-            "type": "array",
-            "items": {
-                "title": "Gene Note",
-                "type": "string",
-                "linkTo": "NoteStandard"
-            }
-        }
-    },
-    "variant_notes": {
-        "variant_notes": {
-            "title": "Variant Notes",
-            "description": "Notes related to this Variant",
-            "type": "array",
-            "items": {
-                "title": "Variant Note",
-                "type": "string",
-                "linkTo": "NoteStandard"
-            }
-        }
-    },
     "alternative_ids": {
         "alternative_ids": {
             "title": "Alternative identifiers",
