@@ -23,7 +23,7 @@ def new_discovery_note():
         "project": "hms-dbmi",
         "institution": "hms-dbmi",
         "note_text": "This variant is a candidate for association with Syndrome X.",
-        "variant_candidacy": "moderate candidate"
+        "variant_candidacy": "Moderate candidate"
     }
 
 
