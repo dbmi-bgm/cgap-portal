@@ -50,17 +50,30 @@
             "title": "Gene Candidacy",
             "description": "Candidacy level for Gene Discovery",
             "type": "string",
-            "enum": []
+            "enum": [
+                "Tier 1 - Novel gene and phenotype",
+                "Tier 1 - Novel gene for known phenotype",
+                "Tier 1 - Phenotype expansion",
+                "Tier 1 - Phenotype not delineated",
+                "Tier 1 - Novel mode of inheritance",
+                "Tier 1 - Known gene, new phenotype",
+                "Tier 2 - Novel gene and phenotype",
+                "Tier 2 - Novel gene for known phenotype",
+                "Tier 2 - Phenotype expansion",
+                "Tier 2 - Phenotype not delineated",
+                "Tier 2 - Known gene, new phenotype",
+                "Known gene for phenotype"
+            ]
         },
         "variant_candidacy": {
             "title": "Variant Candidacy",
             "description": "Candidacy level for Variant Discovery",
             "type": "string",
             "enum": [
-                "strong candidate",
-                "moderate candidate",
-                "weak candidate",
-                "not a candidate"
+                "Strong candidate",
+                "Moderate candidate",
+                "Weak candidate",
+                "Not a candidate"
             ]
         },
         "previous_note": {
