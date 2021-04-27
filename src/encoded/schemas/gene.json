@@ -41,9 +41,6 @@
             "$ref": "mixins.json#/interpretation"
         },
         {
-            "$ref": "mixins.json#/gene_notes"
-        },
-        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
