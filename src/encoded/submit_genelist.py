@@ -738,7 +738,8 @@ class VariantUpdateSubmission:
         """
         if not self.variant_samples:
             validate_output = (
-                "No variant samples were found for the given genes"
+                "No project-associated variant samples were found for the "
+                "given genes."
             )
             return validate_output
         not_validated = []
