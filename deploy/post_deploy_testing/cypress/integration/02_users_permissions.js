@@ -1,11 +1,13 @@
+import { cypressVisitHeaders } from './../support';
 
-describe('Impersonate user JWT, navigate to profile, edit last_name to & back.', function () {
+
+describe.skip('Impersonate user JWT, navigate to profile, edit last_name to & back.', function () {
 
 
     context('Frontend Test User Profile', function () {
 
         beforeEach(function(){
-            cy.visit('/');
+            cy.visit('/', { headers: cypressVisitHeaders });
         });
 
         /** Cypress clears browser state between tests so need to use beforeEach rather than before. This may change according to Cypress - https://github.com/cypress-io/cypress/issues/747 */
@@ -46,7 +48,7 @@ describe('Impersonate user JWT, navigate to profile, edit last_name to & back.',
                 .get('ul.dropdown-menu[aria-labelledby="user_account_nav_button"]').contains('Profile').click().end()
                 .get('.page-container .user-title-row-container h1.user-title').invoke('text').should('include', "Frontend").end() // Test only for first name as we're editing last name & it may change re: delayed indexing, etc.
                 .url().then(function(currUrl){
-                    return cy.visit(currUrl + '?datastore=database').end() // Edit last name ON DATASTORE=DATABASE TO PREVENT ERRORS DUE TO INDEXING NOT BEING CAUGHT UP FROM PRIOR TEST
+                    return cy.visit(currUrl + '?datastore=database', { headers: cypressVisitHeaders }).end() // Edit last name ON DATASTORE=DATABASE TO PREVENT ERRORS DUE TO INDEXING NOT BEING CAUGHT UP FROM PRIOR TEST
                         .get('.page-container .user-title-row-container h1.user-title .last_name .value.saved a.edit-button').click().end()
                         .get('.page-container .user-title-row-container h1.user-title .last_name .value.editing input')
                         .scrollToCenterElement().clear({ force : true }).type('SuperTest', { force : true }).then(function(inputfield){
@@ -55,7 +57,7 @@ describe('Impersonate user JWT, navigate to profile, edit last_name to & back.',
                                 .get('.page-container .user-title-row-container h1.user-title .last_name .value.editing .loading-icon').should('have.length', 0).end()
                                 .get('.page-container .user-title-row-container h1.user-title').should('have.text', "Frontend SuperTest").wait(500).end()
                                 // After reloading on datastore=database, last name stays edited. Then change back.
-                                .reload()//.visit(currUrl + '?datastore=database').end()
+                                .reload()//.visit(currUrl + '?datastore=database', { headers: cypressVisitHeaders }).end()
                                 .get('.page-container .user-title-row-container h1.user-title').should('have.text', "Frontend SuperTest").end()
                                 // Cleanup & test again
                                 .get('.page-container .user-title-row-container h1.user-title .last_name .value.saved a.edit-button').click({ force : true }).end()
