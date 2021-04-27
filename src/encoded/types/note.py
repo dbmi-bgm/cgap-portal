@@ -35,6 +35,10 @@ class NoteStandard(Note):
 
     item_type = 'note_standard'
     schema = load_schema('encoded:schemas/note_standard.json')
+    embedded_list = [
+        'last_modified.date_modified',
+        'last_modified.modified_by.display_title'
+    ]
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -61,6 +65,10 @@ class NoteInterpretation(Note):
 
     item_type = 'note_interpretation'
     schema = load_schema('encoded:schemas/note_interpretation.json')
+    embedded_list = [
+        'last_modified.date_modified',
+        'last_modified.modified_by.display_title'
+    ]
 
     @calculated_property(schema={
         "title": "Display Title",

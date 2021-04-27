@@ -54,10 +54,14 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = [
-        "interpretations.classification",
+        "Interpretations.classification",
         "interpretations.acmg_guidelines",
         "interpretations.conclusion",
-        "interpretations.note_text"
+        "interpretations.note_text",
+        "interpretations.version",
+        "interpretations.project",
+        "interpretations.institution",
+        "interpretations.status"
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
@@ -75,10 +79,30 @@ def build_variant_sample_embedded_list():
     embedded_list = [
         "cmphet.*",
         "variant_sample_list.created_for_case",
+        "variant_notes.note_text",
+        "variant_notes.version",
+        "variant_notes.project",
+        "variant_notes.institution",
+        "variant_notes.status",
+        "variant_notes.last_modified.date_modified",
+        "variant_notes.last_modified.modified_by.display_title",
+        "gene_notes.note_text",
+        "gene_notes.version",
+        "gene_notes.project",
+        "gene_notes.institution",
+        "gene_notes.status",
+        "gene_notes.last_modified.date_modified",
+        "gene_notes.last_modified.modified_by.display_title",
         "interpretation.classification",
         "interpretation.acmg_guidelines",
         "interpretation.conclusion",
-        "interpretation.note_text"
+        "interpretation.note_text",
+        "interpretation.version",
+        "interpretation.project",
+        "interpretation.institution",
+        "interpretation.status",
+        "interpretation.last_modified.date_modified",
+        "interpretation.last_modified.modified_by.display_title"
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')

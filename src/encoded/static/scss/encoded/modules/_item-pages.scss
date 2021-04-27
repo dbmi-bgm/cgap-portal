@@ -554,6 +554,18 @@ h3.submission-subtitle {
 
 @mixin statusColorStyles {
 
+	// Blue
+	&[data-status="benign"]:before {						// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: $primary;
+	}
+
+	// Dark Blue
+	&[data-status="likely benign"]:before {					// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: $primary-dark;
+	}
+
 	// Green
 	&[data-status="current"]:before,						// Applicable to Item.status
 	&[data-status="shared"]:before,							// Applicable to Item.status
@@ -561,7 +573,6 @@ h3.submission-subtitle {
 	&[data-status="uploaded"]:before,						// Applicable to File.status
 	&[data-status="public"]:before,							// Applicable to Pages & UserContent
 	&[data-status="complete"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
-	&[data-status="benign"]:before,							// Applicable to ClinVar Clinical Significance
 	&[data-status="protective"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #308756;
@@ -578,8 +589,7 @@ h3.submission-subtitle {
 	&[data-status="in public review"]:before,				// Applicable to Item.status
 	&[data-status="uploading"]:before,						// Applicable to File.status
 	&[data-status="output_files_transferring"]:before,		// Applicable to WorkflowRun.run_status
-	&[data-status="output_file_transfer_finished"]:before,	// Applicable to WorkflowRun.run_status
-	&[data-status="likely benign"]:before {					// Applicable to ClinVar Clinical Significance
+	&[data-status="output_file_transfer_finished"]:before {	// Applicable to WorkflowRun.run_status
 		color: #fff;
 		background-color: #80921c;
 	}
@@ -601,6 +611,7 @@ h3.submission-subtitle {
 	&[data-status="inactive"]:before,						// Applicable to Item.status
 	&[data-status="revoked"]:before,						// Applicable to User.status
 	&[data-status="probable-pathogenic"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="likely pathogenic"]:before,				// Applicable to SampleVariant Interpretation Classification
 	&[data-status="affects"]:before,						// Applicable to ClinVar Clinical Significance
 	&[data-status="restricted"]:before {					// Deprecated?
 		color: #fff;
@@ -630,6 +641,7 @@ h3.submission-subtitle {
 	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
 	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
 	&[data-status="not provided"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="VUS"]:before,							// Applicable to SampleVariant Interpretation Classification
 	&[data-status="unspecified"]:before {					// Deprecated? Fallback for lack of status in some cases?
 		color: #fff;
 		background-color: #7b7b7b;
@@ -2058,6 +2070,18 @@ $download-button-width : 100px;
 				}
 			}
 
+			/* Interpretation styles*/
+			&#case-info\.interpretation {
+				.card-header.section-header {
+					font-weight: 400;
+					margin: 0; /* overrides the default `margin: 10px 0` of header (h1, h2, ..) elems */
+					
+					a:hover > div.title-block > span {
+						text-decoration: underline;
+					}
+				}
+			}
+
 			h2 {
 				font-size: 1.5rem;
 				font-weight: 400;
@@ -2705,7 +2729,7 @@ $download-button-width : 100px;
 
 
 /**********************************************************
-  VariantSampleView & similar - Annotation Space
+  VariantSampleView & similar - Annotation & Interpretation Space
 **********************************************************/
 
 // TODO maybe move somewhere else
@@ -2843,6 +2867,53 @@ $download-button-width : 100px;
 					color: $primary-dark;
 				}
 				*/
+			}
+		}
+	}
+
+	.interpretation-space {
+		position: sticky;
+		position: -webkit-sticky;
+		top: 50px;
+
+		.card-header.interpretation-header {
+			background-color: $primary-dark;
+			color: #ffffff;
+			font-size: 1.1em;
+
+			button:focus {
+				outline: thin dotted;
+			}
+		}
+
+		.card-body {
+			ul {
+				list-style-type: none;
+				border:1px solid lightgray;
+				border-radius: 5px;
+				li.interpretation-tab {
+					&[data-active="true"] {
+						background-color: #beccda;
+						color: $primary-dark;
+						border-radius: 3px;
+					}
+					font-size: 13px;
+					padding: 3px 10px;
+				}
+			}
+
+			.interpretation-panel {
+				margin: 10px 0;
+
+				textarea {
+					border-color: lightgrey;
+    				border-radius: 5px;
+					padding: 10px;
+				}
+
+				.dropdown.btn-group {
+					flex-grow: 1;
+				}
 			}
 		}
 	}
