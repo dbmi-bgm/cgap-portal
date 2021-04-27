@@ -54,7 +54,7 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = [
-        "Interpretations.classification",
+        "interpretations.classification",
         "interpretations.acmg_guidelines",
         "interpretations.conclusion",
         "interpretations.note_text",
