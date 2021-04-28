@@ -222,6 +222,8 @@ export class InterpretationSpaceWrapper extends React.Component {
  */
 export class InterpretationSpaceController extends React.Component {
 
+    static tabNames = ["Variant Notes", "Gene Notes", "Clinical", "Discovery"];
+
     static haveEditPermission(actions){
         return _.findWhere(actions, { "name" : "edit" });
     }
@@ -259,16 +261,13 @@ export class InterpretationSpaceController extends React.Component {
         super(props);
         const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation, lastSavedDiscovery, defaultTab } = props;
 
-        // use to validate passed in defaultTab prop
-        const acceptableTabNames = ["Variant Notes", "Gene Notes", "Interpretation", "Discovery Interpretation"];
-
         this.state = {
             // Initialize WIP states to last saved - if a tab is closed WIP progress is temporarily saved here
             variant_notes_wip: lastSavedVariantNote,
             gene_notes_wip: lastSavedGeneNote,
             interpretation_wip: lastSavedInterpretation,
             discovery_interpretation_wip: lastSavedDiscovery,
-            currentTab: _.contains(acceptableTabNames, defaultTab) ? defaultTab : "Variant Notes",
+            currentTab: _.contains(InterpretationSpaceController.tabNames, defaultTab) ? defaultTab : "Variant Notes",
             isExpanded: false // TODO - currently unused; V2
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
@@ -344,7 +343,7 @@ export class InterpretationSpaceController extends React.Component {
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case "Interpretation":
+            case "Clinical":
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab}
                     key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
@@ -352,7 +351,7 @@ export class InterpretationSpaceController extends React.Component {
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case "Discovery Interpretation":
+            case "Discovery":
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} noteLabel={currentTab}
                     key={3} saveToField="discovery_interpretation" noteType="note_discovery" { ...passProps }
@@ -393,8 +392,8 @@ function InterpretationSpaceTabs(props) {
 
     const variantNotesActive = currentTab === "Variant Notes" ? true : false;
     const geneNotesActive = currentTab === "Gene Notes" ? true : false;
-    const interpretationActive = currentTab === "Interpretation" ? true : false;
-    const discoveryActive = currentTab === "Discovery Interpretation" ? true : false;
+    const interpretationActive = currentTab === "Clinical" ? true : false;
+    const discoveryActive = currentTab === "Discovery" ? true : false;
 
     return (
         <ul className="p-1 d-flex align-items-center justify-content-between">
@@ -406,13 +405,13 @@ function InterpretationSpaceTabs(props) {
                 data-active={geneNotesActive}>
                 Gene Notes
             </li>
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Interpretation")}
+            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Clinical")}
                 data-active={interpretationActive}>
-                Interpretation
+                Clinical
             </li>
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Discovery Interpretation")}
+            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Discovery")}
                 data-active={discoveryActive}>
-                Discovery Interpretation
+                Discovery
             </li>
         </ul>
     );
