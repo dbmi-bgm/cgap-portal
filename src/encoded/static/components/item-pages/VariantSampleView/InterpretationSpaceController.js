@@ -380,7 +380,7 @@ function InterpretationSpaceHeader(props) { // Expanded items commented out unti
     return (
         <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
             <i className="icon icon-poll-h fas"></i>
-            Variant Interpretation
+            Interpretation Space
             <button type="button" className="btn btn-link" onClick={toggleExpanded || undefined} style={{ visibility: "hidden" }}>
                 { isExpanded ? <i className="icon icon-compress fas"></i> : <i className="icon icon-expand fas"></i> }
             </button>
