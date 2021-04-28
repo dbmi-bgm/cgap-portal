@@ -2,7 +2,7 @@ import argparse
 import logging
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
-from ..ingestion.table_utils import GeneTableParser
+from encoded.ingestion.table_utils import GeneTableParser
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
