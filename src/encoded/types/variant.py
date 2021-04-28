@@ -61,7 +61,16 @@ def build_variant_embedded_list():
         "interpretations.version",
         "interpretations.project",
         "interpretations.institution",
-        "interpretations.status"
+        "interpretations.status",
+        "discovery_interpretations.gene_candidacy",
+        "discovery_interpretations.variant_candidacy",
+        "discovery_interpretations.note_text",
+        "discovery_interpretations.version",
+        "discovery_interpretations.project",
+        "discovery_interpretations.institution",
+        "discovery_interpretations.status",
+        "discovery_interpretations.last_modified.date_modified",
+        "discovery_interpretations.last_modified.modified_by.display_title"
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
@@ -102,7 +111,16 @@ def build_variant_sample_embedded_list():
         "interpretation.institution",
         "interpretation.status",
         "interpretation.last_modified.date_modified",
-        "interpretation.last_modified.modified_by.display_title"
+        "interpretation.last_modified.modified_by.display_title",
+        "discovery_interpretation.gene_candidacy",
+        "discovery_interpretation.variant_candidacy",
+        "discovery_interpretation.note_text",
+        "discovery_interpretation.version",
+        "discovery_interpretation.project",
+        "discovery_interpretation.institution",
+        "discovery_interpretation.status",
+        "discovery_interpretation.last_modified.date_modified",
+        "discovery_interpretation.last_modified.modified_by.display_title"
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
