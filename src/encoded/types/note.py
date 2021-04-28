@@ -51,6 +51,7 @@ class NoteStandard(Note):
             return type_date
         # last resort, use uuid
         except Exception:
+            properties = self.upgrade_properties()
             return properties.get('uuid', None)
 
 
@@ -81,6 +82,7 @@ class NoteInterpretation(Note):
             return type_date
         # last resort, use uuid
         except Exception:
+            properties = self.upgrade_properties()
             return properties.get('uuid', None)
 
 
@@ -107,4 +109,5 @@ class NoteDiscovery(Note):
             return type_date
         # last resort, use uuid
         except Exception:
+            properties = self.upgrade_properties()
             return properties.get('uuid', None)
