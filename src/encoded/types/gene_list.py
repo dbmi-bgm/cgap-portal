@@ -28,10 +28,10 @@ class Gene(Item):
     rev = {'gene_lists': ('GeneList', 'genes')}
     embedded_list = [
         'gene_lists.title',
-        'interpretation.classification',
-        'interpretation.acmg_guidelines',
-        'interpretation.conclusion',
-        'interpretation.note_text'
+        'interpretations.classification',
+        'interpretations.acmg_guidelines',
+        'interpretations.conclusion',
+        'interpretations.note_text'
     ]
 
     @calculated_property(schema={
