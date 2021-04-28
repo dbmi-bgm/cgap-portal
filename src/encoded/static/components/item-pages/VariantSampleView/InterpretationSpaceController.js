@@ -223,6 +223,7 @@ export class InterpretationSpaceWrapper extends React.Component {
 export class InterpretationSpaceController extends React.Component {
 
     static tabNames = ["Variant Notes", "Gene Notes", "Clinical", "Discovery"];
+    static tabTitles = ["Variant Notes", "Gene Notes", "ACMG Interpretation", "Variant/Gene Discovery"];
 
     static haveEditPermission(actions){
         return _.findWhere(actions, { "name" : "edit" });
@@ -267,7 +268,7 @@ export class InterpretationSpaceController extends React.Component {
             gene_notes_wip: lastSavedGeneNote,
             interpretation_wip: lastSavedInterpretation,
             discovery_interpretation_wip: lastSavedDiscovery,
-            currentTab: _.contains(InterpretationSpaceController.tabNames, defaultTab) ? defaultTab : "Variant Notes",
+            currentTab: (defaultTab >= 0 && defaultTab < InterpretationSpaceController.tabNames.length) ? defaultTab : 0, // TODO: validate elsewhere - default to variantnotes
             isExpanded: false // TODO - currently unused; V2
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
@@ -327,33 +328,33 @@ export class InterpretationSpaceController extends React.Component {
 
         let panelToDisplay = null;
         switch(currentTab) {
-            case "Variant Notes":
+            case (0):
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab}
+                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case "Gene Notes":
+            case (1):
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab}
+                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case "Clinical":
+            case (2):
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab}
+                    lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case "Discovery":
+            case (3):
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} noteLabel={currentTab}
+                    lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={3} saveToField="discovery_interpretation" noteType="note_discovery" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
@@ -390,29 +391,15 @@ function InterpretationSpaceHeader(props) { // Expanded items commented out unti
 function InterpretationSpaceTabs(props) {
     const { currentTab, switchToTab } = props;
 
-    const variantNotesActive = currentTab === "Variant Notes" ? true : false;
-    const geneNotesActive = currentTab === "Gene Notes" ? true : false;
-    const interpretationActive = currentTab === "Clinical" ? true : false;
-    const discoveryActive = currentTab === "Discovery" ? true : false;
-
     return (
         <ul className="p-1 d-flex align-items-center justify-content-between">
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Variant Notes")}
-                data-active={variantNotesActive}>
-                Variant Notes
-            </li>
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Gene Notes")}
-                data-active={geneNotesActive}>
-                Gene Notes
-            </li>
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Clinical")}
-                data-active={interpretationActive}>
-                Clinical
-            </li>
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Discovery")}
-                data-active={discoveryActive}>
-                Discovery
-            </li>
+            {InterpretationSpaceController.tabNames.map((tabName, i) => {
+                const isActive = currentTab === i;
+                return (
+                    <li key={i} className="interpretation-tab clickable" onClick={(e) => switchToTab(i)} data-active={isActive}>
+                        {tabName}
+                    </li>);
+            })}
         </ul>
     );
 }
@@ -507,7 +494,7 @@ class GenericInterpretationPanel extends React.Component {
                 { noteType === "note_interpretation" ?
                     <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
-                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
+                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
