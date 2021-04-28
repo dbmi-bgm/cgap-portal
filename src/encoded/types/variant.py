@@ -486,9 +486,7 @@ class VariantSample(Item):
         variant_props = get_item_or_none(request, variant, frame="embedded")
         genes = variant_props.get("genes", [])
         for gene in genes:
-            genelists = (
-                gene.get("genes_most_severe_gene", {}).get("gene_lists", [])
-            )
+            genelists = gene.get("genes_most_severe_gene", {}).get("gene_lists", [])
             for genelist in genelists:
                 if (genelist["project"]["@id"] in potential_projects
                         and genelist["display_title"] not in project_genelists):

@@ -1,9 +1,9 @@
 import pytest
 import webtest
 import requests  # XXX: C4-211
-from .variant_fixtures import VARIANT_SAMPLE_URL
+from encoded.tests.variant_fixtures import VARIANT_SAMPLE_URL
 from encoded.types.variant import build_variant_sample_annotation_id
-from ..ingestion.common import CGAP_CORE_PROJECT
+from encoded.ingestion.common import CGAP_CORE_PROJECT
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.workbook]
