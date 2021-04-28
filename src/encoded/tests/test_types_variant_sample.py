@@ -109,33 +109,23 @@ def test_project_specific_variant_sample_genelist(
     respective projects. Institution is irrelevant here.
 
     Logic is:
-        - If gene list project is variant sample project, then the two are
-          associated (via variant sample's project_genelists property)
-        - If gene list project is cgap_core_project, then the two are
-          associated regardless of variant sample project
-        - If neither of the above apply, the two are not associated
+        - If gene list project is CGAP_CORE_PROJECT or same as variant sample
+          project, then the two are associated (via variant sample's
+          project_genelists property)
     """
-    response = testapp.post_json(
-        "/variant-samples", variant_sample
-    ).json["@graph"][0]
+    response = testapp.post_json("/variant-samples", variant_sample).json["@graph"][0]
     cgap_core_response = testapp.post_json(
-        "/variant-samples", cgap_core_variant_sample
-    ).json["@graph"][0]
+        "/variant-samples", cgap_core_variant_sample).json["@graph"][0]
     bgm_response = testapp.post_json(
-        "/variant-samples", bgm_variant_sample
-    ).json["@graph"][0]
+        "/variant-samples", bgm_variant_sample).json["@graph"][0]
     no_genelists_response = testapp.post_json(
-        "/variant-samples", variant_sample_2
-    ).json["@graph"][0]
+        "/variant-samples", variant_sample_2).json["@graph"][0]
     assert set(response["project_genelists"]) == {
         genelist["display_title"],
-        cgap_core_genelist["display_title"],
-    }
+        cgap_core_genelist["display_title"]}
     assert set(cgap_core_response["project_genelists"]) == {
-        cgap_core_genelist["display_title"]
-    }
+        cgap_core_genelist["display_title"]}
     assert set(bgm_response["project_genelists"]) == {
         bgm_genelist["display_title"],
-        cgap_core_genelist["display_title"],
-    }
+        cgap_core_genelist["display_title"]}
     assert not no_genelists_response["project_genelists"]

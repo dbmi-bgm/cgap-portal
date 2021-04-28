@@ -3,7 +3,7 @@ from uuid import uuid4
 import pytest
 import webtest
 
-from ..ingestion.common import CGAP_CORE_PROJECT
+from encoded.ingestion.common import CGAP_CORE_PROJECT
 
 
 class MockedLogger(object):
