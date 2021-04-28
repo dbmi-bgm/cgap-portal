@@ -30,7 +30,7 @@ export class InterpretationSpaceWrapper extends React.Component {
      *      "user": null... etc. }
      */
     static initializeNoteState(context = {}) {
-        const fields = ["variant_notes", "gene_notes", "interpretation"];
+        const fields = ["variant_notes", "gene_notes", "interpretation", "discovery_interpretation"];
         const newState = {};
         fields.forEach((field) => {
             const { [field]: note = null } = context;
@@ -206,10 +206,9 @@ export class InterpretationSpaceWrapper extends React.Component {
     }
 
     render() {
-        const { defaultTab, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
-        const { variant_notes, gene_notes, interpretation } = this.state;
+        const { variant_notes, gene_notes, interpretation, discovery_interpretation } = this.state;
         return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
-            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation}
+            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation} lastSavedDiscovery={discovery_interpretation}
             saveAsDraft={this.saveAsDraft} />;
     }
 }
@@ -258,16 +257,17 @@ export class InterpretationSpaceController extends React.Component {
 
     constructor(props) {
         super(props);
-        const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation, defaultTab } = props;
+        const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation, lastSavedDiscovery, defaultTab } = props;
 
         // use to validate passed in defaultTab prop
-        const acceptableTabNames = ["Variant Notes", "Gene Notes", "Interpretation"];
+        const acceptableTabNames = ["Variant Notes", "Gene Notes", "Interpretation", "Discovery Interpretation"];
 
         this.state = {
             // Initialize WIP states to last saved - if a tab is closed WIP progress is temporarily saved here
             variant_notes_wip: lastSavedVariantNote,
             gene_notes_wip: lastSavedGeneNote,
             interpretation_wip: lastSavedInterpretation,
+            discovery_interpretation_wip: lastSavedDiscovery,
             currentTab: _.contains(acceptableTabNames, defaultTab) ? defaultTab : "Variant Notes",
             isExpanded: false // TODO - currently unused; V2
         };
@@ -313,8 +313,8 @@ export class InterpretationSpaceController extends React.Component {
     }
 
     render() {
-        const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip } = this.state;
-        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, context } = this.props;
+        const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip, discovery_interpretation_wip } = this.state;
+        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context } = this.props;
         const { actions = [] } = context || {};
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
@@ -322,6 +322,7 @@ export class InterpretationSpaceController extends React.Component {
         const isDraftVariantNoteUnsaved = this.memoized.hasNoteChanged(variant_notes_wip, lastSavedVariantNote);
         const isDraftGeneNoteUnsaved = this.memoized.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
         const isDraftInterpretationUnsaved = this.memoized.hasNoteChanged(interpretation_wip, lastSavedInterpretation);
+        const isDraftDiscoveryUnsaved = this.memoized.hasNoteChanged(discovery_interpretation_wip, lastSavedDiscovery);
 
         const hasEditPermission = this.memoized.haveEditPermission(actions);
 
@@ -332,7 +333,7 @@ export class InterpretationSpaceController extends React.Component {
                     lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab}
                     key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
-                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved} />
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case "Gene Notes":
@@ -340,7 +341,7 @@ export class InterpretationSpaceController extends React.Component {
                     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab}
                     key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
-                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved} />
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case "Interpretation":
@@ -348,7 +349,15 @@ export class InterpretationSpaceController extends React.Component {
                     lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab}
                     key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
-                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved} />
+                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
+                );
+                break;
+            case "Discovery Interpretation":
+                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
+                    lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} noteLabel={currentTab}
+                    key={3} saveToField="discovery_interpretation" noteType="note_discovery" { ...passProps }
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
                 );
                 break;
             default:
@@ -385,6 +394,8 @@ function InterpretationSpaceTabs(props) {
     const variantNotesActive = currentTab === "Variant Notes" ? true : false;
     const geneNotesActive = currentTab === "Gene Notes" ? true : false;
     const interpretationActive = currentTab === "Interpretation" ? true : false;
+    const discoveryActive = currentTab === "Discovery Interpretation" ? true : false;
+
     return (
         <ul className="p-1 d-flex align-items-center justify-content-between">
             <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Variant Notes")}
@@ -398,6 +409,10 @@ function InterpretationSpaceTabs(props) {
             <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Interpretation")}
                 data-active={interpretationActive}>
                 Interpretation
+            </li>
+            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Discovery Interpretation")}
+                data-active={discoveryActive}>
+                Discovery Interpretation
             </li>
         </ul>
     );
