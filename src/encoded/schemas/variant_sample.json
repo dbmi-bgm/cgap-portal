@@ -489,17 +489,6 @@
             "title": "Variant",
             "type": "string",
             "linkTo": "Variant"
-        },
-        "project_genelists": {
-            "title": "Project Gene Lists",
-            "field_name": "project_genelists",
-            "description": "Gene lists associated with project of variant sample",
-            "type": "array",
-            "items": {
-                "title": "Gene list title",
-                "type": "string",
-                "description": "Gene list title"
-            }
         }
     },
     "columns": {
