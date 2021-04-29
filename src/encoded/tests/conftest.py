@@ -244,7 +244,7 @@ def htmltestapp(app):
     """TestApp for TEST user, accepting text/html content."""
     environ = {
         'HTTP_ACCEPT': 'text/html',
-        'HTTP_HOST': "mytestingwebsite.somewhere.example.com"
+        'HTTP_HOST': "mytestingwebsite.somewhere.example.com",
         'REMOTE_USER': 'TEST',
     }
     test_app = webtest.TestApp(app, environ)
