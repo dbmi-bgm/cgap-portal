@@ -34,7 +34,7 @@ def assume_identity():
     region_name = REGION  # us-east-1
 
     # XXX: We should refactor a SecretsManager wrapper into dcicutils
-    session = boto3.session.Session()
+    session = boto3.session.Session(region_name=region_name)
     # configure watchtower handler from session
     logger.addHandler(watchtower.CloudWatchLogHandler(boto3_session=session))
     client = session.client(
