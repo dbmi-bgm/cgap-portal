@@ -7,10 +7,14 @@
 import os
 import json
 import boto3
+import logging
 from botocore.exceptions import ClientError
 from dcicutils.beanstalk_utils import REGION
 from dcicutils.qa_utils import override_environ
 from dcicutils.deployment_utils import IniFileManager
+
+
+logger = logging.getLogger(__file__)
 
 
 class CGAPDockerIniFileManager(IniFileManager):
@@ -58,13 +62,16 @@ def assume_identity():
         # Depending on whether the secret is a string or binary, one of these fields will be populated.
         if 'SecretString' in get_secret_value_response:
             identity = json.loads(get_secret_value_response['SecretString'])
+            logger.error('got a secret')
         else:
-            print('Got unexpected response structure from boto3')
+            logger.error('Got unexpected response structure from boto3')
             exit(1)
 
         # build production.ini
         with override_environ(identity):  # noQA exit above
+            logger.error('building the ini file')
             CGAPDockerIniFileManager.main()
+            logger.error('production.ini should be here now')
 
 
 if __name__ == '__main__':
