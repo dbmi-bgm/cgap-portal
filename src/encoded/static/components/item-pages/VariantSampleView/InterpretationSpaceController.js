@@ -41,6 +41,59 @@ export class InterpretationSpaceWrapper extends React.Component {
         return newState;
     }
 
+    /**
+     * Accepts note state from GenericInterpretationPanel and returns a version cleaned for post/patch request
+     * @param {Object} noteState    An object containing a map of fields & data for submission.
+     * @param {String} noteType     One of "note_standard", "note_interpretation", or "note_discovery"
+     * Different types of notes accept slightly different fields, and will throw errors if they receive
+     * the wrong ones. The 'fieldsToClean' arrays can be updated to accomodate new fields.
+     *
+     * Does not edit note in-place.
+     */
+    static cleanUpNoteStateForPostPatch(noteState, noteType) {
+        if (!noteType) {
+            throw new Error ("Failed to provide noteType for note cleanup.");
+        }
+
+        // Clone note, so not editing in-place
+        const cleanedNote = { ...noteState };
+
+        const fieldsToCleanFromInterpretation = ["gene_candidacy", "variant_candidacy"];
+        const fieldsToCleanFromDiscovery = ["acmg_guidelines", "conclusion", "classification"];
+        const fieldsToCleanFromStandard = ["acmg_guidelines", "conclusion", "classification", "gene_candidacy", "variant_candidacy"];
+
+        switch(noteType) {
+            case "note_interpretation":
+                fieldsToCleanFromInterpretation.forEach((field) => {
+                    delete cleanedNote[field];
+                });
+                if (cleanedNote.classification === null) {
+                    delete cleanedNote.classification;
+                }
+                break;
+            case "note_standard":
+                fieldsToCleanFromStandard.forEach((field) => {
+                    delete cleanedNote[field];
+                });
+                break;
+            case "note_discovery":
+                fieldsToCleanFromDiscovery.forEach((field) => {
+                    delete cleanedNote[field];
+                });
+                if (cleanedNote.gene_candidacy === null) {
+                    delete cleanedNote.gene_candidacy;
+                }
+                if (cleanedNote.variant_candidacy === null) {
+                    delete cleanedNote.variant_candidacy;
+                }
+                break;
+            default:
+                throw new Error("Failed to cleanup note of type '" + noteType + "' for submission");
+        }
+
+        return cleanedNote;
+    }
+
     constructor(props) {
         super(props);
         console.log("InterpretationSpaceWrapper props", props);
@@ -53,31 +106,16 @@ export class InterpretationSpaceWrapper extends React.Component {
      * Can be used for creating new drafts
      * @param {Object}   note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
      * @param {String}   noteType "note_interpretation" or "note_standard"
-     * @param {Integer}  version  Number to set version to (not in use currently... may need if expand for case in future)
-     * @param {String}   status   Should be "in review" (not really in use currently... may expand if expand for case in future)
      */
-    postNewNote(note, noteType, version = 1, status = "in review") {
+    postNewNote(note, noteType) {
         const { context: { institution = null, project = null } = {} } = this.props;
         const { '@id': institutionID } = institution || {};
         const { '@id': projectID } = project || {};
 
-        const noteToSubmit = { ...note };
-
-        if (noteType === "note_interpretation") {
-            // Prune keys with incomplete values
-            if (noteToSubmit.classification === null) {
-                delete noteToSubmit.classification;
-            }
-        } else {
-            // Prune unused keys
-            delete noteToSubmit.acmg_guidelines;
-            delete noteToSubmit.conclusion;
-            delete noteToSubmit.classification;
-        }
+        const noteToSubmit = InterpretationSpaceWrapper.cleanUpNoteStateForPostPatch(note, noteType); // returns a cleaned clone
 
         noteToSubmit.institution = institutionID;
         noteToSubmit.project = projectID;
-        noteToSubmit.status = status;
 
         return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(noteToSubmit));
     }
@@ -106,27 +144,10 @@ export class InterpretationSpaceWrapper extends React.Component {
             console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
             const {
                 '@id': noteAtID,
-                uuid: noteUUID, version,
+                uuid: noteUUID
             } = lastSavedNote;
 
-            const noteToSubmit = { ...note };
-
-            if (noteType === "note_interpretation") {
-                // Prune keys with incomplete values
-                if (noteToSubmit.classification === null) {
-                    delete noteToSubmit.classification;
-                }
-            } else {
-                // Prune unused keys
-                delete noteToSubmit.acmg_guidelines;
-                delete noteToSubmit.conclusion;
-                delete noteToSubmit.classification;
-            }
-
-            // Bump version number only if already has one (draft autosave/clone of a pre-existing approved note)
-            if (noteToSubmit.version) {
-                noteToSubmit.version = version + 1;
-            }
+            const noteToSubmit = InterpretationSpaceWrapper.cleanUpNoteStateForPostPatch(note, noteType); // returns a cleaned clone
 
             this.setState({ loading: true }, () => {
                 this.patchPreviouslySavedNote(noteAtID, noteToSubmit)
@@ -159,7 +180,7 @@ export class InterpretationSpaceWrapper extends React.Component {
             let newNoteID;
 
             this.setState({ loading: true }, () => {
-                this.postNewNote(note, noteType, null, "in review")
+                this.postNewNote(note, noteType)
                     .then((response) => {
                         const { '@graph': noteItems = [], status } = response;
 
@@ -408,16 +429,19 @@ class GenericInterpretationPanel extends React.Component {
     constructor(props) {
         super(props);
 
-        const { note_text = "", acmg_guidelines = [], classification = null, conclusion =  "", variant_candidacy = null, gene_candidacy = null } = props.lastWIPNote || props.lastSavedNote || {};
+        const {
+            note_text = "", acmg_guidelines = [], classification = null,
+            conclusion =  "", variant_candidacy = null, gene_candidacy = null
+        } = props.lastWIPNote || props.lastSavedNote || {};
 
         this.state = {
             // Fields in form. Using snake casing to make it easier to add state data directly to post/patch request
             note_text,
-            acmg_guidelines,            // TODO: Currently Unused
             classification,
-            conclusion,                 // TODO: Currently Unused
             variant_candidacy,
-            gene_candidacy
+            gene_candidacy,
+            acmg_guidelines,            // TODO: Currently Unused
+            conclusion                  // TODO: Currently Unused
         };
 
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
