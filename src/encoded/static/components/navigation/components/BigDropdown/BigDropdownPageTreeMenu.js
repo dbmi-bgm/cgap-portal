@@ -71,7 +71,7 @@ export function BigDropdownPageTreeMenu(props) {
             <div key="reserved"
                 className={"help-menu-tree level-1-no-child-links level-1 col-12" + (!hasLevel2Children? " col-lg-8" : " col-lg-4")}>
                 { level1ChildrenWithoutSubChildren.map(function(child){
-                    const active = (urlParts.pathname.indexOf(child.name) > -1 ? ' active' : '');
+                    const active = urlParts.pathname.indexOf(child.name) > -1;
                     return <Level1Title childPageItem={child} key={child.name} active={active} />;
                 }) }
             </div>

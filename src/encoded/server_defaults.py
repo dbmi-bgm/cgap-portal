@@ -11,7 +11,7 @@ from string import digits, ascii_uppercase
 
 ACCESSION_FACTORY = __name__ + ':accession_factory'
 ACCESSION_PREFIX = 'GAP'
-TEST_PREFIX = 'TST'
+ACCESSION_TEST_PREFIX = 'TST'
 
 
 def includeme(config):

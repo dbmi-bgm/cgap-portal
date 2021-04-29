@@ -40,15 +40,6 @@
             "$ref": "mixins.json#/notes"
         },
         {
-            "$ref": "mixins.json#/interpretation"
-        },
-        {
-            "$ref": "mixins.json#/variant_notes"
-        },
-        {
-            "$ref": "mixins.json#/gene_notes"
-        },
-        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
@@ -489,6 +480,30 @@
             "title": "Variant",
             "type": "string",
             "linkTo": "Variant"
+        },
+        "gene_notes": {
+            "title": "Gene Notes",
+            "description": "Notes related to the relevant Gene",
+            "type": "string",
+            "linkTo": "NoteStandard"
+        },
+        "variant_notes": {
+            "title": "Variant Notes",
+            "description": "Notes related to the relevant Variant",
+            "type": "string",
+            "linkTo": "NoteStandard"
+        },
+        "interpretation": {
+            "title": "Clinical Interpretation",
+            "description": "Clinical Interpretation Note connected to this item",
+            "type": "string",
+            "linkTo": "NoteInterpretation"
+        },
+        "discovery_interpretation": {
+            "title": "Discovery Interpretation",
+            "description": "Gene/Variant Discovery interpretation note connected to this item",
+            "type": "string",
+            "linkTo": "NoteDiscovery"
         }
     },
     "columns": {
@@ -627,7 +642,7 @@
             "search_type": "sayt_without_terms",
             "sayt_item_type": "Gene"
         },
-        "variant.genes.genes_most_severe_gene.gene_lists.display_title": {
+        "project_genelists": {
             "title": "Gene List",
             "order": 2,
             "grouping": "Genes",

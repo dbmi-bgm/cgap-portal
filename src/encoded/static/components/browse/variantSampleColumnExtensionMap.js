@@ -31,6 +31,7 @@ export const variantSampleColumnExtensionMap = {
     "associated_genotype_labels.proband_genotype_label" : {
         widthMap: { 'lg' : 240, 'md' : 230, 'sm' : 200 },
         render: function(result, props) {
+            const { align = "center" } = props;
             const { associated_genotype_labels : { proband_genotype_label = null, mother_genotype_label = null, father_genotype_label = null } = {} } = result;
             const rows = [];
             if (proband_genotype_label) {
@@ -44,15 +45,17 @@ export const variantSampleColumnExtensionMap = {
             if (father_genotype_label) {
                 rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
             }
-            return <StackedRowColumn className="text-center" {...{ rows }}/>;
+            return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
         }
     },
     // "Gene, Transcript" column
     "variant.genes.genes_most_severe_gene.display_title": {
         // Also includes "variant.genes.genes_most_severe_transcript"
+        // TODO: Update with onclick to handle google analytics tracking
         widthMap: { 'lg' : 155, 'md' : 140, 'sm' : 130 },
         render: function(result, props) {
-            const { variant : { genes = [] } = {} } = result;
+            const { "@id" : atID = null, variant : { genes = [] } = {} } = result;
+            const { link = null, align = "center" } = props;
 
             const geneTitles = genes.map((geneItem) => {
                 const { genes_most_severe_gene: { display_title = null } = {} } = geneItem || {};
@@ -61,10 +64,13 @@ export const variantSampleColumnExtensionMap = {
             if (genes.length > 0) {
                 const { genes_most_severe_transcript = null } = genes[0] || {};
                 const rows = [
-                    <span key="genes_ensg" className="font-italic d-block text-truncate">{ geneTitles.length > 1 ? geneTitles.join() : geneTitles } </span>,
-                    <span data-tip="Most Severe Transcript" key="genes_severe_transcript" className="font-italic d-block text-truncate">{ genes_most_severe_transcript}</span>
+                    <span key="genes_ensg" className="d-block text-truncate">{ geneTitles.length > 1 ? geneTitles.join() : geneTitles } </span>,
+                    <span data-tip="Most Severe Transcript" key="genes_severe_transcript" className="font-italic d-block text-truncate text-small">{ genes_most_severe_transcript}</span>
                 ];
-                return <StackedRowColumn className="text-center" {...{ rows }} />;
+                return (
+                    <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"}>
+                        <StackedRowColumn className={"text-" + align} {...{ rows }} />
+                    </a>);
             }
             return null;
         }
@@ -72,16 +78,21 @@ export const variantSampleColumnExtensionMap = {
     // "Coding & Protein Sequence" col (existing 'Variant' column)
     "variant.genes.genes_most_severe_hgvsc": {
         // Also renders "variant.genes.genes_most_severe_hgvsp"
+        // TODO: Update with onclick to handle google analytics tracking
         widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
         render: function(result, props) {
-            const { variant : { genes : [ firstGene = null ] = [] } = {} } = result;
+            const { link = null, align = "center" } = props;
+            const { "@id" : atID = null, variant : { genes : [ firstGene = null ] = [] } = {} } = result;
             const { genes_most_severe_hgvsc = null, genes_most_severe_hgvsp = null } = firstGene || {};
 
             if (!genes_most_severe_hgvsc && !genes_most_severe_hgvsp) {
                 return null;
             }
 
-            return <GenesMostSevereHGVSCColumn gene={firstGene} />;
+            return (
+                <a href={link ? link: atID ? atID + '?annotationTab=1' : "#"}>
+                    <GenesMostSevereHGVSCColumn gene={firstGene} {...{ align }} />
+                </a>);
         }
     },
     "variant.genes.genes_most_severe_consequence.coding_effect": { // Coding Effect column
@@ -157,7 +168,7 @@ export function StackedRowColumn(props) {
 export const VariantSampleDisplayTitleColumn = React.memo(function VariantSampleDisplayTitleColumn(props) {
     const { result = null, link, onClick, className = null } = props;
     const { variant = null } = result || {};
-    const { display_title = null, ID = null } = variant;
+    const { display_title = null, ID = null } = variant || {};
 
     const cls = ("title-block" + (className ? " " + className : ""));
     const rows = [
@@ -175,7 +186,7 @@ export const VariantSampleDisplayTitleColumn = React.memo(function VariantSample
     );
 });
 
-const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene }){
+const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene, align }){
     const {
         genes_most_severe_hgvsc = null,
         genes_most_severe_hgvsp = null
@@ -201,6 +212,6 @@ const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColum
             </div>);
     }
 
-    return <StackedRowColumn className="text-center" {...{ rows }} />;
+    return <StackedRowColumn className={"text-" + align} {...{ rows }} />;
 });
 

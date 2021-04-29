@@ -7,7 +7,7 @@ import moment from 'moment';
 import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
-import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
+import { FilteringTableFilterSetUI, FilterSetController, SaveFilterSetButtonController, SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI';
 import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
 
 /**
@@ -76,9 +76,10 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     const {
         context = null,
-        windowHeight,
         session = false,
         schemas,
+        windowHeight,
+        windowWidth,
         onCancelSelection,          // Not used -- passed in from SelectedItemsController and would close window.
         onCompleteSelection,        // Not used -- passed in from SelectedItemsController and would send selected items back to parent window.
         selectedItems,              // passed in from SelectedItemsController
@@ -144,6 +145,10 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             ]
         };
 
+        // IMPORTANT:
+        // We preserve this, but we DO NOT utilize it in FilterSetController at moment
+        // because FilterSet Presets may be re-used for many different Cases.
+        // TODO: maybe remove
         if (initial_search_href_filter_addon) {
             blankFilterSetItem.flags = [
                 {
@@ -158,29 +163,37 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedItems there.
     const fsuiProps = {
-        schemas,
+        schemas, session,
         variantSampleListItem,
         updateVariantSampleListID,
         refreshExistingVariantSampleListItem,
         selectedItems,
         onResetSelectedItems,
-        setIsSubmitting,
-        "caseItem": context
+        // setIsSubmitting,
+        // "caseItem": context
     };
+
+    const embeddedTableHeaderBody = (
+        <SaveFilterSetButtonController caseItem={context} setIsSubmitting={setIsSubmitting}>
+            <SaveFilterSetPresetButtonController>
+                <FilteringTableFilterSetUI {...fsuiProps} />
+            </SaveFilterSetPresetButtonController>
+        </SaveFilterSetButtonController>
+    );
 
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
     const embeddedTableHeader = activeFilterSetID ? (
         <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
             <FilterSetController {...{ searchHrefBase, onResetSelectedItems }} excludeFacets={hideFacets}>
-                <FilteringTableFilterSetUI {...fsuiProps} />
+                { embeddedTableHeaderBody }
             </FilterSetController>
         </ajax.FetchedItem>
     ) : (
         // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
         // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase, onResetSelectedItems }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
-            <FilteringTableFilterSetUI {...fsuiProps} />
+        <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+            { embeddedTableHeaderBody }
         </FilterSetController>
     );
 
