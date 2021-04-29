@@ -17,7 +17,6 @@ from dcicutils.deployment_utils import IniFileManager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__file__)
-logger.addHandler(watchtower.CloudWatchLogHandler())
 
 
 class CGAPDockerIniFileManager(IniFileManager):
@@ -36,6 +35,8 @@ def assume_identity():
 
     # XXX: We should refactor a SecretsManager wrapper into dcicutils
     session = boto3.session.Session()
+    # configure watchtower handler from session
+    logger.addHandler(watchtower.CloudWatchLogHandler(boto3_session=session))
     client = session.client(
         service_name='secretsmanager',
         region_name=region_name

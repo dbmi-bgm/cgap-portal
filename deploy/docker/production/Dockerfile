@@ -7,9 +7,9 @@ MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
 # Build Arguments
 ARG CGAP_ENV_NAME
-ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"fourfront-cgapmastertest"}
+ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-mastertest"}
 ARG CGAP_BRANCH
-ENV CGAP_BRANCH=${CGAP_BRANCH:-"master"}
+ENV CGAP_BRANCH=${CGAP_BRANCH:-"c4_519"}
 
 # Configure (global) Env
 ENV CGAP_REPO=https://github.com/dbmi-bgm/cgap-portal.git
