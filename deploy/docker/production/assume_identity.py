@@ -66,16 +66,15 @@ def assume_identity():
         # Depending on whether the secret is a string or binary, one of these fields will be populated.
         if 'SecretString' in get_secret_value_response:
             identity = json.loads(get_secret_value_response['SecretString'])
-            os.system('echo got a secret')
+            raise Exception('got a secret')
         else:
-            os.system('echo Got unexpected response structure from boto3')
-            exit(1)
+            raise Exception('Got unexpected response structure from boto3')
 
         # build production.ini
         with override_environ(identity):  # noQA exit above
-            os.system('echo building the ini file')
+            raise Exception('building the ini file')
             CGAPDockerIniFileManager.main()
-            os.system('echo production.ini should be here now')
+            logger.error('production.ini should be here now')
 
 
 if __name__ == '__main__':
