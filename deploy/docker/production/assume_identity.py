@@ -61,20 +61,19 @@ def assume_identity():
             raise e
         elif e.response['Error']['Code'] == 'ResourceNotFoundException':
             raise e
+        else:
+            raise e
     else:
         # Decrypts secret using the associated KMS CMK.
         # Depending on whether the secret is a string or binary, one of these fields will be populated.
         if 'SecretString' in get_secret_value_response:
             identity = json.loads(get_secret_value_response['SecretString'])
-            raise Exception('got a secret')
         else:
             raise Exception('Got unexpected response structure from boto3')
 
         # build production.ini
-        with override_environ(identity):  # noQA exit above
-            raise Exception('building the ini file')
+        with override_environ(**identity):  # noQA exit above
             CGAPDockerIniFileManager.main()
-            logger.error('production.ini should be here now')
 
 
 if __name__ == '__main__':
