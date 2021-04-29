@@ -315,7 +315,6 @@ def login(context, request):
 
     request_parts = urlparse(request.referrer)
     request_domain = request_parts.hostname
-
     is_https = request_parts.scheme == "https"
 
 
@@ -330,11 +329,16 @@ def login(context, request):
     #     # (This check is not strictly needed for anything, just provides more feedback faster.. maybe should be removed?)
     #     raise LoginDenied(domain=request.domain)
 
+    # `request.domain` is more consistently-present than request.referrer
+    # however login is only triggered through AJAX so we can depend on request.referrer here,
+    # and have it serve as minor layer of obfuscation.
+
+    if not request_domain:
+        raise HTTPForbidden("Expected a valid hostname")
 
     request.response.set_cookie(
         "jwtToken",
         value=request_token,
-        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
         domain=request_domain,
         path="/",
         httponly=True,
@@ -361,14 +365,11 @@ def logout(context, request):
     browser cookies and re-requesting the current 4DN URL.
     """
 
-    request_parts = urlparse(request.referrer)
-    request_domain = request_parts.hostname
-
     # Deletes the cookie
     request.response.set_cookie(
         name='jwtToken',
         value=None,
-        domain=request_domain,
+        domain=request.domain,
         max_age=0,
         path='/',
         overwrite=True
@@ -528,7 +529,6 @@ def impersonate_user(context, request):
     request.response.set_cookie(
         "jwtToken",
         value=id_token.decode('utf-8'),
-        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
         domain=request_domain,
         path="/",
         httponly=True,
