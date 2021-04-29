@@ -408,7 +408,7 @@ class GenericInterpretationPanel extends React.Component {
     constructor(props) {
         super(props);
 
-        const { note_text = "", acmg_guidelines = [], classification = null, conclusion =  "" } = props.lastWIPNote || props.lastSavedNote || {};
+        const { note_text = "", acmg_guidelines = [], classification = null, conclusion =  "", variant_candidacy = null, gene_candidacy = null } = props.lastWIPNote || props.lastSavedNote || {};
 
         this.state = {
             // Fields in form. Using snake casing to make it easier to add state data directly to post/patch request
@@ -416,6 +416,8 @@ class GenericInterpretationPanel extends React.Component {
             acmg_guidelines,            // TODO: Currently Unused
             classification,
             conclusion,                 // TODO: Currently Unused
+            variant_candidacy,
+            gene_candidacy
         };
 
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
@@ -474,7 +476,7 @@ class GenericInterpretationPanel extends React.Component {
             last_modified: lastModified = null
         } = lastSavedNote || {};
         const { modified_by: { display_title : lastModUsername } = {}, date_modified = null } = lastModified || {};
-        const { note_text: noteText, acmg_guidelines, classification, conclusion } = this.state;
+        const { note_text: noteText, acmg_guidelines, classification, gene_candidacy, variant_candidacy, conclusion } = this.state;
 
         const noteChangedSinceLastSave = memoizedHasNoteChanged(lastSavedNote, this.state);
         const noteTextPresent = !!noteText;
@@ -493,6 +495,9 @@ class GenericInterpretationPanel extends React.Component {
                 <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
                     <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    : null }
+                { noteType === "note_discovery" ?
+                    <DiscoveryForm {...{ schemas, gene_candidacy, variant_candidacy, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
                 <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave }}
                     saveAsDraft={this.saveStateAsDraft}
@@ -663,6 +668,28 @@ function ACMGInterpretationForm(props) {
     return (
         <React.Fragment>
             <NoteFieldDrop {...{ schemas, noteType }} getFieldProperties={getFieldProperties} onOptionChange={onDropOptionChange} field="classification" value={classification}/>
+        </React.Fragment>
+    );
+}
+
+/** Display additional form fields for Discovery */
+function DiscoveryForm(props) {
+    const { schemas, variant_candidacy, gene_candidacy, conclusion = null, noteType, onDropOptionChange } = props;
+
+    const getFieldProperties = useMemo(function(){
+        if (!schemas) return function(){ return null; };
+        // Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`.
+        return function(field){
+            const noteItem = noteType === "note_discovery" ? "NoteDiscovery" : "NoteStandard";
+            const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, noteItem);
+            return (schemaProperty || {});
+        };
+    }, [ schemas ]);
+
+    return (
+        <React.Fragment>
+            <NoteFieldDrop {...{ schemas, noteType }} getFieldProperties={getFieldProperties} onOptionChange={onDropOptionChange} field="variant_candidacy" value={variant_candidacy}/>
+            <NoteFieldDrop {...{ schemas, noteType }} getFieldProperties={getFieldProperties} onOptionChange={onDropOptionChange} field="gene_candidacy" value={gene_candidacy}/>
         </React.Fragment>
     );
 }
