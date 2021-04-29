@@ -5,7 +5,7 @@ echo "Starting up CGAP Portal"
 
 # Run assume_identity.py to access the desired deployment configuration from
 # secrets manager - this builds production.ini
-poetry run python -m assume_identity.py
+poetry run python -m assume_identity
 
 # XXX: this is deployment stuff, doesn't need to be run at this time
 ## Clear db/es since this is the local entry point
