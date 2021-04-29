@@ -910,8 +910,15 @@ class PedigreeMetadata:
                                        {'family_id': item['family_id'], 'members': []})
             family_metadata[item['family_id']]['members'].append(alias)
             if item.get('proband', False):
-                family_metadata[item['family_id']]['proband'] = alias
-                family_metadata[item['family_id']]['aliases'] = [self.project + ':family-' + item['individual_id']]
+                if 'proband' not in family_metadata[item['family_id']]:
+                    family_metadata[item['family_id']]['proband'] = alias
+                    family_metadata[item['family_id']]['aliases'] = [
+                        self.project + ':family-' + item['individual_id']
+                    ]
+                else:
+                    msg = ('More than one proband indicated for family {}. Please indicate'
+                           ' a single proband in the spreadsheet and resubmit'.format(item['family_id']))
+                    self.errors.append(msg)
             del item['family_id']
         final_family_dict = {}
         for key, value in family_metadata.items():
@@ -921,7 +928,7 @@ class PedigreeMetadata:
                 # if family not in DB, create a new one
                 # first make sure a proband is indicated for a family if its not already in DB
                 if not value.get('proband'):
-                    msg = ('No proband indicated for family {}. Please edit and resubmit'.format(value['family_id']))
+                    msg = 'No proband indicated for family {}. Please edit and resubmit'.format(value['family_id'])
                     self.errors.append(msg)
                 else:
                     final_family_dict[value['aliases'][0]] = value
