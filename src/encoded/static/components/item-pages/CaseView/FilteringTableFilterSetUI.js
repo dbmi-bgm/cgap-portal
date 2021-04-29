@@ -570,23 +570,26 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
         } = this.state;
 
         let body = null;
-        if (isLoadingPresets) {
-            body = (
-                <div className="text-center text-large py-4 text-muted">
-                    <i className="icon icon-spin icon-2x icon-circle-notch fas"/>
-                </div>
-            );
-        } else if (!presetResults || presetResults.length === 0){
-            body = (
-                <div className="py-4 px-3 bg-white border-bottom">
-                    <h4 className="my-0 text-400">
-                        No presets saved yet
-                    </h4>
-                    <p>
-                        Create a FilterSet and then click <em>Save As...</em> to create a preset.
-                    </p>
-                </div>
-            );
+        if (!presetResults || presetResults.length === 0){
+            if (isLoadingPresets) {
+                // Only show loading indicator in body for lack of initial results.
+                body = (
+                    <div className="text-center text-large py-4 text-muted">
+                        <i className="icon icon-spin icon-2x icon-circle-notch fas"/>
+                    </div>
+                );
+            } else {
+                body = (
+                    <div className="py-4 px-3 bg-white border-bottom">
+                        <h4 className="my-0 text-400">
+                            No presets saved yet
+                        </h4>
+                        <p>
+                            Create a FilterSet and then click <em>Save As...</em> to create a preset.
+                        </p>
+                    </div>
+                );
+            }
         } else if (presetResults) {
 
             // TODO wrap results in infinite scroll of some sort later on,
@@ -603,7 +606,7 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
             };
             const { derived_from_preset_filterset: currentCaseDerivedFromPresetUUID = null } = currentCaseFilterSet || {};
             body = (
-                <div className="results-container">
+                <div className="results-container border-top">
                     { presetResults.map(function(presetFilterSet, idx){
                         const { uuid: thisPresetFSUUID } = presetFilterSet;
                         const isOriginOfCurrentCaseFilterSet = currentCaseDerivedFromPresetUUID === thisPresetFSUUID;
@@ -623,7 +626,7 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
                 <i className="icon icon-exclamation-triangle fas ml-05 text-small" data-tip={errorMessage} data-html />
 
             );
-        } else if (isCheckingForNewFilterSet) {
+        } else if (isCheckingForNewFilterSet || isLoadingPresets) {
             nextToTitleIcon = (
                 <i className="icon icon-circle-notch icon-spin fas ml-07 text-small text-muted" data-tip="Preset(s) below have been updated but this is not yet reflected." data-html />
             );
@@ -646,9 +649,7 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
                         </div>
                     </div>
                 </div>
-                <div className="inner-body border-top">
-                    { body }
-                </div>
+                { body }
             </div>
         );
     }
