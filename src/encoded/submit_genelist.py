@@ -435,41 +435,21 @@ class GeneListSubmission:
                 ).json["@graph"]
                 project_titles = [x["title"] for x in project_genelists]
                 for previous_title in project_titles:
+                    genelist_title = previous_title
                     title_count = re.findall(r"\(\d{1,}\)", previous_title)
-                    if not title_count:
-                        if self.title == previous_title:
-                            genelist_idx = project_titles.index(previous_title)
-                            genelist_uuid = project_genelists[genelist_idx][
-                                "uuid"
-                            ]
-                            genelist_gene_uuids = project_genelists[
-                                genelist_idx
-                            ]["genes"]
-                            for gene_uuid in genelist_gene_uuids:
-                                previous_genelist_gene_ids.append(
-                                    gene_uuid["uuid"]
-                                )
-                            break
-                        else:
-                            continue
-                    title_count = title_count[-1]
-                    title_count_idx = previous_title.index(title_count)
-                    previous_title_stripped = previous_title[
-                        :title_count_idx
-                    ].strip()
-                    if self.title == previous_title_stripped:
-                        genelist_idx = project_titles.index(previous_title)
+                    if title_count:
+                        title_count_idx = previous_title.index(title_count[-1])
+                        previous_title = previous_title[:title_count_idx].strip()
+                    if self.title == previous_title:
+                        genelist_idx = project_titles.index(genelist_title)
                         genelist_uuid = project_genelists[genelist_idx]["uuid"]
                         genelist_gene_uuids = project_genelists[genelist_idx][
                             "genes"
                         ]
-                        for gene_uuid in genelist_gene_uuids:
-                            previous_genelist_gene_ids.append(
-                                gene_uuid["uuid"]
-                            )
+                        previous_genelist_gene_ids += [
+                            gene["uuid"] for gene in genelist_gene_uuids
+                        ]
                         break
-                    else:
-                        continue
             except VirtualAppError:
                 pass
         try:
@@ -590,6 +570,7 @@ class GeneListSubmission:
         """
         if not self.post_output:
             return
+        uuids_to_update = list(set(self.gene_ids + self.previous_gene_ids))
         creation_post_url = "/IngestionSubmission"
         creation_post_data = {
             "ingestion_type": "variant_update",
@@ -609,7 +590,7 @@ class GeneListSubmission:
             (
                 "datafile",
                 self.title.replace(" ", "_") + "_gene_ids",
-                bytes("\n".join(self.gene_ids), encoding="utf-8"),
+                bytes("\n".join(uuids_to_update), encoding="utf-8"),
             )
         ]
         submission_response = self.vapp.post(
@@ -739,6 +720,7 @@ class VariantUpdateSubmission:
             "variant.genes.genes_most_severe_gene.uuid",
             self.vapp,
             item_type="VariantSample",
+            project=self.project,
         )
         for variant_sample_response in variant_sample_search:
             variant_samples_to_invalidate.append(
@@ -756,7 +738,8 @@ class VariantUpdateSubmission:
         """
         if not self.variant_samples:
             validate_output = (
-                "No variant samples were found for the given genes"
+                "No project-associated variant samples were found for the "
+                "given genes."
             )
             return validate_output
         not_validated = []
@@ -804,7 +787,12 @@ class CommonUtils:
 
     @staticmethod
     def batch_search(
-        item_list, search_term, app, item_type="Gene", batch_size=5
+        item_list,
+        search_term,
+        app,
+        item_type="Gene",
+        project=None,
+        batch_size=5,
     ):
         """
         Performs get requests in batches to decrease the number of
@@ -820,6 +808,10 @@ class CommonUtils:
             batch.append(item)
             if item == item_list[-1] or len(batch) == batch_size:
                 batch_string = ("&" + search_term + "=").join(batch)
+                if project:
+                    batch_string += "&project.%40id=" + project.replace(
+                        "/", "%2F"
+                    )
                 try:
                     response = app.get(
                         "/search/?type="

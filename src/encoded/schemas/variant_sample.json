@@ -642,7 +642,7 @@
             "search_type": "sayt_without_terms",
             "sayt_item_type": "Gene"
         },
-        "variant.genes.genes_most_severe_gene.gene_lists.display_title": {
+        "project_genelists": {
             "title": "Gene List",
             "order": 2,
             "grouping": "Genes",

@@ -1,23 +1,24 @@
-import boto3
 import datetime
 import io
 import json
-import negspy.coordinates as nc
 import os
+from urllib.parse import parse_qs, urlparse
+
+import boto3
+import negspy.coordinates as nc
 import pytz
 import structlog
-
 from pyramid.httpexceptions import HTTPTemporaryRedirect
 from pyramid.settings import asbool
 from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
-from urllib.parse import parse_qs, urlparse
-from ..util import resolve_file_path
-from ..inheritance_mode import InheritanceMode
-from .base import Item, get_item_or_none
 
+from encoded.ingestion.common import CGAP_CORE_PROJECT
+from encoded.inheritance_mode import InheritanceMode
+from encoded.util import resolve_file_path
+from encoded.types.base import Item, get_item_or_none
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
@@ -466,6 +467,31 @@ class VariantSample(Item):
                 new_labels[role_key] = ' '.join(label)  # just in case
 
         return new_labels
+
+    @calculated_property(schema={
+        "title": "Project Gene Lists",
+        "field_name": "project_genelists",
+        "description": "Gene lists associated with project of variant sample",
+        "type": "array",
+        "items": {
+            "title": "Gene list title",
+            "type": "string",
+            "description": "Gene list title"
+        }
+    })
+    def project_genelists(self, request, project, variant):
+        project_genelists = []
+        core_project = CGAP_CORE_PROJECT + "/"
+        potential_projects = [core_project, project]
+        variant_props = get_item_or_none(request, variant, frame="embedded")
+        genes = variant_props.get("genes", [])
+        for gene in genes:
+            genelists = gene.get("genes_most_severe_gene", {}).get("gene_lists", [])
+            for genelist in genelists:
+                if (genelist["project"]["@id"] in potential_projects
+                        and genelist["display_title"] not in project_genelists):
+                    project_genelists.append(genelist["display_title"])
+        return project_genelists
 
 
 @collection(
