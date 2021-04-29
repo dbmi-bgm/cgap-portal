@@ -77,6 +77,12 @@ RUN touch /var/log/nginx/access.log && \
 RUN touch /var/log/nginx/error.log && \
         chown -R nginx:nginx /var/log/nginx/error.log
 
+# Provide base ini file
+# will be picked up by IniFileManager
+# *.ini must match the env name in secrets manager!
+# For now, this is mastertest. - Will 04/29/21
+COPY mastertest.ini deploy/ini_files/.
+
 COPY entrypoint.sh .
 COPY assume_identity.py .
 RUN chmod +x entrypoint.sh
