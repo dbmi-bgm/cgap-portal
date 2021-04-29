@@ -217,7 +217,6 @@ class TestVariantUpdateSubmission:
         )
         assert len(variant_update.gene_uuids) == 3
         assert len(variant_update.variant_samples) == 1
-        assert variant_update.json_post
         assert variant_update.validate_output
         assert variant_update.post_output
         assert not variant_update.errors

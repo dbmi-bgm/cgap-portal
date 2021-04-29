@@ -58,6 +58,7 @@ export const Term = {
             case 'date_modified':
             case 'public_release':
             case 'project_release':
+            case 'approved_date':
                 if (allowJSXOutput){
                     return <LocalizedTime timestamp={term} localize={false} />;
                 }

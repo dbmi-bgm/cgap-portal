@@ -1,38 +1,25 @@
-import glob
-import io
-import json
-import pkg_resources
 import re
-import rfc3987
 
+from dcicutils.misc_utils import ignored, is_valid_absolute_uri
 from jsonschema_serialize_fork import FormatChecker
 from pyramid.threadlocal import get_current_request
 from .server_defaults import (
     ACCESSION_FACTORY,
     ACCESSION_PREFIX,
-    TEST_PREFIX,
+    ACCESSION_TEST_PREFIX,
     test_accession,
 )
-from uuid import UUID
 
 
-# XXX: This is broken, cannot decode schema files - Will 3/2/2021
-# def compute_accession_codes():
-#     letter_pairs = set()
-#     for file in glob.glob(pkg_resources.resource_filename('encoded', 'schemas/*.json')):
-#         with io.open(file) as fp:
-#             schema = json.load(fp)
-#         letter_pair = schema.get('properties', {}).get('accession', {}).get('accessionType')
-#         if letter_pair:
-#             if not isinstance(letter_pair, str) or len(letter_pair) != 2:
-#                 raise RuntimeError("accession_type in %s is not a 2-character string:", letter_pair)
-#             letter_pairs.add(letter_pair)
-#     return "|".join(sorted(letter_pairs))
-
+# Codes we allow for testing go here.
+ACCESSION_TEST_CODES = "BS|ES|EX|FI|FS|IN|SR|WF"
 
 accession_re = re.compile(r'^%s[1-9A-Z]{9}$' % ACCESSION_PREFIX)
-test_accession_re = re.compile(r'^TST(EX|ES|FI|FS|SR|BS|IN|WF)[0-9]{4}([0-9][0-9][0-9]|[A-Z][A-Z][A-Z])$')
-uuid_re = re.compile(r'(?i)\{?(?:[0-9a-f]{4}-?){8}\}?')
+
+test_accession_re = re.compile(r'^%s(%s)[0-9]{4}([0-9][0-9][0-9]|[A-Z][A-Z][A-Z])$' % (
+    ACCESSION_TEST_PREFIX, ACCESSION_TEST_CODES))
+
+uuid_re = re.compile(r'(?i)[{]?(?:[0-9a-f]{4}-?){8}[}]?')
 
 
 @FormatChecker.cls_checks("uuid")
@@ -43,7 +30,7 @@ def is_uuid(instance):
 
 
 def is_accession(instance):
-    ''' just a pattern checker '''
+    """Just a pattern checker."""
     # Unfortunately we cannot access the accessionType here
     return (
         accession_re.match(instance) is not None or
@@ -65,14 +52,14 @@ def is_accession_for_server(instance):
 
 @FormatChecker.cls_checks("gene_name")
 def is_gene_name(instance):
-    ''' should check a webservice at HGNC/MGI for validation '''
+    """This SHOULD check a webservice at HGNC/MGI for validation, but for now this just returns True always.."""
+    ignored(instance)
     return True
 
 
 @FormatChecker.cls_checks("target_label")
 def is_target_label(instance):
     if is_gene_name(instance):
-        #note this always returns true
         return True
     mod_histone_patt = "^H([234]|2A|2B)[KRT][0-9]+(me|ac|ph)"
     fusion_patt = "^(eGFP|HA)-"
@@ -86,7 +73,4 @@ def is_target_label(instance):
 
 @FormatChecker.cls_checks("uri", raises=ValueError)
 def is_uri(instance):
-    if ':' not in instance:
-        # We want only absolute uris
-        return False
-    return rfc3987.parse(instance, rule="URI_reference")
+    return is_valid_absolute_uri(instance)

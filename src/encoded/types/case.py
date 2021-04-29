@@ -10,105 +10,94 @@ from .base import (
 )
 
 
-@collection(
-    name='cases',
-    unique_key='accession',
-    properties={
-        'title': 'Cases',
-        'description': 'Listing of Cases',
-    })
-class Case(Item):
-    item_type = 'case'
-    name_key = 'accession'
-    schema = load_schema('encoded:schemas/case.json')
-    embedded_list = [
-        "family.*", # This embeds all Family fields, but not all Family.members fields.
-        "family.relationships.*",
-        "family.proband.accession",
-        "family.family_phenotypic_features",
-        "family.members.*", # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
-        "family.members.individual_id",
-        "family.members.case",
-        "family.members.case.case_title",
-        "family.members.case.accession",
-        "family.members.case.report",
-        "family.members.case.report.accession",
-        "family.members.case.family",
-        "family.members.case.sample.accession",
-        "family.members.case.sample.workup_type",
-        "family.members.samples",
-        "family.members.samples.bam_sample_id",
-        "family.members.samples.sequence_id",
-        "family.members.samples.other_specimen_ids",
-        "family.members.samples.specimen_accession",
-        "family.members.samples.completed_processes",
-        "family.members.samples.library_info",
-        "family.members.samples.workup_type",
-        "family.members.samples.specimen_type",
-        "family.members.samples.specimen_collection_date",
-        "family.members.samples.accession",
-        "family.members.samples.processed_files.last_modified.*",
-        "family.members.samples.files.last_modified.*",
-        "family.members.samples.files.quality_metric",
-        "family.members.samples.files.quality_metric.qc_list.qc_type",
-        "family.members.samples.files.quality_metric.qc_list.value.overall_quality_status",
-        "family.members.samples.files.quality_metric.qc_list.value.url",
-        "family.members.samples.files.quality_metric.qc_list.value.status",
-        "family.members.samples.files.quality_metric.overall_quality_status",
-        "family.members.samples.files.quality_metric.url",
-        "family.members.samples.files.quality_metric.status",
-        "family.analysis_groups.*", # Probably don't need all of this; look into
-        "family.analysis_groups.cases.sample",
-        "secondary_families.*",
-        "secondary_families.relationships.*",
-        "secondary_families.proband.accession",
-        "secondary_families.members.*",
-        "secondary_families.members.individual_id",
-        "secondary_families.members.accession",
-        "secondary_families.members.case",
-        "secondary_families.members.case.accession",
-        "secondary_families.members.case.case_title",
-        "secondary_families.members.case.report",
-        "secondary_families.members.case.report.accession",
-        "secondary_families.members.case.family",
-        "secondary_families.members.case.sample.workup_type",
-        "secondary_families.members.case.sample.accession",
-        "secondary_families.members.samples",
-        "secondary_families.members.samples.specimen_accession",
-        "secondary_families.members.samples.bam_sample_id",
-        "secondary_families.members.samples.sequence_id",
-        "secondary_families.members.samples.other_specimen_ids",
-        "secondary_families.members.samples.completed_processes",
-        "secondary_families.members.samples.library_info",
-        "secondary_families.members.samples.workup_type",
-        "secondary_families.members.samples.specimen_collection_date",
-        "secondary_families.members.samples.specimen_type",
-        "secondary_families.family_phenotypic_features",
-        "secondary_families.members.samples.accession",
-        "secondary_families.members.samples.processed_files.last_modified.*",
-        "secondary_families.members.samples.files.last_modified.*",
-        "secondary_families.members.samples.files.quality_metric",
-        "secondary_families.members.samples.files.quality_metric.qc_list.qc_type",
-        "secondary_families.members.samples.files.quality_metric.qc_list.value.overall_quality_status",
-        "secondary_families.members.samples.files.quality_metric.qc_list.value.url",
-        "secondary_families.members.samples.files.quality_metric.qc_list.value.status",
-        "secondary_families.members.samples.files.quality_metric.overall_quality_status",
-        "secondary_families.members.samples.files.quality_metric.url",
-        "secondary_families.members.samples.files.quality_metric.status",
-        "secondary_families.analysis_groups.*",
-        "secondary_families.analysis_groups.cases.sample",
+def _build_family_embeds(*, base_path):
+    """ Helper function for below method the generates appropriate metadata for family embed.
+        Note that we are in a sense "taking Koray's word for it" that this is correct. It's possible that
+        these can be pruned/modified for efficiency, but so long as we aren't analyzing a ton of cases
+        it shouldn't be a problem.
+    """
+    return [base_path + '.' + p for p in [
+        # Family linkTo
+        "*",  # This embeds all Family fields, but not all Family.members fields.
+
+        # Populating relationships
+        "relationships.*",
+
+        # Individual linkTo
+        "proband.accession",
+
+        # Array of phenotypes linkTo
+        "family_phenotypic_features.phenotype_name",
+
+        # Individual linkTo
+        "members.*",
+        # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
+
+        # Case linkTo
+        "members.case.case_title",
+        "members.case.case_id",
+        "members.case.accession",
+        "members.case.report",
+        "members.case.report.accession",
+        "members.case.family",
+        "members.case.individual",
+        "members.case.sample_processing",
+        "members.case.sample.accession",
+        "members.case.sample.workup_type",
+
+        # Sample linkTo
+        "members.samples.bam_sample_id",
+        "members.samples.sequence_id",
+        "members.samples.other_specimen_ids",
+        "members.samples.specimen_accession",
+        "members.samples.completed_processes",
+        "members.samples.library_info",
+        "members.samples.workup_type",
+        "members.samples.specimen_type",
+        "members.samples.specimen_collection_date",
+        "members.samples.accession",
+
+        # File linkTo
+        "members.samples.processed_files.last_modified.*",
+        "members.samples.processed_files.accession",
+
+        # File linkTo
+        "members.samples.files.last_modified.*",
+        "members.samples.files.file_format.file_format",
+        "members.samples.files.accession",
+
+        # TODO review QC
+        "members.samples.files.quality_metric",
+        "members.samples.files.quality_metric.qc_list.qc_type",
+        "members.samples.files.quality_metric.qc_list.value.overall_quality_status",
+        "members.samples.files.quality_metric.qc_list.value.url",
+        "members.samples.files.quality_metric.qc_list.value.status",
+        "members.samples.files.quality_metric.overall_quality_status",
+        "members.samples.files.quality_metric.url",
+        "members.samples.files.quality_metric.status",
+
+        # TODO Probably don't need all of this; look into
+        "analysis_groups.*",
+
+        # Case linkTo
+        "analysis_groups.cases.family",
+        "analysis_groups.cases.individual",
+        "analysis_groups.cases.sample_processing",
+        "analysis_groups.cases.case_id",
+
+        # Sample linkTo
+        "analysis_groups.cases.sample.accession",
+    ]]
+
+
+def _build_case_embedded_list():
+    """ Helper function intended to be used to create the embedded list for case.
+        All types should implement a function like this going forward.
+    """
+    return _build_family_embeds(base_path='family') + [
+        # Individual linkTo
         "individual.accession",
         "individual.date_created",
-        "individual.father",
-        "individual.father.samples",
-        "individual.father.samples.library_info",
-        "individual.father.samples.workup_type",
-        "individual.father.samples.accession",
-        "individual.mother",
-        "individual.mother.samples",
-        "individual.mother.samples.library_info",
-        "individual.mother.samples.workup_type",
-        "individual.mother.samples.accession",
         "individual.status",
         "individual.sex",
         "individual.individual_id",
@@ -127,10 +116,32 @@ class Case(Item):
         "individual.cause_of_infertility",
         "individual.ancestry",
         "individual.clinic_notes",
-        "individual.phenotypic_features.phenotypic_feature",
+
+        # Individual linkTo
+        "individual.father.accession",
+
+        # TODO fixme samples linkTo
+        "individual.father.samples.library_info",
+        "individual.father.samples.workup_type",
+        "individual.father.samples.accession",
+
+        # Individual linkTo
+        "individual.mother.accession",
+
+        # Samples linkTo
+        "individual.mother.samples.library_info",
+        "individual.mother.samples.workup_type",
+        "individual.mother.samples.accession",
+
+        # Phenotype linkTo
+        "individual.phenotypic_features.phenotypic_feature.phenotype_name",
+        "individual.phenotypic_features.phenotypic_feature.hpo_id",
         "individual.phenotypic_features.onset_age",
         "individual.phenotypic_features.onset_age_units",
+
+        # Samples linkTo
         "individual.samples.status",
+        "individual.samples.accession",
         "individual.samples.last_modified.*",
         "individual.samples.specimen_type",
         "individual.samples.specimen_notes",
@@ -138,8 +149,14 @@ class Case(Item):
         "individual.samples.specimen_accession_date",
         "individual.samples.sequencing_date",
         "individual.samples.workup_type",
-        "individual.samples.processed_files",
+        "individual.samples.completed_processes",
+
+        # TODO fixme file linkTo
+        "individual.samples.processed_files.file_format.file_format",
+        "individual.samples.processed_files.accession",
         "individual.samples.processed_files.workflow_run_outputs",
+
+        # QC
         "individual.samples.processed_files.quality_metric",
         "individual.samples.processed_files.quality_metric.qc_list.qc_type",
         "individual.samples.processed_files.quality_metric.qc_list.value.overall_quality_status",
@@ -148,6 +165,12 @@ class Case(Item):
         "individual.samples.processed_files.quality_metric.overall_quality_status",
         "individual.samples.processed_files.quality_metric.url",
         "individual.samples.processed_files.quality_metric.status",
+
+        # File linkTo
+        "individual.samples.files.file_format.file_format",
+        "individual.samples.files.accession",
+
+        # QC
         "individual.samples.files.quality_metric",
         "individual.samples.files.quality_metric.qc_list.qc_type",
         "individual.samples.files.quality_metric.qc_list.value.overall_quality_status",
@@ -156,8 +179,11 @@ class Case(Item):
         "individual.samples.files.quality_metric.overall_quality_status",
         "individual.samples.files.quality_metric.url",
         "individual.samples.files.quality_metric.status",
-        "individual.samples.completed_processes",
+
+        # Family linkTo
         "individual.families.uuid",
+
+        # Sample linkTo
         "sample.accession",
         "sample.bam_sample_id",
         "sample.specimen_type",
@@ -166,59 +192,133 @@ class Case(Item):
         "sample.workup_type",
         "sample.library_info",
         "sample.last_modified.*",
-        "sample.files.status",
         "sample.completed_processes",
+
+        # File linkTo
+        "sample.files.status",
+        "sample.files.accession",
+        "sample.files.file_format.file_format",
+
+        # FileFormat linkTo
         "sample.processed_files.file_format.file_format",
+
+        # QC
         "sample.processed_files.quality_metric.quality_metric_summary.sample",
         "sample.processed_files.quality_metric.quality_metric_summary.title",
         "sample.processed_files.quality_metric.quality_metric_summary.value",
         "sample.processed_files.quality_metric.quality_metric_summary.numberType",
+
+        # Sample Processing linkTo
         "sample_processing.analysis_type",
         "sample_processing.last_modified.*",
+        "sample_processing.completed_processes",
+        "sample_processing.samples_pedigree.*",
+
+        # Family linkTo
         "sample_processing.families.family_id",
-        "sample_processing.families.proband.individual_id",
-        "sample_processing.families.mother.individual_id",
-        "sample_processing.families.father.individual_id",
+        "sample_processing.families.title",
         "sample_processing.families.accession",
-        "sample_processing.families.members.individual_id",
+        "sample_processing.families.analysis_groups",
+
+        # Individual linkTo
+        "sample_processing.families.proband.accession",
+        "sample_processing.families.proband.individual_id",
+
+        # Individual linkTo
+        "sample_processing.families.mother.accession",
+        "sample_processing.families.mother.individual_id",
+
+        # Individual linkTo
+        "sample_processing.families.father.accession",
+        "sample_processing.families.father.individual_id",
+
+        # Individual linkTo
         "sample_processing.families.members.accession",
-        "sample_processing.families.members.samples",
-        "sample_processing.families.members.case",
+        "sample_processing.families.members.individual_id",
+
+        # Sample linkTo
+        "sample_processing.families.members.samples.accession",
+
+        # Case linkTo
+        # XXX: should it embed sample processing as well?
+        "sample_processing.families.members.case.case_id",
         "sample_processing.families.members.case.report",
         "sample_processing.families.members.case.report.accession",
         "sample_processing.families.members.case.family",
+        "sample_processing.families.members.case.individual",
         "sample_processing.families.members.case.sample.accession",
+
+        # Sample linkTo
         "sample_processing.samples.accession",
-        "sample_processing.processed_files",
+        "sample_processing.samples.bam_sample_id",
+
+        # File linkTo
+        "sample_processing.samples.processed_files.accession",
+        "sample_processing.samples.processed_files.file_format.file_format",
         "sample_processing.samples.processed_files.last_modified.*",
+
+        # File linkTo
+        "sample_processing.processed_files.file_format.file_format",
+        "sample_processing.processed_files.accession",
+
+        # File linkTo
+        "sample_processing.sample_processed_files.processed_files.accession",
+        "sample_processing.sample_processed_files.processed_files.file_format.file_format",
+        "sample_processing.sample_processed_files.processed_files.last_modified.*",
+
+        # Sample linkTo
+        "sample_processing.sample_processed_files.sample.accession",
+
+        # QC
         "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.title",
         "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.sample",
         "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.value",
         "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.numberType",
         "sample_processing.samples.processed_files.quality_metric.filtering_condition",
         "sample_processing.samples.processed_files.quality_metric.*",
-        "sample_processing.samples.bam_sample_id",
+
+        # QC
         "sample_processing.processed_files.quality_metric.quality_metric_summary.title",
         "sample_processing.processed_files.quality_metric.quality_metric_summary.sample",
         "sample_processing.processed_files.quality_metric.quality_metric_summary.value",
         "sample_processing.processed_files.quality_metric.quality_metric_summary.numberType",
         "sample_processing.processed_files.quality_metric.filtering_condition",
         "sample_processing.processed_files.quality_metric.*",
-        "sample_processing.families.analysis_groups",
-        "sample_processing.sample_processed_files.processed_files.last_modified.*",
-        "sample_processing.sample_processed_files.sample.accession",
-        "sample_processing.completed_processes",
-        "sample_processing.samples_pedigree.*",
+
+        # Report linkTo
         "report.last_modified.*",
         "report.status",
         "report.accession",
         "report.case.accession",
+
+        # FilterSet LinkTo
         "active_filterset.@id",
+        "active_filterset.title",
+
+        # FilterSet linkTo
         "cohort.filter_set.*",
+
+        # Project linkTo
         "project.name",
+
+        # File linkTo
         "vcf_file.file_ingestion_status",
         "vcf_file.accession",
     ]
+
+
+@collection(
+    name='cases',
+    unique_key='accession',
+    properties={
+        'title': 'Cases',
+        'description': 'Listing of Cases',
+    })
+class Case(Item):
+    item_type = 'case'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/case.json')
+    embedded_list = _build_case_embedded_list()
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -345,8 +445,8 @@ class Case(Item):
             included_relations = [item.get('relationship') for item in sp_item.get('samples_pedigree', [{}])]
             for relation in ['mother', 'father', 'sister', 'brother', 'co-parent',
                             'daughter', 'son', 'daughter II', 'son II',
-                            'daughter III', 'son III', 'sister II', 
-                            'sister III', 'sister IV', 'brother II', 
+                            'daughter III', 'son III', 'sister II',
+                            'sister III', 'sister IV', 'brother II',
                             'brother III', 'brother IV']:
                 if relation in included_relations:
                     relation = relation.replace(' ', '_').replace('-', '_')
