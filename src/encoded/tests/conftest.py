@@ -212,7 +212,7 @@ def anonhtmltestapp(app):
 def anon_es_testapp(es_app):
     """ TestApp simulating a bare Request entering the application (with ES enabled) """
     environ = {
-        'HTTP_ACCEPT': 'application/json',,
+        'HTTP_ACCEPT': 'application/json',
         'HTTP_HOST': "mytestingwebsite.somewhere.example.com"
     }
     return webtest.TestApp(es_app, environ)
