@@ -15,12 +15,11 @@ const {
     "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFunc },
     "variant.genes.genes_most_severe_hgvsc": { render: variantRenderFunc },
     "associated_genotype_labels.proband_genotype_label": { render: genotypeLabelRenderFunc },
-    "DP": { render: dpRenderFunc },
 } = variantSampleColumnExtensionMap;
 
 
 export const InterpretationTab = React.memo(function InterpretationTab (props) {
-    const { variantSampleListItem, schemas } = props;
+    const { variantSampleListItem, schemas, caseAccession } = props;
     const { variant_samples: vsSelections = [] } = variantSampleListItem;
 
     const {
@@ -37,11 +36,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                 "associated_genotype_labels.proband_genotype_label": {
                     title: genotypeLabelColTitle,
                     description: genotypeLabelColDescription
-                } = {},
-                "DP": {
-                    title: dpColTitle,
-                    description: dpColDescription
-                } = {},
+                } = {}
             } = {}
         } = {}
     } = schemas || {};
@@ -60,12 +55,13 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
 
                         <div className="flex-grow-1 d-flex flex-column flex-sm-row">
                             <div className="flex-auto">
-                                <VariantSampleDisplayTitleColumn result={variant_sample_item} link={vsID} />
+                                <VariantSampleDisplayTitleColumn result={variant_sample_item}
+                                    link={`${vsID}?showInterpretation=True${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
                             </div>
-                            <div className="flex-grow-1 d-none d-sm-block">
+                            <div className="flex-grow-1  d-sm-block">
                                 &nbsp;
                             </div>
-                            <div className="flex-auto text-secondary text-small" data-tip="Date Selected">
+                            <div className="flex-auto text-small" data-tip="Date Selected">
                                 <i className="icon icon-calendar far mr-07"/>
                                 <LocalizedTime timestamp={date_selected} />
                             </div>
@@ -85,34 +81,27 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                 </div>
                 <div className="card-body pt-0 pb-08">
                     <div className="row flex-column flex-sm-row">
-                        <div className="col col-sm-7 col-lg-2 py-2">
+                        <div className="col col-sm-4 col-lg-3 py-2">
                             <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
                                 { geneTranscriptColTitle || "Gene, Transcript" }
                             </label>
-                            { geneTranscriptRenderFunc(variant_sample_item) }
+                            { geneTranscriptRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=Gene%20Notes' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                         </div>
-                        <div className="col col-sm-5 col-lg-2 py-2">
+                        <div className="col col-sm-4 col-lg-3 py-2">
                             <label className="mb-04 text-small" data-tip={variantColDescription}>
                                 { variantColTitle || "Variant" }
                             </label>
-                            { variantRenderFunc(variant_sample_item) }
+                            { variantRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                         </div>
-                        <div className="col col-sm-7 col-lg-3 py-2">
+                        <div className="col col-sm-4 col-lg-3 py-2">
                             <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
                                 { genotypeLabelColTitle || "Genotype" }
                             </label>
-                            { genotypeLabelRenderFunc(variant_sample_item) }
+                            { genotypeLabelRenderFunc(variant_sample_item, { align: 'left' }) }
                         </div>
-                        <div className="col col-sm-5 col-lg-2 py-2" data-field="DP">
-                            <label className="mb-04 text-small" data-tip={dpColDescription}>
-                                { dpColTitle || "Coverage, VAF" }
-                            </label>
-                            { dpRenderFunc(variant_sample_item) }
-                        </div>
-                        {/* the below is temporarily invisible via 'd-none' */}
-                        <div className="d-none col col-sm-12 col-lg-3 py-2">
+                        <div className="col col-sm-12 col-lg-3 py-2">
                             <label className="mb-04 text-small">Interpretation</label>
-                            <div><em>TODO</em></div>
+                            <div className="w-100 text-left text-muted">Pending</div>
                         </div>
                     </div>
                 </div>
