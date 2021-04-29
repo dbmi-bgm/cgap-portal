@@ -321,9 +321,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                                         <PresetFilterSetSelectionUI {...presetSelectionUIProps} />
                                     </div>
                                     <div className="flex-grow-1">
-                                        <div className="filterset-blocks-container" data-all-selected={allFilterBlocksSelected}>
-                                            { fsuiBlocksBody }
-                                        </div>
+                                        { fsuiBlocksBody }
                                     </div>
                                 </div>
                             </div>
@@ -421,11 +419,12 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
 
     // TODO: componentDidUpdate({ pastSession }) { if changed, then reset results & reload (?) }
 
-    componentDidUpdate({ lastSavedPresetFilterSet: pastLastSavedPresetFilterSet }, { checkingForNewFilterSetRequests: lastCheckingRequests }){
+    componentDidUpdate({ lastSavedPresetFilterSet: pastLastSavedPresetFilterSet }, { isLoadingPresets: lastIsLoadingPresets }){
         const { lastSavedPresetFilterSet } = this.props;
-        const { checkingForNewFilterSetRequests } = this.state;
+        const { isLoadingPresets } = this.state;
 
-        if (Object.keys(checkingForNewFilterSetRequests).length > 0 && Object.keys(lastCheckingRequests).length === 0) {
+        // Rebuild tooltips after new results loaded.
+        if (!isLoadingPresets && lastIsLoadingPresets) {
             ReactTooltip.rebuild();
         }
 
@@ -604,7 +603,7 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
             };
             const { derived_from_preset_filterset: currentCaseDerivedFromPresetUUID = null } = currentCaseFilterSet || {};
             body = (
-                <div className="results-container border-top">
+                <div className="results-container">
                     { presetResults.map(function(presetFilterSet, idx){
                         const { uuid: thisPresetFSUUID } = presetFilterSet;
                         const isOriginOfCurrentCaseFilterSet = currentCaseDerivedFromPresetUUID === thisPresetFSUUID;
@@ -647,7 +646,9 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
                         </div>
                     </div>
                 </div>
-                { body }
+                <div className="inner-body border-top">
+                    { body }
+                </div>
             </div>
         );
     }
@@ -690,9 +691,6 @@ function PresetFilterSetResult (props) {
     const [ isLoadingItemView, setIsLoadingItemView ] = useState(false);
 
     const isPatchingPreset = patchingPresetResultUUID === presetFSUUID;
-
-    // Used to show item as "deleted" in list temporarily until it gets removed from ElasticSearch results.
-    // const [ isDeleted, setIsDeleted ] = useState(false);
 
     // Separate from import (view) permission (which is implictly allowed for all presets here, else wouldnt have been returned from /search/?type=FilterSet request)
     const haveEditPermission = !!(loadedItemView && _.findWhere(loadedItemView.actions || [], { "name": "edit" }));
@@ -742,6 +740,7 @@ function PresetFilterSetResult (props) {
         }
 
         importFromPresetFilterSet(presetFilterSet);
+
     }, [ presetFilterSet, importFromPresetFilterSet, warnBeforeImport ]);
 
 
@@ -908,7 +907,7 @@ function PresetFilterSetResult (props) {
             </div>
             <div className="info pl-12 pr-08 text-small pb-04">
 
-                <DropdownButton variant="default btn-dropdown-icon mr-05" size="xs" disabled={!!(patchingPresetResultUUID)}
+                <DropdownButton variant="default btn-dropdown-icon mr-05" size="xs" disabled={!!(patchingPresetResultUUID || isDeleted)}
                     onClick={onMenuClick} onSelect={onMenuOptionSelect}
                     title={
                         <i className={"icon text-secondary fas icon-fw icon-" + (isPatchingPreset ? "circle-notch icon-spin" : "ellipsis-v")} data-tip="View actions"/>
@@ -1933,7 +1932,6 @@ class SaveFilterSetPresetButton extends React.Component {
 
 
 /** Renders the Blocks */
-
 const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
     const {
         filterSet, filterBlocksLen, facetDict, schemas,
@@ -1942,6 +1940,7 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
         cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
         ...remainingProps // Contains: addNewFilterBlock, toggleIntersectFilterBlocks, intersectFilterBlocks, saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged,
     } = props;
+
     const { filter_blocks = [] } = filterSet || {};
     const { query: currentSingleBlockQuery = null } = (singleSelectedFilterBlockIdx !== null && filter_blocks[singleSelectedFilterBlockIdx]) || {};
 
@@ -1952,7 +1951,7 @@ const FilterSetUIBlocks = React.memo(function FilterSetUIBlocks(props){
 
 
     return (
-        <div className="blocks-outer-container">
+        <div className="filterset-blocks-container blocks-outer-container" data-all-selected={allFilterBlocksSelected}>
 
             { typeof selectFilterBlockIdx === "function" ?
                 // If selectFilterBlockIdx is not provided from FilterSetController, act as read-only view & don't show interaction-related elements.

@@ -2344,93 +2344,99 @@ $download-button-width : 100px;
 		display: flex;
 		flex-direction: column;
 
-		.results-container {
-
-			flex-basis: 140px; /* <- Min height, essentially */
-			min-height: 140px;
+		.inner-body {
+			flex-basis: 300px; /* <- Min height, essentially */
+			min-height: 300px;
 			flex-grow: 1;
 			flex-shrink: 1;
-			/** keep scrollbar always visible for layout consistency (instd of overflow:auto) **/
-			overflow-y: scroll;
 
-			.preset-filterset-result {
-
-				background-color: #fff;
-				border-bottom: 1px solid #ddd;
-
-				.title {
-					height: 36px;
-					padding-top: 8px;
-					display: flex;
-					align-items: center;
-				}
-
-				.title-icon-container {
-					color: $secondary;
-					font-size: 1rem; /* Unset from parent elem's .text-small */
-					&.clickable {
-						color: $primary;
-						&:hover {
-							color: $primary-dark;
-						}
+			.results-container {
+				/** keep scrollbar always visible for layout consistency (instd of overflow:auto) **/
+				overflow-y: scroll;
+				max-height: 100%;
+	
+				.preset-filterset-result {
+	
+					background-color: #fff;
+					border-bottom: 1px solid #ddd;
+	
+					.title {
+						height: 36px;
+						padding-top: 8px;
+						display: flex;
+						align-items: center;
 					}
-				}
-
-				.info {
-					height: 36px;
-					display: flex;
-					align-items: center;
-
-					.btn-dropdown-icon {
-						/* Todo - make reusable everywhere ? */
-						padding-left: 5px;
-						padding-right: 5px;
-						&:after {
-							/* Hide down 'v' icon */
-							display: none;
-						}
-					}
-
-					.count-indicator-wrapper {
-
-						svg {
-							/** This seems to work well visually here. **/
-							vertical-align: sub;
-						}
-
-						svg circle {
-							fill: #999;
-						}
-					}
-
+	
 					.title-icon-container {
-						button.import-preset-btn {
-							line-height: 1.45;
+						color: $secondary;
+						font-size: 1rem; /* Unset from parent elem's .text-small */
+						&.clickable {
+							color: $primary;
+							&:hover {
+								color: $primary-dark;
+							}
 						}
 					}
-				}
-
-				&[data-is-origin-of-current-case-filterset="true"] {
-					background-color: $light;
-
-					&[data-is-current-case-filterset-unchanged="true"] {
-						/* Similar color to filterset-block below, but lighter */
-						background-color: lighten($primary, 55%);
-
+	
+					.info {
+						height: 36px;
+						display: flex;
+						align-items: center;
+	
+						.btn-dropdown-icon {
+							/* Todo - make reusable everywhere ? */
+							padding-left: 5px;
+							padding-right: 5px;
+							&:after {
+								/* Hide down 'v' icon */
+								display: none;
+							}
+						}
+	
+						.count-indicator-wrapper {
+	
+							svg {
+								/** This seems to work well visually here. **/
+								vertical-align: sub;
+							}
+	
+							svg circle {
+								fill: #999;
+							}
+						}
+	
+						.title-icon-container {
+							button.import-preset-btn {
+								line-height: 1.45;
+							}
+						}
 					}
-					
-				}
-
-				&[data-has-been-deleted="true"] {
-					/* background: #fff4f4; */
-					> .title,
-					> .info {
-						opacity: 0.4;
+	
+					&[data-is-origin-of-current-case-filterset="true"] {
+						background-color: $light;
+	
+						&[data-is-current-case-filterset-unchanged="true"] {
+							/* Similar color to filterset-block below, but lighter */
+							background-color: lighten($primary, 55%);
+	
+						}
+						
 					}
+	
+					&[data-has-been-deleted="true"] {
+						/* background: #fff4f4; */
+						> .title,
+						> .info {
+							opacity: 0.4;
+						}
+					}
+	
 				}
 
 			}
+
 		}
+
 	}
 }
 
@@ -2469,10 +2475,9 @@ $download-button-width : 100px;
 		}
 	}
 
-
 	.blocks-container {
 
-		min-height: 400px;
+		/* min-height: 400px; */
 		overflow: auto;
 
 		.filterset-block {
@@ -2625,6 +2630,17 @@ $download-button-width : 100px;
 		border-top: none;
 		transition: background-color .4s .1s ease-in;
 
+
+		/* While present as child of flex-grow-1 'column', stretch self to min-height of left presets column */
+		min-height: 100%;
+		display: flex;
+		flex-direction: column;
+
+		> .blocks-container {
+			flex-grow: 1;
+		}
+
+
 		&[data-all-selected="true"] {
 			border-color: $primary-dark;
 			background-color: desaturate(lighten($primary-dark, 40%), 25%);
@@ -2649,6 +2665,7 @@ $download-button-width : 100px;
 				}
 			}
 		}
+
 	}
 
 	// &[data-all-selected="true"] {
