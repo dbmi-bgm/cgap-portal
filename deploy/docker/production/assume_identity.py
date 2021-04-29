@@ -23,6 +23,10 @@ _MY_DIR = os.path.dirname(__file__)
 class CGAPDockerIniFileManager(IniFileManager):
     """ This runs at top level, so path is slightly different. """
     # should work but doesn't (missing cgap-portal): os.path.join(os.path.dirname(_MY_DIR), "pyproject.toml")
+    # TODO: repair via
+    # expected = <hardwired>
+    # actual = <computed>
+    # assert actual == expected, "The actual value %s was not what we expected, %s." % (actual, expected)
     TEMPLATE_DIR = '/home/nginx/cgap-portal/deploy/ini_files'
     PYPROJECT_FILE_NAME = '/home/nginx/cgap-portal/pyproject.toml'
 
