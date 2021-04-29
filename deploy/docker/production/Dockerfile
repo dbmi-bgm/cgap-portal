@@ -82,15 +82,17 @@ RUN touch /var/log/nginx/error.log && \
 # *.ini must match the env name in secrets manager!
 # For now, this is mastertest. - Will 04/29/21
 COPY mastertest.ini deploy/ini_files/.
+RUN touch production.ini
+RUN chown nginx:nginx production.ini
 
 COPY entrypoint.sh .
 COPY assume_identity.py .
 RUN chmod +x entrypoint.sh
 RUN chmod +x assume_identity.py
 EXPOSE 8000
-# Container does not ever run as root
-# This way even if someone gets access to the container they cannot
-# read production.ini for example
+
+# Container does not run as root
 USER nginx
+WORKDIR /home/nginx/cgap-portal
 
 ENTRYPOINT ["/home/nginx/cgap-portal/entrypoint.sh"]

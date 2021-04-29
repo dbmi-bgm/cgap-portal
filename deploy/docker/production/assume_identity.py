@@ -17,13 +17,14 @@ from dcicutils.deployment_utils import IniFileManager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__file__)
+_MY_DIR = os.path.dirname(__file__)
 
 
 class CGAPDockerIniFileManager(IniFileManager):
     """ This runs at top level, so path is slightly different. """
-    _MY_DIR = os.path.dirname(__file__)
-    TEMPLATE_DIR = os.path.join(_MY_DIR, "deploy/ini_files")
-    PYPROJECT_FILE_NAME = os.path.join(os.path.dirname(_MY_DIR), "pyproject.toml")
+    # should work but doesn't (missing cgap-portal): os.path.join(os.path.dirname(_MY_DIR), "pyproject.toml")
+    TEMPLATE_DIR = '/home/nginx/cgap-portal/deploy/ini_files'
+    PYPROJECT_FILE_NAME = '/home/nginx/cgap-portal/pyproject.toml'
 
 
 def assume_identity():
@@ -72,7 +73,8 @@ def assume_identity():
             raise Exception('Got unexpected response structure from boto3')
 
         # build production.ini
-        with override_environ(**identity):  # noQA exit above
+        with override_environ(**identity):
+
             CGAPDockerIniFileManager.main()
 
 
