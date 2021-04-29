@@ -1929,6 +1929,17 @@ docs = ["Sphinx (>=1.8.1)", "docutils", "pylons-sphinx-themes (>=1.0.9)"]
 testing = ["nose", "coverage"]
 
 [[package]]
+name = "watchtower"
+version = "1.0.6"
+description = "Python CloudWatch Logging"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+boto3 = ">=1.9.253,<2"
+
+[[package]]
 name = "webob"
 version = "1.8.7"
 description = "WSGI request and response object"
@@ -2073,7 +2084,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<3.7"
-content-hash = "abc0588a86d0a588f0a5c30c913ff9d12621bea9bfaad336a0921433110f4d76"
+content-hash = "f757ac1b0d257e70d7fc609424468b780f99229bba95d4625531c5863ed25b2d"
 
 [metadata.files]
 apipkg = [
@@ -3010,6 +3021,10 @@ venusian = [
 waitress = [
     {file = "waitress-1.2.0-py2.py3-none-any.whl", hash = "sha256:8b8c8686f628a635b9747e3014a0ab19cf9cf95c5c36eb3331ae355a462ee602"},
     {file = "waitress-1.2.0.tar.gz", hash = "sha256:e624c829656ffc99b33d661072b2814885ae92835cf835ee8ab283ddb7c915b9"},
+]
+watchtower = [
+    {file = "watchtower-1.0.6-py3-none-any.whl", hash = "sha256:2859275df4ad71b005b983613dd64cabbda61f9fdd3db7600753fc465090119d"},
+    {file = "watchtower-1.0.6.tar.gz", hash = "sha256:5eb5d78e730e1016e166b14a79a02d1b939cf1a58f2d559ff4f7c6f953284ebf"},
 ]
 webob = [
     {file = "WebOb-1.8.7-py2.py3-none-any.whl", hash = "sha256:73aae30359291c14fa3b956f8b5ca31960e420c28c1bec002547fb04928cf89b"},

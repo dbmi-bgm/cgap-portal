@@ -8,13 +8,16 @@ import os
 import json
 import boto3
 import logging
+import watchtower
 from botocore.exceptions import ClientError
 from dcicutils.beanstalk_utils import REGION
 from dcicutils.qa_utils import override_environ
 from dcicutils.deployment_utils import IniFileManager
 
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__file__)
+logger.addHandler(watchtower.CloudWatchLogHandler())
 
 
 class CGAPDockerIniFileManager(IniFileManager):

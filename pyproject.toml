@@ -116,6 +116,7 @@ WSGIProxy2 = "0.4.2"
 sentry-sdk = "^0.16.5"
 granite-suite = "0.1.11b0"
 openpyxl = "^3.0.7"
+watchtower = "^1.0.6"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
