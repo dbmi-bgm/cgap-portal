@@ -125,8 +125,44 @@ export class InterpretationSpaceWrapper extends React.Component {
         return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteID }));
     }
 
-    patchPreviouslySavedNote(noteAtID, noteToPatch) { // ONLY USED FOR DRAFTS -- other notes are cloned
-        return ajax.promise(noteAtID, 'PATCH', {}, JSON.stringify(noteToPatch));
+    patchPreviouslySavedNote(noteToPatch, noteType, noteID) { // ONLY USED FOR DRAFTS -- other notes are cloned
+        const { interpretation = null, discovery_interpretation = null } = this.state;
+        const { classification: previousClassification = null } = interpretation || {};
+        const { variant_candidacy: previousVarCandidacy = null, gene_candidacy: previousGeneCandidacy = null } = discovery_interpretation || {};
+        const {
+            classification = null,
+            variant_candidacy = null,
+            gene_candidacy = null
+        } = noteToPatch;
+
+        // Returns a clone, cleaned of unneccessary state fields
+        const cleanedNoteToPatch = InterpretationSpaceWrapper.cleanUpNoteStateForPostPatch(noteToPatch, noteType);
+
+        let patchURL = noteID;
+
+        // Check for deleted fields and add to patch URL
+        switch(noteType) {
+            case "note_interpretation":
+                if (!classification && previousClassification) {
+                    patchURL += '?delete_fields=classification';
+                }
+                break;
+            case "note_discovery":
+                if ((!variant_candidacy && previousVarCandidacy) &&
+                    (!gene_candidacy && previousGeneCandidacy)) {
+                    patchURL += '?delete_fields=variant_candidacy,gene_candidacy';
+                } else if (!variant_candidacy && previousVarCandidacy) {
+                    patchURL += '?delete_fields=variant_candidacy';
+                } else if (!gene_candidacy && previousGeneCandidacy) {
+                    patchURL += '?delete_fields=gene_candidacy';
+                }
+                break;
+            default:
+                break; // do nothing special for standard notes
+        }
+        console.log("patchURL", patchURL);
+
+        return ajax.promise(patchURL, 'PATCH', {}, JSON.stringify(cleanedNoteToPatch));
     }
 
     getNote(uuid, noteType) {
@@ -142,15 +178,10 @@ export class InterpretationSpaceWrapper extends React.Component {
         // Does a draft already exist?
         if (lastSavedNote) { // Patch the pre-existing draft item & overwrite it
             console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
-            const {
-                '@id': noteAtID,
-                uuid: noteUUID
-            } = lastSavedNote;
-
-            const noteToSubmit = InterpretationSpaceWrapper.cleanUpNoteStateForPostPatch(note, noteType); // returns a cleaned clone
+            const { "@id": noteAtID = null, "uuid": noteUUID } = lastSavedNote;
 
             this.setState({ loading: true }, () => {
-                this.patchPreviouslySavedNote(noteAtID, noteToSubmit)
+                this.patchPreviouslySavedNote(note, noteType, noteAtID || noteUUID)
                     .then((response) => {
                         const { '@graph': graph = [], status } = response;
                         // Some handling for various fail responses/codes
