@@ -32,7 +32,9 @@ README:
 """
 
 
-TESTING_DOMAIN_REFERRER = "mytestingwebsite.somewhere.example.com"
+TEST_HTTP_HOST = "mytestingwebsite.somewhere.example.com"
+TEST_HTTP_REFERER = "https://" + TEST_HTTP_HOST
+
 
 
 @pytest.fixture(autouse=True)
@@ -195,8 +197,8 @@ def anontestapp(app):
     """TestApp for anonymous user (i.e., no user specified), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': "application/json",
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER
     }
     return webtest.TestApp(app, environ)
 
@@ -206,8 +208,8 @@ def anonhtmltestapp(app):
     """TestApp for anonymous (not logged in) user, accepting text/html content."""
     environ = {
         'HTTP_ACCEPT': 'text/html',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER
     }
     test_app = webtest.TestApp(app, environ)
     return test_app
@@ -218,8 +220,8 @@ def anon_es_testapp(es_app):
     """ TestApp simulating a bare Request entering the application (with ES enabled) """
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER
     }
     return webtest.TestApp(es_app, environ)
 
@@ -229,8 +231,8 @@ def anon_html_es_testapp(es_app):
     """TestApp with ES + Postgres for anonymous (not logged in) user, accepting text/html content."""
     environ = {
         'HTTP_ACCEPT': 'text/html',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER
     }
     return webtest.TestApp(es_app, environ)
 
@@ -240,8 +242,8 @@ def testapp(app):
     """TestApp for username TEST, accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER,
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST'
     }
     return webtest.TestApp(app, environ)
@@ -252,8 +254,8 @@ def htmltestapp(app):
     """TestApp for TEST user, accepting text/html content."""
     environ = {
         'HTTP_ACCEPT': 'text/html',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER,
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST',
     }
     test_app = webtest.TestApp(app, environ)
@@ -265,8 +267,8 @@ def es_testapp(es_app):
     """ TestApp with ES + Postgres. Must be imported where it is needed. """
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER,
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST',
     }
     return webtest.TestApp(es_app, environ)
@@ -277,8 +279,8 @@ def html_es_testapp(es_app):
     """TestApp with ES + Postgres for TEST user, accepting text/html content."""
     environ = {
         'HTTP_ACCEPT': 'text/html',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER,
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST',
     }
     return webtest.TestApp(es_app, environ)
@@ -289,8 +291,8 @@ def authenticated_testapp(app):
     """TestApp for an authenticated, non-admin user (TEST_AUTHENTICATED), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER,
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST_AUTHENTICATED',
     }
     return webtest.TestApp(app, environ)
@@ -301,8 +303,8 @@ def authenticated_es_testapp(es_app):
     """ TestApp for authenticated non-admin user with ES """
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER,
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST_AUTHENTICATED',
     }
     return webtest.TestApp(es_app, environ)
@@ -313,8 +315,8 @@ def submitter_testapp(app):
     """TestApp for a non-admin user (TEST_SUBMITTER), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER,
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST_SUBMITTER',
     }
     return webtest.TestApp(app, environ)
@@ -326,8 +328,8 @@ def indexer_testapp(es_app):
         Always uses the ES app (obviously, but not so obvious previously) """
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER,
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'INDEXER',
     }
     return webtest.TestApp(es_app, environ)
@@ -338,8 +340,8 @@ def embed_testapp(app):
     """TestApp for user EMBED, accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'HTTP_HOST': TESTING_DOMAIN_REFERRER,
-        'HTTP_REFERER': TESTING_DOMAIN_REFERRER,
+        'HTTP_HOST': TEST_HTTP_HOST,
+        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'EMBED',
     }
     return webtest.TestApp(app, environ)
