@@ -314,32 +314,21 @@ def login(context, request):
         request_token = request.json_body.get("id_token", None)
 
     request_parts = urlparse(request.referrer)
-    request_domain = request_parts.hostname
+    # These should be equal; sometimes referrer request header may not be present
+    referrer_domain = request_parts.hostname
     is_https = request_parts.scheme == "https"
-
-
-    # The below 'check' is disabled to provide less feedback than possible
-    # to make it slightly harder for brute force attacks.
-
-    # is_valid_token = Auth0AuthenticationPolicy.get_token_info(request_token, request)
-    # if not is_valid_token:
-    #     # Doesn't check if User exists in system, just if token is validly signed,
-    #     # to allow for unregistered users to still have cookie stored so
-    #     # they can go through registration process.
-    #     # (This check is not strictly needed for anything, just provides more feedback faster.. maybe should be removed?)
-    #     raise LoginDenied(domain=request.domain)
 
     # `request.domain` is more consistently-present than request.referrer
     # however login is only triggered through AJAX so we can depend on request.referrer here,
     # and have it serve as minor layer of obfuscation.
 
-    if not request_domain:
-        raise HTTPForbidden("Expected a valid hostname")
+    if not referrer_domain or referrer_domain != request.domain:
+        raise HTTPForbidden("Expected a valid referrer domain")
 
     request.response.set_cookie(
         "jwtToken",
         value=request_token,
-        domain=request_domain,
+        domain=referrer_domain,
         path="/",
         httponly=True,
         samesite="strict",
