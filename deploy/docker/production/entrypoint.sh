@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# Echo something at startup
-echo "Starting up CGAP Portal"
+echo "Starting up CGAP-Portal WSGI"
 
 # Run assume_identity.py to access the desired deployment configuration from
 # secrets manager - this builds production.ini
