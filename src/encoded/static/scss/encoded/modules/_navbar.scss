@@ -361,19 +361,18 @@ div#top-nav.navbar-fixed-top {
                                 width: 30px;
                                 height: 30px;
                             }
+                            .user-first-name {
+                                flex-grow: 0;
+                                flex-shrink: 1;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
                             @include media-breakpoint-up(lg){
                                 img.account-icon-image {
                                     margin-right: 12px;
                                 }
                             }
             
-                        }
-
-                        > a {
-                            @include navbar-link-button-item;
-                            white-space: nowrap;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
                         }
 
                         .dropdown-menu {
@@ -385,15 +384,15 @@ div#top-nav.navbar-fixed-top {
                         }
 
                         @include navbar-fixed-position {
-                            max-width: 120px;
+                            max-width: 200px; //120px;
                         }
 
                         @include media-breakpoint-between(lg, xl) {
-                            max-width: 150px;
+                            max-width: 300px; // 150px;
                         }
 
                         @include media-breakpoint-up(xl) {
-                            max-width: 180px;
+                            max-width: 320px; // 180px;
                         }
                     }
 

@@ -13,6 +13,17 @@ from .base import Item, get_item_or_none
 log = structlog.getLogger(__name__)
 
 
+def _build_gene_embedded_list():
+    """ Helper function intended to be used to create the embedded list for gene """
+    return [
+        'gene_lists.title',
+        'interpretations.classification',
+        'interpretations.acmg_guidelines',
+        'interpretations.conclusion',
+        'interpretations.note_text'
+    ]
+
+
 @collection(
     name='genes',
     unique_key='gene:ensgid',
@@ -26,13 +37,7 @@ class Gene(Item):
     name_key = 'ensgid'  # use the ENSEMBL Gene ID as the identifier
     schema = load_schema('encoded:schemas/gene.json')
     rev = {'gene_lists': ('GeneList', 'genes')}
-    embedded_list = [
-        'gene_lists.title',
-        'interpretations.classification',
-        'interpretations.acmg_guidelines',
-        'interpretations.conclusion',
-        'interpretations.note_text'
-    ]
+    embedded_list = _build_gene_embedded_list()
 
     @calculated_property(schema={
         "title": "Display Title",
