@@ -151,12 +151,14 @@ def handle_metadata_bundle(submission: SubmissionFolio):
         project = get_parameter(submission.parameters, 'project')
         validate_only = get_parameter(submission.parameters, 'validate_only', as_type=bool, default=False)
 
+        submission_type = 'family_history' if submission.ingestion_type == 'family_history' else 'accessioning'
+
         bundle_results = submit_metadata_bundle(s3_client=s3_client,
                                                 bucket=submission.bucket,
                                                 key=submission.object_name,
                                                 project=project,
                                                 institution=institution,
-                                                submission_type=submission.ingestion_type,
+                                                submission_type=submission_type,
                                                 vapp=submission.vapp,
                                                 validate_only=validate_only)
 
