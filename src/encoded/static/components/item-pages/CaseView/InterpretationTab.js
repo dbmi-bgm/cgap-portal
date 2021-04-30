@@ -47,8 +47,9 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
             filter_blocks_request_at_time_of_selection,
             variant_sample_item
         } = sel;
-        const { "@id": vsID, interpretation = null } = variant_sample_item || {};
+        const { "@id": vsID, interpretation = null, discovery_interpretation = null } = variant_sample_item || {};
         const { classification: acmgClassification = null } = interpretation || {};
+        const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discovery_interpretation || {};
         return (
             <div className="card mb-1" key={idx}>
                 <div className="card-header">
@@ -109,13 +110,25 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                                 </div>:
                                 <div className="w-100 text-left text-muted text-truncate">Pending</div>}
                         </div>
-                        <div className="col col-sm-4 col-lg-2 py-2">
+                        <div className="col col-sm-8 col-lg-3 py-2">
                             <label className="mb-04 text-small">Discovery</label>
-                            <div className="w-100 text-left text-muted">
-                                <span className="font-italic">Gene: </span>N/A
+                            <div className="w-100 text-left">
+                                <span className="font-italic text-muted mr-1">Gene: </span>
+                                { geneCandidacy ?
+                                    <span className="text-left">
+                                        <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
+                                        {geneCandidacy}
+                                    </span>:
+                                    <span className="text-left text-muted text-truncate">Not Available</span>}
                             </div>
-                            <div className="w-100 text-left text-muted">
-                                <span className="font-italic">Variant: </span>N/A
+                            <div className="text-left">
+                                <span className="font-italic text-muted mr-1">Variant: </span>
+                                { variantCandidacy ?
+                                    <span className="w-100 text-left">
+                                        <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/>
+                                        {variantCandidacy}
+                                    </span>:
+                                    <span className="text-left text-muted text-truncate">Not Available</span>}
                             </div>
                         </div>
                     </div>
