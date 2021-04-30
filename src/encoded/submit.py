@@ -934,9 +934,10 @@ class PedigreeMetadata:
                     final_family_dict[value['aliases'][0]] = value
             else:
                 for match in family_matches.json['@graph']:
-                    value.setdefault('aliases', [])
-                    value['aliases'].extend(match.get('aliases', []))
+                    # value.setdefault('aliases', [])
+                    # value['aliases'].extend(match.get('aliases', []))
                     final_family_dict[match['@id']] = value
+                    #final_family_dict[match['@id']]['aliases'] = match.get('aliases', [])
                     if value.get('proband'):
                         phenotypes = list(set([item['phenotypic_feature'] for item in
                                       self.individuals[value['proband']].get('phenotypic_features', [])]))
@@ -953,6 +954,7 @@ class PedigreeMetadata:
                         if phenotypes:
                             final_family_dict[match['@id']]['family_phenotypic_features'] = phenotypes[:4]
                         del final_family_dict[match['@id']]['proband']
+                        del final_family_dict[match['@id']]['aliases']
         return final_family_dict
 
     def check_individuals(self):
@@ -1305,7 +1307,10 @@ def validate_all_items(virtualapp, json_data):
                             json_data_final['patch'].setdefault(itemtype, {})
                             json_data_final['patch'][itemtype][db_results[alias]['@id']] = patch_data
                         elif itemtype not in ['case', 'report', 'sample_processing', 'file_fastq']:
-                            item_name = alias[alias.index(':')+1:]
+                            if itemtype == 'family' and ':' not in alias:
+                                item_name = data.get('family_id')
+                            else:
+                                item_name = alias[alias.index(':')+1:]
                             if item_name.startswith(itemtype + '-'):
                                 item_name = item_name[item_name.index('-') + 1:]
                             if itemtype == 'family':
