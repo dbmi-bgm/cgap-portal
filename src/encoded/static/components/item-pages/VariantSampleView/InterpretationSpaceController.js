@@ -290,14 +290,20 @@ export class InterpretationSpaceController extends React.Component {
         // TODO: Figure out a way to use _.isMatch/_.isEqual for future versions. Kicking this can down the road slightly.
         const {
             classification: lastSavedClassification = null,
+            gene_candidacy: lastSavedGeneCandidacy = null,
+            variant_candidacy: lastSavedVariantCandidacy = null,
             note_text: lastSavedNoteText = ""
         } = lastSavedNote || {};
         const {
             classification: currClassification = null,
+            gene_candidacy: currGeneCandidacy = null,
+            variant_candidacy: currVariantCandidacy = null,
             note_text: currNoteText = ""
         } = currNote || {};
 
-        if (currClassification !== lastSavedClassification) {
+        if (currClassification !== lastSavedClassification ||
+            currGeneCandidacy !== lastSavedGeneCandidacy ||
+            currVariantCandidacy !== lastSavedVariantCandidacy) {
             // console.log("classifications do not match:", currClassification, lastSavedClassification);
             return true;
         }
