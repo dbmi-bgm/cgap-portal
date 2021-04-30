@@ -1,7 +1,9 @@
+from uuid import uuid4
+
 import pytest
 import webtest
 
-from uuid import uuid4
+from encoded.ingestion.common import CGAP_CORE_PROJECT
 
 
 class MockedLogger(object):
@@ -1138,3 +1140,175 @@ def embedded_item_dict():
             }
         ]
     }
+
+
+@pytest.fixture
+def cgap_core_project(testapp):
+    item = {
+        "name": CGAP_CORE_PROJECT.split("/")[-1],
+        "title": "cgap core",
+        "description": "The CGAP core project",
+    }
+    return testapp.post_json("/project", item).json["@graph"][0]
+
+
+@pytest.fixture
+def gene(testapp, project, institution):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "gene_symbol": "APC",
+        "ensgid": "ENSG00000001111",
+    }
+    return testapp.post_json("/gene", item).json["@graph"][0]
+
+
+@pytest.fixture
+def gene_2(testapp, project, institution):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "gene_symbol": "FBN1",
+        "ensgid": "ENSG00000002222",
+    }
+    return testapp.post_json("/gene", item).json["@graph"][0]
+
+
+@pytest.fixture
+def cgap_core_genelist(testapp, cgap_core_project, institution, gene):
+    item = {
+        "project": cgap_core_project["@id"],
+        "institution": institution["@id"],
+        "title": "CGAP Core gene list",
+        "genes": [gene["@id"]],
+    }
+    return testapp.post_json("/gene-lists", item).json["@graph"][0]
+
+
+@pytest.fixture
+def bgm_genelist(testapp, bgm_project, institution, gene):
+    item = {
+        "project": bgm_project["@id"],
+        "institution": institution["@id"],
+        "title": "BGM gene list",
+        "genes": [gene["@id"]],
+    }
+    return testapp.post_json("/gene-lists", item).json["@graph"][0]
+
+
+@pytest.fixture
+def genelist(testapp, project, institution, gene):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "title": "Simple gene list",
+        "genes": [gene["@id"]],
+    }
+    return testapp.post_json("/gene-lists", item).json["@graph"][0]
+
+
+@pytest.fixture
+def genelist_to_post(testapp, project, institution, gene_2):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "title": "Simple gene list",
+        "genes": [gene_2["@id"]],
+    }
+    return item
+
+
+@pytest.fixture
+def variant(testapp, project, institution, gene):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "1",
+        "REF": "A",
+        "ALT": "C",
+        "POS": 12345,
+        "genes": [{"genes_most_severe_gene": gene["@id"]}],
+    }
+    return testapp.post_json("/variant", item).json["@graph"][0]
+
+
+@pytest.fixture
+def variant_2(testapp, project, institution, gene_2):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "2",
+        "REF": "T",
+        "ALT": "G",
+        "POS": 45678,
+        "genes": [{"genes_most_severe_gene": gene_2["@id"]}],
+    }
+    return testapp.post_json("/variant", item).json["@graph"][0]
+
+
+@pytest.fixture
+def variant_sample(project, institution, variant):
+    """
+    This item is not pre-posted to database so gene list association with
+    variant samples can be tested (due to longer process of associating variant
+    samples with gene lists when the latter is posted after the former).
+    """
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "variant": variant["@id"],
+        "CALL_INFO": "some_sample",
+        "file": "some_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def variant_sample_2(project, institution, variant_2):
+    """
+    This item is not pre-posted to database so gene list association with
+    variant samples can be tested (due to longer process of associating variant
+    samples with gene lists when the latter is posted after the former).
+    """
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "variant": variant_2["@id"],
+        "CALL_INFO": "some_sample",
+        "file": "some_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def cgap_core_variant_sample(cgap_core_project, institution, variant):
+    """
+    This item is not pre-posted to database so gene list association with
+    variant samples can be tested (due to longer process of associating variant
+    samples with gene lists when the latter is posted after the former).
+    """
+    item = {
+        "project": cgap_core_project["@id"],
+        "institution": institution["@id"],
+        "variant": variant["@id"],
+        "CALL_INFO": "some_cgap_core_sample",
+        "file": "some_cgap_core_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def bgm_variant_sample(bgm_project, institution, variant):
+    """
+    This item is not pre-posted to database so gene list association with
+    variant samples can be tested (due to longer process of associating variant
+    samples with gene lists when the latter is posted after the former).
+    """
+    item = {
+        "project": bgm_project["@id"],
+        "institution": institution["@id"],
+        "variant": variant["@id"],
+        "CALL_INFO": "some_bgm_sample",
+        "file": "some_bgm_vcf_file",
+    }
+    return item

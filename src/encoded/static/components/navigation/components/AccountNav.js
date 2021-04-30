@@ -73,7 +73,7 @@ export const AccountNav = React.memo(function AccountNav(props){
     const navItemTitle = (
         <React.Fragment>
             { acctIcon }
-            { acctTitle }
+            <span className="user-first-name">{ acctTitle }</span>
         </React.Fragment>
     );
 
