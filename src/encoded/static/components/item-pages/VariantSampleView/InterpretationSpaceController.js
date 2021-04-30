@@ -555,10 +555,11 @@ class GenericInterpretationPanel extends React.Component {
                     : null}
                 <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
-                    <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    <GenericFieldForm fieldsArr={[{ field: 'classification', value: classification }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
                 { noteType === "note_discovery" ?
-                    <DiscoveryForm {...{ schemas, gene_candidacy, variant_candidacy, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
+                        {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
                 <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave }}
                     saveAsDraft={this.saveStateAsDraft}
@@ -579,7 +580,7 @@ class GenericInterpretationPanel extends React.Component {
 function NoteFieldDrop(props) {
     const { value = null, schemas = null, field = null, noteType = null, onOptionChange, cls="mb-1", getFieldProperties } = props;
     if (!schemas) {
-        return 'loading...'; // TODO: actually implement a load spinner
+        return null;
     }
 
     const fieldSchema = getFieldProperties(field);
@@ -712,47 +713,51 @@ AutoGrowTextArea.defaultProps = {
 };
 
 
-/** Display additional form fields for ACMG Interpretation */
-function ACMGInterpretationForm(props) {
-    const { schemas, acmg_guidelines = [], classification = null, conclusion = null, noteType, onDropOptionChange } = props;
-
-    const getFieldProperties = useMemo(function(){
-        if (!schemas) return function(){ return null; };
-        // Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`.
-        return function(field){
-            const noteItem = noteType === "note_interpretation" ? "NoteInterpretation" : "NoteStandard";
-            const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, noteItem);
-            return (schemaProperty || {});
-        };
-    }, [ schemas ]);
-
-    return (
-        <React.Fragment>
-            <NoteFieldDrop {...{ schemas, noteType }} getFieldProperties={getFieldProperties} onOptionChange={onDropOptionChange} field="classification" value={classification}/>
-        </React.Fragment>
-    );
+function noteFieldNameToSchemaFormatted(field) {
+    switch(field) {
+        case "note_interpretation":
+            return "NoteInterpretation";
+        case "note_discovery":
+            return "NoteDiscovery";
+        default:
+            return "NoteStandard";
+    }
 }
 
-/** Display additional form fields for Discovery */
-function DiscoveryForm(props) {
-    const { schemas, variant_candidacy, gene_candidacy, conclusion = null, noteType, onDropOptionChange } = props;
+/** Displays additional form fields for ACMG Interpretation and Discovery */
+function GenericFieldForm(props) {
+    const { fieldsArr = [], schemas, onDropOptionChange, noteType } = props;
+
+    if (!schemas) {
+        return (
+            <div className="d-flex align-items-center justify-content-center pb-05 mb-1">
+                <i className="icon icon-fw fas icon-circle-notch icon-spin mr-08"/>
+                Loading...
+            </div>);
+    }
 
     const getFieldProperties = useMemo(function(){
         if (!schemas) return function(){ return null; };
         // Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`.
         return function(field){
-            const noteItem = noteType === "note_discovery" ? "NoteDiscovery" : "NoteStandard";
+            const noteItem = noteFieldNameToSchemaFormatted(noteType);
             const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, noteItem);
             return (schemaProperty || {});
         };
     }, [ schemas ]);
 
+    const fieldsJSX = useMemo(function() {
+        return fieldsArr.map((fieldDataObj) => {
+            const { field, value } = fieldDataObj;
+            return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field }} getFieldProperties={getFieldProperties}
+                onOptionChange={onDropOptionChange} />);
+        });
+    }, [ schemas, noteType, fieldsArr ]);
+
     return (
         <React.Fragment>
-            <NoteFieldDrop {...{ schemas, noteType }} getFieldProperties={getFieldProperties} onOptionChange={onDropOptionChange} field="variant_candidacy" value={variant_candidacy}/>
-            <NoteFieldDrop {...{ schemas, noteType }} getFieldProperties={getFieldProperties} onOptionChange={onDropOptionChange} field="gene_candidacy" value={gene_candidacy}/>
-        </React.Fragment>
-    );
+            { fieldsJSX }
+        </React.Fragment>);
 }
 
 /**
