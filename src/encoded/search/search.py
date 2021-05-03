@@ -54,9 +54,10 @@ class SearchBuilder:
         API itself. Search is by far our most complicated API, thus there is a lot of state.
     """
     DEFAULT_SEARCH_FRAME = 'embedded'
-    DEFAULT_HIDDEN = 'default_hidden'
-    ADDITIONAL_FACETS = 'additional_facet'
-    DEBUG = 'debug'
+    DEFAULT_HIDDEN = 'default_hidden'  # facet is hidden by default
+    ADDITIONAL_FACETS = 'additional_facet'  # specifies an aggregation to compute in addition
+    RESCUE_TERMS = 'rescue_terms'  # special facet field that contains terms that should always have buckets
+    DEBUG = 'debug'  # search debug parameter
     MISSING = object()
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
@@ -875,6 +876,15 @@ class SearchBuilder:
                     for bucket in extract_buckets(source_aggregation['primary_agg']):
                         if bucket['key'] not in term_to_bucket:
                             term_to_bucket[bucket['key']] = bucket
+
+                    # bring in rescue terms
+                    if self.RESCUE_TERMS in facet:
+                        for rescue_term in facet[self.RESCUE_TERMS]:
+                            if rescue_term not in term_to_bucket:
+                                term_to_bucket[rescue_term] = {
+                                    'key': rescue_term,
+                                    'doc_count': 0
+                                }
 
                     result_facet['terms'] = list(term_to_bucket.values())
 
