@@ -602,7 +602,7 @@ function NoteFieldDrop(props) {
             <label className="w-100 text-small">
                 { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
             </label>
-            <div className="d-flex">
+            <div className="d-flex note-field-drop">
                 <Dropdown as={ButtonGroup} className={cls}>
                     <Dropdown.Toggle variant="outline-secondary text-left" id="dropdown-basic">
                         { value ? <><i className="status-indicator-dot ml-1 mr-07" data-status={value} /> { value }</> : "Select an option..."}

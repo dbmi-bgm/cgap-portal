@@ -3113,13 +3113,18 @@ $download-button-width : 100px;
 					padding: 10px;
 				}
 
-				.dropdown.btn-group {
-					width: 270px;
-					
-					>button {
-						max-width: 100%;
-						text-overflow: ellipsis;
-						overflow: hidden;
+				.note-field-drop {
+					width: 310px;
+
+					.dropdown.btn-group {
+						width: 270px;
+						flex-grow: 1;
+						
+						>button {
+							max-width: 100%;
+							text-overflow: ellipsis;
+							overflow: hidden;
+						}
 					}
 				}
 			}
