@@ -752,7 +752,7 @@ function GenericFieldForm(props) {
             const { field, value } = fieldDataObj;
             return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field }} getFieldProperties={getFieldProperties}
                 onOptionChange={onDropOptionChange} />);
-        });
+        }).sort().reverse(); // Reverse really just to get Variant candidacy to show up last. May need a better solution if more fields added in future.
     }, [ schemas, noteType, fieldsArr ]);
 
     return (
