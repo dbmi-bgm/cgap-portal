@@ -274,6 +274,7 @@ export class InterpretationSpaceWrapper extends React.Component {
  */
 export class InterpretationSpaceController extends React.Component {
 
+    // CurrentTab will always be a number between 0-3 and index to these values
     static tabNames = ["Variant Notes", "Gene Notes", "Clinical", "Discovery"];
     static tabTitles = ["Variant Notes", "Gene Notes", "ACMG Interpretation", "Variant/Gene Discovery"];
 
@@ -386,7 +387,7 @@ export class InterpretationSpaceController extends React.Component {
 
         let panelToDisplay = null;
         switch(currentTab) {
-            case (0):
+            case (0): // Variant Notes
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
@@ -394,7 +395,7 @@ export class InterpretationSpaceController extends React.Component {
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case (1):
+            case (1): // Gene Notes
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
@@ -402,7 +403,7 @@ export class InterpretationSpaceController extends React.Component {
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case (2):
+            case (2): // Interpretation
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
@@ -410,7 +411,7 @@ export class InterpretationSpaceController extends React.Component {
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case (3):
+            case (3): // Discovery
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={3} saveToField="discovery_interpretation" noteType="note_discovery" { ...passProps }
