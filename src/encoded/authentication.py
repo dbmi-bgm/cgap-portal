@@ -313,21 +313,13 @@ def login(context, request):
     if request_token is None:
         request_token = request.json_body.get("id_token", None)
 
-    app_url_parts = urlparse(request.application_url)
-    app_domain = app_url_parts.hostname
-    is_https = app_url_parts.scheme == "https"
 
-    # `request.domain` is more consistently-present than request.referrer
-    # however login is only triggered through AJAX so we can depend on request.referrer here,
-    # and have it serve as minor layer of obfuscation.
-
-    if not app_domain or app_domain != request.domain:
-        raise HTTPForbidden("Expected a valid origin")
+    is_https = request.scheme == "https"
 
     request.response.set_cookie(
         "jwtToken",
         value=request_token,
-        domain=app_domain,
+        domain=request.domain,
         path="/",
         httponly=True,
         samesite="strict",
@@ -509,18 +501,12 @@ def impersonate_user(context, request):
         algorithm=JWT_ENCODING_ALGORITHM
 	)
 
-
-    app_url_parts = urlparse(request.application_url)
-    app_domain = app_url_parts.hostname
-    is_https = app_url_parts.scheme == "https"
-
-    if not app_domain or app_domain != request.domain:
-        raise HTTPForbidden("Expected a valid origin")
+    is_https = request.scheme == "https"
 
     request.response.set_cookie(
         "jwtToken",
         value=id_token.decode('utf-8'),
-        domain=app_domain,
+        domain=request.domain,
         path="/",
         httponly=True,
         samesite="strict",

@@ -33,7 +33,6 @@ README:
 
 
 TEST_HTTP_HOST = "mytestingwebsite.somewhere.example.com"
-TEST_HTTP_REFERER = "https://" + TEST_HTTP_HOST
 
 
 
@@ -197,8 +196,7 @@ def anontestapp(app):
     """TestApp for anonymous user (i.e., no user specified), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': "application/json",
-        'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER
+        'HTTP_HOST': TEST_HTTP_HOST
     }
     return webtest.TestApp(app, environ)
 
@@ -208,8 +206,7 @@ def anonhtmltestapp(app):
     """TestApp for anonymous (not logged in) user, accepting text/html content."""
     environ = {
         'HTTP_ACCEPT': 'text/html',
-        'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER
+        'HTTP_HOST': TEST_HTTP_HOST
     }
     test_app = webtest.TestApp(app, environ)
     return test_app
@@ -220,8 +217,7 @@ def anon_es_testapp(es_app):
     """ TestApp simulating a bare Request entering the application (with ES enabled) """
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER
+        'HTTP_HOST': TEST_HTTP_HOST
     }
     return webtest.TestApp(es_app, environ)
 
@@ -231,8 +227,7 @@ def anon_html_es_testapp(es_app):
     """TestApp with ES + Postgres for anonymous (not logged in) user, accepting text/html content."""
     environ = {
         'HTTP_ACCEPT': 'text/html',
-        'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER
+        'HTTP_HOST': TEST_HTTP_HOST
     }
     return webtest.TestApp(es_app, environ)
 
@@ -243,7 +238,6 @@ def testapp(app):
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST'
     }
     return webtest.TestApp(app, environ)
@@ -255,7 +249,6 @@ def htmltestapp(app):
     environ = {
         'HTTP_ACCEPT': 'text/html',
         'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST',
     }
     test_app = webtest.TestApp(app, environ)
@@ -268,7 +261,6 @@ def es_testapp(es_app):
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST',
     }
     return webtest.TestApp(es_app, environ)
@@ -280,7 +272,6 @@ def html_es_testapp(es_app):
     environ = {
         'HTTP_ACCEPT': 'text/html',
         'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST',
     }
     return webtest.TestApp(es_app, environ)
@@ -292,7 +283,6 @@ def authenticated_testapp(app):
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST_AUTHENTICATED',
     }
     return webtest.TestApp(app, environ)
@@ -304,7 +294,6 @@ def authenticated_es_testapp(es_app):
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST_AUTHENTICATED',
     }
     return webtest.TestApp(es_app, environ)
@@ -316,7 +305,6 @@ def submitter_testapp(app):
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'TEST_SUBMITTER',
     }
     return webtest.TestApp(app, environ)
@@ -329,7 +317,6 @@ def indexer_testapp(es_app):
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'INDEXER',
     }
     return webtest.TestApp(es_app, environ)
@@ -341,7 +328,6 @@ def embed_testapp(app):
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'HTTP_HOST': TEST_HTTP_HOST,
-        'HTTP_REFERER': TEST_HTTP_REFERER,
         'REMOTE_USER': 'EMBED',
     }
     return webtest.TestApp(app, environ)
