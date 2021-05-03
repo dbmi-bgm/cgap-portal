@@ -821,7 +821,7 @@ function UnsavedInterpretationModal(props) {
                         Navigate Away & Discard Notes
                     </Button>
                     <Button className="flex-grow-1" variant="primary" onClick={() => setIsSubmitting(false, null, false)}>
-                        Continue Editing
+                        Back to Notes
                     </Button>
                 </Modal.Footer>
             </Modal>
