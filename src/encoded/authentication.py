@@ -322,8 +322,6 @@ def login(context, request):
     # however login is only triggered through AJAX so we can depend on request.referrer here,
     # and have it serve as minor layer of obfuscation.
 
-    print("TTT", request.referrer, referrer_domain, request.domain)
-
     if not referrer_domain or referrer_domain != request.domain:
         raise HTTPForbidden("Expected a valid referrer domain")
 
