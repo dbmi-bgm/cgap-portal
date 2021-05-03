@@ -3114,7 +3114,13 @@ $download-button-width : 100px;
 				}
 
 				.dropdown.btn-group {
-					flex-grow: 1;
+					width: 270px;
+					
+					>button {
+						max-width: 100%;
+						text-overflow: ellipsis;
+						overflow: hidden;
+					}
 				}
 			}
 		}
