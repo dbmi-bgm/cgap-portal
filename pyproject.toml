@@ -161,7 +161,7 @@ pytest-xdist = ">=1.14"
 # snovault commands
 batchupgrade = "snovault.batchupgrade:main"
 create-mapping = "snovault.elasticsearch.create_mapping:main"
-es-index-listener = "snovault.elasticsearch.es_index_listener:main"
+es-index-data = "snovault.commands.es_index_data:main"
 wipe-test-indices = "snovault.commands.wipe_test_indices:main"
 # encoded commands
 add-date-created = "encoded.commands.add_date_created:main"
