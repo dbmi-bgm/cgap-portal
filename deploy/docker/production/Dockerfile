@@ -10,6 +10,8 @@ ARG CGAP_ENV_NAME
 ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-mastertest"}
 ARG CGAP_BRANCH
 ENV CGAP_BRANCH=${CGAP_BRANCH:-"c4_519"}
+ARG ENTRYPOINT
+ENV ENTRYPOINT=${ENTRYPOINT:-"entrypoint.sh"}
 
 # Configure (global) Env
 ENV CGAP_REPO=https://github.com/dbmi-bgm/cgap-portal.git
@@ -85,7 +87,7 @@ COPY mastertest.ini deploy/ini_files/.
 RUN touch production.ini
 RUN chown nginx:nginx production.ini
 
-COPY entrypoint.sh .
+COPY $ENTRYPOINT entrypoint.sh
 COPY assume_identity.py .
 RUN chmod +x entrypoint.sh
 RUN chmod +x assume_identity.py
