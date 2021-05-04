@@ -313,29 +313,13 @@ def login(context, request):
     if request_token is None:
         request_token = request.json_body.get("id_token", None)
 
-    request_parts = urlparse(request.referrer)
-    request_domain = request_parts.hostname
 
-    is_https = request_parts.scheme == "https"
-
-
-    # The below 'check' is disabled to provide less feedback than possible
-    # to make it slightly harder for brute force attacks.
-
-    # is_valid_token = Auth0AuthenticationPolicy.get_token_info(request_token, request)
-    # if not is_valid_token:
-    #     # Doesn't check if User exists in system, just if token is validly signed,
-    #     # to allow for unregistered users to still have cookie stored so
-    #     # they can go through registration process.
-    #     # (This check is not strictly needed for anything, just provides more feedback faster.. maybe should be removed?)
-    #     raise LoginDenied(domain=request.domain)
-
+    is_https = request.scheme == "https"
 
     request.response.set_cookie(
         "jwtToken",
         value=request_token,
-        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
-        domain=request_domain,
+        domain=request.domain,
         path="/",
         httponly=True,
         samesite="strict",
@@ -361,14 +345,11 @@ def logout(context, request):
     browser cookies and re-requesting the current 4DN URL.
     """
 
-    request_parts = urlparse(request.referrer)
-    request_domain = request_parts.hostname
-
     # Deletes the cookie
     request.response.set_cookie(
         name='jwtToken',
         value=None,
-        domain=request_domain,
+        domain=request.domain,
         max_age=0,
         path='/',
         overwrite=True
@@ -520,16 +501,12 @@ def impersonate_user(context, request):
         algorithm=JWT_ENCODING_ALGORITHM
 	)
 
-    # Better place to get this maybe?
-    request_parts = urlparse(request.referrer)
-    request_domain = request_parts.hostname
-    is_https = request_parts.scheme == "https"
+    is_https = request.scheme == "https"
 
     request.response.set_cookie(
         "jwtToken",
         value=id_token.decode('utf-8'),
-        # THE BELOW NEEDS TESTING RE: CLOUD ENVIRONMENT:
-        domain=request_domain,
+        domain=request.domain,
         path="/",
         httponly=True,
         samesite="strict",
