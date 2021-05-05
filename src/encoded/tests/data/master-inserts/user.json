@@ -128,6 +128,22 @@
         "project_roles": [{"project": "f586dc9e-64eb-47fe-b140-624fd504d549",
                            "role": "scientist"}],
         "user_institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb"
+    },{
+        "email": "cypress-test-user@cgap.hms.harvard.edu",
+        "uuid": "5196db84-f3d9-44bd-bba0-59e9e83634a1",
+        "first_name": "Cypress",
+        "last_name": "Test Account",
+        "status": "current",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "project_roles": [{
+            "role": "developer",
+            "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+        }],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "job_title": "Crash Test Dummy",
+        "date_created": "2021-05-04T22:05:01.596462+00:00",
+        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab245628888"
     },
     {
         "email": "eric_berg@hms.harvard.edu",
