@@ -6,29 +6,29 @@ import boto3
 import contextlib
 import json
 import logging
-import os
-import re
+# import os
+# import re
 import traceback
 
-from dcicutils.misc_utils import ignored, check_true, PRINT
+from dcicutils.misc_utils import ignored, check_true, PRINT, VirtualApp
 from snovault import collection, load_schema
-from pyramid.request import Request
-from pyramid.security import Allow, Deny, Everyone
+# from pyramid.request import Request
+# from pyramid.security import Allow, Deny, Everyone
 from .base import (
     Item,
     # TODO: Maybe collect all these permission styles into a single file, give them symbolic names,
     #       and permit only the symbolic names to be used in each situation so we can curate a full inventory of modes.
     #       -kmp 26-Jul-2020
     # Ticket C4-332
-    ALLOW_PROJECT_MEMBER_ADD_ACL,
-)
-from .base import (
-    ONLY_ADMIN_VIEW_ACL,
+    # ALLOW_PROJECT_MEMBER_ADD_ACL,
+    # ONLY_ADMIN_VIEW_ACL,
 )
 from ..util import (
-    debuglog, subrequest_item_creation, beanstalk_env_from_registry, create_empty_s3_file, s3_output_stream
+    debuglog, beanstalk_env_from_registry, create_empty_s3_file, s3_output_stream,  # subrequest_item_creation,
+    make_vapp_for_ingestion,  # vapp_for_email,
 )
 from ..ingestion.common import metadata_bundles_bucket, get_parameter
+
 
 # ALLOW_SUBMITTER_VIEW_ACL = (
 #     # TODO: There is an issue here where we want a logged in user remotely only to view this
@@ -46,6 +46,7 @@ class SubmissionFolio:
 
     def __init__(self, *, vapp, ingestion_type, submission_id, log=None):
         self.vapp = vapp
+        self._admin_vapp = make_vapp_for_ingestion(app=vapp.app)
         self.ingestion_type = ingestion_type
         self.log = log or logging
         self.bs_env = beanstalk_env_from_registry(vapp.app.registry)
@@ -74,9 +75,15 @@ class SubmissionFolio:
         return self.make_submission_uri(self.submission_id)
 
     def patch_item(self, **kwargs):
-        res = self.vapp.patch_json(self.submission_uri, kwargs)
+        res = self._admin_vapp.patch_json(self.submission_uri, kwargs)
         [item] = res.json['@graph']
         debuglog(json.dumps(item))
+        return item
+
+    def get_item(self):
+        res = self._admin_vapp.get(self.submission_uri)
+        [item] = res.json['@graph']
+        return item
 
     def note_additional_datum(self, key, from_dict, from_key=None, default=None):
         self.other_details['additional_data'] = additional_data = (
@@ -113,6 +120,7 @@ class SubmissionFolio:
 
         self.object_name = object_name = manifest['object_name']
         self.parameters = parameters = manifest['parameters']
+        email = manifest['email']
 
         debuglog(submission_id, "object_name:", object_name)
         debuglog(submission_id, "parameters:", parameters)
@@ -130,10 +138,16 @@ class SubmissionFolio:
         }
 
         try:
+
+            other_keys = {}
+            if email:
+                other_keys['submitted_by'] = email
+
             self.patch_item(submission_id=submission_id,
                             object_name=object_name,
                             parameters=parameters,
-                            processing_status={"state": "processing"})
+                            processing_status={"state": "processing"},
+                            **other_keys)
 
             self.resolution = resolution
 
@@ -190,7 +204,14 @@ class SubmissionFolio:
     @staticmethod
     def show_report_lines(lines, fp, default="Nothing to report."):
         for line in lines or ([default] if default else []):
-            print(line, file=fp)
+            try:
+                print(line, file=fp)
+            except UnicodeEncodeError:
+                ascii_line = line.encode(
+                    encoding="ascii", errors="backslashreplace"
+                ).decode(encoding="ascii")
+                print(ascii_line, file=fp)
+
 
 @collection(
     name='ingestion-submissions',

@@ -1,23 +1,24 @@
-import boto3
 import datetime
 import io
 import json
-import negspy.coordinates as nc
 import os
+from urllib.parse import parse_qs, urlparse
+
+import boto3
+import negspy.coordinates as nc
 import pytz
 import structlog
-
 from pyramid.httpexceptions import HTTPTemporaryRedirect
 from pyramid.settings import asbool
 from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
-from urllib.parse import parse_qs, urlparse
-from ..util import resolve_file_path
-from ..inheritance_mode import InheritanceMode
-from .base import Item, get_item_or_none
 
+from encoded.ingestion.common import CGAP_CORE_PROJECT
+from encoded.inheritance_mode import InheritanceMode
+from encoded.util import resolve_file_path
+from encoded.types.base import Item, get_item_or_none
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
@@ -54,10 +55,14 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = [
-        "interpretation.classification",
-        "interpretation.acmg_guidelines",
-        "interpretation.conclusion",
-        "interpretation.note_text"
+        "interpretations.classification",
+        "interpretations.acmg_guidelines",
+        "interpretations.conclusion",
+        "interpretations.note_text",
+        "interpretations.version",
+        "interpretations.project",
+        "interpretations.institution",
+        "interpretations.status"
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
@@ -75,10 +80,30 @@ def build_variant_sample_embedded_list():
     embedded_list = [
         "cmphet.*",
         "variant_sample_list.created_for_case",
+        "variant_notes.note_text",
+        "variant_notes.version",
+        "variant_notes.project",
+        "variant_notes.institution",
+        "variant_notes.status",
+        "variant_notes.last_modified.date_modified",
+        "variant_notes.last_modified.modified_by.display_title",
+        "gene_notes.note_text",
+        "gene_notes.version",
+        "gene_notes.project",
+        "gene_notes.institution",
+        "gene_notes.status",
+        "gene_notes.last_modified.date_modified",
+        "gene_notes.last_modified.modified_by.display_title",
         "interpretation.classification",
         "interpretation.acmg_guidelines",
         "interpretation.conclusion",
-        "interpretation.note_text"
+        "interpretation.note_text",
+        "interpretation.version",
+        "interpretation.project",
+        "interpretation.institution",
+        "interpretation.status",
+        "interpretation.last_modified.date_modified",
+        "interpretation.last_modified.modified_by.display_title"
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
@@ -442,6 +467,31 @@ class VariantSample(Item):
                 new_labels[role_key] = ' '.join(label)  # just in case
 
         return new_labels
+
+    @calculated_property(schema={
+        "title": "Project Gene Lists",
+        "field_name": "project_genelists",
+        "description": "Gene lists associated with project of variant sample",
+        "type": "array",
+        "items": {
+            "title": "Gene list title",
+            "type": "string",
+            "description": "Gene list title"
+        }
+    })
+    def project_genelists(self, request, project, variant):
+        project_genelists = []
+        core_project = CGAP_CORE_PROJECT + "/"
+        potential_projects = [core_project, project]
+        variant_props = get_item_or_none(request, variant, frame="embedded")
+        genes = variant_props.get("genes", [])
+        for gene in genes:
+            genelists = gene.get("genes_most_severe_gene", {}).get("gene_lists", [])
+            for genelist in genelists:
+                if (genelist["project"]["@id"] in potential_projects
+                        and genelist["display_title"] not in project_genelists):
+                    project_genelists.append(genelist["display_title"])
+        return project_genelists
 
 
 @collection(

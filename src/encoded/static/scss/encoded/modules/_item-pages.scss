@@ -554,6 +554,18 @@ h3.submission-subtitle {
 
 @mixin statusColorStyles {
 
+	// Blue
+	&[data-status="benign"]:before {						// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: $primary;
+	}
+
+	// Dark Blue
+	&[data-status="likely benign"]:before {					// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: $primary-dark;
+	}
+
 	// Green
 	&[data-status="current"]:before,						// Applicable to Item.status
 	&[data-status="shared"]:before,							// Applicable to Item.status
@@ -561,7 +573,6 @@ h3.submission-subtitle {
 	&[data-status="uploaded"]:before,						// Applicable to File.status
 	&[data-status="public"]:before,							// Applicable to Pages & UserContent
 	&[data-status="complete"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
-	&[data-status="benign"]:before,							// Applicable to ClinVar Clinical Significance
 	&[data-status="protective"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #308756;
@@ -578,8 +589,7 @@ h3.submission-subtitle {
 	&[data-status="in public review"]:before,				// Applicable to Item.status
 	&[data-status="uploading"]:before,						// Applicable to File.status
 	&[data-status="output_files_transferring"]:before,		// Applicable to WorkflowRun.run_status
-	&[data-status="output_file_transfer_finished"]:before,	// Applicable to WorkflowRun.run_status
-	&[data-status="likely benign"]:before {					// Applicable to ClinVar Clinical Significance
+	&[data-status="output_file_transfer_finished"]:before {	// Applicable to WorkflowRun.run_status
 		color: #fff;
 		background-color: #80921c;
 	}
@@ -601,6 +611,7 @@ h3.submission-subtitle {
 	&[data-status="inactive"]:before,						// Applicable to Item.status
 	&[data-status="revoked"]:before,						// Applicable to User.status
 	&[data-status="probable-pathogenic"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="likely pathogenic"]:before,				// Applicable to SampleVariant Interpretation Classification
 	&[data-status="affects"]:before,						// Applicable to ClinVar Clinical Significance
 	&[data-status="restricted"]:before {					// Deprecated?
 		color: #fff;
@@ -630,6 +641,7 @@ h3.submission-subtitle {
 	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
 	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
 	&[data-status="not provided"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="VUS"]:before,							// Applicable to SampleVariant Interpretation Classification
 	&[data-status="unspecified"]:before {					// Deprecated? Fallback for lack of status in some cases?
 		color: #fff;
 		background-color: #7b7b7b;
@@ -2058,6 +2070,18 @@ $download-button-width : 100px;
 				}
 			}
 
+			/* Interpretation styles*/
+			&#case-info\.interpretation {
+				.card-header.section-header {
+					font-weight: 400;
+					margin: 0; /* overrides the default `margin: 10px 0` of header (h1, h2, ..) elems */
+					
+					a:hover > div.title-block > span {
+						text-decoration: underline;
+					}
+				}
+			}
+
 			h2 {
 				font-size: 1.5rem;
 				font-weight: 400;
@@ -2285,15 +2309,144 @@ $download-button-width : 100px;
 	}
 }
 
+#case-info {
+
+	.embedded-search-view-outer-container {
+
+		// (Stylistic) increase whitespace around this components/elems
+		.above-results-table-row {
+			margin-top: 16px;
+			padding-bottom: 16px;
+		}
+
+	}
+}
+
+
+.filterset-preset-selection-outer-column {
+	/** Responsive styling copied over from .facet-column in _search.scss **/
+	/* (todo: maybe consider making it a mixin) */
+
+	@include navbar-static-position {
+		width: 100%;
+	}
+
+	@include navbar-fixed-position {
+		width: 320px;
+	}
+
+	/** -- **/
+
+	.filterset-preset-selection-body {
+
+		/** Is located within the .filterset-outer-container **/
+		/* border-right: 1px solid #777; */
+		display: flex;
+		flex-direction: column;
+
+		.results-container {
+
+			flex-basis: 300px; /* <- Min height, essentially */
+			min-height: 300px;
+			flex-grow: 1;
+			flex-shrink: 1;
+
+			/** keep scrollbar always visible for layout consistency (instd of overflow:auto) **/
+			overflow-y: scroll;
+			max-height: 100%;
+
+			.preset-filterset-result {
+
+				background-color: #fff;
+				border-bottom: 1px solid #ddd;
+
+				.title {
+					height: 36px;
+					padding-top: 8px;
+					display: flex;
+					align-items: center;
+				}
+
+				.title-icon-container {
+					color: $secondary;
+					font-size: 1rem; /* Unset from parent elem's .text-small */
+					&.clickable {
+						color: $primary;
+						&:hover {
+							color: $primary-dark;
+						}
+					}
+				}
+
+				.info {
+					height: 36px;
+					display: flex;
+					align-items: center;
+
+					.btn-dropdown-icon {
+						/* Todo - make reusable everywhere ? */
+						padding-left: 5px;
+						padding-right: 5px;
+						&:after {
+							/* Hide down 'v' icon */
+							display: none;
+						}
+					}
+
+					.count-indicator-wrapper {
+
+						svg {
+							/** This seems to work well visually here. **/
+							vertical-align: sub;
+						}
+
+						svg circle {
+							fill: #999;
+						}
+					}
+
+					.title-icon-container {
+						button.import-preset-btn {
+							line-height: 1.45;
+						}
+					}
+				}
+
+				&[data-is-origin-of-current-case-filterset="true"] {
+					background-color: $light;
+
+					&[data-is-current-case-filterset-unchanged="true"] {
+						/* Similar color to filterset-block below, but lighter */
+						background-color: lighten($primary, 55%);
+
+					}
+					
+				}
+
+				&[data-has-been-deleted="true"] {
+					/* background: #fff4f4; */
+					> .title,
+					> .info {
+						opacity: 0.4;
+					}
+				}
+
+			}
+
+		}
+
+	}
+}
 
 .filterset-outer-container {
 	// TODO CHANGE
 	// border: 1px solid #999;
 	/* background-color: desaturate(lighten($primary-dark, 45%), 30%); */ // #b4c8d8; // $gray-300;
-	background-color: #dedede;
+
+	// background-color: #dedede;
 	border-radius: $border-radius-lg;
-	border: 4px solid transparent;
-	transition: background-color .5s ease-out;
+	// border: 4px solid transparent;
+	// transition: background-color .5s ease-out;
 
 	h4 i.icon.clickable {
 		@include clickable-hoverable-icon;
@@ -2303,9 +2456,10 @@ $download-button-width : 100px;
 
 	.filter-set-ui-header {
 		/** Header **/
-		/** Margins are negatively offset from parent elem's border - tho maybe dif layouting in future to be adopted **/
-		margin: -4px;
+		/* Looks nice, enough to accomodate Save | Save As buttons, and gives us a concrete number to match FS preset selection UI header height to. */
+		min-height: 65px;
 		background-color: $primary-dark;
+		color: #fff;
 		h4 {
 			color: #fff;
 		}
@@ -2321,6 +2475,9 @@ $download-button-width : 100px;
 
 	.blocks-container {
 
+		/* min-height: 400px; */
+		overflow: auto;
+
 		.filterset-block {
 			border-radius: $border-radius-lg;
 			border: 1px solid #8e8e8e;
@@ -2333,10 +2490,15 @@ $download-button-width : 100px;
 			// margin: 0 -3px; /* Subtract border-width to align left + right unselected edges properly w. other UI elements */
 			/* transition: border-color .5s, background-color .5s; */
 
-			transition: background-color .5s ease-out;
+			/* Disabled for now - sometimes can be slow: */
+			/* transition: background-color .5s ease-out; */
 
 
 			/* box-shadow: 0 1px 6px -3px black; */
+
+			&:not(:last-child) {
+				margin-bottom: 16px;
+			}
 
 			&.selected {
 				border-width: 3px;
@@ -2458,30 +2620,76 @@ $download-button-width : 100px;
 
 	}
 
-	&[data-all-selected="true"] {
-		border-color: $primary-dark;
-		background-color: desaturate(lighten($primary-dark, 40%), 25%);
-		.blocks-container {
+	.filterset-blocks-container {
 
-		 	.filterset-block.selected {
-		 		border-width: 1px;
-				padding: 2px;
-				border-radius: $border-radius-lg;
-				border-color: desaturate(lighten($primary-dark, 15%), 25%);;
-			}
+		background-color: #dedede;
+		// border-radius: $border-radius-lg;
+		border: 4px solid transparent;
+		border-top: none;
+		transition: background-color .4s .1s ease-in;
 
-			&:hover {
-				.filterset-block.clickable.selected {
-					&:hover {
-						border-width: 2px;
-						padding: 1px;
-						border-radius: $border-radius-lg + 1px;
-						border-color: $primary-dark;
+
+		/* While present as child of flex-grow-1 'column', stretch self to min-height of left presets column */
+		min-height: 100%;
+		display: flex;
+		flex-direction: column;
+
+		> .blocks-container {
+			flex-grow: 1;
+		}
+
+
+		&[data-all-selected="true"] {
+			border-color: $primary-dark;
+			background-color: desaturate(lighten($primary-dark, 40%), 25%);
+			.blocks-container {
+	
+				 .filterset-block.selected {
+					 border-width: 1px;
+					padding: 2px;
+					border-radius: $border-radius-lg;
+					border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+				}
+	
+				&:hover {
+					.filterset-block.clickable.selected {
+						&:hover {
+							border-width: 2px;
+							padding: 1px;
+							border-radius: $border-radius-lg + 1px;
+							border-color: $primary-dark;
+						}
 					}
 				}
 			}
 		}
+
 	}
+
+	// &[data-all-selected="true"] {
+	// 	border-color: $primary-dark;
+	// 	background-color: desaturate(lighten($primary-dark, 40%), 25%);
+	// 	.blocks-container {
+
+	// 	 	.filterset-block.selected {
+	// 	 		border-width: 1px;
+	// 			padding: 2px;
+	// 			border-radius: $border-radius-lg;
+	// 			border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+	// 		}
+
+	// 		&:hover {
+	// 			.filterset-block.clickable.selected {
+	// 				&:hover {
+	// 					border-width: 2px;
+	// 					padding: 1px;
+	// 					border-radius: $border-radius-lg + 1px;
+	// 					border-color: $primary-dark;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 }
 
@@ -2705,7 +2913,7 @@ $download-button-width : 100px;
 
 
 /**********************************************************
-  VariantSampleView & similar - Annotation Space
+  VariantSampleView & similar - Annotation & Interpretation Space
 **********************************************************/
 
 // TODO maybe move somewhere else
@@ -2843,6 +3051,53 @@ $download-button-width : 100px;
 					color: $primary-dark;
 				}
 				*/
+			}
+		}
+	}
+
+	.interpretation-space {
+		position: sticky;
+		position: -webkit-sticky;
+		top: 50px;
+
+		.card-header.interpretation-header {
+			background-color: $primary-dark;
+			color: #ffffff;
+			font-size: 1.1em;
+
+			button:focus {
+				outline: thin dotted;
+			}
+		}
+
+		.card-body {
+			ul {
+				list-style-type: none;
+				border:1px solid lightgray;
+				border-radius: 5px;
+				li.interpretation-tab {
+					&[data-active="true"] {
+						background-color: #beccda;
+						color: $primary-dark;
+						border-radius: 3px;
+					}
+					font-size: 13px;
+					padding: 3px 10px;
+				}
+			}
+
+			.interpretation-panel {
+				margin: 10px 0;
+
+				textarea {
+					border-color: lightgrey;
+    				border-radius: 5px;
+					padding: 10px;
+				}
+
+				.dropdown.btn-group {
+					flex-grow: 1;
+				}
 			}
 		}
 	}

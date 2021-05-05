@@ -35,7 +35,7 @@ export function GeneTabBody(props){
         chrom = null,
         spos = null,
         epos = null
-    } = currentGeneItem;
+    } = currentGeneItem || {};
 
     const getTipForField = useMemo(function(){
         if (!schemas) return function(){ return null; };

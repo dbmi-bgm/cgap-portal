@@ -20,7 +20,7 @@ from snovault.elasticsearch.create_mapping import (
     build_index_record,
     compare_against_existing_mapping
 )
-from snovault.elasticsearch.indexer_utils import get_namespaced_index
+from snovault.elasticsearch.indexer_utils import get_namespaced_index, compute_invalidation_scope
 from snovault.elasticsearch.interfaces import INDEXER_QUEUE
 from sqlalchemy import MetaData, func
 from timeit import default_timer as timer
@@ -30,7 +30,7 @@ from .. import main, loadxl
 from ..verifier import verify_item
 
 
-pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.flaky]
+pytestmark = [pytest.mark.working, pytest.mark.indexing]
 
 
 POSTGRES_MAJOR_VERSION_EXPECTED = 11
@@ -64,7 +64,7 @@ def app(es_app_settings, request):
     db_session.bind.pool.dispose()
 
 
-@pytest.yield_fixture(autouse=True)
+@pytest.yield_fixture
 def setup_and_teardown(app):
     """
     Run create mapping and purge queue before tests and clear out the
@@ -93,7 +93,8 @@ def setup_and_teardown(app):
 
 
 @pytest.mark.slow
-def test_indexing_simple(app, testapp, indexer_testapp):
+@pytest.mark.flaky
+def test_indexing_simple(app, setup_and_teardown, testapp, indexer_testapp):
     es = app.registry['elasticsearch']
     namespaced_ppp = get_namespaced_index(app, 'testing_post_put_patch')
     doc_count = es.count(index=namespaced_ppp, doc_type='testing_post_put_patch').get('count')
@@ -137,7 +138,9 @@ def test_indexing_simple(app, testapp, indexer_testapp):
     assert testing_ppp_settings['settings']['index']['number_of_shards'] == '1'
 
 
-def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
+@pytest.mark.skip
+@pytest.mark.flaky
+def test_create_mapping_on_indexing(app, setup_and_teardown, testapp, registry, elasticsearch):
     """
     Test overall create_mapping functionality using app.
     Do this by checking es directly before and after running mapping.
@@ -164,7 +167,8 @@ def test_create_mapping_on_indexing(app, testapp, registry, elasticsearch):
         assert compare_against_existing_mapping(es, namespaced_index, item_type, item_record, True)
 
 
-def test_file_processed_detailed(app, testapp, indexer_testapp, project, institution, file_formats):
+@pytest.mark.flaky
+def test_file_processed_detailed(app, setup_and_teardown, testapp, indexer_testapp, project, institution, file_formats):
     # post file_processed
     item = {
         'institution': institution['uuid'],
@@ -224,7 +228,8 @@ def test_file_processed_detailed(app, testapp, indexer_testapp, project, institu
     assert found_rel_sid > found_fp_sid  # sid of related file is greater
 
 
-def test_real_validation_error(app, indexer_testapp, testapp, institution, project, file_formats):
+@pytest.mark.flaky
+def test_real_validation_error(app, setup_and_teardown, indexer_testapp, testapp, institution, project, file_formats):
     """
     Create an item (file-processed) with a validation error and index,
     to ensure that validation errors work
@@ -263,7 +268,7 @@ def test_real_validation_error(app, indexer_testapp, testapp, institution, proje
 # TODO: This might need to use es_testapp now. -kmp 14-Mar-2021
 @pytest.mark.performance
 @pytest.mark.skip(reason="need to update perf-testing inserts")
-def test_load_and_index_perf_data(testapp, indexer_testapp):
+def test_load_and_index_perf_data(testapp, setup_and_teardown, indexer_testapp):
     """
     ~~ CURRENTLY NOT WORKING ~~
 
@@ -322,3 +327,97 @@ def test_load_and_index_perf_data(testapp, indexer_testapp):
                                                                             frame_time, embed_time))
     # userful for seeing debug messages
     # assert False
+
+
+class TestInvalidationScopeViewCGAP:
+    """ Integrated testing of invalidation scope - requires ES component, so in this file. """
+    DEFAULT_SCOPE = ['status', 'uuid']  # --> this is what you get if there is nothing
+
+    class MockedRequest:
+        def __init__(self, registry, source_type, target_type):
+            self.registry = registry
+            self.json = {
+                'source_type': source_type,
+                'target_type': target_type
+            }
+
+    @pytest.mark.parametrize('source_type, target_type, invalidated', [
+        # Test WorkflowRun (same as fourfront)
+        ('FileProcessed', 'WorkflowRunAwsem',
+            DEFAULT_SCOPE + ['accession', 'file_format', 'filename', 'file_size']
+         ),
+        ('Software', 'WorkflowRunAwsem',
+            DEFAULT_SCOPE + ['name', 'title', 'version', 'source_url']
+         ),
+        ('Workflow', 'WorkflowRunAwsem',
+            DEFAULT_SCOPE + ['category', 'experiment_types', 'app_name', 'title']
+         ),
+        ('WorkflowRunAwsem', 'FileProcessed',  # no link
+            DEFAULT_SCOPE
+         ),
+        # Test Case as it has the most links and thus the most ways things can go wrong
+        ('VariantSample', 'Case',
+            DEFAULT_SCOPE  # no link
+         ),
+        ('Variant', 'Case',
+            DEFAULT_SCOPE  # no link
+         ),
+        ('Individual', 'Case',
+            DEFAULT_SCOPE + ['accession', 'alternate_accessions', 'tags', 'last_modified.date_modified',
+                             'last_modified.modified_by', 'date_created', 'submitted_by',
+                             'schema_version', 'aliases', 'institution', 'project', 'individual_id', 'age',
+                             'age_units', 'is_pregnancy', 'gestational_age', 'sex', 'quantity',
+                             'phenotypic_features.phenotypic_feature', 'phenotypic_features.onset_age',
+                             'phenotypic_features.onset_age_units', 'disorders', 'clinic_notes', 'birth_year',
+                             'is_deceased', 'life_status', 'is_termination_of_pregnancy',
+                             'is_spontaneous_abortion', 'is_still_birth', 'cause_of_death',
+                             'age_at_death', 'age_at_death_units', 'is_no_children_by_choice',
+                             'is_infertile', 'cause_of_infertility', 'ancestry', 'images',
+                             'related_documents', 'institutional_id.id', 'institutional_id.institution',
+                             'mother', 'father', 'samples']
+         ),
+        ('Sample', 'Case',
+            DEFAULT_SCOPE + ['accession', 'workup_type', 'specimen_type',
+                             'specimen_accession_date', 'specimen_collection_date',
+                             'specimen_accession', 'specimen_notes', 'sequence_id',
+                             'sequencing_date', 'completed_processes', 'bam_sample_id']
+         ),
+        ('Family', 'Case',
+            DEFAULT_SCOPE + ['institution', 'project', 'tags', 'last_modified.date_modified',
+                             'last_modified.modified_by', 'date_created', 'submitted_by', 'aliases',
+                             'accession', 'alternate_accessions', 'schema_version', 'title', 'family_id',
+                             'members', 'proband', 'pedigree_source', 'original_pedigree', 'clinic_notes',
+                             'timestamp', 'family_phenotypic_features', 'description']
+         ),
+        ('Phenotype', 'Case',
+            DEFAULT_SCOPE + ['hpo_id', 'phenotype_name']
+         ),
+        ('FileProcessed', 'Case',
+            DEFAULT_SCOPE + ['accession', 'quality_metric', 'file_ingestion_status']
+         ),
+        ('Report', 'Case',
+            DEFAULT_SCOPE + ['accession']
+         ),
+        ('FilterSet', 'Case',
+            DEFAULT_SCOPE + ['notes', 'tags', 'last_modified.date_modified', 'last_modified.modified_by',
+                             'date_created', 'submitted_by', 'institution', 'project', 'aliases',
+                             'schema_version', 'title', 'search_type', 'filter_blocks.name',
+                             'filter_blocks.query', 'filter_blocks.flags_applied', 'flags.name',
+                             'flags.query', 'created_in_case_accession', 'preset_for_projects',
+                             'preset_for_users', 'default_for_projects', 'derived_from_preset_filterset']
+         ),
+        ('Project', 'Case',
+            DEFAULT_SCOPE + ['name']
+         ),
+    ])
+    def test_invalidation_scope_view_parametrized(self, indexer_testapp, source_type, target_type, invalidated):
+        """ Just call the route function - test some basic interactions.
+            In this test, the source_type is the type on which we simulate a modification and target type is
+            the type we are simulating an invalidation on. In all cases uuid and status will trigger invalidation
+            if a linkTo exists, so those fields are always returned as part of the invalidation scope (even when no
+            link exists).
+        """
+        req = self.MockedRequest(indexer_testapp.app.registry, source_type, target_type)
+        scope = compute_invalidation_scope(None, req)
+        print(scope['Invalidated'])
+        assert sorted(scope['Invalidated']) == sorted(invalidated)

@@ -123,34 +123,40 @@
             "type": "string",
             "format": "accession"
         },
-        "is_preset_for_project": {
+        "derived_from_preset_filterset": {
+            "title": "Derived From Preset UUID",
+            "description": "If this FilterSet was derived from a FilterSet Preset, then this info is saved here for reference and later de-duplication.",
+            "type": "string",
+            "format": "uuid"
+        },
+        "preset_for_projects": {
             "title": "Preset for project",
             "description": "Link filter set to project as a preset",
             "type": "array",
             "items": {
-                "title": "Project uuid",
+                "title": "Project UUID",
                 "type": "string",
                 "format": "uuid",
                 "uniqueItems": true
             }
         },
-        "is_preset_for_users": {
+        "preset_for_users": {
             "title": "Preset for user",
             "description": "Link filter set to user as a preset",
             "type": "array",
             "items": {
-                "title": "User uuid",
+                "title": "User UUID",
                 "type": "string",
                 "format": "uuid",
                 "uniqueItems": true
             }
         },
-        "is_default_for_project": {
+        "default_for_projects": {
             "title": "Default for project",
             "description": "Link filter set to project as a default",
             "type": "array",
             "items": {
-                "title": "Project uuid",
+                "title": "Project UUID",
                 "type": "string",
                 "format": "uuid",
                 "uniqueItems": true

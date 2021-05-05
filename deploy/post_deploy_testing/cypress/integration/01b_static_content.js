@@ -1,8 +1,10 @@
+import { cypressVisitHeaders } from './../support';
 
-describe('Static Page & Content Tests', function () {
+
+describe.skip('Static Page & Content Tests', function () {
 
     before(function(){
-        cy.visit('/');
+        cy.visit('/', { headers: cypressVisitHeaders });
     });
 
 

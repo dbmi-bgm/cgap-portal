@@ -35,6 +35,10 @@ class NoteStandard(Note):
 
     item_type = 'note_standard'
     schema = load_schema('encoded:schemas/note_standard.json')
+    embedded_list = [
+        'last_modified.date_modified',
+        'last_modified.modified_by.display_title'
+    ]
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -47,6 +51,7 @@ class NoteStandard(Note):
             return type_date
         # last resort, use uuid
         except Exception:
+            properties = self.upgrade_properties()
             return properties.get('uuid', None)
 
 
@@ -61,6 +66,10 @@ class NoteInterpretation(Note):
 
     item_type = 'note_interpretation'
     schema = load_schema('encoded:schemas/note_interpretation.json')
+    embedded_list = [
+        'last_modified.date_modified',
+        'last_modified.modified_by.display_title'
+    ]
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -69,8 +78,36 @@ class NoteInterpretation(Note):
     })
     def display_title(self, date_created):
         try:
-            type_date = "Interpretation from " + date_created[:10]
+            type_date = "Clinical Interpretation from " + date_created[:10]
             return type_date
         # last resort, use uuid
         except Exception:
+            properties = self.upgrade_properties()
+            return properties.get('uuid', None)
+
+
+@collection(
+    name='notes-discovery',
+    properties={
+        'title': 'Discovery Notes',
+        'description': 'Listing of Discovery Notes',
+    })
+class NoteDiscovery(Note):
+    """NoteDiscovery class."""
+
+    item_type = 'note_discovery'
+    schema = load_schema('encoded:schemas/note_discovery.json')
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "Note's display title",
+        "type": "string"
+    })
+    def display_title(self, date_created):
+        try:
+            type_date = "Discovery Interpretation from " + date_created[:10]
+            return type_date
+        # last resort, use uuid
+        except Exception:
+            properties = self.upgrade_properties()
             return properties.get('uuid', None)

@@ -33,6 +33,7 @@ ITEM_INDEX_ORDER = [
     'FileReference',
     'Image',
     'NoteInterpretation',
+    'NoteDiscovery',
     'NoteStandard',
     'Gene',
     'GeneList',
