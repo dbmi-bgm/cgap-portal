@@ -5,16 +5,22 @@ describe('Deployment/CI Search View Tests', function () {
 
     context('/search/?type=Item', function () {
 
-        before(function(){ // beforeAll
-            cy.visit('/search/', { headers: cypressVisitHeaders });
+        before(function(){
+            cy.visit("/", { headers: cypressVisitHeaders }).loginCGAP().end();
         });
 
-        it('Has at least 10 results for /search/?type=Item', function () {
-            cy.location('search').should('include', 'type=Item').end()
+        beforeEach(function(){
+            // See https://docs.cypress.io/api/cypress-api/cookies#Preserve-Once
+            Cypress.Cookies.preserveOnce('jwtToken', 'searchSessionID');
+        });
+
+        it('Has at least 5 results for /search/?type=Item', function () {
+            cy.visit("/search/", { headers: cypressVisitHeaders }).end()
+                .location('search').should('include', 'type=Item').end()
                 .get('.search-results-container .search-result-row').then(($searchResultElems)=>{
-                    expect($searchResultElems.length).to.be.greaterThan(10);
+                    expect($searchResultElems.length).to.be.greaterThan(5);
                 }).end()
-                .searchPageTotalResultCount().should('be.greaterThan', 10);
+                .searchPageTotalResultCount().should('be.greaterThan', 5);
         });
 
     });
@@ -27,7 +33,7 @@ describe('Deployment/CI Search View Tests', function () {
 
         beforeEach(function(){
             // Ensure we preserve search session cookie for proper ordering.
-            Cypress.Cookies.preserveOnce("searchSessionID");
+            Cypress.Cookies.preserveOnce('jwtToken', 'searchSessionID');
         });
 
         it('Should redirect to /search/?type=Page correctly', function(){
