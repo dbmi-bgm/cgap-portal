@@ -50,24 +50,19 @@ describe('Case View - Initial', function () {
 
         it("Have 5 tabs, with first being active by default", function(){
             cy.get(".tab-router .dot-tab-nav-list .arrow-tab").should("have.length", 5)
-                .eq(0).click()
-                .should(function($arrowTab){
-                    const className = $arrowTab[0].className;
-                    expect(className).to.have.string(" active");
-                    expect($arrowTab).to.have.text('Accessioning');
-                }).end()
+                .eq(0)
+                .should("have.text", "Accessioning")
+                .should("have.class", "active").end()
                 // `id="case-info.accessioning"`; NOT class="accessioning"
                 .get("#case-info\\.accessioning > h1").contains("Accessioning Report and History");
         });
 
         it("Click 2nd tab, see QC metrics", function(){
             cy.get(".tab-router .dot-tab-nav-list .arrow-tab")
-                .eq(1).click()
-                .should(function($arrowTab){
-                    const className = $arrowTab[0].className;
-                    expect(className).to.have.string(" active");
-                    expect($arrowTab).to.have.text('Bioinformatics');
-                }).end()
+                .eq(1)
+                .should("have.text", "Bioinformatics")
+                .click()
+                .should("have.class", "active").end()
                 .get("#case-info\\.bioinformatics > h1").contains("Bioinformatics Analysis").end()
                 .get("#case-info\\.bioinformatics .tab-inner-container.card:first-of-type .card-body .qc-summary")
                 .eq(0).contains("Total Number of Reads:466477333")
@@ -77,12 +72,10 @@ describe('Case View - Initial', function () {
         it("Click 3rd tab, see FSUI & Filtering Table", function(){
             /** Todo - more in-depth testing, maybe in sep file. */
             cy.get(".tab-router .dot-tab-nav-list .arrow-tab")
-                .eq(2).click()
-                .should(function($arrowTab){
-                    const className = $arrowTab[0].className;
-                    expect(className).to.have.string(" active");
-                    expect($arrowTab).to.have.text('Filtering');
-                }).end()
+                .eq(2)
+                .should("have.text", "Filtering")
+                .click()
+                .should("have.class", "active").end()
                 .get("#case-info\\.filtering .embedded-search-container h1").contains("Variant Filtering and Technical Review").end()
                 .get("#case-info\\.filtering .above-variantsample-table-ui .blocks-container .filterset-block").should("have.length.greaterThan", 0);
         });
@@ -91,17 +84,11 @@ describe('Case View - Initial', function () {
             /** Todo - more in-depth testing, maybe in sep file. */
             cy.get(".tab-router .dot-tab-nav-list .arrow-tab")
                 .eq(3)
+                .should("have.text", "Interpretation")
                 // Wait to become not disabled first (-- VSL item is loading --)
-                .should(function($arrowTab){
-                    const className = $arrowTab[0].className;
-                    expect(className).to.not.have.string(" disabled");
-                    expect($arrowTab).to.have.text('Interpretation');
-                })
+                .should("not.have.class", "disabled")
                 .click()
-                .should(function($arrowTab){
-                    const className = $arrowTab[0].className;
-                    expect(className).to.have.string(" active");
-                }).end()
+                .should("have.class", "active").end()
                 .get("#case-info\\.interpretation div.card").should("have.length.greaterThan", 0);
         });
 
