@@ -51,11 +51,11 @@
             "description": "Significance classification indicated by this note",
             "type": "string",
             "enum": [
-                "benign",
-                "likely benign",
+                "Benign",
+                "Likely Benign",
                 "VUS",
-                "likely pathogenic",
-                "pathogenic"
+                "Likely Pathogenic",
+                "Pathogenic"
             ]
         },
         "acmg_guidelines": {
