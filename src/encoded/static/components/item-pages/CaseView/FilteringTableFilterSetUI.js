@@ -234,7 +234,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             selectedItems, onResetSelectedItems,
 
             // From VariantSampleListController (in index.js, wraps CaseInfoTabView)
-            variantSampleListItem, updateVariantSampleListID, refreshExistingVariantSampleListItem
+            variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem
         } = this.props;
         const { total: totalCount, facets = null } = searchContext || {};
         const { filter_blocks = [] } = filterSet || {};
@@ -346,7 +346,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                         </h4>
                         { selectedItems instanceof Map ?
                             <div className="col-auto pr-06">
-                                <AddToVariantSampleListButton {...{ selectedItems, onResetSelectedItems, variantSampleListItem, updateVariantSampleListID, refreshExistingVariantSampleListItem, caseItem, filterSet, selectedFilterBlockIndices }} />
+                                <AddToVariantSampleListButton {...{ selectedItems, onResetSelectedItems, caseItem, filterSet, selectedFilterBlockIndices,
+                                    variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
                             </div>
                             : null }
                     </AboveTableControlsBase>
@@ -956,7 +957,8 @@ function AddToVariantSampleListButton(props){
         caseItem = null,
         filterSet,
         selectedFilterBlockIndices = {},
-        refreshExistingVariantSampleListItem
+        fetchVariantSampleListItem,
+        isLoadingVariantSampleListItem = false
     } = props;
 
     const {
@@ -966,7 +968,7 @@ function AddToVariantSampleListButton(props){
         accession: caseAccession = null
     } = caseItem;
 
-    const [ isLoading, setIsLoading ] = useState(false);
+    const [ isPatchingVSL, setIsPatchingVSL ] = useState(false);
 
     /** PATCH or create new VariantSampleList w. additions */
 
@@ -980,7 +982,7 @@ function AddToVariantSampleListButton(props){
             throw new Error("Expected selected items");
         }
 
-        setIsLoading(true);
+        setIsPatchingVSL(true);
 
         function addToSelectionsList(variantSampleSelectionsList){
 
@@ -1036,8 +1038,10 @@ function AddToVariantSampleListButton(props){
                         throw new Error("Didn't succeed in creating new VSL Item");
                     }
 
-                    onResetSelectedItems();
-                    updateVariantSampleListID(vslAtID);
+                    updateVariantSampleListID(vslAtID, function(){
+                        // Wait to reset selected items until after loading updated VSL so that checkboxes still appear checked during VSL PATCH+GET request.
+                        fetchVariantSampleListItem(onResetSelectedItems);
+                    });
 
                     // PATCH Case w. variant_sample_list_id
                     return ajax.promise(caseAtID, "PATCH", {}, JSON.stringify({ "variant_sample_list_id": vslAtID }));
@@ -1079,7 +1083,7 @@ function AddToVariantSampleListButton(props){
 
             requestPromiseChain = ajax.promise(vslAtID, "PATCH", {}, JSON.stringify(patchVSLPayload) )
                 .then(function(respVSL){
-                    console.log('VSP PATCH resposne', respVSL);
+                    console.log('VSL PATCH response', respVSL);
                     const {
                         "@graph": [{
                             "@id": vslAtID
@@ -1091,8 +1095,9 @@ function AddToVariantSampleListButton(props){
                         throw new Error("Didn't succeed in patching VSL Item");
                     }
 
-                    onResetSelectedItems();
-                    refreshExistingVariantSampleListItem();
+                    // Wait to reset selected items until after loading updated VSL so that checkboxes still appear checked during VSL PATCH+GET request.
+                    fetchVariantSampleListItem(onResetSelectedItems);
+
                 });
 
             // We shouldn't have any duplicates since prev-selected VSes should appear as checked+disabled in table.
@@ -1100,7 +1105,7 @@ function AddToVariantSampleListButton(props){
         }
 
 
-        // Show any errors using an alert and unset isLoading state on completion.
+        // Show any errors using an alert and unset isPatchingVSL state on completion.
         requestPromiseChain.catch(function(error){
             // TODO: add analytics exception event for this
             console.error(error);
@@ -1110,16 +1115,39 @@ function AddToVariantSampleListButton(props){
                 "style" : "danger"
             });
         }).finally(function(){
-            setIsLoading(false);
+            setIsPatchingVSL(false);
         });
 
     };
 
+    let btnTitle = null;
+    if (isLoadingVariantSampleListItem) {
+        btnTitle = (
+            <span className="d-flex align-items-center">
+                <i className="icon icon-circle-notch icon-spin fas mr-1"/>
+                Loading most recent selections...
+            </span>
+        );
+    } else if (isPatchingVSL) {
+        btnTitle = (
+            <span className="d-flex align-items-center">
+                <i className="icon icon-circle-notch icon-spin fas mr-1"/>
+                Saving selections...
+            </span>
+        );
+    } else {
+        btnTitle = (
+            <span>
+                Add <strong>{ selectedItems.size }</strong> selected Variant Samples to Interpretation
+            </span>
+        );
+    }
+
+    const disabled = isLoadingVariantSampleListItem || isPatchingVSL || selectedItems.size === 0;
 
     return (
-        <button type="button" className="btn btn-primary" disabled={isLoading || selectedItems.size === 0} onClick={onButtonClick}>
-            { isLoading ? <i className="icon icon-circle-notch icon-spin fas mr-1"/> : null }
-            Add <strong>{ selectedItems.size }</strong> selected Variant Samples to Interpretation
+        <button type="button" className="btn btn-primary" disabled={disabled} onClick={disabled ? null : onButtonClick}>
+            { btnTitle }
         </button>
     );
 }
@@ -2684,6 +2712,7 @@ export class FilterSetController extends React.PureComponent {
         // }
 
         if (onResetSelectedItems && searchContext !== pastSearchContext) {
+            console.info("Resetting selected VS items");
             onResetSelectedItems();
         }
 

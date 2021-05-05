@@ -31,11 +31,12 @@ export class VariantSampleListController extends React.PureComponent {
     }
 
     static getDerivedStateFromProps(props, state) {
-        if (props.id) {
+        const { id: vslID } = props;
+        if (vslID) {
             // If supplied via props, always set to props.id and prevent
             // from ever changing.
-            // Else rely on `updateVariantSampleListID` to set it.
-            return { "variantSampleListID": props.id };
+            // Else rely on `updateVariantSampleListID` to set it (when it comes in as not present from Case initially).
+            return { "variantSampleListID": vslID };
         }
         return null;
     }
@@ -44,7 +45,6 @@ export class VariantSampleListController extends React.PureComponent {
         super(props);
         this.fetchVariantSampleListItem = this.fetchVariantSampleListItem.bind(this);
         this.updateVariantSampleListID = this.updateVariantSampleListID.bind(this);
-        this.refreshExistingVariantSampleListItem = this.refreshExistingVariantSampleListItem.bind(this);
         const { id: vslID } = props;
         this.state = {
             "variantSampleListItem": null,
@@ -68,20 +68,8 @@ export class VariantSampleListController extends React.PureComponent {
         }
     }
 
-    componentDidUpdate(prevProps, prevState){
-        const { variantSampleListID } = this.state;
-        const { variantSampleListID: pastVSLID } = prevState;
-        if (variantSampleListID !== pastVSLID) {
-            if (!variantSampleListID) {
-                this.setState({ "variantSampleListItem" : null });
-            } else {
-                this.fetchVariantSampleListItem();
-            }
-        }
-    }
-
     /** Fetches datastore=database `@@embedded` representation of 'state.variantSampleListID' */
-    fetchVariantSampleListItem(callback = null){
+    fetchVariantSampleListItem(fnCallback = null){
         const { variantSampleListID } = this.state;
 
         if (this.currentRequest) {
@@ -107,6 +95,7 @@ export class VariantSampleListController extends React.PureComponent {
                 throw new Error("Couldn't get VSL");
             }
 
+
             this.currentRequest = null;
 
             this.setState(function({ refreshCount: prevRefreshCount, variantSampleListItem: prevItem }){
@@ -119,7 +108,8 @@ export class VariantSampleListController extends React.PureComponent {
                     nextState.refreshCount = prevRefreshCount + 1;
                 }
                 return nextState;
-            });
+            }, fnCallback);
+
         };
 
         this.setState({ "isLoadingVariantSampleListItem": true }, () => {
@@ -132,13 +122,9 @@ export class VariantSampleListController extends React.PureComponent {
         });
     }
 
-    updateVariantSampleListID(vslID){
-        // componentDidUpdate will handle triggering fetch of Item.
-        this.setState({ "variantSampleListID": vslID });
-    }
-
-    refreshExistingVariantSampleListItem(){
-        this.fetchVariantSampleListItem();
+    /** Does NOT trigger a refresh, refresh must be triggered manually afterwards */
+    updateVariantSampleListID(vslID, callback){
+        this.setState({ "variantSampleListID": vslID }, callback);
     }
 
     render(){
@@ -151,7 +137,7 @@ export class VariantSampleListController extends React.PureComponent {
             isLoadingVariantSampleListItem,
             "savedVariantSampleIDMap": this.memoized.activeVariantSampleIDMap(variant_samples),
             "updateVariantSampleListID": this.updateVariantSampleListID,
-            "refreshExistingVariantSampleListItem": this.refreshExistingVariantSampleListItem
+            "fetchVariantSampleListItem": this.fetchVariantSampleListItem
         };
         return React.Children.map(children, function(child){
             if (!React.isValidElement(child) || typeof child.type === "string") {

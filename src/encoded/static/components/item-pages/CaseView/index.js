@@ -137,7 +137,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
         savedVariantSampleIDMap = {},
-        refreshExistingVariantSampleListItem
+        fetchVariantSampleListItem
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
 
@@ -296,7 +296,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
                         <SelectedItemsController isMultiselect>
                             <FilteringTab {...{ context, windowHeight, session, schemas, setIsSubmitting, variantSampleListItem,
-                                updateVariantSampleListID, savedVariantSampleIDMap, refreshExistingVariantSampleListItem }} />
+                                updateVariantSampleListID, savedVariantSampleIDMap, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
                         </SelectedItemsController>
                     </DotRouterTab>
                     <DotRouterTab tabTitle={
