@@ -8,6 +8,6 @@ poetry run python -m assume_identity
 
 # Start indexer, do 20 runs
 for i in {1..20}; do
-  poetry run es-index-data production.ini --app-name app --verbose
+  poetry run es-index-data production.ini --app-name app
   sleep 1
 done
