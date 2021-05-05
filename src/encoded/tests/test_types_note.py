@@ -77,7 +77,7 @@ def test_add_note_interpretation_success(workbook, es_testapp, new_interpretatio
 
 def test_add_note_interpretation_fail(workbook, es_testapp, new_interpretation):
     """ test NoteInterpretation item fails to post when schema isn't followed """
-    new_interpretation['classification'] = 'Likely Pathogenic'  # wrong case for enum
+    new_interpretation['classification'] = 'likely pathogenic'  # wrong case for enum
     post_note(es_testapp, new_interpretation, expected_status=422)
 
 def test_patch_note_interpretation_success(workbook, es_testapp, new_interpretation):
