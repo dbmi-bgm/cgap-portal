@@ -27,27 +27,6 @@ describe('Case View - Initial', function () {
             .first().within(function($rowElem){
                 return cy.get(".search-result-column-block[data-field=\"display_title\"] .adv-block-link").click();
             });
-
-
-        // cy.loginCGAP().end()
-
-        // cy.login4DN({ 'email' : 'ud4dntest@gmail.com', 'useEnvToken' : false }).end()
-        //     .get('ul.navbar-acct li.user-account-item').should('have.class', 'is-logged-in').then((accountListItem)=>{
-        //         expect(accountListItem.children('#user_account_nav_button').text()).to.contain('Frontend');
-        //     }).end()
-        //     .get("#user_account_nav_button").click().end()
-        //     .get('ul.dropdown-menu[aria-labelledby="user_account_nav_button"]').contains('Profile').click().end()
-        //     .get('.page-container .user-title-row-container h1.user-title').should('contain', "Frontend").end() // Test only for first name as we're editing last name & it may change re: delayed indexing, etc.
-        //     .get('.page-container .access-keys-container h3').should('contain', "Access Keys").end()
-        //     .get('.page-container .access-keys-container #add-access-key').scrollToCenterElement().click({ force : true }).wait(100).end()
-        //     .get('.modal-body').should('contain', 'Access Key ID').should('contain', 'Secret Access Key').end()
-        //     .get('.modal-body div.row:first-of-type code').invoke('text').then(function(accessKeyID){
-        //         return cy.get('.fade.in.modal').click().wait(500).end()
-        //             .get('.page-container .access-keys-container').should('contain', accessKeyID).end()
-        //             .get('.page-container .access-keys-container .access-keys-table tr:last-child .access-key-buttons .btn-danger').click({ force : true }).end()
-        //             .get('.page-container .access-keys-container').should('not.contain', accessKeyID);
-        //     });
-
     });
 
     context("Top area", function(){
@@ -127,10 +106,6 @@ describe('Case View - Initial', function () {
         });
 
     });
-
-
-
-    // });
 
 });
 
