@@ -1060,7 +1060,7 @@ function AddToVariantSampleListButton(props){
             // patch existing
             const {
                 "@id": vslAtID,
-                variant_samples: existingVariantSampleSelections
+                variant_samples: existingVariantSampleSelections = []
             } = variantSampleListItem;
 
             const patchVSLPayload = { "variant_samples": [ ...existingVariantSampleSelections ] };
