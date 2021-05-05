@@ -134,6 +134,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         PedigreeVizLibrary = null,
         // Passed in from VariantSampleListController which wraps this component in `getTabObject`
         variantSampleListItem = null,
+        isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
         savedVariantSampleIDMap = {},
         refreshExistingVariantSampleListItem
@@ -298,7 +299,12 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                                 updateVariantSampleListID, savedVariantSampleIDMap, refreshExistingVariantSampleListItem }} />
                         </SelectedItemsController>
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled={vsSelections.length === 0} cache={false}>
+                    <DotRouterTab tabTitle={
+                        <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
+                            { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
+                            Interpretation
+                        </span>
+                    } dotPath=".interpretation" disabled={vsSelections.length === 0} cache={false}>
                         <InterpretationTab {...{ variantSampleListItem, schemas, caseAccession }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>

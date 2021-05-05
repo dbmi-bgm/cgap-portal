@@ -49,6 +49,7 @@ export class VariantSampleListController extends React.PureComponent {
         this.state = {
             "variantSampleListItem": null,
             "variantSampleListID": typeof vslID === "string" ? vslID : null,
+            "isLoadingVariantSampleListItem": typeof vslID === "string" ? true : false,
             // `refreshCount` not necessary at all, just for potential internal debugging.
             "refreshCount": 0
         };
@@ -56,6 +57,8 @@ export class VariantSampleListController extends React.PureComponent {
         this.memoized = {
             activeVariantSampleIDMap: memoize(VariantSampleListController.activeVariantSampleIDMap)
         };
+
+        this.currentRequest = null;
     }
 
     componentDidMount(){
@@ -81,17 +84,37 @@ export class VariantSampleListController extends React.PureComponent {
     fetchVariantSampleListItem(callback = null){
         const { variantSampleListID } = this.state;
 
+        if (this.currentRequest) {
+            // Abort is additional signal for browser to cancel request,
+            // not to be relied on in JS logic
+            // (instead safest to make sure scopedRequest === this.currentRequest)
+            this.currentRequest.abort();
+        }
+
+        let scopedRequest = null;
+
         console.info("Fetching VariantSampleList ...");
         const vslFetchCallback = (resp) => {
             console.info("Fetched VariantSampleList", resp);
             const { "@id": vslID, error = null } = resp;
+
+            if (scopedRequest !== this.currentRequest) {
+                // Request superseded, cancel it.
+                return false;
+            }
+
             if (!vslID) {
                 throw new Error("Couldn't get VSL");
             }
 
+            this.currentRequest = null;
+
             this.setState(function({ refreshCount: prevRefreshCount, variantSampleListItem: prevItem }){
                 const { "@id": prevAtID = null } = prevItem || {};
-                const nextState = { "variantSampleListItem": resp };
+                const nextState = {
+                    "variantSampleListItem": resp,
+                    "isLoadingVariantSampleListItem": false
+                };
                 if (prevAtID && vslID !== prevAtID) {
                     nextState.refreshCount = prevRefreshCount + 1;
                 }
@@ -99,12 +122,14 @@ export class VariantSampleListController extends React.PureComponent {
             });
         };
 
-        ajax.load(
-            variantSampleListID + "?datastore=database",
-            vslFetchCallback,
-            "GET",
-            vslFetchCallback
-        );
+        this.setState({ "isLoadingVariantSampleListItem": true }, () => {
+            scopedRequest = this.currentRequest = ajax.load(
+                variantSampleListID + "?datastore=database",
+                vslFetchCallback,
+                "GET",
+                vslFetchCallback
+            );
+        });
     }
 
     updateVariantSampleListID(vslID){
@@ -118,11 +143,12 @@ export class VariantSampleListController extends React.PureComponent {
 
     render(){
         const { children, id: propVSLID, ...passProps } = this.props;
-        const { variantSampleListItem } = this.state;
+        const { variantSampleListItem, isLoadingVariantSampleListItem } = this.state;
         const { variant_samples = [] } = variantSampleListItem || {};
         const childProps = {
             ...passProps,
             variantSampleListItem,
+            isLoadingVariantSampleListItem,
             "savedVariantSampleIDMap": this.memoized.activeVariantSampleIDMap(variant_samples),
             "updateVariantSampleListID": this.updateVariantSampleListID,
             "refreshExistingVariantSampleListItem": this.refreshExistingVariantSampleListItem
