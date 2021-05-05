@@ -27,17 +27,14 @@ describe('Deployment/CI Search View Tests', function () {
 
     context('/search/?type=Page', function(){
 
-        before(function(){ // beforeAll
-            cy.visit('/pages', { headers: cypressVisitHeaders }); // We should get redirected to ?type=Page
-        });
-
         beforeEach(function(){
             // Ensure we preserve search session cookie for proper ordering.
             Cypress.Cookies.preserveOnce('jwtToken', 'searchSessionID');
         });
 
         it('Should redirect to /search/?type=Page correctly', function(){
-            cy.location('search').should('include', 'type=Page').end()
+            cy.visit('/pages', { headers: cypressVisitHeaders }).end() // We should get redirected to ?type=Page
+                .location('search').should('include', 'type=Page').end()
                 .location('pathname').should('include', '/search/');
         });
 
