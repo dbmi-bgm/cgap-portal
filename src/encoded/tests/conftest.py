@@ -191,7 +191,7 @@ def root(registry):
 def anontestapp(app):
     """TestApp for anonymous user (i.e., no user specified), accepting JSON data."""
     environ = {
-        'HTTP_ACCEPT': 'application/json',
+        'HTTP_ACCEPT': "application/json"
     }
     return webtest.TestApp(app, environ)
 
@@ -210,7 +210,7 @@ def anonhtmltestapp(app):
 def anon_es_testapp(es_app):
     """ TestApp simulating a bare Request entering the application (with ES enabled) """
     environ = {
-        'HTTP_ACCEPT': 'application/json',
+        'HTTP_ACCEPT': 'application/json'
     }
     return webtest.TestApp(es_app, environ)
 
@@ -229,7 +229,7 @@ def testapp(app):
     """TestApp for username TEST, accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'REMOTE_USER': 'TEST',
+        'REMOTE_USER': 'TEST'
     }
     return webtest.TestApp(app, environ)
 

@@ -809,6 +809,30 @@ class VariantTableParser(object):
             'type': 'string',
             'linkTo': 'Variant',
         }
+        schema['properties']['gene_notes'] = {
+            'title': 'Gene Notes',
+            'description': 'Note item related to this Gene',
+            'type': 'string',
+            'linkTo': 'NoteStandard'
+        }
+        schema['properties']['variant_notes'] = {
+            'title': 'Variant Notes',
+            'description': 'Notes related to the relevant Variant',
+            'type': 'string',
+            'linkTo': 'NoteStandard'
+        }
+        schema['properties']['interpretation'] = {
+            'title': 'Clinical Interpretation',
+            'description': 'Clinical Interpretation Note connected to this item',
+            'type': 'string',
+            'linkTo': 'NoteInterpretation'
+        }
+        schema['properties']['discovery_interpretation'] = {
+            'title': 'Discovery Interpretation',
+            'description': 'Gene/Variant Discovery interpretation note connected to this item',
+            'type': 'string',
+            'linkTo': 'NoteDiscovery'
+        }
         schema['properties']['file'] = {  # NOT a linkTo as the ID is sufficient for filtering
             'title': 'File',
             'description': 'String Accession of the vcf file used in digestion',
@@ -905,6 +929,7 @@ class VariantTableParser(object):
         schema['title'] = 'Variants'
         schema['description'] = "Schema for variants"
         schema['id'] = '/profiles/variant.json'
+        schema['mixinProperties'].append({"$ref": "mixins.json#/interpretation"})
         schema['properties'] = var_props
         schema['properties']['hg19'] = {  # required for testing :( - will 1-8-2021
             "title": "hg19 Coordinates",
@@ -933,6 +958,16 @@ class VariantTableParser(object):
                         "description": "hg19 coordinate position",
                     }
                 }
+            }
+        }
+        schema['properties']['variant_notes'] = {
+            "title": "Variant Notes",
+            "description": "Notes related to this Variant",
+            "type": "array",
+            "items": {
+                "title": "Variant Note",
+                "type": "string",
+                "linkTo": "NoteStandard"
             }
         }
         schema['properties']['schema_version'] = {'default': '1'}
@@ -1054,7 +1089,8 @@ class GeneTableParser(VariantTableParser):
             {"$ref": "mixins.json#/status"},
             {"$ref": "mixins.json#/attribution"},
             {"$ref": "mixins.json#/notes"},
-            {"$ref": "mixins.json#/static_embeds"}
+            {"$ref": "mixins.json#/static_embeds"},
+            {"$ref": "mixins.json#/interpretation"}
         ]
 
     def generate_gene_schema(self, gene_props, columns, facets):
@@ -1074,6 +1110,16 @@ class GeneTableParser(VariantTableParser):
         gene_props['ensgid']['uniqueKey'] = True  # XXX: This is required for genes
         schema['properties'] = gene_props
         schema['properties']['schema_version'] = {'default': '1'}
+        schema['properties']['gene_notes'] = {
+            "title": "Gene Notes",
+            "description": "Notes related to this Gene",
+            "type": "array",
+            "items": {
+                "title": "Gene Note",
+                "type": "string",
+                "linkTo": "NoteStandard"
+            }
+        }
         schema['facets'] = facets
         schema['columns'] = columns
         logger.info('Build gene schema')

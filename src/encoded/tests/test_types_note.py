@@ -13,7 +13,17 @@ def new_interpretation():
         "institution": "hms-dbmi",
         "note_text": "This variant is reported in the ClinVar database as associated with Syndrome X.",
         "conclusion": "For this reason, the variant has been classified as likely pathogenic.",
-        "classification": "likely pathogenic"
+        "classification": "Likely pathogenic"
+    }
+
+
+@pytest.fixture
+def new_discovery_note():
+    return {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "note_text": "This variant is a candidate for association with Syndrome X.",
+        "variant_candidacy": "Moderate candidate"
     }
 
 
@@ -67,7 +77,7 @@ def test_add_note_interpretation_success(workbook, es_testapp, new_interpretatio
 
 def test_add_note_interpretation_fail(workbook, es_testapp, new_interpretation):
     """ test NoteInterpretation item fails to post when schema isn't followed """
-    new_interpretation['classification'] = 'Likely Pathogenic'  # wrong case for enum
+    new_interpretation['classification'] = 'likely pathogenic'  # wrong case for enum
     post_note(es_testapp, new_interpretation, expected_status=422)
 
 def test_patch_note_interpretation_success(workbook, es_testapp, new_interpretation):
@@ -83,6 +93,31 @@ def test_patch_note_interpretation_fail(workbook, es_testapp, new_interpretation
     resp = post_note(es_testapp, new_interpretation).json['@graph'][0]
     patch_info = {
         'associated_items': {"item_type": "Variant", "item_identifier": variant_with_note}  # wrong type
+    }
+    es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
+
+def test_add_note_discovery_success(workbook, es_testapp, new_discovery_note):
+    """ test NoteDiscovery item posts successfully """
+    post_note(es_testapp, new_discovery_note, note_type='note_discovery')
+
+def test_add_note_discovery_fail(workbook, es_testapp, new_discovery_note):
+    """ test NoteDiscovery item fails to post when schema isn't followed """
+    new_discovery_note['gene_candidacy'] = 'Tier 1'  # wrong value for enum
+    post_note(es_testapp, new_discovery_note, note_type='note_discovery', expected_status=422)
+
+def test_patch_note_discovery_success(workbook, es_testapp, new_discovery_note):
+    """ test NoteDiscovery item is patched successfully when associated_items SOEA is added """
+    resp = post_note(es_testapp, new_discovery_note, note_type='note_discovery').json['@graph'][0]
+    patch_info = {
+        'associated_items': [{"item_type": "Variant", "item_identifier": variant_with_note}]
+    }
+    es_testapp.patch_json('/' + resp['@id'], patch_info, status=200)
+
+def test_patch_note_discovery_fail(workbook, es_testapp, new_discovery_note):
+    """ test NoteDiscovery item fails to patch with incorrectly formatted prop """
+    resp = post_note(es_testapp, new_discovery_note, note_type='note_discovery').json['@graph'][0]
+    patch_info = {
+        'associated_items': {"item_type": "Variant", "item_identifier": variant_with_note}  # wrong prop type
     }
     es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
 
@@ -117,9 +152,9 @@ def test_link_standard_note_to_report(workbook, es_testapp, new_standard_note, t
 def test_add_note_to_gene(workbook, es_testapp, gene1_es):
     """ test linking note to gene """
     note_info = es_testapp.get(f'/notes-interpretation/{note1_uuid}/', status=200).json
-    patch = {'interpretation': note1_uuid}
+    patch = {'interpretations': [note1_uuid]}
     resp = es_testapp.patch_json('/' + gene1_es['@id'], patch, status=200).json['@graph'][0]
-    assert resp['interpretation'] == note_info['@id']
+    assert resp['interpretations'] == [note_info['@id']]
 
 def test_add_note_to_variant_sample(workbook, es_testapp, test_variant_sample):
     """ test linking note to variant sample item """
