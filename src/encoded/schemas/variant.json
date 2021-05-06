@@ -2082,12 +2082,30 @@
         "genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
             "order": 5,
-            "grouping": "Consequence"
+            "grouping": "Consequence",
+            "rescue_terms": [
+                "Missense",
+                "Synonymous",
+                "Frameshift",
+                "Inframe indel",
+                "Nonsense",
+                "Start lost",
+                "Stop lost"
+            ]
         },
         "genes.genes_most_severe_consequence.location": {
             "title": "Location",
             "order": 6,
-            "grouping": "Consequence"
+            "grouping": "Consequence",
+            "rescue_terms": [
+                "UTR",
+                "CDS",
+                "splice site",
+                "intron",
+                "upstream",
+                "miRNA",
+                "downstream"
+            ]
         },
         "genes.genes_most_severe_consequence.impact": {
             "title": "Impact",
