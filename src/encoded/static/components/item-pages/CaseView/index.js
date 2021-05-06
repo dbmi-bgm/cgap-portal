@@ -134,9 +134,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         PedigreeVizLibrary = null,
         // Passed in from VariantSampleListController which wraps this component in `getTabObject`
         variantSampleListItem = null,
+        isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
         savedVariantSampleIDMap = {},
-        refreshExistingVariantSampleListItem
+        fetchVariantSampleListItem
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
 
@@ -295,10 +296,15 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
                         <SelectedItemsController isMultiselect>
                             <FilteringTab {...{ context, windowHeight, session, schemas, setIsSubmitting, variantSampleListItem,
-                                updateVariantSampleListID, savedVariantSampleIDMap, refreshExistingVariantSampleListItem }} />
+                                updateVariantSampleListID, savedVariantSampleIDMap, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
                         </SelectedItemsController>
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled={vsSelections.length === 0} cache={false}>
+                    <DotRouterTab tabTitle={
+                        <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
+                            { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
+                            Interpretation
+                        </span>
+                    } dotPath=".interpretation" disabled={vsSelections.length === 0} cache={false}>
                         <InterpretationTab {...{ variantSampleListItem, schemas, caseAccession }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
