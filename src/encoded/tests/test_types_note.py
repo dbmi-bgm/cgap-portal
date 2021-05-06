@@ -13,7 +13,7 @@ def new_interpretation():
         "institution": "hms-dbmi",
         "note_text": "This variant is reported in the ClinVar database as associated with Syndrome X.",
         "conclusion": "For this reason, the variant has been classified as likely pathogenic.",
-        "classification": "Likely Pathogenic"
+        "classification": "Likely pathogenic"
     }
 
 
