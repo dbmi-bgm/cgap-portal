@@ -43,9 +43,23 @@ def get_existing_key_ids(testapp, user_uuid, key_desc):
     return [res['@id'] for res in search_res['@graph']]
 
 
+def get_ecs_real_url():
+    """ Inspects Cloudformation stacks, looking for LB URL
+        TODO: pull into dcicutils
+    """
+    cfn_client = boto3.client('cloudformation')
+    stacks = cfn_client.describe_stacks().get('Stacks', [])
+    for stack in stacks:
+        for output in stack['Outputs']:
+            if output.get('OutputKey', '') == 'ECSApplicationURL':  # TODO remove hard-code
+                return output.get('OutputValue')
+    log.error('Did not locate the server from Cloudformation! Check ECS Stack metadata.')
+    return ''
+
+
 def generate_access_key(testapp, env, user_uuid, description):
     """
-    Generate an access key for given user on given environment.
+    Generate an access for given user on given environment.
 
     Args:
         testapp (webtest.TestApp): current TestApp
@@ -56,7 +70,7 @@ def generate_access_key(testapp, env, user_uuid, description):
     Returns:
         dict: access key contents with server
     """
-    server = get_beanstalk_real_url(env)
+    server = get_ecs_real_url()  # INCOMPATIBLE CHANGE; will break beanstalk -Will 5/6/21
     access_key_req = {'user': user_uuid, 'description': description}
     res = testapp.post_json('/access_key', access_key_req).json
     return {'secret': res['secret_access_key'],

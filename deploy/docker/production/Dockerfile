@@ -1,7 +1,9 @@
 # CGAP-Portal Dockerfile
+# Note that images are pinned via sha256 as opposed to tag
+# so that we don't pick up new images unintentionally
 
-# TODO: appropriately pin/verify this image
-FROM python:3.6.12-buster
+# Debian Buster with Python 3.6.13
+FROM python@sha256:db248d2d0494973550d323dd6b82af7fc2f4c1e0365769a758abd7fac2aa70db
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
