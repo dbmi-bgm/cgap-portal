@@ -48,6 +48,10 @@ def submit_upload_files(
                 else:
                     results["success"] = True
                     results["validation_output"] = upload_files.validation_output
+                    results["result"] = {
+                        "files_found": upload_files.files_to_move,
+                        "file_size": upload_files.largest_file_size
+                    }
             elif upload_files.post_output:
                 results["success"] = True
                 results["validation_output"] = upload_files.validation_output
@@ -83,7 +87,7 @@ class AssociateFiles:
         self.s3_client = self.setup_client()
         self.dest_bucket = self.get_file_upload_bucket()
         self.file_specs = self.get_file_info()
-        self.files_to_move = self.validate_files()
+        self.files_to_move, self.largest_file_size = self.validate_files()
         if not validate_only and not self.errors:
             self.copy_success = self.multithread_copy()
             #        self.delete_results = self.delete_files()
@@ -124,38 +128,43 @@ class AssociateFiles:
     def _is_file_in_bucket(s3_client, file_key, bucket):
         """Check if file exists in bucket."""
         result = False
+        file_length = None
         try:
-            s3_client.head_object(Bucket=bucket, Key=file_key)
+            response = s3_client.head_object(Bucket=bucket, Key=file_key)
+            file_length = response.get("ContentLength")
+            file_length = file_length * 10**(-9)
             result = True
         except Exception:
             pass
-        return result
+        return result, file_length
 
     def validate_files(self):
         """
         Ensure all files to upload either exist in the Uploads bucket
         or have already been uploaded to the destination.
         """
-        found_in_src = []
+        found_in_src = {}
         found_in_dest = []
         not_found = []
+        largest_file_size = 0
         s3_client = self.s3_client
         src = self.src_bucket
         dest = self.dest_bucket
-        files_to_check = [file_info for file_info in self.file_specs]
-        for file_info in files_to_check:
-            src_check = self._is_file_in_bucket(s3_client, file_info, src)
+        for file_info in self.file_specs:
+            upload_key = self.file_specs[file_info]["upload_key"]
+            src_check, file_length = self._is_file_in_bucket(s3_client, file_info, src)
             if src_check:
-                found_in_src.append(file_info)
+                found_in_src[file_info] = upload_key
+                if file_length > largest_file_size:
+                    largest_file_size = file_length
                 continue
-            key = self.file_specs[file_info]["upload_key"]
-            dest_check = self._is_file_in_bucket(s3_client, key, dest)
+            dest_check, _ = self._is_file_in_bucket(s3_client, upload_key, dest)
             if dest_check:
                 found_in_dest.append(file_info)
             not_found.append(file_info)
         if found_in_src:
             msg = (
-                "%s file(s) found and are ready to be associated with the case."
+                "%s file(s) found and ready to be associated with the case."
             ) % (str(len(found_in_src)))
             self.validation_output.append(msg)
         if found_in_dest:
@@ -169,8 +178,8 @@ class AssociateFiles:
                 "to ensure the name is accurate and the file has been uploaded "
                 "appropriately: %s."
             ) % (str(len(not_found)), ", ".join(not_found))
-            self.errors.append(msg)
-        return found_in_src
+            self.validation_output.append(msg)
+        return found_in_src, largest_file_size
 
     @staticmethod
     def copy_file(s3_client, src_bucket, src_key, dest_bucket, dest_key, errors):
@@ -191,12 +200,13 @@ class AssociateFiles:
         """
         file_args = []
         for file_info in self.files_to_move:
+            upload_key = self.files_to_move[file_info]
             copy_args = (
                 self.s3_client,
                 self.src_bucket,
                 file_info,
                 self.dest_bucket,
-                file_info["upload_key"],
+                upload_key,
                 errors,
             )
             file_args += [copy_args]
