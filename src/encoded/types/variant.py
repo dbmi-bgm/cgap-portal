@@ -506,11 +506,14 @@ class VariantSampleList(Item):
     item_type = 'variant_sample_list'
     schema = load_schema('encoded:schemas/variant_sample_list.json')
     embedded_list = [
-        'variant_samples.variant_sample_item.*',
+        'variant_samples.variant_sample_item.variant.display_title',
         'variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title',
         'variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript',
         'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc',
-        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp'
+        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp',
+        'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
+        'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
+        'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label'
     ]
 
 

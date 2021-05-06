@@ -19,8 +19,8 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
         selectedItems,
         onSelectItem,
-        onResetSelectedItems,
         savedVariantSampleIDMap = {},
+        isLoadingVariantSampleListItem,
         ...passProps
     } = props;
 
@@ -36,21 +36,21 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
                         <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <VariantSampleSelectionCheckbox {...{ selectedItems, onSelectItem, savedVariantSampleIDMap }} />
+                            <VariantSampleSelectionCheckbox {...{ selectedItems, onSelectItem, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />
                             <VariantSampleDisplayTitleColumn />
                         </DisplayTitleColumnWrapper>
                     );
                 }
             }
         };
-    }, [ originalColExtMap, selectedItems, savedVariantSampleIDMap ]);
+    }, [ originalColExtMap, selectedItems, savedVariantSampleIDMap, isLoadingVariantSampleListItem ]);
 
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
 
 /** Based mostly on SPC SelectionItemCheckbox w. minor alterations */
 export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleSelectionCheckbox(props){
-    const { selectedItems, result, onSelectItem, savedVariantSampleIDMap } = props;
+    const { selectedItems, result, onSelectItem, savedVariantSampleIDMap, isLoadingVariantSampleListItem = false } = props;
     const { "@id": resultID } = result;
     const isPrevSaved = savedVariantSampleIDMap[resultID];
     const isSelected = selectedItems.has(resultID);
@@ -60,15 +60,7 @@ export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleS
         return onSelectItem(result, true);
     }, [ onSelectItem, result ]);
 
-    useEffect(function(){
-        // Unselect this if for some reason has been previously selected.
-        // (might occur if someone started selecting things before VariantSampleList?datastore=databse Item has finished loading)
-        if (isSelected && isPrevSaved) {
-            onSelectItem(result, true);
-        }
-    }, [ isSelected, isPrevSaved ]);
-
-    return <input type="checkbox" checked={isChecked} onChange={onChange} disabled={isPrevSaved} className="mr-2" />;
+    return <input type="checkbox" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} className="mr-2" />;
 });
 
 
