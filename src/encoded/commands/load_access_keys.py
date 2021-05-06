@@ -6,8 +6,9 @@ import os
 import boto3
 from pyramid.paster import get_app
 from webtest import AppError
+from botocore.exceptions import ClientError
 from dcicutils.misc_utils import TestApp
-from dcicutils.beanstalk_utils import get_beanstalk_real_url
+from dcicutils.beanstalk_utils import get_beanstalk_real_url, REGION
 
 log = structlog.getLogger(__name__)
 EPILOG = __doc__
@@ -84,6 +85,8 @@ def main():
     )
     parser.add_argument('config_uri', help='path to configfile')
     parser.add_argument('--app-name', help='Pyramid app name in configfile')
+    parser.add_argument('--secret-name', help='name of application identity stored in secrets manager within which'
+                                              'to locate S3_ENCRYPT_KEY, for example: dev/beanstalk/cgap-dev')
     args = parser.parse_args()
 
     app = get_app(args.config_uri, args.app_name)
@@ -97,9 +100,53 @@ def main():
     if not env:
         raise RuntimeError('load_access_keys: cannot find env.name in settings')
 
-    encrypt_key = os.environ.get('S3_ENCRYPT_KEY')
+    # XXX: refactor into helper method in dcicutils, see assume_identity.py
+    if args.secret_name is not None:
+        secret_name = args.secret_name
+        region_name = REGION  # us-east-1
+
+        # XXX: We should refactor a SecretsManager wrapper into dcicutils
+        session = boto3.session.Session(region_name=region_name)
+        # configure watchtower handler from session
+        client = session.client(
+            service_name='secretsmanager',
+            region_name=region_name
+        )
+
+        try:
+            get_secret_value_response = client.get_secret_value(
+                SecretId=secret_name
+            )
+        except ClientError as e:  # leaving some useful debug info to help narrow issues
+            if e.response['Error']['Code'] == 'DecryptionFailureException':
+                # Secrets Manager can't decrypt the protected secret text using the provided KMS key.
+                raise e
+            elif e.response['Error']['Code'] == 'InternalServiceErrorException':
+                # An error occurred on the server side.
+                raise e
+            elif e.response['Error']['Code'] == 'InvalidParameterException':
+                # You provided an invalid value for a parameter.
+                raise e
+            elif e.response['Error']['Code'] == 'InvalidRequestException':
+                # You provided a parameter value that is not valid for the current state of the resource.
+                raise e
+            elif e.response['Error']['Code'] == 'ResourceNotFoundException':
+                raise e
+            else:
+                raise e
+        else:
+            # Decrypts secret using the associated KMS CMK.
+            # Depending on whether the secret is a string or binary, one of these fields will be populated.
+            if 'SecretString' in get_secret_value_response:
+                identity = json.loads(get_secret_value_response['SecretString'])
+                encrypt_key = identity.get('S3_ENCRYPT_KEY', None)
+            else:
+                raise Exception('Got unexpected response structure from boto3')
+    else:
+        encrypt_key = os.environ.get('S3_ENCRYPT_KEY')
+
     if not encrypt_key:
-        raise RuntimeError('load_access_keys: must define S3_ENCRYPT_KEY in env')
+        raise RuntimeError('load_access_keys: must define S3_ENCRYPT_KEY in env or in passed secret')
 
     # will need to use a dynamic region at some point (not just here)
     s3 = boto3.client('s3', region_name='us-east-1')

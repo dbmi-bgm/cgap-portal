@@ -16,4 +16,5 @@ poetry run create-mapping-on-deploy production.ini --app-name app
 poetry run load-data production.ini --app-name app --prod
 
 # Load access keys
-poetry run load-access-keys production.ini --app-name app
+# Note that the secret name must match that which was created for this environment
+poetry run load-access-keys production.ini --app-name app --secret-name dev/beanstalk/cgap-dev
