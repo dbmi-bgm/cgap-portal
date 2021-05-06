@@ -531,7 +531,7 @@ class VariantSampleList(Item):
         'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp',
         'variant_samples.variant_sample_item.interpretation.classification',
         'variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy',
-        'variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy'
+        'variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy',
         'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
         'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
         'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label'
