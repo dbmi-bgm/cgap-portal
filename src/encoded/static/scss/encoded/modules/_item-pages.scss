@@ -555,7 +555,7 @@ h3.submission-subtitle {
 @mixin statusColorStyles {
 
 	// Blue
-	&[data-status="benign"]:before,
+	&[data-status="Benign"]:before,
 	&[data-status="Not a candidate"]:before,
 	&[data-status="Known gene for phenotype"]:before {						// Applicable to ClinVar Clinical Significance
 		color: #fff;
@@ -563,7 +563,7 @@ h3.submission-subtitle {
 	}
 
 	// Dark Blue
-	&[data-status="likely benign"]:before,
+	&[data-status="Likely benign"]:before,
 	&[data-status="Weak candidate"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: $primary-dark;
@@ -614,15 +614,10 @@ h3.submission-subtitle {
 	&[data-status="inactive"]:before,						// Applicable to Item.status
 	&[data-status="revoked"]:before,						// Applicable to User.status
 	&[data-status="probable-pathogenic"]:before,			// Applicable to ClinVar Clinical Significance
-	&[data-status="likely pathogenic"]:before,				// Applicable to SampleVariant Interpretation Classification
+	&[data-status="Likely pathogenic"]:before,				// Applicable to SampleVariant Interpretation Classification
 	&[data-status="Moderate candidate"]:before,
 	&[data-status="affects"]:before,						// Applicable to ClinVar Clinical Significance
-	&[data-status="restricted"]:before,						// Deprecated?
-	&[data-status="Tier 2 - Known gene, new phenotype"]:before, 					
-	&[data-status="Tier 2 - Phenotype not delineated"]:before,
-	&[data-status="Tier 2 - Phenotype expansion"]:before,
-	&[data-status="Tier 2 - Novel gene for known phenotype"]:before,
-	&[data-status="Tier 2 - Novel gene and phenotype"]:before {
+	&[data-status="restricted"]:before{						// Deprecated?
 		color: #fff;
 		background-color: #812423;
 	}
@@ -632,14 +627,8 @@ h3.submission-subtitle {
 	&[data-status="upload failed"]:before,					// Applicable to File.status
 	&[data-status="error"]:before,							// Applicable to WorkflowRun.run_status + columnExtensionMap columns
 	&[data-status="risk factor"]:before,					// Applicable to ClinVar Clinical Significance
-	&[data-status="pathogenic"]:before, 					// Applicable to ClinVar Clinical Significance
-	&[data-status="Strong candidate"]:before,
-	&[data-status="Tier 1 - Known gene, new phenotype"]:before, 					
-	&[data-status="Tier 1 - Phenotype not delineated"]:before,
-	&[data-status="Tier 1 - Phenotype expansion"]:before,
-	&[data-status="Tier 1 - Novel gene for known phenotype"]:before,
-	&[data-status="Tier 1 - Novel gene and phenotype"]:before,
-	&[data-status="Tier 1 - Novel mode of inheritance"]:before {
+	&[data-status="Pathogenic"]:before, 					// Applicable to ClinVar Clinical Significance
+	&[data-status="Strong candidate"]:before {
 		color: #fff;
 		background-color: #a90d0b;
 	}
@@ -657,7 +646,7 @@ h3.submission-subtitle {
 	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
 	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
 	&[data-status="not provided"]:before,					// Applicable to ClinVar Clinical Significance
-	&[data-status="VUS"]:before,							// Applicable to SampleVariant Interpretation Classification
+	&[data-status="Uncertain significance"]:before,			// Applicable to SampleVariant Interpretation Classification
 	&[data-status="unspecified"]:before,					// Deprecated? Fallback for lack of status in some cases?
 	&[data-status="Weak candidate"]:before,
 	&[data-status="Known gene for phenotype"]:before {
