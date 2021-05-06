@@ -189,6 +189,7 @@ def main(global_config, **local_config):
     config.include('.loadxl')
     config.include('.visualization')
     config.include('.ingestion_listener')
+    config.include('.vsl_listener')
 
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')
