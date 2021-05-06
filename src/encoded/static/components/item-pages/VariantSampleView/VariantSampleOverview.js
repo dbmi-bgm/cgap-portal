@@ -119,7 +119,7 @@ export class VariantSampleOverview extends React.PureComponent {
         const { query: {
             showInterpretation = true,      // used only if "True" (toggles showing of interpretation sidebar/pane)
             annotationTab = null,           // used only if can be parsed to integer (Variant = 0, Gene = 1, Sample = 2, AnnotationBrowser = 3, BAM Browser = 4)
-            interpretationTab = null,       // used only if one of "Variant Notes", "Gene Notes", "Interpretation"
+            interpretationTab = null,       // used only if can be parsed to integer (Variant Notes = 0, Gene Notes = 1, Clinical = 2, Discovery = 3)
             caseSource = null
         } } = memoizedUrlParse(href);
 
@@ -133,7 +133,7 @@ export class VariantSampleOverview extends React.PureComponent {
                     </div>
                     { showInterpretation == 'True' && !anyNotePermErrors ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...passProps} defaultTab={interpretationTab} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}/>
+                            <InterpretationSpaceWrapper {...passProps} defaultTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}/>
                         </div> : null
                     }
                 </div>
