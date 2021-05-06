@@ -51,7 +51,7 @@ def get_ecs_real_url(env):
     stacks = cfn_client.describe_stacks().get('Stacks', [])
     for stack in stacks:
         for output in stack['Outputs']:
-            if output.get('OutputKey', '') == ('ECSApplicationURL%s' % env):
+            if output.get('OutputKey', '') == ('ECSApplicationURL%s' % env.replace('-', '')):
                 return output.get('OutputValue')
     log.error('Did not locate the server from Cloudformation! Check ECS Stack metadata.')
     return ''
