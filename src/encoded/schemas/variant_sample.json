@@ -1283,11 +1283,11 @@
             ]
         },
         "variant.csq_gnomadg_af": {
-            "title": "Alt Allele Frequency (V3)",
+            "title": "Alt Allele Frequency (v3)",
             "aggregation_type": "range",
             "number_step": "any",
             "order": 18,
-            "grouping": "GnomAD V3",
+            "grouping": "Pop. Frequency (gnomAD v3)",
             "ranges": [
                 {
                     "from": 0,
@@ -1312,11 +1312,11 @@
             ]
         },
         "variant.csq_gnomadg_af_popmax": {
-            "title": "Alt AF - PopMax (V3)",
+            "title": "Alt AF - PopMax (v3)",
             "aggregation_type": "range",
             "number_step": "any",
             "order": 19,
-            "grouping": "GnomAD V3",
+            "grouping": "Pop. Frequency (gnomAD v3)",
             "ranges": [
                 {
                     "from": 0,
@@ -1341,25 +1341,25 @@
             ]
         },
         "variant.csq_gnomadg_an": {
-            "title": "Total Allele Number (V3)",
+            "title": "Total Allele Number (v3)",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 20,
-            "grouping": "GnomAD V3"
+            "grouping": "Pop. Frequency (gnomAD v3)"
         },
         "variant.csq_gnomadg_nhomalt": {
-            "title": "Homozygous Count (V3)",
+            "title": "Homozygous Count (v3)",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 21,
-            "grouping": "GnomAD V3"
+            "grouping": "Pop. Frequency (gnomAD v3)"
         },
         "variant.csq_gnomade2_af": {
-            "title": "Alt Allele Frequency (V2)",
+            "title": "Alt Allele Frequency (v2)",
             "aggregation_type": "range",
             "number_step": "any",
             "order": 30,
-            "grouping": "GnomAD V2",
+            "grouping": "Pop. Frequency (gnomAD v2)",
             "ranges": [
                 {
                     "from": 0,
@@ -1384,11 +1384,11 @@
             ]
         },
         "variant.csq_gnomade2_af_popmax": {
-            "title": "Alt AF - PopMax (V2)",
+            "title": "Alt AF - PopMax (v2)",
             "aggregation_type": "range",
             "number_step": "any",
             "order": 31,
-            "grouping": "GnomAD V2",
+            "grouping": "Pop. Frequency (gnomAD v2)",
             "ranges": [
                 {
                     "from": 0,
@@ -1413,18 +1413,18 @@
             ]
         },
         "variant.csq_gnomade2_an": {
-            "title": "Total Allele Number (V2)",
+            "title": "Total Allele Number (v2)",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 32,
-            "grouping": "GnomAD V2"
+            "grouping": "Pop. Frequency (gnomAD v2)"
         },
         "variant.csq_gnomade2_nhomalt": {
-            "title": "Homozygous Count (V2)",
+            "title": "Homozygous Count (v2)",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 33,
-            "grouping": "GnomAD V2"
+            "grouping": "Pop. Frequency (gnomAD v2)"
         },
         "variant.csq_phylop100way_vertebrate": {
             "title": "PhyloP (100 Vertebrates)",
