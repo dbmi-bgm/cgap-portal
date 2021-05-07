@@ -1383,7 +1383,7 @@
                 }
             ]
         },
-        "variant.csq_gnomade2_af-popmax": {
+        "variant.csq_gnomade2_af_popmax": {
             "title": "Alt AF - PopMax (V2)",
             "aggregation_type": "range",
             "number_step": "any",

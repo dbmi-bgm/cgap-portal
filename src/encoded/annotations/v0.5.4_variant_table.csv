@@ -236,4 +236,4 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 219,csq_gnomade2_an-xy,csq_gnomade2_an_male,GnomADv2 Exome Total AN - male,Y,62238&48858,variant,gnomAD,v2.1.1,Total number of alleles in male samples in gnomAD v2.1.1 exome data,integer,,Y,,,,,0,,,,,,,,,
 220,csq_gnomade2_af-xy,csq_gnomade2_af_male,GnomADv2 Exome Alt AF - male,Y,4.33819e-04&1.18097e-02,variant,gnomAD,v2.1.1,Alternate allele frequency in male samples in gnomAD v2.1.1 exome data,number,,Y,,,,,0,1,,,,,,,,
 221,csq_gnomade2_nhomalt-xy,csq_gnomade2_nhomalt_male,GnomADv2 Exome Homozygous Count - male,Y,3&171,variant,gnomAD,v2.1.1,Count of homozygous individuals in male samples in gnomAD v2.1.1 exome data,integer,,Y,,,,,0,,,,,,,,,
-222,csq_gnomade2_af-popmax,csq_gnomade2_af_popmax,GnomADv2 Exome Alt AF - PopMax,Y,6.21670e-03&2.07905e-02,variant,gnomAD,v2.1.1,maximum population allele frequency in gnomAD v2.1.1 exome data,number,,Y,,,,,0,1,,,,,,,,
+222,csq_gnomade2_af_popmax,csq_gnomade2_af_popmax,GnomADv2 Exome Alt AF - PopMax,Y,6.21670e-03&2.07905e-02,variant,gnomAD,v2.1.1,maximum population allele frequency in gnomAD v2.1.1 exome data,number,,Y,,,,,0,1,,,,,,,,

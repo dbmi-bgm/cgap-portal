@@ -739,13 +739,13 @@
                 "max": 1
             }
         },
-        "csq_gnomade2_af-popmax": {
+        "csq_gnomade2_af_popmax": {
             "title": "GnomADv2 Exome Alt AF - PopMax",
             "type": "array",
-            "field_name": "csq_gnomade2_af-popmax",
+            "field_name": "csq_gnomade2_af_popmax",
             "items": {
                 "title": "GnomADv2 Exome Alt AF - PopMax",
-                "field_name": "csq_gnomade2_af-popmax",
+                "field_name": "csq_gnomade2_af_popmax",
                 "type": "number",
                 "do_import": true,
                 "vcf_field": "csq_gnomade2_af_popmax",
