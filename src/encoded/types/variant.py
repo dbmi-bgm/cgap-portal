@@ -62,7 +62,16 @@ def build_variant_embedded_list():
         "interpretations.version",
         "interpretations.project",
         "interpretations.institution",
-        "interpretations.status"
+        "interpretations.status",
+        "discovery_interpretations.gene_candidacy",
+        "discovery_interpretations.variant_candidacy",
+        "discovery_interpretations.note_text",
+        "discovery_interpretations.version",
+        "discovery_interpretations.project",
+        "discovery_interpretations.institution",
+        "discovery_interpretations.status",
+        "discovery_interpretations.last_modified.date_modified",
+        "discovery_interpretations.last_modified.modified_by.display_title"
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
@@ -103,7 +112,16 @@ def build_variant_sample_embedded_list():
         "interpretation.institution",
         "interpretation.status",
         "interpretation.last_modified.date_modified",
-        "interpretation.last_modified.modified_by.display_title"
+        "interpretation.last_modified.modified_by.display_title",
+        "discovery_interpretation.gene_candidacy",
+        "discovery_interpretation.variant_candidacy",
+        "discovery_interpretation.note_text",
+        "discovery_interpretation.version",
+        "discovery_interpretation.project",
+        "discovery_interpretation.institution",
+        "discovery_interpretation.status",
+        "discovery_interpretation.last_modified.date_modified",
+        "discovery_interpretation.last_modified.modified_by.display_title"
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
@@ -506,11 +524,17 @@ class VariantSampleList(Item):
     item_type = 'variant_sample_list'
     schema = load_schema('encoded:schemas/variant_sample_list.json')
     embedded_list = [
-        'variant_samples.variant_sample_item.*',
+        'variant_samples.variant_sample_item.variant.display_title',
         'variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title',
         'variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript',
         'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc',
-        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp'
+        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp',
+        'variant_samples.variant_sample_item.interpretation.classification',
+        'variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy',
+        'variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy',
+        'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
+        'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
+        'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label'
     ]
 
 

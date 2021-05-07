@@ -30,7 +30,7 @@ export class InterpretationSpaceWrapper extends React.Component {
      *      "user": null... etc. }
      */
     static initializeNoteState(context = {}) {
-        const fields = ["variant_notes", "gene_notes", "interpretation"];
+        const fields = ["variant_notes", "gene_notes", "interpretation", "discovery_interpretation"];
         const newState = {};
         fields.forEach((field) => {
             const { [field]: note = null } = context;
@@ -39,6 +39,59 @@ export class InterpretationSpaceWrapper extends React.Component {
         newState.loading = false;
         newState.user = null;
         return newState;
+    }
+
+    /**
+     * Accepts note state from GenericInterpretationPanel and returns a version cleaned for post/patch request
+     * @param {Object} noteState    An object containing a map of fields & data for submission.
+     * @param {String} noteType     One of "note_standard", "note_interpretation", or "note_discovery"
+     * Different types of notes accept slightly different fields, and will throw errors if they receive
+     * the wrong ones. The 'fieldsToClean' arrays can be updated to accomodate new fields.
+     *
+     * Does not edit note in-place.
+     */
+    static cleanUpNoteStateForPostPatch(noteState, noteType) {
+        if (!noteType) {
+            throw new Error ("Failed to provide noteType for note cleanup.");
+        }
+
+        // Clone note, so not editing in-place
+        const cleanedNote = { ...noteState };
+
+        const fieldsToCleanFromInterpretation = ["gene_candidacy", "variant_candidacy"];
+        const fieldsToCleanFromDiscovery = ["acmg_guidelines", "conclusion", "classification"];
+        const fieldsToCleanFromStandard = ["acmg_guidelines", "conclusion", "classification", "gene_candidacy", "variant_candidacy"];
+
+        switch(noteType) {
+            case "note_interpretation":
+                fieldsToCleanFromInterpretation.forEach((field) => {
+                    delete cleanedNote[field];
+                });
+                if (cleanedNote.classification === null) {
+                    delete cleanedNote.classification;
+                }
+                break;
+            case "note_standard":
+                fieldsToCleanFromStandard.forEach((field) => {
+                    delete cleanedNote[field];
+                });
+                break;
+            case "note_discovery":
+                fieldsToCleanFromDiscovery.forEach((field) => {
+                    delete cleanedNote[field];
+                });
+                if (cleanedNote.gene_candidacy === null) {
+                    delete cleanedNote.gene_candidacy;
+                }
+                if (cleanedNote.variant_candidacy === null) {
+                    delete cleanedNote.variant_candidacy;
+                }
+                break;
+            default:
+                throw new Error("Failed to cleanup note of type '" + noteType + "' for submission");
+        }
+
+        return cleanedNote;
     }
 
     constructor(props) {
@@ -53,31 +106,16 @@ export class InterpretationSpaceWrapper extends React.Component {
      * Can be used for creating new drafts
      * @param {Object}   note     Object with at least 'note_text' field; typically state from GenericInterpretationPanel
      * @param {String}   noteType "note_interpretation" or "note_standard"
-     * @param {Integer}  version  Number to set version to (not in use currently... may need if expand for case in future)
-     * @param {String}   status   Should be "in review" (not really in use currently... may expand if expand for case in future)
      */
-    postNewNote(note, noteType, version = 1, status = "in review") {
+    postNewNote(note, noteType) {
         const { context: { institution = null, project = null } = {} } = this.props;
         const { '@id': institutionID } = institution || {};
         const { '@id': projectID } = project || {};
 
-        const noteToSubmit = { ...note };
-
-        if (noteType === "note_interpretation") {
-            // Prune keys with incomplete values
-            if (noteToSubmit.classification === null) {
-                delete noteToSubmit.classification;
-            }
-        } else {
-            // Prune unused keys
-            delete noteToSubmit.acmg_guidelines;
-            delete noteToSubmit.conclusion;
-            delete noteToSubmit.classification;
-        }
+        const noteToSubmit = InterpretationSpaceWrapper.cleanUpNoteStateForPostPatch(note, noteType); // returns a cleaned clone
 
         noteToSubmit.institution = institutionID;
         noteToSubmit.project = projectID;
-        noteToSubmit.status = status;
 
         return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(noteToSubmit));
     }
@@ -87,8 +125,44 @@ export class InterpretationSpaceWrapper extends React.Component {
         return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteID }));
     }
 
-    patchPreviouslySavedNote(noteAtID, noteToPatch) { // ONLY USED FOR DRAFTS -- other notes are cloned
-        return ajax.promise(noteAtID, 'PATCH', {}, JSON.stringify(noteToPatch));
+    patchPreviouslySavedNote(noteToPatch, noteType, noteID) { // ONLY USED FOR DRAFTS -- other notes are cloned
+        const { interpretation = null, discovery_interpretation = null } = this.state;
+        const { classification: previousClassification = null } = interpretation || {};
+        const { variant_candidacy: previousVarCandidacy = null, gene_candidacy: previousGeneCandidacy = null } = discovery_interpretation || {};
+        const {
+            classification = null,
+            variant_candidacy = null,
+            gene_candidacy = null
+        } = noteToPatch;
+
+        // Returns a clone, cleaned of unneccessary state fields
+        const cleanedNoteToPatch = InterpretationSpaceWrapper.cleanUpNoteStateForPostPatch(noteToPatch, noteType);
+
+        let patchURL = noteID;
+
+        // Check for deleted fields and add to patch URL
+        switch(noteType) {
+            case "note_interpretation":
+                if (!classification && previousClassification) {
+                    patchURL += '?delete_fields=classification';
+                }
+                break;
+            case "note_discovery":
+                if ((!variant_candidacy && previousVarCandidacy) &&
+                    (!gene_candidacy && previousGeneCandidacy)) {
+                    patchURL += '?delete_fields=variant_candidacy,gene_candidacy';
+                } else if (!variant_candidacy && previousVarCandidacy) {
+                    patchURL += '?delete_fields=variant_candidacy';
+                } else if (!gene_candidacy && previousGeneCandidacy) {
+                    patchURL += '?delete_fields=gene_candidacy';
+                }
+                break;
+            default:
+                break; // do nothing special for standard notes
+        }
+        console.log("patchURL", patchURL);
+
+        return ajax.promise(patchURL, 'PATCH', {}, JSON.stringify(cleanedNoteToPatch));
     }
 
     getNote(uuid, noteType) {
@@ -104,32 +178,10 @@ export class InterpretationSpaceWrapper extends React.Component {
         // Does a draft already exist?
         if (lastSavedNote) { // Patch the pre-existing draft item & overwrite it
             console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
-            const {
-                '@id': noteAtID,
-                uuid: noteUUID, version,
-            } = lastSavedNote;
-
-            const noteToSubmit = { ...note };
-
-            if (noteType === "note_interpretation") {
-                // Prune keys with incomplete values
-                if (noteToSubmit.classification === null) {
-                    delete noteToSubmit.classification;
-                }
-            } else {
-                // Prune unused keys
-                delete noteToSubmit.acmg_guidelines;
-                delete noteToSubmit.conclusion;
-                delete noteToSubmit.classification;
-            }
-
-            // Bump version number only if already has one (draft autosave/clone of a pre-existing approved note)
-            if (noteToSubmit.version) {
-                noteToSubmit.version = version + 1;
-            }
+            const { "@id": noteAtID = null, "uuid": noteUUID } = lastSavedNote;
 
             this.setState({ loading: true }, () => {
-                this.patchPreviouslySavedNote(noteAtID, noteToSubmit)
+                this.patchPreviouslySavedNote(note, noteType, noteAtID || noteUUID)
                     .then((response) => {
                         const { '@graph': graph = [], status } = response;
                         // Some handling for various fail responses/codes
@@ -159,7 +211,7 @@ export class InterpretationSpaceWrapper extends React.Component {
             let newNoteID;
 
             this.setState({ loading: true }, () => {
-                this.postNewNote(note, noteType, null, "in review")
+                this.postNewNote(note, noteType)
                     .then((response) => {
                         const { '@graph': noteItems = [], status } = response;
 
@@ -206,10 +258,9 @@ export class InterpretationSpaceWrapper extends React.Component {
     }
 
     render() {
-        const { defaultTab, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
-        const { variant_notes, gene_notes, interpretation } = this.state;
+        const { variant_notes, gene_notes, interpretation, discovery_interpretation } = this.state;
         return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
-            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation}
+            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation} lastSavedDiscovery={discovery_interpretation}
             saveAsDraft={this.saveAsDraft} />;
     }
 }
@@ -222,6 +273,10 @@ export class InterpretationSpaceWrapper extends React.Component {
  * and the draft held in state there.)
  */
 export class InterpretationSpaceController extends React.Component {
+
+    // CurrentTab will always be a number between 0-3 and index to these values
+    static tabNames = ["Variant Notes", "Gene Notes", "Clinical", "Discovery"];
+    static tabTitles = ["Variant Notes", "Gene Notes", "ACMG Interpretation", "Variant/Gene Discovery"];
 
     static haveEditPermission(actions){
         return _.findWhere(actions, { "name" : "edit" });
@@ -236,14 +291,20 @@ export class InterpretationSpaceController extends React.Component {
         // TODO: Figure out a way to use _.isMatch/_.isEqual for future versions. Kicking this can down the road slightly.
         const {
             classification: lastSavedClassification = null,
+            gene_candidacy: lastSavedGeneCandidacy = null,
+            variant_candidacy: lastSavedVariantCandidacy = null,
             note_text: lastSavedNoteText = ""
         } = lastSavedNote || {};
         const {
             classification: currClassification = null,
+            gene_candidacy: currGeneCandidacy = null,
+            variant_candidacy: currVariantCandidacy = null,
             note_text: currNoteText = ""
         } = currNote || {};
 
-        if (currClassification !== lastSavedClassification) {
+        if (currClassification !== lastSavedClassification ||
+            currGeneCandidacy !== lastSavedGeneCandidacy ||
+            currVariantCandidacy !== lastSavedVariantCandidacy) {
             // console.log("classifications do not match:", currClassification, lastSavedClassification);
             return true;
         }
@@ -258,17 +319,15 @@ export class InterpretationSpaceController extends React.Component {
 
     constructor(props) {
         super(props);
-        const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation, defaultTab } = props;
-
-        // use to validate passed in defaultTab prop
-        const acceptableTabNames = ["Variant Notes", "Gene Notes", "Interpretation"];
+        const { lastSavedVariantNote, lastSavedGeneNote, lastSavedInterpretation, lastSavedDiscovery, defaultTab } = props;
 
         this.state = {
             // Initialize WIP states to last saved - if a tab is closed WIP progress is temporarily saved here
             variant_notes_wip: lastSavedVariantNote,
             gene_notes_wip: lastSavedGeneNote,
             interpretation_wip: lastSavedInterpretation,
-            currentTab: _.contains(acceptableTabNames, defaultTab) ? defaultTab : "Variant Notes",
+            discovery_interpretation_wip: lastSavedDiscovery,
+            currentTab: (defaultTab >= 0 && defaultTab < InterpretationSpaceController.tabNames.length) ? defaultTab : 0, // TODO: validate elsewhere - default to variantnotes
             isExpanded: false // TODO - currently unused; V2
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
@@ -313,8 +372,8 @@ export class InterpretationSpaceController extends React.Component {
     }
 
     render() {
-        const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip } = this.state;
-        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, context } = this.props;
+        const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip, discovery_interpretation_wip } = this.state;
+        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context } = this.props;
         const { actions = [] } = context || {};
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
@@ -322,33 +381,42 @@ export class InterpretationSpaceController extends React.Component {
         const isDraftVariantNoteUnsaved = this.memoized.hasNoteChanged(variant_notes_wip, lastSavedVariantNote);
         const isDraftGeneNoteUnsaved = this.memoized.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
         const isDraftInterpretationUnsaved = this.memoized.hasNoteChanged(interpretation_wip, lastSavedInterpretation);
+        const isDraftDiscoveryUnsaved = this.memoized.hasNoteChanged(discovery_interpretation_wip, lastSavedDiscovery);
 
         const hasEditPermission = this.memoized.haveEditPermission(actions);
 
         let panelToDisplay = null;
         switch(currentTab) {
-            case "Variant Notes":
+            case (0): // Variant Notes
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={currentTab}
+                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
-                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved} />
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case "Gene Notes":
+            case (1): // Gene Notes
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={currentTab}
+                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
-                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved} />
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case "Interpretation":
+            case (2): // Interpretation
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={currentTab}
+                    lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
-                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved} />
+                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
+                );
+                break;
+            case (3): // Discovery
+                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
+                    lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
+                    key={3} saveToField="discovery_interpretation" noteType="note_discovery" { ...passProps }
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
                 );
                 break;
             default:
@@ -371,7 +439,7 @@ function InterpretationSpaceHeader(props) { // Expanded items commented out unti
     return (
         <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
             <i className="icon icon-poll-h fas"></i>
-            Variant Interpretation
+            Interpretation Space
             <button type="button" className="btn btn-link" onClick={toggleExpanded || undefined} style={{ visibility: "hidden" }}>
                 { isExpanded ? <i className="icon icon-compress fas"></i> : <i className="icon icon-expand fas"></i> }
             </button>
@@ -382,23 +450,15 @@ function InterpretationSpaceHeader(props) { // Expanded items commented out unti
 function InterpretationSpaceTabs(props) {
     const { currentTab, switchToTab } = props;
 
-    const variantNotesActive = currentTab === "Variant Notes" ? true : false;
-    const geneNotesActive = currentTab === "Gene Notes" ? true : false;
-    const interpretationActive = currentTab === "Interpretation" ? true : false;
     return (
         <ul className="p-1 d-flex align-items-center justify-content-between">
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Variant Notes")}
-                data-active={variantNotesActive}>
-                Variant Notes
-            </li>
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Gene Notes")}
-                data-active={geneNotesActive}>
-                Gene Notes
-            </li>
-            <li className="interpretation-tab clickable" onClick={(e) => switchToTab("Interpretation")}
-                data-active={interpretationActive}>
-                Interpretation
-            </li>
+            {InterpretationSpaceController.tabNames.map((tabName, i) => {
+                const isActive = currentTab === i;
+                return (
+                    <li key={i} className="interpretation-tab clickable" onClick={(e) => switchToTab(i)} data-active={isActive}>
+                        {tabName}
+                    </li>);
+            })}
         </ul>
     );
 }
@@ -407,14 +467,19 @@ class GenericInterpretationPanel extends React.Component {
     constructor(props) {
         super(props);
 
-        const { note_text = "", acmg_guidelines = [], classification = null, conclusion =  "" } = props.lastWIPNote || props.lastSavedNote || {};
+        const {
+            note_text = "", acmg_guidelines = [], classification = null,
+            conclusion =  "", variant_candidacy = null, gene_candidacy = null
+        } = props.lastWIPNote || props.lastSavedNote || {};
 
         this.state = {
             // Fields in form. Using snake casing to make it easier to add state data directly to post/patch request
             note_text,
-            acmg_guidelines,            // TODO: Currently Unused
             classification,
-            conclusion,                 // TODO: Currently Unused
+            variant_candidacy,
+            gene_candidacy,
+            acmg_guidelines,            // TODO: Currently Unused
+            conclusion                  // TODO: Currently Unused
         };
 
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
@@ -473,7 +538,7 @@ class GenericInterpretationPanel extends React.Component {
             last_modified: lastModified = null
         } = lastSavedNote || {};
         const { modified_by: { display_title : lastModUsername } = {}, date_modified = null } = lastModified || {};
-        const { note_text: noteText, acmg_guidelines, classification, conclusion } = this.state;
+        const { note_text: noteText, acmg_guidelines, classification, gene_candidacy, variant_candidacy, conclusion } = this.state;
 
         const noteChangedSinceLastSave = memoizedHasNoteChanged(lastSavedNote, this.state);
         const noteTextPresent = !!noteText;
@@ -491,9 +556,13 @@ class GenericInterpretationPanel extends React.Component {
                     : null}
                 <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
-                    <ACMGInterpretationForm {...{ schemas, acmg_guidelines, classification, conclusion, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    <GenericFieldForm fieldsArr={[{ field: 'classification', value: classification }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
-                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteLabel }}
+                { noteType === "note_discovery" ?
+                    <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
+                        {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    : null }
+                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
@@ -512,7 +581,7 @@ class GenericInterpretationPanel extends React.Component {
 function NoteFieldDrop(props) {
     const { value = null, schemas = null, field = null, noteType = null, onOptionChange, cls="mb-1", getFieldProperties } = props;
     if (!schemas) {
-        return 'loading...'; // TODO: actually implement a load spinner
+        return null;
     }
 
     const fieldSchema = getFieldProperties(field);
@@ -533,7 +602,7 @@ function NoteFieldDrop(props) {
             <label className="w-100 text-small">
                 { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
             </label>
-            <div className="d-flex">
+            <div className="w-100 d-flex note-field-drop">
                 <Dropdown as={ButtonGroup} className={cls}>
                     <Dropdown.Toggle variant="outline-secondary text-left" id="dropdown-basic">
                         { value ? <><i className="status-indicator-dot ml-1 mr-07" data-status={value} /> { value }</> : "Select an option..."}
@@ -645,25 +714,51 @@ AutoGrowTextArea.defaultProps = {
 };
 
 
-/** Display additional form fields for ACMG Interpretation */
-function ACMGInterpretationForm(props) {
-    const { schemas, acmg_guidelines = [], classification = null, conclusion = null, noteType, onDropOptionChange } = props;
+function noteFieldNameToSchemaFormatted(field) {
+    switch(field) {
+        case "note_interpretation":
+            return "NoteInterpretation";
+        case "note_discovery":
+            return "NoteDiscovery";
+        default:
+            return "NoteStandard";
+    }
+}
+
+/** Displays additional form fields for ACMG Interpretation and Discovery */
+function GenericFieldForm(props) {
+    const { fieldsArr = [], schemas, onDropOptionChange, noteType } = props;
+
+    if (!schemas) {
+        return (
+            <div className="d-flex align-items-center justify-content-center pb-05 mb-1">
+                <i className="icon icon-fw fas icon-circle-notch icon-spin mr-08"/>
+                Loading...
+            </div>);
+    }
 
     const getFieldProperties = useMemo(function(){
         if (!schemas) return function(){ return null; };
         // Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`.
         return function(field){
-            const noteItem = noteType === "note_interpretation" ? "NoteInterpretation" : "NoteStandard";
+            const noteItem = noteFieldNameToSchemaFormatted(noteType);
             const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, noteItem);
             return (schemaProperty || {});
         };
     }, [ schemas ]);
 
+    const fieldsJSX = useMemo(function() {
+        return fieldsArr.map((fieldDataObj) => {
+            const { field, value } = fieldDataObj;
+            return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field }} getFieldProperties={getFieldProperties}
+                onOptionChange={onDropOptionChange} />);
+        }).sort().reverse(); // Reverse really just to get Variant candidacy to show up last. May need a better solution if more fields added in future.
+    }, [ schemas, noteType, fieldsArr ]);
+
     return (
         <React.Fragment>
-            <NoteFieldDrop {...{ schemas, noteType }} getFieldProperties={getFieldProperties} onOptionChange={onDropOptionChange} field="classification" value={classification}/>
-        </React.Fragment>
-    );
+            { fieldsJSX }
+        </React.Fragment>);
 }
 
 /**
@@ -726,7 +821,7 @@ function UnsavedInterpretationModal(props) {
                         Navigate Away & Discard Notes
                     </Button>
                     <Button className="flex-grow-1" variant="primary" onClick={() => setIsSubmitting(false, null, false)}>
-                        Continue Editing
+                        Back to Notes
                     </Button>
                 </Modal.Footer>
             </Modal>
