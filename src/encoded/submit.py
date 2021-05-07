@@ -1177,10 +1177,18 @@ def parse_exception(e, aliases):
                         field = field_name.replace('_', ' ')
                     error = 'field: ' + error.replace(field_name, field)
                     if 'phenotypic feature' in field:
-                        hpo_idx = error.index('/phenotypes/') + 12
-                        hpo_term = error[hpo_idx:error.index('/', hpo_idx)]
-                        msg = ('HPO terms - HPO term {} not found in database.'
-                               ' Please check HPO ID and resubmit.'.format(hpo_term))
+                        if 'family phenotypic features' in field:
+                            # family phenotypic features error is redundant to individual phenotypes
+                            # from POV of user, so remove
+                            continue
+                        if '/phenotypes/' in error:  # find term name instead of @id
+                            hpo_idx = error.index('/phenotypes/') + 12
+                            hpo_term = error[hpo_idx:error.index('/', hpo_idx)]
+                        else:
+                            hpo_term = error.split("\'")[1]
+                        if error.endswith('not found'):
+                            error = ('HPO terms - HPO term {} not found in database.'
+                                    ' Please check HPO ID and resubmit.'.format(hpo_term))
                     keep.append(error)
                 elif 'Additional properties are not allowed' in error:
                     keep.append(error[2:])
