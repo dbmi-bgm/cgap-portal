@@ -10,13 +10,14 @@ MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 # Build Arguments
 ARG CGAP_ENV_NAME
 ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-mastertest"}
+ARG CGAP_REPO
+ENV CGAP_REPO=${CGAP_REPO:-"https://github.com/dbmi-bgm/cgap-portal.git"}
 ARG CGAP_BRANCH
 ENV CGAP_BRANCH=${CGAP_BRANCH:-"c4_519"}
 ARG ENTRYPOINT
 ENV ENTRYPOINT=${ENTRYPOINT:-"entrypoint.sh"}
 
 # Configure (global) Env
-ENV CGAP_REPO=https://github.com/dbmi-bgm/cgap-portal.git
 ENV NGINX_USER=nginx
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
@@ -28,58 +29,58 @@ ENV PYTHONFAULTHANDLER=1 \
   PIP_DEFAULT_TIMEOUT=100 \
   POETRY_VERSION=1.1.4
 
-# Install nginx
+# Install nginx, base system
 COPY install_nginx.sh /
-RUN bash /install_nginx.sh
+RUN bash /install_nginx.sh && \
+    apt-get update && \
+    apt-get install -y curl vim emacs postgresql-client net-tools && \
+    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    apt-get install -y ca-certificates nodejs npm
 
-# Intall things needed for our system
-RUN apt-get update
-RUN apt-get install -y curl vim emacs postgresql-client net-tools
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash -
-RUN apt-get install -y ca-certificates nodejs npm
-
-# Configure CGAP User
+# Configure CGAP User (nginx)
 WORKDIR /home/nginx
-RUN mkdir -p /home/nginx/cgap-portal
 
-# Configure venv
+# Configure venv, repo, back-end build
 ENV VIRTUAL_ENV=/opt/venv
 RUN python -m venv /opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-RUN chown -R nginx:nginx /opt/venv
+RUN chown -R nginx:nginx /opt/venv && \
+    mkdir -p /home/nginx/cgap-portal && \
+    git clone $CGAP_REPO --branch $CGAP_BRANCH && \
+    cd cgap-portal && \
+    pip install --upgrade pip && \
+    pip install poetry==1.1.4 wheel==0.29.0 && \
+    poetry install && \
+    python setup_eb.py develop && \
+    make fix-dist-info
 
-# Copy to /home/nginx/cgap-portal
-RUN git clone $CGAP_REPO --branch $CGAP_BRANCH
-
-# Build the application
+# Front-end
 WORKDIR /home/nginx/cgap-portal
-RUN pip install --upgrade pip
-RUN pip install poetry==1.1.4 wheel==0.29.0
-RUN poetry install
-RUN python setup_eb.py develop
-RUN make fix-dist-info
-RUN npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/bin/python
-RUN npm run build
-RUN npm run build-scss
-RUN make aws-ip-ranges
-RUN cat /dev/urandom | head -c 256 | base64 > session-secret.b64
+RUN npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/bin/python && \
+    npm run build && \
+    npm run build-scss
+
+# Misc
+RUN make aws-ip-ranges && \
+    cat /dev/urandom | head -c 256 | base64 > session-secret.b64
 
 # Copy config files in (down here for quick debugging)
 # Remove default configuration from Nginx
-RUN rm /etc/nginx/nginx.conf
-RUN rm /etc/nginx/conf.d/default.conf
+RUN rm /etc/nginx/nginx.conf && \
+    rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/nginx.conf
-# give nginx user permissions
+
+# nginx filesystem setup
 RUN chown -R nginx:nginx /var/cache/nginx && \
     chown -R nginx:nginx /var/log/nginx && \
-    chown -R nginx:nginx /etc/nginx/conf.d
-RUN touch /var/run/nginx.pid && \
-        chown -R nginx:nginx /var/run/nginx.pid
-RUN rm -f /var/log/nginx/*
-RUN touch /var/log/nginx/access.log && \
-        chown -R nginx:nginx /var/log/nginx/access.log
-RUN touch /var/log/nginx/error.log && \
-        chown -R nginx:nginx /var/log/nginx/error.log
+    chown -R nginx:nginx /etc/nginx/conf.d && \
+    touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid && \
+    rm -f /var/log/nginx/* && \
+    touch /var/log/nginx/access.log && \
+    chown -R nginx:nginx /var/log/nginx/access.log && \
+    touch /var/log/nginx/error.log && \
+    chown -R nginx:nginx /var/log/nginx/error.log
 
 # Provide base ini file
 # will be picked up by IniFileManager
@@ -97,6 +98,5 @@ EXPOSE 8000
 
 # Container does not run as root
 USER nginx
-WORKDIR /home/nginx/cgap-portal
 
 ENTRYPOINT ["/home/nginx/cgap-portal/entrypoint.sh"]
