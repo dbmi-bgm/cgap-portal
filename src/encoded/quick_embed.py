@@ -82,8 +82,14 @@ def _embed(request, item, depth, embed_props):
             if ATID_PATTERN.match(item):
                 if embed_props["desired_embeds"]:
                     if item.split("/")[1] in embed_props["desired_embeds"]:
-                        item = get_item_or_none(request, item)
-                        depth += 1
+                        if item in embed_props["cache"]:
+                            item = embed_props["cache"][item]
+                            depth += 1
+                        else:
+                            cache_item = item
+                            item = get_item_or_none(request, item)
+                            embed_props["cache"][cache_item] = item
+                            depth += 1
                     else:
                         new_embed = False
                 else:
@@ -91,7 +97,7 @@ def _embed(request, item, depth, embed_props):
                         new_embed = False
                     elif item in embed_props["cache"]:
                         item = embed_props["cache"][item]
-                        new_embed = False
+                        depth += 1
                     elif GENELIST_ATID.match(item):
                         cache_item = item
                         item = _embed_genelist(request, item)
