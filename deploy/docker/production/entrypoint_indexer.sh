@@ -7,7 +7,10 @@ echo "Starting up CGAP-Portal Indexer"
 poetry run python -m assume_identity
 
 # Start indexer, do 20 runs
-for i in {1..20}; do
+i=0
+while [ $i -ne 20 ]
+do
+  i=$(($i + 1))
   poetry run es-index-data production.ini --app-name app
-  sleep 1
+  sleep 3
 done

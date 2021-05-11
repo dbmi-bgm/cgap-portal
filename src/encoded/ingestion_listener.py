@@ -31,7 +31,7 @@ from vcf import Reader
 from .ingestion.vcf_utils import VCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
 from .commands.add_altcounts_by_gene import main as add_altcounts
-from .ingestion.common import metadata_bundles_bucket, get_parameter  # , IngestionReport
+from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure  # , BadParameter
 from .ingestion.processors import get_ingestion_processor
 # from .types.base import get_item_or_none
@@ -579,7 +579,8 @@ class IngestionListener:
                 # report results in error_log regardless of status
                 msg = variant_builder.ingestion_report.brief_summary()
                 log.error(msg)
-                self.update_status(msg=msg)
+                if self.update_status is not None and callable(self.update_status):
+                    self.update_status(msg=msg)
 
                 # if we had no errors, patch the file status to 'Ingested'
                 if error > 0:
