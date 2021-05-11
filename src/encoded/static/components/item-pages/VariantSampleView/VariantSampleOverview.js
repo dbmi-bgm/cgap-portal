@@ -125,6 +125,7 @@ export class VariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
+                <ACMGInvoker />
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
                     <div className="col">
                         {/* BA1, BS1, BS2, BS3 etc markers here */}
@@ -279,3 +280,46 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
 });
 
 
+class ACMGInvoker extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            invoked: {}
+        };
+
+        this.toggleInvocation = this.toggleInvocation.bind(this);
+    }
+
+    toggleInvocation(criteria) {
+        const { invoked = {} } = this.state;
+        const newInvocations = { ...invoked };
+
+        if (newInvocations[criteria] !== undefined) { // already set
+            newInvocations[criteria] = !newInvocations[criteria];
+
+        } else { // first time setting
+            newInvocations[criteria] = true;
+        }
+
+        this.setState({ invoked: newInvocations });
+    }
+
+    render() {
+        const { invoked = {} } = this.state;
+
+        const acmgCriteria = [ "BA1", "BS1", "BS2", "BS3", "BS4", "BP1", "BP2", "BP3", "BP4", "BP5", "BP6",
+            "BP7", "PP1", "PP2", "PP3", "PP4", "PP5", "PM1", "PM2", "PM3", "PM4", "PM5", "PM6", "PS1", "PS2",
+            "PS3", "PS4", "PVS1" ];
+
+        return (
+            <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
+                {acmgCriteria.map((criteria) => (
+                    <div className="acmg-invoker text-600 text-center ml-02 mr-02" key={criteria} data-criteria={criteria} data-invoked={invoked[criteria]}
+                        onClick={() => this.toggleInvocation(criteria)} style={{ flex: "1" }}>
+                        { criteria }
+                    </div>))}
+            </div>
+        );
+    }
+}

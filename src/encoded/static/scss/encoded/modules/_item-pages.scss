@@ -673,6 +673,95 @@ i.status-indicator-dot {
 }
 
 
+@mixin acmgColorStyles {
+
+	// Standalone Benign Impact -
+	&[data-criteria="BA1"],
+	// Strong Benign Evidence - 
+	&[data-criteria="BS1"],
+	&[data-criteria="BS2"],
+	&[data-criteria="BS3"],
+	&[data-criteria="BS4"] {
+		color: #47419a;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #47419a;
+		}
+	}
+
+	// Supporting Benign Evidence
+	&[data-criteria="BP1"],
+	&[data-criteria="BP2"],
+	&[data-criteria="BP3"],
+	&[data-criteria="BP4"],
+	&[data-criteria="BP5"],
+	&[data-criteria="BP6"],
+	&[data-criteria="BP7"] {
+		color: $primary;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: $primary;
+		}
+	}
+
+	// Supporting Pathogenic Evidence
+	&[data-criteria="PP1"],
+	&[data-criteria="PP2"],
+	&[data-criteria="PP3"],
+	&[data-criteria="PP4"],
+	&[data-criteria="PP5"] {
+		color: #308756;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #308756;
+		}
+	}
+
+	// Moderate Pathogenic Evidence
+	&[data-criteria="PM1"],
+	&[data-criteria="PM2"],
+	&[data-criteria="PM3"],
+	&[data-criteria="PM4"],
+	&[data-criteria="PM5"],
+	&[data-criteria="PM6"] {
+		color: #E59545;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #E59545;
+		}
+	}
+
+	// Strong Pathogenic Evidence
+	&[data-criteria="PS1"],
+	&[data-criteria="PS2"],
+	&[data-criteria="PS3"],
+	&[data-criteria="PS4"],
+	// Very Strong Pathogenic Evidence
+	&[data-criteria="PVS1"] {
+		color: #a90d0b;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #a90d0b;
+		}
+	}
+}
+
+.acmg-invoker {
+	border: 1px solid #efefef;
+	padding: 5px;
+
+	@include acmgColorStyles;
+}
 
 
 /**********************************************************
