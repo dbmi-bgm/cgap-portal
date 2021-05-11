@@ -1911,24 +1911,24 @@
             "schema_title": "GnomAD Homozygous Count - male",
             "min": 0
         },
-        "csq_phastcons100verts": {
+        "csq_phastcons100way_vertebrate": {
             "title": "PhastCons (100 Vertebrates)",
-            "field_name": "csq_phastcons100verts",
+            "field_name": "csq_phastcons100way_vertebrate",
             "type": "number",
             "do_import": true,
-            "vcf_field": "csq_phastcons100verts",
+            "vcf_field": "csq_phastcons100way_vertebrate",
             "source_name": "UCSC - VEP",
             "source_version": "hg38",
             "description": "PhastCons 100 way score",
             "scope": "variant",
             "schema_title": "PhastCons (100 Vertebrates)"
         },
-        "csq_phylop100verts": {
+        "csq_phylop100way_vertebrate": {
             "title": "PhyloP (100 Vertebrates)",
-            "field_name": "csq_phylop100verts",
+            "field_name": "csq_phylop100way_vertebrate",
             "type": "number",
             "do_import": true,
-            "vcf_field": "csq_phylop100verts",
+            "vcf_field": "csq_phylop100way_vertebrate",
             "source_name": "UCSC - VEP",
             "source_version": "hg38",
             "description": "PhyloP 100 way score",
@@ -1950,12 +1950,12 @@
             "scope": "variant",
             "schema_title": "PhyloP (100 Vertebrates) rankscore"
         },
-        "csq_phylop30mams": {
+        "csq_phylop30way_mammalian": {
             "title": "PhyloP (30 Mammals)",
-            "field_name": "csq_phylop30mams",
+            "field_name": "csq_phylop30way_mammalian",
             "type": "number",
             "do_import": true,
-            "vcf_field": "csq_phylop30mams",
+            "vcf_field": "csq_phylop30way_mammalian",
             "source_name": "UCSC - VEP",
             "source_version": "hg38",
             "description": "PhyloP 30 way score",
