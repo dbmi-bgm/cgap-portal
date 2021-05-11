@@ -1359,7 +1359,7 @@
             "aggregation_type": "range",
             "number_step": "any",
             "order": 30,
-            "grouping": "Pop. Frequency (gnomAD v2)",
+            "grouping": "Pop. Frequency (gnomAD v2 exome)",
             "ranges": [
                 {
                     "from": 0,
@@ -1388,7 +1388,7 @@
             "aggregation_type": "range",
             "number_step": "any",
             "order": 31,
-            "grouping": "Pop. Frequency (gnomAD v2)",
+            "grouping": "Pop. Frequency (gnomAD v2 exome)",
             "ranges": [
                 {
                     "from": 0,
@@ -1417,14 +1417,14 @@
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 32,
-            "grouping": "Pop. Frequency (gnomAD v2)"
+            "grouping": "Pop. Frequency (gnomAD v2 exome)"
         },
         "variant.csq_gnomade2_nhomalt": {
             "title": "Homozygous Count (v2)",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 33,
-            "grouping": "Pop. Frequency (gnomAD v2)"
+            "grouping": "Pop. Frequency (gnomAD v2 exome)"
         },
         "variant.csq_phylop100way_vertebrate": {
             "title": "PhyloP (100 Vertebrates)",
