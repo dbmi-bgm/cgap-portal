@@ -88,10 +88,10 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 86,genes_most_severe_consequence.location,genes_most_severe_consequence.location,Location,Y,,variant,,,Location on worst effect transcript ,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,4,calculated_property,,,,,,,Y,,,,,
 87,genes_most_severe_consequence.coding_effect,genes_most_severe_consequence.coding_effect,Coding Effect,Y,,variant,,,Coding effect on worst effect transcript,string,"{""key"": ""genes"", ""title"": ""Gene""}",N,4,calculated_property,,,,,,,Y,,,,,
 88,genes_most_severe_gene.gene_lists.display_title,genes_ensg.gene_lists.display_title,Gene List,Y,,variant,,,Gene lists,string,"{""key"": ""genes"", ""title"": ""Gene""}",Y,0,calculated_property,,,,,,,Y,,,,,
-90,csq_phastcons100verts,csq_phastcons100verts,PhastCons (100 Vertebrates),Y,0,variant,UCSC - VEP,hg38,PhastCons 100 way score,number,,N,,,,,,,,,,,,,,
-91,csq_phylop100verts,csq_phylop100verts,PhyloP (100 Vertebrates),Y,-0.684,variant,UCSC - VEP,hg38,PhyloP 100 way score,number,,N,3,phyloP,,,-20,10,,,,,,,Conservation,PhyloP100
+90,csq_phastcons100way_vertebrate,csq_phastcons100verts,PhastCons (100 Vertebrates),Y,0,variant,UCSC - VEP,hg38,PhastCons 100 way score,number,,N,,,,,,,,,,,,,,
+91,csq_phylop100way_vertebrate,csq_phylop100verts,PhyloP (100 Vertebrates),Y,-0.684,variant,UCSC - VEP,hg38,PhyloP 100 way score,number,,N,3,phyloP,,,-20,10,,,,,,,Conservation,PhyloP100
 ,csq_phylop100way_vertebrate_rankscore,csq_phylop100way_vertebrate_rankscore,PhyloP (100 Vertebrates) rankscore,Y,10.40694444,variant,dbNSFP,v4.1a,PhyloP 100 way rankscore,number,,N,,,,,,,,,,,,,,
-92,csq_phylop30mams,csq_phylop30mams,PhyloP (30 Mammals),Y,-0.327,variant,UCSC - VEP,hg38,PhyloP 30 way score,number,,N,,,,,,,,,,,,,,
+92,csq_phylop30way_mammalian,csq_phylop30mams,PhyloP (30 Mammals),Y,-0.327,variant,UCSC - VEP,hg38,PhyloP 30 way score,number,,N,,,,,,,,,,,,,,
 93,csq_gerp_rs,csq_gerp++_rs,Gerp++ score,Y,1.15,variant,dbNSFP,v4.1a,GERP score,number,,N,,,,,,,,,,,,,Conservation,
 ,csq_gerp_rs_rankscore,csq_gerp++_rs_rankscore,Gerp++ rankscore,Y,20.66458333,variant,dbNSFP,v4.1a,GERP rankscore,number,,N,,,,,,,,,,,,,,
 94,csq_siphy_29way_logodds,csq_siphy_29way_logodds,SiPhy (Omega),Y,4.1978,variant,dbNSFP,v4.1a,Siphy omega score,number,,N,,,,,,,,,,,,,,
