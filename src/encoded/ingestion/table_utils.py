@@ -929,7 +929,6 @@ class VariantTableParser(object):
         schema['title'] = 'Variants'
         schema['description'] = "Schema for variants"
         schema['id'] = '/profiles/variant.json'
-        schema['mixinProperties'].append({"$ref": "mixins.json#/interpretation"})
         schema['properties'] = var_props
         schema['properties']['hg19'] = {  # required for testing :( - will 1-8-2021
             "title": "hg19 Coordinates",
