@@ -43,7 +43,7 @@ class VCFParser(object):
         'csq_hg19_pos(1-based)': 'csq_hg19_pos',
         'csq_gerp++_rs_rankscore': 'csq_gerp_rs_rankscore',
         'csq_gerp++_rs': 'csq_gerp_rs',
-        'csq_phastcons100verts': 'csq_phastcons100_vertebrate',
+        'csq_phastcons100verts': 'csq_phastcons100way_vertebrate',
         'csq_phylop100verts': 'csq_phylop100way_vertebrate',
         'csq_phylop30mams': 'csq_phylop30way_mammalian'
     }
