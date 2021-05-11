@@ -342,8 +342,9 @@ function GDNAList({ context }){
     const { variant = {} } = context;
     const {
         // mutanno_hgvsg = fallbackElem, // (temporarily?) removed
-        display_title: hgvsg_placeholder = fallbackElem,
+        // display_title: hgvsg_placeholder = fallbackElem, // Superseded by more explicit `hgvsg`
         // POS: pos,
+        hgvsg = fallbackElem,
         CHROM: chrom = fallbackElem,
         hg19_chr = fallbackElem,
         hg19_pos = fallbackElem
@@ -355,7 +356,7 @@ function GDNAList({ context }){
             <div className="row pb-1 pb-md-03" key="GRCh38">
                 <div className="col-12 col-md-3 font-italic"><em>GRCh38</em></div>
                 <div className="col-12 col-md-2">{ chrom }</div>
-                <div className="col-12 col-md-7">{ hgvsg_placeholder }</div>
+                <div className="col-12 col-md-7">{ hgvsg }</div>
             </div>
             {/* Legacy GRCh37/hg19 support. */}
             <div className="row pb-1 pb-md-03" key="GCRCh37">
