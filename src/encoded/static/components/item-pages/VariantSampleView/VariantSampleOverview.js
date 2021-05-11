@@ -285,10 +285,12 @@ class ACMGInvoker extends React.Component {
         super(props);
 
         this.state = {
-            invoked: {}
+            invoked: {},
+            autoClassification: null
         };
 
         this.toggleInvocation = this.toggleInvocation.bind(this);
+
     }
 
     toggleInvocation(criteria) {
@@ -302,11 +304,14 @@ class ACMGInvoker extends React.Component {
             newInvocations[criteria] = true;
         }
 
-        this.setState({ invoked: newInvocations });
+        const classifier = new AutoClassify(newInvocations);
+        const classification = classifier.getClassification();
+
+        this.setState({ invoked: newInvocations, autoClassification: classification });
     }
 
     render() {
-        const { invoked = {} } = this.state;
+        const { invoked = {}, autoClassification = null } = this.state;
 
         const acmgCriteria = [ "BA1", "BS1", "BS2", "BS3", "BS4", "BP1", "BP2", "BP3", "BP4", "BP5", "BP6",
             "BP7", "PP1", "PP2", "PP3", "PP4", "PP5", "PM1", "PM2", "PM3", "PM4", "PM5", "PM6", "PS1", "PS2",
@@ -319,7 +324,159 @@ class ACMGInvoker extends React.Component {
                         onClick={() => this.toggleInvocation(criteria)} style={{ flex: "1" }}>
                         { criteria }
                     </div>))}
+                { autoClassification || "No classification suggestions available" }
             </div>
         );
+    }
+}
+
+
+class AutoClassify {
+    /**
+     * Based on https://www.mgz-muenchen.com/files/Public/Downloads/2018/ACMG%20Classification%20of%20Sequence%20Variants.pdf (pg 3)
+     */
+    static criteriaToClassification = {
+        "BA1": { type: "benign", strength: "standalone" },
+        "BS1": { type: "benign", strength: "strong" },
+        "BS2": { type: "benign", strength: "strong" },
+        "BS3": { type: "benign", strength: "strong" },
+        "BS4": { type: "benign", strength: "strong" },
+        "BP1": { type: "benign", strength: "moderate" },
+        "BP2": { type: "benign", strength: "moderate" },
+        "BP3": { type: "benign", strength: "moderate" },
+        "BP4": { type: "benign", strength: "moderate" },
+        "BP5": { type: "benign", strength: "moderate" },
+        "BP6": { type: "benign", strength: "moderate" },
+        "BP7": { type: "benign", strength: "moderate" },
+        "PP1": { type: "pathogenic", strength: "supporting" },
+        "PP2": { type: "pathogenic", strength: "supporting" },
+        "PP3": { type: "pathogenic", strength: "supporting" },
+        "PP4": { type: "pathogenic", strength: "supporting" },
+        "PP5": { type: "pathogenic", strength: "supporting" },
+        "PM1": { type: "pathogenic", strength: "moderate" },
+        "PM2": { type: "pathogenic", strength: "moderate" },
+        "PM3": { type: "pathogenic", strength: "moderate" },
+        "PM4": { type: "pathogenic", strength: "moderate" },
+        "PM5": { type: "pathogenic", strength: "moderate" },
+        "PM6": { type: "pathogenic", strength: "moderate" },
+        "PS1": { type: "pathogenic", strength: "strong" },
+        "PS2": { type: "pathogenic", strength: "strong" },
+        "PS3": { type: "pathogenic", strength: "strong" },
+        "PS4": { type: "pathogenic", strength: "strong" },
+        "PVS1": { type: "pathogenic", strength: "vstrong" }
+    }
+
+    constructor(invoked) {
+        this.evidenceOfPathogenicity = {};
+        this.evidenceOfBenignImpact = {};
+        this.autoClassification = null;
+
+        // Flatten into an array of invoked items
+        const invokedFlat = [];
+        Object.keys(invoked).forEach((criteria) => {
+            if (invoked[criteria]) { invokedFlat.push(criteria); }
+        });
+
+        // Collect counts of various evidence types
+        invokedFlat.forEach((criteria) => {
+            const classification = AutoClassify.criteriaToClassification[criteria];
+            if (classification.type === "pathogenic") {
+                if (this.evidenceOfPathogenicity[classification.strength] === undefined) {
+                    this.evidenceOfPathogenicity[classification.strength] = 1;
+                } else {
+                    this.evidenceOfPathogenicity[classification.strength] = this.evidenceOfPathogenicity[classification.strength]++;
+                }
+            } else {
+                if (this.evidenceOfBenignImpact[classification.strength] === undefined) {
+                    this.evidenceOfBenignImpact[classification.strength] = 1;
+                } else {
+                    this.evidenceOfBenignImpact[classification.strength] = this.evidenceOfBenignImpact[classification.strength]++;
+                }
+            }
+        });
+    }
+
+    isPathogenic(){
+        const { vstrong = 0, strong = 0, moderate = 0, supporting = 0 } = this.evidenceOfPathogenicity;
+        if (vstrong >= 1) {                             // (i) 1 Very strong (PVS1) AND
+            if ((strong >= 1) ||                        //      a) ≥1 Strong (PS1–PS4) OR
+                (moderate >= 2) ||                      //      b) ≥2 Moderate (PM1–PM6) OR
+                (moderate === 1 && supporting === 1) || //      c) 1 Moderate (PM1–PM6) and 1 supporting (PP1–PP5) OR
+                (supporting >= 2)) {                    //      d) d) ≥2 Supporting (PP1–PP5)
+                return true;
+            }
+        }
+        if (strong >= 2) {                              // (ii) ≥2 Strong (PS1–PS4) OR
+            return true;
+        }
+        if (strong === 1) {                             // (iii) 1 Strong (PS1–PS4) AND
+            if ((moderate >= 3) ||                      //      a) ≥3 Moderate (PM1–PM6) OR
+            (moderate === 2 && supporting >= 2) ||      //      b) 2 Moderate (PM1–PM6) AND ≥2 Supporting (PP1–PP5) OR
+            (moderate === 1 && supporting >= 4)) {      //      c) 1 Moderate (PM1–PM6) AND ≥4 supporting (PP1–PP5
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    isLikelyPathogenic(){
+        const { vstrong = 0, strong = 0, moderate = 0, supporting = 0 } = this.evidenceOfPathogenicity;
+        if ((vstrong === 1 && moderate === 1) ||                    // (i) 1 Very strong (PVS1) AND 1 moderate (PM1–PM6) OR
+            (strong === 1 && (moderate === 1 || moderate === 2)) || // (ii) 1 Strong (PS1–PS4) AND 1–2 moderate (PM1–PM6) OR
+            (strong === 1 && (supporting >= 2)) ||                  // (iii) 1 Strong (PS1–PS4) AND ≥2 supporting (PP1–PP5) OR
+            (moderate >= 3) ||                                      // (iv) ≥3 Moderate (PM1–PM6) OR
+            (moderate === 2) && (supporting >= 2) ||                // (v) 2 Moderate (PM1–PM6) AND ≥2 supporting (PP1–PP5) OR
+            (moderate === 1) && (supporting >= 4)) {                // (vi) 1 Moderate (PM1–PM6) AND ≥4 supporting (PP1–PP5)
+            return true;
+        }
+        return false;
+
+    }
+
+    isBenign(){
+        const { standalone = 0, strong = 0 } = this.evidenceOfBenignImpact;
+        if (standalone || strong >= 2) {    // (i) 1 Stand-alone (BA1) OR (ii) ≥2 Strong (BS1–BS4)
+            return true;
+        }
+        return false;
+    }
+
+    isLikelyBenign(){
+        const { strong = 0, supporting = 0 } = this.evidenceOfBenignImpact;
+        if ((strong === 1 && supporting >= 1) ||    // (i) 1 Strong (BS1–BS4) and 1 supporting (BP1–BP7) OR
+            (supporting >= 2)                       // (ii) ≥2 Supporting (BP1–BP7)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    classify() {
+        const isBenign = this.isBenign();
+        const isLikelyBenign = this.isLikelyBenign();
+        const isPathogenic = this.isPathogenic();
+        const isLikelyPathogenic = this.isLikelyPathogenic();
+        console.log("classifying...");
+
+        if (isBenign) {
+            // (Uncertain significance ii) the criteria for benign and pathogenic are contradictory
+            return isPathogenic ? "Uncertain significance" : "Benign";
+        } else if (isLikelyBenign) {
+            return "Likely benign";
+        } else if (isPathogenic) {
+            return "Pathogenic";
+        } else if (isLikelyPathogenic) {
+            return "Likely Pathogenic";
+        } else { // (Uncertain significance i) Other criteria shown above are not met
+            return "Uncertain significance";
+        }
+    }
+
+    getClassification() {
+        const classification = this.classify();
+        this.autoClassification = classification;
+        console.log("Final classification...", classification);
+        return classification;
     }
 }
