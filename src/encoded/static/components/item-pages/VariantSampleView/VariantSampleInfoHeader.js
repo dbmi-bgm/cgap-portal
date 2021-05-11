@@ -345,8 +345,8 @@ function GDNAList({ context }){
         display_title: hgvsg_placeholder = fallbackElem,
         // POS: pos,
         CHROM: chrom = fallbackElem,
-        csq_hg19_chr = fallbackElem,
-        csq_hg19_pos = fallbackElem
+        hg19_chr = fallbackElem,
+        hg19_pos = fallbackElem
     } = variant;
 
     const renderedRows =  (
@@ -360,19 +360,19 @@ function GDNAList({ context }){
             {/* Legacy GRCh37/hg19 support. */}
             <div className="row pb-1 pb-md-03" key="GCRCh37">
                 <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
-                <div className="col-12 col-md-2 ">{ csq_hg19_chr }</div>
-                <div className="col-12 col-md-7">{ csq_hg19_pos }</div>
+                <div className="col-12 col-md-2 ">{ hg19_chr }</div>
+                <div className="col-12 col-md-7">{ hg19_pos }</div>
             </div>
         </React.Fragment>
     );
 
     //Legacy GRCh37/hg19 support.
     /** @DEPRECATED as of Annotations v20; leaving here since csq_hg19 may be reverted to array again in future
-     * csq_hg19.forEach(function({ csq_hg19_pos, csq_hg19_chrom, csq_hg19_hgvsg }, idx){
+     * csq_hg19.forEach(function({ hg19_pos, hg19_chr, csq_hg19_hgvsg }, idx){
         renderedRows.push(
             <div className="row pb-1 pb-md-03" key={idx}>
                 <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
-                <div className="col-12 col-md-2 ">{ csq_hg19_chrom }</div>
+                <div className="col-12 col-md-2 ">{ hg19_chr }</div>
                 <div className="col-12 col-md-7">{ csq_hg19_hgvsg }</div>
             </div>
         );
