@@ -20,10 +20,10 @@ def includeme(config):
 
 def _minimal_embed(request, item_id):
     """
-    Embed minimal item info. Helpful for preventing deep recursions for
+    Embed minimal item info. Helpful for preventing recursions for
     items for which detailed info is commonly not needed.
 
-    :param request:
+    :param request: pyramid request object
     :param item_id: string uuid or @id
     :return item_embed: dict with item title and @id
     """
@@ -39,7 +39,7 @@ def _embed_genelist(request, genelist_atid):
     Embed limited gene list information from raw view to avoid costly
     object view of large gene lists.
 
-    :param request:
+    :param request: pyramid request object
     :param genelist_atid: string of gene list @id
     :return genelist_embed: dictionary with limited gene list information
     """
@@ -53,16 +53,15 @@ def _embed_genelist(request, genelist_atid):
 
 def _embed(request, item, depth, embed_props):
     """
-    Provide full embedded view of items excluding gene list full embed
-    by recursively finding @ids and embedding corresponding object views.
-    Stores @id with embedded view in cache should @id come up again, which
-    tends to be common with project and institution particularly.
+    Embeds items recursively according to input parameters. Unpacks
+    dictionaries and lists to find @ids, which are selectively embedded,
+    typically in object view. Stores new embeds in cache for look-up.
 
-    :param request:
-    :param item: object of interest to handle
+    :param request: pyramid request object
+    :param item: object of interest to expand
     :param depth: int of current embed depth
     :param embed_props: dict of embedding properties
-    :return item, new_embed: object of interest processed and bool for state of
+    :return item, new_embed: object of interest processed and bool if
         newly embedded @id
     """
     new_embed = True
@@ -124,15 +123,13 @@ def _embed(request, item, depth, embed_props):
 @debug_log
 def embed(context, request):
     """
-    Custom API to return pseudo-embedded view of object posted to endpoint
-    with in url.
-
-    NOTE: Only grabs one level of depth for user, project, and institution
-    to prevent infinite recursion.
+    API to return custom-embedded view of object posted to endpoint. If no
+    parameters provided, attempts to return object with embedding done
+    per default parameters.
 
     :param context:
-    :param request:
-    :return results: dict containing pseduo-embedded view of item
+    :param request: pyramid request object
+    :return results: dict containing custom-embedded view of item
     """
     ids = []
     ignored_embeds = []
