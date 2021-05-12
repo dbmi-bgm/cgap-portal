@@ -721,6 +721,7 @@ class VariantUpdateSubmission:
             self.vapp,
             item_type="VariantSample",
             project=self.project,
+            batch_size=3,
         )
         for variant_sample_response in variant_sample_search:
             variant_samples_to_invalidate.append(
