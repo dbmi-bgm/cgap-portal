@@ -714,12 +714,12 @@ i.status-indicator-dot {
 	&[data-criteria="PP3"],
 	&[data-criteria="PP4"],
 	&[data-criteria="PP5"] {
-		color: #308756;
+		color: #80921c;
 		background-color: #fff;
 
 		&[data-invoked="true"] {
 			color: #fff;
-			background-color: #308756;
+			background-color: #80921c;
 		}
 	}
 
@@ -762,9 +762,25 @@ i.status-indicator-dot {
 
 .acmg-invoker {
 	border: 1px solid #efefef;
-	padding: 5px;
+	padding: 0 5px;
+
+	// &:hover { // a little janky ATM; needs tweaking
+	// 	font-size: large;
+	// 	padding: 5px 7px;
+	// }
 
 	@include acmgColorStyles;
+}
+
+.acmg-guidelines-title {
+	padding: 5px 5px 5px 15px;
+    min-width: 135px;
+    align-self: center;
+}
+
+.acmg-guidelines-invoker {
+	width: calc(100% - 145px);
+    overflow-x: scroll;
 }
 
 

@@ -318,14 +318,19 @@ class ACMGInvoker extends React.Component {
             "PS3", "PS4", "PVS1" ];
 
         return (
-            <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
-                {acmgCriteria.map((criteria) => (
-                    <div className="acmg-invoker text-600 text-center ml-02 mr-02" key={criteria} data-criteria={criteria} data-invoked={invoked[criteria]}
-                        onClick={() => this.toggleInvocation(criteria)} style={{ flex: "1" }}>
-                        { criteria }
-                    </div>))}
-                { autoClassification || "No classification suggestions available" }
-            </div>
+            <>
+                <div className="card flex-row my-3">
+                    <div className="text-600 acmg-guidelines-title">ACMG Guidelines</div>
+                    <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
+                        {acmgCriteria.map((criteria) => (
+                            <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={criteria} data-criteria={criteria} data-invoked={invoked[criteria]}
+                                onClick={() => this.toggleInvocation(criteria)} style={{ flex: "1" }}>
+                                { criteria }
+                            </div>))}
+                    </div>
+                </div>
+                <div className="mb-2">{ autoClassification || "No classification suggestions available" }</div>
+            </>
         );
     }
 }
