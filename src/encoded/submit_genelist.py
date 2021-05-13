@@ -5,7 +5,8 @@ from dcicutils.misc_utils import VirtualAppError
 from openpyxl import load_workbook
 from webtest import AppError
 
-from .util import s3_local_file
+from encoded.util import s3_local_file
+from encoded.ingestion.common import CGAP_CORE_PROJECT
 
 
 def submit_genelist(
@@ -186,7 +187,7 @@ class GeneListSubmission:
         if genes_with_spaces:
             self.errors.append(
                 "Gene symbols/IDs should not contain spaces. Please reformat "
-                "the following gene entries: %s" % ", ".join(genes_with_spaces)
+                "the following gene entries: %s." % ", ".join(genes_with_spaces)
             )
         if non_ascii_genes:
             self.errors.append(
@@ -233,7 +234,7 @@ class GeneListSubmission:
                 non_ensgids.append(gene)
         if ensgids:
             ensgid_search = CommonUtils.batch_search(
-                ensgids, "ensgid", self.vapp, batch_size=10
+                self.vapp, ensgids, "ensgid", batch_size=10
             )
             for response in ensgid_search:
                 if response["gene_symbol"] in gene_ids:
@@ -263,7 +264,7 @@ class GeneListSubmission:
                 if not non_ensgids:
                     break
                 search = CommonUtils.batch_search(
-                    non_ensgids, search_type, self.vapp, batch_size=10,
+                    self.vapp, non_ensgids, search_type, batch_size=10,
                 )
                 for response in search:
                     if (
@@ -349,37 +350,25 @@ class GeneListSubmission:
         if not self.gene_ids:
             return None
         with open(self.filename, "rb") as stream:
+            extension = self.filename.split(".")[-1]
             if not self.title:
                 self.title = "Stand_in_genelist"
-            if self.filename.endswith("txt"):
-                attach = {
-                    "download": self.title.replace(" ", "_") + "_genelist.txt",
-                    "type": "text/plain",
-                    "href": (
-                        "data:%s;base64,%s"
-                        % (
-                            "text/plain",
-                            b64encode(stream.read()).decode("ascii"),
-                        )
-                    ),
-                }
-            elif self.filename.endswith("xlsx"):
-                attach = {
-                    "download": self.title.replace(" ", "_")
-                    + "_genelist.xlsx",
-                    "type": (
-                        "application/vnd.openxmlformats-officedocument."
-                        "spreadsheetml.sheet"
-                    ),
-                    "href": (
-                        "data:%s;base64,%s"
-                        % (
-                            "application/vnd.openxmlformats-officedocument."
-                            "spreadsheetml.sheet",
-                            b64encode(stream.read()).decode("ascii"),
-                        )
-                    ),
-                }
+            if extension == "txt":
+                content_type = "text/plain"
+            elif extension == "xlsx":
+                content_type = (
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            attach = {
+                "download": self.title.replace(" ", "_") + "_genelist." + extension,
+                "type": content_type,
+                "href": (
+                    "data:%s;base64,%s" % (
+                        content_type,
+                        b64encode(stream.read()).decode("ascii"),
+                    )
+                ),
+            }
         document_post_body = {
             "institution": self.institution,
             "project": self.project,
@@ -387,8 +376,7 @@ class GeneListSubmission:
         }
         genelist_post_body = {
             "title": (
-                self.title + " (%s)" % len(self.gene_ids)
-                if self.title
+                self.title + " (%s)" % len(self.gene_ids) if self.title
                 else "Stand in title"
             ),
             "institution": self.institution,
@@ -421,18 +409,15 @@ class GeneListSubmission:
         genelist_uuid = None
         document_uuid = None
         previous_genelist_gene_ids = []
+        project_list = [self.project.replace("/", "%2F")]
         document_json = self.post_bodies[0]
         genelist_json = self.post_bodies[1]
         if self.title:
             try:
-                project_genelists = self.vapp.get(
-                    "/search/?type=GeneList"
-                    "&project.%40id="
-                    + self.project.replace("/", "%2F")
-                    + "&institution.%40id="
-                    + self.institution.replace("/", "%2F")
-                    + "&field=title&field=uuid&field=genes.uuid"
-                ).json["@graph"]
+                fields = ["title", "uuid", "genes.uuid"]
+                project_genelists = CommonUtils.batch_search(
+                    self.vapp, project_list, "project.%40id", item_type="GeneList", institution=self.institution, fields=fields
+                )
                 project_titles = [x["title"] for x in project_genelists]
                 for previous_title in project_titles:
                     genelist_title = previous_title
@@ -453,14 +438,10 @@ class GeneListSubmission:
             except VirtualAppError:
                 pass
         try:
-            project_documents = self.vapp.get(
-                "/search/?type=Document"
-                "&project.%40id="
-                + self.project.replace("/", "%2F")
-                + "&institution.%40id="
-                + self.institution.replace("/", "%2F")
-                + "&field=display_title&field=uuid"
-            ).json["@graph"]
+            fields = ["display_title", "uuid"]
+            project_documents = CommonUtils.batch_search(
+                self.vapp, project_list, "project.%40id", item_type="Document", institution=self.institution, fields=fields
+            )
             project_docs = [
                 x["display_title"].replace(".txt", "").replace(".xlsx", "")
                 for x in project_documents
@@ -715,12 +696,16 @@ class VariantUpdateSubmission:
             return None
         variant_samples_to_invalidate = []
         genes_to_search = list(set(self.gene_uuids))
+        if self.project == CGAP_CORE_PROJECT + "/":
+            project = None
+        else:
+            project = self.project
         variant_sample_search = CommonUtils.batch_search(
+            self.vapp,
             genes_to_search,
             "variant.genes.genes_most_severe_gene.uuid",
-            self.vapp,
             item_type="VariantSample",
-            project=self.project,
+            project=project,
             fields=["uuid"]
         )
         for variant_sample_response in variant_sample_search:
@@ -788,12 +773,13 @@ class CommonUtils:
 
     @staticmethod
     def batch_search(
+        app,
         item_list,
         search_term,
-        app,
+        batch_size=5,
         item_type="Gene",
         project=None,
-        batch_size=5,
+        institution=None,
         fields=[]
     ):
         """
@@ -808,8 +794,12 @@ class CommonUtils:
         flat_result = []
         search_size = 100
         add_ons = ""
+        import pdb
+        pdb.set_trace()
         if project:
             add_ons += "&project.%40id=" + project.replace("/", "%2F")
+        if institution:
+            add_ons += "&institution.%40id=" + institution.replace("/", "%2F")
         if fields:
             field_string = "&field=" + "&field=".join(fields)
             add_ons += field_string
