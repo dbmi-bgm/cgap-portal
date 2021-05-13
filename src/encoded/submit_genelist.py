@@ -233,7 +233,7 @@ class GeneListSubmission:
                 non_ensgids.append(gene)
         if ensgids:
             ensgid_search = CommonUtils.batch_search(
-                ensgids, "ensgid", self.vapp, batch_size=20
+                ensgids, "ensgid", self.vapp, batch_size=10
             )
             for response in ensgid_search:
                 if response["gene_symbol"] in gene_ids:
@@ -263,7 +263,7 @@ class GeneListSubmission:
                 if not non_ensgids:
                     break
                 search = CommonUtils.batch_search(
-                    non_ensgids, search_type, self.vapp, batch_size=10
+                    non_ensgids, search_type, self.vapp, batch_size=10,
                 )
                 for response in search:
                     if (
@@ -721,7 +721,7 @@ class VariantUpdateSubmission:
             self.vapp,
             item_type="VariantSample",
             project=self.project,
-            batch_size=3,
+            fields=["uuid"]
         )
         for variant_sample_response in variant_sample_search:
             variant_samples_to_invalidate.append(
@@ -794,6 +794,7 @@ class CommonUtils:
         item_type="Gene",
         project=None,
         batch_size=5,
+        fields=[]
     ):
         """
         Performs get requests in batches to decrease the number of
@@ -805,26 +806,36 @@ class CommonUtils:
         batch = []
         results = []
         flat_result = []
+        search_size = 100
+        add_ons = ""
+        if project:
+            add_ons += "&project.%40id=" + project.replace("/", "%2F")
+        if fields:
+            field_string = "&field=" + "&field=".join(fields)
+            add_ons += field_string
+        base_search = "/search/?type=" + item_type + "&" + search_term + "="
         for item in item_list:
             batch.append(item)
             if item == item_list[-1] or len(batch) == batch_size:
                 batch_string = ("&" + search_term + "=").join(batch)
-                if project:
-                    batch_string += "&project.%40id=" + project.replace(
-                        "/", "%2F"
-                    )
-                try:
-                    response = app.get(
-                        "/search/?type="
-                        + item_type
-                        + "&"
-                        + search_term
-                        + "="
-                        + batch_string
-                    )
-                    results.append(response.json["@graph"])
-                except (VirtualAppError, AppError):
-                    pass
+                if add_ons:
+                    batch_string += add_ons
+                count = 0
+                new_search = True
+                while new_search:
+                    limit = str(search_size)
+                    from_index = str(search_size*count)
+                    limit_add_on = "&from=" + from_index + "&limit=" + limit
+                    search_string = base_search + batch_string + limit_add_on
+                    try:
+                        response = app.get(search_string).json["@graph"]
+                        results.append(response)
+                        if len(response) == search_size:
+                            count += 1
+                        else:
+                            new_search = False
+                    except (VirtualAppError, AppError):
+                        new_search = False
                 batch = []
         flat_result = [x for sublist in results for x in sublist]
         return flat_result
