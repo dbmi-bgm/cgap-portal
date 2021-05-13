@@ -341,13 +341,13 @@ class AutoClassify {
         "BS2": { type: "benign", strength: "strong" },
         "BS3": { type: "benign", strength: "strong" },
         "BS4": { type: "benign", strength: "strong" },
-        "BP1": { type: "benign", strength: "moderate" },
-        "BP2": { type: "benign", strength: "moderate" },
-        "BP3": { type: "benign", strength: "moderate" },
-        "BP4": { type: "benign", strength: "moderate" },
-        "BP5": { type: "benign", strength: "moderate" },
-        "BP6": { type: "benign", strength: "moderate" },
-        "BP7": { type: "benign", strength: "moderate" },
+        "BP1": { type: "benign", strength: "supporting" },
+        "BP2": { type: "benign", strength: "supporting" },
+        "BP3": { type: "benign", strength: "supporting" },
+        "BP4": { type: "benign", strength: "supporting" },
+        "BP5": { type: "benign", strength: "supporting" },
+        "BP6": { type: "benign", strength: "supporting" },
+        "BP7": { type: "benign", strength: "supporting" },
         "PP1": { type: "pathogenic", strength: "supporting" },
         "PP2": { type: "pathogenic", strength: "supporting" },
         "PP3": { type: "pathogenic", strength: "supporting" },
@@ -384,13 +384,15 @@ class AutoClassify {
                 if (this.evidenceOfPathogenicity[classification.strength] === undefined) {
                     this.evidenceOfPathogenicity[classification.strength] = 1;
                 } else {
-                    this.evidenceOfPathogenicity[classification.strength] = this.evidenceOfPathogenicity[classification.strength]++;
+                    const newValue = this.evidenceOfPathogenicity[classification.strength] + 1;
+                    this.evidenceOfPathogenicity[classification.strength] = newValue;
                 }
             } else {
                 if (this.evidenceOfBenignImpact[classification.strength] === undefined) {
                     this.evidenceOfBenignImpact[classification.strength] = 1;
                 } else {
-                    this.evidenceOfBenignImpact[classification.strength] = this.evidenceOfBenignImpact[classification.strength]++;
+                    const newValue = this.evidenceOfBenignImpact[classification.strength] + 1;
+                    this.evidenceOfBenignImpact[classification.strength] = newValue;
                 }
             }
         });
