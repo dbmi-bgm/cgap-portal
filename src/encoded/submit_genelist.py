@@ -68,9 +68,7 @@ class GeneListSubmission:
     Class to handle processing of submitted gene list.
     """
 
-    def __init__(
-        self, filename, project, institution, vapp, validate_only=False
-    ):
+    def __init__(self, filename, project, institution, vapp, validate_only=False):
         self.filename = filename
         self.project = project
         self.institution = institution
@@ -110,9 +108,7 @@ class GeneListSubmission:
                 title_line = line
                 title_idx = title_line.lower().index("title")
                 title_line = title_line[title_idx + 5:]
-                title_line = title_line.translate(
-                    {ord(i): None for i in ':;"\n"'}
-                )
+                title_line = title_line.translate({ord(i): None for i in ':;"\n"'})
                 title = title_line.strip()
                 if title == "":
                     title = None
@@ -239,14 +235,10 @@ class GeneListSubmission:
             for response in ensgid_search:
                 if response["gene_symbol"] in gene_ids:
                     gene_ids[response["gene_symbol"]].append(response["uuid"])
-                    gene_ensgids[response["gene_symbol"]].append(
-                        response["ensgid"]
-                    )
+                    gene_ensgids[response["gene_symbol"]].append(response["ensgid"])
                 else:
                     gene_ids[response["gene_symbol"]] = [response["uuid"]]
-                    gene_ensgids[response["gene_symbol"]] = [
-                        response["ensgid"]
-                    ]
+                    gene_ensgids[response["gene_symbol"]] = [response["ensgid"]]
                 ensgids.remove(response["ensgid"])
             if ensgids:
                 unmatched_genes_without_options += ensgids
@@ -264,20 +256,18 @@ class GeneListSubmission:
                 if not non_ensgids:
                     break
                 search = CommonUtils.batch_search(
-                    self.vapp, non_ensgids, search_type, batch_size=10,
+                    self.vapp,
+                    non_ensgids,
+                    search_type,
+                    batch_size=10,
                 )
                 for response in search:
                     if (
                         response["gene_symbol"] in gene_ids
-                        and response["uuid"]
-                        not in gene_ids[response["gene_symbol"]]
+                        and response["uuid"] not in gene_ids[response["gene_symbol"]]
                     ):
-                        gene_ids[response["gene_symbol"]].append(
-                            response["uuid"]
-                        )
-                        gene_ensgids[response["gene_symbol"]].append(
-                            response["ensgid"]
-                        )
+                        gene_ids[response["gene_symbol"]].append(response["uuid"])
+                        gene_ensgids[response["gene_symbol"]].append(response["ensgid"])
                         responsible_gene = response[search_type]
                         if type(response[search_type]) is list:
                             for item in response[search_type]:
@@ -285,14 +275,11 @@ class GeneListSubmission:
                                     responsible_gene = item
                                     break
                         self.notes.append(
-                            "Note: gene %s refers to multiple genes "
-                            "in our database, including genes with "
-                            "the following Ensembl IDs: %s. If you "
-                            "would prefer to "
-                            "only include one of these genes in this "
-                            "gene list, please resubmit and replace "
-                            "the gene %s with one of "
-                            "the Ensembl IDs above."
+                            "Note: gene %s refers to multiple genes in our database,"
+                            " including genes with the following Ensembl IDs: %s."
+                            " If you would prefer to only include one of these genes"
+                            " in this gene list, please resubmit and replace the"
+                            " gene %s with one of the Ensembl IDs above."
                             % (
                                 responsible_gene,
                                 ", ".join(gene_ensgids[responsible_gene]),
@@ -302,9 +289,7 @@ class GeneListSubmission:
                         continue
                     else:
                         gene_ids[response["gene_symbol"]] = [response["uuid"]]
-                        gene_ensgids[response["gene_symbol"]] = [
-                            response["ensgid"]
-                        ]
+                        gene_ensgids[response["gene_symbol"]] = [response["ensgid"]]
                     if type(response[search_type]) is str:
                         non_ensgids.remove(response[search_type])
                     elif type(response[search_type]) is list:
@@ -315,9 +300,9 @@ class GeneListSubmission:
         if non_ensgids:
             for gene in non_ensgids:
                 try:
-                    response = self.vapp.get(
-                        "/search/?type=Gene&q=" + gene
-                    ).json["@graph"]
+                    response = self.vapp.get("/search/?type=Gene&q=" + gene).json[
+                        "@graph"
+                    ]
                     options = [option["gene_symbol"] for option in response]
                     self.errors.append(
                         "No perfect match found for gene %s. "
@@ -343,8 +328,8 @@ class GeneListSubmission:
         Creates gene list and document bodies for posting.
 
         Returns:
-            - List of bodies to post: [document, gene list] (None if no matched
-              genes)
+            - List of bodies to post: [document, gene list]
+              (None if no matched genes)
         """
 
         if not self.gene_ids:
@@ -363,7 +348,8 @@ class GeneListSubmission:
                 "download": self.title.replace(" ", "_") + "_genelist." + extension,
                 "type": content_type,
                 "href": (
-                    "data:%s;base64,%s" % (
+                    "data:%s;base64,%s"
+                    % (
                         content_type,
                         b64encode(stream.read()).decode("ascii"),
                     )
@@ -376,7 +362,8 @@ class GeneListSubmission:
         }
         genelist_post_body = {
             "title": (
-                self.title + " (%s)" % len(self.gene_ids) if self.title
+                self.title + " (%s)" % len(self.gene_ids)
+                if self.title
                 else "Stand in title"
             ),
             "institution": self.institution,
@@ -416,7 +403,12 @@ class GeneListSubmission:
             try:
                 fields = ["title", "uuid", "genes.uuid"]
                 project_genelists = CommonUtils.batch_search(
-                    self.vapp, project_list, "project.%40id", item_type="GeneList", institution=self.institution, fields=fields
+                    self.vapp,
+                    project_list,
+                    "project.%40id",
+                    item_type="GeneList",
+                    institution=self.institution,
+                    fields=fields,
                 )
                 project_titles = [x["title"] for x in project_genelists]
                 for previous_title in project_titles:
@@ -428,9 +420,7 @@ class GeneListSubmission:
                     if self.title == previous_title:
                         genelist_idx = project_titles.index(genelist_title)
                         genelist_uuid = project_genelists[genelist_idx]["uuid"]
-                        genelist_gene_uuids = project_genelists[genelist_idx][
-                            "genes"
-                        ]
+                        genelist_gene_uuids = project_genelists[genelist_idx]["genes"]
                         previous_genelist_gene_ids += [
                             gene["uuid"] for gene in genelist_gene_uuids
                         ]
@@ -440,7 +430,12 @@ class GeneListSubmission:
         try:
             fields = ["display_title", "uuid"]
             project_documents = CommonUtils.batch_search(
-                self.vapp, project_list, "project.%40id", item_type="Document", institution=self.institution, fields=fields
+                self.vapp,
+                project_list,
+                "project.%40id",
+                item_type="Document",
+                institution=self.institution,
+                fields=fields,
             )
             project_docs = [
                 x["display_title"].replace(".txt", "").replace(".xlsx", "")
@@ -510,9 +505,7 @@ class GeneListSubmission:
                 {"attachment": document_json["attachment"]},
             ).json
         else:
-            document_post = self.vapp.post_json(
-                "/Document/", document_json
-            ).json
+            document_post = self.vapp.post_json("/Document/", document_json).json
         post_result["Document"] = (
             "posted with uuid " + document_post["@graph"][0]["uuid"]
         )
@@ -528,9 +521,7 @@ class GeneListSubmission:
                     },
                 ).json
             else:
-                genelist_post = self.vapp.post_json(
-                    "/GeneList/", genelist_json
-                ).json
+                genelist_post = self.vapp.post_json("/GeneList/", genelist_json).json
             post_result["Gene list"] = (
                 "posted with uuid " + genelist_post["@graph"][0]["uuid"]
             )
@@ -650,9 +641,7 @@ class VariantUpdateSubmission:
     list of gene uuids.
     """
 
-    def __init__(
-        self, filename, project, institution, vapp, validate_only=False
-    ):
+    def __init__(self, filename, project, institution, vapp, validate_only=False):
         self.filename = filename
         self.project = project
         self.institution = institution
@@ -666,8 +655,8 @@ class VariantUpdateSubmission:
 
     def genes_from_file(self):
         """
-        Extracts gene uuids from input file. Expects gene uuids to be separated
-        by '\n'.
+        Extracts gene uuids from input file. Expects gene uuids
+        to be separated by '\n'.
 
         Returns:
             - List of gene uuids
@@ -690,7 +679,7 @@ class VariantUpdateSubmission:
 
         Returns:
             - List of unique variant sample uuids (None if no gene
-            uuids)
+              uuids)
         """
         if not self.gene_uuids:
             return None
@@ -706,12 +695,10 @@ class VariantUpdateSubmission:
             "variant.genes.genes_most_severe_gene.uuid",
             item_type="VariantSample",
             project=project,
-            fields=["uuid"]
+            fields=["uuid"],
         )
         for variant_sample_response in variant_sample_search:
-            variant_samples_to_invalidate.append(
-                variant_sample_response["uuid"]
-            )
+            variant_samples_to_invalidate.append(variant_sample_response["uuid"])
         to_invalidate = list(set(variant_samples_to_invalidate))
         return to_invalidate
 
@@ -730,9 +717,7 @@ class VariantUpdateSubmission:
             return validate_output
         not_validated = []
         for uuid in self.variant_samples:
-            validate_response = self.vapp.patch_json(
-                "/" + uuid + "?validate_only", {}
-            )
+            validate_response = self.vapp.patch_json("/" + uuid + "?validate_only", {})
             if validate_response.json["status"] != "success":
                 not_validated.append(uuid)
         if not_validated:
@@ -780,11 +765,12 @@ class CommonUtils:
         item_type="Gene",
         project=None,
         institution=None,
-        fields=[]
+        fields=[],
     ):
         """
         Performs get requests in batches to decrease the number of
-        API calls and improve performance.
+        API calls and capture all search results (as default behavior
+        of vapp.get("/search/") is to return only first 25 items).
 
         Returns:
             - List of all items found by search
@@ -794,8 +780,6 @@ class CommonUtils:
         flat_result = []
         search_size = 100
         add_ons = ""
-        import pdb
-        pdb.set_trace()
         if project:
             add_ons += "&project.%40id=" + project.replace("/", "%2F")
         if institution:
@@ -814,7 +798,7 @@ class CommonUtils:
                 new_search = True
                 while new_search:
                     limit = str(search_size)
-                    from_index = str(search_size*count)
+                    from_index = str(search_size * count)
                     limit_add_on = "&from=" + from_index + "&limit=" + limit
                     search_string = base_search + batch_string + limit_add_on
                     try:
