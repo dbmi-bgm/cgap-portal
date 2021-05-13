@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
@@ -18,6 +18,13 @@ import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
     const { variant } = context;
     const { csq_clinvar: variationID } = variant;
+    const [ showingTable, setShowingTable ] = useState("v3"); // Allowed: "v2", "v3", and maybe "summary" in future; could be converted integer instd of of text.
+
+    const onSelectShowingTable = useCallback(function(evtKey, e){
+        e.stopPropagation();
+        setShowingTable(evtKey);
+        return;
+    });
 
     const { getTipForField, clinvarExternalHref } = useMemo(function(){
 
@@ -42,6 +49,13 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
 
         return ret;
     }, [ schemas, variationID ]);
+
+    const titleDict = useMemo(function(){
+        return {
+            "v2": <React.Fragment><span className="text-600">GnomAD</span> V2 Exome</React.Fragment>,
+            "v3": <React.Fragment><span className="text-600">GnomAD</span> V3</React.Fragment>
+        };
+    });
 
     return (
         <div className="variant-tab-body card-body">
@@ -68,13 +82,18 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
 
                     <div className="inner-card-section flex-grow-0 pb-2 pb-xl-0">
                         <div className="info-header-title">
-                            <h4>
-                                {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
-                                GnomAD
-                            </h4>
+
+                            <DropdownButton size="lg py-1" variant="outline-dark select-gnomad-version" onSelect={onSelectShowingTable}
+                                title={titleDict[showingTable]} >
+                                <DropdownItem eventKey="v3" active={showingTable === "v3"}>{ titleDict.v3 }</DropdownItem>
+                                <DropdownItem eventKey="v2" active={showingTable === "v2"}>{ titleDict.v2 }</DropdownItem>
+                            </DropdownButton>
+
+                            {/* todo link/icon to GnomAD -- is there a gnomad link somewhere ? */}
+
                         </div>
                         <div className="info-body overflow-auto">
-                            <GnomADTable {...{ context, schemas, getTipForField }} />
+                            <GnomADTable {...{ context, schemas, getTipForField }} prefix={showingTable === "v2" ? "csq_gnomade2" : "csq_gnomadg"} />
                         </div>
                     </div>
 
@@ -107,26 +126,29 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
     );
 });
 
-const GnomADTable = React.memo(function GnomADTable({ context, getTipForField }){
+
+
+const GnomADTable = React.memo(function GnomADTable(props){
+    const { context, getTipForField, prefix = "csq_gnomadg" } = props;
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const { variant } = context;
     const {
         // Allele Counts
-        csq_gnomadg_ac: gnomad_ac,      // Total
-        'csq_gnomadg_ac-xx': gnomad_ac_female, // Female
-        'csq_gnomadg_ac-xy': gnomad_ac_male, // Male
+        [prefix + "_ac"]: gnomad_ac,      // Total
+        [prefix + "_ac-xx"]: gnomad_ac_female, // Female
+        [prefix + "_ac-xy"]: gnomad_ac_male, // Male
         // Allele Frequences
-        csq_gnomadg_af: gnomad_af,
-        'csq_gnomadg_af-xx': gnomad_af_female,
-        'csq_gnomadg_af-xy': gnomad_af_male,
+        [prefix + "_af"]: gnomad_af,
+        [prefix + "_af-xx"]: gnomad_af_female,
+        [prefix + "_af-xy"]: gnomad_af_male,
         // Allele Numbers
         csq_gnomadg_an: gnomad_an,
-        'csq_gnomadg_an-xx': gnomad_an_female,
-        'csq_gnomadg_an-xy': gnomad_an_male,
+        [prefix + "_an-xx"]: gnomad_an_female,
+        [prefix + "_an-xy"]: gnomad_an_male,
         // Homozygote Numbers
-        csq_gnomadg_nhomalt: gnomad_nhomalt,
-        'csq_gnomadg_nhomalt-xx': gnomad_nhomalt_female,
-        'csq_gnomadg_nhomalt-xy': gnomad_nhomalt_male
+        [prefix + "_nhomalt"]: gnomad_nhomalt,
+        [prefix + "_nhomalt-xx"]: gnomad_nhomalt_female,
+        [prefix + "_nhomalt-xy"]: gnomad_nhomalt_male
     } = variant;
 
     const populationsAncestryList = [
@@ -145,10 +167,10 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
     const ancestryRowData = _.sortBy(
         populationsAncestryList.map(function([popStr, populationTitle]){
             const {
-                ["csq_gnomadg_ac-" + popStr]: alleleCount,
-                ["csq_gnomadg_af-" + popStr]: alleleFreq,
-                ["csq_gnomadg_an-" + popStr]: alleleNum,
-                ["csq_gnomadg_nhomalt-" + popStr]: homozygoteNum,
+                [prefix + "_ac-" + popStr]: alleleCount,
+                [prefix + "_af-" + popStr]: alleleFreq,
+                [prefix + "_an-" + popStr]: alleleNum,
+                [prefix + "_nhomalt-" + popStr]: homozygoteNum,
             } = variant;
             return { popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum };
         }),
@@ -177,10 +199,10 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
             <thead>
                 <tr>
                     <th className="text-left">Population</th>
-                    <th data-tip={getTipForField("csq_gnomadg_ac")}>Allele Count</th>
-                    <th data-tip={getTipForField("csq_gnomadg_an")}>Allele Number</th>
-                    <th data-tip={getTipForField("csq_gnomadg_nhomalt")}># of Homozygotes</th>
-                    <th className="text-left" data-tip={getTipForField("csq_gnomadg_af")}>Allele Frequency</th>
+                    <th data-tip={getTipForField(prefix + "_ac")}>Allele Count</th>
+                    <th data-tip={getTipForField(prefix + "_an")}>Allele Number</th>
+                    <th data-tip={getTipForField(prefix + "_nhomalt")}># of Homozygotes</th>
+                    <th className="text-left" data-tip={getTipForField(prefix + "_af")}>Allele Frequency</th>
                 </tr>
             </thead>
             <tbody>
@@ -210,6 +232,8 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         </table>
     );
 });
+
+
 
 function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref }){
     const { variant } = context;
