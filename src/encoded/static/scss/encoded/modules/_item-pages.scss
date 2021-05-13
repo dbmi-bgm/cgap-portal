@@ -754,6 +754,10 @@ i.status-indicator-dot {
 			background-color: #a90d0b;
 		}
 	}
+
+	&[data-criteria="none"] {
+		border: 1px dashed lightgrey;
+	}
 }
 
 .acmg-invoker {

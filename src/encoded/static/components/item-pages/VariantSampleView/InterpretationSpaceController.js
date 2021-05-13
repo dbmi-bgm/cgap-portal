@@ -771,18 +771,21 @@ function ACMGPicker(props) {
     const fieldSchema = getFieldProperties(field);
     const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
 
+
+    const picked = selections.map((selection, i) => (
+        <div className={`acmg-invoker text-600 text-center mr-02 ${i === 0 ? '': 'ml-02'}`} key={selection} data-criteria={selection} data-invoked={true}
+            style={{ }}>
+            { selection }
+        </div>
+    ));
+
     return (
         <React.Fragment>
             <label className="w-100 text-small">
                 { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
             </label>
             <div className="w-100 d-flex acmg-picker mb-08">
-                { selections.map((selection, i) => (
-                    <div className={`acmg-invoker text-600 text-center mr-02 ${i === 0 ? '': 'ml-02'}`} key={selection} data-criteria={selection} data-invoked={true}
-                        style={{ }}>
-                        { selection }
-                    </div>
-                ))}
+                { selections.length > 0 ? picked : <div className="acmg-invoker text-muted" data-tip={"Use the picker above to make invocations."} data-criteria="none">None yet</div>}
             </div>
         </React.Fragment>
     );
