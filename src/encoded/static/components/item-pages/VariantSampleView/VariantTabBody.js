@@ -126,6 +126,11 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
     );
 });
 
+/**
+ * In some scenarios we may have arrays for some fields, esp for gnomad v2 exome.
+ * This is a simple workaround to standardize to show only first value, if this is case & >1 value (rare).
+ * In future we may change how this logic works (so instead of [0], the index of the least rare total frequency to be shown.)
+ */
 function standardizeGnomadValue(value, fallbackElem = <em data-tip="Not Available"> - </em>){
     if (typeof value === "number") return value;
     if (Array.isArray(value) && _.every(value, function(v){ return typeof v === "number"; })) {
