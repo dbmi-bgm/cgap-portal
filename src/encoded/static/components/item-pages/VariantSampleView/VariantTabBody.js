@@ -142,7 +142,7 @@ const GnomADTable = React.memo(function GnomADTable(props){
         [prefix + "_af-xx"]: gnomad_af_female,
         [prefix + "_af-xy"]: gnomad_af_male,
         // Allele Numbers
-        csq_gnomadg_an: gnomad_an,
+        [prefix + "_an"]: gnomad_an,
         [prefix + "_an-xx"]: gnomad_an_female,
         [prefix + "_an-xy"]: gnomad_an_male,
         // Homozygote Numbers
