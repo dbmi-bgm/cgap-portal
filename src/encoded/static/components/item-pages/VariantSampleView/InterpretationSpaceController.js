@@ -556,7 +556,7 @@ class GenericInterpretationPanel extends React.Component {
                     : null}
                 <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
-                    <GenericFieldForm fieldsArr={[{ field: 'classification', value: classification }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    <GenericFieldForm fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_guidelines', value: acmg_guidelines }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
                 { noteType === "note_discovery" ?
                     <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
@@ -750,7 +750,8 @@ function GenericFieldForm(props) {
     const fieldsJSX = useMemo(function() {
         return fieldsArr.map((fieldDataObj) => {
             const { field, value } = fieldDataObj;
-            return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field }} getFieldProperties={getFieldProperties}
+            if (field === "acmg_guidelines") { return (<ACMGPicker selections={value} {...{ schemas, field, getFieldProperties }}/>); }
+            return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field, getFieldProperties }}
                 onOptionChange={onDropOptionChange} />);
         }).sort().reverse(); // Reverse really just to get Variant candidacy to show up last. May need a better solution if more fields added in future.
     }, [ schemas, noteType, fieldsArr ]);
@@ -759,6 +760,32 @@ function GenericFieldForm(props) {
         <React.Fragment>
             { fieldsJSX }
         </React.Fragment>);
+}
+
+function ACMGPicker(props) {
+    const { field, selections = [], schemas = null, onOptionChange, cls="mb-1", getFieldProperties } = props;
+    if (!schemas) {
+        return null;
+    }
+
+    const fieldSchema = getFieldProperties(field);
+    const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
+
+    return (
+        <React.Fragment>
+            <label className="w-100 text-small">
+                { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
+            </label>
+            <div className="w-100 d-flex acmg-picker mb-08">
+                { selections.map((selection, i) => (
+                    <div className={`acmg-invoker text-600 text-center mr-02 ${i === 0 ? '': 'ml-02'}`} key={selection} data-criteria={selection} data-invoked={true}
+                        style={{ }}>
+                        { selection }
+                    </div>
+                ))}
+            </div>
+        </React.Fragment>
+    );
 }
 
 /**
