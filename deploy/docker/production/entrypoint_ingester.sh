@@ -6,4 +6,5 @@ echo "Starting CGAP-Portal Ingester"
 # secrets manager - this builds production.ini
 poetry run python -m assume_identity
 
+# will serve forever
 poetry run ingestion-listener production.ini --app-name app

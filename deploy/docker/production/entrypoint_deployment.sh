@@ -18,3 +18,5 @@ poetry run load-data production.ini --app-name app --prod
 # Load access keys
 # Note that the secret name must match that which was created for this environment
 poetry run load-access-keys production.ini --app-name app --secret-name dev/beanstalk/cgap-dev
+
+exit 0
