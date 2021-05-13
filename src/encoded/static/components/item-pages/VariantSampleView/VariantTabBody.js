@@ -126,11 +126,16 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
     );
 });
 
-
+function standardizeGnomadValue(value, fallbackElem = <em data-tip="Not Available"> - </em>){
+    if (typeof value === "number") return value;
+    if (Array.isArray(value) && _.every(value, function(v){ return typeof v === "number"; })) {
+        return value[0]; // Pick first
+    }
+    return fallbackElem;
+}
 
 const GnomADTable = React.memo(function GnomADTable(props){
     const { context, getTipForField, prefix = "csq_gnomadg" } = props;
-    const fallbackElem = <em data-tip="Not Available"> - </em>;
     const { variant } = context;
     const {
         // Allele Counts
@@ -179,17 +184,13 @@ const GnomADTable = React.memo(function GnomADTable(props){
         }
     );
     const ancestryTableRows = ancestryRowData.map(function({ popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum }){
-        const showAlleleCount = typeof alleleCount === "number" ? alleleCount : fallbackElem;
-        const showAlleleNum = typeof alleleNum === "number" ? alleleNum : fallbackElem;
-        const showHomozygoteNum = typeof homozygoteNum === "number" ? homozygoteNum : fallbackElem;
-        const showAlleleFreq = typeof alleleFreq === "number" ? (alleleFreq || "0.0000") : fallbackElem;
         return (
             <tr key={populationTitle}>
                 <td className="text-600 text-left">{ populationTitle }</td>
-                <td>{ showAlleleCount }</td>
-                <td>{ showAlleleNum }</td>
-                <td>{ showHomozygoteNum }</td>
-                <td className="text-left">{ showAlleleFreq }</td>
+                <td>{ standardizeGnomadValue(alleleCount) }</td>
+                <td>{ standardizeGnomadValue(alleleNum) }</td>
+                <td>{ standardizeGnomadValue(homozygoteNum) }</td>
+                <td className="text-left">{ alleleFreq === 0 ? "0.0000" : standardizeGnomadValue(alleleFreq) }</td>
             </tr>
         );
     });
@@ -209,24 +210,24 @@ const GnomADTable = React.memo(function GnomADTable(props){
                 { ancestryTableRows }
                 <tr className="border-top">
                     <td className="text-600 text-left">Female</td>
-                    <td>{ typeof gnomad_ac_female === "number" ? gnomad_ac_female : fallbackElem }</td>
-                    <td>{ typeof gnomad_an_female === "number" ? gnomad_an_female : fallbackElem }</td>
-                    <td>{ typeof gnomad_nhomalt_female === "number" ? gnomad_nhomalt_female : fallbackElem }</td>
-                    <td className="text-left">{ typeof gnomad_af_female === "number" ? (gnomad_af_female || "0.0000") : fallbackElem }</td>
+                    <td>{ standardizeGnomadValue(gnomad_ac_female) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_an_female) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_nhomalt_female) }</td>
+                    <td className="text-left">{ gnomad_af_female === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af_female) }</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Male</td>
-                    <td>{ typeof gnomad_ac_male === "number" ? gnomad_ac_male : fallbackElem }</td>
-                    <td>{ typeof gnomad_an_male === "number" ? gnomad_an_male : fallbackElem }</td>
-                    <td>{ typeof gnomad_nhomalt_male === "number" ? gnomad_nhomalt_male : fallbackElem }</td>
-                    <td className="text-left">{ typeof gnomad_af_male === "number" ? (gnomad_af_male || "0.0000") : fallbackElem }</td>
+                    <td>{ standardizeGnomadValue(gnomad_ac_male) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_an_male) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_nhomalt_male) }</td>
+                    <td className="text-left">{ gnomad_af_male === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af_male) }</td>
                 </tr>
                 <tr className="border-top">
                     <td className="bg-light text-left"><strong>Total</strong></td>
-                    <td className="bg-light text-600">{ typeof gnomad_ac === "number" ? gnomad_ac : fallbackElem }</td>
-                    <td className="bg-light text-600">{ typeof gnomad_an === "number" ? gnomad_an : fallbackElem }</td>
-                    <td className="bg-light text-600">{ typeof gnomad_nhomalt === "number" ? gnomad_nhomalt : fallbackElem }</td>
-                    <td className="bg-light text-600 text-left">{ typeof gnomad_af === "number" ? (gnomad_af || "0.0000") : fallbackElem }</td>
+                    <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_ac) }</td>
+                    <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_an) }</td>
+                    <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_nhomalt) }</td>
+                    <td className="bg-light text-600 text-left">{ gnomad_af === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af) }</td>
                 </tr>
             </tbody>
         </table>
