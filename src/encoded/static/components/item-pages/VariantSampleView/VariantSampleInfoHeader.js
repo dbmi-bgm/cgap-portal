@@ -130,7 +130,6 @@ function TranscriptSelectionSection(props){
             <span>
                 { selectedGeneTitle }
                 { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
-                &nbsp;
             </span>
         ) : <em>No gene selected</em>;
         body = <TranscriptSelectionSectionBody {...{ schemas }} currentTranscript={geneTranscriptList[currentTranscriptIdx]} />;
@@ -264,7 +263,7 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 }
 
 
-function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
+function GeneTranscriptDisplayTitle({ transcript }){
     if (!transcript) return null;
     const {
         csq_canonical = false,
@@ -276,11 +275,11 @@ function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
         } = {}
     } = transcript;
     return (
-        <span className={className}>
-            <span>{ csq_mane || csq_feature }</span>
+        <React.Fragment>
+            <span className="text-600">{ csq_mane || csq_feature }</span>
             <span className="text-400"> ({ geneDisplayTitle || <em>No Gene</em> })</span>
             { csq_canonical ? <span className="text-300"> (canonical)</span> : null }
-        </span>
+        </React.Fragment>
     );
 }
 

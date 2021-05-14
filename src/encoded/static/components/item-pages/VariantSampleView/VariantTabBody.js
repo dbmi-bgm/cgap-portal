@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
@@ -18,6 +18,13 @@ import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
     const { variant } = context;
     const { csq_clinvar: variationID } = variant;
+    const [ showingTable, setShowingTable ] = useState("v3"); // Allowed: "v2", "v3", and maybe "summary" in future; could be converted integer instd of of text.
+
+    const onSelectShowingTable = useCallback(function(evtKey, e){
+        e.stopPropagation();
+        setShowingTable(evtKey);
+        return;
+    });
 
     const { getTipForField, clinvarExternalHref } = useMemo(function(){
 
@@ -42,6 +49,13 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
 
         return ret;
     }, [ schemas, variationID ]);
+
+    const titleDict = useMemo(function(){
+        return {
+            "v2": <React.Fragment><span className="text-600">GnomAD</span> V2 Exome</React.Fragment>,
+            "v3": <React.Fragment><span className="text-600">GnomAD</span> V3</React.Fragment>
+        };
+    });
 
     return (
         <div className="variant-tab-body card-body">
@@ -68,13 +82,18 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
 
                     <div className="inner-card-section flex-grow-0 pb-2 pb-xl-0">
                         <div className="info-header-title">
-                            <h4>
-                                {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
-                                GnomAD
-                            </h4>
+
+                            <DropdownButton size="lg py-1" variant="outline-dark select-gnomad-version" onSelect={onSelectShowingTable}
+                                title={titleDict[showingTable]} >
+                                <DropdownItem eventKey="v3" active={showingTable === "v3"}>{ titleDict.v3 }</DropdownItem>
+                                <DropdownItem eventKey="v2" active={showingTable === "v2"}>{ titleDict.v2 }</DropdownItem>
+                            </DropdownButton>
+
+                            {/* todo link/icon to GnomAD -- is there a gnomad link somewhere ? */}
+
                         </div>
                         <div className="info-body overflow-auto">
-                            <GnomADTable {...{ context, schemas, getTipForField }} />
+                            <GnomADTable {...{ context, schemas, getTipForField }} prefix={showingTable === "v2" ? "csq_gnomade2" : "csq_gnomadg"} />
                         </div>
                     </div>
 
@@ -107,26 +126,39 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
     );
 });
 
-const GnomADTable = React.memo(function GnomADTable({ context, getTipForField }){
-    const fallbackElem = <em data-tip="Not Available"> - </em>;
+/**
+ * In some scenarios we may have arrays for some fields, esp for gnomad v2 exome.
+ * This is a simple workaround to standardize to show only first value, if this is case & >1 value (rare).
+ * In future we may change how this logic works (so instead of [0], the index of the least rare total frequency to be shown.)
+ */
+function standardizeGnomadValue(value, fallbackElem = <em data-tip="Not Available"> - </em>){
+    if (typeof value === "number") return value;
+    if (Array.isArray(value) && _.every(value, function(v){ return typeof v === "number"; })) {
+        return value[0]; // Pick first
+    }
+    return fallbackElem;
+}
+
+const GnomADTable = React.memo(function GnomADTable(props){
+    const { context, getTipForField, prefix = "csq_gnomadg" } = props;
     const { variant } = context;
     const {
         // Allele Counts
-        csq_gnomadg_ac: gnomad_ac,      // Total
-        'csq_gnomadg_ac-xx': gnomad_ac_female, // Female
-        'csq_gnomadg_ac-xy': gnomad_ac_male, // Male
+        [prefix + "_ac"]: gnomad_ac,      // Total
+        [prefix + "_ac-xx"]: gnomad_ac_female, // Female
+        [prefix + "_ac-xy"]: gnomad_ac_male, // Male
         // Allele Frequences
-        csq_gnomadg_af: gnomad_af,
-        'csq_gnomadg_af-xx': gnomad_af_female,
-        'csq_gnomadg_af-xy': gnomad_af_male,
+        [prefix + "_af"]: gnomad_af,
+        [prefix + "_af-xx"]: gnomad_af_female,
+        [prefix + "_af-xy"]: gnomad_af_male,
         // Allele Numbers
-        csq_gnomadg_an: gnomad_an,
-        'csq_gnomadg_an-xx': gnomad_an_female,
-        'csq_gnomadg_an-xy': gnomad_an_male,
+        [prefix + "_an"]: gnomad_an,
+        [prefix + "_an-xx"]: gnomad_an_female,
+        [prefix + "_an-xy"]: gnomad_an_male,
         // Homozygote Numbers
-        csq_gnomadg_nhomalt: gnomad_nhomalt,
-        'csq_gnomadg_nhomalt-xx': gnomad_nhomalt_female,
-        'csq_gnomadg_nhomalt-xy': gnomad_nhomalt_male
+        [prefix + "_nhomalt"]: gnomad_nhomalt,
+        [prefix + "_nhomalt-xx"]: gnomad_nhomalt_female,
+        [prefix + "_nhomalt-xy"]: gnomad_nhomalt_male
     } = variant;
 
     const populationsAncestryList = [
@@ -145,10 +177,10 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
     const ancestryRowData = _.sortBy(
         populationsAncestryList.map(function([popStr, populationTitle]){
             const {
-                ["csq_gnomadg_ac-" + popStr]: alleleCount,
-                ["csq_gnomadg_af-" + popStr]: alleleFreq,
-                ["csq_gnomadg_an-" + popStr]: alleleNum,
-                ["csq_gnomadg_nhomalt-" + popStr]: homozygoteNum,
+                [prefix + "_ac-" + popStr]: alleleCount,
+                [prefix + "_af-" + popStr]: alleleFreq,
+                [prefix + "_an-" + popStr]: alleleNum,
+                [prefix + "_nhomalt-" + popStr]: homozygoteNum,
             } = variant;
             return { popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum };
         }),
@@ -157,17 +189,13 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         }
     );
     const ancestryTableRows = ancestryRowData.map(function({ popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum }){
-        const showAlleleCount = typeof alleleCount === "number" ? alleleCount : fallbackElem;
-        const showAlleleNum = typeof alleleNum === "number" ? alleleNum : fallbackElem;
-        const showHomozygoteNum = typeof homozygoteNum === "number" ? homozygoteNum : fallbackElem;
-        const showAlleleFreq = typeof alleleFreq === "number" ? (alleleFreq || "0.0000") : fallbackElem;
         return (
             <tr key={populationTitle}>
                 <td className="text-600 text-left">{ populationTitle }</td>
-                <td>{ showAlleleCount }</td>
-                <td>{ showAlleleNum }</td>
-                <td>{ showHomozygoteNum }</td>
-                <td className="text-left">{ showAlleleFreq }</td>
+                <td>{ standardizeGnomadValue(alleleCount) }</td>
+                <td>{ standardizeGnomadValue(alleleNum) }</td>
+                <td>{ standardizeGnomadValue(homozygoteNum) }</td>
+                <td className="text-left">{ alleleFreq === 0 ? "0.0000" : standardizeGnomadValue(alleleFreq) }</td>
             </tr>
         );
     });
@@ -177,39 +205,41 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
             <thead>
                 <tr>
                     <th className="text-left">Population</th>
-                    <th data-tip={getTipForField("csq_gnomadg_ac")}>Allele Count</th>
-                    <th data-tip={getTipForField("csq_gnomadg_an")}>Allele Number</th>
-                    <th data-tip={getTipForField("csq_gnomadg_nhomalt")}># of Homozygotes</th>
-                    <th className="text-left" data-tip={getTipForField("csq_gnomadg_af")}>Allele Frequency</th>
+                    <th data-tip={getTipForField(prefix + "_ac")}>Allele Count</th>
+                    <th data-tip={getTipForField(prefix + "_an")}>Allele Number</th>
+                    <th data-tip={getTipForField(prefix + "_nhomalt")}># of Homozygotes</th>
+                    <th className="text-left" data-tip={getTipForField(prefix + "_af")}>Allele Frequency</th>
                 </tr>
             </thead>
             <tbody>
                 { ancestryTableRows }
                 <tr className="border-top">
                     <td className="text-600 text-left">Female</td>
-                    <td>{ typeof gnomad_ac_female === "number" ? gnomad_ac_female : fallbackElem }</td>
-                    <td>{ typeof gnomad_an_female === "number" ? gnomad_an_female : fallbackElem }</td>
-                    <td>{ typeof gnomad_nhomalt_female === "number" ? gnomad_nhomalt_female : fallbackElem }</td>
-                    <td className="text-left">{ typeof gnomad_af_female === "number" ? (gnomad_af_female || "0.0000") : fallbackElem }</td>
+                    <td>{ standardizeGnomadValue(gnomad_ac_female) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_an_female) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_nhomalt_female) }</td>
+                    <td className="text-left">{ gnomad_af_female === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af_female) }</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Male</td>
-                    <td>{ typeof gnomad_ac_male === "number" ? gnomad_ac_male : fallbackElem }</td>
-                    <td>{ typeof gnomad_an_male === "number" ? gnomad_an_male : fallbackElem }</td>
-                    <td>{ typeof gnomad_nhomalt_male === "number" ? gnomad_nhomalt_male : fallbackElem }</td>
-                    <td className="text-left">{ typeof gnomad_af_male === "number" ? (gnomad_af_male || "0.0000") : fallbackElem }</td>
+                    <td>{ standardizeGnomadValue(gnomad_ac_male) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_an_male) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_nhomalt_male) }</td>
+                    <td className="text-left">{ gnomad_af_male === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af_male) }</td>
                 </tr>
                 <tr className="border-top">
                     <td className="bg-light text-left"><strong>Total</strong></td>
-                    <td className="bg-light text-600">{ typeof gnomad_ac === "number" ? gnomad_ac : fallbackElem }</td>
-                    <td className="bg-light text-600">{ typeof gnomad_an === "number" ? gnomad_an : fallbackElem }</td>
-                    <td className="bg-light text-600">{ typeof gnomad_nhomalt === "number" ? gnomad_nhomalt : fallbackElem }</td>
-                    <td className="bg-light text-600 text-left">{ typeof gnomad_af === "number" ? (gnomad_af || "0.0000") : fallbackElem }</td>
+                    <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_ac) }</td>
+                    <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_an) }</td>
+                    <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_nhomalt) }</td>
+                    <td className="bg-light text-600 text-left">{ gnomad_af === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af) }</td>
                 </tr>
             </tbody>
         </table>
     );
 });
+
+
 
 function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref }){
     const { variant } = context;
