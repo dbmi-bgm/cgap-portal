@@ -9,7 +9,7 @@ poetry run python -m assume_identity
 # Start indexer, run forever
 while true
 do
-  poetry run es-index-data production.ini --app-name app
+  poetry run es-index-data production.ini --app-name app || echo "Indexing Runtime Error thrown - check previous output"
   sleep 3
 done
 
