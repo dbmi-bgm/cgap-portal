@@ -706,8 +706,7 @@ class TestPedigreeRow:
         obj = PedigreeRow(row_dict_pedigree, 2, project['name'], institution['name'])
         assert (obj.errors != []) == is_error
         if obj.errors:
-            text = ('Row 2 - term {} does not match the format for an '
-                    'HPO or MONDO ontology term.'.format(val))
+            text = f'Row 2 - term {val!r} does not match the format for an HPO or MONDO ontology term.'
             assert text in ''.join(obj.errors)
 
 
@@ -751,7 +750,6 @@ class TestPedigreeMetadata:
         submission = PedigreeMetadata(es_testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
         assert len(submission.families) == 1
         fam = list(submission.families.values())[0]
-        assert 'hms-dbmi:0101' in fam['aliases']
         assert list(submission.families.keys())[0] == WORKBOOK_FAMILY_ID1
         assert len(fam['members']) == len(example_rows_pedigree)
         assert len(submission.errors) == 0
@@ -901,8 +899,8 @@ def test_xls_to_json_pedigree_errors(testapp, project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
     rows = digest_xlsx(TEST_PEDIGREE_WITH_ERRORS)
     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'family_history')
-    assert 'Row 5 - term HP:00000821 does not match the format' in ''.join(json_out['errors'])
-    assert 'Row 9 - missing required field(s) family id.' in ''.join(json_out['errors'])
+    assert "Row 5 - term 'HP:00000821' does not match the format" in "".join(json_out['errors'])
+    assert "Row 9 - missing required field(s) family id." in "".join(json_out['errors'])
     assert success
 
 

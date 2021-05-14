@@ -12,7 +12,7 @@ from webtest import AppError
 from .util import s3_local_file, debuglog
 
 
-GENERIC_FIELD_MAPPING = {  # for spreadsheet column names that are different from schema property names
+GENERIC_FIELD_MAPPINGS = {  # for spreadsheet column names that are different from schema property names
     'individual': {
         'mother id': 'mother',
         'father id': 'father',
@@ -76,15 +76,14 @@ SS_RELATION = 'relation to proband'
 SS_REPORT_REQUIRED = 'report required'
 SS_PROBAND = 'proband'
 
-REQUIRED_CASE_COLS = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
-REQUIRED_COLUMNS_ACCESSIONING =  REQUIRED_CASE_COLS + [SS_INDIVIDUAL_ID, SS_SEX, SS_RELATION, SS_REPORT_REQUIRED]
-REQUIRED_COLUMNS_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID, SS_SEX, SS_PROBAND]
+REQUIRED_COLS_FOR_CASE = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
+REQUIRED_COLS_FOR_ACCESSIONING =  REQUIRED_COLS_FOR_CASE + [SS_INDIVIDUAL_ID, SS_SEX, SS_RELATION, SS_REPORT_REQUIRED]
+REQUIRED_COLS_FOR_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID, SS_SEX, SS_PROBAND]
 
 # half-siblings not currently supported, because pedigree info is needed to know
 # which parent is shared. Can come back to this after pedigree processing is integrated.
 SIBLING_LABEL = 'sibling'
-SIBLINGS = ['sibling', 'brother', 'sister',
-            'full sibling', 'full brother', 'full sister']
+SIBLINGS = ['sibling', 'brother', 'sister', 'full sibling', 'full brother', 'full sister']
 
 RELATIONS = SIBLINGS + ['proband', 'mother', 'father']
 
@@ -101,6 +100,9 @@ LINKTO_FIELDS = [  # linkTo properties that we will want to patch in second-roun
 
 
 ID_SOURCES = ['UDN']
+
+HPO_TERM_ID_PATTERN = re.compile(r'^HP:[0-9]{7}$')
+MONDO_TERM_ID_PATTERN = re.compile(r'^MONDO:[0-9]{7}$')
 
 
 def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, submission_type, vapp,  # <- Required keyword arguments
@@ -138,7 +140,7 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, subm
             results['validation_output'].append(msg)
             return results
         json_data, json_success = xls_to_json(
-            vapp, xls_data=rows, project=project_json, institution=institution_json,
+            vapp=vapp, xls_data=rows, project=project_json, institution=institution_json,
             ingestion_id=key.split('/')[0], submission_type=submission_type)
         if not json_success:
             results['validation_output'] = json_data['errors']
@@ -167,10 +169,10 @@ def map_fields(row, metadata_dict, addl_fields, item_type):
         row - dictionary of format {column name1: value1, column name 2: value 2}
         metadata_dict - the dictionary (json) to be filled with metadata parsed in this function.
             Can be empty.
-        addl_fields - list of fields not present in GENERIC_FIELD_MAPPING. These fields will appear
+        addl_fields - list of fields not present in GENERIC_FIELD_MAPPINGS. These fields will appear
             in the output dictionary as keys, with spaces replaced with underscores. E.g., a field
             'individual id' will appear in the output dict as 'individual_id'.
-        item_type - the key in GENERIC_FIELD_MAPPING to look at for column name to schema property mappings.
+        item_type - the key in GENERIC_FIELD_MAPPINGS to look at for column name to schema property mappings.
 
     Example usage:
     output = map_fields(row_dict, {}, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
@@ -178,9 +180,9 @@ def map_fields(row, metadata_dict, addl_fields, item_type):
     """
     for field in addl_fields:
         metadata_dict[field] = use_abbrev(row.get(field.replace('_', ' ')))
-    for map_field in GENERIC_FIELD_MAPPING[item_type]:
+    for map_field in GENERIC_FIELD_MAPPINGS[item_type]:
         if map_field in row:
-            metadata_dict[GENERIC_FIELD_MAPPING[item_type][map_field]] = use_abbrev(row.get(map_field))
+            metadata_dict[GENERIC_FIELD_MAPPINGS[item_type][map_field]] = use_abbrev(row.get(map_field))
     return metadata_dict
 
 
@@ -247,6 +249,17 @@ def string_to_array(str_value):
     return [item.strip() for item in str_value.split(',')]
 
 
+def format_ontology_term_with_colon(str_value):
+    """
+    Used for ontology terms, to convert underscore-formatted term ids to
+    colon-formatted term ids. Also converts term IDs to uppercase.
+    Example input: 'hp_0000124'
+    Example output: 'HP:0000124'
+    """
+    if not isinstance(str_value, str):
+        raise ValueError('String value expected.')
+    return str_value.upper().replace('_', ':')
+
 class MetadataItem:
     """
     class for single DB-item-worth of json
@@ -292,12 +305,12 @@ class SubmissionRow:
 
     def found_missing_values(self):
         # makes sure no required values from spreadsheet are missing
-        missing_required = [col for col in REQUIRED_COLUMNS_ACCESSIONING
+        missing_required = [col for col in REQUIRED_COLS_FOR_ACCESSIONING
                             if col not in self.metadata or not self.metadata[col]]
         if missing_required:
             self.errors.append(
                 'Row {} - missing required field(s) {}. This row cannot be processed.'
-                ''.format(self.row, ', '.join(missing_required))
+                .format(self.row, ', '.join(missing_required))
             )
         return len(self.errors) > 0
 
@@ -709,7 +722,7 @@ class SubmissionMetadata:
         indicated in the spreadsheet.
         """
         if all(field in row_item.metadata
-               for field in REQUIRED_CASE_COLS):
+               for field in REQUIRED_COLS_FOR_CASE):
             key = '{}-{}'.format(row_item.metadata[SS_ANALYSIS_ID], row_item.metadata[SS_SPECIMEN_ID])
             case_id_col = get_column_name(row_item.metadata, ['unique analysis id', 'case id'])
             self.case_info[key] = {
@@ -798,25 +811,25 @@ class PedigreeRow:
 
     def found_missing_values(self):
         # makes sure no required values from spreadsheet are missing
-        missing_required = [col for col in REQUIRED_COLUMNS_PEDIGREE
+        missing_required = [col for col in REQUIRED_COLS_FOR_PEDIGREE
                             if col not in self.metadata or not self.metadata[col]]
         if missing_required:
             self.errors.append(
                 'Row {} - missing required field(s) {}. This row cannot be processed.'
-                ''.format(self.row, ', '.join(missing_required))
+                .format(self.row, ', '.join(missing_required))
             )
         return len(self.errors) > 0
 
     def format_atid(self, term):
         """turns HPO or MONDO term IDs into the corresponding @id in the database."""
-        term_id = term.upper().replace('_', ':') if term else ''
-        if re.match(r'^HP:[0-9]{7}$', term_id):
+        term_id = format_ontology_term_with_colon(term) if term else ''
+        if HPO_TERM_ID_PATTERN.match(term_id):
             return f'/phenotypes/{term_id}/'
-        elif re.match(r'^MONDO:[0-9]{7}$', term_id):
+        elif MONDO_TERM_ID_PATTERN.match(term_id):
             return f'/disorders/{term_id}/'
         else:
-            msg = ('Row {} - term {} does not match the format for an HPO or MONDO '
-                   'ontology term. Please edit and resubmit.'.format(self.row, term))
+            msg = (f'Row {self.row} - term {term!r} does not match the format for'
+                   ' an HPO or MONDO ontology term. Please edit and resubmit.')
             self.errors.append(msg)
             return term
 
@@ -855,9 +868,10 @@ class PedigreeRow:
         return MetadataItem(info, self.row, 'individual')
 
     def is_proband(self):
-        if self.metadata['proband'].lower().startswith('y'):
-            return True
-        return False
+        return is_yes_value(self.metadata['proband'])
+        # if self.metadata['proband'].lower().startswith('y'):
+        #     return True
+        # return False
 
 
 class PedigreeMetadata:
@@ -916,8 +930,8 @@ class PedigreeMetadata:
                         self.project + ':family-' + item['individual_id']
                     ]
                 else:
-                    msg = ('More than one proband indicated for family {}. Please indicate'
-                           ' a single proband in the spreadsheet and resubmit'.format(item['family_id']))
+                    msg = (f'More than one proband indicated for family {item["family_id"]}.'
+                           ' Please indicate a single proband in the spreadsheet and resubmit.')
                     self.errors.append(msg)
             del item['family_id']
         final_family_dict = {}
@@ -928,16 +942,13 @@ class PedigreeMetadata:
                 # if family not in DB, create a new one
                 # first make sure a proband is indicated for a family if its not already in DB
                 if not value.get('proband'):
-                    msg = 'No proband indicated for family {}. Please edit and resubmit'.format(value['family_id'])
+                    msg = f'No proband indicated for family {value["family_id"]}. Please edit and resubmit.'
                     self.errors.append(msg)
                 else:
                     final_family_dict[value['aliases'][0]] = value
             else:
                 for match in family_matches.json['@graph']:
-                    # value.setdefault('aliases', [])
-                    # value['aliases'].extend(match.get('aliases', []))
                     final_family_dict[match['@id']] = value
-                    #final_family_dict[match['@id']]['aliases'] = match.get('aliases', [])
                     if value.get('proband'):
                         phenotypes = list(set([item['phenotypic_feature'] for item in
                                       self.individuals[value['proband']].get('phenotypic_features', [])]))
@@ -958,9 +969,11 @@ class PedigreeMetadata:
         return final_family_dict
 
     def check_individuals(self):
-        """Make sure that every value in mother ID or father ID columns are also in sheet in same family.
+        """
+        Make sure that every value in mother ID or father ID columns are also in sheet in same family.
         If a mother or father ID does not have a line in the sheet, just create minimal metadata for it
-        and add it to the family."""
+        and add it to the family.
+        """
         parent_dict = {'mother': 'F', 'father': 'M'}
         for fam_alias, fam_metadata in self.families.items():
             for member in fam_metadata['members']:
@@ -1024,9 +1037,9 @@ class SpreadsheetProcessing:
         self.ingestion_id = ingestion_id
         self.submission_type = submission_type
         if self.submission_type == 'accessioning':
-            self.required_columns = REQUIRED_COLUMNS_ACCESSIONING
+            self.required_columns = REQUIRED_COLS_FOR_ACCESSIONING
         elif self.submission_type == 'family_history':
-            self.required_columns = REQUIRED_COLUMNS_PEDIGREE
+            self.required_columns = REQUIRED_COLS_FOR_PEDIGREE
         else:
             raise ValueError(f'{submission_type} not a valid submission_type argument')
         self.output = {}
@@ -1094,11 +1107,10 @@ def xls_to_json(vapp, xls_data, project, institution, ingestion_id, submission_t
         on to the next step.
     """
     if submission_type not in ['accessioning', 'family_history']:
-        raise ValueError(f'{submission_type} not a valid submission_type argument, '
-                         'expected values "accessioning" or "family_history"')
-    else:
-        result = SpreadsheetProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
-                                       ingestion_id=ingestion_id, submission_type=submission_type)
+        raise ValueError(f'{submission_type} is not a valid submission_type argument,'
+                         ' expected values are "accessioning" or "family_history"')
+    result = SpreadsheetProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
+                                   ingestion_id=ingestion_id, submission_type=submission_type)
     result.output['errors'] = result.errors
     return result.output, result.passing
 
@@ -1168,8 +1180,8 @@ def parse_exception(e, aliases):
                 if error.index('- ') > 0:
                     field_name = error[:error.index(' - ')]
                     field = None
-                    if field_name in GENERIC_FIELD_MAPPING['sample'].values():
-                        field = [key for key, val in GENERIC_FIELD_MAPPING['sample'].items() if val == field_name][0]
+                    if field_name in GENERIC_FIELD_MAPPINGS['sample'].values():
+                        field = [key for key, val in GENERIC_FIELD_MAPPINGS['sample'].items() if val == field_name][0]
                     elif field_name == 'requisition_acceptance.accepted_rejected':
                         field = 'Req Accepted Y\\N'
                     error = map_enum_options(field_name, error)
