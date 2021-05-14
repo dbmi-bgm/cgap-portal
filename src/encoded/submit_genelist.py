@@ -768,7 +768,7 @@ class CommonUtils:
         fields=[],
     ):
         """
-        Performs get requests in batches to decrease the number of
+        Performs search requests in batches to decrease the number of
         API calls and capture all search results (as default behavior
         of vapp.get("/search/") is to return only first 25 items).
 
