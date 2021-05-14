@@ -294,6 +294,6 @@ def test_batch_search(es_testapp, wb_project, wb_institution):
         project=project,
         fields=fields,
     )
-    assert len(response) > 30
+    assert len(response) > 25
     for idx in range(len(response)):
         assert response[idx]["project"]["@id"] == project
