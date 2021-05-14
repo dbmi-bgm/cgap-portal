@@ -61,22 +61,21 @@ def _embed(request, item, depth, embed_props):
     :param item: object of interest to expand
     :param depth: int of current embed depth
     :param embed_props: dict of embedding properties
-    :return item, new_embed: object of interest processed and bool if
-        newly embedded @id
+    :return item: object of interest processed
     """
-    new_embed = True
-    while new_embed:
+    while True:
         if depth == embed_props["embed_depth"]:
-            new_embed = False
+            break
         elif isinstance(item, dict) and item:
             for key in item:
                 if key in embed_props["ignored_keys"]:
-                    new_embed = False
                     continue
-                item[key], new_embed = _embed(request, item[key], depth, embed_props)
+                item[key] = _embed(request, item[key], depth, embed_props)
+            break
         elif isinstance(item, list) and item:
             for idx in range(len(item)):
-                item[idx], new_embed = _embed(request, item[idx], depth, embed_props)
+                item[idx] = _embed(request, item[idx], depth, embed_props)
+            break
         elif isinstance(item, str):
             if ATID_PATTERN.match(item):
                 if embed_props["desired_embeds"]:
@@ -90,10 +89,10 @@ def _embed(request, item, depth, embed_props):
                             embed_props["cache"][cache_item] = item
                             depth += 1
                     else:
-                        new_embed = False
+                        break
                 else:
                     if item.split("/")[1] in embed_props["ignored_embeds"]:
-                        new_embed = False
+                        break
                     elif item in embed_props["cache"]:
                         item = embed_props["cache"][item]
                         depth += 1
@@ -101,25 +100,25 @@ def _embed(request, item, depth, embed_props):
                         cache_item = item
                         item = _embed_genelist(request, item)
                         embed_props["cache"][cache_item] = item
-                        new_embed = False
+                        break
                     elif MINIMAL_EMBED_ATID.match(item):
                         cache_item = item
                         item = _minimal_embed(request, item)
                         embed_props["cache"][cache_item] = item
-                        new_embed = False
+                        break
                     else:
                         cache_item = item
                         item = get_item_or_none(request, item)
                         embed_props["cache"][cache_item] = item
                         depth += 1
             else:
-                new_embed = False
+                break
         else:
-            new_embed = False
-    return item, new_embed
+            break
+    return item
 
 
-@view_config(route_name='embed', request_method='POST', permission="admin")
+@view_config(route_name='embed', request_method='POST', permission="edit")
 @debug_log
 def embed(context, request):
     """
@@ -127,7 +126,7 @@ def embed(context, request):
     parameters provided, attempts to return object with embedding done
     per default parameters.
 
-    :param context:
+    :param context: pyramid request context
     :param request: pyramid request object
     :return results: dict containing custom-embedded view of item
     """
@@ -137,12 +136,12 @@ def embed(context, request):
     cache = {}
     results = []
     depth = 0
-    embed_depth = 5  # Arbritary standard depth to search.
-    ignored(context)
+    embed_depth = 3  # Arbritary standard depth to search.
     ignored_keys = [
         "@id", "@type", "principals_allowed", "uuid", "status", "title",
         "display_title", "schema_version", "date_created"
     ]
+    ignored(context)
     if request.GET:
         ids += request.GET.dict_of_lists().get("id", [])
         embed_depth = int(request.GET.get("depth", embed_depth))
