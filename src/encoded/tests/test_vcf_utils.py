@@ -125,6 +125,13 @@ class TestIngestVCF:
         assert self.get_genes_field(result, 0, 'genes_most_severe_gene') == 'ENSG00000188976'
         assert self.get_genes_field(result, 0, 'genes_most_severe_hgvsc') == 'ENST00000327044.7:c.1528A>C'
 
+        # check record 4 (new gnomade2 fields)
+        record = test_vcf.read_next_record()
+        result = test_vcf.create_variant_from_record(record)
+        for field_name in test_vcf.OVERWRITE_FIELDS.values():
+            if 'gnomade2' in field_name:
+                assert field_name in result
+
     def test_build_multiple_sample_variants(self, test_vcf):
         """ Generates 3 sample variant items and checks them for correctness """
         record = test_vcf.read_next_record()
