@@ -89,7 +89,7 @@ class TestGeneListSubmission:
         identifiable in the database.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/" "test-parse_gene_list.txt",
+            "src/encoded/tests/data/documents/gene_lists/test-parse_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -110,7 +110,7 @@ class TestGeneListSubmission:
         Tests for detection of empty gene list and no title.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/" "test-empty_gene_list.txt",
+            "src/encoded/tests/data/documents/gene_lists/test-empty_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -127,7 +127,7 @@ class TestGeneListSubmission:
         given an excel gene list.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/" "test_empty_gene_list.xlsx",
+            "src/encoded/tests/data/documents/gene_lists/test_empty_gene_list.xlsx",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -144,7 +144,7 @@ class TestGeneListSubmission:
         different names.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/" "test-match_gene_list.txt",
+            "src/encoded/tests/data/documents/gene_lists/test-match_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -158,8 +158,7 @@ class TestGeneListSubmission:
         posting should occur in this scenario.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/"
-            "test-no-match_gene_list.txt",
+            "src/encoded/tests/data/documents/gene_lists/test-no-match_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -174,8 +173,7 @@ class TestGeneListSubmission:
         when some genes are not identified in the database.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/"
-            "test-no-match_gene_list.txt",
+            "src/encoded/tests/data/documents/gene_lists/test-no-match_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -204,7 +202,7 @@ class TestGeneListSubmission:
         Test for correct parsing of excel-formatted gene list.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/" "test-match_gene_list.xlsx",
+            "src/encoded/tests/data/documents/gene_lists/test-match_gene_list.xlsx",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -318,4 +316,5 @@ def test_batch_search(es_testapp, wb_project, wb_institution):
     )
     assert len(response) > 25
     for idx in range(len(response)):
+        assert "uuid" in response[idx]
         assert response[idx]["project"]["@id"] == project
