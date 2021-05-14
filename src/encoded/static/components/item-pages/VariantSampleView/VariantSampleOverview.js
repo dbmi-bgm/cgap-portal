@@ -4,6 +4,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
+import memoize from 'memoize-one';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -371,11 +372,103 @@ class AutoClassify {
         "PVS1": { type: "pathogenic", strength: "vstrong" }
     }
 
+    /**
+     * Takes evidence of pathogenicity counts and returns true if Pathogenic criteria invoked
+     * @param {Number} vstrong      # of PVS1 evidence invoked
+     * @param {Number} strong       # of (PS1–PS4) evidence invoked
+     * @param {Number} moderate     # of (PM1–PM6) evidence invoked
+     * @param {Number} supporting   # of (PP1–PP5) evidence invoked
+     * @returns {boolean}
+     */
+    static isPathogenic(vstrong, strong, moderate, supporting){
+        if (vstrong >= 1) {                             // (i) 1 Very strong (PVS1) AND
+            if ((strong >= 1) ||                        //      a) ≥1 Strong (PS1–PS4) OR
+                (moderate >= 2) ||                      //      b) ≥2 Moderate (PM1–PM6) OR
+                (moderate === 1 && supporting === 1) || //      c) 1 Moderate (PM1–PM6) and 1 supporting (PP1–PP5) OR
+                (supporting >= 2)) {                    //      d) d) ≥2 Supporting (PP1–PP5)
+                return true;
+            }
+        }
+        if (strong >= 2) {                              // (ii) ≥2 Strong (PS1–PS4) OR
+            return true;
+        }
+        if (strong === 1) {                             // (iii) 1 Strong (PS1–PS4) AND
+            if ((moderate >= 3) ||                      //      a) ≥3 Moderate (PM1–PM6) OR
+            (moderate === 2 && supporting >= 2) ||      //      b) 2 Moderate (PM1–PM6) AND ≥2 Supporting (PP1–PP5) OR
+            (moderate === 1 && supporting >= 4)) {      //      c) 1 Moderate (PM1–PM6) AND ≥4 supporting (PP1–PP5
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Takes evidence of pathogenicity counts and returns true if Likely Pathogenic criteria invoked
+     * @param {Number} vstrong      # of PVS1 evidence invoked
+     * @param {Number} strong       # of (PS1–PS4) evidence invoked
+     * @param {Number} moderate     # of (PM1–PM6) evidence invoked
+     * @param {Number} supporting   # of (PP1–PP5) evidence invoked
+     * @returns {boolean}
+     */
+    static isLikelyPathogenic(vstrong, strong, moderate, supporting){
+        if ((vstrong === 1 && moderate === 1) ||                    // (i) 1 Very strong (PVS1) AND 1 moderate (PM1–PM6) OR
+            (strong === 1 && (moderate === 1 || moderate === 2)) || // (ii) 1 Strong (PS1–PS4) AND 1–2 moderate (PM1–PM6) OR
+            (strong === 1 && (supporting >= 2)) ||                  // (iii) 1 Strong (PS1–PS4) AND ≥2 supporting (PP1–PP5) OR
+            (moderate >= 3) ||                                      // (iv) ≥3 Moderate (PM1–PM6) OR
+            (moderate === 2) && (supporting >= 2) ||                // (v) 2 Moderate (PM1–PM6) AND ≥2 supporting (PP1–PP5) OR
+            (moderate === 1) && (supporting >= 4)) {                // (vi) 1 Moderate (PM1–PM6) AND ≥4 supporting (PP1–PP5)
+            return true;
+        }
+        return false;
+
+    }
+
+    /**
+     * Takes evidence of benign effect counts and returns true if Benign criteria invoked
+     * @param {Number} standalone       # of BA1 evidence invoked
+     * @param {Number} strong           # of (BS1-BS4) evidence invoked
+     * @returns {boolean}
+     */
+    static isBenign(standalone, strong){
+        if (standalone || strong >= 2) {    // (i) 1 Stand-alone (BA1) OR (ii) ≥2 Strong (BS1–BS4)
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Takes evidence of benign effect counts and returns true if Likely Benign criteria invoked
+     * @param {Number} strong           # of (BS1-BS4) evidence invoked
+     * @param {Number} supporting       # of (BP1-BP7) evidence invoked
+     * @returns {boolean}
+     */
+    static isLikelyBenign(strong, supporting){
+        if ((strong === 1 && supporting >= 1) ||    // (i) 1 Strong (BS1–BS4) and 1 supporting (BP1–BP7) OR
+            (supporting >= 2)                       // (ii) ≥2 Supporting (BP1–BP7)
+        ) {
+            return true;
+        }
+        return false;
+    }
+
     constructor(invoked) {
         this.evidenceOfPathogenicity = {};
         this.evidenceOfBenignImpact = {};
         this.autoClassification = null;
 
+        this.initializeEvidenceFromInvoked(invoked);
+
+        this.memoized = {
+            isBenign: memoize(AutoClassify.isBenign),
+            isLikelyBenign: memoize(AutoClassify.isLikelyBenign),
+            isPathogenic: memoize(AutoClassify.isPathogenic),
+            isLikelyPathogenic: memoize(AutoClassify.isLikelyPathogenic)
+        };
+    }
+
+    initializeEvidenceFromInvoked(invoked) {
+        console.log("populating with evidence from, ", invoked);
         // Flatten into an array of invoked items
         const invokedFlat = [];
         Object.keys(invoked).forEach((criteria) => {
@@ -403,81 +496,51 @@ class AutoClassify {
         });
     }
 
-    isPathogenic(){
-        const { vstrong = 0, strong = 0, moderate = 0, supporting = 0 } = this.evidenceOfPathogenicity;
-        if (vstrong >= 1) {                             // (i) 1 Very strong (PVS1) AND
-            if ((strong >= 1) ||                        //      a) ≥1 Strong (PS1–PS4) OR
-                (moderate >= 2) ||                      //      b) ≥2 Moderate (PM1–PM6) OR
-                (moderate === 1 && supporting === 1) || //      c) 1 Moderate (PM1–PM6) and 1 supporting (PP1–PP5) OR
-                (supporting >= 2)) {                    //      d) d) ≥2 Supporting (PP1–PP5)
-                return true;
-            }
-        }
-        if (strong >= 2) {                              // (ii) ≥2 Strong (PS1–PS4) OR
-            return true;
-        }
-        if (strong === 1) {                             // (iii) 1 Strong (PS1–PS4) AND
-            if ((moderate >= 3) ||                      //      a) ≥3 Moderate (PM1–PM6) OR
-            (moderate === 2 && supporting >= 2) ||      //      b) 2 Moderate (PM1–PM6) AND ≥2 Supporting (PP1–PP5) OR
-            (moderate === 1 && supporting >= 4)) {      //      c) 1 Moderate (PM1–PM6) AND ≥4 supporting (PP1–PP5
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    isLikelyPathogenic(){
-        const { vstrong = 0, strong = 0, moderate = 0, supporting = 0 } = this.evidenceOfPathogenicity;
-        if ((vstrong === 1 && moderate === 1) ||                    // (i) 1 Very strong (PVS1) AND 1 moderate (PM1–PM6) OR
-            (strong === 1 && (moderate === 1 || moderate === 2)) || // (ii) 1 Strong (PS1–PS4) AND 1–2 moderate (PM1–PM6) OR
-            (strong === 1 && (supporting >= 2)) ||                  // (iii) 1 Strong (PS1–PS4) AND ≥2 supporting (PP1–PP5) OR
-            (moderate >= 3) ||                                      // (iv) ≥3 Moderate (PM1–PM6) OR
-            (moderate === 2) && (supporting >= 2) ||                // (v) 2 Moderate (PM1–PM6) AND ≥2 supporting (PP1–PP5) OR
-            (moderate === 1) && (supporting >= 4)) {                // (vi) 1 Moderate (PM1–PM6) AND ≥4 supporting (PP1–PP5)
-            return true;
-        }
-        return false;
-
-    }
-
-    isBenign(){
-        const { standalone = 0, strong = 0 } = this.evidenceOfBenignImpact;
-        if (standalone || strong >= 2) {    // (i) 1 Stand-alone (BA1) OR (ii) ≥2 Strong (BS1–BS4)
-            return true;
-        }
-        return false;
-    }
-
-    isLikelyBenign(){
-        const { strong = 0, supporting = 0 } = this.evidenceOfBenignImpact;
-        if ((strong === 1 && supporting >= 1) ||    // (i) 1 Strong (BS1–BS4) and 1 supporting (BP1–BP7) OR
-            (supporting >= 2)                       // (ii) ≥2 Supporting (BP1–BP7)
-        ) {
-            return true;
-        }
-        return false;
-    }
-
     classify() {
-        const isBenign = this.isBenign();
-        const isLikelyBenign = this.isLikelyBenign();
-        const isPathogenic = this.isPathogenic();
-        const isLikelyPathogenic = this.isLikelyPathogenic();
+        const {
+            standalone = null,
+            strong: strongb = null,
+            supporting: supportingb = null
+        } = this.evidenceOfBenignImpact;
+        const {
+            vstrong = null,
+            strong: strongp = null,
+            supporting: supportingp = null,
+            moderate: moderatep = null
+        } = this.evidenceOfPathogenicity;
+
         console.log("classifying...");
 
+        // Check for certain benign affect
+        const isBenign = this.memoized.isBenign(standalone, strongb);
+        let isPathogenic;
         if (isBenign) {
+            isPathogenic = this.memoized.isPathogenic(vstrong, strongp, moderatep, supportingp);
             // (Uncertain significance ii) the criteria for benign and pathogenic are contradictory
             return isPathogenic ? "Uncertain significance" : "Benign";
-        } else if (isLikelyBenign) {
-            return "Likely benign";
-        } else if (isPathogenic) {
-            return "Pathogenic";
-        } else if (isLikelyPathogenic) {
-            return "Likely Pathogenic";
-        } else { // (Uncertain significance i) Other criteria shown above are not met
-            return "Uncertain significance";
         }
+
+        // Check for certain pathogenicity
+        if (isPathogenic === undefined) {
+            isPathogenic = this.memoized.isPathogenic(vstrong, strongp, moderatep, supportingp);
+        }
+        if (isPathogenic) {
+            return "Pathogenic";
+        }
+
+        // Check for likelihoods (note: currently not checking for contradictory criteria -- may need to do so in future)
+        const isLikelyBenign = this.memoized.isLikelyBenign(strongb, supportingb);
+        if (isLikelyBenign) {
+            return "Likely benign";
+        }
+
+        const isLikelyPathogenic = this.memoized.isLikelyPathogenic(vstrong, strongp, moderatep, supportingp);
+        if (isLikelyPathogenic) {
+            return "Likely Pathogenic";
+        }
+
+        // (Uncertain significance i) Other criteria shown above are not met
+        return "Uncertain significance";
     }
 
     getClassification() {
