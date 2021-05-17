@@ -431,17 +431,6 @@ class VariantTableParser(object):
         schema['required'] = ['institution', 'project']  # for display_title
         schema['identifyingProperties'] = ['uuid', 'aliases', 'annotation_id']
         schema['additionalProperties'] = False
-        schema['mixinProperties'] = [
-            { "$ref": "mixins.json#/schema_version" },
-            { "$ref": "mixins.json#/uuid" },
-            { "$ref": "mixins.json#/aliases" },
-            { "$ref": "mixins.json#/submitted" },
-            { "$ref": "mixins.json#/modified" },
-            { "$ref": "mixins.json#/status" },
-            { "$ref": "mixins.json#/attribution" },
-            { "$ref": "mixins.json#/notes" },
-            { "$ref": "mixins.json#/static_embeds" }
-        ]
 
     @staticmethod
     def add_variant_required_fields(schema):
@@ -940,7 +929,6 @@ class VariantTableParser(object):
         schema['title'] = 'Variants'
         schema['description'] = "Schema for variants"
         schema['id'] = '/profiles/variant.json'
-        schema['mixinProperties'].append({"$ref": "mixins.json#/interpretation"})
         schema['properties'] = var_props
         schema['properties']['hg19'] = {  # required for testing :( - will 1-8-2021
             "title": "hg19 Coordinates",

@@ -39,10 +39,57 @@ class VCFParser(object):
     CSQ = 'CSQ'  # INFO field that contains VEP annotations
     GRANITE = 'GRANITE'  # annotation field from GRANITE
     CGAP = 'CGAP'  # annotation fields from CGAP itself
-    OVERWRITE_FIELDS = {  # field names that do not validate our DB and are mapped
+    # field names that do not validate our DB and are mapped
+    # XXX: this is also being used for fields that differ in vcf_name
+    # and we want to maintain consistency across other fields.
+    # TODO: walk schemas to determine these fields dynamically
+    OVERWRITE_FIELDS = {
         'csq_hg19_pos(1-based)': 'csq_hg19_pos',
         'csq_gerp++_rs_rankscore': 'csq_gerp_rs_rankscore',
-        'csq_gerp++_rs': 'csq_gerp_rs'
+        'csq_gerp++_rs': 'csq_gerp_rs',
+        'csq_phastcons100verts': 'csq_phastcons100way_vertebrate',
+        'csq_phylop100verts': 'csq_phylop100way_vertebrate',
+        'csq_phylop30mams': 'csq_phylop30way_mammalian',
+        'csq_gnomade2_ac_oth': 'csq_gnomade2_ac-oth',
+        'csq_gnomade2_an_oth': 'csq_gnomade2_an-oth',
+        'csq_gnomade2_af_oth': 'csq_gnomade2_af-oth',
+        'csq_gnomade2_nhomalt_oth': 'csq_gnomade2_nhomalt-oth',
+        'csq_gnomade2_ac_sas': 'csq_gnomade2_ac-sas',
+        'csq_gnomade2_an_sas': 'csq_gnomade2_an-sas',
+        'csq_gnomade2_af_sas': 'csq_gnomade2_af-sas',
+        'csq_gnomade2_nhomalt_sas': 'csq_gnomade2_nhomalt-sas',
+        'csq_gnomade2_ac_fin': 'csq_gnomade2_ac-fin',
+        'csq_gnomade2_an_fin': 'csq_gnomade2_an-fin',
+        'csq_gnomade2_af_fin': 'csq_gnomade2_af-fin',
+        'csq_gnomade2_nhomalt_fin': 'csq_gnomade2_nhomalt-fin',
+        'csq_gnomade2_ac_eas': 'csq_gnomade2_ac-eas',
+        'csq_gnomade2_an_eas': 'csq_gnomade2_an-eas',
+        'csq_gnomade2_af_eas': 'csq_gnomade2_af-eas',
+        'csq_gnomade2_nhomalt_eas': 'csq_gnomade2_nhomalt-eas',
+        'csq_gnomade2_ac_amr': 'csq_gnomade2_ac-amr',
+        'csq_gnomade2_an_amr': 'csq_gnomade2_an-amr',
+        'csq_gnomade2_af_amr': 'csq_gnomade2_af-amr',
+        'csq_gnomade2_nhomalt_amr': 'csq_gnomade2_nhomalt-amr',
+        'csq_gnomade2_ac_afr': 'csq_gnomade2_ac-afr',
+        'csq_gnomade2_an_afr': 'csq_gnomade2_an-afr',
+        'csq_gnomade2_af_afr': 'csq_gnomade2_af-afr',
+        'csq_gnomade2_nhomalt_afr': 'csq_gnomade2_nhomalt-afr',
+        'csq_gnomade2_ac_asj': 'csq_gnomade2_ac-asj',
+        'csq_gnomade2_an_asj': 'csq_gnomade2_an-asj',
+        'csq_gnomade2_af_asj': 'csq_gnomade2_af-asj',
+        'csq_gnomade2_nhomalt_asj': 'csq_gnomade2_nhomalt-asj',
+        'csq_gnomade2_ac_nfe': 'csq_gnomade2_ac-nfe',
+        'csq_gnomade2_an_nfe': 'csq_gnomade2_an-nfe',
+        'csq_gnomade2_af_nfe': 'csq_gnomade2_af-nfe',
+        'csq_gnomade2_nhomalt_nfe': 'csq_gnomade2_nhomalt-nfe',
+        'csq_gnomade2_ac_female': 'csq_gnomade2_ac-xx',
+        'csq_gnomade2_an_female': 'csq_gnomade2_an-xx',
+        'csq_gnomade2_af_female': 'csq_gnomade2_af-xx',
+        'csq_gnomade2_nhomalt_female': 'csq_gnomade2_nhomalt-xx',
+        'csq_gnomade2_ac_male': 'csq_gnomade2_ac-xy',
+        'csq_gnomade2_an_male': 'csq_gnomade2_an-xy',
+        'csq_gnomade2_af_male': 'csq_gnomade2_af-xy',
+        'csq_gnomade2_nhomalt_male': 'csq_gnomade2_nhomalt-xy',
     }
     DISABLED_FIELDS = ['csq_tsl']  # annotation fields that do not validate
     VCF_FIELDS = ['CHROM', 'POS', 'ID', 'REF', 'ALT']
@@ -295,6 +342,9 @@ class VCFParser(object):
 
     def fix_encoding(self, val):
         """ Decodes restricted characters from val, returning the result"""
+        # uncomment below to enable: tolerate using '.' in vcf spec for single valued fields
+        # if isinstance(val, list) and len(val) == 1 and isinstance(val[0], str):
+        #     val = val[0]
         for encoded, decoded in self.RESTRICTED_CHARACTER_ENCODING.items():
             val = val.replace(encoded, decoded)
         return val
@@ -335,7 +385,7 @@ class VCFParser(object):
         elif t == 'array':
             if sub_type:
                 if not isinstance(value, list):
-                    items = self.fix_encoding(value).split('&') if sub_type == 'string' else value
+                    items = self.fix_encoding(value).split('&')
                 else:
                     items = value
                 return list(map(lambda v: self.cast_field_value(sub_type, v, sub_type=None), items))

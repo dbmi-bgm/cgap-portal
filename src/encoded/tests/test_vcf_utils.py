@@ -1,11 +1,4 @@
 import pytest
-import json
-from .data.variant_workbook.expected import (
-    VARIANT_SCHEMA,
-    VARIANT_SAMPLE_SCHEMA,
-    EXPECTED_ANNOTATION_FIELDS,
-    TEST_VCF,
-)
 from ..ingestion.vcf_utils import (
     VCFParser
 )
@@ -18,7 +11,11 @@ from .variant_fixtures import (  # noqa
 )
 
 
-pytestmark = [pytest.mark.working, pytest.mark.ingestion, pytest.mark.workbook]
+pytestmark = [pytest.mark.working, pytest.mark.ingestion]
+TEST_VCF = './src/encoded/annotations/GAPFIBVPFEP5_v0.5.4.reformat.altcounts.vcf.subset'
+EXPECTED_ANNOTATION_FIELDS = ['comHet', 'CSQ']
+VARIANT_SCHEMA = './src/encoded/schemas/variant.json'
+VARIANT_SAMPLE_SCHEMA = './src/encoded/schemas/variant_sample.json'
 
 
 @pytest.fixture
@@ -76,21 +73,17 @@ class TestIngestVCF:
         result = test_vcf.create_variant_from_record(record)
 
         # check top level fields
-        assert self.get_top_level_field(result, 'CHROM') == '1'
+        assert self.get_top_level_field(result, 'CHROM') == '8'
         assert self.get_top_level_field(result, 'csq_spliceai_pred_ds_al') == 0.0  # default
-        assert self.get_top_level_field(result, 'csq_spliceai_pred_dp_dg') == 7
-        assert self.get_top_level_field(result, 'csq_spliceai_pred_dp_ag') == 8
+        assert self.get_top_level_field(result, 'csq_spliceai_pred_dp_dg') == 38
+        assert self.get_top_level_field(result, 'csq_spliceai_pred_dp_ag') == -47
 
         # check sub-embedded object fields
-        assert len(result['transcript']) == 11
-        assert self.get_transcript_field(result, 0, 'csq_consequence') == ['intron_variant']
-        assert self.get_transcript_field(result, 0, 'csq_gene') == 'ENSG00000187634'
-        assert self.get_transcript_field(result, 0, 'csq_feature') == 'ENST00000341065'
+        assert len(result['transcript']) == 1
+        assert self.get_transcript_field(result, 0, 'csq_consequence') == ['splice_region_variant']
+        assert self.get_transcript_field(result, 0, 'csq_gene') == 'ENSG00000261236'
+        assert self.get_transcript_field(result, 0, 'csq_feature') == 'ENST00000569669'
         assert self.get_transcript_field(result, 0, 'csq_strand') is True
-
-        # check other indices
-        assert self.get_transcript_field(result, 3, 'csq_strand') is True
-        assert self.get_transcript_field(result, 3, 'csq_consequence') == ['intron_variant']
 
     def test_build_multiple_variants(self, test_vcf):
         """
@@ -103,34 +96,41 @@ class TestIngestVCF:
         result = test_vcf.create_variant_from_record(record)
 
         # check top level fields
-        assert self.get_top_level_field(result, 'csq_cadd_phred') == 24.9
-        assert self.get_top_level_field(result, 'csq_spliceai_pred_symbol') == 'NOC2L'
-        assert self.get_top_level_field(result, 'csq_gnomadg_ac') == 2
-        assert self.get_top_level_field(result, 'csq_spliceai_pred_dp_ag') == -15
+        assert self.get_top_level_field(result, 'csq_cadd_phred') == 2.692
+        assert self.get_top_level_field(result, 'csq_spliceai_pred_symbol') == 'SAMD11'
+        assert self.get_top_level_field(result, 'csq_gnomadg_ac') == 340
+        assert self.get_top_level_field(result, 'csq_spliceai_pred_dp_ag') == 8
 
         # check transcript
-        assert len(result['transcript'].keys()) == 1
-        assert self.get_transcript_field(result, 0, 'csq_consequence') == ['missense_variant']
-        assert self.get_transcript_field(result, 0, 'csq_feature') == 'ENST00000327044'
-        assert self.get_transcript_field(result, 0, 'csq_domains') == ['Pfam:PF03715', 'PANTHER:PTHR12687',
-                                                                       'PANTHER:PTHR12687:SF10', 'Superfamily:SSF48371']
+        assert len(result['transcript'].keys()) == 11
+        assert self.get_transcript_field(result, 0, 'csq_consequence') == ['intron_variant']
+        assert self.get_transcript_field(result, 0, 'csq_feature') == 'ENST00000341065'
 
         # check genes
-        assert self.get_genes_field(result, 0, 'genes_most_severe_gene') == 'ENSG00000188976'
-        assert self.get_genes_field(result, 0, 'genes_most_severe_transcript') == 'ENST00000327044'
+        assert self.get_genes_field(result, 0, 'genes_most_severe_gene') == 'ENSG00000187634'
+        assert self.get_genes_field(result, 0, 'genes_most_severe_transcript') == 'ENST00000342066'
 
         # check record 3 (only a few things)
         record = test_vcf.read_next_record()
         result = test_vcf.create_variant_from_record(record)
-        assert len(result[self.VEP_IDENTIFIER].keys()) == 2
-        assert self.get_top_level_field(result, 'spliceaiMaxds') == 0.03
-        assert self.get_top_level_field(result, 'variantClass') == 'DEL'
-        assert self.get_top_level_field(result, 'csq_spliceai_pred_symbol') == 'PERM1'
-        assert self.get_transcript_field(result, 0, 'csq_consequence') == ['inframe_deletion']
-        assert self.get_transcript_field(result, 0, 'csq_feature') == 'ENST00000341290'
+        assert len(result[self.VEP_IDENTIFIER].keys()) == 1
+        assert self.get_top_level_field(result, 'spliceaiMaxds') == 0
+        assert self.get_top_level_field(result, 'variantClass') == 'SNV'
+        assert self.get_top_level_field(result, 'csq_spliceai_pred_symbol') == 'NOC2L'
+        assert self.get_transcript_field(result, 0, 'csq_consequence') == ['missense_variant']
+        assert self.get_transcript_field(result, 0, 'csq_feature') == 'ENST00000327044'
         assert self.get_transcript_field(result, 0, 'csq_trembl') is None
-        assert self.get_genes_field(result, 0, 'genes_most_severe_gene') == 'ENSG00000187642'
-        assert self.get_genes_field(result, 0, 'genes_most_severe_hgvsc') == 'ENST00000433179.3:c.1993_1995del'
+        assert self.get_transcript_field(result, 0, 'csq_domains') == ['Pfam:PF03715', 'PANTHER:PTHR12687',
+                                                                       'PANTHER:PTHR12687:SF10', 'Superfamily:SSF48371']
+        assert self.get_genes_field(result, 0, 'genes_most_severe_gene') == 'ENSG00000188976'
+        assert self.get_genes_field(result, 0, 'genes_most_severe_hgvsc') == 'ENST00000327044.7:c.1528A>C'
+
+        # check record 4 (new gnomade2 fields)
+        record = test_vcf.read_next_record()
+        result = test_vcf.create_variant_from_record(record)
+        for field_name in test_vcf.OVERWRITE_FIELDS.values():
+            if 'gnomade2' in field_name:
+                assert field_name in result
 
     def test_build_multiple_sample_variants(self, test_vcf):
         """ Generates 3 sample variant items and checks them for correctness """
@@ -138,22 +138,22 @@ class TestIngestVCF:
         result = test_vcf.create_sample_variant_from_record(record)
         for sample in result:
             assert self.get_top_level_field(sample, 'GT') != '0/0'  # this VCF has one of these that should be dropped
-        assert result[0]['FS'] == 11.761
+        assert result[0]['FS'] == 0.0
         assert result[0]['GT'] == '0/1'
 
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)[0]  # inspect first
-        assert self.get_top_level_field(result, 'DP') == 37
+        assert self.get_top_level_field(result, 'DP') == 12
         assert self.get_top_level_field(result, 'GT') == '0/1'
-        assert self.get_top_level_field(result, 'GQ') == 99
-        assert self.get_top_level_field(result, 'PL') == '375,0,687'
+        assert self.get_top_level_field(result, 'GQ') == 63
+        assert self.get_top_level_field(result, 'PL') == '63,0,226'
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)[0]
-        assert self.get_top_level_field(result, 'DP') == 38
+        assert self.get_top_level_field(result, 'DP') == 37
         assert len(result['samplegeno']) == 3  # just check field presence
         assert result['samplegeno'][0]['samplegeno_numgt'] == '0/0'
         assert result['samplegeno'][0]['samplegeno_ad'] == '36/0'
-        assert result['samplegeno'][0]['samplegeno_gt'] == 'CGAA/CGAA'
+        assert result['samplegeno'][0]['samplegeno_gt'] == 'T/T'
 
     # Tests a subset of the last test
     # def test_post_variants(self, es_testapp, test_vcf, gene_workbook, post_variant_consequence_items):
@@ -170,34 +170,35 @@ class TestIngestVCF:
 
 
 # integrated test, so outside of class XXX: Refactor to use variant_utils
-@pytest.mark.skip  # Comment this out and run directly to test the first 5 variants and variant samples validation
-def test_post_variants_and_samples_with_links(workbook, es_testapp, test_vcf):
-    """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
-        NOTE: This is the most important test functionally speaking.
-    """
-    # post gene workbook
-    genes = json.load(open(GENE_WORKBOOK, 'r'))
-    for entry in genes:
-        entry['project'] = 'hms-dbmi'
-        entry['institution'] = 'hms-dbmi'
-        es_testapp.post_json(GENE_URL, entry, status=201)
-
-    for idx, record in enumerate(test_vcf):
-        if idx == MAX_POSTS_FOR_TESTING:
-            break
-        variant = test_vcf.create_variant_from_record(record)
-        assert 'transcript' in variant
-        variant['project'] = 'hms-dbmi'
-        variant['institution'] = 'hms-dbmi'
-        test_vcf.format_variant_sub_embedded_objects(variant)
-        res = es_testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
-        assert 'annotation_id' in res
-        variant_samples = test_vcf.create_sample_variant_from_record(record)
-        for sample in variant_samples:
-            sample['project'] = 'hms-dbmi'
-            sample['institution'] = 'hms-dbmi'
-            sample['variant'] = res['@id']  # make link
-            sample['file'] = 'dummy-filename'
-            res2 = es_testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
-            assert 'annotation_id' in res2['@graph'][0]
-            assert 'bam_snapshot' in res2['@graph'][0]
+# Also, if not fully uncommented, the setup still occurs ???
+# @pytest.mark.skip  # Comment this out and run directly to test the first 5 variants and variant samples validation
+# def test_post_variants_and_samples_with_links(workbook, es_testapp, test_vcf):
+#     """ Will post all generated variants and samples, forming linkTo's from variant_sample to variant
+#         NOTE: This is the most important test functionally speaking.
+#     """
+#     # post gene workbook
+#     genes = json.load(open(GENE_WORKBOOK, 'r'))
+#     for entry in genes:
+#         entry['project'] = 'hms-dbmi'
+#         entry['institution'] = 'hms-dbmi'
+#         es_testapp.post_json(GENE_URL, entry, status=201)
+#
+#     for idx, record in enumerate(test_vcf):
+#         if idx == MAX_POSTS_FOR_TESTING:
+#             break
+#         variant = test_vcf.create_variant_from_record(record)
+#         assert 'transcript' in variant
+#         variant['project'] = 'hms-dbmi'
+#         variant['institution'] = 'hms-dbmi'
+#         test_vcf.format_variant_sub_embedded_objects(variant)
+#         res = es_testapp.post_json(VARIANT_URL, variant, status=201).json['@graph'][0]  # only one item posted
+#         assert 'annotation_id' in res
+#         variant_samples = test_vcf.create_sample_variant_from_record(record)
+#         for sample in variant_samples:
+#             sample['project'] = 'hms-dbmi'
+#             sample['institution'] = 'hms-dbmi'
+#             sample['variant'] = res['@id']  # make link
+#             sample['file'] = 'dummy-filename'
+#             res2 = es_testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
+#             assert 'annotation_id' in res2['@graph'][0]
+#             assert 'bam_snapshot' in res2['@graph'][0]

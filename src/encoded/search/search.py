@@ -25,6 +25,7 @@ from ..authorization import is_admin_request
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
     find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
+    is_array_of_numerical_field,
     execute_search, make_search_subreq, build_sort_dicts,
     NESTED, COMMON_EXCLUDED_URI_PARAMS, MAX_FACET_COUNTS,
 )
@@ -292,7 +293,7 @@ class SearchBuilder:
                 else:
                     prepared_terms['q'] = val
             elif field not in COMMON_EXCLUDED_URI_PARAMS + ['type']:
-                if 'embedded.' + field not in prepared_terms.keys():
+                if 'embedded.' + field not in prepared_terms:
                     prepared_terms['embedded.' + field] = []
                 prepared_terms['embedded.' + field].append(val)
         return prepared_terms
@@ -609,7 +610,6 @@ class SearchBuilder:
         validation_error_facets = [
             ('validation_errors.name', {'title': 'Validation Errors', 'order': 999})
         ]
-
         current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
         self._initialize_additional_facets(append_facets, current_type_schema)
 
@@ -675,7 +675,10 @@ class SearchBuilder:
                         field_schema = schema_for_field(f_field, self.request, self.doc_types)
 
                         if field_schema:
-                            if is_date_field(field, field_schema) or is_numerical_field(field_schema):
+                            # field could be a date, numerical, or array of numerical
+                            if (is_date_field(field, field_schema) or
+                                    is_numerical_field(field_schema) or
+                                    is_array_of_numerical_field(field_schema)):
                                 title_field = field_schema.get("title", f_field)
                                 use_field = f_field
                                 aggregation_type = 'stats'
@@ -736,8 +739,8 @@ class SearchBuilder:
 
         # Transform filter search into filter + faceted search
         self.query = LuceneBuilder.build_facets(self.query, self.facets, query_filters, self.string_query,
-                                                 self.request, self.doc_types, self.custom_aggregations, self.size,
-                                                 self.from_, self.item_type_es_mapping)
+                                                self.request, self.doc_types, self.custom_aggregations, self.size,
+                                                self.from_, self.item_type_es_mapping)
 
         # Add preference from session, if available
         # This just sets the value on the class - it is passed to execute_search later
