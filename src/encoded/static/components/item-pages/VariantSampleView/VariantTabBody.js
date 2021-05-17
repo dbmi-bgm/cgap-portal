@@ -440,7 +440,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_phastcons100way_vertebrate")}phastCons (100 Vertebrates)</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_phastcons100way_vertebrate")}>phastCons (100 Vertebrates)</label>
                             </td>
                             <td className="text-left">{ csq_phastcons100way_vertebrate }</td>
                             <td className="text-left">{ fallbackElem }</td>
