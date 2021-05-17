@@ -1,5 +1,5 @@
-CGAP-Docker
-===========
+CGAP-Docker (local)
+===================
 
 It is now possible to run a local deployment of CGAP without installing any system level
 dependencies other than Docker. A few important notes on this setup.
@@ -28,8 +28,9 @@ AWS keys are sourced and run::
 The first command will take awhile the first time you run it but should speed up after. Since it is doing a fresh
 rebuild every time it is a little slower than the old local deployment since it has to fully reinstall/rebuild both Python
 and the client. Because of this, it is recommended to continue active development using the existing installation setup.
-Once the branch is ready for integrated testing, set the desired branch in ``docker-compose.yml`` and trigger a build.
-When the app is brought online the behavior should be identical to that of the existing local deployment setup.
+Once the branch is ready for "integrated" testing, set the desired branch in ``docker-compose.yml`` and trigger a build.
+When the app is brought online the behavior should be identical to that of the existing local deployment setup. It will
+also match the production behavior in ECS.
 
 To access the running container::
 
@@ -50,3 +51,10 @@ Below is a small list of useful Docker commands for advanced users::
     $ docker-compose up -d  # will start cluster in background using existing containers
     $ docker-compose up -d -V --build  # trigger a rebuild/recreation of cluster containers
     $ docker system prune  # will cleanup unused Docker components - BE CAREFUL WITH THIS
+
+Note that the Dockerfile's take arguments (set these in docker-compose.yml):
+    * CGAP_ENV_NAME="cgap-mastertest"
+    * CGAP_REPO="https://github.com/dbmi-bgm/cgap-portal.git"
+    * CGAP_BRANCH="master"
+    * ENTRYPOINT="entrypoint.sh"
+

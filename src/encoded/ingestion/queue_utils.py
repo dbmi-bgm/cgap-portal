@@ -22,7 +22,7 @@ class IngestionQueueManager:
 
     def __init__(self, registry, override_name=None):
         """ Does initial setup for interacting with SQS """
-        self.batch_size = 10
+        self.batch_size = 1  # NOTE: this value is important because we don't want to block other jobs
         self.env_name = registry.settings.get('env.name', None)
         if not self.env_name:  # replace with something usable
             backup = socket.gethostname()[:80].replace('.', '-')
