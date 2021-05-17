@@ -383,7 +383,11 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
         csq_sift_converted_rankscore = fallbackElem,
         csq_polyphen2_hvar_score = fallbackElem,
         csq_polyphen2_hvar_pred = fallbackElem,
-        csq_polyphen2_hvar_rankscore = fallbackElem
+        csq_polyphen2_hvar_rankscore = fallbackElem,
+        csq_revel_rankscore = fallbackElem,
+        csq_revel_score = fallbackElem,
+        csq_phylop30way_mammalian = fallbackElem,
+        csq_phastcons100way_vertebrate = fallbackElem
     } = variant;
 
     // Not too sure whether to use table or <row> and <cols> here..
@@ -426,6 +430,22 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                             <td className="text-left">{ fallbackElem }</td>
                             <td className="text-left">{ csq_cadd_raw_rankscore }</td>
                         </tr>
+                         <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("csq_phylop30way_mammalian")}>PhyloP (30 Mammals)</label>
+                            </td>
+                            <td className="text-left">{ csq_phylop30way_mammalian }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                        </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("csq_phastcons100way_vertebrate")}>PhastCons (100 Vertebrates)</label>
+                            </td>
+                            <td className="text-left">{ csq_phastcons100way_vertebrate }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -464,6 +484,14 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                             <td className="text-left">{ csq_primateai_score }</td>
                             <td className="text-left">{ csq_primateai_pred }</td>
                             <td className="text-left">{ csq_primateai_rankscore }</td>
+                        </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("csq_revel_score")}>REVEL</label>
+                            </td>
+                            <td className="text-left">{ csq_revel_score }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ csq_revel_rankscore }</td>
                         </tr>
                     </tbody>
                 </table>
