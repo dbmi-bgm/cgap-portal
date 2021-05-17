@@ -416,14 +416,6 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_phylop100way_vertebrate")}>PhyloP (100 Vertebrates)</label>
-                            </td>
-                            <td className="text-left">{ csq_phylop100way_vertebrate }</td>
-                            <td className="text-left">{ fallbackElem }</td>
-                            <td className="text-left">{ csq_phylop100way_vertebrate_rankscore }</td>
-                        </tr>
-                        <tr>
-                            <td className="text-left">
                                 <label className="mb-0" data-tip={getTipForField("csq_cadd_phred")}>CADD</label>
                             </td>
                             <td className="text-left">{ csq_cadd_phred }</td>
@@ -432,7 +424,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                          <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_phylop30way_mammalian")}>PhyloP (30 Mammals)</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_phylop30way_mammalian")}>phyloP (30 Mammals)</label>
                             </td>
                             <td className="text-left">{ csq_phylop30way_mammalian }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -440,7 +432,15 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_phastcons100way_vertebrate")}>PhastCons (100 Vertebrates)</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_phylop100way_vertebrate")}>phyloP (100 Vertebrates)</label>
+                            </td>
+                            <td className="text-left">{ csq_phylop100way_vertebrate }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ csq_phylop100way_vertebrate_rankscore }</td>
+                        </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("csq_phastcons100way_vertebrate")}phastCons (100 Vertebrates)</label>
                             </td>
                             <td className="text-left">{ csq_phastcons100way_vertebrate }</td>
                             <td className="text-left">{ fallbackElem }</td>
