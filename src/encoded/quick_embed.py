@@ -12,13 +12,20 @@ GENELIST_ATID = re.compile("/gene-lists/[a-zA-Z0-9-]+/")
 MINIMAL_EMBEDS = ["projects", "institutions", "users"]
 MINIMAL_EMBED_ATID = re.compile("/(" + "|".join(MINIMAL_EMBEDS) + ")/[a-zA-Z0-9-_:]+/")
 KEYS_TO_IGNORE = [
-    "@id", "@type", "principals_allowed", "uuid", "status", "title",
-    "display_title", "schema_version", "date_created"
+    "@id",
+    "@type",
+    "principals_allowed",
+    "uuid",
+    "status",
+    "title",
+    "display_title",
+    "schema_version",
+    "date_created",
 ]
 
 
 def includeme(config):
-    config.add_route('embed', '/embed')
+    config.add_route("embed", "/embed")
     config.scan(__name__)
 
 
@@ -122,7 +129,7 @@ def _embed(request, item, depth, embed_props):
     return item
 
 
-@view_config(route_name='embed', request_method='POST', permission="view")
+@view_config(route_name="embed", request_method="POST", permission="view")
 @debug_log
 def embed(context, request):
     """
@@ -159,7 +166,7 @@ def embed(context, request):
         "ignored_embeds": ignored_embeds,
         "desired_embeds": desired_embeds,
         "embed_depth": embed_depth,
-        "cache": cache
+        "cache": cache,
     }
     for item_id in ids:
         item_info = get_item_or_none(request, item_id)

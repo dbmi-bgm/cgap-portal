@@ -9,7 +9,7 @@ KEYS_NOT_INCLUDED = ["@context", "actions", "aggregated-items", "validation-erro
 
 
 def _embed_with_url_params(testapp, embed_string, status="*"):
-    """"""
+    """POST to embed endpoint with url parameters."""
     creation_post_data = {}
     creation_post_headers = {
         "Content-type": "application/json",
@@ -23,15 +23,15 @@ def _embed_with_url_params(testapp, embed_string, status="*"):
     return response
 
 
-def _embed_with_json_params(testapp, embed_json):
-    """"""
+def _embed_with_json_params(testapp, embed_json, status="*"):
+    """POST to embed endpoint with json parameters."""
     creation_post_data = embed_json
     creation_post_headers = {
         "Content-type": "application/json",
         "Accept": "application/json",
     }
     response = testapp.post_json(
-        "/embed", creation_post_data, headers=creation_post_headers
+        EMBED_URL, creation_post_data, headers=creation_post_headers
     ).json
     if isinstance(response, list):
         response = response[0]
@@ -39,13 +39,13 @@ def _embed_with_json_params(testapp, embed_json):
 
 
 def _convert_atid_to_key(atid_name_list):
-    """ Removes last letter from all strings in list. """
+    """Removes last letter from all strings in list."""
     key_name_list = [atid_name[:-1] for atid_name in atid_name_list]
     return key_name_list
 
 
 def _contains_atid(item):
-    """ Returns bool for presence of @id in item. """
+    """Returns bool for presence of @id in item."""
     result = False
     if isinstance(item, dict):
         for value in item.values():
@@ -74,8 +74,8 @@ def variant_sample_list(
         "institution": institution["@id"],
         "variant_samples": [
             {"variant_sample_item": vs_1["@id"]},
-            {"variant_sample_item": vs_2["@id"]}
-        ]
+            {"variant_sample_item": vs_2["@id"]},
+        ],
     }
     return testapp.post_json("/variant-sample-lists", vs_list).json["@graph"][0]
 
@@ -86,16 +86,16 @@ def test_post_methods(testapp, variant_sample_list):
     or in json body.
     """
     vsl_uuid = variant_sample_list["uuid"]
-    vsl_embed_url = _embed_with_url_params(testapp, "/embed?id=" + vsl_uuid)
+    vsl_embed_url = _embed_with_url_params(testapp, EMBED_URL + "?id=" + vsl_uuid)
     json_to_post = {"ids": [vsl_uuid]}
     vsl_embed_json = _embed_with_json_params(testapp, json_to_post)
     assert vsl_embed_url == vsl_embed_json
 
 
 def test_depth_of_zero(testapp, variant_sample_list):
-    """ Test request with depth=0 returns @@object view of item. """
+    """Test request with depth=0 returns @@object view of item."""
     vsl_uuid = variant_sample_list["uuid"]
-    url_params = "/embed?id=" + vsl_uuid + "&depth=0"
+    url_params = EMBED_URL + "?id=" + vsl_uuid + "&depth=0"
     vsl_embed = _embed_with_url_params(testapp, url_params)
     for key, value in variant_sample_list.items():
         if key not in KEYS_NOT_INCLUDED:
@@ -103,13 +103,13 @@ def test_depth_of_zero(testapp, variant_sample_list):
 
 
 def test_desired_keys(testapp, variant_sample_list):
-    """ Test embedding only requested 'desired' keys. """
+    """Test embedding only requested 'desired' keys."""
     vsl_uuid = variant_sample_list["uuid"]
     vsl_atid = variant_sample_list["@id"]
     vsl_true = testapp.get(vsl_atid).json
     desired = ["projects"]
     desired_addon = "&desired=".join(desired)
-    url_params = "/embed?id=" + vsl_uuid + "&depth=1&desired=" + desired_addon
+    url_params = EMBED_URL + "?id=" + vsl_uuid + "&depth=1&desired=" + desired_addon
     vsl_embed_url = _embed_with_url_params(testapp, url_params)
     json_to_post = {"ids": [vsl_uuid], "depth": 1, "desired": desired}
     vsl_embed_json = _embed_with_json_params(testapp, json_to_post)
@@ -125,12 +125,12 @@ def test_desired_keys(testapp, variant_sample_list):
 
 
 def test_ignored_keys(testapp, variant_sample_list):
-    """ Test embedding all keys except requested 'ignored' keys. """
+    """Test embedding all keys except requested 'ignored' keys."""
     vsl_uuid = variant_sample_list["uuid"]
     ignored = ["projects"]
     ignored_keys = _convert_atid_to_key(ignored)
     ignored_addon = "&ignored=".join(ignored)
-    url_params = "/embed?id=" + vsl_uuid + "&depth=1&ignored=" + ignored_addon
+    url_params = EMBED_URL + "?id=" + vsl_uuid + "&depth=1&ignored=" + ignored_addon
     vsl_embed_url = _embed_with_url_params(testapp, url_params)
     json_to_post = {"ids": [vsl_uuid], "depth": 1, "ignored": ignored}
     vsl_embed_json = _embed_with_json_params(testapp, json_to_post)
@@ -145,9 +145,9 @@ def test_ignored_keys(testapp, variant_sample_list):
 
 
 def test_minimal_embeds(testapp, variant_sample_list):
-    """ Test default minimal embedding settings work as intended. """
+    """Test default minimal embedding settings work as intended."""
     vsl_uuid = variant_sample_list["uuid"]
-    url_params = "/embed?id=" + vsl_uuid
+    url_params = EMBED_URL + "?id=" + vsl_uuid
     vsl_embed_url = _embed_with_url_params(testapp, url_params)
     minimal_embeds = _convert_atid_to_key(MINIMAL_EMBEDS)
     for key in minimal_embeds:
@@ -157,9 +157,9 @@ def test_minimal_embeds(testapp, variant_sample_list):
 
 
 def test_non_project_user(bgm_user_testapp, variant_sample_list):
-    """ Test user from different project cannot call for embed. """
+    """Test user from different project cannot call for embed."""
     vsl_uuid = variant_sample_list["uuid"]
-    url_params = "/embed?id=" + vsl_uuid
+    url_params = EMBED_URL + "?id=" + vsl_uuid
     vsl_embed_url = _embed_with_url_params(bgm_user_testapp, url_params, status=403)
     assert vsl_embed_url["status"] == "error"
     assert vsl_embed_url["title"] == "Forbidden"
