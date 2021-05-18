@@ -6,7 +6,6 @@ from snovault.util import debug_log
 
 from encoded.types.base import get_item_or_none
 
-
 ATID_PATTERN = re.compile("/[a-zA-Z-]+/[a-zA-Z0-9-_:]+/")
 GENELIST_ATID = re.compile("/gene-lists/[a-zA-Z0-9-]+/")
 MINIMAL_EMBEDS = ["projects", "institutions", "users"]
