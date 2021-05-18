@@ -51,21 +51,20 @@ def _embed_genelist(request, genelist_atid):
 
     :param request: pyramid request object
     :param genelist_atid: string of gene list @id
-    :return genelist_embed: dictionary with limited gene list information
+    :return genelist_embed: dict with gene list title and uuid
     """
     genelist_raw = get_item_or_none(request, genelist_atid, frame="raw")
     title = genelist_raw.get("title", "")
-    project_uuid = genelist_raw.get("project")
-    project_embed = _minimal_embed(request, project_uuid)
-    genelist_embed = {"title": title, "project": project_embed}
+    uuid = genelist_raw.get("uuid", "")
+    genelist_embed = {"title": title, "uuid": uuid}
     return genelist_embed
 
 
 def _embed(request, item, depth, embed_props):
     """
-    Embeds items recursively according to input parameters. Unpacks
+    Embed items recursively according to input parameters. Unpack
     dictionaries and lists to find @ids, which are selectively embedded,
-    typically in object view. Stores new embeds in cache for look-up.
+    typically in object view. Store new embeds in cache for look-up.
 
     :param request: pyramid request object
     :param item: object of interest to expand
@@ -133,7 +132,7 @@ def _embed(request, item, depth, embed_props):
 def embed(context, request):
     """
     API to return custom-embedded view of object posted to endpoint. If no
-    parameters provided, attempts to return object with embedding done
+    parameters provided, attempt to return object with embedding done
     per default parameters.
 
     :param context: pyramid request context
