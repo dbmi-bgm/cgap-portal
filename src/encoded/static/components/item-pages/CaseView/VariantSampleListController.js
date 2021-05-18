@@ -31,11 +31,12 @@ export class VariantSampleListController extends React.PureComponent {
     }
 
     static getDerivedStateFromProps(props, state) {
-        if (props.id) {
+        const { id: vslID } = props;
+        if (vslID) {
             // If supplied via props, always set to props.id and prevent
             // from ever changing.
-            // Else rely on `updateVariantSampleListID` to set it.
-            return { "variantSampleListID": props.id };
+            // Else rely on `updateVariantSampleListID` to set it (when it comes in as not present from Case initially).
+            return { "variantSampleListID": vslID };
         }
         return null;
     }
@@ -44,11 +45,11 @@ export class VariantSampleListController extends React.PureComponent {
         super(props);
         this.fetchVariantSampleListItem = this.fetchVariantSampleListItem.bind(this);
         this.updateVariantSampleListID = this.updateVariantSampleListID.bind(this);
-        this.refreshExistingVariantSampleListItem = this.refreshExistingVariantSampleListItem.bind(this);
         const { id: vslID } = props;
         this.state = {
             "variantSampleListItem": null,
             "variantSampleListID": typeof vslID === "string" ? vslID : null,
+            "isLoadingVariantSampleListItem": typeof vslID === "string" ? true : false,
             // `refreshCount` not necessary at all, just for potential internal debugging.
             "refreshCount": 0
         };
@@ -56,6 +57,8 @@ export class VariantSampleListController extends React.PureComponent {
         this.memoized = {
             activeVariantSampleIDMap: memoize(VariantSampleListController.activeVariantSampleIDMap)
         };
+
+        this.currentRequest = null;
     }
 
     componentDidMount(){
@@ -65,67 +68,76 @@ export class VariantSampleListController extends React.PureComponent {
         }
     }
 
-    componentDidUpdate(prevProps, prevState){
-        const { variantSampleListID } = this.state;
-        const { variantSampleListID: pastVSLID } = prevState;
-        if (variantSampleListID !== pastVSLID) {
-            if (!variantSampleListID) {
-                this.setState({ "variantSampleListItem" : null });
-            } else {
-                this.fetchVariantSampleListItem();
-            }
-        }
-    }
-
     /** Fetches datastore=database `@@embedded` representation of 'state.variantSampleListID' */
-    fetchVariantSampleListItem(callback = null){
+    fetchVariantSampleListItem(fnCallback = null){
         const { variantSampleListID } = this.state;
+
+        if (this.currentRequest) {
+            // Abort is additional signal for browser to cancel request,
+            // not to be relied on in JS logic
+            // (instead safest to make sure scopedRequest === this.currentRequest)
+            this.currentRequest.abort();
+        }
+
+        let scopedRequest = null;
 
         console.info("Fetching VariantSampleList ...");
         const vslFetchCallback = (resp) => {
             console.info("Fetched VariantSampleList", resp);
             const { "@id": vslID, error = null } = resp;
+
+            if (scopedRequest !== this.currentRequest) {
+                // Request superseded, cancel it.
+                return false;
+            }
+
             if (!vslID) {
                 throw new Error("Couldn't get VSL");
             }
 
+
+            this.currentRequest = null;
+
             this.setState(function({ refreshCount: prevRefreshCount, variantSampleListItem: prevItem }){
                 const { "@id": prevAtID = null } = prevItem || {};
-                const nextState = { "variantSampleListItem": resp };
+                const nextState = {
+                    "variantSampleListItem": resp,
+                    "isLoadingVariantSampleListItem": false
+                };
                 if (prevAtID && vslID !== prevAtID) {
                     nextState.refreshCount = prevRefreshCount + 1;
                 }
                 return nextState;
-            });
+            }, fnCallback);
+
         };
 
-        ajax.load(
-            variantSampleListID + "?datastore=database",
-            vslFetchCallback,
-            "GET",
-            vslFetchCallback
-        );
+        this.setState({ "isLoadingVariantSampleListItem": true }, () => {
+            scopedRequest = this.currentRequest = ajax.load(
+                variantSampleListID + "?datastore=database",
+                vslFetchCallback,
+                "GET",
+                vslFetchCallback
+            );
+        });
     }
 
-    updateVariantSampleListID(vslID){
-        // componentDidUpdate will handle triggering fetch of Item.
-        this.setState({ "variantSampleListID": vslID });
-    }
-
-    refreshExistingVariantSampleListItem(){
-        this.fetchVariantSampleListItem();
+    /** Does NOT trigger a refresh, refresh must be triggered manually afterwards */
+    updateVariantSampleListID(vslID, callback){
+        this.setState({ "variantSampleListID": vslID }, callback);
     }
 
     render(){
         const { children, id: propVSLID, ...passProps } = this.props;
-        const { variantSampleListItem } = this.state;
+        const { variantSampleListItem, isLoadingVariantSampleListItem } = this.state;
         const { variant_samples = [] } = variantSampleListItem || {};
         const childProps = {
             ...passProps,
             variantSampleListItem,
+            isLoadingVariantSampleListItem,
             "savedVariantSampleIDMap": this.memoized.activeVariantSampleIDMap(variant_samples),
             "updateVariantSampleListID": this.updateVariantSampleListID,
-            "refreshExistingVariantSampleListItem": this.refreshExistingVariantSampleListItem
+            "fetchVariantSampleListItem": this.fetchVariantSampleListItem
         };
         return React.Children.map(children, function(child){
             if (!React.isValidElement(child) || typeof child.type === "string") {

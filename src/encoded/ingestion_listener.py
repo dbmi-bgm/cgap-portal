@@ -31,7 +31,7 @@ from vcf import Reader
 from .ingestion.vcf_utils import VCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
 from .commands.add_altcounts_by_gene import main as add_altcounts
-from .ingestion.common import metadata_bundles_bucket, get_parameter  # , IngestionReport
+from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure  # , BadParameter
 from .ingestion.processors import get_ingestion_processor
 # from .types.base import get_item_or_none

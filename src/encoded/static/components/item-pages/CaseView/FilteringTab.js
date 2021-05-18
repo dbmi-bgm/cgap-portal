@@ -73,7 +73,6 @@ export function filterQueryByQuery(query1, query2){
 
 
 export const FilteringTab = React.memo(function FilteringTab(props) {
-
     const {
         context = null,
         session = false,
@@ -88,7 +87,8 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
         updateVariantSampleListID,  // Passed in from VariantSampleListController
         savedVariantSampleIDMap,    // Passed in from VariantSampleListController
-        refreshExistingVariantSampleListItem, // Passed in from VariantSampleListController
+        fetchVariantSampleListItem, // Passed in from VariantSampleListController
+        isLoadingVariantSampleListItem, // Passed in from VariantSampleListController
         setIsSubmitting             // Passed in from App
     } = props;
 
@@ -166,9 +166,9 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         schemas, session,
         variantSampleListItem,
         updateVariantSampleListID,
-        refreshExistingVariantSampleListItem,
+        fetchVariantSampleListItem,
+        isLoadingVariantSampleListItem,
         selectedItems,
-        onResetSelectedItems,
         // setIsSubmitting,
         // "caseItem": context
     };
@@ -192,7 +192,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     ) : (
         // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
         // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+        <FilterSetController {...{ searchHrefBase, onResetSelectedItems }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
             { embeddedTableHeaderBody }
         </FilterSetController>
     );
@@ -207,11 +207,11 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // Table re-initializes upon change of key so we use it refresh table based on session.
     const searchTableKey = "session:" + session;
 
-
     const tableProps = {
         hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader,
-        selectedItems, onSelectItem, onResetSelectedItems,
+        selectedItems, onSelectItem,
         savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
+        isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
         "key": searchTableKey
     };
 

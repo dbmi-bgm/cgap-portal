@@ -555,13 +555,16 @@ h3.submission-subtitle {
 @mixin statusColorStyles {
 
 	// Blue
-	&[data-status="benign"]:before {						// Applicable to ClinVar Clinical Significance
+	&[data-status="Benign"]:before,
+	&[data-status="Not a candidate"]:before,
+	&[data-status="Known gene for phenotype"]:before {						// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: $primary;
 	}
 
 	// Dark Blue
-	&[data-status="likely benign"]:before {					// Applicable to ClinVar Clinical Significance
+	&[data-status="Likely benign"]:before,
+	&[data-status="Weak candidate"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: $primary-dark;
 	}
@@ -611,9 +614,10 @@ h3.submission-subtitle {
 	&[data-status="inactive"]:before,						// Applicable to Item.status
 	&[data-status="revoked"]:before,						// Applicable to User.status
 	&[data-status="probable-pathogenic"]:before,			// Applicable to ClinVar Clinical Significance
-	&[data-status="likely pathogenic"]:before,				// Applicable to SampleVariant Interpretation Classification
+	&[data-status="Likely pathogenic"]:before,				// Applicable to SampleVariant Interpretation Classification
+	&[data-status="Moderate candidate"]:before,
 	&[data-status="affects"]:before,						// Applicable to ClinVar Clinical Significance
-	&[data-status="restricted"]:before {					// Deprecated?
+	&[data-status="restricted"]:before{						// Deprecated?
 		color: #fff;
 		background-color: #812423;
 	}
@@ -623,7 +627,8 @@ h3.submission-subtitle {
 	&[data-status="upload failed"]:before,					// Applicable to File.status
 	&[data-status="error"]:before,							// Applicable to WorkflowRun.run_status + columnExtensionMap columns
 	&[data-status="risk factor"]:before,					// Applicable to ClinVar Clinical Significance
-	&[data-status="pathogenic"]:before {					// Applicable to ClinVar Clinical Significance
+	&[data-status="Pathogenic"]:before, 					// Applicable to ClinVar Clinical Significance
+	&[data-status="Strong candidate"]:before {
 		color: #fff;
 		background-color: #a90d0b;
 	}
@@ -641,9 +646,11 @@ h3.submission-subtitle {
 	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
 	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
 	&[data-status="not provided"]:before,					// Applicable to ClinVar Clinical Significance
-	&[data-status="VUS"]:before,							// Applicable to SampleVariant Interpretation Classification
-	&[data-status="unspecified"]:before {					// Deprecated? Fallback for lack of status in some cases?
-		color: #fff;
+	&[data-status="Uncertain significance"]:before,			// Applicable to SampleVariant Interpretation Classification
+	&[data-status="unspecified"]:before,					// Deprecated? Fallback for lack of status in some cases?
+	&[data-status="Weak candidate"]:before,
+	&[data-status="Known gene for phenotype"]:before {
+	    color: #fff;
 		background-color: #7b7b7b;
 		//display: none;
 	}
@@ -2938,6 +2945,7 @@ $download-button-width : 100px;
 			height: 32px;
 			position: relative;
 			z-index: 5;
+
 			> h4 {
 				// todo: maybe add color if to be just for this section (?)
 				font-weight: 600;
@@ -2948,6 +2956,10 @@ $download-button-width : 100px;
 
 			.dropdown {
 				background-color: $card-bg;
+				> button {
+					padding-left: 8px; /* Matches padding-left of the h4 elem, to align all titles at left edge */
+					padding-right: 28px;
+				}
 			}
 
 			+ .info-body {
@@ -2968,8 +2980,10 @@ $download-button-width : 100px;
 	.card .inner-card-section {
 		// TODO: Maybe consider propagating further, overriding btn-outline-secondary or btn-secondary with
 		// this (since their defaults look somewhat like disabled - but maybe useful idk)
-		.btn-outline-secondary.select-transcript {
-			@include button-variant(#fff, #e0e0e0);
+		> .info-header-title {
+			> .dropdown > .btn-outline-secondary {
+				@include button-variant(#fff, #e0e0e0);
+			}
 		}
 	}
 
@@ -2996,6 +3010,7 @@ $download-button-width : 100px;
 				border-radius: 0;
 				background-color: #beccda;
 				color: $primary-dark;
+				line-height: 1.125; /* scrunch up the text a little bit if it flows onto a 2nd+ line */
 				&[disabled]{
 					color: #fff8;
 				}
@@ -3082,7 +3097,7 @@ $download-button-width : 100px;
 						border-radius: 3px;
 					}
 					font-size: 13px;
-					padding: 3px 10px;
+					padding: 3px 7px;
 				}
 			}
 
@@ -3095,8 +3110,15 @@ $download-button-width : 100px;
 					padding: 10px;
 				}
 
-				.dropdown.btn-group {
+				.note-field-drop .dropdown.btn-group {
+					width: 270px;
 					flex-grow: 1;
+					
+					>button {
+						max-width: 100%;
+						text-overflow: ellipsis;
+						overflow: hidden;
+					}
 				}
 			}
 		}
