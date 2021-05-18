@@ -675,8 +675,18 @@ i.status-indicator-dot {
 
 @mixin acmgColorStyles {
 
+
+
 	// Standalone Benign Impact -
-	&[data-criteria="BA1"],
+	&[data-criteria="BA1"] {
+		color: #31098D;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #31098D;
+		}
+	}
 	// Strong Benign Evidence - 
 	&[data-criteria="BS1"],
 	&[data-criteria="BS2"],
@@ -699,12 +709,12 @@ i.status-indicator-dot {
 	&[data-criteria="BP5"],
 	&[data-criteria="BP6"],
 	&[data-criteria="BP7"] {
-		color: $primary;
+		color: #0063D6;
 		background-color: #fff;
 
 		&[data-invoked="true"] {
 			color: #fff;
-			background-color: $primary;
+			background-color: #0063D6;
 		}
 	}
 
@@ -714,12 +724,12 @@ i.status-indicator-dot {
 	&[data-criteria="PP3"],
 	&[data-criteria="PP4"],
 	&[data-criteria="PP5"] {
-		color: #80921c;
+		color: #C4AA1D;
 		background-color: #fff;
 
 		&[data-invoked="true"] {
 			color: #fff;
-			background-color: #80921c;
+			background-color: #C4AA1D;
 		}
 	}
 
@@ -730,12 +740,12 @@ i.status-indicator-dot {
 	&[data-criteria="PM4"],
 	&[data-criteria="PM5"],
 	&[data-criteria="PM6"] {
-		color: #E59545;
+		color: #D36900;
 		background-color: #fff;
 
 		&[data-invoked="true"] {
 			color: #fff;
-			background-color: #E59545;
+			background-color: #D36900;
 		}
 	}
 
@@ -743,15 +753,24 @@ i.status-indicator-dot {
 	&[data-criteria="PS1"],
 	&[data-criteria="PS2"],
 	&[data-criteria="PS3"],
-	&[data-criteria="PS4"],
-	// Very Strong Pathogenic Evidence
-	&[data-criteria="PVS1"] {
+	&[data-criteria="PS4"]{
 		color: #a90d0b;
 		background-color: #fff;
 
 		&[data-invoked="true"] {
 			color: #fff;
 			background-color: #a90d0b;
+		}
+	}
+
+	// Very Strong Pathogenic Evidence
+	&[data-criteria="PVS1"] {
+		color: #9A0000;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #9A0000;
 		}
 	}
 
@@ -762,9 +781,9 @@ i.status-indicator-dot {
 
 .acmg-invoker {
 	border: 1px solid #efefef;
-	padding: 0 5px;
-	font-size: 0.83em;
-    letter-spacing: 1.5px;
+	padding: 3px 8px;
+    font-size: 0.7em;
+    letter-spacing: 1px;
 
 	// &:hover { // a little janky ATM; needs tweaking
 	// 	font-size: large;
