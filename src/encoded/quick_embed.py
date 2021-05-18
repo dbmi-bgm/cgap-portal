@@ -147,7 +147,7 @@ def embed(context, request):
     cache = {}
     results = []
     depth = 0
-    embed_depth = 3  # Arbritary standard depth to search.
+    embed_depth = 4  # Arbritary standard depth to search.
     ignored_keys = KEYS_TO_IGNORE
     ignored(context)
     if request.GET:
