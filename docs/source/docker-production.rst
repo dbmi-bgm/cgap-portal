@@ -1,9 +1,9 @@
 CGAP-Docker (production)
 ========================
 
-CGAP-Docker runs in production on Elastic Container Service, meant to be orchestrated from the 4dn-cloud-infra repository. End users will modify `deploy/docker/production/Makefile`` to suite their immediate build needs with respect to target AWS Account/ECR Repository/Tagging strategy. For more information on the specifics of the ECS setup, see 4dn-cloud-infra.
+CGAP-Docker runs in production on AWS Elastic Container Service, meant to be orchestrated from the 4dn-cloud-infra repository. End users will modify ``deploy/docker/production/Makefile`` to suite their immediate build needs with respect to target AWS Account/ECR Repository/Tagging strategy. For more information on the specifics of the ECS setup, see 4dn-cloud-infra.
 
-The CGAP Application has been orchestrated into the ECS Service/Task paradigm. As of writing all core application services have their own image tag defined by the ``$ENTRYPOINT`` build argument. As such, they are all separate services with the following notable characteristics:
+The CGAP Application has been orchestrated into the ECS Service/Task paradigm. As of writing all core application services have their own image tag varied by passing the ``$ENTRYPOINT`` build argument. As such, they are all separate services with the following notable characteristics:
 
     * WSGI - services standard API requests - 8x parallelization on Fargate Spot
     * Indexer - hits /index at 3 second intervals indefinitely - 4x parallelization on Fargate Spot
@@ -13,10 +13,10 @@ The CGAP Application has been orchestrated into the ECS Service/Task paradigm. A
 Building an Image
 ^^^^^^^^^^^^^^^^^
 
-The production application configuration is in ``deploy/docker/production``. A description of all the relevent files is below.
+The production application configuration is in ``deploy/docker/production``. A description of all the relevant files follows.
 
     * assume_identity.py - script for pulling application configuration from Secrets Manager
-    * Dockerfile - production Dockerfile, essentially identical to local deployment, except the container does not run as root
+    * Dockerfile - production Dockerfile, essentially identical to local deployment except the container does not run as root
     * entrypoint.sh - WSGI entrypoint
     * entrypoint_deploymentn.sh - deployment entrypoint
     * entrypoint_indexer.sh - indexer entrypoint

@@ -16,9 +16,11 @@ class IngestionQueueManager:
     class and QueueManager should be refactored into a "helper" class, but for now this is sufficient
     and is tested independently here.
 
-    We will use a single queue to keep track of VCF File uuids to be indexed.
+    We will use a single queue to keep track of File uuids to be indexed. This used to manage only VCFs
+    but now the Ingestion functionality is generic and can be extended to arbitrary processing on
+    any type.
     """
-    BUCKET_EXTENSION = '-vcfs'
+    BUCKET_EXTENSION = '-ingestion-queue'  # XXX: breaking change, matches 4dn-cloud-infra resources
 
     def __init__(self, registry, override_name=None):
         """ Does initial setup for interacting with SQS """
