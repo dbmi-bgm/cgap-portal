@@ -11,6 +11,10 @@ ATID_PATTERN = re.compile("/[a-zA-Z-]+/[a-zA-Z0-9-_:]+/")
 GENELIST_ATID = re.compile("/gene-lists/[a-zA-Z0-9-]+/")
 MINIMAL_EMBEDS = ["projects", "institutions", "users"]
 MINIMAL_EMBED_ATID = re.compile("/(" + "|".join(MINIMAL_EMBEDS) + ")/[a-zA-Z0-9-_:]+/")
+KEYS_TO_IGNORE = [
+    "@id", "@type", "principals_allowed", "uuid", "status", "title",
+    "display_title", "schema_version", "date_created"
+]
 
 
 def includeme(config):
@@ -118,7 +122,7 @@ def _embed(request, item, depth, embed_props):
     return item
 
 
-@view_config(route_name='embed', request_method='POST', permission="edit")
+@view_config(route_name='embed', request_method='POST', permission="view")
 @debug_log
 def embed(context, request):
     """
@@ -137,10 +141,7 @@ def embed(context, request):
     results = []
     depth = 0
     embed_depth = 3  # Arbritary standard depth to search.
-    ignored_keys = [
-        "@id", "@type", "principals_allowed", "uuid", "status", "title",
-        "display_title", "schema_version", "date_created"
-    ]
+    ignored_keys = KEYS_TO_IGNORE
     ignored(context)
     if request.GET:
         ids += request.GET.dict_of_lists().get("id", [])
@@ -162,6 +163,6 @@ def embed(context, request):
     }
     for item_id in ids:
         item_info = get_item_or_none(request, item_id)
-        item_result, _ = _embed(request, item_info, depth, embed_props)
+        item_result = _embed(request, item_info, depth, embed_props)
         results.append(item_result)
     return results
