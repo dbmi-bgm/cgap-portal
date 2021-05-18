@@ -785,7 +785,7 @@ function ACMGPicker(props) {
                 { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
             </label>
             <div className="w-100 d-flex acmg-picker mb-08">
-                { selections.length > 0 ? picked : <div className="acmg-invoker text-muted" data-tip={"Use the picker above to make invocations."} data-criteria="none">None yet</div>}
+                { selections.length > 0 ? picked : <div className="acmg-invoker text-muted" data-tip={"Use the picker above to make invocations."} data-criteria="none">None</div>}
             </div>
         </React.Fragment>
     );
