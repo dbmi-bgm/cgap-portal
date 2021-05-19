@@ -4,7 +4,7 @@ from snovault import (
 
 
 @upgrade_step('variant', '1', '2')
-def variant_update_1_2(value, system):
+def variant_1_2(value, system):
     """ Upgrades variant from schema version 1 to 2, deleting the 4 relevant fields. """
 
     if 'csq_rs_dbsnp151' in value:
