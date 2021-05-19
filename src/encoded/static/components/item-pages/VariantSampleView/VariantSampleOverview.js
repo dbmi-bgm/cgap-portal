@@ -130,14 +130,42 @@ export class VariantSampleOverview extends React.PureComponent {
 
 class InterpretationController extends React.Component {
 
+    static initializeGlobalACMGState(criteriaArr) {
+        const stateObj = {};
+        criteriaArr.forEach((criteria) => {
+            stateObj[criteria] = true;
+        });
+
+        return stateObj;
+    }
+
+    static flattenGlobalACMGStateIntoArray(criteriaObj) {
+        // Flatten into an array of invoked items
+        const invokedFlat = [];
+        Object.keys(criteriaObj).forEach((criteria) => {
+            if (criteriaObj[criteria]) { invokedFlat.push(criteria); }
+        });
+        return invokedFlat.sort(); // TODO: sort so that it aligns with color scheme above
+    }
+
     constructor(props) {
         super(props);
 
+        // Initialize global selections based on most recent interpretation from context
+        const { context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
+        const acmgSelections = InterpretationController.initializeGlobalACMGState(acmg_guidelines);
+
         this.state = {
+            globalACMGSelections: acmgSelections,
             showACMGInvoker: false, // False by default, state method passed into Interpretation space and called when clinical tab is selected
         };
 
         this.toggleACMGInvoker = this.toggleACMGInvoker.bind(this);
+        this.toggleInvocation = this.toggleInvocation.bind(this);
+
+        this.memoized = {
+            flattenGlobalACMGStateIntoArray: memoize(InterpretationController.flattenGlobalACMGStateIntoArray)
+        };
     }
 
     toggleACMGInvoker(callback) {
@@ -145,8 +173,24 @@ class InterpretationController extends React.Component {
         this.setState({ showACMGInvoker: !showACMGInvoker }, callback);
     }
 
+    toggleInvocation(criteria, callback) {
+        const { globalACMGSelections = {} } = this.state;
+        const newInvocations = { ...globalACMGSelections };
+
+        if (newInvocations[criteria] !== undefined) { // already set
+            newInvocations[criteria] = !newInvocations[criteria];
+
+        } else { // first time setting
+            newInvocations[criteria] = true;
+        }
+
+        // TODO: re-add autoclassification update method here-ish/maybe in callback?
+
+        this.setState({ globalACMGSelections: newInvocations }, callback);
+    }
+
     render() {
-        const { showACMGInvoker } = this.state;
+        const { showACMGInvoker, globalACMGSelections } = this.state;
         const { context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const passProps = { context, schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
 
@@ -159,17 +203,19 @@ class InterpretationController extends React.Component {
 
         const anyNotePermErrors = interpError || varNoteError || geneNoteError || discoveryError;
 
+        const wipACMGSelections = this.memoized.flattenGlobalACMGStateIntoArray(globalACMGSelections);
+
         return (
             <React.Fragment>
-                { showACMGInvoker ? <ACMGInvoker /> : null}
+                { showACMGInvoker ? <ACMGInvoker invokedFromSavedNote={acmg_guidelines} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} /> : null}
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
                     <div className="col">
-                        {/* Annotation Space passed as children */}
+                        {/* Annotation Space passed as child */}
                         { children }
                     </div>
                     { showInterpretation == 'True' && !anyNotePermErrors ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} />
+                            <InterpretationSpaceWrapper wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} />
                         </div> : null }
                 </div>
             </React.Fragment>
@@ -319,33 +365,18 @@ class ACMGInvoker extends React.Component {
         super(props);
 
         this.state = {
-            invoked: {},
             autoClassification: null
         };
 
-        this.toggleInvocation = this.toggleInvocation.bind(this);
-
+        // this.classifier = new AutoClassify(newInvocations);
     }
 
-    toggleInvocation(criteria) {
-        const { invoked = {} } = this.state;
-        const newInvocations = { ...invoked };
-
-        if (newInvocations[criteria] !== undefined) { // already set
-            newInvocations[criteria] = !newInvocations[criteria];
-
-        } else { // first time setting
-            newInvocations[criteria] = true;
-        }
-
-        const classifier = new AutoClassify(newInvocations);
-        const classification = classifier.getClassification();
-
-        this.setState({ invoked: newInvocations, autoClassification: classification });
-    }
+    // const classifier = new AutoClassify(newInvocations);
+    // const classification = classifier.getClassification();
 
     render() {
-        const { invoked = {}, autoClassification = null } = this.state;
+        const { autoClassification = null } = this.state;
+        const { globalACMGSelections: invoked = {}, toggleInvocation } = this.props;
 
         const acmgCriteria = [
             { criteria: "BA1", description: "Allele frequency is >5% in Exome Sequencing Project, 1000 Genomes Project, or Exome Aggregation Consortium" },
@@ -390,14 +421,14 @@ class ACMGInvoker extends React.Component {
                             const { criteria, description } = obj;
                             return (
                                 <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={criteria} data-criteria={criteria} data-invoked={invoked[criteria]}
-                                    onClick={() => this.toggleInvocation(criteria)} style={{ flex: "1" }} data-html data-tip={(acmgTip(criteria, description || genericDescription))}>
+                                    onClick={() => toggleInvocation(criteria)} style={{ flex: "1" }} data-html data-tip={(acmgTip(criteria, description || genericDescription))}>
                                     { criteria }
                                 </div>
                             );}
                         )}
                     </div>
                 </div>
-                <div className="mb-2">{ autoClassification || "No classification suggestions available" }</div>
+                {/* <div className="mb-2">{ autoClassification || "No classification suggestions available" }</div> */}
             </>
         );
     }
