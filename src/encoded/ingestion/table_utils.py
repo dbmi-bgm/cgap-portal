@@ -969,7 +969,7 @@ class VariantTableParser(object):
                 "linkTo": "NoteStandard"
             }
         }
-        schema['properties']['schema_version'] = {'default': '1'}
+        schema['properties']['schema_version'] = {'default': '2'}
         schema['facets'] = facs
         schema['columns'] = cols
         schema['facets'] = self.sort_schema_properties(schema, key='facets')
