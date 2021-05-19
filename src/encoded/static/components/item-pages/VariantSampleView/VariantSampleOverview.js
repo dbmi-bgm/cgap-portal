@@ -168,7 +168,7 @@ class InterpretationController extends React.Component {
                     </div>
                     { showInterpretation == 'True' && !anyNotePermErrors ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...passProps} defaultTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} />
+                            <InterpretationSpaceWrapper {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} />
                         </div> : null }
                 </div>
             </React.Fragment>

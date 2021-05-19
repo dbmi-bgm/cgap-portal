@@ -359,9 +359,18 @@ export class InterpretationSpaceController extends React.Component {
 
     switchToTab(newTab) {
         const { currentTab } = this.state;
+        const { toggleACMGInvoker } = this.props;
         // componentWillUnmount in panel saves unsaved items before dismount completes
         if (currentTab !== newTab) {
-            this.setState({ currentTab: newTab });
+            this.setState({ currentTab: newTab }, () => {
+                if (newTab === 2) {
+                    // On clinical interpretation; toggle acmg visible
+                    toggleACMGInvoker();
+                } else if (currentTab === 2) {
+                    // Switched from clinical interpretation; toggle invisible
+                    toggleACMGInvoker();
+                }
+            });
         }
     }
 
