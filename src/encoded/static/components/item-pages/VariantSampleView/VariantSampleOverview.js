@@ -119,7 +119,7 @@ export class VariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <InterpretationController {...passProps} {...{ showInterpretation, interpretationTab, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}>
+                <InterpretationController {...passProps} interpretationTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} {...{ showInterpretation, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}>
                     <VariantSampleInfoHeader {...passProps} onSelectTranscript={this.onSelectTranscript} />
                     <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
                 </InterpretationController>
@@ -152,12 +152,12 @@ class InterpretationController extends React.Component {
         super(props);
 
         // Initialize global selections based on most recent interpretation from context
-        const { context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
+        const { interpretationTab, context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
         const acmgSelections = InterpretationController.initializeGlobalACMGState(acmg_guidelines);
 
         this.state = {
             globalACMGSelections: acmgSelections,
-            showACMGInvoker: false, // False by default, state method passed into Interpretation space and called when clinical tab is selected
+            showACMGInvoker: interpretationTab === 2, // State method passed into Interpretation space and called when clinical tab is selected
         };
 
         this.toggleACMGInvoker = this.toggleACMGInvoker.bind(this);
@@ -215,7 +215,7 @@ class InterpretationController extends React.Component {
                     </div>
                     { showInterpretation == 'True' && !anyNotePermErrors ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} />
+                            <InterpretationSpaceWrapper wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
                         </div> : null }
                 </div>
             </React.Fragment>
@@ -414,7 +414,7 @@ class ACMGInvoker extends React.Component {
 
         return (
             <>
-                <div className="card flex-row my-3">
+                <div className="card flex-row my-3 mt-0">
                     <div className="text-600 acmg-guidelines-title">ACMG Guidelines</div>
                     <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
                         {acmgCriteria.map((obj) => {
