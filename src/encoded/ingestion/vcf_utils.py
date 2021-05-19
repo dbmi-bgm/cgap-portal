@@ -44,7 +44,6 @@ class VCFParser(object):
     # and we want to maintain consistency across other fields.
     # TODO: walk schemas to determine these fields dynamically
     OVERWRITE_FIELDS = {
-        'csq_hg19_pos(1-based)': 'csq_hg19_pos',
         'csq_gerp++_rs_rankscore': 'csq_gerp_rs_rankscore',
         'csq_gerp++_rs': 'csq_gerp_rs',
         'csq_phastcons100verts': 'csq_phastcons100way_vertebrate',
