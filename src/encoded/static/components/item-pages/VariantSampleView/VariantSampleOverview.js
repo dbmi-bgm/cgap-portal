@@ -109,14 +109,6 @@ export class VariantSampleOverview extends React.PureComponent {
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
 
-        const {
-            interpretation: { error: interpError = null } = {},
-            variant_notes: { error: varNoteError = null } = {},
-            gene_notes: { error: geneNoteError = null } = {},
-        } = context || {};
-
-        const anyNotePermErrors = interpError || varNoteError || geneNoteError;
-
         const { query: {
             showInterpretation = true,      // used only if "True" (toggles showing of interpretation sidebar/pane)
             annotationTab = null,           // used only if can be parsed to integer (Variant = 0, Gene = 1, Sample = 2, AnnotationBrowser = 3, BAM Browser = 4)
@@ -126,20 +118,60 @@ export class VariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <ACMGInvoker />
+                <InterpretationController {...passProps} {...{ showInterpretation, interpretationTab, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}>
+                    <VariantSampleInfoHeader {...passProps} onSelectTranscript={this.onSelectTranscript} />
+                    <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
+                </InterpretationController>
+            </div>
+        );
+    }
+}
+
+class InterpretationController extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            showACMGInvoker: false, // False by default, state method passed into Interpretation space and called when clinical tab is selected
+        };
+
+        this.toggleACMGInvoker = this.toggleACMGInvoker.bind(this);
+    }
+
+    toggleACMGInvoker(callback) {
+        const { showACMGInvoker } = this.state;
+        this.setState({ showACMGInvoker: !showACMGInvoker }, callback);
+    }
+
+    render() {
+        const { showACMGInvoker } = this.state;
+        const { context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const passProps = { context, schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
+
+        const {
+            interpretation: { error: interpError = null, acmg_guidelines = [] } = {},
+            variant_notes: { error: varNoteError = null } = {},
+            gene_notes: { error: geneNoteError = null } = {},
+            discovery_interpretation: { error: discoveryError = null } = {}
+        } = context || {}; // TODO: Pull from most recent note from db=datastore request
+
+        const anyNotePermErrors = interpError || varNoteError || geneNoteError || discoveryError;
+
+        return (
+            <React.Fragment>
+                { showACMGInvoker ? <ACMGInvoker /> : null}
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
                     <div className="col">
-                        {/* BA1, BS1, BS2, BS3 etc markers here */}
-                        <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
-                        <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
+                        {/* Annotation Space passed as children */}
+                        { children }
                     </div>
                     { showInterpretation == 'True' && !anyNotePermErrors ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...passProps} defaultTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}/>
-                        </div> : null
-                    }
+                            <InterpretationSpaceWrapper {...passProps} defaultTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} />
+                        </div> : null }
                 </div>
-            </div>
+            </React.Fragment>
         );
     }
 }
