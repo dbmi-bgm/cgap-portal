@@ -68,6 +68,7 @@
             "type": "string",
             "enum": [
                 "data_bundle",
+                "accessioning",
                 "metadata_bundle",
                 "simulated_bundle",
                 "vcf",

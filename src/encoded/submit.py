@@ -273,7 +273,7 @@ class MetadataItem:
         self.metadata['row'] = self.row
 
 
-class SubmissionRow:
+class AccessionRow:
     """
     class used to hold metadata parsed from one row of spreadsheet at a time
     """
@@ -459,7 +459,7 @@ class SubmissionRow:
             if fmt == 'fastq':
                 self.sample.metadata.setdefault('files', []).append(file_alias)
                 if paired:
-                    paired_end = str(SubmissionRow.get_paired_end_value(i))
+                    paired_end = str(AccessionRow.get_paired_end_value(i))
                     file_info['paired_end'] = paired_end
                     if paired_end == '2':
                         file_info['related_files'] = [
@@ -475,12 +475,12 @@ class SubmissionRow:
                 self.files_processed.append(MetadataItem(file_info, self.row, 'file_processed'))
 
 
-class SubmissionMetadata:
+class AccessionMetadata:
     """
     class to hold info parsed from one spreadsheet.
 
-    One row is parsed at a time and a SubmissionRow object is generated; this is then
-    compared with previous rows already added to SubmissionMetadata object, and compared,
+    One row is parsed at a time and a AccessionRow object is generated; this is then
+    compared with previous rows already added to AccessionMetadata object, and compared,
     and changes made if necessary. This is because some objects (like family and sample_processing)
     have metadata that occurs across multiple rows.
     """
@@ -568,9 +568,9 @@ class SubmissionMetadata:
 
     def add_metadata_single_item(self, item):
         """
-        Looks at metadata from a SubmissionRow object, one DB itemtype at a time
+        Looks at metadata from a AccessionRow object, one DB itemtype at a time
         and compares and adds it. If each item is not
-        already represented in metadata for current SubmissionMetadata instance,
+        already represented in metadata for current AccessionMetadata instance,
         it is added; if it is represented, missing fields are added to item.
         Currently used for Individual and Sample items
         """
@@ -624,7 +624,7 @@ class SubmissionMetadata:
 
     def add_family_metadata(self, idx, family, individual):
         """
-        Looks at 'family' metadata from SubmissionRow object. Adds family to SubmissionMetadata
+        Looks at 'family' metadata from AccessionRow object. Adds family to AccessionMetadata
         instance if not already present. If present, family is compared and necessary changes added.
         """
         if family.alias in self.families:
@@ -650,7 +650,7 @@ class SubmissionMetadata:
 
     def add_sample_processing(self, sp_item, analysis_id):
         """
-        Looks at 'sample_processing' metadata from SubmissionRow object. Adds SP item to SubmissionMetadata
+        Looks at 'sample_processing' metadata from AccessionRow object. Adds SP item to AccessionMetadata
         instance if not already present. If present, SP metadata is compared and necessary changes added.
         """
         sp_item.metadata['analysis_type'] = self.analysis_types.get(analysis_id)
@@ -764,7 +764,7 @@ class SubmissionMetadata:
                                    ' Row cannot be processed.'.format(i + 1 + self.counter))
                 continue
             try:
-                processed_row = SubmissionRow(row, i + 1 + self.counter, fam, self.project, self.institution)
+                processed_row = AccessionRow(row, i + 1 + self.counter, fam, self.project, self.institution)
                 simple_add_items = [processed_row.individual, processed_row.sample]
                 simple_add_items.extend(processed_row.files_fastq)
                 simple_add_items.extend(processed_row.files_processed)
@@ -897,7 +897,7 @@ class PedigreeMetadata:
         """
         Looks at metadata from a PedigreeRow object, one DB itemtype at a time
         and compares and adds it. If each item is not
-        already represented in metadata for current SubmissionMetadata instance,
+        already represented in metadata for current AccessionMetadata instance,
         it is added; if it is represented, missing fields are added to item.
         """
         previous = self.individuals
@@ -1029,6 +1029,10 @@ class SpreadsheetProcessing:
     to hold all metadata extracted from spreadsheet.
     """
 
+    REQUIRED_COLUMNS = []
+    METADATA_CLASS = None
+    SKIP = 0
+
     def __init__(self, vapp, xls_data, project, institution, ingestion_id, submission_type='accessioning'):
         self.virtualapp = vapp
         self.input = xls_data
@@ -1036,12 +1040,12 @@ class SpreadsheetProcessing:
         self.institution = institution
         self.ingestion_id = ingestion_id
         self.submission_type = submission_type
-        if self.submission_type == 'accessioning':
-            self.required_columns = REQUIRED_COLS_FOR_ACCESSIONING
-        elif self.submission_type == 'family_history':
-            self.required_columns = REQUIRED_COLS_FOR_PEDIGREE
-        else:
-            raise ValueError(f'{submission_type} not a valid submission_type argument')
+        # if self.submission_type == 'accessioning':
+        #     self.required_columns = REQUIRED_COLS_FOR_ACCESSIONING
+        # elif self.submission_type == 'family_history':
+        #     self.required_columns = REQUIRED_COLS_FOR_PEDIGREE
+        # else:
+        #     raise ValueError(f'{submission_type} not a valid submission_type argument')
         self.output = {}
         self.errors = []
         self.keys = []
@@ -1075,7 +1079,7 @@ class SpreadsheetProcessing:
         """
         Turns each row into a dictionary of form {column heading1: row value1, ...}
         """
-        missing = [col for col in self.required_columns if col not in self.keys]
+        missing = [col for col in self.REQUIRED_COLUMNS if col not in self.keys]
         if missing:
             msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
             self.errors.append(msg)
@@ -1089,14 +1093,30 @@ class SpreadsheetProcessing:
                 self.rows.append(row_dict)
 
     def extract_metadata(self):
-        if self.submission_type == 'accessioning':
-            result = SubmissionMetadata(self.rows, self.project, self.institution, self.ingestion_id, self.counter)
-        elif self.submission_type == 'family_history':
-            result = PedigreeMetadata(self.virtualapp, self.rows, self.project,
-                                      self.institution, self.ingestion_id, self.counter)
+        # if self.submission_type == 'accessioning':
+        #     result = AccessionMetadata(self.rows, self.project, self.institution, self.ingestion_id, self.counter)
+        # elif self.submission_type == 'family_history':
+        #     result = PedigreeMetadata(self.virtualapp, self.rows, self.project,
+        #                               self.institution, self.ingestion_id, self.counter)
+        current_args = [self.virtualapp, self.rows, self.project,
+                        self.institution, self.ingestion_id, self.counter]
+        result = self.METADATA_CLASS(*current_args[self.SKIP:])
         self.output = result.json_out
         self.errors.extend(result.errors)
         self.passing = True
+
+
+class AccessionProcessing(SpreadsheetProcessing):
+
+    REQUIRED_COLUMNS = REQUIRED_COLS_FOR_ACCESSIONING
+    METADATA_CLASS = AccessionMetadata
+    SKIP = 1
+
+
+class PedigreeProcessing(SpreadsheetProcessing):
+
+    REQUIRED_COLUMNS = REQUIRED_COLS_FOR_PEDIGREE
+    METADATA_CLASS = PedigreeMetadata
 
 
 def xls_to_json(vapp, xls_data, project, institution, ingestion_id, submission_type):
@@ -1106,11 +1126,17 @@ def xls_to_json(vapp, xls_data, project, institution, ingestion_id, submission_t
     result.passing - whether submission "passes" this part of the code and can move
         on to the next step.
     """
-    if submission_type not in ['accessioning', 'family_history']:
+    if submission_type == 'accessioning':
+        result = AccessionProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
+                                     ingestion_id=ingestion_id, submission_type=submission_type)
+    elif submission_type == 'family_history':
+        result = PedigreeProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
+                                     ingestion_id=ingestion_id, submission_type=submission_type)
+    else:
         raise ValueError(f'{submission_type} is not a valid submission_type argument,'
                          ' expected values are "accessioning" or "family_history"')
-    result = SpreadsheetProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
-                                   ingestion_id=ingestion_id, submission_type=submission_type)
+    # result = SpreadsheetProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
+    #                                ingestion_id=ingestion_id, submission_type=submission_type)
     result.output['errors'] = result.errors
     return result.output, result.passing
 

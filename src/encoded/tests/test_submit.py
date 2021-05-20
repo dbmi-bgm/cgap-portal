@@ -5,15 +5,18 @@ from copy import deepcopy
 from unittest import mock
 from .. import submit
 from ..submit import (
+    HPO_TERM_ID_PATTERN,
+    MONDO_TERM_ID_PATTERN,
     compare_fields,
     digest_xlsx,
     format_ontology_term_with_colon,
     MetadataItem,
-    SubmissionRow,
-    SubmissionMetadata,
+    AccessionRow,
+    AccessionMetadata,
     PedigreeRow,
     PedigreeMetadata,
-    SpreadsheetProcessing,
+    AccessionProcessing,
+    PedigreeProcessing,
     map_fields,
     parse_exception,
     post_and_patch_all_items,
@@ -270,7 +273,7 @@ def big_family_rows():
 
 @pytest.fixture
 def example_rows_obj(example_rows, project, institution):
-    return SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+    return AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
 
 
 @pytest.fixture
@@ -318,6 +321,22 @@ def new_family(child, mother, father):
     }
 
 
+def test_hp_term_id_pattern():
+    assert HPO_TERM_ID_PATTERN.match("HP:1234567")
+    assert not HPO_TERM_ID_PATTERN.match("HP_1234567")
+    assert not HPO_TERM_ID_PATTERN.match("HP:12345678")
+    assert not HPO_TERM_ID_PATTERN.match("HP:123456X")
+    assert not HPO_TERM_ID_PATTERN.match("HPO:1234567")
+
+
+def test_mondo_term_id_pattern():
+    assert MONDO_TERM_ID_PATTERN.match("MONDO:1234567")
+    assert not MONDO_TERM_ID_PATTERN.match("MONDO_1234567")
+    assert not MONDO_TERM_ID_PATTERN.match("MONDO:12345678")
+    assert not MONDO_TERM_ID_PATTERN.match("MONDO:123456X")
+    assert not MONDO_TERM_ID_PATTERN.match("MO:1234567")
+
+
 def test_map_fields(sample_info):
     # tests spreadsheet fields are mapped to correct cgap property
     result = map_fields(sample_info, {}, [], 'sample')
@@ -337,7 +356,7 @@ def test_format_ontology_term_with_colon(term, result):
     assert format_ontology_term_with_colon(term) == result
 
 
-class TestSubmissionRow:
+class TestAccessionRow:
 
     @pytest.mark.parametrize('col, val, sample_alias', [
         (None, None, 'encode-project:sample-3464467-WGS-2'),
@@ -348,11 +367,11 @@ class TestSubmissionRow:
     def test_row_sample_aliases(self, row_dict, col, val, sample_alias, project, institution):
         if col:
             row_dict[col] = val
-        obj = SubmissionRow(row_dict, 1, 'test-proj:fam', project['name'], institution['name'])
+        obj = AccessionRow(row_dict, 1, 'test-proj:fam', project['name'], institution['name'])
         assert obj.sample_alias == sample_alias
 
     def test_extract_individual_metadata(self, row_dict, project, institution):
-        obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        obj = AccessionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert obj.indiv_alias == 'encode-project:individual-456'
         assert obj.individual.metadata['aliases'] == [obj.indiv_alias]
         assert obj.individual.metadata['individual_id'] == row_dict['individual id']
@@ -368,7 +387,7 @@ class TestSubmissionRow:
         """
         row_dict['age'] = age
         row_dict['birth year'] = birth_year
-        obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        obj = AccessionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert isinstance(obj.individual.metadata['age'], val_type)
         assert not obj.errors
 
@@ -383,7 +402,7 @@ class TestSubmissionRow:
         be permitted with a pedigree file.
         """
         row_dict['relation to proband'] = relation
-        obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        obj = AccessionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert obj.family.alias == 'test-proj:fam1'
         assert obj.family.metadata['members'] == ['encode-project:individual-456']
         if relation == 'proband':
@@ -401,7 +420,7 @@ class TestSubmissionRow:
         """
         row_dict['req accepted y/n'] = 'Yes'
         row_dict['specimen accepted by ref lab'] = "n"
-        obj = SubmissionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        obj = AccessionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert obj.sample.metadata['specimen_accession'] == row_dict['specimen id']
         assert obj.sample.metadata['specimen_accepted'] == 'No'
         assert obj.sample.metadata['specimen_type'] == 'peripheral blood'
@@ -413,7 +432,7 @@ class TestSubmissionRow:
         """expected file extensions in spreadsheet"""
         row_dict['files'] = 'f1.fastq.gz, f2.cram, f3.vcf.gz'
         files = [f.strip() for f in row_dict['files'].split(',')]
-        obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        obj = AccessionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
         assert files[0] in obj.files_fastq[0].alias
         assert obj.files_fastq[0].metadata['file_format'] == '/file-formats/fastq/'
         assert obj.files_fastq[0].metadata['file_type'] == 'reads'
@@ -425,7 +444,7 @@ class TestSubmissionRow:
         """filenames indicating uncompressed fastqs/vcfs should lead to errors"""
         row_dict['files'] = 'f1.fastq, f2.cram, f3.vcf'
         files = [f.strip() for f in row_dict['files'].split(',')]
-        obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        obj = AccessionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
         assert not obj.files_fastq
         assert obj.files_processed[0].alias == 'encode-project:f2.cram'
         assert files[2] not in ''.join([f.alias for f in obj.files_processed])
@@ -435,7 +454,7 @@ class TestSubmissionRow:
         """# file extensions other than fastq.gz,.cram, .vcf.gz should generate an error"""
         row_dict['files'] = 'f3.gvcf.gz'
         files = [f.strip() for f in row_dict['files'].split(',')]
-        obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        obj = AccessionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
         assert not obj.files_processed
         assert 'File extension on f3.gvcf.gz not supported - ' in ''.join(obj.errors)
 
@@ -453,17 +472,17 @@ class TestSubmissionRow:
     def test_found_missing_values(self, row_dict, project, institution, field, error):
         """some columns are required for spreadsheet submission, others are optional."""
         row_dict[field] = None
-        obj = SubmissionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        obj = AccessionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
         assert (len(obj.errors) > 0) == error
         assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
                 ''.format(field) in obj.errors) == error
 
     @pytest.mark.parametrize('num, val', [(0, 1), (1, 2), (2, 1), (3, 2), (4, 1), (5, 2)])
     def test_get_paired_end_value(self, num, val):
-        assert SubmissionRow.get_paired_end_value(num) == val
+        assert AccessionRow.get_paired_end_value(num) == val
 
 
-class TestSubmissionMetadata:
+class TestAccessionMetadata:
 
     def test_init_families(self, example_rows_obj, project):
         """test family aliases are named after proband individual ids"""
@@ -481,7 +500,7 @@ class TestSubmissionMetadata:
         assert a_types['2222'] == 'WGS'
         assert a_types['3333'] == 'WES-Group'
         example_rows[1]['test requested'] = 'WES'
-        new_obj = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        new_obj = AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
         new_a_types = new_obj.analysis_types
         assert new_a_types['1111'] is None
 
@@ -500,7 +519,7 @@ class TestSubmissionMetadata:
                 {k: v for k, v in example_rows[1].items()}
             ]
             data[rowidx]['specimen accepted by ref lab'] = 'Y'
-        submission = SubmissionMetadata(data, project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(data, project, institution, TEST_INGESTION_ID1)
         assert len(submission.individuals) == 2
         assert len(submission.samples) == 2
         assert 'specimen_accepted' in list(submission.samples.values())[1]
@@ -513,7 +532,7 @@ class TestSubmissionMetadata:
         # for rowidx in (1, 2):
         example_rows[0]['files'] = 'f1.fastq.gz, f2.fastq.gz'
         example_rows[1]['files'] = 'f1.fastq.gz, f2.fastq.gz'
-        submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
         fastqs = list(submission.files_fastq.values())
         assert len(fastqs[1]['related_files']) == 1
 
@@ -530,7 +549,7 @@ class TestSubmissionMetadata:
         # for rowidx in (1, 2):
         example_rows[0]['files'] = files1
         example_rows[1]['files'] = files2
-        submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
         assert 'Please ensure fastq is paired with correct file in all rows' in ''.join(submission.errors)
         # fastqs = list(submission.files_fastq.values())
         # assert len(fastqs[1]['related_files']) == 1
@@ -541,7 +560,7 @@ class TestSubmissionMetadata:
         if samples have the same specimen_accession but different test number, the bam_sample_id
         should be unique but the specimen_accession should stay the same.
         """
-        submission = SubmissionMetadata(example_rows_with_test_number,
+        submission = AccessionMetadata(example_rows_with_test_number,
                                         project, institution, TEST_INGESTION_ID1)
         accession1 = [item for item in submission.samples.values() if item['specimen_accession'] == '1']
         assert accession1[0]['specimen_accession'] == accession1[1]['specimen_accession']
@@ -558,7 +577,7 @@ class TestSubmissionMetadata:
         before modification, fixture contains proband, mother, father, sister.
         """
         big_family_rows[4]['relation to proband'] = last_relation
-        submission = SubmissionMetadata(big_family_rows, project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(big_family_rows, project, institution, TEST_INGESTION_ID1)
         assert len(submission.families) == 1
         fam = list(submission.families.values())[0]
         assert len(fam['members']) == 5
@@ -568,7 +587,7 @@ class TestSubmissionMetadata:
     def test_add_sample_processing(self, example_rows, project, institution):
         """tests metadata creation for sample_processing item from a set of rows"""
         example_rows[6]['test requested'] = 'WGS'  # analysis 3333 will have mismatched workup type values
-        submission = SubmissionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
         sps = submission.sample_processings
         assert sps['encode-project:analysis-1111']['analysis_type'] == 'WGS-Trio'
         assert sps['encode-project:analysis-2222']['analysis_type'] == 'WGS'
@@ -585,7 +604,7 @@ class TestSubmissionMetadata:
         if not report:
             row_dict['report required'] = 'N'
         row_dict['unique analysis id'] = case_id
-        submission = SubmissionMetadata([row_dict], project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata([row_dict], project, institution, TEST_INGESTION_ID1)
         case = list(submission.cases.values())[0]
         assert row_dict['individual id'] in case['individual']
         assert case['ingestion_ids'] == [TEST_INGESTION_ID1]
@@ -603,7 +622,7 @@ class TestSubmissionMetadata:
     def test_add_case_info(self, row_dict, case_id, project, institution):
         """tests that case ID from row gets added to proper dictionary attribute"""
         row_dict['unique analysis id'] = case_id
-        submission = SubmissionMetadata([row_dict], project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata([row_dict], project, institution, TEST_INGESTION_ID1)
         key = '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id'])
         assert submission.case_info.get(key)['case id'] == case_id
 
@@ -612,7 +631,7 @@ class TestSubmissionMetadata:
         tests that correct proband mother and father get added to individual item metadata
         after all rows are processed
         """
-        obj = SubmissionMetadata(big_family_rows, project, institution, TEST_INGESTION_ID1)
+        obj = AccessionMetadata(big_family_rows, project, institution, TEST_INGESTION_ID1)
         proband = obj.individuals['encode-project:individual-456']
         sister = obj.individuals['encode-project:individual-546']
         brother = obj.individuals['encode-project:individual-555']
@@ -814,14 +833,14 @@ class TestSpreadsheetProcessing:
     def test_header_found(self, testapp, project, institution, xls_list, remove_row, success_bool):
         """tests that proper header is found when present"""
         data = iter(xls_list[0:remove_row] + xls_list[(remove_row) + 1:])
-        obj = SpreadsheetProcessing(testapp, data, project, institution, TEST_INGESTION_ID1)
+        obj = AccessionProcessing(testapp, data, project, institution, TEST_INGESTION_ID1)
         assert obj.passing == success_bool
         assert (len(obj.errors) == 0) == success_bool
         assert ('Column headers not detected in spreadsheet!' in ''.join(obj.errors)) == (not success_bool)
 
     def test_create_row_dict(self, testapp, xls_list, project, institution):
         """tests that dictionary of colname: field value is created for each row"""
-        obj = SpreadsheetProcessing(testapp, iter(xls_list), project, institution, TEST_INGESTION_ID1)
+        obj = AccessionProcessing(testapp, iter(xls_list), project, institution, TEST_INGESTION_ID1)
         assert obj.keys
         assert len(obj.rows) == 3
         for row in obj.rows:
@@ -831,7 +850,7 @@ class TestSpreadsheetProcessing:
         """tests that correct error is returned when a required column header is not in spreadsheet"""
         idx = xls_list[1].index('Specimen ID')
         rows = (row[0:idx] + row[idx+1:] for row in xls_list)
-        obj = SpreadsheetProcessing(testapp, rows, project, institution, TEST_INGESTION_ID1)
+        obj = AccessionProcessing(testapp, rows, project, institution, TEST_INGESTION_ID1)
         assert not obj.passing
         assert 'Column(s) "specimen id" not found in spreadsheet!' in ''.join(obj.errors)
 
@@ -843,7 +862,7 @@ class TestSpreadsheetProcessing:
                                    xls_list_pedigree, remove_row, success_bool):
         """tests that proper header is found when present"""
         data = iter(xls_list_pedigree[0:remove_row] + xls_list_pedigree[(remove_row) + 1:])
-        obj = SpreadsheetProcessing(testapp, data, project, institution, TEST_INGESTION_ID1,
+        obj = PedigreeProcessing(testapp, data, project, institution, TEST_INGESTION_ID1,
                                     submission_type='family_history')
         assert obj.passing == success_bool
         assert (len(obj.errors) == 0) == success_bool
@@ -851,7 +870,7 @@ class TestSpreadsheetProcessing:
 
     def test_create_row_dict_pedigree(self, testapp, xls_list_pedigree, project, institution):
         """tests that dictionary of colname: field value is created for each row"""
-        obj = SpreadsheetProcessing(testapp, iter(xls_list_pedigree), project, institution,
+        obj = PedigreeProcessing(testapp, iter(xls_list_pedigree), project, institution,
                                     TEST_INGESTION_ID1, submission_type='family_history')
         assert obj.keys
         assert len(obj.rows) == 8
@@ -868,7 +887,7 @@ class TestSpreadsheetProcessing:
         """tests that correct error is returned when a required column header is not in spreadsheet"""
         idx = xls_list_pedigree[0].index(col)
         rows = (row[0:idx] + row[idx+1:] for row in xls_list_pedigree)
-        obj = SpreadsheetProcessing(testapp, rows, project, institution, TEST_INGESTION_ID1,
+        obj = PedigreeProcessing(testapp, rows, project, institution, TEST_INGESTION_ID1,
                                     submission_type='family_history')
         assert obj.passing == success_bool
         if not success_bool:
