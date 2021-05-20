@@ -155,9 +155,12 @@ class InterpretationController extends React.Component {
         // Initialize global selections based on most recent interpretation from context
         const { interpretationTab, context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
         const acmgSelections = InterpretationController.initializeGlobalACMGState(acmg_guidelines);
+        const classifier = new AutoClassify(acmgSelections);
+        const classification = classifier.getClassification();
 
         this.state = {
             globalACMGSelections: acmgSelections,
+            autoClassification: classification,
             showACMGInvoker: interpretationTab === 2, // State method passed into Interpretation space and called when clinical tab is selected
         };
 
@@ -185,13 +188,15 @@ class InterpretationController extends React.Component {
             newInvocations[criteria] = true;
         }
 
-        // TODO: re-add autoclassification update method here-ish/maybe in callback?
+        // TODO: rework this to have a single instance, updated when new criteria toggled
+        const classifier = new AutoClassify(newInvocations);
+        const classification = classifier.getClassification();
 
-        this.setState({ globalACMGSelections: newInvocations }, callback);
+        this.setState({ globalACMGSelections: newInvocations, autoClassification: classification }, callback);
     }
 
     render() {
-        const { showACMGInvoker, globalACMGSelections } = this.state;
+        const { showACMGInvoker, globalACMGSelections, autoClassification } = this.state;
         const { context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const passProps = { context, schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
 
@@ -220,7 +225,7 @@ class InterpretationController extends React.Component {
                     </div>
                     { showInterpretation == 'True' && !anyNotePermErrors ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
+                            <InterpretationSpaceWrapper {...{ autoClassification }} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
                         </div> : null }
                 </div>
             </React.Fragment>
@@ -366,21 +371,7 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
 
 
 class ACMGInvoker extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            autoClassification: null
-        };
-
-        // this.classifier = new AutoClassify(newInvocations);
-    }
-
-    // const classifier = new AutoClassify(newInvocations);
-    // const classification = classifier.getClassification();
-
     render() {
-        const { autoClassification = null } = this.state;
         const { globalACMGSelections: invoked = {}, toggleInvocation } = this.props;
 
         const acmgCriteria = [
@@ -414,27 +405,24 @@ class ACMGInvoker extends React.Component {
             { criteria: "PVS1", description: "Null variant (nonsense, frameshift, canonical ±1 or 2 splice sites, initiation codon, single or multiexon deletion) in a gene where LOF is a known mechanism of disease.<br/><br/>Caveats:<br/><ul><li>Beware of genes where LOF is not a known disease mechanism (e.g., GFAP, MYH7)</li><li>Use caution interpreting LOF variants at the extreme 3′ end of a gene</li><li>Use caution with splice variants that are predicted to lead to exon skipping but leave the remainder of the protein intact</li><li>Use caution in the presence of multiple transcripts</li></ul>" }
         ];
 
-        const genericDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        const genericDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
         const acmgTip = (criteria, description) => `<h5 class="my-0 mw-10 text-600">${criteria}</h5><div style="max-width: 250px">${description}</div>`;
 
         return (
-            <>
-                <div className="card flex-row my-3 mt-0">
-                    <div className="text-600 acmg-guidelines-title">ACMG Guidelines</div>
-                    <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
-                        {acmgCriteria.map((obj) => {
-                            const { criteria, description } = obj;
-                            return (
-                                <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={criteria} data-criteria={criteria} data-invoked={invoked[criteria]}
-                                    onClick={() => toggleInvocation(criteria)} style={{ flex: "1" }} data-html data-tip={(acmgTip(criteria, description || genericDescription))}>
-                                    { criteria }
-                                </div>
-                            );}
-                        )}
-                    </div>
+            <div className="card flex-row my-3 mt-0">
+                <div className="text-600 acmg-guidelines-title">ACMG Guidelines</div>
+                <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
+                    {acmgCriteria.map((obj) => {
+                        const { criteria, description } = obj;
+                        return (
+                            <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={criteria} data-criteria={criteria} data-invoked={invoked[criteria]}
+                                onClick={() => toggleInvocation(criteria)} style={{ flex: "1" }} data-html data-tip={(acmgTip(criteria, description || genericDescription))}>
+                                { criteria }
+                            </div>
+                        );}
+                    )}
                 </div>
-                {/* <div className="mb-2">{ autoClassification || "No classification suggestions available" }</div> */}
-            </>
+            </div>
         );
     }
 }

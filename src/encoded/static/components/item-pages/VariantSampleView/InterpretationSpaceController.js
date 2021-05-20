@@ -388,7 +388,7 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip, discovery_interpretation_wip } = this.state;
-        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections } = this.props;
+        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification } = this.props;
         const { actions = [] } = context || {};
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
@@ -426,7 +426,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} wipACMGSelections={wipACMGSelections}
                     lastWIPNote={interpretationWIP} lastSavedNote={lastSavedInterpretation} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission, autoClassification }}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
@@ -563,7 +563,7 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { lastSavedNote = null, wipACMGSelections, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource, hasEditPermission } = this.props;
+        const { lastSavedNote = null, wipACMGSelections, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource, hasEditPermission, autoClassification } = this.props;
         const {
             status: savedNoteStatus,
             last_modified: lastModified = null
@@ -593,7 +593,7 @@ class GenericInterpretationPanel extends React.Component {
                     : null}
                 <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
-                    <GenericFieldForm fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_guidelines', value: wipACMGSelections }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    <GenericFieldForm fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_guidelines', value: wipACMGSelections, autoClassification }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
                 { noteType === "note_discovery" ?
                     <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
@@ -786,8 +786,8 @@ function GenericFieldForm(props) {
 
     const fieldsJSX = useMemo(function() {
         return fieldsArr.map((fieldDataObj) => {
-            const { field, value } = fieldDataObj;
-            if (field === "acmg_guidelines") { return (<ACMGPicker selections={value} {...{ schemas, field, getFieldProperties }}/>); }
+            const { field, value, autoClassification } = fieldDataObj;
+            if (field === "acmg_guidelines") { return (<ACMGPicker selections={value} {...{ schemas, field, autoClassification, getFieldProperties }}/>); }
             return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field, getFieldProperties }}
                 onOptionChange={onDropOptionChange} />);
         }).sort().reverse(); // Reverse really just to get Variant candidacy to show up last. May need a better solution if more fields added in future.
@@ -800,7 +800,7 @@ function GenericFieldForm(props) {
 }
 
 function ACMGPicker(props) {
-    const { field, selections = [], schemas = null, onOptionChange, cls="mb-1", getFieldProperties } = props;
+    const { field, selections = [], schemas = null, onOptionChange, cls="mb-1", getFieldProperties, autoClassification } = props;
     if (!schemas) {
         return null;
     }
@@ -824,6 +824,7 @@ function ACMGPicker(props) {
             <div className="w-100 d-flex acmg-picker mb-08">
                 { selections.length > 0 ? picked : <div className="acmg-invoker text-muted" data-tip={"Use the picker above to make invocations."} data-criteria="none">None</div>}
             </div>
+            { autoClassification ? <div className="text-small mb-2"><span className="text-600">CGAP's Classification:</span> {autoClassification}</div>: null}
         </React.Fragment>
     );
 }
