@@ -1025,13 +1025,13 @@ class PedigreeMetadata:
 class SpreadsheetProcessing:
     """
     class that holds relevant information for processing of a single spreadsheet.
-    After initial processing of header and rows, will create an instance of SpreadsheetMetadata
-    to hold all metadata extracted from spreadsheet.
+    After initial processing of header and rows, will create an instance of relevant
+    'Metadata' class to hold all metadata extracted from spreadsheet.
     """
 
     REQUIRED_COLUMNS = []
     METADATA_CLASS = None
-    SKIP = 0
+    SKIP = 0  # handles number of args required to instantiate relevant Metadata class
 
     def __init__(self, vapp, xls_data, project, institution, ingestion_id, submission_type='accessioning'):
         self.virtualapp = vapp
@@ -1040,12 +1040,6 @@ class SpreadsheetProcessing:
         self.institution = institution
         self.ingestion_id = ingestion_id
         self.submission_type = submission_type
-        # if self.submission_type == 'accessioning':
-        #     self.required_columns = REQUIRED_COLS_FOR_ACCESSIONING
-        # elif self.submission_type == 'family_history':
-        #     self.required_columns = REQUIRED_COLS_FOR_PEDIGREE
-        # else:
-        #     raise ValueError(f'{submission_type} not a valid submission_type argument')
         self.output = {}
         self.errors = []
         self.keys = []
@@ -1093,11 +1087,6 @@ class SpreadsheetProcessing:
                 self.rows.append(row_dict)
 
     def extract_metadata(self):
-        # if self.submission_type == 'accessioning':
-        #     result = AccessionMetadata(self.rows, self.project, self.institution, self.ingestion_id, self.counter)
-        # elif self.submission_type == 'family_history':
-        #     result = PedigreeMetadata(self.virtualapp, self.rows, self.project,
-        #                               self.institution, self.ingestion_id, self.counter)
         current_args = [self.virtualapp, self.rows, self.project,
                         self.institution, self.ingestion_id, self.counter]
         result = self.METADATA_CLASS(*current_args[self.SKIP:])
@@ -1107,14 +1096,22 @@ class SpreadsheetProcessing:
 
 
 class AccessionProcessing(SpreadsheetProcessing):
-
+    """
+    class that holds relevant information for processing of a single accessioning spreadsheet.
+    After initial processing of header and rows, will create an instance of AccessionMetadata
+    to hold all metadata extracted from spreadsheet.
+    """
     REQUIRED_COLUMNS = REQUIRED_COLS_FOR_ACCESSIONING
     METADATA_CLASS = AccessionMetadata
-    SKIP = 1
+    SKIP = 1  # vapp arg not needed for instantiation of this class (only PedigreeMetadata)
 
 
 class PedigreeProcessing(SpreadsheetProcessing):
-
+    """
+    class that holds relevant information for processing of a single pedigree/family history spreadsheet.
+    After initial processing of header and rows, will create an instance of PedigreeMetadata
+    to hold all metadata extracted from spreadsheet.
+    """
     REQUIRED_COLUMNS = REQUIRED_COLS_FOR_PEDIGREE
     METADATA_CLASS = PedigreeMetadata
 
@@ -1135,8 +1132,6 @@ def xls_to_json(vapp, xls_data, project, institution, ingestion_id, submission_t
     else:
         raise ValueError(f'{submission_type} is not a valid submission_type argument,'
                          ' expected values are "accessioning" or "family_history"')
-    # result = SpreadsheetProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
-    #                                ingestion_id=ingestion_id, submission_type=submission_type)
     result.output['errors'] = result.errors
     return result.output, result.passing
 
