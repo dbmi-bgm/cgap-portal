@@ -7,6 +7,7 @@ from .. import submit
 from ..submit import (
     compare_fields,
     digest_xlsx,
+    format_ontology_term_with_colon,
     MetadataItem,
     SubmissionRow,
     SubmissionMetadata,
@@ -324,6 +325,16 @@ def test_map_fields(sample_info):
     assert result['specimen_accession'] == '9034'
     assert result['specimen_collection_date'] == '2020-01-06'
     assert not result.get('sequencing_lab')
+
+
+@pytest.mark.parametrize('term, result', [
+    ('hp_12345', 'HP:12345'),
+    ('mOndO_765432', 'MONDO:765432'),
+    ('mondo:123', 'MONDO:123'),
+    ('hpo12345', 'HPO12345')
+])
+def test_format_ontology_term_with_colon(term, result):
+    assert format_ontology_term_with_colon(term) == result
 
 
 class TestSubmissionRow:
