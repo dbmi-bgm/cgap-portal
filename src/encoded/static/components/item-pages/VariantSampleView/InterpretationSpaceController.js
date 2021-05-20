@@ -395,12 +395,12 @@ export class InterpretationSpaceController extends React.Component {
 
         const isDraftVariantNoteUnsaved = this.memoized.hasNoteChanged(variant_notes_wip, lastSavedVariantNote);
         const isDraftGeneNoteUnsaved = this.memoized.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
+        const isDraftDiscoveryUnsaved = this.memoized.hasNoteChanged(discovery_interpretation_wip, lastSavedDiscovery);
 
         // Add ACMG from WIP
         const interpretationWIP = { ...interpretation_wip };
         interpretationWIP["acmg_guidelines"] = wipACMGSelections;
         const isDraftInterpretationUnsaved = this.memoized.hasNoteChanged(interpretationWIP, lastSavedInterpretation);
-        const isDraftDiscoveryUnsaved = this.memoized.hasNoteChanged(discovery_interpretation_wip, lastSavedDiscovery);
 
         const hasEditPermission = this.memoized.haveEditPermission(actions);
 
@@ -445,7 +445,8 @@ export class InterpretationSpaceController extends React.Component {
             <div className="card interpretation-space">
                 <InterpretationSpaceHeader {...{ isExpanded }} toggleExpanded={this.toggleExpanded}/>
                 <div className="card-body">
-                    <InterpretationSpaceTabs {...{ currentTab }} switchToTab={this.switchToTab} />
+                    <InterpretationSpaceTabs {...{ currentTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftVariantNoteUnsaved, isDraftInterpretationUnsaved }}
+                        switchToTab={this.switchToTab} />
                     { panelToDisplay }
                 </div>
             </div>
@@ -467,17 +468,23 @@ function InterpretationSpaceHeader(props) { // Expanded items commented out unti
 }
 
 function InterpretationSpaceTabs(props) {
-    const { currentTab, switchToTab } = props;
+    const { currentTab, switchToTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftInterpretationUnsaved, isDraftVariantNoteUnsaved } = props;
+    const tabIndexToUnsavedDraft = { 0: isDraftVariantNoteUnsaved, 1: isDraftGeneNoteUnsaved, 2: isDraftInterpretationUnsaved, 3: isDraftDiscoveryUnsaved };
+
+    // Maybe memoize?
+    const tabsRender = InterpretationSpaceController.tabNames.map((tabName, i) => {
+        const isActive = currentTab === i;
+        const unsavedDraft = tabIndexToUnsavedDraft[i];
+        return (
+            <li key={i} className={`interpretation-tab clickable d-flex align-items-center ${unsavedDraft ? 'font-italic' : ''}`}
+                onClick={(e) => switchToTab(i)} data-active={isActive} data-tip={unsavedDraft ? "Unsaved changes": null}>
+                {tabName}{unsavedDraft ? '*': ''}
+            </li>);
+    });
 
     return (
         <ul className="p-1 d-flex align-items-center justify-content-between">
-            {InterpretationSpaceController.tabNames.map((tabName, i) => {
-                const isActive = currentTab === i;
-                return (
-                    <li key={i} className="interpretation-tab clickable" onClick={(e) => switchToTab(i)} data-active={isActive}>
-                        {tabName}
-                    </li>);
-            })}
+            {tabsRender}
         </ul>
     );
 }
