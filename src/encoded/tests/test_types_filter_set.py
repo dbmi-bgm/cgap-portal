@@ -46,7 +46,7 @@ def test_filter_set_barebones(workbook, es_testapp, barebones_filter_set):
         ],
         'search_type': 'Project'  # NOTE: will work since we are not actually validating this
     }).json['@graph']
-    assert len(compound_search_res) == 1
+    assert len(compound_search_res) == 2
 
     # do it again, this time with a type that will return 404
     es_testapp.post_json(COMPOUND_SEARCH_URL, {
@@ -109,7 +109,7 @@ def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
         ],
         'search_type': 'Project'
     }).json['@graph']
-    assert len(compound_search_res) == 1
+    assert len(compound_search_res) == 2
 
     # execute the same search using filter_blocks and flags
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {

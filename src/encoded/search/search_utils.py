@@ -377,7 +377,15 @@ def make_search_subreq(request, path):
 
 def is_numerical_field(field_schema):
     """ Helper method that checks field_schemas type and determines if it is a 'numerical' field. """
-    return field_schema['type'] in ("integer", "float", "number")
+    return field_schema.get('type', 'n/a') in ("integer", "float", "number")
+
+
+def is_array_of_numerical_field(field_schema):
+    """ Helper method that checks if field schema is a numerical array field. """
+    items = field_schema.get('items', None)
+    if items:
+        return is_numerical_field(items)
+    return False
 
 
 def is_date_field(field, field_schema):
