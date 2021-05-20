@@ -19,8 +19,46 @@ const {
 
 
 export const InterpretationTab = React.memo(function InterpretationTab (props) {
-    const { variantSampleListItem, schemas, caseAccession } = props;
-    const { variant_samples: vsSelections = [] } = variantSampleListItem;
+    const { variantSampleListItem, schemas, caseAccession, isLoadingVariantSampleListItem = false } = props;
+    const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
+
+    let body = null;
+
+    if (isLoadingVariantSampleListItem) {
+        body = (
+            <h4 className="text-400 text-center text-muted">
+                <i className="icon icon-spin icon-circle-notch icon-2x fas"/>
+            </h4>
+        );
+    } else if (vsSelections.length === 0) {
+        body = (
+            <h4 className="text-400">No selections added yet</h4>
+        );
+    } else {
+        body = vsSelections.map(function(selectionSubObject, idx){
+            return <VariantSampleSelection {...{ schemas, caseAccession }} selection={selectionSubObject} key={idx} index={idx} />;
+        });
+    }
+
+    return (
+        <React.Fragment>
+            <h1 className="text-300">
+                Interpretation
+            </h1>
+            <div>
+                { body }
+            </div>
+        </React.Fragment>
+    );
+});
+
+
+function VariantSampleSelection({ selection, index, caseAccession, schemas }){
+    const {
+        date_selected,
+        filter_blocks_request_at_time_of_selection,
+        variant_sample_item
+    } = selection;
 
     const {
         "VariantSample": {
@@ -41,110 +79,92 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         } = {}
     } = schemas || {};
 
-    const renderedSections = vsSelections.map(function(sel, idx){
-        const {
-            date_selected,
-            filter_blocks_request_at_time_of_selection,
-            variant_sample_item
-        } = sel;
-        const { "@id": vsID, interpretation = null, discovery_interpretation = null } = variant_sample_item || {};
-        const { classification: acmgClassification = null } = interpretation || {};
-        const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discovery_interpretation || {};
-        return (
-            <div className="card mb-1" key={idx}>
-                <div className="card-header">
-                    <div className="d-flex align-items-center">
-
-                        <div className="flex-grow-1 d-flex flex-column flex-sm-row">
-                            <div className="flex-auto">
-                                <VariantSampleDisplayTitleColumn result={variant_sample_item}
-                                    link={`${vsID}?showInterpretation=True${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
-                            </div>
-                            <div className="flex-grow-1  d-sm-block">
-                                &nbsp;
-                            </div>
-                            <div className="flex-auto text-small" data-tip="Date Selected">
-                                <i className="icon icon-calendar far mr-07"/>
-                                <LocalizedTime timestamp={date_selected} />
-                            </div>
-                        </div>
-
-                        <div className="flex-auto pl-16">
-                            <DropdownButton size="sm" variant="light" disabled title={
-                                <React.Fragment>
-                                    <i className="icon icon-bars fas mr-07"/>
-                                    Actions
-                                </React.Fragment>
-                            }>
-                                TODO
-                            </DropdownButton>
-                        </div>
-                    </div>
-                </div>
-                <div className="card-body pt-0 pb-08">
-                    <div className="row flex-column flex-sm-row">
-                        <div className="col col-sm-4 col-lg-2 py-2">
-                            <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
-                                { geneTranscriptColTitle || "Gene, Transcript" }
-                            </label>
-                            { geneTranscriptRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
-                        </div>
-                        <div className="col col-sm-4 col-lg-2 py-2">
-                            <label className="mb-04 text-small" data-tip={variantColDescription}>
-                                { variantColTitle || "Variant" }
-                            </label>
-                            { variantRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
-                        </div>
-                        <div className="col col-sm-4 col-lg-3 py-2">
-                            <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
-                                { genotypeLabelColTitle || "Genotype" }
-                            </label>
-                            { genotypeLabelRenderFunc(variant_sample_item, { align: 'left' }) }
-                        </div>
-                        <div className="col col-sm-4 col-lg-2 py-2">
-                            <label className="mb-04 text-small">ACMG Classification</label>
-                            { acmgClassification ?
-                                <div className="w-100 text-left">
-                                    <i className="status-indicator-dot mr-1" data-status={acmgClassification}/>
-                                    {acmgClassification}
-                                </div>:
-                                <div className="w-100 text-left text-muted text-truncate">Pending</div>}
-                        </div>
-                        <div className="col col-sm-8 col-lg-3 py-2">
-                            <label className="mb-04 text-small">Discovery</label>
-                            <div className="w-100 text-left">
-                                <span className="font-italic text-muted" style={{ marginRight: "25px" }}>Gene: </span>
-                                { geneCandidacy ?
-                                    <span className="text-left">
-                                        <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
-                                        {geneCandidacy}
-                                    </span>:
-                                    <span className="text-left text-muted text-truncate">Not Available</span>}
-                            </div>
-                            <div className="text-left">
-                                <span className="font-italic text-muted mr-1">Variant: </span>
-                                { variantCandidacy ?
-                                    <span className="w-100 text-left">
-                                        <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/>
-                                        {variantCandidacy}
-                                    </span>:
-                                    <span className="text-left text-muted text-truncate">Not Available</span>}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    });
-
+    const { "@id": vsID, interpretation = null, discovery_interpretation = null } = variant_sample_item || {};
+    const { classification: acmgClassification = null } = interpretation || {};
+    const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discovery_interpretation || {};
     return (
-        <React.Fragment>
-            <h1 className="text-300">
-                Interpretation
-            </h1>
-            <div>
-                { renderedSections }
+        <div className="card mb-1" key={index}>
+            <div className="card-header">
+                <div className="d-flex align-items-center">
+
+                    <div className="flex-grow-1 d-flex flex-column flex-sm-row">
+                        <div className="flex-auto">
+                            <VariantSampleDisplayTitleColumn result={variant_sample_item}
+                                link={`${vsID}?showInterpretation=True${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
+                        </div>
+                        <div className="flex-grow-1  d-sm-block">
+                            &nbsp;
+                        </div>
+                        <div className="flex-auto text-small" data-tip="Date Selected">
+                            <i className="icon icon-calendar far mr-07"/>
+                            <LocalizedTime timestamp={date_selected} />
+                        </div>
+                    </div>
+
+                    <div className="flex-auto pl-16">
+                        <DropdownButton size="sm" variant="light" disabled title={
+                            <React.Fragment>
+                                <i className="icon icon-bars fas mr-07"/>
+                                Actions
+                            </React.Fragment>
+                        }>
+                            TODO
+                        </DropdownButton>
+                    </div>
+                </div>
             </div>
-        </React.Fragment>
+            <div className="card-body pt-0 pb-08">
+                <div className="row flex-column flex-sm-row">
+                    <div className="col col-sm-4 col-lg-2 py-2">
+                        <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
+                            { geneTranscriptColTitle || "Gene, Transcript" }
+                        </label>
+                        { geneTranscriptRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                    </div>
+                    <div className="col col-sm-4 col-lg-2 py-2">
+                        <label className="mb-04 text-small" data-tip={variantColDescription}>
+                            { variantColTitle || "Variant" }
+                        </label>
+                        { variantRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                    </div>
+                    <div className="col col-sm-4 col-lg-3 py-2">
+                        <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
+                            { genotypeLabelColTitle || "Genotype" }
+                        </label>
+                        { genotypeLabelRenderFunc(variant_sample_item, { align: 'left' }) }
+                    </div>
+                    <div className="col col-sm-4 col-lg-2 py-2">
+                        <label className="mb-04 text-small">ACMG Classification</label>
+                        { acmgClassification ?
+                            <div className="w-100 text-left">
+                                <i className="status-indicator-dot mr-1" data-status={acmgClassification}/>
+                                {acmgClassification}
+                            </div>:
+                            <div className="w-100 text-left text-muted text-truncate">Pending</div>}
+                    </div>
+                    <div className="col col-sm-8 col-lg-3 py-2">
+                        <label className="mb-04 text-small">Discovery</label>
+                        <div className="w-100 text-left">
+                            <span className="font-italic text-muted" style={{ marginRight: "25px" }}>Gene: </span>
+                            { geneCandidacy ?
+                                <span className="text-left">
+                                    <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
+                                    {geneCandidacy}
+                                </span>:
+                                <span className="text-left text-muted text-truncate">Not Available</span>}
+                        </div>
+                        <div className="text-left">
+                            <span className="font-italic text-muted mr-1">Variant: </span>
+                            { variantCandidacy ?
+                                <span className="w-100 text-left">
+                                    <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/>
+                                    {variantCandidacy}
+                                </span>:
+                                <span className="text-left text-muted text-truncate">Not Available</span>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
-});
+}

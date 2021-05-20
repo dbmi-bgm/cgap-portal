@@ -11,7 +11,7 @@ from .variant_fixtures import ANNOTATION_FIELD_URL
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = resolve_file_path('annotations/v0.5.3_variant_table.csv')
+MT_LOC = resolve_file_path('annotations/v0.5.4_variant_table.csv')
 ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
 EXPECTED_FIELDS = ['no', 'field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list', 'priority', 'source',
@@ -31,11 +31,11 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid',
                           'transcript.vep_consequence.var_conseq_name']
-VARIANT_TABLE_VERSION = 'annV0.5.3'
-VARIANT_TABLE_DATE = '03.09.2021'
-NUMBER_ANNOTATION_FIELDS = 191
+VARIANT_TABLE_VERSION = 'annV0.5.4'
+VARIANT_TABLE_DATE = '04.20.2021'
+NUMBER_ANNOTATION_FIELDS = 236
 SAMPLE_FIELDS_EXPECTED = 26
-VARIANT_FIELDS_EXPECTED = 165
+VARIANT_FIELDS_EXPECTED = 210
 TRANSCRIPT_FIELDS_EXPECTED = 30
 
 
@@ -71,7 +71,6 @@ def test_add_default_schema_fields(MTParser):
     assert 'required' in schema
     assert 'identifyingProperties' in schema
     assert 'additionalProperties' in schema
-    assert 'mixinProperties' in schema
 
 
 def test_read_variant_table_header(MTParser):
@@ -123,7 +122,7 @@ def test_generate_variant_json_items(MTParser, inserts):
     assert var_props['CHROM']['title'] == 'Chromosome'
     assert var_props['CHROM']['type'] == 'string'
     assert var_props['POS']['type'] == 'integer'
-    assert var_props['csq_cadd_phred']['source_name'] == 'dbNSFP'
+    assert var_props['csq_cadd_phred']['source_name'] == 'CADD'
     assert var_props['csq_cadd_phred']['type'] == 'number'
 
     # check vep (transcript) sub-embedded object
@@ -178,9 +177,9 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert 'enum' in properties['CHROM']
     assert properties['ALT']['field_name'] == 'ALT'
     assert properties['ALT']['type'] == 'string'
-    assert properties['csq_gnomadg_af_popmax']['default'] == 0
     assert properties['csq_gnomadg_af_popmax']['min'] == 0
     assert properties['csq_gnomadg_af_popmax']['max'] == 1
+    assert properties['csq_gnomade2_an']['items']['min'] == 0
     assert properties['csq_sift_pred']['type'] == 'string'
 
     # check sub-embedded object fields

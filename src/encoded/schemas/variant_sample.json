@@ -1283,11 +1283,11 @@
             ]
         },
         "variant.csq_gnomadg_af": {
-            "title": "GnomAD Alt Allele Frequency",
+            "title": "Alt Allele Frequency (v3)",
             "aggregation_type": "range",
             "number_step": "any",
             "order": 18,
-            "grouping": "Population Frequency",
+            "grouping": "Pop. Frequency (gnomAD v3)",
             "ranges": [
                 {
                     "from": 0,
@@ -1312,11 +1312,11 @@
             ]
         },
         "variant.csq_gnomadg_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
+            "title": "Alt AF - PopMax (v3)",
             "aggregation_type": "range",
             "number_step": "any",
             "order": 19,
-            "grouping": "Population Frequency",
+            "grouping": "Pop. Frequency (gnomAD v3)",
             "ranges": [
                 {
                     "from": 0,
@@ -1341,24 +1341,96 @@
             ]
         },
         "variant.csq_gnomadg_an": {
-            "title": "GnomAD Total Allele Number",
+            "title": "Total Allele Number (v3)",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 20,
-            "grouping": "Population Frequency"
+            "grouping": "Pop. Frequency (gnomAD v3)"
         },
         "variant.csq_gnomadg_nhomalt": {
-            "title": "GnomAD Homozygous Count",
+            "title": "Homozygous Count (v3)",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 21,
-            "grouping": "Population Frequency"
+            "grouping": "Pop. Frequency (gnomAD v3)"
+        },
+        "variant.csq_gnomade2_af": {
+            "title": "Alt Allele Frequency (v2)",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 30,
+            "grouping": "Pop. Frequency (gnomAD v2 exome)",
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0,
+                    "label": "unobserved"
+                },
+                {
+                    "from": 0,
+                    "to": 0.001,
+                    "label": "ultra-rare"
+                },
+                {
+                    "from": 0.001,
+                    "to": 0.01,
+                    "label": "rare"
+                },
+                {
+                    "from": 0.01,
+                    "to": 1,
+                    "label": "common"
+                }
+            ]
+        },
+        "variant.csq_gnomade2_af_popmax": {
+            "title": "Alt AF - PopMax (v2)",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 31,
+            "grouping": "Pop. Frequency (gnomAD v2 exome)",
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0,
+                    "label": "unobserved"
+                },
+                {
+                    "from": 0,
+                    "to": 0.001,
+                    "label": "ultra-rare"
+                },
+                {
+                    "from": 0.001,
+                    "to": 0.01,
+                    "label": "rare"
+                },
+                {
+                    "from": 0.01,
+                    "to": 1,
+                    "label": "common"
+                }
+            ]
+        },
+        "variant.csq_gnomade2_an": {
+            "title": "Total Allele Number (v2)",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 32,
+            "grouping": "Pop. Frequency (gnomAD v2 exome)"
+        },
+        "variant.csq_gnomade2_nhomalt": {
+            "title": "Homozygous Count (v2)",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 33,
+            "grouping": "Pop. Frequency (gnomAD v2 exome)"
         },
         "variant.csq_phylop100way_vertebrate": {
             "title": "PhyloP (100 Vertebrates)",
             "aggregation_type": "range",
             "number_step": "any",
-            "order": 22,
+            "order": 40,
             "grouping": "Effect Predictors",
             "ranges": [
                 {
@@ -1392,68 +1464,68 @@
             "title": "CADD Phred score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 23,
+            "order": 41,
             "grouping": "Effect Predictors"
         },
         "variant.genes.genes_most_severe_sift_score": {
             "title": "SIFT score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 24,
+            "order": 42,
             "grouping": "Effect Predictors"
         },
         "variant.genes.genes_most_severe_polyphen_score": {
             "title": "PolyPhen score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 25,
+            "order": 43,
             "grouping": "Effect Predictors"
         },
         "variant.spliceaiMaxds": {
             "title": "SpliceAI Max Delta",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 27,
+            "order": 50,
             "grouping": "Effect Predictors"
         },
         "variant.genes.genes_most_severe_maxentscan_diff": {
             "title": "MaxEntScan Diff",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 31,
+            "order": 51,
             "grouping": "Effect Predictors"
         },
         "variant.genes.genes_most_severe_gene.s_het": {
             "title": "S_het",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 32,
+            "order": 60,
             "grouping": "Constraint Metrics"
         },
         "variant.genes.genes_most_severe_gene.oe_lof_upper": {
             "title": "LOEUF",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 33,
+            "order": 61,
             "grouping": "Constraint Metrics"
         },
         "variant.genes.genes_most_severe_gene.oe_mis": {
             "title": "o/e (missense)",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 34,
+            "order": 62,
             "grouping": "Constraint Metrics"
         },
         "variant.genes.genes_most_severe_gene.oe_lof": {
             "title": "o/e (LoF)",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 35,
+            "order": 63,
             "grouping": "Constraint Metrics"
         },
         "variant.csq_clinvar_clnsig": {
             "title": "Clinvar",
-            "order": 36,
+            "order": 70,
             "grouping": "variant database"
         }
     }
