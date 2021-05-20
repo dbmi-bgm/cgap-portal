@@ -3,6 +3,7 @@
 # so that we don't pick up new images unintentionally
 
 # Debian Buster with Python 3.6.13
+# TODO: maybe swap in ubuntu 20.04 and install Python manually?
 FROM python@sha256:db248d2d0494973550d323dd6b82af7fc2f4c1e0365769a758abd7fac2aa70db
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
@@ -10,12 +11,8 @@ MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 # Build Arguments
 ARG CGAP_ENV_NAME
 ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-mastertest"}
-ARG CGAP_REPO
-ENV CGAP_REPO=${CGAP_REPO:-"https://github.com/dbmi-bgm/cgap-portal.git"}
-ARG CGAP_BRANCH
-ENV CGAP_BRANCH=${CGAP_BRANCH:-"c4_519"}
 ARG ENTRYPOINT
-ENV ENTRYPOINT=${ENTRYPOINT:-"entrypoint.sh"}
+ENV ENTRYPOINT=${ENTRYPOINT:-"deploy/docker/production/entrypoint.sh"}
 
 # Configure (global) Env
 ENV NGINX_USER=nginx
@@ -30,7 +27,7 @@ ENV PYTHONFAULTHANDLER=1 \
   POETRY_VERSION=1.1.4
 
 # Install nginx, base system
-COPY install_nginx.sh /
+COPY deploy/docker/production/install_nginx.sh /
 RUN bash /install_nginx.sh && \
     apt-get update && \
     apt-get install -y curl vim emacs postgresql-client net-tools && \
@@ -40,24 +37,41 @@ RUN bash /install_nginx.sh && \
 # Configure CGAP User (nginx)
 WORKDIR /home/nginx
 
-# Configure venv, repo, back-end build
+# Configure venv
 ENV VIRTUAL_ENV=/opt/venv
 RUN python -m venv /opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Upgrade pip, install in layer
+RUN pip install --upgrade pip && \
+    pip install poetry==1.1.4 wheel==0.29.0
+
+# Adjust permissions
 RUN chown -R nginx:nginx /opt/venv && \
-    mkdir -p /home/nginx/cgap-portal && \
-    git clone $CGAP_REPO --branch $CGAP_BRANCH && \
-    cd cgap-portal && \
-    pip install --upgrade pip && \
-    pip install poetry==1.1.4 wheel==0.29.0 && \
-    poetry install && \
+    mkdir -p /home/nginx/cgap-portal
+
+WORKDIR /home/nginx/cgap-portal
+
+# Do the back-end dependency install
+COPY pyproject.toml .
+COPY poetry.lock .
+RUN poetry install --no-root
+
+# Do the front-end dependency install
+COPY package.json .
+COPY package-lock.json .
+RUN npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/bin/python
+
+# Copy over the rest of the code
+COPY . .
+
+# Build remaining back-end
+RUN poetry install && \
     python setup_eb.py develop && \
     make fix-dist-info
 
-# Front-end
-WORKDIR /home/nginx/cgap-portal
-RUN npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/bin/python && \
-    npm run build && \
+# Build front-end
+RUN npm run build && \
     npm run build-scss
 
 # Misc
@@ -68,7 +82,7 @@ RUN make aws-ip-ranges && \
 # Remove default configuration from Nginx
 RUN rm /etc/nginx/nginx.conf && \
     rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY deploy/docker/production/nginx.conf /etc/nginx/nginx.conf
 
 # nginx filesystem setup
 RUN chown -R nginx:nginx /var/cache/nginx && \
@@ -86,12 +100,12 @@ RUN chown -R nginx:nginx /var/cache/nginx && \
 # will be picked up by IniFileManager
 # *.ini must match the env name in secrets manager!
 # For now, this is mastertest. - Will 04/29/21
-COPY mastertest.ini deploy/ini_files/.
+COPY deploy/docker/production/mastertest.ini deploy/ini_files/.
 RUN touch production.ini
 RUN chown nginx:nginx production.ini
 
 COPY $ENTRYPOINT entrypoint.sh
-COPY assume_identity.py .
+COPY deploy/docker/production/assume_identity.py .
 RUN chmod +x entrypoint.sh
 RUN chmod +x assume_identity.py
 EXPOSE 8000
