@@ -7,6 +7,7 @@ import ReactTooltip from 'react-tooltip';
 import memoize from 'memoize-one';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+import Collapse from 'react-bootstrap/esm/Collapse';
 import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
@@ -207,7 +208,11 @@ class InterpretationController extends React.Component {
 
         return (
             <React.Fragment>
-                { showACMGInvoker ? <ACMGInvoker invokedFromSavedNote={acmg_guidelines} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} /> : null}
+                <Collapse in={showACMGInvoker}>
+                    <div>{/** Collapse seems not to work without wrapper element */}
+                        <ACMGInvoker invokedFromSavedNote={acmg_guidelines} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} />
+                    </div>
+                </Collapse>
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
                     <div className="col">
                         {/* Annotation Space passed as child */}
