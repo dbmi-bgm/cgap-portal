@@ -17,7 +17,8 @@ services:
     #command: ["postgres", "-c", "log_statement=all"]
 
   # ElasticSearch Component
-  # Disabled for now as too compute intensive
+  # Disabled for now as too compute intensive, but feel free to try it if you dont need
+  # to test any search APIs
   # To connect use:
   # elasticsearch.server = es:9200
   #  es:
@@ -42,7 +43,7 @@ services:
   #            After running once, comment this out so the container will serve without reloading inserts.
   #            Has no effect if TEST is specified.
   app:
-    build: ./deploy/docker/local
+    build: .
     container_name: cgap
     command: "/home/nginx/cgap-portal/entrypoint.sh"
     environment:
