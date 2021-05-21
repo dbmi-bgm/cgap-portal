@@ -173,10 +173,10 @@ update:  # updates dependencies
 	poetry update
 
 build-docker:
-	docker-compose build --build-arg BUILD_PATH=deploy/docker/local/
+	docker-compose build --build-arg BUILD_PATH=deploy/docker/local
 
 build-docker-clean:
-	docker-compose build --no-cache BUILD_PATH=deploy/docker/local/
+	docker-compose build --no-cache BUILD_PATH=deploy/docker/local
 
 deploy-docker:
 	docker-compose up -V

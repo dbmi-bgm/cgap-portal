@@ -12,7 +12,7 @@ MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 ARG CGAP_ENV_NAME
 ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-mastertest"}
 ARG BUILD_PATH
-ENV BUILD_PATH=${BUILD_PATH:-"deploy/docker/production/"}
+ENV BUILD_PATH=${BUILD_PATH:-"deploy/docker/production"}
 ARG INI_BASE
 ENV INI_BASE=${INI_BASE:-"mastertest.ini"}
 ARG ENTRYPOINT
@@ -104,14 +104,14 @@ RUN chown -R nginx:nginx /var/cache/nginx && \
 # will be picked up by IniFileManager
 # *.ini must match the env name in secrets manager!
 # For now, this is mastertest. - Will 04/29/21
-RUN if [[ $BUILD_PATH == *"production"* ]]; then \
+SHELL ["/bin/bash", "-c"]
+RUN if [[ $BUILD_PATH =~ .*production.* ]]; then \
         echo "Detected production build" && \
         cp $BUILD_PATH/$INI_BASE deploy/ini_files/. ; \
     else \
         echo "Detected local build" && \
         cp $BUILD_PATH/docker_development.ini development.ini ; \
     fi
-
 
 RUN touch production.ini
 RUN chown nginx:nginx production.ini

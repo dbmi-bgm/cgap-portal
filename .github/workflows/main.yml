@@ -25,7 +25,7 @@ jobs:
     # Build matrix
     strategy:
       matrix:
-        test_type: ['UNIT', 'NPM']
+        test_type: ['UNIT', 'NPM', 'Docker']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -42,6 +42,7 @@ jobs:
           check-latest: false
 
       - name: Install/Link Postgres
+        ${{ matrix.test_type == 'NPM' || matrix.test_type == 'UNIT' }}
         run: |
           sudo apt-get install curl ca-certificates gnupg
           curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
@@ -117,3 +118,7 @@ jobs:
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
           poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
           poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+
+      - name: Docker Build
+        if: ${{ matrix.test_type == 'Docker' }}
+        run: make build-docker
