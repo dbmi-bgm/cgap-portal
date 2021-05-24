@@ -39,3 +39,29 @@ The following instructions describe how to build and push images. Note though th
 
 
 Note that steps 1, 4 and 6 are all that are needed to be repeated once initial setup is done, assuming you are continuously pushing to the same location. To change which ECS orchestration you are effectively deploying to, all steps must be repeated in the relevant account.
+
+
+Tagging Strategy
+^^^^^^^^^^^^^^^^
+
+As stated previously, the cgap-portal consists of 4 core components that have been translated into ECS Services/Tasks. The task definitions specify image tags that differentiate each of the 4 components. Those tags are:
+
+    * ``latest`` - push to this tag to modify the WSGI image
+    * ``latest-indexer`` - push to this tag to modify the indexer image
+    * ``latest-ingester`` - push to this tag to modify the ingester image
+    * ``latest-deployment`` - push to this tag to modify the deployment image
+
+After all new image versions have been pushed, issue a forced deployment update to the ECS cluster. This action will spawn a new set of tasks for all services using the newer image tags. For WSGI, once the new tasks are deemed healthy by ECS and the Application Load Balancer, they will be added to the WSGI Target Group and immediately begin serving requests. At that time the old tasks will begin the de-registration process from the target group, after which they will be spun down. The remaining new tasks will come online more quickly since they do not need to pass load balancer health checks. Once the old tasks have been cleaned up, it is safe to trigger a deployment task through the Deployment Service.
+
+Deciding what Image(s) to Update
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Generally speaking, all 4 tags must be pushed in order for the deployment to be considered "valid". With that said, there are a few scenarios where it may make sense to do a partial image bundle upload. Note that when uploading to production, none of the following apply.
+
+    * If you are only making front-end changes, feel free to push only the ``latest`` tag.
+    * If you are not ingesting VCF files or modifying the ingestion pipeline, you do not need to update the ``latest-ingester`` image.
+    * If you want to phase back-end changes in prior to releasing them on the front-end, push ``latest-indexer`` and ``latest-deployment`` images.
+    * If you are only modifying the deployment commands ie: ``entrypoint_deployment.sh``, then you only need to update the ``latest-deployment`` tag.
+
+
+Note that these images have implied dependencies on each other that are not obvious. We consider the deployment and indexer images to be bundled together in the sense that updating one without the other will trigger undefined behavior if the deployment is triggered. It is thus imperative that, at a bare minimum before triggering an ECS Cluster update, that both the ``latest-indexer`` and ``latest-deployment`` tags have been updated in the case that any back-end changes have been made, whether it be to application, it's dependencies or the Dockerfile itself.
