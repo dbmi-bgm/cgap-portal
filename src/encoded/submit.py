@@ -2,6 +2,7 @@ from copy import deepcopy
 import csv
 import datetime
 import json
+import re
 import openpyxl
 
 from dcicutils.lang_utils import n_of
@@ -11,8 +12,20 @@ from webtest import AppError
 from .util import s3_local_file, debuglog
 
 
-GENERIC_FIELD_MAPPING = {  # for spreadsheet column names that are different from schema property names
-    'individual': {},
+GENERIC_FIELD_MAPPINGS = {  # for spreadsheet column names that are different from schema property names
+    'individual': {
+        'mother id': 'mother',
+        'father id': 'father',
+        'hpo terms': 'phenotypic_features',
+        'mondo terms': 'disorders',
+        'deceased': 'is_deceased',
+        'termination of pregnancy': 'is_termination_of_pregnancy',
+        'still birth': 'is_still_birth',
+        'pregnancy': 'is_pregnancy',
+        'spontaneous abortion': 'is_spontaneous_abortion',
+        'infertile': 'is_infertile',
+        'no children by choice': 'is_no_children_by_choice'
+    },
     'family': {},
     'sample': {
         'date collected': 'specimen_collection_date',
@@ -55,19 +68,22 @@ YES_VALS = ['y', 'yes']
 # SS at end refers to spreadsheet, to distinguish from prop names in schema if we need
 # vars for those at any point.
 SS_INDIVIDUAL_ID = 'individual id'
+SS_FAMILY_ID = 'family id'
+SS_SEX = 'sex'
 SS_SPECIMEN_ID = 'specimen id'
 SS_ANALYSIS_ID = 'analysis id'
 SS_RELATION = 'relation to proband'
 SS_REPORT_REQUIRED = 'report required'
+SS_PROBAND = 'proband'
 
-REQUIRED_CASE_COLS = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
-REQUIRED_COLUMNS =  REQUIRED_CASE_COLS + [SS_INDIVIDUAL_ID, SS_RELATION, SS_REPORT_REQUIRED]
+REQUIRED_COLS_FOR_CASE = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
+REQUIRED_COLS_FOR_ACCESSIONING =  REQUIRED_COLS_FOR_CASE + [SS_INDIVIDUAL_ID, SS_SEX, SS_RELATION, SS_REPORT_REQUIRED]
+REQUIRED_COLS_FOR_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID, SS_SEX, SS_PROBAND]
 
 # half-siblings not currently supported, because pedigree info is needed to know
 # which parent is shared. Can come back to this after pedigree processing is integrated.
 SIBLING_LABEL = 'sibling'
-SIBLINGS = ['sibling', 'brother', 'sister',
-            'full sibling', 'full brother', 'full sister']
+SIBLINGS = ['sibling', 'brother', 'sister', 'full sibling', 'full brother', 'full sister']
 
 RELATIONS = SIBLINGS + ['proband', 'mother', 'father']
 
@@ -85,8 +101,11 @@ LINKTO_FIELDS = [  # linkTo properties that we will want to patch in second-roun
 
 ID_SOURCES = ['UDN']
 
+HPO_TERM_ID_PATTERN = re.compile(r'^HP:[0-9]{7}$')
+MONDO_TERM_ID_PATTERN = re.compile(r'^MONDO:[0-9]{7}$')
 
-def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp,  # <- Required keyword arguments
+
+def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, submission_type, vapp,  # <- Required keyword arguments
                            validate_only=False):  # <-- Optional keyword arguments (with defaults)
     """
     Handles processing of a submitted workbook.
@@ -121,9 +140,8 @@ def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, vapp
             results['validation_output'].append(msg)
             return results
         json_data, json_success = xls_to_json(
-            xls_data=rows, project=project_json, institution=institution_json,
-            ingestion_id=key.split('/')[0]
-        )
+            vapp=vapp, xls_data=rows, project=project_json, institution=institution_json,
+            ingestion_id=key.split('/')[0], submission_type=submission_type)
         if not json_success:
             results['validation_output'] = json_data['errors']
             return results
@@ -151,10 +169,10 @@ def map_fields(row, metadata_dict, addl_fields, item_type):
         row - dictionary of format {column name1: value1, column name 2: value 2}
         metadata_dict - the dictionary (json) to be filled with metadata parsed in this function.
             Can be empty.
-        addl_fields - list of fields not present in GENERIC_FIELD_MAPPING. These fields will appear
+        addl_fields - list of fields not present in GENERIC_FIELD_MAPPINGS. These fields will appear
             in the output dictionary as keys, with spaces replaced with underscores. E.g., a field
             'individual id' will appear in the output dict as 'individual_id'.
-        item_type - the key in GENERIC_FIELD_MAPPING to look at for column name to schema property mappings.
+        item_type - the key in GENERIC_FIELD_MAPPINGS to look at for column name to schema property mappings.
 
     Example usage:
     output = map_fields(row_dict, {}, ['individual_id', 'sex', 'age', 'birth_year'], 'individual')
@@ -162,9 +180,9 @@ def map_fields(row, metadata_dict, addl_fields, item_type):
     """
     for field in addl_fields:
         metadata_dict[field] = use_abbrev(row.get(field.replace('_', ' ')))
-    for map_field in GENERIC_FIELD_MAPPING[item_type]:
+    for map_field in GENERIC_FIELD_MAPPINGS[item_type]:
         if map_field in row:
-            metadata_dict[GENERIC_FIELD_MAPPING[item_type][map_field]] = use_abbrev(row.get(map_field))
+            metadata_dict[GENERIC_FIELD_MAPPINGS[item_type][map_field]] = use_abbrev(row.get(map_field))
     return metadata_dict
 
 
@@ -211,6 +229,10 @@ def remove_spaces_in_id(id_value):
     return id_value.replace(' ', '_')
 
 
+def generate_individual_alias(project_name, individual_id):
+    return '{}:individual-{}'.format(project_name, remove_spaces_in_id(individual_id))
+
+
 def is_yes_value(str_value):
     """
     Determines whether the value of a field means 'yes'.
@@ -221,6 +243,22 @@ def is_yes_value(str_value):
         return True
     return False
 
+
+def string_to_array(str_value):
+    """converts cell contents to list, splitting by commas"""
+    return [item.strip() for item in str_value.split(',')]
+
+
+def format_ontology_term_with_colon(str_value):
+    """
+    Used for ontology terms, to convert underscore-formatted term ids to
+    colon-formatted term ids. Also converts term IDs to uppercase.
+    Example input: 'hp_0000124'
+    Example output: 'HP:0000124'
+    """
+    if not isinstance(str_value, str):
+        raise ValueError('String value expected.')
+    return str_value.upper().replace('_', ':')
 
 class MetadataItem:
     """
@@ -235,31 +273,29 @@ class MetadataItem:
         self.metadata['row'] = self.row
 
 
-class SubmissionRow:
+class AccessionRow:
     """
     class used to hold metadata parsed from one row of spreadsheet at a time
     """
 
-    def __init__(self, row, idx, family_alias, project, institution):
+    def __init__(self, metadata, idx, family_alias, project, institution):
         self.project = project
         self.institution = institution
-        self.metadata = row
+        self.metadata = metadata
         self.row = idx
         self.errors = []
         if not self.found_missing_values():
-            self.indiv_alias = '{}:individual-{}'.format(
-                project, remove_spaces_in_id(row[SS_INDIVIDUAL_ID])
-            )
+            self.indiv_alias = generate_individual_alias(project, metadata[SS_INDIVIDUAL_ID])
             self.fam_alias = family_alias
             self.sample_alias = '{}:sample-{}-{}'.format(
                 project,
-                remove_spaces_in_id(row[SS_SPECIMEN_ID]),
-                remove_spaces_in_id(row[get_column_name(row, ['workup type', 'test requested'])])
+                remove_spaces_in_id(metadata[SS_SPECIMEN_ID]),
+                remove_spaces_in_id(metadata[get_column_name(metadata, ['workup type', 'test requested'])])
             )
             if self.metadata.get('test number'):
                 self.sample_alias = self.sample_alias + '-' + self.metadata['test number']
-            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(row[SS_ANALYSIS_ID]))
-            self.case_name = remove_spaces_in_id(row.get('unique analysis id'))
+            self.analysis_alias = '{}:analysis-{}'.format(project, remove_spaces_in_id(metadata[SS_ANALYSIS_ID]))
+            self.case_name = remove_spaces_in_id(metadata.get('unique analysis id'))
             self.individual = self.extract_individual_metadata()
             self.family = self.extract_family_metadata()
             self.sample, self.analysis = self.extract_sample_metadata()
@@ -269,12 +305,12 @@ class SubmissionRow:
 
     def found_missing_values(self):
         # makes sure no required values from spreadsheet are missing
-        missing_required = [col for col in REQUIRED_COLUMNS
+        missing_required = [col for col in REQUIRED_COLS_FOR_ACCESSIONING
                             if col not in self.metadata or not self.metadata[col]]
         if missing_required:
             self.errors.append(
                 'Row {} - missing required field(s) {}. This row cannot be processed.'
-                ''.format(self.row, ', '.join(missing_required))
+                .format(self.row, ', '.join(missing_required))
             )
         return len(self.errors) > 0
 
@@ -423,7 +459,7 @@ class SubmissionRow:
             if fmt == 'fastq':
                 self.sample.metadata.setdefault('files', []).append(file_alias)
                 if paired:
-                    paired_end = str(SubmissionRow.get_paired_end_value(i))
+                    paired_end = str(AccessionRow.get_paired_end_value(i))
                     file_info['paired_end'] = paired_end
                     if paired_end == '2':
                         file_info['related_files'] = [
@@ -439,12 +475,12 @@ class SubmissionRow:
                 self.files_processed.append(MetadataItem(file_info, self.row, 'file_processed'))
 
 
-class SubmissionMetadata:
+class AccessionMetadata:
     """
     class to hold info parsed from one spreadsheet.
 
-    One row is parsed at a time and a SubmissionRow object is generated; this is then
-    compared with previous rows already added to SubmissionMetadata object, and compared,
+    One row is parsed at a time and a AccessionRow object is generated; this is then
+    compared with previous rows already added to AccessionMetadata object, and compared,
     and changes made if necessary. This is because some objects (like family and sample_processing)
     have metadata that occurs across multiple rows.
     """
@@ -532,9 +568,9 @@ class SubmissionMetadata:
 
     def add_metadata_single_item(self, item):
         """
-        Looks at metadata from a SubmissionRow object, one DB itemtype at a time
+        Looks at metadata from a AccessionRow object, one DB itemtype at a time
         and compares and adds it. If each item is not
-        already represented in metadata for current SubmissionMetadata instance,
+        already represented in metadata for current AccessionMetadata instance,
         it is added; if it is represented, missing fields are added to item.
         Currently used for Individual and Sample items
         """
@@ -588,7 +624,7 @@ class SubmissionMetadata:
 
     def add_family_metadata(self, idx, family, individual):
         """
-        Looks at 'family' metadata from SubmissionRow object. Adds family to SubmissionMetadata
+        Looks at 'family' metadata from AccessionRow object. Adds family to AccessionMetadata
         instance if not already present. If present, family is compared and necessary changes added.
         """
         if family.alias in self.families:
@@ -614,7 +650,7 @@ class SubmissionMetadata:
 
     def add_sample_processing(self, sp_item, analysis_id):
         """
-        Looks at 'sample_processing' metadata from SubmissionRow object. Adds SP item to SubmissionMetadata
+        Looks at 'sample_processing' metadata from AccessionRow object. Adds SP item to AccessionMetadata
         instance if not already present. If present, SP metadata is compared and necessary changes added.
         """
         sp_item.metadata['analysis_type'] = self.analysis_types.get(analysis_id)
@@ -686,7 +722,7 @@ class SubmissionMetadata:
         indicated in the spreadsheet.
         """
         if all(field in row_item.metadata
-               for field in REQUIRED_CASE_COLS):
+               for field in REQUIRED_COLS_FOR_CASE):
             key = '{}-{}'.format(row_item.metadata[SS_ANALYSIS_ID], row_item.metadata[SS_SPECIMEN_ID])
             case_id_col = get_column_name(row_item.metadata, ['unique analysis id', 'case id'])
             self.case_info[key] = {
@@ -728,7 +764,7 @@ class SubmissionMetadata:
                                    ' Row cannot be processed.'.format(i + 1 + self.counter))
                 continue
             try:
-                processed_row = SubmissionRow(row, i + 1 + self.counter, fam, self.project, self.institution)
+                processed_row = AccessionRow(row, i + 1 + self.counter, fam, self.project, self.institution)
                 simple_add_items = [processed_row.individual, processed_row.sample]
                 simple_add_items.extend(processed_row.files_fastq)
                 simple_add_items.extend(processed_row.files_processed)
@@ -760,18 +796,250 @@ class SubmissionMetadata:
             self.json_out['errors'] = self.errors
 
 
+class PedigreeRow:
+
+    def __init__(self, metadata, idx, project, institution):
+        self.project = project
+        self.institution = institution
+        self.row = idx
+        self.metadata = metadata
+        self.errors = []
+        if not self.found_missing_values():
+            self.indiv_alias = generate_individual_alias(project, metadata[SS_INDIVIDUAL_ID])
+            self.individual = self.extract_individual_metadata()
+            self.proband = self.is_proband()
+
+    def found_missing_values(self):
+        # makes sure no required values from spreadsheet are missing
+        missing_required = [col for col in REQUIRED_COLS_FOR_PEDIGREE
+                            if col not in self.metadata or not self.metadata[col]]
+        if missing_required:
+            self.errors.append(
+                'Row {} - missing required field(s) {}. This row cannot be processed.'
+                .format(self.row, ', '.join(missing_required))
+            )
+        return len(self.errors) > 0
+
+    def format_atid(self, term):
+        """turns HPO or MONDO term IDs into the corresponding @id in the database."""
+        term_id = format_ontology_term_with_colon(term) if term else ''
+        if HPO_TERM_ID_PATTERN.match(term_id):
+            return f'/phenotypes/{term_id}/'
+        elif MONDO_TERM_ID_PATTERN.match(term_id):
+            return f'/disorders/{term_id}/'
+        else:
+            msg = (f'Row {self.row} - term {term!r} does not match the format for'
+                   ' an HPO or MONDO ontology term. Please edit and resubmit.')
+            self.errors.append(msg)
+            return term
+
+    def reformat_phenotypic_features(self, feature_list):
+        if not feature_list:
+            return []
+        return [{'phenotypic_feature': self.format_atid(feature)} for feature in feature_list if feature]
+
+    def extract_individual_metadata(self):
+        info = {'aliases': [self.indiv_alias]}
+        simple_fields = [
+            'family_id', 'individual_id', 'sex', 'age', 'age_units', 'clinic_notes',
+            'ancestry', 'quantity', 'life_status', 'cause_of_death', 'age_at_death',
+            'age_at_death_units', 'gestational_age', 'cause_of_infertility'
+        ]
+        info = map_fields(self.metadata, info, simple_fields, 'individual')
+        for field in info:
+            if field.startswith('is_'):
+                info[field] = is_yes_value(info[field])
+        for field in ['mother', 'father']:  # turn mother and father IDs into item aliases
+            if info.get(field):
+                info[field] = generate_individual_alias(self.project, info[field])
+        info['proband'] = self.is_proband()
+        if info.get('age') and not info.get('age_units'):
+            info['age_units'] = 'year'
+        if info.get('ancestry'):
+            info['ancestry'] = string_to_array(info['ancestry'])
+        if info.get('phenotypic_features'):
+            info['phenotypic_features'] = string_to_array(info['phenotypic_features'])
+        if info.get('disorders'):
+            info['disorders'] = [self.format_atid(item.strip()) for item in info['disorders'].split(',')]
+        info['phenotypic_features'] = self.reformat_phenotypic_features(info.get('phenotypic_features', []))
+        for col in ['age', 'birth_year', 'age_at_death', 'gestational_age', 'quantity']:
+            if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
+                info[col] = int(info[col])
+        return MetadataItem(info, self.row, 'individual')
+
+    def is_proband(self):
+        return is_yes_value(self.metadata['proband'])
+        # if self.metadata['proband'].lower().startswith('y'):
+        #     return True
+        # return False
+
+
+class PedigreeMetadata:
+
+    def __init__(self, vapp, rows, project, institution, ingestion_id, counter=1):
+        self.virtualapp = vapp
+        self.rows = rows
+        self.project = project.get('name')
+        self.project_atid = project.get('@id')
+        self.institution = institution.get('name')
+        self.institution_atid = institution.get('@id')
+        self.ingestion_id = ingestion_id
+        self.counter = counter
+        self.metadata = []
+        self.individuals = {}
+        self.families = {}
+        self.errors = []
+        self.json_out = {}
+        self.process_rows()
+        self.create_json_out()
+
+    def add_individual_metadata(self, item):
+        """
+        Looks at metadata from a PedigreeRow object, one DB itemtype at a time
+        and compares and adds it. If each item is not
+        already represented in metadata for current AccessionMetadata instance,
+        it is added; if it is represented, missing fields are added to item.
+        """
+        previous = self.individuals
+        prev = [p for p in previous.keys()]
+        if item.alias not in prev:
+            previous[item.alias] = item.metadata
+        else:
+            for key in item.metadata:
+                if key not in previous[item.alias]:
+                    previous[item.alias][key] = item.metadata[key]
+
+    def add_family_metadata(self):
+        """
+        Creates family metadata based on family_id for each individual in sheet.
+
+        In some scenarios we will have multiple Family items in the DB for the same family,
+        if the proband needs to be changed (e.g. the family has 2 affected siblings). In these cases
+        we want to update the family history for both families, so we will look up the family ID and patch
+        all families with the ID.
+        """
+        family_metadata = {}
+        for alias, item in self.individuals.items():
+            family_metadata.setdefault(item['family_id'],
+                                       {'family_id': item['family_id'], 'members': []})
+            family_metadata[item['family_id']]['members'].append(alias)
+            if item.get('proband', False):
+                if 'proband' not in family_metadata[item['family_id']]:
+                    family_metadata[item['family_id']]['proband'] = alias
+                    family_metadata[item['family_id']]['aliases'] = [
+                        self.project + ':family-' + item['individual_id']
+                    ]
+                else:
+                    msg = (f'More than one proband indicated for family {item["family_id"]}.'
+                           ' Please indicate a single proband in the spreadsheet and resubmit.')
+                    self.errors.append(msg)
+            del item['family_id']
+        final_family_dict = {}
+        for key, value in family_metadata.items():
+            try:
+                family_matches = self.virtualapp.get(f'/search/?type=Family&family_id={key}')
+            except Exception:
+                # if family not in DB, create a new one
+                # first make sure a proband is indicated for a family if its not already in DB
+                if not value.get('proband'):
+                    msg = f'No proband indicated for family {value["family_id"]}. Please edit and resubmit.'
+                    self.errors.append(msg)
+                else:
+                    final_family_dict[value['aliases'][0]] = value
+            else:
+                for match in family_matches.json['@graph']:
+                    final_family_dict[match['@id']] = value
+                    if value.get('proband'):
+                        phenotypes = list(set([item['phenotypic_feature'] for item in
+                                      self.individuals[value['proband']].get('phenotypic_features', [])]))
+                        # Add other family member phenotypes if proband phenotypes < 4
+                        if len(phenotypes) < 4:
+                            for member in value['members']:
+                                if member != value['proband']:
+                                    member_phenotypes = [item['phenotypic_feature'] for item in
+                                                         self.individuals[member].get('phenotypic_features', [])]
+                                    phenotypes.extend(member_phenotypes)
+                                    phenotypes = list(set(phenotypes))
+                                    if len(phenotypes) >= 4:
+                                        break
+                        if phenotypes:
+                            final_family_dict[match['@id']]['family_phenotypic_features'] = phenotypes[:4]
+                        del final_family_dict[match['@id']]['proband']
+                        del final_family_dict[match['@id']]['aliases']
+        return final_family_dict
+
+    def check_individuals(self):
+        """
+        Make sure that every value in mother ID or father ID columns are also in sheet in same family.
+        If a mother or father ID does not have a line in the sheet, just create minimal metadata for it
+        and add it to the family.
+        """
+        parent_dict = {'mother': 'F', 'father': 'M'}
+        for fam_alias, fam_metadata in self.families.items():
+            for member in fam_metadata['members']:
+                individual = self.individuals[member]
+                for parent in ['mother', 'father']:
+                    if individual.get(parent):
+                        if individual[parent] not in fam_metadata['members']:
+                            info = {
+                                'individual_id': individual[parent],
+                                'sex': parent_dict[parent]
+                            }
+                            self.individuals[individual[parent]] = info
+                            fam_metadata['members'].append(individual[parent])
+
+    def process_rows(self):
+        """
+        Method for iterating over spreadsheet rows to process each one and compare it to previous rows.
+        """
+        for i, row in enumerate(self.rows):
+            try:
+                processed_row = PedigreeRow(row, i + 1 + self.counter, self.project, self.institution)
+                self.errors.extend(processed_row.errors)
+                self.add_individual_metadata(processed_row.individual)
+            except AttributeError as e:
+                continue
+        self.families = self.add_family_metadata()
+        self.check_individuals()
+
+    def create_json_out(self):
+        """
+        Creates final json that can be used for subsequent validation function.
+        """
+        itemtype_dict = {
+            'family': self.families,
+            'individual': self.individuals
+        }
+        for key in itemtype_dict:
+            self.json_out[key] = {}
+            for alias, metadata in itemtype_dict[key].items():
+                new_metadata = {k: v for k, v in metadata.items() if v}
+                new_metadata['project'] = self.project_atid
+                new_metadata['institution'] = self.institution_atid
+                if key == 'individual' and 'proband' in new_metadata:
+                    del new_metadata['proband']
+                self.json_out[key][alias] = new_metadata
+            self.json_out['errors'] = self.errors
+
+
 class SpreadsheetProcessing:
     """
     class that holds relevant information for processing of a single spreadsheet.
-    After initial processing of header and rows, will create an instance of SpreadsheetMetadata
-    to hold all metadata extracted from spreadsheet.
+    After initial processing of header and rows, will create an instance of relevant
+    'Metadata' class to hold all metadata extracted from spreadsheet.
     """
 
-    def __init__(self, xls_data, project, institution, ingestion_id):
+    REQUIRED_COLUMNS = []
+    METADATA_CLASS = None
+    SKIP = 0  # handles number of args required to instantiate relevant Metadata class
+
+    def __init__(self, vapp, xls_data, project, institution, ingestion_id, submission_type='accessioning'):
+        self.virtualapp = vapp
         self.input = xls_data
         self.project = project
         self.institution = institution
         self.ingestion_id = ingestion_id
+        self.submission_type = submission_type
         self.output = {}
         self.errors = []
         self.keys = []
@@ -805,7 +1073,7 @@ class SpreadsheetProcessing:
         """
         Turns each row into a dictionary of form {column heading1: row value1, ...}
         """
-        missing = [col for col in REQUIRED_COLUMNS if col not in self.keys]
+        missing = [col for col in self.REQUIRED_COLUMNS if col not in self.keys]
         if missing:
             msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
             self.errors.append(msg)
@@ -819,21 +1087,51 @@ class SpreadsheetProcessing:
                 self.rows.append(row_dict)
 
     def extract_metadata(self):
-        result = SubmissionMetadata(self.rows, self.project, self.institution, self.ingestion_id, self.counter)
+        current_args = [self.virtualapp, self.rows, self.project,
+                        self.institution, self.ingestion_id, self.counter]
+        result = self.METADATA_CLASS(*current_args[self.SKIP:])
         self.output = result.json_out
         self.errors.extend(result.errors)
         self.passing = True
 
 
-def xls_to_json(xls_data, project, institution, ingestion_id):
+class AccessionProcessing(SpreadsheetProcessing):
+    """
+    class that holds relevant information for processing of a single accessioning spreadsheet.
+    After initial processing of header and rows, will create an instance of AccessionMetadata
+    to hold all metadata extracted from spreadsheet.
+    """
+    REQUIRED_COLUMNS = REQUIRED_COLS_FOR_ACCESSIONING
+    METADATA_CLASS = AccessionMetadata
+    SKIP = 1  # vapp arg not needed for instantiation of this class (only PedigreeMetadata)
+
+
+class PedigreeProcessing(SpreadsheetProcessing):
+    """
+    class that holds relevant information for processing of a single pedigree/family history spreadsheet.
+    After initial processing of header and rows, will create an instance of PedigreeMetadata
+    to hold all metadata extracted from spreadsheet.
+    """
+    REQUIRED_COLUMNS = REQUIRED_COLS_FOR_PEDIGREE
+    METADATA_CLASS = PedigreeMetadata
+
+
+def xls_to_json(vapp, xls_data, project, institution, ingestion_id, submission_type):
     """
     Wrapper for SpreadsheetProcessing that returns expected values:
     result.output - metadata to be submitted in json
     result.passing - whether submission "passes" this part of the code and can move
         on to the next step.
     """
-    result = SpreadsheetProcessing(xls_data=xls_data, project=project, institution=institution,
-                                   ingestion_id=ingestion_id)
+    if submission_type == 'accessioning':
+        result = AccessionProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
+                                     ingestion_id=ingestion_id, submission_type=submission_type)
+    elif submission_type == 'family_history':
+        result = PedigreeProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
+                                     ingestion_id=ingestion_id, submission_type=submission_type)
+    else:
+        raise ValueError(f'{submission_type} is not a valid submission_type argument,'
+                         ' expected values are "accessioning" or "family_history"')
     result.output['errors'] = result.errors
     return result.output, result.passing
 
@@ -903,14 +1201,27 @@ def parse_exception(e, aliases):
                 if error.index('- ') > 0:
                     field_name = error[:error.index(' - ')]
                     field = None
-                    if field_name in GENERIC_FIELD_MAPPING['sample'].values():
-                        field = [key for key, val in GENERIC_FIELD_MAPPING['sample'].items() if val == field_name][0]
+                    if field_name in GENERIC_FIELD_MAPPINGS['sample'].values():
+                        field = [key for key, val in GENERIC_FIELD_MAPPINGS['sample'].items() if val == field_name][0]
                     elif field_name == 'requisition_acceptance.accepted_rejected':
                         field = 'Req Accepted Y\\N'
                     error = map_enum_options(field_name, error)
                     if not field:
                         field = field_name.replace('_', ' ')
                     error = 'field: ' + error.replace(field_name, field)
+                    if 'phenotypic feature' in field:
+                        if 'family phenotypic features' in field:
+                            # family phenotypic features error is redundant to individual phenotypes
+                            # from POV of user, so remove
+                            continue
+                        if '/phenotypes/' in error:  # find term name instead of @id
+                            hpo_idx = error.index('/phenotypes/') + 12
+                            hpo_term = error[hpo_idx:error.index('/', hpo_idx)]
+                        else:
+                            hpo_term = error.split("\'")[1]
+                        if error.endswith('not found'):
+                            error = ('HPO terms - HPO term {} not found in database.'
+                                    ' Please check HPO ID and resubmit.'.format(hpo_term))
                     keep.append(error)
                 elif 'Additional properties are not allowed' in error:
                     keep.append(error[2:])
@@ -1037,7 +1348,10 @@ def validate_all_items(virtualapp, json_data):
                             json_data_final['patch'].setdefault(itemtype, {})
                             json_data_final['patch'][itemtype][db_results[alias]['@id']] = patch_data
                         elif itemtype not in ['case', 'report', 'sample_processing', 'file_fastq']:
-                            item_name = alias[alias.index(':')+1:]
+                            if itemtype == 'family' and ':' not in alias:
+                                item_name = data.get('family_id')
+                            else:
+                                item_name = alias[alias.index(':')+1:]
                             if item_name.startswith(itemtype + '-'):
                                 item_name = item_name[item_name.index('-') + 1:]
                             if itemtype == 'family':
