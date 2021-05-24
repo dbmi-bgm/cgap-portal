@@ -1,4 +1,4 @@
-CGAP-Docker (local)
+CGAP-Docker (Local)
 ===================
 
 With Docker, it is possible to run a local deployment of CGAP without installing any system level
@@ -15,28 +15,34 @@ Start by installing Docker::
     $ brew install docker
 
 
-Prior to building the image, navigate to deploy/docker/local and open docker_development.ini.
+Prior to building the image, navigate to ``deploy/docker/local``, open ``docker_development.ini`` and make the following modifications (at a minimum).
 
 * Modify env.name and indexer.namespace - these values must be globally unique with respect to our infrastructure (feel free to just replace the name)
 * Consider changing load_prod_data to load_local_data if you need to load more inserts
+* Once you have loaded inserts once, comment out L54 in ``docker-compose.yml`` to disable automatic insert reloading
 
-There are two new Make targets that should be sufficient for normal use. To build the image locally, ensure your
-AWS keys are sourced and run::
+There are two new Make targets that should be sufficient for normal use. To build the image locally, ensure your AWS keys are sourced and run::
 
     $ make build-docker  # runs docker-compose build
+    $ make build-docker-clean  # runs a no-cache build, regenerating all layers
     $ make deploy-docker  # runs docker-compose up
 
-The first command will take awhile the first time you run it but should speed up after. Since it is doing a fresh
-rebuild every time it is a little slower than the old local deployment since it has to fully reinstall/rebuild both Python
-and the client. Because of this, it is recommended to continue active development using the existing installation setup.
-Once the branch is ready for "integrated" testing, set the desired branch in ``docker-compose.yml`` and trigger a build.
-When the app is brought online the behavior should be identical to that of the existing local deployment setup. It will
-also match the production behavior in ECS.
+The build will take around 10 minutes the first time but will speed up dramatically after due to layer caching. In general, the rate limiting step for rebuilding is the front-end build (unless you are also updating dependencies, which will slow down the build further). Although this may seem like a drawback, the key benefit is that what you are running in Docker is essentially identical to that which is orchestrated on ECS in production. This should reduce our reliance/need for test environments.
+
 
 To access the running container::
 
     $ docker ps   # will show running containers
     $ docker exec -it <container_id_prefix> bash
+
+
+Common Issues
+^^^^^^^^^^^^^
+
+Some notable issues that you may encounter include:
+
+    * The NPM build may fail/hang - this can happen when Docker does not have enough resources. Try upping the amount CPU/RAM you are allocating to Docker.
+    * Nginx install fails to locate GPG key - this happens when the Docker internal cache has run out of space and needs to be cleaned - see documentation on `docker prune <https://docs.docker.com/config/pruning/.>`_.
 
 
 Docker Command Cheatsheet
@@ -51,11 +57,4 @@ Below is a small list of useful Docker commands for advanced users::
     $ docker-compose up  # will start cluster and log all output to console
     $ docker-compose up -d  # will start cluster in background using existing containers
     $ docker-compose up -d -V --build  # trigger a rebuild/recreation of cluster containers
-    $ docker system prune  # will cleanup unused Docker components - BE CAREFUL WITH THIS
-
-Note that the Dockerfile's take arguments (set these in docker-compose.yml):
-    * CGAP_ENV_NAME="cgap-mastertest"
-    * CGAP_REPO="https://github.com/dbmi-bgm/cgap-portal.git"
-    * CGAP_BRANCH="master"
-    * ENTRYPOINT="entrypoint.sh"
-
+    $ docker system prune  # will cleanup ALL unused Docker components - BE CAREFUL WITH THIS
