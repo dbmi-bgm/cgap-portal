@@ -28,11 +28,12 @@ Welcome to CGAP! We are a team of scientists, clinicians, and developers who aim
 
 Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. For installation and more information on getting started, see our `documentation page <https://cgap-portal.readthedocs.io/en/latest/index.html>`_.
 
-For information on how to run CGAP with Docker, see `here. <./docs/source/docker-setup.rst>`_
+For information on how to run CGAP with Docker, see `here. <./docs/source/docker-local.rst>`_
+
+For information on CGAP-Docker in production, see `here. <./docs/source/docker-production.rst>`_
 
 Navigating this Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-    * .ebextensions/ contains Beanstalk deployment scripts
     * .github/ contains Github Action Workflows
     * bin/ contains the few remaining executables
     * deploy/docker contains Docker setups (see docker-compose.yml)

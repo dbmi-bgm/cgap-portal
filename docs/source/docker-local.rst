@@ -1,12 +1,13 @@
 CGAP-Docker (local)
 ===================
 
-It is now possible to run a local deployment of CGAP without installing any system level
+With Docker, it is possible to run a local deployment of CGAP without installing any system level
 dependencies other than Docker. A few important notes on this setup.
 
-* This is not ideal for active development as you cannot run unit tests or edit source files in the container on the host machine (in your local editor).
+* Although the build dependency layer is cached, it still takes around 4 minutes to rebuild the front-end for each image. This limitation is tolerable considering the local deployment now identically matches the execution runtime of production.
 * ElasticSearch is too compute intensive to virtualize on most machines. For this reason we use the CGAP test ES cluster for this deployment instead of spinning up an ES cluster in Docker. If you want to attempt to run containerized ES, see ``docker-compose.yml``.
-* VERY IMPORTANT: Do not upload the local deployment container image to any registry. This utility is in beta - .
+* This setup only works when users have sourced AWS Keys in the main account (to connect to the shared ES cluster).
+* IMPORTANT: Do not upload the local deployment container image to any registry.
 
 
 Start by installing Docker::
@@ -14,9 +15,9 @@ Start by installing Docker::
     $ brew install docker
 
 
-Prior to building the image, navigate to deploy/docker/local and open docker_development.ini
+Prior to building the image, navigate to deploy/docker/local and open docker_development.ini.
 
-* Modify env.name and indexer.namespace - these values must be globally unique (feel free to just replace the name)
+* Modify env.name and indexer.namespace - these values must be globally unique with respect to our infrastructure (feel free to just replace the name)
 * Consider changing load_prod_data to load_local_data if you need to load more inserts
 
 There are two new Make targets that should be sufficient for normal use. To build the image locally, ensure your

@@ -1,10 +1,20 @@
 Local Installation
 ==================
 
+Docker Instructions
+^^^^^^^^^^^^^^^^^^^
+
+See `docker local docs. <./docker-local.rst>`_
+
+Legacy Instructions
+^^^^^^^^^^^^^^^^^^^
+
 The following instructions are for running a CGAP deployment with macOS and homebrew.
 
+Note that as of summer 2021, these instructions are out of date. Please refer to the Docker setup. There are no guarantees the legacy instructions will work from this point forward.
+
 CGAP is known to work with Python 3.6.x and will not work with Python 3.7 or greater. If part of the HMS team, it is
-recommended to use Python 3.6.13, since that's what is running on our servers. It is best practice to create a fresh Python 
+recommended to use Python 3.6.13, since that's what is running on our servers. It is best practice to create a fresh Python
 virtualenv using one of these versions before proceeding to the following steps.
 
 * Step 0: Obtain AWS keys. These will need to added to your environment variables or through the AWS CLI (installed later in this process).
