@@ -34,14 +34,9 @@ For information on CGAP-Docker in production, see `here. <./docs/source/docker-p
 
 Navigating this Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-    * .github/ contains Github Action Workflows
+    * .github/workflows/ contains Github Action Workflows
     * bin/ contains the few remaining executables
     * deploy/docker contains Docker setups (see docker-compose.yml)
     * docs/ contains documentation
-    * etc/ is deprecated/unused
-    * examples/ is deprecated/unused
-    * jest/ is deprecated/unused
-    * parts/ contains production WSGI entry points
     * scripts/ contains misc scripts
     * src/ where the code is
-    * src-docker/ mount point where container code is
