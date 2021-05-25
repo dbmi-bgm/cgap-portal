@@ -41,6 +41,11 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         } = {}
     } = schemas || {};
 
+    const placeholderStatusIndicator =  (
+        <span className="text-left text-muted text-truncate">
+            <i className="status-indicator-dot mr-1" data-status="Not Available"/>Not Available
+        </span>);
+
     const renderedSections = vsSelections.map(function(sel, idx){
         const {
             date_selected,
@@ -108,7 +113,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                                     <i className="status-indicator-dot mr-1" data-status={acmgClassification}/>
                                     {acmgClassification}
                                 </div>:
-                                <div className="w-100 text-left text-muted text-truncate">Pending</div>}
+                                <div className="w-100 text-left text-truncate">{placeholderStatusIndicator}</div>}
                         </div>
                         <div className="col col-sm-8 col-lg-3 py-2">
                             <label className="mb-04 text-small">Discovery</label>
@@ -118,8 +123,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                                     <span className="text-left">
                                         <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
                                         {geneCandidacy}
-                                    </span>:
-                                    <span className="text-left text-muted text-truncate">Not Available</span>}
+                                    </span>: placeholderStatusIndicator}
                             </div>
                             <div className="text-left">
                                 <span className="font-italic text-muted mr-1">Variant: </span>
@@ -127,8 +131,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                                     <span className="w-100 text-left">
                                         <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/>
                                         {variantCandidacy}
-                                    </span>:
-                                    <span className="text-left text-muted text-truncate">Not Available</span>}
+                                    </span>: placeholderStatusIndicator}
                             </div>
                         </div>
                     </div>

@@ -640,8 +640,7 @@ h3.submission-subtitle {
 		background-color: #47419a;
 	}
 
-	
-	// Gray (unused?) (used to be for 'archived')
+	// Gray
 	&[data-status="obsolete"]:before,						// Applicable to Item.status
 	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
 	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
@@ -652,7 +651,12 @@ h3.submission-subtitle {
 	&[data-status="Known gene for phenotype"]:before {
 	    color: #fff;
 		background-color: #7b7b7b;
-		//display: none;
+	}
+
+	// Gray outline
+	&[data-status="Not Available"]:before {
+		border: 1px solid #adb5bd;
+		background-color: #fff;
 	}
 }
 
