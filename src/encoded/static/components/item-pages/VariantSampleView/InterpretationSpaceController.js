@@ -810,7 +810,7 @@ function ACMGPicker(props) {
 
 
     const picked = selections.map((selection, i) => (
-        <div className={`acmg-invoker text-600 text-center mr-02 ${i === 0 ? '': 'ml-02'}`} key={selection} data-criteria={selection} data-invoked={true}
+        <div className={`acmg-invoker text-600 text-monospace text-center mr-01 ml-01`} key={selection} data-criteria={selection} data-invoked={true}
             style={{ }}>
             { selection }
         </div>
@@ -821,7 +821,7 @@ function ACMGPicker(props) {
             <label className="w-100 text-small">
                 { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
             </label>
-            <div className="w-100 d-flex acmg-picker mb-08">
+            <div className="w-100 d-flex flex-wrap acmg-picker mb-08">
                 { selections.length > 0 ? picked : <div className="acmg-invoker text-muted" data-tip={"Use the picker above to make invocations."} data-criteria="none">None</div>}
             </div>
 
