@@ -824,7 +824,15 @@ function ACMGPicker(props) {
             <div className="w-100 d-flex acmg-picker mb-08">
                 { selections.length > 0 ? picked : <div className="acmg-invoker text-muted" data-tip={"Use the picker above to make invocations."} data-criteria="none">None</div>}
             </div>
-            { autoClassification ? <div className="text-small mb-2"><span className="text-600">CGAP's Classification:</span> {autoClassification}</div>: null}
+
+            { autoClassification ? (
+                <>
+                    <label className="w-100 text-small">CGAP's Classification:</label>
+                    <div className="w-100 mb-08 ml-1">
+                        <i className="status-indicator-dot ml-1 mr-1" data-status={autoClassification} />{autoClassification}
+                    </div>
+                </>)
+                : null }
         </React.Fragment>
     );
 }
