@@ -410,7 +410,7 @@ class ACMGInvoker extends React.Component {
 
         return (
             <div className="card flex-row my-3 mt-0">
-                <div className="text-600 acmg-guidelines-title">ACMG Guidelines</div>
+                <div className="text-600 acmg-guidelines-title">ACMG Rules</div>
                 <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
                     {acmgCriteria.map((obj) => {
                         const { criteria, description } = obj;
