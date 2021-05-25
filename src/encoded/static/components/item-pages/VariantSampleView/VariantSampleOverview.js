@@ -627,7 +627,7 @@ class AutoClassify {
 
         const isLikelyPathogenic = this.memoized.isLikelyPathogenic(vstrong, strongp, moderatep, supportingp);
         if (isLikelyPathogenic) {
-            return "Likely Pathogenic";
+            return "Likely pathogenic";
         }
 
         // (Uncertain significance i) Other criteria shown above are not met
