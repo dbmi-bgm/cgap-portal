@@ -586,7 +586,7 @@ class GenericInterpretationPanel extends React.Component {
         return (
             <div className="interpretation-panel">
                 <label className={`w-100 ${lastModUsername ? "mb-0" : ""}`}>
-                    { noteLabel }
+                    { noteLabel } <span className="text-smaller font-italic text-danger text-400">(Required)</span>
                 </label>
                 { lastModUsername ?
                     <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsername} </div>
