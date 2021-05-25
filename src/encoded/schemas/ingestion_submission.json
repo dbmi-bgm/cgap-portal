@@ -68,11 +68,13 @@
             "type": "string",
             "enum": [
                 "data_bundle",
+                "accessioning",
                 "metadata_bundle",
                 "simulated_bundle",
                 "vcf",
                 "genelist",
-                "variant_update"
+                "variant_update",
+                "family_history"
             ]
         },
         "submission_id": {
