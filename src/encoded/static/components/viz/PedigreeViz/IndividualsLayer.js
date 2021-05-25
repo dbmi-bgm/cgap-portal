@@ -41,7 +41,7 @@ export const IndividualsLayer = React.memo(function IndividualsLayer(props){
     return (
         <div className="individuals-layer">
             { g.map(function(individual, idx){
-                return <IndividualDiv {...passProps} {...{ individual }} key={individual.id} />;
+                return <IndividualDiv {...passProps} {...{ individual }} key={idx} />;
             }) }
         </div>
     );
@@ -169,8 +169,7 @@ const DetailText = React.memo(function DetailText (props) {
         //diseaseToIndex = {},
         showOrderBasedName = true,
         showNotes = true, // Name of this prop may change in future.
-        textScale = 1,
-        diseasesLimit = 8
+        textScale = 1
     } = props;
 
     const {
@@ -192,7 +191,7 @@ const DetailText = React.memo(function DetailText (props) {
     const textContainerStyle = {
         width: width + individualXSpacing,
         maxHeight: individualYSpacing - (height / 5),
-        // Add extra few px to account for node shape border and such.
+        // Add extra few px (height / 10) to account for node shape border and such.
         // Additional margin-top for .detail-text may be supplied in (S)CSS sheets.
         transform: `translate3d(0, ${height + (height / 10)}px, 0)`,
         fontSize: (0.9 * Math.min(textScale, 2)) + "rem",
@@ -202,12 +201,7 @@ const DetailText = React.memo(function DetailText (props) {
 
     let diseasesBody = null;
     if (showNotes) {
-        // Eventually could have more stuff here, maybe have showNotes be enum of various opts to display.. idk.
-        /*
-        diseases.filter(function(disease){
-            return !diseaseToIndex[disease];
-        })
-        */
+        // Eventually could have more stuff here, maybe have `showNotes` be enum of various opts to display.. idk.
         let diseasesRows = diseases.map(function(disease, i){
             return (
                 <li className="line-item" key={"d-" + i} data-describing="disease">
@@ -217,7 +211,12 @@ const DetailText = React.memo(function DetailText (props) {
         });
 
         const diseasesLen = diseasesRows.length;
-
+        const diseasesLimit = 8;
+        // Currently trimmed according to this (at-the-moment) arbitrary-ish
+        // `diseasesLimit`, in future we could take into account font-size + 1.25em lineheight
+        // and measure out what a good diseasesLimit could be re: `dims.individualYSpacing`.
+        // Would need to consider how to get font-size in pixels (currently is rem) .. maybe define font-size
+        // in px in pedigreeviz to begin with?
         if (diseasesLen > diseasesLimit) {
             const difference = diseasesLen - diseasesLimit;
             diseasesRows = diseasesRows.slice(0, (diseasesLimit - 1));
@@ -235,7 +234,7 @@ const DetailText = React.memo(function DetailText (props) {
                 { showOrderBasedName ? orderBasedName : (name || id) }
             </h5>
             { ageString ?
-                <span data-describing="age" className="line-item" style={{ minWidth: width }}>
+                <span data-describing="age" className="line-item" style={{ width }}>
                     { ageString }
                 </span>
                 : null }
@@ -273,7 +272,7 @@ const AboveNodeText = React.memo(function AboveNodeText (props){
         // Add extra few px to account for node shape border and such.
         // Additional margin-top for .detail-text may be supplied in (S)CSS sheets.
         transform: `translate3d(-${ individualXSpacing / 2 }px,0,0)`,
-        bottom: individualHeight * 1.5,
+        bottom: individualHeight * 1.25,
         fontSize: Math.min(textScale, 2) + "rem",
         transformOrigin: `${ individualWidth / 2 }px 100%`
     };

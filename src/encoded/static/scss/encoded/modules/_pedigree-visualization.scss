@@ -192,10 +192,12 @@ $pedigree-disease-colors :
                                 allow it to transition better on other browsers, such as firefox, which doesnt
                                 support transform (as an ATTRIBUTE) transitions.
                             */
+                            margin-top: 0.5rem;
                             background-color: transparent;
                             transition: background-color .3s ease-out;
                             padding-left: 0px; /* decrease from default */
                             list-style-position: inside;
+                            line-height: 1.25em;
                             > li {
                                 /* prevent these from wrapping */
                                 overflow: hidden;
@@ -208,8 +210,9 @@ $pedigree-disease-colors :
                             font-size: 1em;
                             text-align: center;
                             white-space: nowrap;
+                            overflow: visible;
                             font-weight: 400;
-                            margin: 0 0 6px 0; /** Override any default such as 10px 0; */
+                            margin: 0; /** Override any default such as 10px 0; */
                             &.showing-order-based-name {
                                 font-family: $font-family-monospace;
                                 font-family: $font-family-serif;
@@ -218,8 +221,10 @@ $pedigree-disease-colors :
                             }
                         }
 
-                        [data-describing="age"] {
+                        span.line-item[data-describing="age"] {
                             text-align: center;
+                            white-space: nowrap;
+                            overflow: visible;
                         }
 
 
@@ -230,6 +235,7 @@ $pedigree-disease-colors :
                         text-align: center;
                         position: absolute;
                         transition: font-size 0.3s ease-out;
+                        @include no-user-select;
                     }
     
                     &.is-hovered-over,
@@ -250,10 +256,12 @@ $pedigree-disease-colors :
                         }
                         .detail-text {
                             /* max-width: none !important; */
+                            width: auto !important;
                             ul {
                                 background-color: transparentize($pedigree-viz-bg-color, 0.25);
                                 box-shadow: 0 0 10px 6px transparentize($pedigree-viz-bg-color, 0.25);
                                 li {
+                                    /* Overrides hidden + text-ellipsis */
                                     overflow: visible;
                                 }
                             }

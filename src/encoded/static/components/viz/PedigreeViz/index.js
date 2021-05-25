@@ -509,7 +509,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             "objectGraph": orderedNodes,
             "vizViewID" : this.id,
             containerWidth, containerHeight,
-            graphHeight, graphWidth, dims, scale,
+            graphHeight, graphWidth, dims,
             diseaseToIndex,
             selectedNode,
             hoveredNode,

@@ -12,7 +12,9 @@ export const IndividualNodeShapeLayer = React.memo(function IndividualNodeShapeL
     return (
         <g className="individuals-bg-shape-layer">
             <ClipPathDefinitions {...{ dims, vizViewID }} />
-            { g.map((indv) => <IndividualNodeShape {...passProps} key={indv.id} individual={indv} /> )}
+            { g.map(function(individual, idx){
+                return <IndividualNodeShape {...passProps} {...{ individual }} key={idx} />;
+            }) }
         </g>
     );
 });
@@ -120,10 +122,7 @@ export class IndividualNodeShape extends React.PureComponent {
             textScale,
             vizViewID = 0,
             hoveredNode = null,
-            selectedNode = null,
-            // showOrderBasedName = true,
-            // showNotes = true,
-            // maxHeightIndex = Infinity
+            selectedNode = null
         } = this.props;
         const {
             individualWidth: width,
