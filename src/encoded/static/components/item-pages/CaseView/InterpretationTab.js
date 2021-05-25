@@ -58,7 +58,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                         <div className="flex-grow-1 d-flex flex-column flex-sm-row">
                             <div className="flex-auto">
                                 <VariantSampleDisplayTitleColumn result={variant_sample_item}
-                                    link={`${vsID}?showInterpretation=True${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
+                                    link={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
                             </div>
                             <div className="flex-grow-1  d-sm-block">
                                 &nbsp;
@@ -87,13 +87,13 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                             <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
                                 { geneTranscriptColTitle || "Gene, Transcript" }
                             </label>
-                            { geneTranscriptRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                            { geneTranscriptRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                         </div>
                         <div className="col col-sm-4 col-lg-2 py-2">
                             <label className="mb-04 text-small" data-tip={variantColDescription}>
                                 { variantColTitle || "Variant" }
                             </label>
-                            { variantRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                            { variantRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                         </div>
                         <div className="col col-sm-4 col-lg-3 py-2">
                             <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>

@@ -275,8 +275,8 @@ export class InterpretationSpaceWrapper extends React.Component {
 export class InterpretationSpaceController extends React.Component {
 
     // CurrentTab will always be a number between 0-3 and index to these values
-    static tabNames = ["Variant Notes", "Gene Notes", "Clinical", "Discovery"];
-    static tabTitles = ["Variant Notes", "Gene Notes", "ACMG Interpretation", "Variant/Gene Discovery"];
+    static tabNames = ["Gene Notes", "Variant Notes", "Clinical", "Discovery"];
+    static tabTitles = ["Gene Notes", "Variant Notes", "ACMG Interpretation", "Variant/Gene Discovery"];
 
     static haveEditPermission(actions){
         return _.findWhere(actions, { "name" : "edit" });
@@ -406,20 +406,20 @@ export class InterpretationSpaceController extends React.Component {
 
         let panelToDisplay = null;
         switch(currentTab) {
-            case (0): // Variant Notes
-                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
-                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
-                );
-                break;
-            case (1): // Gene Notes
+            case (0): // Gene Notes
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
+                );
+                break;
+            case (1): // Variant Notes
+                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
+                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
+                    key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (2): // Interpretation
@@ -469,7 +469,7 @@ function InterpretationSpaceHeader(props) { // Expanded items commented out unti
 
 function InterpretationSpaceTabs(props) {
     const { currentTab, switchToTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftInterpretationUnsaved, isDraftVariantNoteUnsaved } = props;
-    const tabIndexToUnsavedDraft = { 0: isDraftVariantNoteUnsaved, 1: isDraftGeneNoteUnsaved, 2: isDraftInterpretationUnsaved, 3: isDraftDiscoveryUnsaved };
+    const tabIndexToUnsavedDraft = { 0: isDraftGeneNoteUnsaved, 1: isDraftVariantNoteUnsaved, 2: isDraftInterpretationUnsaved, 3: isDraftDiscoveryUnsaved };
 
     // Maybe memoize?
     const tabsRender = InterpretationSpaceController.tabNames.map((tabName, i) => {
