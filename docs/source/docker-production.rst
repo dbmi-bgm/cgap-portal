@@ -3,12 +3,21 @@ CGAP-Docker (Production)
 
 CGAP-Docker runs in production on AWS Elastic Container Service, meant to be orchestrated from the 4dn-cloud-infra repository. End users will modify ``deploy/docker/production/Makefile`` to suite their immediate build needs with respect to target AWS Account/ECR Repository/Tagging strategy. For more information on the specifics of the ECS setup, see 4dn-cloud-infra.
 
-The CGAP Application has been orchestrated into the ECS Service/Task paradigm. As of writing all core application services have their own image tag varied by passing the ``$ENTRYPOINT`` build argument. As such, they are all separate services with the following notable characteristics:
+The CGAP Application has been orchestrated into the ECS Service/Task paradigm. As of writing all core application services have their own image tag varied by passing the ``$ENTRYPOINT`` build argument. As such, they are all separate services described by the following table:
 
-    * WSGI - services standard API requests - 8x parallelization on Fargate Spot
-    * Indexer - hits /index at 3 second intervals indefinitely - 4x parallelization on Fargate Spot
-    * Ingester - poll for ingestion tasks from SQS - 1x parallelization TODO add ability to add additional tasks through API
-    * Deployment - triggers the standard deployment actions - must be explicitly run either through ECS console or TODO through API.
++------------+--------------------------------+-----+------+------+-----+--------------------------+
+| Kind       | Use                            | Num | Spot | vCPU | Mem | Notes                    |
++============+================================+=====+======+======+=====+==========================+
+| WSGI       | Services standard API requests | 8   | Yes  | .25  | 512 | Needs autoscaling.       |
++------------+--------------------------------+-----+------+------+-----+--------------------------+
+| Indexer    | Hits /index at 3sec            | 4   | Yes  | .25  | 512 | Needs autoscaling.       |
+|            | intervals indefinitely.        |     |      |      |     | Could use CPU%           |
++------------+--------------------------------+-----+------+------+-----+--------------------------+
+| Ingester   | Polls SQS for ingestion tasks  | 1   | No   | .25  | 512 | Need API to add tasks.   |
++------------+--------------------------------+-----+------+------+-----+--------------------------+
+| Deployment | Triggers the standard          | 0   | Yes  | .5   | 1024| Run explicitly or (TODO) |
+|            | deployment actions.            |     |      |      |     | by API.                  |
++------------+--------------------------------+-----+------+------+-----+--------------------------+
 
 Building an Image
 ^^^^^^^^^^^^^^^^^
@@ -53,7 +62,7 @@ As stated previously, the cgap-portal consists of 4 core components that have be
 
 After all new image versions have been pushed, issue a forced deployment update to the ECS cluster. This action will spawn a new set of tasks for all services using the newer image tags. For WSGI, once the new tasks are deemed healthy by ECS and the Application Load Balancer, they will be added to the WSGI Target Group and immediately begin serving requests. At that time the old tasks will begin the de-registration process from the target group, after which they will be spun down. The remaining new tasks will come online more quickly since they do not need to pass load balancer health checks. Once the old tasks have been cleaned up, it is safe to trigger a deployment task through the Deployment Service.
 
-Deciding what Image(s) to Update
+Deciding Which Image(s) to Update
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Generally speaking, all 4 tags must be pushed in order for the deployment to be considered "valid". With that said, there are a few scenarios where it may make sense to do a partial image bundle upload. Note that when uploading to production, none of the following apply.
