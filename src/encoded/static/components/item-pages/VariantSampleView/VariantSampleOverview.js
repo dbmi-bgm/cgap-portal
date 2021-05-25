@@ -602,7 +602,7 @@ class AutoClassify {
 
         console.log("classifying...");
 
-        // Check for certain benign affect
+        // Check for certain benign effect
         const isBenign = this.memoized.isBenign(standalone, strongb);
         let isPathogenic;
         if (isBenign) {
@@ -619,13 +619,19 @@ class AutoClassify {
             return "Pathogenic";
         }
 
-        // Check for likelihoods (note: currently not checking for contradictory criteria -- may need to do so in future)
+        // Check for probable benign effect
         const isLikelyBenign = this.memoized.isLikelyBenign(strongb, supportingb);
+        let isLikelyPathogenic;
         if (isLikelyBenign) {
-            return "Likely benign";
+            isLikelyPathogenic = this.memoized.isLikelyPathogenic(vstrong, strongp, moderatep, supportingp);
+            // (Uncertain significance ii) the criteria for benign and pathogenic are contradictory
+            return isLikelyPathogenic ? "Uncertain significance" : "Likely benign";
         }
 
-        const isLikelyPathogenic = this.memoized.isLikelyPathogenic(vstrong, strongp, moderatep, supportingp);
+        // Check for probable pathogenic effect
+        if (isLikelyPathogenic === undefined) {
+            isLikelyPathogenic = this.memoized.isLikelyPathogenic(vstrong, strongp, moderatep, supportingp);
+        }
         if (isLikelyPathogenic) {
             return "Likely pathogenic";
         }
