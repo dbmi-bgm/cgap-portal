@@ -422,7 +422,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                             <td className="text-left">{ fallbackElem }</td>
                             <td className="text-left">{ csq_cadd_raw_rankscore }</td>
                         </tr>
-                         <tr>
+                        <tr>
                             <td className="text-left">
                                 <label className="mb-0" data-tip={getTipForField("csq_phylop30way_mammalian")}>phyloP (30 Mammals)</label>
                             </td>

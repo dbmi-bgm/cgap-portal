@@ -172,6 +172,11 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         }, 0);
     }
 
+    static textScale(scale){
+        // Update less frequently by rounding for better performance (less changes, caught by Memo/PureComponent)
+        return Math.floor(((0.5 / scale) + 0.5) * 5) / 5;
+    }
+
     static defaultProps = {
         "width": 600,
         "scale": 1,
@@ -216,7 +221,8 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             graphToDiseaseIndices: memoize(graphToDiseaseIndices),
             orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
             scaledStyle: memoize(scaledStyle),
-            visAreaTransform: memoize(PedigreeVizViewUserInterface.visAreaTransform)
+            visAreaTransform: memoize(PedigreeVizViewUserInterface.visAreaTransform),
+            textScale: memoize(PedigreeVizViewUserInterface.textScale)
         };
 
         this.innerRef = React.createRef();
@@ -399,7 +405,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
     }
 
     handleMouseLeave(evt){
-        this.handleMouseUp();
+        this.handleMouseUp(null);
     }
 
     handleMouseUp(evt = null){
@@ -420,8 +426,17 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
 
         // Act as click off of or onto node; we will have vectorX if 'click'ed within container.
         if (Math.abs(vectorX) <= 5 && Math.abs(vectorY) <= 5){
-            const nodeID = (evt && evt.target && evt.target.id) || null;
-            const nodeType = (evt && evt.target && evt.target.getAttribute("data-node-type")) || null;
+
+            const mouseTarget = (evt && evt.target) || null;
+            const node = (mouseTarget && (
+                // For individual nodes with d.mouse-event-area:
+                (mouseTarget.className === "mouse-event-area" && mouseTarget.parentNode)
+                // For relationship nodes:
+                || (mouseTarget.id && mouseTarget)
+            )) || null;
+            const nodeID = (node && node.id) || null;
+            const nodeType = (node && node.getAttribute("data-node-type")) || null;
+
             if (selectedNode !== null) {
                 if (nodeID === selectedNode.id) {
                     // Keep same node selected if (re)click on it
@@ -467,6 +482,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
         const scaledVizStyle = this.memoized.scaledStyle(graphHeight, graphWidth, scale);
         const maxHeightIndex = this.memoized.maxHeightIndex(objectGraph);
+        const textScale = this.memoized.textScale(scale);
 
 
         const outerContainerStyle = { minHeight : containerHeight, ...containerStyle };
@@ -498,6 +514,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             selectedNode,
             hoveredNode,
             maxHeightIndex,
+            textScale,
             // In passProps:
             // onNodeMouseIn,
             // onNodeMouseLeave,
@@ -518,7 +535,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         return (
             // IndividualsLayer may become deprecated, and move to all-SVG for easier exportability... unsure.
             <div className="pedigree-viz-container" style={outerContainerStyle} data-selection-disabled={disableSelect}
-                data-selected-node={selectedNode && selectedNode.id} data-instance-index={this.id}>
+                data-selected-node={selectedNode && selectedNode.id} data-instance-index={this.id} data-is-node-hovered-over={!!(hoveredNode)} data-is-node-selected={!!(selectedNode)}>
                 <div className="inner-container" ref={this.innerRef} style={innerContainerStyle}
                     onMouseDown={this.handleContainerMouseDown}
                     onMouseMove={this.handleContainerMouseMove}
@@ -537,7 +554,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                     <ScaleControls {...{ scale, minScale, maxScale, setScale }} />
                     : null }
                 { selectedNodePane ?
-                    <div className="detail-pane-container" data-is-open="true" data-has-selected-node={!!(selectedNode)}>
+                    <div className="detail-pane-container" data-is-open="true" data-has-selected-node={!!(selectedNode)} style={{ height: containerHeight }}>
                         { selectedNodePane }
                     </div>
                     : null }
@@ -552,22 +569,18 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
         edges, relationships,
         selectedNode, hoveredNode,
         onNodeMouseIn, onNodeMouseLeave,
-        dims, scale,
-        showOrderBasedName, showNotes
+        dims, textScale
     } = props;
+    // Props contains showOrderBasedName, showNotes (passed to IndividualNodeShapeLayer)
     const svgStyle = { width: graphWidth, height: graphHeight };
-
-    // Update less frequently by rounding for better performance (less changes, caught by Memo/PureComponent)
-    const textScale = Math.floor(((0.5 / scale) + 0.5) * 5) / 5;
-    const textScaleTransformStr = "scale3d(" + textScale +"," + textScale +",1)";
 
     return (
         <svg className="pedigree-viz-shapes-layer shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight}
-            style={svgStyle} data-is-node-hovered-over={!!(hoveredNode)} data-is-node-selected={!!(selectedNode)}>
+            style={svgStyle}>
             <EdgesLayer {...{ edges, dims }} />
             <SelectedNodeIdentifier {...{ selectedNode, dims, textScale }} />
-            <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims, textScale, textScaleTransformStr }} />
-            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr, showOrderBasedName, showNotes }} />
+            <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims }} />
+            <IndividualNodeShapeLayer {...props} />
         </svg>
     );
 });
