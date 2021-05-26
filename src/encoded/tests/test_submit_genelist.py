@@ -1,3 +1,4 @@
+import json
 import pytest
 
 from encoded.tests.test_access_key import basic_auth
@@ -8,6 +9,10 @@ from encoded.submit_genelist import (
 )
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
+
+
+GENELIST_PATH = "src/encoded/tests/data/documents/gene_lists/"
+VARIANT_UPDATE_PATH = "src/encoded/tests/data/documents/"
 
 
 @pytest.fixture
@@ -83,13 +88,13 @@ class TestGeneListSubmission:
         assert creation_response["status"] == "success"
         assert submission_response["success"]
 
-    def test_normal_genelist(self, es_testapp, workbook, wb_project, wb_institution):
+    def test_basic_genelist(self, es_testapp, workbook, wb_project, wb_institution):
         """
-        Tests for full gene list functionality given gene list with all genes
-        identifiable in the database.
+        Tests for gene list functionality given gene list with all genes
+        identifiable in the database and a title.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/test-parse_gene_list.txt",
+            GENELIST_PATH + "test-parse_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -110,7 +115,7 @@ class TestGeneListSubmission:
         Tests for detection of empty gene list and no title.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/test-empty_gene_list.txt",
+            GENELIST_PATH + "test-empty_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -127,7 +132,7 @@ class TestGeneListSubmission:
         given an excel gene list.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/test_empty_gene_list.xlsx",
+            GENELIST_PATH + "test_empty_gene_list.xlsx",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -144,7 +149,7 @@ class TestGeneListSubmission:
         different names.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/test-match_gene_list.txt",
+            GENELIST_PATH + "test-match_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -158,7 +163,7 @@ class TestGeneListSubmission:
         posting should occur in this scenario.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/test-no-match_gene_list.txt",
+            GENELIST_PATH + "test-no-match_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -173,7 +178,7 @@ class TestGeneListSubmission:
         when some genes are not identified in the database.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/test-no-match_gene_list.txt",
+            GENELIST_PATH + "test-no-match_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
@@ -185,30 +190,63 @@ class TestGeneListSubmission:
         """
         Ensure gene list and document are patched if attempting to submit gene
         list with title identical to the title of a previously created gene
-        list associated with the project.
+        list associated with the project. Also tests for accurate patching
+        of bam_sample_ids.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/"
-            "test-previous-title_gene_list.txt",
+            GENELIST_PATH + "test-previous-title_gene_list.txt",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
         )
         assert genelist.patch_genelist_uuid
         assert genelist.patch_document_uuid
+        assert genelist.bam_sample_ids
 
     def test_excel_format(self, es_testapp, workbook, wb_project, wb_institution):
         """
         Test for correct parsing of excel-formatted gene list.
         """
         genelist = GeneListSubmission(
-            "src/encoded/tests/data/documents/gene_lists/test-match_gene_list.xlsx",
+            GENELIST_PATH + "test-match_gene_list.xlsx",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
         )
         assert len(genelist.gene_ids) == 2
         assert genelist.post_output
+
+    def test_valid_case_accession(self, es_testapp, wb_project, wb_institution):
+        """
+        Test for successful gene list submission when a valid case accession is
+        given.
+        """
+        genelist = GeneListSubmission(
+            GENELIST_PATH + "test_match_case_gene_list.txt",
+            wb_project["@id"],
+            wb_institution["@id"],
+            es_testapp,
+        )
+        assert genelist.case_atids
+        assert genelist.bam_sample_ids
+        assert genelist.post_output
+        assert not genelist.errors
+
+    def test_invalid_case_accession(self, es_testapp, wb_project, wb_institution):
+        """
+        Test for unsuccessful gene list submission when invalid case accession
+        provided, as well as successful parsing of multiple cases submitted.
+        """
+        genelist = GeneListSubmission(
+            GENELIST_PATH + "test_no_match_case_gene_list.txt",
+            wb_project["@id"],
+            wb_institution["@id"],
+            es_testapp,
+        )
+        assert genelist.case_atids
+        assert genelist.bam_sample_ids
+        assert genelist.errors
+        assert not genelist.post_output
 
 
 class TestVariantUpdateSubmission:
@@ -218,15 +256,32 @@ class TestVariantUpdateSubmission:
         and queues project-associated variant samples for indexing.
         """
         variant_update = VariantUpdateSubmission(
-            "src/encoded/tests/data/documents/test-variant-update.txt",
+            VARIANT_UPDATE_PATH + "test-variant-update.json",
+            wb_project["@id"],
+            wb_institution["@id"],
+            es_testapp,
+        )
+        assert len(variant_update.gene_uuids) == 3
+        assert len(variant_update.variant_samples) == 2
+        assert variant_update.validate_output
+        assert variant_update.post_output
+        assert not variant_update.errors
+
+    def test_variant_update_with_case(self, es_testapp, wb_project, wb_institution):
+        """
+        Test that submission with case information (BAM sample IDs) is correctly
+        parsed and only variant samples associated with the case are queued for
+        indexing.
+        """
+        variant_update = VariantUpdateSubmission(
+            VARIANT_UPDATE_PATH + "test_variant_update_with_case.json",
             wb_project["@id"],
             wb_institution["@id"],
             es_testapp,
         )
         assert len(variant_update.gene_uuids) == 3
         assert len(variant_update.variant_samples) == 1
-        assert variant_update.validate_output
-        assert variant_update.post_output
+        assert len(variant_update.bam_sample_ids) == 1
         assert not variant_update.errors
 
     def test_core_variant_update(self, es_testapp, core_project, wb_institution):
@@ -235,12 +290,12 @@ class TestVariantUpdateSubmission:
         samples regardless of project.
         """
         variant_update = VariantUpdateSubmission(
-            "src/encoded/tests/data/documents/test-variant-update.txt",
+            VARIANT_UPDATE_PATH + "test-variant-update.json",
             core_project["@id"],
             wb_institution["@id"],
             es_testapp,
         )
-        assert len(variant_update.variant_samples) == 2
+        assert len(variant_update.variant_samples) == 3
 
     def test_variant_update_endpoint(
         self, testapp, bgm_project, bgm_access_key, institution
@@ -278,11 +333,13 @@ class TestVariantUpdateSubmission:
                 bgm_access_key["secret_access_key"],
             )
         }
+        datafile_body = {"genes": ["PCSK9", "FBN1"]}
+        datafile = json.dumps(datafile_body)
         upload_file = [
             (
                 "datafile",
-                "Testing",
-                bytes("\n".join(["PCSK9", "FBN1"]), encoding="utf-8"),
+                "Testing.json",
+                bytes(datafile, encoding="utf-8"),
             )
         ]
         submission_response = testapp.post(
