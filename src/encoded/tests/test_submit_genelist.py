@@ -243,10 +243,24 @@ class TestGeneListSubmission:
             wb_institution["@id"],
             es_testapp,
         )
-        assert genelist.case_atids
-        assert genelist.bam_sample_ids
+        assert len(genelist.case_atids) == 3
+        assert len(genelist.bam_sample_ids) == 1
         assert genelist.errors
         assert not genelist.post_output
+
+    def test_xlsx_case_parsing(self, es_testapp, wb_project, wb_institution):
+        """
+        Test that Excel (.xlsx) files including case accessions are appropriately
+        parsed when given in subsequent rows or in one comma-separated row.
+        """
+        genelist = GeneListSubmission(
+            GENELIST_PATH + "test_parse_cases_gene_list.xlsx",
+            wb_project["@id"],
+            wb_institution["@id"],
+            es_testapp,
+        )
+        assert len(genelist.case_atids) == 3
+        assert len(genelist.bam_sample_ids) == 1
 
 
 class TestVariantUpdateSubmission:

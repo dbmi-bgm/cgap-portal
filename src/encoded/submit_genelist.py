@@ -170,6 +170,7 @@ class GeneListSubmission:
             else:
                 cases.append(case)
         cases = [case.strip() for case in cases if case]
+        cases = list(set(cases))
         case_atids = ["/cases/" + case + "/" for case in cases]
         return case_atids
 

@@ -1,5 +1,6 @@
-Title: One case shouldn't match
+Title: Two cases shouldn't match
 Case: GAPFIZ123456, GAPFIO67BOS2 
+Case: GAPFIZ234567
 NLGN4Y
 USP9Y
 TSPY8
