@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import memoize from 'memoize-one';
 import { individualLeftPosition, individualTopPosition } from './layout-utilities-drawing';
 
@@ -36,12 +36,22 @@ export function individualClassName(individual, isBeingHovered = false, isSelect
 
 
 export const IndividualsLayer = React.memo(function IndividualsLayer(props){
-    const { objectGraph: g, ...passProps } = props;
-    // passProps contains also diseaseToIndex, showOrderBasedName, showNotes, textScale, textScaleTransformStr, maxHeightIndex
+    const { objectGraph, dims, textScale, ...passProps } = props;
+    // passProps contains also diseaseToIndex, showOrderBasedName, showNotes, maxHeightIndex
+
+    const { aboveNodeTextContainerStyle, detailTextContainerStyle } = useMemo(function(){
+        // These calculated styles are same for each node, so we do once here and then
+        // pass down, rather than recalculating per each leaf component.
+        return {
+            "aboveNodeTextContainerStyle": AboveNodeText.textContainerStyle(dims, textScale),
+            "detailTextContainerStyle": DetailText.textContainerStyle(dims, textScale)
+        };
+    }, [ dims, textScale ]);
+
     return (
         <div className="individuals-layer">
-            { g.map(function(individual, idx){
-                return <IndividualDiv {...passProps} {...{ individual }} key={idx} />;
+            { objectGraph.map(function(individual, idx){
+                return <IndividualDiv {...passProps} {...{ individual, dims, aboveNodeTextContainerStyle, detailTextContainerStyle }} key={idx} />;
             }) }
         </div>
     );
@@ -102,9 +112,10 @@ export class IndividualDiv extends React.PureComponent {
 
             diseaseToIndex,
             showOrderBasedName = true,
-            textScale,
             showNotes = true,
-            maxHeightIndex = Infinity
+            maxHeightIndex = Infinity,
+            aboveNodeTextContainerStyle,
+            detailTextContainerStyle
         } = this.props;
 
         const {
@@ -154,8 +165,8 @@ export class IndividualDiv extends React.PureComponent {
                     <NodeOptionsPanel {...this.props} onAddSelect={this.handleAddNewIndividual} /> : null
                 */}
                 <div className="mouse-event-area" onMouseEnter={this.onMouseEnter} onMouseLeave={onNodeMouseLeave}/>
-                <AboveNodeText {...{ individual, maxHeightIndex, dims, textScale }} />
-                <DetailText {...{ individual, dims, diseaseToIndex, textScale, showNotes, showOrderBasedName }} />
+                <AboveNodeText {...{ individual, maxHeightIndex, dims, aboveNodeTextContainerStyle }} />
+                <DetailText {...{ individual, dims, diseaseToIndex, showNotes, showOrderBasedName, detailTextContainerStyle }} />
             </div>
         );
     }
@@ -169,15 +180,10 @@ const DetailText = React.memo(function DetailText (props) {
         //diseaseToIndex = {},
         showOrderBasedName = true,
         showNotes = true, // Name of this prop may change in future.
-        textScale = 1
+        detailTextContainerStyle
     } = props;
 
-    const {
-        individualWidth: width,
-        individualHeight: height,
-        individualYSpacing,
-        individualXSpacing
-    } = dims;
+    const { individualWidth: width } = dims;
 
     const {
         id,
@@ -186,17 +192,6 @@ const DetailText = React.memo(function DetailText (props) {
         diseases = [],
         orderBasedName,
     } = individual;
-
-
-    const textContainerStyle = {
-        width: width + individualXSpacing,
-        maxHeight: individualYSpacing - (height / 5),
-        // Add extra few px (height / 10) to account for node shape border and such.
-        // Additional margin-top for .detail-text may be supplied in (S)CSS sheets.
-        transform: `translate3d(0, ${height + (height / 10)}px, 0)`,
-        fontSize: (0.9 * Math.min(textScale, 2)) + "rem",
-        transformOrigin: `${ width / 2 }px 0`
-    };
 
 
     let diseasesBody = null;
@@ -227,7 +222,7 @@ const DetailText = React.memo(function DetailText (props) {
     }
 
     return (
-        <div className="detail-text" style={textContainerStyle}>
+        <div className="detail-text" style={detailTextContainerStyle}>
             <h5 data-describing="title"
                 className={(showOrderBasedName ? " showing-order-based-name" : "")}
                 style={{ width }}>
@@ -242,15 +237,26 @@ const DetailText = React.memo(function DetailText (props) {
         </div>
     );
 
-
 });
+/** @see AboveNodeText.textContainerStyle */
+DetailText.textContainerStyle = function(dims, textScale = 1){
+    const { individualWidth, individualHeight, individualYSpacing, individualXSpacing } = dims;
+    return {
+        width: individualWidth + individualXSpacing,
+        maxHeight: individualYSpacing - (individualHeight / 5),
+        // Add extra few px (individualHeight / 10) to account for node shape border and such.
+        // Additional margin-top for .detail-text may be supplied in (S)CSS sheets.
+        transform: `translate3d(0, ${individualHeight + (individualHeight / 10)}px, 0)`,
+        fontSize: (0.9 * Math.min(textScale, 2)) + "rem",
+        transformOrigin: `${ individualWidth / 2 }px 0`
+    };
+};
 
 const AboveNodeText = React.memo(function AboveNodeText (props){
     const {
         individual,
-        dims: { individualXSpacing, individualHeight, individualWidth },
         maxHeightIndex,
-        textScale = 1
+        aboveNodeTextContainerStyle
     } = props;
 
     const {
@@ -267,24 +273,35 @@ const AboveNodeText = React.memo(function AboveNodeText (props){
     const moreAncestryPresent = ancestry.length > 3;
     const showAncestry = moreAncestryPresent ? ancestry.slice(0, 3) : ancestry; // Up to 3 shown.
 
-    const textContainerStyle = {
-        width: individualWidth + individualXSpacing,
-        // Add extra few px to account for node shape border and such.
-        // Additional margin-top for .detail-text may be supplied in (S)CSS sheets.
-        transform: `translate3d(-${ individualXSpacing / 2 }px,0,0)`,
-        bottom: individualHeight * 1.25,
-        fontSize: Math.min(textScale, 2) + "rem",
-        transformOrigin: `${ individualWidth / 2 }px 100%`
-    };
-
     return (
-        <div className="above-node-text" data-describing="ancestry" style={textContainerStyle}>
+        <div className="above-node-text" data-describing="ancestry" style={aboveNodeTextContainerStyle}>
             { showAncestry.join(" • ") }
         </div>
     );
 });
+/**
+ * Could potentially make this func a prop eventually if publish/export PedigreeViz as
+ * a standalone library to allow people to customize.
+ */
+AboveNodeText.textContainerStyle = function(dims, textScale = 1){
+    const { individualWidth, individualHeight, individualXSpacing } = dims;
+    return {
+        width: individualWidth + individualXSpacing,
+        // Add extra few px to account for node shape border and such.
+        // Additional margin-top for .detail-text may be supplied in (S)CSS sheets.
+        transform: `translate3d(-${ individualXSpacing / 2 }px,0,0)`,
+        // Enough space for 'selected-node-identifier'
+        bottom: individualHeight * 1.4,
+        // Scaling with fontSize makes it a little easier to keep text containers their intended width (with text-wrapping for text within it)
+        // to avoid text overflowing (or containers overlapping) at greater scales.
+        // Not too sure if there is performance impact (i.e. in browser repaints) compared to scale3d(..) tho..
+        fontSize: Math.min(textScale, 2) + "rem",
+        // Below necessary if changing from scaling fontSize to using transform: scale3d(..) or similar:
+        // transformOrigin: `${ individualWidth / 2 }px 100%`
+    };
+};
 
-/** TODO */
+/** Potential TODO for if making PedigreeViz user-editable in future */
 // function NodeOptionsPanel(props){
 //     const { onAddSelect, individual } = props;
 //     const { _parentReferences } = individual;
