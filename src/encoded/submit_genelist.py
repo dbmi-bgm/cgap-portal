@@ -756,9 +756,8 @@ class VariantUpdateSubmission:
         self.vapp = vapp
         self.errors = []
         self.gene_uuids, self.bam_sample_ids = self.genes_from_file()
-        self.variant_samples = self.find_associated_variants()
+        self.variant_samples, self.validate_output = self.find_associated_variants()
         self.admin_vapp = self.create_admin_vapp()
-        self.validate_output = self.validate_patch()
         if not validate_only:
             self.post_output = self.queue_variants_for_indexing()
 
@@ -787,6 +786,7 @@ class VariantUpdateSubmission:
         Returns:
             - List of unique variant sample uuids (None if no gene
               uuids)
+            - Validation output msg
         """
         if not self.gene_uuids:
             return None
@@ -810,7 +810,8 @@ class VariantUpdateSubmission:
         )
         variant_sample_uuids = [item["uuid"] for item in variant_sample_search]
         to_invalidate = list(set(variant_sample_uuids))
-        return to_invalidate
+        validation_output = "Found %s variant samples to update" % len(to_invalidate)
+        return to_invalidate, validation_output
 
     def create_admin_vapp(self):
         """
@@ -825,37 +826,9 @@ class VariantUpdateSubmission:
         admin_vapp = VirtualApp(app, config)
         return admin_vapp
 
-    def validate_patch(self):
-        """
-        Validates empty patching of variant samples.
-
-        Returns:
-            - String info about validation
-        """
-        if not self.variant_samples:
-            validate_output = (
-                "No project-associated variant samples were found for the "
-                "given genes."
-            )
-            return validate_output
-        not_validated = []
-        for uuid in self.variant_samples:
-            validate_response = self.vapp.patch_json("/" + uuid + "?validate_only", {})
-            if validate_response.json["status"] != "success":
-                not_validated.append(uuid)
-        if not_validated:
-            self.errors.append(
-                "Validation failed for the following variant sample(s): %s."
-                % ", ".join(not_validated)
-            )
-        validate_output = "%s variant sample(s) validated for updating." % str(
-            len(self.variant_samples) - len(not_validated)
-        )
-        return validate_output
-
     def queue_variants_for_indexing(self):
         """
-        Queues all variant samples for indexing by empty patching.
+        Queues all variant samples for indexing.
 
         Returns:
             - String info about post (None if validation failed or posting
@@ -863,12 +836,26 @@ class VariantUpdateSubmission:
         """
         if self.errors:
             return None
-        for uuid in self.variant_samples:
-            self.vapp.patch_json("/" + uuid, {})
-        post_output = "%s variant sample(s) successfully updated." % str(
-            len(self.variant_samples)
-        )
-        return post_output
+        if len(self.variant_samples) == 0:
+            msg = "No variant samples were posted to the indexing queue."
+            return msg
+        queue_body = {
+            "uuids": self.variant_samples, "target_queue": "primary", "strict": True
+        }
+        queue_response = self.admin_vapp.post_json("/queue_indexing", queue_body).json
+        if queue_response["notification"] == "Success":
+            msg = (
+                "%s variant sample(s) successfully updated."
+                % str(len(self.variant_samples))
+            )
+            return msg
+        else:
+            self.errors.append(
+                "Variant samples were not properly queued for indexing."
+                " Response to POSTing to /queue_indexing was: %s."
+                % queue_response
+            )
+            return None
 
 
 class CommonUtils:
