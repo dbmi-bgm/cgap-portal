@@ -382,6 +382,7 @@ class GeneListSubmission:
                     bam_sample_ids.append(case_bam_sample_id)
             except (VirtualAppError, AppError):
                 cases_not_found.append(self._accession_from_atid(case_atid))
+        bam_sample_ids = list(set(bam_sample_ids))
         if cases_without_sample_ids:
             self.errors.append(
                 "The following cases have not yet been processed: %s. Please"
@@ -480,14 +481,12 @@ class GeneListSubmission:
         genelist_json = self.post_bodies[1]
         if self.title:
             try:
-                fields = ["title", "uuid", "genes.uuid"]
                 project_genelists = CommonUtils.batch_search(
                     self.vapp,
                     project_list,
                     "project.%40id",
                     item_type="GeneList",
                     institution=self.institution,
-                    fields=fields,
                 )
                 project_titles = [x["title"] for x in project_genelists]
                 for previous_title in project_titles:
@@ -500,10 +499,10 @@ class GeneListSubmission:
                         genelist_idx = project_titles.index(genelist_title)
                         old_genelist = project_genelists[genelist_idx]
                         genelist_uuid = old_genelist["uuid"]
-                        prior_gene_uuids = old_genelist["genes"]
+                        prior_genes = old_genelist["genes"]
                         prior_sample_ids = old_genelist.get("bam_sample_ids", [])
                         previous_genelist_gene_ids += [
-                            gene["uuid"] for gene in prior_gene_uuids
+                            gene["uuid"] for gene in prior_genes
                         ]
                         break
             except VirtualAppError:
@@ -571,7 +570,6 @@ class GeneListSubmission:
                 removed_sample_ids,
                 "sample.bam_sample_id",
                 item_type="Case",
-                project=self.project,
                 fields=["accession"],
             )
             cases_removed = [case["accession"] for case in case_search]
@@ -643,8 +641,12 @@ class GeneListSubmission:
         """
         if not self.post_output:
             return
+        bam_samples = []
         uuids_to_update = list(set(self.gene_ids + self.previous_gene_ids))
-        bam_samples = list(set(self.bam_sample_ids + self.previous_bam_ids))
+        if self.bam_sample_ids and self.previous_bam_ids:
+            bam_samples = list(set(self.bam_sample_ids + self.previous_bam_ids))
+        elif self.bam_sample_ids and not self.patch_genelist_uuid:
+            bam_samples = self.bam_sample_ids
         datafile = json.dumps(
             {"gene_uuids": uuids_to_update, "bam_sample_ids": bam_samples}
         )
@@ -720,7 +722,7 @@ def submit_variant_update(
             "post_output": [],
             "upload_info": [],
         }
-        if filename.endswith(".json"):
+        if not filename.endswith(".json"):
             msg = "Expected input file to be a json file."
             results["validation_output"].append(msg)
             return results
@@ -807,11 +809,11 @@ class VariantUpdateSubmission:
             item_type="VariantSample",
             project=project,
             add_on=add_on,
-            fields=["uuid", "file"],
+            fields=["uuid"],
         )
         variant_sample_uuids = [item["uuid"] for item in variant_sample_search]
         to_invalidate = list(set(variant_sample_uuids))
-        validation_output = "Found %s variant samples to update" % len(to_invalidate)
+        validation_output = "%s variant samples to update." % len(to_invalidate)
         return to_invalidate, validation_output
 
     def create_admin_vapp(self):
@@ -846,7 +848,7 @@ class VariantUpdateSubmission:
         queue_response = self.admin_vapp.post_json("/queue_indexing", queue_body).json
         if queue_response["notification"] == "Success":
             msg = (
-                "%s variant sample(s) successfully updated."
+                "%s variant samples successfully updated."
                 % str(len(self.variant_samples))
             )
             return msg
@@ -868,30 +870,7 @@ class CommonUtils:
         pass
 
     @staticmethod
-    def batch_search(
-        app,
-        item_list,
-        search_term,
-        batch_size=5,
-        item_type="Gene",
-        project=None,
-        institution=None,
-        add_on=None,
-        fields=[],
-    ):
-        """
-        Performs search requests in batches to decrease the number of
-        API calls and capture all search results (as default behavior
-        of vapp.get("/search/") is to return only first 25 items).
-
-        Returns:
-            - List of all items found by search
-        """
-        batch = []
-        results = []
-        flat_result = []
-        search_size = 100
-        add_ons = ""
+    def add_ons = ""
         if project:
             add_ons += "&project.%40id=" + project.replace("/", "%2F")
         if institution:
