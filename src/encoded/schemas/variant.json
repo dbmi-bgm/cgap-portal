@@ -2935,28 +2935,28 @@
             "grouping": "Consequence"
         },
         "csq_gnomadg_af": {
-            "title": "GnomAD Alt Allele Frequency",
+            "title": "gnomAD Alt Allele Frequency",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 18,
             "grouping": "Population Frequency"
         },
         "csq_gnomadg_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
+            "title": "gnomAD Alt AF - PopMax",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 19,
             "grouping": "Population Frequency"
         },
         "csq_gnomadg_an": {
-            "title": "GnomAD Total Allele Number",
+            "title": "gnomAD Total Allele Number",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 20,
             "grouping": "Population Frequency"
         },
         "csq_gnomadg_nhomalt": {
-            "title": "GnomAD Homozygous Count",
+            "title": "gnomAD Homozygous Count",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 21,
