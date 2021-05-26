@@ -19,7 +19,7 @@ const {
 
 
 export const InterpretationTab = React.memo(function InterpretationTab (props) {
-    const { variantSampleListItem, schemas, caseAccession, isLoadingVariantSampleListItem = false } = props;
+    const { variantSampleListItem, schemas, context, isLoadingVariantSampleListItem = false } = props;
     const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
 
     let body = null;
@@ -36,7 +36,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         );
     } else {
         body = vsSelections.map(function(selectionSubObject, idx){
-            return <VariantSampleSelection {...{ schemas, caseAccession }} selection={selectionSubObject} key={idx} index={idx} />;
+            return <VariantSampleSelection {...{ schemas, context }} selection={selectionSubObject} key={idx} index={idx} />;
         });
     }
 
@@ -53,7 +53,8 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
 });
 
 
-function VariantSampleSelection({ selection, index, caseAccession, schemas }){
+const VariantSampleSelection = React.memo(function VariantSampleSelection({ selection, index, context, schemas }){
+    const { accession: caseAccession } = context; // `context` refers to our Case in here.
     const {
         date_selected,
         filter_blocks_request_at_time_of_selection,
@@ -119,19 +120,19 @@ function VariantSampleSelection({ selection, index, caseAccession, schemas }){
                         <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
                             { geneTranscriptColTitle || "Gene, Transcript" }
                         </label>
-                        { geneTranscriptRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        { geneTranscriptRenderFunc(variant_sample_item, { link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
                         <label className="mb-04 text-small" data-tip={variantColDescription}>
                             { variantColTitle || "Variant" }
                         </label>
-                        { variantRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        { variantRenderFunc(variant_sample_item, { link: vsID + '?showInterpretation=True&annotationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                     </div>
                     <div className="col col-sm-4 col-lg-3 py-2">
                         <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
                             { genotypeLabelColTitle || "Genotype" }
                         </label>
-                        { genotypeLabelRenderFunc(variant_sample_item, { align: 'left' }) }
+                        { genotypeLabelRenderFunc(variant_sample_item) }
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
                         <label className="mb-04 text-small">ACMG Classification</label>
@@ -167,4 +168,10 @@ function VariantSampleSelection({ selection, index, caseAccession, schemas }){
             </div>
         </div>
     );
-}
+});
+
+
+
+
+
+

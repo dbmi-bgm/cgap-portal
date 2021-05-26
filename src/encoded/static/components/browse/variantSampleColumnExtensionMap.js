@@ -31,7 +31,6 @@ export const variantSampleColumnExtensionMap = {
     "associated_genotype_labels.proband_genotype_label" : {
         widthMap: { 'lg' : 240, 'md' : 230, 'sm' : 200 },
         render: function(result, props) {
-            const { align = "center" } = props;
             const { associated_genotype_labels : { proband_genotype_label = null, mother_genotype_label = null, father_genotype_label = null } = {} } = result;
             const rows = [];
             if (proband_genotype_label) {
@@ -45,7 +44,7 @@ export const variantSampleColumnExtensionMap = {
             if (father_genotype_label) {
                 rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
             }
-            return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
+            return <StackedRowColumn {...{ rows }}/>;
         }
     },
     // "Gene, Transcript" column
@@ -55,7 +54,7 @@ export const variantSampleColumnExtensionMap = {
         widthMap: { 'lg' : 155, 'md' : 140, 'sm' : 130 },
         render: function(result, props) {
             const { "@id" : atID = null, variant : { genes = [] } = {} } = result;
-            const { link = null, align = "center" } = props;
+            const { link = null } = props;
 
             const geneTitles = genes.map((geneItem) => {
                 const { genes_most_severe_gene: { display_title = null } = {} } = geneItem || {};
@@ -69,7 +68,7 @@ export const variantSampleColumnExtensionMap = {
                 ];
                 return (
                     <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"}>
-                        <StackedRowColumn className={"text-" + align} {...{ rows }} />
+                        <StackedRowColumn {...{ rows }} />
                     </a>);
             }
             return null;
@@ -81,7 +80,7 @@ export const variantSampleColumnExtensionMap = {
         // TODO: Update with onclick to handle google analytics tracking
         widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
         render: function(result, props) {
-            const { link = null, align = "center" } = props;
+            const { link = null } = props;
             const { "@id" : atID = null, variant : { genes : [ firstGene = null ] = [] } = {} } = result;
             const { genes_most_severe_hgvsc = null, genes_most_severe_hgvsp = null } = firstGene || {};
 
@@ -91,7 +90,7 @@ export const variantSampleColumnExtensionMap = {
 
             return (
                 <a href={link ? link: atID ? atID + '?annotationTab=1' : "#"}>
-                    <GenesMostSevereHGVSCColumn gene={firstGene} {...{ align }} />
+                    <GenesMostSevereHGVSCColumn gene={firstGene} />
                 </a>);
         }
     },
@@ -186,7 +185,7 @@ export const VariantSampleDisplayTitleColumn = React.memo(function VariantSample
     );
 });
 
-const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene, align }){
+const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene }){
     const {
         genes_most_severe_hgvsc = null,
         genes_most_severe_hgvsp = null
@@ -196,22 +195,24 @@ const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColum
     // Memoized on the 1 prop it receives which is dependency for its calculation.
     if (genes_most_severe_hgvsc) {
         const hgvscSplit = genes_most_severe_hgvsc.split(":");
-        var scSplit = hgvscSplit[1].split(".");
+        const scSplit = hgvscSplit[1].split(".");
         rows.push(
             <div className="text-truncate d-block" key="sc">
                 <span className="text-600">{ scSplit[0] }.</span><span>{ scSplit[1] }</span>
-            </div>);
+            </div>
+        );
     }
 
     if (genes_most_severe_hgvsp) {
         const hgvspSplit = genes_most_severe_hgvsp.split(":");
-        var spSplit = hgvspSplit[1].split(".");
+        const spSplit = hgvspSplit[1].split(".");
         rows.push(
             <div className="text-truncate d-block" key="sp">
                 <span className="text-600">{ spSplit[0] }.</span><span>{ spSplit[1] }</span>
-            </div>);
+            </div>
+        );
     }
 
-    return <StackedRowColumn className={"text-" + align} {...{ rows }} />;
+    return <StackedRowColumn {...{ rows }} />;
 });
 
