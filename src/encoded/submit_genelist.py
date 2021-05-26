@@ -870,7 +870,30 @@ class CommonUtils:
         pass
 
     @staticmethod
-    def add_ons = ""
+    def batch_search(
+        app,
+        item_list,
+        search_term,
+        batch_size=5,
+        item_type="Gene",
+        project=None,
+        institution=None,
+        add_on=None,
+        fields=[],
+    ):
+        """
+        Performs search requests in batches to decrease the number of
+        API calls and capture all search results (as default behavior
+        of vapp.get("/search/") is to return only first 25 items).
+
+        Returns:
+            - List of all items found by search
+        """
+        batch = []
+        results = []
+        flat_result = []
+        search_size = 100
+        add_ons = ""
         if project:
             add_ons += "&project.%40id=" + project.replace("/", "%2F")
         if institution:
