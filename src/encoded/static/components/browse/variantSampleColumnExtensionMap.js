@@ -31,6 +31,7 @@ export const variantSampleColumnExtensionMap = {
     "associated_genotype_labels.proband_genotype_label" : {
         widthMap: { 'lg' : 240, 'md' : 230, 'sm' : 200 },
         render: function(result, props) {
+            const { align = "center" } = props;
             const { associated_genotype_labels : { proband_genotype_label = null, mother_genotype_label = null, father_genotype_label = null } = {} } = result;
             const rows = [];
             if (proband_genotype_label) {
@@ -44,7 +45,7 @@ export const variantSampleColumnExtensionMap = {
             if (father_genotype_label) {
                 rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
             }
-            return <StackedRowColumn {...{ rows }}/>;
+            return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
         }
     },
     // "Gene, Transcript" column
@@ -54,7 +55,7 @@ export const variantSampleColumnExtensionMap = {
         widthMap: { 'lg' : 155, 'md' : 140, 'sm' : 130 },
         render: function(result, props) {
             const { "@id" : atID = null, variant : { genes = [] } = {} } = result;
-            const { link = null } = props;
+            const { link = null, align = "center" } = props;
 
             const geneTitles = genes.map((geneItem) => {
                 const { genes_most_severe_gene: { display_title = null } = {} } = geneItem || {};
@@ -68,7 +69,7 @@ export const variantSampleColumnExtensionMap = {
                 ];
                 return (
                     <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"}>
-                        <StackedRowColumn {...{ rows }} />
+                        <StackedRowColumn className={"text-" + align} {...{ rows }} />
                     </a>);
             }
             return null;
@@ -80,7 +81,7 @@ export const variantSampleColumnExtensionMap = {
         // TODO: Update with onclick to handle google analytics tracking
         widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
         render: function(result, props) {
-            const { link = null } = props;
+            const { link = null, align = "center" } = props;
             const { "@id" : atID = null, variant : { genes : [ firstGene = null ] = [] } = {} } = result;
             const { genes_most_severe_hgvsc = null, genes_most_severe_hgvsp = null } = firstGene || {};
 
@@ -90,7 +91,7 @@ export const variantSampleColumnExtensionMap = {
 
             return (
                 <a href={link ? link: atID ? atID + '?annotationTab=1' : "#"}>
-                    <GenesMostSevereHGVSCColumn gene={firstGene} />
+                    <GenesMostSevereHGVSCColumn gene={firstGene} {...{ align }} />
                 </a>);
         }
     },
@@ -185,7 +186,7 @@ export const VariantSampleDisplayTitleColumn = React.memo(function VariantSample
     );
 });
 
-const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene }){
+const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene, align = "center" }){
     const {
         genes_most_severe_hgvsc = null,
         genes_most_severe_hgvsp = null
@@ -213,6 +214,6 @@ const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColum
         );
     }
 
-    return <StackedRowColumn {...{ rows }} />;
+    return <StackedRowColumn className={"text-" + align} {...{ rows }} />;
 });
 
