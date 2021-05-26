@@ -130,7 +130,6 @@ function TranscriptSelectionSection(props){
             <span>
                 { selectedGeneTitle }
                 { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
-                &nbsp;
             </span>
         ) : <em>No gene selected</em>;
         body = <TranscriptSelectionSectionBody {...{ schemas }} currentTranscript={geneTranscriptList[currentTranscriptIdx]} />;
@@ -264,7 +263,7 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 }
 
 
-function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
+function GeneTranscriptDisplayTitle({ transcript }){
     if (!transcript) return null;
     const {
         csq_canonical = false,
@@ -276,11 +275,11 @@ function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
         } = {}
     } = transcript;
     return (
-        <span className={className}>
-            <span>{ csq_mane || csq_feature }</span>
+        <React.Fragment>
+            <span className="text-600">{ csq_mane || csq_feature }</span>
             <span className="text-400"> ({ geneDisplayTitle || <em>No Gene</em> })</span>
             { csq_canonical ? <span className="text-300"> (canonical)</span> : null }
-        </span>
+        </React.Fragment>
     );
 }
 
@@ -342,11 +341,12 @@ function GDNAList({ context }){
     const { variant = {} } = context;
     const {
         // mutanno_hgvsg = fallbackElem, // (temporarily?) removed
-        display_title: hgvsg_placeholder = fallbackElem,
+        // display_title: hgvsg_placeholder = fallbackElem, // Superseded by more explicit `hgvsg`
         // POS: pos,
+        hgvsg = fallbackElem,
         CHROM: chrom = fallbackElem,
-        csq_hg19_chr = fallbackElem,
-        csq_hg19_pos = fallbackElem
+        hg19_chr = fallbackElem,
+        hg19_pos = fallbackElem
     } = variant;
 
     const renderedRows =  (
@@ -355,24 +355,24 @@ function GDNAList({ context }){
             <div className="row pb-1 pb-md-03" key="GRCh38">
                 <div className="col-12 col-md-3 font-italic"><em>GRCh38</em></div>
                 <div className="col-12 col-md-2">{ chrom }</div>
-                <div className="col-12 col-md-7">{ hgvsg_placeholder }</div>
+                <div className="col-12 col-md-7">{ hgvsg }</div>
             </div>
             {/* Legacy GRCh37/hg19 support. */}
             <div className="row pb-1 pb-md-03" key="GCRCh37">
                 <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
-                <div className="col-12 col-md-2 ">{ csq_hg19_chr }</div>
-                <div className="col-12 col-md-7">{ csq_hg19_pos }</div>
+                <div className="col-12 col-md-2 ">{ hg19_chr }</div>
+                <div className="col-12 col-md-7">{ hg19_pos }</div>
             </div>
         </React.Fragment>
     );
 
     //Legacy GRCh37/hg19 support.
     /** @DEPRECATED as of Annotations v20; leaving here since csq_hg19 may be reverted to array again in future
-     * csq_hg19.forEach(function({ csq_hg19_pos, csq_hg19_chrom, csq_hg19_hgvsg }, idx){
+     * csq_hg19.forEach(function({ hg19_pos, hg19_chr, csq_hg19_hgvsg }, idx){
         renderedRows.push(
             <div className="row pb-1 pb-md-03" key={idx}>
                 <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
-                <div className="col-12 col-md-2 ">{ csq_hg19_chrom }</div>
+                <div className="col-12 col-md-2 ">{ hg19_chr }</div>
                 <div className="col-12 col-md-7">{ csq_hg19_hgvsg }</div>
             </div>
         );

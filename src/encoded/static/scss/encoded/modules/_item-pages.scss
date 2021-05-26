@@ -3079,6 +3079,7 @@ $download-button-width : 100px;
 			height: 32px;
 			position: relative;
 			z-index: 5;
+
 			> h4 {
 				// todo: maybe add color if to be just for this section (?)
 				font-weight: 600;
@@ -3089,6 +3090,10 @@ $download-button-width : 100px;
 
 			.dropdown {
 				background-color: $card-bg;
+				> button {
+					padding-left: 8px; /* Matches padding-left of the h4 elem, to align all titles at left edge */
+					padding-right: 28px;
+				}
 			}
 
 			+ .info-body {
@@ -3109,8 +3114,10 @@ $download-button-width : 100px;
 	.card .inner-card-section {
 		// TODO: Maybe consider propagating further, overriding btn-outline-secondary or btn-secondary with
 		// this (since their defaults look somewhat like disabled - but maybe useful idk)
-		.btn-outline-secondary.select-transcript {
-			@include button-variant(#fff, #e0e0e0);
+		> .info-header-title {
+			> .dropdown > .btn-outline-secondary {
+				@include button-variant(#fff, #e0e0e0);
+			}
 		}
 	}
 
@@ -3137,6 +3144,7 @@ $download-button-width : 100px;
 				border-radius: 0;
 				background-color: #beccda;
 				color: $primary-dark;
+				line-height: 1.125; /* scrunch up the text a little bit if it flows onto a 2nd+ line */
 				&[disabled]{
 					color: #fff8;
 				}
