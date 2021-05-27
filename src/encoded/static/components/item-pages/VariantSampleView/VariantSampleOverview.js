@@ -166,7 +166,12 @@ class InterpretationController extends React.Component {
         Object.keys(criteriaObj).forEach((criteria) => {
             if (criteriaObj[criteria]) { invokedFlat.push(criteria); }
         });
-        return invokedFlat.sort(); // TODO: sort so that it aligns with color scheme above
+        return invokedFlat.sort((a, b) => {
+            const orderA = AutoClassify.criteriaToClassification[a].order;
+            const orderB = AutoClassify.criteriaToClassification[b].order;
+            // Sort so that it aligns with color scheme above
+            return orderA - orderB;
+        });
     }
 
     constructor(props) {
@@ -464,34 +469,34 @@ class AutoClassify {
      * Based on https://www.mgz-muenchen.com/files/Public/Downloads/2018/ACMG%20Classification%20of%20Sequence%20Variants.pdf (pg 3)
      */
     static criteriaToClassification = {
-        "BA1": { type: "benign", strength: "standalone" },
-        "BS1": { type: "benign", strength: "strong" },
-        "BS2": { type: "benign", strength: "strong" },
-        "BS3": { type: "benign", strength: "strong" },
-        "BS4": { type: "benign", strength: "strong" },
-        "BP1": { type: "benign", strength: "supporting" },
-        "BP2": { type: "benign", strength: "supporting" },
-        "BP3": { type: "benign", strength: "supporting" },
-        "BP4": { type: "benign", strength: "supporting" },
-        "BP5": { type: "benign", strength: "supporting" },
-        "BP6": { type: "benign", strength: "supporting" },
-        "BP7": { type: "benign", strength: "supporting" },
-        "PP1": { type: "pathogenic", strength: "supporting" },
-        "PP2": { type: "pathogenic", strength: "supporting" },
-        "PP3": { type: "pathogenic", strength: "supporting" },
-        "PP4": { type: "pathogenic", strength: "supporting" },
-        "PP5": { type: "pathogenic", strength: "supporting" },
-        "PM1": { type: "pathogenic", strength: "moderate" },
-        "PM2": { type: "pathogenic", strength: "moderate" },
-        "PM3": { type: "pathogenic", strength: "moderate" },
-        "PM4": { type: "pathogenic", strength: "moderate" },
-        "PM5": { type: "pathogenic", strength: "moderate" },
-        "PM6": { type: "pathogenic", strength: "moderate" },
-        "PS1": { type: "pathogenic", strength: "strong" },
-        "PS2": { type: "pathogenic", strength: "strong" },
-        "PS3": { type: "pathogenic", strength: "strong" },
-        "PS4": { type: "pathogenic", strength: "strong" },
-        "PVS1": { type: "pathogenic", strength: "vstrong" }
+        "BA1": { type: "benign", strength: "standalone", order: 1 },
+        "BS1": { type: "benign", strength: "strong", order: 2 },
+        "BS2": { type: "benign", strength: "strong", order: 2 },
+        "BS3": { type: "benign", strength: "strong", order: 2 },
+        "BS4": { type: "benign", strength: "strong", order: 2 },
+        "BP1": { type: "benign", strength: "supporting", order: 3 },
+        "BP2": { type: "benign", strength: "supporting", order: 3 },
+        "BP3": { type: "benign", strength: "supporting", order: 3 },
+        "BP4": { type: "benign", strength: "supporting", order: 3 },
+        "BP5": { type: "benign", strength: "supporting", order: 3 },
+        "BP6": { type: "benign", strength: "supporting", order: 3 },
+        "BP7": { type: "benign", strength: "supporting", order: 3 },
+        "PP1": { type: "pathogenic", strength: "supporting", order: 4 },
+        "PP2": { type: "pathogenic", strength: "supporting", order: 4 },
+        "PP3": { type: "pathogenic", strength: "supporting", order: 4 },
+        "PP4": { type: "pathogenic", strength: "supporting", order: 4 },
+        "PP5": { type: "pathogenic", strength: "supporting", order: 4 },
+        "PM1": { type: "pathogenic", strength: "moderate", order: 5 },
+        "PM2": { type: "pathogenic", strength: "moderate", order: 5 },
+        "PM3": { type: "pathogenic", strength: "moderate", order: 5 },
+        "PM4": { type: "pathogenic", strength: "moderate", order: 5 },
+        "PM5": { type: "pathogenic", strength: "moderate", order: 5 },
+        "PM6": { type: "pathogenic", strength: "moderate", order: 5 },
+        "PS1": { type: "pathogenic", strength: "strong", order: 6 },
+        "PS2": { type: "pathogenic", strength: "strong", order: 6 },
+        "PS3": { type: "pathogenic", strength: "strong", order: 6 },
+        "PS4": { type: "pathogenic", strength: "strong", order: 6 },
+        "PVS1": { type: "pathogenic", strength: "vstrong", order: 7 }
     }
 
     /**
