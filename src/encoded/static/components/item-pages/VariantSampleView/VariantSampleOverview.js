@@ -437,7 +437,7 @@ class ACMGInvoker extends React.Component {
                                 The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS" target="_blank" rel="noreferrer">this publication</a>.
                             </div>
                             <div>
-                                Citation: Richards, S., Aziz, N., Bale, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genet Med 17, 405–423 (2015). https://doi.org/10.1038/gim.2015.30
+                                <u>Full Citation</u>: Richards, S., Aziz, N., Bale, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genet Med 17, 405–423 (2015). https://doi.org/10.1038/gim.2015.30
                             </div>
                         </div>
                     }/>
