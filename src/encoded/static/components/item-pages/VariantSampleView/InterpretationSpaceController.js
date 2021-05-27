@@ -478,7 +478,7 @@ function InterpretationSpaceTabs(props) {
         return (
             <li key={i} className={`interpretation-tab clickable d-flex align-items-center ${unsavedDraft ? 'font-italic' : ''}`}
                 onClick={(e) => switchToTab(i)} data-active={isActive} data-tip={unsavedDraft ? "Unsaved changes": null}>
-                {tabName}{unsavedDraft ? <span className="text-warning text-600">*</span>: ''}
+                {tabName}{unsavedDraft ? <span className="text-danger text-600">*</span>: ''}
             </li>);
     });
 
@@ -586,7 +586,7 @@ class GenericInterpretationPanel extends React.Component {
         return (
             <div className="interpretation-panel">
                 <label className={`w-100 ${lastModUsername ? "mb-0" : ""}`}>
-                    { noteLabel } <span className="text-smaller font-italic text-danger text-400">(Required)</span>
+                    { noteLabel }
                 </label>
                 { lastModUsername ?
                     <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsername} </div>
@@ -740,7 +740,7 @@ class AutoGrowTextArea extends React.Component {
                 // height: parentHeight
             }} className={cls}>
                 <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: textAreaHeight > maxHeight ? maxHeight: textAreaHeight, resize: "none" }} className="w-100"
-                    onChange={this.onChangeWrapper} />
+                    onChange={this.onChangeWrapper} placeholder="Required" />
             </div>
         );
     }
