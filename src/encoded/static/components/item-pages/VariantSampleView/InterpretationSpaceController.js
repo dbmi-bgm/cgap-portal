@@ -478,7 +478,7 @@ function InterpretationSpaceTabs(props) {
         return (
             <li key={i} className={`interpretation-tab clickable d-flex align-items-center ${unsavedDraft ? 'font-italic' : ''}`}
                 onClick={(e) => switchToTab(i)} data-active={isActive} data-tip={unsavedDraft ? "Unsaved changes": null}>
-                {tabName}{unsavedDraft ? <span className="text-danger text-600">*</span>: ''}
+                {tabName}{unsavedDraft ? <span className="text-warning text-600">*</span>: ''}
             </li>);
     });
 
