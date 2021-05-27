@@ -133,10 +133,10 @@ export class VariantSampleOverview extends React.PureComponent {
 }
 
 function QuickPopover(props) {
-    const { title, content, cls } = props || {};
+    const { title, content, cls, popID, tooltip } = props || {};
     const popover = (
-        <Popover id="popover-basic">
-            <Popover.Title as="h3">{title}</Popover.Title>
+        <Popover id={popID}>
+            <Popover.Title className="m-0" as="h4">{title}</Popover.Title>
             <Popover.Content>
                 { content }
             </Popover.Content>
@@ -144,7 +144,7 @@ function QuickPopover(props) {
     );
     return (
         <OverlayTrigger trigger="focus" placement="right" overlay={popover}>
-            <Button variant="link" className={cls} data-tip="Click for citation info"><i className="icon icon-info-circle fas" /></Button>
+            <Button variant="link" className={cls} data-tip={tooltip || "Click for citation info"}><i className="icon icon-info-circle fas" /></Button>
         </OverlayTrigger>
     );
 }
@@ -431,7 +431,7 @@ class ACMGInvoker extends React.Component {
         return (
             <div className="card flex-row my-3 mt-0">
                 <div className="text-600 acmg-guidelines-title">ACMG Rules
-                    <QuickPopover cls="p-1" title="Note on ACMG Tooltips and AutoClassification" content={
+                    <QuickPopover cls="p-1" popID="acmg-info-popover" title="Note on ACMG Tooltips and Auto-Classification" content={
                         <div>
                             <div className="mb-05">
                                 The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS" target="_blank" rel="noreferrer">this publication</a>.
