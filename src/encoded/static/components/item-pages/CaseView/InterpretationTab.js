@@ -151,7 +151,7 @@ function VariantSampleSelection({ selection, index, caseAccession, schemas }){
                     <div className="col col-sm-8 col-lg-3 py-2">
                         <label className="mb-04 text-small">Discovery</label>
                         <div className="w-100 text-left">
-                            <span className="font-italic text-muted" style={{ marginRight: "25px" }}>Gene: </span>
+                            <span className="font-italic text-muted d-inline-block" style={{ width: "70px" }}>Gene: </span>
                             { geneCandidacy ?
                                 <span className="text-left">
                                     <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
@@ -159,7 +159,7 @@ function VariantSampleSelection({ selection, index, caseAccession, schemas }){
                                 </span>: placeholderStatusIndicator}
                         </div>
                         <div className="text-left">
-                            <span className="font-italic text-muted mr-1">Variant: </span>
+                            <span className="font-italic text-muted d-inline-block" style={{ width: "70px" }}>Variant: </span>
                             { variantCandidacy ?
                                 <span className="w-100 text-left">
                                     <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/>
