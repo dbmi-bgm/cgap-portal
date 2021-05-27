@@ -1,10 +1,13 @@
 'use strict';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
+import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
+import Button from 'react-bootstrap/esm/Button';
 import memoize from 'memoize-one';
+import Popover  from 'react-bootstrap/esm/Popover';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import Collapse from 'react-bootstrap/esm/Collapse';
@@ -127,6 +130,23 @@ export class VariantSampleOverview extends React.PureComponent {
             </div>
         );
     }
+}
+
+function QuickPopover(props) {
+    const { title, content } = props || {};
+    const popover = (
+        <Popover id="popover-basic">
+            <Popover.Title as="h3">{title}</Popover.Title>
+            <Popover.Content>
+                { content }
+            </Popover.Content>
+        </Popover>
+    );
+    return (
+        <OverlayTrigger trigger="click" placement="right" overlay={popover}>
+            <Button variant="link" data-tip="Click for citation info"><i className="icon icon-info-circle fas" /></Button>
+        </OverlayTrigger>
+    );
 }
 
 class InterpretationController extends React.Component {
@@ -410,7 +430,18 @@ class ACMGInvoker extends React.Component {
 
         return (
             <div className="card flex-row my-3 mt-0">
-                <div className="text-600 acmg-guidelines-title">ACMG Rules</div>
+                <div className="text-600 acmg-guidelines-title">ACMG Rules
+                    <QuickPopover title="Note on ACMG Tooltips and AutoClassification" content={
+                        <div>
+                            <div className="mb-05">
+                                The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS">this publication</a>.
+                            </div>
+                            <div>
+                                Citation: Richards, S., Aziz, N., Bale, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genet Med 17, 405–423 (2015). https://doi.org/10.1038/gim.2015.30
+                            </div>
+                        </div>
+                    }/>
+                </div>
                 <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
                     {acmgCriteria.map((obj) => {
                         const { criteria, description } = obj;
