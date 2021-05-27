@@ -133,7 +133,7 @@ export class VariantSampleOverview extends React.PureComponent {
 }
 
 function QuickPopover(props) {
-    const { title, content } = props || {};
+    const { title, content, cls } = props || {};
     const popover = (
         <Popover id="popover-basic">
             <Popover.Title as="h3">{title}</Popover.Title>
@@ -143,8 +143,8 @@ function QuickPopover(props) {
         </Popover>
     );
     return (
-        <OverlayTrigger trigger="click" placement="right" overlay={popover}>
-            <Button variant="link" data-tip="Click for citation info"><i className="icon icon-info-circle fas" /></Button>
+        <OverlayTrigger trigger="focus" placement="right" overlay={popover}>
+            <Button variant="link" className={cls} data-tip="Click for citation info"><i className="icon icon-info-circle fas" /></Button>
         </OverlayTrigger>
     );
 }
@@ -431,10 +431,10 @@ class ACMGInvoker extends React.Component {
         return (
             <div className="card flex-row my-3 mt-0">
                 <div className="text-600 acmg-guidelines-title">ACMG Rules
-                    <QuickPopover title="Note on ACMG Tooltips and AutoClassification" content={
+                    <QuickPopover cls="p-1" title="Note on ACMG Tooltips and AutoClassification" content={
                         <div>
                             <div className="mb-05">
-                                The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS">this publication</a>.
+                                The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS" target="_blank" rel="noreferrer">this publication</a>.
                             </div>
                             <div>
                                 Citation: Richards, S., Aziz, N., Bale, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genet Med 17, 405–423 (2015). https://doi.org/10.1038/gim.2015.30
