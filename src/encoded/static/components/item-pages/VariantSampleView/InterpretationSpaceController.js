@@ -599,7 +599,7 @@ class GenericInterpretationPanel extends React.Component {
                     <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
                         {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
-                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave }}
+                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteType }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
@@ -837,6 +837,19 @@ function ACMGPicker(props) {
     );
 }
 
+function getTooltipPerNoteType(noteType) {
+    switch(noteType) {
+        case "note_interpretation":
+            return "Note text required to save ACMG classification";
+        case "note_discovery":
+            return "Note text required to save discovery interpretation";
+        case "note_standard":
+            return "Note text required to save";
+        default:
+            return null;
+    }
+}
+
 /**
  * Displays and handles different CTAs for various stages in the Note Submission Process
  */
@@ -849,23 +862,31 @@ function GenericInterpretationSubmitButton(props) {
         noteChangedSinceLastSave,   // Has the text in the note space changed since last save?
         saveAsDraft,                // Fx -- save as Draft
         cls,
-        hasEditPermission
+        hasEditPermission,
+        noteType
     } = props;
 
     const allButtonsDropsDisabled = !noteTextPresent || !noteChangedSinceLastSave;
 
+    const dataTip = !hasEditPermission ? "You must be added to the project to submit a note for this item." :
+        !noteTextPresent ? getTooltipPerNoteType(noteType) : null;
+
     if (isCurrent || isApproved || !hasEditPermission) {
         // No further steps allowed; saved to knowledgebase or approved to case
         return (
-            <Button variant="primary btn-block" disabled className={cls} data-tip={!hasEditPermission ? "You must be added to the project to submit a note for this item." : null}>
-                { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
-            </Button>);
+            <div data-tip={dataTip}>
+                <Button variant="primary btn-block" disabled className={cls}>
+                    { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
+                </Button>
+            </div>);
     } else { // Brand new draft OR previous draft; allow saving or re-saving as draft
         return (
-            <Button variant="primary btn-block" onClick={saveAsDraft}
-                disabled={allButtonsDropsDisabled}>
-                { isDraft ? "Re-save as Draft": "Save as Draft" }
-            </Button>
+            <div data-tip={dataTip}>
+                <Button variant="primary btn-block" onClick={saveAsDraft} data-tip={dataTip}
+                    disabled={allButtonsDropsDisabled}>
+                    { isDraft ? "Re-save as Draft": "Save as Draft" }
+                </Button>
+            </div>
         );
     }
 }
