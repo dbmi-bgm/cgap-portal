@@ -9,6 +9,7 @@ from webtest import AppError
 from encoded.util import s3_local_file
 from encoded.ingestion.common import CGAP_CORE_PROJECT
 
+CGAP_CORE_PROJECT = CGAP_CORE_PROJECT + "/"
 
 def submit_genelist(
     *, s3_client, bucket, key, project, institution, vapp, validate_only=False
@@ -369,11 +370,16 @@ class GeneListSubmission:
             - list of BAM sample IDs
         """
         bam_sample_ids = []
+        project_mismatch = []
         cases_without_sample_ids = []
         cases_not_found = []
         for case_atid in self.case_atids:
             try:
                 response = self.vapp.get(case_atid, status=200).json
+                case_project = response.get("project").get("@id")
+                if self.project != CGAP_CORE_PROJECT and self.project != case_project:
+                    project_mismatch.append(self._accession_from_atid(case_atid))
+                    continue
                 sample = response.get("sample", {})
                 case_bam_sample_id = sample.get("bam_sample_id", "")
                 if not case_bam_sample_id:
@@ -383,6 +389,13 @@ class GeneListSubmission:
             except (VirtualAppError, AppError):
                 cases_not_found.append(self._accession_from_atid(case_atid))
         bam_sample_ids = list(set(bam_sample_ids))
+        if project_mismatch:
+            self.errors.append(
+                "The following cases belonged to projects different than the project"
+                " used for gene list submission: %s. Please remove these cases from"
+                " this submission or re-submit under the appropriate project."
+                % ", ".join(project_mismatch)
+            )
         if cases_without_sample_ids:
             self.errors.append(
                 "The following cases have not yet been processed: %s. Please"
@@ -795,7 +808,7 @@ class VariantUpdateSubmission:
             return None
         project = self.project
         genes_to_search = list(set(self.gene_uuids))
-        if self.project == CGAP_CORE_PROJECT + "/":
+        if self.project == CGAP_CORE_PROJECT:
             project = None
         if self.bam_sample_ids:
             variant_sample_search = []
