@@ -794,11 +794,10 @@ class VariantUpdateSubmission:
         if not self.gene_uuids:
             return None
         add_on = None
+        project = self.project
         genes_to_search = list(set(self.gene_uuids))
         if self.project == CGAP_CORE_PROJECT + "/":
             project = None
-        else:
-            project = self.project
         if self.bam_sample_ids:
             add_on = "&CALL_INFO=" + "&CALL_INFO=".join(self.bam_sample_ids)
         variant_sample_search = CommonUtils.batch_search(

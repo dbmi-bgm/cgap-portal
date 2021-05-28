@@ -517,16 +517,16 @@ class VariantSample(Item):
             gene_atid = gene.get("genes_most_severe_gene", "")
             if gene_atid:
                 gene_atids.append(gene_atid)
+        gene_atids = list(set(gene_atids))
         genes_object = [get_item_or_none(request, atid) for atid in gene_atids]
         for gene in genes_object:
             genelist_atids += gene.get("gene_lists", [])
+        genelist_atids = list(set(genelist_atids))
         genelists_raw = [
             get_item_or_none(request, atid, frame="raw") for atid in genelist_atids
         ]
         for genelist in genelists_raw:
             title = genelist.get("title", "")
-            if not title:
-                continue
             bam_sample_ids = genelist.get("bam_sample_ids", [])
             project_uuid = genelist.get("project")
             project_object = get_item_or_none(request, project_uuid)
@@ -534,15 +534,16 @@ class VariantSample(Item):
             genelist_info[title] = {
                 "project": project_atid, "bam_sample_ids": bam_sample_ids
             }
-        for genelist_title, values in genelist_info.items():
+        for genelist_title, props in genelist_info.items():
             if genelist_title in associated_genelists:
                 continue
-            bam_sample_ids = values.get("bam_sample_ids")
-            if bam_sample_ids:
-                if CALL_INFO in bam_sample_ids:
+            bam_sample_ids = props.get("bam_sample_ids")
+            if props["project"] in potential_projects:
+                if bam_sample_ids:
+                    if CALL_INFO in bam_sample_ids:
+                        associated_genelists.append(genelist_title)
+                else:
                     associated_genelists.append(genelist_title)
-            elif values["project"] in potential_projects:
-                associated_genelists.append(genelist_title)
         return associated_genelists
 
 
