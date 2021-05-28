@@ -2,25 +2,24 @@
     {
       "title": "Test Meta Workflow",
       "name": "test_metawf",
-      "meta_workflow_version": "v1",
+      "version": "v1",
       "description": "Test meta workflow",
       "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
       "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+      "arguments": [
+          {
+              "argument_name": "bam",
+              "argument_type": "file"
+          }
+      ],
       "workflows": [
           {
               "name": "mpileup",
               "workflow": "e2e95743-0d3b-4e07-b1e5-71c80dd74906",
               "inputs": [
                   {
-                      "argument_name": "bam"
-                  }
-              ],
-              "outputs": [
-                  {
-                      "argument_name": "rck",
-                      "target": "rcktar",
-                      "name_in_target": "input_rcks",
-                      "scatter": true
+                      "argument_name": "bam",
+                      "argument_type": "file"
                   }
               ]
           },
@@ -30,14 +29,10 @@
               "inputs": [
                   {
                       "argument_name": "input_rcks",
+                      "argument_type": "file",
                       "source": "mpileup",
-                      "name_in_source": "rck",
-                      "scatter": true
-                  }
-              ],
-              "outputs": [
-                  {   
-                      "argument_name": "rcktar"
+                      "source_argument_name": "rck",
+                      "gather": 1
                   }
               ]
           }
