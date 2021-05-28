@@ -13,7 +13,7 @@ from snovault import (
     load_schema,
 )
 from snovault.util import debug_log
-from webtest import TestApp
+from dcicutils.misc_utils import VirtualApp
 from xml.etree.ElementTree import fromstring
 from .base import Item, get_item_or_none
 from ..util import get_trusted_email
@@ -22,24 +22,11 @@ from ..util import get_trusted_email
 log = structlog.getLogger(__name__)
 
 
-@collection(
-    name='families',
-    unique_key='accession',
-    properties={
-        'title': 'Families',
-        'description': 'Listing of Families',
-    })
-class Family(Item):
-    item_type = 'family'
-    name_key = 'accession'
-    schema = load_schema('encoded:schemas/family.json')
-    rev = {'sample_procs': ('SampleProcessing', 'families'),
-           'case': ('Case', 'family')}
+def _build_family_embedded_list():
+    return [
 
-    embedded_list = [
+        # Individual linkTo
         "members.accession",
-        "members.father",
-        "members.mother",
         "members.status",
         "members.sex",
         "members.is_deceased",
@@ -57,16 +44,27 @@ class Family(Item):
         "members.cause_of_infertility",
         "members.ancestry",
         "members.clinic_notes",
-        "members.phenotypic_features.phenotypic_feature",
+
+        # Individual linkTo
+        "members.father.accession",
+        "members.mother.accession",
+
+        # Phenotype linkTo
+        "members.phenotypic_features.phenotypic_feature.hpo_id",
+        "members.phenotypic_features.phenotypic_feature.phenotype_name",
         "members.phenotypic_features.onset_age",
         "members.phenotypic_features.onset_age_units",
+
+        # Sample linkTo
         "members.samples.status",
         "members.samples.bam_sample_id",
         "members.samples.specimen_type",
         "members.samples.specimen_notes",
         "members.samples.specimen_collection_date",
         "members.samples.workup_type",
-        "members.samples.processed_files",
+        "members.samples.completed_processes",
+
+        # File linkTo / QC
         "members.samples.processed_files.workflow_run_outputs",
         "members.samples.processed_files.quality_metric",
         "members.samples.processed_files.quality_metric.qc_list.qc_type",
@@ -76,6 +74,8 @@ class Family(Item):
         "members.samples.processed_files.quality_metric.overall_quality_status",
         "members.samples.processed_files.quality_metric.url",
         "members.samples.processed_files.quality_metric.status",
+
+        # QC
         "members.samples.files.quality_metric",
         "members.samples.files.quality_metric.qc_list.qc_type",
         "members.samples.files.quality_metric.qc_list.value.overall_quality_status",
@@ -84,8 +84,11 @@ class Family(Item):
         "members.samples.files.quality_metric.overall_quality_status",
         "members.samples.files.quality_metric.url",
         "members.samples.files.quality_metric.status",
-        "members.samples.completed_processes",
+
+        # Sample linkTo
         "analysis_groups.samples.accession",
+
+        # QC
         "analysis_groups.processed_files",
         "analysis_groups.processed_files.quality_metric",
         "analysis_groups.processed_files.quality_metric.qc_list.qc_type",
@@ -95,6 +98,8 @@ class Family(Item):
         "analysis_groups.processed_files.quality_metric.overall_quality_status",
         "analysis_groups.processed_files.quality_metric.url",
         "analysis_groups.processed_files.quality_metric.status",
+
+        # QC
         "analysis_groups.sample_processed_files",
         "analysis_groups.sample_processed_files.sample.accession",
         "analysis_groups.sample_processed_files.processed_files.quality_metric",
@@ -107,6 +112,23 @@ class Family(Item):
         "analysis_groups.sample_processed_files.processed_files.quality_metric.status",
         "analysis_groups.completed_processes",
     ]
+
+
+@collection(
+    name='families',
+    unique_key='accession',
+    properties={
+        'title': 'Families',
+        'description': 'Listing of Families',
+    })
+class Family(Item):
+    item_type = 'family'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/family.json')
+    rev = {'sample_procs': ('SampleProcessing', 'families'),
+           'case': ('Case', 'family')}
+
+    embedded_list = _build_family_embedded_list()
 
     @calculated_property(schema={
         "title": "Cases",
@@ -565,7 +587,7 @@ class Family(Item):
 def process_pedigree(context, request):
     """
     Endpoint to handle creation of a family of individuals provided a pedigree
-    file. Uses a webtest TestApp to handle POSTing and PATCHing items.
+    file. Uses a dcicutils.misc_utils.VirtualApp to handle POSTing and PATCHing items.
     The request.json contains attachment information and file content.
 
     Currently, only handles XML input formatted from the Proband app.
@@ -605,10 +627,10 @@ def process_pedigree(context, request):
     ped_datetime = datetime.utcnow()
     ped_timestamp = ped_datetime.isoformat() + '+00:00'
     app = get_app(config_uri, 'app')
-    # get user email for TestApp authentication
+    # get user email for VirtualApp authentication
     email = get_trusted_email(request, context="Family %s" % family_item)
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
-    testapp = TestApp(app, environ)
+    testapp = VirtualApp(app, environ)
 
     # parse XML and create family by two rounds of POSTing/PATCHing individuals
     response = {'title': 'Pedigree Processing'}
@@ -839,7 +861,7 @@ def add_to_clinic_notes(testapp, notes, refs, data, family_item, uuids_by_ref):
     other functions that change `clinic_notes`
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         notes (str): notes value for the object
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -867,7 +889,7 @@ def annotations_xml_ref_to_clinic_notes(testapp, ref_ids, refs, data, family_ite
     to find the annotations used as note .
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_ids (list): value for the reference field of the relevant xml obj
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -899,7 +921,7 @@ def diagnoses_xml_to_phenotypic_features(testapp, ref_vals, refs, data, family_i
     `phenotypic_features` or `clinic_notes` in the family metadata.
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_vals (list): list of dict diagnoses values
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -963,7 +985,7 @@ def affected_xml_to_phenotypic_features(testapp, ref_vals, refs, data, family_it
     `phenotypic_features` or `clinic_notes` in the family metadata.
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_vals (list): list of dict affected values (should only have 1 item)
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -993,7 +1015,7 @@ def cause_of_death_xml_to_phenotype(testapp, ref_vals, refs, data, family_item, 
     `cause_of_death` or `clinic_notes` in the family metadata.
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_vals (list): list of dict containg cause of death info (should be length 1)
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -1104,7 +1126,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, family_item,
     Can be easily extended by adding tuples to `to_convert` dict
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         xml_data (dict): parsed XMl data, probably from `etree_to_dict`
         refs: (dict): reference-based parsed XML data
         ref_field (str): name of reference field from the XML data

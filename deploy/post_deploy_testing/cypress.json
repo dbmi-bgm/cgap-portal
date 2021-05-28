@@ -1,10 +1,10 @@
 {
-    "baseUrl" : "https://data.4dnucleome.org",
-    "projectId": "4opx2c",
+    "baseUrl" : "https://cgap.hms.harvard.edu",
+    "projectId": "9hf9k3",
     "defaultCommandTimeout" : 60000,
     "pageLoadTimeout" : 120000,
     "requestTimeout" : 40000,
     "responseTimeout" : 120000,
-    "blacklistHosts": "www.google-analytics.com"
+    "blockHosts": "www.google-analytics.com"
   }
   

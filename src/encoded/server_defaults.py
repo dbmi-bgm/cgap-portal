@@ -11,6 +11,7 @@ from string import digits, ascii_uppercase
 
 ACCESSION_FACTORY = __name__ + ':accession_factory'
 ACCESSION_PREFIX = 'GAP'
+ACCESSION_TEST_PREFIX = 'TST'
 
 
 def includeme(config):
@@ -20,6 +21,10 @@ def includeme(config):
     else:
         factory = enc_accession
     config.registry[ACCESSION_FACTORY] = factory
+
+
+# XXX: This stuff is all added based on the serverDefault identifier in the schemas
+# removing it altogether will totally break our code
 
 
 @server_default

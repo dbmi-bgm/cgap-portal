@@ -127,7 +127,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
                     'higlass-dependencies'
                 ).then((loadedDeps) =>{
                     higlassDependencies = loadedDeps;
-                    const { higlassRegister, SequenceTrack, TranscriptsTrack, ClinvarTrack, TextTrack, OrthologsTrack, PileupTrack } = higlassDependencies;
+                    const { higlassRegister, SequenceTrack, TranscriptsTrack, ClinvarTrack, TextTrack, OrthologsTrack, PileupTrack, GnomadTrack } = higlassDependencies;
 
                     higlassRegister({
                         name: 'SequenceTrack',
@@ -158,6 +158,11 @@ export class HiGlassPlainContainer extends React.PureComponent {
                         name: 'PileupTrack',
                         track: PileupTrack,
                         config: PileupTrack.config,
+                    });
+                    higlassRegister({
+                        name: 'GnomadTrack',
+                        track: GnomadTrack,
+                        config: GnomadTrack.config,
                     });
 
                     finish();

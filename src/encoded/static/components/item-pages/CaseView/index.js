@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
@@ -8,12 +8,15 @@ import url from 'url';
 import { console, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
+import { SelectedItemsController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/SelectedItemsController';
 
 import { responsiveGridState } from './../../util/layout';
 import DefaultItemView from './../DefaultItemView';
 import { TabPaneErrorBoundary } from './../components/TabView';
 import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
+import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
+import { VariantSampleListController } from './VariantSampleListController';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -23,8 +26,9 @@ import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
+import { InterpretationTab } from './InterpretationTab';
 import CaseSubmissionView from './CaseSubmissionView';
-import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
+
 
 
 
@@ -58,7 +62,7 @@ export default class CaseView extends DefaultItemView {
      *     </CurrentFamilyController>
      * }
      * function CaseViewBody (props){
-     *    const { currFamily, selectedDiseases, ... } = props;
+     *    const { currFamily, selectedDiseaseIdxMap, ... } = props;
      *    const tabs = [];
      *    tabs.push(CaseInfoTabView.getTabObject(props));
      *    // ... Case-related-logic ..
@@ -122,13 +126,21 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         session,
         schemas,
         graphData,
-        selectedDiseases,
+        selectedDiseaseIdxMap,
         windowWidth,
         windowHeight,
         idToGraphIdentifier,
-        PedigreeVizLibrary = null
+        setIsSubmitting,
+        PedigreeVizLibrary = null,
+        // Passed in from VariantSampleListController which wraps this component in `getTabObject`
+        variantSampleListItem = null,
+        isLoadingVariantSampleListItem = false,
+        updateVariantSampleListID,
+        savedVariantSampleIDMap = {},
+        fetchVariantSampleListItem
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
+
     const {
         family: currFamily = null, // Previously selected via CurrentFamilyController.js, now primary from case.
         secondary_families = null,
@@ -139,8 +151,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         accession: caseAccession,
         individual: caseIndividual,
         sample_processing: sampleProcessing = null,
-        initial_search_href_filter_addon: filterHrefAddon = "",
+        initial_search_href_filter_addon: filterHrefAddon = ""
     } = context;
+
+    const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
 
     const {
         countIndividuals: numIndividuals,
@@ -216,7 +230,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             pedBlock = (
                 <div className="pedigree-pane-wrapper flex-fill">
                     <PedigreeVizView {...graphData} width={pedWidth} height={300} disableSelect showNotes={false}
-                        visibleDiseases={selectedDiseases} showZoomControls={false} enablePinchZoom={false} />
+                        visibleDiseaseIdxMap={selectedDiseaseIdxMap} showZoomControls={false} enablePinchZoom={false} />
                 </div>
             );
         }
@@ -280,10 +294,18 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
-                        <FilteringTab {...{ context, windowHeight, session, schemas }} />
+                        <SelectedItemsController isMultiselect>
+                            <FilteringTab {...{ context, windowHeight, session, schemas, setIsSubmitting, variantSampleListItem,
+                                updateVariantSampleListID, savedVariantSampleIDMap, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
+                        </SelectedItemsController>
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Interpretation" dotPath=".interpretation" disabled cache={false}>
-                        <InterpretationTab {...props} />
+                    <DotRouterTab tabTitle={
+                        <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
+                            { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
+                            Interpretation
+                        </span>
+                    } dotPath=".interpretation" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
+                        <InterpretationTab {...{ variantSampleListItem, schemas, caseAccession, isLoadingVariantSampleListItem }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
                         <ReportingTab {...props} />
@@ -294,6 +316,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     );
 });
 CaseInfoTabView.getTabObject = function(props){
+    const { context: { variant_sample_list_id } = {} } = props;
     return {
         'tab' : (
             <React.Fragment>
@@ -303,7 +326,11 @@ CaseInfoTabView.getTabObject = function(props){
         ),
         'key' : 'case-info',
         'disabled' : false,
-        'content' : <CaseInfoTabView {...props} />
+        'content' : (
+            <VariantSampleListController id={variant_sample_list_id}>
+                <CaseInfoTabView {...props} />
+            </VariantSampleListController>
+        )
     };
 };
 
@@ -409,22 +436,20 @@ class DotRouter extends React.PureComponent {
 function DotRouterTab(props) {
     const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
 
-    const onClick = useMemo(function(){
-        return function(){
-            const targetDotPath = prependDotPath + dotPath;
-            navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
-                // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
-                // layout.animateScrollTo(targetDotPath);
-            });
-        };
-    }, [ dotPath ]);
+    const onClick = useCallback(function(){
+        const targetDotPath = prependDotPath + dotPath;
+        navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
+            // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
+            // layout.animateScrollTo(targetDotPath);
+        });
+    }, []); // Previously was: [ prependDotPath, dotPath ] -- removed for now since these are hardcoded and don't change. IMPORTANT: REVERT IF THESE BECOME DYNAMIC.
 
     if (!React.isValidElement(children)) {
         throw new Error("Expected children to be present and valid JSX");
     }
 
     return (
-        <div className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")} >
+        <div className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")}>
             <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
@@ -467,33 +492,35 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
                     <span className="current-case text-small text-400 m-0">Current Selection</span>
                 </div>
             </h1>
-            <div className="tab-inner-container">
-                <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
-                    persistent={[
-                        <div key={currFamilyID} className="primary-family">
-                            <h4 className="mt-0 mb-05 text-400">
-                                <span className="text-300">Primary Cases from </span>
-                                { primaryFamilyTitle }
-                            </h4>
-                            <FamilyAccessionStackedTable family={currFamily} result={context}
-                                fadeIn collapseLongLists collapseShow={1} />
-                        </div>
-                    ]}
-                    collapsible={
-                        secondary_families.map(function(family){
-                            const { display_title, '@id' : familyID } = family;
-                            return (
-                                <div className="py-4 secondary-family" key={familyID}>
-                                    <h4 className="mt-0 mb-05 text-400">
-                                        <span className="text-300">Related Cases from </span>
-                                        { display_title }
-                                    </h4>
-                                    <FamilyAccessionStackedTable result={context} family={family} collapseLongLists/>
-                                </div>
-                            );
-                        })
-                    } />
-                { viewSecondaryFamiliesBtn }
+            <div className="tab-inner-container card">
+                <div className="card-body">
+                    <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
+                        persistent={[
+                            <div key={currFamilyID} className="primary-family">
+                                <h4 className="mt-0 mb-05 text-400">
+                                    <span className="text-300">Primary Cases from </span>
+                                    { primaryFamilyTitle }
+                                </h4>
+                                <FamilyAccessionStackedTable family={currFamily} result={context}
+                                    fadeIn collapseLongLists collapseShow={1} />
+                            </div>
+                        ]}
+                        collapsible={
+                            secondary_families.map(function(family){
+                                const { display_title, '@id' : familyID } = family;
+                                return (
+                                    <div className="py-4 secondary-family" key={familyID}>
+                                        <h4 className="mt-0 mb-05 text-400">
+                                            <span className="text-300">Related Cases from </span>
+                                            { display_title }
+                                        </h4>
+                                        <FamilyAccessionStackedTable result={context} family={family} collapseLongLists/>
+                                    </div>
+                                );
+                            })
+                        } />
+                    { viewSecondaryFamiliesBtn }
+                </div>
             </div>
         </React.Fragment>
     );
@@ -580,7 +607,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     });
 
     return (
-        <>
+        <React.Fragment>
             <div className="row qc-summary">
                 <div className="col-sm-8 text-600">
                     Total Number of Reads:
@@ -665,7 +692,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     { (msaStats.filteredVariants && msaStats.filteredVariants.value) ? decorateNumberWithCommas(msaStats.filteredVariants.value) : "" }
                 </div>
             </div>
-        </>
+        </React.Fragment>
     );
 });
 
@@ -694,7 +721,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     }, []);
 
     const title = (
-        <h4 data-family-index={0} className="pb-0 p-2 mb-0 d-inline-block w-100">
+        <h4 data-family-index={0} className="my-0 d-inline-block w-100">
             <span className="font-italic text-500">{ familyDisplayTitle }</span>
             {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
             <button type="button" className="btn btn-sm btn-primary pull-right"
@@ -708,18 +735,20 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
     return (
         <React.Fragment>
-            <h1>{ caseDisplayTitle }: <span className="text-300">Bioinformatics Analysis</span></h1>
+            <h1><span className="text-300">Bioinformatics Analysis</span></h1>
             {/* <div className="tab-inner-container clearfix font-italic qc-status">
                 <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
             </div> */}
-            <div className="tab-inner-container">
-                <h2 className="section-header">Quality Control Metrics (QC)</h2>
-                <BioinfoStats {...{ caseSample, sampleProcessing }} />
+            <div className="tab-inner-container card">
+                <h4 className="card-header section-header">Quality Control Metrics (QC)</h4>
+                <div className="card-body">
+                    <BioinfoStats {...{ caseSample, sampleProcessing }} />
+                </div>
             </div>
-            <div className="tab-inner-container">
-                <h2 className="section-header">Multisample Analysis Table</h2>
-                <div className="family-index-0" data-is-current-family={true}>
+            <div className="tab-inner-container card">
+                <h4 className="card-header section-header">Multisample Analysis Table</h4>
+                <div className="card-body family-index-0" data-is-current-family={true}>
                     { title }
                     <CaseSummaryTable {...family} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
                 </div>
@@ -729,11 +758,6 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 });
 
 
-
-
-function InterpretationTab(props) {
-    return <h1>This is the interpretation tab.</h1>;
-}
 function ReportingTab(props) {
     return <h1>This is the reporting tab</h1>;
 }

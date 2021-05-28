@@ -554,6 +554,21 @@ h3.submission-subtitle {
 
 @mixin statusColorStyles {
 
+	// Blue
+	&[data-status="Benign"]:before,
+	&[data-status="Not a candidate"]:before,
+	&[data-status="Known gene for phenotype"]:before {						// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: $primary;
+	}
+
+	// Dark Blue
+	&[data-status="Likely benign"]:before,
+	&[data-status="Weak candidate"]:before {					// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: $primary-dark;
+	}
+
 	// Green
 	&[data-status="current"]:before,						// Applicable to Item.status
 	&[data-status="shared"]:before,							// Applicable to Item.status
@@ -561,7 +576,6 @@ h3.submission-subtitle {
 	&[data-status="uploaded"]:before,						// Applicable to File.status
 	&[data-status="public"]:before,							// Applicable to Pages & UserContent
 	&[data-status="complete"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
-	&[data-status="benign"]:before,							// Applicable to ClinVar Clinical Significance
 	&[data-status="protective"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #308756;
@@ -578,8 +592,7 @@ h3.submission-subtitle {
 	&[data-status="in public review"]:before,				// Applicable to Item.status
 	&[data-status="uploading"]:before,						// Applicable to File.status
 	&[data-status="output_files_transferring"]:before,		// Applicable to WorkflowRun.run_status
-	&[data-status="output_file_transfer_finished"]:before,	// Applicable to WorkflowRun.run_status
-	&[data-status="likely benign"]:before {					// Applicable to ClinVar Clinical Significance
+	&[data-status="output_file_transfer_finished"]:before {	// Applicable to WorkflowRun.run_status
 		color: #fff;
 		background-color: #80921c;
 	}
@@ -601,8 +614,10 @@ h3.submission-subtitle {
 	&[data-status="inactive"]:before,						// Applicable to Item.status
 	&[data-status="revoked"]:before,						// Applicable to User.status
 	&[data-status="probable-pathogenic"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="Likely pathogenic"]:before,				// Applicable to SampleVariant Interpretation Classification
+	&[data-status="Moderate candidate"]:before,
 	&[data-status="affects"]:before,						// Applicable to ClinVar Clinical Significance
-	&[data-status="restricted"]:before {					// Deprecated?
+	&[data-status="restricted"]:before{						// Deprecated?
 		color: #fff;
 		background-color: #812423;
 	}
@@ -612,7 +627,8 @@ h3.submission-subtitle {
 	&[data-status="upload failed"]:before,					// Applicable to File.status
 	&[data-status="error"]:before,							// Applicable to WorkflowRun.run_status + columnExtensionMap columns
 	&[data-status="risk factor"]:before,					// Applicable to ClinVar Clinical Significance
-	&[data-status="pathogenic"]:before {					// Applicable to ClinVar Clinical Significance
+	&[data-status="Pathogenic"]:before, 					// Applicable to ClinVar Clinical Significance
+	&[data-status="Strong candidate"]:before {
 		color: #fff;
 		background-color: #a90d0b;
 	}
@@ -630,8 +646,11 @@ h3.submission-subtitle {
 	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
 	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
 	&[data-status="not provided"]:before,					// Applicable to ClinVar Clinical Significance
-	&[data-status="unspecified"]:before {					// Deprecated? Fallback for lack of status in some cases?
-		color: #fff;
+	&[data-status="Uncertain significance"]:before,			// Applicable to SampleVariant Interpretation Classification
+	&[data-status="unspecified"]:before,					// Deprecated? Fallback for lack of status in some cases?
+	&[data-status="Weak candidate"]:before,
+	&[data-status="Known gene for phenotype"]:before {
+	    color: #fff;
 		background-color: #7b7b7b;
 		//display: none;
 	}
@@ -1913,7 +1932,7 @@ $download-button-width : 100px;
 					> button {
 						// TODO store color in variable, ideally bootstrap one, for re-use in places.
 						background-color: cornflowerblue;
-						transition: background-color .25s, box-shadow .5s;
+						transition: background-color .25s ease-out, box-shadow .5s;
 						color: #ffff;
 						height: 100%;
 						display: block;
@@ -1953,7 +1972,7 @@ $download-button-width : 100px;
 							width: auto;
 							path {
 								fill: cornflowerblue;
-								transition: fill .25s;
+								transition: fill .25s ease-out;
 							}
 						}
 
@@ -2038,9 +2057,11 @@ $download-button-width : 100px;
 			}
 
 			h1 {
+				/* todo: consider using an h2 instead, as is 2.1rem by default (close to the 2rem set here) and */
+				/* possibly more semantically accurate (i.e. is a section title, not page title) (subjective) */
 				font-size: 2rem;
 				margin-bottom: 20px;
-				font-weight: 500;
+				margin-top: 0px;
 			}
 
 			/* 'Current Case' selection marker/styling */
@@ -2056,31 +2077,35 @@ $download-button-width : 100px;
 				}
 			}
 
+			/* Interpretation styles*/
+			&#case-info\.interpretation {
+				.card-header.section-header {
+					font-weight: 400;
+					margin: 0; /* overrides the default `margin: 10px 0` of header (h1, h2, ..) elems */
+					
+					a:hover > div.title-block > span {
+						text-decoration: underline;
+					}
+				}
+			}
+
 			h2 {
 				font-size: 1.5rem;
 				font-weight: 400;
 			}
 
 			.tab-inner-container {
-				background-color: #ffffff;
 				margin-bottom: 20px;
-				padding: 20px;
-				border-radius: $border-radius-lg;
-				box-shadow: 0 1px 5px #0002;
-				border-color: #d6d6d6;
 
 				&.qc-status {
 					font-size: 19px;
 				}
 
-				h2.section-header {
+				.card-header.section-header {
 					background-color: $primary-dark;
-					width: calc( 100% + 40px);
-					padding: 10px 10px 10px 20px;
 					color: #ffff;
-					margin-left: -20px;
-					margin-right: -40px;
-					margin-top: -20px;
+					font-weight: 400;
+					margin: 0; /* overrides the default `margin: 10px 0` of header (h1, h2, ..) elems */
 				}
 
 				.processing-summary-table {
@@ -2121,8 +2146,8 @@ $download-button-width : 100px;
 					}
 				}
 
-				.row.qc-summary {
-					padding: 2px 0;
+				.row.qc-summary:not(:last-child) {
+					padding-bottom: 5px;
 				}
 
 				.processing-summary-table-container {
@@ -2291,15 +2316,144 @@ $download-button-width : 100px;
 	}
 }
 
+#case-info {
+
+	.embedded-search-view-outer-container {
+
+		// (Stylistic) increase whitespace around this components/elems
+		.above-results-table-row {
+			margin-top: 16px;
+			padding-bottom: 16px;
+		}
+
+	}
+}
+
+
+.filterset-preset-selection-outer-column {
+	/** Responsive styling copied over from .facet-column in _search.scss **/
+	/* (todo: maybe consider making it a mixin) */
+
+	@include navbar-static-position {
+		width: 100%;
+	}
+
+	@include navbar-fixed-position {
+		width: 320px;
+	}
+
+	/** -- **/
+
+	.filterset-preset-selection-body {
+
+		/** Is located within the .filterset-outer-container **/
+		/* border-right: 1px solid #777; */
+		display: flex;
+		flex-direction: column;
+
+		.results-container {
+
+			flex-basis: 300px; /* <- Min height, essentially */
+			min-height: 300px;
+			flex-grow: 1;
+			flex-shrink: 1;
+
+			/** keep scrollbar always visible for layout consistency (instd of overflow:auto) **/
+			overflow-y: scroll;
+			max-height: 100%;
+
+			.preset-filterset-result {
+
+				background-color: #fff;
+				border-bottom: 1px solid #ddd;
+
+				.title {
+					height: 36px;
+					padding-top: 8px;
+					display: flex;
+					align-items: center;
+				}
+
+				.title-icon-container {
+					color: $secondary;
+					font-size: 1rem; /* Unset from parent elem's .text-small */
+					&.clickable {
+						color: $primary;
+						&:hover {
+							color: $primary-dark;
+						}
+					}
+				}
+
+				.info {
+					height: 36px;
+					display: flex;
+					align-items: center;
+
+					.btn-dropdown-icon {
+						/* Todo - make reusable everywhere ? */
+						padding-left: 5px;
+						padding-right: 5px;
+						&:after {
+							/* Hide down 'v' icon */
+							display: none;
+						}
+					}
+
+					.count-indicator-wrapper {
+
+						svg {
+							/** This seems to work well visually here. **/
+							vertical-align: sub;
+						}
+
+						svg circle {
+							fill: #999;
+						}
+					}
+
+					.title-icon-container {
+						button.import-preset-btn {
+							line-height: 1.45;
+						}
+					}
+				}
+
+				&[data-is-origin-of-current-case-filterset="true"] {
+					background-color: $light;
+
+					&[data-is-current-case-filterset-unchanged="true"] {
+						/* Similar color to filterset-block below, but lighter */
+						background-color: lighten($primary, 55%);
+
+					}
+					
+				}
+
+				&[data-has-been-deleted="true"] {
+					/* background: #fff4f4; */
+					> .title,
+					> .info {
+						opacity: 0.4;
+					}
+				}
+
+			}
+
+		}
+
+	}
+}
 
 .filterset-outer-container {
 	// TODO CHANGE
 	// border: 1px solid #999;
 	/* background-color: desaturate(lighten($primary-dark, 45%), 30%); */ // #b4c8d8; // $gray-300;
-	background-color: #dedede;
+
+	// background-color: #dedede;
 	border-radius: $border-radius-lg;
-	border: 4px solid transparent;
-	transition: background-color .5s ease-out;
+	// border: 4px solid transparent;
+	// transition: background-color .5s ease-out;
 
 	h4 i.icon.clickable {
 		@include clickable-hoverable-icon;
@@ -2309,15 +2463,27 @@ $download-button-width : 100px;
 
 	.filter-set-ui-header {
 		/** Header **/
-		/** Margins are negatively offset from parent elem's border - tho maybe dif layouting in future to be adopted **/
-		margin: -4px;
+		/* Looks nice, enough to accomodate Save | Save As buttons, and gives us a concrete number to match FS preset selection UI header height to. */
+		min-height: 65px;
 		background-color: $primary-dark;
+		color: #fff;
 		h4 {
 			color: #fff;
 		}
 	}
 
+	&[data-is-open="false"] {
+		.filter-set-ui-header {
+			/* Appear more as button when closed */
+			/* Same as parent .filterset-outer-container above */
+			border-radius: inherit;
+		}
+	}
+
 	.blocks-container {
+
+		/* min-height: 400px; */
+		overflow: auto;
 
 		.filterset-block {
 			border-radius: $border-radius-lg;
@@ -2331,10 +2497,15 @@ $download-button-width : 100px;
 			// margin: 0 -3px; /* Subtract border-width to align left + right unselected edges properly w. other UI elements */
 			/* transition: border-color .5s, background-color .5s; */
 
-			transition: background-color .5s ease-out;
+			/* Disabled for now - sometimes can be slow: */
+			/* transition: background-color .5s ease-out; */
 
 
 			/* box-shadow: 0 1px 6px -3px black; */
+
+			&:not(:last-child) {
+				margin-bottom: 16px;
+			}
 
 			&.selected {
 				border-width: 3px;
@@ -2456,30 +2627,76 @@ $download-button-width : 100px;
 
 	}
 
-	&[data-all-selected="true"] {
-		border-color: $primary-dark;
-		background-color: desaturate(lighten($primary-dark, 40%), 25%);
-		.blocks-container {
+	.filterset-blocks-container {
 
-		 	.filterset-block.selected {
-		 		border-width: 1px;
-				padding: 2px;
-				border-radius: $border-radius-lg;
-				border-color: desaturate(lighten($primary-dark, 15%), 25%);;
-			}
+		background-color: #dedede;
+		// border-radius: $border-radius-lg;
+		border: 4px solid transparent;
+		border-top: none;
+		transition: background-color .4s .1s ease-in;
 
-			&:hover {
-				.filterset-block.clickable.selected {
-					&:hover {
-						border-width: 2px;
-						padding: 1px;
-						border-radius: $border-radius-lg + 1px;
-						border-color: $primary-dark;
+
+		/* While present as child of flex-grow-1 'column', stretch self to min-height of left presets column */
+		min-height: 100%;
+		display: flex;
+		flex-direction: column;
+
+		> .blocks-container {
+			flex-grow: 1;
+		}
+
+
+		&[data-all-selected="true"] {
+			border-color: $primary-dark;
+			background-color: desaturate(lighten($primary-dark, 40%), 25%);
+			.blocks-container {
+	
+				 .filterset-block.selected {
+					 border-width: 1px;
+					padding: 2px;
+					border-radius: $border-radius-lg;
+					border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+				}
+	
+				&:hover {
+					.filterset-block.clickable.selected {
+						&:hover {
+							border-width: 2px;
+							padding: 1px;
+							border-radius: $border-radius-lg + 1px;
+							border-color: $primary-dark;
+						}
 					}
 				}
 			}
 		}
+
 	}
+
+	// &[data-all-selected="true"] {
+	// 	border-color: $primary-dark;
+	// 	background-color: desaturate(lighten($primary-dark, 40%), 25%);
+	// 	.blocks-container {
+
+	// 	 	.filterset-block.selected {
+	// 	 		border-width: 1px;
+	// 			padding: 2px;
+	// 			border-radius: $border-radius-lg;
+	// 			border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+	// 		}
+
+	// 		&:hover {
+	// 			.filterset-block.clickable.selected {
+	// 				&:hover {
+	// 					border-width: 2px;
+	// 					padding: 1px;
+	// 					border-radius: $border-radius-lg + 1px;
+	// 					border-color: $primary-dark;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 }
 
@@ -2658,28 +2875,32 @@ $download-button-width : 100px;
 
 	}
 
-	/** Dropdown for selecting diseases/features -- CGAP-specific **/
+	/** DetailPane Legend Body for selecting diseases/features -- CGAP-specific **/
 
-	.tabview-title-controls-container {
+	.detail-pane-container {
 		.disease-option {
-			padding: 1px 10px;
 			display: flex;
 			align-items: center;
+
 			.checkbox-with-label {
 				flex: 1;
 				> label {
 					cursor: pointer;
+					> input {
+						// Override default mr-08
+						margin-right: 16px !important;
+					}
 				}
 			}
 			.disease-color-patch {
-				height: 16px;
-				width: 16px;
+				height: 20px;
+				width: 20px;
+				line-height: 20px;
 				border-radius: 50%;
 				transition: background-color .3s;
 				text-align: center;
-				line-height: 1;
 				> span {
-					font-size: 0.675rem;
+					font-size: 0.75rem;
 					font-weight: 600;
 					top: -2px;
 					position: relative;
@@ -2699,7 +2920,7 @@ $download-button-width : 100px;
 
 
 /**********************************************************
-  VariantSampleView & similar - Annotation Space
+  VariantSampleView & similar - Annotation & Interpretation Space
 **********************************************************/
 
 // TODO maybe move somewhere else
@@ -2724,6 +2945,7 @@ $download-button-width : 100px;
 			height: 32px;
 			position: relative;
 			z-index: 5;
+
 			> h4 {
 				// todo: maybe add color if to be just for this section (?)
 				font-weight: 600;
@@ -2734,6 +2956,10 @@ $download-button-width : 100px;
 
 			.dropdown {
 				background-color: $card-bg;
+				> button {
+					padding-left: 8px; /* Matches padding-left of the h4 elem, to align all titles at left edge */
+					padding-right: 28px;
+				}
 			}
 
 			+ .info-body {
@@ -2754,8 +2980,10 @@ $download-button-width : 100px;
 	.card .inner-card-section {
 		// TODO: Maybe consider propagating further, overriding btn-outline-secondary or btn-secondary with
 		// this (since their defaults look somewhat like disabled - but maybe useful idk)
-		.btn-outline-secondary.select-transcript {
-			@include button-variant(#fff, #e0e0e0);
+		> .info-header-title {
+			> .dropdown > .btn-outline-secondary {
+				@include button-variant(#fff, #e0e0e0);
+			}
 		}
 	}
 
@@ -2782,12 +3010,11 @@ $download-button-width : 100px;
 				border-radius: 0;
 				background-color: #beccda;
 				color: $primary-dark;
+				line-height: 1.125; /* scrunch up the text a little bit if it flows onto a 2nd+ line */
 				&[disabled]{
 					color: #fff8;
 				}
 				&[data-active="true"] {
-					// background-color: $primary-dark;
-					// color: #fff;
 					@extend .card;
 					color: $primary-dark;
 					display: initial;
@@ -2839,6 +3066,60 @@ $download-button-width : 100px;
 					color: $primary-dark;
 				}
 				*/
+			}
+		}
+	}
+
+	.interpretation-space {
+		position: sticky;
+		position: -webkit-sticky;
+		top: 50px;
+
+		.card-header.interpretation-header {
+			background-color: $primary-dark;
+			color: #ffffff;
+			font-size: 1.1em;
+
+			button:focus {
+				outline: thin dotted;
+			}
+		}
+
+		.card-body {
+			ul {
+				list-style-type: none;
+				border:1px solid lightgray;
+				border-radius: 5px;
+				li.interpretation-tab {
+					&[data-active="true"] {
+						background-color: #beccda;
+						color: $primary-dark;
+						border-radius: 3px;
+					}
+					font-size: 13px;
+					padding: 3px 7px;
+				}
+			}
+
+			.interpretation-panel {
+				margin: 10px 0;
+
+				textarea {
+					border-color: lightgrey;
+    				border-radius: 5px;
+					padding: 10px;
+				}
+
+				.note-field-drop .dropdown.btn-group {
+					width: 270px;
+					flex-grow: 1;
+					
+					>button {
+						max-width: 100%;
+						text-overflow: ellipsis;
+						overflow: hidden;
+					}
+				}
 			}
 		}
 	}

@@ -2,16 +2,30 @@
     "title": "Page",
     "id": "/profiles/page.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "required": ["name"],
+    "required": [
+        "name"
+    ],
     "additionalProperties": true,
-    "identifyingProperties": ["uuid", "aliases"],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/aliases" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        }
     ],
     "type": "object",
     "properties": {
@@ -31,32 +45,32 @@
                 "in review",
                 "deleted"
             ],
-            "lookup" : 55
+            "lookup": 55
         },
         "name": {
             "title": "Path Name",
             "comment": "Unique route/pathname of this page.",
             "type": "string",
-            "lookup" : 40
+            "lookup": 40
         },
         "title": {
             "title": "Title",
             "comment": "Title for the Page",
             "type": "string",
-            "lookup" : 50
+            "lookup": 50
         },
         "description": {
             "title": "Description",
-            "description" : "Internal description of page.",
+            "description": "Internal description of page.",
             "type": "string",
-            "lookup" : 85
+            "lookup": 85
         },
         "table-of-contents": {
             "title": "Table of Contents",
             "type": "object",
             "additionalProperties": true,
             "properties": {
-                "enabled" : {
+                "enabled": {
                     "title": "Enabled",
                     "description": "Enable the table of contents or not. Defaults to false.",
                     "type": "boolean",
@@ -66,7 +80,7 @@
                     "title": "Header Depth",
                     "description": "Maximum depth for table of contents titles, 1-6",
                     "type": "integer",
-                    "default" : 4
+                    "default": 4
                 },
                 "list-styles": {
                     "title": "List Styles",
@@ -77,11 +91,11 @@
                     }
                 }
             },
-            "default" : {
-                "enabled" : false,
-                "include-top-link" : false,
-                "skip-depth" : 1,
-                "header-depth" : 4
+            "default": {
+                "enabled": false,
+                "include-top-link": false,
+                "skip-depth": 1,
+                "header-depth": 4
             }
         },
         "content": {
@@ -90,49 +104,56 @@
             "type": "array",
             "items": {
                 "type": "string",
-                "linkTo" : "UserContent"
+                "linkTo": "UserContent"
             },
-            "lookup" : 70
+            "lookup": 70
         },
-        "children" : {
+        "children": {
             "title": "Child Pages",
             "type": "array",
             "items": {
                 "type": "string",
-                "linkTo" : "Page"
+                "linkTo": "Page"
             },
-            "lookup" : 60
+            "lookup": 60
         },
-        "redirect" : {
-            "title" : "Redirect",
-            "type" : "object",
-            "properties" :{
-                "target" : {
-                    "title" : "Target",
+        "redirect": {
+            "title": "Redirect",
+            "type": "object",
+            "properties": {
+                "target": {
+                    "title": "Target",
                     "description": "URL or path to redirect to.",
-                    "type" : "string"
+                    "type": "string"
                 },
-                "enabled" : {
-                    "title" : "Redirect Enabled",
-                    "type" : "boolean",
-                    "default" : false
+                "enabled": {
+                    "title": "Redirect Enabled",
+                    "type": "boolean",
+                    "default": false
                 },
-                "code" : {
-                    "title" : "Response Code",
-                    "description" : "Code returned by response.",
-                    "comment" : "See https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection",
-                    "type" : "integer",
-                    "default" : 307,
-                    "enum" : [301, 302, 303, 307]
+                "code": {
+                    "title": "Response Code",
+                    "description": "Code returned by response.",
+                    "comment": "See https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#3xx_Redirection",
+                    "type": "integer",
+                    "default": 307,
+                    "enum": [
+                        301,
+                        302,
+                        303,
+                        307
+                    ]
                 }
             },
-            "lookup" : 80
+            "lookup": 80
         }
     },
-    "columns" : {
-        "name" : {
-            "title" : "Path Name"
+    "columns": {
+        "name": {
+            "title": "Path Name"
         }
     },
-    "excludedColumns" : ["institution.display_title"]
+    "excludedColumns": [
+        "institution.display_title"
+    ]
 }

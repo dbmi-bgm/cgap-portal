@@ -12,6 +12,8 @@ import { basicColumnExtensionMap,
     DisplayTitleColumnUser } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { Schemas, typedefs } from './../util';
 
+import { variantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './variantSampleColumnExtensionMap';
+
 // eslint-disable-next-line no-unused-vars
 const { Item, ColumnDefinition } = typedefs;
 
@@ -127,6 +129,7 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
 
 export const columnExtensionMap = {
     ...basicColumnExtensionMap,
+    ...variantSampleColumnExtensionMap,
     'display_title' : { // TODO: Look into a better way to do this
         'title' : "Title",
         'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
@@ -134,12 +137,14 @@ export const columnExtensionMap = {
         'order' : -100,
         'render' : function renderDisplayTitleColumn(result, parentProps){
             const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-            const { '@type' : itemTypeList = ["Item"] } = result;
+            const { '@type': itemTypeList = ["Item"] } = result;
             let renderElem;
             if (itemTypeList[0] === "User") {
                 renderElem = <DisplayTitleColumnUser {...{ result }}/>;
             } else if (itemTypeList[0] === "Case") {
                 renderElem = <DisplayTitleColumnCase {...{ result }}/>;
+            } else if (itemTypeList[0] === "VariantSample") {
+                renderElem = <VariantSampleDisplayTitleColumn {...{ result }} />;
             } else {
                 renderElem = <DisplayTitleColumnDefault {...{ result }}/>;
             }
@@ -147,25 +152,6 @@ export const columnExtensionMap = {
                 <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
                     { renderElem }
                 </DisplayTitleColumnWrapper>
-            );
-        }
-    },
-    // TODO: change to organization
-    'lab.display_title' : {
-        'title' : "Lab",
-        'widthMap' : { 'lg' : 200, 'md' : 180, 'sm' : 160 },
-        'render' : function labTitle(result, props){
-            const { lab, submitted_by : { display_title : submitterTitle } = {} } = result;
-            if (!lab) return null;
-            const labLink = <a href={object.atIdFromObject(lab)}>{ lab.display_title }</a>;
-            if (!submitterTitle){
-                return labLink;
-            }
-            return (
-                <span>
-                    <i className="icon icon-fw icon-user far user-icon" data-html data-tip={'<small>Submitted by</small> ' + result.submitted_by.display_title} />
-                    { labLink }
-                </span>
             );
         }
     },
@@ -426,16 +412,18 @@ export const columnExtensionMap = {
         }
     },
     'bam_snapshot': {
-        'noSort' : true,
-        'render' : function(result, props) {
+        "noSort": true,
+        "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
+        "colTitle": <i className="icon icon-fw icon-image fas" />,
+        "render": function(result, props) {
             const { bam_snapshot = null, uuid = null } = result;
             if (bam_snapshot) {
                 return (
                     <div className="mx-auto text-truncate">
-                        <a target="_blank" rel="noreferrer" href={`/${uuid}/@@download`}>
-                            View BAM Snapshot
+                        <a target="_blank" className="btn btn-outline-dark btn-sm" rel="noreferrer"
+                            href={`/${uuid}/@@download`} data-html data-tip="View BAM Snapshot <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>">
+                            <i className="icon icon-fw icon-image fas" />
                         </a>
-                        <i className="ml-1 icon-sm icon fas icon-external-link-alt"></i>
                     </div>
                 );
             }

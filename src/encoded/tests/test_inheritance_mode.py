@@ -4,6 +4,9 @@ from ..inheritance_mode import InheritanceMode, InheritanceModeError
 from ..util import resolve_file_path
 
 
+pytestmark = [pytest.mark.setone, pytest.mark.working]
+
+
 CSV_TESTS = resolve_file_path('tests/data/variant_workbook/inheritance_mode_test_data.csv')
 
 
@@ -319,7 +322,7 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
                 {'labels': ['Heterozygous'], 'role': 'mother', 'sample_id': 'sample_id_2'},
                 {'labels': ['Heterozygous'], 'role': 'father', 'sample_id': 'sample_id_3'}
             ],
-            'inheritance_modes': ['Recessive']
+            'inheritance_modes': ['Homozygous recessive']
         }
     ),
     (  # test case 4 (no mother, father)

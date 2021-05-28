@@ -2,7 +2,8 @@ import pytest
 from webtest import AppError
 
 
-pytestmark = [pytest.mark.working, pytest.mark.search]
+pytestmark = [pytest.mark.working, pytest.mark.search, pytest.mark.workbook]
+
 COMPOUND_SEARCH_URL = '/compound_search'
 FILTER_SET_URL = '/filter_set'
 VARIANT_URL = '/variant'
@@ -45,7 +46,7 @@ def test_filter_set_barebones(workbook, es_testapp, barebones_filter_set):
         ],
         'search_type': 'Project'  # NOTE: will work since we are not actually validating this
     }).json['@graph']
-    assert len(compound_search_res) == 1
+    assert len(compound_search_res) == 2
 
     # do it again, this time with a type that will return 404
     es_testapp.post_json(COMPOUND_SEARCH_URL, {
@@ -108,7 +109,7 @@ def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
         ],
         'search_type': 'Project'
     }).json['@graph']
-    assert len(compound_search_res) == 1
+    assert len(compound_search_res) == 2
 
     # execute the same search using filter_blocks and flags
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {
@@ -133,7 +134,8 @@ def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
 
 @pytest.fixture
 def typical_filter_set():
-    """ A filter set with two filter blocks and a flag """
+    """ A filter set with two filter blocks, a flag, and preset/
+    default assignments"""
     return {
         'title': 'Test filter set',
         'search_type': 'Variant',
@@ -154,7 +156,18 @@ def typical_filter_set():
             }
         ],
         'project': 'hms-dbmi',
-        'institution': 'hms-dbmi'
+        'institution': 'hms-dbmi',
+        'preset_for_projects': [
+            '4e4f2247-352a-46ad-9aec-70c218d94884',
+            '1ddaa694-b80c-4c3e-95c3-684344a71aaf'
+            ],
+        'preset_for_users': [
+            '2feea865-1d90-496d-8632-fb12b6a3429f'
+            ],
+        'default_for_projects': [
+            'c159d935-1451-4ae1-801c-bdd25cd5d4ec',
+            '4d2db0db-4a80-4845-b0e0-c029b6538032'
+            ]
     }
 
 
@@ -315,8 +328,8 @@ def test_filter_set_selectively_apply_flags(workbook, es_testapp, filter_set_wit
 @pytest.fixture
 def filter_set_with_only_flags():
     return {
-        'search_type': 'Variant',
-        'global_flags': 'CHROM=1'
+        "search_type": "Variant",
+        "global_flags": "CHROM=1"
     }
 
 

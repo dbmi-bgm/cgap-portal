@@ -46,8 +46,8 @@
             "type": "string",
             "formInput": "textarea"
         },
-        "meta_workflow_version": {
-            "title": "meta workflow version",
+        "version": {
+            "title": "Version",
             "description": "The version of the meta workflow.",
             "type": "string"
         },
@@ -96,53 +96,126 @@
                                     "title" : "Input Argument Name",
                                     "type" : "string"
                                 },
+                                "argument_type" : {
+                                    "title" : "Input Argument type",
+                                    "description" : "input argument type (either file or parameter)",
+                                    "type" : "string"
+                                    "enum" : [
+                                        "file",
+                                        "parameter",
+                                    ]
+                                },
                                 "source" : {
                                     "title" : "Source Workflow",
                                     "description" : "Where this input file came from (source workflow name). If this field is null or undefined, the input is global and not from another workflow's output.",
                                     "type" : "string"
                                 },
-                                "name_in_source" : {
-                                    "title" : "Name in Source Workflow",
+                                "source_argument_name" : {
+                                    "title" : "Argument name in the Source Workflow",
                                     "description" : "Output argument name in the source workflow",
                                     "type" : "string"
                                 },
                                 "scatter": {
                                     "title": "Scatter",
-                                    "description" : "Whether the input is an array from multiple runs of the source",
+                                    "description" : "The input dimension decrease if scattered into mutiple runs (default: not set)",
+                                    "type" : "integer"
+                                },
+                                "gather": {
+                                    "title": "Gather",
+                                    "description" : "The input dimension increase from multiple runs of the source workflow (default: not set)",
+                                    "type" : "integer"
+                                },
+                                "mount": {
+                                    "title": "Mount",
+                                    "description" : "Whether the input is mounted",
                                     "type" : "boolean"
+                                },
+                                "rename": {
+                                    "title": "Rename",
+                                    "description" : "What the input should be renamed to when downloaded to EC2 for execution",
+                                    "type" : "string"
+                                },
+                                "unzip": {
+                                    "title": "Unzip",
+                                    "description" : "How the input should be decompressed when downloaded to EC2 for execution",
+                                    "type" : "string",
+                                    "enum": [
+                                        "gz",
+                                        "bz2"
+                                    ]
+                                },
+                                "default_file": {
+                                    "title": "Default input file",
+                                    "description" : "Default input file (applicable when argument_type is file)",
+                                    "type" : "string",
+                                    "linkTo": "File"
+                                },
+                                "default_value": {
+                                    "title": "Default value",
+                                    "description" : "Default value (applicable when argument_type is parameter)",
+                                    "type" : "string"
                                 }
                             }
                         }
                     },
-                    "outputs" : {
-                        "title" : "Workflow Outputs",
-                        "type" : "array",
-                        "items" : {
-                            "type" : "object",
-                            "properties" : {
-                                "argument_name" : {
-                                    "title" : "Output Name",
-                                    "type" : "string"
-                                },
-                                "target" : {
-                                    "title" : "Target Workflow",
-                                    "description" : "Where this output file should go next (target workflow name). If this field is null or undefined, the output is global and going into another workflow as input.",
-                                    "type" : "string"
-                                },
-                                "name_in_target" : {
-                                    "title" : "Name in Target Workflow",
-                                    "description" : "Input argument name in the target workflow",
-                                    "type" : "string"
-                                },
-                                "scatter": {
-                                    "title": "Scatter",
-                                    "description" : "Whether the input of the target is an array from multiple runs of the workflow",
-                                    "type" : "boolean"
-                                }
-                            }
-                        }
+                    "config" : {
+                        "title" : "Config",
+                        "description" : "Tibanna configuration for execution",
+                        "type" : "object",
+                        "additionalProperties": true
+                    },
+                    "custom_pf_fields" : {
+                        "title" : "Custom PF fields",
+                        "description" : "Custom fields to be added to processed file items through Tibanna",
+                        "type" : "object",
+                        "additionalProperties": true
+                    },
+                    "custom_qc_fields" : {
+                        "title" : "Custom QC fields",
+                        "description" : "Custom fields to be added to QC items through Tibanna",
+                        "type" : "object",
+                        "additionalProperties": true
+                    },
+                    "common_fields" : {
+                        "title" : "Common fields",
+                        "description" : "Common fields to be added to Workflow Run, Processed file and QC items through Tibanna",
+                        "type" : "object",
+                        "additionalProperties": true
                     }
                 }
+            }
+        },
+        "arguments": {
+            "title": "Arguments",
+            "description": "Global arguments of the meta-workflow",
+            "type": "array",
+            "items": {
+                "title": "Argument",
+                "description": "individual global argument of the meta-workflow",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "argument_name" : {
+                        "title" : "Argument Name",
+                        "description" : "Name of the workflow, unique within the meta workflow",
+                        "type" : "string"
+                    },
+                    "argument_type" : {
+                        "title" : "Argument Type",
+                        "description" : "Name of the workflow, unique within the meta workflow",
+                        "type" : "string"
+                    },
+                    "default_value": {
+                        "title" : "Default value",
+                        "description" : "Default value of the parameter type argument",
+                        "type" : "string"
+                    },
+                    "default_file": {
+                        "title" : "Default file",
+                        "description" : "Default file item of the file type argument",
+                        "type" : "string",
+                        "linkTo": "File"
+                    }
             }
         }
     },

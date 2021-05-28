@@ -1,3 +1,5 @@
+SHELL=/bin/bash
+
 clean:  # clear node modules, eggs, npm build stuff
 	make clean-python-caches
 	make clean-npm-caches
@@ -18,6 +20,9 @@ clean-npm-caches:
 clean-node-modules:
 	rm -rf node_modules
 
+clear-poetry-cache:  # clear poetry/pypi cache. for user to do explicitly, never automatic
+	poetry cache clear pypi --all
+
 aws-ip-ranges:
 	curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
 
@@ -37,8 +42,8 @@ macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an e
 	bin/macpoetry-install
 
 configure:  # does any pre-requisite installs
-	pip install --upgrade pip
-	pip install poetry==1.0.10  # pinned to avoid build problems we cannot fix in pyproject.toml
+	pip install --upgrade pip==21.0.1
+	pip install poetry==1.1.4  # this version is known to work. -kmp 11-Mar-2021
 
 build:  # builds
 	make configure
@@ -104,14 +109,20 @@ deploy1b:  # starts ingestion engine separately so it can be easily stopped and 
 deploy2:  # spins up waittress to serve the application
 	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini
 
-deploy3:  # uploads: GeneAnnotationFields, then Genes, then AnnotationFields, then Variant + VariantSamples
-	python src/encoded/commands/ingestion.py src/encoded/annotations/variant_table_v0.4.8.csv src/encoded/schemas/annotation_field.json src/encoded/schemas/variant.json src/encoded/schemas/variant_sample.json src/encoded/annotations/GAPFI3JX5D2J.vcf hms-dbmi hms-dbmi src/encoded/annotations/gene_table_v0.4.6.csv src/encoded/schemas/gene_annotation_field.json src/encoded/schemas/gene.json src/encoded/annotations/gene_inserts_v0.4.6.json hms-dbmi hms-dbmi development.ini --post-variant-consequences --post-variants --post-gene-annotation-field-inserts --post-gene-inserts --app-name app
+deploy3:  # Uploads genes, consequences then ingests the VCF below
+	poetry run ingest-vcf src/encoded/annotations/GAPFIBVPFEP5_v0.5.4.reformat.altcounts.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
 
 psql-dev:  # starts psql with the url after 'sqlalchemy.url =' in development.ini
-	@psql `grep 'sqlalchemy[.]url =' development.ini | sed -E 's/^.* = (.*)/\1/'`
+	@scripts/psql-start dev
 
-kibana-start:
+psql-test:  # starts psql with a url constructed from data in 'ps aux'.
+	@scripts/psql-start test
+
+kibana-start:  # starts a dev version of kibana (default port)
 	scripts/kibana-start
+
+kibana-start-test:  # starts a test version of kibana (port chosen for active tests)
+	scripts/kibana-start test
 
 kibana-stop:
 	scripts/kibana-stop
@@ -124,19 +135,39 @@ kill:  # kills back-end processes associated with the application. Use with care
 clean-python:
 	@echo -n "Are you sure? This will wipe all libraries installed on this virtualenv [y/N] " && read ans && [ $${ans:-N} = y ]
 	pip uninstall encoded
-	pip freeze | xargs pip uninstall -y
+	pip uninstall -y -r <(pip freeze)
 
 test:
-	bin/test -vv --timeout=200 -m "working and not indexing" && bin/test -vv --timeout=200 -m "working and indexing"
+	make test-unit || echo "unit tests failed"
+	make test-npm
 
 retest:
-	bin/test -vv --last-failed
+	poetry run python -m pytest -vv -r w --last-failed
 
 test-any:
-	bin/test -vv --timeout=200
+	poetry run python -m pytest -vv -r w --timeout=200
 
-travis-test:
-	bin/test -vv --instafail --force-flaky --max-runs=3 --timeout=400 -m "working and not indexing and not action_fail" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443 && bin/test -vv --timeout=300 -m "working and indexing and not action_fail" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+test-npm:
+	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and not indexing"
+
+test-unit:
+	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and indexing"
+
+test-performance:
+	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and performance and not broken and not sloppy"
+
+test-integrated:
+	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and (integrated or integratedx) and not performance and not broken and not sloppy"
+
+remote-test:  # Actually, we don't normally use this. Instead the GA workflow sets up two parallel tests.
+	make remote-test-unit
+	make remote-test-npm
+
+remote-test-npm:  # Note this only does the 'not indexing' tests
+	poetry run python -m pytest -vv -r w --instafail --force-flaky --max-runs=3 --timeout=400 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+
+remote-test-unit:  # Note this does the 'indexing' tests
+	poetry run python -m pytest -vv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update
@@ -152,16 +183,19 @@ info:
 	   $(info - Use 'make build-locust' to install locust. Do not do this unless you know what you are doing.)
 	   $(info - Use 'make clean' to clear out (non-python) dependencies.)
 	   $(info - Use 'make clean-python' to clear python virtualenv for fresh poetry install.)
+	   $(info - Use 'make clear-poetry-cache' to clear the poetry pypi cache if in a bad state. (Safe, but later recaching can be slow.))
 	   $(info - Use 'make configure' to install poetry. You should not have to do this directly.)
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts.)
 	   $(info - Use 'make deploy2' to spin up the application server.)
 	   $(info - Use 'make deploy3' to load variants and genes.)
-	   $(info - Use 'make kibana-start' to start kibana, and 'make kibana-stop' to stop it.)
+	   $(info - Use 'make kibana-start' to start kibana on the default local ES port, and 'make kibana-stop' to stop it.)
+	   $(info - Use 'make kibana-start-test' to start kibana on the port being used for active testing, and 'make kibana-stop' to stop it.)
 	   $(info - Use 'make kill' to kill postgres and elasticsearch proccesses. Please use with care.)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests. Implied by 'make build'.)
 	   $(info - Use 'make npm-setup' to build the front-end. Implied by 'make build'.)
 	   $(info - Use 'make psql-dev' to start psql on data associated with an active 'make deploy1'.)
+	   $(info - Use 'make psql-test' to start psql on data associated with an active test.)
 	   $(info - Use 'make retest' to run failing tests from the previous test run.)
-	   $(info - Use 'make test' to run tests with normal options we use on travis ('-m "working and not performance"').)
+	   $(info - Use 'make test' to run tests with normal options similar to what we use on GitHub Actions.)
 	   $(info - Use 'make test-any' to run tests without marker constraints (i.e., with no '-m' option).)
 	   $(info - Use 'make update' to update dependencies (and the lock file).)

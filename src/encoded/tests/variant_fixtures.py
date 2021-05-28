@@ -1,13 +1,12 @@
 import pytest
-import json
 from ..util import resolve_file_path
-from ..commands.ingest_genes import GeneIngestion
+from ..ingestion.gene_utils import GeneIngestion
 
 
 GENES_LOC = resolve_file_path('tests/data/variant_workbook/gene_inserts_partial.json')
 GENE_WORKBOOK = resolve_file_path('tests/data/variant_workbook/gene_workbook.json')
 VARIANT_CONSEQUENCE_LOC = resolve_file_path('annotations/variant_consequence.json')
-MAX_POSTS_FOR_TESTING = 5
+MAX_POSTS_FOR_TESTING = 4
 ANNOTATION_FIELD_URL = '/annotation_field'
 GENE_ANNOTATION_FIELD_URL = '/gene_annotation_field'
 VARIANT_URL = '/variant'

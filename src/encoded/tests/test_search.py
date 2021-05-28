@@ -1,22 +1,25 @@
 import json
-import pytest
 import mock
+import pytest
+import webtest
 
-from datetime import (datetime, timedelta)
-from dcicutils.misc_utils import Retry
+from datetime import datetime, timedelta
+from dcicutils.misc_utils import Retry, ignored
+from dcicutils.qa_utils import notice_pytest_fixtures, local_attrs
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
-from ..search import lucene_builder
+from snovault.elasticsearch.indexer_utils import get_namespaced_index
+from snovault.schema_utils import load_schema
+from snovault.util import add_default_embeds
+from webtest import AppError
 from ..search.lucene_builder import LuceneBuilder
 from ..search.search_utils import find_nested_path
-from snovault.elasticsearch.indexer_utils import get_namespaced_index
-from snovault.util import add_default_embeds
-from snovault.schema_utils import load_schema
-from webtest import AppError
 
 
-pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search]
+
+
+pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search, pytest.mark.workbook]
 
 
 ### IMPORTANT
@@ -40,6 +43,7 @@ def recursively_find_uuids(json, uuids):
 
 def test_search_view(workbook, es_testapp):
     """ Test basic things about search view """
+    notice_pytest_fixtures(workbook)
     res = es_testapp.get('/search/?type=Item').json
     assert res['@type'] == ['ItemSearchResults', 'Search']
     assert res['@id'] == '/search/?type=Item'
@@ -48,6 +52,12 @@ def test_search_view(workbook, es_testapp):
     assert res['title'] == 'Search'
     assert res['total'] > 0
     assert 'facets' in res
+
+    # type facet should always have > 1 option here, even when it is selected
+    for facet in res['facets']:
+        if facet['field'] == 'type':
+            assert len(facet['terms']) > 1
+            break
     assert 'filters' in res
     assert '@graph' in res
 
@@ -57,6 +67,7 @@ def test_search_with_no_query(workbook, es_testapp):
     using /search/ (with no query) should default to /search/?type=Item
     thus, should satisfy same assertions as test_search_view
     """
+    notice_pytest_fixtures(workbook)
     res = es_testapp.get('/search/').follow(status=200)
     assert res.json['@type'] == ['ItemSearchResults', 'Search']
     assert res.json['@id'] == '/search/?type=Item'
@@ -214,6 +225,7 @@ def dd_dts(es_testapp, workbook):
 
 
 def test_search_date_range_find_within(dd_dts, es_testapp, workbook):
+    notice_pytest_fixtures(workbook)
     # the MboI enzyme should be returned with all the provided pairs
     gres = es_testapp.get('/search/?type=Disorder&disorder_name=Dummy+Disorder').json
     g_uuids = [item['uuid'] for item in gres['@graph'] if 'uuid' in item]
@@ -235,6 +247,7 @@ def test_search_date_range_find_within(dd_dts, es_testapp, workbook):
 
 @pytest.mark.skip # XXX: how to best port?
 def test_search_with_nested_integer(es_testapp, workbook):
+    notice_pytest_fixtures(workbook)
     search0 = '/search/?type=ExperimentHiC'
     s0res = es_testapp.get(search0).json
     s0_uuids = [item['uuid'] for item in s0res['@graph'] if 'uuid' in item]
@@ -255,6 +268,7 @@ def test_search_with_nested_integer(es_testapp, workbook):
 
 
 def test_search_date_range_dontfind_without(dd_dts, es_testapp, workbook):
+    notice_pytest_fixtures(workbook)
     # the MboI enzyme should be returned with all the provided pairs
     dts = {k: v.replace(':', '%3A') for k, v in dd_dts.items()}
     datepairs = [
@@ -306,72 +320,85 @@ def test_search_query_string_with_booleans(workbook, es_testapp):
     assert tester_uuid not in not_uuids
 
 
-# @pytest.mark.skip  # N/A?
-# def test_metadata_tsv_view(workbook, htmltestapp):
-#
-#     FILE_ACCESSION_COL_INDEX = 3
-#     FILE_DOWNLOAD_URL_COL_INDEX = 0
-#
-#     def check_tsv(result_rows, len_requested = None):
-#         info_row = result_rows.pop(0)
-#         header_row = result_rows.pop(0)
-#
-#         assert header_row[FILE_ACCESSION_COL_INDEX] == 'File Accession'
-#         assert header_row.index('File Download URL') == FILE_DOWNLOAD_URL_COL_INDEX # Ensure we have this column
-#         assert len(result_rows) > 0 # We at least have some rows.
-#
-#         for row_index in range(1):
-#             assert len(result_rows[row_index][FILE_ACCESSION_COL_INDEX]) > 4 # We have a value for File Accession
-#             assert 'http' in result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX] # Make sure it seems like a valid URL.
-#             assert '/@@download/' in result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX]
-#             assert result_rows[row_index][FILE_ACCESSION_COL_INDEX] in result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX] # That File Accession is also in File Download URL of same row.
-#             assert len(result_rows[row_index][FILE_ACCESSION_COL_INDEX]) < len(result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX])
-#
-#         # Last some rows should be 'summary' rows. And have empty spaces for 'Download URL' / first column.
-#         summary_start_row = None
-#         for row_index, row in enumerate(result_rows):
-#             if row[1] == 'Summary':
-#                 summary_start_row = row_index - 1
-#                 break
-#
-#         # Check that summary cells are present, in right place, with some correct-looking values
-#         assert result_rows[summary_start_row + 1][1] == 'Summary'
-#         assert result_rows[summary_start_row + 3][1] == 'Files Selected for Download:'
-#         assert result_rows[summary_start_row + 4][1] == 'Total File Rows:'
-#         assert result_rows[summary_start_row + 5][1] == 'Unique Downloadable Files:'
-#         if len_requested:
-#             assert int(result_rows[summary_start_row + 3][4]) == len_requested
-#         assert int(result_rows[summary_start_row + 4][4]) == summary_start_row
-#         assert int(result_rows[summary_start_row + 5][4]) <= summary_start_row
-#
-#
-#     # run a simple GET query with type=ExperimentSetReplicate
-#     res = htmltestapp.get('/metadata/type=ExperimentSetReplicate/metadata.tsv') # OLD URL FORMAT IS USED -- TESTING REDIRECT TO NEW URL
-#     res = res.maybe_follow() # Follow redirect -- https://docs.pylonsproject.org/projects/webtest/en/latest/api.html#webtest.response.TestResponse.maybe_follow
-#     assert 'text/tsv' in res.content_type
-#     result_rows = [ row.rstrip(' \r').split('\t') for row in res.body.decode('utf-8').split('\n') ] # Strip out carriage returns and whatnot. Make a plain multi-dim array.
-#
-#     check_tsv(result_rows)
-#
-#     # Perform POST w/ accession triples (main case, for BrowseView downloads)
-#     res2_post_data = { # N.B. '.post', not '.post_json' is used. This dict is converted to POST form values, with key values STRINGIFIED, not to POST JSON request.
-#         "accession_triples" : [
-#             ["4DNESAAAAAA1","4DNEXO67APU1","4DNFIO67APU1"],
-#             ["4DNESAAAAAA1","4DNEXO67APU1","4DNFIO67APT1"],
-#             ["4DNESAAAAAA1","4DNEXO67APT1","4DNFIO67APV1"],
-#             ["4DNESAAAAAA1","4DNEXO67APT1","4DNFIO67APY1"],
-#             ["4DNESAAAAAA1","4DNEXO67APV1","4DNFIO67APZ1"],
-#             ["4DNESAAAAAA1","4DNEXO67APV1","4DNFIO67AZZ1"]
-#         ],
-#         'download_file_name' : 'metadata_TEST.tsv'
-#     }
-#
-#     res2 = htmltestapp.post('/metadata/?type=ExperimentSetReplicate', { k : json.dumps(v) for k,v in res2_post_data.items() }) # NEWER URL FORMAT
-#
-#     assert 'text/tsv' in res2.content_type
-#     result_rows = [ row.rstrip(' \r').split('\t') for row in res2.body.decode('utf-8').split('\n') ]
-#
-#     check_tsv(result_rows, len(res2_post_data['accession_triples']))
+@pytest.mark.broken  # test doesn't work, this will keep make from running it
+@pytest.mark.skip  # In case of running the file by name, this still doesn't want to run
+def test_metadata_tsv_view(workbook, html_es_testapp):
+
+    file_accession_col_index = 3
+    file_download_url_col_index = 0
+
+    def check_tsv(result_rows, len_requested=None):
+        info_row = result_rows.pop(0)
+        header_row = result_rows.pop(0)
+        ignored(info_row)
+
+        assert header_row[file_accession_col_index] == 'File Accession'
+        assert header_row.index('File Download URL') == file_download_url_col_index  # Ensure we have this column
+        assert len(result_rows) > 0  # We at least have some rows.
+
+        for row_index in range(1):
+            assert len(result_rows[row_index][file_accession_col_index]) > 4  # We have a value for File Accession
+            assert 'http' in result_rows[row_index][file_download_url_col_index]  # Make sure it seems like a valid URL.
+            assert '/@@download/' in result_rows[row_index][file_download_url_col_index]
+            # That File Accession is also in File Download URL of same row.
+            assert (result_rows[row_index][file_accession_col_index]
+                    in result_rows[row_index][file_download_url_col_index])
+            assert (len(result_rows[row_index][file_accession_col_index])
+                    < len(result_rows[row_index][file_download_url_col_index]))
+
+        # Last some rows should be 'summary' rows. And have empty spaces for 'Download URL' / first column.
+        summary_start_row = None
+        for row_index, row in enumerate(result_rows):
+            if row[1] == 'Summary':
+                summary_start_row = row_index - 1
+                break
+
+        # Check that summary cells are present, in right place, with some correct-looking values
+        assert result_rows[summary_start_row + 1][1] == 'Summary'
+        assert result_rows[summary_start_row + 3][1] == 'Files Selected for Download:'
+        assert result_rows[summary_start_row + 4][1] == 'Total File Rows:'
+        assert result_rows[summary_start_row + 5][1] == 'Unique Downloadable Files:'
+        if len_requested:
+            assert int(result_rows[summary_start_row + 3][4]) == len_requested
+        assert int(result_rows[summary_start_row + 4][4]) == summary_start_row
+        assert int(result_rows[summary_start_row + 5][4]) <= summary_start_row
+
+   # run a simple GET query with type=ExperimentSetReplicate
+    # OLD URL FORMAT IS USED -- TESTING REDIRECT TO NEW URL
+    res = html_es_testapp.get('/metadata/type=ExperimentSetReplicate/metadata.tsv')
+    # Follow redirect
+    # -- https://docs.pylonsproject.org/projects/webtest/en/latest/api.html#webtest.response.TestResponse.maybe_follow
+    res = res.maybe_follow()
+    assert 'text/tsv' in res.content_type
+    # Strip out carriage returns and whatnot. Make a plain multi-dim array.
+    result_rows = [row.rstrip(' \r').split('\t') for row in res.body.decode('utf-8').split('\n')]
+
+    check_tsv(result_rows)
+
+    # Perform POST w/ accession triples (main case, for BrowseView downloads)
+
+    # N.B. '.post', not '.post_json' is used. This dict is converted to POST form values,
+    # with key values STRINGIFIED, not to POST JSON request.
+    res2_post_data = {
+        "accession_triples": [
+            ["4DNESAAAAAA1", "4DNEXO67APU1", "4DNFIO67APU1"],
+            ["4DNESAAAAAA1", "4DNEXO67APU1", "4DNFIO67APT1"],
+            ["4DNESAAAAAA1", "4DNEXO67APT1", "4DNFIO67APV1"],
+            ["4DNESAAAAAA1", "4DNEXO67APT1", "4DNFIO67APY1"],
+            ["4DNESAAAAAA1", "4DNEXO67APV1", "4DNFIO67APZ1"],
+            ["4DNESAAAAAA1", "4DNEXO67APV1", "4DNFIO67AZZ1"]
+        ],
+        'download_file_name': 'metadata_TEST.tsv'
+    }
+
+    res2 = html_es_testapp.post('/metadata/?type=ExperimentSetReplicate',  # NEWER URL FORMAT
+                                {k: json.dumps(v)
+                                 for k, v in res2_post_data.items()})
+
+    assert 'text/tsv' in res2.content_type
+    result_rows = [row.rstrip(' \r').split('\t') for row in res2.body.decode('utf-8').split('\n')]
+
+    check_tsv(result_rows, len(res2_post_data['accession_triples']))
 
 
 def test_default_schema_and_non_schema_facets(workbook, es_testapp):
@@ -505,12 +532,44 @@ def test_collection_actions_filtered_by_permission(workbook, es_testapp, anon_es
     assert len(res.json['@graph']) == 0
 
 
-@Retry.retry_allowed('test_index_data_workbook.check', wait_seconds=1, retries_allowed=5)
-def check_item_type(client, item_type):
-    # This might get a 404 if not enough time has elapsed, so try a few times before giving up.
-    return client.get('/%s?limit=all' % item_type, status=[200, 301]).follow()
+class ItemTypeChecker:
+
+    @staticmethod
+    @Retry.retry_allowed('ItemTypeCheckerf.check_item_type', wait_seconds=1, retries_allowed=5)
+    def check_item_type(client, item_type, deleted=False):
+        # This might get a 404 if not enough time has elapsed, so try a few times before giving up.
+        #
+        # We retry a lot of times because it's still fast if things are working quickly, but if it's
+        # slow it's better to wait than fail the test. Slowness is not what we're trying to check for here.
+        # And even if it's slow for one item, that same wait time will help others have time to catch up,
+        # so it shouldn't be slow for others. At least that's the theory. -kmp 27-Jan-2021
+        extra = "&status=deleted" if deleted else ""
+        return client.get('/%s?limit=all%s' % (item_type, extra), status=[200, 301]).follow()
 
 
+    CONSIDER_DELETED = True
+
+    @classmethod
+    def get_all_items_of_type(cls, client, item_type):
+        if cls.CONSIDER_DELETED:
+            try:
+                res = cls.check_item_type(client, item_type)
+                items_not_deleted = res.json.get('@graph', [])
+            except webtest.AppError:
+                items_not_deleted = []
+            try:
+                res = cls.check_item_type(client, item_type, deleted=True)
+                items_deleted = res.json.get('@graph', [])
+            except webtest.AppError:
+                items_deleted = []
+            return items_not_deleted + items_deleted
+        else:
+            res = cls.check_item_type(client, item_type)
+            items_not_deleted = res.json.get('@graph', [])
+            return items_not_deleted
+
+
+@pytest.mark.manual  # this test just loads the workbook, reindexes it and searches
 def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
     es = es_testapp.app.registry['elasticsearch']
     # we need to reindex the collections to make sure numbers are correct
@@ -546,8 +605,8 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
         # check items in search result individually
         search_url = '/%s?limit=all' % item_type
         print("search_url=", search_url)
-        res = check_item_type(client=es_testapp, item_type=item_type)
-        for item_res in res.json.get('@graph', []):
+        items = ItemTypeChecker.get_all_items_of_type(client=es_testapp, item_type=item_type)
+        for item_res in items:
             index_view_res = es.get(index=namespaced_index, doc_type=item_type,
                                     id=item_res['uuid'])['_source']
             # make sure that the linked_uuids match the embedded data
@@ -566,7 +625,42 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
                 html_res = html_es_testapp.get(item_res['@id'])
                 assert html_res.body.startswith(b'<!DOCTYPE html>')
             except Exception as e:
+                ignored(e)
                 pass
+
+@pytest.mark.manual
+def test_index_data_workbook_after_posting_deleted_page_c4_570(workbook, es_testapp, html_es_testapp):
+    """
+    Regression test for C4-570.
+
+    This test takes a long time to run since it runs a long-running test three different ways.
+    This test must be invoked manually. 'make test' and 'make travis-test' will skip it because it's marked manual.
+    See details at https://hms-dbmi.atlassian.net/browse/C4-570
+    """
+
+    # Running the test this way should work fine
+    test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+
+    # But now let's add a deleted page.
+    # test_index_data_workbook will fail if preceded by anything that makes a deleted page
+    es_testapp.post_json('/pages/',
+                         {
+                             "name": "help/user-guide/sample-deleted-page",
+                             "title": "Sample Deleted Page",
+                             "content": [],
+                             "uuid": "db807a0f-2e76-4c77-a6bb-313a9c174252",
+                             "status": "deleted"
+                         },
+                         status=201)
+
+    # This test will now protect itself against failure.
+    test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+
+    # And we can see that if we hadn't protected ourselves against failure, this would reliably fail.
+    with pytest.raises(webtest.AppError):
+        with local_attrs(ItemTypeChecker, CONSIDER_DELETED=False):
+            test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+
 
 
 class MockedRequest(object):
@@ -585,8 +679,8 @@ class MockedRequest(object):
 def hacked_query():
     """ This is valid lucene that will have 'principals_allowed.view' that differs from what is on the request.
         Our helper method should detect such change and throw an error. """
-    return {'query': {'bool': {'filter': [{'bool': {'must': [{'terms':
-                     {'principals_allowed.view': ['system.Everyone', 'group.PERMISSION_YOU_DONT_HAVE']}}]}}]}}}
+    return {'query': {'bool': {'filter': {'bool': {'must': [{'terms':
+                     {'principals_allowed.view': ['system.Everyone', 'group.PERMISSION_YOU_DONT_HAVE']}}]}}}}}
 
 
 def test_search_with_hacked_query(workbook, anon_es_testapp, hacked_query):
@@ -594,13 +688,12 @@ def test_search_with_hacked_query(workbook, anon_es_testapp, hacked_query):
         verification function should throw an exception if there is any delta in the permissions object
         we explicitly attach to every search query.
     """
-    with mock.patch.object(lucene_builder, 'convert_search_to_dictionary', return_value=hacked_query):
-        mocked_request_with_least_permissive_permissions = MockedRequest()
-        with pytest.raises(HTTPBadRequest):
-            LuceneBuilder.verify_search_has_permissions(mocked_request_with_least_permissive_permissions, None)
-        mocked_request_with_same_permissions = MockedRequest(principals_allowed=['system.Everyone',
-                                                                                 'group.PERMISSION_YOU_DONT_HAVE'])
-        LuceneBuilder.verify_search_has_permissions(mocked_request_with_same_permissions, None)
+    mocked_request_with_least_permissive_permissions = MockedRequest()
+    with pytest.raises(HTTPBadRequest):
+        LuceneBuilder.verify_search_has_permissions(mocked_request_with_least_permissive_permissions, hacked_query)
+    mocked_request_with_same_permissions = MockedRequest(principals_allowed=['system.Everyone',
+                                                                             'group.PERMISSION_YOU_DONT_HAVE'])
+    LuceneBuilder.verify_search_has_permissions(mocked_request_with_same_permissions, hacked_query)
 
 
 def test_search_with_principals_allowed_fails(workbook, anon_es_testapp):
@@ -626,10 +719,10 @@ def test_search_debug_parameter(workbook, es_testapp, anon_es_testapp, authentic
     resp_with_debug = es_testapp.get('/search/?type=Family&debug=true', status=200).json
     assert 'query' in resp_with_debug
     # no results should still show query
-    resp_with_debug = es_testapp.get('/search/?type=Gene&debug=true', status=404).json
+    resp_with_debug = es_testapp.get('/search/?type=Phenotype&debug=true', status=404).json
     assert 'query' in resp_with_debug
     # doesn't matter what you pass
-    resp_with_debug = es_testapp.get('/search/?type=Gene&debug=blah', status=404).json
+    resp_with_debug = es_testapp.get('/search/?type=Phenotype&debug=blah', status=404).json
     assert 'query' in resp_with_debug
     # no results, no admin, no query
     resp_without_debug = anon_es_testapp.get('/search/?type=Family&debug=true', status=404).json
@@ -863,6 +956,10 @@ class TestNestedSearch(object):
         facets_that_shows_limited_options = es_testapp.get(
             '/search/?type=Variant&hg19.hg19_pos=11780388').json['facets']
         self.verify_facet(facets_that_shows_limited_options, 'hg19.hg19_hgvsg', 1)  # reduced to only 1 option
+
+        # rescue terms show up (7 terms + no value, see variant.json -> facets)
+        self.verify_facet(facets, 'genes.genes_most_severe_consequence.coding_effect', 8)
+        self.verify_facet(facets, 'genes.genes_most_severe_consequence.location', 8)
 
     def test_search_nested_exists_query(self, workbook, es_testapp):
         """ Tests doing a !=No+value search on a nested sub-field. """

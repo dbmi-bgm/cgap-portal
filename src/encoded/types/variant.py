@@ -1,33 +1,26 @@
+import datetime
+import io
 import json
 import os
+from urllib.parse import parse_qs, urlparse
+
 import boto3
+import negspy.coordinates as nc
 import pytz
-import datetime
-from pyramid.view import view_config
+import structlog
+from pyramid.httpexceptions import HTTPTemporaryRedirect
 from pyramid.settings import asbool
-from urllib.parse import (
-    parse_qs,
-    urlparse,
-)
-from pyramid.httpexceptions import (
-    HTTPTemporaryRedirect
-)
+from pyramid.view import view_config
+from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
-from ..util import resolve_file_path
-from ..inheritance_mode import InheritanceMode
-from snovault import (
-    calculated_property,
-    collection,
-    load_schema,
-)
-from .base import (
-    Item,
-    get_item_or_none,
-)
-import negspy.coordinates as nc
 
+from encoded.ingestion.common import CGAP_CORE_PROJECT
+from encoded.inheritance_mode import InheritanceMode
+from encoded.util import resolve_file_path
+from encoded.types.base import Item, get_item_or_none
 
+log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
 ANNOTATION_ID_SEP = '_'
 
@@ -61,8 +54,26 @@ def build_variant_embedded_list():
 
         :returns: list of variant embeds
     """
-    embedded_list = []
-    with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
+    embedded_list = [
+        "interpretations.classification",
+        "interpretations.acmg_guidelines",
+        "interpretations.conclusion",
+        "interpretations.note_text",
+        "interpretations.version",
+        "interpretations.project",
+        "interpretations.institution",
+        "interpretations.status",
+        "discovery_interpretations.gene_candidacy",
+        "discovery_interpretations.variant_candidacy",
+        "discovery_interpretations.note_text",
+        "discovery_interpretations.version",
+        "discovery_interpretations.project",
+        "discovery_interpretations.institution",
+        "discovery_interpretations.status",
+        "discovery_interpretations.last_modified.date_modified",
+        "discovery_interpretations.last_modified.modified_by.display_title"
+    ]
+    with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
     return embedded_list + Item.embedded_list
 
@@ -76,11 +87,45 @@ def build_variant_sample_embedded_list():
         :returns: list of embeds from 'variant' linkTo
     """
     embedded_list = [
-        "cmphet.*"
+        "cmphet.*",
+        "variant_sample_list.created_for_case",
+        "variant_notes.note_text",
+        "variant_notes.version",
+        "variant_notes.project",
+        "variant_notes.institution",
+        "variant_notes.status",
+        "variant_notes.last_modified.date_modified",
+        "variant_notes.last_modified.modified_by.display_title",
+        "gene_notes.note_text",
+        "gene_notes.version",
+        "gene_notes.project",
+        "gene_notes.institution",
+        "gene_notes.status",
+        "gene_notes.last_modified.date_modified",
+        "gene_notes.last_modified.modified_by.display_title",
+        "interpretation.classification",
+        "interpretation.acmg_guidelines",
+        "interpretation.conclusion",
+        "interpretation.note_text",
+        "interpretation.version",
+        "interpretation.project",
+        "interpretation.institution",
+        "interpretation.status",
+        "interpretation.last_modified.date_modified",
+        "interpretation.last_modified.modified_by.display_title",
+        "discovery_interpretation.gene_candidacy",
+        "discovery_interpretation.variant_candidacy",
+        "discovery_interpretation.note_text",
+        "discovery_interpretation.version",
+        "discovery_interpretation.project",
+        "discovery_interpretation.institution",
+        "discovery_interpretation.status",
+        "discovery_interpretation.last_modified.date_modified",
+        "discovery_interpretation.last_modified.modified_by.display_title"
     ]
-    with open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
+    with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
-    with open(resolve_file_path('schemas/variant_sample_embeds.json'), 'r') as fd:
+    with io.open(resolve_file_path('schemas/variant_sample_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant_sample')
     return ['variant.*'] + embedded_list + Item.embedded_list
 
@@ -96,15 +141,21 @@ def build_variant_display_title(chrom, pos, ref, alt, sep='>'):
     )
 
 
+def build_variant_sample_annotation_id(call_info, variant_uuid, file_accession):
+    """ Helper function that builds a variant sample annotation ID from the required parts. """
+    return ':'.join([call_info, variant_uuid, file_accession])
+
+
 def load_extended_descriptions_in_schemas(schema_object, depth=0):
-    '''
+    """
     MODIFIES SCHEMA_OBJECT **IN PLACE** RECURSIVELY
-    :param schema_object: A dictionary of any type that might have 'extended_description', 'properties', or 'items.properties'. Should be an Item schema initially.
+    :param schema_object: A dictionary of any type that might have 'extended_description', 'properties',
+        or 'items.properties'. Should be an Item schema initially.
     :param depth: Don't supply this. Used to check/optimize at depth=0 where schema_object is root of schema.
     TODO:
         Maybe reuse and/or move somewhere more global/easy-to-import-from?
         Maybe in base.py?
-    '''
+    """
 
     if depth == 0:
         # Root of Item schema, no extended_description here, but maybe facets or columns
@@ -121,8 +172,10 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
     for field_name, field_schema in schema_object.items():
         if "extended_description" in field_schema:
             if field_schema["extended_description"][-5:] == ".html":
-                html_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../..", field_schema["extended_description"])
-                with open(html_file_path) as open_file:
+                html_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                              "../../..",
+                                              field_schema["extended_description"])
+                with io.open(html_file_path) as open_file:
                     field_schema["extended_description"] = "".join([ l.strip() for l in open_file.readlines() ])
 
         # Applicable only to "properties" of Item schema, not columns or facets:
@@ -131,7 +184,10 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                 load_extended_descriptions_in_schemas(field_schema["properties"], depth + 1)
                 continue
 
-            if field_schema["type"] == "array" and "items" in field_schema and field_schema["items"]["type"] == "object" and "properties" in field_schema["items"]:
+            if (field_schema["type"] == "array"
+                    and "items" in field_schema
+                    and field_schema["items"]["type"] == "object"
+                    and "properties" in field_schema["items"]):
                 load_extended_descriptions_in_schemas(field_schema["items"]["properties"], depth + 1)
                 continue
 
@@ -193,6 +249,7 @@ class VariantSample(Item):
 
     item_type = 'variant_sample'
     schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant_sample.json'))
+    rev = {'variant_sample_lists': ('VariantSampleList', 'variant_samples')}
     embedded_list = build_variant_sample_embedded_list()
     FACET_ORDER_OVERRIDE = {
         'inheritance_modes': {
@@ -225,7 +282,11 @@ class VariantSample(Item):
 
     POSSIBLE_GENOTYPE_LABEL_FIELDS = [
         'proband_genotype_label', 'mother_genotype_label', 'father_genotype_label',
-        'sister_genotype_label', 'brother_genotype_label', 'co_parent_genotype_label',
+        'sister_genotype_label', 'sister_II_genotype_label', 'sister_III_genotype_label',
+        'sister_IV_genotype_label',
+        'brother_genotype_label', 'brother_II_genotype_label', 'brother_III_genotype_label',
+        'brother_IV_genotype_label'
+        'co_parent_genotype_label',
         'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
         'son_II_genotype_label'
     ]
@@ -252,6 +313,17 @@ class VariantSample(Item):
         if variant:
             return CALL_INFO + ':' + variant_display_title  # HG002:chr1:504A>T
         return CALL_INFO
+
+    @calculated_property(schema={
+        "title": "Variant Sample List",
+        "description": "The list containing this variant sample",
+        "type": "string",
+        "linkTo": "VariantSampleList"
+    })
+    def variant_sample_list(self, request):
+        result = self.rev_link_atids(request, "variant_sample_lists")
+        if result:
+            return result[0]  # expected one list per case
 
     @calculated_property(schema={
         "title": "AD_REF",
@@ -299,7 +371,7 @@ class VariantSample(Item):
         variant_props = get_item_or_none(request, variant, 'Variant', frame='raw')
         if variant_props is None:
             raise RuntimeError('Got none for something that definitely exists')
-        file_path = '%s/bamsnap/chr%s:%s.png' % (  # file = accession of associated VCF file
+        file_path = '%s/bamsnap/chr%s_%s.png' % (  # file = accession of associated VCF file
             file, variant_props['CHROM'], variant_props['POS']
         )
         return file_path
@@ -308,6 +380,7 @@ class VariantSample(Item):
         "title": "Associated Genotype Labels",
         "description": "Named Genotype Label fields that can be searched on",
         "type": "object",
+        "additional_properties": True,
         "properties": {
             "proband_genotype_label": {
                 "title": "Proband Genotype",
@@ -325,8 +398,32 @@ class VariantSample(Item):
                 "title": "Sister Genotype",
                 "type": "string"
             },
+            "sister_II_genotype_label": {
+                "title": "Sister II Genotype",
+                "type": "string"
+            },
+            "sister_III_genotype_label": {
+                "title": "Sister III Genotype",
+                "type": "string"
+            },
+            "sister_IV_genotype_label": {
+                "title": "Sister IV Genotype",
+                "type": "string"
+            },
             "brother_genotype_label": {
                 "title": "Brother Genotype",
+                "type": "string"
+            },
+            "brother_II_genotype_label": {
+                "title": "Brother II Genotype",
+                "type": "string"
+            },
+            "brother_III_genotype_label": {
+                "title": "Brother III Genotype",
+                "type": "string"
+            },
+            "brother_IV_genotype_label": {
+                "title": "Brother IV Genotype",
                 "type": "string"
             },
             "co_parent_genotype_label": {
@@ -388,6 +485,57 @@ class VariantSample(Item):
                 new_labels[role_key] = ' '.join(label)  # just in case
 
         return new_labels
+
+    @calculated_property(schema={
+        "title": "Project Gene Lists",
+        "field_name": "project_genelists",
+        "description": "Gene lists associated with project of variant sample",
+        "type": "array",
+        "items": {
+            "title": "Gene list title",
+            "type": "string",
+            "description": "Gene list title"
+        }
+    })
+    def project_genelists(self, request, project, variant):
+        project_genelists = []
+        core_project = CGAP_CORE_PROJECT + "/"
+        potential_projects = [core_project, project]
+        variant_props = get_item_or_none(request, variant, frame="embedded")
+        genes = variant_props.get("genes", [])
+        for gene in genes:
+            genelists = gene.get("genes_most_severe_gene", {}).get("gene_lists", [])
+            for genelist in genelists:
+                if (genelist["project"]["@id"] in potential_projects
+                        and genelist["display_title"] not in project_genelists):
+                    project_genelists.append(genelist["display_title"])
+        return project_genelists
+
+
+@collection(
+    name='variant-sample-lists',
+    properties={
+        'title': 'Variant Sample Lists',
+        'description': 'Collection of all variant sample lists'
+    })
+class VariantSampleList(Item):
+    """ VariantSampleList class """
+
+    item_type = 'variant_sample_list'
+    schema = load_schema('encoded:schemas/variant_sample_list.json')
+    embedded_list = [
+        'variant_samples.variant_sample_item.variant.display_title',
+        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title',
+        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript',
+        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc',
+        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp',
+        'variant_samples.variant_sample_item.interpretation.classification',
+        'variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy',
+        'variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy',
+        'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
+        'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
+        'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label'
+    ]
 
 
 @view_config(name='download', context=VariantSample, request_method='GET',

@@ -2,22 +2,24 @@
 
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
 """
-import os
+
+import datetime as datetime_module
 import logging
+import os
+import pkg_resources
 import pytest
 import webtest
-import tempfile
-import time
-import subprocess
-import pkg_resources
 
+
+from dcicutils.qa_utils import notice_pytest_fixtures, MockFileSystem
 from pyramid.request import apply_request_extensions
-from pyramid.testing import DummyRequest, setUp, tearDown
+from pyramid.testing import DummyRequest  # , setUp, tearDown
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
 from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
-from .. import main
+from snovault.util import generate_indexer_namespace_for_testing
 from .conftest_settings import make_app_settings_dictionary
+from .. import main
 from ..loadxl import load_all
 
 
@@ -30,25 +32,22 @@ README:
 """
 
 
-pytest_plugins = [
-    'encoded.tests.datafixtures',
-    'snovault.tests.serverfixtures',
-]
-
-
 @pytest.fixture(autouse=True)
 def autouse_external_tx(external_tx):
     pass
 
 
 @pytest.fixture(scope='session')
-def app_settings(request, wsgi_server_host_port, conn, DBSession):
-
+def app_settings(request, wsgi_server_host_port, conn, DBSession):  # noQA - We didn't choose the fixture name.
+    notice_pytest_fixtures(request, wsgi_server_host_port, conn, DBSession)
     settings = make_app_settings_dictionary()
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
     # add some here for file testing
     settings[DBSESSION] = DBSession
     return settings
+
+
+INDEXER_NAMESPACE_FOR_TESTING = generate_indexer_namespace_for_testing('cgap')
 
 
 @pytest.fixture(scope='session')
@@ -61,7 +60,7 @@ def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_serv
     settings['collection_datastore'] = 'elasticsearch'
     settings['item_datastore'] = 'elasticsearch'
     settings['indexer'] = True
-    settings['indexer.namespace'] = os.environ.get('TRAVIS_JOB_ID', '')  # set namespace for tests
+    settings['indexer.namespace'] = INDEXER_NAMESPACE_FOR_TESTING
 
     # use aws auth to access elasticsearch
     if aws_auth:
@@ -88,13 +87,8 @@ def pytest_configure():
 
 
 @pytest.yield_fixture
-def config():
-    yield setUp()
-    tearDown()
-
-
-@pytest.yield_fixture
 def threadlocals(request, dummy_request, registry):
+    notice_pytest_fixtures(request, dummy_request, registry)
     threadlocal_manager.push({'request': dummy_request, 'registry': registry})
     yield dummy_request
     threadlocal_manager.pop()
@@ -167,66 +161,88 @@ def root(registry):
     return registry[ROOT]
 
 
+# Available Fixtures
+# ------------------
+#
+#  ################## +-----------------------------------------+----------------------------------------------------+
+#  ################## |               Basic Application         |      Application with ES + Postgres                |
+#  ################## +-----------------------+-----------------+---------------------------+------------------------+
+#  ################## |   JSON content        |  HTML content   |      JSON content         |      HTML content      |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  Anonymous User     | anontestapp           | anonhtmltestapp |  anon_es_testapp          | anon_html_es_testapp   |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  System User        | testapp               | htmltestapp     |  es_testapp               | html_es_testapp        |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  Authenticated User | authenticated_testapp | -----           |  authenticated_es_testapp | -----                  |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  Submitter User     | submitter_testapp     | -----           |  -----                    | -----                  |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  Indexer User       | -----                 | -----           |  indexer_testapp          | -----                  |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  Embed User         | embed_testapp         | -----           |  -----                    | -----                  |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#
+# TODO: Reconsider naming to have some underscores interspersed for better readability.
+#       e.g., html_testapp rather than htmltestapp, and especially anon_html_test_app rather than anonhtmltestapp.
+#       -kmp 03-Feb-2020
+
+
+@pytest.fixture
+def anontestapp(app):
+    """TestApp for anonymous user (i.e., no user specified), accepting JSON data."""
+    environ = {
+        'HTTP_ACCEPT': "application/json"
+    }
+    return webtest.TestApp(app, environ)
+
+
 @pytest.fixture
 def anonhtmltestapp(app):
+    """TestApp for anonymous (not logged in) user, accepting text/html content."""
     environ = {
         'HTTP_ACCEPT': 'text/html'
     }
     test_app = webtest.TestApp(app, environ)
-    # original_get = test_app.get
-    # # Emulate client acting as a browser when making requests to this (unless other header supplied)
-    # def new_get_request(url, params=None, headers=None, **kwargs):
-    #     new_headers = { "Accept" : "text/html" }
-    #     new_headers.update(headers or {})
-    #     return original_get(url, params=params, headers=new_headers, **kwargs)
-    # setattr(test_app, "get", new_get_request)
     return test_app
 
 
 @pytest.fixture
-def anon_html_es_testapp(es_app):
+def anon_es_testapp(es_app):
+    """ TestApp simulating a bare Request entering the application (with ES enabled) """
     environ = {
-        'HTTP_ACCEPT': 'text/html'
+        'HTTP_ACCEPT': 'application/json'
     }
     return webtest.TestApp(es_app, environ)
 
 
 @pytest.fixture
-def htmltestapp(app):
+def anon_html_es_testapp(es_app):
+    """TestApp with ES + Postgres for anonymous (not logged in) user, accepting text/html content."""
     environ = {
-        'HTTP_ACCEPT': 'text/html',
-        'REMOTE_USER': 'TEST',
-    }
-    test_app = webtest.TestApp(app, environ)
-    # original_get = test_app.get
-    # # Emulate client acting as a browser when making requests to this (unless other header supplied)
-    # def new_get_request(url, params=None, headers=None, **kwargs):
-    #     new_headers = { "Accept" : "text/html" }
-    #     new_headers.update(headers or {})
-    #     return original_get(url, params=params, headers=new_headers, **kwargs)
-    # setattr(test_app, "get", new_get_request)
-    return test_app
-
-
-@pytest.fixture
-def html_es_testapp(es_app):
-    """ HTML testapp that uses ES """
-    environ = {
-        'HTTP_ACCEPT': 'text/html',
-        'REMOTE_USER': 'TEST',
+        'HTTP_ACCEPT': 'text/html'
     }
     return webtest.TestApp(es_app, environ)
 
 
 @pytest.fixture(scope="session")
 def testapp(app):
-    """TestApp with JSON accept header.
-    """
+    """TestApp for username TEST, accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'REMOTE_USER': 'TEST',
+        'REMOTE_USER': 'TEST'
     }
     return webtest.TestApp(app, environ)
+
+
+@pytest.fixture
+def htmltestapp(app):
+    """TestApp for TEST user, accepting text/html content."""
+    environ = {
+        'HTTP_ACCEPT': 'text/html',
+        'REMOTE_USER': 'TEST',
+    }
+    test_app = webtest.TestApp(app, environ)
+    return test_app
 
 
 @pytest.fixture(scope='session')
@@ -240,28 +256,18 @@ def es_testapp(es_app):
 
 
 @pytest.fixture
-def anontestapp(app):
-    """TestApp with JSON accept header.
-    """
+def html_es_testapp(es_app):
+    """TestApp with ES + Postgres for TEST user, accepting text/html content."""
     environ = {
-        'HTTP_ACCEPT': 'application/json',
-    }
-    return webtest.TestApp(app, environ)
-
-
-@pytest.fixture
-def anon_es_testapp(es_app):
-    """ TestApp simulating a bare Request entering the application (with ES enabled) """
-    environ = {
-        'HTTP_ACCEPT': 'application/json',
+        'HTTP_ACCEPT': 'text/html',
+        'REMOTE_USER': 'TEST',
     }
     return webtest.TestApp(es_app, environ)
 
 
 @pytest.fixture
 def authenticated_testapp(app):
-    """TestApp with JSON accept header for non-admin user.
-    """
+    """TestApp for an authenticated, non-admin user (TEST_AUTHENTICATED), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_AUTHENTICATED',
@@ -279,11 +285,9 @@ def authenticated_es_testapp(es_app):
     return webtest.TestApp(es_app, environ)
 
 
-
 @pytest.fixture
 def submitter_testapp(app):
-    """TestApp with JSON accept header for non-admin user.
-    """
+    """TestApp for a non-admin user (TEST_SUBMITTER), accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_SUBMITTER',
@@ -304,6 +308,7 @@ def indexer_testapp(es_app):
 
 @pytest.fixture
 def embed_testapp(app):
+    """TestApp for user EMBED, accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'EMBED',
@@ -313,6 +318,7 @@ def embed_testapp(app):
 
 @pytest.fixture
 def wsgi_app(wsgi_server):
+    """TestApp for WSGI server."""
     return webtest.TestApp(wsgi_server)
 
 
@@ -333,10 +339,14 @@ class WorkbookCache:
         }
         testapp = webtest.TestApp(es_app, environ)
 
-        # just load the workbook inserts
+        # Just load the workbook inserts
+        # Note that load_all returns None for success or an Exception on failure.
         load_res = load_all(testapp, pkg_resources.resource_filename('encoded', 'tests/data/workbook-inserts/'), [])
-        if load_res:
-            raise (load_res)
+
+        if isinstance(load_res, Exception):
+            raise load_res
+        elif load_res:
+            raise RuntimeError("load_all returned a true value that was not an exception.")
 
         testapp.post_json('/index', {})
         return True
@@ -347,3 +357,9 @@ def workbook(es_app):
     """ Loads a bunch of data (tests/data/workbook-inserts) into the system on first run
         (session scope doesn't work). """
     WorkbookCache.initialize_if_needed(es_app)
+
+
+@pytest.yield_fixture
+def mocked_file_system():
+    with MockFileSystem(auto_mirror_files_for_read=True).mock_exists_open_remove():
+        yield

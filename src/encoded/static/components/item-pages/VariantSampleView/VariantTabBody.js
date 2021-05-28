@@ -1,14 +1,11 @@
 'use strict';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-
-import { Schemas } from './../../util';
 import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 
 /**
@@ -17,7 +14,14 @@ import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 
 export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
     const { variant } = context;
-    const { clinvar_variationid: variationID } = variant;
+    const { csq_clinvar: variationID } = variant;
+    const [ showingTable, setShowingTable ] = useState("v3"); // Allowed: "v2", "v3", and maybe "summary" in future; could be converted integer instd of of text.
+
+    const onSelectShowingTable = useCallback(function(evtKey, e){
+        e.stopPropagation();
+        setShowingTable(evtKey);
+        return;
+    });
 
     const { getTipForField, clinvarExternalHref } = useMemo(function(){
 
@@ -35,13 +39,20 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                 return (schemaProperty || {}).description || null;
             };
             if (variationID) {
-                const clinvarIDSchemaProperty = schemaTransforms.getSchemaProperty("clinvar_variationid", schemas, "Variant");
+                const clinvarIDSchemaProperty = schemaTransforms.getSchemaProperty("csq_clinvar", schemas, "Variant");
                 ret.clinvarExternalHref = clinvarIDSchemaProperty.link.replace("<ID>", variationID);
             }
         }
 
         return ret;
     }, [ schemas, variationID ]);
+
+    const titleDict = useMemo(function(){
+        return {
+            "v2": <React.Fragment><span className="text-600">gnomAD</span> v2 exome</React.Fragment>,
+            "v3": <React.Fragment><span className="text-600">gnomAD</span> v3</React.Fragment>
+        };
+    });
 
     return (
         <div className="variant-tab-body card-body">
@@ -68,13 +79,18 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
 
                     <div className="inner-card-section flex-grow-0 pb-2 pb-xl-0">
                         <div className="info-header-title">
-                            <h4>
-                                {/* todo link to GnomAD -- is there a gnomad link somewhere ? */}
-                                GnomAD
-                            </h4>
+
+                            <DropdownButton size="lg py-1" variant="outline-secondary select-gnomad-version" onSelect={onSelectShowingTable}
+                                title={titleDict[showingTable]} >
+                                <DropdownItem eventKey="v3" active={showingTable === "v3"}>{ titleDict.v3 }</DropdownItem>
+                                <DropdownItem eventKey="v2" active={showingTable === "v2"}>{ titleDict.v2 }</DropdownItem>
+                            </DropdownButton>
+
+                            {/* todo link/icon to GnomAD -- is there a gnomad link somewhere ? */}
+
                         </div>
                         <div className="info-body overflow-auto">
-                            <GnomADTable {...{ context, schemas, getTipForField }} />
+                            <GnomADTable {...{ context, schemas, getTipForField }} prefix={showingTable === "v2" ? "csq_gnomade2" : "csq_gnomadg"} />
                         </div>
                     </div>
 
@@ -107,19 +123,39 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
     );
 });
 
-const GnomADTable = React.memo(function GnomADTable({ context, getTipForField }){
+/**
+ * In some scenarios we may have arrays for some fields, esp for gnomad v2 exome.
+ * This is a simple workaround to standardize to show only first value, if this is case & >1 value (rare).
+ * In future we may change how this logic works (so instead of [0], the index of the least rare total frequency to be shown.)
+ */
+function standardizeGnomadValue(value, fallbackElem = <em data-tip="Not Available"> - </em>){
+    if (typeof value === "number") return value;
+    if (Array.isArray(value) && _.every(value, function(v){ return typeof v === "number"; })) {
+        return value[0]; // Pick first
+    }
+    return fallbackElem;
+}
+
+const GnomADTable = React.memo(function GnomADTable(props){
+    const { context, getTipForField, prefix = "csq_gnomadg" } = props;
     const { variant } = context;
     const {
         // Allele Counts
-        gnomad_ac,      // Total
-        gnomad_ac_female, // Female
-        gnomad_ac_male, // Male
+        [prefix + "_ac"]: gnomad_ac,      // Total
+        [prefix + "_ac-xx"]: gnomad_ac_female, // Female
+        [prefix + "_ac-xy"]: gnomad_ac_male, // Male
         // Allele Frequences
-        gnomad_af, gnomad_af_female, gnomad_af_male,
+        [prefix + "_af"]: gnomad_af,
+        [prefix + "_af-xx"]: gnomad_af_female,
+        [prefix + "_af-xy"]: gnomad_af_male,
         // Allele Numbers
-        gnomad_an, gnomad_an_female, gnomad_an_male,
+        [prefix + "_an"]: gnomad_an,
+        [prefix + "_an-xx"]: gnomad_an_female,
+        [prefix + "_an-xy"]: gnomad_an_male,
         // Homozygote Numbers
-        gnomad_nhomalt, gnomad_nhomalt_female, gnomad_nhomalt_male
+        [prefix + "_nhomalt"]: gnomad_nhomalt,
+        [prefix + "_nhomalt-xx"]: gnomad_nhomalt_female,
+        [prefix + "_nhomalt-xy"]: gnomad_nhomalt_male
     } = variant;
 
     const populationsAncestryList = [
@@ -132,15 +168,16 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         ["fin", "Finnish"],
         ["nfe", "Non-Finnish European"],
         ["sas", "South Asian"],
+        ["mid", "Middle Eastern"],
         ["oth", "Other Ancestry"]
     ];
     const ancestryRowData = _.sortBy(
         populationsAncestryList.map(function([popStr, populationTitle]){
             const {
-                ["gnomad_ac_" + popStr]: alleleCount,
-                ["gnomad_af_" + popStr]: alleleFreq,
-                ["gnomad_an_" + popStr]: alleleNum,
-                ["gnomad_nhomalt_" + popStr]: homozygoteNum,
+                [prefix + "_ac-" + popStr]: alleleCount,
+                [prefix + "_af-" + popStr]: alleleFreq,
+                [prefix + "_an-" + popStr]: alleleNum,
+                [prefix + "_nhomalt-" + popStr]: homozygoteNum,
             } = variant;
             return { popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum };
         }),
@@ -152,10 +189,10 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
         return (
             <tr key={populationTitle}>
                 <td className="text-600 text-left">{ populationTitle }</td>
-                <td>{ alleleCount }</td>
-                <td>{ alleleNum }</td>
-                <td>{ homozygoteNum }</td>
-                <td className="text-left">{ alleleFreq || "0.0000" }</td>
+                <td>{ standardizeGnomadValue(alleleCount) }</td>
+                <td>{ standardizeGnomadValue(alleleNum) }</td>
+                <td>{ standardizeGnomadValue(homozygoteNum) }</td>
+                <td className="text-left">{ alleleFreq === 0 ? "0.0000" : standardizeGnomadValue(alleleFreq) }</td>
             </tr>
         );
     });
@@ -165,48 +202,50 @@ const GnomADTable = React.memo(function GnomADTable({ context, getTipForField })
             <thead>
                 <tr>
                     <th className="text-left">Population</th>
-                    <th data-tip={getTipForField("gnomad_ac")}>Allele Count</th>
-                    <th data-tip={getTipForField("gnomad_an")}>Allele Number</th>
-                    <th data-tip={getTipForField("gnomad_nhomalt")}># of Homozygotes</th>
-                    <th className="text-left" data-tip={getTipForField("gnomad_af")}>Allele Frequency</th>
+                    <th data-tip={getTipForField(prefix + "_ac")}>Allele Count</th>
+                    <th data-tip={getTipForField(prefix + "_an")}>Allele Number</th>
+                    <th data-tip={getTipForField(prefix + "_nhomalt")}># of Homozygotes</th>
+                    <th className="text-left" data-tip={getTipForField(prefix + "_af")}>Allele Frequency</th>
                 </tr>
             </thead>
             <tbody>
                 { ancestryTableRows }
                 <tr className="border-top">
                     <td className="text-600 text-left">Female</td>
-                    <td>{ gnomad_ac_female }</td>
-                    <td>{ gnomad_an_female }</td>
-                    <td>{ gnomad_nhomalt_female }</td>
-                    <td className="text-left">{ gnomad_af_female || "0.0000" }</td>
+                    <td>{ standardizeGnomadValue(gnomad_ac_female) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_an_female) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_nhomalt_female) }</td>
+                    <td className="text-left">{ gnomad_af_female === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af_female) }</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Male</td>
-                    <td>{ gnomad_ac_male }</td>
-                    <td>{ gnomad_an_male }</td>
-                    <td>{ gnomad_nhomalt_male }</td>
-                    <td className="text-left">{ gnomad_af_male || "0.0000" }</td>
+                    <td>{ standardizeGnomadValue(gnomad_ac_male) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_an_male) }</td>
+                    <td>{ standardizeGnomadValue(gnomad_nhomalt_male) }</td>
+                    <td className="text-left">{ gnomad_af_male === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af_male) }</td>
                 </tr>
                 <tr className="border-top">
                     <td className="bg-light text-left"><strong>Total</strong></td>
-                    <td className="bg-light text-600">{ gnomad_ac }</td>
-                    <td className="bg-light text-600">{ gnomad_an }</td>
-                    <td className="bg-light text-600">{ gnomad_nhomalt }</td>
-                    <td className="bg-light text-600 text-left">{ gnomad_af || "0.0000" }</td>
+                    <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_ac) }</td>
+                    <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_an) }</td>
+                    <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_nhomalt) }</td>
+                    <td className="bg-light text-600 text-left">{ gnomad_af === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af) }</td>
                 </tr>
             </tbody>
         </table>
     );
 });
 
+
+
 function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref }){
     const { variant } = context;
     const {
-        clinvar_variationid: variationID,
-        clinvar_clnsig: clinicalSignificance,
-        clinvar_clnsigconf: conflictingClinicalSignificance,
-        clinvar_submission = [],
-        clinvar_clnrevstat: reviewStatus
+        csq_clinvar: variationID,
+        csq_clinvar_clnsig: clinicalSignificance,
+        csq_clinvar_clnsigconf: conflictingClinicalSignificance,
+        clinvar_submission = [], // TODO - missing in data rn.
+        csq_clinvar_clnrevstat: reviewStatus
     } = variant;
 
     if (!variationID) {
@@ -229,7 +268,7 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
 
             <div className="row mb-1">
                 <div className="col">
-                    <label data-tip={getTipForField("clinvar_variationid")} className="mr-1 mb-0">ID: </label>
+                    <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
                     { clinvarExternalHref?
                         <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
                             { variationID }
@@ -247,7 +286,7 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
 
             <div className="row">
                 <div className="col-3">
-                    <label data-tip={getTipForField("clinvar_clnsig")} className="mb-03">Interpretation: </label>
+                    <label data-tip={getTipForField("csq_clinvar_clnsig")} className="mb-03">Interpretation: </label>
                 </div>
                 <div className="col-9">
                     { clinicalSignificance }
@@ -256,7 +295,7 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
 
             <div className="row">
                 <div className="col-3">
-                    <label data-tip={getTipForField("clinvar_clnrevstat")} className="mb-0">Review Status: </label>
+                    <label data-tip={getTipForField("csq_clinvar_clnrevstat")} className="mb-0">Review Status: </label>
                 </div>
                 <div className="col-9">
                     { reviewStatus }
@@ -325,22 +364,28 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
-        conservation_gerp = fallbackElem,
-        conservation_phylop100 = fallbackElem,
-        cadd_phred = fallbackElem,
+        csq_gerp_rs = fallbackElem,
+        csq_gerp_rs_rankscore = fallbackElem,
+        csq_phylop100way_vertebrate = fallbackElem,
+        csq_phylop100way_vertebrate_rankscore = fallbackElem,
+        csq_cadd_phred = fallbackElem,
+        csq_cadd_raw_rankscore = fallbackElem,
         transcript = [],
-        spliceai_maxds = fallbackElem,
-        primateai_primatedl_score = fallbackElem
+        spliceaiMaxds = fallbackElem,
+        csq_primateai_pred = fallbackElem,
+        csq_primateai_score = fallbackElem,
+        csq_primateai_rankscore = fallbackElem,
+        csq_sift_score = fallbackElem,
+        csq_sift_pred = fallbackElem,
+        csq_sift_converted_rankscore = fallbackElem,
+        csq_polyphen2_hvar_score = fallbackElem,
+        csq_polyphen2_hvar_pred = fallbackElem,
+        csq_polyphen2_hvar_rankscore = fallbackElem,
+        csq_revel_rankscore = fallbackElem,
+        csq_revel_score = fallbackElem,
+        csq_phylop30way_mammalian = fallbackElem,
+        csq_phastcons100way_vertebrate = fallbackElem
     } = variant;
-
-    // Should we instead find transcript with largest score instead of using current?
-    const currentTranscript = transcript[currentTranscriptIdx];
-    const {
-        vep_sift_score = fallbackElem,
-        vep_sift_prediction = fallbackElem,
-        vep_polyphen_score = fallbackElem,
-        vep_polyphen_prediction = fallbackElem
-    } = currentTranscript || {};
 
     // Not too sure whether to use table or <row> and <cols> here..
     // Went with <table> since is more semantically correct for the data we're
@@ -360,19 +405,43 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("conservation_gerp")}>GERP++</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_gerp_rs")}>GERP++</label>
                             </td>
-                            <td className="text-left">{ conservation_gerp }</td>
-                            {/* TODO for all:
-                            <td className="text-left">{ prediction }/td>
-                            <td className="text-left">{ score }</td>
-                            */}
+                            <td className="text-left">{ csq_gerp_rs }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ csq_gerp_rs_rankscore }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("conservation_phylop100")}>PhyloP (100 Vertabrates)</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_cadd_phred")}>CADD</label>
                             </td>
-                            <td className="text-left">{ conservation_phylop100 }</td>
+                            <td className="text-left">{ csq_cadd_phred }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ csq_cadd_raw_rankscore }</td>
+                        </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("csq_phylop30way_mammalian")}>phyloP (30 Mammals)</label>
+                            </td>
+                            <td className="text-left">{ csq_phylop30way_mammalian }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                        </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("csq_phylop100way_vertebrate")}>phyloP (100 Vertebrates)</label>
+                            </td>
+                            <td className="text-left">{ csq_phylop100way_vertebrate }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ csq_phylop100way_vertebrate_rankscore }</td>
+                        </tr>
+                        <tr>
+                            <td className="text-left">
+                                <label className="mb-0" data-tip={getTipForField("csq_phastcons100way_vertebrate")}>phastCons (100 Vertebrates)</label>
+                            </td>
+                            <td className="text-left">{ csq_phastcons100way_vertebrate }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ fallbackElem }</td>
                         </tr>
                     </tbody>
                 </table>
@@ -391,27 +460,35 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("cadd_phred")}>CADD</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_sift_score")}>SIFT</label>
                             </td>
-                            <td className="text-left">{ cadd_phred }</td>
+                            <td className="text-left">{ csq_sift_score }</td>
+                            <td className="text-left">{ csq_sift_pred }</td>
+                            <td className="text-left">{ csq_sift_converted_rankscore }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("transcript.vep_sift_score")}>SIFT</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_polyphen2_hvar_score")}>PolyPhen2</label>
                             </td>
-                            <td className="text-left">{ vep_sift_score }</td>
+                            <td className="text-left">{ csq_polyphen2_hvar_score }</td>
+                            <td className="text-left">{ csq_polyphen2_hvar_pred }</td>
+                            <td className="text-left">{ csq_polyphen2_hvar_rankscore }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("transcript.vep_polyphen_score")}>PolyPhen2</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_primateai_score")}>PrimateAI DL Score</label>
                             </td>
-                            <td className="text-left">{ vep_polyphen_score }</td>
+                            <td className="text-left">{ csq_primateai_score }</td>
+                            <td className="text-left">{ csq_primateai_pred }</td>
+                            <td className="text-left">{ csq_primateai_rankscore }</td>
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("primateai_primatedl_score")}>PrimateAI DL Score</label>
+                                <label className="mb-0" data-tip={getTipForField("csq_revel_score")}>REVEL</label>
                             </td>
-                            <td className="text-left">{ primateai_primatedl_score }</td>
+                            <td className="text-left">{ csq_revel_score }</td>
+                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-left">{ csq_revel_rankscore }</td>
                         </tr>
                     </tbody>
                 </table>
@@ -426,13 +503,18 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
 
             <div className="table-container">
                 <table className="w-100">
-                    <PredictorsTableHeading/>
+                    <thead>
+                        <tr>
+                            <th className="text-left w-25">Prediction Tool</th>
+                            <th className="text-left w-75">Score</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("spliceai_maxds")}>SpliceAI</label>
+                                <label className="mb-0" data-tip={getTipForField("spliceaiMaxds")}>SpliceAI</label>
                             </td>
-                            <td className="text-left">{ spliceai_maxds }</td>
+                            <td className="text-left">{ spliceaiMaxds }</td>
                         </tr>
                     </tbody>
                 </table>
@@ -444,14 +526,12 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
 
 function PredictorsTableHeading(){
     return (
-        <thead className="bg-transparent">
+        <thead>
             <tr>
-                <th className="text-left w-75">Prediction Tool</th>
+                <th className="text-left w-25">Prediction Tool</th>
                 <th className="text-left w-25">Score</th>
-                {/* TODO (and change all to w-25):
                 <th className="text-left w-25">Prediction</th>
                 <th className="text-left w-25">Rank Score (0 to 1)</th>
-                */}
             </tr>
         </thead>
     );
@@ -462,15 +542,15 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
     const { variant } = context;
     const { transcript = [], } = variant;
     const externalDatabaseFieldnames = [
-        "clinvar_variationid"
+        "csq_clinvar"
     ];
 
     const transcriptFieldNames = [
-        "vep_feature",
-        "vep_ccds",
-        "vep_ensp",
-        "vep_swissprot",
-        "vep_trembl"
+        "csq_feature",
+        "csq_ccds",
+        "csq_ensp",
+        "csq_swissprot",
+        "csq_trembl"
     ];
 
     if (!variant) {

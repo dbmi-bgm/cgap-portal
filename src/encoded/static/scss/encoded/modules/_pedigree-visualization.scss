@@ -59,12 +59,22 @@ $pedigree-disease-colors :
         $color: nth($pedigree-disease-colors, $i);
         &[data-disease-index="#{$pedigree-colors-length + $i}"] {
             background-color: darken($color, 10%);
+            @if lightness(darken($color, 10%)) > 70% {
+                color: #000;
+            } @else {
+                color: #fff;
+            }
         }
     }
     @for $i from 1 through $pedigree-colors-length {
         $color: nth($pedigree-disease-colors, $i);
         &[data-disease-index="#{2 * $pedigree-colors-length + $i}"] {
             background-color: lighten($color, 10%);
+            @if lightness(lighten($color, 10%)) > 70% {
+                color: #000;
+            } @else {
+                color: #fff;
+            }
         }
     }
 }
@@ -365,7 +375,8 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
 
             g.text-box {
                 // Could be above or below node
-                transition: transform .25s linear;
+                transition: transform .25s linear, opacity .3s ease-out;
+                opacity: 1;
                 rect.bg-rect {
                     stroke: none;
                     fill: transparentize($pedigree-viz-bg-color, 0.25);
@@ -436,3 +447,23 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
     }
 }
 
+
+svg.pedigree-viz-shapes-layer.shapes-layer[data-is-node-selected="true"]:not([data-is-node-hovered-over="true"]) {
+    > .individuals-bg-shape-layer {
+        > g.pedigree-individual-shape:not(.is-selected):not(.is-hovered-over) {
+            g.text-box {
+                opacity: 0.6;
+            }
+        }
+    }
+}
+
+svg.pedigree-viz-shapes-layer.shapes-layer[data-is-node-hovered-over="true"] {
+    > .individuals-bg-shape-layer {
+        > g.pedigree-individual-shape:not(.is-hovered-over) {
+            g.text-box {
+                opacity: 0.15;
+            }
+        }
+    }
+}

@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 
@@ -51,13 +51,13 @@ const auth0Options = {
  * @todo Refactor this into a BigDropdown menu.
  */
 export const AccountNav = React.memo(function AccountNav(props){
-    const { session, updateUserInfo, schemas, ...passProps } = props;
+    const { session, updateAppSessionState, schemas, ...passProps } = props;
     const { windowWidth, href } = passProps;
 
     if (!session) { // Render login button
         return (
             <div className="navbar-nav navbar-acct">
-                <LoginController {...{ updateUserInfo, auth0Options }}>
+                <LoginController {...{ updateAppSessionState, auth0Options }}>
                     <LoginNavItem {...{ schemas, session, href, windowWidth }} key="login-register" className="user-account-item" />
                 </LoginController>
             </div>
@@ -73,7 +73,7 @@ export const AccountNav = React.memo(function AccountNav(props){
     const navItemTitle = (
         <React.Fragment>
             { acctIcon }
-            { acctTitle }
+            <span className="user-first-name">{ acctTitle }</span>
         </React.Fragment>
     );
 
@@ -82,7 +82,7 @@ export const AccountNav = React.memo(function AccountNav(props){
         <div className="navbar-nav navbar-acct">
             <BigDropdownNavItem {...passProps} {...{ windowWidth, href }} id="account-menu-item"
                 navItemContent={navItemTitle} className={cls}>
-                <UserActionsMenu {...{ userActions, href, updateUserInfo, userDetails, windowWidth }}/>
+                <UserActionsMenu {...{ userActions, href, userDetails, windowWidth }}/>
             </BigDropdownNavItem>
         </div>
     );
@@ -90,13 +90,13 @@ export const AccountNav = React.memo(function AccountNav(props){
 AccountNav.propTypes = {
     'session'         : PropTypes.bool.isRequired,      /** Passed in by App */
     'href'            : PropTypes.string.isRequired,    /** Passed in by Redux store */
-    'updateUserInfo'  : PropTypes.func.isRequired,      /** Passed in by App */
+    'updateAppSessionState'  : PropTypes.func.isRequired,      /** Passed in by App */
     'mounted'         : PropTypes.bool                  /** Passed in by Navigation */
 };
 
 
 function UserActionsMenu(props){
-    const { userActions, href, updateUserInfo, userDetails, windowWidth, windowHeight } = props;
+    const { userActions, href, userDetails, windowWidth, windowHeight } = props;
     const { first_name: firstName = "Account", last_name: lastName = null } = userDetails;
     const introTitle = firstName + (lastName ? " " + lastName : "");
 
@@ -149,7 +149,7 @@ function UserActionsMenu(props){
                 </div>
                 <div className="help-menu-tree level-1-no-child-links level-1 col-12 col-lg-4 mt-2">
                     { renderedActions }
-                    <LogoutController updateUserInfo={updateUserInfo}>
+                    <LogoutController>
                         <LogoutLink/>
                     </LogoutController>
                 </div>
@@ -158,11 +158,11 @@ function UserActionsMenu(props){
     );
 }
 
-function LogoutLink({ performLogout }){
+function LogoutLink({ performLogout, isLoading = false }){
     return (
         <div className="level-1-title-container">
             <a className="level-1-title text-medium d-block" onClick={performLogout} id="logoutbtn" href="#">
-                <i className="icon icon-fw icon-sign-out-alt fas mr-07"/>
+                <i className={"icon icon-fw fas mr-07 icon-" + (isLoading ? "spin icon-circle-notch" : "sign-out-alt")}/>
                 <span>Log Out</span>
             </a>
         </div>

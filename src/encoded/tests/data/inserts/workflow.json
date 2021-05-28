@@ -6,15 +6,27 @@
           {
               "argument_format": "bam",
               "argument_type": "Input file",
-              "workflow_argument_name": "input_bam"
-          }
+              "workflow_argument_name": "input_bam",
+              "mount": true
+          },
+          {
+              "argument_format": "regions",
+              "argument_type": "Input file",
+              "workflow_argument_name": "regions",
+              "default_input_file": "1c07a3aa-e2a3-498c-b838-15991c4a2f28"
+          },
           {
               "argument_format": "rck_gz",
               "argument_type": "Output processed file",
               "workflow_argument_name": "rck",
               "secondary_file_formats": ["rck_gz_tbi"]
-          },
+          }
       ],
+      "default_tibanna_config": {
+          "instance_type": "c5.4xlarge",
+          "ebs_size": "200",
+          "EBS_optimized": true
+       },
       "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
       "category": ["processing"],
       "cwl_child_filenames": [],
@@ -41,6 +53,20 @@
                       "source": [
                           {
                               "name": "input_bam"
+                          }
+                      ]
+                  },
+                  {
+                      "meta": {
+                          "cardinality": "single",
+                          "file_format": "txt",
+                          "global": true,
+                          "type": "reference file"
+                      },
+                      "name": "regions",
+                      "source": [
+                          {
+                              "name": "regions"
                           }
                       ]
                   }

@@ -61,23 +61,37 @@ Cypress.Commands.add('scrollToCenterElement', { prevSubject : true }, (subject, 
 /**
  * This emulates login.js. Perhaps we should adjust login.js somewhat to match this better re: navigate.then(...) .
  */
-Cypress.Commands.add('login4DN', function(options = { 'useEnvToken' : true }){
+Cypress.Commands.add('loginCGAP', function(options = { 'useEnvToken' : true, 'email': null }){
 
     function performLogin(token){
         return cy.window().then((w)=>{
-            w.fourfront.JWT.save(token);
             cy.request({
                 'url' : '/login',
                 'method' : 'POST',
                 'body' : JSON.stringify({ 'id_token' : token }),
-                'headers' : { 'Authorization': 'Bearer ' + token, 'Content-Type' : "application/json; charset=UTF-8" },
+                'headers' : {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': "application/json",
+                    'Content-Type': "application/json; charset=UTF-8"
+                },
                 'followRedirect' : true
             }).then(function(resp){
-                w.fourfront.JWT.saveUserInfoLocalStorage(resp.body);
-                // Triggers app.state.session change (req'd to update UI)
-                w.fourfront.app.updateUserInfo();
-                // Refresh curr page/context
-                w.fourfront.navigate('', { 'inPlace' : true });
+                if (resp.status && resp.status === 200) {
+                    cy.request({
+                        'url': '/session-properties',
+                        'method': 'GET',
+                        'headers' : {
+                            'Accept': "application/json",
+                            'Content-Type': "application/json; charset=UTF-8"
+                        }
+                    }).then(function (userInfoResponse) {
+                        w.fourfront.JWT.saveUserInfoLocalStorage(userInfoResponse.body);
+                        // Triggers app.state.session change (req'd to update UI)
+                        w.fourfront.app.updateAppSessionState();
+                        // Refresh curr page/context
+                        w.fourfront.navigate('', { 'inPlace' : true });
+                    }).end();
+                }
             }).end();
         }).end();
     }
@@ -95,14 +109,14 @@ Cypress.Commands.add('login4DN', function(options = { 'useEnvToken' : true }){
 
     // If no token, we try to generate/impersonate one ourselves
 
-    const email = options.email || options.user || Cypress.env('LOGIN_AS_USER') || '4dndcic@gmail.com';
+    const email = options.email || options.user || "cypress-test-user@cgap.hms.harvard.edu";
     const auth0client = Cypress.env('Auth0Client');
     const auth0secret = Cypress.env('Auth0Secret');
 
     if (!auth0client || !auth0secret) throw new Error('Cannot test login if no Auth0Client & Auth0Secret in ENV vars.');
 
     Cypress.log({
-        'name' : "Login 4DN",
+        'name' : "Login CGAP",
         'message' : 'Attempting to impersonate-login for ' + email,
         'consoleProps' : ()=>{
             return { auth0client, auth0secret, email };

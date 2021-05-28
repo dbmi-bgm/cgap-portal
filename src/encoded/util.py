@@ -1,12 +1,15 @@
+# utility functions
+
 import contextlib
 import datetime
 import gzip
 import io
 import os
 import pyramid.request
+import re
 import tempfile
 
-from dcicutils.misc_utils import check_true
+from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity
 from io import BytesIO
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden, HTTPServerError
 from snovault import COLLECTIONS, Collection
@@ -90,7 +93,10 @@ def debuglog(*args):
 
 def subrequest_object(request, object_id):
     subreq = make_subrequest(request, "/" + object_id)
-    response = request.invoke_subrequest(subreq, use_tweens=True)
+    subreq.headers['Accept'] = 'application/json'
+    # Tweens are suppressed here because this is an internal call and doesn't need things like HTML processing.
+    # -kmp 2-Feb-2021
+    response = request.invoke_subrequest(subreq, use_tweens=False)
     if response.status_code >= 300:  # alas, the response from a pyramid subrequest has no .raise_for_status()
         raise HTTPServerError("Error obtaining object: %s" % object_id)
     object_json = response.json
@@ -291,7 +297,129 @@ def beanstalk_env_from_registry(registry):
 def check_user_is_logged_in(request):
     """ Raises HTTPForbidden if the request did not come from a logged in user. """
     for principal in request.effective_principals:
-        if principal.startswith('userid.') or principal == 'group.admin':  # allow if not logged in OR has admin
+        if principal.startswith('userid.') or principal == 'group.admin':  # allow if logged in OR has admin
             break
     else:
         raise HTTPForbidden(title="Not logged in.")
+
+
+# IMPLEMENTATION NOTE:
+#
+#    We have middleware that overrides various details about content type that are declared in the view_config.
+#    It used to work by having a wired set of exceptions, but this facility allows us to do it in a more data-driven
+#    way. Really I think we should just rely on the information in the view_config, but I didn't have time to explore
+#    why we are not using that.
+#
+#    See validate_request_tween_factory in renderers.py for where this is used. This declaration info is here
+#    rather than there to simplify the load order dependencies.
+#
+#    -kmp 1-Sep-2020
+
+CONTENT_TYPE_SPECIAL_CASES = {
+    'application/x-www-form-urlencoded': [
+        # Single legacy special case to allow us to POST to metadata TSV requests via form submission.
+        # All other special case values should be added using register_path_content_type.
+        '/metadata/'
+    ]
+}
+
+
+def register_path_content_type(*, path, content_type):
+    """
+    Registers that endpoints that begin with the specified path use the indicated content_type.
+
+    This is part of an inelegant workaround for an issue in renderers.py that maybe we can make go away in the future.
+    See the 'implementation note' in ingestion/common.py for more details.
+    """
+    exceptions = CONTENT_TYPE_SPECIAL_CASES.get(content_type, None)
+    if exceptions is None:
+        CONTENT_TYPE_SPECIAL_CASES[content_type] = exceptions = []
+    if path not in exceptions:
+        exceptions.append(path)
+
+
+def content_type_allowed(request):
+    """
+    Returns True if the current request allows the requested content type.
+
+    This is part of an inelegant workaround for an issue in renderers.py that maybe we can make go away in the future.
+    See the 'implementation note' in ingestion/common.py for more details.
+    """
+    if request.content_type == "application/json":
+        # For better or worse, we always allow this.
+        return True
+
+    exceptions = CONTENT_TYPE_SPECIAL_CASES.get(request.content_type)
+
+    if exceptions:
+        for text in exceptions:
+            if text in request.path:
+                return True
+
+    return False
+
+
+def _app_from_clues(app=None, registry=None, context=None):
+    if count_if(identity, [app, registry, context]) != 1:
+        raise RuntimeError("Expected exactly one of app, registry, or context.")
+    if not app:
+        app = (registry or context).app
+    return app
+
+
+EMAIL_PATTERN = re.compile(r'[^@]+[@][^@]+')
+
+
+def make_vapp_for_email(*, email, app=None, registry=None, context=None):
+    app = _app_from_clues(app=app, registry=registry, context=context)
+    if not isinstance(email, str) or not EMAIL_PATTERN.match(email):
+        # It's critical to check that the pattern has an '@' so we know it's not a system account (injection).
+        raise RuntimeError("Expected email to be a string of the form 'user@host'.")
+    user_environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': email,
+    }
+    vapp = VirtualApp(app, user_environ)
+    return vapp
+
+
+@contextlib.contextmanager
+def vapp_for_email(email, app=None, registry=None, context=None):
+    yield make_vapp_for_email(email=email, app=app, registry=registry, context=context)
+
+
+def make_vapp_for_ingestion(*, app=None, registry=None, context=None):
+    app = _app_from_clues(app=app, registry=registry, context=context)
+    user_environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': 'INGESTION',
+    }
+    vapp = VirtualApp(app, user_environ)
+    return vapp
+
+
+@contextlib.contextmanager
+def vapp_for_ingestion(app=None, registry=None, context=None):
+    yield make_vapp_for_ingestion(app=app, registry=registry, context=context)
+
+
+# I didn't need these for persona matching, but might in the future so am going to hold them for a little while.
+# -kmp 2-Apr-2021
+#
+# def name_matcher(name):
+#     """
+#     Given a string name, returns a predicate that returns True if given that name (in any case), and False otherwise.
+#     """
+#     return lambda n: n.lower() == name
+#
+#
+# def any_name_matcher(*names):
+#     """
+#     Given a list of string names, returns a predicate that matches those names. Given no names, it matches any name.
+#     The matcher returned is incase-sensitive.
+#     """
+#     if names:
+#         canonical_names = [name.lower() for name in names]
+#         return lambda name: name.lower() in canonical_names
+#     else:
+#         return constantly(True)

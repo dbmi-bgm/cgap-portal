@@ -1,5 +1,5 @@
 import json
-import urllib
+import urllib.parse
 from pyramid.view import view_config
 from pyramid.request import Request
 from pyramid.httpexceptions import HTTPBadRequest
@@ -46,8 +46,19 @@ class CompoundSearchBuilder:
         :return: new Request
         """
 
-        if '?' not in query:  # do some sanitization
+        # do some sanitization
+        # This will actually urlencode the entire previous string, so:
+        # `&inheritance_modes=Neurodev+2500%2B+%282598%29` will become:
+        # `&inheritance_modes=Neurodev%2B2500%252B%2B%25282598%2529` (the "&" & "=" chars can be encoded too, but left intact)
+        # so the "+" become urlencoded into 'plus-sign' encodings (%2B) (rather than space - %20), and previous 'plus-sign'
+        # encodings go from `%2B` to `%252B` (the percent sign gets encoded). So essentially is an encoding of an encoding.
+        # But it works once goes into snovault's `make_subreq` downstream.
+        if len(query) > 0 and query[0] != "?":
             query = '?' + query
+
+        # If any '?', '&', or '=' in search term, should have been pre-encoded.
+        # Meant to handle "+" especially.
+        query = urllib.parse.quote(query, safe="?&=")
 
         subreq = make_search_subreq(request, route + '%s&from=%s&limit=%s' % (query, from_, to))
         subreq.headers['Accept'] = 'application/json'
@@ -69,7 +80,7 @@ class CompoundSearchBuilder:
         for k, v in dict_with_more_vals.items():
             if k in dict_to_merge_into:
                 dict_to_merge_into[k] += v
-            else: 
+            else:
                 dict_to_merge_into[k] = v
 
         return urllib.parse.urlencode(dict_to_merge_into, doseq=True)
@@ -131,7 +142,11 @@ class CompoundSearchBuilder:
         :return: query string that combines the two, if type requirement isn't already there
         """
         if type_flag not in flags or type_flag.lower() not in flags:
-            flags += '&' + type_flag
+            if len(flags) > 0:
+                flags += '&' + type_flag
+            else:
+                flags = type_flag
+
         return flags
 
     @classmethod
@@ -229,10 +244,11 @@ class CompoundSearchBuilder:
 
             search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query)
             search_builder_instance.assure_session_id()
-            search_builder_instance.search = search_builder_instance.search.sort(sort)
-            search_builder_instance.search = search_builder_instance.search[from_ : from_ + to]
-
-            es_results = execute_search(compound_subreq, search_builder_instance.search)
+            search_builder_instance.query['sort'] = sort
+            es_results = execute_search(es=search_builder_instance.es,
+                                        query=search_builder_instance.query,
+                                        index=search_builder_instance.es_index,
+                                        from_=from_, size=to, session_id=search_builder_instance.search_session_id)
             return cls.format_filter_set_results(request, es_results, filter_set, result_sort, search_builder_instance)
 
     @classmethod
@@ -295,7 +311,7 @@ def build_query(context, request):
     """
     builder = SearchBuilder(context, request)
     builder._build_query()
-    return builder.search.to_dict()
+    return builder.query
 
 
 @view_config(route_name='compound_search', request_method='POST', permission='search')
@@ -352,7 +368,7 @@ def compound_search(context, request):
     body = json.loads(request.body)
     filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, body)
     intersect = True if body.get('intersect', False) else False
-    
+
     # Disabled for time being to allow test(s) to pass. Not sure whether to add Project to FilterSet schema 'search_type' enum.
     # if filter_set.get(CompoundSearchBuilder.TYPE) not in request.registry[TYPES]["FilterSet"].schema["properties"][CompoundSearchBuilder.TYPE]["enum"]:
     #    raise HTTPBadRequest("Passed bad {} body param: {}".format(CompoundSearchBuilder.TYPE, filter_set.get(CompoundSearchBuilder.TYPE)))

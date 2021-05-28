@@ -3,7 +3,7 @@
 
 'use strict';
 
-import React, { useMemo, useRef } from 'react';
+import React, { useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import Modal from 'react-bootstrap/esm/Modal';
@@ -120,16 +120,6 @@ class SyncedAccessKeyTable extends React.PureComponent {
      * @param {MouseEvent} e - Click event.
      */
     handleCreate(e) {
-        const item = {};
-        const idToken = JWT.get();
-        if (idToken){
-            const decoded = JWT.decode(idToken);
-            item.user = decoded.email.toLowerCase();
-        } else {
-            console.warn("Access key aborted");
-            return;
-        }
-
         ajax.load('/access-keys/', (resp)=>{
             const [ newKey ] = resp['@graph'];
             this.setState(function({ access_keys : prevKeys }){
@@ -145,7 +135,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
                 "message"   : "Check your internet connection or if you have been logged out due to expired session.",
                 "style"     : 'danger'
             });
-        }, JSON.stringify(item));
+        }, "{}");
     }
 
     showNewSecret(response, reset = false) {
@@ -570,7 +560,7 @@ const ProfileWorkFields = React.memo(function ProfileWorkFields({ user }){
 });
 
 
-export function ImpersonateUserForm({ updateUserInfo }) {
+export function ImpersonateUserForm({ updateAppSessionState }) {
 
     const inputFieldRef = useRef(null);
     /**
@@ -580,43 +570,34 @@ export function ImpersonateUserForm({ updateUserInfo }) {
      *
      * @param {Object} data - User ID or email address.
      */
-    const onSubmit = useMemo(function(){
-        return function(e){
-            e.preventDefault();
-            const { value: userid = "" } = inputFieldRef.current;
-            if (userid.length === 0){
-                console.warn("No userid supplied", e);
-                return;
+    const onSubmit = useCallback(function(e){
+        // `useCallback(fn, deps)` is equivalent to `useMemo(() => fn, deps)`
+        // See https://reactjs.org/docs/hooks-reference.html#usecallback
+        e.preventDefault();
+        const { value: userid = "" } = inputFieldRef.current;
+        if (userid.length === 0){
+            console.warn("No userid supplied", e);
+            return;
+        }
+        const url = "/impersonate-user";
+        const postData = { 'userid' : userid };
+        const callbackFxn = (resp) => {
+            JWT.saveUserInfoLocalStorage(resp);
+            updateAppSessionState();
+            let navTarget = "/";
+            const profileAction = resp.user_actions && _.find(resp.user_actions, { 'id' : 'profile' });
+            if (profileAction && profileAction.href){
+                navTarget = profileAction.href;
             }
-            const url = "/impersonate-user";
-            const postData = { 'userid' : userid };
-            const callbackFxn = (resp) => {
-                //if(typeof(Storage) !== 'undefined'){ // check if localStorage supported
-                //    localStorage.setItem("user_info", JSON.stringify(payload));
-                //}
-                JWT.saveUserInfo(resp);
-                updateUserInfo();
-                let navTarget = "/";
-                const profileAction = resp.user_actions && _.find(resp.user_actions, { 'id' : 'profile' });
-                if (profileAction && profileAction.href){
-                    navTarget = profileAction.href;
-                }
-                navigate(navTarget, { 'inPlace' : true });
-                alert('Success! ' + userid + ' is being impersonated.');
-            };
-            const fallbackFxn = function() {
-                alert('Impersonation unsuccessful.\nPlease check to make sure the provided email is correct.');
-            };
-
-            //var userInfo = localStorage.getItem('user_info') || null;
-            //var idToken = userInfo ? JSON.parse(userInfo).id_token : null;
-            //var reqHeaders = {'Accept': 'application/json'};
-            //if(userInfo){
-            //    reqHeaders['Authorization'] = 'Bearer '+idToken;
-            //}
-            ajax.load(url, callbackFxn, 'POST', fallbackFxn, JSON.stringify(postData));
+            navigate(navTarget, { 'inPlace' : true });
+            alert('Success! ' + userid + ' is being impersonated.');
         };
-    }, [ updateUserInfo ]);
+        const fallbackFxn = function() {
+            alert('Impersonation unsuccessful.\nPlease check to make sure the provided email is correct.');
+        };
+
+        ajax.load(url, callbackFxn, 'POST', fallbackFxn, JSON.stringify(postData));
+    }, [ updateAppSessionState ]);
 
     return (
         <div className="mt-3 container" id="content">
@@ -625,8 +606,13 @@ export function ImpersonateUserForm({ updateUserInfo }) {
                 <div className="col-12 col-lg-6">
                     <form onSubmit={onSubmit}>
                         <input type="text" className="mt-08 form-control" placeholder="Enter an email to impersonate..." ref={inputFieldRef} />
-                        <button type="submit" className="btn btn-primary btn-md mt-15">
-                            <i className="icon icon-fw icon-user icon-user-ninja fas"/>&nbsp; Impersonate
+                        <a href="/search/?type=User" target="_blank" className="btn btn-secondary btn-md mt-2 mr-2">
+                            <i className="icon icon-fw icon-users fas mr-08"/>
+                            View Users
+                        </a>
+                        <button type="submit" className="btn btn-primary btn-md mt-2">
+                            <i className="icon icon-fw icon-user-ninja fas mr-08"/>
+                            Impersonate
                         </button>
                     </form>
                 </div>
