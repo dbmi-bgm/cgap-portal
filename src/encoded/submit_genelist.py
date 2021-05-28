@@ -793,23 +793,35 @@ class VariantUpdateSubmission:
         """
         if not self.gene_uuids:
             return None
-        add_on = None
         project = self.project
         genes_to_search = list(set(self.gene_uuids))
         if self.project == CGAP_CORE_PROJECT + "/":
             project = None
         if self.bam_sample_ids:
-            add_on = "&CALL_INFO=" + "&CALL_INFO=".join(self.bam_sample_ids)
-        variant_sample_search = CommonUtils.batch_search(
-            self.vapp,
-            genes_to_search,
-            "variant.genes.genes_most_severe_gene.uuid",
-            batch_size=3,
-            item_type="VariantSample",
-            project=project,
-            add_on=add_on,
-            fields=["uuid"],
-        )
+            variant_sample_search = []
+            for sample_id in self.bam_sample_ids:
+                add_on = "&CALL_INFO=" + sample_id
+                vs_addon_search = CommonUtils.batch_search(
+                    self.vapp,
+                    genes_to_search,
+                    "variant.genes.genes_most_severe_gene.uuid",
+                    batch_size=4,
+                    item_type="VariantSample",
+                    project=project,
+                    add_on=add_on,
+                    fields=["uuid"],
+                )
+                variant_sample_search += vs_addon_search
+        else:
+            variant_sample_search = CommonUtils.batch_search(
+                self.vapp,
+                genes_to_search,
+                "variant.genes.genes_most_severe_gene.uuid",
+                batch_size=5,
+                item_type="VariantSample",
+                project=project,
+                fields=["uuid"],
+            )
         variant_sample_uuids = [item["uuid"] for item in variant_sample_search]
         to_invalidate = list(set(variant_sample_uuids))
         validation_output = "%s variant samples to update." % len(to_invalidate)
