@@ -1,6 +1,7 @@
 import re
 
 from dcicutils.misc_utils import ignored
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.view import view_config
 from snovault.util import debug_log
 
@@ -165,6 +166,11 @@ def embed(context, request):
         desired_embeds = request.json.get("desired", [])
         embed_depth = request.json.get("depth", embed_depth)
     ids = list(set(ids))
+    if len(ids) > 5:
+        raise HTTPBadRequest(
+            "Too many items were given for embedding."
+            " Please limit to less than 5 items."
+        )
     embed_props = {
         "ignored_embeds": ignored_embeds,
         "desired_embeds": desired_embeds,
@@ -174,6 +180,5 @@ def embed(context, request):
     for item_id in ids:
         item_info = get_item_or_none(request, item_id)
         item_embed = CustomEmbed(request, item_info, embed_props)
-        item_result = item_embed.result
-        results.append(item_result)
+        results.append(item_embed.result)
     return results

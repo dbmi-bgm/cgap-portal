@@ -31,7 +31,7 @@ def _embed_with_json_params(testapp, embed_json, status="*"):
         "Accept": "application/json",
     }
     response = testapp.post_json(
-        EMBED_URL, creation_post_data, headers=creation_post_headers
+        EMBED_URL, creation_post_data, headers=creation_post_headers, status=status
     ).json
     if isinstance(response, list):
         response = response[0]
@@ -163,3 +163,22 @@ def test_non_project_user(bgm_user_testapp, variant_sample_list):
     vsl_embed_url = _embed_with_url_params(bgm_user_testapp, url_params, status=403)
     assert vsl_embed_url["status"] == "error"
     assert vsl_embed_url["title"] == "Forbidden"
+
+
+def test_too_many_items(testapp, variant_sample_list):
+    """Test POST with >5 item IDs results in bad request error."""
+    ids = []
+    ids.append(variant_sample_list["uuid"])
+    ids.append(variant_sample_list["project"])
+    ids.append(variant_sample_list["institution"])
+    variant_sample_atids = [
+        item["variant_sample_item"] for item in variant_sample_list["variant_samples"]
+    ]
+    ids += variant_sample_atids
+    variants_atid = [
+        variant["@id"] for variant in testapp.get("/variants/").json["@graph"]
+    ]
+    ids += variants_atid
+    json_to_post = {"ids": ids, "depth": 1}
+    embed_json = _embed_with_json_params(testapp, json_to_post, status=400)
+    assert embed_json["status"] == "error"
