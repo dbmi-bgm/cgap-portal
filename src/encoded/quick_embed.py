@@ -28,103 +28,111 @@ def includeme(config):
     config.scan(__name__)
 
 
-def _minimal_embed(request, item_id):
+class CustomEmbed:
     """
-    Embed minimal item info. Helpful for preventing recursions for
-    items for which detailed info is commonly not needed.
-
-    :param request: pyramid request object
-    :param item_id: string uuid or @id
-    :return item_embed: dict with item title and @id
+    Class to handle custom embedding for /embed API.
     """
-    item_object = get_item_or_none(request, item_id)
-    item_title = item_object.get("title", "")
-    item_atid = item_object.get("@id", "")
-    item_embed = {"title": item_title, "@id": item_atid}
-    return item_embed
 
+    def __init__(self, request, item, embed_props):
+        self.request = request
+        self.ignored_embeds = embed_props["ignored_embeds"]
+        self.desired_embeds = embed_props["desired_embeds"]
+        self.embed_depth = embed_props["embed_depth"]
+        self.cache = embed_props["cache"]
+        depth = 0
+        self.result = self.embed(item, depth)
 
-def _embed_genelist(request, genelist_atid):
-    """
-    Embed limited gene list information from raw view to avoid costly
-    object view of large gene lists.
+    def _minimal_embed(self, item_id):
+        """
+        Embed minimal item info. Helpful for preventing recursions for
+        items for which detailed info is commonly not needed.
 
-    :param request: pyramid request object
-    :param genelist_atid: string of gene list @id
-    :return genelist_embed: dict with gene list title and uuid
-    """
-    genelist_raw = get_item_or_none(request, genelist_atid, frame="raw")
-    title = genelist_raw.get("title", "")
-    uuid = genelist_raw.get("uuid", "")
-    genelist_embed = {"title": title, "uuid": uuid}
-    return genelist_embed
+        :param item_id: string uuid or @id
+        :return item_embed: dict with item title and @id
+        """
+        item_object = get_item_or_none(self.request, item_id)
+        item_title = item_object.get("title", "")
+        item_atid = item_object.get("@id", "")
+        item_embed = {"title": item_title, "@id": item_atid}
+        return item_embed
 
+    def _embed_genelist(self, genelist_atid):
+        """
+        Embed limited gene list information from raw view to avoid costly
+        object view of large gene lists.
 
-def _embed(request, item, depth, embed_props):
-    """
-    Embed items recursively according to input parameters. Unpack
-    dictionaries and lists to find @ids, which are selectively embedded,
-    typically in object view. Store new embeds in cache for look-up.
+        :param genelist_atid: string of gene list @id
+        :return genelist_embed: dict with gene list title and uuid
+        """
+        genelist_raw = get_item_or_none(self.request, genelist_atid, frame="raw")
+        title = genelist_raw.get("title", "")
+        uuid = genelist_raw.get("uuid", "")
+        genelist_embed = {"title": title, "uuid": uuid}
+        return genelist_embed
 
-    :param request: pyramid request object
-    :param item: object of interest to expand
-    :param depth: int of current embed depth
-    :param embed_props: dict of embedding properties
-    :return item: object of interest processed
-    """
-    while True:
-        if depth == embed_props["embed_depth"]:
-            break
-        elif isinstance(item, dict) and item:
-            for key in item:
-                if key in embed_props["ignored_keys"]:
-                    continue
-                item[key] = _embed(request, item[key], depth, embed_props)
-            break
-        elif isinstance(item, list) and item:
-            for idx in range(len(item)):
-                item[idx] = _embed(request, item[idx], depth, embed_props)
-            break
-        elif isinstance(item, str):
-            if ATID_PATTERN.match(item):
-                if embed_props["desired_embeds"]:
-                    if item.split("/")[1] in embed_props["desired_embeds"]:
-                        if item in embed_props["cache"]:
-                            item = embed_props["cache"][item]
+    def embed(self, item, depth):
+        """
+        Embed items recursively according to input parameters. Unpack
+        dictionaries and lists to find @ids, which are selectively embedded,
+        typically in object view. Store new embeds in cache for look-up.
+
+        :param item: object of interest to expand
+        :param depth: int of current embed depth
+        :return item: object of interest processed
+        """
+        while True:
+            if depth == self.embed_depth:
+                break
+            elif isinstance(item, dict) and item:
+                for key in item:
+                    if key in KEYS_TO_IGNORE:
+                        continue
+                    item[key] = self.embed(item[key], depth)
+                break
+            elif isinstance(item, list) and item:
+                for idx in range(len(item)):
+                    item[idx] = self.embed(item[idx], depth)
+                break
+            elif isinstance(item, str):
+                if ATID_PATTERN.match(item):
+                    if self.desired_embeds:
+                        if item.split("/")[1] in self.desired_embeds:
+                            if item in self.cache:
+                                item = self.cache[item]
+                                depth += 1
+                            else:
+                                cache_item = item
+                                item = get_item_or_none(self.request, item)
+                                self.cache[cache_item] = item
+                                depth += 1
+                        else:
+                            break
+                    else:
+                        if item.split("/")[1] in self.ignored_embeds:
+                            break
+                        elif item in self.cache:
+                            item = self.cache[item]
                             depth += 1
+                        elif GENELIST_ATID.match(item):
+                            cache_item = item
+                            item = self._embed_genelist(item)
+                            self.cache[cache_item] = item
+                            break
+                        elif MINIMAL_EMBED_ATID.match(item):
+                            cache_item = item
+                            item = self._minimal_embed(item)
+                            self.cache[cache_item] = item
+                            break
                         else:
                             cache_item = item
-                            item = get_item_or_none(request, item)
-                            embed_props["cache"][cache_item] = item
+                            item = get_item_or_none(self.request, item)
+                            self.cache[cache_item] = item
                             depth += 1
-                    else:
-                        break
                 else:
-                    if item.split("/")[1] in embed_props["ignored_embeds"]:
-                        break
-                    elif item in embed_props["cache"]:
-                        item = embed_props["cache"][item]
-                        depth += 1
-                    elif GENELIST_ATID.match(item):
-                        cache_item = item
-                        item = _embed_genelist(request, item)
-                        embed_props["cache"][cache_item] = item
-                        break
-                    elif MINIMAL_EMBED_ATID.match(item):
-                        cache_item = item
-                        item = _minimal_embed(request, item)
-                        embed_props["cache"][cache_item] = item
-                        break
-                    else:
-                        cache_item = item
-                        item = get_item_or_none(request, item)
-                        embed_props["cache"][cache_item] = item
-                        depth += 1
+                    break
             else:
                 break
-        else:
-            break
-    return item
+        return item
 
 
 @view_config(route_name="embed", request_method="POST", permission="view")
@@ -144,9 +152,7 @@ def embed(context, request):
     desired_embeds = []
     cache = {}
     results = []
-    depth = 0
     embed_depth = 4  # Arbritary standard depth to search.
-    ignored_keys = KEYS_TO_IGNORE
     ignored(context)
     if request.GET:
         ids += request.GET.dict_of_lists().get("id", [])
@@ -160,7 +166,6 @@ def embed(context, request):
         embed_depth = request.json.get("depth", embed_depth)
     ids = list(set(ids))
     embed_props = {
-        "ignored_keys": ignored_keys,
         "ignored_embeds": ignored_embeds,
         "desired_embeds": desired_embeds,
         "embed_depth": embed_depth,
@@ -168,6 +173,7 @@ def embed(context, request):
     }
     for item_id in ids:
         item_info = get_item_or_none(request, item_id)
-        item_result = _embed(request, item_info, depth, embed_props)
+        item_embed = CustomEmbed(request, item_info, embed_props)
+        item_result = item_embed.result
         results.append(item_result)
     return results
