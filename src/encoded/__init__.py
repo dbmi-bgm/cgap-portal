@@ -189,7 +189,7 @@ def main(global_config, **local_config):
     config.include('.loadxl')
     config.include('.visualization')
     config.include('.ingestion_listener')
-    config.include('.quick_embed')
+    config.include('.custom_embed')
 
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')

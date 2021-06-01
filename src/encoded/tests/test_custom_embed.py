@@ -1,6 +1,6 @@
 import pytest
 
-from encoded.quick_embed import ATID_PATTERN, MINIMAL_EMBEDS
+from encoded.custom_embed import ATID_PATTERN, MINIMAL_EMBEDS
 
 pytestmark = [pytest.mark.working]
 
