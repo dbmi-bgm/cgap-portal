@@ -498,6 +498,13 @@ class VariantSample(Item):
         }
     })
     def project_genelists(self, request, project, variant):
+        """
+        Identifies gene lists associated with the project of the variant sample
+        or associated with CGAP Core project.
+
+        NOTE: Gene lists retrieved with @@raw view to prevent costly @@object
+        view of large gene lists.
+        """
         gene_atids = []
         genelist_atids = []
         genelist_info = {}
@@ -510,16 +517,16 @@ class VariantSample(Item):
             gene_atid = gene.get("genes_most_severe_gene", "")
             if gene_atid:
                 gene_atids.append(gene_atid)
+        gene_atids = list(set(gene_atids))
         genes_object = [get_item_or_none(request, atid) for atid in gene_atids]
         for gene in genes_object:
             genelist_atids += gene.get("gene_lists", [])
+        genelist_atids = list(set(genelist_atids))
         genelists_raw = [
             get_item_or_none(request, atid, frame="raw") for atid in genelist_atids
         ]
         for genelist in genelists_raw:
             title = genelist.get("title", "")
-            if not title:
-                continue
             project_uuid = genelist.get("project")
             project_object = get_item_or_none(request, project_uuid)
             project_atid = project_object.get("@id")
