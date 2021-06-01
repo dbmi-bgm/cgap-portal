@@ -167,7 +167,8 @@ class TestCustomEmbed:
         ids.append(variant_sample_list["project"])
         ids.append(variant_sample_list["institution"])
         variant_sample_atids = [
-            item["variant_sample_item"] for item in variant_sample_list["variant_samples"]
+            item["variant_sample_item"]
+            for item in variant_sample_list["variant_samples"]
         ]
         ids += variant_sample_atids
         variants_atid = [
