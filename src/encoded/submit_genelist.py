@@ -762,7 +762,7 @@ def submit_variant_update(
 class VariantUpdateSubmission:
     """
     Class to update all variant samples associated with a given
-    list.
+    gene list submission.
     """
 
     def __init__(self, filename, project, institution, vapp, validate_only=False):
