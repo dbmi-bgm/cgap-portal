@@ -6,9 +6,6 @@ import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-
-import { Schemas } from './../../util';
 import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 
 /**
@@ -52,8 +49,8 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
 
     const titleDict = useMemo(function(){
         return {
-            "v2": <React.Fragment><span className="text-600">GnomAD</span> V2 Exome</React.Fragment>,
-            "v3": <React.Fragment><span className="text-600">GnomAD</span> V3</React.Fragment>
+            "v2": <React.Fragment><span className="text-600">gnomAD</span> v2 exome</React.Fragment>,
+            "v3": <React.Fragment><span className="text-600">gnomAD</span> v3</React.Fragment>
         };
     });
 
@@ -83,7 +80,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                     <div className="inner-card-section flex-grow-0 pb-2 pb-xl-0">
                         <div className="info-header-title">
 
-                            <DropdownButton size="lg py-1" variant="outline-dark select-gnomad-version" onSelect={onSelectShowingTable}
+                            <DropdownButton size="lg py-1" variant="outline-secondary select-gnomad-version" onSelect={onSelectShowingTable}
                                 title={titleDict[showingTable]} >
                                 <DropdownItem eventKey="v3" active={showingTable === "v3"}>{ titleDict.v3 }</DropdownItem>
                                 <DropdownItem eventKey="v2" active={showingTable === "v2"}>{ titleDict.v2 }</DropdownItem>
@@ -422,7 +419,7 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                             <td className="text-left">{ fallbackElem }</td>
                             <td className="text-left">{ csq_cadd_raw_rankscore }</td>
                         </tr>
-                         <tr>
+                        <tr>
                             <td className="text-left">
                                 <label className="mb-0" data-tip={getTipForField("csq_phylop30way_mammalian")}>phyloP (30 Mammals)</label>
                             </td>

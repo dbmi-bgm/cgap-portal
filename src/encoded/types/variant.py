@@ -534,11 +534,11 @@ class VariantSample(Item):
             genelist_info[title] = {
                 "project": project_atid, "bam_sample_ids": bam_sample_ids
             }
-        for genelist_title, props in genelist_info.items():
+        for genelist_title, genelist_props in genelist_info.items():
             if genelist_title in associated_genelists:
                 continue
-            bam_sample_ids = props.get("bam_sample_ids")
-            if props["project"] in potential_projects:
+            bam_sample_ids = genelist_props.get("bam_sample_ids")
+            if genelist_props["project"] in potential_projects:
                 if bam_sample_ids:
                     if CALL_INFO in bam_sample_ids:
                         associated_genelists.append(genelist_title)
