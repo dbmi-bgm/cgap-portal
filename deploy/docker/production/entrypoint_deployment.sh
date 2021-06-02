@@ -14,7 +14,8 @@ poetry run clear-db-es-contents production.ini --app-name app --env skip
 poetry run create-mapping-on-deploy production.ini --app-name app
 
 # Load Data (based on development.ini, for now just master-inserts)
-poetry run load-data production.ini --app-name app --prod
+# Not necessary after first deploy
+# poetry run load-data production.ini --app-name app --prod
 
 # Load access keys
 # Note that the secret name must match that which was created for this environment
