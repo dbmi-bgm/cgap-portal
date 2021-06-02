@@ -463,7 +463,7 @@ function InterpretationSpaceTabs(props) {
     );
 }
 
-class GenericInterpretationPanel extends React.Component {
+class GenericInterpretationPanel extends React.PureComponent {
     constructor(props) {
         super(props);
 
@@ -566,7 +566,7 @@ class GenericInterpretationPanel extends React.Component {
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
-                    <Button variant="primary btn-block mt-05" onClick={() => { navigate(`/cases/${caseSource}/#case-info.interpretation`)}}>
+                    <Button variant="primary btn-block mt-05" onClick={() => navigate(`/cases/${caseSource}/#case-info.interpretation`)}>
                         Return to Case
                     </Button>: null}
             </div>

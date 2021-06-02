@@ -3053,7 +3053,7 @@ $download-button-width : 100px;
 				.clinvar-info-body {
 					// Special case where we want overflow: auto + max-height when large responsive breakpoint.
 					@include media-breakpoint-up(xl){
-						max-height: 280px;
+						max-height: 320px;
 						overflow: auto;
 					}
 				}

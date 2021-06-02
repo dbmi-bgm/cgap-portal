@@ -52,9 +52,9 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                 <i className="status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />
             </div>
             <h4 className="col-main">
-                { mainTitle || "-" }
+                <span>{ mainTitle || "-" }</span>
             </h4>
-            <div className="col-date text-center text-smaller">
+            <div className="col-date text-smaller">
                 <span className="text-600">{ dateTitle } </span>
                 { date ? <LocalizedTime timestamp={date} formatType="date-sm"/> : "N/A" }
             </div>

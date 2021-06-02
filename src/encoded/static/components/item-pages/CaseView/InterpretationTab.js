@@ -1,10 +1,11 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import queryString from 'query-string';
 import moment from 'moment';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { variantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './../../browse/variantSampleColumnExtensionMap';
 
 /**
@@ -61,6 +62,12 @@ const VariantSampleSelection = React.memo(function VariantSampleSelection({ sele
         variant_sample_item
     } = selection;
 
+    const [ isExpanded, setIsExpanded ] = useState(false); // Can move this state up if have pagination or infinite scroll or something in future.
+    const toggleIsExpanded = useCallback(function(e){
+        e.stopPropagation();
+        setIsExpanded(!isExpanded);
+    }, [ isExpanded ]);
+
     const {
         "VariantSample": {
             columns: {
@@ -86,14 +93,14 @@ const VariantSampleSelection = React.memo(function VariantSampleSelection({ sele
     return (
         <div className="card mb-1" key={index}>
             <div className="card-header">
-                <div className="d-flex align-items-center">
+                <div className="d-flex flex-column flex-lg-row align-items-lg-center">
 
-                    <div className="flex-grow-1 d-flex flex-column flex-sm-row">
+                    <div className="flex-grow-1 d-flex flex-column flex-sm-row align-items-sm-center mb-08 mb-lg-0">
                         <div className="flex-auto">
                             <VariantSampleDisplayTitleColumn result={variant_sample_item}
                                 link={`${vsID}?showInterpretation=True${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
                         </div>
-                        <div className="flex-grow-1  d-sm-block">
+                        <div className="flex-grow-1 d-none d-sm-block">
                             &nbsp;
                         </div>
                         <div className="flex-auto text-small" data-tip="Date Selected">
@@ -103,7 +110,13 @@ const VariantSampleSelection = React.memo(function VariantSampleSelection({ sele
                     </div>
 
                     <div className="flex-auto pl-16">
-                        <DropdownButton size="sm" variant="light" disabled title={
+
+                        <button type="button" className="btn btn-sm btn-outline-dark" onClick={toggleIsExpanded}>
+                            <i className={"icon fas mr-07 icon-" + (!isExpanded ? "plus" : "minus")} />
+                            { !isExpanded ? "Review Variant Notes & Classification" : "Hide Notes" }
+                        </button>
+
+                        <DropdownButton size="sm" variant="light" className="d-inline-block ml-07" disabled title={
                             <React.Fragment>
                                 <i className="icon icon-bars fas mr-07"/>
                                 Actions
@@ -111,6 +124,7 @@ const VariantSampleSelection = React.memo(function VariantSampleSelection({ sele
                         }>
                             TODO
                         </DropdownButton>
+
                     </div>
                 </div>
             </div>
@@ -166,12 +180,139 @@ const VariantSampleSelection = React.memo(function VariantSampleSelection({ sele
                     </div>
                 </div>
             </div>
+
+            { isExpanded ?
+                <VariantSampleExpandedNotes />
+                : null }
+
         </div>
     );
 });
 
 
+function VariantSampleExpandedNotes () {
+    return (
+        <React.Fragment>
+            <div className="card-body bg-light select-checkboxes-section border-top border-bottom">
+                <Checkbox labelClassName="text-400 mb-08">
+                    Save & Send All Notes to Report
+                </Checkbox>
+                <Checkbox labelClassName="text-400 mb-0">
+                    Save & Send All Notes to KnowledgeBase
+                </Checkbox>
+            </div>
+            <div className="card-body notes-section">
+                <div className="row">
+                    <div className="col col-md-6 col-lg-3">
+                        <h4 className="text-300">Variant Notes</h4>
+                        <div className="flex">
+                            <Checkbox>Send to Report</Checkbox>
+                            <Checkbox>Send to KnowledgeBase</Checkbox>
+                        </div>
+                    </div>
+                    <div className="col col-md-6 col-lg-3">
+                        <h4 className="text-300">Gene Notes</h4>
+                        <div className="flex">
+                            <Checkbox>Send to Report</Checkbox>
+                            <Checkbox>Send to KnowledgeBase</Checkbox>
+                        </div>
+                    </div>
+                    <div className="col col-md-6 col-lg-3">
+                        <h4 className="text-300">ACMG Interpretation</h4>
+                        <div className="flex">
+                            <Checkbox>Send to Report</Checkbox>
+                            <Checkbox>Send to KnowledgeBase</Checkbox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </React.Fragment>
+    );
+}
 
+
+
+function ProjectWideSelectionsPanel () {
+
+}
+
+function ACMGClassificationSelections () {
+    return (
+        <div>
+            <h4 className="text-600">ACMG Classification Selections</h4>
+            <div className="row">
+                <div className="col-12 col-lg-6">
+                    <h5 className="text-400">Move to Report</h5>
+                    <ACMGClassificationSelectionsCommonCheckboxList />
+                </div>
+                <div className="col-12 col-lg-6">
+                    <h5 className="text-400">Send to KnowledgeBase</h5>
+                    <ACMGClassificationSelectionsCommonCheckboxList />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ACMGClassificationSelectionsCommonCheckboxList (props) {
+    // TODO: Have a common onChange passed to all of these, using something from props (TBD) to decide its logic
+
+    return (
+        <div>
+            <Checkbox>
+                Pathogenic Variants
+            </Checkbox>
+            <Checkbox>
+                Likely Pathogenic Variants
+            </Checkbox>
+            <Checkbox>
+                VUS Variants
+            </Checkbox>
+            <Checkbox>
+                Likely Benign Variants
+            </Checkbox>
+            <Checkbox>
+                Benign Variants
+            </Checkbox>
+        </div>
+    );
+}
+
+function VariantGeneSelections () {
+
+
+
+    return (
+        <div>
+            <h4 className="text-600">ACMG Classification Selections</h4>
+            <div className="row">
+                <div className="col-12 col-lg-6">
+                    <h5 className="text-400">Move to Report</h5>
+                    <div>
+                        <Checkbox>
+                            Strong
+                        </Checkbox>
+                        <Checkbox>
+                            Likely Pathogenic Variants
+                        </Checkbox>
+                        <Checkbox>
+                            VUS Variants
+                        </Checkbox>
+                        <Checkbox>
+                            Likely Benign Variants
+                        </Checkbox>
+                        <Checkbox>
+                            Benign Variants
+                        </Checkbox>
+                    </div>
+                </div>
+                <div className="col-12 col-lg-6">
+                    <h5 className="text-400">Send to KnowledgeBase</h5>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 
 
