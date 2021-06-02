@@ -7,7 +7,7 @@ wsgi:
 	docker push 645819926742.dkr.ecr.us-east-1.amazonaws.com/cgap-mastertest:latest
 
 indexer:
-	docker build -t cgap-mastertest:latest-indexer -f Dockerfile . --build-arg ENTRYPOINT=entrypoint_indexer --build-arg BUILD_PATH=deploy/docker/production
+	docker build -t cgap-mastertest:latest-indexer -f Dockerfile . --build-arg ENTRYPOINT=entrypoint_indexer.sh --build-arg BUILD_PATH=deploy/docker/production
 	docker tag cgap-mastertest:latest-indexer 645819926742.dkr.ecr.us-east-1.amazonaws.com/cgap-mastertest:latest-indexer
 	docker push 645819926742.dkr.ecr.us-east-1.amazonaws.com/cgap-mastertest:latest-indexer
 

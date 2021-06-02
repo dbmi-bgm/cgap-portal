@@ -104,7 +104,7 @@ def get_higlass_viewconf(context, request):
         request(obj): Http request object. Assumes request's request is JSON and contains these keys:
             requesting_tab(str) : "annotation" or "bam"
             variant_pos_abs(int) : Center of the viewconf in abs genome coordinates
-            
+
     Returns:
         A dictionary.
             success(bool)       : Boolean indicating success.
@@ -112,7 +112,7 @@ def get_higlass_viewconf(context, request):
             viewconfig(dict)    : Dict representing the new viewconfig.
     """
 
-    requesting_tab = request.json_body.get('requesting_tab', None)  
+    requesting_tab = request.json_body.get('requesting_tab', None)
     requesting_tab = requesting_tab if requesting_tab else "annotation"
 
     viewconf_uuid = "00000000-1111-0000-1111-000000000000" if requesting_tab == "annotation" else "9146eeba-ebb8-41aa-93a8-ada8efaff64b"
@@ -126,10 +126,10 @@ def get_higlass_viewconf(context, request):
             "success" : False,
             "errors": "No view config found.",
             "viewconfig": None
-        } 
+        }
 
     # We need absolute URLs for the BAM adn GnomAD Worker
-    host_url = "http://localhost:6543"
+    host_url = "http://c4ecstrialalphaecslb-2115269186.us-east-1.elb.amazonaws.com"
     if request.registry.settings.get('env.name') == CGAP_ENV_WEBPROD:
         host_url = CGAP_PUBLIC_URL_PRD
     elif request.registry.settings.get('env.name') == CGAP_ENV_MASTERTEST:
@@ -138,18 +138,18 @@ def get_higlass_viewconf(context, request):
         host_url = f"http://{CGAP_ENV_DEV}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
 
     if requesting_tab == "annotation":
-        variant_pos = request.json_body.get('variant_pos_abs', None)  
+        variant_pos = request.json_body.get('variant_pos_abs', None)
         variant_pos = variant_pos if variant_pos else 100000
         window_size_small = 20 # window size for the interpretation space
         window_size_large = 5000 # window size for the overview
 
         # Overview
         higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
-        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large 
+        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large
 
         # Details
         higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
-        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small 
+        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small
 
         # Vertical rules
         higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
@@ -159,18 +159,18 @@ def get_higlass_viewconf(context, request):
         higlass_viewconfig['views'][1]['tracks']['top'][17]['options']['workerScriptLocation'] = host_url + wsl
 
     elif requesting_tab == "bam":
-        variant_pos = request.json_body.get('variant_pos_abs', None)  
+        variant_pos = request.json_body.get('variant_pos_abs', None)
         variant_pos = variant_pos if variant_pos else 100000
         # This is the id of the variant sample that we are currently looking at.
         # This should be the first file in the Higlass viewconf
-        bam_sample_id = request.json_body.get('bam_sample_id', None)  
+        bam_sample_id = request.json_body.get('bam_sample_id', None)
         window_size_small = 20 # window size for the interpretation space
         window_size_large = 5000 # window size for the overview
 
         #s3_bucket = request.registry.settings.get('file_wfout_bucket')
         s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
 
-        samples_pedigree = request.json_body.get('samples_pedigree', None) 
+        samples_pedigree = request.json_body.get('samples_pedigree', None)
         samples_pedigree.sort(key=lambda x: x['sample_name'] == bam_sample_id, reverse=True)
 
         top_tracks = higlass_viewconfig['views'][1]['tracks']['top']
@@ -181,7 +181,7 @@ def get_higlass_viewconf(context, request):
 
         # Delete original tracks from the insert, replace them with adjusted data
         # from the sample data. If there is no data, we only show the sequence track
-        del top_tracks[6:10] 
+        del top_tracks[6:10]
         # print(json.dumps(top_tracks, indent=2))
 
         for sample in samples_pedigree:
@@ -209,20 +209,20 @@ def get_higlass_viewconf(context, request):
 
         # Show the correct location
         higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
-        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large 
+        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large
 
         higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
-        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small 
+        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small
 
         # Vertical rules
         higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
         higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
-            
+
     return {
         "success" : True,
         "errors": "",
         "viewconfig" : higlass_viewconfig
-    }     
+    }
 
 def create_presigned_url(bucket_name, object_name, expiration=3600):
     """Generate a presigned URL to share an S3 object
@@ -243,6 +243,5 @@ def create_presigned_url(bucket_name, object_name, expiration=3600):
         return None
 
     # The response contains the presigned URL
-    return response   
+    return response
 
-    
