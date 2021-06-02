@@ -498,17 +498,43 @@ class VariantSample(Item):
         }
     })
     def project_genelists(self, request, project, variant):
+        """
+        Identifies gene lists associated with the project of the variant sample
+        or associated with CGAP Core project.
+
+        NOTE: Gene lists retrieved with @@raw view to prevent costly @@object
+        view of large gene lists.
+        """
+        gene_atids = []
+        genelist_atids = []
+        genelist_info = {}
         project_genelists = []
         core_project = CGAP_CORE_PROJECT + "/"
         potential_projects = [core_project, project]
-        variant_props = get_item_or_none(request, variant, frame="embedded")
+        variant_props = get_item_or_none(request, variant)
         genes = variant_props.get("genes", [])
         for gene in genes:
-            genelists = gene.get("genes_most_severe_gene", {}).get("gene_lists", [])
-            for genelist in genelists:
-                if (genelist["project"]["@id"] in potential_projects
-                        and genelist["display_title"] not in project_genelists):
-                    project_genelists.append(genelist["display_title"])
+            gene_atid = gene.get("genes_most_severe_gene", "")
+            if gene_atid:
+                gene_atids.append(gene_atid)
+        gene_atids = list(set(gene_atids))
+        genes_object = [get_item_or_none(request, atid) for atid in gene_atids]
+        for gene in genes_object:
+            genelist_atids += gene.get("gene_lists", [])
+        genelist_atids = list(set(genelist_atids))
+        genelists_raw = [
+            get_item_or_none(request, atid, frame="raw") for atid in genelist_atids
+        ]
+        for genelist in genelists_raw:
+            title = genelist.get("title", "")
+            project_uuid = genelist.get("project")
+            project_object = get_item_or_none(request, project_uuid)
+            project_atid = project_object.get("@id")
+            genelist_info[title] = project_atid
+        for genelist_title, project_atid in genelist_info.items():
+            if project_atid in potential_projects:
+                if genelist_title not in project_genelists:
+                    project_genelists.append(genelist_title)
         return project_genelists
 
 
