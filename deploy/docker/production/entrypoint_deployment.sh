@@ -7,7 +7,8 @@ echo "Running a CGAP deployment on the given environment"
 poetry run python -m assume_identity
 
 # Clear db/es since this is the local entry point
-poetry run clear-db-es-contents production.ini --app-name app --env $CGAP_ENV_NAME
+# 'skip' is provided as an argument so that this step doesn't run
+poetry run clear-db-es-contents production.ini --app-name app --env skip
 
 ## Create mapping
 poetry run create-mapping-on-deploy production.ini --app-name app
