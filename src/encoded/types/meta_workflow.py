@@ -36,4 +36,3 @@ class MetaWorkflowRun(Item):
     item_type = 'meta_workflow_run'
     name_key = 'accession'
     schema = load_schema('encoded:schemas/meta_workflow_run.json')
-~                                                                  
