@@ -14,6 +14,7 @@ import Collapse from 'react-bootstrap/esm/Collapse';
 import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
+import { acmgUtil } from '../../util';
 import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
 import { VariantTabBody } from './VariantTabBody';
 import { GeneTabBody } from './GeneTabBody';
@@ -399,39 +400,7 @@ class ACMGInvoker extends React.Component {
     render() {
         const { globalACMGSelections: invoked = {}, toggleInvocation } = this.props;
 
-        const acmgCriteria = [
-            { criteria: "BA1", description: "Allele frequency is >5% in Exome Sequencing Project, 1000 Genomes Project, or Exome Aggregation Consortium" },
-            { criteria: "BS1", description: "Allele frequency is greater than expected for disorder (see Table 6)" },
-            { criteria: "BS2", description: "Observed in a healthy adult individual for a recessive (homozygous), dominant (heterozygous), or X-linked (hemizygous) disorder, with full penetrance expected at an early age" },
-            { criteria: "BS3", description: "Well-established in vitro or in vivo functional studies show no damaging effect on protein function or splicing" },
-            { criteria: "BS4", description: "Lack of segregation in affected members of a family<br/><br/><ul><li>Caveat: The presence of phenocopies for common phenotypes (i.e., cancer, epilepsy) can mimic lack of segregation among affected individuals. Also, families may have more than one pathogenic variant contributing to an autosomal dominant disorder, further confounding an apparent lack of segregation.</li></ul>" },
-            { criteria: "BP1", description: "Missense variant in a gene for which primarily truncating variants are known to cause disease" },
-            { criteria: "BP2", description: "Observed in <span class='font-italic'>trans</span> with a pathogenic variant for a fully penetrant dominant gene/disorder or observed in <span class='font-italic'>cis</span> with a pathogenic variant in any inheritance pattern" },
-            { criteria: "BP3", description: "In-frame deletions/insertions in a repetitive region without a known function" },
-            { criteria: "BP4", description: "Multiple lines of computational evidence suggest no impact on gene or gene product (conservation, evolutionary, splicing impact, etc.)<br/><br/><ul><li>Caveat: Because many in silico algorithms use the same or very similar input for their predictions, each algorithm cannot be counted as an independent criterion. BP4 can be used only once in any evaluation of a variant.</li></ul>" },
-            { criteria: "BP5", description: "Variant found in a case with an alternate molecular basis for disease" },
-            { criteria: "BP6", description: "Reputable source recently reports variant as benign, but the evidence is not available to the laboratory to perform an independent evaluation" },
-            { criteria: "BP7", description: "A synonymous (silent) variant for which splicing prediction algorithms predict no impact to the splice consensus sequence nor the creation of a new splice site AND the nucleotide is not highly conserved" },
-            { criteria: "PP1", description: "Cosegregation with disease in multiple affected family members in a gene definitively known to cause the disease<br/><br/><ul><li>Note: May be used as stronger evidence with increasing segregation data</li></ul>" },
-            { criteria: "PP2", description: "Missense variant in a gene that has a low rate of benign missense variation and in which missense variants are a common mechanism of disease" },
-            { criteria: "PP3", description: "Multiple lines of computational evidence support a deleterious effect on the gene or gene product (conservation, evolutionary, splicing impact, etc.)<br/><ul><li>Caveat: Because many in-silico algorithms use the same or very similar input for their predictions, each algorithm should not be counted as an independent criterion. PP3 can be used only once in any evaluation of a variant.</li></ul>" },
-            { criteria: "PP4", description: "Patient’s phenotype or family history is highly specific for a disease with a single genetic etiology" },
-            { criteria: "PP5", description: "Reputable source recently reports variant as pathogenic, but the evidence is not available to the laboratory to perform an independent evaluation" },
-            { criteria: "PM1", description: "Located in a mutational hot spot and/or critical and well-established functional domain (e.g., active site of an enzyme) without benign variation." },
-            { criteria: "PM2", description: "Absent from controls (or at extremely low frequency if recessive) (Table 6) in Exome Sequencing Project, 1000 Genomes Project, or Exome Aggregation Consortium<br/><ul><li>Caveat: Population data for insertions/deletions may be poorly called by next-generation sequencing</li></ul>" },
-            { criteria: "PM3", description: "For recessive disorders, detected in <span class='font-italic'>trans</span> with a pathogenic variant<br/><br/><em>Note: This requires testing of parents (or offspring) to determine phase.</em>" },
-            { criteria: "PM4", description: "Protein length changes as a result of in-frame deletions/insertions in a nonrepeat region or stop-loss variants" },
-            { criteria: "PM5", description: "Novel missense change at an amino acid residue where a different missense change determined to be pathogenic has been seen before<br/><ul><li>Example: Arg156His is pathogenic; now you observe Arg156Cys</li><li>Caveat: Beware of changes that impact splicing rather than at the amino acid/protein level.</li></ul>" },
-            { criteria: "PM6", description: "Assumed de novo, but without confirmation of paternity and maternity" },
-            { criteria: "PS1", description: "Same amino acid change as a previously established pathogenic variant regardless of nucleotide change<br/><ul><li>Example: Val→Leu caused by either G>C or G>T in the same codon</li><li>Caveat: Beware of changes that impact splicing rather than at the amino acid/protein level</li></ul>" },
-            { criteria: "PS2", description: "De novo (<u>both</u> maternity and paternity confirmed) in a patient with the disease and no family history<br/><br/><em>Note: Confirmation of paternity only is insufficient. Egg donation, surrogate motherhood, errors in embryo transfer, and so on, can contribute to nonmaternity.</em>" },
-            { criteria: "PS3", description: "Well-established in vitro or in vivo functional studies supportive of a damaging effect on the gene or gene product<br/><br/><em>Note: Functional studies that have been validated and shown to be reproducible and robust in a clinical diagnostic laboratory setting are considered the most well established.</em>" },
-            { criteria: "PS4", description: "The prevalence of the variant in affected individuals is significantly increased compared with the prevalence in controls<br/><br/><em>Note 1: Relative risk or OR, as obtained from case–control studies, is >5.0, and the confidence interval around the estimate of relative risk or OR does not include 1.0. See the article for detailed guidance.</em><br/><br/><em>Note 2: In instances of very rare variants where case–control studies may not reach statistical significance, the prior observation of the variant in multiple unrelated patients with the same phenotype, and its absence in controls, may be used as moderate level of evidence.</em>" },
-            { criteria: "PVS1", description: "Null variant (nonsense, frameshift, canonical ±1 or 2 splice sites, initiation codon, single or multiexon deletion) in a gene where LOF is a known mechanism of disease.<br/><br/>Caveats:<br/><ul><li>Beware of genes where LOF is not a known disease mechanism (e.g., GFAP, MYH7)</li><li>Use caution interpreting LOF variants at the extreme 3′ end of a gene</li><li>Use caution with splice variants that are predicted to lead to exon skipping but leave the remainder of the protein intact</li><li>Use caution in the presence of multiple transcripts</li></ul>" }
-        ];
-
-        const genericDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-        const acmgTip = (criteria, description) => `<h5 class="my-0 mw-10 text-600">${criteria}</h5><div style="max-width: 250px">${description}</div>`;
+        const acmgTip = (criteria, description) => ( criteria && description ? `<h5 class="my-0 mw-10 text-600">${criteria}</h5><div style="max-width: 250px">${description}</div>`: null);
 
         return (
             <div className="card flex-row my-3 mt-0">
@@ -448,12 +417,12 @@ class ACMGInvoker extends React.Component {
                     }/>
                 </div>
                 <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
-                    {acmgCriteria.map((obj) => {
-                        const { criteria, description } = obj;
+                    {acmgUtil.rules.map((rule) => {
+                        const { [rule]: { description } = {} } = acmgUtil.metadata;
                         return (
-                            <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={criteria} data-criteria={criteria} data-invoked={invoked[criteria]}
-                                onClick={() => toggleInvocation(criteria)} style={{ flex: "1" }} data-html data-tip={(acmgTip(criteria, description || genericDescription))}>
-                                { criteria }
+                            <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={invoked[rule]}
+                                onClick={() => toggleInvocation(rule)} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
+                                { rule }
                             </div>
                         );}
                     )}
