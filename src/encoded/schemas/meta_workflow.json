@@ -99,7 +99,7 @@
                                 "argument_type" : {
                                     "title" : "Input Argument type",
                                     "description" : "input argument type (either file or parameter)",
-                                    "type" : "string"
+                                    "type" : "string",
                                     "enum" : [
                                         "file",
                                         "parameter",
