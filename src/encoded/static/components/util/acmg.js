@@ -1,8 +1,8 @@
 
 
-export const acmgRules = ["BA1", "BS1", "BS2", "BS3", "BS4", "BP1", "BP2", "BP3", "BP4", "BP5", "BP6", "BP7", "PP1", "PP2", "PP3", "PP4", "PP5", "PM1", "PM2", "PM3", "PM4", "PM5", "PM6", "PS1", "PS2", "PS3", "PS4", "PVS1"];
+export const rules = ["BA1", "BS1", "BS2", "BS3", "BS4", "BP1", "BP2", "BP3", "BP4", "BP5", "BP6", "BP7", "PP1", "PP2", "PP3", "PP4", "PP5", "PM1", "PM2", "PM3", "PM4", "PM5", "PM6", "PS1", "PS2", "PS3", "PS4", "PVS1"];
 
-export const acmgMetadata = {
+export const metadata = {
     "BA1": { type: "benign", strength: "standalone", order: 1, description: "Allele frequency is >5% in Exome Sequencing Project, 1000 Genomes Project, or Exome Aggregation Consortium" },
     "BS1": { type: "benign", strength: "strong", order: 2, description: "Allele frequency is greater than expected for disorder (see Table 6)" },
     "BS2": { type: "benign", strength: "strong", order: 2, description: "Observed in a healthy adult individual for a recessive (homozygous), dominant (heterozygous), or X-linked (hemizygous) disorder, with full penetrance expected at an early age" },
