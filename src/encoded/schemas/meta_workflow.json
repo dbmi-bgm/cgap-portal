@@ -102,7 +102,7 @@
                                     "type" : "string",
                                     "enum" : [
                                         "file",
-                                        "parameter",
+                                        "parameter"
                                     ]
                                 },
                                 "source" : {
@@ -168,13 +168,13 @@
                 }
             }
         },
-        "arguments": {
-            "title": "Arguments",
-            "description": "Global arguments of the meta-workflow",
+        "input": {
+            "title": "Input Arguments",
+            "description": "Global input arguments of the meta-workflow",
             "type": "array",
             "items": {
-                "title": "Argument",
-                "description": "individual global argument of the meta-workflow. Additional property default_value may be defined.",
+                "title": "Input Argument",
+                "description": "individual global input argument of the meta-workflow. Additional property default_value may be defined.",
                 "type": "object",
                 "additionalProperties": true,
                 "properties": {
@@ -226,6 +226,7 @@
                             }
                         }
                     }
+                }
             }
         }
     },
