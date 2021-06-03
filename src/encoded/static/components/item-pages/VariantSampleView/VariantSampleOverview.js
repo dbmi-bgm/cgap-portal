@@ -269,6 +269,15 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
     );
 });
 
+/**
+ * A component that controls interpretation/classification state shared between all tabs in interpretation space
+ * AND the global ACMG invoker. The autoclassification and globalACMGSelections held here are passed into
+ * Interpretation Space, used there. ShowACMGInvoker & toggleACMGInvoker toggle visibility for invoker on/off clinical tab.
+ *
+ * Also renders out annotation space (VariantSampleInfoHeader & VariantSampleOverviewTabView) as child (needed to position it inside of
+ * this markup for layout purposes, but wanted to keep separation of functionality, so that component is defined/props are passed
+ * in inside VariantSampleOverview).
+ */
 class InterpretationController extends React.Component {
 
     constructor(props) {
@@ -297,11 +306,21 @@ class InterpretationController extends React.Component {
         this.classifier = classifier;
     }
 
+    /**
+     * Toggles visibility of ACMG invoker (28 clickable rules); currently passed into Interpretation Space and called when interpretation
+     * note tabs are switched to and from clinical tab.
+     * @param {Function} callback   An optional function to call upon state setting.
+     */
     toggleACMGInvoker(callback) {
         const { showACMGInvoker } = this.state;
         this.setState({ showACMGInvoker: !showACMGInvoker }, callback);
     }
 
+    /**
+     * Called when a new rule is invoked or uninvoked
+     * @param {String} criteria     An ACMG rule
+     * @param {Function} callback   An optional function to call upon state setting
+     */
     toggleInvocation(criteria, callback) {
         const { globalACMGSelections = {} } = this.state;
         const newInvocations = { ...globalACMGSelections };
@@ -362,6 +381,9 @@ class InterpretationController extends React.Component {
     }
 }
 
+/**
+ * 28 ACMG Rules, made clickable and "invokable"; uses passed in methods/state from InterpretationController.
+ */
 function ACMGInvoker(props) {
     const { globalACMGSelections: invoked = {}, toggleInvocation } = props || {};
 
