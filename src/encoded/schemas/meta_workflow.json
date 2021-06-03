@@ -164,12 +164,6 @@
                         "description" : "Custom fields to be added to QC items through Tibanna",
                         "type" : "object",
                         "additionalProperties": true
-                    },
-                    "common_fields" : {
-                        "title" : "Common fields",
-                        "description" : "Common fields to be added to Workflow Run, Processed file and QC items through Tibanna",
-                        "type" : "object",
-                        "additionalProperties": true
                     }
                 }
             }
