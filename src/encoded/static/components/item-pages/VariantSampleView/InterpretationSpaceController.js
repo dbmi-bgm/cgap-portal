@@ -785,7 +785,7 @@ function GenericFieldForm(props) {
     const fieldsJSX = useMemo(function() {
         return fieldsArr.map((fieldDataObj) => {
             const { field, value, autoClassification, toggleInvocation } = fieldDataObj;
-            if (field === "acmg_guidelines") { return (<ACMGPicker selections={value} {...{ schemas, field, autoClassification, toggleInvocation, getFieldProperties }}/>); }
+            if (field === "acmg_guidelines") { return (<ACMGPicker key={field} selections={value} {...{ schemas, field, autoClassification, toggleInvocation, getFieldProperties }}/>); }
             return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field, getFieldProperties }}
                 onOptionChange={onDropOptionChange} />);
         }).sort().reverse(); // Reverse really just to get Variant candidacy to show up last. May need a better solution if more fields added in future.
