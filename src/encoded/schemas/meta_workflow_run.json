@@ -193,6 +193,7 @@
                             "title": "Default Files",
                             "description": "A list of objects describing default input file items",
                             "type": "object",
+                            "additionalProperties": false,
                             "properties": {
                                 "file": {
                                     "title" : "File",
@@ -227,6 +228,12 @@
                 "complete",
                 "failed"
             ]
+        },
+        "common_fields": {
+            "title": "Common Fields",
+            "description": "Common fields that go into all workflow_run, processed_files and qc items",
+            "type": "object",
+            "additionalProperties": true
         }
     },
     "facets": {
