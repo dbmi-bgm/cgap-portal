@@ -168,8 +168,8 @@ class InterpretationController extends React.Component {
             if (criteriaObj[criteria]) { invokedFlat.push(criteria); }
         });
         return invokedFlat.sort((a, b) => {
-            const orderA = AutoClassify.criteriaToClassification[a].order;
-            const orderB = AutoClassify.criteriaToClassification[b].order;
+            const orderA = acmgUtil.AutoClassify.criteriaToClassification[a].order;
+            const orderB = acmgUtil.AutoClassify.criteriaToClassification[b].order;
             // Sort so that it aligns with color scheme above
             return orderA - orderB;
         });
@@ -181,7 +181,7 @@ class InterpretationController extends React.Component {
         // Initialize global selections based on most recent interpretation from context
         const { interpretationTab, context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
         const acmgSelections = InterpretationController.initializeGlobalACMGState(acmg_guidelines);
-        const classifier = new AutoClassify(acmgSelections);
+        const classifier = new acmgUtil.AutoClassify(acmgSelections);
         const classification = classifier.getClassification();
 
         this.state = {
@@ -215,7 +215,7 @@ class InterpretationController extends React.Component {
         }
 
         // TODO: rework this to have a single instance, updated when new criteria toggled
-        const classifier = new AutoClassify(newInvocations);
+        const classifier = new acmgUtil.AutoClassify(newInvocations);
         const classification = classifier.getClassification();
 
         this.setState({ globalACMGSelections: newInvocations, autoClassification: classification }, callback);
@@ -429,224 +429,5 @@ class ACMGInvoker extends React.Component {
                 </div>
             </div>
         );
-    }
-}
-
-
-class AutoClassify {
-    /**
-     * Based on https://www.mgz-muenchen.com/files/Public/Downloads/2018/ACMG%20Classification%20of%20Sequence%20Variants.pdf (pg 3)
-     */
-    static criteriaToClassification = {
-        "BA1": { type: "benign", strength: "standalone", order: 1 },
-        "BS1": { type: "benign", strength: "strong", order: 2 },
-        "BS2": { type: "benign", strength: "strong", order: 2 },
-        "BS3": { type: "benign", strength: "strong", order: 2 },
-        "BS4": { type: "benign", strength: "strong", order: 2 },
-        "BP1": { type: "benign", strength: "supporting", order: 3 },
-        "BP2": { type: "benign", strength: "supporting", order: 3 },
-        "BP3": { type: "benign", strength: "supporting", order: 3 },
-        "BP4": { type: "benign", strength: "supporting", order: 3 },
-        "BP5": { type: "benign", strength: "supporting", order: 3 },
-        "BP6": { type: "benign", strength: "supporting", order: 3 },
-        "BP7": { type: "benign", strength: "supporting", order: 3 },
-        "PP1": { type: "pathogenic", strength: "supporting", order: 4 },
-        "PP2": { type: "pathogenic", strength: "supporting", order: 4 },
-        "PP3": { type: "pathogenic", strength: "supporting", order: 4 },
-        "PP4": { type: "pathogenic", strength: "supporting", order: 4 },
-        "PP5": { type: "pathogenic", strength: "supporting", order: 4 },
-        "PM1": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PM2": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PM3": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PM4": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PM5": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PM6": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PS1": { type: "pathogenic", strength: "strong", order: 6 },
-        "PS2": { type: "pathogenic", strength: "strong", order: 6 },
-        "PS3": { type: "pathogenic", strength: "strong", order: 6 },
-        "PS4": { type: "pathogenic", strength: "strong", order: 6 },
-        "PVS1": { type: "pathogenic", strength: "vstrong", order: 7 }
-    }
-
-    /**
-     * Takes evidence of pathogenicity counts and returns true if Pathogenic criteria invoked
-     * @param {Number} vstrong      # of PVS1 evidence invoked
-     * @param {Number} strong       # of (PS1–PS4) evidence invoked
-     * @param {Number} moderate     # of (PM1–PM6) evidence invoked
-     * @param {Number} supporting   # of (PP1–PP5) evidence invoked
-     * @returns {boolean}
-     */
-    static isPathogenic(vstrong, strong, moderate, supporting){
-        if (vstrong >= 1) {                             // (i) 1 Very strong (PVS1) AND
-            if ((strong >= 1) ||                        //      a) ≥1 Strong (PS1–PS4) OR
-                (moderate >= 2) ||                      //      b) ≥2 Moderate (PM1–PM6) OR
-                (moderate === 1 && supporting === 1) || //      c) 1 Moderate (PM1–PM6) and 1 supporting (PP1–PP5) OR
-                (supporting >= 2)) {                    //      d) d) ≥2 Supporting (PP1–PP5)
-                return true;
-            }
-        }
-        if (strong >= 2) {                              // (ii) ≥2 Strong (PS1–PS4) OR
-            return true;
-        }
-        if (strong === 1) {                             // (iii) 1 Strong (PS1–PS4) AND
-            if ((moderate >= 3) ||                      //      a) ≥3 Moderate (PM1–PM6) OR
-            (moderate === 2 && supporting >= 2) ||      //      b) 2 Moderate (PM1–PM6) AND ≥2 Supporting (PP1–PP5) OR
-            (moderate === 1 && supporting >= 4)) {      //      c) 1 Moderate (PM1–PM6) AND ≥4 supporting (PP1–PP5
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Takes evidence of pathogenicity counts and returns true if Likely Pathogenic criteria invoked
-     * @param {Number} vstrong      # of PVS1 evidence invoked
-     * @param {Number} strong       # of (PS1–PS4) evidence invoked
-     * @param {Number} moderate     # of (PM1–PM6) evidence invoked
-     * @param {Number} supporting   # of (PP1–PP5) evidence invoked
-     * @returns {boolean}
-     */
-    static isLikelyPathogenic(vstrong, strong, moderate, supporting){
-        if ((vstrong === 1 && moderate === 1) ||                    // (i) 1 Very strong (PVS1) AND 1 moderate (PM1–PM6) OR
-            (strong === 1 && (moderate === 1 || moderate === 2)) || // (ii) 1 Strong (PS1–PS4) AND 1–2 moderate (PM1–PM6) OR
-            (strong === 1 && (supporting >= 2)) ||                  // (iii) 1 Strong (PS1–PS4) AND ≥2 supporting (PP1–PP5) OR
-            (moderate >= 3) ||                                      // (iv) ≥3 Moderate (PM1–PM6) OR
-            (moderate === 2) && (supporting >= 2) ||                // (v) 2 Moderate (PM1–PM6) AND ≥2 supporting (PP1–PP5) OR
-            (moderate === 1) && (supporting >= 4)) {                // (vi) 1 Moderate (PM1–PM6) AND ≥4 supporting (PP1–PP5)
-            return true;
-        }
-        return false;
-
-    }
-
-    /**
-     * Takes evidence of benign effect counts and returns true if Benign criteria invoked
-     * @param {Number} standalone       # of BA1 evidence invoked
-     * @param {Number} strong           # of (BS1-BS4) evidence invoked
-     * @returns {boolean}
-     */
-    static isBenign(standalone, strong){
-        if (standalone || strong >= 2) {    // (i) 1 Stand-alone (BA1) OR (ii) ≥2 Strong (BS1–BS4)
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Takes evidence of benign effect counts and returns true if Likely Benign criteria invoked
-     * @param {Number} strong           # of (BS1-BS4) evidence invoked
-     * @param {Number} supporting       # of (BP1-BP7) evidence invoked
-     * @returns {boolean}
-     */
-    static isLikelyBenign(strong, supporting){
-        if ((strong === 1 && supporting >= 1) ||    // (i) 1 Strong (BS1–BS4) and 1 supporting (BP1–BP7) OR
-            (supporting >= 2)                       // (ii) ≥2 Supporting (BP1–BP7)
-        ) {
-            return true;
-        }
-        return false;
-    }
-
-    constructor(invoked) {
-        this.evidenceOfPathogenicity = {};
-        this.evidenceOfBenignImpact = {};
-        this.autoClassification = null;
-
-        this.initializeEvidenceFromInvoked(invoked);
-
-        this.memoized = {
-            isBenign: memoize(AutoClassify.isBenign),
-            isLikelyBenign: memoize(AutoClassify.isLikelyBenign),
-            isPathogenic: memoize(AutoClassify.isPathogenic),
-            isLikelyPathogenic: memoize(AutoClassify.isLikelyPathogenic)
-        };
-    }
-
-    initializeEvidenceFromInvoked(invoked) {
-        // console.log("populating with evidence from, ", invoked);
-        // Flatten into an array of invoked items
-        const invokedFlat = [];
-        Object.keys(invoked).forEach((criteria) => {
-            if (invoked[criteria]) { invokedFlat.push(criteria); }
-        });
-
-        // Collect counts of various evidence types
-        invokedFlat.forEach((criteria) => {
-            const classification = AutoClassify.criteriaToClassification[criteria];
-            if (classification.type === "pathogenic") {
-                if (this.evidenceOfPathogenicity[classification.strength] === undefined) {
-                    this.evidenceOfPathogenicity[classification.strength] = 1;
-                } else {
-                    const newValue = this.evidenceOfPathogenicity[classification.strength] + 1;
-                    this.evidenceOfPathogenicity[classification.strength] = newValue;
-                }
-            } else {
-                if (this.evidenceOfBenignImpact[classification.strength] === undefined) {
-                    this.evidenceOfBenignImpact[classification.strength] = 1;
-                } else {
-                    const newValue = this.evidenceOfBenignImpact[classification.strength] + 1;
-                    this.evidenceOfBenignImpact[classification.strength] = newValue;
-                }
-            }
-        });
-    }
-
-    classify() {
-        const {
-            standalone = null,
-            strong: strongb = null,
-            supporting: supportingb = null
-        } = this.evidenceOfBenignImpact;
-        const {
-            vstrong = null,
-            strong: strongp = null,
-            supporting: supportingp = null,
-            moderate: moderatep = null
-        } = this.evidenceOfPathogenicity;
-
-        // Check for certain benign effect
-        const isBenign = this.memoized.isBenign(standalone, strongb);
-        let isPathogenic;
-        if (isBenign) {
-            isPathogenic = this.memoized.isPathogenic(vstrong, strongp, moderatep, supportingp);
-            // (Uncertain significance ii) the criteria for benign and pathogenic are contradictory
-            return isPathogenic ? "Uncertain significance" : "Benign";
-        }
-
-        // Check for certain pathogenicity
-        if (isPathogenic === undefined) {
-            isPathogenic = this.memoized.isPathogenic(vstrong, strongp, moderatep, supportingp);
-        }
-        if (isPathogenic) {
-            return "Pathogenic";
-        }
-
-        // Check for probable benign effect
-        const isLikelyBenign = this.memoized.isLikelyBenign(strongb, supportingb);
-        let isLikelyPathogenic;
-        if (isLikelyBenign) {
-            isLikelyPathogenic = this.memoized.isLikelyPathogenic(vstrong, strongp, moderatep, supportingp);
-            // (Uncertain significance ii) the criteria for benign and pathogenic are contradictory
-            return isLikelyPathogenic ? "Uncertain significance" : "Likely benign";
-        }
-
-        // Check for probable pathogenic effect
-        if (isLikelyPathogenic === undefined) {
-            isLikelyPathogenic = this.memoized.isLikelyPathogenic(vstrong, strongp, moderatep, supportingp);
-        }
-        if (isLikelyPathogenic) {
-            return "Likely pathogenic";
-        }
-
-        // (Uncertain significance i) Other criteria shown above are not met
-        return "Uncertain significance";
-    }
-
-    getClassification() {
-        const classification = this.classify();
-        this.autoClassification = classification;
-        console.log("Final classification...", classification);
-        return classification;
     }
 }
