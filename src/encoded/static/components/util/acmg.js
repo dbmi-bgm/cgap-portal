@@ -64,16 +64,14 @@ export function flattenStateMapIntoArray(obj) {
     return invokedFlat.sort((a, b) => {
         const orderA = metadata[a].order;
         const orderB = metadata[b].order;
-        // Sort so that it aligns with color scheme above
         return orderA - orderB;
     });
 }
 
-
+/**
+ * Based on https://www.mgz-muenchen.com/files/Public/Downloads/2018/ACMG%20Classification%20of%20Sequence%20Variants.pdf (pg 3)
+ */
 export class AutoClassify {
-    /**
-     * Based on https://www.mgz-muenchen.com/files/Public/Downloads/2018/ACMG%20Classification%20of%20Sequence%20Variants.pdf (pg 3)
-     */
 
     /**
      * Takes evidence of pathogenicity counts and returns true if Pathogenic criteria invoked
@@ -179,10 +177,7 @@ export class AutoClassify {
     initializeEvidenceFromInvoked(invoked) {
         // console.log("populating with evidence from, ", invoked);
         // Flatten into an array of invoked items
-        const invokedFlat = [];
-        Object.keys(invoked).forEach((rule) => {
-            if (invoked[rule]) { invokedFlat.push(rule); }
-        });
+        const invokedFlat = flattenStateMapIntoArray(invoked);
 
         // Collect counts of various evidence types
         invokedFlat.forEach((rule) => {
