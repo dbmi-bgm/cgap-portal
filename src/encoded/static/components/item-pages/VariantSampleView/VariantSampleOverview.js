@@ -133,99 +133,6 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 }
 
-class InterpretationController extends React.Component {
-
-    constructor(props) {
-        super(props);
-
-        // Initialize ACMG selections based on most recent interpretation from context
-        const { interpretationTab, context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
-        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_guidelines);
-        const classifier = new acmgUtil.AutoClassify(acmgSelections);
-        const classification = classifier.getClassification();
-
-        this.state = {
-            globalACMGSelections: acmgSelections,
-            autoClassification: classification,
-            showACMGInvoker: interpretationTab === 2, // State method passed into Interpretation space and called when clinical tab is selected
-        };
-
-        this.toggleACMGInvoker = this.toggleACMGInvoker.bind(this);
-        this.toggleInvocation = this.toggleInvocation.bind(this);
-
-        this.memoized = {
-            flattenGlobalACMGStateIntoArray: memoize(acmgUtil.flattenStateMapIntoArray)
-        };
-
-        // Save an instance of autoclassify so that other methods can use it to calculate classification
-        this.classifier = classifier;
-    }
-
-    toggleACMGInvoker(callback) {
-        const { showACMGInvoker } = this.state;
-        this.setState({ showACMGInvoker: !showACMGInvoker }, callback);
-    }
-
-    toggleInvocation(criteria, callback) {
-        const { globalACMGSelections = {} } = this.state;
-        const newInvocations = { ...globalACMGSelections };
-
-        if (newInvocations[criteria] !== undefined) { // already set
-            const newState = !newInvocations[criteria];
-            newInvocations[criteria] = newState;
-            if (newState) {
-                this.classifier.invoke(criteria);
-            } else {
-                this.classifier.uninvoke(criteria);
-            }
-        } else { // first time setting
-            newInvocations[criteria] = true;
-            this.classifier.invoke(criteria);
-        }
-
-        const classification = this.classifier.getClassification();
-
-        this.setState({ globalACMGSelections: newInvocations, autoClassification: classification }, callback);
-    }
-
-    render() {
-        const { showACMGInvoker, globalACMGSelections, autoClassification } = this.state;
-        const { context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
-        const passProps = { context, schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
-
-        const {
-            interpretation: { error: interpError = null, acmg_guidelines = [] } = {},
-            variant_notes: { error: varNoteError = null } = {},
-            gene_notes: { error: geneNoteError = null } = {},
-            discovery_interpretation: { error: discoveryError = null } = {}
-        } = context || {}; // TODO: Pull from most recent note from db=datastore request
-
-        const anyNotePermErrors = interpError || varNoteError || geneNoteError || discoveryError;
-
-        const wipACMGSelections = this.memoized.flattenGlobalACMGStateIntoArray(globalACMGSelections);
-
-        return (
-            <React.Fragment>
-                <Collapse in={showACMGInvoker}>
-                    <div>{/** Collapse seems not to work without wrapper element */}
-                        <ACMGInvoker invokedFromSavedNote={acmg_guidelines} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} />
-                    </div>
-                </Collapse>
-                <div className="row flex-column-reverse flex-lg-row flex-nowrap">
-                    <div className="col">
-                        {/* Annotation Space passed as child */}
-                        { children }
-                    </div>
-                    { showInterpretation == 'True' && !anyNotePermErrors ?
-                        <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...{ autoClassification }} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
-                        </div> : null }
-                </div>
-            </React.Fragment>
-        );
-    }
-}
-
 function getCurrentTranscriptGeneID(context, transcriptIndex){
     const { variant: { transcript: geneTranscriptList = [] } = {} } = context;
     const { csq_gene : { "@id" : geneID = null } = {} } = geneTranscriptList[transcriptIndex] || {};
@@ -362,6 +269,98 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
     );
 });
 
+class InterpretationController extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        // Initialize ACMG selections based on most recent interpretation from context
+        const { interpretationTab, context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
+        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_guidelines);
+        const classifier = new acmgUtil.AutoClassify(acmgSelections);
+        const classification = classifier.getClassification();
+
+        this.state = {
+            globalACMGSelections: acmgSelections,
+            autoClassification: classification,
+            showACMGInvoker: interpretationTab === 2, // State method passed into Interpretation space and called when clinical tab is selected
+        };
+
+        this.toggleACMGInvoker = this.toggleACMGInvoker.bind(this);
+        this.toggleInvocation = this.toggleInvocation.bind(this);
+
+        this.memoized = {
+            flattenGlobalACMGStateIntoArray: memoize(acmgUtil.flattenStateMapIntoArray)
+        };
+
+        // Save an instance of autoclassify so that other methods can use it to calculate classification
+        this.classifier = classifier;
+    }
+
+    toggleACMGInvoker(callback) {
+        const { showACMGInvoker } = this.state;
+        this.setState({ showACMGInvoker: !showACMGInvoker }, callback);
+    }
+
+    toggleInvocation(criteria, callback) {
+        const { globalACMGSelections = {} } = this.state;
+        const newInvocations = { ...globalACMGSelections };
+
+        if (newInvocations[criteria] !== undefined) { // already set
+            const newState = !newInvocations[criteria];
+            newInvocations[criteria] = newState;
+            if (newState) {
+                this.classifier.invoke(criteria);
+            } else {
+                this.classifier.uninvoke(criteria);
+            }
+        } else { // first time setting
+            newInvocations[criteria] = true;
+            this.classifier.invoke(criteria);
+        }
+
+        const classification = this.classifier.getClassification();
+
+        this.setState({ globalACMGSelections: newInvocations, autoClassification: classification }, callback);
+    }
+
+    render() {
+        const { showACMGInvoker, globalACMGSelections, autoClassification } = this.state;
+        const { context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const passProps = { context, schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
+
+        const {
+            interpretation: { error: interpError = null, acmg_guidelines = [] } = {},
+            variant_notes: { error: varNoteError = null } = {},
+            gene_notes: { error: geneNoteError = null } = {},
+            discovery_interpretation: { error: discoveryError = null } = {}
+        } = context || {}; // TODO: Pull from most recent note from db=datastore request
+
+        const anyNotePermErrors = interpError || varNoteError || geneNoteError || discoveryError;
+
+        const wipACMGSelections = this.memoized.flattenGlobalACMGStateIntoArray(globalACMGSelections);
+
+        return (
+            <React.Fragment>
+                <Collapse in={showACMGInvoker}>
+                    <div>{/** Collapse seems not to work without wrapper element */}
+                        <ACMGInvoker invokedFromSavedNote={acmg_guidelines} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} />
+                    </div>
+                </Collapse>
+                <div className="row flex-column-reverse flex-lg-row flex-nowrap">
+                    <div className="col">
+                        {/* Annotation Space passed as child */}
+                        { children }
+                    </div>
+                    { showInterpretation == 'True' && !anyNotePermErrors ?
+                        <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
+                            <InterpretationSpaceWrapper {...{ autoClassification }} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
+                        </div> : null }
+                </div>
+            </React.Fragment>
+        );
+    }
+}
 
 function ACMGInvoker(props) {
     const { globalACMGSelections: invoked = {}, toggleInvocation } = props || {};
