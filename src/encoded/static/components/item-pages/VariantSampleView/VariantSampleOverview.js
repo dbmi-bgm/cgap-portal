@@ -133,23 +133,6 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 }
 
-function QuickPopover(props) {
-    const { title, content, cls, popID, tooltip } = props || {};
-    const popover = (
-        <Popover id={popID}>
-            <Popover.Title className="m-0" as="h4">{title}</Popover.Title>
-            <Popover.Content>
-                { content }
-            </Popover.Content>
-        </Popover>
-    );
-    return (
-        <OverlayTrigger trigger="focus" placement="right" overlay={popover}>
-            <Button variant="link" className={cls} data-tip={tooltip || "Click for citation info"}><i className="icon icon-info-circle fas" /></Button>
-        </OverlayTrigger>
-    );
-}
-
 class InterpretationController extends React.Component {
 
     constructor(props) {
@@ -380,38 +363,53 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
 });
 
 
-class ACMGInvoker extends React.Component {
-    render() {
-        const { globalACMGSelections: invoked = {}, toggleInvocation } = this.props;
+function ACMGInvoker(props) {
+    const { globalACMGSelections: invoked = {}, toggleInvocation } = props || {};
 
-        const acmgTip = (criteria, description) => ( criteria && description ? `<h5 class="my-0 mw-10 text-600">${criteria}</h5><div style="max-width: 250px">${description}</div>`: null);
+    const acmgTip = (criteria, description) => ( criteria && description ? `<h5 class="my-0 mw-10 text-600">${criteria}</h5><div style="max-width: 250px">${description}</div>`: null);
 
-        return (
-            <div className="card flex-row my-3 mt-0">
-                <div className="text-600 acmg-guidelines-title">ACMG Rules
-                    <QuickPopover cls="p-1" popID="acmg-info-popover" title="Note on ACMG Tooltips and Auto-Classification" content={
-                        <div>
-                            <div className="mb-05">
-                                The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS" target="_blank" rel="noreferrer">this publication</a>.
-                            </div>
-                            <div>
-                                <u>Full Citation</u>: Richards, S., Aziz, N., Bale, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genet Med 17, 405–423 (2015). https://doi.org/10.1038/gim.2015.30
-                            </div>
+    return (
+        <div className="card flex-row my-3 mt-0">
+            <div className="text-600 acmg-guidelines-title">ACMG Rules
+                <QuickPopover cls="p-1" popID="acmg-info-popover" title="Note on ACMG Tooltips and Auto-Classification" content={
+                    <div>
+                        <div className="mb-05">
+                            The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS" target="_blank" rel="noreferrer">this publication</a>.
                         </div>
-                    }/>
-                </div>
-                <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
-                    {acmgUtil.rules.map((rule) => {
-                        const { [rule]: { description } = {} } = acmgUtil.metadata;
-                        return (
-                            <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={invoked[rule]}
-                                onClick={() => toggleInvocation(rule)} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
-                                { rule }
-                            </div>
-                        );}
-                    )}
-                </div>
+                        <div>
+                            <u>Full Citation</u>: Richards, S., Aziz, N., Bale, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genet Med 17, 405–423 (2015). https://doi.org/10.1038/gim.2015.30
+                        </div>
+                    </div>
+                }/>
             </div>
-        );
-    }
+            <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
+                {acmgUtil.rules.map((rule) => {
+                    const { [rule]: { description } = {} } = acmgUtil.metadata;
+                    return (
+                        <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={invoked[rule]}
+                            onClick={() => toggleInvocation(rule)} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
+                            { rule }
+                        </div>
+                    );}
+                )}
+            </div>
+        </div>
+    );
+}
+
+function QuickPopover(props) {
+    const { title, content, cls, popID, tooltip } = props || {};
+    const popover = (
+        <Popover id={popID}>
+            <Popover.Title className="m-0" as="h4">{title}</Popover.Title>
+            <Popover.Content>
+                { content }
+            </Popover.Content>
+        </Popover>
+    );
+    return (
+        <OverlayTrigger trigger="focus" placement="right" overlay={popover}>
+            <Button variant="link" className={cls} data-tip={tooltip || "Click for citation info"}><i className="icon icon-info-circle fas" /></Button>
+        </OverlayTrigger>
+    );
 }
