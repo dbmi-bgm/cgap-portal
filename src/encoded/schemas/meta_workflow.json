@@ -143,17 +143,6 @@
                                         "gz",
                                         "bz2"
                                     ]
-                                },
-                                "default_file": {
-                                    "title": "Default input file",
-                                    "description" : "Default input file (applicable when argument_type is file)",
-                                    "type" : "string",
-                                    "linkTo": "File"
-                                },
-                                "default_value": {
-                                    "title": "Default value",
-                                    "description" : "Default value (applicable when argument_type is parameter)",
-                                    "type" : "string"
                                 }
                             }
                         }
@@ -191,9 +180,9 @@
             "type": "array",
             "items": {
                 "title": "Argument",
-                "description": "individual global argument of the meta-workflow",
+                "description": "individual global argument of the meta-workflow. Additional property default_value may be defined.",
                 "type": "object",
-                "additionalProperties": false,
+                "additionalProperties": true,
                 "properties": {
                     "argument_name" : {
                         "title" : "Argument Name",
@@ -205,16 +194,43 @@
                         "description" : "Name of the workflow, unique within the meta workflow",
                         "type" : "string"
                     },
-                    "default_value": {
+                    "value": {
                         "title" : "Default value",
-                        "description" : "Default value of the parameter type argument",
+                        "description" : "Default value of the parameter-type argument",
                         "type" : "string"
                     },
-                    "default_file": {
-                        "title" : "Default file",
-                        "description" : "Default file item of the file type argument",
-                        "type" : "string",
-                        "linkTo": "File"
+                    "value_type": {
+                        "title": "Value Type",
+                        "description": "Type of the specific input parameter value",
+                        "type": "string",
+                        "enum":[
+                            "string",
+                            "integer",
+                            "float",
+                            "json"
+                        ]
+                    },
+                    "files": {
+                        "title" : "Default files",
+                        "description" : "Default file item(s) of the file argument",
+                        "type": "array",
+                        "items": {
+                            "title": "Default Files",
+                            "description": "A list of objects describing default input file items",
+                            "type": "object",
+                            "properties": {
+                                "file": {
+                                    "title" : "File",
+                                    "type" : "string",
+                                    "linkTo": "File"
+                                },
+                                "dimension": {
+                                    "title" : "Dimension",
+                                    "description": "Dimension of file in the input argument (unset for a singleton, '0', '1', '2'.. for a list, '0,0', '0,1' ... for a nested list)",
+                                    "type" : "string"
+                                }
+                            }
+                        }
                     }
             }
         }

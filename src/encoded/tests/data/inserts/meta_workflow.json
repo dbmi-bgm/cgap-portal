@@ -6,33 +6,65 @@
       "description": "Test meta workflow",
       "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
       "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-      "arguments": [
+      "uuid": "ceafe51e-61b9-40fc-bdfa-d01e5e27046e",
+      "aliases": ["cgap:test_metawf"],
+      "input": [
           {
               "argument_name": "bam",
               "argument_type": "file"
+          },
+          {
+              "argument_name": "reference",
+              "argument_type": "file",
+              "files": [
+                  {
+                      "file": "1053df95-4cf3-41cc-971d-81bb16c486dd"
+                  }
+              ]
+          },
+          {
+              "argument_name": "nthread_mpileup",
+              "argument_type": "parameter",
+              "value": "32",
+              "value_type": "integer"
+          },
+          {
+              "argument_name": "rcktar_content_filenames",
+              "argument_type": "parameter"
           }
       ],
       "workflows": [
           {
               "name": "mpileup",
               "workflow": "e2e95743-0d3b-4e07-b1e5-71c80dd74906",
-              "inputs": [
+              "input": [
                   {
                       "argument_name": "bam",
+                      "argument_type": "file",
+                      "scatter": 1
+                  },
+                  {
+                      "argument_name": "reference",
                       "argument_type": "file"
+                  },
+                  {
+                      "argument_name": "nthread",
+                      "argument_type": "parameter",
+                      "source_argument_name": "nthread_mpileup"
                   }
               ]
           },
           {
               "name": "rcktar",
               "workflow": "40f60563-a3e6-4a45-b083-c6a2e00dc71f",
-              "inputs": [
+              "input": [
                   {
                       "argument_name": "input_rcks",
                       "argument_type": "file",
                       "source": "mpileup",
                       "source_argument_name": "rck",
-                      "gather": 1
+                      "gather": 1,
+                      "rename": "formula:rcktar_content_filenames"
                   }
               ]
           }

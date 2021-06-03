@@ -45,5 +45,32 @@
           "value": "10e82a90-49e5-4c33-afab-9ec90d65faa1"
         }
       ]
+    },
+    {
+        "uuid": "1964b601-4d50-44cd-bfa5-78bb7043d060",
+        "workflow": "e2e95743-0d3b-4e07-b1e5-71c80dd74906",
+        "awsem_job_id": "axqsn1LkT6GT",
+        "run_status": "complete",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "submitted_by": "soohyun_lee@hms.harvard.edu"
+    },
+    {
+        "uuid": "9202acd3-e89c-4b69-9894-ce6f9582d266",
+        "workflow": "e2e95743-0d3b-4e07-b1e5-71c80dd74906",
+        "awsem_job_id": "cKqCPmE29n24",
+        "run_status": "error",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "submitted_by": "soohyun_lee@hms.harvard.edu"
+    },
+    {
+        "uuid": "1964b601-4d50-44cd-bfa5-78bb7043d060",
+        "workflow": "8a39b6fb-8c91-4e88-a77f-70b654c2c0dc",
+        "awsem_job_id": "NJWsxyP6aeAk",
+        "run_status": "started",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "submitted_by": "soohyun_lee@hms.harvard.edu"
     }
 ]
