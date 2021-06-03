@@ -160,14 +160,20 @@ export class AutoClassify {
         this.evidenceOfBenignImpact = {};
         this.autoClassification = null;
 
-        this.initializeEvidenceFromInvoked(invoked);
-
         this.memoized = {
             isBenign: memoize(AutoClassify.isBenign),
             isLikelyBenign: memoize(AutoClassify.isLikelyBenign),
             isPathogenic: memoize(AutoClassify.isPathogenic),
             isLikelyPathogenic: memoize(AutoClassify.isLikelyPathogenic)
         };
+
+        this.initializeEvidenceFromInvoked = this.initializeEvidenceFromInvoked.bind(this);
+        this.classify = this.classify.bind(this);
+        this.updateClassification = this.updateClassification.bind(this);
+        this.invoke = this.invoke.bind(this);
+        this.uninvoke = this.uninvoke.bind(this);
+
+        this.initializeEvidenceFromInvoked(invoked);
     }
 
     initializeEvidenceFromInvoked(invoked) {
@@ -197,6 +203,8 @@ export class AutoClassify {
                 }
             }
         });
+
+        this.updateClassification();
     }
 
     classify() {
@@ -250,10 +258,51 @@ export class AutoClassify {
         return "Uncertain significance";
     }
 
-    getClassification() {
+    /** Adjusts evidence on new invocation */
+    invoke(rule) {
+        // Adjust count of evidence types
+        const { strength, type } = metadata[rule];
+        if (type === "pathogenic") {
+            if (this.evidenceOfPathogenicity[strength] === undefined) {
+                this.evidenceOfPathogenicity[strength] = 1;
+            } else {
+                const newValue = this.evidenceOfPathogenicity[strength] + 1;
+                this.evidenceOfPathogenicity[strength] = newValue;
+            }
+        } else {
+            if (this.evidenceOfBenignImpact[strength] === undefined) {
+                this.evidenceOfBenignImpact[strength] = 1;
+            } else {
+                const newValue = this.evidenceOfBenignImpact[strength] + 1;
+                this.evidenceOfBenignImpact[strength] = newValue;
+            }
+        }
+
+        return this.updateClassification();
+    }
+
+    /** Adjusts evidence and re-calculates classification on un-invocation */
+    uninvoke(rule) {
+        // Adjust count of evidence types
+        const { strength, type } = metadata[rule];
+        if (type === "pathogenic") {
+            const newValue = this.evidenceOfPathogenicity[strength] - 1;
+            this.evidenceOfPathogenicity[strength] = newValue;
+        } else {
+            const newValue = this.evidenceOfBenignImpact[strength] - 1;
+            this.evidenceOfBenignImpact[strength] = newValue;
+        }
+
+        return this.updateClassification();
+    }
+
+    updateClassification() {
         const classification = this.classify();
         this.autoClassification = classification;
-        console.log("Final classification...", classification);
         return classification;
+    }
+
+    getClassification() {
+        return this.autoClassification;
     }
 }

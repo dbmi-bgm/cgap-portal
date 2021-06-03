@@ -155,7 +155,7 @@ class InterpretationController extends React.Component {
     constructor(props) {
         super(props);
 
-        // Initialize global selections based on most recent interpretation from context
+        // Initialize ACMG selections based on most recent interpretation from context
         const { interpretationTab, context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
         const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_guidelines);
         const classifier = new acmgUtil.AutoClassify(acmgSelections);
@@ -173,6 +173,9 @@ class InterpretationController extends React.Component {
         this.memoized = {
             flattenGlobalACMGStateIntoArray: memoize(acmgUtil.flattenStateMapIntoArray)
         };
+
+        // Save an instance of autoclassify so that other methods can use it to calculate classification
+        this.classifier = classifier;
     }
 
     toggleACMGInvoker(callback) {
@@ -185,15 +188,19 @@ class InterpretationController extends React.Component {
         const newInvocations = { ...globalACMGSelections };
 
         if (newInvocations[criteria] !== undefined) { // already set
-            newInvocations[criteria] = !newInvocations[criteria];
-
+            const newState = !newInvocations[criteria];
+            newInvocations[criteria] = newState;
+            if (newState) {
+                this.classifier.invoke(criteria);
+            } else {
+                this.classifier.uninvoke(criteria);
+            }
         } else { // first time setting
             newInvocations[criteria] = true;
+            this.classifier.invoke(criteria);
         }
 
-        // TODO: rework this to have a single instance, updated when new criteria toggled
-        const classifier = new acmgUtil.AutoClassify(newInvocations);
-        const classification = classifier.getClassification();
+        const classification = this.classifier.getClassification();
 
         this.setState({ globalACMGSelections: newInvocations, autoClassification: classification }, callback);
     }
