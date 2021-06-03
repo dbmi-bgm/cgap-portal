@@ -41,10 +41,12 @@
                   {
                       "argument_name": "bam",
                       "argument_type": "file",
+                      "mount": true,
                       "scatter": 1
                   },
                   {
                       "argument_name": "reference",
+                      "mount": true,
                       "argument_type": "file"
                   },
                   {
@@ -52,7 +54,20 @@
                       "argument_type": "parameter",
                       "source_argument_name": "nthread_mpileup"
                   }
-              ]
+              ],
+              "config": {
+                  "instance_type": "c5.4xlarge",
+                  "ebs_size": 200,
+                  "EBS_optimized": true,
+                  "log_bucket": "tibanna-output",
+                  "behavior_on_capacity_limit": "wait_and_retry"
+              },
+              "custom_pf_fields": {
+                  "rck": {
+                      "file_type" : "read counts (rck)",
+                      "description": "read counts (rck) file"
+                  }
+              }
           },
           {
               "name": "rcktar",
@@ -66,7 +81,21 @@
                       "gather": 1,
                       "rename": "formula:rcktar_content_filenames"
                   }
-              ]
+              ],
+              "config": {
+                  "instance_type": "c5.xlarge",
+                  "ebs_size": "2.5x",
+                  "EBS_optimized": true,
+                  "spot_instance": true,
+                  "log_bucket": "tibanna-output",
+                  "behavior_on_capacity_limit": "wait_and_retry"
+              },
+              "custom_pf_fields": {
+                  "rck_tar": {
+                      "file_type" : "tarred read counts (rck)",
+                      "description": "tarred read counts (rck) file"
+                  }
+              }
           }
       ]
     }
