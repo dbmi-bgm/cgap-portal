@@ -62,8 +62,8 @@ export function flattenStateMapIntoArray(obj) {
         if (obj[rule]) { invokedFlat.push(rule); }
     });
     return invokedFlat.sort((a, b) => {
-        const orderA = AutoClassify.criteriaToClassification[a].order;
-        const orderB = AutoClassify.criteriaToClassification[b].order;
+        const orderA = metadata[a].order;
+        const orderB = metadata[b].order;
         // Sort so that it aligns with color scheme above
         return orderA - orderB;
     });
@@ -74,36 +74,6 @@ export class AutoClassify {
     /**
      * Based on https://www.mgz-muenchen.com/files/Public/Downloads/2018/ACMG%20Classification%20of%20Sequence%20Variants.pdf (pg 3)
      */
-    static criteriaToClassification = {
-        "BA1": { type: "benign", strength: "standalone", order: 1 },
-        "BS1": { type: "benign", strength: "strong", order: 2 },
-        "BS2": { type: "benign", strength: "strong", order: 2 },
-        "BS3": { type: "benign", strength: "strong", order: 2 },
-        "BS4": { type: "benign", strength: "strong", order: 2 },
-        "BP1": { type: "benign", strength: "supporting", order: 3 },
-        "BP2": { type: "benign", strength: "supporting", order: 3 },
-        "BP3": { type: "benign", strength: "supporting", order: 3 },
-        "BP4": { type: "benign", strength: "supporting", order: 3 },
-        "BP5": { type: "benign", strength: "supporting", order: 3 },
-        "BP6": { type: "benign", strength: "supporting", order: 3 },
-        "BP7": { type: "benign", strength: "supporting", order: 3 },
-        "PP1": { type: "pathogenic", strength: "supporting", order: 4 },
-        "PP2": { type: "pathogenic", strength: "supporting", order: 4 },
-        "PP3": { type: "pathogenic", strength: "supporting", order: 4 },
-        "PP4": { type: "pathogenic", strength: "supporting", order: 4 },
-        "PP5": { type: "pathogenic", strength: "supporting", order: 4 },
-        "PM1": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PM2": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PM3": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PM4": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PM5": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PM6": { type: "pathogenic", strength: "moderate", order: 5 },
-        "PS1": { type: "pathogenic", strength: "strong", order: 6 },
-        "PS2": { type: "pathogenic", strength: "strong", order: 6 },
-        "PS3": { type: "pathogenic", strength: "strong", order: 6 },
-        "PS4": { type: "pathogenic", strength: "strong", order: 6 },
-        "PVS1": { type: "pathogenic", strength: "vstrong", order: 7 }
-    }
 
     /**
      * Takes evidence of pathogenicity counts and returns true if Pathogenic criteria invoked
@@ -204,26 +174,26 @@ export class AutoClassify {
         // console.log("populating with evidence from, ", invoked);
         // Flatten into an array of invoked items
         const invokedFlat = [];
-        Object.keys(invoked).forEach((criteria) => {
-            if (invoked[criteria]) { invokedFlat.push(criteria); }
+        Object.keys(invoked).forEach((rule) => {
+            if (invoked[rule]) { invokedFlat.push(rule); }
         });
 
         // Collect counts of various evidence types
-        invokedFlat.forEach((criteria) => {
-            const classification = AutoClassify.criteriaToClassification[criteria];
-            if (classification.type === "pathogenic") {
-                if (this.evidenceOfPathogenicity[classification.strength] === undefined) {
-                    this.evidenceOfPathogenicity[classification.strength] = 1;
+        invokedFlat.forEach((rule) => {
+            const { strength, type } = metadata[rule];
+            if (type === "pathogenic") {
+                if (this.evidenceOfPathogenicity[strength] === undefined) {
+                    this.evidenceOfPathogenicity[strength] = 1;
                 } else {
-                    const newValue = this.evidenceOfPathogenicity[classification.strength] + 1;
-                    this.evidenceOfPathogenicity[classification.strength] = newValue;
+                    const newValue = this.evidenceOfPathogenicity[strength] + 1;
+                    this.evidenceOfPathogenicity[strength] = newValue;
                 }
             } else {
-                if (this.evidenceOfBenignImpact[classification.strength] === undefined) {
-                    this.evidenceOfBenignImpact[classification.strength] = 1;
+                if (this.evidenceOfBenignImpact[strength] === undefined) {
+                    this.evidenceOfBenignImpact[strength] = 1;
                 } else {
-                    const newValue = this.evidenceOfBenignImpact[classification.strength] + 1;
-                    this.evidenceOfBenignImpact[classification.strength] = newValue;
+                    const newValue = this.evidenceOfBenignImpact[strength] + 1;
+                    this.evidenceOfBenignImpact[strength] = newValue;
                 }
             }
         });
