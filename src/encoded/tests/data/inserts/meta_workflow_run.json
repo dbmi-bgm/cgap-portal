@@ -46,7 +46,7 @@
       "input": [
           {
               "argument_name": "bam",
-              "argument_type": "file"
+              "argument_type": "file",
               "files": [
                   {
                       "file": "10002377-49e5-4c33-afab-9ec90d65faa1",
