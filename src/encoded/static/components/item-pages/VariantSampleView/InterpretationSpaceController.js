@@ -96,7 +96,6 @@ export class InterpretationSpaceWrapper extends React.Component {
 
     constructor(props) {
         super(props);
-        console.log("InterpretationSpaceWrapper props", props);
         const { context = null } = props;
         this.state = InterpretationSpaceWrapper.initializeNoteState(context); // Ex. { variantNotes: <note linkto>, loading: false }
         this.saveAsDraft = this.saveAsDraft.bind(this);
@@ -309,17 +308,16 @@ export class InterpretationSpaceController extends React.Component {
             currVariantCandidacy !== lastSavedVariantCandidacy ||
             !_.isEqual(currACMG, lastSavedACMG)
         ) {
-            // console.log("classifications do not match:", currClassification, lastSavedClassification);
-            console.log("acmg, classificaton, or candidacy does not match");
+            // console.log("acmg, classificaton, or candidacy does not match");
             return true;
         }
 
         if (lastSavedNoteText !== currNoteText) {
-            console.log("text does not match");
+            // console.log("text does not match");
             return true;
         }
 
-        console.log("note has not changed");
+        // console.log("note has not changed");
         return false;
     }
 

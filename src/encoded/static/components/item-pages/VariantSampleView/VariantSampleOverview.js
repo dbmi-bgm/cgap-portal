@@ -595,7 +595,7 @@ class AutoClassify {
     }
 
     initializeEvidenceFromInvoked(invoked) {
-        console.log("populating with evidence from, ", invoked);
+        // console.log("populating with evidence from, ", invoked);
         // Flatten into an array of invoked items
         const invokedFlat = [];
         Object.keys(invoked).forEach((criteria) => {
@@ -635,8 +635,6 @@ class AutoClassify {
             supporting: supportingp = null,
             moderate: moderatep = null
         } = this.evidenceOfPathogenicity;
-
-        console.log("classifying...");
 
         // Check for certain benign effect
         const isBenign = this.memoized.isBenign(standalone, strongb);
