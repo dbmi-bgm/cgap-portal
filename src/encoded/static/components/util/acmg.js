@@ -35,6 +35,41 @@ export const metadata = {
     "PVS1": { type: "pathogenic", strength: "vstrong", order: 7, description: "Null variant (nonsense, frameshift, canonical ±1 or 2 splice sites, initiation codon, single or multiexon deletion) in a gene where LOF is a known mechanism of disease.<br/><br/>Caveats:<br/><ul><li>Beware of genes where LOF is not a known disease mechanism (e.g., GFAP, MYH7)</li><li>Use caution interpreting LOF variants at the extreme 3′ end of a gene</li><li>Use caution with splice variants that are predicted to lead to exon skipping but leave the remainder of the protein intact</li><li>Use caution in the presence of multiple transcripts</li></ul>" }
 };
 
+/**
+ * Converts an array into a map of rules to invoked state
+ * @param {Array} arr An array of invoked criteria
+ * @returns {Object} structured such that { [ACMG_Rule]: true/false }
+ */
+export function criteriaArrayToStateMap(arr) {
+    const stateObj = {};
+    arr.forEach((criteria) => {
+        stateObj[criteria] = true;
+    });
+
+    return stateObj;
+}
+
+
+/**
+ * Converts a rule state map back into an array of invoked items
+ * @param {Object} obj structured such that { [ACMG_Rule]: true/false }
+ * @returns {Array} An array of invoked criteria, sorted from least to most pathogenic
+ */
+export function flattenStateMapIntoArray(obj) {
+    // Flatten into an array of invoked items
+    const invokedFlat = [];
+    Object.keys(obj).forEach((rule) => {
+        if (obj[rule]) { invokedFlat.push(rule); }
+    });
+    return invokedFlat.sort((a, b) => {
+        const orderA = AutoClassify.criteriaToClassification[a].order;
+        const orderB = AutoClassify.criteriaToClassification[b].order;
+        // Sort so that it aligns with color scheme above
+        return orderA - orderB;
+    });
+}
+
+
 export class AutoClassify {
     /**
      * Based on https://www.mgz-muenchen.com/files/Public/Downloads/2018/ACMG%20Classification%20of%20Sequence%20Variants.pdf (pg 3)

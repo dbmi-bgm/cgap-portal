@@ -152,35 +152,12 @@ function QuickPopover(props) {
 
 class InterpretationController extends React.Component {
 
-    static initializeGlobalACMGState(criteriaArr) {
-        const stateObj = {};
-        criteriaArr.forEach((criteria) => {
-            stateObj[criteria] = true;
-        });
-
-        return stateObj;
-    }
-
-    static flattenGlobalACMGStateIntoArray(criteriaObj) {
-        // Flatten into an array of invoked items
-        const invokedFlat = [];
-        Object.keys(criteriaObj).forEach((criteria) => {
-            if (criteriaObj[criteria]) { invokedFlat.push(criteria); }
-        });
-        return invokedFlat.sort((a, b) => {
-            const orderA = acmgUtil.AutoClassify.criteriaToClassification[a].order;
-            const orderB = acmgUtil.AutoClassify.criteriaToClassification[b].order;
-            // Sort so that it aligns with color scheme above
-            return orderA - orderB;
-        });
-    }
-
     constructor(props) {
         super(props);
 
         // Initialize global selections based on most recent interpretation from context
         const { interpretationTab, context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
-        const acmgSelections = InterpretationController.initializeGlobalACMGState(acmg_guidelines);
+        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_guidelines);
         const classifier = new acmgUtil.AutoClassify(acmgSelections);
         const classification = classifier.getClassification();
 
@@ -194,7 +171,7 @@ class InterpretationController extends React.Component {
         this.toggleInvocation = this.toggleInvocation.bind(this);
 
         this.memoized = {
-            flattenGlobalACMGStateIntoArray: memoize(InterpretationController.flattenGlobalACMGStateIntoArray)
+            flattenGlobalACMGStateIntoArray: memoize(acmgUtil.flattenStateMapIntoArray)
         };
     }
 
