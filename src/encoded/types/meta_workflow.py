@@ -1,5 +1,5 @@
 """The type file for the collection MetaWorkflow and MetaWorkflowRun.
-  
+
 moving this out of __init.py__ and into it's own file as
 add logic for autopopulating 'name' upon update or create
 """
@@ -27,12 +27,10 @@ class MetaWorkflow(Item):
 
 @collection(
     name='meta-workflow-runs',
-    unique_key='accession',
     properties={
         'title': 'MetaWorkflowRuns',
         'description': 'Listing of MetaWorkflowRuns',
     })
 class MetaWorkflowRun(Item):
     item_type = 'meta_workflow_run'
-    name_key = 'accession'
     schema = load_schema('encoded:schemas/meta_workflow_run.json')
