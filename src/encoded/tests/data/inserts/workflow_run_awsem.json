@@ -1,29 +1,83 @@
 [
     {
         "uuid": "1964b601-4d50-44cd-bfa5-78bb7043d060",
+        "title": "test mpileup v18 run 2020-08-22 21:03:51.321318",
         "workflow": "e2e95743-0d3b-4e07-b1e5-71c80dd74906",
         "awsem_job_id": "axqsn1LkT6GT",
         "run_status": "complete",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "submitted_by": "soohyun_lee@hms.harvard.edu"
+        "submitted_by": "soohyun_lee@hms.harvard.edu",
+        "input_files": [
+            {
+              "workflow_argument_name": "bam",
+              "ordinal": 1,
+              "dimension": "0",
+              "value": "10002377-49e5-4c33-afab-9ec90d65faa1"
+            },
+            {
+              "workflow_argument_name": "reference",
+              "ordinal": 1,
+              "dimension": "0",
+              "value": "1053df95-4cf3-41cc-971d-81bb16c486dd"
+            }
+        ],
+        "output_files": [
+            {
+              "workflow_argument_name": "rck",
+              "upload_key": "9d165f81-fec0-4de6-af4d-c0558d835d2e/GAPFIFYGNO3D.rck.gz",
+              "value": "9d165f81-fec0-4de6-af4d-c0558d835d2e",
+              "type": "Output processed file",
+              "format": "/file-formats/rck/"
+            }
+        ]
     },
     {
         "uuid": "9202acd3-e89c-4b69-9894-ce6f9582d266",
+        "title": "test mpileup v18 run 2020-08-22 21:04:51.321318",
         "workflow": "e2e95743-0d3b-4e07-b1e5-71c80dd74906",
         "awsem_job_id": "cKqCPmE29n24",
         "run_status": "error",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "submitted_by": "soohyun_lee@hms.harvard.edu"
+        "submitted_by": "soohyun_lee@hms.harvard.edu",
+        "input_files": [
+            {
+              "workflow_argument_name": "bam",
+              "ordinal": 1,
+              "dimension": "0",
+              "value": "10002377-49e5-4c33-afab-9ec90d65faa2"
+            },
+            {
+              "workflow_argument_name": "reference",
+              "ordinal": 1,
+              "dimension": "0",
+              "value": "1053df95-4cf3-41cc-971d-81bb16c486dd"
+            }
+        ]
     },
     {
         "uuid": "8a39b6fb-8c91-4e88-a77f-70b654c2c0dc",
+        "title": "test mpileup v18 run 2020-08-22 21:05:51.321318",
         "workflow": "e2e95743-0d3b-4e07-b1e5-71c80dd74906",
         "awsem_job_id": "NJWsxyP6aeAk",
         "run_status": "started",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "submitted_by": "soohyun_lee@hms.harvard.edu"
+        "submitted_by": "soohyun_lee@hms.harvard.edu",
+        "input_files": [
+            {
+              "workflow_argument_name": "bam",
+              "ordinal": 1,
+              "dimension": "0",
+              "value": "10002377-49e5-4c33-afab-9ec90d65faa3"
+            },
+            {
+              "workflow_argument_name": "reference",
+              "ordinal": 1,
+              "dimension": "0",
+              "value": "1053df95-4cf3-41cc-971d-81bb16c486dd"
+            }
+        ]
     }
 ]
