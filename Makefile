@@ -219,8 +219,7 @@ info:
 	   $(info - Use 'make test' to run tests with normal options similar to what we use on GitHub Actions.)
 	   $(info - Use 'make test-any' to run tests without marker constraints (i.e., with no '-m' option).)
 	   $(info - Use 'make update' to update dependencies (and the lock file).)
-
-   		$(info - Use 'make build-local' to build the local Docker image.)
+	   $(info - Use 'make build-local' to build the local Docker image.)
 	   $(info - Use 'make build-local-clean' to build the local Docker image with no cache.)
 	   $(info - Use 'make deploy-local' start up the cluster - pserve output will follow if successful.)
 	   $(info - Use 'make deploy-local-daemon' will start the cluster in daemon mode.)
