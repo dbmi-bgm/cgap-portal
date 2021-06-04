@@ -8,7 +8,7 @@ import memoize from "memoize-one";
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 /**
- * Holds datastore=database representation of VariantSampleList Item
+ * Holds embedded representation of VariantSampleList Item
  * Gets refreshed after saving/moving VariantSamples to InterpretationTab
  * and upon mount.
  */
@@ -68,7 +68,7 @@ export class VariantSampleListController extends React.PureComponent {
         }
     }
 
-    /** Fetches datastore=database `@@embedded` representation of 'state.variantSampleListID' */
+    /** Fetches `@@embedded` representation of 'state.variantSampleListID' from embed api */
     fetchVariantSampleListItem(fnCallback = null){
         const { variantSampleListID } = this.state;
 
@@ -112,6 +112,7 @@ export class VariantSampleListController extends React.PureComponent {
 
         };
 
+        // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
         this.setState({ "isLoadingVariantSampleListItem": true }, () => {
             scopedRequest = this.currentRequest = ajax.load(
                 '/embed',
