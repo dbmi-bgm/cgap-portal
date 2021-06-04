@@ -219,7 +219,7 @@
             "linkTo": "MetaWorkflow"
         },
         "final_status": {
-            "title": "Run Status",
+            "title": "Final Status",
             "type": "string",
             "default": "pending",
             "enum": [
@@ -237,11 +237,11 @@
         }
     },
     "facets": {
-        "workflow.title": {
-            "title": "Workflow"
+        "meta_workflow.title": {
+            "title": "MetaWorkflow"
         },
-        "run_status": {
-            "title": "Run Status"
+        "final_status": {
+            "title": "Final Status"
         }
     },
     "columns": {
