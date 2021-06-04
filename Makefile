@@ -172,17 +172,25 @@ remote-test-unit:  # Note this does the 'indexing' tests
 update:  # updates dependencies
 	poetry update
 
-build-docker:
+build-local:
 	docker-compose build
 
-build-docker-clean:
+build-local-clean:
 	docker-compose build --no-cache BUILD_PATH=deploy/docker/local
 
-deploy-docker:
+deploy-local:
 	docker-compose up -V
 
-deploy-docker-daemon:
+deploy-local-daemon:
 	docker-compose up -d -V
+
+ecr-login:
+	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 645819926742.dkr.ecr.us-east-1.amazonaws.com
+
+build-production:
+	docker build -t cgap-mastertest:latest .
+	docker tag cgap-mastertest:latest 645819926742.dkr.ecr.us-east-1.amazonaws.com/cgap-mastertest:latest
+	docker push 645819926742.dkr.ecr.us-east-1.amazonaws.com/cgap-mastertest:latest
 
 help:
 	@make info
@@ -211,7 +219,10 @@ info:
 	   $(info - Use 'make test' to run tests with normal options similar to what we use on GitHub Actions.)
 	   $(info - Use 'make test-any' to run tests without marker constraints (i.e., with no '-m' option).)
 	   $(info - Use 'make update' to update dependencies (and the lock file).)
-	   $(info - Use 'make build-docker' to build the local Docker image.)
-	   $(info - Use 'make build-docker-clean' to build the local Docker image with no cache.)
-	   $(info - Use 'make deploy-docker' start up the cluster - pserve output will follow if successful.)
-	   $(info - Use 'make deploy-docker-daemon' will start the cluster in daemon mode.)
+
+   		$(info - Use 'make build-local' to build the local Docker image.)
+	   $(info - Use 'make build-local-clean' to build the local Docker image with no cache.)
+	   $(info - Use 'make deploy-local' start up the cluster - pserve output will follow if successful.)
+	   $(info - Use 'make deploy-local-daemon' will start the cluster in daemon mode.)
+	   $(info - Use 'make ecr-login' to login to ECR with the currently sourced AWS creds.)
+	   $(info - Use 'make build-production' to build/tag/push a production image.)
