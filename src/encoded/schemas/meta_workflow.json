@@ -86,7 +86,7 @@
                         "type" : "string",
                         "linkTo": "Workflow"
                     },
-                    "inputs" : {
+                    "input" : {
                         "title" : "Workflow Inputs",
                         "type" : "array",
                         "items" : {

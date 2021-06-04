@@ -1,10 +1,10 @@
 [
     {
       "title": "Test Meta Workflow Run",
-      "name": "test_metawf_run",
       "description": "Test meta workflow run",
       "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
       "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+      "uuid": "2a481229-03dd-44b9-b235-a8a005608262",
       "meta_workflow": "ceafe51e-61b9-40fc-bdfa-d01e5e27046e",
       "workflow_runs": [
           {

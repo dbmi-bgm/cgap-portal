@@ -8,7 +8,7 @@
         "meta_workflow",
         "project",
         "institution",
-        "run_status"
+        "final_status"
     ],
     "additionalProperties": false,
     "identifyingProperties": [
