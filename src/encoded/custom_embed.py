@@ -136,7 +136,7 @@ class CustomEmbed:
         return item
 
 
-@view_config(route_name="embed", request_method="POST", permission="view")
+@view_config(route_name="embed", request_method="POST", permission="edit")
 @debug_log
 def embed(context, request):
     """
