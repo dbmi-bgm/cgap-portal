@@ -261,7 +261,7 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
 
         except (ValueError, jwt.exceptions.InvalidTokenError, jwt.exceptions.InvalidKeyError) as e:
             # Catch errors from decoding JWT
-            print('Invalid JWT assertion : %s (%s)', (e, type(e).__name__))
+            print('Invalid JWT assertion : %s (%s)' % (e, type(e).__name__))
             request.set_property(lambda r: True, 'auth0_expired') # Allow us to return 403 code &or unset cookie in renderers.py
             return None
 

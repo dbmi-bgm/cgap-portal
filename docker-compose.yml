@@ -42,16 +42,19 @@ services:
   #   * LOAD - Trigger a reload of the inserts in the database.
   #            After running once, comment this out so the container will serve without reloading inserts.
   #            Has no effect if TEST is specified.
-  app:
+  app-portal:
     build: .
-    container_name: cgap
+    container_name: cgap-portal
     command: "/home/nginx/cgap-portal/entrypoint.sh"
     environment:
       # Default to caller's environment
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
-      # TEST: "true" # default: run local deployment
+      # TEST: "true" # default: commented out to run local deployment - uncomment to run tests in the container
       LOAD: "true"  # default: load the inserts (comment this out after first run)
+      application_type: "local"  # use local entrypoint
+      ENCODED_VERSION: "local"
+      CGAP_ENV_NAME: "cgap-docker-will-test"  # XXX: update me
     ports:
       - "8000:8000"  # nginx proxy port (note application traffic is not forwarded)
     depends_on:

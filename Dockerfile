@@ -11,12 +11,8 @@ MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 # Build Arguments
 ARG CGAP_ENV_NAME
 ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-mastertest"}
-ARG BUILD_PATH
-ENV BUILD_PATH=${BUILD_PATH:-"deploy/docker/production"}
 ARG INI_BASE
 ENV INI_BASE=${INI_BASE:-"mastertest.ini"}
-ARG ENTRYPOINT
-ENV ENTRYPOINT=${ENTRYPOINT:-"entrypoint.sh"}
 
 # Configure (global) Env
 ENV NGINX_USER=nginx
@@ -31,7 +27,7 @@ ENV PYTHONFAULTHANDLER=1 \
   POETRY_VERSION=1.1.4
 
 # Install nginx, base system
-COPY $BUILD_PATH/install_nginx.sh /
+COPY deploy/docker/production/install_nginx.sh /
 RUN bash /install_nginx.sh && \
     apt-get update && \
     apt-get install -y curl vim emacs postgresql-client net-tools && \
@@ -86,7 +82,7 @@ RUN make aws-ip-ranges && \
 # Remove default configuration from Nginx
 RUN rm /etc/nginx/nginx.conf && \
     rm /etc/nginx/conf.d/default.conf
-COPY $BUILD_PATH/nginx.conf /etc/nginx/nginx.conf
+COPY deploy/docker/production/nginx.conf /etc/nginx/nginx.conf
 
 # nginx filesystem setup
 RUN chown -R nginx:nginx /var/cache/nginx && \
@@ -100,25 +96,31 @@ RUN chown -R nginx:nginx /var/cache/nginx && \
     touch /var/log/nginx/error.log && \
     chown -R nginx:nginx /var/log/nginx/error.log
 
-# Provide base ini file
-# will be picked up by IniFileManager
-# *.ini must match the env name in secrets manager!
+# Pull all required files
+# Note that *.ini must match the env name in secrets manager!
+# Note that deploy/docker/production/entrypoint.sh resolves which entrypoint to run
+# based on env variable "application_type".
 # For now, this is mastertest. - Will 04/29/21
-SHELL ["/bin/bash", "-c"]
-RUN if [[ $BUILD_PATH =~ .*production.* ]]; then \
-        echo "Detected production build" && \
-        cp $BUILD_PATH/$INI_BASE deploy/ini_files/. ; \
-    else \
-        echo "Detected local build" && \
-        cp $BUILD_PATH/docker_development.ini development.ini ; \
-    fi
+COPY deploy/docker/local/docker_development.ini development.ini
+COPY deploy/docker/local/entrypoint.sh entrypoint_local.sh
+RUN chown nginx:nginx development.ini
+RUN chmod +x entrypoint_local.sh
 
+# Production setup
 RUN touch production.ini
 RUN chown nginx:nginx production.ini
-
-COPY $BUILD_PATH/$ENTRYPOINT entrypoint.sh
+COPY deploy/docker/production/$INI_BASE deploy/ini_files/.
+COPY deploy/docker/production/entrypoint.sh .
+COPY deploy/docker/production/entrypoint_portal.sh .
+COPY deploy/docker/production/entrypoint_deployment.sh .
+COPY deploy/docker/production/entrypoint_indexer.sh .
+COPY deploy/docker/production/entrypoint_ingester.sh .
 COPY deploy/docker/production/assume_identity.py .
 RUN chmod +x entrypoint.sh
+RUN chmod +x entrypoint_deployment.sh
+RUN chmod +x entrypoint_deployment.sh
+RUN chmod +x entrypoint_indexer.sh
+RUN chmod +x entrypoint_ingester.sh
 RUN chmod +x assume_identity.py
 EXPOSE 8000
 
