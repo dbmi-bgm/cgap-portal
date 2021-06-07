@@ -22,9 +22,36 @@ For information on CGAP-Docker in production, see `here. <./docs/source/docker-p
 
 Navigating this Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-    * .github/workflows/ contains Github Action Workflows
-    * bin/ contains the few remaining executables
-    * deploy/docker contains Docker setups (see docker-compose.yml)
-    * docs/ contains documentation
-    * scripts/ contains misc scripts
-    * src/ where the code is
+
+Important directories/files are outlined below.
+
+    * ``.github/workflows/`` contains Github Action Workflows
+    * ``bin/`` contains the few remaining executables
+    * ``deploy/docker`` contains containerization related scripts/configuration
+    * ``docs/ contains`` documentation
+    * ``scripts/`` contains misc scripts
+    * ``src/encoded/`` where the code is
+    * ``.dockerignore`` specifies paths ignored by the Dockerfile
+    * ``Dockerfile`` contains the Docker build instructions for the cgap-portal
+    * ``Makefile`` contains macros for common build operations - see ``make info``
+    * ``docker-compose.yml`` builds the new local deployment - see `docker-local.rst``
+    * ``package.json`` and ``package-lock.json`` specify the front-end dependencies
+    * ``pyproject.toml`` and ``poetry.lock`` specify the back-end dependencies
+    * ``setup_eb.py`` performs final installation setup
+
+Navigating src/encoded/
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Top level files are modules that make up the core functionality of the back-end. Some modules differ greatly from or do
+not even exist in fourfront.
+
+    * ``annotations/`` contains mapping table and ingestion related metadata
+    * ``commands/`` contains Python commands that can be run on the system from the command line
+    * ``docs/`` contains ReadTheDocs documentation
+    * ``ingestion/`` contains ingestion related code, such as mapping table intake and VCF processing
+    * ``schemas/`` contains the metadata schemas
+    * ``search/`` contains the search/filter_set APIs
+    * ``static/`` contains front-end code
+    * ``tests/`` contains back-end unit tests and insert data
+    * ``types/`` contains metadata type definitions
+    * ``upgrade/`` contains collection schema version upgraders - are not functioning as intended currently
