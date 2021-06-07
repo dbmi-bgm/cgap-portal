@@ -1,11 +1,11 @@
 import re
+from uuid import UUID
 
 from dcicutils.misc_utils import ignored
-from pyramid.security import Authenticated
 from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden
+from pyramid.security import Authenticated
 from pyramid.view import view_config
 from snovault.util import debug_log
-from uuid import UUID
 
 ATID_PATTERN = re.compile("/[a-zA-Z-]+/[a-zA-Z0-9-_:]+/")
 GENELIST_ATID = re.compile("/gene-lists/[a-zA-Z0-9-]+/")
