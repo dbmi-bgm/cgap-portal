@@ -22,7 +22,7 @@ KEYS_TO_IGNORE = [
     "schema_version",
     "date_created",
 ]
-FORBIDDEN_MSG = "no view permissions"
+FORBIDDEN_MSG = {"error": "no view permissions"}
 
 
 def includeme(config):
