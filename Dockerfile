@@ -44,7 +44,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Upgrade pip, install in layer
 RUN pip install --upgrade pip && \
-    pip install poetry==1.1.4 wheel==0.29.0
+    pip install poetry==1.1.4
 
 # Adjust permissions
 RUN chown -R nginx:nginx /opt/venv && \
