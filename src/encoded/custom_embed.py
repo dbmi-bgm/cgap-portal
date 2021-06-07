@@ -46,6 +46,17 @@ class CustomEmbed:
 
     def _user_embed(self, item_id, depth, frame="object"):
         """
+        Use request's embed method to find given item in the database for
+        the given frame. If the user who made the call to the API does
+        not have permissions to view the item, the item will not be embedded.
+        Instead, if the item is the initial ID given to the API, nothing is
+        embedded; if the item is to be embedded at a subsequent depth, a
+        message stating the item cannot be embedded is inserted instead.
+
+        :param item_id: string uuid or @id
+        :param depth: int of current embedding depth
+        :param frame: string view to generate of item
+        :return item: object to return for embedding
         """
         item = None
         if not item_id.startswith("/"):
@@ -63,6 +74,7 @@ class CustomEmbed:
         items for which detailed info is commonly not needed.
 
         :param item_id: string uuid or @id
+        :param depth: int of current embedding depth
         :return item_embed: dict with item title and @id
         """
         item_object = self._user_embed(item_id, depth)
@@ -80,6 +92,7 @@ class CustomEmbed:
         object view of large gene lists.
 
         :param genelist_atid: string of gene list @id
+        :param depth: int of current embedding depth
         :return genelist_embed: dict with gene list title and uuid
         """
         genelist_raw = self._user_embed(genelist_atid, depth, frame="raw")
@@ -94,6 +107,11 @@ class CustomEmbed:
     @staticmethod
     def _valid_uuid(uuid_to_test, version=4):
         """
+        Determine if given string is a valid uuid.
+
+        :param uuid_to_test: string to check
+        :param version: int for uuid version
+        :return: bool if given string is valid uuid
         """
         try:
             uuid_obj = UUID(uuid_to_test, version=version)
