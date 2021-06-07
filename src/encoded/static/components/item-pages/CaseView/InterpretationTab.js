@@ -26,6 +26,3 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         </React.Fragment>
     );
 });
-
-
-

@@ -640,8 +640,7 @@ h3.submission-subtitle {
 		background-color: #47419a;
 	}
 
-	
-	// Gray (unused?) (used to be for 'archived')
+	// Gray
 	&[data-status="obsolete"]:before,						// Applicable to Item.status
 	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
 	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
@@ -652,7 +651,12 @@ h3.submission-subtitle {
 	&[data-status="Known gene for phenotype"]:before {
 	    color: #fff;
 		background-color: #7b7b7b;
-		//display: none;
+	}
+
+	// Gray outline
+	&[data-status="Not Available"]:before {
+		border: 1px solid #adb5bd;
+		background-color: #fff;
 	}
 }
 
@@ -673,6 +677,136 @@ i.status-indicator-dot {
 }
 
 
+@mixin acmgColorStyles {
+
+
+
+	// Standalone Benign Impact -
+	&[data-criteria="BA1"] {
+		color: #31098D;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #31098D;
+		}
+	}
+	// Strong Benign Evidence - 
+	&[data-criteria="BS1"],
+	&[data-criteria="BS2"],
+	&[data-criteria="BS3"],
+	&[data-criteria="BS4"] {
+		color: #47419a;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #47419a;
+		}
+	}
+
+	// Supporting Benign Evidence
+	&[data-criteria="BP1"],
+	&[data-criteria="BP2"],
+	&[data-criteria="BP3"],
+	&[data-criteria="BP4"],
+	&[data-criteria="BP5"],
+	&[data-criteria="BP6"],
+	&[data-criteria="BP7"] {
+		color: #0063D6;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #0063D6;
+		}
+	}
+
+	// Supporting Pathogenic Evidence
+	&[data-criteria="PP1"],
+	&[data-criteria="PP2"],
+	&[data-criteria="PP3"],
+	&[data-criteria="PP4"],
+	&[data-criteria="PP5"] {
+		color: #C4AA1D;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #C4AA1D;
+		}
+	}
+
+	// Moderate Pathogenic Evidence
+	&[data-criteria="PM1"],
+	&[data-criteria="PM2"],
+	&[data-criteria="PM3"],
+	&[data-criteria="PM4"],
+	&[data-criteria="PM5"],
+	&[data-criteria="PM6"] {
+		color: #D36900;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #D36900;
+		}
+	}
+
+	// Strong Pathogenic Evidence
+	&[data-criteria="PS1"],
+	&[data-criteria="PS2"],
+	&[data-criteria="PS3"],
+	&[data-criteria="PS4"]{
+		color: #a90d0b;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #a90d0b;
+		}
+	}
+
+	// Very Strong Pathogenic Evidence
+	&[data-criteria="PVS1"] {
+		color: #9A0000;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #9A0000;
+		}
+	}
+
+	&[data-criteria="none"] {
+		border: 1px dashed lightgrey;
+	}
+}
+
+.acmg-invoker {
+	border: 1px solid #efefef;
+	padding: 3px 8px;
+    font-size: 0.7em;
+    letter-spacing: 1px;
+
+	// &:hover { // a little janky ATM; needs tweaking
+	// 	font-size: large;
+	// 	padding: 5px 7px;
+	// }
+
+	@include acmgColorStyles;
+}
+
+.acmg-guidelines-title {
+	padding: 5px 5px 5px 15px;
+    min-width: 135px;
+    align-self: center;
+}
+
+.acmg-guidelines-invoker {
+	width: calc(100% - 145px);
+    overflow-x: scroll;
+}
 
 
 /**********************************************************

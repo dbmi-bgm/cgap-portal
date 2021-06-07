@@ -96,7 +96,6 @@ export class InterpretationSpaceWrapper extends React.Component {
 
     constructor(props) {
         super(props);
-        console.log("InterpretationSpaceWrapper props", props);
         const { context = null } = props;
         this.state = InterpretationSpaceWrapper.initializeNoteState(context); // Ex. { variantNotes: <note linkto>, loading: false }
         this.saveAsDraft = this.saveAsDraft.bind(this);
@@ -275,8 +274,8 @@ export class InterpretationSpaceWrapper extends React.Component {
 export class InterpretationSpaceController extends React.Component {
 
     // CurrentTab will always be a number between 0-3 and index to these values
-    static tabNames = ["Variant Notes", "Gene Notes", "Clinical", "Discovery"];
-    static tabTitles = ["Variant Notes", "Gene Notes", "ACMG Interpretation", "Variant/Gene Discovery"];
+    static tabNames = ["Gene Notes", "Variant Notes", "Clinical", "Discovery"];
+    static tabTitles = ["Gene Notes", "Variant Notes", "ACMG Interpretation", "Variant/Gene Discovery"];
 
     static haveEditPermission(actions){
         return _.findWhere(actions, { "name" : "edit" });
@@ -293,19 +292,23 @@ export class InterpretationSpaceController extends React.Component {
             classification: lastSavedClassification = null,
             gene_candidacy: lastSavedGeneCandidacy = null,
             variant_candidacy: lastSavedVariantCandidacy = null,
-            note_text: lastSavedNoteText = ""
+            note_text: lastSavedNoteText = "",
+            acmg_guidelines: lastSavedACMG = []
         } = lastSavedNote || {};
         const {
             classification: currClassification = null,
             gene_candidacy: currGeneCandidacy = null,
             variant_candidacy: currVariantCandidacy = null,
-            note_text: currNoteText = ""
+            note_text: currNoteText = "",
+            acmg_guidelines: currACMG = []
         } = currNote || {};
 
         if (currClassification !== lastSavedClassification ||
             currGeneCandidacy !== lastSavedGeneCandidacy ||
-            currVariantCandidacy !== lastSavedVariantCandidacy) {
-            // console.log("classifications do not match:", currClassification, lastSavedClassification);
+            currVariantCandidacy !== lastSavedVariantCandidacy ||
+            !_.isEqual(currACMG, lastSavedACMG)
+        ) {
+            // console.log("acmg, classificaton, or candidacy does not match");
             return true;
         }
 
@@ -314,6 +317,7 @@ export class InterpretationSpaceController extends React.Component {
             return true;
         }
 
+        // console.log("note has not changed");
         return false;
     }
 
@@ -359,9 +363,18 @@ export class InterpretationSpaceController extends React.Component {
 
     switchToTab(newTab) {
         const { currentTab } = this.state;
+        const { toggleACMGInvoker } = this.props;
         // componentWillUnmount in panel saves unsaved items before dismount completes
         if (currentTab !== newTab) {
-            this.setState({ currentTab: newTab });
+            this.setState({ currentTab: newTab }, () => {
+                if (newTab === 2) {
+                    // On clinical interpretation; toggle acmg visible
+                    toggleACMGInvoker();
+                } else if (currentTab === 2) {
+                    // Switched from clinical interpretation; toggle invisible
+                    toggleACMGInvoker();
+                }
+            });
         }
     }
 
@@ -373,29 +386,25 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip, discovery_interpretation_wip } = this.state;
-        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context } = this.props;
+        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation } = this.props;
         const { actions = [] } = context || {};
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
 
         const isDraftVariantNoteUnsaved = this.memoized.hasNoteChanged(variant_notes_wip, lastSavedVariantNote);
         const isDraftGeneNoteUnsaved = this.memoized.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
-        const isDraftInterpretationUnsaved = this.memoized.hasNoteChanged(interpretation_wip, lastSavedInterpretation);
         const isDraftDiscoveryUnsaved = this.memoized.hasNoteChanged(discovery_interpretation_wip, lastSavedDiscovery);
+
+        // Add ACMG from WIP
+        const interpretationWIP = { ...interpretation_wip };
+        interpretationWIP["acmg_guidelines"] = wipACMGSelections;
+        const isDraftInterpretationUnsaved = this.memoized.hasNoteChanged(interpretationWIP, lastSavedInterpretation);
 
         const hasEditPermission = this.memoized.haveEditPermission(actions);
 
         let panelToDisplay = null;
         switch(currentTab) {
-            case (0): // Variant Notes
-                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
-                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
-                );
-                break;
-            case (1): // Gene Notes
+            case (0): // Gene Notes
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
@@ -403,11 +412,19 @@ export class InterpretationSpaceController extends React.Component {
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
-            case (2): // Interpretation
+            case (1): // Variant Notes
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={interpretation_wip} lastSavedNote={lastSavedInterpretation} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
+                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
+                    key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
                     memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
+                );
+                break;
+            case (2): // Interpretation
+                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} wipACMGSelections={wipACMGSelections}
+                    lastWIPNote={interpretationWIP} lastSavedNote={lastSavedInterpretation} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
+                    key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission, autoClassification, toggleInvocation }}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
@@ -426,7 +443,8 @@ export class InterpretationSpaceController extends React.Component {
             <div className="card interpretation-space">
                 <InterpretationSpaceHeader {...{ isExpanded }} toggleExpanded={this.toggleExpanded}/>
                 <div className="card-body">
-                    <InterpretationSpaceTabs {...{ currentTab }} switchToTab={this.switchToTab} />
+                    <InterpretationSpaceTabs {...{ currentTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftVariantNoteUnsaved, isDraftInterpretationUnsaved }}
+                        switchToTab={this.switchToTab} />
                     { panelToDisplay }
                 </div>
             </div>
@@ -448,17 +466,23 @@ function InterpretationSpaceHeader(props) { // Expanded items commented out unti
 }
 
 function InterpretationSpaceTabs(props) {
-    const { currentTab, switchToTab } = props;
+    const { currentTab, switchToTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftInterpretationUnsaved, isDraftVariantNoteUnsaved } = props;
+    const tabIndexToUnsavedDraft = { 0: isDraftGeneNoteUnsaved, 1: isDraftVariantNoteUnsaved, 2: isDraftInterpretationUnsaved, 3: isDraftDiscoveryUnsaved };
+
+    // Maybe memoize?
+    const tabsRender = InterpretationSpaceController.tabNames.map((tabName, i) => {
+        const isActive = currentTab === i;
+        const unsavedDraft = tabIndexToUnsavedDraft[i];
+        return (
+            <li key={i} className={`interpretation-tab clickable d-flex align-items-center ${unsavedDraft ? 'font-italic' : ''}`}
+                onClick={(e) => switchToTab(i)} data-active={isActive} data-tip={unsavedDraft ? "Unsaved changes": null}>
+                {tabName}{unsavedDraft ? <span className="text-danger text-600">*</span>: ''}
+            </li>);
+    });
 
     return (
         <ul className="p-1 d-flex align-items-center justify-content-between">
-            {InterpretationSpaceController.tabNames.map((tabName, i) => {
-                const isActive = currentTab === i;
-                return (
-                    <li key={i} className="interpretation-tab clickable" onClick={(e) => switchToTab(i)} data-active={isActive}>
-                        {tabName}
-                    </li>);
-            })}
+            {tabsRender}
         </ul>
     );
 }
@@ -468,7 +492,7 @@ class GenericInterpretationPanel extends React.PureComponent {
         super(props);
 
         const {
-            note_text = "", acmg_guidelines = [], classification = null,
+            note_text = "", classification = null,
             conclusion =  "", variant_candidacy = null, gene_candidacy = null
         } = props.lastWIPNote || props.lastSavedNote || {};
 
@@ -478,7 +502,6 @@ class GenericInterpretationPanel extends React.PureComponent {
             classification,
             variant_candidacy,
             gene_candidacy,
-            acmg_guidelines,            // TODO: Currently Unused
             conclusion                  // TODO: Currently Unused
         };
 
@@ -488,9 +511,12 @@ class GenericInterpretationPanel extends React.PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { setIsSubmitting, isSubmitting, memoizedHasNoteChanged, lastSavedNote, otherDraftsUnsaved } = this.props;
+        const { setIsSubmitting, wipACMGSelections, isSubmitting, memoizedHasNoteChanged, lastSavedNote, otherDraftsUnsaved } = this.props;
 
-        const isThisNoteUnsaved = memoizedHasNoteChanged(lastSavedNote, this.state);
+        const savedState = { ...this.state };
+        savedState.acmg_guidelines = wipACMGSelections;
+
+        const isThisNoteUnsaved = memoizedHasNoteChanged(lastSavedNote, savedState);
         const anyNotesUnsaved = otherDraftsUnsaved || isThisNoteUnsaved;
 
         // Only trigger if switching from no unsaved to unsaved present or vice versa
@@ -518,8 +544,10 @@ class GenericInterpretationPanel extends React.PureComponent {
 
     // Wrapping passed in functions so as to call them with this component's state, then pass down to children
     saveStateAsDraft() {
-        const { saveAsDraft, noteType, saveToField } = this.props;
-        saveAsDraft(this.state, saveToField, noteType);
+        const { saveAsDraft, noteType, saveToField, wipACMGSelections } = this.props;
+        const stateToSave = { ...this.state };
+        stateToSave.acmg_guidelines = wipACMGSelections;
+        saveAsDraft(stateToSave, saveToField, noteType);
     }
 
     componentWillUnmount() { // Before unmounting (as in switching tabs), save unsaved changes in controller state
@@ -527,24 +555,31 @@ class GenericInterpretationPanel extends React.PureComponent {
 
         // Only trigger if note has changed since last soft save (WIP)
         if (memoizedHasNoteChanged(lastWIPNote, this.state)) {
+            // console.log("note has changed since last soft save... updating WIP");
             retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
         }
     }
 
     render() {
-        const { lastSavedNote = null, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource, hasEditPermission } = this.props;
+        const { lastSavedNote = null, wipACMGSelections, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource, hasEditPermission, autoClassification, toggleInvocation } = this.props;
         const {
             status: savedNoteStatus,
             last_modified: lastModified = null
         } = lastSavedNote || {};
         const { modified_by: { display_title : lastModUsername } = {}, date_modified = null } = lastModified || {};
-        const { note_text: noteText, acmg_guidelines, classification, gene_candidacy, variant_candidacy, conclusion } = this.state;
+        const { note_text: noteText, classification, gene_candidacy, variant_candidacy, conclusion } = this.state;
 
-        const noteChangedSinceLastSave = memoizedHasNoteChanged(lastSavedNote, this.state);
+
+        const stateToSave = { ...this.state };
+        stateToSave.acmg_guidelines = wipACMGSelections;
+
+        const noteChangedSinceLastSave = memoizedHasNoteChanged(lastSavedNote, stateToSave);
         const noteTextPresent = !!noteText;
         const isDraft = savedNoteStatus === "in review";
         const isCurrent = savedNoteStatus === "current";
         const isApproved = savedNoteStatus === "approved";
+        // console.log("GenericInterpretationPanel state", stateToSave);
+        // console.log("lastSavedNote", lastSavedNote);
 
         return (
             <div className="interpretation-panel">
@@ -556,13 +591,13 @@ class GenericInterpretationPanel extends React.PureComponent {
                     : null}
                 <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
-                    <GenericFieldForm fieldsArr={[{ field: 'classification', value: classification }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    <GenericFieldForm fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_guidelines', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
                 { noteType === "note_discovery" ?
                     <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
                         {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
-                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave }}
+                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteType }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
@@ -703,7 +738,7 @@ class AutoGrowTextArea extends React.Component {
                 // height: parentHeight
             }} className={cls}>
                 <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: textAreaHeight > maxHeight ? maxHeight: textAreaHeight, resize: "none" }} className="w-100"
-                    onChange={this.onChangeWrapper} />
+                    onChange={this.onChangeWrapper} placeholder="Required" />
             </div>
         );
     }
@@ -749,8 +784,9 @@ function GenericFieldForm(props) {
 
     const fieldsJSX = useMemo(function() {
         return fieldsArr.map((fieldDataObj) => {
-            const { field, value } = fieldDataObj;
-            return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field }} getFieldProperties={getFieldProperties}
+            const { field, value, autoClassification, toggleInvocation } = fieldDataObj;
+            if (field === "acmg_guidelines") { return (<ACMGPicker key={field} selections={value} {...{ schemas, field, autoClassification, toggleInvocation, getFieldProperties }}/>); }
+            return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field, getFieldProperties }}
                 onOptionChange={onDropOptionChange} />);
         }).sort().reverse(); // Reverse really just to get Variant candidacy to show up last. May need a better solution if more fields added in future.
     }, [ schemas, noteType, fieldsArr ]);
@@ -759,6 +795,57 @@ function GenericFieldForm(props) {
         <React.Fragment>
             { fieldsJSX }
         </React.Fragment>);
+}
+
+function ACMGPicker(props) {
+    const { field, selections = [], schemas = null, onOptionChange, cls="mb-1", getFieldProperties, autoClassification, toggleInvocation } = props;
+    if (!schemas) {
+        return null;
+    }
+
+    const fieldSchema = getFieldProperties(field);
+    const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
+
+
+    const picked = selections.map((selection, i) => (
+        <div className={`acmg-invoker text-600 clickable text-monospace text-center mr-01 ml-01`} key={selection} data-criteria={selection} data-invoked={true}
+            data-tip="Click to deselect this rule" onClick={() => toggleInvocation(selection)}>
+            { selection }
+        </div>
+    ));
+
+    return (
+        <React.Fragment>
+            <label className="w-100 text-small">
+                { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
+            </label>
+            <div className="w-100 d-flex flex-wrap acmg-picker mb-08">
+                { selections.length > 0 ? picked : <div className="acmg-invoker text-muted" data-tip={"Use the picker above to make invocations."} data-criteria="none">None</div>}
+            </div>
+
+            { autoClassification ? (
+                <>
+                    <label className="w-100 text-small">CGAP's Classification:</label>
+                    <div className="w-100 mb-08 ml-1">
+                        <i className="status-indicator-dot ml-1 mr-1" data-status={autoClassification} />{autoClassification}
+                    </div>
+                </>)
+                : null }
+        </React.Fragment>
+    );
+}
+
+function getTooltipPerNoteType(noteType) {
+    switch(noteType) {
+        case "note_interpretation":
+            return "Note text required to save ACMG classification";
+        case "note_discovery":
+            return "Note text required to save discovery interpretation";
+        case "note_standard":
+            return "Note text required to save";
+        default:
+            return null;
+    }
 }
 
 /**
@@ -773,23 +860,31 @@ function GenericInterpretationSubmitButton(props) {
         noteChangedSinceLastSave,   // Has the text in the note space changed since last save?
         saveAsDraft,                // Fx -- save as Draft
         cls,
-        hasEditPermission
+        hasEditPermission,
+        noteType
     } = props;
 
     const allButtonsDropsDisabled = !noteTextPresent || !noteChangedSinceLastSave;
 
+    const dataTip = !hasEditPermission ? "You must be added to the project to submit a note for this item." :
+        !noteTextPresent ? getTooltipPerNoteType(noteType) : null;
+
     if (isCurrent || isApproved || !hasEditPermission) {
         // No further steps allowed; saved to knowledgebase or approved to case
         return (
-            <Button variant="primary btn-block" disabled className={cls} data-tip={!hasEditPermission ? "You must be added to the project to submit a note for this item." : null}>
-                { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
-            </Button>);
+            <div data-tip={dataTip}>
+                <Button variant="primary btn-block" disabled className={cls}>
+                    { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
+                </Button>
+            </div>);
     } else { // Brand new draft OR previous draft; allow saving or re-saving as draft
         return (
-            <Button variant="primary btn-block" onClick={saveAsDraft}
-                disabled={allButtonsDropsDisabled}>
-                { isDraft ? "Re-save as Draft": "Save as Draft" }
-            </Button>
+            <div data-tip={dataTip}>
+                <Button variant="primary btn-block" onClick={saveAsDraft} data-tip={dataTip}
+                    disabled={allButtonsDropsDisabled}>
+                    { isDraft ? "Re-save as Draft": "Save as Draft" }
+                </Button>
+            </div>
         );
     }
 }
