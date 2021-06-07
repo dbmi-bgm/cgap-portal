@@ -1,11 +1,11 @@
 import re
 
 from dcicutils.misc_utils import ignored
-from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.security import Authenticated
+from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden
 from pyramid.view import view_config
 from snovault.util import debug_log
-
-from encoded.types.base import get_item_or_none
+from uuid import UUID
 
 ATID_PATTERN = re.compile("/[a-zA-Z-]+/[a-zA-Z0-9-_:]+/")
 GENELIST_ATID = re.compile("/gene-lists/[a-zA-Z0-9-]+/")
@@ -22,6 +22,7 @@ KEYS_TO_IGNORE = [
     "schema_version",
     "date_created",
 ]
+FORBIDDEN_MSG = "no view permissions"
 
 
 def includeme(config):
@@ -40,10 +41,23 @@ class CustomEmbed:
         self.desired_embeds = embed_props["desired_embeds"]
         self.embed_depth = embed_props["embed_depth"]
         self.cache = embed_props["cache"]
-        depth = 0
+        depth = -1
         self.result = self.embed(item, depth)
 
-    def _minimal_embed(self, item_id):
+    def _user_embed(self, item_id, depth, frame="object"):
+        """
+        """
+        item = None
+        if not item_id.startswith("/"):
+            item_id = "/" + item_id
+        try:
+            item = self.request.embed(item_id, "@@" + frame, as_user=True)
+        except HTTPForbidden:
+            if depth != -1:
+                item = FORBIDDEN_MSG
+        return item
+
+    def _minimal_embed(self, item_id, depth):
         """
         Embed minimal item info. Helpful for preventing recursions for
         items for which detailed info is commonly not needed.
@@ -51,13 +65,16 @@ class CustomEmbed:
         :param item_id: string uuid or @id
         :return item_embed: dict with item title and @id
         """
-        item_object = get_item_or_none(self.request, item_id)
-        item_title = item_object.get("title", "")
-        item_atid = item_object.get("@id", "")
-        item_embed = {"title": item_title, "@id": item_atid}
+        item_object = self._user_embed(item_id, depth)
+        if isinstance(item_object, str):
+            item_embed = item_object
+        else:
+            item_title = item_object.get("title", "")
+            item_atid = item_object.get("@id", "")
+            item_embed = {"title": item_title, "@id": item_atid}
         return item_embed
 
-    def _embed_genelist(self, genelist_atid):
+    def _embed_genelist(self, genelist_atid, depth):
         """
         Embed limited gene list information from raw view to avoid costly
         object view of large gene lists.
@@ -65,11 +82,24 @@ class CustomEmbed:
         :param genelist_atid: string of gene list @id
         :return genelist_embed: dict with gene list title and uuid
         """
-        genelist_raw = get_item_or_none(self.request, genelist_atid, frame="raw")
-        title = genelist_raw.get("title", "")
-        uuid = genelist_raw.get("uuid", "")
-        genelist_embed = {"title": title, "uuid": uuid}
+        genelist_raw = self._user_embed(genelist_atid, depth, frame="raw")
+        if isinstance(genelist_raw, str):
+            genelist_embed = genelist_raw
+        else:
+            title = genelist_raw.get("title", "")
+            uuid = genelist_raw.get("uuid", "")
+            genelist_embed = {"title": title, "uuid": uuid}
         return genelist_embed
+
+    @staticmethod
+    def _valid_uuid(uuid_to_test, version=4):
+        """
+        """
+        try:
+            uuid_obj = UUID(uuid_to_test, version=version)
+        except ValueError:
+            return False
+        return str(uuid_obj) == uuid_to_test
 
     def embed(self, item, depth):
         """
@@ -103,7 +133,7 @@ class CustomEmbed:
                                 depth += 1
                             else:
                                 cache_item = item
-                                item = get_item_or_none(self.request, item)
+                                item = self._user_embed(item, depth)
                                 self.cache[cache_item] = item
                                 depth += 1
                         else:
@@ -116,19 +146,22 @@ class CustomEmbed:
                             depth += 1
                         elif GENELIST_ATID.match(item):
                             cache_item = item
-                            item = self._embed_genelist(item)
+                            item = self._embed_genelist(item, depth)
                             self.cache[cache_item] = item
                             break
                         elif MINIMAL_EMBED_ATID.match(item):
                             cache_item = item
-                            item = self._minimal_embed(item)
+                            item = self._minimal_embed(item, depth)
                             self.cache[cache_item] = item
                             break
                         else:
                             cache_item = item
-                            item = get_item_or_none(self.request, item)
+                            item = self._user_embed(item, depth)
                             self.cache[cache_item] = item
                             depth += 1
+                elif self._valid_uuid(item):
+                    item = self._user_embed(item, depth)
+                    depth += 1
                 else:
                     break
             else:
@@ -136,7 +169,9 @@ class CustomEmbed:
         return item
 
 
-@view_config(route_name="embed", request_method="POST", permission="view")
+@view_config(
+    route_name="embed", request_method="POST", effective_principals=Authenticated
+)
 @debug_log
 def embed(context, request):
     """
@@ -178,7 +213,6 @@ def embed(context, request):
         "cache": cache,
     }
     for item_id in ids:
-        item_info = get_item_or_none(request, item_id)
-        item_embed = CustomEmbed(request, item_info, embed_props)
+        item_embed = CustomEmbed(request, item_id, embed_props)
         results.append(item_embed.result)
     return results

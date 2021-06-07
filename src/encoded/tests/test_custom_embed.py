@@ -1,6 +1,11 @@
 import pytest
 
-from encoded.custom_embed import ATID_PATTERN, MINIMAL_EMBEDS
+from encoded.custom_embed import ATID_PATTERN, MINIMAL_EMBEDS, FORBIDDEN_MSG
+from encoded.tests.test_permissions import (
+    udn_project, admin_user, udn_user, multi_project_user, no_project_user,
+    deleted_user, admin_testapp, udn_user_testapp, multi_project_user_testapp,
+    no_project_user_testapp, deleted_user_testapp, simple_doc_item, bwh_institution,
+)
 
 pytestmark = [pytest.mark.working]
 
@@ -152,13 +157,49 @@ class TestCustomEmbed:
                 assert "@id" in vsl_embed_url[key]
                 assert "title" in vsl_embed_url[key]
 
-    def test_non_project_user(self, bgm_user_testapp, variant_sample_list):
-        """Test user from different project cannot call for embed."""
+    def test_authenticated_permissions(
+        self, deleted_user_testapp, anontestapp, variant_sample_list
+    ):
+        """Test non-authenticated users cannot POST to API."""
         vsl_uuid = variant_sample_list["uuid"]
         url_params = EMBED_URL + "?id=" + vsl_uuid
-        vsl_embed_url = _embed_with_url_params(bgm_user_testapp, url_params, status=403)
-        assert vsl_embed_url["status"] == "error"
-        assert vsl_embed_url["title"] == "Forbidden"
+        anon_embed = _embed_with_url_params(anontestapp, url_params, status=404)
+        deleted_user_embed = _embed_with_url_params(
+            deleted_user_testapp, url_params, status=404
+        )
+        assert anon_embed["status"] == "error"
+        assert deleted_user_embed["status"] == "error"
+
+    def test_non_project_user(self, bgm_user_testapp, variant_sample_list):
+        """
+        Test user from different project cannot call for embed if item
+        not accessible (e.g. different project and not "shared").
+        API will return None for such a call.
+        """
+        vsl_uuid = variant_sample_list["uuid"]
+        url_params = EMBED_URL + "?id=" + vsl_uuid
+        vsl_embed_url = _embed_with_url_params(bgm_user_testapp, url_params)
+        assert not vsl_embed_url
+
+    def test_non_project_user_shared_item(
+        self, testapp, bgm_user_testapp, variant_sample_list
+    ):
+        """
+        Test user from different project can call for embed if item is
+        accessible (e.g. "shared" status) but embedded items that are not
+        accessible (e.g. different project and not "shared") are not shown
+        within the returned item.
+        """
+        vsl_uuid = variant_sample_list["uuid"]
+        vsl_atid = variant_sample_list["@id"]
+        testapp.patch_json(vsl_atid, {"status": "shared"})
+        url_params = EMBED_URL + "?id=" + vsl_uuid
+        bgm_vsl_embed_url = _embed_with_url_params(bgm_user_testapp, url_params)
+        admin_vsl_embed_url = _embed_with_url_params(testapp, url_params)
+        for key in admin_vsl_embed_url:
+            assert key in bgm_vsl_embed_url
+        for variant_sample in bgm_vsl_embed_url["variant_samples"]:
+            assert variant_sample["variant_sample_item"] == FORBIDDEN_MSG
 
     def test_too_many_items(self, testapp, variant_sample_list):
         """Test POST with >5 item IDs results in bad request error."""
