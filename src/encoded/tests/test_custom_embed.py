@@ -2,9 +2,7 @@ import pytest
 
 from encoded.custom_embed import ATID_PATTERN, MINIMAL_EMBEDS, FORBIDDEN_MSG
 from encoded.tests.test_permissions import (
-    udn_project, admin_user, udn_user, multi_project_user, no_project_user,
-    deleted_user, admin_testapp, udn_user_testapp, multi_project_user_testapp,
-    no_project_user_testapp, deleted_user_testapp, simple_doc_item, bwh_institution,
+    deleted_user, deleted_user_testapp, bwh_institution
 )
 
 pytestmark = [pytest.mark.working]
@@ -219,3 +217,19 @@ class TestCustomEmbed:
         json_to_post = {"ids": ids, "depth": 1}
         embed_json = _embed_with_json_params(testapp, json_to_post, status=400)
         assert embed_json["status"] == "error"
+
+    def test_no_items(self, testapp):
+        """Test POST with no ID info results in bad request."""
+        api_call = _embed_with_url_params(testapp, EMBED_URL, status=400)
+        assert api_call["status"] == "error"
+
+    def test_invalid_item_id(self, testapp):
+        """Test call to API with invalid uuid or @id results in bad request."""
+        nonexistent_uuid = "c1649409-9cb5-4887-8dde-e72feca80059"
+        nonexistent_atid = "/projects/not-a-real-project/"
+        not_uuid_or_atid = "dog"
+        bad_ids = [nonexistent_uuid, nonexistent_atid, not_uuid_or_atid]
+        for item_id in bad_ids:
+            url_params = EMBED_URL + "?id=" + item_id
+            api_call = _embed_with_url_params(testapp, url_params, status=400)
+            assert api_call["status"] == "error"

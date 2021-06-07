@@ -66,6 +66,8 @@ class CustomEmbed:
         except HTTPForbidden:
             if depth != -1:
                 item = FORBIDDEN_MSG
+        except KeyError:
+            raise HTTPBadRequest("The item with ID %s could not be found." % item_id)
         return item
 
     def _minimal_embed(self, item_id, depth):
@@ -224,6 +226,8 @@ def embed(context, request):
             "Too many items were given for embedding."
             " Please limit to less than 5 items."
         )
+    if not ids:
+        raise HTTPBadRequest("No item identifier was provided.")
     embed_props = {
         "ignored_embeds": ignored_embeds,
         "desired_embeds": desired_embeds,
@@ -233,4 +237,7 @@ def embed(context, request):
     for item_id in ids:
         item_embed = CustomEmbed(request, item_id, embed_props)
         results.append(item_embed.result)
+    item_ids_not_found = [item for item in results if isinstance(item, str)]
+    if item_ids_not_found:
+        raise HTTPBadRequest("One of the item IDs was not valid.")
     return results
