@@ -53,6 +53,12 @@
                       "argument_name": "nthread",
                       "argument_type": "parameter",
                       "source_argument_name": "nthread_mpileup"
+                  },
+                  {
+                      "argument_name": "MQthr",
+                      "argument_type": "parameter",
+                      "value": "0",
+                      "value_type": "integer"
                   }
               ],
               "config": {

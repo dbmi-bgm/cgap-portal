@@ -15,6 +15,14 @@
               "workflow_argument_name": "reference"
           },
           {
+              "argument_type": "parameter",
+              "workflow_argument_name": "nthreads"
+          },
+          {
+              "argument_type": "parameter",
+              "workflow_argument_name": "MQthr"
+          },
+          {
               "argument_format": "rck_gz",
               "argument_type": "Output processed file",
               "workflow_argument_name": "rck",

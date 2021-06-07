@@ -182,7 +182,8 @@
                             "string",
                             "integer",
                             "float",
-                            "json"
+                            "json",
+                            "boolean"
                         ]
                     },
                     "files": {

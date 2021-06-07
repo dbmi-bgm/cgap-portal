@@ -105,6 +105,23 @@
                                         "parameter"
                                     ]
                                 },
+                                "value": {
+                                    "title": "Value",
+                                    "description": "a specific input parameter value",
+                                    "type": "string"
+                                },
+                                "value_type": {
+                                    "title": "Value Type",
+                                    "description": "Type of the specific input parameter value",
+                                    "type": "string",
+                                    "enum":[
+                                        "string",
+                                        "integer",
+                                        "float",
+                                        "json",
+                                        "boolean"
+                                    ]
+                                },
                                 "source" : {
                                     "title" : "Source Workflow",
                                     "description" : "Where this input file came from (source workflow name). If this field is null or undefined, the input is global and not from another workflow's output.",
@@ -201,7 +218,8 @@
                             "string",
                             "integer",
                             "float",
-                            "json"
+                            "json",
+                            "boolean"
                         ]
                     },
                     "files": {
