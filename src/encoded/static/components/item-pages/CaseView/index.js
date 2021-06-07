@@ -27,8 +27,8 @@ import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
 import { InterpretationTab } from './InterpretationTab';
+import { FinalizeCaseTab } from './FinalizeCaseTab';
 import CaseSubmissionView from './CaseSubmissionView';
-
 
 
 
@@ -307,8 +307,13 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     } dotPath=".interpretation" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
                         <InterpretationTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
-                        <ReportingTab {...props} />
+                    <DotRouterTab tabTitle={
+                        <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
+                            { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
+                            Finalize Case
+                        </span>
+                    } dotPath=".finalize" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
+                        <FinalizeCaseTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem }} />
                     </DotRouterTab>
                 </DotRouter>
                 : null }
@@ -433,12 +438,13 @@ class DotRouter extends React.PureComponent {
     }
 }
 
-function DotRouterTab(props) {
+const DotRouterTab = React.memo(function DotRouterTab(props) {
     const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
 
     const onClick = useCallback(function(){
         const targetDotPath = prependDotPath + dotPath;
-        navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
+        const navOpts = { "skipRequest": true, "replace": true, "dontScrollToTop": true };
+        navigate("#" + targetDotPath, navOpts, function(){
             // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
             // layout.animateScrollTo(targetDotPath);
         });
@@ -464,7 +470,16 @@ function DotRouterTab(props) {
             </div>
         </div>
     );
-}
+}, function(prevProps, nextProps){
+    // Custom equality comparison func.
+    // Skip comparing the hardcoded `prependDotPath` & `dotPath` -- revert if those props become dynamic.
+    // Also skip checking for props.children, since that is rendered by `DotRouter` and not this `DotRouterTab`.
+    const compareKeys = ["disabled", "active", "tabTitle"];
+    const anyChanged = _.any(compareKeys, function(k){
+        return prevProps[k] !== nextProps[k];
+    });
+    return !anyChanged;
+});
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context, currFamily, secondary_families = [] } = props;
@@ -756,8 +771,3 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         </React.Fragment>
     );
 });
-
-
-function ReportingTab(props) {
-    return <h1>This is the reporting tab</h1>;
-}

@@ -1,0 +1,343 @@
+'use strict';
+
+import React, { useCallback, useMemo, useState } from 'react';
+import queryString from 'query-string';
+import moment from 'moment';
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
+import { variantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './../../browse/variantSampleColumnExtensionMap';
+
+
+/**
+ * @module
+ * This file contains the VariantSampleSelection item, which is shared between InterpretationTab and Finalize Case tab.
+ */
+
+
+// Using integers here for faster comparisons.
+export const parentTabTypes = {
+    "INTERPRETATION": 1,
+    "FINALIZECASE": 2
+};
+
+
+/**
+ * Shows list of variant sample selections, or loading icon, depending on props.
+ */
+export const VariantSampleSelectionList = React.memo(function VariantSampleSelectionList (props) {
+    const {
+        variantSampleListItem,
+        schemas,
+        context,
+        isLoadingVariantSampleListItem = false,
+        parentTabType = parentTabTypes.INTERPRETATION
+    } = props;
+    const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
+
+    if (isLoadingVariantSampleListItem) {
+        return (
+            <h4 className="text-400 text-center text-muted">
+                <i className="icon icon-spin icon-circle-notch icon-2x fas"/>
+            </h4>
+        );
+    } else if (vsSelections.length === 0) {
+        return (
+            <h4 className="text-400">No selections added yet</h4>
+        );
+    } else {
+        return vsSelections.map(function(selectionSubObject, idx){
+            return (
+                <VariantSampleSelection {...{ schemas, context, parentTabType }}
+                    selection={selectionSubObject} key={idx} index={idx} />
+            );
+        });
+    }
+});
+
+
+/**
+ * For now, we just re-use the column render func from some VariantSample columns
+ * as value 'cells' of this card.
+ */
+const {
+    "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFunc },
+    "variant.genes.genes_most_severe_hgvsc": { render: variantRenderFunc },
+    "associated_genotype_labels.proband_genotype_label": { render: genotypeLabelRenderFunc },
+} = variantSampleColumnExtensionMap;
+
+export const VariantSampleSelection = React.memo(function VariantSampleSelection(props){
+    const {
+        selection,  // VariantSample Item
+        index,
+        context,    // Case
+        schemas,
+        parentTabType = parentTabTypes.INTERPRETATION
+    } = props;
+    const { accession: caseAccession } = context; // `context` refers to our Case in here.
+    const {
+        date_selected,
+        filter_blocks_request_at_time_of_selection,
+        variant_sample_item
+    } = selection;
+
+
+    // TODO: Consider if should just re-use state.isExpanded for "Actions" btn, expanding to show a menu..
+    const [ isExpanded, setIsExpanded ] = useState(false); // Can move this state up if have pagination or infinite scroll or something in future.
+    const toggleIsExpanded = useCallback(function(e){
+        e.stopPropagation();
+        setIsExpanded(!isExpanded);
+    }, [ isExpanded ]);
+
+    const {
+        "VariantSample": {
+            columns: {
+                "variant.genes.genes_most_severe_gene.display_title": {
+                    title: geneTranscriptColTitle,
+                    description: geneTranscriptColDescription
+                } = {},
+                "variant.genes.genes_most_severe_hgvsc": {
+                    title: variantColTitle,
+                    description: variantColDescription
+                } = {},
+                "associated_genotype_labels.proband_genotype_label": {
+                    title: genotypeLabelColTitle,
+                    description: genotypeLabelColDescription
+                } = {}
+            } = {}
+        } = {}
+    } = schemas || {};
+
+    const { "@id": vsID, interpretation = null, discovery_interpretation = null } = variant_sample_item || {};
+    const { classification: acmgClassification = null } = interpretation || {};
+    const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discovery_interpretation || {};
+    return (
+        <div className="card mb-1" key={index}>
+            <div className="card-header">
+                <div className="d-flex flex-column flex-lg-row align-items-lg-center">
+
+                    <div className="flex-auto mb-08 mb-lg-0">
+                        <VariantSampleDisplayTitleColumn result={variant_sample_item}
+                            link={`${vsID}?showInterpretation=True${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
+                    </div>
+
+                    <div className="flex-grow-1 d-none d-lg-block px-2">&nbsp;</div>
+
+                    <div className="flex-auto">
+
+                        { parentTabType === parentTabTypes.FINALIZECASE ?
+                            <button type="button" className="btn btn-sm btn-primary" onClick={toggleIsExpanded}>
+                                <i className={"icon fas mr-07 icon-" + (!isExpanded ? "plus" : "minus")} />
+                                { !isExpanded ? "Review Variant Notes & Classification" : "Hide Notes" }
+                            </button>
+                            : null }
+
+                        { parentTabType === parentTabTypes.INTERPRETATION ?
+                            <DropdownButton size="sm" variant="light" className="d-inline-block ml-07" disabled title={
+                                <React.Fragment>
+                                    <i className="icon icon-bars fas mr-07"/>
+                                    Actions
+                                </React.Fragment>
+                            }>
+                                TODO
+                            </DropdownButton>
+                            : null }
+
+                    </div>
+                </div>
+            </div>
+
+            <div className="card-body pt-0 pb-08">
+                <div className="row flex-column flex-sm-row">
+                    <div className="col col-sm-4 col-lg-2 py-2">
+                        <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
+                            { geneTranscriptColTitle || "Gene, Transcript" }
+                        </label>
+                        { geneTranscriptRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                    </div>
+                    <div className="col col-sm-4 col-lg-2 py-2">
+                        <label className="mb-04 text-small" data-tip={variantColDescription}>
+                            { variantColTitle || "Variant" }
+                        </label>
+                        { variantRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                    </div>
+                    <div className="col col-sm-4 col-lg-3 py-2">
+                        <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
+                            { genotypeLabelColTitle || "Genotype" }
+                        </label>
+                        { genotypeLabelRenderFunc(variant_sample_item, { align: 'left' }) }
+                    </div>
+                    <div className="col col-sm-4 col-lg-2 py-2">
+                        <label className="mb-04 text-small">ACMG Classification</label>
+                        { acmgClassification ?
+                            <div className="w-100 text-left">
+                                <i className="status-indicator-dot mr-1" data-status={acmgClassification}/>
+                                {acmgClassification}
+                            </div>:
+                            <div className="w-100 text-left text-muted text-truncate">Pending</div>}
+                    </div>
+                    <div className="col col-sm-8 col-lg-3 py-2">
+                        <label className="mb-04 text-small">Discovery</label>
+                        <div className="w-100 text-left">
+                            <span className="font-italic text-muted" style={{ marginRight: "25px" }}>Gene: </span>
+                            { geneCandidacy ?
+                                <span className="text-left">
+                                    <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
+                                    {geneCandidacy}
+                                </span>:
+                                <span className="text-left text-muted text-truncate">Not Available</span>}
+                        </div>
+                        <div className="text-left">
+                            <span className="font-italic text-muted mr-1">Variant: </span>
+                            { variantCandidacy ?
+                                <span className="w-100 text-left">
+                                    <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/>
+                                    {variantCandidacy}
+                                </span>:
+                                <span className="text-left text-muted text-truncate">Not Available</span>}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="card-body border-top attribution-section pt-1 pb-08">
+                <div className="d-flex align-items-center">
+                    <div className="flex-auto text-small" data-tip="Date Selected">
+                        <i className="icon icon-calendar far mr-07"/>
+                        <LocalizedTime timestamp={date_selected} />
+                    </div>
+                </div>
+            </div>
+
+            { isExpanded ?
+                <VariantSampleExpandedNotes />
+                : null }
+
+        </div>
+    );
+});
+
+
+function VariantSampleExpandedNotes () {
+    return (
+        <React.Fragment>
+            <div className="card-body bg-light select-checkboxes-section border-top border-bottom">
+                <Checkbox labelClassName="text-400 mb-08">
+                    Save & Send All Notes to Report
+                </Checkbox>
+                <Checkbox labelClassName="text-400 mb-0">
+                    Save & Send All Notes to KnowledgeBase
+                </Checkbox>
+            </div>
+            <div className="card-body notes-section">
+                <div className="row">
+                    <div className="col col-md-6 col-lg-3">
+                        <h4 className="text-300">Variant Notes</h4>
+                        <div className="flex">
+                            <Checkbox>Send to Report</Checkbox>
+                            <Checkbox>Send to KnowledgeBase</Checkbox>
+                        </div>
+                    </div>
+                    <div className="col col-md-6 col-lg-3">
+                        <h4 className="text-300">Gene Notes</h4>
+                        <div className="flex">
+                            <Checkbox>Send to Report</Checkbox>
+                            <Checkbox>Send to KnowledgeBase</Checkbox>
+                        </div>
+                    </div>
+                    <div className="col col-md-6 col-lg-3">
+                        <h4 className="text-300">ACMG Interpretation</h4>
+                        <div className="flex">
+                            <Checkbox>Send to Report</Checkbox>
+                            <Checkbox>Send to KnowledgeBase</Checkbox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </React.Fragment>
+    );
+}
+
+
+
+function ProjectWideSelectionsPanel () {
+
+}
+
+function ACMGClassificationSelections () {
+    return (
+        <div>
+            <h4 className="text-600">ACMG Classification Selections</h4>
+            <div className="row">
+                <div className="col-12 col-lg-6">
+                    <h5 className="text-400">Move to Report</h5>
+                    <ACMGClassificationSelectionsCommonCheckboxList />
+                </div>
+                <div className="col-12 col-lg-6">
+                    <h5 className="text-400">Send to KnowledgeBase</h5>
+                    <ACMGClassificationSelectionsCommonCheckboxList />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ACMGClassificationSelectionsCommonCheckboxList (props) {
+    // TODO: Have a common onChange passed to all of these, using something from props (TBD) to decide its logic
+
+    return (
+        <div>
+            <Checkbox>
+                Pathogenic Variants
+            </Checkbox>
+            <Checkbox>
+                Likely Pathogenic Variants
+            </Checkbox>
+            <Checkbox>
+                VUS Variants
+            </Checkbox>
+            <Checkbox>
+                Likely Benign Variants
+            </Checkbox>
+            <Checkbox>
+                Benign Variants
+            </Checkbox>
+        </div>
+    );
+}
+
+function VariantGeneSelections () {
+
+
+
+    return (
+        <div>
+            <h4 className="text-600">ACMG Classification Selections</h4>
+            <div className="row">
+                <div className="col-12 col-lg-6">
+                    <h5 className="text-400">Move to Report</h5>
+                    <div>
+                        <Checkbox>
+                            Strong
+                        </Checkbox>
+                        <Checkbox>
+                            Likely Pathogenic Variants
+                        </Checkbox>
+                        <Checkbox>
+                            VUS Variants
+                        </Checkbox>
+                        <Checkbox>
+                            Likely Benign Variants
+                        </Checkbox>
+                        <Checkbox>
+                            Benign Variants
+                        </Checkbox>
+                    </div>
+                </div>
+                <div className="col-12 col-lg-6">
+                    <h5 className="text-400">Send to KnowledgeBase</h5>
+                </div>
+            </div>
+        </div>
+    );
+}
