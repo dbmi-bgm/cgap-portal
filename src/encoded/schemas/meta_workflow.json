@@ -164,6 +164,16 @@
                             }
                         }
                     },
+                    "dependencies": {
+                        "title": "Dependencies",
+                        "description": "forced dependencies (other than deduced from input-output connections)",
+                        "type": "array",
+                        "items": {
+                            "title": "Dependency",
+                            "description": "One of the forced dependencies",
+                            "type": "string"
+                        }
+                    },
                     "config" : {
                         "title" : "Config",
                         "description" : "Tibanna configuration for execution",
