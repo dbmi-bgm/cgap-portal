@@ -43,7 +43,7 @@ Navigating src/encoded/
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 Top level files are modules that make up the core functionality of the back-end. Some modules differ greatly from or do
-not even exist in fourfront.
+not even exist in fourfront. Directories are outlined below.
 
     * ``annotations/`` contains mapping table and ingestion related metadata
     * ``commands/`` contains Python commands that can be run on the system from the command line
