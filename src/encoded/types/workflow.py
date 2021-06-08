@@ -754,7 +754,6 @@ def _build_workflow_run_embedded_list():
 
 @collection(
     name='workflow-runs',
-    unique_key='accession',
     properties={
         'title': 'Workflow Runs',
         'description': 'Listing of executions of 4DN analysis workflows',
@@ -764,7 +763,6 @@ class WorkflowRun(Item):
 
     item_type = 'workflow_run'
     schema = load_schema('encoded:schemas/workflow_run.json')
-    name_key = 'accession'
     embedded_list = _build_workflow_run_embedded_list()
 
     @calculated_property(schema=workflow_run_steps_property_schema, category='page')
