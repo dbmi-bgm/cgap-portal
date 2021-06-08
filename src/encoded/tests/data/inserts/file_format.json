@@ -43,5 +43,47 @@
         "standard_file_extension": "vcf.gz",
         "other_allowed_extensions": ["vcf"],
         "valid_item_types": ["FileProcessed"]
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_format": "rck_gz_tbi",
+        "status": "shared",
+        "uuid": "535e070d-ee58-4060-9264-b08d61968463",
+        "description": "tabix index of compressed rck file",
+        "standard_file_extension": "rck.gz.tbi",
+        "valid_item_types": ["FileProcessed"]
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_format": "rck_gz",
+        "status": "shared",
+        "uuid": "a3693d56-d3ac-40f0-8a1a-4b02e8747478",
+        "description": "rck, compressed",
+        "standard_file_extension": "rck.gz",
+        "valid_item_types": ["FileProcessed"],
+        "extrafile_formats": ["535e070d-ee58-4060-9264-b08d61968463"]
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_format": "rck_tar_index",
+        "status": "shared",
+        "uuid": "4c52b183-afed-40b7-a884-0ed0f7d349e8",
+        "description": "index file of rck.tar",
+        "standard_file_extension": "rck.tar.index",
+        "valid_item_types": ["FileProcessed"]
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_format": "rck_tar",
+        "status": "shared",
+        "uuid": "82abe09a-1405-4e2b-9138-0eed39a91470",
+        "description": "tar ball of rck files",
+        "standard_file_extension": "rck.tar",
+        "valid_item_types": ["FileProcessed"],
+        "extrafile_formats": ["4c52b183-afed-40b7-a884-0ed0f7d349e8"]
     }
 ]

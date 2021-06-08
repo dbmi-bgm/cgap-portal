@@ -10,10 +10,17 @@
               "mount": true
           },
           {
-              "argument_format": "regions",
+              "argument_format": "txt",
               "argument_type": "Input file",
-              "workflow_argument_name": "regions",
-              "default_input_file": "1c07a3aa-e2a3-498c-b838-15991c4a2f28"
+              "workflow_argument_name": "reference"
+          },
+          {
+              "argument_type": "parameter",
+              "workflow_argument_name": "nthreads"
+          },
+          {
+              "argument_type": "parameter",
+              "workflow_argument_name": "MQthr"
           },
           {
               "argument_format": "rck_gz",
@@ -204,8 +211,7 @@
       "docker_registry_url": "https://hub.docker.com/",
       "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
       "name": "test_rcktar_v18",
-      "aliases": ["cgap:test_rcktar_v18",
-                  "cgap:test_rcktar_v17"],
+      "aliases": ["cgap:test_rcktar_v18"],
       "steps": [
           {
               "inputs": [
