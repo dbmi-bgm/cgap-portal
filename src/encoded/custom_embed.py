@@ -152,7 +152,12 @@ class CustomEmbed:
                 break
             elif isinstance(item, str):
                 if ATID_PATTERN.match(item):
-                    if self.desired_embeds:
+                    if depth == -1:
+                        cache_item = item
+                        item = self._user_embed(item, depth)
+                        self.cache[cache_item] = item
+                        depth += 1
+                    elif self.desired_embeds:
                         if item.split("/")[1] in self.desired_embeds:
                             if item in self.cache:
                                 item = self.cache[item]
