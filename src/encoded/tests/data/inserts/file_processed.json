@@ -38,5 +38,15 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "submitted_by": "koray_kirli@hms.harvard.edu"
+    },
+    {
+        "status": "shared",
+        "uuid": "9d165f81-fec0-4de6-af4d-c0558d835d2e",
+        "file_format": "a3693d56-d3ac-40f0-8a1a-4b02e8747478",
+        "accession": "GAPFIFYGNO3D",
+        "filename": "abcd.rck.gz",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "submitted_by": "soohyun_lee@hms.harvard.edu"
     }
 ]

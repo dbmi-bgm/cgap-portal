@@ -1,0 +1,108 @@
+[
+    {
+      "title": "Test Meta Workflow",
+      "name": "test_metawf",
+      "version": "v1",
+      "description": "Test meta workflow",
+      "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+      "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+      "uuid": "ceafe51e-61b9-40fc-bdfa-d01e5e27046e",
+      "aliases": ["cgap:test_metawf"],
+      "input": [
+          {
+              "argument_name": "bam",
+              "argument_type": "file"
+          },
+          {
+              "argument_name": "reference",
+              "argument_type": "file",
+              "files": [
+                  {
+                      "file": "1053df95-4cf3-41cc-971d-81bb16c486dd"
+                  }
+              ]
+          },
+          {
+              "argument_name": "nthread_mpileup",
+              "argument_type": "parameter",
+              "value": "32",
+              "value_type": "integer"
+          },
+          {
+              "argument_name": "rcktar_content_filenames",
+              "argument_type": "parameter"
+          }
+      ],
+      "workflows": [
+          {
+              "name": "mpileup",
+              "workflow": "e2e95743-0d3b-4e07-b1e5-71c80dd74906",
+              "input": [
+                  {
+                      "argument_name": "bam",
+                      "argument_type": "file",
+                      "mount": true,
+                      "scatter": 1
+                  },
+                  {
+                      "argument_name": "reference",
+                      "mount": true,
+                      "argument_type": "file"
+                  },
+                  {
+                      "argument_name": "nthread",
+                      "argument_type": "parameter",
+                      "source_argument_name": "nthread_mpileup"
+                  },
+                  {
+                      "argument_name": "MQthr",
+                      "argument_type": "parameter",
+                      "value": "0",
+                      "value_type": "integer"
+                  }
+              ],
+              "config": {
+                  "instance_type": "c5.4xlarge",
+                  "ebs_size": 200,
+                  "EBS_optimized": true,
+                  "log_bucket": "tibanna-output",
+                  "behavior_on_capacity_limit": "wait_and_retry"
+              },
+              "custom_pf_fields": {
+                  "rck": {
+                      "file_type" : "read counts (rck)",
+                      "description": "read counts (rck) file"
+                  }
+              }
+          },
+          {
+              "name": "rcktar",
+              "workflow": "40f60563-a3e6-4a45-b083-c6a2e00dc71f",
+              "input": [
+                  {
+                      "argument_name": "input_rcks",
+                      "argument_type": "file",
+                      "source": "mpileup",
+                      "source_argument_name": "rck",
+                      "gather": 1,
+                      "rename": "formula:rcktar_content_filenames"
+                  }
+              ],
+              "config": {
+                  "instance_type": "c5.xlarge",
+                  "ebs_size": "2.5x",
+                  "EBS_optimized": true,
+                  "spot_instance": true,
+                  "log_bucket": "tibanna-output",
+                  "behavior_on_capacity_limit": "wait_and_retry"
+              },
+              "custom_pf_fields": {
+                  "rck_tar": {
+                      "file_type" : "tarred read counts (rck)",
+                      "description": "tarred read counts (rck) file"
+                  }
+              }
+          }
+      ]
+    }
+]
