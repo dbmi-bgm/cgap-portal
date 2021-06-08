@@ -11,6 +11,7 @@ from encoded.ingestion.common import CGAP_CORE_PROJECT
 
 CGAP_CORE_PROJECT = CGAP_CORE_PROJECT + "/"
 
+
 def submit_genelist(
     *, s3_client, bucket, key, project, institution, vapp, validate_only=False
 ):
@@ -95,9 +96,9 @@ class GeneListSubmission:
 
     def extract_txt_file(self, txt_file):
         """
-        Parses a .txt file for genes and title. For every non-empty line,
-        assumes the line is a title if it contains the word "Title"; otherwise,
-        line is assumed to be a gene.
+        Parses a .txt file for genes, cases, and title. For every non-empty
+        line, searches for starting word of "title" or "case" and makes
+        corresponding assignment; otherwise, line is assumed to be a gene.
 
         Returns:
             - title string
@@ -129,10 +130,10 @@ class GeneListSubmission:
 
     def extract_xlsx_file(self, xlsx_file):
         """
-        Parses a .xlsx file for genes and title. Assumes headers "Genes" and
-        "Title" are in the first row of document and will take the title from
-        the first row below the title header and genes from all non-empty rows
-        beneath the genes header.
+        Parses a .xlsx file for genes, cases, and title. Assumes headers "Genes",
+        "Case", and "Title" are in the first row of document and will designate
+        the rows underneath appropriately (though title is taken to be the first
+        non-empty row under the header).
 
         Returns:
             - title string
@@ -398,8 +399,8 @@ class GeneListSubmission:
             )
         if cases_without_sample_ids:
             self.errors.append(
-                "The following cases have not yet been processed: %s. Please"
-                " resubmit the gene list once the cases have been processed,"
+                "The following cases are missing sample metadta: %s. Please resubmit"
+                " the gene list once sample metadata is complete for these cases"
                 " or remove these cases from the current submission."
                 % ", ".join(cases_without_sample_ids)
             )
