@@ -32,9 +32,9 @@ Important directories/files are outlined below.
     * ``scripts/`` contains misc scripts
     * ``src/encoded/`` where the code is
     * ``.dockerignore`` specifies paths ignored by the Dockerfile
-    * ``Dockerfile`` contains the Docker build instructions for the cgap-portal
+    * ``Dockerfile`` contains the Docker build instructions for the cgap-portal - see ``docker-production.rst``
     * ``Makefile`` contains macros for common build operations - see ``make info``
-    * ``docker-compose.yml`` builds the new local deployment - see `docker-local.rst``
+    * ``docker-compose.yml`` builds the new local deployment - see ``docker-local.rst``
     * ``package.json`` and ``package-lock.json`` specify the front-end dependencies
     * ``pyproject.toml`` and ``poetry.lock`` specify the back-end dependencies
     * ``setup_eb.py`` performs final installation setup
