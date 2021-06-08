@@ -41,6 +41,7 @@ class CustomEmbed:
         self.desired_embeds = embed_props["desired_embeds"]
         self.embed_depth = embed_props["embed_depth"]
         self.cache = embed_props["cache"]
+        self.invalid_ids = []
         depth = -1
         self.result = self.embed(item, depth)
 
@@ -59,6 +60,7 @@ class CustomEmbed:
         :return item: object to return for embedding
         """
         item = None
+        given_id = item_id
         if not item_id.startswith("/"):
             item_id = "/" + item_id
         try:
@@ -67,7 +69,7 @@ class CustomEmbed:
             if depth != -1:
                 item = FORBIDDEN_MSG
         except KeyError:
-            raise HTTPBadRequest("The item with ID %s could not be found." % item_id)
+            self.invalid_ids.append(given_id)
         return item
 
     def _minimal_embed(self, item_id, depth):
@@ -80,12 +82,14 @@ class CustomEmbed:
         :return item_embed: dict with item title and @id
         """
         item_object = self._user_embed(item_id, depth)
-        if isinstance(item_object, str):
+        if item_object == FORBIDDEN_MSG:
             item_embed = item_object
-        else:
+        elif isinstance(item_object, dict):
             item_title = item_object.get("title", "")
             item_atid = item_object.get("@id", "")
             item_embed = {"title": item_title, "@id": item_atid}
+        else:
+            item_embed = item_object
         return item_embed
 
     def _embed_genelist(self, genelist_atid, depth):
@@ -98,12 +102,14 @@ class CustomEmbed:
         :return genelist_embed: dict with gene list title and uuid
         """
         genelist_raw = self._user_embed(genelist_atid, depth, frame="raw")
-        if isinstance(genelist_raw, str):
+        if genelist_raw == FORBIDDEN_MSG:
             genelist_embed = genelist_raw
-        else:
+        elif isinstance(genelist_raw, dict):
             title = genelist_raw.get("title", "")
             uuid = genelist_raw.get("uuid", "")
             genelist_embed = {"title": title, "uuid": uuid}
+        else:
+            genelist_embed = genelist_raw
         return genelist_embed
 
     @staticmethod
@@ -208,6 +214,7 @@ def embed(context, request):
     desired_embeds = []
     cache = {}
     results = []
+    invalid_ids = []
     embed_depth = 4  # Arbritary standard depth to search.
     ignored(context)
     if request.GET:
@@ -237,7 +244,10 @@ def embed(context, request):
     for item_id in ids:
         item_embed = CustomEmbed(request, item_id, embed_props)
         results.append(item_embed.result)
-    item_ids_not_found = [item for item in results if isinstance(item, str)]
-    if item_ids_not_found:
-        raise HTTPBadRequest("One of the item IDs was not valid.")
+        invalid_ids += item_embed.invalid_ids
+    invalid_ids += [item for item in results if isinstance(item, str)]
+    if invalid_ids:
+        raise HTTPBadRequest(
+            "The following IDs were invalid: %s." % ", ".join(invalid_ids)
+        )
     return results

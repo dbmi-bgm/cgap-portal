@@ -233,3 +233,8 @@ class TestCustomEmbed:
             url_params = EMBED_URL + "?id=" + item_id
             api_call = _embed_with_url_params(testapp, url_params, status=400)
             assert api_call["status"] == "error"
+        url_params = EMBED_URL + "?id=" + "&id=".join(bad_ids)
+        api_call = _embed_with_url_params(testapp, url_params, status=400)
+        assert api_call["status"] == "error"
+        for item_id in bad_ids:
+            assert item_id in api_call["detail"]
