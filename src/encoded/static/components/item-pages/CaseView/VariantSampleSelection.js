@@ -118,7 +118,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
                     <div className="flex-auto mb-08 mb-lg-0">
                         <VariantSampleDisplayTitleColumn result={variant_sample_item}
-                            link={`${vsID}?showInterpretation=True${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
+                            link={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
                     </div>
 
                     <div className="flex-grow-1 d-none d-lg-block px-2">&nbsp;</div>
@@ -128,7 +128,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         { parentTabType === parentTabTypes.FINALIZECASE ?
                             <button type="button" className="btn btn-sm btn-primary" onClick={toggleIsExpanded}>
                                 <i className={"icon fas mr-07 icon-" + (!isExpanded ? "plus" : "minus")} />
-                                { !isExpanded ? "Review Variant Notes & Classification" : "Hide Notes" }
+                                { !isExpanded ? "Review Variant Notes & Classification" : "Hide Variant Notes & Classification" }
                             </button>
                             : null }
 
@@ -173,28 +173,28 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                             <div className="w-100 text-left">
                                 <i className="status-indicator-dot mr-1" data-status={acmgClassification}/>
                                 {acmgClassification}
-                            </div>:
-                            <div className="w-100 text-left text-muted text-truncate">Pending</div>}
+                            </div>
+                            : <div className="w-100 text-left"><PlaceHolderStatusIndicator /></div> }
                     </div>
                     <div className="col col-sm-8 col-lg-3 py-2">
                         <label className="mb-04 text-small">Discovery</label>
                         <div className="w-100 text-left">
-                            <span className="font-italic text-muted" style={{ marginRight: "25px" }}>Gene: </span>
+                            <span className="font-italic text-muted d-inline-block" style={{ width: "70px" }}>Gene: </span>
                             { geneCandidacy ?
                                 <span className="text-left">
                                     <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
                                     {geneCandidacy}
-                                </span>:
-                                <span className="text-left text-muted text-truncate">Not Available</span>}
+                                </span>
+                                : <PlaceHolderStatusIndicator/> }
                         </div>
                         <div className="text-left">
-                            <span className="font-italic text-muted mr-1">Variant: </span>
+                            <span className="font-italic text-muted d-inline-block" style={{ width: "70px" }}>Variant: </span>
                             { variantCandidacy ?
                                 <span className="w-100 text-left">
                                     <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/>
                                     {variantCandidacy}
-                                </span>:
-                                <span className="text-left text-muted text-truncate">Not Available</span>}
+                                </span>
+                                : <PlaceHolderStatusIndicator/> }
                         </div>
                     </div>
                 </div>
@@ -217,6 +217,15 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     );
 });
 
+const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicator(){
+    return (
+        <span className="text-left text-muted text-truncate">
+            <i className="status-indicator-dot mr-1" data-status="Not Available" />
+            Not Available
+        </span>
+    );
+});
+
 
 function VariantSampleExpandedNotes () {
     return (
@@ -233,23 +242,23 @@ function VariantSampleExpandedNotes () {
                 <div className="row">
                     <div className="col col-md-6 col-lg-3">
                         <h4 className="text-300">Variant Notes</h4>
-                        <div className="flex">
-                            <Checkbox>Send to Report</Checkbox>
-                            <Checkbox>Send to KnowledgeBase</Checkbox>
+                        <div className="d-flex flex-column flex-xl-row">
+                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to Report</Checkbox>
+                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to KnowledgeBase</Checkbox>
                         </div>
                     </div>
                     <div className="col col-md-6 col-lg-3">
                         <h4 className="text-300">Gene Notes</h4>
-                        <div className="flex">
-                            <Checkbox>Send to Report</Checkbox>
-                            <Checkbox>Send to KnowledgeBase</Checkbox>
+                        <div className="d-flex flex-column flex-xl-row">
+                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to Report</Checkbox>
+                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to KnowledgeBase</Checkbox>
                         </div>
                     </div>
                     <div className="col col-md-6 col-lg-3">
                         <h4 className="text-300">ACMG Interpretation</h4>
-                        <div className="flex">
-                            <Checkbox>Send to Report</Checkbox>
-                            <Checkbox>Send to KnowledgeBase</Checkbox>
+                        <div className="d-flex flex-column flex-xl-row">
+                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to Report</Checkbox>
+                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to KnowledgeBase</Checkbox>
                         </div>
                     </div>
                 </div>
