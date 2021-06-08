@@ -92,26 +92,6 @@ class CustomEmbed:
             item_embed = item_object
         return item_embed
 
-    def _embed_genelist(self, genelist_atid, depth):
-        """
-        Embed limited gene list information from raw view to avoid costly
-        object view of large gene lists.
-
-        :param genelist_atid: string of gene list @id
-        :param depth: int of current embedding depth
-        :return genelist_embed: dict with gene list title and uuid
-        """
-        genelist_raw = self._user_embed(genelist_atid, depth, frame="raw")
-        if genelist_raw == FORBIDDEN_MSG:
-            genelist_embed = genelist_raw
-        elif isinstance(genelist_raw, dict):
-            title = genelist_raw.get("title", "")
-            uuid = genelist_raw.get("uuid", "")
-            genelist_embed = {"title": title, "uuid": uuid}
-        else:
-            genelist_embed = genelist_raw
-        return genelist_embed
-
     @staticmethod
     def _valid_uuid(uuid_to_test, version=4):
         """
@@ -176,9 +156,8 @@ class CustomEmbed:
                             item = self.cache[item]
                             depth += 1
                         elif GENELIST_ATID.match(item):
-                            cache_item = item
-                            item = self._embed_genelist(item, depth)
-                            self.cache[cache_item] = item
+                            # NOTE: Non-admins forbidden for raw view, so just skip
+                            # attempt to embed gene lists.
                             break
                         elif MINIMAL_EMBED_ATID.match(item):
                             cache_item = item
