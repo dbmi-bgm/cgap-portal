@@ -1,0 +1,80 @@
+[
+    {
+      "title": "Test Meta Workflow Run",
+      "description": "Test meta workflow run",
+      "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+      "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+      "uuid": "2a481229-03dd-44b9-b235-a8a005608262",
+      "meta_workflow": "ceafe51e-61b9-40fc-bdfa-d01e5e27046e",
+      "workflow_runs": [
+          {
+              "name": "mpileup",
+              "status": "completed",
+              "shard": "0",
+              "workflow_run": "1964b601-4d50-44cd-bfa5-78bb7043d060",
+              "jobid": "axqsn1LkT6GT",
+              "output": [
+                  {
+                      "argument_name": "rck",
+                      "file": "9d165f81-fec0-4de6-af4d-c0558d835d2e"
+                  }
+              ]
+          },
+          {
+              "name": "mpileup",
+              "status": "failed",
+              "shard": "1",
+              "workflow_run": "9202acd3-e89c-4b69-9894-ce6f9582d266",
+              "jobid": "cKqCPmE29n24"
+          },
+          {
+              "name": "mpileup",
+              "status": "running",
+              "shard": "2",
+              "workflow_run": "8a39b6fb-8c91-4e88-a77f-70b654c2c0dc",
+              "jobid": "NJWsxyP6aeAk"
+          },
+          {
+              "name": "rcktar",
+              "status": "pending",
+              "shard": "0",
+              "dependencies": [
+                  "mpileup:0",
+                  "mpileup:1",
+                  "mpileup:2"
+              ]
+          }
+      ],
+      "input": [
+          {
+              "argument_name": "bam",
+              "argument_type": "file",
+              "files": [
+                  {
+                      "file": "10002377-49e5-4c33-afab-9ec90d65faa1",
+                      "dimension": "0"
+                  },
+                  {
+                      "file": "10002377-49e5-4c33-afab-9ec90d65faa2",
+                      "dimension": "1"
+                  },
+                  {
+                      "file": "10002377-49e5-4c33-afab-9ec90d65faa3",
+                      "dimension": "2"
+                  }
+              ]
+          },
+          {
+              "argument_name": "rcktar_content_filenames",
+              "argument_type": "parameter",
+              "value": "[\"a.rck\", \"b.rck\", \"c.rck\"]",
+              "value_type": "json"
+          }
+      ],
+      "common_fields": {
+          "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+          "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+      },
+      "final_status": "failed"
+    }
+]

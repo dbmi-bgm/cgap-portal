@@ -79,6 +79,12 @@ function VariantSampleSelection({ selection, index, caseAccession, schemas }){
         } = {}
     } = schemas || {};
 
+    const placeholderStatusIndicator =  (
+        <span className="text-left text-muted text-truncate">
+            <i className="status-indicator-dot mr-1" data-status="Not Available" />Not Available
+        </span>);
+
+
     const { "@id": vsID, interpretation = null, discovery_interpretation = null } = variant_sample_item || {};
     const { classification: acmgClassification = null } = interpretation || {};
     const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discovery_interpretation || {};
@@ -90,7 +96,7 @@ function VariantSampleSelection({ selection, index, caseAccession, schemas }){
                     <div className="flex-grow-1 d-flex flex-column flex-sm-row">
                         <div className="flex-auto">
                             <VariantSampleDisplayTitleColumn result={variant_sample_item}
-                                link={`${vsID}?showInterpretation=True${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
+                                link={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
                         </div>
                         <div className="flex-grow-1  d-sm-block">
                             &nbsp;
@@ -140,27 +146,25 @@ function VariantSampleSelection({ selection, index, caseAccession, schemas }){
                                 <i className="status-indicator-dot mr-1" data-status={acmgClassification}/>
                                 {acmgClassification}
                             </div>:
-                            <div className="w-100 text-left text-muted text-truncate">Pending</div>}
+                            <div className="w-100 text-left">{placeholderStatusIndicator}</div>}
                     </div>
                     <div className="col col-sm-8 col-lg-3 py-2">
                         <label className="mb-04 text-small">Discovery</label>
                         <div className="w-100 text-left">
-                            <span className="font-italic text-muted" style={{ marginRight: "25px" }}>Gene: </span>
+                            <span className="font-italic text-muted d-inline-block" style={{ width: "70px" }}>Gene: </span>
                             { geneCandidacy ?
                                 <span className="text-left">
                                     <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
                                     {geneCandidacy}
-                                </span>:
-                                <span className="text-left text-muted text-truncate">Not Available</span>}
+                                </span>: placeholderStatusIndicator}
                         </div>
                         <div className="text-left">
-                            <span className="font-italic text-muted mr-1">Variant: </span>
+                            <span className="font-italic text-muted d-inline-block" style={{ width: "70px" }}>Variant: </span>
                             { variantCandidacy ?
                                 <span className="w-100 text-left">
                                     <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/>
                                     {variantCandidacy}
-                                </span>:
-                                <span className="text-left text-muted text-truncate">Not Available</span>}
+                                </span>: placeholderStatusIndicator}
                         </div>
                     </div>
                 </div>

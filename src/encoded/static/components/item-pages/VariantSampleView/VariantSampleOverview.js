@@ -1,14 +1,20 @@
 'use strict';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
+import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
+import Button from 'react-bootstrap/esm/Button';
+import memoize from 'memoize-one';
+import Popover  from 'react-bootstrap/esm/Popover';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+import Collapse from 'react-bootstrap/esm/Collapse';
 import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
+import { acmgUtil } from '../../util';
 import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
 import { VariantTabBody } from './VariantTabBody';
 import { GeneTabBody } from './GeneTabBody';
@@ -57,6 +63,7 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     componentDidMount(){
+        layout.animateScrollTo(0,0);
         this.loadGene();
     }
 
@@ -108,14 +115,6 @@ export class VariantSampleOverview extends React.PureComponent {
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
 
-        const {
-            interpretation: { error: interpError = null } = {},
-            variant_notes: { error: varNoteError = null } = {},
-            gene_notes: { error: geneNoteError = null } = {},
-        } = context || {};
-
-        const anyNotePermErrors = interpError || varNoteError || geneNoteError;
-
         const { query: {
             showInterpretation = true,      // used only if "True" (toggles showing of interpretation sidebar/pane)
             annotationTab = null,           // used only if can be parsed to integer (Variant = 0, Gene = 1, Sample = 2, AnnotationBrowser = 3, BAM Browser = 4)
@@ -125,18 +124,10 @@ export class VariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <div className="row flex-column-reverse flex-lg-row flex-nowrap">
-                    <div className="col">
-                        {/* BA1, BS1, BS2, BS3 etc markers here */}
-                        <VariantSampleInfoHeader { ...passProps} onSelectTranscript={this.onSelectTranscript} />
-                        <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
-                    </div>
-                    { showInterpretation == 'True' && !anyNotePermErrors ?
-                        <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...passProps} defaultTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} {...{ caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}/>
-                        </div> : null
-                    }
-                </div>
+                <InterpretationController {...passProps} interpretationTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} {...{ showInterpretation, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}>
+                    <VariantSampleInfoHeader {...passProps} onSelectTranscript={this.onSelectTranscript} />
+                    <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
+                </InterpretationController>
             </div>
         );
     }
@@ -278,4 +269,172 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
     );
 });
 
+/**
+ * A component that controls interpretation/classification state shared between all tabs in interpretation space
+ * AND the global ACMG invoker. The autoclassification and globalACMGSelections held here are passed into
+ * Interpretation Space, used there. ShowACMGInvoker & toggleACMGInvoker toggle visibility for invoker on/off clinical tab.
+ *
+ * Also renders out annotation space (VariantSampleInfoHeader & VariantSampleOverviewTabView) as child (needed to position it inside of
+ * this markup for layout purposes, but wanted to keep separation of functionality, so that component is defined/props are passed
+ * in inside VariantSampleOverview).
+ */
+class InterpretationController extends React.Component {
 
+    constructor(props) {
+        super(props);
+
+        // Initialize ACMG selections based on most recent interpretation from context
+        const { interpretationTab, context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
+        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_guidelines);
+        const classifier = new acmgUtil.AutoClassify(acmgSelections);
+        const classification = classifier.getClassification();
+
+        this.state = {
+            globalACMGSelections: acmgSelections,
+            autoClassification: classification,
+            showACMGInvoker: interpretationTab === 2, // State method passed into Interpretation space and called when clinical tab is selected
+        };
+
+        this.toggleACMGInvoker = this.toggleACMGInvoker.bind(this);
+        this.toggleInvocation = this.toggleInvocation.bind(this);
+
+        this.memoized = {
+            flattenGlobalACMGStateIntoArray: memoize(acmgUtil.flattenStateMapIntoArray)
+        };
+
+        // Save an instance of autoclassify so that other methods can use it to calculate classification
+        this.classifier = classifier;
+    }
+
+    /**
+     * Toggles visibility of ACMG invoker (28 clickable rules); currently passed into Interpretation Space and called when interpretation
+     * note tabs are switched to and from clinical tab.
+     * @param {Function} callback   An optional function to call upon state setting.
+     */
+    toggleACMGInvoker(callback) {
+        const { showACMGInvoker } = this.state;
+        this.setState({ showACMGInvoker: !showACMGInvoker }, callback);
+    }
+
+    /**
+     * Called when a new rule is invoked or uninvoked
+     * @param {String} criteria     An ACMG rule
+     * @param {Function} callback   An optional function to call upon state setting
+     */
+    toggleInvocation(criteria, callback) {
+        const { globalACMGSelections = {} } = this.state;
+        const newInvocations = { ...globalACMGSelections };
+
+        if (newInvocations[criteria] !== undefined) { // already set
+            const newState = !newInvocations[criteria];
+            newInvocations[criteria] = newState;
+            if (newState) {
+                this.classifier.invoke(criteria);
+            } else {
+                this.classifier.uninvoke(criteria);
+            }
+        } else { // first time setting
+            newInvocations[criteria] = true;
+            this.classifier.invoke(criteria);
+        }
+
+        const classification = this.classifier.getClassification();
+
+        this.setState({ globalACMGSelections: newInvocations, autoClassification: classification }, callback);
+    }
+
+    render() {
+        const { showACMGInvoker, globalACMGSelections, autoClassification } = this.state;
+        const { context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const passProps = { context, schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
+
+        const {
+            interpretation: { error: interpError = null, acmg_guidelines = [] } = {},
+            variant_notes: { error: varNoteError = null } = {},
+            gene_notes: { error: geneNoteError = null } = {},
+            discovery_interpretation: { error: discoveryError = null } = {}
+        } = context || {}; // TODO: Pull from most recent note from db=datastore request
+
+        const anyNotePermErrors = interpError || varNoteError || geneNoteError || discoveryError;
+
+        const wipACMGSelections = this.memoized.flattenGlobalACMGStateIntoArray(globalACMGSelections);
+
+        return (
+            <React.Fragment>
+                <Collapse in={showACMGInvoker}>
+                    <div>{/** Collapse seems not to work without wrapper element */}
+                        <ACMGInvoker invokedFromSavedNote={acmg_guidelines} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} />
+                    </div>
+                </Collapse>
+                <div className="row flex-column-reverse flex-lg-row flex-nowrap">
+                    <div className="col">
+                        {/* Annotation Space passed as child */}
+                        { children }
+                    </div>
+                    { showInterpretation == 'True' && !anyNotePermErrors ?
+                        <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
+                            <InterpretationSpaceWrapper {...{ autoClassification }} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
+                        </div> : null }
+                </div>
+            </React.Fragment>
+        );
+    }
+}
+
+/**
+ * 28 ACMG Rules, made clickable and "invokable"; uses passed in methods/state from InterpretationController.
+ */
+function ACMGInvoker(props) {
+    const { globalACMGSelections: invoked = {}, toggleInvocation } = props || {};
+
+    const acmgTip = (criteria, description) => ( criteria && description ? `<h5 class="my-0 mw-10 text-600">${criteria}</h5><div style="max-width: 250px">${description}</div>`: null);
+
+    return (
+        <div className="card flex-row my-3 mt-0">
+            <div className="text-600 acmg-guidelines-title">ACMG Rules
+                <QuickPopover cls="p-1" popID="acmg-info-popover" title="Note on ACMG Tooltips and Auto-Classification" content={
+                    <div>
+                        <div className="mb-05">
+                            The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS" target="_blank" rel="noreferrer">this publication</a>.
+                        </div>
+                        <div>
+                            <u>Full Citation</u>: Richards, S., Aziz, N., Bale, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genet Med 17, 405–423 (2015). https://doi.org/10.1038/gim.2015.30
+                        </div>
+                    </div>
+                }/>
+            </div>
+            <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
+                {acmgUtil.rules.map((rule) => {
+                    const { [rule]: { description } = {} } = acmgUtil.metadata;
+                    return (
+                        <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={invoked[rule]}
+                            onClick={() => toggleInvocation(rule)} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
+                            { rule }
+                        </div>
+                    );}
+                )}
+            </div>
+        </div>
+    );
+}
+
+function QuickPopover(props) {
+    const { title, content, cls, popID, tooltip } = props || {};
+    const popover = (
+        <Popover id={popID}>
+            <Popover.Title className="m-0" as="h4">{title}</Popover.Title>
+            <Popover.Content>
+                { content }
+            </Popover.Content>
+        </Popover>
+    );
+    return (
+        <OverlayTrigger trigger="focus" placement="right" overlay={popover} transition={false}>
+            {({ ref, ...triggerHandler }) => (
+                <Button ref={ref} {...triggerHandler} variant="link" className={cls} data-tip={tooltip || "Click for citation info"}>
+                    <i className="icon icon-info-circle fas" />
+                </Button>
+            )}
+        </OverlayTrigger>
+    );
+}

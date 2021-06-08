@@ -12,13 +12,13 @@ const commonStyle1 = {
     "fillOpacity" : 1,
     "stroke": "#20445f", // "#083c52",
     "strokeWidth" : 0.5,
-    "stroke-linejoin": "round",
-    "stroke-linecap": "butt",
-    "stroke-miterlimit": 4,
-    "stroke-dasharray" : "none",
-    "stroke-dashoffset" : 0,
+    "strokeLinejoin": "round",
+    "strokeLinecap": "butt",
+    "strokeMiterlimit": 4,
+    "strokeDasharray" : "none",
+    "strokeDashoffset" : 0,
     "strokeOpacity": 1,
-    "paint-order" :"fill markers stroke"
+    "paintOrder" :"fill markers stroke"
 };
 
 const commonStyle2 = _.extend({}, commonStyle1, {
