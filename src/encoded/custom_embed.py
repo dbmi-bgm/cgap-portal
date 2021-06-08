@@ -190,7 +190,7 @@ class CustomEmbed:
                             item = self._user_embed(item, depth)
                             self.cache[cache_item] = item
                             depth += 1
-                elif self._valid_uuid(item):
+                elif self._valid_uuid(item) and depth == -1:
                     item = self._user_embed(item, depth)
                     depth += 1
                 else:
