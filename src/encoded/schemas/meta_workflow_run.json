@@ -1,0 +1,253 @@
+{
+    "title": "Meta Workflow Run",
+    "description": "Schema for submitting metadata on the meta workflow executation and tracking",
+    "id": "/profiles/meta_workflow_run.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "meta_workflow",
+        "project",
+        "institution",
+        "final_status"
+    ],
+    "additionalProperties": false,
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/documents"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        }
+    ],
+    "mixinFacets": [
+        {
+            "$ref": "mixins.json#/facets_common"
+        }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "title": {
+            "title": "Title",
+            "description": "The preferred viewable name of the meta workflow run.",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "A plain text description of the meta-workflow run",
+            "type": "string"
+        },
+        "workflow_runs": {
+            "title": "workflow runs",
+            "description": "The list of workflow runs with their status and output files",
+            "type": "array",
+            "items": {
+              "title": "Workflow Run",
+              "description": "Individual workflow run the meta workflow run.",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                  "name": {
+                      "title": "Name",
+                      "description": "Name of the corresponding workflow defined in the meta-workflow",
+                      "type": "string"
+                  },
+                  "status": {
+                      "title": "Status",
+                      "description": "Status of the current workflow run",
+                      "type": "string",
+                      "enum": [
+                          "pending",
+                          "running",
+                          "completed",
+                          "failed"
+                      ]
+                  },
+                  "shard": {
+                      "title": "Shard",
+                      "description": "Shard of the current workflow run in the format of x (1D) | x:x (2D) | x:x:x (3D)",
+                      "type": "string"
+                  },
+                  "dependencies": {
+                      "title": "Dependencies",
+                      "description": "Dependencies of the current workflow run",
+                      "type": "array",
+                      "items": {
+                          "title": "Dependency",
+                          "description": "A dependency of the current workflow run, in the format of name:shard.",
+                          "type": "string"
+                      }
+                  },
+                  "output": {
+                      "title": "Output",
+                      "description": "Output of the current workflow run",
+                      "type": "array",
+                      "items": {
+                          "title": "Output",
+                          "description": "An output of the current workflow run.",
+                          "type": "object",
+                          "additionalProperties": false,
+                          "properties": {
+                              "argument_name": {
+                                  "title": "Argument Name",
+                                  "description": "Name of the output argument",
+                                  "type": "string"
+                              },
+                              "file": {
+                                  "title": "File",
+                                  "description": "the actual output file (link to a file item)",
+                                  "type": "string",
+                                  "linkTo": "File"
+                              }
+                          }
+                      }
+                  },
+                  "workflow_run": {
+                      "title": "Workflow Run",
+                      "description": "Link to the corresponding workflow run item",
+                      "type": "string",
+                      "linkTo": "WorkflowRun"
+                  },
+                  "jobid": {
+                      "title": "Job ID",
+                      "description": "Job ID of the current workflow run",
+                      "type": "string"
+                  }
+              }
+            }
+        },
+        "input": {
+            "title": "Input",
+            "description": "The input files and parameters used for the meta workflow run.",
+            "type": "array",
+            "items": {
+                "title": "Input",
+                "description": "Input files or parameters associated with an input argument of the meta workflow run.",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "argument_name": {
+                        "title": "Workflow argument name",
+                        "description": "the name of the argument of the workflow that corresponds to the input file",
+                        "type": "string"
+                    },
+                    "argument_type": {
+                        "title": "Workflow argument type",
+                        "description": "the type of the argument of the workflow that corresponds to the input file",
+                        "type": "string",
+                        "enum": [
+                            "file",
+                            "parameter"
+                        ]
+                    },
+                    "value": {
+                        "title": "Value",
+                        "description": "a specific input parameter value",
+                        "type": "string"
+                    },
+                    "value_type": {
+                        "title": "Value Type",
+                        "description": "Type of the specific input parameter value",
+                        "type": "string",
+                        "enum":[
+                            "string",
+                            "integer",
+                            "float",
+                            "json",
+                            "boolean"
+                        ]
+                    },
+                    "files": {
+                        "title" : "File",
+                        "description" : "Default file item of the file type argument",
+                        "type": "array",
+                        "items": {
+                            "title": "Default Files",
+                            "description": "A list of objects describing default input file items",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "file": {
+                                    "title" : "File",
+                                    "type" : "string",
+                                    "linkTo": "File"
+                                },
+                                "dimension": {
+                                    "title" : "Dimension",
+                                    "description": "Dimension of file in the input argument (unset for a singleton, '0', '1', '2'.. for a list, '0,0', '0,1' ... for a nested list)",
+                                    "type" : "string",
+                                    "default": "0"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "meta_workflow": {
+            "title": "Meta Workflow",
+            "description": "The meta workflow associated with the meta-workflow run.",
+            "type": "string",
+            "linkTo": "MetaWorkflow"
+        },
+        "final_status": {
+            "title": "Final Status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+                "pending",
+                "running",
+                "complete",
+                "failed"
+            ]
+        },
+        "common_fields": {
+            "title": "Common Fields",
+            "description": "Common fields that go into all workflow_run, processed_files and qc items",
+            "type": "object",
+            "additionalProperties": true
+        }
+    },
+    "facets": {
+        "meta_workflow.title": {
+            "title": "MetaWorkflow"
+        },
+        "final_status": {
+            "title": "Final Status"
+        }
+    },
+    "columns": {
+        "meta_workflow.title": {
+            "title": "MetaWorkflow"
+        }
+    }
+}
