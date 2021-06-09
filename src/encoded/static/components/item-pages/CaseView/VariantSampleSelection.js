@@ -232,8 +232,8 @@ function VariantSampleExpandedNotes (props) {
     const {
         interpretation: clinicalInterpretationNote = null,
         discovery_interpretation: discoveryInterpretationNote = null,
-        variant_notes = [],
-        gene_notes = []
+        variant_notes: lastVariantNote = null, // = [],
+        gene_notes: lastGeneNote = null, // = []
     } = variantSample;
 
     const {
@@ -246,8 +246,8 @@ function VariantSampleExpandedNotes (props) {
         note_text: discoveryNoteText
     } = discoveryInterpretationNote || {};
 
-    const lastVariantNote = variant_notes[variant_notes.length - 1] || null;
-    const lastGeneNote = gene_notes[gene_notes.length - 1] || null;
+    // const lastVariantNote = variant_notes[variant_notes.length - 1] || null;
+    // const lastGeneNote = gene_notes[gene_notes.length - 1] || null;
 
     const { note_text: lastVariantNoteText } = lastVariantNote || {};
     const { note_text: lastGeneNoteText } = lastGeneNote || {};
@@ -309,7 +309,11 @@ function VariantSampleExpandedNotes (props) {
                                 <div className="clincical-classification mt-12 flex-grow-0">
                                     <label className="mb-0 mt-08">Classification</label>
                                     <div>
-                                        <i className="status-indicator-dot ml-1 mr-1" data-status={classification} />{classification}
+                                        { classification?
+                                            <React.Fragment>
+                                                <i className="status-indicator-dot ml-1 mr-1" data-status={classification} />{classification}
+                                            </React.Fragment>
+                                            : <em>None Defined</em> }
                                     </div>
                                 </div>
                             </div>
@@ -331,14 +335,22 @@ function VariantSampleExpandedNotes (props) {
                                 <div className="discovery-gene-candidacy mt-12 flex-grow-0">
                                     <label className="mb-0 mt-08">Gene Candidacy</label>
                                     <div>
-                                        <i className="status-indicator-dot ml-1 mr-1" data-status={gene_candidacy} />{gene_candidacy}
+                                        { gene_candidacy ?
+                                            <React.Fragment>
+                                                <i className="status-indicator-dot ml-1 mr-1" data-status={gene_candidacy} />{gene_candidacy}
+                                            </React.Fragment>
+                                            : <em>None Defined</em> }
                                     </div>
                                 </div>
 
                                 <div className="discovery-variant-candidacy flex-grow-0">
                                     <label className="mb-0 mt-08">Variant Candidacy</label>
                                     <div>
-                                        <i className="status-indicator-dot ml-1 mr-1" data-status={variant_candidacy} />{variant_candidacy}
+                                        { variant_candidacy ?
+                                            <React.Fragment>
+                                                <i className="status-indicator-dot ml-1 mr-1" data-status={variant_candidacy} />{variant_candidacy}
+                                            </React.Fragment>
+                                            : <em>None Defined</em> }
                                     </div>
                                 </div>
                             </div>
