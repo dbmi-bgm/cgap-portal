@@ -16,7 +16,6 @@ import StaticPage                           from './static-pages/StaticPage';
 import DirectoryPage                        from './static-pages/DirectoryPage';
 
 import HomePage                             from './static-pages/HomePage';
-import ReleaseUpdates                       from './static-pages/ReleaseUpdates';
 
 
 import DefaultItemView                      from './item-pages/DefaultItemView';
@@ -44,7 +43,6 @@ content_views.register(StaticPage,              'StaticPage');
 content_views.register(DirectoryPage,           'DirectoryPage');
 
 content_views.register(HomePage,                'HomePage');
-content_views.register(ReleaseUpdates,          'Release-updatesPage');
 
 content_views.register(DefaultItemView,         'Item');
 content_views.register(CaseView,                'Case');
@@ -54,6 +52,7 @@ content_views.register(FileProcessedView,       'FileProcessed');
 content_views.register(SampleView,              'Sample');
 content_views.register(HealthView,              'Health');
 content_views.register(DocumentView,            'Document');
+content_views.register(DocumentView,            'Image');
 content_views.register(SchemaView,              'JSONSchema');
 content_views.register(UserView,                'User');
 content_views.register(ImpersonateUserForm,     'User', 'impersonate-user');

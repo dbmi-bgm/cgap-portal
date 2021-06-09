@@ -210,7 +210,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             </div>
 
             { isExpanded ?
-                <VariantSampleExpandedNotes />
+                <VariantSampleExpandedNotes variantSample={variant_sample_item} />
                 : null }
 
         </div>
@@ -227,45 +227,143 @@ const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicato
 });
 
 
-function VariantSampleExpandedNotes () {
+function VariantSampleExpandedNotes (props) {
+    const { variantSample } = props;
+    const {
+        interpretation: clinicalInterpretationNote = null,
+        discovery_interpretation: discoveryInterpretationNote = null,
+        variant_notes = [],
+        gene_notes = []
+    } = variantSample;
+
+    const {
+        classification,
+        note_text: clinicalNoteText
+    } = clinicalInterpretationNote || {};
+    const {
+        variant_candidacy,
+        gene_candidacy,
+        note_text: discoveryNoteText
+    } = discoveryInterpretationNote || {};
+
+    const lastVariantNote = variant_notes[variant_notes.length - 1] || null;
+    const lastGeneNote = gene_notes[gene_notes.length - 1] || null;
+
+    const { note_text: lastVariantNoteText } = lastVariantNote || {};
+    const { note_text: lastGeneNoteText } = lastGeneNote || {};
+
+    const noVariantNotesSaved = lastVariantNote === null;
+    const noGeneNotesSaved = lastGeneNote === null;
+    const noDiscoveryNoteSaved = discoveryInterpretationNote === null;
+    const noClinicalNoteSaved = clinicalInterpretationNote === null;
+
     return (
         <React.Fragment>
             <div className="card-body bg-light select-checkboxes-section border-top border-bottom">
                 <Checkbox labelClassName="text-400 mb-08">
-                    Save & Send All Notes to Report
+                    Send All Notes to Report
                 </Checkbox>
                 <Checkbox labelClassName="text-400 mb-0">
-                    Save & Send All Notes to KnowledgeBase
+                    Send All Notes to KnowledgeBase
                 </Checkbox>
             </div>
             <div className="card-body notes-section">
                 <div className="row">
-                    <div className="col col-md-6 col-lg-3">
+                    <div className="col-12 col-md-6 col-lg-3">
                         <h4 className="text-300">Variant Notes</h4>
-                        <div className="d-flex flex-column flex-xl-row">
-                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to Report</Checkbox>
-                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to KnowledgeBase</Checkbox>
-                        </div>
+                        <NoteCheckboxes />
+
+                        { !noVariantNotesSaved ?
+                            <div className="note-content-area d-flex flex-column">
+                                <div className="note-text-content flex-grow-1">
+                                    { lastVariantNoteText || <em>Note was left blank</em> }
+                                </div>
+                            </div>
+                            : <div className="text-center pt-16 pb-0"><em>No Variant Notes Saved</em></div> }
+
                     </div>
-                    <div className="col col-md-6 col-lg-3">
+                    <div className="col-12 col-md-6 col-lg-3 d-flex flex-column">
                         <h4 className="text-300">Gene Notes</h4>
-                        <div className="d-flex flex-column flex-xl-row">
-                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to Report</Checkbox>
-                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to KnowledgeBase</Checkbox>
-                        </div>
+                        <NoteCheckboxes />
+
+                        { !noGeneNotesSaved ?
+                            <div className="note-content-area d-flex flex-column">
+                                <div className="note-text-content flex-grow-1">
+                                    { lastGeneNoteText || <em>Note was left blank</em> }
+                                </div>
+                            </div>
+                            : <div className="text-center pt-16 pb-0"><em>No Gene Notes Saved</em></div> }
+
                     </div>
-                    <div className="col col-md-6 col-lg-3">
+                    <div className="col-12 col-md-6 col-lg-3">
                         <h4 className="text-300">ACMG Interpretation</h4>
-                        <div className="d-flex flex-column flex-xl-row">
-                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to Report</Checkbox>
-                            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0">Send to KnowledgeBase</Checkbox>
-                        </div>
+                        <NoteCheckboxes />
+
+                        { !noClinicalNoteSaved ?
+
+                            <div className="note-content-area d-flex flex-column">
+                                <div className="note-text-content flex-grow-1">
+                                    { clinicalNoteText || <em>Note was left blank</em> }
+                                </div>
+
+                                <div className="clincical-classification mt-12 flex-grow-0">
+                                    <label className="mb-0 mt-08">Classification</label>
+                                    <div>
+                                        <i className="status-indicator-dot ml-1 mr-1" data-status={classification} />{classification}
+                                    </div>
+                                </div>
+                            </div>
+
+                            : <div className="text-center pt-16 pb-0"><em>No Interpretation Note Saved</em></div> }
+
+                    </div>
+                    <div className="col-12 col-md-6 col-lg-3">
+                        <h4 className="text-300">Gene Discovery</h4>
+                        <NoteCheckboxes />
+
+                        { !noDiscoveryNoteSaved ?
+
+                            <div className="note-content-area d-flex flex-column">
+                                <div className="note-text-content flex-grow-1">
+                                    { discoveryNoteText || <em>Note was left blank</em> }
+                                </div>
+
+                                <div className="discovery-gene-candidacy mt-12 flex-grow-0">
+                                    <label className="mb-0 mt-08">Gene Candidacy</label>
+                                    <div>
+                                        <i className="status-indicator-dot ml-1 mr-1" data-status={gene_candidacy} />{gene_candidacy}
+                                    </div>
+                                </div>
+
+                                <div className="discovery-variant-candidacy flex-grow-0">
+                                    <label className="mb-0 mt-08">Variant Candidacy</label>
+                                    <div>
+                                        <i className="status-indicator-dot ml-1 mr-1" data-status={variant_candidacy} />{variant_candidacy}
+                                    </div>
+                                </div>
+                            </div>
+
+                            : <div className="text-center pt-16 pb-0"><em>No Gene Discovery Note Saved</em></div> }
+
                     </div>
                 </div>
             </div>
         </React.Fragment>
     );
 }
+
+const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onKBChange, reportChecked, kbChecked }) {
+    return (
+        <div className="d-flex flex-column flex-xl-row text-small">
+            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0" onChange={onReportChange} checked={reportChecked}>
+                Send to Report
+            </Checkbox>
+            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0" onChange={onKBChange} checked={kbChecked}>
+                Send to KnowledgeBase
+            </Checkbox>
+        </div>
+    );
+});
 
 
 

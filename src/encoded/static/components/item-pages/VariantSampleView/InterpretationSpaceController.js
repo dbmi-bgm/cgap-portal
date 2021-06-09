@@ -824,12 +824,12 @@ function ACMGPicker(props) {
             </div>
 
             { autoClassification ? (
-                <>
-                    <label className="w-100 text-small">CGAP's Classification:</label>
+                <React.Fragment>
+                    <label className="w-100 text-small">CGAP&apos;s Classification:</label>
                     <div className="w-100 mb-08 ml-1">
                         <i className="status-indicator-dot ml-1 mr-1" data-status={autoClassification} />{autoClassification}
                     </div>
-                </>)
+                </React.Fragment>)
                 : null }
         </React.Fragment>
     );
