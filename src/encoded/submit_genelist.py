@@ -1,12 +1,15 @@
+import json
 import re
 from base64 import b64encode
 
-from dcicutils.misc_utils import VirtualAppError
+from dcicutils.misc_utils import VirtualApp, VirtualAppError
 from openpyxl import load_workbook
 from webtest import AppError
 
 from encoded.util import s3_local_file
 from encoded.ingestion.common import CGAP_CORE_PROJECT
+
+CGAP_CORE_PROJECT = CGAP_CORE_PROJECT + "/"
 
 
 def submit_genelist(
@@ -75,79 +78,108 @@ class GeneListSubmission:
         self.vapp = vapp
         self.errors = []
         self.notes = []
-        self.genes, self.title = self.parse_genelist()
+        self.non_gene_terms = ["title", "case"]
+        self.genes, self.title, self.case_atids = self.parse_genelist()
         self.gene_ids = self.match_genes()
+        self.bam_sample_ids = self.get_case_sample_id()
         self.post_bodies = self.create_post_bodies()
         (
             self.validation_output,
             self.patch_genelist_uuid,
             self.patch_document_uuid,
             self.previous_gene_ids,
+            self.previous_bam_ids,
         ) = self.validate_postings()
         if not validate_only:
             self.post_output, self.at_id = self.post_items()
             self.submit_variant_update()
 
-    @staticmethod
-    def extract_txt_file(txt_file):
+    def extract_txt_file(self, txt_file):
         """
-        Parses a .txt file for genes and title. For every non-empty line,
-        assumes the line is a title if it contains the word "Title"; otherwise,
-        line is assumed to be a gene.
+        Parses a .txt file for genes, cases, and title. For every non-empty
+        line, searches for starting word of "title" or "case" and makes
+        corresponding assignment; otherwise, line is assumed to be a gene.
 
         Returns:
             - title string
+            - list of associated cases
             - list of genes
         """
-        title = None
         genelist = []
+        non_gene_items = {term: [] for term in self.non_gene_terms}
         with open(txt_file, "r", encoding="utf-8") as genelist_file:
             genelist_raw = genelist_file.readlines()
-        for line in genelist_raw:
-            if "title" in line.lower():
-                title_line = line
-                title_idx = title_line.lower().index("title")
-                title_line = title_line[title_idx + 5:]
-                title_line = title_line.translate({ord(i): None for i in ':;"\n"'})
-                title = title_line.strip()
-                if title == "":
-                    title = None
-                genelist_raw.remove(line)
-                break
+        for line in genelist_raw.copy():
+            for term in self.non_gene_terms:
+                if line.lower().startswith(term):
+                    term_line = line
+                    term_idx = term_line.lower().index(term)
+                    term_line = term_line[(term_idx + len(term)):]
+                    term_line = term_line.translate({ord(i): None for i in ':;"\n"'})
+                    term_line = term_line.strip()
+                    if term_line:
+                        non_gene_items[term].append(term_line)
+                    genelist_raw.remove(line)
+                    break
+        title = non_gene_items["title"]
+        cases = non_gene_items["case"]
         for line in genelist_raw:
             line = line.translate({ord(i): None for i in '"\t""\n":;'})
             genelist.append(line.strip())
-        return title, genelist
+        return title, cases, genelist
 
-    @staticmethod
-    def extract_xlsx_file(xlsx_file):
+    def extract_xlsx_file(self, xlsx_file):
         """
-        Parses a .xlsx file for genes and title. Assumes headers "Genes" and
-        "Title" are in the first row of document and will take the title from
-        the first row below the title header and genes from all non-empty rows
-        beneath the genes header.
+        Parses a .xlsx file for genes, cases, and title. Assumes headers "Genes",
+        "Case", and "Title" are in the first row of document and will designate
+        the rows underneath appropriately (though title is taken to be the first
+        non-empty row under the header).
 
         Returns:
             - title string
+            - list of cases
             - list of genes
         """
-        title = None
-        genelist = []
+        possible_items = {term: [] for term in self.non_gene_terms}
+        possible_items["genes"] = []
         wb = load_workbook(xlsx_file)
         sheet = wb.worksheets[0]
         for col in sheet.iter_cols(values_only=True):
-            if col[0] is not None and len(col) > 1:
-                if "Title" in col[0] and col[1] is not None:
-                    title = str(col[1]).strip()
-                if "Genes" in col[0]:
-                    for cell in col[1:]:
-                        if cell is not None:
-                            genelist.append(str(cell).strip())
-        return title, genelist
+            if isinstance(col[0], str) and len(col) > 1:
+                for term in possible_items:
+                    if term in col[0].lower():
+                        for cell in col[1:]:
+                            if not cell:
+                                continue
+                            elif isinstance(cell, str):
+                                possible_items[term].append(cell.strip())
+                            elif isinstance(cell, int):
+                                possible_items[term].append(str(cell))
+                        break
+        title = possible_items["title"]
+        cases = possible_items["case"]
+        genelist = possible_items["genes"]
+        return title, cases, genelist
+
+    @staticmethod
+    def _create_case_atids(case_list):
+        """Convert case accession list to list of case @ids."""
+        cases = []
+        case_atids = []
+        for case in case_list:
+            if "," in case:
+                cases += case.split(",")
+            else:
+                cases.append(case)
+        cases = [case.strip() for case in cases if case]
+        cases = list(set(cases))
+        case_atids = ["/cases/" + case + "/" for case in cases]
+        return case_atids
 
     def parse_genelist(self):
         """
-        Parses gene list file, extracts title, and removes any duplicate genes.
+        Parses gene list file, extracts title and cases, and removes any duplicate
+        genes.
 
         Assumes gene list is txt file with line-separated title/genes or an
         xlsx file with standard formatting defined.
@@ -155,23 +187,25 @@ class GeneListSubmission:
         Returns:
             - gene list title (None if not found)
             - a unique gene list (possibly empty)
+            - list of associated cases (possibly empty)
+
         """
 
-        title = None
-        genelist = []
         genes_with_spaces = []
         non_ascii_genes = []
         if self.filename.endswith(".txt"):
-            title, genelist = self.extract_txt_file(self.filename)
+            title, cases, genelist = self.extract_txt_file(self.filename)
         elif self.filename.endswith(".xlsx"):
-            title, genelist = self.extract_xlsx_file(self.filename)
-        if title:
-            title = title.translate({ord(i): None for i in "'+&!?=%/"}).strip()
+            title, cases, genelist = self.extract_xlsx_file(self.filename)
+        if title and title[0]:
+            title = title[0].translate({ord(i): None for i in "'+&!?=%/"}).strip()
         else:
+            title = None
             self.errors.append(
                 "No title was found in the gene list. Please check the "
                 "formatting of the submitted document."
             )
+        case_atids = self._create_case_atids(cases)
         genelist = [x for x in genelist if x != ""]
         for gene in genelist.copy():
             if " " in gene:
@@ -197,7 +231,7 @@ class GeneListSubmission:
                 "formatting of the submitted document."
             )
         genelist = list(set(genelist))
-        return genelist, title
+        return genelist, title, case_atids
 
     def match_genes(self):
         """
@@ -323,6 +357,60 @@ class GeneListSubmission:
             matched_gene_uuids += gene_ids[gene_name]
         return matched_gene_uuids
 
+    @staticmethod
+    def _accession_from_atid(atid):
+        """Retrieves case/file accessions from @id."""
+        return atid.split("/")[-2]
+
+    def get_case_sample_id(self):
+        """
+        For each case accession provided, identify the associated sample's BAM
+        Sample ID, if it exists.
+
+        Returns:
+            - list of BAM sample IDs
+        """
+        bam_sample_ids = []
+        project_mismatch = []
+        cases_without_sample_ids = []
+        cases_not_found = []
+        for case_atid in self.case_atids:
+            try:
+                response = self.vapp.get(case_atid, status=200).json
+                case_project = response.get("project").get("@id")
+                if self.project != CGAP_CORE_PROJECT and self.project != case_project:
+                    project_mismatch.append(self._accession_from_atid(case_atid))
+                    continue
+                sample = response.get("sample", {})
+                case_bam_sample_id = sample.get("bam_sample_id", "")
+                if not case_bam_sample_id:
+                    cases_without_sample_ids.append(self._accession_from_atid(case_atid))
+                else:
+                    bam_sample_ids.append(case_bam_sample_id)
+            except (VirtualAppError, AppError):
+                cases_not_found.append(self._accession_from_atid(case_atid))
+        bam_sample_ids = list(set(bam_sample_ids))
+        if project_mismatch:
+            self.errors.append(
+                "The following cases belonged to projects different than the project"
+                " used for gene list submission: %s. Please remove these cases from"
+                " this submission or re-submit under the appropriate project."
+                % ", ".join(project_mismatch)
+            )
+        if cases_without_sample_ids:
+            self.errors.append(
+                "The following cases are missing sample metadta: %s. Please resubmit"
+                " the gene list once sample metadata is complete for these cases"
+                " or remove these cases from the current submission."
+                % ", ".join(cases_without_sample_ids)
+            )
+        if cases_not_found:
+            self.errors.append(
+                "No cases could be found that matched the following accessions: %s."
+                % ", ".join(cases_not_found)
+            )
+        return bam_sample_ids
+
     def create_post_bodies(self):
         """
         Creates gene list and document bodies for posting.
@@ -370,6 +458,8 @@ class GeneListSubmission:
             "project": self.project,
             "genes": self.gene_ids,
         }
+        if self.bam_sample_ids:
+            genelist_post_body["bam_sample_ids"] = self.bam_sample_ids
         return [document_post_body, genelist_post_body]
 
     def validate_postings(self):
@@ -388,27 +478,29 @@ class GeneListSubmission:
             - Previously existing document uuid (None if no match)
             - List of genes that were removed from the previous gene list (None
               if not applicable).
+            - List of BAM sample IDs from existing gene list
         """
 
         if not self.gene_ids:
-            return None, None, None, None
+            return None, None, None, None, None
         validate_result = {}
+        validate_display = []
         genelist_uuid = None
         document_uuid = None
         previous_genelist_gene_ids = []
+        prior_sample_ids = []
+        removed_sample_ids = []
         project_list = [self.project.replace("/", "%2F")]
         document_json = self.post_bodies[0]
         genelist_json = self.post_bodies[1]
         if self.title:
             try:
-                fields = ["title", "uuid", "genes.uuid"]
                 project_genelists = CommonUtils.batch_search(
                     self.vapp,
                     project_list,
                     "project.%40id",
                     item_type="GeneList",
                     institution=self.institution,
-                    fields=fields,
                 )
                 project_titles = [x["title"] for x in project_genelists]
                 for previous_title in project_titles:
@@ -419,10 +511,12 @@ class GeneListSubmission:
                         previous_title = previous_title[:title_count_idx].strip()
                     if self.title == previous_title:
                         genelist_idx = project_titles.index(genelist_title)
-                        genelist_uuid = project_genelists[genelist_idx]["uuid"]
-                        genelist_gene_uuids = project_genelists[genelist_idx]["genes"]
+                        old_genelist = project_genelists[genelist_idx]
+                        genelist_uuid = old_genelist["uuid"]
+                        prior_genes = old_genelist["genes"]
+                        prior_sample_ids = old_genelist.get("bam_sample_ids", [])
                         previous_genelist_gene_ids += [
-                            gene["uuid"] for gene in genelist_gene_uuids
+                            gene["uuid"] for gene in prior_genes
                         ]
                         break
             except VirtualAppError:
@@ -448,27 +542,52 @@ class GeneListSubmission:
         except VirtualAppError:
             pass
         if document_uuid:
+            for key in document_json.copy():
+                if key != "attachment":
+                    del document_json[key]
+            self.post_bodies[0] = document_json
             self.vapp.patch_json(
                 "/Document/" + document_uuid + "?check_only=true",
-                {"attachment": document_json["attachment"]},
+                document_json,
             )
         else:
             self.vapp.post_json("/Document/?check_only=true", document_json)
         validate_result["Document"] = "validated"
         if genelist_uuid:
+            for key in ["project", "institution"]:
+                del genelist_json[key]
+            if prior_sample_ids:
+                genelist_json["bam_sample_ids"] = self.bam_sample_ids
+            self.post_bodies[1] = genelist_json
             self.vapp.patch_json(
                 "/GeneList/" + genelist_uuid + "?check_only=true",
-                {
-                    "title": genelist_json["title"],
-                    "genes": genelist_json["genes"],
-                },
+                genelist_json,
             )
         else:
             self.vapp.post_json("/GeneList/?check_only=true", genelist_json)
         validate_result["Gene list"] = "validated"
         validate_result["Title"] = self.title
         validate_result["Number of genes"] = len(genelist_json["genes"])
-        validate_display = []
+        if self.bam_sample_ids:
+            case_accessions = [
+                self._accession_from_atid(case_id) for case_id in self.case_atids
+            ]
+            validate_result["Associated cases"] = ", ".join(case_accessions)
+        if prior_sample_ids:
+            removed_sample_ids = [
+                sample_id for sample_id in prior_sample_ids
+                if sample_id not in self.bam_sample_ids
+            ]
+        if removed_sample_ids:
+            case_search = CommonUtils.batch_search(
+                self.vapp,
+                removed_sample_ids,
+                "sample.bam_sample_id",
+                item_type="Case",
+                fields=["accession"],
+            )
+            cases_removed = [case["accession"] for case in case_search]
+            validate_result["Removed cases"] = ", ".join(cases_removed)
         for key in validate_result:
             validate_display.append("%s: %s" % (key, validate_result[key]))
         if genelist_uuid:
@@ -482,6 +601,7 @@ class GeneListSubmission:
             genelist_uuid,
             document_uuid,
             previous_genelist_gene_ids,
+            prior_sample_ids,
         )
 
     def post_items(self):
@@ -493,7 +613,6 @@ class GeneListSubmission:
               processing).
             - @id of gene list posted/patched
         """
-
         if self.errors:
             return None, None
         post_result = {}
@@ -501,8 +620,7 @@ class GeneListSubmission:
         genelist_json = self.post_bodies[1]
         if self.patch_document_uuid:
             document_post = self.vapp.patch_json(
-                "/Document/" + self.patch_document_uuid,
-                {"attachment": document_json["attachment"]},
+                "/Document/" + self.patch_document_uuid, document_json,
             ).json
         else:
             document_post = self.vapp.post_json("/Document/", document_json).json
@@ -513,12 +631,7 @@ class GeneListSubmission:
             genelist_json["source_file"] = document_post["@graph"][0]["@id"]
             if self.patch_genelist_uuid:
                 genelist_post = self.vapp.patch_json(
-                    "/GeneList/" + self.patch_genelist_uuid,
-                    {
-                        "title": genelist_json["title"],
-                        "genes": genelist_json["genes"],
-                        "source_file": genelist_json["source_file"],
-                    },
+                    "/GeneList/" + self.patch_genelist_uuid, genelist_json
                 ).json
             else:
                 genelist_post = self.vapp.post_json("/GeneList/", genelist_json).json
@@ -542,7 +655,15 @@ class GeneListSubmission:
         """
         if not self.post_output:
             return
+        bam_samples = []
         uuids_to_update = list(set(self.gene_ids + self.previous_gene_ids))
+        if self.bam_sample_ids and self.previous_bam_ids:
+            bam_samples = list(set(self.bam_sample_ids + self.previous_bam_ids))
+        elif self.bam_sample_ids and not self.patch_genelist_uuid:
+            bam_samples = self.bam_sample_ids
+        datafile = json.dumps(
+            {"gene_uuids": uuids_to_update, "bam_sample_ids": bam_samples}
+        )
         creation_post_url = "/IngestionSubmission"
         creation_post_data = {
             "ingestion_type": "variant_update",
@@ -561,8 +682,8 @@ class GeneListSubmission:
         upload_file = [
             (
                 "datafile",
-                self.title.replace(" ", "_") + "_gene_ids",
-                bytes("\n".join(uuids_to_update), encoding="utf-8"),
+                self.title.replace(" ", "_") + ".json",
+                bytes(datafile, encoding="utf-8"),
             )
         ]
         submission_response = self.vapp.post(
@@ -615,6 +736,10 @@ def submit_variant_update(
             "post_output": [],
             "upload_info": [],
         }
+        if not filename.endswith(".json"):
+            msg = "Expected input file to be a json file."
+            results["validation_output"].append(msg)
+            return results
         variant_update = VariantUpdateSubmission(
             filename, project, institution, vapp, validate_only
         )
@@ -638,7 +763,7 @@ def submit_variant_update(
 class VariantUpdateSubmission:
     """
     Class to update all variant samples associated with a given
-    list of gene uuids.
+    gene list submission.
     """
 
     def __init__(self, filename, project, institution, vapp, validate_only=False):
@@ -647,30 +772,28 @@ class VariantUpdateSubmission:
         self.institution = institution
         self.vapp = vapp
         self.errors = []
-        self.gene_uuids = self.genes_from_file()
-        self.variant_samples = self.find_associated_variants()
-        self.validate_output = self.validate_patch()
+        self.gene_uuids, self.bam_sample_ids = self.genes_from_file()
+        self.variant_samples, self.validate_output = self.find_associated_variants()
+        self.admin_vapp = self.create_admin_vapp()
         if not validate_only:
             self.post_output = self.queue_variants_for_indexing()
 
     def genes_from_file(self):
         """
-        Extracts gene uuids from input file. Expects gene uuids
-        to be separated by '\n'.
+        Extracts gene uuids and associated BAM sample IDs from input json file.
 
         Returns:
             - List of gene uuids
+            - List of bam sample ids
         """
         gene_uuids = []
         with open(self.filename, "r") as genelist_file:
-            genelist = genelist_file.readlines()
-        for line in genelist:
-            if line.endswith("\n"):
-                line = line[:-1]
-            gene_uuids.append(line)
+            contents = json.load(genelist_file)
+        gene_uuids = contents.get("gene_uuids", [])
+        bam_sample_ids = contents.get("bam_sample_ids", [])
         if not gene_uuids:
             self.errors.append("No gene uuids were found in the input file")
-        return gene_uuids
+        return gene_uuids, bam_sample_ids
 
     def find_associated_variants(self):
         """
@@ -680,59 +803,60 @@ class VariantUpdateSubmission:
         Returns:
             - List of unique variant sample uuids (None if no gene
               uuids)
+            - Validation output msg
         """
         if not self.gene_uuids:
             return None
-        variant_samples_to_invalidate = []
+        project = self.project
         genes_to_search = list(set(self.gene_uuids))
-        if self.project == CGAP_CORE_PROJECT + "/":
+        if self.project == CGAP_CORE_PROJECT:
             project = None
+        if self.bam_sample_ids:
+            variant_sample_search = []
+            for sample_id in self.bam_sample_ids:
+                add_on = "&CALL_INFO=" + sample_id
+                vs_addon_search = CommonUtils.batch_search(
+                    self.vapp,
+                    genes_to_search,
+                    "variant.genes.genes_most_severe_gene.uuid",
+                    batch_size=4,
+                    item_type="VariantSample",
+                    project=project,
+                    add_on=add_on,
+                    fields=["uuid"],
+                )
+                variant_sample_search += vs_addon_search
         else:
-            project = self.project
-        variant_sample_search = CommonUtils.batch_search(
-            self.vapp,
-            genes_to_search,
-            "variant.genes.genes_most_severe_gene.uuid",
-            item_type="VariantSample",
-            project=project,
-            fields=["uuid"],
-        )
-        for variant_sample_response in variant_sample_search:
-            variant_samples_to_invalidate.append(variant_sample_response["uuid"])
-        to_invalidate = list(set(variant_samples_to_invalidate))
-        return to_invalidate
-
-    def validate_patch(self):
-        """
-        Validates empty patching of variant samples.
-
-        Returns:
-            - String info about validation
-        """
-        if not self.variant_samples:
-            validate_output = (
-                "No project-associated variant samples were found for the "
-                "given genes."
+            variant_sample_search = CommonUtils.batch_search(
+                self.vapp,
+                genes_to_search,
+                "variant.genes.genes_most_severe_gene.uuid",
+                batch_size=5,
+                item_type="VariantSample",
+                project=project,
+                fields=["uuid"],
             )
-            return validate_output
-        not_validated = []
-        for uuid in self.variant_samples:
-            validate_response = self.vapp.patch_json("/" + uuid + "?validate_only", {})
-            if validate_response.json["status"] != "success":
-                not_validated.append(uuid)
-        if not_validated:
-            self.errors.append(
-                "Validation failed for the following variant sample(s): %s."
-                % ", ".join(not_validated)
-            )
-        validate_output = "%s variant sample(s) validated for updating." % str(
-            len(self.variant_samples) - len(not_validated)
-        )
-        return validate_output
+        variant_sample_uuids = [item["uuid"] for item in variant_sample_search]
+        to_invalidate = list(set(variant_sample_uuids))
+        validation_output = "%s variant samples to update." % len(to_invalidate)
+        return to_invalidate, validation_output
+
+    def create_admin_vapp(self):
+        """
+        Create VirtualApp with admin permissions for posting to the
+        indexing queue.
+        """
+        app = self.vapp.app
+        config = {
+            "HTTP_ACCEPT": "application/json",
+            "REMOTE_USER": "IMPORT"
+        }
+        admin_vapp = VirtualApp(app, config)
+        return admin_vapp
 
     def queue_variants_for_indexing(self):
         """
-        Queues all variant samples for indexing by empty patching.
+        Queues all variant samples for indexing.
 
         Returns:
             - String info about post (None if validation failed or posting
@@ -740,12 +864,26 @@ class VariantUpdateSubmission:
         """
         if self.errors:
             return None
-        for uuid in self.variant_samples:
-            self.vapp.patch_json("/" + uuid, {})
-        post_output = "%s variant sample(s) successfully updated." % str(
-            len(self.variant_samples)
-        )
-        return post_output
+        if len(self.variant_samples) == 0:
+            msg = "No variant samples were posted to the indexing queue."
+            return msg
+        queue_body = {
+            "uuids": self.variant_samples, "target_queue": "primary", "strict": True
+        }
+        queue_response = self.admin_vapp.post_json("/queue_indexing", queue_body).json
+        if queue_response["notification"] == "Success":
+            msg = (
+                "%s variant samples successfully updated."
+                % str(len(self.variant_samples))
+            )
+            return msg
+        else:
+            self.errors.append(
+                "Variant samples were not properly queued for indexing."
+                " Response to POSTing to /queue_indexing was: %s."
+                % queue_response
+            )
+            return None
 
 
 class CommonUtils:
@@ -765,6 +903,7 @@ class CommonUtils:
         item_type="Gene",
         project=None,
         institution=None,
+        add_on=None,
         fields=[],
     ):
         """
@@ -787,6 +926,8 @@ class CommonUtils:
         if fields:
             field_string = "&field=" + "&field=".join(fields)
             add_ons += field_string
+        if add_on:
+            add_ons += add_on
         base_search = "/search/?type=" + item_type + "&" + search_term + "="
         for item in item_list:
             batch.append(item)

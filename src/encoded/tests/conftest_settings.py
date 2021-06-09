@@ -51,6 +51,7 @@ ORDER = [
     'quality_metric_vcfqc', 'quality_metric_bamqc', 'quality_metric_peddyqc',
     'software', 'static_section', 'tracking_item', 'workflow_mapping',
     'workflow_run_awsem', 'workflow_run', 'annotation_field', 'variant_sample',
+    'meta_workflow', 'meta_workflow_run',
     'variant', 'variant_sample_list', 'gene_annotation_field', # 'gene',
     'higlass_view_config', 'ingestion_submission'
 ]
