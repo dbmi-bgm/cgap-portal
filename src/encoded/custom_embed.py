@@ -1,11 +1,11 @@
 import re
+from uuid import UUID
 
 from dcicutils.misc_utils import ignored
-from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden
+from pyramid.security import Authenticated
 from pyramid.view import view_config
 from snovault.util import debug_log
-
-from encoded.types.base import get_item_or_none
 
 ATID_PATTERN = re.compile("/[a-zA-Z-]+/[a-zA-Z0-9-_:]+/")
 GENELIST_ATID = re.compile("/gene-lists/[a-zA-Z0-9-]+/")
@@ -22,6 +22,7 @@ KEYS_TO_IGNORE = [
     "schema_version",
     "date_created",
 ]
+FORBIDDEN_MSG = {"error": "no view permissions"}
 
 
 def includeme(config):
@@ -40,36 +41,71 @@ class CustomEmbed:
         self.desired_embeds = embed_props["desired_embeds"]
         self.embed_depth = embed_props["embed_depth"]
         self.cache = embed_props["cache"]
-        depth = 0
+        self.invalid_ids = []
+        depth = -1
         self.result = self.embed(item, depth)
 
-    def _minimal_embed(self, item_id):
+    def _user_embed(self, item_id, depth, frame="object"):
+        """
+        Use request's embed method to find given item in the database for
+        the given frame. If the user who made the call to the API does
+        not have permissions to view the item, the item will not be embedded.
+        Instead, if the item is the initial ID given to the API, nothing is
+        embedded; if the item is to be embedded at a subsequent depth, a
+        message stating the item cannot be embedded is inserted instead.
+
+        :param item_id: string uuid or @id
+        :param depth: int of current embedding depth
+        :param frame: string view to generate of item
+        :return item: object to return for embedding
+        """
+        item = None
+        given_id = item_id
+        if not item_id.startswith("/"):
+            item_id = "/" + item_id
+        try:
+            item = self.request.embed(item_id, "@@" + frame, as_user=True)
+        except HTTPForbidden:
+            if depth != -1:
+                item = FORBIDDEN_MSG
+        except KeyError:
+            self.invalid_ids.append(given_id)
+        return item
+
+    def _minimal_embed(self, item_id, depth):
         """
         Embed minimal item info. Helpful for preventing recursions for
         items for which detailed info is commonly not needed.
 
         :param item_id: string uuid or @id
+        :param depth: int of current embedding depth
         :return item_embed: dict with item title and @id
         """
-        item_object = get_item_or_none(self.request, item_id)
-        item_title = item_object.get("title", "")
-        item_atid = item_object.get("@id", "")
-        item_embed = {"title": item_title, "@id": item_atid}
+        item_object = self._user_embed(item_id, depth)
+        if item_object == FORBIDDEN_MSG:
+            item_embed = item_object
+        elif isinstance(item_object, dict):
+            item_title = item_object.get("title", "")
+            item_atid = item_object.get("@id", "")
+            item_embed = {"title": item_title, "@id": item_atid}
+        else:
+            item_embed = item_object
         return item_embed
 
-    def _embed_genelist(self, genelist_atid):
+    @staticmethod
+    def _valid_uuid(uuid_to_test, version=4):
         """
-        Embed limited gene list information from raw view to avoid costly
-        object view of large gene lists.
+        Determine if given string is a valid uuid.
 
-        :param genelist_atid: string of gene list @id
-        :return genelist_embed: dict with gene list title and uuid
+        :param uuid_to_test: string to check
+        :param version: int for uuid version
+        :return: bool if given string is valid uuid
         """
-        genelist_raw = get_item_or_none(self.request, genelist_atid, frame="raw")
-        title = genelist_raw.get("title", "")
-        uuid = genelist_raw.get("uuid", "")
-        genelist_embed = {"title": title, "uuid": uuid}
-        return genelist_embed
+        try:
+            uuid_obj = UUID(uuid_to_test, version=version)
+        except ValueError:
+            return False
+        return str(uuid_obj) == uuid_to_test
 
     def embed(self, item, depth):
         """
@@ -96,14 +132,19 @@ class CustomEmbed:
                 break
             elif isinstance(item, str):
                 if ATID_PATTERN.match(item):
-                    if self.desired_embeds:
+                    if depth == -1:
+                        cache_item = item
+                        item = self._user_embed(item, depth)
+                        self.cache[cache_item] = item
+                        depth += 1
+                    elif self.desired_embeds:
                         if item.split("/")[1] in self.desired_embeds:
                             if item in self.cache:
                                 item = self.cache[item]
                                 depth += 1
                             else:
                                 cache_item = item
-                                item = get_item_or_none(self.request, item)
+                                item = self._user_embed(item, depth)
                                 self.cache[cache_item] = item
                                 depth += 1
                         else:
@@ -115,20 +156,22 @@ class CustomEmbed:
                             item = self.cache[item]
                             depth += 1
                         elif GENELIST_ATID.match(item):
-                            cache_item = item
-                            item = self._embed_genelist(item)
-                            self.cache[cache_item] = item
+                            # NOTE: Non-admins forbidden for raw view, so just skip
+                            # attempt to embed gene lists.
                             break
                         elif MINIMAL_EMBED_ATID.match(item):
                             cache_item = item
-                            item = self._minimal_embed(item)
+                            item = self._minimal_embed(item, depth)
                             self.cache[cache_item] = item
                             break
                         else:
                             cache_item = item
-                            item = get_item_or_none(self.request, item)
+                            item = self._user_embed(item, depth)
                             self.cache[cache_item] = item
                             depth += 1
+                elif self._valid_uuid(item) and depth == -1:
+                    item = self._user_embed(item, depth)
+                    depth += 1
                 else:
                     break
             else:
@@ -136,7 +179,9 @@ class CustomEmbed:
         return item
 
 
-@view_config(route_name="embed", request_method="POST", permission="edit")
+@view_config(
+    route_name="embed", request_method="POST", effective_principals=Authenticated
+)
 @debug_log
 def embed(context, request):
     """
@@ -153,6 +198,7 @@ def embed(context, request):
     desired_embeds = []
     cache = {}
     results = []
+    invalid_ids = []
     embed_depth = 4  # Arbritary standard depth to search.
     ignored(context)
     if request.GET:
@@ -171,6 +217,8 @@ def embed(context, request):
             "Too many items were given for embedding."
             " Please limit to less than 5 items."
         )
+    if not ids:
+        raise HTTPBadRequest("No item identifier was provided.")
     embed_props = {
         "ignored_embeds": ignored_embeds,
         "desired_embeds": desired_embeds,
@@ -178,7 +226,12 @@ def embed(context, request):
         "cache": cache,
     }
     for item_id in ids:
-        item_info = get_item_or_none(request, item_id)
-        item_embed = CustomEmbed(request, item_info, embed_props)
+        item_embed = CustomEmbed(request, item_id, embed_props)
         results.append(item_embed.result)
+        invalid_ids += item_embed.invalid_ids
+    invalid_ids += [item for item in results if isinstance(item, str)]
+    if invalid_ids:
+        raise HTTPBadRequest(
+            "The following IDs were invalid: %s." % ", ".join(invalid_ids)
+        )
     return results
