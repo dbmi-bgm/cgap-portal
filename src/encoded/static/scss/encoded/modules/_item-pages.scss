@@ -2001,6 +2001,8 @@ i.status-indicator-dot {
 		border-radius: $border-radius-sm;
 		border: 1px solid #eee;
 		padding: 8px 12px;
+		overflow: auto;
+		white-space: pre-wrap;
 	}
 
 }
