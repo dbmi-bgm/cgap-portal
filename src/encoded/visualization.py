@@ -128,7 +128,7 @@ def get_higlass_viewconf(context, request):
             "viewconfig": None
         }
 
-    # We need absolute URLs for the BAM adn GnomAD Worker
+    # We need absolute URLs for the BAM and GnomAD Worker
     # XXX: this needs a workaround - Will 6/8/21
     host_url = "http://c4ecstrialalphacgapmastertest-273357903.us-east-1.elb.amazonaws.com"
     if request.registry.settings.get('env.name') == CGAP_ENV_WEBPROD:

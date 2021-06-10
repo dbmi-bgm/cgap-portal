@@ -33,10 +33,10 @@ Building CGAP Docker
 
 There are two new Make targets that should be sufficient for normal use. To build the image locally, ensure your AWS keys are sourced and run::
 
-    $ make build-docker  # runs docker-compose build
-    $ make build-docker-clean  # runs a no-cache build, regenerating all layers
-    $ make deploy-docker  # runs docker-compose up
-    $ make deploy-docker-daemon  # runs services in background
+    $ make build-docker-local  # runs docker-compose build
+    $ make build-docker-local-clean  # runs a no-cache build, regenerating all layers
+    $ make deploy-docker-local  # runs docker-compose up
+    $ make deploy-docker-local-daemon  # runs services in background
 
 The build will take around 10 minutes the first time but will speed up dramatically after due to layer caching. In general, the rate limiting step for rebuilding is the front-end build (unless you are also updating dependencies, which will slow down the build further). Although this may seem like a drawback, the key benefit is that what you are running in Docker is essentially identical to that which is orchestrated on ECS in production. This should reduce our reliance/need for test environments.
 
@@ -70,11 +70,11 @@ Docker Command Cheatsheet
 
 Below is a small list of useful Docker commands for advanced users::
 
-    $ docker-compose build  # will trigger a build of the local cluster
-    $ docker-compose build --no-cache  # will trigger a fresh build of the entire cluster
-    $ docker-compose down  # will stop cluster
+    $ docker-compose build  # will trigger a build of the local cluster (see make build-docker-local)
+    $ docker-compose build --no-cache  # will trigger a fresh build of the entire cluster (see make build-docker-local-clean)
+    $ docker-compose down  # will stop cluster (can also ctrl-c)
     $ docker-compose down --volumes  # will remove cluster volumes as well
-    $ docker-compose up  # will start cluster and log all output to console
-    $ docker-compose up -d  # will start cluster in background using existing containers
+    $ docker-compose up  # will start cluster and log all output to console (see make deploy-docker-local)
+    $ docker-compose up -d  # will start cluster in background using existing containers (see make deploy-docker-local-daemon)
     $ docker-compose up -d -V --build  # trigger a rebuild/recreation of cluster containers
     $ docker system prune  # will cleanup ALL unused Docker components - BE CAREFUL WITH THIS

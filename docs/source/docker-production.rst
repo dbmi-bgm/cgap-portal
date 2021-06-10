@@ -40,10 +40,10 @@ The production application configuration is in ``deploy/docker/production``. A d
 The following instructions describe how to build and push images. Note though that we assume an existing ECS setup. For instructions on how to orchestrate ECS, see 4dn-cloud-infra, but that is not the focus of this documentation.
 
     1. Ensure the orchestrator credentials are sourced, or that your IAM user has been granted sufficient perms to push to ECR.
-    2. In the Makefile under ``build-production``, replace "cgap-mastertest" with the env.name configured for the environment. This name should match the ECR repo name if you navigate to the ECR Console.
+    2. In the Makefile under ``build-docker-production``, replace "cgap-mastertest" with the env.name configured for the environment. This name should match the ECR repo name if you navigate to the ECR Console.
     3. Again in the Makefile, replace the ECR Repo URL (NOT the tag) with the one from the output of the ECR stack in the account.
     4. Run ``make ecr-login``, which should pull ECR credentials using the currently active AWS credentials.
-    5. Run ``make build-production``.
+    5. Run ``make build-docker-production``.
 
 
 Note that steps 4 and 6 are all that are needed to be repeated once initial setup is done, assuming you are continuously pushing to the same location. To change which ECS orchestration you are effectively deploying to, all steps must be repeated in the relevant account.

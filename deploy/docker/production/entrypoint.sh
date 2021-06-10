@@ -13,7 +13,6 @@
 # Note that only "local" can be run from the local machine
 # but the same image build is run across the entire local/production stack.
 
-
 deployment="deployment"
 ingester="ingester"
 indexer="indexer"
@@ -23,15 +22,15 @@ local="local"
 echo "Resolving which entrypoint is desired"
 
 # shellcheck disable=SC2154
-if [ "$application_type" = deployment ]; then
+if [ "$application_type" = $deployment ]; then
   sh entrypoint_deployment.sh
-elif [ "$application_type" = ingester ]; then
+elif [ "$application_type" = $ingester ]; then
   sh entrypoint_ingester.sh
-elif [ "$application_type" = indexer ]; then
+elif [ "$application_type" = $indexer ]; then
   sh entrypoint_indexer.sh
-elif [ "$application_type" = portal ]; then
+elif [ "$application_type" = $portal ]; then
   sh entrypoint_portal.sh
-elif [ "$application_type" = local ]; then
+elif [ "$application_type" = $local ]; then
   sh entrypoint_local.sh
 else
   echo "Could not resolve entrypoint! Check that \$application_type is set."

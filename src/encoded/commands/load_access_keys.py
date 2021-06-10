@@ -100,11 +100,11 @@ def main():
     if not env:
         raise RuntimeError('load_access_keys: cannot find env.name in settings')
 
-    # XXX: refactor into helper method in dcicutils, see assume_identity.py
+    # Resolve secret from environment if one is not specified
     encrypt_key = None
     if args.secret_name is not None:
         identity = assume_identity()  # automatically detects GLOBAL_APPLICATION_CONFIGURATION
-        encrypt_key = identity.get('S3_ENCRYPT_KEY', None)
+        encrypt_key = identity.get('S3_ENCRYPT_KEY', None)  # one of the secrets
         if not encrypt_key:
             encrypt_key = os.environ.get('S3_ENCRYPT_KEY')
 
