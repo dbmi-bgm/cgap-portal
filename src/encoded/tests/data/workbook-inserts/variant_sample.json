@@ -3,15 +3,23 @@
         "project": "hms-dbmi",
         "institution": "hms-dbmi",
         "variant": "cedff838-99af-4936-a0ae-4dfc63ba8bf4",
-        "file": "SomeFile",
+        "file": "GAPFIZ123456",
         "CALL_INFO": "SomeString",
         "uuid": "11bff838-99af-4936-a0ae-4dfc63ba8bf4"
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "variant": "cedff838-99af-4936-a0ae-4dfc63ba8bf4",
+        "file": "GAPFIZ123456",
+        "CALL_INFO": "Sample_ID",
+        "uuid": "11bff838-99af-4936-a0ae-4dfc63ba8bf5"
     },
     {
         "project": "cgap-core",
         "institution": "hms-dbmi",
         "variant": "cedff838-99af-4936-a0ae-4dfc63ba8bf4",
-        "file": "AnotherFile",
+        "file": "GAPFIZ654321",
         "CALL_INFO": "SomeString",
         "uuid": "421d9db2-b98a-4e8c-9b0f-addb6bdb0b15"
     }

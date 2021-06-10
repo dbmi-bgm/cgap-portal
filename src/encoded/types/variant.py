@@ -487,9 +487,9 @@ class VariantSample(Item):
         return new_labels
 
     @calculated_property(schema={
-        "title": "Project Gene Lists",
-        "field_name": "project_genelists",
-        "description": "Gene lists associated with project of variant sample",
+        "title": "Associated Gene Lists",
+        "field_name": "associated_genelists",
+        "description": "Gene lists associated with project or case of variant sample",
         "type": "array",
         "items": {
             "title": "Gene list title",
@@ -497,10 +497,10 @@ class VariantSample(Item):
             "description": "Gene list title"
         }
     })
-    def project_genelists(self, request, project, variant):
+    def associated_genelists(self, request, project, variant, CALL_INFO):
         """
-        Identifies gene lists associated with the project of the variant sample
-        or associated with CGAP Core project.
+        Identifies gene lists associated with the project or project and CALL_INFO
+        of the variant sample, if the gene list has associated BAM sample IDs.
 
         NOTE: Gene lists retrieved with @@raw view to prevent costly @@object
         view of large gene lists.
@@ -508,7 +508,7 @@ class VariantSample(Item):
         gene_atids = []
         genelist_atids = []
         genelist_info = {}
-        project_genelists = []
+        associated_genelists = []
         core_project = CGAP_CORE_PROJECT + "/"
         potential_projects = [core_project, project]
         variant_props = get_item_or_none(request, variant)
@@ -527,15 +527,24 @@ class VariantSample(Item):
         ]
         for genelist in genelists_raw:
             title = genelist.get("title", "")
+            bam_sample_ids = genelist.get("bam_sample_ids", [])
             project_uuid = genelist.get("project")
             project_object = get_item_or_none(request, project_uuid)
             project_atid = project_object.get("@id")
-            genelist_info[title] = project_atid
-        for genelist_title, project_atid in genelist_info.items():
-            if project_atid in potential_projects:
-                if genelist_title not in project_genelists:
-                    project_genelists.append(genelist_title)
-        return project_genelists
+            genelist_info[title] = {
+                "project": project_atid, "bam_sample_ids": bam_sample_ids
+            }
+        for genelist_title, genelist_props in genelist_info.items():
+            if genelist_title in associated_genelists:
+                continue
+            bam_sample_ids = genelist_props.get("bam_sample_ids")
+            if genelist_props["project"] in potential_projects:
+                if bam_sample_ids:
+                    if CALL_INFO in bam_sample_ids:
+                        associated_genelists.append(genelist_title)
+                else:
+                    associated_genelists.append(genelist_title)
+        return associated_genelists
 
 
 @collection(
