@@ -79,6 +79,16 @@
             "description": "The original gene list file used for generating this gene list item",
             "type": "string",
             "linkTo": "Document"
+        },
+        "bam_sample_ids": {
+            "title": "BAM Sample IDs",
+            "description": "The BAM sample IDs associated with this gene list",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "BAM Sample ID",
+                "type": "string"
+            }
         }
     }
 }

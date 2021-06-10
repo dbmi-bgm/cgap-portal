@@ -642,7 +642,7 @@
             "search_type": "sayt_without_terms",
             "sayt_item_type": "Gene"
         },
-        "project_genelists": {
+        "associated_genelists": {
             "title": "Gene List",
             "order": 2,
             "grouping": "Genes",

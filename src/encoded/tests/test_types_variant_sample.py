@@ -111,7 +111,7 @@ def test_project_specific_variant_sample_genelist(
     Logic is:
         - If gene list project is CGAP_CORE_PROJECT or same as variant sample
           project, then the two are associated (via variant sample's
-          project_genelists property)
+          associated_genelists property)
     """
     response = testapp.post_json("/variant-samples", variant_sample).json["@graph"][0]
     cgap_core_response = testapp.post_json(
@@ -120,12 +120,44 @@ def test_project_specific_variant_sample_genelist(
         "/variant-samples", bgm_variant_sample).json["@graph"][0]
     no_genelists_response = testapp.post_json(
         "/variant-samples", variant_sample_2).json["@graph"][0]
-    assert set(response["project_genelists"]) == {
+    assert set(response["associated_genelists"]) == {
         genelist["display_title"],
         cgap_core_genelist["display_title"]}
-    assert set(cgap_core_response["project_genelists"]) == {
+    assert set(cgap_core_response["associated_genelists"]) == {
         cgap_core_genelist["display_title"]}
-    assert set(bgm_response["project_genelists"]) == {
+    assert set(bgm_response["associated_genelists"]) == {
         bgm_genelist["display_title"],
         cgap_core_genelist["display_title"]}
-    assert not no_genelists_response["project_genelists"]
+    assert not no_genelists_response["associated_genelists"]
+
+
+def test_case_specific_variant_sample_genelist(
+    testapp, genelist, cgap_core_genelist, variant_sample
+):
+    """
+    Test variant samples correctly matched with gene lists based on project
+    and cases (via genelist bam_sample_ids) when gene lists have case info.
+    """
+    genelist_title = genelist["display_title"]
+
+    bam_sample_id = "some_sample"
+    genelist_patch = {"bam_sample_ids": [bam_sample_id]}
+    testapp.patch_json(genelist["@id"], genelist_patch)
+    variant_sample["CALL_INFO"] = bam_sample_id
+    vs_post = testapp.post_json("/variant-samples", variant_sample).json["@graph"][0]
+    assert genelist_title in vs_post["associated_genelists"]
+
+    new_bam_sample_id = "another_sample"
+    genelist_patch = {"bam_sample_ids": [new_bam_sample_id]}
+    testapp.patch_json(genelist["@id"], genelist_patch)
+    vs_patch = testapp.patch_json(vs_post["@id"], {}).json["@graph"][0]
+    assert genelist_title not in vs_patch["associated_genelists"]
+
+    testapp.patch_json(cgap_core_genelist["@id"], genelist_patch)
+    vs_patch = testapp.patch_json(vs_post["@id"], {}).json["@graph"][0]
+    assert not vs_patch["associated_genelists"]
+
+    genelist_patch = {"bam_sample_ids": [bam_sample_id, new_bam_sample_id]}
+    testapp.patch_json(genelist["@id"], genelist_patch)
+    vs_patch = testapp.patch_json(vs_post["@id"], {}).json["@graph"][0]
+    assert genelist_title in vs_patch["associated_genelists"]
