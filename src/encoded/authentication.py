@@ -322,7 +322,9 @@ def login(context, request):
         domain=request.domain,
         path="/",
         httponly=True,
-        samesite="strict",
+        # 'Lax' is default and fine esp. with secure cookies; 'strict' prevents user-clicked links/redirects from being authenticated.
+        # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+        samesite="Lax",
         overwrite=True,
         secure=is_https
     )
