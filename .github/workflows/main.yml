@@ -122,4 +122,4 @@ jobs:
 
       - name: Docker Build
         if: ${{ matrix.test_type == 'Docker' }}
-        run: make build-local
+        run: make build-docker-local
