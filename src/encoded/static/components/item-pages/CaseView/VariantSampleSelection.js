@@ -306,7 +306,7 @@ function VariantSampleExpandedNotes (props) {
                                     { clinicalNoteText || <em>Note was left blank</em> }
                                 </div>
 
-                                <div className="clincical-classification mt-12 flex-grow-0">
+                                <div className="clinical-classification flex-grow-0">
                                     <label className="mb-0 mt-08">Classification</label>
                                     <div>
                                         { classification?
@@ -332,7 +332,7 @@ function VariantSampleExpandedNotes (props) {
                                     { discoveryNoteText || <em>Note was left blank</em> }
                                 </div>
 
-                                <div className="discovery-gene-candidacy mt-12 flex-grow-0">
+                                <div className="discovery-gene-candidacy flex-grow-0">
                                     <label className="mb-0 mt-08">Gene Candidacy</label>
                                     <div>
                                         { gene_candidacy ?
