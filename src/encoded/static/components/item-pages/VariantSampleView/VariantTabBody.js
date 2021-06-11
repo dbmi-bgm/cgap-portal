@@ -14,7 +14,10 @@ import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 
 export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
     const { variant } = context;
-    const { csq_clinvar: variationID } = variant;
+    const {
+        csq_clinvar: variationID,
+        annotation_id: annotationID
+    } = variant;
     const [ showingTable, setShowingTable ] = useState("v3"); // Allowed: "v2", "v3", and maybe "summary" in future; could be converted integer instd of of text.
 
     const onSelectShowingTable = useCallback(function(evtKey, e){
@@ -63,13 +66,13 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                     <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
                         <div className="info-header-title">
                             <h4>
+                                ClinVar
                                 { clinvarExternalHref ?
-                                    <a href={clinvarExternalHref} rel="noopener noreferrer" target="_blank">
-                                        ClinVar
+                                    <a href={clinvarExternalHref} rel="noopener noreferrer" target="_blank"
+                                        className="px-1" data-tip="View this variant in ClinVar">
                                         <i className="icon icon-external-link-alt fas ml-07 text-small"/>
                                     </a>
-                                    : "ClinVar"
-                                }
+                                    : null }
                             </h4>
                         </div>
                         <div className="info-body clinvar-info-body">
@@ -78,13 +81,28 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                     </div>
 
                     <div className="inner-card-section flex-grow-0 pb-2 pb-xl-0">
-                        <div className="info-header-title">
+                        <div className="info-header-title justify-content-start">
 
                             <DropdownButton size="lg py-1" variant="outline-secondary select-gnomad-version" onSelect={onSelectShowingTable}
                                 title={titleDict[showingTable]} >
                                 <DropdownItem eventKey="v3" active={showingTable === "v3"}>{ titleDict.v3 }</DropdownItem>
                                 <DropdownItem eventKey="v2" active={showingTable === "v2"}>{ titleDict.v2 }</DropdownItem>
                             </DropdownButton>
+
+                            { annotationID ?
+                                <h4>
+                                    <a target="_blank" rel="noopener noreferrer"
+                                        className="text-small px-1"
+                                        data-tip={"View this variant in gnomAD " + showingTable}
+                                        href={
+                                            "https://gnomad.broadinstitute.org/variant/"
+                                            + annotationID // <- Do not wrap in encodeURIComponent -- transformed value isn't found.
+                                            + "?dataset=" + (showingTable === "v3" ? "gnomad_r3" : "gnomad_r2_1")
+                                        } >
+                                        <i className="icon icon-external-link-alt fas"/>
+                                    </a>
+                                </h4>
+                                : null }
 
                             {/* todo link/icon to GnomAD -- is there a gnomad link somewhere ? */}
 
