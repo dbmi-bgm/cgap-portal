@@ -257,31 +257,17 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
         );
     }
 
-    const submissionLen = clinvar_submission.length;
-    const submissionsRendered = clinvar_submission.map(function(submission, idx){
-        const { clinvar_submission_accession } = submission;
-        return <ClinVarSubmissionEntry submission={submission} key={clinvar_submission_accession || idx} index={idx} />;
-    });
-
     return (
         <React.Fragment>
 
-            <div className="row mb-1">
-                <div className="col">
-                    <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
-                    { clinvarExternalHref?
-                        <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
-                            { variationID }
-                            <i className="icon icon-external-link-alt fas ml-07 text-small"/>
-                        </a>
-                        : <span>{ variationID }</span> }
-                </div>
-                <div className="col">
-                    <label data-tip={getTipForField("clinvar_submission")} className="mr-1 mb-0">Submissions: </label>
-                    <span>
-                        { submissionLen }
-                    </span>
-                </div>
+            <div className="mb-1">
+                <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
+                { clinvarExternalHref?
+                    <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
+                        { variationID }
+                        <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                    </a>
+                    : <span>{ variationID }</span> }
             </div>
 
             <div className="row">
@@ -302,63 +288,10 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
                 </div>
             </div>
 
-            <hr/>
-
-            <div>
-                <div className="row mb-08">
-                    <div className="col-3">
-                        <h6 className="my-0 text-600">Classification</h6>
-                    </div>
-                    <div className="col-2">
-                        <h6 className="my-0 text-600">Date</h6>
-                    </div>
-                    <div className="col-4">
-                        <h6 className="my-0 text-600">Submitted By</h6>
-                    </div>
-                    <div className="col-3">
-                        <h6 className="my-0 text-600">Links</h6>
-                    </div>
-                </div>
-
-                { submissionsRendered }
-
-            </div>
-
         </React.Fragment>
     );
 }
 
-function ClinVarSubmissionEntry({ submission, index = 0 }){
-    const fallbackElem = <em data-tip="Not Available"> - </em>;
-    const {
-        clinvar_submission_interpretation = null,
-        clinvar_submission_submitter = fallbackElem,
-        clinvar_submission_accession = fallbackElem // change into link when available
-    } = submission;
-
-    const interpretation = clinvar_submission_interpretation || fallbackElem;
-    const fakeStatusValue = clinvar_submission_interpretation ? clinvar_submission_interpretation.toLowerCase() : null;
-
-    return (
-        <div className={"my-1 border rounded p-1" + (index % 2 === 0 ? " bg-light" : "")}>
-            <div className="row align-items-center text-small">
-                <div className="col-3" data-field="clinvar_submission_interpretation">
-                    <i className="status-indicator-dot mr-07 ml-05" data-status={fakeStatusValue} />
-                    { interpretation }
-                </div>
-                <div className="col-2">
-                    { fallbackElem }
-                </div>
-                <div className="col-4">
-                    { clinvar_submission_submitter }
-                </div>
-                <div className="col-3">
-                    { clinvar_submission_accession }
-                </div>
-            </div>
-        </div>
-    );
-}
 
 function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;
@@ -545,6 +478,7 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
         "csq_clinvar"
     ];
 
+    // Prepended with "transcript." and added to above `externalDatabaseFieldnames`.
     const transcriptFieldNames = [
         "csq_feature",
         "csq_ccds",
