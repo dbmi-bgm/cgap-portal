@@ -149,7 +149,9 @@ export class IndividualBody extends React.PureComponent {
                 </div>
 
                 <div className="details">
-                    { ancestry ? <InlineDetailRow label="Ancestry" value={ancestry} /> : null }
+                    { ancestry ?
+                        <InlineDetailRow label="Ancestry" value={ancestry.join(" • ")} />
+                        : null }
                     <PhenotypicFeatures features={phenotypic_features} diseaseToIndex={diseaseToIndex} />
                     <ClinicianNotes individual={loadedIndividualItem || individualItem} haveEditPermission={haveEditPermission} />
                     <FileWrapper individual={loadedIndividualItem || individualItem } {...{ haveEditPermission, schemas }} />

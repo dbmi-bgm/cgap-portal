@@ -26,6 +26,8 @@ ITEM_INDEX_ORDER = [
     'WorkflowMapping',
     'WorkflowRun',
     'WorkflowRunAwsem',
+    'MetaWorkflow',
+    'MetaWorkflowRun',
     'VariantConsequence',
     'FileFormat',
     'FileFastq',

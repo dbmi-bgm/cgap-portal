@@ -963,7 +963,7 @@ class TestNestedSearch(object):
 
     def test_search_nested_exists_query(self, workbook, es_testapp):
         """ Tests doing a !=No+value search on a nested sub-field. """
-        es_testapp.get('/search/?type=SampleProcessing&samples.uuid!=No+value', status=404)
+        es_testapp.get('/search/?type=SampleProcessing&samples.accession!=No+value', status=404)
 
     def test_search_nested_field_no_value(self, workbook, es_testapp):
         """ Tests that we can do item.sub_embedded_object=No+value and get correct results
