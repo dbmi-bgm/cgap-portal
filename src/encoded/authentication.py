@@ -452,7 +452,7 @@ def basic_auth_check(username, password, request):
 
     # Check expiration first
     properties = access_key.properties
-    expiration_date = datetime.datetime.fromisoformat(properties['expiration_date'])
+    expiration_date = datetime.date.fromisoformat(properties['expiration_date'])
     now = datetime.datetime.utcnow()
     if now > expiration_date:
         return None

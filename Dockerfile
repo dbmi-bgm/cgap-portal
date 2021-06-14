@@ -31,7 +31,7 @@ COPY deploy/docker/production/install_nginx.sh /
 RUN bash /install_nginx.sh && \
     apt-get update && \
     apt-get install -y curl vim emacs postgresql-client net-tools && \
-    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
     apt-get install -y ca-certificates nodejs npm
 
 # Configure CGAP User (nginx)
