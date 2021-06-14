@@ -429,7 +429,7 @@ function QuickPopover(props) {
         </Popover>
     );
     return (
-        <OverlayTrigger trigger="focus" placement="right" overlay={popover} transition={false}>
+        <OverlayTrigger trigger="focus" placement="right" overlay={popover}>
             {({ ref, ...triggerHandler }) => (
                 <Button ref={ref} {...triggerHandler} variant="link" className={cls} data-tip={tooltip || "Click for citation info"}>
                     <i className="icon icon-info-circle fas" />
