@@ -451,11 +451,14 @@ def basic_auth_check(username, password, request):
         return None
 
     # Check expiration first
+    # Note that access keys generated awhile ago will remain valid (for now) - will 6/14/21
     properties = access_key.properties
-    expiration_date = datetime.date.fromisoformat(properties['expiration_date'])
-    now = datetime.datetime.utcnow()
-    if now > expiration_date:
-        return None
+    expiration_date = properties.get('expiration_date')
+    if expiration_date:
+        dt = datetime.date.fromisoformat(expiration_date)
+        now = datetime.datetime.utcnow()
+        if now > dt:
+            return None
 
     # If expiration valid, check hash
     hash = properties['secret_access_key_hash']
