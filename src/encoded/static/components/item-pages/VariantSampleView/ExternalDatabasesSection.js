@@ -82,7 +82,7 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         );
     });
 
-    const externalDatabaseElems = externalDatabaseSchemaFields.map(function([ fieldName, fieldSchema ]){
+    let externalDatabaseElems = externalDatabaseSchemaFields.map(function([ fieldName, fieldSchema ]){
         const {
             link: linkFormat = null,
             title: schemaTitle = null,
@@ -155,13 +155,8 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         );
     });
 
-    prependItems.forEach(function(prependItem){
-        externalDatabaseElems.unshift(prependItem);
-    });
-
-    appendItems.forEach(function(appendItem){
-        externalDatabaseElems.push(appendItem);
-    });
+    // Merge with any custom-rendered items.
+    externalDatabaseElems = prependItems.concat(externalDatabaseElems).concat(appendItems);
 
     const externalDatabaseElemsLen = externalDatabaseElems.length;
     if (externalDatabaseElemsLen === 0) {
