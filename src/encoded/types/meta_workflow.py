@@ -12,6 +12,7 @@ from .base import (
     Item,
 )
 
+
 @collection(
     name='meta-workflows',
     unique_key='accession',
@@ -33,4 +34,5 @@ class MetaWorkflow(Item):
     })
 class MetaWorkflowRun(Item):
     item_type = 'meta_workflow_run'
+    embedded_list = ['meta_workflow.title']
     schema = load_schema('encoded:schemas/meta_workflow_run.json')

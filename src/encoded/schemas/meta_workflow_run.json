@@ -7,8 +7,7 @@
     "required": [
         "meta_workflow",
         "project",
-        "institution",
-        "final_status"
+        "institution"
     ],
     "additionalProperties": false,
     "identifyingProperties": [
