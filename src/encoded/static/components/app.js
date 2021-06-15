@@ -72,7 +72,7 @@ export default class App extends React.PureComponent {
      * @returns {void} Nothing
      */
     static scrollTo() {
-        var { hash } = window.location;
+        const { hash } = window.location;
         if (hash && document.getElementById(hash.slice(1))) {
             window.location.replace(hash);
         } else {
@@ -247,6 +247,7 @@ export default class App extends React.PureComponent {
             // Emit event from our window object to notify that fourfront JS has initialized.
             // This is to be used by, e.g. submissions view which might control a child window.
             window.dispatchEvent(new Event('fourfrontinitialized'));
+
             // CURRENT: If we have parent window, post a message to it as well.
             if (window.opener) window.opener.postMessage({ 'eventType' : 'fourfrontinitialized' }, '*');
 
@@ -282,6 +283,35 @@ export default class App extends React.PureComponent {
                 // Put this Alert into SPC as a predefined/constant export, then cancel/remove it (if active) in the callback function
                 // upon login success ( https://github.com/4dn-dcic/shared-portal-components/blob/master/src/components/navigation/components/LoginController.js#L111 )
                 Alerts.queue(NotLoggedInAlert);
+            }
+
+            // Set Alert if user initializes app between 330-830a ET (possibly temporary)
+            // 12-4 am in ET is either 4am-8am or 5am-9am UTC, depending on daylight savings.
+            const currTime = new Date();
+            const currUTCHours = currTime.getUTCHours();
+            const currUTCMinutes = currTime.getUTCMinutes();
+            const showAlert = (
+                ((currUTCHours >= 4 || (currUTCHours === 3 && currUTCMinutes >= 30))
+                && currUTCHours <= 7 || (currUTCHours === 8 && currUTCMinutes <= 30))
+            );
+            if (showAlert) {
+                const startTime = new Date();
+                startTime.setUTCHours(3);
+                startTime.setUTCMinutes(30);
+                startTime.setUTCSeconds(0);
+                const endTime = new Date();
+                endTime.setUTCHours(8);
+                endTime.setUTCMinutes(30);
+                endTime.setUTCSeconds(0);
+                let timezoneOffset = endTime.getTimezoneOffset() / 60;
+                timezoneOffset = 0 - timezoneOffset;
+                if (timezoneOffset > 0) { timezoneOffset = "+" + timezoneOffset; }
+                Alerts.queue({
+                    "title" : "Scheduled Daily Maintenance",
+                    "style": "warning",
+                    "message": `CGAP is running its daily scheduled maintenance and data indexing. \
+                                Some data might not show up between ${startTime.toLocaleTimeString()} and ${endTime.toLocaleTimeString()} (UTC${timezoneOffset}).`
+                });
             }
 
         });
