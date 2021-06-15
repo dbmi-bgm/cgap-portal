@@ -35,6 +35,7 @@ from snovault import (
     CONNECTION,
     COLLECTIONS
 )
+from dateutil.parser import isoparse
 from dcicutils.misc_utils import remove_element
 from snovault.validation import ValidationFailure
 from snovault.calculated import calculate_properties
@@ -455,7 +456,7 @@ def basic_auth_check(username, password, request):
     properties = access_key.properties
     expiration_date = properties.get('expiration_date')
     if expiration_date:
-        dt = datetime.date.fromisoformat(expiration_date)
+        dt = isoparse(expiration_date)  # datetime.date.fromisoformat in Python3.7
         now = datetime.datetime.utcnow()
         if now > dt:
             return None
