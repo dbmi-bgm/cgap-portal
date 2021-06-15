@@ -80,51 +80,6 @@ export default class App extends React.PureComponent {
         }
     }
 
-    /**
-     * Used in browser.js to collect prop values from server-side-rendered HTML
-     * and then re-feed them into Redux store.
-     *
-     * @param {HTMLElement} document - HTML DOM element representing the document.
-     * @param {string} [filter=null] - If set, filters down prop fields/values collected to only one(s) defined.
-     * @returns {Object} Object keyed by field name with collected value as value.
-     */
-    static getRenderedPropValues(document, filter = null){
-        var returnObj = {}, script_props;
-        if (typeof filter === 'string'){
-            script_props = document.querySelectorAll('script[data-prop-name="' + filter + '"]');
-        } else {
-            script_props = document.querySelectorAll('script[data-prop-name]');
-        }
-        _.forEach(script_props, function(elem){
-            const prop_name = elem.getAttribute('data-prop-name');
-            if (filter && Array.isArray(filter)){
-                if (filter.indexOf(prop_name) === -1){
-                    return;
-                }
-            }
-            let elem_value = elem.text;
-            const elem_type = elem.getAttribute('type') || '';
-            if (elem_type === 'application/json' || elem_type.slice(-5) === '+json') {
-                elem_value = JSON.parse(elem_value);
-            }
-            returnObj[prop_name] = elem_value;
-        });
-        return returnObj;
-    }
-
-    /**
-     * Runs `App.getRenderedPropValues` and extends with `{ href }` from canonical link element.
-     *
-     * @param {HTMLElement} document - HTML DOM element representing the document.
-     * @param {string} [filters=null] - If set, filters down prop fields/values collected to only one(s) defined.
-     * @returns {Object} Object keyed by field name with collected value as value.
-     */
-    static getRenderedProps(document, filters = null) {
-        return _.extend(App.getRenderedPropValues(document, filters), {
-            'href' : document.querySelector('link[rel="canonical"]').getAttribute('href') // Ensure the initial render is exactly the same
-        });
-    }
-
     static debouncedOnNavigationTooltipRebuild = _.debounce(ReactTooltip.rebuild, 500);
 
     /**
