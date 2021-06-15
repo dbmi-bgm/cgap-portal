@@ -431,7 +431,7 @@ class AccessionRow:
         valid_extensions = {
             '.fastq.gz': ('fastq', 'reads'),
             '.fq.gz': ('fastq', 'reads'),
-            '.cram': ('cram', 'alignments'),
+            '.cram': ('CRAM', 'alignments'),
             '.vcf.gz': ('vcf_gz', 'raw VCF')
         }
         files = {'file_fastq': {}, 'file_processed': {}, 'errors': []}
@@ -468,7 +468,7 @@ class AccessionRow:
                         ]
                 self.files_fastq.append(MetadataItem(file_info, self.row, 'file_fastq'))
             else:
-                if fmt == 'cram':
+                if fmt == 'CRAM':
                     self.sample.metadata.setdefault('cram_files', []).append(file_alias)
                 else:
                     self.sample.metadata.setdefault('processed_files', []).append(file_alias)
