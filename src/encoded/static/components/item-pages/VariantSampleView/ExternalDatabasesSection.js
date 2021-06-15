@@ -50,7 +50,9 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
             // "clingendis.disease_id", // removed for now ('user can find through clingen')
             // "transcriptid.ensembl_trs", // removed for now
             // "gnomad" // removed for now
-        ]
+        ],
+        prependItems = [],
+        appendItems = []
     } = props;
 
     if (!schemas) {
@@ -67,7 +69,10 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         if (propertySchema && propertySchema.items) {
             propertySchema = propertySchema.items;
         }
-        return [ fieldName, propertySchema ];
+        return [
+            fieldName,
+            propertySchema
+        ];
     }).filter(function(f){
         // Filter out fields which don't exist in schema yet.
         // Or for which we can't form links for.
@@ -111,8 +116,8 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
             val = externalIDs.map(function(externalID){
                 const linkToID = linkFormat.replace("<ID>", externalID);
                 return (
-                    <a href={linkToID || null} className="d-block" target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName} key={externalID}>
-                        <span>{ externalID }</span>
+                    <a href={linkToID} className="d-block" target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName} key={externalID}>
+                        <span className="align-middle">{ externalID }</span>
                         <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
                     </a>
                 );
@@ -124,8 +129,8 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
                 const title = index === 0 ? externalID : `(${index + 1})`;
                 return (
                     <React.Fragment key={externalID}>
-                        <a href={linkToID || null} target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName}
-                            data-tip={index === 0 ? null : externalID}>
+                        <a href={linkToID} target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName}
+                            data-tip={index === 0 ? null : externalID} className="align-middle">
                             { title }
                         </a>
                         { index === extIDsLen - 1 ?
@@ -148,7 +153,15 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
                 </div>
             </div>
         );
-    }).filter(function(elem){ return !!elem; });
+    });
+
+    prependItems.forEach(function(prependItem){
+        externalDatabaseElems.unshift(prependItem);
+    });
+
+    appendItems.forEach(function(appendItem){
+        externalDatabaseElems.push(appendItem);
+    });
 
     const externalDatabaseElemsLen = externalDatabaseElems.length;
     if (externalDatabaseElemsLen === 0) {

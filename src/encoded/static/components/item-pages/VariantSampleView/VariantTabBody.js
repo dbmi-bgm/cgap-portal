@@ -18,6 +18,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
         csq_clinvar: variationID,
         annotation_id: annotationID
     } = variant;
+
     const [ showingTable, setShowingTable ] = useState("v3"); // Allowed: "v2", "v3", and maybe "summary" in future; could be converted integer instd of of text.
 
     const onSelectShowingTable = useCallback(function(evtKey, e){
@@ -491,7 +492,16 @@ function PredictorsTableHeading(){
 
 function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
     const { variant } = context;
-    const { transcript = [], } = variant;
+    const {
+        transcript = [],
+        CHROM: hg38CHR,
+        POS: hg38POS
+    } = variant;
+
+    if (!variant) {
+        return null;
+    }
+
     const externalDatabaseFieldnames = [
         "csq_clinvar"
     ];
@@ -504,10 +514,6 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
         "csq_swissprot",
         "csq_trembl"
     ];
-
-    if (!variant) {
-        return null;
-    }
 
     // For now we kind of create combo object of these above ^, transforming "transcript" to be single item for vals to be plucked from
     const currentItem = {
@@ -526,8 +532,29 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
     });
 
 
+    // Additional things not in a single schema field.
+    const externalResourcesAppend = [];
+    if (hg38CHR && hg38POS) {
+        const chrPosVal = `chr${hg38CHR}:${hg38POS}`;
+        externalResourcesAppend.push(
+            <div className="row mb-03" key="POS">
+                <div className="col-12 col-lg">
+                    <label className="mb-0 black-label" htmlFor="external_resource_for_ucsc_hg38" data-tip="See position in UCSC Genome Browser">
+                        UCSC Genome Browser
+                    </label>
+                </div>
+                <div className="col-12 col-lg-auto">
+                    <a href={"https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&position=" + chrPosVal} className="d-block" target="_blank" rel="noopener noreferrer" id="external_resource_for_ucsc_hg38">
+                        <span className="align-middle">{ chrPosVal }</span>
+                        <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
+                    </a>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <ExternalDatabasesSection itemType="Variant" {...{ currentItem, schemas, externalDatabaseFieldnames }} />
+        <ExternalDatabasesSection itemType="Variant" {...{ currentItem, schemas, externalDatabaseFieldnames }} appendItems={externalResourcesAppend} />
     );
 }
 
