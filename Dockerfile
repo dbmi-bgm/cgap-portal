@@ -24,15 +24,25 @@ ENV PYTHONFAULTHANDLER=1 \
   PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_VERSION=1.1.4
+  POETRY_VERSION=1.1.4 \
+  NODE_VERSION=12.22.1
 
 # Install nginx, base system
 COPY deploy/docker/production/install_nginx.sh /
 RUN bash /install_nginx.sh && \
     apt-get update && \
-    apt-get install -y curl vim emacs postgresql-client net-tools && \
-    curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
-    apt-get install -y ca-certificates nodejs npm
+    apt-get install -y curl vim emacs postgresql-client net-tools ca-certificates
+
+
+ENV NVM_DIR=/root/.nvm
+RUN apt install -y curl
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
+RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
+ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
+RUN node --version
+RUN npm --version
 
 # Configure CGAP User (nginx)
 WORKDIR /home/nginx
