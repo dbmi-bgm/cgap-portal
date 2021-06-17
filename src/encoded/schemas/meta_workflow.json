@@ -267,7 +267,7 @@
         "name": {
             "title": "Name"
         },
-        "meta_workflow_version": {
+        "version": {
             "title": "Version",
             "colTitle" : "Version"
         }
