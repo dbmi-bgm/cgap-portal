@@ -89,7 +89,9 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         savedVariantSampleIDMap,    // Passed in from VariantSampleListController
         fetchVariantSampleListItem, // Passed in from VariantSampleListController
         isLoadingVariantSampleListItem, // Passed in from VariantSampleListController
-        setIsSubmitting             // Passed in from App
+        setIsSubmitting,            // Passed in from App
+        addToBodyClassList,         // Passed in from App
+        removeFromBodyClassList     // Passed in from App
     } = props;
 
     const {
@@ -209,6 +211,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     const tableProps = {
         hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader,
+        addToBodyClassList, removeFromBodyClassList,
         selectedItems, onSelectItem,
         savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
         isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading

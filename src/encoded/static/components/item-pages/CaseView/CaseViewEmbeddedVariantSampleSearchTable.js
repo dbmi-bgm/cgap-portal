@@ -21,6 +21,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         onSelectItem,
         savedVariantSampleIDMap = {},
         isLoadingVariantSampleListItem,
+        // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
 

@@ -1983,29 +1983,50 @@ i.status-indicator-dot {
 	CaseView -> InterpretationTab + FinalizeCaseTab
 **********************************************************/
 
-.note-content-area {
+.variant-sample-selection {
 
-	margin-top: 12px;
-
-	height: 300px;
-
-	@include media-breakpoint-up(lg){
-		height: 400px;
+	h4.selected-vsl-title {
+		font-size: 1.275rem; /* Slight decrease from h4 default of 1.3rem */
+		i.icon {
+			font-size: 0.825em;
+		}
+		a + i.icon-pen {
+			color: transparent;
+		}
+		a:hover + i.icon-pen {
+			color: $gray-400;
+		}
 	}
 
-	@include media-breakpoint-up(xl){
-		height: 500px;
-	}
+	.note-content-area {
 
-	> .note-text-content {
-		border-radius: $border-radius-sm;
-		border: 1px solid #eee;
-		padding: 8px 12px;
-		overflow: auto;
-		white-space: pre-wrap;
+		margin-top: 12px;
+	
+		@include media-breakpoint-up(md){
+			min-height: 150px;
+			max-height: 270px;
+		}
+	
+		@include media-breakpoint-up(lg){
+			max-height: 400px;
+		}
+	
+		@include media-breakpoint-up(xl){
+			max-height: 500px;
+		}
+	
+		> .note-text-content {
+			border-radius: $border-radius-sm;
+			border: 1px solid #eee;
+			padding: 8px 12px;
+			overflow: auto;
+			white-space: pre-wrap;
+		}
+	
 	}
-
+	
 }
+
 
 /**********************************************************
   HiGlass Views

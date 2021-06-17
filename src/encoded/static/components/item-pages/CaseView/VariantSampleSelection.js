@@ -108,17 +108,43 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         } = {}
     } = schemas || {};
 
-    const { "@id": vsID, interpretation = null, discovery_interpretation = null } = variant_sample_item || {};
-    const { classification: acmgClassification = null } = interpretation || {};
-    const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discovery_interpretation || {};
+    const {
+        "@id": vsID,
+        variant: { display_title: variantDisplayTitle },
+        interpretation: clinicalInterpretationNote = null,
+        discovery_interpretation: discoveryInterpretationNote = null,
+        variant_notes: lastVariantNote = null,
+        gene_notes: lastGeneNote = null
+    } = variant_sample_item || {};
+
+    const noSavedNotes = clinicalInterpretationNote === null && discoveryInterpretationNote === null && lastVariantNote === null && lastGeneNote === null;
+    const { classification: acmgClassification = null } = clinicalInterpretationNote || {};
+    const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discoveryInterpretationNote || {};
+
+
     return (
-        <div className="card mb-1" key={index}>
+        <div className="card mb-1 variant-sample-selection" key={index}>
             <div className="card-header">
                 <div className="d-flex flex-column flex-lg-row align-items-lg-center">
 
-                    <div className="flex-auto mb-08 mb-lg-0">
-                        <VariantSampleDisplayTitleColumn result={variant_sample_item}
-                            link={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`} />
+                    <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
+                        <h4 className="text-truncate text-600 my-0 selected-vsl-title">
+                            {
+                                parentTabType === parentTabTypes.FINALIZECASE ?
+                                    <React.Fragment>
+                                        { variantDisplayTitle }
+                                        { noSavedNotes ? <i className="icon icon-exclamation-triangle fas ml-12 text-muted" data-tip="No notes saved for this Sample Variant in interpretation"/> : null }
+                                    </React.Fragment>
+                                    : (
+                                        <React.Fragment>
+                                            <a href={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`}>
+                                                { variantDisplayTitle }
+                                            </a>
+                                            <i className="icon icon-pen fas ml-12"/>
+                                        </React.Fragment>
+                                    )
+                            }
+                        </h4>
                     </div>
 
                     <div className="flex-grow-1 d-none d-lg-block px-2">&nbsp;</div>
@@ -267,41 +293,44 @@ function VariantSampleExpandedNotes (props) {
                     Send All Notes to KnowledgeBase
                 </Checkbox>
             </div>
-            <div className="card-body notes-section">
+            <div className="card-body notes-section pt-0">
                 <div className="row">
-                    <div className="col-12 col-md-6 col-lg-3">
-                        <h4 className="text-300">Variant Notes</h4>
+
+                    <div className="col-12 col-md-6 col-lg-3 d-flex flex-column">
+                        <h4 className="text-300 mt-2">Variant Notes</h4>
                         <NoteCheckboxes />
 
                         { !noVariantNotesSaved ?
-                            <div className="note-content-area d-flex flex-column">
+                            <div className="note-content-area d-flex flex-column flex-grow-1">
                                 <div className="note-text-content flex-grow-1">
                                     { lastVariantNoteText || <em>Note was left blank</em> }
                                 </div>
                             </div>
-                            : <div className="text-center pt-16 pb-0"><em>No Variant Notes Saved</em></div> }
+                            : <div className="text-center py-3"><em className="text-secondary">No Variant Notes Saved</em></div> }
 
                     </div>
+
                     <div className="col-12 col-md-6 col-lg-3 d-flex flex-column">
-                        <h4 className="text-300">Gene Notes</h4>
+                        <h4 className="text-300 mt-2">Gene Notes</h4>
                         <NoteCheckboxes />
 
                         { !noGeneNotesSaved ?
-                            <div className="note-content-area d-flex flex-column">
+                            <div className="note-content-area d-flex flex-column flex-grow-1">
                                 <div className="note-text-content flex-grow-1">
                                     { lastGeneNoteText || <em>Note was left blank</em> }
                                 </div>
                             </div>
-                            : <div className="text-center pt-16 pb-0"><em>No Gene Notes Saved</em></div> }
+                            : <div className="text-center py-3"><em className="text-secondary">No Gene Notes Saved</em></div> }
 
                     </div>
-                    <div className="col-12 col-md-6 col-lg-3">
-                        <h4 className="text-300">ACMG Interpretation</h4>
+
+                    <div className="col-12 col-md-6 col-lg-3 d-flex flex-column">
+                        <h4 className="text-300 mt-2">ACMG Interpretation</h4>
                         <NoteCheckboxes />
 
                         { !noClinicalNoteSaved ?
 
-                            <div className="note-content-area d-flex flex-column">
+                            <div className="note-content-area d-flex flex-column flex-grow-1">
                                 <div className="note-text-content flex-grow-1">
                                     { clinicalNoteText || <em>Note was left blank</em> }
                                 </div>
@@ -317,19 +346,19 @@ function VariantSampleExpandedNotes (props) {
                                     </div>
                                 </div>
                             </div>
-
-                            : <div className="text-center pt-16 pb-0"><em>No Interpretation Note Saved</em></div> }
+                            : <div className="text-center py-3"><em className="text-secondary">No Interpretation Note Saved</em></div> }
 
                     </div>
-                    <div className="col-12 col-md-6 col-lg-3">
-                        <h4 className="text-300">Gene Discovery</h4>
+
+                    <div className="col-12 col-md-6 col-lg-3 d-flex flex-column">
+                        <h4 className="text-300 mt-2">Gene Discovery</h4>
                         <NoteCheckboxes />
 
                         { !noDiscoveryNoteSaved ?
 
-                            <div className="note-content-area d-flex flex-column">
+                            <div className="note-content-area d-flex flex-column flex-grow-1">
                                 <div className="note-text-content flex-grow-1">
-                                    { discoveryNoteText || <em>Note was left blank</em> }
+                                    { discoveryNoteText || <em className="text-secondary">Note was left blank</em> }
                                 </div>
 
                                 <div className="discovery-gene-candidacy flex-grow-0">
@@ -354,8 +383,7 @@ function VariantSampleExpandedNotes (props) {
                                     </div>
                                 </div>
                             </div>
-
-                            : <div className="text-center pt-16 pb-0"><em>No Gene Discovery Note Saved</em></div> }
+                            : <div className="text-center py-3"><em>No Gene Discovery Note Saved</em></div> }
 
                     </div>
                 </div>
@@ -376,6 +404,42 @@ const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onK
         </div>
     );
 });
+
+
+
+
+
+
+
+
+
+class FinalizeCaseDataStore extends React.PureComponent {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            sendToKnowledgeBase: {},
+            sendToReport: {}
+        };
+    }
+
+    render(){
+        const { children, ...passProps } = this.props;
+        return React.Children.map(children, function(c){
+            if (React.isValidElement(c)) {
+                return React.cloneElement(c, { ...passProps });
+            }
+            return c;
+        });
+    }
+
+}
+
+
+
+
+
 
 
 

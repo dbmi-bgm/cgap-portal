@@ -121,23 +121,26 @@ export default class CaseView extends DefaultItemView {
 
 const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const {
+        // Passed in from App or redux
         context = {},
         href,
         session,
         schemas,
-        graphData,
-        selectedDiseaseIdxMap,
         windowWidth,
         windowHeight,
-        idToGraphIdentifier,
+        addToBodyClassList,
+        removeFromBodyClassList,
         setIsSubmitting,
+        graphData,
+        selectedDiseaseIdxMap,
+        idToGraphIdentifier,
         PedigreeVizLibrary = null,
         // Passed in from VariantSampleListController which wraps this component in `getTabObject`
         variantSampleListItem = null,
         isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
         savedVariantSampleIDMap = {},
-        fetchVariantSampleListItem
+        fetchVariantSampleListItem,
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
 
@@ -296,7 +299,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
                         <SelectedItemsController isMultiselect>
                             <FilteringTab {...{ context, windowHeight, session, schemas, setIsSubmitting, variantSampleListItem,
-                                updateVariantSampleListID, savedVariantSampleIDMap, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
+                                updateVariantSampleListID, savedVariantSampleIDMap, fetchVariantSampleListItem, isLoadingVariantSampleListItem,
+                                addToBodyClassList, removeFromBodyClassList }} />
                         </SelectedItemsController>
                     </DotRouterTab>
                     <DotRouterTab tabTitle={
