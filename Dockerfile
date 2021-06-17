@@ -33,18 +33,20 @@ RUN bash /install_nginx.sh && \
     apt-get update && \
     apt-get install -y curl vim emacs postgresql-client net-tools ca-certificates
 
+# Configure CGAP User (nginx)
+WORKDIR /home/nginx/.nvm
 
-ENV NVM_DIR=/root/.nvm
+# Install Node
+ENV NVM_DIR=/home/nginx/.nvm
 RUN apt install -y curl
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
-ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
+ENV PATH="/home/nginx/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN node --version
 RUN npm --version
 
-# Configure CGAP User (nginx)
 WORKDIR /home/nginx
 
 # Configure venv
