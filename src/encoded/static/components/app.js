@@ -80,51 +80,6 @@ export default class App extends React.PureComponent {
         }
     }
 
-    /**
-     * Used in browser.js to collect prop values from server-side-rendered HTML
-     * and then re-feed them into Redux store.
-     *
-     * @param {HTMLElement} document - HTML DOM element representing the document.
-     * @param {string} [filter=null] - If set, filters down prop fields/values collected to only one(s) defined.
-     * @returns {Object} Object keyed by field name with collected value as value.
-     */
-    static getRenderedPropValues(document, filter = null){
-        var returnObj = {}, script_props;
-        if (typeof filter === 'string'){
-            script_props = document.querySelectorAll('script[data-prop-name="' + filter + '"]');
-        } else {
-            script_props = document.querySelectorAll('script[data-prop-name]');
-        }
-        _.forEach(script_props, function(elem){
-            const prop_name = elem.getAttribute('data-prop-name');
-            if (filter && Array.isArray(filter)){
-                if (filter.indexOf(prop_name) === -1){
-                    return;
-                }
-            }
-            let elem_value = elem.text;
-            const elem_type = elem.getAttribute('type') || '';
-            if (elem_type === 'application/json' || elem_type.slice(-5) === '+json') {
-                elem_value = JSON.parse(elem_value);
-            }
-            returnObj[prop_name] = elem_value;
-        });
-        return returnObj;
-    }
-
-    /**
-     * Runs `App.getRenderedPropValues` and extends with `{ href }` from canonical link element.
-     *
-     * @param {HTMLElement} document - HTML DOM element representing the document.
-     * @param {string} [filters=null] - If set, filters down prop fields/values collected to only one(s) defined.
-     * @returns {Object} Object keyed by field name with collected value as value.
-     */
-    static getRenderedProps(document, filters = null) {
-        return _.extend(App.getRenderedPropValues(document, filters), {
-            'href' : document.querySelector('link[rel="canonical"]').getAttribute('href') // Ensure the initial render is exactly the same
-        });
-    }
-
     static debouncedOnNavigationTooltipRebuild = _.debounce(ReactTooltip.rebuild, 500);
 
     /**
@@ -292,6 +247,7 @@ export default class App extends React.PureComponent {
             // Emit event from our window object to notify that fourfront JS has initialized.
             // This is to be used by, e.g. submissions view which might control a child window.
             window.dispatchEvent(new Event('fourfrontinitialized'));
+
             // CURRENT: If we have parent window, post a message to it as well.
             if (window.opener) window.opener.postMessage({ 'eventType' : 'fourfrontinitialized' }, '*');
 
@@ -327,6 +283,35 @@ export default class App extends React.PureComponent {
                 // Put this Alert into SPC as a predefined/constant export, then cancel/remove it (if active) in the callback function
                 // upon login success ( https://github.com/4dn-dcic/shared-portal-components/blob/master/src/components/navigation/components/LoginController.js#L111 )
                 Alerts.queue(NotLoggedInAlert);
+            }
+
+            // Set Alert if user initializes app between 330-830a ET (possibly temporary)
+            // 12-4 am in ET is either 4am-8am or 5am-9am UTC, depending on daylight savings.
+            const currTime = new Date();
+            const currUTCHours = currTime.getUTCHours();
+            const currUTCMinutes = currTime.getUTCMinutes();
+            const showAlert = (
+                ((currUTCHours >= 4 || (currUTCHours === 3 && currUTCMinutes >= 30))
+                && currUTCHours <= 7 || (currUTCHours === 8 && currUTCMinutes <= 30))
+            );
+            if (showAlert) {
+                const startTime = new Date();
+                startTime.setUTCHours(3);
+                startTime.setUTCMinutes(30);
+                startTime.setUTCSeconds(0);
+                const endTime = new Date();
+                endTime.setUTCHours(8);
+                endTime.setUTCMinutes(30);
+                endTime.setUTCSeconds(0);
+                let timezoneOffset = endTime.getTimezoneOffset() / 60;
+                timezoneOffset = 0 - timezoneOffset;
+                if (timezoneOffset > 0) { timezoneOffset = "+" + timezoneOffset; }
+                Alerts.queue({
+                    "title" : "Scheduled Daily Maintenance",
+                    "style": "warning",
+                    "message": `CGAP is running its daily scheduled maintenance and data indexing. \
+                                Some data might not show up between ${startTime.toLocaleTimeString()} and ${endTime.toLocaleTimeString()} (UTC${timezoneOffset}).`
+                });
             }
 
         });
