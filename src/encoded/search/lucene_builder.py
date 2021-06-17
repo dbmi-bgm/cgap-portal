@@ -51,19 +51,26 @@ class LuceneBuilder:
         # nested range fields must also be separated from other nested sub queries - see comment in 'handle_nested_filters'
         for range_field, range_def in range_filters.items():
             nested_path = find_nested_path(range_field, es_mapping)
+            range_query = {RANGE: {range_field: range_def}}
+            if 'add_no_value' in range_def:
+                del range_def['add_no_value']
+                range_query = {
+                    BOOL: {
+                        SHOULD: [
+                            range_query,
+                            {BOOL: {MUST_NOT: {EXISTS: {FIELD: range_field}}}}
+                        ]
+                    }
+                }
             if nested_path:
                 must_filters.append(('range', {  # NOT using the constant, since the 2nd part is the lucene sub-query
                     NESTED: {
                         PATH: nested_path,
-                        QUERY: {
-                            RANGE: {range_field: range_def}
-                        }
+                        QUERY: range_query
                     }
                 }))
             else:
-                must_filters.append(('range', {
-                    RANGE: {range_field: range_def}
-                }))
+                must_filters.append(('range', range_query))
 
     @staticmethod
     def handle_should_query(field_name, options):
@@ -132,7 +139,7 @@ class LuceneBuilder:
                 if filters['add_no_value'] is True:  # when searching on 'No Value'
                     should_arr = [must_not_terms] if must_not_terms else []
                     should_arr.append({BOOL: {MUST: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
-                    must_not_filters_nested.append((query_field, should_arr))
+                    must_filters_nested.append((query_field, should_arr))
                     if must_terms: must_filters_nested.append((query_field, must_terms))
                 else:  # when not searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
@@ -153,7 +160,7 @@ class LuceneBuilder:
                     # add to must_not in an OR case, which is equivalent to filtering on '! No value'
                     should_arr = [must_terms] if must_terms else []
                     should_arr.append({EXISTS: {FIELD: query_field}})  # field=value OR field EXISTS
-                    must_filters.append((query_field, {BOOL: {SHOULD: should_arr}}))
+                    must_not_filters.append((query_field, {BOOL: {SHOULD: should_arr}}))
                 else:  # no filtering on 'No value'
                     if must_terms: must_filters.append((query_field, must_terms))
                 if must_not_terms: must_not_filters.append((query_field, must_not_terms))
@@ -252,7 +259,7 @@ class LuceneBuilder:
                                 else:
                                     insertion_point = _q[NESTED][QUERY][BOOL]
                                     if key not in insertion_point:  # this can happen if we are combining with 'No value'
-                                       insertion_point[key] = query[BOOL][key][0]
+                                        insertion_point[key] = query[BOOL][key][0]
                                     else:
                                         insertion_point[key].append(query[BOOL][key][0])
 
@@ -383,6 +390,7 @@ class LuceneBuilder:
             exists_field = False  # keep track of null values
             range_type = False  # If we determine is a range request (field.to, field.from), will be populated with string 'date' or 'numerical'
             range_direction = None
+            field_schema = {}
             if field == 'q' or field in COMMON_EXCLUDED_URI_PARAMS:
                 continue
             elif field == 'type' and term != 'Item':
@@ -461,6 +469,10 @@ class LuceneBuilder:
                         elif range_direction == 'lt' or range_direction == 'lte':
                             if term > range_filters[query_field][range_direction]:
                                 range_filters[query_field][range_direction] = term
+
+                # Check if schema requests no value
+                if field_schema.get('add_no_value', False):
+                    range_filters[query_field]['add_no_value'] = True
 
             # add these to field_filters directly, handle later with build_sub_queries
             else:

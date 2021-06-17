@@ -1235,10 +1235,13 @@ class TestSearchHiddenAndAdditionalFacets:
 
 @pytest.fixture(scope='session')
 def bucket_range_data_raw():
-    """ 10 objects with a numerical field we will bucket on.
+    """ 9 objects with a numerical field we will bucket on.
             'special_integer' has i in it.
             'special_object_that_holds_integer' holds a single integer field with i as well
             'array_of_objects_that_holds_integer' holds 2 objects that are mirrors of one another
+        +
+        1 object with a value for no_value_integer, to test that filtering on a field that sets
+        'add_no_value' to True will not filter documents with 'No value'.
     """
     return [{
         'special_integer': i,
@@ -1255,7 +1258,9 @@ def bucket_range_data_raw():
                 'embedded_integer': 9 if i < 5 else 0
             },
         ]
-    } for i in range(10)]
+    } for i in range(9)] + [{
+        'no_value_integer': 8
+    }]
 
 
 @pytest.fixture(scope='session')  # XXX: consider scope further - Will 11/5/2020
@@ -1278,6 +1283,10 @@ class TestSearchBucketRangeFacets:
                 assert len(facet['ranges']) == expected_cardinality
                 for bucket in facet['ranges']:
                     assert bucket['doc_count'] == expected_count
+
+    @staticmethod
+    def verify_counts(response, expected_count):
+        assert len(response['@graph']) == expected_count
 
     @staticmethod
     def select_facet(facets, facet_name):
@@ -1323,6 +1332,20 @@ class TestSearchBucketRangeFacets:
         for r in facet_with_labels['ranges']:
             assert 'label' in r
             assert r['label'] in ['Low', 'High']
+
+    def test_search_bucket_range_add_no_value(self, workbook, es_testapp, bucket_range_data):
+        """ Tests that providing a range filter on a field that specifies 'add_no_value' does not
+            filter documents that have no value for that field.
+        """
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=5').json  # should detect
+        self.verify_counts(res, 10)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=10').json  # should not detect
+        self.verify_counts(res, 9)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.to=10').json  # should detect
+        self.verify_counts(res, 10)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=4'
+                             '&no_value_integer.to=10').json  # should detect
+        self.verify_counts(res, 10)
 
     def test_search_bucket_range_workbook(self, es_testapp, workbook):
         # TODO: write me once some bucket-range aggregations are defined on schemas for workbook inserts

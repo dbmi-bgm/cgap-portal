@@ -389,11 +389,18 @@ class TestingHiddenFacets(Item):
 
 @collection('testing-bucket-range-facets')
 class TestingBucketRangeFacets(Item):
-    """ Collection for testing BucketRange facets. """
+    """ Collection for testing BucketRange facets.
+        Also tests 'add_no_value' schema param behavior.
+    """
     item_type = 'testing_bucket_range_facets'
     schema = {
         'type': 'object',
         'properties': {
+            'no_value_integer': {
+                'type': 'integer',
+                'add_no_value': True  # if a range query is specified on this field, include documents that
+                                      # have 'No value' for the field
+            },
             'special_integer': {
                 'type': 'integer'
             },
