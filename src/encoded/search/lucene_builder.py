@@ -139,7 +139,7 @@ class LuceneBuilder:
                 if filters['add_no_value'] is True:  # when searching on 'No Value'
                     should_arr = [must_not_terms] if must_not_terms else []
                     should_arr.append({BOOL: {MUST: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
-                    must_filters_nested.append((query_field, should_arr))
+                    must_not_filters_nested.append((query_field, should_arr))
                     if must_terms: must_filters_nested.append((query_field, must_terms))
                 else:  # when not searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
@@ -160,10 +160,11 @@ class LuceneBuilder:
                     # add to must_not in an OR case, which is equivalent to filtering on '! No value'
                     should_arr = [must_terms] if must_terms else []
                     should_arr.append({EXISTS: {FIELD: query_field}})  # field=value OR field EXISTS
-                    must_not_filters.append((query_field, {BOOL: {SHOULD: should_arr}}))
-                else:  # no filtering on 'No value'
-                    if must_terms: must_filters.append((query_field, must_terms))
-                if must_not_terms: must_not_filters.append((query_field, must_not_terms))
+                    must_filters.append((query_field, {BOOL: {SHOULD: should_arr}}))
+                elif must_terms:  # no filtering on 'No value'
+                    must_filters.append((query_field, must_terms))
+                if must_not_terms:
+                    must_not_filters.append((query_field, must_not_terms))
 
         return must_filters, must_not_filters, must_filters_nested, must_not_filters_nested
 
