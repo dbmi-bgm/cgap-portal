@@ -225,7 +225,7 @@
             "enum": [
                 "pending",
                 "running",
-                "complete",
+                "completed",
                 "failed"
             ]
         },
