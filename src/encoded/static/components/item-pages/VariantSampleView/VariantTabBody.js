@@ -14,7 +14,11 @@ import { ExternalDatabasesSection } from './ExternalDatabasesSection';
 
 export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
     const { variant } = context;
-    const { csq_clinvar: variationID } = variant;
+    const {
+        csq_clinvar: variationID,
+        annotation_id: annotationID
+    } = variant;
+
     const [ showingTable, setShowingTable ] = useState("v3"); // Allowed: "v2", "v3", and maybe "summary" in future; could be converted integer instd of of text.
 
     const onSelectShowingTable = useCallback(function(evtKey, e){
@@ -63,13 +67,13 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                     <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
                         <div className="info-header-title">
                             <h4>
+                                ClinVar
                                 { clinvarExternalHref ?
-                                    <a href={clinvarExternalHref} rel="noopener noreferrer" target="_blank">
-                                        ClinVar
+                                    <a href={clinvarExternalHref} rel="noopener noreferrer" target="_blank"
+                                        className="px-1" data-tip="View this variant in ClinVar">
                                         <i className="icon icon-external-link-alt fas ml-07 text-small"/>
                                     </a>
-                                    : "ClinVar"
-                                }
+                                    : null }
                             </h4>
                         </div>
                         <div className="info-body clinvar-info-body">
@@ -78,13 +82,28 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                     </div>
 
                     <div className="inner-card-section flex-grow-0 pb-2 pb-xl-0">
-                        <div className="info-header-title">
+                        <div className="info-header-title justify-content-start">
 
                             <DropdownButton size="lg py-1" variant="outline-secondary select-gnomad-version" onSelect={onSelectShowingTable}
                                 title={titleDict[showingTable]} >
                                 <DropdownItem eventKey="v3" active={showingTable === "v3"}>{ titleDict.v3 }</DropdownItem>
                                 <DropdownItem eventKey="v2" active={showingTable === "v2"}>{ titleDict.v2 }</DropdownItem>
                             </DropdownButton>
+
+                            { annotationID ?
+                                <h4>
+                                    <a target="_blank" rel="noopener noreferrer"
+                                        className="text-small px-1"
+                                        data-tip={"View this variant in gnomAD " + showingTable}
+                                        href={
+                                            "https://gnomad.broadinstitute.org/variant/"
+                                            + annotationID // <- Do not wrap in encodeURIComponent -- transformed value isn't found.
+                                            + "?dataset=" + (showingTable === "v3" ? "gnomad_r3" : "gnomad_r2_1")
+                                        } >
+                                        <i className="icon icon-external-link-alt fas"/>
+                                    </a>
+                                </h4>
+                                : null }
 
                             {/* todo link/icon to GnomAD -- is there a gnomad link somewhere ? */}
 
@@ -257,31 +276,17 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
         );
     }
 
-    const submissionLen = clinvar_submission.length;
-    const submissionsRendered = clinvar_submission.map(function(submission, idx){
-        const { clinvar_submission_accession } = submission;
-        return <ClinVarSubmissionEntry submission={submission} key={clinvar_submission_accession || idx} index={idx} />;
-    });
-
     return (
         <React.Fragment>
 
-            <div className="row mb-1">
-                <div className="col">
-                    <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
-                    { clinvarExternalHref?
-                        <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
-                            { variationID }
-                            <i className="icon icon-external-link-alt fas ml-07 text-small"/>
-                        </a>
-                        : <span>{ variationID }</span> }
-                </div>
-                <div className="col">
-                    <label data-tip={getTipForField("clinvar_submission")} className="mr-1 mb-0">Submissions: </label>
-                    <span>
-                        { submissionLen }
-                    </span>
-                </div>
+            <div className="mb-1">
+                <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
+                { clinvarExternalHref?
+                    <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
+                        { variationID }
+                        <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                    </a>
+                    : <span>{ variationID }</span> }
             </div>
 
             <div className="row">
@@ -302,63 +307,10 @@ function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref 
                 </div>
             </div>
 
-            <hr/>
-
-            <div>
-                <div className="row mb-08">
-                    <div className="col-3">
-                        <h6 className="my-0 text-600">Classification</h6>
-                    </div>
-                    <div className="col-2">
-                        <h6 className="my-0 text-600">Date</h6>
-                    </div>
-                    <div className="col-4">
-                        <h6 className="my-0 text-600">Submitted By</h6>
-                    </div>
-                    <div className="col-3">
-                        <h6 className="my-0 text-600">Links</h6>
-                    </div>
-                </div>
-
-                { submissionsRendered }
-
-            </div>
-
         </React.Fragment>
     );
 }
 
-function ClinVarSubmissionEntry({ submission, index = 0 }){
-    const fallbackElem = <em data-tip="Not Available"> - </em>;
-    const {
-        clinvar_submission_interpretation = null,
-        clinvar_submission_submitter = fallbackElem,
-        clinvar_submission_accession = fallbackElem // change into link when available
-    } = submission;
-
-    const interpretation = clinvar_submission_interpretation || fallbackElem;
-    const fakeStatusValue = clinvar_submission_interpretation ? clinvar_submission_interpretation.toLowerCase() : null;
-
-    return (
-        <div className={"my-1 border rounded p-1" + (index % 2 === 0 ? " bg-light" : "")}>
-            <div className="row align-items-center text-small">
-                <div className="col-3" data-field="clinvar_submission_interpretation">
-                    <i className="status-indicator-dot mr-07 ml-05" data-status={fakeStatusValue} />
-                    { interpretation }
-                </div>
-                <div className="col-2">
-                    { fallbackElem }
-                </div>
-                <div className="col-4">
-                    { clinvar_submission_submitter }
-                </div>
-                <div className="col-3">
-                    { clinvar_submission_accession }
-                </div>
-            </div>
-        </div>
-    );
-}
 
 function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
     const { variant } = context;
@@ -540,11 +492,21 @@ function PredictorsTableHeading(){
 
 function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
     const { variant } = context;
-    const { transcript = [], } = variant;
+    const {
+        transcript = [],
+        CHROM: hg38CHR,
+        POS: hg38POS
+    } = variant;
+
+    if (!variant) {
+        return null;
+    }
+
     const externalDatabaseFieldnames = [
         "csq_clinvar"
     ];
 
+    // Prepended with "transcript." and added to above `externalDatabaseFieldnames`.
     const transcriptFieldNames = [
         "csq_feature",
         "csq_ccds",
@@ -552,10 +514,6 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
         "csq_swissprot",
         "csq_trembl"
     ];
-
-    if (!variant) {
-        return null;
-    }
 
     // For now we kind of create combo object of these above ^, transforming "transcript" to be single item for vals to be plucked from
     const currentItem = {
@@ -574,8 +532,29 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
     });
 
 
+    // Additional things not in a single schema field.
+    const externalResourcesAppend = [];
+    if (hg38CHR && hg38POS) {
+        const chrPosVal = `chr${hg38CHR}:${hg38POS}`;
+        externalResourcesAppend.push(
+            <div className="row mb-03" key="POS">
+                <div className="col-12 col-lg">
+                    <label className="mb-0 black-label" htmlFor="external_resource_for_ucsc_hg38" data-tip="See position in UCSC Genome Browser">
+                        UCSC Genome Browser
+                    </label>
+                </div>
+                <div className="col-12 col-lg-auto">
+                    <a href={"https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&position=" + chrPosVal} className="d-block" target="_blank" rel="noopener noreferrer" id="external_resource_for_ucsc_hg38">
+                        <span className="align-middle">{ chrPosVal }</span>
+                        <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
+                    </a>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <ExternalDatabasesSection itemType="Variant" {...{ currentItem, schemas, externalDatabaseFieldnames }} />
+        <ExternalDatabasesSection itemType="Variant" {...{ currentItem, schemas, externalDatabaseFieldnames }} appendItems={externalResourcesAppend} />
     );
 }
 
