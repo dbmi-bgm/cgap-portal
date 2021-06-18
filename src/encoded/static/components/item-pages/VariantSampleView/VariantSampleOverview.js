@@ -111,7 +111,7 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     render(){
-        const { context = null, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const { context = null, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext } = this.props;
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
 
@@ -124,7 +124,7 @@ export class VariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <InterpretationController {...passProps} interpretationTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} {...{ showInterpretation, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen }}>
+                <InterpretationController {...passProps} interpretationTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} {...{ showInterpretation, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext }}>
                     <VariantSampleInfoHeader {...passProps} onSelectTranscript={this.onSelectTranscript} />
                     <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
                 </InterpretationController>
@@ -345,9 +345,11 @@ class InterpretationController extends React.Component {
 
     render() {
         const { showACMGInvoker, globalACMGSelections, autoClassification } = this.state;
-        const { context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
-        const passProps = { context, schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
+        const { newContext, context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const passProps = { schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
 
+        // Pulling actions and checking for note errors with old context (actions are not pulled in via embed api currently)
+        const { actions = [] } = context;
         const {
             interpretation: { error: interpError = null, acmg_guidelines = [] } = {},
             variant_notes: { error: varNoteError = null } = {},
@@ -359,9 +361,11 @@ class InterpretationController extends React.Component {
 
         const wipACMGSelections = this.memoized.flattenGlobalACMGStateIntoArray(globalACMGSelections);
 
+        const showInterpretationSpace = showInterpretation == 'True' && !anyNotePermErrors && newContext;
+
         return (
             <React.Fragment>
-                <Collapse in={showACMGInvoker}>
+                <Collapse in={showACMGInvoker && newContext}>
                     <div>{/** Collapse seems not to work without wrapper element */}
                         <ACMGInvoker invokedFromSavedNote={acmg_guidelines} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} />
                     </div>
@@ -371,9 +375,9 @@ class InterpretationController extends React.Component {
                         {/* Annotation Space passed as child */}
                         { children }
                     </div>
-                    { showInterpretation == 'True' && !anyNotePermErrors ?
+                    { showInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...{ autoClassification }} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
+                            <InterpretationSpaceWrapper {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
                         </div> : null }
                 </div>
             </React.Fragment>

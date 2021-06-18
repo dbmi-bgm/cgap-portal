@@ -386,8 +386,7 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip, discovery_interpretation_wip } = this.state;
-        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation } = this.props;
-        const { actions = [] } = context || {};
+        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation, actions } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
 
