@@ -1300,7 +1300,7 @@
                     "label": "ultra-rare"
                 },
                 {
-                    "from": 0.001,
+                    "from": 0,
                     "to": 0.01,
                     "label": "rare"
                 },
@@ -1329,7 +1329,7 @@
                     "label": "ultra-rare"
                 },
                 {
-                    "from": 0.001,
+                    "from": 0,
                     "to": 0.01,
                     "label": "rare"
                 },
@@ -1354,6 +1354,26 @@
             "order": 21,
             "grouping": "Pop. Frequency (gnomAD v3)"
         },
+        "variant.csq_gnomadg_ac-xy": {
+            "title": "Hemizygous Count (v3)",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 22,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0
+                },
+                {
+                    "from": 1,
+                    "to": 5
+                },
+                {
+                    "from": 6
+                }
+            ],
+            "grouping": "Pop. Frequency (gnomAD v3)"
+        },
         "variant.csq_gnomade2_af": {
             "title": "Alt Allele Frequency (v2)",
             "aggregation_type": "range",
@@ -1372,7 +1392,7 @@
                     "label": "ultra-rare"
                 },
                 {
-                    "from": 0.001,
+                    "from": 0,
                     "to": 0.01,
                     "label": "rare"
                 },
@@ -1401,7 +1421,7 @@
                     "label": "ultra-rare"
                 },
                 {
-                    "from": 0.001,
+                    "from": 0,
                     "to": 0.01,
                     "label": "rare"
                 },
@@ -1424,6 +1444,26 @@
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 33,
+            "grouping": "Pop. Frequency (gnomAD v2 exome)"
+        },
+        "variant.csq_gnomade2_ac-xy": {
+            "title": "Hemizygous Count (v2)",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 34,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0
+                },
+                {
+                    "from": 1,
+                    "to": 5
+                },
+                {
+                    "from": 6
+                }
+            ],
             "grouping": "Pop. Frequency (gnomAD v2 exome)"
         },
         "variant.csq_phylop100way_vertebrate": {
