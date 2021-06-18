@@ -101,7 +101,7 @@ function VariantSampleSelection({ selection, index, caseAccession, schemas }){
                         <div className="flex-grow-1  d-sm-block">
                             &nbsp;
                         </div>
-                        <div className="flex-auto text-small" data-tip="Date Selected">
+                        <div className="flex-auto align-self-center text-small" data-tip="Date Selected">
                             <i className="icon icon-calendar far mr-07"/>
                             <LocalizedTime timestamp={date_selected} />
                         </div>
