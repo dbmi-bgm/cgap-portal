@@ -184,13 +184,27 @@ deploy-docker-local:
 deploy-docker-local-daemon:
 	docker-compose up -d -V
 
+ENV_NAME ?= cgap-mastertest
+AWS_ACCOUNT ?= 645819926742
+
 ecr-login:
-	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 645819926742.dkr.ecr.us-east-1.amazonaws.com
+	@echo "Making ecr-login AWS_ACCOUNT=${AWS_ACCOUNT} ..."
+	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com
+
+rebuild-docker-production:
+	@echo "Remaking build-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
+	docker build -t ${ENV_NAME}:latest . --no-cache
+	make tag-and-push-docker-production
 
 build-docker-production:
-	docker build -t cgap-mastertest:latest .
-	docker tag cgap-mastertest:latest 645819926742.dkr.ecr.us-east-1.amazonaws.com/cgap-mastertest:latest
-	docker push 645819926742.dkr.ecr.us-east-1.amazonaws.com/cgap-mastertest:latest
+	@echo "Making build-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
+	docker build -t ${ENV_NAME}:latest .
+	make tag-and-push-docker-production
+
+tag-and-push-docker-production:
+	@echo "Making tag-and-push-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
+	docker tag ${ENV_NAME}:latest ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/${ENV_NAME}:latest
+	docker push ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/${ENV_NAME}:latest
 
 help:
 	@make info
