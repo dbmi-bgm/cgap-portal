@@ -57,8 +57,11 @@ def generate_access_key(testapp, env, user_uuid, description):
     Returns:
         dict: access key contents with server
     """
-    server = get_ecs_real_url(env)  # try to grab from Cfn, if we are ECS env
-    if not server:  # fallback if we are a beanstalk
+    try:
+        server = get_ecs_real_url(env)  # try to grab from Cfn, if we are ECS env
+    except Exception:
+        server = get_beanstalk_real_url(env)
+    if not server:
         server = get_beanstalk_real_url(env)
     access_key_req = {'user': user_uuid, 'description': description}
     res = testapp.post_json('/access_key', access_key_req).json
