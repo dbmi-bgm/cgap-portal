@@ -345,7 +345,7 @@ class InterpretationController extends React.Component {
 
     render() {
         const { showACMGInvoker, globalACMGSelections, autoClassification } = this.state;
-        const { newContext, context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const { newVSLoading, newContext, context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const passProps = { schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
 
         // Pulling actions and checking for note errors with old context (actions are not pulled in via embed api currently)
@@ -362,6 +362,7 @@ class InterpretationController extends React.Component {
         const wipACMGSelections = this.memoized.flattenGlobalACMGStateIntoArray(globalACMGSelections);
 
         const showInterpretationSpace = showInterpretation == 'True' && !anyNotePermErrors && newContext;
+        const showFallbackInterpretationSpace = showInterpretation == 'True' && !anyNotePermErrors && !newContext && !newVSLoading;
 
         return (
             <React.Fragment>
@@ -378,6 +379,10 @@ class InterpretationController extends React.Component {
                     { showInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
                             <InterpretationSpaceWrapper {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
+                        </div> : null }
+                    { showFallbackInterpretationSpace ?
+                        <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
+                            <InterpretationSpaceWrapper isFallback {...{ autoClassification, actions, context }} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
                         </div> : null }
                 </div>
             </React.Fragment>

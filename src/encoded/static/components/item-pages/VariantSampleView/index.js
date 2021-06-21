@@ -73,9 +73,10 @@ class OverviewTabView extends React.Component {
 
                 if (!atID) {
                     Alerts.queue({
-                        title: "Some information may be out of date.",
+                        title: "Error: Some information may be out of date.",
                         style: "warning",
-                        message: "Could not retrieve the most recent version of this variant and it's notes. Refresh before making changes to ensure all edits are preserved." });
+                        message: "Could not retrieve the most recent version of this variant and its notes due to a server error. Please try refreshing the page in a few minutes."
+                    });
                 }
 
                 this.setState({ newVSLoading: false, newestVariantSample: resp[0] });
@@ -91,7 +92,7 @@ class OverviewTabView extends React.Component {
     }
 
     render() {
-        const { newestVariantSample = null } = this.state;
+        const { newestVariantSample = null, newVSLoading } = this.state;
         return (
             <div>
                 <h3 className="tab-section-title container-wide">
@@ -99,7 +100,7 @@ class OverviewTabView extends React.Component {
                 </h3>
                 <hr className="tab-section-title-horiz-divider"/>
                 <div className="container-wide bg-light py-3 mh-inner-tab-height-full">
-                    <VariantSampleOverview {...this.props} newContext={newestVariantSample} />
+                    <VariantSampleOverview {...this.props} newContext={newestVariantSample} {...{ newVSLoading }} />
                 </div>
             </div>
         );
