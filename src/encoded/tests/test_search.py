@@ -1298,7 +1298,7 @@ class TestSearchBucketRangeFacets:
         return result
 
     @pytest.mark.parametrize('expected_fields, expected_counts', [
-        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 5),
+        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 4),
         (['array_of_objects_that_holds_integer.embedded_integer'], 9)
     ])
     def test_search_bucket_range_simple(self, workbook, es_testapp, bucket_range_data, expected_fields, expected_counts):
