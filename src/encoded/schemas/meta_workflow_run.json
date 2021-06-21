@@ -226,7 +226,8 @@
                 "pending",
                 "running",
                 "completed",
-                "failed"
+                "failed",
+                "inactive"
             ]
         },
         "common_fields": {
