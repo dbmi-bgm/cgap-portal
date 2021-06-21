@@ -7,8 +7,7 @@
     "required": [
         "meta_workflow",
         "project",
-        "institution",
-        "final_status"
+        "institution"
     ],
     "additionalProperties": false,
     "identifyingProperties": [
@@ -226,7 +225,7 @@
             "enum": [
                 "pending",
                 "running",
-                "complete",
+                "completed",
                 "failed"
             ]
         },
