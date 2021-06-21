@@ -453,7 +453,7 @@ class Case(Item):
                     if relation in included_relations:
                         relation = relation.replace(' ', '_').replace('-', '_')
                         fields.append(f'associated_genotype_labels.{relation}_genotype_label')
-            else:
+            elif analysis_type in ['WGS', 'WES']:  # proband-only analysis types 
                 fields.append('proband_only_inheritance_modes')
         return fields
 
