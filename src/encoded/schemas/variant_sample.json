@@ -1236,6 +1236,7 @@
             "extended_description": "src/encoded/docs/extended_description_VariantSample_inheritance_mode.html",
             "order": 15,
             "grouping": "Inheritance",
+            "default_hidden": true,
             "rescue_terms": [
                 "de novo (strong)",
                 "de novo (medium)",
@@ -1261,6 +1262,20 @@
                 "Low relevance, missing call(s) in family",
                 "Low relevance, mismatching chrXY genotype(s)",
                 "Low relevance, other"
+            ]
+        },
+        "proband_only_inheritance_modes": {
+            "title": "Inheritance Modes",
+            "extended_description": "src/encoded/docs/extended_description_VariantSample_inheritance_mode_probandonly.html",
+            "order": 15,
+            "grouping": "Inheritance",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Compound Het (Unphased/strong_pair)",
+                "Compound Het (Unphased/medium_pair)",
+                "Compound Het (Unphased/weak_pair)",
+                "X-linked",
+                "Y-linked"
             ]
         },
         "novoPP": {

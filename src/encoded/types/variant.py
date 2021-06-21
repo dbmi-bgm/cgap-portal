@@ -270,7 +270,9 @@ class VariantSample(Item):
             InheritanceMode.INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER: 15,  # X-linked recessive (Maternal)
             InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER: 16,  # X-linked dominant (Maternal)
             InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER: 17,  # X-linked dominant (Paternal)
+            'X-linked': 17,
             InheritanceMode.INHMODE_LABEL_Y_LINKED: 18,  # Y-linked dominant
+            'Y-linked': 18,
             InheritanceMode.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT: 19,  # Low relevance, homozygous in a parent
             InheritanceMode.INHMODE_LABEL_NONE_MN: 20,  # Low relevance, multiallelic site family
             InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 21,  # Low relevance, present in both parent(s)
@@ -361,6 +363,28 @@ class VariantSample(Item):
                 return 0.0
             return round(int(alt) / (int(ref) + int(alt)), 3)  # round to 3 digits
         return 0.0
+
+    @calculated_property(schema={
+        "title": "proband_only_inheritance_modes",
+        "description": "Inheritance Modes (only including those relevant to a proband-only analysis)",
+        "type": "array",
+        "items": {
+            "type": "string"
+        }
+    })
+    def proband_only_inheritance_modes(self, request, variant, inheritance_modes=[]):
+        proband_mode_options = [
+            'Compound Het (Unphased/strong_pair)',
+            'Compound Het (Unphased/medium_pair)',
+            'Compound Het (Unphased/weak_pair)'
+        ]
+        proband_modes = [item for item in inheritance_modes if item in proband_mode_options]
+        variant = get_item_or_none(request, variant, 'Variant', frame='raw')
+        if variant['CHROM'] in ['X', 'Y']:
+            proband_modes.append(f"{variant['CHROM']}-linked")
+        if proband_modes:
+            return proband_modes
+        return None
 
     @calculated_property(schema={
         "title": "bam_snapshot",
