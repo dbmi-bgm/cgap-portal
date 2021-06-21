@@ -199,6 +199,7 @@ const DetailText = React.memo(function DetailText (props) {
         // Eventually could have more stuff here, maybe have `showNotes` be enum of various opts to display.. idk.
         let diseasesRows = diseases.map(function(disease, i){
             return (
+                // Include bullet point inside text to minimize empty width
                 <li className="line-item" key={"d-" + i} data-describing="disease">
                     { disease }
                 </li>
