@@ -7,6 +7,7 @@ import boto3
 from pyramid.paster import get_app
 from webtest import AppError
 from dcicutils.misc_utils import TestApp
+from dcicutils.beanstalk_utils import get_beanstalk_real_url
 from dcicutils.cloudformation_utils import get_ecs_real_url
 from dcicutils.secrets_utils import assume_identity
 
@@ -56,7 +57,9 @@ def generate_access_key(testapp, env, user_uuid, description):
     Returns:
         dict: access key contents with server
     """
-    server = get_ecs_real_url(env)  # INCOMPATIBLE CHANGE; will break beanstalk -Will 5/6/21
+    server = get_ecs_real_url(env)  # try to grab from Cfn, if we are ECS env
+    if not server:  # fallback if we are a beanstalk
+        server = get_beanstalk_real_url(env)
     access_key_req = {'user': user_uuid, 'description': description}
     res = testapp.post_json('/access_key', access_key_req).json
     return {'secret': res['secret_access_key'],
@@ -121,7 +124,7 @@ def main():
                    ('foursight.app@gmail.com', 'access_key_foursight')]
     for email, key_name in to_generate:
         try:
-            user_props = testapp.get('/users/%s?datastore=database' % (email)).follow().json
+            user_props = testapp.get('/users/%s?datastore=database' % email).follow().json
         except Exception as exc:
             log.error('load_access_keys: could not get user %s. Exception: %s' % (email, exc))
             continue
