@@ -152,7 +152,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                     <div className="flex-auto">
 
                         { parentTabType === parentTabTypes.FINALIZECASE ?
-                            <button type="button" className="btn btn-sm btn-primary" onClick={toggleIsExpanded}>
+                            <button type="button" className="btn btn-sm btn-primary" onClick={toggleIsExpanded} disabled={noSavedNotes}>
                                 <i className={"icon fas mr-07 icon-" + (!isExpanded ? "plus" : "minus")} />
                                 { !isExpanded ? "Review Variant Notes & Classification" : "Hide Variant Notes & Classification" }
                             </button>

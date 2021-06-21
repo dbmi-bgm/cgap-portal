@@ -31,19 +31,37 @@ export const variantSampleColumnExtensionMap = {
     "associated_genotype_labels.proband_genotype_label" : {
         widthMap: { 'lg' : 240, 'md' : 230, 'sm' : 200 },
         render: function(result, props) {
-            const { align = "center" } = props;
+            const { align = "left" } = props;
             const { associated_genotype_labels : { proband_genotype_label = null, mother_genotype_label = null, father_genotype_label = null } = {} } = result;
             const rows = [];
             if (proband_genotype_label) {
-                rows.push(<div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{proband_genotype_label}</div>);
+                rows.push(
+                    // rows.push(<div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{proband_genotype_label}</div>);
+                    <div key="proband_gt" className="d-block text-truncate">
+                        <i className="icon icon-user icon-fw fas mr-04" data-tip="Proband Genotype"/>
+                        { proband_genotype_label }
+                    </div>
+                );
             } else {
                 return null;
             }
             if (mother_genotype_label) {
-                rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{mother_genotype_label || "-"}</div>);
+                // rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{mother_genotype_label || "-"}</div>);
+                rows.push(
+                    <div key="mother_gt" className="d-block text-truncate">
+                        <i className="icon icon-venus icon-fw fas mr-04" data-tip="Mother Genotype"/>
+                        { mother_genotype_label || "-" }
+                    </div>
+                );
             }
             if (father_genotype_label) {
-                rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
+                // rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
+                rows.push(
+                    <div key="father_gt" className="d-block text-truncate">
+                        <i className="icon icon-mars icon-fw fas mr-04" data-tip="Father Genotype"/>
+                        { father_genotype_label || "-" }
+                    </div>
+                );
             }
             return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
         }
