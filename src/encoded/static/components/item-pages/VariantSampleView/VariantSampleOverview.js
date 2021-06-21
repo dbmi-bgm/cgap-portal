@@ -63,7 +63,6 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     componentDidMount(){
-        layout.animateScrollTo(0,0);
         this.loadGene();
     }
 
