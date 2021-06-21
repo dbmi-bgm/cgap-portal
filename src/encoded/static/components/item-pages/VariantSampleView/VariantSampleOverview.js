@@ -392,7 +392,7 @@ function ACMGInvoker(props) {
     return (
         <div className="card flex-row my-3 mt-0">
             <div className="text-600 acmg-guidelines-title">ACMG Rules
-                <QuickPopover cls="p-1" popID="acmg-info-popover" title="Note on ACMG Tooltips and Auto-Classification" content={
+                <QuickPopover className="p-1" popID="acmg-info-popover" title="Note on ACMG Tooltips and Auto-Classification" content={
                     <div>
                         <div className="mb-05">
                             The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS" target="_blank" rel="noreferrer">this publication</a>.
@@ -419,7 +419,7 @@ function ACMGInvoker(props) {
 }
 
 function QuickPopover(props) {
-    const { title, content, cls, popID, tooltip } = props || {};
+    const { title, content, className, popID, tooltip } = props || {};
     const popover = (
         <Popover id={popID}>
             <Popover.Title className="m-0" as="h4">{title}</Popover.Title>
@@ -428,13 +428,16 @@ function QuickPopover(props) {
             </Popover.Content>
         </Popover>
     );
+    const cls = "btn btn-link" + (className ? " " + className : "");
     return (
         <OverlayTrigger trigger="focus" placement="right" overlay={popover}>
-            {({ ref, ...triggerHandler }) => (
-                <Button ref={ref} {...triggerHandler} variant="link" className={cls} data-tip={tooltip || "Click for citation info"}>
-                    <i className="icon icon-info-circle fas" />
-                </Button>
-            )}
+            { function({ ref, ...triggerHandlers }){
+                return (
+                    <button type="button" ref={ref} { ...triggerHandlers } className={cls} data-tip={tooltip || "Click for citation info"}>
+                        <i className="icon icon-info-circle fas" />
+                    </button>
+                );
+            }}
         </OverlayTrigger>
     );
 }
