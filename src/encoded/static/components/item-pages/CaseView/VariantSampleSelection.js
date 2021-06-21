@@ -31,7 +31,12 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         schemas,
         context,
         isLoadingVariantSampleListItem = false,
-        parentTabType = parentTabTypes.INTERPRETATION
+        parentTabType = parentTabTypes.INTERPRETATION,
+        // From FinalizeCaseDataStore (if used):
+        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToReportStoreItems,
+        sendToKnowledgeBaseStore,
+        sendToReportStore
     } = props;
     const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
 
@@ -46,9 +51,16 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
             <h4 className="text-400">No selections added yet</h4>
         );
     } else {
+        const commonProps = {
+            schemas, context, parentTabType,
+            toggleSendToKnowledgeBaseStoreItems,
+            toggleSendToReportStoreItems,
+            sendToKnowledgeBaseStore,
+            sendToReportStore
+        };
         return vsSelections.map(function(selectionSubObject, idx){
             return (
-                <VariantSampleSelection {...{ schemas, context, parentTabType }}
+                <VariantSampleSelection {...commonProps}
                     selection={selectionSubObject} key={idx} index={idx} />
             );
         });
@@ -72,7 +84,12 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         index,
         context,    // Case
         schemas,
-        parentTabType = parentTabTypes.INTERPRETATION
+        parentTabType = parentTabTypes.INTERPRETATION,
+        // From FinalizeCaseDataStore (if used):
+        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToReportStoreItems,
+        sendToKnowledgeBaseStore,
+        sendToReportStore
     } = props;
     const { accession: caseAccession } = context; // `context` refers to our Case in here.
     const {
@@ -121,6 +138,17 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     const { classification: acmgClassification = null } = clinicalInterpretationNote || {};
     const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discoveryInterpretationNote || {};
 
+    let expandedNotesSection = null;
+    if (isExpanded) {
+        const noteSectionProps = {
+            "variantSample": variant_sample_item,
+            toggleSendToKnowledgeBaseStoreItems,
+            toggleSendToReportStoreItems,
+            sendToKnowledgeBaseStore,
+            sendToReportStore
+        };
+        expandedNotesSection = <VariantSampleExpandedNotes {...noteSectionProps} />;
+    }
 
     return (
         <div className="card mb-1 variant-sample-selection" key={index}>
@@ -235,9 +263,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                 </div>
             </div>
 
-            { isExpanded ?
-                <VariantSampleExpandedNotes variantSample={variant_sample_item} />
-                : null }
+            { expandedNotesSection }
 
         </div>
     );
@@ -254,7 +280,13 @@ const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicato
 
 
 function VariantSampleExpandedNotes (props) {
-    const { variantSample } = props;
+    const {
+        variantSample,
+        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToReportStoreItems,
+        sendToKnowledgeBaseStore,
+        sendToReportStore
+    } = props;
     const {
         interpretation: clinicalInterpretationNote = null,
         discovery_interpretation: discoveryInterpretationNote = null,
@@ -262,34 +294,107 @@ function VariantSampleExpandedNotes (props) {
         gene_notes: lastGeneNote = null, // = []
     } = variantSample;
 
-    const {
-        classification,
-        note_text: clinicalNoteText
-    } = clinicalInterpretationNote || {};
-    const {
-        variant_candidacy,
-        gene_candidacy,
-        note_text: discoveryNoteText
-    } = discoveryInterpretationNote || {};
+    const { classification } = clinicalInterpretationNote || {};
 
-    // const lastVariantNote = variant_notes[variant_notes.length - 1] || null;
-    // const lastGeneNote = gene_notes[gene_notes.length - 1] || null;
+    const { variant_candidacy, gene_candidacy } = discoveryInterpretationNote || {};
 
-    const { note_text: lastVariantNoteText } = lastVariantNote || {};
-    const { note_text: lastGeneNoteText } = lastGeneNote || {};
-
+    // TODO check for view permissions?
     const noVariantNotesSaved = lastVariantNote === null;
     const noGeneNotesSaved = lastGeneNote === null;
     const noDiscoveryNoteSaved = discoveryInterpretationNote === null;
     const noClinicalNoteSaved = clinicalInterpretationNote === null;
 
+    console.log("TTT",
+        lastVariantNote, noVariantNotesSaved,
+        lastGeneNote, noGeneNotesSaved,
+        discoveryInterpretationNote, noDiscoveryNoteSaved,
+        clinicalInterpretationNote, noClinicalNoteSaved,
+        sendToReportStore,
+        sendToKnowledgeBaseStore
+    );
+
+    const allNotesToReportSelected = (
+        (noVariantNotesSaved       || sendToReportStore[lastVariantNote.uuid])
+        && (noGeneNotesSaved       || sendToReportStore[lastGeneNote.uuid])
+        && (noDiscoveryNoteSaved   || sendToReportStore[discoveryInterpretationNote.uuid])
+        && (noClinicalNoteSaved    || sendToReportStore[clinicalInterpretationNote.uuid])
+    );
+
+    const someNotesToReportSelected = (
+        (!noVariantNotesSaved       && sendToReportStore[lastVariantNote.uuid])
+        || (!noGeneNotesSaved       && sendToReportStore[lastGeneNote.uuid])
+        || (!noDiscoveryNoteSaved   && sendToReportStore[discoveryInterpretationNote.uuid])
+        || (!noClinicalNoteSaved    && sendToReportStore[clinicalInterpretationNote.uuid])
+    );
+
+    const allNotesToKnowledgeBaseSelected = (
+        (noVariantNotesSaved       || sendToKnowledgeBaseStore[lastVariantNote.uuid])
+        && (noGeneNotesSaved       || sendToKnowledgeBaseStore[lastGeneNote.uuid])
+        && (noDiscoveryNoteSaved   || sendToKnowledgeBaseStore[discoveryInterpretationNote.uuid])
+        && (noClinicalNoteSaved    || sendToKnowledgeBaseStore[clinicalInterpretationNote.uuid])
+    );
+
+    const someNotesToKnowledgeBaseSelected = (
+        (!noVariantNotesSaved       && sendToKnowledgeBaseStore[lastVariantNote.uuid])
+        || (!noGeneNotesSaved       && sendToKnowledgeBaseStore[lastGeneNote.uuid])
+        || (!noDiscoveryNoteSaved   && sendToKnowledgeBaseStore[discoveryInterpretationNote.uuid])
+        || (!noClinicalNoteSaved    && sendToKnowledgeBaseStore[clinicalInterpretationNote.uuid])
+    );
+
+
+    /* Common logic for selecting report and knowledgebase notes */
+    function makeNoteSelectionObjects (useStore = sendToReportStore, allSelected = false) {
+        const noteSelectionObjects = [];
+        if (!noVariantNotesSaved) {
+            if (allSelected || !useStore[lastVariantNote.uuid]) {
+                // Add, will uncheck
+                noteSelectionObjects.push([ lastVariantNote.uuid, true ]);
+            }
+        }
+        if (!noGeneNotesSaved) {
+            if (allSelected || !useStore[lastGeneNote.uuid]) {
+                // Add, will uncheck
+                noteSelectionObjects.push([ lastGeneNote.uuid, true ]);
+            }
+        }
+        if (!noDiscoveryNoteSaved) {
+            if (allSelected || !useStore[discoveryInterpretationNote.uuid]) {
+                // Add, will uncheck
+                noteSelectionObjects.push([ discoveryInterpretationNote.uuid, true ]);
+            }
+        }
+        if (!noClinicalNoteSaved) {
+            if (allSelected || !useStore[clinicalInterpretationNote.uuid]) {
+                // Add, will uncheck
+                noteSelectionObjects.push([ clinicalInterpretationNote.uuid, true ]);
+            }
+        }
+        return noteSelectionObjects;
+    }
+
+    const onChangeSendAllNotesToReport = useCallback(function(e){
+        e.stopPropagation();
+        toggleSendToReportStoreItems(makeNoteSelectionObjects(sendToReportStore, allNotesToReportSelected));
+    }, [ sendToReportStore, allNotesToReportSelected ]);
+
+    const onChangeSendAllNotesToKnowledgeBase = useCallback(function(e){
+        e.stopPropagation();
+        toggleSendToKnowledgeBaseStoreItems(makeNoteSelectionObjects(sendToKnowledgeBaseStore, allNotesToKnowledgeBaseSelected));
+    }, [ sendToKnowledgeBaseStore, allNotesToKnowledgeBaseSelected ]);
+
     return (
         <React.Fragment>
             <div className="card-body bg-light select-checkboxes-section border-top border-bottom">
-                <Checkbox labelClassName="text-400 mb-08">
+                <Checkbox labelClassName="text-400 mb-08 no-highlight"
+                    checked={!!allNotesToReportSelected}
+                    onChange={onChangeSendAllNotesToReport}
+                    indeterminate={someNotesToReportSelected && !allNotesToReportSelected}>
                     Send All Notes to Report
                 </Checkbox>
-                <Checkbox labelClassName="text-400 mb-0">
+                <Checkbox labelClassName="text-400 mb-0 no-highlight"
+                    checked={!!allNotesToKnowledgeBaseSelected}
+                    onChange={onChangeSendAllNotesToKnowledgeBase}
+                    indeterminate={someNotesToKnowledgeBaseSelected && !allNotesToKnowledgeBaseSelected}>
                     Send All Notes to KnowledgeBase
                 </Checkbox>
             </div>
@@ -298,92 +403,117 @@ function VariantSampleExpandedNotes (props) {
 
                     <div className="col-12 col-md-6 col-lg-3 d-flex flex-column">
                         <h4 className="text-300 mt-2">Variant Notes</h4>
-                        <NoteCheckboxes />
 
                         { !noVariantNotesSaved ?
-                            <div className="note-content-area d-flex flex-column flex-grow-1">
-                                <div className="note-text-content flex-grow-1">
-                                    { lastVariantNoteText || <em>Note was left blank</em> }
+                            <React.Fragment>
+                                <NoteCheckboxes
+                                    reportChecked={!!sendToReportStore[lastVariantNote.uuid]}
+                                    kbChecked={!!sendToKnowledgeBaseStore[lastVariantNote.uuid]}
+                                    onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastVariantNote.uuid, true ] ]); })}
+                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ lastVariantNote.uuid, true ] ]); })} />
+                                <div className="note-content-area d-flex flex-column flex-grow-1">
+                                    <div className="note-text-content flex-grow-1">
+                                        { lastVariantNote.note_text || <em>Note was left blank</em> }
+                                    </div>
                                 </div>
-                            </div>
+                            </React.Fragment>
                             : <div className="text-center py-3"><em className="text-secondary">No Variant Notes Saved</em></div> }
 
                     </div>
 
                     <div className="col-12 col-md-6 col-lg-3 d-flex flex-column">
                         <h4 className="text-300 mt-2">Gene Notes</h4>
-                        <NoteCheckboxes />
 
                         { !noGeneNotesSaved ?
-                            <div className="note-content-area d-flex flex-column flex-grow-1">
-                                <div className="note-text-content flex-grow-1">
-                                    { lastGeneNoteText || <em>Note was left blank</em> }
+                            <React.Fragment>
+                                <NoteCheckboxes
+                                    reportChecked={!!sendToReportStore[lastGeneNote.uuid]}
+                                    kbChecked={!!sendToKnowledgeBaseStore[lastGeneNote.uuid]}
+                                    onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastGeneNote.uuid, true ] ]); })}
+                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ lastGeneNote.uuid, true ] ]); })} />
+                                <div className="note-content-area d-flex flex-column flex-grow-1">
+                                    <div className="note-text-content flex-grow-1">
+                                        { lastGeneNote.note_text || <em>Note was left blank</em> }
+                                    </div>
                                 </div>
-                            </div>
+                            </React.Fragment>
                             : <div className="text-center py-3"><em className="text-secondary">No Gene Notes Saved</em></div> }
 
                     </div>
 
                     <div className="col-12 col-md-6 col-lg-3 d-flex flex-column">
                         <h4 className="text-300 mt-2">ACMG Interpretation</h4>
-                        <NoteCheckboxes />
 
                         { !noClinicalNoteSaved ?
 
-                            <div className="note-content-area d-flex flex-column flex-grow-1">
-                                <div className="note-text-content flex-grow-1">
-                                    { clinicalNoteText || <em>Note was left blank</em> }
-                                </div>
+                            <React.Fragment>
+                                <NoteCheckboxes
+                                    reportChecked={!!sendToReportStore[clinicalInterpretationNote.uuid]}
+                                    kbChecked={!!sendToKnowledgeBaseStore[clinicalInterpretationNote.uuid]}
+                                    onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ clinicalInterpretationNote.uuid, true ] ]); })}
+                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ clinicalInterpretationNote.uuid, true ] ]); })} />
 
-                                <div className="clinical-classification flex-grow-0">
-                                    <label className="mb-0 mt-08">Classification</label>
-                                    <div>
-                                        { classification?
-                                            <React.Fragment>
-                                                <i className="status-indicator-dot ml-1 mr-1" data-status={classification} />{classification}
-                                            </React.Fragment>
-                                            : <em>None Defined</em> }
+                                <div className="note-content-area d-flex flex-column flex-grow-1">
+                                    <div className="note-text-content flex-grow-1">
+                                        { clinicalInterpretationNote.note_text || <em>Note was left blank</em> }
+                                    </div>
+
+                                    <div className="clinical-classification flex-grow-0">
+                                        <label className="mb-0 mt-08">Classification</label>
+                                        <div>
+                                            { classification?
+                                                <React.Fragment>
+                                                    <i className="status-indicator-dot ml-1 mr-1" data-status={classification} />{classification}
+                                                </React.Fragment>
+                                                : <em>None Defined</em> }
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </React.Fragment>
                             : <div className="text-center py-3"><em className="text-secondary">No Interpretation Note Saved</em></div> }
 
                     </div>
 
                     <div className="col-12 col-md-6 col-lg-3 d-flex flex-column">
                         <h4 className="text-300 mt-2">Gene Discovery</h4>
-                        <NoteCheckboxes />
 
                         { !noDiscoveryNoteSaved ?
 
-                            <div className="note-content-area d-flex flex-column flex-grow-1">
-                                <div className="note-text-content flex-grow-1">
-                                    { discoveryNoteText || <em className="text-secondary">Note was left blank</em> }
-                                </div>
+                            <React.Fragment>
+                                <NoteCheckboxes
+                                    reportChecked={!!sendToReportStore[discoveryInterpretationNote.uuid]}
+                                    kbChecked={!!sendToKnowledgeBaseStore[discoveryInterpretationNote.uuid]}
+                                    onReportChange={ useCallback(function(){ toggleSendToReportStoreItems([ [ discoveryInterpretationNote.uuid, true ] ]); }) }
+                                    onKBChange={ useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ discoveryInterpretationNote.uuid, true ] ]); }) } />
+                                <div className="note-content-area d-flex flex-column flex-grow-1">
+                                    <div className="note-text-content flex-grow-1">
+                                        { discoveryInterpretationNote.note_text || <em className="text-secondary">Note was left blank</em> }
+                                    </div>
 
-                                <div className="discovery-gene-candidacy flex-grow-0">
-                                    <label className="mb-0 mt-08">Gene Candidacy</label>
-                                    <div>
-                                        { gene_candidacy ?
-                                            <React.Fragment>
-                                                <i className="status-indicator-dot ml-1 mr-1" data-status={gene_candidacy} />{gene_candidacy}
-                                            </React.Fragment>
-                                            : <em>None Defined</em> }
+                                    <div className="discovery-gene-candidacy flex-grow-0">
+                                        <label className="mb-0 mt-08">Gene Candidacy</label>
+                                        <div>
+                                            { gene_candidacy ?
+                                                <React.Fragment>
+                                                    <i className="status-indicator-dot ml-1 mr-1" data-status={gene_candidacy} />{gene_candidacy}
+                                                </React.Fragment>
+                                                : <em>None Defined</em> }
+                                        </div>
+                                    </div>
+
+                                    <div className="discovery-variant-candidacy flex-grow-0">
+                                        <label className="mb-0 mt-08">Variant Candidacy</label>
+                                        <div>
+                                            { variant_candidacy ?
+                                                <React.Fragment>
+                                                    <i className="status-indicator-dot ml-1 mr-1" data-status={variant_candidacy} />{variant_candidacy}
+                                                </React.Fragment>
+                                                : <em>None Defined</em> }
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div className="discovery-variant-candidacy flex-grow-0">
-                                    <label className="mb-0 mt-08">Variant Candidacy</label>
-                                    <div>
-                                        { variant_candidacy ?
-                                            <React.Fragment>
-                                                <i className="status-indicator-dot ml-1 mr-1" data-status={variant_candidacy} />{variant_candidacy}
-                                            </React.Fragment>
-                                            : <em>None Defined</em> }
-                                    </div>
-                                </div>
-                            </div>
-                            : <div className="text-center py-3"><em>No Gene Discovery Note Saved</em></div> }
+                            </React.Fragment>
+                            : <div className="text-center py-3"><em className="text-secondary">No Gene Discovery Note Saved</em></div> }
 
                     </div>
                 </div>
@@ -413,22 +543,51 @@ const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onK
 
 
 
-class FinalizeCaseDataStore extends React.PureComponent {
+export class FinalizeCaseDataStore extends React.PureComponent {
 
     constructor(props) {
         super(props);
 
+        this.toggleSendToKnowledgeBaseStoreItems = this.toggleStoreItems.bind(this, "sendToKnowledgeBaseStore");
+        this.toggleSendToReportStoreItems = this.toggleStoreItems.bind(this, "sendToReportStore");
+
         this.state = {
-            sendToKnowledgeBase: {},
-            sendToReport: {}
+            // Keyed by note ID and value will contain { noteItem, vslItem } (references)
+            sendToKnowledgeBaseStore: {},
+            sendToReportStore: {}
         };
     }
 
+    toggleStoreItems(storeName, noteSelectionObjects){
+        this.setState(function(currState){
+            const nextStore = { ...currState[storeName] };
+            noteSelectionObjects.forEach(function([ id, data ]){
+                if (nextStore[id]) {
+                    delete nextStore[id];
+                } else {
+                    nextStore[id] = data;
+                }
+            });
+            return { [storeName] : nextStore };
+        });
+    }
+
     render(){
-        const { children, ...passProps } = this.props;
+        const {
+            props: { children, ...passProps },
+            state,
+            toggleSendToKnowledgeBaseStoreItems,
+            toggleSendToReportStoreItems
+        } = this;
+        const childProps = {
+            ...passProps,
+            ...state,
+            toggleSendToKnowledgeBaseStoreItems,
+            toggleSendToReportStoreItems
+        };
         return React.Children.map(children, function(c){
             if (React.isValidElement(c)) {
-                return React.cloneElement(c, { ...passProps });
+                return React.cloneElement(c, childProps);
             }
             return c;
         });
@@ -443,7 +602,7 @@ class FinalizeCaseDataStore extends React.PureComponent {
 
 
 
-function ProjectWideSelectionsPanel () {
+function CaseSpecificSelectionsPanel () {
 
 }
 
