@@ -931,7 +931,7 @@ export default class App extends React.PureComponent {
                         // If is explicit 404 (vs just 0 search results), pyramid will send it as 'code' property.
                         analytics.exception('Page Not Found - ' + targetHref);
                     }
-                }).then(()=>{
+                }).then(function(){
                     if (!options.replace && !options.dontScrollToTop) {
                         App.scrollTo();
                     }

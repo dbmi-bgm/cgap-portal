@@ -752,12 +752,13 @@ i.status-indicator-dot {
 .acmg-guidelines-title {
 	padding: 5px 5px 5px 15px;
     min-width: 135px;
-    align-self: center;
+	align-self: center;
 }
 
 .acmg-guidelines-invoker {
 	width: calc(100% - 145px);
-    overflow-x: scroll;
+    overflow-x: auto;
+	height: 50px;
 }
 
 
