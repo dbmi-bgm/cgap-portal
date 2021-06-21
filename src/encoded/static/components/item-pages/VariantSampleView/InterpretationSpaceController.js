@@ -386,7 +386,7 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip, discovery_interpretation_wip } = this.state;
-        const { lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation, actions } = this.props;
+        const { isFallback, lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation, actions } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
 
@@ -407,7 +407,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission, isFallback }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
@@ -415,7 +415,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission, isFallback }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
@@ -423,7 +423,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} wipACMGSelections={wipACMGSelections}
                     lastWIPNote={interpretationWIP} lastSavedNote={lastSavedInterpretation} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission, autoClassification, toggleInvocation }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission, autoClassification, toggleInvocation, isFallback }}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
@@ -431,7 +431,7 @@ export class InterpretationSpaceController extends React.Component {
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
                     key={3} saveToField="discovery_interpretation" noteType="note_discovery" { ...passProps }
-                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission }}
+                    memoizedHasNoteChanged={this.memoized.hasNoteChanged} {...{ hasEditPermission, isFallback }}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
                 );
                 break;
@@ -560,7 +560,7 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     render() {
-        const { lastSavedNote = null, wipACMGSelections, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource, hasEditPermission, autoClassification, toggleInvocation } = this.props;
+        const { lastSavedNote = null, wipACMGSelections, noteLabel, noteType, schemas, memoizedHasNoteChanged, caseSource, hasEditPermission, autoClassification, toggleInvocation, isFallback } = this.props;
         const {
             status: savedNoteStatus,
             last_modified: lastModified = null
@@ -594,15 +594,15 @@ class GenericInterpretationPanel extends React.Component {
                 { (lastModUsernameFromNew || lastModUsername) ?
                     <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsernameFromNew || lastModUsername} </div>
                     : null}
-                <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
+                <AutoGrowTextArea {...{ isFallback }} cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
-                    <GenericFieldForm fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_guidelines', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    <GenericFieldForm {...{ isFallback }} fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_guidelines', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
                 { noteType === "note_discovery" ?
                     <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
-                        {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                        {...{ schemas, noteType, isFallback }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
-                <GenericInterpretationSubmitButton {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteType }}
+                <GenericInterpretationSubmitButton {...{ hasEditPermission, isFallback, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteType }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
@@ -619,11 +619,12 @@ class GenericInterpretationPanel extends React.Component {
  * Currently only used for classification, but can be used in future for variant/gene candidacy dropdowns (and maybe as a stopgap for ACMG).
  */
 function NoteFieldDrop(props) {
-    const { value = null, schemas = null, field = null, noteType = null, onOptionChange, cls="mb-1", getFieldProperties } = props;
+    const { isFallback, value = null, schemas = null, field = null, noteType = null, onOptionChange, cls="mb-1", getFieldProperties } = props;
     if (!schemas) {
         return null;
     }
 
+    const disableInputs = isFallback; // Made its own variable in case we add perm checks in future
     const fieldSchema = getFieldProperties(field);
 
     const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
@@ -644,13 +645,13 @@ function NoteFieldDrop(props) {
             </label>
             <div className="w-100 d-flex note-field-drop">
                 <Dropdown as={ButtonGroup} className={cls}>
-                    <Dropdown.Toggle variant="outline-secondary text-left" id="dropdown-basic">
+                    <Dropdown.Toggle disabled={disableInputs} variant="outline-secondary text-left" id="dropdown-basic">
                         { value ? <><i className="status-indicator-dot ml-1 mr-07" data-status={value} /> { value }</> : "Select an option..."}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
                 </Dropdown>
                 { value ?
-                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => onOptionChange(field, null)}>
+                    <Button disabled={disableInputs} variant="danger" className={cls + ' ml-03'} onClick={() => onOptionChange(field, null)}>
                         <i className="icon icon-trash-alt fas" />
                     </Button>
                     : null}
@@ -735,15 +736,18 @@ class AutoGrowTextArea extends React.Component {
     }
 
     render() {
-        const { text, cls, minHeight, maxHeight } = this.props;
+        const { text, cls, minHeight, maxHeight, isFallback } = this.props;
         const { textAreaHeight, parentHeight } = this.state;
+
+        const disableField = isFallback;
+
         return (
             <div style={{
                 minHeight: parentHeight > maxHeight ? maxHeight: parentHeight,
                 // height: parentHeight
             }} className={cls}>
                 <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: textAreaHeight > maxHeight ? maxHeight: textAreaHeight, resize: "none" }} className="w-100"
-                    onChange={this.onChangeWrapper} placeholder="Required" />
+                    onChange={this.onChangeWrapper} placeholder="Required" disabled={disableField} />
             </div>
         );
     }
@@ -767,7 +771,7 @@ function noteFieldNameToSchemaFormatted(field) {
 
 /** Displays additional form fields for ACMG Interpretation and Discovery */
 function GenericFieldForm(props) {
-    const { fieldsArr = [], schemas, onDropOptionChange, noteType } = props;
+    const { fieldsArr = [], schemas, onDropOptionChange, noteType, isFallback } = props;
 
     if (!schemas) {
         return (
@@ -790,8 +794,8 @@ function GenericFieldForm(props) {
     const fieldsJSX = useMemo(function() {
         return fieldsArr.map((fieldDataObj) => {
             const { field, value, autoClassification, toggleInvocation } = fieldDataObj;
-            if (field === "acmg_guidelines") { return (<ACMGPicker key={field} selections={value} {...{ schemas, field, autoClassification, toggleInvocation, getFieldProperties }}/>); }
-            return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field, getFieldProperties }}
+            if (field === "acmg_guidelines") { return (<ACMGPicker key={field} selections={value} {...{ schemas, field, autoClassification, toggleInvocation, getFieldProperties, isFallback }}/>); }
+            return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field, getFieldProperties, isFallback }}
                 onOptionChange={onDropOptionChange} />);
         }).sort().reverse(); // Reverse really just to get Variant candidacy to show up last. May need a better solution if more fields added in future.
     }, [ schemas, noteType, fieldsArr ]);
@@ -803,7 +807,7 @@ function GenericFieldForm(props) {
 }
 
 function ACMGPicker(props) {
-    const { field, selections = [], schemas = null, onOptionChange, cls="mb-1", getFieldProperties, autoClassification, toggleInvocation } = props;
+    const { field, selections = [], schemas = null, onOptionChange, cls="mb-1", getFieldProperties, autoClassification, toggleInvocation, isFallback } = props;
     if (!schemas) {
         return null;
     }
@@ -811,10 +815,9 @@ function ACMGPicker(props) {
     const fieldSchema = getFieldProperties(field);
     const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
 
-
     const picked = selections.map((selection, i) => (
-        <div className={`acmg-invoker text-600 clickable text-monospace text-center mr-01 ml-01`} key={selection} data-criteria={selection} data-invoked={true}
-            data-tip="Click to deselect this rule" onClick={() => toggleInvocation(selection)}>
+        <div className={`acmg-invoker text-600 ${isFallback ? "unclickable" : "clickable"} text-monospace text-center mr-01 ml-01`} key={selection} data-criteria={selection} data-invoked={true}
+            data-tip={!isFallback ? "Click to deselect this rule": null} onClick={!isFallback ? () => toggleInvocation(selection): undefined}>
             { selection }
         </div>
     ));
@@ -864,15 +867,17 @@ function GenericInterpretationSubmitButton(props) {
         noteTextPresent,            // Is there text in the note space?
         noteChangedSinceLastSave,   // Has the text in the note space changed since last save?
         saveAsDraft,                // Fx -- save as Draft
-        cls,
-        hasEditPermission,
-        noteType
+        cls,                        // Classes to apply to the button
+        hasEditPermission,          // Derived from actions
+        noteType,                   // "note_interpretation", "note_discovery", etc.
+        isFallback                  // Determined on render in VariantSampleOverview - is this using embed api "newContext" or context as fallback
     } = props;
 
-    const allButtonsDropsDisabled = !noteTextPresent || !noteChangedSinceLastSave;
+    const allButtonsDropsDisabled = !noteTextPresent || !noteChangedSinceLastSave || isFallback;
 
-    const dataTip = !hasEditPermission ? "You must be added to the project to submit a note for this item." :
-        !noteTextPresent ? getTooltipPerNoteType(noteType) : null;
+    const dataTip = isFallback ? "Unable to retrieve most recent version of this note. Reload the page to try again.":
+        !hasEditPermission ? "You must be added to the project to submit a note for this item." :
+            !noteTextPresent ? getTooltipPerNoteType(noteType) : null;
 
     if (isCurrent || isApproved || !hasEditPermission) {
         // No further steps allowed; saved to knowledgebase or approved to case
