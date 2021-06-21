@@ -1299,7 +1299,7 @@ class TestSearchBucketRangeFacets:
 
     @pytest.mark.parametrize('expected_fields, expected_counts', [
         (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 5),
-        (['array_of_objects_that_holds_integer.embedded_integer'], 10)
+        (['array_of_objects_that_holds_integer.embedded_integer'], 9)
     ])
     def test_search_bucket_range_simple(self, workbook, es_testapp, bucket_range_data, expected_fields, expected_counts):
         """ Tests searching a collection of documents with varying integer field types that
@@ -1316,7 +1316,7 @@ class TestSearchBucketRangeFacets:
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
                           '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
         self.verify_facet_counts(res, ['array_of_objects_that_holds_integer.embedded_integer'],
-                                 2, 10)
+                                 2, 9)
 
     @pytest.mark.parametrize('identifier', [
         'reverse', 'forward'
@@ -1327,7 +1327,7 @@ class TestSearchBucketRangeFacets:
                           '&array_of_objects_that_holds_integer.embedded_integer.from=6'
                           '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
         self.verify_facet_counts(res, ['array_of_objects_that_holds_integer.embedded_integer'],
-                                 2, 10)
+                                 2, 9)
         facet_with_labels = self.select_facet(res, 'array_of_objects_that_holds_integer.embedded_integer')
         for r in facet_with_labels['ranges']:
             assert 'label' in r

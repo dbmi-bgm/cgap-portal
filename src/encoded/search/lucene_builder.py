@@ -472,6 +472,8 @@ class LuceneBuilder:
                                 range_filters[query_field][range_direction] = term
 
                 # Check if schema requests no value
+                if 'items' in field_schema:  # we are searching on an array of numerics
+                    field_schema = field_schema['items']
                 if field_schema.get('add_no_value', False):
                     range_filters[query_field]['add_no_value'] = True
 
