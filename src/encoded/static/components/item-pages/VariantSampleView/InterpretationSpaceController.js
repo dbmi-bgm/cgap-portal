@@ -542,10 +542,11 @@ class GenericInterpretationPanel extends React.Component {
 
     // Wrapping passed in functions so as to call them with this component's state, then pass down to children
     saveStateAsDraft() {
-        const { saveAsDraft, noteType, saveToField, wipACMGSelections } = this.props;
+        const { saveAsDraft, retainWIPStateOnUnmount, noteType, saveToField, wipACMGSelections } = this.props;
         const stateToSave = { ...this.state };
         stateToSave.acmg_guidelines = wipACMGSelections;
         saveAsDraft(stateToSave, saveToField, noteType);
+        retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
     }
 
     componentWillUnmount() { // Before unmounting (as in switching tabs), save unsaved changes in controller state
