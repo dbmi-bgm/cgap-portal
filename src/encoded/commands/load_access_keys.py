@@ -108,8 +108,8 @@ def main():
     if args.secret_name is not None:
         identity = assume_identity()  # automatically detects GLOBAL_APPLICATION_CONFIGURATION
         encrypt_key = identity.get('S3_ENCRYPT_KEY', None)  # one of the secrets
-        if not encrypt_key:
-            encrypt_key = os.environ.get('S3_ENCRYPT_KEY')
+    if not encrypt_key:
+        encrypt_key = os.environ.get('S3_ENCRYPT_KEY')
 
     if not encrypt_key:
         raise RuntimeError('load_access_keys: must define S3_ENCRYPT_KEY in env or in GAC')
