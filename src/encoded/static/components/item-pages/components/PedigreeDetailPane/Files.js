@@ -84,7 +84,7 @@ function FileArrayField (props) {
             </ul>
             { haveEditPermission ?
                 <DragAndDropFileUploadController {...{ fieldDisplayTitle, fieldType, fieldName, individualId, project, institution, fileSchema, files }}
-                    award={null} lab={null} cls="btn btn-sm btn-outline-dark" />
+                    award={null} lab={null} cls="btn btn-sm btn-outline-dark" requireVerification />
                 : null }
         </div>
     );
