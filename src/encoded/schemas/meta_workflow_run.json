@@ -225,8 +225,9 @@
             "enum": [
                 "pending",
                 "running",
-                "complete",
-                "failed"
+                "completed",
+                "failed",
+                "inactive"
             ]
         },
         "common_fields": {
