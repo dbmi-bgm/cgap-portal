@@ -565,7 +565,13 @@ class GenericInterpretationPanel extends React.Component {
             status: savedNoteStatus,
             last_modified: lastModified = null
         } = lastSavedNote || {};
-        const { modified_by: { display_title : lastModUsername } = {}, date_modified = null } = lastModified || {};
+        const {
+            modified_by: {
+                display_title: lastModUsername,
+                title: lastModUsernameFromNew
+            } = {},
+            date_modified = null
+        } = lastModified || {};
         const { note_text: noteText, classification, gene_candidacy, variant_candidacy, conclusion } = this.state;
 
 
@@ -582,11 +588,11 @@ class GenericInterpretationPanel extends React.Component {
 
         return (
             <div className="interpretation-panel">
-                <label className={`w-100 ${lastModUsername ? "mb-0" : ""}`}>
+                <label className={`w-100 ${(lastModUsernameFromNew || lastModUsername) ? "mb-0" : ""}`}>
                     { noteLabel }
                 </label>
-                { lastModUsername ?
-                    <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsername} </div>
+                { (lastModUsernameFromNew || lastModUsername) ?
+                    <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsernameFromNew || lastModUsername} </div>
                     : null}
                 <AutoGrowTextArea cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
