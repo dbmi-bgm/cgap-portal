@@ -403,7 +403,7 @@ function ACMGInvoker(props) {
                     </div>
                 }/>
             </div>
-            <div className="d-flex acmg-guidelines-invoker align-items-center" style={{ height: "50px" }}>
+            <div className="d-flex acmg-guidelines-invoker align-items-center">
                 {acmgUtil.rules.map((rule) => {
                     const { [rule]: { description } = {} } = acmgUtil.metadata;
                     return (
