@@ -1,3 +1,4 @@
+import os
 from copy import (
     copy,
     deepcopy
@@ -129,8 +130,10 @@ def get_higlass_viewconf(context, request):
         }
 
     # We need absolute URLs for the BAM and GnomAD Worker
-    # XXX: this needs a workaround - Will 6/8/21
-    host_url = "http://c4ecstrialalphacgapmastertest-273357903.us-east-1.elb.amazonaws.com"
+    # XXX: this needs a better workaround - Will June 22 2021
+    host_url = 'localhost:6543'
+    if 'IDENTITY' in os.environ:  # detect use of global application configuration
+        host_url = "http://c4ecstrialalphacgapmastertest-273357903.us-east-1.elb.amazonaws.com"
     if request.registry.settings.get('env.name') == CGAP_ENV_WEBPROD:
         host_url = CGAP_PUBLIC_URL_PRD
     elif request.registry.settings.get('env.name') == CGAP_ENV_MASTERTEST:

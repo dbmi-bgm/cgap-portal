@@ -16,7 +16,7 @@ Welcome to CGAP! We are a team of scientists, clinicians, and developers who aim
 
 Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. For installation and more information on getting started, see our `documentation page <https://cgap-portal.readthedocs.io/en/latest/index.html>`_.
 
-Note that at this time, CGAP is operating in hybrid model where some environments are deployed to AWS ElasticBeanstalk and others are deployed to AWS Elastic Container Service. The BS deployments are considered legacy and the ECS deployments 
+Note that at this time, CGAP is operating in hybrid model where some environments are deployed to AWS ElasticBeanstalk and others are deployed to AWS Elastic Container Service. The BS deployments are referred to as "legacy deployments" and the ECS deployments are referred to as "alpha deployments".
 
 For information on how to run CGAP with Docker, see `here. <./docs/source/docker-local.rst>`_
 
@@ -28,9 +28,11 @@ Navigating this Repository
 Important directories/files are outlined below.
 
     * ``.github/workflows/`` contains Github Action Workflows
+    * ``.ebextensions/`` contains the Elastic Beanstalk provisioning scripts
     * ``bin/`` contains the few remaining executables
     * ``deploy/docker`` contains containerization related scripts/configuration
     * ``docs/ contains`` documentation
+    * ``parts/`` contains WSGI entry points for the Beanstalk setup
     * ``scripts/`` contains misc scripts
     * ``src/encoded/`` where the code is
     * ``.dockerignore`` specifies paths ignored by the Dockerfile

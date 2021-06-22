@@ -53,7 +53,7 @@ To access the running container::
 Alternative Configuration with Local ElasticSearch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-ElasticSearch is too compute intensive to virtualize on most machines. For this reason we use the CGAP test ES cluster for this deployment instead of spinning up an ES cluster in Docker. It is possible however to modify ``docker-compose.yml`` to spinup a local Elasticsearch
+ElasticSearch is too compute intensive to virtualize on most machines. For this reason we use the CGAP test ES cluster for this deployment instead of spinning up an ES cluster in Docker. It is possible however to modify ``docker-compose.yml`` to spinup a local Elasticsearch. If your machine can handle this it is the ideal setup, but typically things are just too slow for it to be viable (YMMV).
 
 
 Common Issues

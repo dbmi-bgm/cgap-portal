@@ -19,6 +19,6 @@ poetry run create-mapping-on-deploy production.ini --app-name app
 
 # Load access keys
 # Note that the secret name must match that which was created for this environment
-poetry run load-access-keys production.ini --app-name app --secret-name dev/beanstalk/cgap-dev
+poetry run load-access-keys production.ini --app-name app --secret-name "$IDENTITY"
 
 exit 0
