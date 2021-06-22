@@ -1340,7 +1340,7 @@ i.status-indicator-dot {
 				/* todo: consider using an h2 instead, as is 2.1rem by default (close to the 2rem set here) and */
 				/* possibly more semantically accurate (i.e. is a section title, not page title) (subjective) */
 				font-size: 2rem;
-				margin-bottom: 20px;
+				margin-bottom: 36px; /* matches padding-bottom of timeline/tabs nav */
 				margin-top: 0px;
 			}
 

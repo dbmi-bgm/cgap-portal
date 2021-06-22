@@ -49,7 +49,7 @@ export const variantSampleColumnExtensionMap = {
                 // rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{mother_genotype_label || "-"}</div>);
                 rows.push(
                     <div key="mother_gt" className="d-block text-truncate">
-                        <i className="icon icon-venus icon-fw fas mr-04" data-tip="Mother Genotype"/>
+                        <i className="text-small icon icon-circle icon-fw far mr-04" data-tip="Mother Genotype"/>
                         { mother_genotype_label || "-" }
                     </div>
                 );
@@ -58,7 +58,7 @@ export const variantSampleColumnExtensionMap = {
                 // rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
                 rows.push(
                     <div key="father_gt" className="d-block text-truncate">
-                        <i className="icon icon-mars icon-fw fas mr-04" data-tip="Father Genotype"/>
+                        <i className="text-small icon icon-square icon-fw far mr-04" data-tip="Father Genotype"/>
                         { father_genotype_label || "-" }
                     </div>
                 );

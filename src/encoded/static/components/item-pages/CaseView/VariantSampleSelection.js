@@ -304,15 +304,6 @@ function VariantSampleExpandedNotes (props) {
     const noDiscoveryNoteSaved = discoveryInterpretationNote === null;
     const noClinicalNoteSaved = clinicalInterpretationNote === null;
 
-    console.log("TTT",
-        lastVariantNote, noVariantNotesSaved,
-        lastGeneNote, noGeneNotesSaved,
-        discoveryInterpretationNote, noDiscoveryNoteSaved,
-        clinicalInterpretationNote, noClinicalNoteSaved,
-        sendToReportStore,
-        sendToKnowledgeBaseStore
-    );
-
     const allNotesToReportSelected = (
         (noVariantNotesSaved       || sendToReportStore[lastVariantNote.uuid])
         && (noGeneNotesSaved       || sendToReportStore[lastGeneNote.uuid])
@@ -602,8 +593,27 @@ export class FinalizeCaseDataStore extends React.PureComponent {
 
 
 
-function CaseSpecificSelectionsPanel () {
-
+export function CaseSpecificSelectionsPanel () {
+    const [ isExpanded, setIsExpanded ] = useState(false);
+    const toggleExpanded = useCallback(function(e){
+        e.stopPropagation();
+        setIsExpanded(!isExpanded);
+    }, [ isExpanded ]);
+    return (
+        <div className="card mb-24">
+            <div className={"card-header py-3 bg-primary-dark" + (!isExpanded ? " rounded" : "")}>
+                <h4 className="text-400 my-0 d-flex align-items-center clickable text-white" onClick={toggleExpanded}>
+                    <i className={"mr-1 icon fas icon-" + (isExpanded ? "minus" : "plus")}/>
+                    <span>Case Specific Selections</span>
+                </h4>
+            </div>
+            { isExpanded ?
+                <div className="card-body">
+                    <ACMGClassificationSelections />
+                </div>
+                : null }
+        </div>
+    );
 }
 
 function ACMGClassificationSelections () {

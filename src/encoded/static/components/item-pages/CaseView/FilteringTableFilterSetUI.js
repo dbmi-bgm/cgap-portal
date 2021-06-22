@@ -304,7 +304,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             // TODO 1: Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
             <React.Fragment>
 
-                <div className="row mb-24 mt-0">
+                <div className="row mb-36 mt-0">
                     <h1 className="col my-0">
                         <span className="text-300">Variant Filtering and Technical Review</span>
                     </h1>
