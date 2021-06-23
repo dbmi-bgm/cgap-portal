@@ -931,6 +931,10 @@ export default class App extends React.PureComponent {
                         // If is explicit 404 (vs just 0 search results), pyramid will send it as 'code' property.
                         analytics.exception('Page Not Found - ' + targetHref);
                     }
+                }).then(function(){
+                    if (!options.replace && !options.dontScrollToTop) {
+                        App.scrollTo();
+                    }
                 });
 
             /**
@@ -1004,10 +1008,6 @@ export default class App extends React.PureComponent {
                     }
                 }
             });
-
-            if (!options.replace && !options.dontScrollToTop) {
-                currentRequestInThisScope.then(App.scrollTo);
-            }
 
             // currentRequestInThisScope === this.currentNavigationRequest here and in outer `this.navigation` scope.
             // BUT this may not be case later in async Promise chain if new request launched and
