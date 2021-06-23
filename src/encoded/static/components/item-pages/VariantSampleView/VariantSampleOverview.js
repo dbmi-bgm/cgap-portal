@@ -327,10 +327,10 @@ class InterpretationController extends React.Component {
         let acmg_guidelines;
         if (newContext) { // if new context is loaded in
             const { interpretation = {} } = newContext;
-            acmg_guidelines = interpretation.acmg_guidelines;
+            acmg_guidelines = interpretation.acmg_guidelines || [];
         } else { // not successfully loaded in; default to old context
             const { interpretation = {} } = context || {};
-            acmg_guidelines = interpretation.acmg_guidelines;
+            acmg_guidelines = interpretation.acmg_guidelines || [];
         }
 
         // Initialize classifier and prepare new state
