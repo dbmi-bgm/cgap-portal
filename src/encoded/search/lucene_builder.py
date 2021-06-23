@@ -934,9 +934,10 @@ class LuceneBuilder:
             smallest IEEE 32 value such that the bucket effectively only captures
             the value 0.
         """
-        if 'from' in ranges and 'to' in ranges:
-            if ranges['from'] == 0 and ranges['to'] == 0:
-                ranges['to'] = cls.SMALLEST_NONZERO_IEEE_32
+        for r in ranges:
+            if 'from' in r and 'to' in r:
+                if r['from'] == 0 and r['to'] == 0:
+                    r['to'] = cls.SMALLEST_NONZERO_IEEE_32
         return {
             RANGE: {
                 FIELD: query_field,
