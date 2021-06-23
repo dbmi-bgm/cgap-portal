@@ -347,14 +347,15 @@ class InterpretationController extends React.Component {
         const { newVSLoading, newContext = null, context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const passProps = { schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
 
-        // Pulling actions and checking for note errors with old context (actions are not pulled in via embed api currently)
-        const { actions = [] } = newContext || {};
+        // Pulling actions and checking for note errors with newcontext; use context if not present
         const {
-            interpretation: { error: interpError = null, acmg_guidelines = [] } = {},
+            actions = [],
+            acmg_guidelines = [],
+            interpretation: { error: interpError = null } = {},
             variant_notes: { error: varNoteError = null } = {},
             gene_notes: { error: geneNoteError = null } = {},
             discovery_interpretation: { error: discoveryError = null } = {}
-        } = context || {}; // TODO: Pull from most recent note from db=datastore request
+        } = newContext || context || {};
 
         const anyNotePermErrors = interpError || varNoteError || geneNoteError || discoveryError;
 
