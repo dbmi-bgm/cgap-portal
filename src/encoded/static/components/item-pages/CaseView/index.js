@@ -733,10 +733,10 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         // original_pedigree: { display_title: pedFileName } = {},
         display_title: familyDisplayTitle
     } = family;
-    const onClick = useMemo(function(){
-        return function(evt){
-            navigate(`${vcfAtId}#provenance`, { replace: true });
-        };
+
+    const onClick = useCallback(function(evt){
+        evt.stopPropagation();
+        navigate(`${vcfAtId}#provenance`, { replace: true });
     }, []);
 
     const title = (
@@ -760,13 +760,13 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                 <span className="pull-right">3/28/20</span>
             </div> */}
             <div className="tab-inner-container card">
-                <h4 className="card-header section-header">Quality Control Metrics (QC)</h4>
+                <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
                 <div className="card-body">
                     <BioinfoStats {...{ caseSample, sampleProcessing }} />
                 </div>
             </div>
             <div className="tab-inner-container card">
-                <h4 className="card-header section-header">Multisample Analysis Table</h4>
+                <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
                 <div className="card-body family-index-0" data-is-current-family={true}>
                     { title }
                     <CaseSummaryTable {...family} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
