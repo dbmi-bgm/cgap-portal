@@ -1243,7 +1243,7 @@ def bucket_range_data_raw():
         1 object with a value for no_value_integer, to test that filtering on a field that sets
         'add_no_value' to True will not filter documents with 'No value'.
     """
-    return [{
+    entries = [{
         'special_integer': i,
         'special_object_that_holds_integer': {
             'embedded_integer': i
@@ -1258,9 +1258,11 @@ def bucket_range_data_raw():
                 'embedded_integer': 9 if i < 5 else 0
             },
         ]
-    } for i in range(9)] + [{
-        'no_value_integer': 8
-    }]
+    } for i in range(10)]
+    # set no value int on the last element
+    entries[-1]['no_value_integer'] = 8
+    entries[-1]['no_value_integer_array'] = [8]
+    return entries
 
 
 @pytest.fixture(scope='session')  # XXX: consider scope further - Will 11/5/2020
@@ -1298,8 +1300,9 @@ class TestSearchBucketRangeFacets:
         return result
 
     @pytest.mark.parametrize('expected_fields, expected_counts', [
-        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 4),
-        (['array_of_objects_that_holds_integer.embedded_integer'], 9)
+        (['special_integer'], 5),
+        (['special_object_that_holds_integer.embedded_integer'], 5),
+        (['array_of_objects_that_holds_integer.embedded_integer'], 10)
     ])
     def test_search_bucket_range_simple(self, workbook, es_testapp, bucket_range_data, expected_fields, expected_counts):
         """ Tests searching a collection of documents with varying integer field types that
@@ -1316,7 +1319,7 @@ class TestSearchBucketRangeFacets:
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
                           '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
         self.verify_facet_counts(res, ['array_of_objects_that_holds_integer.embedded_integer'],
-                                 2, 9)
+                                 2, 10)
 
     @pytest.mark.parametrize('identifier', [
         'reverse', 'forward'
@@ -1327,7 +1330,7 @@ class TestSearchBucketRangeFacets:
                           '&array_of_objects_that_holds_integer.embedded_integer.from=6'
                           '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
         self.verify_facet_counts(res, ['array_of_objects_that_holds_integer.embedded_integer'],
-                                 2, 9)
+                                 2, 10)
         facet_with_labels = self.select_facet(res, 'array_of_objects_that_holds_integer.embedded_integer')
         for r in facet_with_labels['ranges']:
             assert 'label' in r
@@ -1337,14 +1340,28 @@ class TestSearchBucketRangeFacets:
         """ Tests that providing a range filter on a field that specifies 'add_no_value' does not
             filter documents that have no value for that field.
         """
-        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=5').json  # should detect
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=0').json  # should detect
         self.verify_counts(res, 10)
-        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=10').json  # should not detect
-        self.verify_counts(res, 9)
+        es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=10', status=404)  # should not detect
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.to=10').json  # should detect
         self.verify_counts(res, 10)
-        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=4'
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=0'
                              '&no_value_integer.to=10').json  # should detect
+        self.verify_counts(res, 10)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
+                             '&no_value_integer_array.from=0').json  # should detect
+        self.verify_counts(res, 10)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
+                             '&no_value_integer_array.from=8').json  # should detect
+        self.verify_counts(res, 1)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
+                             '&no_value_integer_array.from=0&no_value_integer_array.to=7').json  # should detect
+        self.verify_counts(res, 9)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
+                             '&no_value_integer_array.from=-1&no_value_integer_array.to=7').json  # should detect
+        self.verify_counts(res, 9)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
+                             '&no_value_integer_array.from=-1&no_value_integer_array.to=9').json  # should detect
         self.verify_counts(res, 10)
 
     def test_search_bucket_range_workbook(self, es_testapp, workbook):

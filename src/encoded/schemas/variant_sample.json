@@ -14,35 +14,6 @@
         "annotation_id"
     ],
     "additionalProperties": false,
-    "mixinProperties": [
-        {
-            "$ref": "mixins.json#/schema_version"
-        },
-        {
-            "$ref": "mixins.json#/uuid"
-        },
-        {
-            "$ref": "mixins.json#/aliases"
-        },
-        {
-            "$ref": "mixins.json#/submitted"
-        },
-        {
-            "$ref": "mixins.json#/modified"
-        },
-        {
-            "$ref": "mixins.json#/status"
-        },
-        {
-            "$ref": "mixins.json#/attribution"
-        },
-        {
-            "$ref": "mixins.json#/notes"
-        },
-        {
-            "$ref": "mixins.json#/static_embeds"
-        }
-    ],
     "title": "Sample Variant",
     "description": "Schema for variant info for sample",
     "id": "/profiles/variant_sample.json",
@@ -313,10 +284,22 @@
                 }
             }
         },
+        "discovery_interpretation": {
+            "title": "Discovery Interpretation",
+            "description": "Gene/Variant Discovery interpretation note connected to this item",
+            "type": "string",
+            "linkTo": "NoteDiscovery"
+        },
         "file": {
             "title": "File",
             "description": "String Accession of the vcf file used in digestion",
             "type": "string"
+        },
+        "gene_notes": {
+            "title": "Gene Notes",
+            "description": "Note item related to this Gene",
+            "type": "string",
+            "linkTo": "NoteStandard"
         },
         "genotype_labels": {
             "title": "Genotype Labels",
@@ -344,6 +327,12 @@
             "items": {
                 "type": "string"
             }
+        },
+        "interpretation": {
+            "title": "Clinical Interpretation",
+            "description": "Clinical Interpretation Note connected to this item",
+            "type": "string",
+            "linkTo": "NoteInterpretation"
         },
         "novoPP": {
             "title": "novoCaller PP",
@@ -481,29 +470,11 @@
             "type": "string",
             "linkTo": "Variant"
         },
-        "gene_notes": {
-            "title": "Gene Notes",
-            "description": "Notes related to the relevant Gene",
-            "type": "string",
-            "linkTo": "NoteStandard"
-        },
         "variant_notes": {
             "title": "Variant Notes",
             "description": "Notes related to the relevant Variant",
             "type": "string",
             "linkTo": "NoteStandard"
-        },
-        "interpretation": {
-            "title": "Clinical Interpretation",
-            "description": "Clinical Interpretation Note connected to this item",
-            "type": "string",
-            "linkTo": "NoteInterpretation"
-        },
-        "discovery_interpretation": {
-            "title": "Discovery Interpretation",
-            "description": "Gene/Variant Discovery interpretation note connected to this item",
-            "type": "string",
-            "linkTo": "NoteDiscovery"
         }
     },
     "columns": {

@@ -845,6 +845,8 @@ class SearchBuilder:
 
                     # TODO - refactor ?
                     # merge bucket labels from ranges into buckets
+                    total_hits = es_results.get('hits', {}).get('total', 0)
+                    bucket_hits = 0
                     for r in result_facet['ranges']:
                         for b in bucket_location['buckets']:
 
@@ -852,7 +854,19 @@ class SearchBuilder:
                             if (r.get('from', self.MISSING) == b.get('from', self.MISSING) and
                                     r.get('to', self.MISSING) == b.get('to', self.MISSING)):
                                 r['doc_count'] = b['doc_count']
+                                bucket_hits += b['doc_count']
                                 break
+
+                    # Normally, this difference would be zero, but when searching
+                    # on certain range fields we wish to include documents that have
+                    # no value - the bucket range aggregation does not return a No value
+                    # bucket, so we must force it in and infer its counts - Will 6/21/21
+                    hit_difference = total_hits - bucket_hits
+                    if hit_difference > 0:
+                        bucket_location['buckets'].append({
+                            'key': 'No value',
+                            'doc_count': hit_difference
+                        })
 
                 # process terms agg
                 else:

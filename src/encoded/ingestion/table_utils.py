@@ -29,7 +29,7 @@ class MappingTableHeader:
         not vary across . """
     HEADER_ROW_INDEX = 2
     INTEGER_FIELDS = ['no', 'maximum_length_of_value', 'default', 'min', 'max']
-    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field', 'do_import']
+    BOOLEAN_FIELDS = ['is_list', 'calculated_property', 'embedded_field', 'do_import', 'add_no_value']
     STRING_FIELDS = ['field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
                      'annotation_category', 'separator', 'description',
                      'scope', 'schema_title', 'pattern', 'link', 'abbreviation']

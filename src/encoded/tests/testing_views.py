@@ -401,6 +401,13 @@ class TestingBucketRangeFacets(Item):
                 'add_no_value': True  # if a range query is specified on this field, include documents that
                                       # have 'No value' for the field
             },
+            'no_value_integer_array': {
+                'type': 'array',
+                'items': {
+                    'type': 'integer',
+                    'add_no_value': True
+                }
+            },
             'special_integer': {
                 'type': 'integer'
             },
@@ -429,6 +436,22 @@ class TestingBucketRangeFacets(Item):
             }
         },
         'facets': {
+            'no_value_integer': {
+                'title': 'No value integer',
+                'aggregation_type': 'range',
+                'ranges': [
+                    {'from': 0, 'to': 5},
+                    {'from': 5, 'to': 10}
+                ]
+            },
+            'no_value_integer_array': {
+                'title': 'No value integer array',
+                'aggregation_type': 'range',
+                'ranges': [
+                    {'from': 0, 'to': 5},
+                    {'from': 5, 'to': 10}
+                ]
+            },
             'special_integer': {
                 'title': 'Special Integer',
                 'aggregation_type': 'range',

@@ -33,6 +33,10 @@ class LuceneBuilder:
         be "entry-point" methods as well.
     """
     to_from_pattern = re.compile("^(.*)[.](to|from)$")
+    RANGE_DIRECTIONS = ['gt', 'gte', 'lt', 'lte']
+    SMALLEST_NONZERO_IEEE_32 = 1.1754e-38  # smallest epsilon > 0
+    # ref: http://www.cs.uwm.edu/classes/cs315/Bacon/Lecture/HTML/ch04s17.html
+    # 1.00000000000000000000001 x 2^-127 = 1.1754e-38
 
     @staticmethod
     def apply_range_filters(range_filters, must_filters, es_mapping):
@@ -374,6 +378,21 @@ class LuceneBuilder:
         return False, None, None
 
     @classmethod
+    def range_includes_zero(cls, range_filter):
+        """ Returns True if the given range_filter includes the value 0. """
+        for direction in cls.RANGE_DIRECTIONS:
+            if direction in range_filter:
+                if direction == 'lte' and float(range_filter[direction]) >= 0:
+                    return True
+                elif direction == 'gte' and float(range_filter[direction]) <= 0:
+                    return True
+                elif direction == 'lt' and float(range_filter[direction]) > 0:
+                    return True
+                elif direction == 'gt' and float(range_filter[direction]) < 0:
+                    return True
+        return False
+
+    @classmethod
     def handle_range_filters(cls, request, result, field_filters, doc_types):
         """
         Constructs range_filters based on the given filters as part of the MUST sub-query
@@ -452,7 +471,7 @@ class LuceneBuilder:
                     if range_type == 'date':
                         range_filters[query_field]['format'] = 'yyyy-MM-dd HH:mm'
 
-                if range_direction in ('gt', 'gte', 'lt', 'lte'):
+                if range_direction in cls.RANGE_DIRECTIONS:
                     if range_type == "date" and len(term) == 10:  # TODO: refactor to use regex -Will 06/24/2020
                         # Correct term to have hours, e.g. 00:00 or 23:59, if not otherwise supplied.
                         if range_direction == 'gt' or range_direction == 'lte':
@@ -474,7 +493,7 @@ class LuceneBuilder:
                 # Check if schema requests no value
                 if 'items' in field_schema:  # we are searching on an array of numerics
                     field_schema = field_schema['items']
-                if field_schema.get('add_no_value', False):
+                if field_schema.get('add_no_value', False) and cls.range_includes_zero(range_filters[query_field]):
                     range_filters[query_field]['add_no_value'] = True
 
             # add these to field_filters directly, handle later with build_sub_queries
@@ -908,9 +927,16 @@ class LuceneBuilder:
                 FILTER: facet_filters
             }
 
-    @staticmethod
-    def _build_range_aggregation(query_field, ranges):
-        """ Builds a range aggregation. """
+    @classmethod
+    def _build_range_aggregation(cls, query_field, ranges):
+        """ Builds a range aggregation.
+            Detects when 0-0 range is specified and replaces 'to' with the
+            smallest IEEE 32 value such that the bucket effectively only captures
+            the value 0.
+        """
+        if 'from' in ranges and 'to' in ranges:
+            if ranges['from'] == 0 and ranges['to'] == 0:
+                ranges['to'] = cls.SMALLEST_NONZERO_IEEE_32
         return {
             RANGE: {
                 FIELD: query_field,
