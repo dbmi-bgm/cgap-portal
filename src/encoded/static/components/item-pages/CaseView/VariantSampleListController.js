@@ -8,7 +8,7 @@ import memoize from "memoize-one";
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 /**
- * Holds embedded representation of VariantSampleList Item
+ * Holds embedded-ish representation of VariantSampleList Item (minus gene list stuff, basically)
  * Gets refreshed after saving/moving VariantSamples to InterpretationTab
  * and upon mount.
  */
@@ -68,7 +68,7 @@ export class VariantSampleListController extends React.PureComponent {
         }
     }
 
-    /** Fetches `@@embedded` representation of 'state.variantSampleListID' from embed api */
+    /** Fetches `@@embedded`-ish representation of 'state.variantSampleListID' from embed api */
     fetchVariantSampleListItem(fnCallback = null){
         const { variantSampleListID } = this.state;
 
