@@ -863,7 +863,7 @@ class SearchBuilder:
                     # bucket, so we must force it in and infer its counts - Will 6/21/21
                     hit_difference = total_hits - bucket_hits
                     if hit_difference > 0:
-                        bucket_location['buckets'].append({
+                        result_facet['ranges'].append({
                             'key': 'No value',
                             'doc_count': hit_difference
                         })

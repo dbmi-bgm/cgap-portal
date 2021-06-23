@@ -448,6 +448,7 @@ class TestingBucketRangeFacets(Item):
                 'title': 'No value integer array',
                 'aggregation_type': 'range',
                 'ranges': [
+                    {'from': 0, 'to': 0},  # test zero range faceting behavior
                     {'from': 0, 'to': 5},
                     {'from': 5, 'to': 10}
                 ]

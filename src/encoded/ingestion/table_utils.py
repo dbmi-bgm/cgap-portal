@@ -546,11 +546,11 @@ class VariantTableParser(object):
 
     @staticmethod
     def add_extra_variant_sample_facets(facs):
-        '''
+        """
         Order of a Facet Group within top-level FacetList is determined by `min(grouped facet 1, grouped facet 2, ...)`
         which is then used for sorting relative to all other top-level facets' and facet groups' orders.
         Facets within a group are sorted relative to each other.
-        '''
+        """
         facs["variant.genes.genes_most_severe_gene.display_title"] = {
             "title": "Gene",
             "order": 1,
@@ -676,8 +676,6 @@ class VariantTableParser(object):
                 "grouping": "Genotype",
                 "default_hidden": True
             },
-
-
             "associated_genotype_labels.sister_genotype_label": {
                 "title": "Sister Genotype",
                 "order": 1001,
@@ -702,8 +700,6 @@ class VariantTableParser(object):
                 "grouping": "Genotype",
                 "default_hidden": True
             },
-
-
             "associated_genotype_labels.brother_genotype_label": {
                 "title": "Brother Genotype",
                 "order": 1005,
@@ -728,8 +724,6 @@ class VariantTableParser(object):
                 "grouping": "Genotype",
                 "default_hidden": True
             },
-
-
             "associated_genotype_labels.daughter_genotype_label": {
                 "title": "Daughter Genotype",
                 "order": 1009,
@@ -754,8 +748,6 @@ class VariantTableParser(object):
                 "grouping": "Genotype",
                 "default_hidden": True
             },
-
-
             "associated_genotype_labels.son_genotype_label": {
                 "title": "Son Genotype",
                 "order": 1013,
@@ -802,6 +794,17 @@ class VariantTableParser(object):
         schema['title'] = 'Sample Variant'
         schema['description'] = "Schema for variant info for sample"
         schema['id'] = '/profiles/variant_sample.json'
+        schema['mixinProperties'] = [
+            {"$ref": "mixins.json#/schema_version"},
+            {"$ref": "mixins.json#/uuid"},
+            {"$ref": "mixins.json#/aliases"},
+            {"$ref": "mixins.json#/submitted"},
+            {"$ref": "mixins.json#/modified"},
+            {"$ref": "mixins.json#/status"},
+            {"$ref": "mixins.json#/attribution"},
+            {"$ref": "mixins.json#/notes"},
+            {"$ref": "mixins.json#/static_embeds"},
+        ]
         schema['properties'] = sample_props
         schema['properties']['schema_version'] = {'default': '1'}
         schema['properties']['variant'] = {  # link to single variant
@@ -929,6 +932,18 @@ class VariantTableParser(object):
         schema['title'] = 'Variants'
         schema['description'] = "Schema for variants"
         schema['id'] = '/profiles/variant.json'
+        schema['mixinProperties'] = [
+            {"$ref": "mixins.json#/schema_version"},
+            {"$ref": "mixins.json#/uuid"},
+            {"$ref": "mixins.json#/aliases"},
+            {"$ref": "mixins.json#/submitted"},
+            {"$ref": "mixins.json#/modified"},
+            {"$ref": "mixins.json#/status"},
+            {"$ref": "mixins.json#/attribution"},
+            {"$ref": "mixins.json#/notes"},
+            {"$ref": "mixins.json#/interpretation"},
+            {"$ref": "mixins.json#/static_embeds"},
+        ]
         schema['properties'] = var_props
         schema['properties']['hg19'] = {  # required for testing :( - will 1-8-2021
             "title": "hg19 Coordinates",
