@@ -50,7 +50,7 @@ class OverviewTabView extends React.Component {
 
         this.state = {
             newestVariantSample: null,
-            newVSLoading: false,
+            newVSLoading: true,
         };
 
         this.loadNewestVariantSample = this.loadNewestVariantSample.bind(this);
@@ -58,37 +58,34 @@ class OverviewTabView extends React.Component {
 
     componentDidMount() {
         this.loadNewestVariantSample();
-
     }
 
     loadNewestVariantSample() {
         const { context: { uuid = null } = {} } = this.props;
-        this.setState({ newVSLoading: true }, () => {
-            // Do AJAX request to get new variant sample
-            // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
+        // Do AJAX request to get new variant sample
+        // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
 
-            const vsFetchCallback = (resp) => {
-                const { 0: { "@id": atID = null } = {} } = resp;
-                console.log("pulling new VS resp", resp);
+        const vsFetchCallback = (resp) => {
+            const { 0: { "@id": atID = null } = {} } = resp;
+            console.log("pulling new VS resp", resp);
 
-                if (!atID) {
-                    Alerts.queue({
-                        title: "Error: Some information may be out of date.",
-                        style: "warning",
-                        message: "Could not retrieve the most recent version of this variant and its notes due to a server error. Please try refreshing the page in a few minutes."
-                    });
-                }
+            if (!atID) {
+                Alerts.queue({
+                    title: "Error: Some information may be out of date.",
+                    style: "warning",
+                    message: "Could not retrieve the most recent version of this variant and its notes due to a server error. Please try refreshing the page in a few minutes."
+                });
+            }
 
-                this.setState({ newVSLoading: false, newestVariantSample: resp[0] });
-            };
+            this.setState({ newVSLoading: false, newestVariantSample: resp[0] });
+        };
 
-            ajax.load(
-                '/embed?id=' + uuid,
-                vsFetchCallback,
-                "POST",
-                vsFetchCallback
-            );
-        });
+        ajax.load(
+            '/embed?id=' + uuid,
+            vsFetchCallback,
+            "POST",
+            vsFetchCallback
+        );
     }
 
     render() {

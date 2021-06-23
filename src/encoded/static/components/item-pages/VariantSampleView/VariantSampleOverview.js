@@ -110,7 +110,7 @@ export class VariantSampleOverview extends React.PureComponent {
     }
 
     render(){
-        const { context = null, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext } = this.props;
+        const { context = null, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading } = this.props;
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
 
@@ -123,7 +123,7 @@ export class VariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <InterpretationController {...passProps} interpretationTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} {...{ showInterpretation, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext }}>
+                <InterpretationController {...passProps} interpretationTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} {...{ showInterpretation, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading }}>
                     <VariantSampleInfoHeader {...passProps} onSelectTranscript={this.onSelectTranscript} />
                     <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
                 </InterpretationController>
@@ -282,15 +282,11 @@ class InterpretationController extends React.Component {
     constructor(props) {
         super(props);
 
-        // Initialize ACMG selections based on most recent interpretation from context
-        const { interpretationTab, context: { interpretation: { acmg_guidelines = [] } = {} } = {} } = props;
-        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_guidelines);
-        const classifier = new acmgUtil.AutoClassify(acmgSelections);
-        const classification = classifier.getClassification();
+        const { interpretationTab } = props;
 
         this.state = {
-            globalACMGSelections: acmgSelections,
-            autoClassification: classification,
+            globalACMGSelections: [],
+            autoClassification: null,
             showACMGInvoker: interpretationTab === 2, // State method passed into Interpretation space and called when clinical tab is selected
         };
 
@@ -301,8 +297,49 @@ class InterpretationController extends React.Component {
             flattenGlobalACMGStateIntoArray: memoize(acmgUtil.flattenStateMapIntoArray)
         };
 
-        // Save an instance of autoclassify so that other methods can use it to calculate classification
+        // A saved instance of autoclassify that other methods will use to calculate classification
+        this.classifier = null;
+    }
+
+    componentDidUpdate(pastProps) {
+        const { newContext = null, newVSLoading } = this.props;
+        const { newContext: pastNC = null, newVSLoading: pastVSLoadStatus } = pastProps;
+
+        // If just loaded new context
+        if (!pastNC && !newVSLoading && newContext) {
+            console.log("log1: just loaded new context");
+            this.initializeACMGFromContext();
+        } else if (pastVSLoadStatus && !newVSLoading && !newContext) {
+            // If just attempted to load new context and failed... do the same thing (it's handled slightly differently in-method)
+            console.log("log1: just failed at loading new context");
+            this.initializeACMGFromContext();
+        }
+        console.log(`pastVSLoading=${pastVSLoadStatus}, newVSLoading=${newVSLoading}, newContext=${newContext}`);
+    }
+
+    /**
+     * Should only be called once; if the log ever appears more than that, need to look into.
+     */
+    initializeACMGFromContext() {
+        const { context = null, newContext = null } = this.props;
+        console.log("log1: initializing ACMG from context");
+
+        let acmg_guidelines;
+        if (newContext) { // if new context is loaded in
+            const { interpretation = {} } = newContext;
+            acmg_guidelines = interpretation.acmg_guidelines;
+        } else { // not successfully loaded in; default to old context
+            const { interpretation = {} } = context || {};
+            acmg_guidelines = interpretation.acmg_guidelines;
+        }
+
+        // Initialize classifier and prepare new state
+        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_guidelines);
+        const classifier = new acmgUtil.AutoClassify(acmgSelections);
+        const classification = classifier.getClassification();
         this.classifier = classifier;
+
+        this.setState({ globalACMGSelections: acmgSelections, autoClassification: classification });
     }
 
     /**
@@ -361,7 +398,7 @@ class InterpretationController extends React.Component {
 
         const wipACMGSelections = this.memoized.flattenGlobalACMGStateIntoArray(globalACMGSelections);
 
-        const showInterpretationSpace = showInterpretation == 'True' && !anyNotePermErrors && newContext;
+        const showInterpretationSpace = showInterpretation == 'True' && !anyNotePermErrors && newContext && !newVSLoading;
         const showFallbackInterpretationSpace = showInterpretation == 'True' && !anyNotePermErrors && !newContext && !newVSLoading;
 
         return (
