@@ -344,11 +344,11 @@ class InterpretationController extends React.Component {
 
     render() {
         const { showACMGInvoker, globalACMGSelections, autoClassification } = this.state;
-        const { newVSLoading, newContext, context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const { newVSLoading, newContext = null, context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const passProps = { schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
 
         // Pulling actions and checking for note errors with old context (actions are not pulled in via embed api currently)
-        const { actions = [] } = context;
+        const { actions = [] } = newContext || {};
         const {
             interpretation: { error: interpError = null, acmg_guidelines = [] } = {},
             variant_notes: { error: varNoteError = null } = {},
