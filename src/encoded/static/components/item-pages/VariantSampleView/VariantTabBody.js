@@ -16,7 +16,8 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
     const { variant } = context;
     const {
         csq_clinvar: variationID,
-        annotation_id: annotationID
+        annotation_id: annotationID,
+        hg19_chr, hg19_pos, ALT, REF
     } = variant;
 
     const [ showingTable, setShowingTable ] = useState("v3"); // Allowed: "v2", "v3", and maybe "summary" in future; could be converted integer instd of of text.
@@ -58,6 +59,21 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
         };
     });
 
+    let gnomadExternalLink = null;
+    if (showingTable === "v3" && annotationID) {
+        gnomadExternalLink = (
+            "https://gnomad.broadinstitute.org/variant/"
+            + annotationID // <- Do not wrap in encodeURIComponent -- transformed value isn't found.
+            + "?dataset=gnomad_r3"
+        );
+    } else if (showingTable === "v2" && hg19_chr && hg19_pos && ALT && REF) {
+        gnomadExternalLink = (
+            "https://gnomad.broadinstitute.org/variant/"
+            + (`chr${hg19_chr}:${hg19_pos}${REF}_${ALT}`)
+            + "?dataset=gnomad_r2_1"
+        );
+    }
+
     return (
         <div className="variant-tab-body card-body">
             <div className="row">
@@ -90,16 +106,10 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                                 <DropdownItem eventKey="v2" active={showingTable === "v2"}>{ titleDict.v2 }</DropdownItem>
                             </DropdownButton>
 
-                            { annotationID ?
+                            { gnomadExternalLink ?
                                 <h4>
-                                    <a target="_blank" rel="noopener noreferrer"
-                                        className="text-small px-1"
-                                        data-tip={"View this variant in gnomAD " + showingTable}
-                                        href={
-                                            "https://gnomad.broadinstitute.org/variant/"
-                                            + annotationID // <- Do not wrap in encodeURIComponent -- transformed value isn't found.
-                                            + "?dataset=" + (showingTable === "v3" ? "gnomad_r3" : "gnomad_r2_1")
-                                        } >
+                                    <a href={gnomadExternalLink} target="_blank" rel="noopener noreferrer"
+                                        className="text-small px-1" data-tip={"View this variant in gnomAD " + showingTable}>
                                         <i className="icon icon-external-link-alt fas"/>
                                     </a>
                                 </h4>
