@@ -42,7 +42,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
 
     if (isLoadingVariantSampleListItem) {
         return (
-            <h4 className="text-400 text-center text-muted">
+            <h4 className="text-400 text-center text-muted py-3">
                 <i className="icon icon-spin icon-circle-notch icon-2x fas"/>
             </h4>
         );
@@ -376,18 +376,22 @@ function VariantSampleExpandedNotes (props) {
     return (
         <React.Fragment>
             <div className="card-body bg-light select-checkboxes-section border-top border-bottom">
-                <Checkbox labelClassName="text-400 mb-08 no-highlight"
-                    checked={!!allNotesToReportSelected}
-                    onChange={onChangeSendAllNotesToReport}
-                    indeterminate={someNotesToReportSelected && !allNotesToReportSelected}>
-                    Send All Notes to Report
-                </Checkbox>
-                <Checkbox labelClassName="text-400 mb-0 no-highlight"
-                    checked={!!allNotesToKnowledgeBaseSelected}
-                    onChange={onChangeSendAllNotesToKnowledgeBase}
-                    indeterminate={someNotesToKnowledgeBaseSelected && !allNotesToKnowledgeBaseSelected}>
-                    Send All Notes to KnowledgeBase
-                </Checkbox>
+                <div>
+                    <Checkbox className="d-inline-block mb-08"
+                        checked={!!allNotesToReportSelected}
+                        onChange={onChangeSendAllNotesToReport}
+                        indeterminate={someNotesToReportSelected && !allNotesToReportSelected}>
+                        Send All Notes to Report
+                    </Checkbox>
+                </div>
+                <div>
+                    <Checkbox className="d-inline-block"
+                        checked={!!allNotesToKnowledgeBaseSelected}
+                        onChange={onChangeSendAllNotesToKnowledgeBase}
+                        indeterminate={someNotesToKnowledgeBaseSelected && !allNotesToKnowledgeBaseSelected}>
+                        Send All Notes to KnowledgeBase
+                    </Checkbox>
+                </div>
             </div>
             <div className="card-body notes-section pt-0">
                 <div className="row">
@@ -516,10 +520,10 @@ function VariantSampleExpandedNotes (props) {
 const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onKBChange, reportChecked, kbChecked }) {
     return (
         <div className="d-flex flex-column flex-xl-row text-small">
-            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0" onChange={onReportChange} checked={reportChecked}>
+            <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={onReportChange} checked={reportChecked}>
                 Send to Report
             </Checkbox>
-            <Checkbox className="flex-grow-1" labelClassName="text-400 mb-0" onChange={onKBChange} checked={kbChecked}>
+            <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={onKBChange} checked={kbChecked}>
                 Send to KnowledgeBase
             </Checkbox>
         </div>
@@ -619,7 +623,7 @@ export function CaseSpecificSelectionsPanel () {
 function ACMGClassificationSelections () {
     return (
         <div>
-            <h4 className="text-600">ACMG Classification Selections</h4>
+            <h4 className="text-400 mt-0">ACMG Classification Selections</h4>
             <div className="row">
                 <div className="col-12 col-lg-6">
                     <h5 className="text-400">Move to Report</h5>

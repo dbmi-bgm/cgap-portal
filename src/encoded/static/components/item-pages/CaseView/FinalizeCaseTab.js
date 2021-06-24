@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { VariantSampleSelectionList, FinalizeCaseDataStore, parentTabTypes } from './VariantSampleSelection';
+import { VariantSampleSelectionList, FinalizeCaseDataStore, CaseSpecificSelectionsPanel, parentTabTypes } from './VariantSampleSelection';
 
 
 
@@ -15,6 +15,7 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
             </h1>
             <div>
                 <FinalizeCaseDataStore>
+                    <CaseSpecificSelectionsPanel />
                     <VariantSampleSelectionList {...{ isLoadingVariantSampleListItem, variantSampleListItem, schemas, context }}
                         parentTabType={parentTabTypes.FINALIZECASE} />
                 </FinalizeCaseDataStore>
