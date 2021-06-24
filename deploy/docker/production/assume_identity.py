@@ -36,7 +36,7 @@ def build_production_ini_from_global_application_configuration():
     # build production.ini
     with override_environ(**identity):
 
-        CGAPDockerIniFileManager.main()
+        CGAPDockerIniFileManager.build_ini_file_from_template('cgap_any_alpha.ini', 'production.ini')
 
 
 if __name__ == '__main__':
