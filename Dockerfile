@@ -9,10 +9,8 @@ FROM python@sha256:db248d2d0494973550d323dd6b82af7fc2f4c1e0365769a758abd7fac2aa7
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
 # Build Arguments
-ARG CGAP_ENV_NAME
-ENV CGAP_ENV_NAME=${CGAP_ENV_NAME:-"cgap-mastertest"}
 ARG INI_BASE
-ENV INI_BASE=${INI_BASE:-"mastertest.ini"}
+ENV INI_BASE=${INI_BASE:-"cgap_any_alpha.ini"}
 
 # Configure (global) Env
 ENV NGINX_USER=nginx
