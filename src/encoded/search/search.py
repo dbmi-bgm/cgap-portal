@@ -851,8 +851,10 @@ class SearchBuilder:
                         for b in bucket_location['buckets']:
 
                             # if ranges match we found our bucket, propagate doc_count into 'ranges' field
-                            if (r.get('from', self.MISSING) == b.get('from', self.MISSING) and
-                                    r.get('to', self.MISSING) == b.get('to', self.MISSING)):
+                            # note that we must round to the 37th decimal place to round epsilon to 0
+                            # this is such a small round that info should be preserved in all actual cases
+                            if (round(r.get('from', self.MISSING), 37) == round(b.get('from', self.MISSING), 37) and
+                                    round(r.get('to', self.MISSING), 37) == round(b.get('to', self.MISSING), 37)):
                                 r['doc_count'] = b['doc_count']
                                 bucket_hits += b['doc_count']
                                 break
