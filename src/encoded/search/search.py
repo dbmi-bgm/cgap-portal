@@ -855,7 +855,7 @@ class SearchBuilder:
                                     keeping all lower precision values the same while rounding up epsilon
                                     so it is properly merged into 'single value' buckets.
                                 """
-                                if isinstance(bound, object):
+                                if type(bound) == object:
                                     return bound
                                 return round(bound, 37)
 
