@@ -380,7 +380,7 @@ class LuceneBuilder:
     @classmethod
     def range_includes_zero(cls, range_filter):
         """ Returns True if the given range_filter includes the value 0. """
-        for direction in cls.RANGE_DIRECTIONS:
+        for direction in cls.RANGE_DIRECTIONS + ['from', 'to']:
             if direction in range_filter:
                 if direction == 'lte' and float(range_filter[direction]) >= 0:
                     return True
@@ -389,6 +389,10 @@ class LuceneBuilder:
                 elif direction == 'lt' and float(range_filter[direction]) > 0:
                     return True
                 elif direction == 'gt' and float(range_filter[direction]) < 0:
+                    return True
+                elif direction == 'from' and float(range_filter[direction]) <= 0:  # same as gte
+                    return True
+                elif direction == 'to' and float(range_filter[direction]) > 0:  # same as lt
                     return True
         return False
 
