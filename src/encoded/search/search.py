@@ -850,11 +850,20 @@ class SearchBuilder:
                     for r in result_facet['ranges']:
                         for b in bucket_location['buckets']:
 
+                            def round_bound(bound):
+                                """ Rounds a lower or upper bound to the nearest 37th decimal, effectively
+                                    keeping all lower precision values the same while rounding up epsilon
+                                    so it is properly merged into 'single value' buckets.
+                                """
+                                if isinstance(bound, object):
+                                    return bound
+                                return round(bound, 37)
+
                             # if ranges match we found our bucket, propagate doc_count into 'ranges' field
                             # note that we must round to the 37th decimal place to round epsilon to 0
                             # this is such a small round that info should be preserved in all actual cases
-                            if (round(r.get('from', self.MISSING), 37) == round(b.get('from', self.MISSING), 37) and
-                                    round(r.get('to', self.MISSING), 37) == round(b.get('to', self.MISSING), 37)):
+                            if (round_bound(r.get('from', self.MISSING)) == round_bound(b.get('from', self.MISSING)) and
+                                    round_bound(r.get('to', self.MISSING)) == round_bound(b.get('to', self.MISSING))):
                                 r['doc_count'] = b['doc_count']
                                 bucket_hits += b['doc_count']
                                 break
