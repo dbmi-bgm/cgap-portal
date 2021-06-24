@@ -800,12 +800,13 @@ i.status-indicator-dot {
 .acmg-guidelines-title {
 	padding: 5px 5px 5px 15px;
     min-width: 135px;
-    align-self: center;
+	align-self: center;
 }
 
 .acmg-guidelines-invoker {
 	width: calc(100% - 145px);
-    overflow-x: scroll;
+    overflow-x: auto;
+	height: 50px;
 }
 
 
@@ -3171,35 +3172,16 @@ $download-button-width : 100px;
 				}
 			}
 		}
+
 		.content-column {
 			flex-basis: 320px;
 			min-width: 320px;
 			flex-grow: 1;
 			@include media-breakpoint-up(lg){
 				&.card {
+					// Blend/align the topleft corner with the column of tab links
 					border-top-left-radius: 0px;
 				}
-			}
-
-			
-			.inner-card-section {
-
-				.clinvar-info-body {
-					// Special case where we want overflow: auto + max-height when large responsive breakpoint.
-					@include media-breakpoint-up(xl){
-						max-height: 280px;
-						overflow: auto;
-					}
-				}
-
-				/*
-				.info-header-title, h4, h3 {
-					color: $primary-dark;
-				}
-				thead > tr > th {
-					color: $primary-dark;
-				}
-				*/
 			}
 		}
 	}
