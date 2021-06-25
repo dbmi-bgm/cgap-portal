@@ -881,7 +881,8 @@ class SearchBuilder:
                         # })
                         # But for now, add this value to all ranges that include 0
                         for r in result_facet['ranges']:
-                            if LuceneBuilder.range_includes_zero(r):
+                            lower, upper = r.get('from', -1e38), r.get('to', 1e38)
+                            if lower <= 0 <= upper:
                                 r['doc_count'] += hit_difference
 
                 # process terms agg

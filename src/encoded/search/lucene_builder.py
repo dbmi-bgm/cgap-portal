@@ -378,23 +378,33 @@ class LuceneBuilder:
         return False, None, None
 
     @classmethod
+    def canonicalize_bounds(cls, range_filter):
+        """ Canonicalizes the bounds of the range filter such that they are
+            inclusive on the lower bound and exclusive on the upper bound.
+        """
+        lower, upper = -1e38, 1e38  # very large numbers that should never be in range
+        for direction, pivot in range_filter.items():
+            if direction == 'lte':
+                if type(pivot) == int:
+                    upper = pivot + 1
+                else:
+                    upper = pivot + cls.SMALLEST_NONZERO_IEEE_32
+            elif direction == 'lt':
+                upper = pivot
+            elif direction == 'gte':
+                lower = pivot
+            elif direction == 'gt':
+                if type(pivot) == int:
+                    lower = pivot - 1
+                else:
+                    lower = pivot - cls.SMALLEST_NONZERO_IEEE_32
+        return lower, upper
+
+    @classmethod
     def range_includes_zero(cls, range_filter):
         """ Returns True if the given range_filter includes the value 0. """
-        for direction in cls.RANGE_DIRECTIONS + ['from', 'to']:
-            if direction in range_filter:
-                if direction == 'lte' and float(range_filter[direction]) >= 0:
-                    return True
-                elif direction == 'gte' and float(range_filter[direction]) <= 0:
-                    return True
-                elif direction == 'lt' and float(range_filter[direction]) > 0:
-                    return True
-                elif direction == 'gt' and float(range_filter[direction]) < 0:
-                    return True
-                elif direction == 'from' and float(range_filter[direction]) <= 0:  # same as gte
-                    return True
-                elif direction == 'to' and float(range_filter[direction]) > 0:  # same as lt
-                    return True
-        return False
+        lower, upper = cls.canonicalize_bounds(range_filter)
+        return lower <= 0 <= upper
 
     @classmethod
     def handle_range_filters(cls, request, result, field_filters, doc_types):
