@@ -384,20 +384,15 @@ class LuceneBuilder:
         """
         lower, upper = -1e38, 1e38  # very large numbers that should never be in range
         for direction, pivot in range_filter.items():
+            pivot = float(pivot)
             if direction == 'lte':
-                if type(pivot) == int:
-                    upper = pivot + 1
-                else:
-                    upper = pivot + cls.SMALLEST_NONZERO_IEEE_32
+                upper = pivot + cls.SMALLEST_NONZERO_IEEE_32
             elif direction == 'lt':
                 upper = pivot
             elif direction == 'gte':
                 lower = pivot
             elif direction == 'gt':
-                if type(pivot) == int:
-                    lower = pivot - 1
-                else:
-                    lower = pivot - cls.SMALLEST_NONZERO_IEEE_32
+                lower = pivot - cls.SMALLEST_NONZERO_IEEE_32
         return lower, upper
 
     @classmethod

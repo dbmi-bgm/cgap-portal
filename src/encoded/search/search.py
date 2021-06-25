@@ -843,21 +843,21 @@ class SearchBuilder:
                     if 'buckets' not in bucket_location:  # account for nested structure
                         bucket_location = bucket_location['primary_agg']
 
+                    def round_bound(bound):
+                        """ Rounds a lower or upper bound to the nearest 37th decimal, effectively
+                            keeping all lower precision values the same while rounding up epsilon
+                            so it is properly merged into 'single value' buckets.
+                        """
+                        if type(bound) == object:
+                            return bound
+                        return round(bound, 37)
+
                     # TODO - refactor ?
                     # merge bucket labels from ranges into buckets
                     total_hits = es_results.get('hits', {}).get('total', 0)
                     bucket_hits = 0
                     for r in result_facet['ranges']:
                         for b in bucket_location['buckets']:
-
-                            def round_bound(bound):
-                                """ Rounds a lower or upper bound to the nearest 37th decimal, effectively
-                                    keeping all lower precision values the same while rounding up epsilon
-                                    so it is properly merged into 'single value' buckets.
-                                """
-                                if type(bound) == object:
-                                    return bound
-                                return round(bound, 37)
 
                             # if ranges match we found our bucket, propagate doc_count into 'ranges' field
                             # note that we must round to the 37th decimal place to round epsilon to 0
@@ -881,7 +881,7 @@ class SearchBuilder:
                         # })
                         # But for now, add this value to all ranges that include 0
                         for r in result_facet['ranges']:
-                            lower, upper = r.get('from', -1e38), r.get('to', 1e38)
+                            lower, upper = round_bound(r.get('from', -1e38)), round_bound(r.get('to', 1e38))
                             if lower <= 0 <= upper:
                                 r['doc_count'] += hit_difference
 
