@@ -459,8 +459,8 @@ class PanelOne extends React.PureComponent {
                                 id="submission-type"
                             >
                                 <Dropdown.Item eventKey="Accessioning" onSelect={this.handleSelectSubmissionType}>Accessioning</Dropdown.Item>
-                                <Dropdown.Item eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List</Dropdown.Item>
                                 <Dropdown.Item eventKey="Family History" onSelect={this.handleSelectSubmissionType}>Family History</Dropdown.Item>
+                                <Dropdown.Item eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List</Dropdown.Item>
                             </DropdownButton>
                         </div>
                     </div>
@@ -757,7 +757,7 @@ function FileAttachmentBtn(props){
             acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
             break;
         case "family_history":
-            acceptedTypes = "application/vnd.ms-excel"; // TODO: Only excel? No CSV/TSV -- verify this
+            acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"; // TODO: Only excel? No CSV/TSV -- verify this
             break;
     }
 
