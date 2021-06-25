@@ -104,14 +104,22 @@ export default class ExcelSubmissionView extends React.PureComponent {
     handleComplete(e){
         const { submissionItem: { uuid, ingestion_type: ingestionType, additional_data = null } = {} } = this.state;
         const { result: { genelist = '/search/?type=GeneList' } = {} } = additional_data || {};
+        const { target: { value = null } = {} } = e;
 
         switch(ingestionType) {
             case "metadata_bundle":
-            case "family_history": // Probably needs to change
                 navigate(`/search/?type=Case&ingestion_ids=${uuid}`);
                 break;
             case "genelist":
                 navigate(genelist);
+                break;
+            case "family_history": // Probably needs to change
+                console.log("handle complete event", e);
+                if (value === "View Family Info") {
+                    navigate(`#0`); // TODO: Replace with actual URL
+                } else if (value === "View Related Cases") {
+                    navigate(`/search/?type=Case&ingestion_ids=${uuid}`);
+                }
                 break;
             default:
                 break;
@@ -591,12 +599,17 @@ class PanelTwo extends React.PureComponent {
                                     </span>
                                 </>
                                 : <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span>}
-                            { ingestionType === "metadata_bundle" ? <div className="text-small mt-05"><span className="mr-1 text-600" data-tip="Use this ID to upload fastq files in SubmitCGAP.">Ingestion Submission UUID:</span> <object.CopyWrapper className="d-inline text-monospace" value={uuid} key="copy-uuid" data-tip="Click to copy">{ uuid }</object.CopyWrapper> </div>: null}
+                            { ingestionType === "metadata_bundle" || ingestionType === "family_history" ? <div className="text-small mt-05"><span className="mr-1 text-600" data-tip="Use this ID to upload fastq files in SubmitCGAP.">Ingestion Submission UUID:</span> <object.CopyWrapper className="d-inline text-monospace" value={uuid} key="copy-uuid" data-tip="Click to copy">{ uuid }</object.CopyWrapper> </div>: null}
                         </div>
                         <div className="align-self-end">
-                            <button type="button" className="btn btn-success" onClick={handleComplete}>
-                                {ingestionType === "metadata_bundle" ? "View New Cases" : "View Gene List" }
-                            </button>
+                            { ingestionType === "metadata_bundle" || ingestionType === "genelist" ?
+                                <button type="button" className="btn btn-success" onClick={handleComplete}>
+                                    {ingestionType === "metadata_bundle" ? "View New Cases" : "View Gene List" }
+                                </button> :
+                                <>
+                                    <button type="button" className="btn btn-success" onClick={handleComplete} value="View Family Info">View Family Info</button>
+                                    <button type="button" className="btn btn-success" onClick={handleComplete} value="View Related Cases">View Related Cases</button>
+                                </>}
                         </div>
                     </div>
                     { ingestionType !== "metadata_bundle" ? null : (
