@@ -60,13 +60,14 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
     });
 
     let gnomadExternalLink = null;
-    if (showingTable === "v3" && annotationID) {
+    const isDeletion = !ALT || ALT === "-"; // Can't link to deletions in gnomAD at moment.
+    if (showingTable === "v3" && annotationID && !isDeletion) {
         gnomadExternalLink = (
             "https://gnomad.broadinstitute.org/variant/"
             + annotationID // <- Do not wrap in encodeURIComponent -- transformed value isn't found.
             + "?dataset=gnomad_r3"
         );
-    } else if (showingTable === "v2" && hg19_chr && hg19_pos && ALT && REF) {
+    } else if (showingTable === "v2" && hg19_chr && hg19_pos && !isDeletion && REF) {
         gnomadExternalLink = (
             "https://gnomad.broadinstitute.org/variant/"
             + (`chr${hg19_chr}:${hg19_pos}${REF}_${ALT}`)
