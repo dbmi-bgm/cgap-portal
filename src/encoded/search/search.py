@@ -780,6 +780,12 @@ class SearchBuilder:
         result_facet['terms'] = sorted(list(term_to_bucket.values()),
                                        key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
 
+    @staticmethod
+    def determine_hit_difference(total, result_facet):
+        """ Determines the hit difference between the given total and the counts in the facets """
+        for r in result_facet['ranges']:
+            pass
+
     def format_facets(self, es_results):
         """
         This method processes the 'aggregations' component of the ES response.
@@ -872,18 +878,18 @@ class SearchBuilder:
                     # on certain range fields we wish to include documents that have
                     # no value - the bucket range aggregation does not return a No value
                     # bucket, so we must force it in and infer its counts - Will 6/21/21
-                    hit_difference = total_hits - bucket_hits
-                    if hit_difference > 0:
+                    # hit_difference = total_hits - bucket_hits
+                    # if hit_difference > 0:
                         # Eventually, pass the "No value" bucket to the client
                         # result_facet['ranges'].append({
                         #     'key': 'No value',
                         #     'doc_count': hit_difference
                         # })
                         # But for now, add this value to all ranges that include 0
-                        for r in result_facet['ranges']:
-                            lower, upper = round_bound(r.get('from', -1e38)), round_bound(r.get('to', 1e38))
-                            if lower <= 0 <= upper:
-                                r['doc_count'] += hit_difference
+                        # for r in result_facet['ranges']:
+                        #     lower, upper = round_bound(r.get('from', -1e38)), round_bound(r.get('to', 1e38))
+                        #     if lower <= 0 <= upper:
+                        #         r['doc_count'] += hit_difference
 
                 # process terms agg
                 else:

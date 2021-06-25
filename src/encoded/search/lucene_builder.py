@@ -667,7 +667,7 @@ class LuceneBuilder:
         for or_term in inner_should:
             # this may be naive, but assume first non-terms
             # filter is the No value query
-            if TERMS in or_term:
+            if TERMS in or_term or RANGE in or_term:
                 continue
             else:
                 inner_bool = or_term
