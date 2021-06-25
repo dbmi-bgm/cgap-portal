@@ -270,15 +270,20 @@ class VariantSample(Item):
             InheritanceMode.INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER: 15,  # X-linked recessive (Maternal)
             InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER: 16,  # X-linked dominant (Maternal)
             InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER: 17,  # X-linked dominant (Paternal)
-            'X-linked': 17,
             InheritanceMode.INHMODE_LABEL_Y_LINKED: 18,  # Y-linked dominant
-            'Y-linked': 18,
             InheritanceMode.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT: 19,  # Low relevance, homozygous in a parent
             InheritanceMode.INHMODE_LABEL_NONE_MN: 20,  # Low relevance, multiallelic site family
             InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 21,  # Low relevance, present in both parent(s)
             InheritanceMode.INHMODE_LABEL_NONE_DOT: 22,  # Low relevance, missing call(s) in family
             InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 23,  # Low relevance, mismatching chrXY genotype(s)
             '_default': 1000  # arbitrary large number
+        },
+        'proband_only_inheritance_modes': {
+            'Compound Het (Unphased/strong_pair)': 1,
+            'Compound Het (Unphased/medium_pair)': 2,
+            'Compound Het (Unphased/weak_pair)': 3,
+            'X-linked': 4,
+            'Y-linked': 5
         }
     }
 
