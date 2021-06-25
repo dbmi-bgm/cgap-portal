@@ -920,8 +920,10 @@ class PedigreeMetadata:
         """
         family_metadata = {}
         for alias, item in self.individuals.items():
-            family_metadata.setdefault(item['family_id'],
-                                       {'family_id': item['family_id'], 'members': []})
+            family_metadata.setdefault(
+                item['family_id'],
+                {'family_id': item['family_id'], 'members': [], 'ingestion_ids': [self.ingestion_id]}
+            )
             family_metadata[item['family_id']]['members'].append(alias)
             if item.get('proband', False):
                 if 'proband' not in family_metadata[item['family_id']]:
