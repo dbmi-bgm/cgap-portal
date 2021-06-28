@@ -245,3 +245,22 @@ class TestCustomEmbed:
         assert api_call["status"] == "error"
         for item_id in bad_ids:
             assert item_id in api_call["detail"]
+
+    def test_actions_field(self, testapp, bgm_user_testapp, variant_sample_list):
+        """
+        Test "actions" field embedded identically to that of a GET request
+        for an item.
+        """
+        vsl_uuid = variant_sample_list["uuid"]
+        vsl_atid = variant_sample_list["@id"]
+        testapp.patch_json(vsl_atid, {"status": "shared"}, status=200)
+        url_params = EMBED_URL + "?id=" + vsl_uuid
+        bgm_vsl_embed_url = _embed_with_url_params(bgm_user_testapp, url_params)
+        admin_vsl_embed_url = _embed_with_url_params(testapp, url_params)
+        bgm_embedded = bgm_user_testapp.get(vsl_atid).json
+        admin_embedded = testapp.get(vsl_atid).json
+        assert bgm_vsl_embed_url["actions"] != admin_vsl_embed_url["actions"]
+        assert bgm_embedded["actions"] == bgm_vsl_embed_url["actions"]
+        assert len(admin_embedded["actions"]) == len(admin_vsl_embed_url["actions"])
+        for action in admin_embedded["actions"]:
+            assert action in admin_vsl_embed_url["actions"]
