@@ -582,9 +582,9 @@ class GenericInterpretationPanel extends React.PureComponent {
         // console.log("GenericInterpretationPanel state", stateToSave);
         // console.log("lastSavedNote", lastSavedNote);
 
-        const onReturnToCaseClick = useCallback(function(){
+        const onReturnToCaseClick = function(){
             return navigate(`/cases/${caseSource}/#case-info.interpretation`);
-        }); // We presume props.caseSource doesnt' change in this component, if does, we can add `[ caseSource ]` as 2nd param to useCallback.
+        }; // We presume props.caseSource doesnt' change in this component, if does, we can add `[ caseSource ]` as 2nd param to useCallback.
 
         return (
             <div className="interpretation-panel">
