@@ -103,8 +103,14 @@ export default class ExcelSubmissionView extends React.PureComponent {
 
     handleComplete(e){
         const { submissionItem: { uuid, ingestion_type: ingestionType, additional_data = null } = {} } = this.state;
-        const { result: { genelist = '/search/?type=GeneList' } = {} } = additional_data || {};
+        const {
+            result: {
+                genelist = '/search/?type=GeneList',
+                patch: { family = null }
+            } = {}
+        } = additional_data || {};
         const { target: { value = null } = {} } = e;
+        const { 0: familyAtID = null } = Object.keys(family) || [];
 
         switch(ingestionType) {
             case "metadata_bundle":
@@ -114,11 +120,10 @@ export default class ExcelSubmissionView extends React.PureComponent {
                 navigate(genelist);
                 break;
             case "family_history": // Probably needs to change
-                console.log("handle complete event", e);
                 if (value === "View Family Info") {
-                    navigate(`#0`); // TODO: Replace with actual URL
+                    navigate(familyAtID || "/?type=Family&sort=-date_created");
                 } else if (value === "View Related Cases") {
-                    navigate(`/search/?type=Case&ingestion_ids=${uuid}`);
+                    navigate(`/search/?type=Case&family.ingestion_ids=${uuid}`);
                 }
                 break;
             default:
@@ -608,7 +613,7 @@ class PanelTwo extends React.PureComponent {
                                 </button> :
                                 <>
                                     <button type="button" className="btn btn-success" onClick={handleComplete} value="View Family Info">View Family Info</button>
-                                    <button type="button" className="btn btn-success" onClick={handleComplete} value="View Related Cases">View Related Cases</button>
+                                    <button type="button" className="btn btn-success ml-05" onClick={handleComplete} value="View Related Cases">View Related Cases</button>
                                 </>}
                         </div>
                     </div>
