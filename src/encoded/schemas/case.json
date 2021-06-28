@@ -33,6 +33,9 @@
             "$ref": "mixins.json#/modified"
         },
         {
+            "$ref": "mixins.json#/ingestion_ids"
+        },
+        {
             "$ref": "mixins.json#/status"
         },
         {
@@ -109,16 +112,6 @@
             "title": "Variant Sample List Identifier",
             "description": "uuid of associated VariantSampleList item",
             "type": "string"
-        },
-        "ingestion_ids": {
-            "title": "Submission IDs",
-            "description": "uuids of the IngestionSubmission items that created/edited this case",
-            "type": "array",
-            "items": {
-                "title": "Submission ID",
-                "description": "an IngestionSubmission item that created or edited this case",
-                "type": "string"
-            }
         }
     },
     "facets": {
