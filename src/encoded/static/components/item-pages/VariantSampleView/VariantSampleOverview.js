@@ -277,7 +277,7 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
  * this markup for layout purposes, but wanted to keep separation of functionality, so that component is defined/props are passed
  * in inside VariantSampleOverview).
  */
-class InterpretationController extends React.Component {
+class InterpretationController extends React.PureComponent {
 
     constructor(props) {
         super(props);
@@ -403,7 +403,7 @@ class InterpretationController extends React.Component {
 
         return (
             <React.Fragment>
-                <Collapse in={showACMGInvoker && newContext}>
+                <Collapse in={!!(showACMGInvoker && newContext)}>
                     <div>{/** Collapse seems not to work without wrapper element */}
                         <ACMGInvoker invokedFromSavedNote={acmg_guidelines} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} />
                     </div>
