@@ -59,6 +59,7 @@ class SearchBuilder:
     ADDITIONAL_FACETS = 'additional_facet'  # specifies an aggregation to compute in addition
     RESCUE_TERMS = 'rescue_terms'  # special facet field that contains terms that should always have buckets
     DEBUG = 'debug'  # search debug parameter
+    CARDINALITY_RANGE = '-3.4028E38-*'
     MISSING = object()
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
@@ -861,35 +862,36 @@ class SearchBuilder:
                     # TODO - refactor ?
                     # merge bucket labels from ranges into buckets
                     total_hits = es_results.get('hits', {}).get('total', 0)
-                    bucket_hits = 0
-                    for r in result_facet['ranges']:
-                        for b in bucket_location['buckets']:
-
+                    agg_cardinality = 0
+                    for b in bucket_location['buckets']:
+                        if b['key'] == self.CARDINALITY_RANGE:
+                            agg_cardinality = b['doc_count']
+                            continue
+                        for r in result_facet['ranges']:
                             # if ranges match we found our bucket, propagate doc_count into 'ranges' field
                             # note that we must round to the 37th decimal place to round epsilon to 0
                             # this is such a small round that info should be preserved in all actual cases
                             if (round_bound(r.get('from', self.MISSING)) == round_bound(b.get('from', self.MISSING)) and
                                     round_bound(r.get('to', self.MISSING)) == round_bound(b.get('to', self.MISSING))):
                                 r['doc_count'] = b['doc_count']
-                                bucket_hits += b['doc_count']
                                 break
 
                     # Normally, this difference would be zero, but when searching
                     # on certain range fields we wish to include documents that have
                     # no value - the bucket range aggregation does not return a No value
                     # bucket, so we must force it in and infer its counts - Will 6/21/21
-                    # hit_difference = total_hits - bucket_hits
-                    # if hit_difference > 0:
+                    hit_difference = total_hits - agg_cardinality
+                    if hit_difference > 0:
                         # Eventually, pass the "No value" bucket to the client
                         # result_facet['ranges'].append({
                         #     'key': 'No value',
                         #     'doc_count': hit_difference
                         # })
                         # But for now, add this value to all ranges that include 0
-                        # for r in result_facet['ranges']:
-                        #     lower, upper = round_bound(r.get('from', -1e38)), round_bound(r.get('to', 1e38))
-                        #     if lower <= 0 <= upper:
-                        #         r['doc_count'] += hit_difference
+                        for r in result_facet['ranges']:
+                            lower, upper = round_bound(r.get('from', -1e38)), round_bound(r.get('to', 1e38))
+                            if lower <= 0 <= upper:
+                                r['doc_count'] += hit_difference
 
                 # process terms agg
                 else:

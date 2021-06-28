@@ -34,7 +34,8 @@ class LuceneBuilder:
     """
     to_from_pattern = re.compile("^(.*)[.](to|from)$")
     RANGE_DIRECTIONS = ['gt', 'gte', 'lt', 'lte']
-    SMALLEST_NONZERO_IEEE_32 = 1.1754e-38  # smallest epsilon > 0
+    SMALLEST_NONZERO_IEEE_32 = 1.1754e-38  # smallest epsilon > 0 (estimate)
+    SMALLEST_NEGATIVE_IEEE_32 = -3.4028e38
     # ref: http://www.cs.uwm.edu/classes/cs315/Bacon/Lecture/HTML/ch04s17.html
     # 1.00000000000000000000001 x 2^-127 = 1.1754e-38
 
@@ -947,6 +948,10 @@ class LuceneBuilder:
             if 'from' in r and 'to' in r:
                 if r['from'] == 0 and r['to'] == 0:
                     r['to'] = cls.SMALLEST_NONZERO_IEEE_32
+        # Add cardinality bucket
+        ranges.append({
+            'from': cls.SMALLEST_NEGATIVE_IEEE_32,
+        })
         return {
             RANGE: {
                 FIELD: query_field,
