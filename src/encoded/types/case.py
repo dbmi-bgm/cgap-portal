@@ -181,7 +181,7 @@ def _build_case_embedded_list():
         "individual.samples.files.quality_metric.status",
 
         # Family linkTo
-        "individual.families.ingestion_ids",
+        "individual.families.uuid",
 
         # Sample linkTo
         "sample.accession",
