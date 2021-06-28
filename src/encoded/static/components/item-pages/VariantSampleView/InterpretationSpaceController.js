@@ -405,32 +405,28 @@ export class InterpretationSpaceController extends React.Component {
             case (0): // Gene Notes
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps }
-                    hasNoteChanged={InterpretationSpaceController.hasNoteChanged} {...{ hasEditPermission, isFallback }}
+                    key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps } {...{ hasEditPermission, isFallback }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (1): // Variant Notes
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps }
-                    hasNoteChanged={InterpretationSpaceController.hasNoteChanged} {...{ hasEditPermission, isFallback }}
+                    key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps } {...{ hasEditPermission, isFallback }}
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (2): // Interpretation
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} wipACMGSelections={wipACMGSelections}
                     lastWIPNote={interpretationWIP} lastSavedNote={lastSavedInterpretation} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps }
-                    hasNoteChanged={InterpretationSpaceController.hasNoteChanged} {...{ hasEditPermission, autoClassification, toggleInvocation, isFallback }}
+                    key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps } {...{ hasEditPermission, autoClassification, toggleInvocation, isFallback }}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (3): // Discovery
                 panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
                     lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={3} saveToField="discovery_interpretation" noteType="note_discovery" { ...passProps }
-                    hasNoteChanged={InterpretationSpaceController.hasNoteChanged} {...{ hasEditPermission, isFallback }}
+                    key={3} saveToField="discovery_interpretation" noteType="note_discovery" { ...passProps } {...{ hasEditPermission, isFallback }}
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
                 );
                 break;
@@ -509,12 +505,12 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { setIsSubmitting, wipACMGSelections, isSubmitting, hasNoteChanged, lastSavedNote, otherDraftsUnsaved } = this.props;
+        const { setIsSubmitting, wipACMGSelections, isSubmitting, lastSavedNote, otherDraftsUnsaved } = this.props;
 
         const savedState = { ...this.state };
         savedState.acmg_guidelines = wipACMGSelections;
 
-        const isThisNoteUnsaved = hasNoteChanged(lastSavedNote, savedState);
+        const isThisNoteUnsaved = InterpretationSpaceController.hasNoteChanged(lastSavedNote, savedState);
         const anyNotesUnsaved = otherDraftsUnsaved || isThisNoteUnsaved;
 
         // Only trigger if switching from no unsaved to unsaved present or vice versa
@@ -550,17 +546,17 @@ class GenericInterpretationPanel extends React.Component {
     }
 
     componentWillUnmount() { // Before unmounting (as in switching tabs), save unsaved changes in controller state
-        const { saveToField, retainWIPStateOnUnmount, lastWIPNote, hasNoteChanged } = this.props;
+        const { saveToField, retainWIPStateOnUnmount, lastWIPNote } = this.props;
 
         // Only trigger if note has changed since last soft save (WIP)
-        if (hasNoteChanged(lastWIPNote, this.state)) {
+        if (InterpretationSpaceController.hasNoteChanged(lastWIPNote, this.state)) {
             // console.log("note has changed since last soft save... updating WIP");
             retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
         }
     }
 
     render() {
-        const { lastSavedNote = null, wipACMGSelections, noteLabel, noteType, schemas, hasNoteChanged, caseSource, hasEditPermission, autoClassification, toggleInvocation, isFallback } = this.props;
+        const { lastSavedNote = null, wipACMGSelections, noteLabel, noteType, schemas, caseSource, hasEditPermission, autoClassification, toggleInvocation, isFallback } = this.props;
         const {
             status: savedNoteStatus,
             last_modified: lastModified = null
@@ -578,13 +574,17 @@ class GenericInterpretationPanel extends React.Component {
         const stateToSave = { ...this.state };
         stateToSave.acmg_guidelines = wipACMGSelections;
 
-        const noteChangedSinceLastSave = hasNoteChanged(lastSavedNote, stateToSave);
+        const noteChangedSinceLastSave = InterpretationSpaceController.hasNoteChanged(lastSavedNote, stateToSave);
         const noteTextPresent = !!noteText;
         const isDraft = savedNoteStatus === "in review";
         const isCurrent = savedNoteStatus === "current";
         const isApproved = savedNoteStatus === "approved";
         // console.log("GenericInterpretationPanel state", stateToSave);
         // console.log("lastSavedNote", lastSavedNote);
+
+        const onReturnToCaseClick = useCallback(function(){
+            return navigate(`/cases/${caseSource}/#case-info.interpretation`);
+        }); // We presume props.caseSource doesnt' change in this component, if does, we can add `[ caseSource ]` as 2nd param to useCallback.
 
         return (
             <div className="interpretation-panel">
@@ -606,9 +606,9 @@ class GenericInterpretationPanel extends React.Component {
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
-                    <Button variant="primary btn-block mt-05" onClick={() => { navigate(`/cases/${caseSource}/#case-info.interpretation`)}}>
+                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={onReturnToCaseClick}>
                         Return to Case
-                    </Button>: null}
+                    </button> : null}
             </div>
         );
     }
@@ -794,9 +794,15 @@ function GenericFieldForm(props) {
     const fieldsJSX = useMemo(function() {
         return fieldsArr.map((fieldDataObj) => {
             const { field, value, autoClassification, toggleInvocation } = fieldDataObj;
-            if (field === "acmg_guidelines") { return (<ACMGPicker key={field} selections={value} {...{ schemas, field, autoClassification, toggleInvocation, getFieldProperties, isFallback }}/>); }
-            return (<NoteFieldDrop key={field} {...{ schemas, noteType, value, field, getFieldProperties, isFallback }}
-                onOptionChange={onDropOptionChange} />);
+            if (field === "acmg_guidelines") {
+                return (
+                    <ACMGPicker key={field} selections={value} {...{ schemas, field, autoClassification, toggleInvocation, getFieldProperties, isFallback }}/>
+                );
+            }
+            return (
+                <NoteFieldDrop key={field} {...{ schemas, noteType, value, field, getFieldProperties, isFallback }}
+                    onOptionChange={onDropOptionChange} />
+            );
         }).sort().reverse(); // Reverse really just to get Variant candidacy to show up last. May need a better solution if more fields added in future.
     }, [ schemas, noteType, fieldsArr ]);
 
@@ -807,7 +813,7 @@ function GenericFieldForm(props) {
 }
 
 function ACMGPicker(props) {
-    const { field, selections = [], schemas = null, onOptionChange, cls="mb-1", getFieldProperties, autoClassification, toggleInvocation, isFallback } = props;
+    const { field, selections = [], schemas = null, getFieldProperties, autoClassification, toggleInvocation, isFallback } = props;
     if (!schemas) {
         return null;
     }
@@ -833,7 +839,7 @@ function ACMGPicker(props) {
 
             { autoClassification ? (
                 <>
-                    <label className="w-100 text-small">CGAP's Classification:</label>
+                    <label className="w-100 text-small">CGAP&apos;s Classification:</label>
                     <div className="w-100 mb-08 ml-1">
                         <i className="status-indicator-dot ml-1 mr-1" data-status={autoClassification} />{autoClassification}
                     </div>
