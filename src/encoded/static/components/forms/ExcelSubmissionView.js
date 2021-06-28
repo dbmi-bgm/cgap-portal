@@ -119,7 +119,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
             case "genelist":
                 navigate(genelist);
                 break;
-            case "family_history": // Probably needs to change
+            case "family_history":
                 if (value === "View Family Info") {
                     navigate(familyAtID || "/?type=Family&sort=-date_created");
                 } else if (value === "View Related Cases") {
@@ -617,7 +617,7 @@ class PanelTwo extends React.PureComponent {
                                 </>}
                         </div>
                     </div>
-                    { ingestionType !== "metadata_bundle" ? null : (
+                    { ingestionType === "genelist" ? null : (
                         <>
                             <hr/>
                             <span className="pl-1">Results:</span>
