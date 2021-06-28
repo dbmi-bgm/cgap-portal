@@ -84,7 +84,7 @@ export class VariantSampleListController extends React.PureComponent {
         console.info("Fetching VariantSampleList ...");
         const vslFetchCallback = (resp) => {
             console.info("Fetched VariantSampleList", resp);
-            const { 0: { "@id": vslID, error = null } = {} } = resp;
+            const { "@id": vslID, error = null } = resp;
 
             if (scopedRequest !== this.currentRequest) {
                 // Request superseded, cancel it.
@@ -101,7 +101,7 @@ export class VariantSampleListController extends React.PureComponent {
             this.setState(function({ refreshCount: prevRefreshCount, variantSampleListItem: prevItem }){
                 const { "@id": prevAtID = null } = prevItem || {};
                 const nextState = {
-                    "variantSampleListItem": resp[0],
+                    "variantSampleListItem": resp,
                     "isLoadingVariantSampleListItem": false
                 };
                 if (prevAtID && vslID !== prevAtID) {
@@ -115,11 +115,10 @@ export class VariantSampleListController extends React.PureComponent {
         // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
         this.setState({ "isLoadingVariantSampleListItem": true }, () => {
             scopedRequest = this.currentRequest = ajax.load(
-                '/embed',
+                variantSampleListID + "?datastore=database",
                 vslFetchCallback,
-                "POST",
-                vslFetchCallback,
-                JSON.stringify({ ids: [variantSampleListID] })
+                "GET",
+                vslFetchCallback
             );
         });
     }
