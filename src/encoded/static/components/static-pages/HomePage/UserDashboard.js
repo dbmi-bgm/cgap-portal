@@ -98,6 +98,10 @@ function AboveCasesTableOptions(props){
                         </div>
                     </h3>
                     <div className="btn-container">
+                        <a className="btn btn-primary mr-1" href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Family History">
+                            <i className="icon icon-plus fas" />
+                            <span className="ml-1 d-none d-sm-inline">Submit Family History</span>
+                        </a>
                         <a className="btn btn-primary mr-1" href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Gene List">
                             <i className="icon icon-plus fas" />
                             <span className="ml-1 d-none d-sm-inline">Submit New Gene List(s)</span>
