@@ -1,7 +1,7 @@
 {
-    "title": "Document",
-    "description": "Additional files like pdf, doc, txt",
-    "id": "/profiles/document.json",
+    "title": "Image",
+    "description": "Image file and caption.",
+    "id": "/profiles/image.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [

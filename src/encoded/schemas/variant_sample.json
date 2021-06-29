@@ -1352,6 +1352,16 @@
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 21,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0
+                },
+                {
+                    "from": 0,
+                    "to": 5
+                }
+            ],
             "grouping": "Pop. Frequency (gnomAD v3)"
         },
         "variant.csq_gnomadg_ac-xy": {
@@ -1365,11 +1375,8 @@
                     "to": 0
                 },
                 {
-                    "from": 1,
+                    "from": 0,
                     "to": 5
-                },
-                {
-                    "from": 6
                 }
             ],
             "grouping": "Pop. Frequency (gnomAD v3)"
@@ -1444,6 +1451,16 @@
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 33,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0
+                },
+                {
+                    "from": 0,
+                    "to": 5
+                }
+            ],
             "grouping": "Pop. Frequency (gnomAD v2 exome)"
         },
         "variant.csq_gnomade2_ac-xy": {
@@ -1457,11 +1474,8 @@
                     "to": 0
                 },
                 {
-                    "from": 1,
+                    "from": 0,
                     "to": 5
-                },
-                {
-                    "from": 6
                 }
             ],
             "grouping": "Pop. Frequency (gnomAD v2 exome)"
