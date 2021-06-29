@@ -111,8 +111,8 @@ def external_creds(bucket, key, name=None, profile_name=None):
             ]
         }
         # boto.set_stream_logger('boto3')
-        conn = boto3.client('sts', aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
-                            aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"))
+        conn = boto3.client('sts', aws_access_key_id=os.environ.get("S3_AWS_ACCESS_KEY_ID"),
+                            aws_secret_access_key=os.environ.get("S3_AWS_SECRET_ACCESS_KEY"))
         token = conn.get_federation_token(Name=name, Policy=json.dumps(policy))
         # 'access_key' 'secret_key' 'expiration' 'session_token'
         credentials = token.get('Credentials')
