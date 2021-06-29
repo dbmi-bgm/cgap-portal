@@ -6,6 +6,7 @@
 
 import os
 import logging
+import subprocess
 from dcicutils.qa_utils import override_environ
 from dcicutils.deployment_utils import IniFileManager
 from dcicutils.secrets_utils import assume_identity
@@ -19,7 +20,6 @@ _MY_DIR = os.path.dirname(__file__)
 class CGAPDockerIniFileManager(IniFileManager):
     """ This runs at top level, so path is slightly different. """
     # should work but doesn't (missing cgap-portal): os.path.join(os.path.dirname(_MY_DIR), "pyproject.toml")
-    # TODO: repair via
     # expected = <hardwired>
     # actual = <computed>
     # assert actual == expected, "The actual value %s was not what we expected, %s." % (actual, expected)
@@ -36,7 +36,10 @@ def build_production_ini_from_global_application_configuration():
     # build production.ini
     with override_environ(**identity):
 
-        CGAPDockerIniFileManager.build_ini_file_from_template('cgap_any_alpha.ini', 'production.ini')
+        CGAPDockerIniFileManager.build_ini_file_from_template(
+            '/home/nginx/cgap-portal/deploy/ini_files/cgap_any_alpha.ini',
+            '/home/nginx/cgap-portal/production.ini'
+        )
 
 
 if __name__ == '__main__':
