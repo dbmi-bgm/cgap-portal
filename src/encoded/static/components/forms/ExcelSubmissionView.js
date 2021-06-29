@@ -638,7 +638,7 @@ class PanelTwo extends React.PureComponent {
 
 function CreatedItemsTable(props) {
     const { aliasToAtIDMap = {} } = props;
-    const aliases = Object.keys(aliasToAtIDMap);
+    const aliases = Object.keys(aliasToAtIDMap).sort();
 
     const persistent = aliases.map((alias) => {
         const atID = aliasToAtIDMap[alias];
@@ -659,7 +659,7 @@ function CreatedItemsTable(props) {
             <object.CopyWrapper className="d-inline text-monospace" value={accession} key="copy-accession">{ accession }</object.CopyWrapper>
         );
 
-        return <PartialList.Row {...{ label, value }} key={alias} className="pb-1" />;
+        return <PartialList.Row {...{ label, value }} key={alias} colSm="7" colMd="7" colLg="7" className="pb-1" />;
     });
     return <PartialList {...{ persistent }} className="pl-1 pt-1"/>;
 }
