@@ -99,14 +99,14 @@ function AboveCasesTableOptions(props){
                         </div>
                     </h3>
                     <DropdownButton variant="primary text-600 text-capitalize" title={<span><i className="icon fas icon-plus mr-05"/>Submit New...</span>} id="submit-new">
-                        <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Gene List">
-                            Gene List(s)
-                        </Dropdown.Item>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add">
                             Case(s)
                         </Dropdown.Item>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Family History">
                             Family History
+                        </Dropdown.Item>
+                        <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Gene List">
+                            Gene List(s)
                         </Dropdown.Item>
                     </DropdownButton>
                 </div>
