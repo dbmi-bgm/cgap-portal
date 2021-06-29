@@ -114,7 +114,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
 
         switch(ingestionType) {
             case "metadata_bundle":
-                navigate(`/search/?type=Case&ingestion_ids=${uuid}`);
+                navigate(`/search/?type=Case&ingestion_ids=${uuid}&proband=true`);
                 break;
             case "genelist":
                 navigate(genelist);
