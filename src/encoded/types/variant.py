@@ -64,7 +64,7 @@ def build_variant_embedded_list():
     """
     embedded_list = [
         "interpretations.classification",
-        "interpretations.acmg_rules_invoked",
+        "interpretations.acmg_rules_invoked.*",
         "interpretations.acmg_rules_with_modifier",
         "interpretations.conclusion",
         "interpretations.note_text",
