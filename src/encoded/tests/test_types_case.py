@@ -121,13 +121,13 @@ def new_case(testapp, project, institution, fam, new_sample_processing):
     return data
 
 
-@pytest.mark.parametrize('num_samples, analysis_type', [
-    (1, 'WGS'),  # proband only
-    (2, 'WGS-Group'),  # proband and father
-    (3, 'WES-Trio'),  # proband, father, mother
-    (4, 'WES-Group')])  # proband, father, mother, brother
+@pytest.mark.parametrize('num_samples, analysis_type, proband_only', [
+    (1, 'WGS', True),  # proband only
+    (2, 'WGS-Group', False),  # proband and father
+    (3, 'WES-Trio', False),  # proband, father, mother
+    (4, 'WES-Group', False)])  # proband, father, mother, brother
 def test_case_additional_facets(testapp, project, institution, new_case,
-                                new_sample_processing, num_samples, analysis_type):
+                                new_sample_processing, num_samples, analysis_type, proband_only):
     """
     tests that additional facets are added to initial_search_href_filter_addon calc prop as appropriate:
     none for proband only, mother and father genotype labels for trio, mother/father/sibling
@@ -149,6 +149,12 @@ def test_case_additional_facets(testapp, project, institution, new_case,
             # genotype labels for this relation should NOT be an additional facet in this prop
             assert (f'associated_genotype_labels.{relation}_genotype_label'
                     not in case['additional_variant_sample_facets'])
+    if proband_only:
+        assert 'proband_only_inheritance_modes' in case['additional_variant_sample_facets']
+        assert 'inheritance_modes' not in case['additional_variant_sample_facets']
+    else:
+        assert 'proband_only_inheritance_modes' not in case['additional_variant_sample_facets']
+        assert 'inheritance_modes' in case['additional_variant_sample_facets']
 
 
 def test_case_proband_case(testapp, proband_case, mother_case):

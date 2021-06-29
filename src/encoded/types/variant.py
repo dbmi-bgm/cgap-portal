@@ -24,6 +24,14 @@ log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
 ANNOTATION_ID_SEP = '_'
 
+# Compound Het constants
+CMPHET_PHASED_STRONG = 'Compound Het (Phased/strong_pair)'
+CMPHET_PHASED_MED = 'Compound Het (Phased/medium_pair)'
+CMPHET_PHASED_WEAK = 'Compound Het (Phased/weak_pair)'
+CMPHET_UNPHASED_STRONG = 'Compound Het (Unphased/strong_pair)'
+CMPHET_UNPHASED_MED = 'Compound Het (Unphased/medium_pair)'
+CMPHET_UNPHASED_WEAK = 'Compound Het (Unphased/weak_pair)'
+
 
 def extend_embedded_list(embedded_list, fd, typ, prefix=None):
     """ Extends the given embedded list with embeds from fd. Helper method for
@@ -259,12 +267,12 @@ class VariantSample(Item):
             InheritanceMode.INHMODE_LABEL_DE_NOVO_WEAK: 3,  # de novo (weak)
             InheritanceMode.INHMODE_LABEL_DE_NOVO_CHRXY: 4,  # de novo (chrXY) XXX: no GATK?
             InheritanceMode.INHMODE_LABEL_RECESSIVE: 5,  # Recessive
-            'Compound Het (Phased/strong_pair)': 6,  # cmphet all auto-generated, see compute_cmphet_inheritance_modes
-            'Compound Het (Phased/medium_pair)': 7,
-            'Compound Het (Phased/weak_pair)': 8,
-            'Compound Het (Unphased/strong_pair)': 9,
-            'Compound Het (Unphased/medium_pair)': 10,
-            'Compound Het (Unphased/weak_pair)': 11,
+            CMPHET_PHASED_STRONG: 6,  # cmphet all auto-generated, see compute_cmphet_inheritance_modes
+            CMPHET_PHASED_MED: 7,
+            CMPHET_PHASED_WEAK: 8,
+            CMPHET_UNPHASED_STRONG: 9,
+            CMPHET_UNPHASED_MED: 10,
+            CMPHET_UNPHASED_WEAK: 11,
             InheritanceMode.INHMODE_LABEL_LOH: 12,  # Loss of Heterozygousity
             InheritanceMode.INHMODE_DOMINANT_MOTHER: 13,  # Dominant (maternal)
             InheritanceMode.INHMODE_DOMINANT_FATHER: 14,  # Dominant (paternal)
@@ -278,6 +286,13 @@ class VariantSample(Item):
             InheritanceMode.INHMODE_LABEL_NONE_DOT: 22,  # Low relevance, missing call(s) in family
             InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 23,  # Low relevance, mismatching chrXY genotype(s)
             '_default': 1000  # arbitrary large number
+        },
+        'proband_only_inheritance_modes': {
+            CMPHET_UNPHASED_STRONG: 1,
+            CMPHET_UNPHASED_MED: 2,
+            CMPHET_UNPHASED_WEAK: 3,
+            'X-linked': 4,
+            'Y-linked': 5
         }
     }
 
@@ -364,7 +379,25 @@ class VariantSample(Item):
         return 0.0
 
     @calculated_property(schema={
-        "title": "bam_snapshot",
+        "title": "Inheritance Modes",
+        "description": "Inheritance Modes (only including those relevant to a proband-only analysis)",
+        "type": "array",
+        "items": {
+            "type": "string"
+        }
+    })
+    def proband_only_inheritance_modes(self, request, variant, inheritance_modes=[]):
+        proband_mode_options = [CMPHET_UNPHASED_STRONG, CMPHET_UNPHASED_MED, CMPHET_UNPHASED_WEAK]
+        proband_modes = [item for item in inheritance_modes if item in proband_mode_options]
+        variant = get_item_or_none(request, variant, 'Variant', frame='raw')
+        if variant['CHROM'] in ['X', 'Y']:
+            proband_modes.append(f"{variant['CHROM']}-linked")
+        if proband_modes:
+            return proband_modes
+        return None
+
+    @calculated_property(schema={
+        "title": "BAM Snapshot",
         "description": "Link to Genome Snapshot Image",
         "type": "string"
     })
