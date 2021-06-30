@@ -1,0 +1,32 @@
+
+
+<h5>Inheritance mode values are candidate labels based on novocaller, Cmp-Het caller, or GATK genotype assignments.</h5>
+
+<p>This case is labeled as proband-only. Since no other family members are in the analysis, most of the traditional inheritance modes can not be assigned. <b>Inheritance modes that can NOT be assigned on this case include:</b></p>
+<ul><li> de novo calls
+<li> Dominant (Maternal) vs Dominant (Paternal) vs Recessive
+<li> Loss of Heterozygosity
+<li> Phased Compound Heterozygous calls
+</ul>
+
+<p>Variants on the X or Y chromosome are still classified <b>X-linked</b> or <b>Y-linked</b>, even though they can't be called as dominant, recessive, or de novo.</p>
+
+<p><b>Compound Heterozygous calls</b>:</p>
+<ul>
+<li> Two heterozygous variants are classified as Compound Heterozygous candidates if they are on the same gene.
+<li> Phasing: This case will only have <b>Unphased</b> Compound Heterozygous candidates, as mother and father genotypes are required to classify a variant as <b>Phased</b> ([Mother: 0/1, Father: 0/0, Child 0/1] and [Mother: 0/0, Father: 0/1, Child 0/1] for the pair).
+<li> <b>Variant severity</b>: A variant is considered severe if it has a SpliceAI Delta Score >0.8 (S); a Clinvar interpretation of Pathogenic or Likely Pathogenic (C); or a HIGH or MODERATE Impact rating (Splice acceptor variant, Splice donor variant, Stop gained, Frameshift variant, Stop lost, Start lost, Transcript amplification, Inframe insertion, Inframe deletion, Missense variant, Protein altering variant).
+<li> Pair strength: Compound Heterozygous pairs are classified based on the severity of the two variants (HIGH, MODERATE, S, or C).
+<ul>
+<li> <b>strong pair</b>: both variants are one of (HIGH, MODERATE, S, or C).
+<li> <b>medium pair</b>: one of the variants are one of (HIGH, MODERATE, S, or C).
+<li> <b>weak pair</b>: neither of the variants are (HIGH, MODERATE, S, or C).
+</ul>
+<li> See Documentation for Details.
+</ul>
+
+<p><b>Low relevance</b>: </p>
+<ul>
+<li> Variants on multiallelic sites (e.g. G, T, A in different individuals) are not assigned inheritance mode values, except possibly compound heterozygous.
+<li> Variants with missing calls (./.) or calls that mismatch the sex (0/1 on chrX for a male) are not assigned inheritance mode values.
+<li> Variants with genotypes that do not meet any of the high relevant criteria above are not assigned GATK-based labels.
