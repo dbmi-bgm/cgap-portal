@@ -17,8 +17,8 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
     const {
         // Get/reuse default colExtMap from EmbeddedItemSearchTable
         columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
-        selectedItems,
-        onSelectItem,
+        selectedVariantSamples,
+        onSelectVariantSample,
         savedVariantSampleIDMap = {},
         isLoadingVariantSampleListItem,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
@@ -37,29 +37,29 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
                         <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <VariantSampleSelectionCheckbox {...{ selectedItems, onSelectItem, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />
+                            <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />
                             <VariantSampleDisplayTitleColumn />
                         </DisplayTitleColumnWrapper>
                     );
                 }
             }
         };
-    }, [ originalColExtMap, selectedItems, savedVariantSampleIDMap, isLoadingVariantSampleListItem ]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem ]);
 
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
 
 /** Based mostly on SPC SelectionItemCheckbox w. minor alterations */
 export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleSelectionCheckbox(props){
-    const { selectedItems, result, onSelectItem, savedVariantSampleIDMap, isLoadingVariantSampleListItem = false } = props;
+    const { selectedVariantSamples, result, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem = false } = props;
     const { "@id": resultID } = result;
     const isPrevSaved = savedVariantSampleIDMap[resultID];
-    const isSelected = selectedItems.has(resultID);
+    const isSelected = selectedVariantSamples.has(resultID);
     const isChecked = isPrevSaved || isSelected;
 
     const onChange = useCallback(function(e){
-        return onSelectItem(result, true);
-    }, [ onSelectItem, result ]);
+        return onSelectVariantSample(result, true);
+    }, [ onSelectVariantSample, result ]);
 
     return <input type="checkbox" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} className="mr-2" />;
 });

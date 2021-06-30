@@ -1,12 +1,14 @@
 'use strict';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { VariantSampleSelectionList, FinalizeCaseDataStore, CaseSpecificSelectionsPanel, parentTabTypes } from './VariantSampleSelection';
+import { VariantSampleSelectionList, parentTabTypes, FinalizeCaseDataStore } from './VariantSampleSelection';
+import { CaseSpecificSelectionsPanel } from './variant-sample-selection-panels';
 
 
 
 export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
     const { variantSampleListItem, schemas, context, isLoadingVariantSampleListItem = false } = props;
+    const commonProps = { isLoadingVariantSampleListItem, variantSampleListItem, schemas, context };
 
     return (
         <React.Fragment>
@@ -15,9 +17,8 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
             </h1>
             <div>
                 <FinalizeCaseDataStore>
-                    <CaseSpecificSelectionsPanel />
-                    <VariantSampleSelectionList {...{ isLoadingVariantSampleListItem, variantSampleListItem, schemas, context }}
-                        parentTabType={parentTabTypes.FINALIZECASE} />
+                    <CaseSpecificSelectionsPanel {...commonProps} />
+                    <VariantSampleSelectionList {...commonProps} parentTabType={parentTabTypes.FINALIZECASE} />
                 </FinalizeCaseDataStore>
             </div>
         </React.Fragment>

@@ -1,12 +1,10 @@
 'use strict';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import queryString from 'query-string';
-import moment from 'moment';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
-import { variantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './../../browse/variantSampleColumnExtensionMap';
+import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
 
 
 /**
@@ -32,7 +30,8 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         context,
         isLoadingVariantSampleListItem = false,
         parentTabType = parentTabTypes.INTERPRETATION,
-        // From FinalizeCaseDataStore (if used):
+
+        // From FinalizeCaseDataStore (if used, else undefined):
         toggleSendToKnowledgeBaseStoreItems,
         toggleSendToReportStoreItems,
         sendToKnowledgeBaseStore,
@@ -226,7 +225,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         { acmgClassification ?
                             <div className="w-100 text-left">
                                 <i className="status-indicator-dot mr-1" data-status={acmgClassification}/>
-                                {acmgClassification}
+                                { acmgClassification }
                             </div>
                             : <div className="w-100 text-left"><PlaceHolderStatusIndicator /></div> }
                     </div>
@@ -237,7 +236,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                             { geneCandidacy ?
                                 <span className="text-left">
                                     <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
-                                    {geneCandidacy}
+                                    { geneCandidacy }
                                 </span>
                                 : <PlaceHolderStatusIndicator/> }
                         </div>
@@ -246,7 +245,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                             { variantCandidacy ?
                                 <span className="w-100 text-left">
                                     <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/>
-                                    {variantCandidacy}
+                                    { variantCandidacy }
                                 </span>
                                 : <PlaceHolderStatusIndicator/> }
                         </div>
@@ -279,7 +278,7 @@ const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicato
 });
 
 
-function VariantSampleExpandedNotes (props) {
+const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNotes (props) {
     const {
         variantSample,
         toggleSendToKnowledgeBaseStoreItems,
@@ -515,7 +514,7 @@ function VariantSampleExpandedNotes (props) {
             </div>
         </React.Fragment>
     );
-}
+});
 
 const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onKBChange, reportChecked, kbChecked }) {
     return (
@@ -535,9 +534,6 @@ const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onK
 
 
 
-
-
-
 export class FinalizeCaseDataStore extends React.PureComponent {
 
     constructor(props) {
@@ -547,7 +543,7 @@ export class FinalizeCaseDataStore extends React.PureComponent {
         this.toggleSendToReportStoreItems = this.toggleStoreItems.bind(this, "sendToReportStore");
 
         this.state = {
-            // Keyed by note ID and value will contain { noteItem, vslItem } (references)
+            // Keyed by Note Item UUID and value is boolean true/false for now (can be changed)
             sendToKnowledgeBaseStore: {},
             sendToReportStore: {}
         };
@@ -588,112 +584,4 @@ export class FinalizeCaseDataStore extends React.PureComponent {
         });
     }
 
-}
-
-
-
-
-
-
-
-
-export function CaseSpecificSelectionsPanel () {
-    const [ isExpanded, setIsExpanded ] = useState(false);
-    const toggleExpanded = useCallback(function(e){
-        e.stopPropagation();
-        setIsExpanded(!isExpanded);
-    }, [ isExpanded ]);
-    return (
-        <div className="card mb-24">
-            <div className={"card-header py-3 bg-primary-dark" + (!isExpanded ? " rounded" : "")}>
-                <h4 className="text-400 my-0 d-flex align-items-center clickable text-white" onClick={toggleExpanded}>
-                    <i className={"mr-1 icon fas icon-" + (isExpanded ? "minus" : "plus")}/>
-                    <span>Case Specific Selections</span>
-                </h4>
-            </div>
-            { isExpanded ?
-                <div className="card-body">
-                    <ACMGClassificationSelections />
-                </div>
-                : null }
-        </div>
-    );
-}
-
-function ACMGClassificationSelections () {
-    return (
-        <div>
-            <h4 className="text-400 mt-0">ACMG Classification Selections</h4>
-            <div className="row">
-                <div className="col-12 col-lg-6">
-                    <h5 className="text-400">Move to Report</h5>
-                    <ACMGClassificationSelectionsCommonCheckboxList />
-                </div>
-                <div className="col-12 col-lg-6">
-                    <h5 className="text-400">Send to KnowledgeBase</h5>
-                    <ACMGClassificationSelectionsCommonCheckboxList />
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function ACMGClassificationSelectionsCommonCheckboxList (props) {
-    // TODO: Have a common onChange passed to all of these, using something from props (TBD) to decide its logic
-
-    return (
-        <div>
-            <Checkbox>
-                Pathogenic Variants
-            </Checkbox>
-            <Checkbox>
-                Likely Pathogenic Variants
-            </Checkbox>
-            <Checkbox>
-                VUS Variants
-            </Checkbox>
-            <Checkbox>
-                Likely Benign Variants
-            </Checkbox>
-            <Checkbox>
-                Benign Variants
-            </Checkbox>
-        </div>
-    );
-}
-
-function VariantGeneSelections () {
-
-
-
-    return (
-        <div>
-            <h4 className="text-600">ACMG Classification Selections</h4>
-            <div className="row">
-                <div className="col-12 col-lg-6">
-                    <h5 className="text-400">Move to Report</h5>
-                    <div>
-                        <Checkbox>
-                            Strong
-                        </Checkbox>
-                        <Checkbox>
-                            Likely Pathogenic Variants
-                        </Checkbox>
-                        <Checkbox>
-                            VUS Variants
-                        </Checkbox>
-                        <Checkbox>
-                            Likely Benign Variants
-                        </Checkbox>
-                        <Checkbox>
-                            Benign Variants
-                        </Checkbox>
-                    </div>
-                </div>
-                <div className="col-12 col-lg-6">
-                    <h5 className="text-400">Send to KnowledgeBase</h5>
-                </div>
-            </div>
-        </div>
-    );
 }
