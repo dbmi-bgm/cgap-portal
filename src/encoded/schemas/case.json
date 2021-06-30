@@ -119,6 +119,12 @@
                 "description": "an IngestionSubmission item that created or edited this case",
                 "type": "string"
             }
+        },
+        "meta_workflow_run": {
+            "title": "MetaWorkflowRun",
+            "description": "Meta-workflow-run associated with this case",
+            "type": "string",
+            "linkTo": "MetaWorkflowRun"
         }
     },
     "facets": {

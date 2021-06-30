@@ -4,6 +4,7 @@ from uuid import UUID
 from dcicutils.misc_utils import ignored
 from pyramid.httpexceptions import HTTPBadRequest, HTTPForbidden
 from pyramid.security import Authenticated
+from pyramid.traversal import find_resource
 from pyramid.view import view_config
 from snovault.util import debug_log
 
@@ -21,6 +22,7 @@ KEYS_TO_IGNORE = [
     "display_title",
     "schema_version",
     "date_created",
+    "actions",
 ]
 FORBIDDEN_MSG = {"error": "no view permissions"}
 
@@ -54,6 +56,10 @@ class CustomEmbed:
         embedded; if the item is to be embedded at a subsequent depth, a
         message stating the item cannot be embedded is inserted instead.
 
+        Additionally, for the initial ID given to the API, if the item is
+        embedded, the "actions" field is included according to the request's
+        permissions, formatted identically to the calc props on items. 
+
         :param item_id: string uuid or @id
         :param depth: int of current embedding depth
         :param frame: string view to generate of item
@@ -70,6 +76,22 @@ class CustomEmbed:
                 item = FORBIDDEN_MSG
         except KeyError:
             self.invalid_ids.append(given_id)
+        if item and depth == -1:
+            actions = []
+            root_resource = self.request.root
+            item_path = item["@id"]
+            item_resource = find_resource(root_resource, item_path)
+            for action in ["edit", "create"]:
+                if self.request.has_permission(action, item_resource):
+                    actions.append({
+                        "name": action,
+                        "title": action.capitalize(),
+                        "profile": "/profiles/%s.json" % item_resource.type_info.name,
+                        "href": "%s?currentAction=%s" % (
+                            self.request.resource_path(item_resource), action
+                        )
+                    })
+            item["actions"] = actions
         return item
 
     def _minimal_embed(self, item_id, depth):
