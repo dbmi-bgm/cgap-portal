@@ -6,7 +6,6 @@
 
 import os
 import logging
-import subprocess
 from dcicutils.qa_utils import override_environ
 from dcicutils.deployment_utils import IniFileManager
 from dcicutils.secrets_utils import assume_identity
