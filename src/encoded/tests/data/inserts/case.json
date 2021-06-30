@@ -8,6 +8,7 @@
         "sample_processing": "4fdb481a-fbdb-4c0f-a68d-aac87f847a67",
         "family": "aa7d83a2-6886-4ca0-9402-7c49734ce3d4",
         "individual": "5ec91041-78a0-4758-abef-21c7f5fd9f12",
-        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf111"
+        "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf111",
+        "meta_workflow_run": "2a481229-03dd-44b9-b235-a8a005608262"
     }
 ]
