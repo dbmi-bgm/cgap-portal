@@ -1236,6 +1236,7 @@
             "extended_description": "src/encoded/docs/extended_description_VariantSample_inheritance_mode.html",
             "order": 15,
             "grouping": "Inheritance",
+            "default_hidden": true,
             "rescue_terms": [
                 "de novo (strong)",
                 "de novo (medium)",
@@ -1261,6 +1262,20 @@
                 "Low relevance, missing call(s) in family",
                 "Low relevance, mismatching chrXY genotype(s)",
                 "Low relevance, other"
+            ]
+        },
+        "proband_only_inheritance_modes": {
+            "title": "Inheritance Modes",
+            "extended_description": "src/encoded/docs/extended_description_VariantSample_inheritance_mode_probandonly.html",
+            "order": 15,
+            "grouping": "Inheritance",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Compound Het (Unphased/strong_pair)",
+                "Compound Het (Unphased/medium_pair)",
+                "Compound Het (Unphased/weak_pair)",
+                "X-linked",
+                "Y-linked"
             ]
         },
         "novoPP": {
@@ -1354,6 +1369,16 @@
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 21,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0
+                },
+                {
+                    "from": 0,
+                    "to": 5
+                }
+            ],
             "grouping": "Pop. Frequency (gnomAD v3)"
         },
         "variant.csq_gnomadg_ac-xy": {
@@ -1368,11 +1393,8 @@
                     "to": 0
                 },
                 {
-                    "from": 1,
+                    "from": 0,
                     "to": 5
-                },
-                {
-                    "from": 6
                 }
             ],
             "grouping": "Pop. Frequency (gnomAD v3)"
@@ -1449,6 +1471,16 @@
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 33,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0
+                },
+                {
+                    "from": 0,
+                    "to": 5
+                }
+            ],
             "grouping": "Pop. Frequency (gnomAD v2 exome)"
         },
         "variant.csq_gnomade2_ac-xy": {
@@ -1463,11 +1495,8 @@
                     "to": 0
                 },
                 {
-                    "from": 1,
+                    "from": 0,
                     "to": 5
-                },
-                {
-                    "from": 6
                 }
             ],
             "grouping": "Pop. Frequency (gnomAD v2 exome)"

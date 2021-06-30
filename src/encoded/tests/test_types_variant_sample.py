@@ -16,6 +16,54 @@ def bgm_test_variant_sample2(bgm_test_variant_sample):
     return bgm_test_variant_sample_copy
 
 
+@pytest.fixture
+def y_variant(bgm_user_testapp, bgm_project, institution):
+    item = {
+        'project': bgm_project['@id'],
+        'institution': institution["name"],
+        "ID": "rs104894976",
+        "ALT": "A",
+        "POS": 2787207,
+        "REF": "G",
+        "hg19": [
+            {
+                "hg19_pos": 2655248,
+                "hg19_chrom": "chrY",
+                "hg19_hgvsg": "NC_000024.9:g.2655248G>A"
+            }
+        ],
+        "CHROM": "Y"
+    }
+    return bgm_user_testapp.post_json('/variants', item).json['@graph'][0]
+
+@pytest.fixture
+def bgm_y_variant_sample(y_variant, institution, bgm_project):
+    # IS NOT pre-POSTed into DB.
+    return {
+        'variant': y_variant['@id'],
+        'AD': '1,3',
+        'CALL_INFO': 'my_test_sample',
+        'file': 'dummy-file-name',
+        'project': bgm_project['@id'],
+        'institution': institution['@id'],
+        'inheritance_modes': [
+            'Dominant (maternal)',
+            'Y-linked dominant',
+            'de novo (strong)',
+            'Compound Het (Unphased/strong_pair)',
+            'Compound Het (Phased/medium_pair)'
+        ]
+    }
+
+
+def test_variant_sample_proband_inheritance(bgm_user_testapp, bgm_y_variant_sample):
+    res = bgm_user_testapp.post_json(VARIANT_SAMPLE_URL, bgm_y_variant_sample, status=[201, 409]).json['@graph'][0]
+    assert sorted(res['proband_only_inheritance_modes']) == sorted([
+        'Y-linked',
+        'Compound Het (Unphased/strong_pair)',
+    ])
+
+
 @pytest.mark.integrated  # uses s3
 def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     """ Tests that we can correctly download an IGV image from the wfoutput bucket. """
