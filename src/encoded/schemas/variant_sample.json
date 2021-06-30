@@ -1287,6 +1287,7 @@
             "aggregation_type": "range",
             "number_step": "any",
             "order": 18,
+            "hide_facet_counts": true,
             "grouping": "Pop. Frequency (gnomAD v3)",
             "ranges": [
                 {
@@ -1316,6 +1317,7 @@
             "aggregation_type": "range",
             "number_step": "any",
             "order": 19,
+            "hide_facet_counts": true,
             "grouping": "Pop. Frequency (gnomAD v3)",
             "ranges": [
                 {
@@ -1356,9 +1358,10 @@
         },
         "variant.csq_gnomadg_ac-xy": {
             "title": "Hemizygous Count (v3)",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
             "number_step": 1,
             "order": 22,
+            "hide_facet_counts": true,
             "ranges": [
                 {
                     "from": 0,
@@ -1379,6 +1382,7 @@
             "aggregation_type": "range",
             "number_step": "any",
             "order": 30,
+            "hide_facet_counts": true,
             "grouping": "Pop. Frequency (gnomAD v2 exome)",
             "ranges": [
                 {
@@ -1408,6 +1412,7 @@
             "aggregation_type": "range",
             "number_step": "any",
             "order": 31,
+            "hide_facet_counts": true,
             "grouping": "Pop. Frequency (gnomAD v2 exome)",
             "ranges": [
                 {
@@ -1448,9 +1453,10 @@
         },
         "variant.csq_gnomade2_ac-xy": {
             "title": "Hemizygous Count (v2)",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
             "number_step": 1,
             "order": 34,
+            "hide_facet_counts": true,
             "ranges": [
                 {
                     "from": 0,
