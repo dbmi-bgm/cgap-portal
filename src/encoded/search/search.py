@@ -861,12 +861,12 @@ class SearchBuilder:
 
                     # TODO - refactor ?
                     # merge bucket labels from ranges into buckets
-                    total_hits = es_results.get('hits', {}).get('total', 0)
-                    agg_cardinality = 0
+                    # total_hits = es_results.get('hits', {}).get('total', 0)
+                    # agg_cardinality = 0
                     for b in bucket_location['buckets']:
-                        if b['key'] == self.CARDINALITY_RANGE:
-                            agg_cardinality = b['doc_count']
-                            continue
+                        # if b['key'] == self.CARDINALITY_RANGE:
+                        #     agg_cardinality = b['doc_count']
+                        #     continue
                         for r in result_facet['ranges']:
                             # if ranges match we found our bucket, propagate doc_count into 'ranges' field
                             # note that we must round to the 37th decimal place to round epsilon to 0
@@ -880,18 +880,18 @@ class SearchBuilder:
                     # on certain range fields we wish to include documents that have
                     # no value - the bucket range aggregation does not return a No value
                     # bucket, so we must force it in and infer its counts - Will 6/21/21
-                    hit_difference = total_hits - agg_cardinality
-                    if hit_difference > 0:
+                    # hit_difference = total_hits - agg_cardinality
+                    # if hit_difference > 0:
                         # Eventually, pass the "No value" bucket to the client
                         # result_facet['ranges'].append({
                         #     'key': 'No value',
                         #     'doc_count': hit_difference
                         # })
                         # But for now, add this value to all ranges that include 0
-                        for r in result_facet['ranges']:
-                            lower, upper = round_bound(r.get('from', -1e38)), round_bound(r.get('to', 1e38))
-                            if lower <= 0 <= upper:
-                                r['doc_count'] += hit_difference
+                        # for r in result_facet['ranges']:
+                        #     lower, upper = round_bound(r.get('from', -1e38)), round_bound(r.get('to', 1e38))
+                        #     if lower <= 0 <= upper:
+                        #         r['doc_count'] += hit_difference
 
                 # process terms agg
                 else:
