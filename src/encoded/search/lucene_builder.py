@@ -432,9 +432,9 @@ class LuceneBuilder:
             is_range, f_field, which = cls.extract_field_from_to(field)
             if is_range:
                 if which == 'to':
-                    range_direction = "lte"
+                    range_direction = 'lt'
                 else:
-                    range_direction = "gte"
+                    range_direction = 'gte'
 
                 # If schema for field is not found (and range_type thus not set),
                 # then treated as ordinary term filter (likely will get 0 results)
@@ -948,10 +948,6 @@ class LuceneBuilder:
             if 'from' in r and 'to' in r:
                 if r['from'] == 0 and r['to'] == 0:
                     r['to'] = cls.SMALLEST_NONZERO_IEEE_32
-        # Add cardinality bucket
-        ranges.append({
-            'from': cls.SMALLEST_NEGATIVE_IEEE_32,
-        })
         return {
             RANGE: {
                 FIELD: query_field,
