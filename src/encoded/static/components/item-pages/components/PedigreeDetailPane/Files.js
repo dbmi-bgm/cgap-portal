@@ -84,7 +84,8 @@ function FileArrayField (props) {
             </ul>
             { haveEditPermission ?
                 <DragAndDropFileUploadController {...{ fieldDisplayTitle, fieldType, fieldName, individualId, project, institution, fileSchema, files }}
-                    award={null} lab={null} cls="btn btn-sm btn-outline-dark mt-05" requireVerification multiselect/>
+                    award={null} lab={null} multiselect cls="btn btn-sm btn-outline-dark mt-05"
+                    requestVerificationMsg={<span>I certify that my file(s) do not contain <a href="https://www.hipaajournal.com/considered-phi-hipaa/" target="_blank" rel="noreferrer">Personal Health Information</a></span>}/>
                 : null }
         </div>
     );
