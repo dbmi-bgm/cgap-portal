@@ -8,7 +8,7 @@ import memoize from "memoize-one";
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 /**
- * Holds datastore=database representation of VariantSampleList Item
+ * Holds embedded-ish representation of VariantSampleList Item (minus gene list stuff, basically)
  * Gets refreshed after saving/moving VariantSamples to InterpretationTab
  * and upon mount.
  */
@@ -68,7 +68,7 @@ export class VariantSampleListController extends React.PureComponent {
         }
     }
 
-    /** Fetches datastore=database `@@embedded` representation of 'state.variantSampleListID' */
+    /** Fetches `@@embedded`-ish representation of 'state.variantSampleListID' from embed api */
     fetchVariantSampleListItem(fnCallback = null){
         const { variantSampleListID } = this.state;
 
@@ -84,7 +84,7 @@ export class VariantSampleListController extends React.PureComponent {
         console.info("Fetching VariantSampleList ...");
         const vslFetchCallback = (resp) => {
             console.info("Fetched VariantSampleList", resp);
-            const { "@id": vslID, error = null } = resp;
+            const { 0: { "@id": vslID, error = null } = {} } = resp;
 
             if (scopedRequest !== this.currentRequest) {
                 // Request superseded, cancel it.
@@ -101,7 +101,7 @@ export class VariantSampleListController extends React.PureComponent {
             this.setState(function({ refreshCount: prevRefreshCount, variantSampleListItem: prevItem }){
                 const { "@id": prevAtID = null } = prevItem || {};
                 const nextState = {
-                    "variantSampleListItem": resp,
+                    "variantSampleListItem": resp[0],
                     "isLoadingVariantSampleListItem": false
                 };
                 if (prevAtID && vslID !== prevAtID) {
@@ -112,12 +112,14 @@ export class VariantSampleListController extends React.PureComponent {
 
         };
 
+        // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
         this.setState({ "isLoadingVariantSampleListItem": true }, () => {
             scopedRequest = this.currentRequest = ajax.load(
-                variantSampleListID + "?datastore=database",
+                '/embed',
                 vslFetchCallback,
-                "GET",
-                vslFetchCallback
+                "POST",
+                vslFetchCallback,
+                JSON.stringify({ ids: [variantSampleListID] })
             );
         });
     }
