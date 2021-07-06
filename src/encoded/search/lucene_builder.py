@@ -948,6 +948,8 @@ class LuceneBuilder:
             if 'from' in r and 'to' in r:
                 if r['from'] == 0 and r['to'] == 0:
                     r['to'] = cls.SMALLEST_NONZERO_IEEE_32
+            if 'to' in r and r['to'] != cls.SMALLEST_NONZERO_IEEE_32:
+                r['to'] += cls.SMALLEST_NONZERO_IEEE_32
         return {
             RANGE: {
                 FIELD: query_field,
