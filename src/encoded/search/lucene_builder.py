@@ -432,7 +432,7 @@ class LuceneBuilder:
             is_range, f_field, which = cls.extract_field_from_to(field)
             if is_range:
                 if which == 'to':
-                    range_direction = 'lt'
+                    range_direction = 'lte'
                 else:
                     range_direction = 'gte'
 

@@ -781,12 +781,6 @@ class SearchBuilder:
         result_facet['terms'] = sorted(list(term_to_bucket.values()),
                                        key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
 
-    @staticmethod
-    def determine_hit_difference(total, result_facet):
-        """ Determines the hit difference between the given total and the counts in the facets """
-        for r in result_facet['ranges']:
-            pass
-
     def format_facets(self, es_results):
         """
         This method processes the 'aggregations' component of the ES response.
