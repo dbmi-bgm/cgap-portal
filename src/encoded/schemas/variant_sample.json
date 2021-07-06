@@ -1292,7 +1292,6 @@
                 },
                 {
                     "from": 0.9,
-                    "to": 1,
                     "label": "de novo candidate (strong)"
                 }
             ]
