@@ -11,30 +11,6 @@ EMBED_URL = "/embed"
 KEYS_NOT_INCLUDED = ["@context", "actions", "aggregated-items", "validation-errors"]
 
 
-@pytest.fixture
-def variant_sample_list(
-    testapp, variant_sample, variant_sample_2, genelist, project, institution
-):
-    vs_1 = testapp.post_json(
-        "/variant-samples", variant_sample, status=201
-    ).json["@graph"][0]
-    vs_2 = testapp.post_json(
-        "/variant-samples", variant_sample_2, status=201
-    ).json["@graph"][0]
-    vs_list = {
-        "project": project["@id"],
-        "institution": institution["@id"],
-        "variant_samples": [
-            {"variant_sample_item": vs_1["@id"]},
-            {"variant_sample_item": vs_2["@id"]},
-        ],
-    }
-    response = testapp.post_json(
-        "/variant-sample-lists", vs_list, status=201
-    ).json["@graph"][0]
-    return response
-
-
 def _embed_with_url_params(testapp, embed_string, status="*"):
     """POST to embed endpoint with url parameters."""
     creation_post_data = {}
