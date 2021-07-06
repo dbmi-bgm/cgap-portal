@@ -112,6 +112,22 @@
             "title": "Variant Sample List Identifier",
             "description": "uuid of associated VariantSampleList item",
             "type": "string"
+        },
+        "ingestion_ids": {
+            "title": "Submission IDs",
+            "description": "uuids of the IngestionSubmission items that created/edited this case",
+            "type": "array",
+            "items": {
+                "title": "Submission ID",
+                "description": "an IngestionSubmission item that created or edited this case",
+                "type": "string"
+            }
+        },
+        "meta_workflow_run": {
+            "title": "MetaWorkflowRun",
+            "description": "Meta-workflow-run associated with this case",
+            "type": "string",
+            "linkTo": "MetaWorkflowRun"
         }
     },
     "facets": {
