@@ -196,10 +196,19 @@ rebuild-docker-production:
 	docker build -t ${ENV_NAME}:latest . --no-cache
 	make tag-and-push-docker-production
 
+build-docker-test:
+	# This will do the equivalent of
+	#    make ecr-login AWS_ACCOUNT=<selected-test-account>
+	#    make build-docker-production AWS_ACCOUNT=<selected-test-account> ENV_NAME=<selected-env>
+	# but it has to do the login inside the script, we can't do it separately here
+	# because it has to infer the correct AWS_ACCOUNT and ENV_NAME by nosing into
+	# ~/.aws_test/test_creds.sh looking for ACCOUNT_NUMBER (note: not AWS_ACCOUNT) and ENV_NAME.
+	scripts/build-docker-test --login  # The login must be done inside the script, after inferring account number
+
 build-docker-production:
 	@echo "Making build-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
 	docker build -t ${ENV_NAME}:latest .
-	make tag-and-push-docker-production
+	make tag-and-push-docker-production ENV_NAME=${ENV_NAME} AWS_ACCOUNT=${AWS_ACCOUNT}
 
 tag-and-push-docker-production:
 	@echo "Making tag-and-push-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
