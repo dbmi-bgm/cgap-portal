@@ -821,12 +821,15 @@ function ACMGPicker(props) {
     const fieldSchema = getFieldProperties(field);
     const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
 
-    const picked = selections.map((selection, i) => (
-        <div className={`acmg-invoker text-600 ${isFallback ? "unclickable" : "clickable"} text-monospace text-center mr-01 ml-01`} key={selection} data-criteria={selection} data-invoked={true}
-            data-tip={!isFallback ? "Click to deselect this rule": null} onClick={!isFallback ? () => toggleInvocation(selection): undefined}>
-            { selection }
-        </div>
-    ));
+    const picked = selections.map((selection, i) => {
+        const { rule_strength: strength, acmg_rule_name: rule } = selection;
+        return (
+            <div className={`acmg-invoker text-600 ${isFallback ? "unclickable" : "clickable"} text-monospace text-center mr-01 ml-01`} key={rule} data-criteria={rule} data-invoked={true}
+                data-tip={!isFallback ? "Click to deselect this rule": null} onClick={!isFallback ? () => toggleInvocation(selection): undefined}>
+                { rule } { !strength || strength !== "Default" ? strength : null }
+            </div>
+        );
+    });
 
     return (
         <React.Fragment>
