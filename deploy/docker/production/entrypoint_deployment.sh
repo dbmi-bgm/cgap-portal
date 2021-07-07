@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Running a CGAP deployment on the given environment"
 
@@ -15,7 +15,9 @@ poetry run create-mapping-on-deploy production.ini --app-name app
 
 # Load Data (based on development.ini, for now just master-inserts)
 # Not necessary after first deploy
-# poetry run load-data production.ini --app-name app --prod
+if [ -n "${INITIAL_DEPLOYMENT}" ]; then
+    poetry run load-data production.ini --app-name app --prod
+fi
 
 # Load access keys
 # Note that the secret name must match that which was created for this environment
