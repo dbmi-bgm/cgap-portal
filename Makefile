@@ -148,7 +148,7 @@ test-any:
 	poetry run python -m pytest -vv -r w --timeout=200
 
 test-npm:
-	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and not indexing"
+	poetry run python -m pytest -vv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not sloppy and not indexing"
 
 test-unit:
 	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and indexing"

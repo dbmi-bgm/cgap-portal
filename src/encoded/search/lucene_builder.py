@@ -33,6 +33,11 @@ class LuceneBuilder:
         be "entry-point" methods as well.
     """
     to_from_pattern = re.compile("^(.*)[.](to|from)$")
+    RANGE_DIRECTIONS = ['gt', 'gte', 'lt', 'lte']
+    SMALLEST_NONZERO_IEEE_32 = 1.1754e-38  # smallest epsilon > 0 (estimate)
+    SMALLEST_NEGATIVE_IEEE_32 = -3.4028e38
+    # ref: http://www.cs.uwm.edu/classes/cs315/Bacon/Lecture/HTML/ch04s17.html
+    # 1.00000000000000000000001 x 2^-127 = 1.1754e-38
 
     @staticmethod
     def apply_range_filters(range_filters, must_filters, es_mapping):
@@ -51,19 +56,26 @@ class LuceneBuilder:
         # nested range fields must also be separated from other nested sub queries - see comment in 'handle_nested_filters'
         for range_field, range_def in range_filters.items():
             nested_path = find_nested_path(range_field, es_mapping)
+            range_query = {RANGE: {range_field: range_def}}
+            if 'add_no_value' in range_def:
+                del range_def['add_no_value']
+                range_query = {
+                    BOOL: {
+                        SHOULD: [
+                            range_query,
+                            {BOOL: {MUST_NOT: {EXISTS: {FIELD: range_field}}}}
+                        ]
+                    }
+                }
             if nested_path:
                 must_filters.append(('range', {  # NOT using the constant, since the 2nd part is the lucene sub-query
                     NESTED: {
                         PATH: nested_path,
-                        QUERY: {
-                            RANGE: {range_field: range_def}
-                        }
+                        QUERY: range_query
                     }
                 }))
             else:
-                must_filters.append(('range', {
-                    RANGE: {range_field: range_def}
-                }))
+                must_filters.append(('range', range_query))
 
     @staticmethod
     def handle_should_query(field_name, options):
@@ -154,9 +166,10 @@ class LuceneBuilder:
                     should_arr = [must_terms] if must_terms else []
                     should_arr.append({EXISTS: {FIELD: query_field}})  # field=value OR field EXISTS
                     must_filters.append((query_field, {BOOL: {SHOULD: should_arr}}))
-                else:  # no filtering on 'No value'
-                    if must_terms: must_filters.append((query_field, must_terms))
-                if must_not_terms: must_not_filters.append((query_field, must_not_terms))
+                elif must_terms:  # no filtering on 'No value'
+                    must_filters.append((query_field, must_terms))
+                if must_not_terms:
+                    must_not_filters.append((query_field, must_not_terms))
 
         return must_filters, must_not_filters, must_filters_nested, must_not_filters_nested
 
@@ -252,7 +265,7 @@ class LuceneBuilder:
                                 else:
                                     insertion_point = _q[NESTED][QUERY][BOOL]
                                     if key not in insertion_point:  # this can happen if we are combining with 'No value'
-                                       insertion_point[key] = query[BOOL][key][0]
+                                        insertion_point[key] = query[BOOL][key][0]
                                     else:
                                         insertion_point[key].append(query[BOOL][key][0])
 
@@ -366,6 +379,30 @@ class LuceneBuilder:
         return False, None, None
 
     @classmethod
+    def canonicalize_bounds(cls, range_filter):
+        """ Canonicalizes the bounds of the range filter such that they are
+            inclusive on the lower bound and exclusive on the upper bound.
+        """
+        lower, upper = -1e38, 1e38  # very large numbers that should never be in range
+        for direction, pivot in range_filter.items():
+            pivot = float(pivot)
+            if direction == 'lte':
+                upper = pivot + cls.SMALLEST_NONZERO_IEEE_32
+            elif direction == 'lt':
+                upper = pivot
+            elif direction == 'gte':
+                lower = pivot
+            elif direction == 'gt':
+                lower = pivot - cls.SMALLEST_NONZERO_IEEE_32
+        return lower, upper
+
+    @classmethod
+    def range_includes_zero(cls, range_filter):
+        """ Returns True if the given range_filter includes the value 0. """
+        lower, upper = cls.canonicalize_bounds(range_filter)
+        return lower <= 0 <= upper
+
+    @classmethod
     def handle_range_filters(cls, request, result, field_filters, doc_types):
         """
         Constructs range_filters based on the given filters as part of the MUST sub-query
@@ -383,6 +420,7 @@ class LuceneBuilder:
             exists_field = False  # keep track of null values
             range_type = False  # If we determine is a range request (field.to, field.from), will be populated with string 'date' or 'numerical'
             range_direction = None
+            field_schema = {}
             if field == 'q' or field in COMMON_EXCLUDED_URI_PARAMS:
                 continue
             elif field == 'type' and term != 'Item':
@@ -394,9 +432,9 @@ class LuceneBuilder:
             is_range, f_field, which = cls.extract_field_from_to(field)
             if is_range:
                 if which == 'to':
-                    range_direction = "lte"
+                    range_direction = 'lte'
                 else:
-                    range_direction = "gte"
+                    range_direction = 'gte'
 
                 # If schema for field is not found (and range_type thus not set),
                 # then treated as ordinary term filter (likely will get 0 results)
@@ -443,7 +481,7 @@ class LuceneBuilder:
                     if range_type == 'date':
                         range_filters[query_field]['format'] = 'yyyy-MM-dd HH:mm'
 
-                if range_direction in ('gt', 'gte', 'lt', 'lte'):
+                if range_direction in cls.RANGE_DIRECTIONS:
                     if range_type == "date" and len(term) == 10:  # TODO: refactor to use regex -Will 06/24/2020
                         # Correct term to have hours, e.g. 00:00 or 23:59, if not otherwise supplied.
                         if range_direction == 'gt' or range_direction == 'lte':
@@ -461,6 +499,12 @@ class LuceneBuilder:
                         elif range_direction == 'lt' or range_direction == 'lte':
                             if term > range_filters[query_field][range_direction]:
                                 range_filters[query_field][range_direction] = term
+
+                # Check if schema requests no value
+                if 'items' in field_schema:  # we are searching on an array of numerics
+                    field_schema = field_schema['items']
+                if field_schema.get('add_no_value', False) and cls.range_includes_zero(range_filters[query_field]):
+                    range_filters[query_field]['add_no_value'] = True
 
             # add these to field_filters directly, handle later with build_sub_queries
             else:
@@ -624,7 +668,7 @@ class LuceneBuilder:
         for or_term in inner_should:
             # this may be naive, but assume first non-terms
             # filter is the No value query
-            if TERMS in or_term:
+            if TERMS in or_term or RANGE in or_term:
                 continue
             else:
                 inner_bool = or_term
@@ -893,9 +937,19 @@ class LuceneBuilder:
                 FILTER: facet_filters
             }
 
-    @staticmethod
-    def _build_range_aggregation(query_field, ranges):
-        """ Builds a range aggregation. """
+    @classmethod
+    def _build_range_aggregation(cls, query_field, ranges):
+        """ Builds a range aggregation.
+            Detects when 0-0 range is specified and replaces 'to' with the
+            smallest IEEE 32 value such that the bucket effectively only captures
+            the value 0.
+        """
+        for r in ranges:
+            if 'from' in r and 'to' in r:
+                if r['from'] == 0 and r['to'] == 0:
+                    r['to'] = cls.SMALLEST_NONZERO_IEEE_32
+            if 'to' in r and r['to'] != cls.SMALLEST_NONZERO_IEEE_32:
+                r['to'] += cls.SMALLEST_NONZERO_IEEE_32
         return {
             RANGE: {
                 FIELD: query_field,
