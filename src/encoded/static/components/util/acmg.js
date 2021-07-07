@@ -38,12 +38,13 @@ export const metadata = {
 /**
  * Converts an array into a map of rules to invoked state
  * @param {Array} arr An array of invoked criteria
- * @returns {Object} structured such that { [ACMG_Rule]: true/false }
+ * @returns {Object} structured such that { [ACMG_Rule]: rulestrength }
  */
 export function criteriaArrayToStateMap(arr) {
     const stateObj = {};
     arr.forEach((criteria) => {
-        stateObj[criteria] = true;
+        const { acmg_rule_name: rule, rule_strength: strength } = criteria || {};
+        stateObj[rule] = strength;
     });
 
     return stateObj;
@@ -52,18 +53,23 @@ export function criteriaArrayToStateMap(arr) {
 
 /**
  * Converts a rule state map back into an array of invoked items
- * @param {Object} obj structured such that { [ACMG_Rule]: true/false }
+ * @param {Object} obj structured such that { [ACMG_Rule]: rulestrength }
  * @returns {Array} An array of invoked criteria, sorted from least to most pathogenic
  */
 export function flattenStateMapIntoArray(obj) {
     // Flatten into an array of invoked items
     const invokedFlat = [];
     Object.keys(obj).forEach((rule) => {
-        if (obj[rule]) { invokedFlat.push(rule); }
+        if (obj[rule]) {
+            invokedFlat.push({ acmg_rule_name: rule, rule_strength: obj[rule] });
+        }
     });
     return invokedFlat.sort((a, b) => {
-        const orderA = metadata[a].order;
-        const orderB = metadata[b].order;
+        const { acmg_rule_name: ruleA } = a;
+        const { acmg_rule_name: ruleB } = b;
+        const orderA = metadata[ruleA].order;
+        const orderB = metadata[ruleB].order;
+
         return orderA - orderB;
     });
 }
