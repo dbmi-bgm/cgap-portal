@@ -1365,7 +1365,8 @@
         },
         "variant.csq_gnomadg_nhomalt": {
             "title": "Homozygous Count (v3)",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
+            "hide_facet_counts": true,
             "number_step": 1,
             "order": 21,
             "ranges": [
@@ -1467,7 +1468,8 @@
         },
         "variant.csq_gnomade2_nhomalt": {
             "title": "Homozygous Count (v2)",
-            "aggregation_type": "stats",
+            "aggregation_type": "range",
+            "hide_facet_counts": true,
             "number_step": 1,
             "order": 33,
             "ranges": [
