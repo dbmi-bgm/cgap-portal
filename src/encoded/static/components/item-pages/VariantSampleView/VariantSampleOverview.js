@@ -452,8 +452,9 @@ function ACMGInvoker(props) {
             <div className="d-flex acmg-guidelines-invoker align-items-center">
                 {acmgUtil.rules.map((rule) => {
                     const { [rule]: { description } = {} } = acmgUtil.metadata;
+                    const isInvoked = invoked[rule];
                     return (
-                        <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={invoked[rule]}
+                        <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={!!isInvoked}
                             onClick={() => toggleInvocation(rule)} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
                             { rule }
                         </div>
