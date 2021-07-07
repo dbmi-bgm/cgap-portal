@@ -185,22 +185,26 @@ export class AutoClassify {
         // Flatten into an array of invoked items
         const invokedFlat = flattenStateMapIntoArray(invoked);
 
-        // Collect counts of various evidence types
-        invokedFlat.forEach((rule) => {
-            const { strength, type } = metadata[rule];
+        // Collect counts of various evidence types (take into consideration non-default strengths)
+        invokedFlat.forEach((invoked) => {
+            const { rule_strength: strength, acmg_rule_name: rule } = invoked;
+            const { strength: defaultStrength, type } = metadata[rule];
+
+            const selectedStrength = (strength && strength !== "Default") ? strength : defaultStrength;
+
             if (type === "pathogenic") {
-                if (this.evidenceOfPathogenicity[strength] === undefined) {
-                    this.evidenceOfPathogenicity[strength] = 1;
+                if (this.evidenceOfPathogenicity[selectedStrength] === undefined) {
+                    this.evidenceOfPathogenicity[selectedStrength] = 1;
                 } else {
-                    const newValue = this.evidenceOfPathogenicity[strength] + 1;
-                    this.evidenceOfPathogenicity[strength] = newValue;
+                    const newValue = this.evidenceOfPathogenicity[selectedStrength] + 1;
+                    this.evidenceOfPathogenicity[selectedStrength] = newValue;
                 }
             } else {
-                if (this.evidenceOfBenignImpact[strength] === undefined) {
-                    this.evidenceOfBenignImpact[strength] = 1;
+                if (this.evidenceOfBenignImpact[selectedStrength] === undefined) {
+                    this.evidenceOfBenignImpact[selectedStrength] = 1;
                 } else {
-                    const newValue = this.evidenceOfBenignImpact[strength] + 1;
-                    this.evidenceOfBenignImpact[strength] = newValue;
+                    const newValue = this.evidenceOfBenignImpact[selectedStrength] + 1;
+                    this.evidenceOfBenignImpact[selectedStrength] = newValue;
                 }
             }
         });
@@ -260,22 +264,23 @@ export class AutoClassify {
     }
 
     /** Adjusts evidence on new invocation */
-    invoke(rule) {
-        // Adjust count of evidence types
-        const { strength, type } = metadata[rule];
+    invoke(rule, strength) {
+        // Adjust count of evidence types (take into consideration non-default strengths)
+        const { defaultStrength, type } = metadata[rule];
+        const selectedStrength = (strength && strength !== "Default") ? strength: defaultStrength;
         if (type === "pathogenic") {
-            if (this.evidenceOfPathogenicity[strength] === undefined) {
-                this.evidenceOfPathogenicity[strength] = 1;
+            if (this.evidenceOfPathogenicity[selectedStrength] === undefined) {
+                this.evidenceOfPathogenicity[selectedStrength] = 1;
             } else {
-                const newValue = this.evidenceOfPathogenicity[strength] + 1;
-                this.evidenceOfPathogenicity[strength] = newValue;
+                const newValue = this.evidenceOfPathogenicity[selectedStrength] + 1;
+                this.evidenceOfPathogenicity[selectedStrength] = newValue;
             }
         } else {
-            if (this.evidenceOfBenignImpact[strength] === undefined) {
-                this.evidenceOfBenignImpact[strength] = 1;
+            if (this.evidenceOfBenignImpact[selectedStrength] === undefined) {
+                this.evidenceOfBenignImpact[selectedStrength] = 1;
             } else {
-                const newValue = this.evidenceOfBenignImpact[strength] + 1;
-                this.evidenceOfBenignImpact[strength] = newValue;
+                const newValue = this.evidenceOfBenignImpact[selectedStrength] + 1;
+                this.evidenceOfBenignImpact[selectedStrength] = newValue;
             }
         }
 
@@ -283,15 +288,16 @@ export class AutoClassify {
     }
 
     /** Adjusts evidence and re-calculates classification on un-invocation */
-    uninvoke(rule) {
-        // Adjust count of evidence types
-        const { strength, type } = metadata[rule];
+    uninvoke(rule, strength) {
+        // Adjust count of evidence types (take into consideration non-default strengths)
+        const { defaultStrength, type } = metadata[rule];
+        const selectedStrength = (strength && strength === "Default") ? strength: defaultStrength;
         if (type === "pathogenic") {
-            const newValue = this.evidenceOfPathogenicity[strength] - 1;
-            this.evidenceOfPathogenicity[strength] = newValue;
+            const newValue = this.evidenceOfPathogenicity[selectedStrength] - 1;
+            this.evidenceOfPathogenicity[selectedStrength] = newValue;
         } else {
-            const newValue = this.evidenceOfBenignImpact[strength] - 1;
-            this.evidenceOfBenignImpact[strength] = newValue;
+            const newValue = this.evidenceOfBenignImpact[selectedStrength] - 1;
+            this.evidenceOfBenignImpact[selectedStrength] = newValue;
         }
 
         return this.updateClassification();
