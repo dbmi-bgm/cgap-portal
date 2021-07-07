@@ -17,6 +17,7 @@ import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
 import { VariantSampleListController } from './VariantSampleListController';
+import { FinalizeCaseDataStore } from './VariantSampleSelection';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -317,7 +318,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             Finalize Case
                         </span>
                     } dotPath=".finalize" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
-                        <FinalizeCaseTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem }} />
+                        <FinalizeCaseDataStore>
+                            <FinalizeCaseTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                        </FinalizeCaseDataStore>
                     </DotRouterTab>
                 </DotRouter>
                 : null }

@@ -13,7 +13,11 @@ export function CaseSpecificSelectionsPanel (props) {
         setIsExpanded(!isExpanded);
     }, [ isExpanded ]);
 
-    // state for Notes section will be here. Might move up some of memoized calculations up to here if needed later.
+    // state for Notes section will be here.
+
+    // We might calculate state for all checkboxes here as may need to infer state from others for intersections.
+
+
 
     return (
         <div className="card mb-24">
@@ -25,8 +29,15 @@ export function CaseSpecificSelectionsPanel (props) {
             </div>
             { isExpanded ?
                 <React.Fragment>
-                    <ACMGClassificationSelections {...props} />
-                    <VariantGeneSelections {...props} />
+                    <div className="card-body">
+                        <ACMGClassificationSelections {...props} />
+                    </div>
+                    <div className="card-body border-top">
+                        <VariantGeneSelections {...props} />
+                    </div>
+                    <div className="card-body border-top">
+                        <NoteTypeSelections {...props} />
+                    </div>
                 </React.Fragment>
                 : null }
         </div>
@@ -37,6 +48,7 @@ function ACMGClassificationSelections (props) {
     const {
         // From FinalizeCaseTab (& higher)
         variantSampleListItem,
+        alreadyInProjectNotes,
         // From FinalizeCaseDataStore
         toggleSendToKnowledgeBaseStoreItems,
         toggleSendToReportStoreItems,
@@ -44,23 +56,23 @@ function ACMGClassificationSelections (props) {
         sendToReportStore
     } = props;
     return (
-        <div className="card-body">
-            <h4 className="text-400 mt-0 mb-04">ACMG Classification Selections</h4>
+        <React.Fragment>
+            <h4 className="text-400 mt-0 8">ACMG Classification Selections</h4>
             <div className="row">
-                <div className="col-12 col-lg-6 px-3">
+                <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Move to Report</h5>
                     <ACMGClassificationSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems} />
                 </div>
-                <div className="col-12 col-lg-6 px-3">
+                <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Send to KnowledgeBase</h5>
-                    <ACMGClassificationSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems} />
+                    <ACMGClassificationSelectionsCommonCheckboxList alreadyInProjectNotes={alreadyInProjectNotes} variantSampleListItem={variantSampleListItem} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems} />
                 </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 }
 
-function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem }) {
+function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadyInProjectNotes }) {
     const { variant_samples = [] } = variantSampleListItem || {};
 
     const pathogenicityEnums = [
@@ -87,9 +99,10 @@ function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, v
                 const { variant_sample_item: { interpretation: { classification } } } = vsSelection;
                 return classification === enumOption;
             },
-            store
+            store,
+            alreadyInProjectNotes
         );
-    }, [ variantSamplesWithInterpretationClassification, store ]);
+    }, [ variantSamplesWithInterpretationClassification, store, alreadyInProjectNotes ]);
 
     const onChange = useCallback(function onChange (evt) {
         const eventKey = evt.target.getAttribute("data-key");
@@ -98,16 +111,18 @@ function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, v
         if (currentChecked) {
             // Uncheck all activeClassifications notes.
             objectsToToggle = activeSelectionsByClassification[eventKey].reduce(function(m, { variant_sample_item }){
-                return m.concat(getAllNoteUUIDsFromVariantSample(variant_sample_item));
+                return m.concat(getAllNotesFromVariantSample(variant_sample_item).map(function({ uuid }){ return uuid; }));
             }, []).map(function(noteUUID){
                 return [ noteUUID, true ];
             });
         } else {
             objectsToToggle = inactiveSelectionsByClassification[eventKey].reduce(function(m, { variant_sample_item }){
                 // Toggle only the yet-unselected note uuids.
-                const noteUUIDsToSelect = getAllNoteUUIDsFromVariantSample(variant_sample_item).filter(function(noteUUID){
-                    return !store[noteUUID];
-                });
+                const noteUUIDsToSelect = getAllNotesFromVariantSample(variant_sample_item)
+                    .map(function({ uuid }){ return uuid; })
+                    .filter(function(noteUUID){
+                        return !store[noteUUID];
+                    });
                 return m.concat(noteUUIDsToSelect);
             }, []).map(function(noteUUID){
                 return [ noteUUID, true ];
@@ -119,7 +134,7 @@ function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, v
     const commonProps = { onChange, checkboxStates, classificationCounts, indeterminateStates };
 
     return (
-        <div>
+        <div className="px-2">
             <KeyedCheckbox data-key="Pathogenic" {...commonProps}>
                 Pathogenic Variants
             </KeyedCheckbox>
@@ -146,6 +161,7 @@ function VariantGeneSelections (props) {
     const {
         // From FinalizeCaseTab (& higher)
         variantSampleListItem,
+        alreadyInProjectNotes,
         // From FinalizeCaseDataStore
         toggleSendToKnowledgeBaseStoreItems,
         toggleSendToReportStoreItems,
@@ -153,24 +169,24 @@ function VariantGeneSelections (props) {
         sendToReportStore
     } = props;
     return (
-        <div className="card-body border-top">
-            <h4 className="text-400 mt-0 mb-04">Variant / Gene Selections</h4>
+        <React.Fragment>
+            <h4 className="text-400 mt-0 mb-08">Variant / Gene Selections</h4>
             <div className="row">
-                <div className="col-12 col-lg-6 px-3">
+                <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Move to Report</h5>
                     <VariantGeneSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems} />
                 </div>
-                <div className="col-12 col-lg-6 px-3">
+                <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Send to KnowledgeBase</h5>
-                    <VariantGeneSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems} />
+                    <VariantGeneSelectionsCommonCheckboxList {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems} />
                 </div>
             </div>
-        </div>
+        </React.Fragment>
     );
 }
 
 
-function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem }) {
+function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadyInProjectNotes }) {
     const { variant_samples = [] } = variantSampleListItem || {};
 
     // These are currently same between gene and variant.
@@ -211,9 +227,10 @@ function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantS
                 const { variant_sample_item: { discovery_interpretation: { gene_candidacy } = {} } } = vsSelection;
                 return gene_candidacy === enumOption;
             },
-            store
+            store,
+            alreadyInProjectNotes
         );
-    }, [ variantSamplesWithGeneCandidacy, store ]);
+    }, [ variantSamplesWithGeneCandidacy, store, alreadyInProjectNotes ]);
 
     const {
         checkboxStates: variantCheckboxStates,
@@ -229,9 +246,10 @@ function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantS
                 const { variant_sample_item: { discovery_interpretation: { variant_candidacy } = {} } } = vsSelection;
                 return variant_candidacy === enumOption;
             },
-            store
+            store,
+            alreadyInProjectNotes
         );
-    }, [ variantSamplesWithVariantCandidacy, store ]);
+    }, [ variantSamplesWithVariantCandidacy, store, alreadyInProjectNotes ]);
 
     const onChange = useCallback(function onChange (evt) {
         const eventKey = evt.target.getAttribute("data-key");
@@ -253,16 +271,18 @@ function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantS
         if (currentChecked) {
             // Uncheck all activeClassifications notes.
             objectsToToggle = activeSelectionsByClassification[eventKey].reduce(function(m, { variant_sample_item }){
-                return m.concat(getAllNoteUUIDsFromVariantSample(variant_sample_item));
+                return m.concat(getAllNotesFromVariantSample(variant_sample_item).map(function({ uuid }){ return uuid; }));
             }, []).map(function(noteUUID){
                 return [ noteUUID, true ];
             });
         } else {
             objectsToToggle = inactiveSelectionsByClassification[eventKey].reduce(function(m, { variant_sample_item }){
                 // Toggle only the yet-unselected note uuids.
-                const noteUUIDsToSelect = getAllNoteUUIDsFromVariantSample(variant_sample_item).filter(function(noteUUID){
-                    return !store[noteUUID];
-                });
+                const noteUUIDsToSelect = getAllNotesFromVariantSample(variant_sample_item)
+                    .map(function({ uuid }){ return uuid; })
+                    .filter(function(noteUUID){
+                        return !store[noteUUID];
+                    });
                 return m.concat(noteUUIDsToSelect);
             }, []).map(function(noteUUID){
                 return [ noteUUID, true ];
@@ -281,7 +301,7 @@ function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantS
     };
 
     return (
-        <div>
+        <div className="px-2">
             <KeyedCheckbox data-key="Strong candidate" {...commonGeneCandidacyProps}>
                 Strong Candidate Genes
             </KeyedCheckbox>
@@ -313,43 +333,99 @@ function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantS
 }
 
 
-// function NoteTypeSelections (props) {
-//     const {
-//         // From FinalizeCaseTab (& higher)
-//         variantSampleListItem,
-//         // From FinalizeCaseDataStore
-//         toggleSendToKnowledgeBaseStoreItems,
-//         toggleSendToReportStoreItems,
-//         sendToKnowledgeBaseStore,
-//         sendToReportStore
-//     } = props;
-//     return (
-//         <div className="card-body border-top">
-//             <h4 className="text-400 mt-0 mb-04">Variant / Gene Selections</h4>
-//             <div className="row">
-//                 <div className="col-12 col-lg-6 px-3">
-//                     <h5 className="text-400 text-large">Move to Report</h5>
-//                     <VariantGeneSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems} />
-//                 </div>
-//                 <div className="col-12 col-lg-6 px-3">
-//                     <h5 className="text-400 text-large">Send to KnowledgeBase</h5>
-//                     <VariantGeneSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems} />
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// }
+function NoteTypeSelections (props) {
+    const {
+        // From FinalizeCaseTab (& higher)
+        variantSampleListItem,
+        // From FinalizeCaseDataStore
+        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToReportStoreItems,
+        sendToKnowledgeBaseStore,
+        sendToReportStore
+    } = props;
+    return (
+        <React.Fragment>
+            <h4 className="text-400 mt-0 mb-08">Notes</h4>
+            <div className="row">
+                <div className="col-12 col-lg-6">
+                    <h5 className="text-400 text-large">Move to Report</h5>
+                    <NoteTypeSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems} />
+                </div>
+                <div className="col-12 col-lg-6">
+                    <h5 className="text-400 text-large">Send to KnowledgeBase</h5>
+                    <NoteTypeSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems} />
+                </div>
+            </div>
+        </React.Fragment>
+    );
+}
+
+function NoteTypeSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem }) {
+    const { variant_samples = [] } = variantSampleListItem || {};
+
+    const noteTypes = [
+        "variant_notes",
+        "gene_notes",
+        "interpretation",
+        "discovery_interpretation"
+    ];
+
+
+    const { checkboxStates, indeterminateStates, classificationCounts, activeSelectionsByClassification, inactiveSelectionsByClassification } = useMemo(function(){
+        return getClassificationStates(
+            noteTypes,
+            variant_samples,
+            function(enumOption, vsSelection){
+                const { variant_sample_item: { [enumOption]: foundNote = null } } = vsSelection;
+                return !!(foundNote);
+            },
+            store
+        );
+    }, [ variant_samples, store ]);
+
+
+
+    const onChange = function(e){
+        console.log('EE');
+    };
+
+    const commonProps = {
+        onChange,
+        checkboxStates,
+        indeterminateStates,
+        classificationCounts
+    };
+
+    return (
+        <div className="px-2">
+            <KeyedCheckbox data-key="variant_notes" {...commonProps}>
+                Variant Notes
+            </KeyedCheckbox>
+            <KeyedCheckbox data-key="gene_notes" {...commonProps}>
+                Gene Notes
+            </KeyedCheckbox>
+            <KeyedCheckbox data-key="interpretation" {...commonProps}>
+                Clinicial Intepretation Notes
+            </KeyedCheckbox>
+            <KeyedCheckbox data-key="discovery_interpretation" {...commonProps}>
+                Gene Discovery Notes
+            </KeyedCheckbox>
+        </div>
+    );
+
+}
+
 
 
 
 /** Common re-usable components below **/
 
 
-function KeyedCheckbox({ children, "data-key": key, checkboxStates, indeterminateStates, classificationCounts, className, ...passProps }){
+function KeyedCheckbox({ children, "data-key": key, checkboxStates, indeterminateStates, classificationCounts, className, disabled, ...passProps }){
     const cls = "pb-02 pt-02" + (className ? " " + className : "");
     return (
         <Checkbox {...passProps} data-key={key} checked={checkboxStates[key]} className={cls}
-            disabled={classificationCounts[key] === 0} indeterminate={indeterminateStates[key]}>
+            disabled={disabled || classificationCounts[key] === 0} indeterminate={indeterminateStates[key]}>
             { children }
             &nbsp;
             <small className="text-secondary">({ classificationCounts[key] })</small>
@@ -357,33 +433,31 @@ function KeyedCheckbox({ children, "data-key": key, checkboxStates, indeterminat
     );
 }
 
-function getAllNoteUUIDsFromVariantSample(variantSampleItem, includeNotes = {}) {
-    //const {  } = includeNotes;
-    // TODO do intersection if Notes option(s) checked or unchecked.
+export function getAllNotesFromVariantSample(variantSampleItem) {
     const {
-        interpretation: { uuid: interpretationUUID } = {},
-        discovery_interpretation: { uuid: discoveryInterpretationUUID } = {},
-        gene_notes: { uuid: lastGeneNoteUUID } = {},
-        variant_notes: { uuid: lastVariantNoteUUID } = {}
+        interpretation = null,
+        discovery_interpretation = null,
+        gene_notes = null,
+        variant_notes = null
     } = variantSampleItem;
-    const noteUUIDs = [];
-    if (interpretationUUID) {
-        noteUUIDs.push(interpretationUUID);
+    const notes = [];
+    if (interpretation !== null && interpretation.uuid) {
+        notes.push(interpretation);
     }
-    if (discoveryInterpretationUUID) {
-        noteUUIDs.push(discoveryInterpretationUUID);
+    if (discovery_interpretation !== null && discovery_interpretation.uuid) {
+        notes.push(discovery_interpretation);
     }
-    if (lastGeneNoteUUID) {
-        noteUUIDs.push(lastGeneNoteUUID);
+    if (gene_notes !== null && gene_notes.uuid) {
+        notes.push(gene_notes);
     }
-    if (lastVariantNoteUUID) {
-        noteUUIDs.push(lastVariantNoteUUID);
+    if (variant_notes !== null && variant_notes.uuid) {
+        notes.push(variant_notes);
     }
-    return noteUUIDs;
+    return notes;
 }
 
 
-function getClassificationStates(possibleEnums, viableVariantSampleSelections, isMatchingClassificationFxn, store){
+function getClassificationStates(possibleEnums, viableVariantSampleSelections, isMatchingClassificationFxn, store, ignoreNoteUUIDs = {}){
     const checkboxStates = {};
     const indeterminateStates = {};
     const classificationCounts = {};
@@ -409,10 +483,14 @@ function getClassificationStates(possibleEnums, viableVariantSampleSelections, i
             classificationCounts[enumOption]++;
 
             // TODO do intersection if Notes option(s) checked or unchecked.
-            const isSelected = _.every(
-                getAllNoteUUIDsFromVariantSample(vsItem),
-                function(uuid){ return store[uuid]; }
-            );
+
+            // Currently does intersection or skip if Note is in `alreadyInProjectNotes` -- TODO: exclude from inactiveSelectionsByClassification if all notes from VS are in alreadyInProjectNotes.
+
+            const currentNotes = getAllNotesFromVariantSample(vsItem).filter(function({ uuid }){
+                return !ignoreNoteUUIDs[uuid];
+            });
+
+            const isSelected = _.every(currentNotes, function({ uuid }){ return store[uuid]; });
 
             if (isSelected) {
                 activeSelectionsByClassification[enumOption].push(vsSelection);

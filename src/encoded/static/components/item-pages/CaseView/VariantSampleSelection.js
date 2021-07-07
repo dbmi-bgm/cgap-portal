@@ -26,10 +26,12 @@ export const parentTabTypes = {
 export const VariantSampleSelectionList = React.memo(function VariantSampleSelectionList (props) {
     const {
         variantSampleListItem,
+        // sortedVariantSampleSelections, // TODO: If this is present, it will take priority over `variantSampleListItem.variant_samples`
         schemas,
         context,
         isLoadingVariantSampleListItem = false,
         parentTabType = parentTabTypes.INTERPRETATION,
+        alreadyInProjectNotes,
 
         // From FinalizeCaseDataStore (if used, else undefined):
         toggleSendToKnowledgeBaseStoreItems,
@@ -55,7 +57,8 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
             toggleSendToKnowledgeBaseStoreItems,
             toggleSendToReportStoreItems,
             sendToKnowledgeBaseStore,
-            sendToReportStore
+            sendToReportStore,
+            alreadyInProjectNotes
         };
         return vsSelections.map(function(selectionSubObject, idx){
             return (
@@ -84,6 +87,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         context,    // Case
         schemas,
         parentTabType = parentTabTypes.INTERPRETATION,
+        // From FinalizeCaseTab (if used):
+        alreadyInProjectNotes,
         // From FinalizeCaseDataStore (if used):
         toggleSendToKnowledgeBaseStoreItems,
         toggleSendToReportStoreItems,
@@ -144,7 +149,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             toggleSendToKnowledgeBaseStoreItems,
             toggleSendToReportStoreItems,
             sendToKnowledgeBaseStore,
-            sendToReportStore
+            sendToReportStore,
+            alreadyInProjectNotes
         };
         expandedNotesSection = <VariantSampleExpandedNotes {...noteSectionProps} />;
     }
@@ -284,79 +290,104 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
         toggleSendToKnowledgeBaseStoreItems,
         toggleSendToReportStoreItems,
         sendToKnowledgeBaseStore,
-        sendToReportStore
+        sendToReportStore,
+        alreadyInProjectNotes
     } = props;
     const {
-        interpretation: clinicalInterpretationNote = null,
-        discovery_interpretation: discoveryInterpretationNote = null,
-        variant_notes: lastVariantNote = null, // = [],
-        gene_notes: lastGeneNote = null, // = []
+        interpretation: {
+            uuid: clinicalInterpretationNoteUUID = null,
+            // status: clinicalInterpretationNoteStatus,
+            note_text: clinicalInterpretationNoteText,
+            classification
+        } = {},
+        discovery_interpretation: {
+            uuid: discoveryInterpretationNoteUUID = null,
+            // status: discoveryInterpretationNoteStatus,
+            note_text: discoveryInterpretationNoteText,
+            variant_candidacy,
+            gene_candidacy
+        } = {},
+        variant_notes: {
+            uuid: lastVariantNoteUUID = null,
+            note_text: lastVariantNoteText
+            // status: lastVariantNoteStatus
+        } = {},
+        gene_notes: {
+            uuid: lastGeneNoteUUID = null,
+            note_text: lastGeneNoteText
+            // status: lastGeneNoteStatus
+        } = {}
     } = variantSample;
 
-    const { classification } = clinicalInterpretationNote || {};
-
-    const { variant_candidacy, gene_candidacy } = discoveryInterpretationNote || {};
-
     // TODO check for view permissions?
-    const noVariantNotesSaved = lastVariantNote === null;
-    const noGeneNotesSaved = lastGeneNote === null;
-    const noDiscoveryNoteSaved = discoveryInterpretationNote === null;
-    const noClinicalNoteSaved = clinicalInterpretationNote === null;
+    const noVariantNotesSaved = lastVariantNoteUUID === null;
+    const noGeneNotesSaved = lastGeneNoteUUID === null;
+    const noDiscoveryNoteSaved = discoveryInterpretationNoteUUID === null;
+    const noClinicalNoteSaved = clinicalInterpretationNoteUUID === null;
+
 
     const allNotesToReportSelected = (
-        (noVariantNotesSaved       || sendToReportStore[lastVariantNote.uuid])
-        && (noGeneNotesSaved       || sendToReportStore[lastGeneNote.uuid])
-        && (noDiscoveryNoteSaved   || sendToReportStore[discoveryInterpretationNote.uuid])
-        && (noClinicalNoteSaved    || sendToReportStore[clinicalInterpretationNote.uuid])
+        (noVariantNotesSaved       || sendToReportStore[lastVariantNoteUUID])
+        && (noGeneNotesSaved       || sendToReportStore[lastGeneNoteUUID])
+        && (noDiscoveryNoteSaved   || sendToReportStore[discoveryInterpretationNoteUUID])
+        && (noClinicalNoteSaved    || sendToReportStore[clinicalInterpretationNoteUUID])
     );
 
     const someNotesToReportSelected = (
-        (!noVariantNotesSaved       && sendToReportStore[lastVariantNote.uuid])
-        || (!noGeneNotesSaved       && sendToReportStore[lastGeneNote.uuid])
-        || (!noDiscoveryNoteSaved   && sendToReportStore[discoveryInterpretationNote.uuid])
-        || (!noClinicalNoteSaved    && sendToReportStore[clinicalInterpretationNote.uuid])
+        (!noVariantNotesSaved       && sendToReportStore[lastVariantNoteUUID])
+        || (!noGeneNotesSaved       && sendToReportStore[lastGeneNoteUUID])
+        || (!noDiscoveryNoteSaved   && sendToReportStore[discoveryInterpretationNoteUUID])
+        || (!noClinicalNoteSaved    && sendToReportStore[clinicalInterpretationNoteUUID])
     );
 
     const allNotesToKnowledgeBaseSelected = (
-        (noVariantNotesSaved       || sendToKnowledgeBaseStore[lastVariantNote.uuid])
-        && (noGeneNotesSaved       || sendToKnowledgeBaseStore[lastGeneNote.uuid])
-        && (noDiscoveryNoteSaved   || sendToKnowledgeBaseStore[discoveryInterpretationNote.uuid])
-        && (noClinicalNoteSaved    || sendToKnowledgeBaseStore[clinicalInterpretationNote.uuid])
+        (noVariantNotesSaved       || sendToKnowledgeBaseStore[lastVariantNoteUUID])
+        && (noGeneNotesSaved       || sendToKnowledgeBaseStore[lastGeneNoteUUID])
+        && (noDiscoveryNoteSaved   || sendToKnowledgeBaseStore[discoveryInterpretationNoteUUID])
+        && (noClinicalNoteSaved    || sendToKnowledgeBaseStore[clinicalInterpretationNoteUUID])
+    );
+
+    const allNotesToKnowledgeBaseAlreadyStored = (
+        (noVariantNotesSaved       || alreadyInProjectNotes[lastVariantNoteUUID])
+        && (noGeneNotesSaved       || alreadyInProjectNotes[lastGeneNoteUUID])
+        && (noDiscoveryNoteSaved   || alreadyInProjectNotes[discoveryInterpretationNoteUUID])
+        && (noClinicalNoteSaved    || alreadyInProjectNotes[clinicalInterpretationNoteUUID])
     );
 
     const someNotesToKnowledgeBaseSelected = (
-        (!noVariantNotesSaved       && sendToKnowledgeBaseStore[lastVariantNote.uuid])
-        || (!noGeneNotesSaved       && sendToKnowledgeBaseStore[lastGeneNote.uuid])
-        || (!noDiscoveryNoteSaved   && sendToKnowledgeBaseStore[discoveryInterpretationNote.uuid])
-        || (!noClinicalNoteSaved    && sendToKnowledgeBaseStore[clinicalInterpretationNote.uuid])
+        (!noVariantNotesSaved       && sendToKnowledgeBaseStore[lastVariantNoteUUID])
+        || (!noGeneNotesSaved       && sendToKnowledgeBaseStore[lastGeneNoteUUID])
+        || (!noDiscoveryNoteSaved   && sendToKnowledgeBaseStore[discoveryInterpretationNoteUUID])
+        || (!noClinicalNoteSaved    && sendToKnowledgeBaseStore[clinicalInterpretationNoteUUID])
     );
+
 
 
     /* Common logic for selecting report and knowledgebase notes */
     function makeNoteSelectionObjects (useStore = sendToReportStore, allSelected = false) {
         const noteSelectionObjects = [];
         if (!noVariantNotesSaved) {
-            if (allSelected || !useStore[lastVariantNote.uuid]) {
+            if (allSelected || !useStore[lastVariantNoteUUID]) {
                 // Add, will uncheck
-                noteSelectionObjects.push([ lastVariantNote.uuid, true ]);
+                noteSelectionObjects.push([ lastVariantNoteUUID, true ]);
             }
         }
         if (!noGeneNotesSaved) {
-            if (allSelected || !useStore[lastGeneNote.uuid]) {
+            if (allSelected || !useStore[lastGeneNoteUUID]) {
                 // Add, will uncheck
-                noteSelectionObjects.push([ lastGeneNote.uuid, true ]);
+                noteSelectionObjects.push([ lastGeneNoteUUID, true ]);
             }
         }
         if (!noDiscoveryNoteSaved) {
-            if (allSelected || !useStore[discoveryInterpretationNote.uuid]) {
+            if (allSelected || !useStore[discoveryInterpretationNoteUUID]) {
                 // Add, will uncheck
-                noteSelectionObjects.push([ discoveryInterpretationNote.uuid, true ]);
+                noteSelectionObjects.push([ discoveryInterpretationNoteUUID, true ]);
             }
         }
         if (!noClinicalNoteSaved) {
-            if (allSelected || !useStore[clinicalInterpretationNote.uuid]) {
+            if (allSelected || !useStore[clinicalInterpretationNoteUUID]) {
                 // Add, will uncheck
-                noteSelectionObjects.push([ clinicalInterpretationNote.uuid, true ]);
+                noteSelectionObjects.push([ clinicalInterpretationNoteUUID, true ]);
             }
         }
         return noteSelectionObjects;
@@ -385,9 +416,10 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                 </div>
                 <div>
                     <Checkbox className="d-inline-block"
-                        checked={!!allNotesToKnowledgeBaseSelected}
+                        disabled={allNotesToKnowledgeBaseAlreadyStored}
+                        checked={!!allNotesToKnowledgeBaseSelected || allNotesToKnowledgeBaseAlreadyStored}
                         onChange={onChangeSendAllNotesToKnowledgeBase}
-                        indeterminate={someNotesToKnowledgeBaseSelected && !allNotesToKnowledgeBaseSelected}>
+                        indeterminate={someNotesToKnowledgeBaseSelected && !allNotesToKnowledgeBaseSelected && !allNotesToKnowledgeBaseAlreadyStored}>
                         Send All Notes to KnowledgeBase
                     </Checkbox>
                 </div>
@@ -401,13 +433,14 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                         { !noVariantNotesSaved ?
                             <React.Fragment>
                                 <NoteCheckboxes
-                                    reportChecked={!!sendToReportStore[lastVariantNote.uuid]}
-                                    kbChecked={!!sendToKnowledgeBaseStore[lastVariantNote.uuid]}
-                                    onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastVariantNote.uuid, true ] ]); })}
-                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ lastVariantNote.uuid, true ] ]); })} />
+                                    reportChecked={!!sendToReportStore[lastVariantNoteUUID]}
+                                    kbChecked={!!sendToKnowledgeBaseStore[lastVariantNoteUUID]}
+                                    onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastVariantNoteUUID, true ] ]); })}
+                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ lastVariantNoteUUID, true ] ]); })}
+                                    kbAlreadyStored={alreadyInProjectNotes[lastVariantNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
-                                        { lastVariantNote.note_text || <em>Note was left blank</em> }
+                                        { lastVariantNoteText || <em>Note was left blank</em> }
                                     </div>
                                 </div>
                             </React.Fragment>
@@ -421,13 +454,14 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                         { !noGeneNotesSaved ?
                             <React.Fragment>
                                 <NoteCheckboxes
-                                    reportChecked={!!sendToReportStore[lastGeneNote.uuid]}
-                                    kbChecked={!!sendToKnowledgeBaseStore[lastGeneNote.uuid]}
-                                    onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastGeneNote.uuid, true ] ]); })}
-                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ lastGeneNote.uuid, true ] ]); })} />
+                                    reportChecked={!!sendToReportStore[lastGeneNoteUUID]}
+                                    kbChecked={!!sendToKnowledgeBaseStore[lastGeneNoteUUID]}
+                                    onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastGeneNoteUUID, true ] ]); })}
+                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ lastGeneNoteUUID, true ] ]); })}
+                                    kbAlreadyStored={alreadyInProjectNotes[lastGeneNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
-                                        { lastGeneNote.note_text || <em>Note was left blank</em> }
+                                        { lastGeneNoteText || <em>Note was left blank</em> }
                                     </div>
                                 </div>
                             </React.Fragment>
@@ -442,14 +476,15 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
 
                             <React.Fragment>
                                 <NoteCheckboxes
-                                    reportChecked={!!sendToReportStore[clinicalInterpretationNote.uuid]}
-                                    kbChecked={!!sendToKnowledgeBaseStore[clinicalInterpretationNote.uuid]}
-                                    onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ clinicalInterpretationNote.uuid, true ] ]); })}
-                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ clinicalInterpretationNote.uuid, true ] ]); })} />
+                                    reportChecked={!!sendToReportStore[clinicalInterpretationNoteUUID]}
+                                    kbChecked={!!sendToKnowledgeBaseStore[clinicalInterpretationNoteUUID]}
+                                    onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ clinicalInterpretationNoteUUID, true ] ]); })}
+                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ clinicalInterpretationNoteUUID, true ] ]); })}
+                                    kbAlreadyStored={alreadyInProjectNotes[clinicalInterpretationNoteUUID]} />
 
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
-                                        { clinicalInterpretationNote.note_text || <em>Note was left blank</em> }
+                                        { clinicalInterpretationNoteText || <em>Note was left blank</em> }
                                     </div>
 
                                     <div className="clinical-classification flex-grow-0">
@@ -475,13 +510,14 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
 
                             <React.Fragment>
                                 <NoteCheckboxes
-                                    reportChecked={!!sendToReportStore[discoveryInterpretationNote.uuid]}
-                                    kbChecked={!!sendToKnowledgeBaseStore[discoveryInterpretationNote.uuid]}
-                                    onReportChange={ useCallback(function(){ toggleSendToReportStoreItems([ [ discoveryInterpretationNote.uuid, true ] ]); }) }
-                                    onKBChange={ useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ discoveryInterpretationNote.uuid, true ] ]); }) } />
+                                    reportChecked={!!sendToReportStore[discoveryInterpretationNoteUUID]}
+                                    kbChecked={!!sendToKnowledgeBaseStore[discoveryInterpretationNoteUUID]}
+                                    onReportChange={ useCallback(function(){ toggleSendToReportStoreItems([ [ discoveryInterpretationNoteUUID, true ] ]); }) }
+                                    onKBChange={ useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ discoveryInterpretationNoteUUID, true ] ]); }) }
+                                    kbAlreadyStored={alreadyInProjectNotes[discoveryInterpretationNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
-                                        { discoveryInterpretationNote.note_text || <em className="text-secondary">Note was left blank</em> }
+                                        { discoveryInterpretationNoteText || <em className="text-secondary">Note was left blank</em> }
                                     </div>
 
                                     <div className="discovery-gene-candidacy flex-grow-0">
@@ -516,13 +552,14 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
     );
 });
 
-const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onKBChange, reportChecked, kbChecked }) {
+const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onKBChange, reportChecked, kbChecked, kbAlreadyStored }) {
     return (
         <div className="d-flex flex-column flex-xl-row text-small">
             <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={onReportChange} checked={reportChecked}>
                 Send to Report
             </Checkbox>
-            <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={onKBChange} checked={kbChecked}>
+            <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={kbAlreadyStored ? null : onKBChange}
+                checked={kbAlreadyStored || kbChecked} disabled={kbAlreadyStored}>
                 Send to KnowledgeBase
             </Checkbox>
         </div>
