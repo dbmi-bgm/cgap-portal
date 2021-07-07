@@ -18,7 +18,7 @@ EXPECTED_FIELDS = ['no', 'field_name', 'vcf_field', 'source_name', 'source_versi
                    'description', 'value_example', 'enum_list', 'do_import',
                    'scope', 'schema_title', 'links_to', 'embedded_field',
                    'calculated_property', 'pattern', 'default', 'min', 'max', 'link', 'comments',
-                   'annotation_space_location', 'abbreviation']
+                   'annotation_space_location', 'abbreviation', 'add_no_value']
 EXPECTED_INSERT = {'field_name': 'CHROM', 'vcf_field': 'CHROM', 'schema_title': 'Chromosome',
                    'do_import': True, 'scope': 'variant', 'source_name': 'VCF',
                    'source_version': 'VCFv4.2', 'description': 'Chromosome',
@@ -32,7 +32,7 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid',
                           'transcript.vep_consequence.var_conseq_name']
 VARIANT_TABLE_VERSION = 'annV0.5.4'
-VARIANT_TABLE_DATE = '04.20.2021'
+VARIANT_TABLE_DATE = '06.23.2021'
 NUMBER_ANNOTATION_FIELDS = 236
 SAMPLE_FIELDS_EXPECTED = 26
 VARIANT_FIELDS_EXPECTED = 210
@@ -180,6 +180,9 @@ def test_generate_variant_schema(MTParser, variant_items):
     assert properties['csq_gnomadg_af_popmax']['min'] == 0
     assert properties['csq_gnomadg_af_popmax']['max'] == 1
     assert properties['csq_gnomade2_an']['items']['min'] == 0
+    assert properties['csq_gnomade2_ac']['items']['add_no_value'] is True
+    assert properties['csq_gnomadg_af-xy']['add_no_value'] is True
+    assert properties['csq_gnomadg_nhomalt-amr']['add_no_value'] is True
     assert properties['csq_sift_pred']['type'] == 'string'
 
     # check sub-embedded object fields
