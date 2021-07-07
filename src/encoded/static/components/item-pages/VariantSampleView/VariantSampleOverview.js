@@ -324,17 +324,17 @@ class InterpretationController extends React.Component {
         const { context = null, newContext = null } = this.props;
         console.log("log1: initializing ACMG from context");
 
-        let acmg_guidelines;
+        let acmg_rules_invoked;
         if (newContext) { // if new context is loaded in
             const { interpretation = {} } = newContext;
-            acmg_guidelines = interpretation.acmg_guidelines || [];
+            acmg_rules_invoked = interpretation.acmg_rules_invoked || [];
         } else { // not successfully loaded in; default to old context
             const { interpretation = {} } = context || {};
-            acmg_guidelines = interpretation.acmg_guidelines || [];
+            acmg_rules_invoked = interpretation.acmg_rules_invoked || [];
         }
 
         // Initialize classifier and prepare new state
-        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_guidelines);
+        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_rules_invoked);
         const classifier = new acmgUtil.AutoClassify(acmgSelections);
         const classification = classifier.getClassification();
         this.classifier = classifier;
@@ -387,7 +387,7 @@ class InterpretationController extends React.Component {
         // Pulling actions and checking for note errors with newcontext; use context if not present
         const {
             actions = [],
-            acmg_guidelines = [],
+            acmg_rules_invoked = [],
             interpretation: { error: interpError = null } = {},
             variant_notes: { error: varNoteError = null } = {},
             gene_notes: { error: geneNoteError = null } = {},
@@ -405,7 +405,7 @@ class InterpretationController extends React.Component {
             <React.Fragment>
                 <Collapse in={showACMGInvoker && newContext}>
                     <div>{/** Collapse seems not to work without wrapper element */}
-                        <ACMGInvoker invokedFromSavedNote={acmg_guidelines} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} />
+                        <ACMGInvoker invokedFromSavedNote={acmg_rules_invoked} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} />
                     </div>
                 </Collapse>
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
