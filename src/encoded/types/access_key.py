@@ -8,6 +8,7 @@ from pyramid.security import (
     Everyone,
 )
 from pyramid.settings import asbool
+import datetime
 from .base import (
     Item,
     DELETED_ACL,
@@ -48,7 +49,7 @@ from snovault.util import debug_log
     ])
 class AccessKey(Item):
     """AccessKey class."""
-
+    ACCESS_KEY_EXPIRATION_TIME = 90  # days
     item_type = 'access_key'
     schema = load_schema('encoded:schemas/access_key.json')
     name_key = 'access_key_id'
@@ -58,6 +59,13 @@ class AccessKey(Item):
         'current': [(Allow, 'role.owner', ['view', 'edit'])] + ONLY_ADMIN_VIEW_ACL,
         'deleted': DELETED_ACL,
     }
+
+    @classmethod
+    def create(cls, registry, uuid, properties, sheets=None):
+        """ Sets the access key timeout 90 days from creation. """
+        properties['expiration_date'] = (datetime.datetime.utcnow() + datetime.timedelta(
+            days=cls.ACCESS_KEY_EXPIRATION_TIME)).isoformat()
+        return super().create(registry, uuid, properties, sheets)
 
     def __ac_local_roles__(self):
         """grab and return user as owner."""
@@ -77,6 +85,9 @@ class AccessKey(Item):
             new_properties = self.properties.copy()
             new_properties.update(properties)
             properties = new_properties
+        # set new expiration
+        properties['expiration_date'] = (datetime.datetime.utcnow() + datetime.timedelta(
+            days=self.ACCESS_KEY_EXPIRATION_TIME)).isoformat()
         self._update(properties, sheets)
 
     class Collection(Item.Collection):

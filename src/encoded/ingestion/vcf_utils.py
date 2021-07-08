@@ -391,7 +391,7 @@ class VCFParser(object):
             else:
                 raise VCFParserException('Got array with no sub-type')
         else:
-            raise VCFParserException('Type was %s and not one of: string, integer, number, boolean, array' % type)
+            raise VCFParserException('Type was %s and not one of: string, integer, number, boolean, array' % t)
 
     def validate_variant_value(self, field, value, key='', exit_on_validation=False):
         """ Given a field, check the variant schema for the type of that field and cast

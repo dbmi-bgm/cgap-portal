@@ -53,6 +53,12 @@
             "title": "Secret access key Hash",
             "comment": "Only admins are allowed to set this value.",
             "type": "string"
+        },
+        "expiration_date": {
+            "Title": "Expiration Date",
+            "comment": "Only admins are allowed to set this value.",
+            "type": "string",
+            "permission": "restricted_fields"
         }
     },
     "facets": {
