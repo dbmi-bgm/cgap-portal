@@ -114,7 +114,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
 
         switch(ingestionType) {
             case "metadata_bundle":
-                navigate(`/search/?type=Case&ingestion_ids=${uuid}&proband=true`);
+                navigate(`/search/?type=Case&ingestion_ids=${uuid}&proband_case=true`);
                 break;
             case "genelist":
                 navigate(genelist);
@@ -123,7 +123,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
                 if (value === "View Family Info") {
                     navigate(familyAtID || "/?type=Family&sort=-date_created");
                 } else if (value === "View Related Cases") {
-                    navigate(`/search/?type=Case&family.ingestion_ids=${uuid}&proband=true`);
+                    navigate(`/search/?type=Case&family.ingestion_ids=${uuid}&proband_case=true`);
                 }
                 break;
             default:
