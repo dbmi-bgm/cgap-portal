@@ -363,17 +363,18 @@ class InterpretationController extends React.Component {
         const { globalACMGSelections = {} } = this.state;
         const newInvocations = { ...globalACMGSelections };
 
-        if (newInvocations[rule] !== undefined) { // already set
-            const newState = !newInvocations[rule];
-            newInvocations[rule] = newState;
+        if (newInvocations[rule || criteria] !== undefined) { // already set (may have strength)
+            const newState = !newInvocations[rule || criteria];
+            newInvocations[rule || criteria] = newState;
             if (newState) {
-                this.classifier.invoke(rule, strength);
+                this.classifier.invoke(rule || criteria, strength || "Default");
             } else {
-                this.classifier.uninvoke(rule, strength);
+                console.log("rule", rule, strength);
+                this.classifier.uninvoke(rule || criteria, strength || "Default");
             }
-        } else { // first time setting
-            newInvocations[rule] = "Default";
-            this.classifier.invoke(rule, strength);
+        } else { // first time setting (won't have strength)
+            newInvocations[rule || criteria] = strength || "Default";
+            this.classifier.invoke(rule || criteria, strength || "Default");
         }
 
         const classification = this.classifier.getClassification();
