@@ -826,7 +826,7 @@ function ACMGPicker(props) {
         return (
             <div className={`acmg-invoker text-600 ${isFallback ? "unclickable" : "clickable"} text-monospace text-center mr-01 ml-01`} key={rule} data-criteria={rule} data-invoked={true}
                 data-tip={!isFallback ? "Click to deselect this rule": null} onClick={!isFallback ? () => toggleInvocation(selection): undefined}>
-                { rule }: { !strength || strength !== "Default" ? strength : null }
+                { rule }{ !strength || strength !== "Default" ? ":" + strength : null }
             </div>
         );
     });
