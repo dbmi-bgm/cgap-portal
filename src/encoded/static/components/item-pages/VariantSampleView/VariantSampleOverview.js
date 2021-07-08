@@ -353,25 +353,27 @@ class InterpretationController extends React.Component {
     }
 
     /**
-     * Called when a new rule is invoked or uninvoked
-     * @param {String} criteria     An ACMG rule
+     * Called when a new rule is invoked (to default only) or uninvoked
+     * @param {Object} criteria     An object with an ACMG rule & strength pair
      * @param {Function} callback   An optional function to call upon state setting
      */
     toggleInvocation(criteria, callback) {
+        console.log("toggleInvocation criteria", criteria);
+        const { acmg_rule_name: rule, rule_strength: strength } = criteria;
         const { globalACMGSelections = {} } = this.state;
         const newInvocations = { ...globalACMGSelections };
 
-        if (newInvocations[criteria] !== undefined) { // already set
-            const newState = !newInvocations[criteria];
-            newInvocations[criteria] = newState;
+        if (newInvocations[rule] !== undefined) { // already set
+            const newState = !newInvocations[rule];
+            newInvocations[rule] = newState;
             if (newState) {
-                this.classifier.invoke(criteria);
+                this.classifier.invoke(rule, strength);
             } else {
-                this.classifier.uninvoke(criteria);
+                this.classifier.uninvoke(rule, strength);
             }
         } else { // first time setting
-            newInvocations[criteria] = true;
-            this.classifier.invoke(criteria);
+            newInvocations[rule] = "Default";
+            this.classifier.invoke(rule, strength);
         }
 
         const classification = this.classifier.getClassification();
