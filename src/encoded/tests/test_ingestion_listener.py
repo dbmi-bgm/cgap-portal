@@ -227,7 +227,6 @@ def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_mana
 
 
 def test_test_port():
-
     from snovault.tests.test_postgresql_fixture import SNOVAULT_DB_TEST_PORT
     assert SNOVAULT_DB_TEST_PORT == 5440
 
