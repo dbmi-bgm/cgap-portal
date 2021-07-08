@@ -249,7 +249,8 @@ def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=Non
     except KeyError as e:
         debuglog("Manifest data is missing 'email' field.")
         if DEBUG_SUBMISSIONS:
-            import pdb; pdb.set_trace()
+            pass
+            # import pdb; pdb.set_trace()
     debuglog("processing submission %s with email %s" % (submission_id, email))
     with vapp_for_email(email=email, app=app) as vapp:
         if DEBUG_SUBMISSIONS:
@@ -579,7 +580,8 @@ class IngestionListener:
                 # report results in error_log regardless of status
                 msg = variant_builder.ingestion_report.brief_summary()
                 log.error(msg)
-                self.update_status(msg=msg)
+                if self.update_status is not None and callable(self.update_status):
+                    self.update_status(msg=msg)
 
                 # if we had no errors, patch the file status to 'Ingested'
                 if error > 0:

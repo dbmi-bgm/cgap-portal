@@ -654,7 +654,7 @@ def process_pedigree(context, request):
     fam_props = context.upgrade_properties()
     post_extra = {'project': fam_props['project'],
                   'institution': fam_props['institution']}
-    xml_extra = {'ped_datetime': ped_datetime}
+    xml_extra = {'ped_datetime': ped_datetime.isoformat()}
 
     family_uuids = create_family_proband(testapp, xml_data, refs, 'managedObjectID',
                                          family_item, post_extra, xml_extra)

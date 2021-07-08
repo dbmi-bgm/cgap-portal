@@ -97,7 +97,7 @@ def test_fixtures2(minitestdata2, testapp):
     assert len(items) == 1
 
 
-def test_order_complete(app, conn):
+def test_order_complete(app):
     order = ORDER + ['access_key']
     environ = {
         'HTTP_ACCEPT': 'application/json',

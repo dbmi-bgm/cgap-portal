@@ -19,7 +19,8 @@ from pyramid.settings import asbool
 from pyramid.threadlocal import get_current_request
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
-from dcicutils.env_utils import CGAP_ENV_WEBPROD, CGAP_ENV_WOLF
+from dcicutils.secrets_utils import assume_identity
+from dcicutils.qa_utils import override_environ
 from snovault import (
     AfterModified,
     BeforeModified,
@@ -110,12 +111,22 @@ def external_creds(bucket, key, name=None, profile_name=None):
                 }
             ]
         }
-        # boto.set_stream_logger('boto3')
-        conn = boto3.client('sts', aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
-                            aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"))
+        # In the new environment, extract S3 Keys from global application configuration
+        if 'IDENTITY' in os.environ:
+            identity = assume_identity()
+            with override_environ(**identity):
+                conn = boto3.client('sts', aws_access_key_id=os.environ.get('S3_AWS_ACCESS_KEY_ID'),
+                                    aws_secret_access_key=os.environ.get('S3_AWS_SECRET_ACCESS_KEY'))
+        # In the old account, we are always passing IAM User creds so these will just work
+        else:
+            conn = boto3.client('sts', aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+                                aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'))
         token = conn.get_federation_token(Name=name, Policy=json.dumps(policy))
         # 'access_key' 'secret_key' 'expiration' 'session_token'
         credentials = token.get('Credentials')
+        # Convert Expiration datetime object to string via cast
+        # Uncaught serialization error picked up by Docker - Will 2/25/2021
+        credentials['Expiration'] = str(credentials['Expiration'])
         credentials.update({
             'upload_url': 's3://{bucket}/{key}'.format(bucket=bucket, key=key),
             'federated_user_arn': token.get('FederatedUser').get('Arn'),

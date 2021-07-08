@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "6.8.12"
+version = "7.0.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -37,13 +37,13 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.6.1,<3.7"
 boto3 = "^1.17.32"
-botocore = "^1.20.32"
+botocore = "^1.20.86"
 certifi = ">=2020.11.8"
 chardet = "3.0.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
-dcicsnovault = "^4.7.5"
-dcicutils = "1.15.0"
+dcicsnovault = "^4.8.1"
+dcicutils = "^1.19.0"
 elasticsearch = "6.8.1"
 execnet = "1.4.1"
 future = "^0.15.2"
@@ -114,6 +114,7 @@ WSGIProxy2 = "0.4.2"
 sentry-sdk = "^0.16.5"
 granite-suite = "0.1.11b0"
 openpyxl = "^3.0.7"
+watchtower = "^1.0.6"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
@@ -160,7 +161,6 @@ pytest-xdist = ">=1.14"
 # snovault commands
 batchupgrade = "snovault.batchupgrade:main"
 create-mapping = "snovault.elasticsearch.create_mapping:main"
-es-index-listener = "snovault.elasticsearch.es_index_listener:main"
 wipe-test-indices = "snovault.commands.wipe_test_indices:main"
 # encoded commands
 add-date-created = "encoded.commands.add_date_created:main"
@@ -170,7 +170,7 @@ configure-kibana-index = "encoded.commands.configure_kibana_index:main"
 create-mapping-on-deploy = "encoded.commands.create_mapping_on_deploy:main"
 dev-servers = "encoded.dev_servers:main"
 dis2pheno = "encoded.commands.parse_hpoa:main"
-es-index-data = "encoded.commands.es_index_data:main"
+es-index-data = "snovault.commands.es_index_data:main"
 export-data = "encoded.commands.export_data:main"
 extract-test-data = "encoded.commands.extract_test_data:main"
 import-data = "encoded.commands.import_data:main"
