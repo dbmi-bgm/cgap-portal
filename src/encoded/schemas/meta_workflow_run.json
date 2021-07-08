@@ -235,11 +235,42 @@
             "description": "Common fields that go into all workflow_run, processed_files and qc items",
             "type": "object",
             "additionalProperties": true
+        },
+        "overall_qcs": {
+            "title": "Overall QCs",
+            "description": "QC tests for a given pipeline",
+            "type": "array",
+            "enable_nested": true,
+            "items": {
+              "title": "Overall QC",
+              "description": "A list of objects describing QC tests",
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                  "name": {
+                      "title" : "Name",
+                      "description": "Name of the QC test",
+                      "type" : "string"
+                  },
+                  "value": {
+                      "title" : "Value",
+                      "description": "Value of the QC test result",
+                      "type" : "string",
+                      "enum": [
+                          "PASS",
+                          "FAIL"
+                      ]
+                  }
+              }
+            }
         }
     },
     "facets": {
         "meta_workflow.title": {
             "title": "MetaWorkflow"
+        },
+        "meta_workflow.version": {
+            "title": "Version"
         },
         "final_status": {
             "title": "Final Status"
@@ -248,6 +279,9 @@
     "columns": {
         "meta_workflow.title": {
             "title": "MetaWorkflow"
+        },
+        "meta_workflow.version": {
+            "title": "Version"
         }
     }
 }
