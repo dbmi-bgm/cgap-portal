@@ -103,14 +103,28 @@ export default class ExcelSubmissionView extends React.PureComponent {
 
     handleComplete(e){
         const { submissionItem: { uuid, ingestion_type: ingestionType, additional_data = null } = {} } = this.state;
-        const { result: { genelist = '/search/?type=GeneList' } = {} } = additional_data || {};
+        const {
+            result: {
+                genelist = '/search/?type=GeneList',
+                patch: { family = null }
+            } = {}
+        } = additional_data || {};
+        const { target: { value = null } = {} } = e;
+        const { 0: familyAtID = null } = Object.keys(family) || [];
 
         switch(ingestionType) {
             case "metadata_bundle":
-                navigate(`/search/?type=Case&ingestion_ids=${uuid}`);
+                navigate(`/search/?type=Case&ingestion_ids=${uuid}&proband_case=true`);
                 break;
             case "genelist":
                 navigate(genelist);
+                break;
+            case "family_history":
+                if (value === "View Family Info") {
+                    navigate(familyAtID || "/?type=Family&sort=-date_created");
+                } else if (value === "View Related Cases") {
+                    navigate(`/search/?type=Case&family.ingestion_ids=${uuid}&proband_case=true`);
+                }
                 break;
             default:
                 break;
@@ -258,7 +272,7 @@ class PanelOne extends React.PureComponent {
 
         this.state = {
             selectingField: null,
-            submissionType: (submissionType && _.contains(["Accessioning", "Gene List"], submissionType) ? submissionType : null),
+            submissionType: { "Accessioning":1, "Gene List":1, "Family History":1 }[submissionType] ? submissionType : null,
             error: null,
             isCreating: false,
             ...PanelOne.flatFieldsFromUser(props.user)
@@ -398,7 +412,7 @@ class PanelOne extends React.PureComponent {
             });
         };
 
-        const ingestionTypeToSubmissionTypeMap = { "Accessioning" : "metadata_bundle", "Gene List": "genelist" };
+        const ingestionTypeToSubmissionTypeMap = { "Accessioning" : "metadata_bundle", "Gene List": "genelist", "Family History": "family_history" };
 
         const postData = {
             institution, project, processing_status: { state: "created" },
@@ -458,8 +472,8 @@ class PanelOne extends React.PureComponent {
                                 id="submission-type"
                             >
                                 <Dropdown.Item eventKey="Accessioning" onSelect={this.handleSelectSubmissionType}>Accessioning</Dropdown.Item>
+                                <Dropdown.Item eventKey="Family History" onSelect={this.handleSelectSubmissionType}>Family History</Dropdown.Item>
                                 <Dropdown.Item eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List</Dropdown.Item>
-                                <Dropdown.Item disabled class="unclickable" eventKey="Family History" onSelect={this.handleSelectSubmissionType}>Family History (coming soon)</Dropdown.Item>
                             </DropdownButton>
                         </div>
                     </div>
@@ -557,6 +571,7 @@ class PanelTwo extends React.PureComponent {
                         Attach a file to this IngestionSubmission
                     </h4>
                     <div className="mt-1">
+                        {/*TODO: update this with family history links */}
                         { ingestionType === "genelist" ?
                             <>Click <a href="/help/submission/gene-lists" target="_blank" rel="noreferrer">here</a> for more on how to format your genelist submission document.</>
                             : <>Click <a href="/help/submission/accessioning" target="_blank" rel="noreferrer">here</a> for more on how to format your accession submission document.</>}
@@ -589,15 +604,20 @@ class PanelTwo extends React.PureComponent {
                                     </span>
                                 </>
                                 : <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span>}
-                            { ingestionType === "metadata_bundle" ? <div className="text-small mt-05"><span className="mr-1 text-600" data-tip="Use this ID to upload fastq files in SubmitCGAP.">Ingestion Submission UUID:</span> <object.CopyWrapper className="d-inline text-monospace" value={uuid} key="copy-uuid" data-tip="Click to copy">{ uuid }</object.CopyWrapper> </div>: null}
+                            { ingestionType === "metadata_bundle" || ingestionType === "family_history" ? <div className="text-small mt-05"><span className="mr-1 text-600" data-tip="Use this ID to upload fastq files in SubmitCGAP.">Ingestion Submission UUID:</span> <object.CopyWrapper className="d-inline text-monospace" value={uuid} key="copy-uuid" data-tip="Click to copy">{ uuid }</object.CopyWrapper> </div>: null}
                         </div>
                         <div className="align-self-end">
-                            <button type="button" className="btn btn-success" onClick={handleComplete}>
-                                {ingestionType === "metadata_bundle" ? "View New Cases" : "View Gene List" }
-                            </button>
+                            { ingestionType === "metadata_bundle" || ingestionType === "genelist" ?
+                                <button type="button" className="btn btn-success" onClick={handleComplete}>
+                                    {ingestionType === "metadata_bundle" ? "View New Cases" : "View Gene List" }
+                                </button> :
+                                <>
+                                    <button type="button" className="btn btn-success" onClick={handleComplete} value="View Family Info">View Family Info</button>
+                                    <button type="button" className="btn btn-success ml-05" onClick={handleComplete} value="View Related Cases">View Related Cases</button>
+                                </>}
                         </div>
                     </div>
-                    { ingestionType !== "metadata_bundle" ? null : (
+                    { ingestionType === "genelist" ? null : (
                         <>
                             <hr/>
                             <span className="pl-1">Results:</span>
@@ -618,7 +638,7 @@ class PanelTwo extends React.PureComponent {
 
 function CreatedItemsTable(props) {
     const { aliasToAtIDMap = {} } = props;
-    const aliases = Object.keys(aliasToAtIDMap);
+    const aliases = Object.keys(aliasToAtIDMap).sort();
 
     const persistent = aliases.map((alias) => {
         const atID = aliasToAtIDMap[alias];
@@ -639,7 +659,7 @@ function CreatedItemsTable(props) {
             <object.CopyWrapper className="d-inline text-monospace" value={accession} key="copy-accession">{ accession }</object.CopyWrapper>
         );
 
-        return <PartialList.Row {...{ label, value }} key={alias} className="pb-1" />;
+        return <PartialList.Row {...{ label, value }} key={alias} colSm="7" colMd="7" colLg="7" className="pb-1" />;
     });
     return <PartialList {...{ persistent }} className="pl-1 pt-1"/>;
 }
@@ -746,9 +766,17 @@ function FileAttachmentBtn(props){
     const { loadingFileResult, postFileSuccess, onFileInputChange, ingestionType } = props;
     const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
 
-    let acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
-    if (ingestionType === "genelist") {
-        acceptedTypes += ", .txt";
+    let acceptedTypes;
+    switch(ingestionType) {
+        case "genelist":
+            acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .txt";
+            break;
+        case "metadata_bundle":
+            acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
+            break;
+        case "family_history":
+            acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"; // TODO: Only excel? No CSV/TSV -- verify this
+            break;
     }
 
     return (
@@ -759,7 +787,7 @@ function FileAttachmentBtn(props){
                     disabled={loadingFileResult || postFileSuccess === true}
                     accept={acceptedTypes} />
                 <i className={"mr-08 icon icon-fw icon-" + icon} />
-                <span>{ ingestionType === "metadata_bundle" ? "Select Excel File..." : "Select Excel or Text File..." }</span>
+                <span>{ ingestionType === "metadata_bundle" || ingestionType === "family_history" ? "Select Excel File..." : "Select Excel or Text File..." }</span>
             </label>
             { !loadingFileResult && postFileSuccess ? <span className="ml-1 text-success">Success! <i className="icon icon-check fas"></i></span> : null}
             { !loadingFileResult && postFileSuccess === false ? <span className="ml-1 text-danger">Failure! <i className="icon icon-times-circle fas"></i></span> : null}

@@ -188,6 +188,11 @@
             "title": "Abbreviation",
             "description": "A shorter name for this field, used by the UI",
             "type": "string"
+        },
+        "add_no_value": {
+            "title": "Add No Value",
+            "description": "Specify 'true' to include documents with 'No value' for this field when 0 is in the search range",
+            "type": "boolean"
         }
     },
     "facets": {
