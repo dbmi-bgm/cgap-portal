@@ -54,7 +54,7 @@ services:
       LOAD: "true"  # default: load the inserts (comment this out after first run)
       application_type: "local"  # use local entrypoint
       ENCODED_VERSION: "local"
-      CGAP_ENV_NAME: "cgap-docker-will-test"  # XXX: update me
+      CGAP_ENV_NAME: "cgap-docker-soo-test"  # XXX: update me
     ports:
       - "8000:8000"  # nginx proxy port (note application traffic is not forwarded)
     depends_on:

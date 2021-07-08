@@ -240,12 +240,12 @@
             "title": "Overall QCs",
             "description": "QC tests for a given pipeline",
             "type": "array",
-            "enable_nested": true,
             "items": {
               "title": "Overall QC",
               "description": "A list of objects describing QC tests",
               "type": "object",
               "additionalProperties": false,
+              "enable_nested": true,
               "properties": {
                   "name": {
                       "title" : "Name",
