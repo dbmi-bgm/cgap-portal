@@ -266,7 +266,7 @@ export class AutoClassify {
     /** Adjusts evidence on new invocation */
     invoke(rule, strength) {
         // Adjust count of evidence types (take into consideration non-default strengths)
-        const { defaultStrength, type } = metadata[rule];
+        const { strength: defaultStrength, type } = metadata[rule];
         const selectedStrength = (strength && strength !== "Default") ? strength: defaultStrength;
         if (type === "pathogenic") {
             if (this.evidenceOfPathogenicity[selectedStrength] === undefined) {
@@ -290,7 +290,7 @@ export class AutoClassify {
     /** Adjusts evidence and re-calculates classification on un-invocation */
     uninvoke(rule, strength) {
         // Adjust count of evidence types (take into consideration non-default strengths)
-        const { defaultStrength, type } = metadata[rule];
+        const { strength: defaultStrength, type } = metadata[rule];
         const selectedStrength = (strength && strength === "Default") ? strength: defaultStrength;
         if (type === "pathogenic") {
             const newValue = this.evidenceOfPathogenicity[selectedStrength] - 1;
