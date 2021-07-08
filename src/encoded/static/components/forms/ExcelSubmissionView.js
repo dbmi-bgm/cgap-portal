@@ -272,7 +272,7 @@ class PanelOne extends React.PureComponent {
 
         this.state = {
             selectingField: null,
-            submissionType: (submissionType && _.contains(["Accessioning", "Gene List", "Family History"], submissionType) ? submissionType : null),
+            submissionType: { "Accessioning":1, "Gene List":1, "Family History":1 }[submissionType] ? submissionType : null,
             error: null,
             isCreating: false,
             ...PanelOne.flatFieldsFromUser(props.user)
