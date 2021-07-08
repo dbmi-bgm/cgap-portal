@@ -310,6 +310,18 @@
             }
         }
     },
+    "ingestion_ids": {
+        "ingestion_ids": {
+            "title": "Submission IDs",
+            "description": "uuids of the IngestionSubmission items that created/edited this case",
+            "type": "array",
+            "items": {
+                "title": "Submission ID",
+                "description": "an IngestionSubmission item that created or edited this case",
+                "type": "string"
+            }
+        }
+    },
     "tags": {
         "tags": {
             "title": "Tags",
