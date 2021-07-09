@@ -192,7 +192,6 @@ class LuceneBuilder:
                 func='construct_nested_sub_queries',
                 msg='Tried to handle nested filter with key other than must/must_not: %s' % key
             )
-
         my_filters = filters.get(key, [])
         if len(my_filters) == 0:
             return {}
@@ -236,41 +235,61 @@ class LuceneBuilder:
                 if _q.get(NESTED, None):
                     if _q[NESTED][PATH] == nested_path:
                         try:
-                            if isinstance(query, list):  # reject list structure, if present
-                                if len(query) != 1:
-                                    raise QueryConstructionException(
-                                        query_type='nested',
-                                        func='handle_nested_filters',
-                                        msg='Malformed entry on query field: %s' % query
-                                    )
-                                query = query[0]
 
-                            if key not in query[BOOL]:  # we are combining a different type of query on this nested path
-                                opposite_key = complement_key_map[key]
-                                if opposite_key in query[BOOL]:
-                                    _q[NESTED][QUERY][BOOL][opposite_key] = query[BOOL][opposite_key]
-                                    found = True
-                                    break
-                            else:
-
-                                # check if this field has multiple options
-                                options = query[BOOL][key][0][MATCH][field].split(',')
-                                if len(options) > 1:
-
-                                    # construct SHOULD sub-query for all options
-                                    sub_query = cls.handle_should_query(field, options)
-                                    _q[NESTED][QUERY][BOOL][key].append(sub_query)
-
-                                # if we don't have options, our original 'query' is what we need
-                                else:
-                                    insertion_point = _q[NESTED][QUERY][BOOL]
-                                    if key not in insertion_point:  # this can happen if we are combining with 'No value'
-                                        insertion_point[key] = query[BOOL][key][0]
+                            # Determine if this nested query is a MUST or MUST NOT
+                            opposite_key = complement_key_map[key]
+                            for sub_sub_query in query:
+                                if BOOL in sub_sub_query:
+                                    if key in sub_sub_query[BOOL]:
+                                        _q[NESTED][QUERY][BOOL][key] += sub_sub_query[BOOL][key]
+                                    elif opposite_key in sub_sub_query[BOOL]:
+                                        _q[NESTED][QUERY][BOOL][opposite_key] += sub_sub_query[BOOL][opposite_key]
                                     else:
-                                        insertion_point[key].append(query[BOOL][key][0])
+                                        raise QueryConstructionException(
+                                            query_type='nested',
+                                            func='handle_nested_filters',
+                                            msg='Malformed entry on query field: %s' % query
+                                        )
+                            found = True
+                            break
 
-                                found = True  # break is not sufficient, see below
-                                break
+                            # if isinstance(query, list):  # reject list structure, if present
+                            #     if len(query) != 1:
+                            #         raise QueryConstructionException(
+                            #             query_type='nested',
+                            #             func='handle_nested_filters',
+                            #             msg='Malformed entry on query field: %s' % query
+                            #         )
+                            #     query = query[0]
+                            #
+                            # if key not in query[BOOL]:  # we are combining a different type of query on this nested path
+                            #     opposite_key = complement_key_map[key]
+                            #     if opposite_key in query[BOOL]:
+                            #         _q[NESTED][QUERY][BOOL][opposite_key] = query[BOOL][opposite_key]
+                            #         found = True
+                            #         break
+                            # else:
+                            #
+                            #     # check if this field has multiple options
+                            #     options = query[BOOL][key][0][MATCH][field].split(',')
+                            #     if len(options) > 1:
+                            #
+                            #         # construct SHOULD sub-query for all options
+                            #         sub_query = cls.handle_should_query(field, options)
+                            #         _q[NESTED][QUERY][BOOL][key].append(sub_query)
+                            #
+                            #     # if we don't have options, our original 'query' is what we need
+                            #     else:
+                            #         insertion_point = _q[NESTED][QUERY][BOOL]
+                            #         if key not in insertion_point:  # this can happen if we are combining with 'No value'
+                            #             insertion_point[key] = query[BOOL][key][0]
+                            #         else:
+                            #             insertion_point[key].append(query[BOOL][key][0])
+
+                                # found = True  # break is not sufficient, see below
+                                # break
+                        except QueryConstructionException:
+                            raise
                         except Exception:  # Why? We found a 'range' nested query and must add this one separately
                             continue  # This behavior is absurd. Somehow it knows to combine separate nested range
                             # queries with AND, but of course not regular queries and of course you cannot
@@ -565,6 +584,90 @@ class LuceneBuilder:
 
         return field_filters
 
+    @staticmethod
+    def build_nested_query(nested_path, query):
+        """ Takes the given query and converts it into a nested query on the
+            given path.
+        """
+        return {
+            'nested': {
+                'path': nested_path,
+                'query': query
+            }
+        }
+
+    @classmethod
+    def handle_nested_filters_v2(cls, nested_filters, nested_query, es_mapping, key=MUST):
+        """ New version of 'handle_nested_filters' that works more intelligently now that
+            elasticsearch_dsl is gone.
+        """
+        nested_path_to_index_map = {}  # maps a nested path to it's index in nested_query
+        for field, query in nested_filters:
+            nested_path = find_nested_path(field, es_mapping)
+
+            # we've discovered a new nested path - must create a new sub-query
+            # for it where we will combine all selections on this path
+            if nested_path not in nested_path_to_index_map:
+
+                # set index in our tracking metadata
+                new_index = len(nested_query)
+                nested_path_to_index_map[nested_path] = new_index
+
+                # build the query
+                # if we have >1 selection on this path, we must combine
+                if len(query) > 1:
+                    combined_query = {
+                        BOOL: {
+                            key: []
+                        }
+                    }
+                    for sub_query in query:
+                        # raw valid lucene
+                        if BOOL not in sub_query:
+                            combined_query[BOOL][key].append(sub_query)
+                        # has duplicated bool -> must, so traverse down
+                        else:
+                            # can only contain one sub_query but does have list structure
+                            try:
+                                _sub_query = sub_query[BOOL][MUST]
+                            except KeyError:
+                                _sub_query = sub_query[BOOL][MUST_NOT]
+                            if isinstance(_sub_query, list):
+                                if len(_sub_query) > 1:
+                                    raise QueryConstructionException(
+                                        query_type='nested',
+                                        func='handle_nested_filters_v2',
+                                        msg='Unexpected query structure: %s' % _sub_query
+                                    )
+                                _sub_query = _sub_query[0]
+                            combined_query[BOOL][key].append(_sub_query)
+                    nested_query.append(cls.build_nested_query(nested_path, combined_query))
+                else:
+                    nested_query.append(cls.build_nested_query(nested_path, query))
+
+            # we've seen this path before - must combine it with existing
+            # query however is needed
+            else:
+                path_index = nested_path_to_index_map[nested_path]
+                combined_query_clauses = nested_query[path_index][NESTED][QUERY][BOOL][key]
+                for sub_query in query:
+                    if BOOL not in sub_query:
+                        combined_query_clauses.append(sub_query)
+                    else:
+                        # can only contain one sub_query but does have list structure
+                        _sub_query = sub_query[BOOL][key]
+                        if isinstance(_sub_query, list):
+                            if len(_sub_query) > 1:
+                                raise QueryConstructionException(
+                                    query_type='nested',
+                                    func='handle_nested_filters_v2',
+                                    msg='Unexpected query structure: %s' % _sub_query
+                                )
+                            _sub_query = _sub_query[0]
+                        combined_query_clauses.append(_sub_query)
+
+        return nested_query
+
     @classmethod
     def build_filters(cls, request, query, result, principals, doc_types, es_mapping):
         """
@@ -617,14 +720,17 @@ class LuceneBuilder:
         # construct queries
         must_filters, must_not_filters, \
         must_filters_nested, must_not_filters_nested = cls.build_sub_queries(field_filters, es_mapping)
-
         # add range limits to filters if given
         cls.apply_range_filters(range_filters, must_filters, es_mapping)
 
         # initialize filter hierarchy
         final_filters = {BOOL: {MUST: [f for _, f in must_filters], MUST_NOT: [f for _, f in must_not_filters]}}
-        cls.handle_nested_filters(must_filters_nested, final_filters, es_mapping, key=MUST)
-        cls.handle_nested_filters(must_not_filters_nested, final_filters, es_mapping, key=MUST_NOT)
+        nested_query = cls.handle_nested_filters_v2(must_filters_nested, [], es_mapping, key=MUST)
+        final_nested_query = cls.handle_nested_filters_v2(must_not_filters_nested, nested_query, es_mapping,
+                                                          key=MUST_NOT)
+        final_filters[BOOL][MUST] += final_nested_query
+        # cls.handle_nested_filters(must_filters_nested, final_filters, es_mapping, key=MUST)
+        # cls.handle_nested_filters(must_not_filters_nested, final_filters, es_mapping, key=MUST_NOT)
 
         # at this point, final_filters is valid lucene and can be dropped into the query directly
         query[QUERY][BOOL][FILTER] = final_filters

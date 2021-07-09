@@ -569,7 +569,7 @@ class ItemTypeChecker:
             return items_not_deleted
 
 
-@pytest.mark.manual  # this test just loads the workbook, reindexes it and searches
+@pytest.mark.skip  # this test just loads the workbook, reindexes it and searches
 def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
     es = es_testapp.app.registry['elasticsearch']
     # we need to reindex the collections to make sure numbers are correct
@@ -774,8 +774,10 @@ class TestNestedSearch(object):
         """ One match for variant with hg19.hg19_pos=12185955 """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_pos=12185955').json
-        self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
+        self.assert_length_is_expected(res, 2)
+        uuids = [res['@graph'][0]['uuid'], res['@graph'][1]['uuid']]
+        assert 'f6aef055-4c88-4a3e-a306-d37a71535d8b' in uuids
+        assert '852bb349-203e-437d-974a-e8d6cb56810a' in uuids
 
     def test_or_search_on_same_nested_field(self, workbook, es_testapp):
         """ Should match 2 since OR on this field """
@@ -816,7 +818,8 @@ class TestNestedSearch(object):
         """ Do an OR search with hg19_post with a negative, should eliminate a variant """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom=chr1'
-                          '&hg19.hg19_pos!=12185955').follow().json
+                          '&hg19.hg19_pos!=12185955&debug=true').follow().json
+        import pdb; pdb.set_trace()
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
             assert variant['uuid'] in [
@@ -835,7 +838,7 @@ class TestNestedSearch(object):
         es_testapp.get('/search/?type=Variant'  # should give no results
                     '&hg19.hg19_chrom=chr2'  # change should be sufficient for no results
                     '&hg19.hg19_pos=12185955'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404).follow()
 
     @pytest.mark.skip  # re-enable once workbook inserts are built out more
     def test_and_search_that_matches_multiple(self, workbook, es_testapp):
@@ -885,18 +888,19 @@ class TestNestedSearch(object):
     def test_nested_search_with_no_value_combined(self, workbook, es_testapp):
         """ Tests searching on 'No value' combined with another nested field, in this case
             should give no results (no matter the ordering) """
+        #import pdb; pdb.set_trace()
+        res = es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_pos=No+value'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow()
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=No+value'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+                       '&hg19.hg19_pos=No+value'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow(status=404)
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=No+value'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A', status=404)
+                       '&hg19.hg19_pos=No+value'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=No+value'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
-        es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=11780388'
-                    '&hg19.hg19_hgvsg=No+value', status=404)
+                       '&hg19.hg19_pos=11780388'
+                       '&hg19.hg19_hgvsg=No+value', status=404)
 
     def test_search_nested_with_non_nested_fields(self, workbook, es_testapp):
         """ Tests that combining a nested search with a non-nested one works in any order
