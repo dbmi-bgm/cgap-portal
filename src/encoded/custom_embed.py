@@ -43,9 +43,15 @@ class CustomEmbed:
         self.desired_embeds = embed_props["desired_embeds"]
         self.embed_depth = embed_props["embed_depth"]
         self.cache = embed_props["cache"]
+        self.requested_fields = embed_props["requested_fields"]
         self.invalid_ids = []
-        depth = -1
-        self.result = self.embed(item, depth)
+        if self.requested_fields:
+            self.field_dict = self.fields_to_dict()
+            item = self._user_embed(item, -1)
+            self.result = self.field_embed(item, self.field_dict, initial_item=True)
+        else:
+            depth = -1
+            self.result = self.embed(item, depth)
 
     def _user_embed(self, item_id, depth, frame="object"):
         """
@@ -200,6 +206,81 @@ class CustomEmbed:
                 break
         return item
 
+    def fields_to_dict(self):
+        """
+        """
+        field_dict = {}
+        for field in self.requested_fields:
+            field_keys = field.split(".")
+            field_keys = [x for x in field_keys if x]
+            field_dict = self._build_nested_dict(field_dict, field_keys)
+        return field_dict
+
+    @staticmethod
+    def _build_nested_dict(field_dict, field_keys):
+        """
+        """
+        key = field_keys[0]
+        if key == field_keys[-1]:
+            if "fields_to_keep" in field_dict:
+                field_dict["fields_to_keep"].append(key)
+            else:
+                field_dict["fields_to_keep"] = [key]
+            return field_dict
+        if key not in field_dict:
+            field_dict[key] = {}
+        field_keys = field_keys[1:]
+        field_dict[key] = CustomEmbed._build_nested_dict(field_dict[key], field_keys)
+        return field_dict
+
+    def field_embed(self, item, field_dict, initial_item=False):
+        """
+        """
+        while True:
+            if isinstance(item, dict):
+                fields_to_keep = []
+                for key in field_dict:
+                    if key == "fields_to_keep":
+                        fields_to_keep += field_dict[key]
+                        continue
+                    if key not in item:
+                        item_type = item["@type"][0]
+                        raise HTTPBadRequest(
+                            "Could not find the requested field '%s' within the"
+                            " %s item."
+                            % (key, item_type)
+                        )
+                    fields_to_keep.append(key)
+                    item[key] = self.field_embed(item[key], field_dict[key])
+                if initial_item:
+                    fields_to_keep.append("actions")
+                if "*" not in fields_to_keep:
+                    culled_item = {}
+                    for field in fields_to_keep:
+                        try:
+                            culled_item[field] = item[field]
+                        except KeyError:
+                            continue
+                    item = culled_item
+                break
+            if isinstance(item, list):
+                for idx in range(len(item)):
+                    item[idx] = self.field_embed(item[idx], field_dict)
+                break
+            elif isinstance(item, str):
+                if ATID_PATTERN.match(item):
+                    if item in self.cache:
+                        item = self.cache[item]
+                    else:
+                        cache_item = item
+                        item = self._user_embed(item, 0)
+                        self.cache[cache_item] = item
+                else:
+                    break
+            else:
+                break
+        return item
+
 
 @view_config(
     route_name="embed", request_method="POST", effective_principals=Authenticated
@@ -219,6 +300,7 @@ def embed(context, request):
     ignored_embeds = []
     desired_embeds = []
     cache = {}
+    requested_fields = []
     results = []
     invalid_ids = []
     embed_depth = 4  # Arbritary standard depth to search.
@@ -233,6 +315,7 @@ def embed(context, request):
         ignored_embeds = request.json.get("ignored", [])
         desired_embeds = request.json.get("desired", [])
         embed_depth = request.json.get("depth", embed_depth)
+        requested_fields = request.json.get("fields", [])
     ids = list(set(ids))
     if len(ids) > 5:
         raise HTTPBadRequest(
@@ -246,6 +329,7 @@ def embed(context, request):
         "desired_embeds": desired_embeds,
         "embed_depth": embed_depth,
         "cache": cache,
+        "requested_fields": requested_fields,
     }
     for item_id in ids:
         item_embed = CustomEmbed(request, item_id, embed_props)
