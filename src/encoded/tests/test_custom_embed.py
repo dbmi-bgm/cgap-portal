@@ -264,3 +264,66 @@ class TestCustomEmbed:
         assert len(admin_embedded["actions"]) == len(admin_vsl_embed_url["actions"])
         for action in admin_embedded["actions"]:
             assert action in admin_vsl_embed_url["actions"]
+
+    def test_field_embed(self, testapp, variant_sample_list):
+        """
+        """
+        vsl_uuid = variant_sample_list["uuid"]
+        fields = [
+            "variant_samples.variant_sample_item.variant.display_title",
+            "*",
+        ]
+        url_params = EMBED_URL + "?id=" + vsl_uuid + "&field=" + "&field=".join(fields)
+        json_params = {"ids": [vsl_uuid], "fields": fields}
+        vsl_embed_url = _embed_with_url_params(testapp, url_params)
+        vsl_embed_json = _embed_with_json_params(testapp, json_params)
+        assert vsl_embed_url == vsl_embed_json
+
+    def test_field_embed_actions(self, testapp, variant_sample_list):
+        """
+        """
+        vsl_uuid = variant_sample_list["uuid"]
+        vsl_atid = variant_sample_list["@id"]
+        fields = ["variant_samples.variant_sample_item.actions"]
+        json_params = {"ids": [vsl_uuid], "fields": fields}
+        vsl_embed_json = _embed_with_json_params(testapp, json_params)
+        vsl_embedded = testapp.get(vsl_atid).json
+        num_actions = len(vsl_embedded["actions"])
+        assert "actions" in vsl_embed_json
+        assert len(vsl_embed_json["actions"]) == num_actions
+        for variant_sample in vsl_embed_json["variant_samples"]:
+            assert "actions" in variant_sample["variant_sample_item"]
+            assert len(variant_sample["variant_sample_item"]["actions"]) == num_actions
+
+        fields = ["variant_samples.actions"]
+        json_params = {"ids": [vsl_uuid], "fields": fields}
+        assert _embed_with_json_params(testapp, json_params, status=400)
+
+    def test_field_embed_wrong_field(self, testapp, variant_sample_list):
+        """
+        """
+        vsl_uuid = variant_sample_list["uuid"]
+        fields = ["variant_samples.some_field.another_field"]
+        json_params = {"ids": [vsl_uuid], "fields": fields}
+        assert _embed_with_json_params(testapp, json_params, status=400)
+
+    def test_field_embed_permissions(
+        self, testapp, bgm_user_testapp, variant_sample_list
+    ):
+        """
+        """
+        vsl_atid = variant_sample_list["@id"]
+        testapp.patch_json(vsl_atid, {"status": "shared"}, status=200)
+        fields = [
+            "variant_samples.variant_sample_item.variant.display_title",
+            "*"
+        ]
+        json_params = {"ids": [vsl_atid], "fields": fields}
+        admin_embed = _embed_with_json_params(testapp, json_params)
+        bgm_embed = _embed_with_json_params(bgm_user_testapp, json_params)
+        bgm_variant_samples = bgm_embed["variant_samples"]
+        for key, value in admin_embed.items():
+            if key not in ["variant_samples", "actions"]:
+                assert bgm_embed[key] == value
+        for variant_sample in bgm_variant_samples:
+            assert variant_sample["variant_sample_item"] == FORBIDDEN_MSG
