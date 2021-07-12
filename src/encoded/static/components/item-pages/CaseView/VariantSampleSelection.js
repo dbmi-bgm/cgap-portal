@@ -586,7 +586,7 @@ export class FinalizeCaseDataStore extends React.PureComponent {
         };
     }
 
-    toggleStoreItems(storeName, noteSelectionObjects){
+    toggleStoreItems(storeName, noteSelectionObjects, callback = null){
         this.setState(function(currState){
             const nextStore = { ...currState[storeName] };
             noteSelectionObjects.forEach(function([ id, data ]){
@@ -597,7 +597,7 @@ export class FinalizeCaseDataStore extends React.PureComponent {
                 }
             });
             return { [storeName] : nextStore };
-        });
+        }, callback);
     }
 
     render(){

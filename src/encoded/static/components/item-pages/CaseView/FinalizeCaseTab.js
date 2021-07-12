@@ -5,7 +5,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import Modal from 'react-bootstrap/esm/Modal';
 import { VariantSampleSelectionList, parentTabTypes } from './VariantSampleSelection';
-import { CaseSpecificSelectionsPanel, getAllNotesFromVariantSample } from './variant-sample-selection-panels';
+import { CaseSpecificSelectionsPanel, getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
 import { ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 
@@ -44,7 +44,9 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
                 <SaveNotesButton {...{ variantSampleListItem, fetchVariantSampleListItem }} selectionStore={sendToKnowledgeBaseStore} />
             </div>
             <div>
-                <CaseSpecificSelectionsPanel {...commonProps} />
+                <NoteSubSelectionStateController>
+                    <CaseSpecificSelectionsPanel {...commonProps} />
+                </NoteSubSelectionStateController>
                 <hr />
                 <VariantSampleSelectionList {...commonProps} parentTabType={parentTabTypes.FINALIZECASE} />
             </div>
@@ -94,6 +96,7 @@ class SaveNotesButton extends React.PureComponent {
             "patchingPercentageComplete": 0,
             "patchErrors": []
         };
+
         this.memoized = {
             selectionStoreSize: memoize(function(selectionStore){
                 return Object.keys(selectionStore).length;
@@ -255,7 +258,26 @@ class SaveNotesButton extends React.PureComponent {
             if (needVariantPatch || needGenePatch) {
                 requestCount++;
 
-                ajax.promise("/embed", "POST", {}, JSON.stringify({ "ids": [variantSampleUUID], "depth": 1 }))
+                const vsEmbedFetchPayload = {
+                    "ids": [variantSampleUUID],
+                    // TODO: get rid of depth once `fields` works (in master) + maybe skip 2nd command and sub-embed gene on here.
+                    "depth": 1,
+                    "fields": [
+                        "variant.@id",
+                        "variant.interpretations",
+                        "variant.discovery_interpretations",
+                        "variant.variant_notes"
+                    ]
+                };
+
+                // TODO:
+                // if (needGenePatch) {
+                //     vsEmbedFetchPayload.fields.push("variant.genes.genes_most_severe_gene.@id");
+                //     vsEmbedFetchPayload.fields.push("variant.genes.genes_most_severe_gene.discovery_interpretations");
+                //     vsEmbedFetchPayload.fields.push("variant.genes.genes_most_severe_gene.gene_notes");
+                // }
+
+                ajax.promise("/embed", "POST", {}, JSON.stringify(vsEmbedFetchPayload))
                     .then(function(vsEmbedList){
                         const [ vsEmbedRepresentation ] = vsEmbedList;
                         const { variant: variantObjRepresentation } =  vsEmbedRepresentation;

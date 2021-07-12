@@ -66,7 +66,7 @@ class OverviewTabView extends React.Component {
         // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
 
         const vsFetchCallback = (resp) => {
-            const { 0: { "@id": atID = null } = {} } = resp;
+            const [ { "@id": atID = null } = {} ] = resp;
             console.log("pulling new VS resp", resp);
 
             if (!atID) {
@@ -77,7 +77,7 @@ class OverviewTabView extends React.Component {
                 });
             }
 
-            this.setState({ newVSLoading: false, newestVariantSample: resp[0] });
+            this.setState({ "newVSLoading": false, "newestVariantSample": resp[0] });
         };
 
         ajax.load(
