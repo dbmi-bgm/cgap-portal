@@ -97,7 +97,6 @@ def build_variant_sample_embedded_list():
     """
     embedded_list = [
         "cmphet.*",
-        "variant_sample_list.created_for_case",
         "variant_notes.note_text",
         "variant_notes.version",
         "variant_notes.project",
@@ -130,7 +129,8 @@ def build_variant_sample_embedded_list():
         "discovery_interpretation.institution",
         "discovery_interpretation.status",
         "discovery_interpretation.last_modified.date_modified",
-        "discovery_interpretation.last_modified.modified_by.display_title"
+        "discovery_interpretation.last_modified.modified_by.display_title",
+        "variant_sample_list.created_for_case",
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
@@ -258,7 +258,7 @@ class VariantSample(Item):
 
     item_type = 'variant_sample'
     schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant_sample.json'))
-    rev = {'variant_sample_lists': ('VariantSampleList', 'variant_samples')}
+    rev = {'variant_sample_list': ('VariantSampleList', 'variant_samples.variant_sample_item')}
     embedded_list = build_variant_sample_embedded_list()
     FACET_ORDER_OVERRIDE = {
         'inheritance_modes': {
@@ -337,7 +337,7 @@ class VariantSample(Item):
         "linkTo": "VariantSampleList"
     })
     def variant_sample_list(self, request):
-        result = self.rev_link_atids(request, "variant_sample_lists")
+        result = self.rev_link_atids(request, "variant_sample_list")
         if result:
             return result[0]  # expected one list per case
 
