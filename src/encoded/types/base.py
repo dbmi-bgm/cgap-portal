@@ -418,6 +418,16 @@ def create(context, request):
             'href': '{item_uri}?currentAction=create'.format(item_uri=request.resource_path(context)),
         }
 
+@snovault.calculated_property(context=Item, category='action')
+def create(context, request):
+    if request.has_permission('clone'):
+        return {
+            'name': 'clone',
+            'title': 'Clone',
+            'profile': '/profiles/{ti.name}.json'.format(ti=context.type_info),
+            'href': '{item_uri}?currentAction=clone'.format(item_uri=request.resource_path(context)),
+        }
+
 
 @view_config(
     context=Collection,
