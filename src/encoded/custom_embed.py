@@ -293,25 +293,20 @@ class CustomEmbed:
                         fields_to_keep += field_dict[key]
                         continue
                     if key not in item:
-                        item_type = item.get("@type", ["given"])[0]
-                        raise HTTPBadRequest(
-                            "Could not find the requested field '%s' within the"
-                            " %s item."
-                            % (key, item_type)
-                        )
+                        continue
                     fields_to_keep.append(key)
                     item[key] = self.field_embed(item[key], field_dict[key])
                 if initial_item:
                     fields_to_keep.append("actions")
+                if "actions" in fields_to_keep and not initial_item:
+                    if DATABASE_ITEM_KEY in item:
+                        item = self.add_actions(item)
+                    else:
+                        raise HTTPBadRequest(
+                            "The 'actions' field was requested for a JSON object"
+                            " that is not a database item."
+                        )
                 if "*" not in fields_to_keep:
-                    if "actions" in fields_to_keep and not initial_item:
-                        if DATABASE_ITEM_KEY in item:
-                            item = self.add_actions(item)
-                        else:
-                            raise HTTPBadRequest(
-                                "The 'actions' field was requested for a JSON object"
-                                " that is not a database item."
-                            )
                     culled_item = {}
                     for field in fields_to_keep:
                         try:

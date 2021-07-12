@@ -267,8 +267,12 @@ class TestCustomEmbed:
 
     def test_field_embed(self, testapp, variant_sample_list):
         """
+        Test POSTs with requested fields return equivalent information for
+        URL query and JSON. Also, ensure "*" wildcard working appropriately
+        and embedded fields are in fact present.
         """
         vsl_uuid = variant_sample_list["uuid"]
+        vsl_atid = variant_sample_list["@id"]
         fields = [
             "variant_samples.variant_sample_item.variant.display_title",
             "*",
@@ -277,10 +281,22 @@ class TestCustomEmbed:
         json_params = {"ids": [vsl_uuid], "fields": fields}
         vsl_embed_url = _embed_with_url_params(testapp, url_params)
         vsl_embed_json = _embed_with_json_params(testapp, json_params)
+        vsl_object = testapp.get(vsl_atid + "?frame=object", status=200).json
         assert vsl_embed_url == vsl_embed_json
+        for key, value in vsl_object.items():
+            if key in ["variant_samples", "actions"]:
+                continue
+            assert vsl_embed_url[key] == value
+        for variant_sample in vsl_embed_url["variant_samples"]:
+            variant = variant_sample["variant_sample_item"]["variant"]
+            assert len(variant.keys()) == 1
+            assert "display_title" in variant.keys()
 
     def test_field_embed_actions(self, testapp, variant_sample_list):
         """
+        Test that "actions" correctly added to dict of requested item ID.
+        Also, test that if "actions" is requested for an embedded field
+        that is not a CGAP item, an HTTPBadRequest error is raised.
         """
         vsl_uuid = variant_sample_list["uuid"]
         vsl_atid = variant_sample_list["@id"]
@@ -301,16 +317,25 @@ class TestCustomEmbed:
 
     def test_field_embed_wrong_field(self, testapp, variant_sample_list):
         """
+        Test that no error thrown if requested field does not exist in
+        item. Rather, the "closest" existing upstream field should be embedded
+        with empty fields.
         """
         vsl_uuid = variant_sample_list["uuid"]
         fields = ["variant_samples.some_field.another_field"]
         json_params = {"ids": [vsl_uuid], "fields": fields}
-        assert _embed_with_json_params(testapp, json_params, status=400)
+        vsl_embed_json = _embed_with_json_params(testapp, json_params, status=200)
+        for field in vsl_embed_json["variant_samples"]:
+            assert not field
 
     def test_field_embed_permissions(
         self, testapp, bgm_user_testapp, variant_sample_list
     ):
         """
+        Test for accurate permissions handling for field embeddings.
+        Items to which the user does not have access should be embedded
+        with the forbidden message and no downstream fields should be
+        embedded within.
         """
         vsl_atid = variant_sample_list["@id"]
         testapp.patch_json(vsl_atid, {"status": "shared"}, status=200)
