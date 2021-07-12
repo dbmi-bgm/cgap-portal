@@ -20,7 +20,7 @@ export function CaseSpecificSelectionsPanel (props) {
 
 
     return (
-        <div className="card mb-24">
+        <div className="card mb-1">
             <div className={"card-header py-3 bg-primary-dark" + (!isExpanded ? " rounded" : "")}>
                 <h4 className="text-400 my-0 d-flex align-items-center clickable text-white" onClick={toggleExpanded}>
                     <i className={"mr-1 icon fas icon-" + (isExpanded ? "minus" : "plus")}/>
@@ -64,7 +64,7 @@ function ACMGClassificationSelections (props) {
                     <ACMGClassificationSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems} />
                 </div>
                 <div className="col-12 col-lg-6">
-                    <h5 className="text-400 text-large">Send to KnowledgeBase</h5>
+                    <h5 className="text-400 text-large">Save to Project</h5>
                     <ACMGClassificationSelectionsCommonCheckboxList alreadyInProjectNotes={alreadyInProjectNotes} variantSampleListItem={variantSampleListItem} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems} />
                 </div>
             </div>
@@ -177,7 +177,7 @@ function VariantGeneSelections (props) {
                     <VariantGeneSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems} />
                 </div>
                 <div className="col-12 col-lg-6">
-                    <h5 className="text-400 text-large">Send to KnowledgeBase</h5>
+                    <h5 className="text-400 text-large">Save to Project</h5>
                     <VariantGeneSelectionsCommonCheckboxList {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems} />
                 </div>
             </div>
@@ -352,7 +352,7 @@ function NoteTypeSelections (props) {
                     <NoteTypeSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems} />
                 </div>
                 <div className="col-12 col-lg-6">
-                    <h5 className="text-400 text-large">Send to KnowledgeBase</h5>
+                    <h5 className="text-400 text-large">Save to Project</h5>
                     <NoteTypeSelectionsCommonCheckboxList variantSampleListItem={variantSampleListItem} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems} />
                 </div>
             </div>
@@ -480,8 +480,6 @@ function getClassificationStates(possibleEnums, viableVariantSampleSelections, i
                 return;
             }
 
-            classificationCounts[enumOption]++;
-
             // TODO do intersection if Notes option(s) checked or unchecked.
 
             // Currently does intersection or skip if Note is in `alreadyInProjectNotes` -- TODO: exclude from inactiveSelectionsByClassification if all notes from VS are in alreadyInProjectNotes.
@@ -489,6 +487,12 @@ function getClassificationStates(possibleEnums, viableVariantSampleSelections, i
             const currentNotes = getAllNotesFromVariantSample(vsItem).filter(function({ uuid }){
                 return !ignoreNoteUUIDs[uuid];
             });
+
+            if (currentNotes.length === 0) {
+                return;
+            }
+
+            classificationCounts[enumOption]++;
 
             const isSelected = _.every(currentNotes, function({ uuid }){ return store[uuid]; });
 
@@ -514,5 +518,11 @@ function getClassificationStates(possibleEnums, viableVariantSampleSelections, i
         }
     });
 
-    return { checkboxStates, indeterminateStates, classificationCounts, activeSelectionsByClassification, inactiveSelectionsByClassification };
+    return {
+        checkboxStates,
+        indeterminateStates,
+        classificationCounts,
+        activeSelectionsByClassification,
+        inactiveSelectionsByClassification
+    };
 }

@@ -45,6 +45,7 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
             </div>
             <div>
                 <CaseSpecificSelectionsPanel {...commonProps} />
+                <hr />
                 <VariantSampleSelectionList {...commonProps} parentTabType={parentTabTypes.FINALIZECASE} />
             </div>
         </React.Fragment>
@@ -60,7 +61,7 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
  * For now can just check if Note.status === "current" and then keep that way if can assert Variant.interpretations etc. will be up-to-date.
  */
 function buildAlreadyStoredNoteUUIDDict(variantSampleListItem){
-    const { variant_samples: vsObjects = [] } = variantSampleListItem = {}; // Might not yet be loaded.
+    const { variant_samples: vsObjects = [] } = variantSampleListItem || {}; // Might not yet be loaded.
     const dict = {};
     vsObjects.forEach(function({ variant_sample_item }){
         getAllNotesFromVariantSample(variant_sample_item).forEach(function(noteItem){
@@ -96,7 +97,17 @@ class SaveNotesButton extends React.PureComponent {
         this.memoized = {
             selectionStoreSize: memoize(function(selectionStore){
                 return Object.keys(selectionStore).length;
-            })
+            }),
+            variantSamplesWithAnySelectionSize: function(variantSampleListItem, selectionStore){
+                const { variant_samples: vsObjects = [] } = variantSampleListItem || {}; // Might not yet be loaded.
+                let count = 0;
+                vsObjects.forEach(function({ variant_sample_item }){
+                    if (_.any(getAllNotesFromVariantSample(variant_sample_item), function({ uuid }){ return selectionStore[uuid]; })) {
+                        count++;
+                    }
+                });
+                return count;
+            }
         };
     }
 
@@ -256,6 +267,7 @@ class SaveNotesButton extends React.PureComponent {
                         }
 
                         if (needGenePatch) {
+                            // TODO: Once can filter down `/embed` response fields, consider combining requests for variant+gene.
                             const geneIDs = genes.map(function(geneObject){
                                 const { genes_most_severe_gene: geneAtID = null } = geneObject;
                                 return geneAtID || null;
@@ -286,7 +298,6 @@ class SaveNotesButton extends React.PureComponent {
                                     .finally(function(){
                                         requestCompletedCount++;
                                         checkIfCompleted();
-                                        console.log("CHECK-GENE", requestCount, requestCompletedCount);
                                     });
 
                             }
@@ -297,7 +308,6 @@ class SaveNotesButton extends React.PureComponent {
                     .finally(function(){
                         requestCompletedCount++;
                         checkIfCompleted();
-                        console.log("CHECK-V", requestCount, requestCompletedCount);
                     });
             }
 
@@ -331,7 +341,6 @@ class SaveNotesButton extends React.PureComponent {
                 }
             }
 
-            console.log("CHECK-VS", requestCount, requestCompletedCount);
             checkIfCompleted();
 
         });
@@ -446,14 +455,15 @@ class SaveNotesButton extends React.PureComponent {
     }
 
     render(){
-        const { selectionStore } = this.props;
+        const { selectionStore, variantSampleListItem } = this.props;
         const { isFetching, isPatching, fetchingPercentageComplete, patchingPercentageComplete } = this.state;
         const selectionStoreSize = this.memoized.selectionStoreSize(selectionStore);
+        const variantSamplesWithAnySelectionSize = this.memoized.variantSamplesWithAnySelectionSize(variantSampleListItem, selectionStore);
         const onHide = fetchingPercentageComplete === 1 && patchingPercentageComplete === 1 ? this.onReset : null;
         return (
             <React.Fragment>
                 <button type="button" className="btn btn-primary" onClick={this.patchNotesStatus} disabled={isFetching || isPatching || selectionStoreSize === 0}>
-                    Save { selectionStoreSize } Note Selections to Project
+                    Save { selectionStoreSize } Notes from { variantSamplesWithAnySelectionSize } Sample Variants to Project
                 </button>
                 { isFetching || isPatching ?
                     <ProgressModal {...{ fetchingPercentageComplete, isFetching, isPatching, patchingPercentageComplete, onHide }} />

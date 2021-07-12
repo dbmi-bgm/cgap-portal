@@ -560,7 +560,7 @@ const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onK
             </Checkbox>
             <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={kbAlreadyStored ? null : onKBChange}
                 checked={kbAlreadyStored || kbChecked} disabled={kbAlreadyStored}>
-                Send to KnowledgeBase
+                Save to Project
             </Checkbox>
         </div>
     );
