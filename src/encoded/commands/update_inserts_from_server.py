@@ -163,6 +163,5 @@ def main():
                     (len(svr_inserts[item_type]), item_type + '.json'))
 
 
-
 if __name__ == "__main__":
     main()

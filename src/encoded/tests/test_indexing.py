@@ -387,7 +387,7 @@ class TestInvalidationScopeViewCGAP:
                              'last_modified.modified_by', 'date_created', 'submitted_by', 'aliases',
                              'accession', 'alternate_accessions', 'schema_version', 'title', 'family_id',
                              'members', 'proband', 'pedigree_source', 'original_pedigree', 'clinic_notes',
-                             'timestamp', 'family_phenotypic_features', 'description']
+                             'timestamp', 'family_phenotypic_features', 'description', 'ingestion_ids']
          ),
         ('Phenotype', 'Case',
             DEFAULT_SCOPE + ['hpo_id', 'phenotype_name']

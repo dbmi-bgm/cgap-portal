@@ -13,7 +13,7 @@ import webtest
 
 from dcicutils.qa_utils import notice_pytest_fixtures, MockFileSystem
 from pyramid.request import apply_request_extensions
-from pyramid.testing import DummyRequest  # , setUp, tearDown
+from pyramid.testing import DummyRequest
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
 from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
@@ -42,7 +42,6 @@ def app_settings(request, wsgi_server_host_port, conn, DBSession):  # noQA - We 
     notice_pytest_fixtures(request, wsgi_server_host_port, conn, DBSession)
     settings = make_app_settings_dictionary()
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
-    # add some here for file testing
     settings[DBSESSION] = DBSession
     return settings
 

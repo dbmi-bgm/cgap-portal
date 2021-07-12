@@ -59,6 +59,7 @@ class SearchBuilder:
     ADDITIONAL_FACETS = 'additional_facet'  # specifies an aggregation to compute in addition
     RESCUE_TERMS = 'rescue_terms'  # special facet field that contains terms that should always have buckets
     DEBUG = 'debug'  # search debug parameter
+    CARDINALITY_RANGE = '-3.4028E38-*'
     MISSING = object()
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
@@ -847,8 +848,6 @@ class SearchBuilder:
                     # merge bucket labels from ranges into buckets
                     for r in result_facet['ranges']:
                         for b in bucket_location['buckets']:
-
-                            # if ranges match we found our bucket, propagate doc_count into 'ranges' field
                             if (r.get('from', self.MISSING) == b.get('from', self.MISSING) and
                                     r.get('to', self.MISSING) == b.get('to', self.MISSING)):
                                 r['doc_count'] = b['doc_count']
