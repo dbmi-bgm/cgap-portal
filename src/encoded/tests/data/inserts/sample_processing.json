@@ -20,5 +20,26 @@
             }
          ],
         "processed_files": ["10002377-49e5-4c33-afab-9ec90d65faa1"]
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "shared",
+        "uuid": "33dcd73c-f48e-475b-84bb-7a4514750657",
+        "analysis_type": "WGS",
+        "samples":
+        [
+            "4fdb481a-fbdb-4c0f-a68d-aac87f847bec"
+        ],
+        "sample_processed_files": [
+            {
+                "sample": "4fdb481a-fbdb-4c0f-a68d-aac87f847bec",
+                "processed_files": ["10002377-49e5-4c33-afab-9ec90d65faf3"]
+            }
+         ],
+        "processed_files": ["6b113e31-d4dd-465a-99b2-16fb0c3928fb"],
+        "families": [
+            "415fa8aa-8482-43d0-a90a-540c0ee9c1e0"
+        ]
     }
 ]

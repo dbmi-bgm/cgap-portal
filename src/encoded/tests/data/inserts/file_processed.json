@@ -48,5 +48,15 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "submitted_by": "soohyun_lee@hms.harvard.edu"
+    },
+    {
+        "status": "shared",
+        "uuid": "6b113e31-d4dd-465a-99b2-16fb0c3928fb",
+        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa5",
+        "accession": "GAPFIFYGNO4A",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_type": "full annotated VCF",
+        "variant_type": "SV"
     }
 ]

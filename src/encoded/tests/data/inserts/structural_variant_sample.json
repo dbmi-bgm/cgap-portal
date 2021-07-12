@@ -1,0 +1,18 @@
+[
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "uuid": "54ad2be8-228f-4690-9805-97f9d7d57f5f",
+        "structural_variant": "4609fd8e-067b-48a0-aef3-0268d4073b56",
+        "CALL_INFO": "test001_sample",
+        "file": "GAPFIFYGNO4A"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "uuid": "54ad2be8-228f-4690-9805-97f9d7d57f5f",
+        "structural_variant": "4609fd8e-067b-48a0-aef3-0268d4073b57",
+        "CALL_INFO": "test001_sample",
+        "file": "GAPFIFYGNO4A"
+    }
+]
