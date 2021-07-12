@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import _ from 'underscore';
 
+import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
@@ -97,16 +98,17 @@ function AboveCasesTableOptions(props){
                             <ProjectSelectDropdown {...{ context, onFilter, isContextLoading, navigate }} />
                         </div>
                     </h3>
-                    <div className="btn-container">
-                        <a className="btn btn-primary mr-1" href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Gene List">
-                            <i className="icon icon-plus fas" />
-                            <span className="ml-1 d-none d-sm-inline">Submit New Gene List(s)</span>
-                        </a>
-                        <a className="btn btn-primary" href="/search/?type=IngestionSubmission&currentAction=add">
-                            <i className="icon icon-plus fas" />
-                            <span className="ml-1 d-none d-sm-inline">Submit New Case(s)</span>
-                        </a>
-                    </div>
+                    <DropdownButton variant="primary text-600 text-capitalize" title={<span><i className="icon fas icon-plus mr-05"/>Submit New...</span>} id="submit-new">
+                        <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add">
+                            Case(s)
+                        </Dropdown.Item>
+                        <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Family History">
+                            Family History
+                        </Dropdown.Item>
+                        <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Gene List">
+                            Gene List(s)
+                        </Dropdown.Item>
+                    </DropdownButton>
                 </div>
             </div>
 

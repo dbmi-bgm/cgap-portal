@@ -1,0 +1,8 @@
+.docker-compose.yml
+Dockerfile
+node_modules/
+.cache
+.pytest_cache
+aws-ip-ranges.json
+.git
+docs

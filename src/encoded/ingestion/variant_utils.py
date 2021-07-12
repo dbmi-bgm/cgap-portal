@@ -101,6 +101,7 @@ class VariantBuilder:
         except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
             log.info('Exception encountered on variant_sample post (attempting patch): %s' % e)
             self.vapp.patch_json('/variant_sample/%s' %
+
                                  build_variant_sample_annotation_id(variant_sample['CALL_INFO'],
                                                                     variant_uuid, self.file),
                                  variant_sample,

@@ -91,7 +91,6 @@ def test_variant_sample_list_post(bgm_user_testapp, variant_sample_list1):
     bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201)
 
 
-
 def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_sample_list1, bgm_test_variant_sample, bgm_test_variant_sample2):
     vsl = bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201).json['@graph'][0]
     vs1 = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample, status=201).json['@graph'][0]
@@ -128,6 +127,14 @@ def test_variant_sample_list_patch_fail(bgm_variant, bgm_user_testapp, variant_s
         'variant_samples': [bgm_variant["@id"]]  # wrong data structure and item type
     }
     bgm_user_testapp.patch_json(vsl['@id'], patch, status=422)
+
+
+def test_variant_sample_list_revlink(testapp, variant_sample_list):
+    """Ensure revlink from VSL to variant sample established."""
+    vsl_atid = variant_sample_list["@id"]
+    vs_atid = variant_sample_list["variant_samples"][0]["variant_sample_item"]
+    variant_sample = testapp.get(vs_atid, status=200).json
+    assert vsl_atid == variant_sample["variant_sample_list"]["@id"]
 
 
 @pytest.mark.parametrize('call_info,variant_uuid,file_accession', [

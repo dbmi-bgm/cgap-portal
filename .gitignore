@@ -83,3 +83,8 @@ elasticsearch-*.deb
 
 # Used for some kinds of debugging in dcicutils, snovault, cgap & ff.
 DEBUGLOG-*
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
