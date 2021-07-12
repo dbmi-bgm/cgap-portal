@@ -2,6 +2,7 @@ import base64
 import os
 from operator import itemgetter
 import jwt
+import datetime
 from base64 import b64decode
 
 from passlib.context import CryptContext
@@ -34,6 +35,7 @@ from snovault import (
     CONNECTION,
     COLLECTIONS
 )
+from dateutil.parser import isoparse
 from dcicutils.misc_utils import remove_element
 from snovault.validation import ValidationFailure
 from snovault.calculated import calculate_properties
@@ -251,9 +253,9 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                     request.set_property(lambda r: False, 'auth0_expired')
                     return payload
 
-            else: # we don't have the key, let auth0 do the work for us
+            else:  # we don't have the key, let auth0 do the work for us
                 user_url = "https://{domain}/tokeninfo".format(domain='hms-dbmi.auth0.com')
-                resp  = requests.post(user_url, {'id_token':token})
+                resp = requests.post(user_url, {'id_token':token})
                 payload = resp.json()
                 if 'email' in payload and Auth0AuthenticationPolicy.email_is_partners_or_hms(payload):
                     request.set_property(lambda r: False, 'auth0_expired')
@@ -261,8 +263,8 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
 
         except (ValueError, jwt.exceptions.InvalidTokenError, jwt.exceptions.InvalidKeyError) as e:
             # Catch errors from decoding JWT
-            print('Invalid JWT assertion : %s (%s)', (e, type(e).__name__))
-            request.set_property(lambda r: True, 'auth0_expired') # Allow us to return 403 code &or unset cookie in renderers.py
+            print('Invalid JWT assertion : %s (%s)' % (e, type(e).__name__))
+            request.set_property(lambda r: True, 'auth0_expired')  # Allow us to return 403 code &or unset cookie in renderers.py
             return None
 
         print("didn't get email or email is not verified")
@@ -313,8 +315,7 @@ def login(context, request):
     if request_token is None:
         request_token = request.json_body.get("id_token", None)
 
-
-    is_https = request.scheme == "https"
+    is_https = (request.scheme == "https")
 
     request.response.set_cookie(
         "jwtToken",
@@ -438,6 +439,10 @@ def session_properties(context, request):
 
 
 def basic_auth_check(username, password, request):
+    """ This function implements the functionality that does the actual checking of the
+        access key against what is in the database. It is thus very important. Access
+        key expiration is implemented here - auth will fail if it has expired
+    """
     # We may get called before the context is found and the root set
     root = request.registry[ROOT]
     collection = root['access-keys']
@@ -446,19 +451,24 @@ def basic_auth_check(username, password, request):
     except KeyError:
         return None
 
+    # Check expiration first
+    # Note that access keys generated awhile ago will remain valid (for now) - will 6/14/21
     properties = access_key.properties
-    hash = properties['secret_access_key_hash']
+    expiration_date = properties.get('expiration_date')
+    if expiration_date:
+        dt = isoparse(expiration_date)  # datetime.date.fromisoformat in Python3.7
+        now = datetime.datetime.utcnow()
+        if now > dt:
+            return None
 
+    # If expiration valid, check hash
+    hash = properties['secret_access_key_hash']
     crypt_context = request.registry[CRYPT_CONTEXT]
     valid = crypt_context.verify(password, hash)
     if not valid:
         return None
 
-    #valid, new_hash = crypt_context.verify_and_update(password, hash)
-    #if new_hash:
-    #    replace_user_hash(user, new_hash)
-
-    return []
+    return []  # success
 
 
 @view_config(route_name='impersonate-user', request_method='POST',

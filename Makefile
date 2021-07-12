@@ -172,6 +172,49 @@ remote-test-unit:  # Note this does the 'indexing' tests
 update:  # updates dependencies
 	poetry update
 
+build-docker-local:
+	docker-compose build
+
+build-docker-local-clean:
+	docker-compose build --no-cache BUILD_PATH=deploy/docker/local
+
+deploy-docker-local:
+	docker-compose up -V
+
+deploy-docker-local-daemon:
+	docker-compose up -d -V
+
+ENV_NAME ?= cgap-mastertest
+AWS_ACCOUNT ?= 645819926742
+
+ecr-login:
+	@echo "Making ecr-login AWS_ACCOUNT=${AWS_ACCOUNT} ..."
+	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com
+
+rebuild-docker-production:
+	@echo "Remaking build-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
+	docker build -t ${ENV_NAME}:latest . --no-cache
+	make tag-and-push-docker-production
+
+build-docker-test:
+	# This will do the equivalent of
+	#    make ecr-login AWS_ACCOUNT=<selected-test-account>
+	#    make build-docker-production AWS_ACCOUNT=<selected-test-account> ENV_NAME=<selected-env>
+	# but it has to do the login inside the script, we can't do it separately here
+	# because it has to infer the correct AWS_ACCOUNT and ENV_NAME by nosing into
+	# ~/.aws_test/test_creds.sh looking for ACCOUNT_NUMBER (note: not AWS_ACCOUNT) and ENV_NAME.
+	scripts/build-docker-test --login  # The login must be done inside the script, after inferring account number
+
+build-docker-production:
+	@echo "Making build-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
+	docker build -t ${ENV_NAME}:latest .
+	make tag-and-push-docker-production ENV_NAME=${ENV_NAME} AWS_ACCOUNT=${AWS_ACCOUNT}
+
+tag-and-push-docker-production:
+	@echo "Making tag-and-push-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
+	docker tag ${ENV_NAME}:latest ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/${ENV_NAME}:latest
+	docker push ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/${ENV_NAME}:latest
+
 help:
 	@make info
 
@@ -199,3 +242,9 @@ info:
 	   $(info - Use 'make test' to run tests with normal options similar to what we use on GitHub Actions.)
 	   $(info - Use 'make test-any' to run tests without marker constraints (i.e., with no '-m' option).)
 	   $(info - Use 'make update' to update dependencies (and the lock file).)
+	   $(info - Use 'make build-docker-local' to build the local Docker image.)
+	   $(info - Use 'make build-docker-local-clean' to build the local Docker image with no cache.)
+	   $(info - Use 'make deploy-docker-local' start up the cluster - pserve output will follow if successful.)
+	   $(info - Use 'make deploy-docker-local-daemon' will start the cluster in daemon mode.)
+	   $(info - Use 'make ecr-login' to login to ECR with the currently sourced AWS creds.)
+	   $(info - Use 'make build-docker-production' to build/tag/push a production image.)

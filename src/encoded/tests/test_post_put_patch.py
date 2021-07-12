@@ -248,7 +248,7 @@ def test_post_check_only_invalid_data(testapp, disorder_data):
     '''
     note theese test should work on any object
     '''
-    disorder_data['taxon_id'] = 24;
+    disorder_data['taxon_id'] = 24
     testapp.post_json('/disorder/?check_only=true', disorder_data, status=422)
 
 
@@ -327,7 +327,7 @@ def test_patch_delete_fields_restricted_fields_admin(link_targets, testapp):
     res = testapp.post_json(COLLECTION_URL, item_with_link[0], status=201)
     url = res.location
     assert res.json['@graph'][0]['protected_link']
-    res = testapp.patch_json(url + "?delete_fields=protected_link", {}, status=200)
+    testapp.patch_json(url + "?delete_fields=protected_link", {}, status=200)
 
 
 def test_patch_delete_fields_restricted_fields_submitter(content, testapp, submitter_testapp):
@@ -344,10 +344,14 @@ def test_patch_delete_fields_restricted_fields_submitter(content, testapp, submi
     res1 = submitter_testapp.patch_json(url + "?delete_fields=protected", {}, status=200)
     assert res1.json['@graph'][0]['protected'] == 'protected default'
 
-    # change protected value
+    # submitter cannot change value
+    submitter_testapp.patch_json(url, {'protected': 'protected new'}, status=422)
+
+    # admin can change protected value
     res = testapp.patch_json(url, {'protected': 'protected new'}, status=200)
     assert res.json['@graph'][0]['protected'] == 'protected new'
 
+    # results in a delta in the protected field, reject
     res2 = submitter_testapp.patch_json(url + "?delete_fields=protected", {}, status=422)
     res_errors = res2.json['errors']
     assert len(res_errors) == 2

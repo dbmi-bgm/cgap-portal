@@ -580,7 +580,8 @@ class IngestionListener:
                 # report results in error_log regardless of status
                 msg = variant_builder.ingestion_report.brief_summary()
                 log.error(msg)
-                self.update_status(msg=msg)
+                if self.update_status is not None and callable(self.update_status):
+                    self.update_status(msg=msg)
 
                 # if we had no errors, patch the file status to 'Ingested'
                 if error > 0:

@@ -75,7 +75,7 @@ const optimization = {
     minimize: mode === "production",
     minimizer: [
         new TerserPlugin({
-            parallel: false,
+            parallel: false,  // XXX: this option causes docker build to fail - Will 2/25/2021
             sourceMap: true,
             terserOptions:{
                 compress: true,

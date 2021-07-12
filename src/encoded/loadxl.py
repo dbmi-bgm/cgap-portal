@@ -7,6 +7,7 @@ import mimetypes
 import os
 import structlog
 import webtest
+import traceback
 
 from base64 import b64encode
 from dcicutils.misc_utils import ignored
@@ -36,6 +37,9 @@ ORDER = [
     'user',
     'file_format',
     'workflow',
+    'meta_workflow',
+    'workflow_run',
+    'meta_workflow_run',
     'variant',
     'higlass_view_config'
 ]
@@ -464,6 +468,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             except Exception as e:
                 print('Patching {} failed. Patch body:\n{}\n\nError Message:\n{}'.format(
                       a_type, str(an_item), str(e)))
+                print('Full error: %s' % traceback.format_exc())
                 e_str = str(e).replace('\n', '')
                 # import pdb; pdb.set_trace()
                 yield str.encode('ERROR: %s\n' % e_str)

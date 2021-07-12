@@ -75,6 +75,10 @@
           "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
           "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
       },
-      "final_status": "failed"
+      "final_status": "failed",
+      "overall_qcs": [
+          {"name": "linecount_test", "value": "PASS"},
+          {"name": "some_other_test", "value": "FAIL"}
+      ]
     }
 ]

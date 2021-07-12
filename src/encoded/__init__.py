@@ -31,10 +31,6 @@ if sys.version_info.major < 3:
     raise EnvironmentError("The CGAP encoded library no longer supports Python 2.")
 
 
-# location of environment variables on elasticbeanstalk
-BEANSTALK_ENV_PATH = "/opt/python/current/env"
-
-
 def static_resources(config):
     mimetypes.init()
     mimetypes.init([pkg_resources.resource_filename('encoded', 'static/mime.types')])
@@ -95,18 +91,7 @@ def app_version(config):
     if not config.registry.settings.get(APP_VERSION_REGISTRY_KEY):
         # we update version as part of deployment process `deploy_beanstalk.py`
         # but if we didn't check env then git
-        version = os.environ.get("ENCODED_VERSION")
-        if not version:
-            try:
-                version = subprocess.check_output(
-                    ['git', '-C', os.path.dirname(__file__), 'describe']).decode('utf-8').strip()
-                diff = subprocess.check_output(
-                    ['git', '-C', os.path.dirname(__file__), 'diff', '--no-ext-diff'])
-                if diff:
-                    version += '-patch' + hashlib.sha1(diff).hexdigest()[:7]
-            except Exception:
-                version = "test"
-
+        version = os.environ.get("ENCODED_VERSION", "test")
         config.registry.settings[APP_VERSION_REGISTRY_KEY] = version
 
     # Fourfront does GA stuff here that makes no sense in CGAP (yet).

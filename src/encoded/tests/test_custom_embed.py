@@ -11,31 +11,7 @@ EMBED_URL = "/embed"
 KEYS_NOT_INCLUDED = ["@context", "actions", "aggregated-items", "validation-errors"]
 
 
-@pytest.fixture
-def variant_sample_list(
-    testapp, variant_sample, variant_sample_2, genelist, project, institution
-):
-    vs_1 = testapp.post_json(
-        "/variant-samples", variant_sample, status=201
-    ).json["@graph"][0]
-    vs_2 = testapp.post_json(
-        "/variant-samples", variant_sample_2, status=201
-    ).json["@graph"][0]
-    vs_list = {
-        "project": project["@id"],
-        "institution": institution["@id"],
-        "variant_samples": [
-            {"variant_sample_item": vs_1["@id"]},
-            {"variant_sample_item": vs_2["@id"]},
-        ],
-    }
-    response = testapp.post_json(
-        "/variant-sample-lists", vs_list, status=201
-    ).json["@graph"][0]
-    return response
-
-
-def _embed_with_url_params(testapp, embed_string, status="*"):
+def _embed_with_url_params(testapp, embed_string, status=200):
     """POST to embed endpoint with url parameters."""
     creation_post_data = {}
     creation_post_headers = {
@@ -97,8 +73,9 @@ class TestCustomEmbed:
         or in json body.
         """
         vsl_uuid = variant_sample_list["uuid"]
-        vsl_embed_url = _embed_with_url_params(testapp, EMBED_URL + "?id=" + vsl_uuid)
-        json_to_post = {"ids": [vsl_uuid]}
+        url_params = EMBED_URL + "?id=" + vsl_uuid + "&ignored=variant-sample-lists"
+        vsl_embed_url = _embed_with_url_params(testapp, url_params)
+        json_to_post = {"ids": [vsl_uuid], "ignored": ["variant-sample-lists"]}
         vsl_embed_json = _embed_with_json_params(testapp, json_to_post)
         assert vsl_embed_url == vsl_embed_json
 
@@ -135,7 +112,7 @@ class TestCustomEmbed:
     def test_ignored_keys(self, testapp, variant_sample_list):
         """Test embedding all keys except requested 'ignored' keys."""
         vsl_uuid = variant_sample_list["uuid"]
-        ignored = ["projects"]
+        ignored = ["projects", "variant-sample-lists"]
         ignored_keys = _convert_atid_to_key(ignored)
         ignored_addon = "&ignored=".join(ignored)
         url_params = EMBED_URL + "?id=" + vsl_uuid + "&depth=1&ignored=" + ignored_addon
@@ -154,7 +131,7 @@ class TestCustomEmbed:
     def test_minimal_embeds(self, testapp, variant_sample_list):
         """Test default minimal embedding settings work as intended."""
         vsl_uuid = variant_sample_list["uuid"]
-        url_params = EMBED_URL + "?id=" + vsl_uuid
+        url_params = EMBED_URL + "?id=" + vsl_uuid + "&ignored=variant-sample-lists"
         vsl_embed_url = _embed_with_url_params(testapp, url_params)
         minimal_embeds = _convert_atid_to_key(MINIMAL_EMBEDS)
         for key in minimal_embeds:
@@ -198,7 +175,7 @@ class TestCustomEmbed:
         vsl_uuid = variant_sample_list["uuid"]
         vsl_atid = variant_sample_list["@id"]
         testapp.patch_json(vsl_atid, {"status": "shared"}, status=200)
-        url_params = EMBED_URL + "?id=" + vsl_uuid
+        url_params = EMBED_URL + "?id=" + vsl_uuid + "&ignored=variant-sample-lists"
         bgm_vsl_embed_url = _embed_with_url_params(bgm_user_testapp, url_params)
         admin_vsl_embed_url = _embed_with_url_params(testapp, url_params)
         for key in admin_vsl_embed_url:
@@ -254,7 +231,7 @@ class TestCustomEmbed:
         vsl_uuid = variant_sample_list["uuid"]
         vsl_atid = variant_sample_list["@id"]
         testapp.patch_json(vsl_atid, {"status": "shared"}, status=200)
-        url_params = EMBED_URL + "?id=" + vsl_uuid
+        url_params = EMBED_URL + "?id=" + vsl_uuid + "&ignored=variant-sample-lists"
         bgm_vsl_embed_url = _embed_with_url_params(bgm_user_testapp, url_params)
         admin_vsl_embed_url = _embed_with_url_params(testapp, url_params)
         bgm_embedded = bgm_user_testapp.get(vsl_atid).json

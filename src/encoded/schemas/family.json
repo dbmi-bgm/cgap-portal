@@ -33,6 +33,9 @@
             "$ref": "mixins.json#/modified"
         },
         {
+            "$ref": "mixins.json#/ingestion_ids"
+        },
+        {
             "$ref": "mixins.json#/status"
         },
         {

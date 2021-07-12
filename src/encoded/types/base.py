@@ -331,11 +331,6 @@ class Item(snovault.Item):
         return False
 
     def _update(self, properties, sheets=None):
-        props = {}
-        try:
-            props = self.properties
-        except KeyError:
-            pass
         add_last_modified(properties)
         super(Item, self)._update(properties, sheets)
 
