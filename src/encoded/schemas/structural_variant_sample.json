@@ -104,8 +104,8 @@
         }
     },
     "columns": {
-        "structural_variant.display_title": {
-            "title": "Variant",
+        "structural_variant.SV_TYPE": {
+            "title": "Type",
             "order": 0
         }
     },
