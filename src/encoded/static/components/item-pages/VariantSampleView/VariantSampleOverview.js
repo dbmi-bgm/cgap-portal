@@ -352,6 +352,11 @@ class InterpretationController extends React.Component {
         this.setState({ showACMGInvoker: !showACMGInvoker }, callback);
     }
 
+    invokeAtStrength(criteria, strength, callback) {
+
+    }
+
+
     /**
      * Called when a new rule is invoked (to default only) or uninvoked
      * @param {Object} criteria     An object with an ACMG rule & strength pair
@@ -359,21 +364,22 @@ class InterpretationController extends React.Component {
      */
     toggleInvocation(criteria, callback) {
         console.log("toggleInvocation criteria", criteria);
-        const { acmg_rule_name: rule = criteria, rule_strength: strength = "Default" } = criteria;
+        const { acmg_rule_name: rule = criteria, rule_strength: strength } = criteria;
         const { globalACMGSelections = {} } = this.state;
         const newInvocations = { ...globalACMGSelections };
 
+        const selectedStrength = strength ? strength: "Default";
         if (newInvocations[rule] !== undefined) { // already set (may have strength)
-            const newState = !newInvocations[rule];
+            const newState = newInvocations[rule] ? false: selectedStrength;
             newInvocations[rule] = newState;
             if (newState) {
-                this.classifier.invoke(rule, strength);
+                this.classifier.invoke(rule, selectedStrength);
             } else {
-                this.classifier.uninvoke(rule, strength);
+                this.classifier.uninvoke(rule, selectedStrength);
             }
         } else { // first time setting (won't have strength)
-            newInvocations[rule] = strength;
-            this.classifier.invoke(rule, strength);
+            newInvocations[rule] = selectedStrength;
+            this.classifier.invoke(rule, selectedStrength);
         }
 
         const classification = this.classifier.getClassification();
@@ -454,10 +460,10 @@ function ACMGInvoker(props) {
             <div className="d-flex acmg-guidelines-invoker align-items-center">
                 {acmgUtil.rules.map((rule) => {
                     const { [rule]: { description } = {} } = acmgUtil.metadata;
-                    const isInvoked = invoked[rule];
+                    const strength = invoked[rule];
                     return (
-                        <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={!!isInvoked}
-                            onClick={() => toggleInvocation(rule)} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
+                        <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={!!strength}
+                            onClick={() => toggleInvocation({ acmg_rule_name: rule, rule_strength: strength })} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
                             { rule }
                         </div>
                     );}

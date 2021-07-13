@@ -265,6 +265,9 @@ export class AutoClassify {
 
     /** Adjusts evidence on new invocation */
     invoke(rule, strength) {
+        if (!rule) {
+            throw new Error ("ACMG rule to invoke was not passed in");
+        }
         // Adjust count of evidence types (take into consideration non-default strengths)
         const { strength: defaultStrength, type } = metadata[rule];
         const selectedStrength = (strength && strength !== "Default") ? strength: defaultStrength;
@@ -289,9 +292,12 @@ export class AutoClassify {
 
     /** Adjusts evidence and re-calculates classification on un-invocation */
     uninvoke(rule, strength) {
+        if (!rule) {
+            throw new Error ("ACMG rule to uninvoke was not passed in");
+        }
         // Adjust count of evidence types (take into consideration non-default strengths)
         const { strength: defaultStrength, type } = metadata[rule];
-        const selectedStrength = (strength && strength === "Default") ? strength: defaultStrength;
+        const selectedStrength = (strength && strength !== "Default") ? strength: defaultStrength;
         if (type === "pathogenic") {
             const newValue = this.evidenceOfPathogenicity[selectedStrength] - 1;
             this.evidenceOfPathogenicity[selectedStrength] = newValue;
