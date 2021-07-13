@@ -296,9 +296,7 @@ class CustomEmbed:
                         continue
                     fields_to_keep.append(key)
                     item[key] = self.field_embed(item[key], field_dict[key])
-                if initial_item:
-                    fields_to_keep.append("actions")
-                if "actions" in fields_to_keep and not initial_item:
+                if initial_item or "actions" in fields_to_keep:
                     if DATABASE_ITEM_KEY in item:
                         item = self.add_actions(item)
                     else:
