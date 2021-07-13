@@ -1312,3 +1312,28 @@ def bgm_variant_sample(bgm_project, institution, variant):
         "file": "some_bgm_vcf_file",
     }
     return item
+
+
+@pytest.fixture
+def variant_sample_list(
+    testapp, variant_sample, variant_sample_2, genelist, project, institution
+):
+    vs_1 = testapp.post_json(
+        "/variant-samples", variant_sample, status=201
+    ).json["@graph"][0]
+    vs_2 = testapp.post_json(
+        "/variant-samples", variant_sample_2, status=201
+    ).json["@graph"][0]
+    vs_list = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "variant_samples": [
+            {"variant_sample_item": vs_1["@id"]},
+            {"variant_sample_item": vs_2["@id"]},
+        ],
+        "created_for_case": "GAPCAK111111",
+    }
+    response = testapp.post_json(
+        "/variant-sample-lists", vs_list, status=201
+    ).json["@graph"][0]
+    return response

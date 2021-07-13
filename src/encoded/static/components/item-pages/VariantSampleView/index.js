@@ -81,10 +81,11 @@ class OverviewTabView extends React.Component {
         };
 
         ajax.load(
-            '/embed?id=' + uuid,
+            '/embed',
             vsFetchCallback,
             "POST",
-            vsFetchCallback
+            vsFetchCallback,
+            JSON.stringify({ ids: [ uuid ], depth: 1 })
         );
     }
 
