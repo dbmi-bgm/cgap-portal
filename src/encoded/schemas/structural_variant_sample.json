@@ -102,5 +102,37 @@
             "description": "Link to Genome Snapshot Image",
             "type": "string"
         }
+    },
+    "columns": {
+        "structural_variant.display_title": {
+            "title": "Variant",
+            "order": 0
+        }
+    },
+    "facets": {
+        "structural_variant.CHROM": {
+            "title": "Chromosome",
+            "order": 0,
+            "grouping": "Position"
+        },
+        "structural_variant.START": {
+            "title": "Start Position",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 1,
+            "grouping": "Position"
+        },
+        "structural_variant.END": {
+            "title": "End Position",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 2,
+            "grouping": "Position"
+        },
+        "structural_variant.SV_TYPE": {
+            "title": "Variant Type",
+            "order": 10,
+            "grouping": "Variant Type"
+        }
     }
 }

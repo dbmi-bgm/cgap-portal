@@ -132,7 +132,33 @@
             }
         },
         "schema_version": {
-            "default": "2"
+            "default": "1"
+        }
+    },
+    "facets": {
+        "CHROM": {
+            "title": "Chromosome",
+            "order": 1,
+            "grouping": "Position"
+        },
+        "START": {
+            "title": "Start Position",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 2,
+            "grouping": "Position"
+        },
+        "END": {
+            "title": "End Position",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 3,
+            "grouping": "Position"
+        },
+        "SV_TYPE": {
+            "title": "Variant Type",
+            "order": 10,
+            "grouping": "Variant Type"
         }
     }
 }
