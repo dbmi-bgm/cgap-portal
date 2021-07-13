@@ -1338,3 +1338,29 @@ def variant_sample_list(
         "/variant-sample-lists", vs_list, status=201
     ).json["@graph"][0]
     return response
+
+
+@pytest.fixture
+def structural_variant(testapp, project, institution):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "1",
+        "START": 1000,
+        "END": 2000,
+        "SV_TYPE": "DEL",
+    }
+    return testapp.post_json("/structural_variant", item).json["@graph"][0]
+
+
+@pytest.fixture
+def structural_variant_sample(project, institution, structural_variant):
+    """This item is not pre-posted to database."""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "structural_variant": structural_variant["@id"],
+        "CALL_INFO": "some_sample",
+        "file": "some_vcf_file",
+    }
+    return item

@@ -137,6 +137,25 @@ def test_variant_sample_list_revlink(testapp, variant_sample_list):
     assert vsl_atid == variant_sample["variant_sample_list"]["@id"]
 
 
+def test_variant_sample_list_sv_patch(
+    testapp, variant_sample_list, structural_variant, structural_variant_sample
+):
+    """Test adding SV samples to variant sample list."""
+    vsl_atid = variant_sample_list["@id"]
+    sv_sample = testapp.post_json(
+        "/structural_variant_sample", structural_variant_sample, status=201
+    ).json["@graph"][0]
+    sv_sample_atid = sv_sample["@id"]
+    vsl_patch = {
+        "structural_variant_samples": [
+			{"structural_variant_sample_item": sv_sample_atid}
+		]
+    }
+    resp = testapp.patch_json(vsl_atid, vsl_patch, status=200).json["@graph"][0]
+    vsl_struct_var = resp["structural_variant_samples"][0]["structural_variant_sample_item"]
+    assert vsl_struct_var == sv_sample["@id"]
+
+
 @pytest.mark.parametrize('call_info,variant_uuid,file_accession', [
     ('NA1278_SAMPLE', 'uuid1', 'GAPIDFIABC'),
     ('NA1279_SAMPLE', 'uuid1', 'GAPIDFIABC'),
