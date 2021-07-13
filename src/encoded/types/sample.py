@@ -83,8 +83,6 @@ class SampleProcessing(Item):
     schema = load_schema('encoded:schemas/sample_processing.json')
     embedded_list = [
         'processed_files.accession',  # used to locate this file from annotated VCF via search
-        'processed_files.file_type',
-        'processed_files.variant_type',
         'samples.completed_processes',
         "samples.processed_files.uuid",
     ]

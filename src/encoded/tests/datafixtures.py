@@ -810,6 +810,7 @@ def file_vcf(testapp, institution, project, file_formats):
         'institution': institution['@id'],
         'project': project['@id'],
         'status': 'uploaded',  # avoid s3 upload codepath
+        'file_type': 'full annotated VCF',
     }
     return testapp.post_json('/file_processed', item).json['@graph'][0]
 

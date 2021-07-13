@@ -385,20 +385,21 @@ class Case(Item):
         """
         Map the SNV vcf file to be digested.
         """
-        vcf_file = {}
+        vcf_file = ""
         if not sample_processing:
             return vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
         if not sp_data:
             return vcf_file
-        files = sp_data.get('processed_files', [])
-        if not files:
+        files_processed = sp_data.get('processed_files', [])
+        if not files_processed:
             return vcf_file
-        for processed_file in files:
-            file_type = processed_file.get("file_type", "")
-            variant_type = processed_file.get("variant_type", "")
-            if file_type == "full annotated VCF" and variant_type != "SV":
-                vcf_file = processed_file.accession
+        for file_processed in files_processed[::-1]:
+            file_data = get_item_or_none(request, file_processed, 'files-processed') 
+            file_type = file_data.get("file_type", "")
+            file_variant_type = file_data.get("variant_type", "")
+            if file_type == "full annotated VCF" and file_variant_type != "SV":
+                vcf_file = file_data["@id"]
                 break
         return vcf_file
 
@@ -412,22 +413,23 @@ class Case(Item):
         """
         Map the SV vcf file to be digested.
         """
-        sv_vcf_file = {}
+        sv_vcf_file = ""
         if not sample_processing:
-            return vcf_file
+            return sv_vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
         if not sp_data:
-            return vcf_file
-        files = sp_data.get('processed_files', [])
-        if not files:
-            return vcf_file
-        for processed_file in files:
-            file_type = processed_file.get("file_type", "")
-            variant_type = processed_file.get("variant_type", "")
-            if file_type == "full annotated VCF" and variant_type == "SV":
-                vcf_file = processed_file.accession
+            return sv_vcf_file
+        files_processed = sp_data.get('processed_files', [])
+        if not files_processed:
+            return sv_vcf_file
+        for file_processed in files_processed[::-1]:
+            file_data = get_item_or_none(request, file_processed, 'files-processed') 
+            file_type = file_data.get("file_type", "")
+            file_variant_type = file_data.get("variant_type", "")
+            if file_type == "full annotated VCF" and file_variant_type == "SV":
+                sv_vcf_file = file_data["@id"]
                 break
-        return vcf_file
+        return sv_vcf_file
 
     @calculated_property(schema={
         "title": "Search Query Filter String Add-On",
