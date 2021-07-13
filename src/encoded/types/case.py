@@ -384,9 +384,8 @@ class Case(Item):
     def vcf_file(self, request, sample_processing=None):
         """
         Map the SNV vcf file to be digested.
-        Currently we have a single file on processed_files field of sample processing
         """
-        vcf_file = ""
+        vcf_file = {}
         if not sample_processing:
             return vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
@@ -411,10 +410,9 @@ class Case(Item):
     })
     def structural_variant_vcf_file(self, request, sample_processing=None):
         """
-        Map the SNV vcf file to be digested.
-        Currently we have a single file on processed_files field of sample processing
+        Map the SV vcf file to be digested.
         """
-        sv_vcf_file = ""
+        sv_vcf_file = {}
         if not sample_processing:
             return vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
