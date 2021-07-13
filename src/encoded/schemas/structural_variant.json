@@ -97,9 +97,10 @@
         "END": {
             "title": "End Position",
             "field_name": "END",
-            "type": "string",
+            "type": "integer",
             "vcf_field": "END",
-            "description": "End Position"
+            "description": "End Position",
+            "min": 0
         },
         "SV_TYPE": {
             "title": "Variant Type",

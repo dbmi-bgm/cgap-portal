@@ -385,7 +385,7 @@ class Case(Item):
         """
         Map the SNV vcf file to be digested.
         """
-        vcf_file = ""
+        vcf_file = {}
         if not sample_processing:
             return vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
@@ -413,7 +413,7 @@ class Case(Item):
         """
         Map the SV vcf file to be digested.
         """
-        sv_vcf_file = ""
+        sv_vcf_file = {}
         if not sample_processing:
             return sv_vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
