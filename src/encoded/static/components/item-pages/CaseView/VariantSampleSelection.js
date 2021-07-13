@@ -420,7 +420,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                         checked={!!allNotesToKnowledgeBaseSelected || allNotesToKnowledgeBaseAlreadyStored}
                         onChange={onChangeSendAllNotesToKnowledgeBase}
                         indeterminate={someNotesToKnowledgeBaseSelected && !allNotesToKnowledgeBaseSelected && !allNotesToKnowledgeBaseAlreadyStored}>
-                        Send All Notes to KnowledgeBase
+                        Send All Notes to Project
                     </Checkbox>
                 </div>
             </div>

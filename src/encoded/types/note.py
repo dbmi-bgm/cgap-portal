@@ -1,9 +1,17 @@
+import datetime
+from pyramid.view import view_config
+from snovault.util import debug_log
 from snovault import (
     abstract_collection,
     calculated_property,
     collection,
     load_schema,
 )
+from snovault.validators import (
+    validate_item_content_patch,
+    no_validate_item_content_patch
+)
+from snovault.crud_views import item_edit as sno_item_edit
 from .base import (
     Item
 )
@@ -22,6 +30,22 @@ class Note(Item):
     base_types = ['Note'] + Item.base_types
     schema = load_schema('encoded:schemas/note.json')
     embedded_list = []
+
+
+
+
+@view_config(context=Note, permission='edit', request_method='PATCH',
+             validators=[validate_item_content_patch])
+@debug_log
+def item_edit(context, request, render=None):
+    previous_status = context.properties.get("status")
+    next_status = request.validated.get("status")
+    if next_status != previous_status and next_status == "current":
+        request.validated["approved_date"] = datetime.datetime.utcnow().isoformat()
+        request.validated["approved_by"] = request.user_info["details"]["uuid"]
+
+    return sno_item_edit(context, request, render)
+
 
 
 @collection(

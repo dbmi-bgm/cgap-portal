@@ -465,6 +465,16 @@ function NoteTypeSelectionsCommonCheckboxList (props) {
         "discovery_interpretation"
     ];
 
+    // Filters down to any VS samples which are currently selected.
+    const variantSampleObjectsSelected = useMemo(function(){
+        return variant_samples.filter(function({ variant_sample_item }){
+            return _.any(
+                getAllNotesFromVariantSample(variant_sample_item),
+                function({ uuid }){ return store[uuid]; }
+            );
+        });
+    }, [ variantSampleListItem, store ]);
+
 
     const {
         checkboxStates: calculatedSelections,
@@ -476,7 +486,7 @@ function NoteTypeSelectionsCommonCheckboxList (props) {
     } = useMemo(function(){
         return getClassificationStates(
             noteTypes,
-            variant_samples,
+            variantSampleObjectsSelected,
             function(enumOption, vsSelection){
                 const { variant_sample_item: { [enumOption]: foundNote = null } } = vsSelection;
                 return !!(foundNote);
@@ -484,14 +494,13 @@ function NoteTypeSelectionsCommonCheckboxList (props) {
             store,
             alreadyInProjectNotes
         );
-    }, [ variant_samples, store, alreadyInProjectNotes ]);
+    }, [ variantSampleObjectsSelected, store, alreadyInProjectNotes ]);
 
 
 
     const onChange = function(evt){
         const eventKey = evt.target.getAttribute("data-key");
         const currentChecked = noteTypesIncludedState[eventKey];
-        console.log('EE', eventKey, currentChecked);
 
         const noteUUIDsToToggle = [];
 
@@ -532,7 +541,7 @@ function NoteTypeSelectionsCommonCheckboxList (props) {
         checkboxStates: noteTypesIncludedState,
         // indeterminateStates,
         classificationCounts,
-        ignoredCounts
+        disableOnNoClassificationsCount: false
     };
 
     return (
@@ -568,19 +577,26 @@ function KeyedCheckbox(props){
         indeterminateStates = {},
         classificationCounts,
         className,
-        disabled,
-        ignoredCounts,
+        disabled: propDisabled,
+        ignoredCounts = {},
+        disableOnNoClassificationsCount = true,
         ...passProps
     } = props;
     const cls = "pb-02 pt-02" + (className ? " " + className : "");
 
-    const checked = checkboxStates[key] || (classificationCounts[key] === 0 && ignoredCounts[key] > 0);
-    return (
-        <Checkbox {...passProps} data-key={key} checked={checked} className={cls}
-            disabled={disabled || classificationCounts[key] === 0} indeterminate={indeterminateStates[key]}>
-            { children }
+    const checked = checkboxStates[key] || (disableOnNoClassificationsCount && classificationCounts[key] === 0 && ignoredCounts[key] > 0);
+    const disabled = propDisabled || (disableOnNoClassificationsCount && classificationCounts[key] === 0);
+    const countAddendum = classificationCounts && typeof classificationCounts[key] === "number" ? (
+        <React.Fragment>
             &nbsp;
             <small className="text-secondary">({ classificationCounts[key] })</small>
+        </React.Fragment>
+    ) : null;
+    return (
+        <Checkbox {...passProps} data-key={key} checked={checked} className={cls}
+            disabled={disabled} indeterminate={indeterminateStates[key]}>
+            { children }
+            { countAddendum }
         </Checkbox>
     );
 }
