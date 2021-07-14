@@ -789,12 +789,25 @@ i.status-indicator-dot {
     font-size: 0.7em;
     letter-spacing: 1px;
 
-	// &:hover { // a little janky ATM; needs tweaking
-	// 	font-size: large;
-	// 	padding: 5px 7px;
-	// }
-
 	@include acmgColorStyles;
+}
+
+.acmg-strength-drop {
+	// .dropdown-toggle-split {
+	// 	display: none;
+	// }
+	.button {
+		border: 1px solid #efefef;
+		padding: 3px 7px;
+		font-size: 0.7em;
+		letter-spacing: 1px;
+	}
+
+	// &:hover {
+	// 	.dropdown-toggle-split {
+	// 		display: block;
+	// 	}
+	// }
 }
 
 .acmg-guidelines-title {

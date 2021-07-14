@@ -8,6 +8,7 @@ import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 import Button from 'react-bootstrap/esm/Button';
 import memoize from 'memoize-one';
 import Popover  from 'react-bootstrap/esm/Popover';
+import SplitButton from 'react-bootstrap/esm/SplitButton';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import Collapse from 'react-bootstrap/esm/Collapse';
@@ -462,14 +463,45 @@ function ACMGInvoker(props) {
                     const { [rule]: { description } = {} } = acmgUtil.metadata;
                     const strength = invoked[rule];
                     return (
-                        <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={!!strength}
-                            onClick={() => toggleInvocation({ acmg_rule_name: rule, rule_strength: strength })} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
-                            { rule }
-                        </div>
+                        <>
+                            {/* <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={!!strength}
+                                onClick={() => toggleInvocation({ acmg_rule_name: rule, rule_strength: strength })} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
+                                { rule }
+                            </div> */}
+                            <ACMGRuleWStrength {...{ rule }}/>
+                        </>
                     );}
                 )}
             </div>
         </div>
+    );
+}
+
+// function calculateACMGRuleStrengthOptions(ruleStrength, evidenceType) {
+//     const ruleStrengthOptions = [];
+//     if (evidenceType === "Benign") {
+//         switch (ruleStrength) {
+//             case "supporting":
+//                 ruleStrengthOptions.push("strong",)
+//             case "strong":
+
+//             case "standalone":
+
+//         }
+//     }
+
+//     return ruleStrengthOptions;
+// }
+
+function ACMGRuleWStrength(props) {
+    const { rule } = props;
+
+    return (
+        <DropdownButton variant={false} size="xs" className="acmg-strength-drop position-static clickable text-600" title={rule} data-criteria={rule}>
+            <DropdownItem eventKey="supporting">Supporting</DropdownItem>
+            <DropdownItem eventKey="strong">Strong</DropdownItem>
+            <DropdownItem eventKey="standalone">Standalone</DropdownItem>
+        </DropdownButton>
     );
 }
 
