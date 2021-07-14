@@ -1126,9 +1126,9 @@ export default class App extends React.PureComponent {
 
         const contentSecurityPolicyStr = [
             "default-src 'self'",
-            "img-src https://*",
+            "img-src 'self' https://*",
             "child-src 'none'",
-            "script-src 'self' https://www.google-analytics.com" + (typeof BUILDTYPE === "string" && BUILDTYPE === "quick" ? " 'unsafe-eval'" : ""),
+            "script-src 'self' https://www.google-analytics.com https://cdn.auth0.com" + (typeof BUILDTYPE === "string" && BUILDTYPE === "quick" ? " 'unsafe-eval'" : ""),
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com"
         ].join("; ");
