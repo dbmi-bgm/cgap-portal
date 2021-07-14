@@ -34,9 +34,9 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         alreadyInProjectNotes,
 
         // From FinalizeCaseDataStore (if used, else undefined):
-        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
-        sendToKnowledgeBaseStore,
+        sendToProjectStore,
         sendToReportStore
     } = props;
     const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
@@ -54,9 +54,9 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
     } else {
         const commonProps = {
             schemas, context, parentTabType,
-            toggleSendToKnowledgeBaseStoreItems,
+            toggleSendToProjectStoreItems,
             toggleSendToReportStoreItems,
-            sendToKnowledgeBaseStore,
+            sendToProjectStore,
             sendToReportStore,
             alreadyInProjectNotes
         };
@@ -90,9 +90,9 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         // From FinalizeCaseTab (if used):
         alreadyInProjectNotes,
         // From FinalizeCaseDataStore (if used):
-        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
-        sendToKnowledgeBaseStore,
+        sendToProjectStore,
         sendToReportStore
     } = props;
     const { accession: caseAccession } = context; // `context` refers to our Case in here.
@@ -146,9 +146,9 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     if (isExpanded) {
         const noteSectionProps = {
             "variantSample": variant_sample_item,
-            toggleSendToKnowledgeBaseStoreItems,
+            toggleSendToProjectStoreItems,
             toggleSendToReportStoreItems,
-            sendToKnowledgeBaseStore,
+            sendToProjectStore,
             sendToReportStore,
             alreadyInProjectNotes
         };
@@ -287,9 +287,9 @@ const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicato
 const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNotes (props) {
     const {
         variantSample,
-        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
-        sendToKnowledgeBaseStore,
+        sendToProjectStore,
         sendToReportStore,
         alreadyInProjectNotes
     } = props;
@@ -341,10 +341,10 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
     );
 
     const allNotesToKnowledgeBaseSelected = (
-        (noVariantNotesSaved       || sendToKnowledgeBaseStore[lastVariantNoteUUID])
-        && (noGeneNotesSaved       || sendToKnowledgeBaseStore[lastGeneNoteUUID])
-        && (noDiscoveryNoteSaved   || sendToKnowledgeBaseStore[discoveryInterpretationNoteUUID])
-        && (noClinicalNoteSaved    || sendToKnowledgeBaseStore[clinicalInterpretationNoteUUID])
+        (noVariantNotesSaved       || sendToProjectStore[lastVariantNoteUUID])
+        && (noGeneNotesSaved       || sendToProjectStore[lastGeneNoteUUID])
+        && (noDiscoveryNoteSaved   || sendToProjectStore[discoveryInterpretationNoteUUID])
+        && (noClinicalNoteSaved    || sendToProjectStore[clinicalInterpretationNoteUUID])
     );
 
     const allNotesToKnowledgeBaseAlreadyStored = (
@@ -355,10 +355,10 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
     );
 
     const someNotesToKnowledgeBaseSelected = (
-        (!noVariantNotesSaved       && sendToKnowledgeBaseStore[lastVariantNoteUUID])
-        || (!noGeneNotesSaved       && sendToKnowledgeBaseStore[lastGeneNoteUUID])
-        || (!noDiscoveryNoteSaved   && sendToKnowledgeBaseStore[discoveryInterpretationNoteUUID])
-        || (!noClinicalNoteSaved    && sendToKnowledgeBaseStore[clinicalInterpretationNoteUUID])
+        (!noVariantNotesSaved       && sendToProjectStore[lastVariantNoteUUID])
+        || (!noGeneNotesSaved       && sendToProjectStore[lastGeneNoteUUID])
+        || (!noDiscoveryNoteSaved   && sendToProjectStore[discoveryInterpretationNoteUUID])
+        || (!noClinicalNoteSaved    && sendToProjectStore[clinicalInterpretationNoteUUID])
     );
 
 
@@ -400,8 +400,8 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
 
     const onChangeSendAllNotesToKnowledgeBase = useCallback(function(e){
         e.stopPropagation();
-        toggleSendToKnowledgeBaseStoreItems(makeNoteSelectionObjects(sendToKnowledgeBaseStore, allNotesToKnowledgeBaseSelected));
-    }, [ sendToKnowledgeBaseStore, allNotesToKnowledgeBaseSelected ]);
+        toggleSendToProjectStoreItems(makeNoteSelectionObjects(sendToProjectStore, allNotesToKnowledgeBaseSelected));
+    }, [ sendToProjectStore, allNotesToKnowledgeBaseSelected ]);
 
     return (
         <React.Fragment>
@@ -434,9 +434,9 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                             <React.Fragment>
                                 <NoteCheckboxes
                                     reportChecked={!!sendToReportStore[lastVariantNoteUUID]}
-                                    kbChecked={!!sendToKnowledgeBaseStore[lastVariantNoteUUID]}
+                                    kbChecked={!!sendToProjectStore[lastVariantNoteUUID]}
                                     onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastVariantNoteUUID, true ] ]); })}
-                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ lastVariantNoteUUID, true ] ]); })}
+                                    onKBChange={useCallback(function(){ toggleSendToProjectStoreItems([ [ lastVariantNoteUUID, true ] ]); })}
                                     kbAlreadyStored={alreadyInProjectNotes[lastVariantNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
@@ -455,9 +455,9 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                             <React.Fragment>
                                 <NoteCheckboxes
                                     reportChecked={!!sendToReportStore[lastGeneNoteUUID]}
-                                    kbChecked={!!sendToKnowledgeBaseStore[lastGeneNoteUUID]}
+                                    kbChecked={!!sendToProjectStore[lastGeneNoteUUID]}
                                     onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastGeneNoteUUID, true ] ]); })}
-                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ lastGeneNoteUUID, true ] ]); })}
+                                    onKBChange={useCallback(function(){ toggleSendToProjectStoreItems([ [ lastGeneNoteUUID, true ] ]); })}
                                     kbAlreadyStored={alreadyInProjectNotes[lastGeneNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
@@ -477,9 +477,9 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                             <React.Fragment>
                                 <NoteCheckboxes
                                     reportChecked={!!sendToReportStore[clinicalInterpretationNoteUUID]}
-                                    kbChecked={!!sendToKnowledgeBaseStore[clinicalInterpretationNoteUUID]}
+                                    kbChecked={!!sendToProjectStore[clinicalInterpretationNoteUUID]}
                                     onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ clinicalInterpretationNoteUUID, true ] ]); })}
-                                    onKBChange={useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ clinicalInterpretationNoteUUID, true ] ]); })}
+                                    onKBChange={useCallback(function(){ toggleSendToProjectStoreItems([ [ clinicalInterpretationNoteUUID, true ] ]); })}
                                     kbAlreadyStored={alreadyInProjectNotes[clinicalInterpretationNoteUUID]} />
 
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
@@ -511,9 +511,9 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                             <React.Fragment>
                                 <NoteCheckboxes
                                     reportChecked={!!sendToReportStore[discoveryInterpretationNoteUUID]}
-                                    kbChecked={!!sendToKnowledgeBaseStore[discoveryInterpretationNoteUUID]}
+                                    kbChecked={!!sendToProjectStore[discoveryInterpretationNoteUUID]}
                                     onReportChange={ useCallback(function(){ toggleSendToReportStoreItems([ [ discoveryInterpretationNoteUUID, true ] ]); }) }
-                                    onKBChange={ useCallback(function(){ toggleSendToKnowledgeBaseStoreItems([ [ discoveryInterpretationNoteUUID, true ] ]); }) }
+                                    onKBChange={ useCallback(function(){ toggleSendToProjectStoreItems([ [ discoveryInterpretationNoteUUID, true ] ]); }) }
                                     kbAlreadyStored={alreadyInProjectNotes[discoveryInterpretationNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
@@ -576,13 +576,13 @@ export class FinalizeCaseDataStore extends React.PureComponent {
     constructor(props) {
         super(props);
 
-        this.toggleSendToKnowledgeBaseStoreItems = this.toggleStoreItems.bind(this, "sendToKnowledgeBaseStore");
+        this.toggleSendToProjectStoreItems = this.toggleStoreItems.bind(this, "sendToProjectStore");
         this.toggleSendToReportStoreItems = this.toggleStoreItems.bind(this, "sendToReportStore");
 
         this.state = {
             // Keyed by Note Item UUID and value is boolean true/false for now (can be changed)
-            sendToKnowledgeBaseStore: {},
-            sendToReportStore: {}
+            "sendToProjectStore": {},
+            "sendToReportStore": {}
         };
     }
 
@@ -604,13 +604,13 @@ export class FinalizeCaseDataStore extends React.PureComponent {
         const {
             props: { children, ...passProps },
             state,
-            toggleSendToKnowledgeBaseStoreItems,
+            toggleSendToProjectStoreItems,
             toggleSendToReportStoreItems
         } = this;
         const childProps = {
             ...passProps,
             ...state,
-            toggleSendToKnowledgeBaseStoreItems,
+            toggleSendToProjectStoreItems,
             toggleSendToReportStoreItems
         };
         return React.Children.map(children, function(c){

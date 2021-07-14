@@ -114,9 +114,9 @@ function ACMGClassificationSelections (props) {
         reportNotesIncluded,
         kbNotesIncluded,
         // From FinalizeCaseDataStore
-        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
-        sendToKnowledgeBaseStore,
+        sendToProjectStore,
         sendToReportStore
     } = props;
     return (
@@ -132,7 +132,7 @@ function ACMGClassificationSelections (props) {
                 <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Save to Project</h5>
                     <ACMGClassificationSelectionsCommonCheckboxList
-                        {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems}
+                        {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
                         noteTypesIncluded={kbNotesIncluded} />
                 </div>
             </div>
@@ -236,9 +236,9 @@ function VariantGeneSelections (props) {
         reportNotesIncluded,
         kbNotesIncluded,
         // From FinalizeCaseDataStore
-        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
-        sendToKnowledgeBaseStore,
+        sendToProjectStore,
         sendToReportStore
     } = props;
     return (
@@ -254,7 +254,7 @@ function VariantGeneSelections (props) {
                 <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Save to Project</h5>
                     <VariantGeneSelectionsCommonCheckboxList
-                        {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems}
+                        {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
                         noteTypesIncluded={kbNotesIncluded}/>
                 </div>
             </div>
@@ -427,9 +427,9 @@ function NoteTypeSelections (props) {
         toggleReportNoteSubselectionState,
         toggleKBNoteSubselectionState,
         // From FinalizeCaseDataStore
-        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
-        sendToKnowledgeBaseStore,
+        sendToProjectStore,
         sendToReportStore
     } = props;
     return (
@@ -445,7 +445,7 @@ function NoteTypeSelections (props) {
                 <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Save to Project</h5>
                     <NoteTypeSelectionsCommonCheckboxList
-                        {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToKnowledgeBaseStore} toggleItems={toggleSendToKnowledgeBaseStoreItems}
+                        {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
                         noteTypesIncludedState={kbNotesIncluded} toggleNoteTypesIncludedState={toggleKBNoteSubselectionState} />
                 </div>
             </div>

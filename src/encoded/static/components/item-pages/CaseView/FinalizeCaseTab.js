@@ -18,9 +18,9 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
         isLoadingVariantSampleListItem = false,
         fetchVariantSampleListItem,
         // From FinalizeCaseDataStore
-        sendToKnowledgeBaseStore,
+        sendToProjectStore,
         sendToReportStore,
-        toggleSendToKnowledgeBaseStoreItems,
+        toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems
     } = props;
 
@@ -30,8 +30,8 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
 
     const commonProps = {
         isLoadingVariantSampleListItem, variantSampleListItem, alreadyInProjectNotes,
-        sendToKnowledgeBaseStore, sendToReportStore,
-        toggleSendToKnowledgeBaseStoreItems, toggleSendToReportStoreItems,
+        sendToProjectStore, sendToReportStore,
+        toggleSendToProjectStoreItems, toggleSendToReportStoreItems,
         schemas, context
     };
 
@@ -41,7 +41,7 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
                 <h1 className="text-300 mb-0">
                     Finalize Case
                 </h1>
-                <SaveNotesButton {...{ variantSampleListItem, fetchVariantSampleListItem }} selectionStore={sendToKnowledgeBaseStore} />
+                <SaveNotesButton {...{ variantSampleListItem, fetchVariantSampleListItem }} selectionStore={sendToProjectStore} />
             </div>
             <div>
                 <NoteSubSelectionStateController>
