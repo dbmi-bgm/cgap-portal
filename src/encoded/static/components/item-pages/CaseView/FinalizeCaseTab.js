@@ -21,7 +21,9 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
         sendToProjectStore,
         sendToReportStore,
         toggleSendToProjectStoreItems,
-        toggleSendToReportStoreItems
+        toggleSendToReportStoreItems,
+        resetSendToProjectStoreItems,
+        resetSendToReportStoreItems
     } = props;
 
     const alreadyInProjectNotes = useMemo(function(){
@@ -41,7 +43,7 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
                 <h1 className="text-300 mb-0">
                     Finalize Case
                 </h1>
-                <SaveNotesButton {...{ variantSampleListItem, fetchVariantSampleListItem }} selectionStore={sendToProjectStore} />
+                <SaveNotesToProjectButton {...{ variantSampleListItem, fetchVariantSampleListItem, resetSendToProjectStoreItems, sendToProjectStore }} />
             </div>
             <div>
                 <NoteSubSelectionStateController>
@@ -79,7 +81,7 @@ function buildAlreadyStoredNoteUUIDDict(variantSampleListItem){
 
 
 
-class SaveNotesButton extends React.PureComponent {
+class SaveNotesToProjectButton extends React.PureComponent {
 
     constructor(props){
         super(props);
@@ -115,7 +117,10 @@ class SaveNotesButton extends React.PureComponent {
     }
 
     getPatchPayloadsProcess(onComplete){
-        const { variantSampleListItem: { variant_samples: vsObjects = [] }, selectionStore } = this.props;
+        const {
+            variantSampleListItem: { variant_samples: vsObjects = [] },
+            sendToProjectStore: selectionStore
+        } = this.props;
 
         const variantSampleItems = vsObjects.map(function({ variant_sample_item }){
             return variant_sample_item;
@@ -385,7 +390,6 @@ class SaveNotesButton extends React.PureComponent {
         let countCompleted = 0;
 
         const checkIfCompleted = () => {
-            console.log("TEST", patchesToComplete, countCompleted);
             // Check if all requests have completed, and call `onComplete` if so.
             if (patchesToComplete === countCompleted) {
                 onComplete({ countCompleted });
@@ -446,10 +450,15 @@ class SaveNotesButton extends React.PureComponent {
                             "isPatching": true,
                             "patchingPercentageComplete": 1
                         }, () => {
-                            const { fetchVariantSampleListItem } = this.props;
-                            if (countCompleted > 0 && typeof fetchVariantSampleListItem === "function") {
-                                console.info("Refreshing our VariantSampleListItem with updated Note Item statuses.");
-                                fetchVariantSampleListItem();
+                            const { fetchVariantSampleListItem, resetSendToProjectStoreItems } = this.props;
+                            if (countCompleted > 0) {
+                                if (typeof fetchVariantSampleListItem === "function") {
+                                    console.info("Refreshing our VariantSampleListItem with updated Note Item statuses.");
+                                    fetchVariantSampleListItem();
+                                }
+                                if (typeof resetSendToProjectStoreItems === "function") {
+                                    resetSendToProjectStoreItems();
+                                }
                             }
                         });
                     });
@@ -477,10 +486,10 @@ class SaveNotesButton extends React.PureComponent {
     }
 
     render(){
-        const { selectionStore, variantSampleListItem } = this.props;
+        const { sendToProjectStore, variantSampleListItem } = this.props;
         const { isFetching, isPatching, fetchingPercentageComplete, patchingPercentageComplete } = this.state;
-        const selectionStoreSize = this.memoized.selectionStoreSize(selectionStore);
-        const variantSamplesWithAnySelectionSize = this.memoized.variantSamplesWithAnySelectionSize(variantSampleListItem, selectionStore);
+        const selectionStoreSize = this.memoized.selectionStoreSize(sendToProjectStore);
+        const variantSamplesWithAnySelectionSize = this.memoized.variantSamplesWithAnySelectionSize(variantSampleListItem, sendToProjectStore);
         const onHide = fetchingPercentageComplete === 1 && patchingPercentageComplete === 1 ? this.onReset : null;
         return (
             <React.Fragment>

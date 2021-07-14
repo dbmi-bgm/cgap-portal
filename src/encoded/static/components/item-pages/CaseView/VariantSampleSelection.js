@@ -578,6 +578,8 @@ export class FinalizeCaseDataStore extends React.PureComponent {
 
         this.toggleSendToProjectStoreItems = this.toggleStoreItems.bind(this, "sendToProjectStore");
         this.toggleSendToReportStoreItems = this.toggleStoreItems.bind(this, "sendToReportStore");
+        this.resetSendToProjectStoreItems = this.resetStoreItems.bind(this, "sendToProjectStore");
+        this.resetSendToReportStoreItems = this.resetStoreItems.bind(this, "sendToReportStore");
 
         this.state = {
             // Keyed by Note Item UUID and value is boolean true/false for now (can be changed)
@@ -600,18 +602,26 @@ export class FinalizeCaseDataStore extends React.PureComponent {
         }, callback);
     }
 
+    resetStoreItems(storeName, callback = null) {
+        this.setState({ [storeName]: {} }, callback);
+    }
+
     render(){
         const {
             props: { children, ...passProps },
             state,
             toggleSendToProjectStoreItems,
-            toggleSendToReportStoreItems
+            toggleSendToReportStoreItems,
+            resetSendToProjectStoreItems,
+            resetSendToReportStoreItems
         } = this;
         const childProps = {
             ...passProps,
             ...state,
             toggleSendToProjectStoreItems,
-            toggleSendToReportStoreItems
+            toggleSendToReportStoreItems,
+            resetSendToProjectStoreItems,
+            resetSendToReportStoreItems
         };
         return React.Children.map(children, function(c){
             if (React.isValidElement(c)) {

@@ -41,7 +41,7 @@ def item_edit(context, request, render=None):
     previous_status = context.properties.get("status")
     next_status = request.validated.get("status")
     if next_status != previous_status and next_status == "current":
-        request.validated["approved_date"] = datetime.datetime.utcnow().isoformat()
+        request.validated["approved_date"] = datetime.datetime.utcnow().isoformat() + "+00:00"
         request.validated["approved_by"] = request.user_info["details"]["uuid"]
 
     return sno_item_edit(context, request, render)

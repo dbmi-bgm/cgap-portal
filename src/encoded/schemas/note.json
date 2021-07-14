@@ -34,7 +34,10 @@
             "title": "Approved By",
             "type": "string",
             "description": "The user who approved this note for a case",
-            "linkTo": "User"
+            "linkTo": "User",
+            "exclude_from": [
+                "FFedit-create"
+            ]
         },
         "approved_date": {
             "title": "Approved At",
@@ -47,6 +50,9 @@
                 {
                     "format": "date"
                 }
+            ],
+            "exclude_from": [
+                "FFedit-create"
             ]
         },
         "associated_items": {
