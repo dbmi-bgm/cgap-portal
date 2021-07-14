@@ -1,10 +1,11 @@
 'use strict';
 
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
 import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
+import Overlay from 'react-bootstrap/esm/Overlay';
 import Button from 'react-bootstrap/esm/Button';
 import memoize from 'memoize-one';
 import Popover  from 'react-bootstrap/esm/Popover';
@@ -444,6 +445,9 @@ function ACMGInvoker(props) {
 
     const acmgTip = (criteria, description) => ( criteria && description ? `<h5 class="my-0 mw-10 text-600">${criteria}</h5><div style="max-width: 250px">${description}</div>`: null);
 
+    const [ acmgStrengthPopover, setACMGStrengthPopover ] = useState(null);
+    const { target: targetIndicatorRef, jsx: acmgStrengthPopoverJSX } = acmgStrengthPopover || {};
+
     return (
         <div className="card flex-row my-3 mt-0">
             <div className="text-600 acmg-guidelines-title">ACMG Rules
@@ -458,23 +462,52 @@ function ACMGInvoker(props) {
                     </div>
                 }/>
             </div>
-            <div className="d-flex acmg-guidelines-invoker align-items-center">
-                {acmgUtil.rules.map((rule) => {
-                    const { [rule]: { description } = {} } = acmgUtil.metadata;
-                    const strength = invoked[rule];
-                    return (
-                        <>
-                            {/* <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={!!strength}
-                                onClick={() => toggleInvocation({ acmg_rule_name: rule, rule_strength: strength })} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
-                                { rule }
-                            </div> */}
-                            <ACMGRuleWStrength {...{ rule }}/>
-                        </>
-                    );}
-                )}
-            </div>
+            <ACMGScrollableList {...{ setACMGStrengthPopover, invoked, acmgTip, toggleInvocation }} />
+            { acmgStrengthPopover ?
+                <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} placement="bottom" rootClose rootCloseEvent="click" onHide={useCallback(function(e){ setPopover(null); })}>
+                    { acmgStrengthPopoverJSX }
+                </Overlay>: null }
         </div>
     );
+}
+
+function ACMGScrollableList(props) {
+    const { invoked, setACMGStrengthPopover, acmgTip, toggleInvocation } = props;
+
+    return (
+        <div className="d-flex acmg-guidelines-invoker align-items-center">
+            {acmgUtil.rules.map((rule) => {
+                const { [rule]: { description } = {} } = acmgUtil.metadata;
+                const strength = invoked[rule];
+                return <ACMGInvokableRule key={rule} {...{ rule, strength, acmgTip, setACMGStrengthPopover, toggleInvocation, description }} />;
+            })}
+        </div>
+    );
+}
+
+class ACMGInvokableRule extends React.Component {
+    constructor(props) {
+        super(props);
+        this.ref = React.createRef();
+        this.toggleRuleStrengthOptions = this.toggleRuleStrengthOptions.bind(this);
+    }
+
+    toggleRuleStrengthOptions() {
+        const { rule, strength, setACMGStrengthPopover, toggleInvocation } = this.props;
+        // console.log("this.ref.current", this.ref.current);
+        toggleInvocation({ acmg_rule_name: rule, rule_strength: strength });
+        setACMGStrengthPopover(this.ref, <div>Hello I am a popover</div>);
+    }
+
+    render() {
+        const { rule, strength,  description, acmgTip } = this.props;
+
+        return (
+            <div ref={this.ref} className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={!!strength}
+                onClick={() => this.toggleRuleStrengthOptions()} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
+                { rule }
+            </div>);
+    }
 }
 
 // function calculateACMGRuleStrengthOptions(ruleStrength, evidenceType) {
@@ -492,18 +525,6 @@ function ACMGInvoker(props) {
 
 //     return ruleStrengthOptions;
 // }
-
-function ACMGRuleWStrength(props) {
-    const { rule } = props;
-
-    return (
-        <DropdownButton variant={false} size="xs" className="acmg-strength-drop position-static clickable text-600" title={rule} data-criteria={rule}>
-            <DropdownItem eventKey="supporting">Supporting</DropdownItem>
-            <DropdownItem eventKey="strong">Strong</DropdownItem>
-            <DropdownItem eventKey="standalone">Standalone</DropdownItem>
-        </DropdownButton>
-    );
-}
 
 function QuickPopover(props) {
     const { title, content, className, popID, tooltip } = props || {};
