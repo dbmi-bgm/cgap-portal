@@ -92,7 +92,7 @@
             "type": "integer",
             "vcf_field": "POS",
             "description": "Start Position",
-            "min": 0
+            "min": 1
         },
         "END": {
             "title": "End Position",
@@ -100,7 +100,7 @@
             "type": "integer",
             "vcf_field": "END",
             "description": "End Position",
-            "min": 0
+            "min": 1
         },
         "SV_TYPE": {
             "title": "Variant Type",

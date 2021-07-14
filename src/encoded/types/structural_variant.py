@@ -131,7 +131,9 @@ class StructuralVariant(Item):
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
-        """ Sets the annotation_id field on this variant prior to passing on. """
+        """
+        Sets the annotation_id field on this structural variant prior to passing on.
+        """
         if properties["SV_TYPE"] not in ["DUP", "DEL"]:
             raise RuntimeError("Received an unexpected SV type")
         properties[ANNOTATION_ID] = build_structural_variant_display_title(
@@ -145,7 +147,7 @@ class StructuralVariant(Item):
     @calculated_property(
         schema={
             "title": "Display Title",
-            "description": "A calculated title for every object in 4DN",
+            "description": "A calculated title for every object in CGAP",
             "type": "string",
         }
     )
@@ -197,7 +199,7 @@ class StructuralVariantSample(Item):
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
-        """Sets the annotation_id field on this structural_variant_sample
+        """Sets the annotation_id field on this structural variant sample
         prior to passing on."""
         properties[ANNOTATION_ID] = "%s:%s:%s" % (
             properties["CALL_INFO"],
@@ -209,7 +211,7 @@ class StructuralVariantSample(Item):
     @calculated_property(
         schema={
             "title": "Display Title",
-            "description": "A calculated title for every object in 4DN",
+            "description": "A calculated title for every object in CGAP",
             "type": "string",
         }
     )
