@@ -21,9 +21,6 @@
             "$ref": "mixins.json#/uuid"
         },
         {
-            "$ref": "mixins.json#/status"
-        },
-        {
             "$ref": "mixins.json#/aliases"
         },
         {

@@ -64,12 +64,12 @@
                         "type": "string",
                         "description": "Stringified JSON representing the compound filter block request made when this Variant Sample was selected"
                     },
-                    "userid": {
-                        "title": "User ID",
+                    "selected_by": {
+                        "title": "Selector",
                         "type": "string",
-                        "description": "User ID of person who made this selection",
+                        "description": "Person who made this selection",
                         "serverDefault": "userid",
-                        "format": "uuid"
+                        "linkTo": "User"
                     },
                     "date_selected": {
                         "title": "Date Selected",

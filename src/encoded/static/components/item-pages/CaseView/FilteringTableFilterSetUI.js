@@ -1029,7 +1029,7 @@ function AddToVariantSampleListButton(props){
                         "variant_sample_item": variantSampleATID, // Will become linkTo (embedded),
                         "filter_blocks_request_at_time_of_selection": filterBlocksRequestData
                         // The below 2 fields are filled in on backend (configured via `serverDefaults` in Item schema for these fields)
-                        // "userid",
+                        // "selected_by",
                         // "date_selected"
                     });
                 });

@@ -37,7 +37,8 @@
             "linkTo": "User",
             "exclude_from": [
                 "FFedit-create"
-            ]
+            ],
+            "permission": "restricted_fields"
         },
         "approved_date": {
             "title": "Approved At",
@@ -53,7 +54,22 @@
             ],
             "exclude_from": [
                 "FFedit-create"
-            ]
+            ],
+            "permission": "restricted_fields"
+        },
+        "status": {
+            "title": "Status",
+            "type": "string",
+            "default": "in review",
+            "enum": [
+                "shared",
+                "obsolete",
+                "current",
+                "inactive",
+                "in review",
+                "deleted"
+            ],
+            "notes": "This is copy of mixins->status, but without permissions:restricted_fields to allow users to control."
         },
         "associated_items": {
             "title": "Associated Items",
