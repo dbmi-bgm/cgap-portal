@@ -3123,7 +3123,7 @@
             "order": 34,
             "grouping": "Constraint Metrics"
         },
-        "interpretation.classification": {
+        "interpretations.classification": {
             "title": "Classification",
             "order": 100
         }
@@ -3182,7 +3182,7 @@
             "order": 70,
             "default_hidden": true
         },
-        "interpretation.classification": {
+        "interpretations.classification": {
             "title": "Classification",
             "order": 100
         }
