@@ -134,6 +134,9 @@
         "project.display_title": {
             "title": "Project"
         },
+        "vcf_file.file_ingestion_status": {
+            "title": "Final VCF Status"
+        },
         "individual.sex": {
             "title": "Gender",
             "grouping": "Individual"
