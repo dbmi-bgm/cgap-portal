@@ -394,7 +394,7 @@ class Case(Item):
         files_processed = sp_data.get('processed_files', [])
         if not files_processed:
             return vcf_file
-        for file_processed in files_processed[::-1]:
+        for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
             file_data = get_item_or_none(request, file_processed, 'files-processed') 
             file_type = file_data.get("file_type", "")
             file_variant_type = file_data.get("variant_type", "")
@@ -422,7 +422,7 @@ class Case(Item):
         files_processed = sp_data.get('processed_files', [])
         if not files_processed:
             return sv_vcf_file
-        for file_processed in files_processed[::-1]:
+        for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
             file_data = get_item_or_none(request, file_processed, 'files-processed') 
             file_type = file_data.get("file_type", "")
             file_variant_type = file_data.get("variant_type", "")

@@ -11,6 +11,8 @@ from .variant import (
     build_variant_sample_annotation_id,
     extend_embedded_list,
     load_extended_descriptions_in_schemas,
+    SHARED_VARIANT_EMBEDS,
+    SHARED_VARIANT_SAMPLE_EMBEDS,
 )
 
 
@@ -20,25 +22,7 @@ def build_structural_variant_embedded_list():
 
     :returns: list of structural variant embeds
     """
-    embedded_list = [
-        "interpretations.classification",
-        "interpretations.acmg_guidelines",
-        "interpretations.conclusion",
-        "interpretations.note_text",
-        "interpretations.version",
-        "interpretations.project",
-        "interpretations.institution",
-        "interpretations.status",
-        "discovery_interpretations.gene_candidacy",
-        "discovery_interpretations.variant_candidacy",
-        "discovery_interpretations.note_text",
-        "discovery_interpretations.version",
-        "discovery_interpretations.project",
-        "discovery_interpretations.institution",
-        "discovery_interpretations.status",
-        "discovery_interpretations.last_modified.date_modified",
-        "discovery_interpretations.last_modified.modified_by.display_title",
-    ]
+    embedded_list = SHARED_VARIANT_EMBEDS + []
     with io.open(
         resolve_file_path("schemas/structural_variant_embeds.json"), "r"
     ) as fd:
@@ -55,42 +39,7 @@ def build_structural_variant_sample_embedded_list():
 
     :returns: list of embeds from 'structural_variant' linkTo
     """
-    embedded_list = [
-        "variant_sample_list.created_for_case",
-        "variant_notes.note_text",
-        "variant_notes.version",
-        "variant_notes.project",
-        "variant_notes.institution",
-        "variant_notes.status",
-        "variant_notes.last_modified.date_modified",
-        "variant_notes.last_modified.modified_by.display_title",
-        "gene_notes.note_text",
-        "gene_notes.version",
-        "gene_notes.project",
-        "gene_notes.institution",
-        "gene_notes.status",
-        "gene_notes.last_modified.date_modified",
-        "gene_notes.last_modified.modified_by.display_title",
-        "interpretation.classification",
-        "interpretation.acmg_guidelines",
-        "interpretation.conclusion",
-        "interpretation.note_text",
-        "interpretation.version",
-        "interpretation.project",
-        "interpretation.institution",
-        "interpretation.status",
-        "interpretation.last_modified.date_modified",
-        "interpretation.last_modified.modified_by.display_title",
-        "discovery_interpretation.gene_candidacy",
-        "discovery_interpretation.variant_candidacy",
-        "discovery_interpretation.note_text",
-        "discovery_interpretation.version",
-        "discovery_interpretation.project",
-        "discovery_interpretation.institution",
-        "discovery_interpretation.status",
-        "discovery_interpretation.last_modified.date_modified",
-        "discovery_interpretation.last_modified.modified_by.display_title",
-    ]
+    embedded_list = SHARED_VARIANT_SAMPLE_EMBEDS + []
     with io.open(
         resolve_file_path("schemas/structural_variant_embeds.json"), "r"
     ) as fd:
@@ -106,10 +55,7 @@ def build_structural_variant_sample_embedded_list():
 
 def build_structural_variant_display_title(sv_type, chrom, start, end):
     """Builds the structural variant display title according to the type of SV."""
-    if sv_type in ["DUP", "DEL"]:
-        display_title = "%s_chr%s:%s-%s" % (sv_type, chrom, start, end)
-    else:
-        raise RuntimeError("Received an unexpected SV type")
+    display_title = "%s_chr%s:%s-%s" % (sv_type, chrom, start, end)
     return display_title
 
 
@@ -134,8 +80,6 @@ class StructuralVariant(Item):
         """
         Sets the annotation_id field on this structural variant prior to passing on.
         """
-        if properties["SV_TYPE"] not in ["DUP", "DEL"]:
-            raise RuntimeError("Received an unexpected SV type")
         properties[ANNOTATION_ID] = build_structural_variant_display_title(
             properties["SV_TYPE"],
             properties["CHROM"],

@@ -108,10 +108,7 @@
             "type": "string",
             "enum": [
                 "DEL",
-                "DUP",
-                "INS",
-                "INV",
-                "BND"
+                "DUP"
             ],
             "vcf_field": "SVTYPE",
             "description": "The type of structural variant"
