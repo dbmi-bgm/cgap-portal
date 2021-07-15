@@ -32,6 +32,65 @@ CMPHET_UNPHASED_STRONG = 'Compound Het (Unphased/strong_pair)'
 CMPHET_UNPHASED_MED = 'Compound Het (Unphased/medium_pair)'
 CMPHET_UNPHASED_WEAK = 'Compound Het (Unphased/weak_pair)'
 
+# Shared embeds for variants and variant samples also used for corresponding SV items
+SHARED_VARIANT_EMBEDS = [
+    "interpretations.classification",
+    "interpretations.acmg_guidelines",
+    "interpretations.conclusion",
+    "interpretations.note_text",
+    "interpretations.version",
+    "interpretations.project",
+    "interpretations.institution",
+    "interpretations.status",
+    "interpretations.last_modified.date_modified",
+    "interpretations.last_modified.modified_by.display_title",
+    "discovery_interpretations.gene_candidacy",
+    "discovery_interpretations.variant_candidacy",
+    "discovery_interpretations.note_text",
+    "discovery_interpretations.version",
+    "discovery_interpretations.project",
+    "discovery_interpretations.institution",
+    "discovery_interpretations.status",
+    "discovery_interpretations.last_modified.date_modified",
+    "discovery_interpretations.last_modified.modified_by.display_title"
+]
+SHARED_VARIANT_SAMPLE_EMBEDS = [
+    "variant_notes.note_text",
+    "variant_notes.version",
+    "variant_notes.project",
+    "variant_notes.institution",
+    "variant_notes.status",
+    "variant_notes.last_modified.date_modified",
+    "variant_notes.last_modified.modified_by.display_title",
+    "gene_notes.note_text",
+    "gene_notes.version",
+    "gene_notes.project",
+    "gene_notes.institution",
+    "gene_notes.status",
+    "gene_notes.last_modified.date_modified",
+    "gene_notes.last_modified.modified_by.display_title",
+    "interpretation.classification",
+    "interpretation.acmg_guidelines",
+    "interpretation.conclusion",
+    "interpretation.note_text",
+    "interpretation.version",
+    "interpretation.project",
+    "interpretation.institution",
+    "interpretation.status",
+    "interpretation.last_modified.date_modified",
+    "interpretation.last_modified.modified_by.display_title",
+    "discovery_interpretation.gene_candidacy",
+    "discovery_interpretation.variant_candidacy",
+    "discovery_interpretation.note_text",
+    "discovery_interpretation.version",
+    "discovery_interpretation.project",
+    "discovery_interpretation.institution",
+    "discovery_interpretation.status",
+    "discovery_interpretation.last_modified.date_modified",
+    "discovery_interpretation.last_modified.modified_by.display_title",
+    "variant_sample_list.created_for_case",
+]
+
 
 def extend_embedded_list(embedded_list, fd, typ, prefix=None):
     """ Extends the given embedded list with embeds from fd. Helper method for
@@ -62,25 +121,7 @@ def build_variant_embedded_list():
 
         :returns: list of variant embeds
     """
-    embedded_list = [
-        "interpretations.classification",
-        "interpretations.acmg_guidelines",
-        "interpretations.conclusion",
-        "interpretations.note_text",
-        "interpretations.version",
-        "interpretations.project",
-        "interpretations.institution",
-        "interpretations.status",
-        "discovery_interpretations.gene_candidacy",
-        "discovery_interpretations.variant_candidacy",
-        "discovery_interpretations.note_text",
-        "discovery_interpretations.version",
-        "discovery_interpretations.project",
-        "discovery_interpretations.institution",
-        "discovery_interpretations.status",
-        "discovery_interpretations.last_modified.date_modified",
-        "discovery_interpretations.last_modified.modified_by.display_title"
-    ]
+    embedded_list = SHARED_VARIANT_EMBEDS + []
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
     return embedded_list + Item.embedded_list
@@ -94,42 +135,8 @@ def build_variant_sample_embedded_list():
 
         :returns: list of embeds from 'variant' linkTo
     """
-    embedded_list = [
+    embedded_list = SHARED_VARIANT_SAMPLE_EMBEDS + [
         "cmphet.*",
-        "variant_notes.note_text",
-        "variant_notes.version",
-        "variant_notes.project",
-        "variant_notes.institution",
-        "variant_notes.status",
-        "variant_notes.last_modified.date_modified",
-        "variant_notes.last_modified.modified_by.display_title",
-        "gene_notes.note_text",
-        "gene_notes.version",
-        "gene_notes.project",
-        "gene_notes.institution",
-        "gene_notes.status",
-        "gene_notes.last_modified.date_modified",
-        "gene_notes.last_modified.modified_by.display_title",
-        "interpretation.classification",
-        "interpretation.acmg_guidelines",
-        "interpretation.conclusion",
-        "interpretation.note_text",
-        "interpretation.version",
-        "interpretation.project",
-        "interpretation.institution",
-        "interpretation.status",
-        "interpretation.last_modified.date_modified",
-        "interpretation.last_modified.modified_by.display_title",
-        "discovery_interpretation.gene_candidacy",
-        "discovery_interpretation.variant_candidacy",
-        "discovery_interpretation.note_text",
-        "discovery_interpretation.version",
-        "discovery_interpretation.project",
-        "discovery_interpretation.institution",
-        "discovery_interpretation.status",
-        "discovery_interpretation.last_modified.date_modified",
-        "discovery_interpretation.last_modified.modified_by.display_title",
-        "variant_sample_list.created_for_case",
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
@@ -593,7 +600,23 @@ class VariantSampleList(Item):
     schema = load_schema('encoded:schemas/variant_sample_list.json')
 
     # Populate `embedded_list` if we want to make this Item searchable, else we can exclude from /search/.
-    embedded_list = []
+    embedded_list = [
+        # 'variant_samples.variant_sample_item.variant.display_title',
+        # 'variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title',
+        # 'variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript',
+        # 'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc',
+        # 'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp',
+        # 'variant_samples.variant_sample_item.interpretation.classification',
+        # 'variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy',
+        # 'variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy',
+        # 'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
+        # 'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
+        # 'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label',
+        # 'structural_variant_samples.structural_variant_sample_item.structural_variant.display_title',
+        # 'structural_variant_samples.structural_variant_sample_item.interpretation.classification',
+        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.gene_candidacy',
+        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.variant_candidacy',
+    ]
 
 
 @view_config(name='download', context=VariantSample, request_method='GET',

@@ -393,7 +393,8 @@ class TestInvalidationScopeViewCGAP:
             DEFAULT_SCOPE + ['hpo_id', 'phenotype_name']
          ),
         ('FileProcessed', 'Case',
-            DEFAULT_SCOPE + ['accession', 'quality_metric', 'file_ingestion_status']
+            DEFAULT_SCOPE + ['accession', 'quality_metric', 'file_ingestion_status',
+                             'file_type', 'variant_type']
          ),
         ('Report', 'Case',
             DEFAULT_SCOPE + ['accession']

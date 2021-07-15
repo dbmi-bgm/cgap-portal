@@ -87,6 +87,47 @@
                 }
             }
         },
+        "structural_variant_samples": {
+            "title": "Structural Variant Samples",
+            "description": "StructuralVariantSample items saved to this list",
+            "type": "array",
+            "items": {
+                "title": "Structural Variant Sample Selection",
+                "type": "object",
+                "properties": {
+                    "structural_variant_sample_item": {
+                        "title": "Structural Variant Sample",
+                        "type": "string",
+                        "linkTo": "StructuralVariantSample"
+                    },
+                    "filter_blocks_request_at_time_of_selection": {
+                        "title": "Filter Block Request",
+                        "type": "string",
+                        "description": "Stringified JSON representing the compound filter block request made when this Structural Variant Sample was selected"
+                    },
+                    "userid": {
+                        "title": "User ID",
+                        "type": "string",
+                        "description": "User ID of person who made this selection",
+                        "serverDefault": "userid",
+                        "format": "uuid"
+                    },
+                    "date_selected": {
+                        "title": "Date Selected",
+                        "type": "string",
+                        "serverDefault": "now",
+                        "anyOf": [
+                            {
+                                "format": "date-time"
+                            },
+                            {
+                                "format": "date"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
         "created_for_case": {
             "title": "Created for Case",
             "description": "Accession of the case this variant sample list was created for",
