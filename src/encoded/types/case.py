@@ -260,6 +260,9 @@ def _build_case_embedded_list():
         # File linkTo
         "sample_processing.processed_files.file_format.file_format",
         "sample_processing.processed_files.accession",
+        "sample_processing.processed_files.variant_type",
+        "sample_processing.processed_files.file_type",
+        "sample_processing.processed_files.upload_key",
 
         # File linkTo
         "sample_processing.sample_processed_files.processed_files.accession",
