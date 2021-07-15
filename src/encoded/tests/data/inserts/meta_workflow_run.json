@@ -43,7 +43,27 @@
                   "mpileup:1",
                   "mpileup:2"
               ]
-          }
+          },
+          {
+              "name": "bamsnap-extra-dimension",
+              "status": "pending",
+              "shard": "0"
+          },
+          {
+              "name": "bamsnap-extra-dimension",
+              "status": "pending",
+              "shard": "1"
+          },
+          {
+              "name": "bamsnap-extra-dimension",
+              "status": "pending",
+              "shard": "2"
+          },
+          {
+              "name": "bamsnap-gather",
+              "status": "pending",
+              "shard": "0"
+          }       
       ],
       "input": [
           {

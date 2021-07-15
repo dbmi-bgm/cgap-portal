@@ -261,5 +261,59 @@
       "uuid": "40f60563-a3e6-4a45-b083-c6a2e00dc71f",
       "previous_version": ["1f35dde7-a768-48a7-81d9-0e047afeed17"],
       "version_upgrade_log": "Updated the version"
+    },
+    {
+      "app_name": "test_bamsnap",
+      "app_version": "v18",
+      "arguments": [
+          {
+              "argument_format": "bam",
+              "argument_type": "Input file",
+              "workflow_argument_name": "input_bams"
+          }
+      ],
+      "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+      "category": ["processing"],
+      "cwl_child_filenames": [],
+      "cwl_directory_url_v1": "https://raw.githubusercontent.com/dbmi-bgm/cgap-pipeline/v18/cwl",
+      "cwl_main_filename": "test.cwl",
+      "cwl_pointer": "",
+      "description": "Test workflow",
+      "docker_image_name": "test/test:test",
+      "docker_registry_url": "https://hub.docker.com/",
+      "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+      "name": "test_bamsnap_v18",
+      "aliases": ["cgap:test_bamsnap_v18"],
+      "steps": [
+          {
+              "inputs": [
+                  {
+                      "meta": {
+                          "cardinality": "array",
+                          "file_format": "bam",
+                          "global": true,
+                          "type": "data file"
+                      },
+                      "name": "input_bams",
+                      "source": [
+                          {
+                              "name": "input_bams"
+                          }
+                      ]
+                  }
+              ],
+              "meta": {
+                  "analysis_step_types": [
+                      "Run bamsnap"
+                  ],
+                  "software_used": [
+                     "/softwares/02d636b9-d82d-4da9-950c-2ca994a13209"
+                  ]
+              },
+              "name": "bamsnap"
+          }
+      ],
+      "title": "Test bamsnap",
+      "uuid": "8fb51fb5-df13-45df-bc9c-2817a29de2b3"
     }
 ]
