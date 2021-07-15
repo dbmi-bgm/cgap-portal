@@ -42,6 +42,8 @@ SHARED_VARIANT_EMBEDS = [
     "interpretations.project",
     "interpretations.institution",
     "interpretations.status",
+    "interpretations.last_modified.date_modified",
+    "interpretations.last_modified.modified_by.display_title",
     "discovery_interpretations.gene_candidacy",
     "discovery_interpretations.variant_candidacy",
     "discovery_interpretations.note_text",
