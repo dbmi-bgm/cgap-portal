@@ -17,9 +17,16 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
 
     return (
         <React.Fragment>
-            <h1 className="text-300">
-                Interpretation
-            </h1>
+            <div className="d-flex align-items-center justify-content-between mb-36">
+                <h1 className="text-300 mb-0">
+                    Interpretation
+                </h1>
+                <div>
+                    <button type="button" className="btn btn-primary" disabled>
+                        Export all selections as <span className="text-600">TSV spreadsheet</span>
+                    </button>
+                </div>
+            </div>
             <div>
                 <VariantSampleSelectionList {...{ isLoadingVariantSampleListItem, variantSampleListItem, schemas, context }} />
             </div>

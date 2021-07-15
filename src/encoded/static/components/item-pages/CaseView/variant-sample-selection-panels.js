@@ -1,6 +1,9 @@
 'use strict';
 
 import React, { useCallback, useMemo, useState } from 'react';
+import Dropdown from 'react-bootstrap/esm/Dropdown';
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import _ from 'underscore';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 
@@ -8,18 +11,27 @@ import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/f
 
 export function CaseSpecificSelectionsPanel (props) {
 
+    const panels = {
+        ACMG: 1,
+        GENEDISCOVERY: 2
+    };
+    const panelTitles = {
+        [panels.ACMG]: "ACMG Classification Selections",
+        [panels.GENEDISCOVERY]: "Gene Discovery Selections"
+    };
+
     const [ isExpanded, setIsExpanded ] = useState(false);
+    const [ showingPanel, setShowingPanel ] = useState(panels.ACMG);
 
     const toggleExpanded = useCallback(function(e){
         e.stopPropagation();
         setIsExpanded(!isExpanded);
     }, [ isExpanded ]);
 
-
-
-    // We might calculate state for all checkboxes ~ here as may need to infer state from others for intersections.
-
-
+    const onSelectPanel = useCallback(function(eventKey, evt){
+        evt.stopPropagation();
+        setShowingPanel(parseInt(eventKey));
+    });
 
     return (
         <div className="card mb-1">
@@ -32,10 +44,25 @@ export function CaseSpecificSelectionsPanel (props) {
             { isExpanded ?
                 <React.Fragment>
                     <div className="card-body">
-                        <ACMGClassificationSelections {...props} />
-                    </div>
-                    <div className="card-body border-top">
-                        <VariantGeneSelections {...props} />
+                        <div className="mb-08">
+                            <DropdownButton variant="outline-dark" size="lg" onSelect={onSelectPanel}
+                                title={panelTitles[showingPanel]}>
+                                <DropdownItem eventKey={panels.ACMG} active={showingPanel === panels.ACMG}>
+                                    { panelTitles[panels.ACMG] }
+                                </DropdownItem>
+                                <DropdownItem eventKey={panels.GENEDISCOVERY} active={showingPanel === panels.GENEDISCOVERY}>
+                                    { panelTitles[panels.GENEDISCOVERY] }
+                                </DropdownItem>
+                            </DropdownButton>
+                        </div>
+
+                        { showingPanel === panels.ACMG ?
+                            <ACMGClassificationSelections {...props} />
+                            : showingPanel === panels.GENEDISCOVERY ?
+                                <VariantGeneSelections {...props} />
+                                : null
+                        }
+
                     </div>
                     <div className="card-body border-top">
                         <NoteTypeSelections {...props} />
@@ -107,36 +134,33 @@ export class NoteSubSelectionStateController extends React.Component {
 
 function ACMGClassificationSelections (props) {
     const {
-        // From FinalizeCaseTab (& higher)
+        // From CaseReviewTab (& higher)
         variantSampleListItem,
         alreadyInProjectNotes,
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
-        // From FinalizeCaseDataStore
+        // From CaseReviewDataStore
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
         sendToReportStore
     } = props;
     return (
-        <React.Fragment>
-            <h4 className="text-400 mt-0 8">ACMG Classification Selections</h4>
-            <div className="row">
-                <div className="col-12 col-lg-6">
-                    <h5 className="text-400 text-large">Move to Report</h5>
-                    <ACMGClassificationSelectionsCommonCheckboxList
-                        variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
-                        noteTypesIncluded={reportNotesIncluded} />
-                </div>
-                <div className="col-12 col-lg-6">
-                    <h5 className="text-400 text-large">Save to Project</h5>
-                    <ACMGClassificationSelectionsCommonCheckboxList
-                        {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
-                        noteTypesIncluded={kbNotesIncluded} />
-                </div>
+        <div className="row">
+            <div className="col-12 col-lg-6">
+                <h5 className="text-400 text-large">Move to Report</h5>
+                <ACMGClassificationSelectionsCommonCheckboxList
+                    variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
+                    noteTypesIncluded={reportNotesIncluded} />
             </div>
-        </React.Fragment>
+            <div className="col-12 col-lg-6">
+                <h5 className="text-400 text-large">Save to Project</h5>
+                <ACMGClassificationSelectionsCommonCheckboxList
+                    {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
+                    noteTypesIncluded={kbNotesIncluded} />
+            </div>
+        </div>
     );
 }
 
@@ -229,36 +253,33 @@ function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, v
 
 function VariantGeneSelections (props) {
     const {
-        // From FinalizeCaseTab (& higher)
+        // From CaseReviewTab (& higher)
         variantSampleListItem,
         alreadyInProjectNotes,
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
-        // From FinalizeCaseDataStore
+        // From CaseReviewDataStore
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
         sendToReportStore
     } = props;
     return (
-        <React.Fragment>
-            <h4 className="text-400 mt-0 mb-08">Variant / Gene Selections</h4>
-            <div className="row">
-                <div className="col-12 col-lg-6">
-                    <h5 className="text-400 text-large">Move to Report</h5>
-                    <VariantGeneSelectionsCommonCheckboxList
-                        variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
-                        noteTypesIncluded={reportNotesIncluded} />
-                </div>
-                <div className="col-12 col-lg-6">
-                    <h5 className="text-400 text-large">Save to Project</h5>
-                    <VariantGeneSelectionsCommonCheckboxList
-                        {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
-                        noteTypesIncluded={kbNotesIncluded}/>
-                </div>
+        <div className="row">
+            <div className="col-12 col-lg-6">
+                <h5 className="text-400 text-large">Move to Report</h5>
+                <VariantGeneSelectionsCommonCheckboxList
+                    variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
+                    noteTypesIncluded={reportNotesIncluded} />
             </div>
-        </React.Fragment>
+            <div className="col-12 col-lg-6">
+                <h5 className="text-400 text-large">Save to Project</h5>
+                <VariantGeneSelectionsCommonCheckboxList
+                    {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
+                    noteTypesIncluded={kbNotesIncluded}/>
+            </div>
+        </div>
     );
 }
 
@@ -418,7 +439,7 @@ function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantS
 
 function NoteTypeSelections (props) {
     const {
-        // From FinalizeCaseTab (& higher)
+        // From CaseReviewTab (& higher)
         variantSampleListItem,
         alreadyInProjectNotes,
         // From NoteSubSelectionStateController
@@ -426,7 +447,7 @@ function NoteTypeSelections (props) {
         kbNotesIncluded,
         toggleReportNoteSubselectionState,
         toggleKBNoteSubselectionState,
-        // From FinalizeCaseDataStore
+        // From CaseReviewDataStore
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
@@ -434,7 +455,7 @@ function NoteTypeSelections (props) {
     } = props;
     return (
         <React.Fragment>
-            <h4 className="text-400 mt-0 mb-08">Notes</h4>
+            <h4 className="text-400 mt-0 mb-08">Note Types</h4>
             <div className="row">
                 <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Move to Report</h5>
@@ -592,12 +613,16 @@ function KeyedCheckbox(props){
             <small className="text-secondary">({ classificationCounts[key] })</small>
         </React.Fragment>
     ) : null;
+
+    // Set class="d-inline-block" and wrap in outer div because otherwise click area for check/uncheck-ing can be unexpectedly wide.
     return (
-        <Checkbox {...passProps} data-key={key} checked={checked} className={cls}
-            disabled={disabled} indeterminate={indeterminateStates[key]}>
-            { children }
-            { countAddendum }
-        </Checkbox>
+        <div className={cls}>
+            <Checkbox {...passProps} data-key={key} checked={checked} className="d-inline-block"
+                disabled={disabled} indeterminate={indeterminateStates[key]}>
+                { children }
+                { countAddendum }
+            </Checkbox>
+        </div>
     );
 }
 

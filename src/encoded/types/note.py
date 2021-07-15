@@ -37,7 +37,7 @@ class Note(Item):
 @view_config(context=Note, permission='edit', request_method='PATCH',
              validators=[validate_item_content_patch])
 @debug_log
-def item_edit(context, request, render=None):
+def note_edit(context, request, render=None):
     previous_status = context.properties.get("status")
     next_status = request.validated.get("status")
     if next_status != previous_status and next_status == "current":

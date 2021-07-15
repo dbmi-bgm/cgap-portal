@@ -15,8 +15,8 @@ import { variantSampleColumnExtensionMap } from './../../browse/variantSampleCol
 
 // Using integers here for faster comparisons.
 export const parentTabTypes = {
-    "INTERPRETATION": 1,
-    "FINALIZECASE": 2
+    INTERPRETATION: 1,
+    CASEREVIEW: 2
 };
 
 
@@ -33,7 +33,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         parentTabType = parentTabTypes.INTERPRETATION,
         alreadyInProjectNotes,
 
-        // From FinalizeCaseDataStore (if used, else undefined):
+        // From CaseReviewDataStore (if used, else undefined):
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
@@ -87,9 +87,9 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         context,    // Case
         schemas,
         parentTabType = parentTabTypes.INTERPRETATION,
-        // From FinalizeCaseTab (if used):
+        // From CaseReviewTab (if used):
         alreadyInProjectNotes,
-        // From FinalizeCaseDataStore (if used):
+        // From CaseReviewDataStore (if used):
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
@@ -163,7 +163,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                     <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
                         <h4 className="text-truncate text-600 my-0 selected-vsl-title">
                             {
-                                parentTabType === parentTabTypes.FINALIZECASE ?
+                                parentTabType === parentTabTypes.CASEREVIEW ?
                                     <React.Fragment>
                                         { variantDisplayTitle }
                                         { noSavedNotes ? <i className="icon icon-exclamation-triangle fas ml-12 text-muted" data-tip="No notes saved for this Sample Variant in interpretation"/> : null }
@@ -184,8 +184,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
                     <div className="flex-auto">
 
-                        { parentTabType === parentTabTypes.FINALIZECASE ?
-                            <button type="button" className="btn btn-sm btn-primary" onClick={toggleIsExpanded} disabled={noSavedNotes}>
+                        { parentTabType === parentTabTypes.CASEREVIEW ?
+                            <button type="button" className={"btn btn-sm btn-" + (noSavedNotes ? "outline-warning" : "primary")} onClick={toggleIsExpanded} disabled={noSavedNotes}>
                                 <i className={"icon fas mr-07 icon-" + (!isExpanded ? "plus" : "minus")} />
                                 { !isExpanded ? "Review Variant Notes & Classification" : "Hide Variant Notes & Classification" }
                             </button>
@@ -571,7 +571,7 @@ const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onK
 
 
 
-export class FinalizeCaseDataStore extends React.PureComponent {
+export class CaseReviewDataStore extends React.PureComponent {
 
     constructor(props) {
         super(props);

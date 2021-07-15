@@ -122,6 +122,9 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
             margin-top: -1px;
         }
     }
+	&.btn-lg {
+        padding-right: 29px;
+    }
 }
 
 

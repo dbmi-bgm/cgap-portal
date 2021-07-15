@@ -124,7 +124,7 @@ export class VariantSampleListController extends React.PureComponent {
                     "ids": [ variantSampleListID ],
                     "fields": [
 
-                        // Fields for list view (for InterpretationTab & FinalizeCaseTab)
+                        // Fields for list view (for InterpretationTab & CaseReviewTab)
 
                         "@id",
                         "variant_samples.date_selected",
@@ -143,7 +143,7 @@ export class VariantSampleListController extends React.PureComponent {
                         "variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
                         "variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
 
-                        // VariantSampleItem Notes (for FinalizeCaseTab)
+                        // VariantSampleItem Notes (for CaseReviewTab)
                         ...variantSampleListItemNoteEmbeds
                     ]
                 })

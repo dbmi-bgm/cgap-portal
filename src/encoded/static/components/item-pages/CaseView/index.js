@@ -17,7 +17,7 @@ import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
 import { VariantSampleListController } from './VariantSampleListController';
-import { FinalizeCaseDataStore } from './VariantSampleSelection';
+import { CaseReviewDataStore } from './VariantSampleSelection';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -28,7 +28,7 @@ import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
 import { InterpretationTab } from './InterpretationTab';
-import { FinalizeCaseTab } from './FinalizeCaseTab';
+import { CaseReviewTab } from './CaseReviewTab';
 import CaseSubmissionView from './CaseSubmissionView';
 
 
@@ -315,12 +315,12 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     <DotRouterTab tabTitle={
                         <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
                             { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
-                            Finalize Case
+                            Case Review
                         </span>
                     } dotPath=".finalize" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
-                        <FinalizeCaseDataStore>
-                            <FinalizeCaseTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
-                        </FinalizeCaseDataStore>
+                        <CaseReviewDataStore>
+                            <CaseReviewTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                        </CaseReviewDataStore>
                     </DotRouterTab>
                 </DotRouter>
                 : null }

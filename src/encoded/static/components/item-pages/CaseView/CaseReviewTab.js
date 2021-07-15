@@ -10,7 +10,7 @@ import { ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util'
 
 
 
-export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
+export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
     const {
         schemas, context,
         // From VariantSampleListController
@@ -41,9 +41,22 @@ export const FinalizeCaseTab = React.memo(function FinalizeCaseTab (props) {
         <React.Fragment>
             <div className="d-flex align-items-center justify-content-between mb-36">
                 <h1 className="text-300 mb-0">
-                    Finalize Case
+                    Case Review
                 </h1>
-                <SaveNotesToProjectButton {...{ variantSampleListItem, fetchVariantSampleListItem, resetSendToProjectStoreItems, sendToProjectStore }} />
+                <div>
+                    {/*
+                    <button type="button" className="btn btn-primary mr-05" disabled>
+                        Export current 'Send to Project' selections as <span className="text-600">TSV spreadsheet</span>
+                    </button>
+                    */}
+                    <SaveNotesToProjectButton {...{ variantSampleListItem, fetchVariantSampleListItem, resetSendToProjectStoreItems, sendToProjectStore }} />
+                    <button type="button" className="btn btn-primary ml-05" disabled>
+                        Send Note Selections to <span className="text-600">Report</span>
+                    </button>
+                    <button type="button" className="btn btn-primary ml-05" disabled>
+                        View Report Draft
+                    </button>
+                </div>
             </div>
             <div>
                 <NoteSubSelectionStateController>
@@ -458,8 +471,9 @@ class SaveNotesToProjectButton extends React.PureComponent {
         const onHide = fetchingPercentageComplete === 1 && patchingPercentageComplete === 1 ? this.onReset : null;
         return (
             <React.Fragment>
-                <button type="button" className="btn btn-primary" onClick={this.onClick} disabled={isFetching || isPatching || selectionStoreSize === 0}>
-                    Save { selectionStoreSize } Notes from { variantSamplesWithAnySelectionSize } Sample Variants to Project
+                <button type="button" className="btn btn-primary" onClick={this.onClick} disabled={isFetching || isPatching || selectionStoreSize === 0}
+                    data-tip={`${selectionStoreSize} Note selections from ${variantSamplesWithAnySelectionSize} Sample Variants`}>
+                    Share Note Selections to <span className="text-600">Project</span>
                 </button>
                 { isFetching || isPatching ?
                     <ProgressModal {...{ fetchingPercentageComplete, isFetching, isPatching, patchingPercentageComplete, onHide }} />
