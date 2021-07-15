@@ -142,6 +142,11 @@
                                     "description" : "The input dimension increase from multiple runs of the source workflow (default: not set)",
                                     "type" : "integer"
                                 },
+                                "extra_dimension": {
+                                    "title": "Extra Dimension",
+                                    "description" : "The extra input dimension increase other than that defined by gather (default: not set)",
+                                    "type" : "integer"
+                                },
                                 "mount": {
                                     "title": "Mount",
                                     "description" : "Whether the input is mounted",
