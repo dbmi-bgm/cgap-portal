@@ -376,30 +376,60 @@ class Case(Item):
         return secondary_families
 
     @calculated_property(schema={
-        "title": "VCF File",
-        "description": "VCF file that will be used in variant digestion",
+        "title": "SNV VCF File",
+        "description": "VCF file that will be used in SNV variant digestion",
         "type": "string",
         "linkTo": "File"
     })
     def vcf_file(self, request, sample_processing=None):
+        """
+        Map the SNV vcf file to be digested.
+        """
         vcf_file = {}
-        """
-        Map the vcf file to be digested
-        Currently we have a single file on processed_files field of sample processing
-        """
         if not sample_processing:
             return vcf_file
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
         if not sp_data:
             return vcf_file
-        files = sp_data.get('processed_files', [])
-        if not files:
+        files_processed = sp_data.get('processed_files', [])
+        if not files_processed:
             return vcf_file
-        # last file is the full annotated one
-        # this is not a good way to map the right file
-        # TODO: embedding file type and mapping with that would be better
-        vcf_file = files[-1]
+        for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
+            file_data = get_item_or_none(request, file_processed, 'files-processed') 
+            file_type = file_data.get("file_type", "")
+            file_variant_type = file_data.get("variant_type", "")
+            if file_type == "full annotated VCF" and file_variant_type != "SV":
+                vcf_file = file_data["@id"]
+                break
         return vcf_file
+
+    @calculated_property(schema={
+        "title": "SV VCF File",
+        "description": "VCF file that will be used in SV variant digestion",
+        "type": "string",
+        "linkTo": "File"
+    })
+    def structural_variant_vcf_file(self, request, sample_processing=None):
+        """
+        Map the SV vcf file to be digested.
+        """
+        sv_vcf_file = {}
+        if not sample_processing:
+            return sv_vcf_file
+        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
+        if not sp_data:
+            return sv_vcf_file
+        files_processed = sp_data.get('processed_files', [])
+        if not files_processed:
+            return sv_vcf_file
+        for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
+            file_data = get_item_or_none(request, file_processed, 'files-processed') 
+            file_type = file_data.get("file_type", "")
+            file_variant_type = file_data.get("variant_type", "")
+            if file_type == "full annotated VCF" and file_variant_type == "SV":
+                sv_vcf_file = file_data["@id"]
+                break
+        return sv_vcf_file
 
     @calculated_property(schema={
         "title": "Search Query Filter String Add-On",

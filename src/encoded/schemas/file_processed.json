@@ -161,6 +161,15 @@
             "exclude_from": [
                 "FFedit-create"
             ]
+        },
+        "variant_type": {
+            "title": "Variant Type",
+            "description": "The variant type associated with this file",
+            "type": "string",
+            "enum": [
+                "SNV",
+                "SV"
+            ]
         }
     },
     "facets": {
