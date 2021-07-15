@@ -191,6 +191,10 @@ ecr-login:
 	@echo "Making ecr-login AWS_ACCOUNT=${AWS_ACCOUNT} ..."
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com
 
+ecr-test-login:
+	@echo "Making ecr-login for your .aws_test account ..."
+	scripts/ecr-test-login
+
 rebuild-docker-production:
 	@echo "Remaking build-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
 	docker build -t ${ENV_NAME}:latest . --no-cache

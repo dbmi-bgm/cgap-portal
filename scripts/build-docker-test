@@ -55,7 +55,20 @@ if [ -z "${env_name}" ]; then
   exit 1
 fi
 
+. ${creds_file}
+
+if [ "${aws_account}" != "${ACCOUNT_NUMBER}" ]; then
+    echo "Data mismatch. \$aws_account='${aws_account}' but \$ACCOUNT_NUMBER='${ACCOUNT_NUMBER}'."
+    exit 1
+fi
+
+if [ "${env_name}" != "${ENV_NAME}" ]; then
+    echo "Data mismatch. \$env_name='${env_name}' but \$ENV_NAME='${ENV_NAME}'."
+    exit 1
+fi
+
 if [ -n "${do_login}" ]; then
     make ecr-login AWS_ACCOUNT="${aws_account}"
 fi
+
 make build-docker-production AWS_ACCOUNT="${aws_account}" ENV_NAME="${env_name}"
