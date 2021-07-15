@@ -386,7 +386,9 @@ class InterpretationController extends React.Component {
 
         const classification = this.classifier.getClassification();
 
-        this.setState({ globalACMGSelections: newInvocations, autoClassification: classification }, callback);
+        const newState = { globalACMGSelections: newInvocations, autoClassification: classification };
+
+        this.setState(newState, () => callback(newState));
     }
 
     render() {
@@ -490,54 +492,76 @@ function ACMGScrollableList(props) {
 
 function ACMGInvokableRule(props) {
     const thisRef = useRef(null);
-    const { rule, strength, description, acmgTip } = props;
+    const { rule, strength, description, acmgTip, toggleInvocation, setACMGStrengthPopover, acmgStrengthPopover } = props;
 
-    function toggleRuleStrengthOptions() {
-        const { rule, strength, setACMGStrengthPopover, acmgStrengthPopover,  toggleInvocation } = props;
-        toggleInvocation({ acmg_rule_name: rule, rule_strength: strength }, () => {
-            if (!acmgStrengthPopover) {
-                setACMGStrengthPopover({
-                    target: thisRef,
-                    jsx: getACMGRulePopover(rule, strength, "Pathogenic")
-                });
-            } else {
-                setACMGStrengthPopover(null);
-            }
-        });
+    function toggleRuleStrengthOptions(newState) {
+        const { globalACMGSelections: { [rule]: newStrength } = {} } = newState;
+        if (!acmgStrengthPopover) {
+            setACMGStrengthPopover({
+                target: thisRef,
+                jsx: generateACMGRulePopover(rule, newStrength)
+            });
+        } else {
+            setACMGStrengthPopover(null);
+        }
+
     }
 
     return (
         <div ref={thisRef} className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={!!strength}
-            onClick={() => toggleRuleStrengthOptions()} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
+            onClick={() => toggleInvocation({ acmg_rule_name: rule, rule_strength: strength }, toggleRuleStrengthOptions)} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
             { rule }
         </div>);
 }
 
-// function calculateACMGRuleStrengthOptions(ruleStrength, evidenceType) {
-//     const ruleStrengthOptions = [];
-//     if (evidenceType === "Benign") {
-//         switch (ruleStrength) {
-//             case "supporting":
-//                 ruleStrengthOptions.push("strong",)
-//             case "strong":
+function calculateACMGRuleStrengthOptions(rule, selectedStrength) {
+    const ruleStrengthOptions = [];
 
-//             case "standalone":
+    // Pull ACMG metadata from util
+    const evidenceType = acmgUtil.metadata[rule].type;
+    const defaultRuleStrength = acmgUtil.metadata[rule].strength;
 
-//         }
-//     }
+    // Find true value of current strength (resolve undefined or "Default" values)
+    const currStrength = selectedStrength === undefined || selectedStrength === "Default" ? defaultRuleStrength: selectedStrength;
 
-//     return ruleStrengthOptions;
-// }
+    // Populate list of strengths
+    let possibleStrengths;
+    if (evidenceType === "benign") {
+        possibleStrengths = ["supporting", "strong", "standalone"];
+    } else { // Pathogenic
+        possibleStrengths = ["supporting", "moderate", "strong", "vstrong"];
+    }
 
-function getACMGRulePopover(rule, selectedStrength, evidenceType) {
+    possibleStrengths.forEach((strength) => {
+        const optionData = { "strengthOption": strength };
+        if (strength === defaultRuleStrength) { // if default strength for the rule
+            optionData.defaultStr = true;
+        }
+        if (strength === currStrength) { // if currently selected strength for the rule
+            optionData.selected = true;
+        }
+        ruleStrengthOptions.push(optionData);
+    });
+
+    return ruleStrengthOptions;
+}
+
+function generateACMGRulePopover(rule, selectedStrength) {
+    const strengthOptions = calculateACMGRuleStrengthOptions(rule, selectedStrength);
 
     return (
-        <Popover id="test">
-            <Popover.Title className="m-0" as="h4">{rule}</Popover.Title>
-            <Popover.Content>
-                <ul>
-                    <li className="selected text-warning">{ selectedStrength }</li>
-                </ul>
+        <Popover id={"acmg-strength-pop-"+rule}>
+            <Popover.Title className="m-0" as="h4">Select ACMG Rule Strength</Popover.Title>
+            <Popover.Content className="p-0">
+                <div className="list-group list-group-flush acmg-strengths">
+                    { strengthOptions.map((options) => {
+                        const { strengthOption, selected = false, defaultStr = false } = options;
+                        return (
+                            <button type="button" key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active': ""}`}>
+                                {rule}_{ strengthOption } { defaultStr ? "(default)": null }
+                            </button>);
+                    })}
+                </div>
             </Popover.Content>
         </Popover>);
 }
