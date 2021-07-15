@@ -611,6 +611,9 @@ class VariantSampleList(Item):
         'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
         'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label',
         'structural_variant_samples.structural_variant_sample_item.structural_variant.display_title',
+        'structural_variant_samples.structural_variant_sample_item.interpretation.classification',
+        'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.gene_candidacy',
+        'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.variant_candidacy',
     ]
 
 
