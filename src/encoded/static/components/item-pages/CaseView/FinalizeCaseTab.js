@@ -116,7 +116,8 @@ class SaveNotesToProjectButton extends React.PureComponent {
         };
     }
 
-    getPatchPayloadsProcess(onComplete){
+    /** @todo detect + stop process if any errors */
+    getPatchPayloadsProcess(onComplete, onError){
         const {
             variantSampleListItem: { variant_samples: vsObjects = [] },
             sendToProjectStore: selectionStore
@@ -138,6 +139,7 @@ class SaveNotesToProjectButton extends React.PureComponent {
         const notePatchPayloads = {};
 
         const checkIfCompleted = () => {
+            console.log("TTT", requestCount, requestCompletedCount);
             // Check if all requests have completed, and call `onComplete` if so.
             if (requestCount === requestCompletedCount) {
                 onComplete({ variantPatchPayloads, genePatchPayloads, notePatchPayloads });
@@ -147,9 +149,10 @@ class SaveNotesToProjectButton extends React.PureComponent {
             }
         };
 
+        // TODO: Consider combining into one big /embed request to VariantSampleListItem
         variantSampleItems.forEach(function(variantSampleItem, vsIdx){
             const {
-                uuid: variantSampleUUID,
+                "@id": variantSampleAtID,
                 interpretation: {
                     uuid: interpretationUUID,
                     "@id": interpretationAtID,
@@ -194,31 +197,28 @@ class SaveNotesToProjectButton extends React.PureComponent {
                 let changed = false;
 
                 if (interpretationUUID && selectionStore[interpretationUUID]) {
-                    const nextAtID = `/notes-interpretation/${interpretationUUID}/`;
                     const currList = variantPatchPayload.interpretations || interpretations || [];
-                    if (currList.indexOf(nextAtID) === -1) {
+                    if (currList.indexOf(interpretationAtID) === -1) {
                         changed = true;
-                        currList.push(nextAtID);
+                        currList.push(interpretationAtID);
                         variantPatchPayload.interpretations = currList;
                     }
                 }
 
                 if (discoveryInterpretationUUID && selectionStore[discoveryInterpretationUUID]) {
-                    const nextAtID = `/notes-discovery/${discoveryInterpretationUUID}/`;
                     const currList = variantPatchPayload.discovery_interpretations || discovery_interpretations || [];
-                    if (currList.indexOf(nextAtID) === -1) {
+                    if (currList.indexOf(discoveryInterpretationAtID) === -1) {
                         changed = true;
-                        currList.push(nextAtID);
+                        currList.push(discoveryInterpretationAtID);
                         variantPatchPayload.discovery_interpretations = currList;
                     }
                 }
 
                 if (lastVariantNoteUUID && selectionStore[lastVariantNoteUUID]) {
-                    const nextAtID = `/notes-standard/${lastVariantNoteUUID}/`;
                     const currList = variantPatchPayload.variant_notes || variant_notes || [];
-                    if (currList.indexOf(nextAtID) === -1) {
+                    if (currList.indexOf(lastVariantNoteAtID) === -1) {
                         changed = true;
-                        currList.push(nextAtID);
+                        currList.push(lastVariantNoteAtID);
                         variantPatchPayload.variant_notes = currList;
                     }
                 }
@@ -235,21 +235,19 @@ class SaveNotesToProjectButton extends React.PureComponent {
                 let changed = false;
 
                 if (discoveryInterpretationUUID && selectionStore[discoveryInterpretationUUID]) {
-                    const nextAtID = `/notes-discovery/${discoveryInterpretationUUID}/`;
                     const currList = genePatchPayload.discovery_interpretations || discovery_interpretations || [];
-                    if (currList.indexOf(nextAtID) === -1) {
+                    if (currList.indexOf(discoveryInterpretationAtID) === -1) {
                         changed = true;
-                        currList.push(nextAtID);
+                        currList.push(discoveryInterpretationAtID);
                         genePatchPayload.discovery_interpretations = currList;
                     }
                 }
 
                 if (lastGeneNoteUUID && selectionStore[lastGeneNoteUUID]) {
-                    const nextAtID = `/notes-standard/${lastGeneNoteUUID}/`;
                     const currList = genePatchPayload.gene_notes || gene_notes || [];
-                    if (currList.indexOf(nextAtID) === -1) {
+                    if (currList.indexOf(lastGeneNoteAtID) === -1) {
                         changed = true;
-                        currList.push(nextAtID);
+                        currList.push(lastGeneNoteAtID);
                         genePatchPayload.gene_notes = currList;
                     }
                 }
@@ -264,9 +262,8 @@ class SaveNotesToProjectButton extends React.PureComponent {
                 requestCount++;
 
                 const vsEmbedFetchPayload = {
-                    "ids": [variantSampleUUID],
-                    // TODO: get rid of depth once `fields` works (in master) + maybe skip 2nd command and sub-embed gene on here.
-                    "depth": 1,
+                    "ids": [ variantSampleAtID ],
+                    // TODO: maybe skip 2nd command and sub-embed gene on here.
                     "fields": [
                         "variant.@id",
                         "variant.interpretations",
@@ -275,12 +272,11 @@ class SaveNotesToProjectButton extends React.PureComponent {
                     ]
                 };
 
-                // TODO:
-                // if (needGenePatch) {
-                //     vsEmbedFetchPayload.fields.push("variant.genes.genes_most_severe_gene.@id");
-                //     vsEmbedFetchPayload.fields.push("variant.genes.genes_most_severe_gene.discovery_interpretations");
-                //     vsEmbedFetchPayload.fields.push("variant.genes.genes_most_severe_gene.gene_notes");
-                // }
+                if (needGenePatch) {
+                    vsEmbedFetchPayload.fields.push("variant.genes.genes_most_severe_gene.@id");
+                    vsEmbedFetchPayload.fields.push("variant.genes.genes_most_severe_gene.discovery_interpretations");
+                    vsEmbedFetchPayload.fields.push("variant.genes.genes_most_severe_gene.gene_notes");
+                }
 
                 ajax.promise("/embed", "POST", {}, JSON.stringify(vsEmbedFetchPayload))
                     .then(function(vsEmbedList){
@@ -294,41 +290,9 @@ class SaveNotesToProjectButton extends React.PureComponent {
                         }
 
                         if (needGenePatch) {
-                            // TODO: Once can filter down `/embed` response fields, consider combining requests for variant+gene.
-                            const geneIDs = genes.map(function(geneObject){
-                                const { genes_most_severe_gene: geneAtID = null } = geneObject;
-                                return geneAtID || null;
-                            }).filter(function(geneAtID){
-                                // Exclude grabbing any genes for which we don't have view permission and/or
-                                // genes which we already have loaded/cached in.
-                                return !!geneAtID;
+                            genes.forEach(function({ genes_most_severe_gene }){
+                                mergeToGenePatchPayloads(genes_most_severe_gene);
                             });
-
-                            const geneIDsToFetch = [];
-
-                            // Avoid fetching any genes we fetched already.
-                            geneIDs.forEach(function(geneAtID){
-                                if (genePatchPayloads[geneAtID]) {
-                                    mergeToGenePatchPayloads({ "@id": geneAtID });
-                                } else {
-                                    geneIDsToFetch.push(geneAtID);
-                                }
-                            });
-
-                            if (geneIDsToFetch.length > 0) {
-                                requestCount++;
-                                // Fetch most recent datastore=database representations of genes.
-                                ajax.promise("/embed", "POST", {}, JSON.stringify({ "ids": geneIDsToFetch, "depth": 0 }))
-                                    .then(function(geneRepresentationResponse){
-                                        geneRepresentationResponse.forEach(mergeToGenePatchPayloads);
-                                    })
-                                    .finally(function(){
-                                        requestCompletedCount++;
-                                        checkIfCompleted();
-                                    });
-
-                            }
-
                         }
 
                     })
@@ -368,9 +332,9 @@ class SaveNotesToProjectButton extends React.PureComponent {
                 }
             }
 
-            checkIfCompleted();
-
         });
+
+        checkIfCompleted();
     }
 
     patchItemsProcess(patchPayloads, onComplete) {
@@ -452,12 +416,13 @@ class SaveNotesToProjectButton extends React.PureComponent {
                         }, () => {
                             const { fetchVariantSampleListItem, resetSendToProjectStoreItems } = this.props;
                             if (countCompleted > 0) {
+                                if (typeof resetSendToProjectStoreItems === "function") {
+                                    console.info("Reset 'send to project' store items.");
+                                    resetSendToProjectStoreItems();
+                                }
                                 if (typeof fetchVariantSampleListItem === "function") {
                                     console.info("Refreshing our VariantSampleListItem with updated Note Item statuses.");
                                     fetchVariantSampleListItem();
-                                }
-                                if (typeof resetSendToProjectStoreItems === "function") {
-                                    resetSendToProjectStoreItems();
                                 }
                             }
                         });
@@ -493,7 +458,7 @@ class SaveNotesToProjectButton extends React.PureComponent {
         const onHide = fetchingPercentageComplete === 1 && patchingPercentageComplete === 1 ? this.onReset : null;
         return (
             <React.Fragment>
-                <button type="button" className="btn btn-primary" onClick={this.patchNotesStatus} disabled={isFetching || isPatching || selectionStoreSize === 0}>
+                <button type="button" className="btn btn-primary" onClick={this.onClick} disabled={isFetching || isPatching || selectionStoreSize === 0}>
                     Save { selectionStoreSize } Notes from { variantSamplesWithAnySelectionSize } Sample Variants to Project
                 </button>
                 { isFetching || isPatching ?

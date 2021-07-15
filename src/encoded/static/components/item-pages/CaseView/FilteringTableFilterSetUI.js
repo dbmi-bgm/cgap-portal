@@ -1024,9 +1024,9 @@ function AddToVariantSampleListButton(props){
                 // selectedVariantSamples is type (literal) Map, so param signature is `value, key, map`.
                 // These are sorted in order of insertion/selection.
                 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
-                selectedVariantSamples.forEach(function(variantSampleItem, variantSampleATID){
+                selectedVariantSamples.forEach(function(variantSampleItem, variantSampleAtID){
                     variantSampleSelectionsList.push({
-                        "variant_sample_item": variantSampleATID, // Will become linkTo (embedded),
+                        "variant_sample_item": variantSampleAtID, // Will become linkTo (embedded),
                         "filter_blocks_request_at_time_of_selection": filterBlocksRequestData
                         // The below 2 fields are filled in on backend (configured via `serverDefaults` in Item schema for these fields)
                         // "selected_by",

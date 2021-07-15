@@ -183,18 +183,25 @@ export class VariantSampleListController extends React.PureComponent {
  * To be used as a part of `fields` /embed payload(s).
  */
 export const variantSampleListItemNoteEmbeds = [
+    "variant_samples.variant_sample_item.interpretation.@id",
     "variant_samples.variant_sample_item.interpretation.uuid",
     "variant_samples.variant_sample_item.interpretation.note_text",
     "variant_samples.variant_sample_item.interpretation.status",
     "variant_samples.variant_sample_item.interpretation.classification",
+
+    "variant_samples.variant_sample_item.discovery_interpretation.@id",
     "variant_samples.variant_sample_item.discovery_interpretation.uuid",
     "variant_samples.variant_sample_item.discovery_interpretation.note_text",
     "variant_samples.variant_sample_item.discovery_interpretation.status",
     "variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy",
     "variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy",
+
+    "variant_samples.variant_sample_item.variant_notes.@id",
     "variant_samples.variant_sample_item.variant_notes.uuid",
     "variant_samples.variant_sample_item.variant_notes.note_text",
     "variant_samples.variant_sample_item.variant_notes.status",
+
+    "variant_samples.variant_sample_item.gene_notes.@id",
     "variant_samples.variant_sample_item.gene_notes.uuid",
     "variant_samples.variant_sample_item.gene_notes.note_text",
     "variant_samples.variant_sample_item.gene_notes.status",
