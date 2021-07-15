@@ -78,6 +78,7 @@
                 "intermediate file",
                 "raw VCF",
                 "gVCF",
+                "Higlass SV VCF",
                 "full annotated VCF"
             ]
         },

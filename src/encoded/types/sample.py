@@ -10,19 +10,9 @@ from .base import (
 from .family import Family
 
 
-@collection(
-    name='samples',
-    unique_key='accession',
-    properties={
-        'title': 'Samples',
-        'description': 'Listing of Samples',
-    })
-class Sample(Item):
-    item_type = 'sample'
-    name_key = 'accession'
-    schema = load_schema('encoded:schemas/sample.json')
-    rev = {'indiv': ('Individual', 'samples')}
-    embedded_list = [
+def _build_sample_embedded_list():
+    """Helper function to create embedded list for sample."""
+    return [
         # File linkTo
         "files.status",
         "files.file_format.file_format",
@@ -38,6 +28,21 @@ class Sample(Item):
         "processed_files.file_format.file_format",
         "processed_files.workflow_run_outputs"
     ]
+
+
+@collection(
+    name='samples',
+    unique_key='accession',
+    properties={
+        'title': 'Samples',
+        'description': 'Listing of Samples',
+    })
+class Sample(Item):
+    item_type = 'sample'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/sample.json')
+    rev = {'indiv': ('Individual', 'samples')}
+    embedded_list = _build_sample_embedded_list()
 
     @calculated_property(schema={
         "title": "Individual",
@@ -72,6 +77,20 @@ class Sample(Item):
             return False
 
 
+def _build_sample_processing_embedded_list():
+    """Helper function to build embedded list for sample_processing."""
+    return [
+        # File linkTo
+        "processed_files.accession",  # used to locate this file from annotated VCF via search
+        "processed_files.variant_type",
+        "processed_files.file_type",
+
+        # Sample linkTo
+        "samples.completed_processes",
+        "samples.processed_files.uuid",
+    ]
+
+
 @collection(
     name='sample-processings',
     properties={
@@ -81,11 +100,7 @@ class Sample(Item):
 class SampleProcessing(Item):
     item_type = 'sample_processing'
     schema = load_schema('encoded:schemas/sample_processing.json')
-    embedded_list = [
-        'processed_files.accession',  # used to locate this file from annotated VCF via search
-        'samples.completed_processes',
-        "samples.processed_files.uuid",
-    ]
+    embedded_list = _build_sample_processing_embedded_list()
     rev = {'case': ('Case', 'sample_processing')}
 
     @calculated_property(schema={
