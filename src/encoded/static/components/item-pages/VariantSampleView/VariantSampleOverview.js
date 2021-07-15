@@ -391,7 +391,8 @@ class InterpretationController extends React.Component {
 
     render() {
         const { showACMGInvoker, globalACMGSelections, autoClassification } = this.state;
-        const { newVSLoading, newContext = null, context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const { newVSLoading, newContext = null, context, schemas, children, showInterpretation, interpretationTab, href,
+            caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const passProps = { schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
 
         // Pulling actions and checking for note errors with newcontext; use context if not present
@@ -425,11 +426,13 @@ class InterpretationController extends React.Component {
                     </div>
                     { showInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
+                            <InterpretationSpaceWrapper {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation}
+                                wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
                         </div> : null }
                     { showFallbackInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper isFallback {...{ autoClassification, actions, context }} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
+                            <InterpretationSpaceWrapper isFallback {...{ autoClassification, actions, context }} toggleInvocation={this.toggleInvocation}
+                                wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
                         </div> : null }
                 </div>
             </React.Fragment>
@@ -464,7 +467,7 @@ function ACMGInvoker(props) {
             </div>
             <ACMGScrollableList {...{ setACMGStrengthPopover, invoked, acmgTip, toggleInvocation }} />
             { acmgStrengthPopover ?
-                <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} placement="bottom" rootClose rootCloseEvent="click" onHide={useCallback(function(e){ setPopover(null); })}>
+                <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} transition={true} placement="bottom" >
                     { acmgStrengthPopoverJSX }
                 </Overlay>: null }
         </div>
@@ -485,29 +488,29 @@ function ACMGScrollableList(props) {
     );
 }
 
-class ACMGInvokableRule extends React.Component {
-    constructor(props) {
-        super(props);
-        this.ref = React.createRef();
-        this.toggleRuleStrengthOptions = this.toggleRuleStrengthOptions.bind(this);
+function ACMGInvokableRule(props) {
+    const thisRef = useRef(null);
+    const { rule, strength, description, acmgTip } = props;
+
+    function toggleRuleStrengthOptions() {
+        const { rule, strength, setACMGStrengthPopover, acmgStrengthPopover,  toggleInvocation } = props;
+        toggleInvocation({ acmg_rule_name: rule, rule_strength: strength }, () => {
+            if (!acmgStrengthPopover) {
+                setACMGStrengthPopover({
+                    target: thisRef,
+                    jsx: getACMGRulePopover(rule, strength, "Pathogenic")
+                });
+            } else {
+                setACMGStrengthPopover(null);
+            }
+        });
     }
 
-    toggleRuleStrengthOptions() {
-        const { rule, strength, setACMGStrengthPopover, toggleInvocation } = this.props;
-        // console.log("this.ref.current", this.ref.current);
-        toggleInvocation({ acmg_rule_name: rule, rule_strength: strength });
-        setACMGStrengthPopover(this.ref, <div>Hello I am a popover</div>);
-    }
-
-    render() {
-        const { rule, strength,  description, acmgTip } = this.props;
-
-        return (
-            <div ref={this.ref} className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={!!strength}
-                onClick={() => this.toggleRuleStrengthOptions()} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
-                { rule }
-            </div>);
-    }
+    return (
+        <div ref={thisRef} className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={!!strength}
+            onClick={() => toggleRuleStrengthOptions()} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
+            { rule }
+        </div>);
 }
 
 // function calculateACMGRuleStrengthOptions(ruleStrength, evidenceType) {
@@ -525,6 +528,19 @@ class ACMGInvokableRule extends React.Component {
 
 //     return ruleStrengthOptions;
 // }
+
+function getACMGRulePopover(rule, selectedStrength, evidenceType) {
+
+    return (
+        <Popover id="test">
+            <Popover.Title className="m-0" as="h4">{rule}</Popover.Title>
+            <Popover.Content>
+                <ul>
+                    <li className="selected text-warning">{ selectedStrength }</li>
+                </ul>
+            </Popover.Content>
+        </Popover>);
+}
 
 function QuickPopover(props) {
     const { title, content, className, popID, tooltip } = props || {};
