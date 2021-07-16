@@ -294,6 +294,7 @@ class InterpretationController extends React.Component {
 
         this.toggleACMGInvoker = this.toggleACMGInvoker.bind(this);
         this.toggleInvocation = this.toggleInvocation.bind(this);
+        this.invokeAtStrength = this.invokeAtStrength.bind(this);
 
         this.memoized = {
             flattenGlobalACMGStateIntoArray: memoize(acmgUtil.flattenStateMapIntoArray)
@@ -354,8 +355,26 @@ class InterpretationController extends React.Component {
         this.setState({ showACMGInvoker: !showACMGInvoker }, callback);
     }
 
-    invokeAtStrength(criteria, strength, callback) {
+    invokeAtStrength(criteria, callback) {
+        console.log("invokeAtStrength", criteria, this);
+        const { acmg_rule_name: rule = criteria, rule_strength: strength } = criteria;
 
+        const { globalACMGSelections = {} } = this.state;
+        const newInvocations = { ...globalACMGSelections };
+
+        if (newInvocations[rule] && newInvocations[rule] !== strength) {
+            this.classifier.uninvoke(rule, newInvocations[rule]);
+            this.classifier.invoke(rule, strength);
+            newInvocations[rule] = strength;
+        } else {
+            this.classifier.invoke(rule, strength);
+            newInvocations[rule] = strength;
+        }
+
+        const classification = this.classifier.getClassification();
+
+        const newState = { globalACMGSelections: newInvocations, autoClassification: classification };
+        this.setState(newState, () => callback ? callback(newState): undefined );
     }
 
 
@@ -388,7 +407,7 @@ class InterpretationController extends React.Component {
 
         const newState = { globalACMGSelections: newInvocations, autoClassification: classification };
 
-        this.setState(newState, () => callback(newState));
+        this.setState(newState, () => callback ? callback(newState): undefined);
     }
 
     render() {
@@ -418,7 +437,7 @@ class InterpretationController extends React.Component {
             <React.Fragment>
                 <Collapse in={showACMGInvoker && newContext}>
                     <div>{/** Collapse seems not to work without wrapper element */}
-                        <ACMGInvoker invokedFromSavedNote={acmg_rules_invoked} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} />
+                        <ACMGInvoker invokedFromSavedNote={acmg_rules_invoked} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} invokeAtStrength={this.invokeAtStrength} />
                     </div>
                 </Collapse>
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
@@ -446,7 +465,7 @@ class InterpretationController extends React.Component {
  * 28 ACMG Rules, made clickable and "invokable"; uses passed in methods/state from InterpretationController.
  */
 function ACMGInvoker(props) {
-    const { globalACMGSelections: invoked = {}, toggleInvocation } = props || {};
+    const { globalACMGSelections: invoked = {}, toggleInvocation, invokeAtStrength } = props || {};
 
     const acmgTip = (criteria, description) => ( criteria && description ? `<h5 class="my-0 mw-10 text-600">${criteria}</h5><div style="max-width: 250px">${description}</div>`: null);
 
@@ -467,7 +486,7 @@ function ACMGInvoker(props) {
                     </div>
                 }/>
             </div>
-            <ACMGScrollableList {...{ setACMGStrengthPopover, invoked, acmgTip, toggleInvocation }} />
+            <ACMGScrollableList {...{ setACMGStrengthPopover, invoked, acmgTip, toggleInvocation, invokeAtStrength }} />
             { acmgStrengthPopover ?
                 <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} transition={true} placement="bottom" >
                     { acmgStrengthPopoverJSX }
@@ -477,14 +496,14 @@ function ACMGInvoker(props) {
 }
 
 function ACMGScrollableList(props) {
-    const { invoked, setACMGStrengthPopover, acmgTip, toggleInvocation } = props;
+    const { invoked, setACMGStrengthPopover, acmgTip, toggleInvocation, invokeAtStrength } = props;
 
     return (
         <div className="d-flex acmg-guidelines-invoker align-items-center">
             {acmgUtil.rules.map((rule) => {
                 const { [rule]: { description } = {} } = acmgUtil.metadata;
                 const strength = invoked[rule];
-                return <ACMGInvokableRule key={rule} {...{ rule, strength, acmgTip, setACMGStrengthPopover, toggleInvocation, description }} />;
+                return <ACMGInvokableRule key={rule} {...{ rule, strength, acmgTip, setACMGStrengthPopover, toggleInvocation, description, invokeAtStrength }} />;
             })}
         </div>
     );
@@ -492,14 +511,14 @@ function ACMGScrollableList(props) {
 
 function ACMGInvokableRule(props) {
     const thisRef = useRef(null);
-    const { rule, strength, description, acmgTip, toggleInvocation, setACMGStrengthPopover, acmgStrengthPopover } = props;
+    const { rule, strength, description, acmgTip, toggleInvocation, setACMGStrengthPopover, acmgStrengthPopover, invokeAtStrength } = props;
 
     function toggleRuleStrengthOptions(newState) {
         const { globalACMGSelections: { [rule]: newStrength } = {} } = newState;
         if (!acmgStrengthPopover) {
             setACMGStrengthPopover({
                 target: thisRef,
-                jsx: generateACMGRulePopover(rule, newStrength)
+                jsx: generateACMGRulePopover(rule, newStrength, invokeAtStrength)
             });
         } else {
             setACMGStrengthPopover(null);
@@ -527,9 +546,9 @@ function calculateACMGRuleStrengthOptions(rule, selectedStrength) {
     // Populate list of strengths
     let possibleStrengths;
     if (evidenceType === "benign") {
-        possibleStrengths = ["supporting", "strong", "standalone"];
+        possibleStrengths = ["Supporting", "Strong", "Standalone"];
     } else { // Pathogenic
-        possibleStrengths = ["supporting", "moderate", "strong", "vstrong"];
+        possibleStrengths = ["Supporting", "Moderate", "Strong", "Very Strong"];
     }
 
     possibleStrengths.forEach((strength) => {
@@ -546,7 +565,7 @@ function calculateACMGRuleStrengthOptions(rule, selectedStrength) {
     return ruleStrengthOptions;
 }
 
-function generateACMGRulePopover(rule, selectedStrength) {
+function generateACMGRulePopover(rule, selectedStrength, invokerFx) {
     const strengthOptions = calculateACMGRuleStrengthOptions(rule, selectedStrength);
 
     return (
@@ -557,7 +576,7 @@ function generateACMGRulePopover(rule, selectedStrength) {
                     { strengthOptions.map((options) => {
                         const { strengthOption, selected = false, defaultStr = false } = options;
                         return (
-                            <button type="button" key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active': ""}`}>
+                            <button type="button" onClick={() => invokerFx({ acmg_rule_name: rule, rule_strength: ( defaultStr ? "Default" : strengthOption ) })} key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active': ""}`}>
                                 {rule}_{ strengthOption } { defaultStr ? "(default)": null }
                             </button>);
                     })}
