@@ -818,7 +818,6 @@ function ACMGPicker(props) {
         return null;
     }
 
-    // TODO update this
     const fieldSchema = getFieldProperties(field);
     const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
 
