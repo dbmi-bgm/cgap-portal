@@ -518,7 +518,7 @@ function ACMGInvokableRule(props) {
         if (!acmgStrengthPopover) {
             setACMGStrengthPopover({
                 target: thisRef,
-                jsx: generateACMGRulePopover(rule, newStrength, invokeAtStrength)
+                jsx: generateACMGRulePopover(rule, newStrength, invokeAtStrength, setACMGStrengthPopover)
             });
         } else {
             setACMGStrengthPopover(null);
@@ -565,7 +565,7 @@ function calculateACMGRuleStrengthOptions(rule, selectedStrength) {
     return ruleStrengthOptions;
 }
 
-function generateACMGRulePopover(rule, selectedStrength, invokerFx) {
+function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStrengthPopoverFx) {
     const strengthOptions = calculateACMGRuleStrengthOptions(rule, selectedStrength);
 
     return (
@@ -576,7 +576,8 @@ function generateACMGRulePopover(rule, selectedStrength, invokerFx) {
                     { strengthOptions.map((options) => {
                         const { strengthOption, selected = false, defaultStr = false } = options;
                         return (
-                            <button type="button" onClick={() => invokerFx({ acmg_rule_name: rule, rule_strength: ( defaultStr ? "Default" : strengthOption ) })} key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active': ""}`}>
+                            <button type="button" onClick={() => invokerFx({ acmg_rule_name: rule, rule_strength: ( defaultStr ? "Default" : strengthOption ) }, () => setACMGStrengthPopoverFx(null))}
+                                key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active': ""}`}>
                                 {rule}_{ strengthOption } { defaultStr ? "(default)": null }
                             </button>);
                     })}
