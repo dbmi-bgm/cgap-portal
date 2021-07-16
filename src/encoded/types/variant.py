@@ -3,6 +3,14 @@ import io
 import json
 import os
 from urllib.parse import parse_qs, urlparse
+from pyramid.httpexceptions import (
+    HTTPBadRequest,
+    HTTPServerError
+)
+from pyramid.traversal import find_resource
+from dcicutils import ff_utils
+from dcicutils.misc_utils import VirtualApp
+from pyramid.paster import get_app
 
 import boto3
 import negspy.coordinates as nc
@@ -14,11 +22,14 @@ from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
+from snovault.embed import make_subrequest
 
 from encoded.ingestion.common import CGAP_CORE_PROJECT
 from encoded.inheritance_mode import InheritanceMode
 from encoded.util import resolve_file_path
 from encoded.types.base import Item, get_item_or_none
+
+from ..custom_embed import CustomEmbed
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
@@ -585,6 +596,209 @@ class VariantSample(Item):
                 else:
                     associated_genelists.append(genelist_title)
         return associated_genelists
+
+
+
+@view_config(
+    name='process-notes',
+    context=VariantSample,
+    request_method='PATCH',
+    permission='edit'
+)
+def process_notes(context, request):
+    """
+    Accepts (may be extended in future):
+        {
+            "save_to_project_notes" : {
+                "variant_notes": UUID,
+                "gene_notes": UUID,
+                "interpretation": UUID,
+                "discovery_interpretation": UUID,
+            }
+        }
+    """
+
+    request_body = request.json
+    stpn = request_body["save_to_project_notes"]
+    ln = {} # 'loaded notes'
+
+    def validate_and_load_note(note_type_name):
+        # Initial Validation - ensure each requested UUID is present in own properties and editable
+        if note_type_name in stpn:
+
+            # Compare UUID submitted vs UUID present on VS Item
+            if stpn[note_type_name] != context.properties[note_type_name]:
+                raise HTTPBadRequest("Not all submitted Note UUIDs are present on VariantSample.")
+
+            # Get @@object view of Note to check permissions, status, etc.
+            loaded_note = request.embed("/" + stpn[note_type_name], "@@object", as_user=True)
+            item_resource = find_resource(request.root, loaded_note["@id"])
+            if not request.has_permission("edit", item_resource):
+                raise HTTPBadRequest("No edit permission for at least one submitted Note UUID.")
+
+            ln[note_type_name] = loaded_note
+
+    for note_type_name in ["interpretation", "discovery_interpretation", "variant_notes", "gene_notes"]:
+        validate_and_load_note(note_type_name)
+
+    if len(ln) == 0:
+        raise HTTPBadRequest("No Note UUIDs supplied.")
+
+    variant = None
+    genes = None
+
+
+    variant_patch_payload = {} # Can be converted to dict of variants if need to PATCH multiple in future
+    genes_patch_payloads = {} # Keyed by @id, along with `note_patch_payloads`
+    note_patch_payloads = {}
+
+    need_variant_patch = "interpretation" in stpn \
+        or "discovery_interpretation" in stpn \
+        or "variant_notes" in stpn
+
+    need_gene_patch = "discovery_interpretation" in stpn \
+        or "gene_notes" in stpn
+
+
+    if need_variant_patch or need_gene_patch:
+        variant_uuid = context.properties["variant"]
+        variant_fields = [
+            "@id",
+            "interpretations",              # These come back in form of @id (not uuid). Contains 's' at end, unlike VS field.
+            "discovery_interpretations",    # These come back in form of @id (not uuid). Contains 's' at end, unlike VS field.
+            "variant_notes"                 # These come back in form of @id (not uuid)
+        ]
+
+        if need_gene_patch:
+            variant_fields.append("genes.genes_most_severe_gene.@id")
+            variant_fields.append("genes.genes_most_severe_gene.discovery_interpretations")
+            variant_fields.append("genes.genes_most_severe_gene.gene_notes")
+
+        variant_embed = CustomEmbed(request, variant_uuid, embed_props={ "requested_fields": variant_fields })
+        variant = variant_embed.result
+
+        if need_gene_patch:
+            genes = [ gene_subobject["genes_most_severe_gene"] for gene_subobject in variant["genes"] ]
+
+
+
+    # Set or extend variant.interpretations, discovery_interpretations, and variant_notes
+    if "interpretation" in ln:
+        # Add to Variant.interpretations
+        if not variant.get("interpretations"):
+            variant_patch_payload["interpretations"] = [
+                ln["interpretation"]["@id"]
+            ]
+        elif ln["interpretation"]["@id"] not in variant["interpretations"]: # 's'
+            # TODO: If note from same project (?) then replace existing note and make new note point to it as
+            # a linked list.
+            variant_patch_payload["interpretations"] = variant["interpretations"]
+            variant_patch_payload["interpretations"].append(ln["interpretation"]["@id"])
+
+        # Update Note status if is not already current.
+        # Note fields "approved_by" and "approved_date" are set by PATCH/item-edit handler for Note Items, not here.
+        if ln["interpretation"]["status"] != "current":
+            note_patch_payloads[ln["interpretation"]["@id"]] = { "status" : "current" }
+
+    if "discovery_interpretation" in ln:
+        # Add to Variant.discovery_interpretations
+        if not variant.get("discovery_interpretations"): # 's'
+            variant_patch_payload["discovery_interpretations"] = [
+                ln["discovery_interpretation"]["@id"]
+            ]
+        elif ln["discovery_interpretation"]["@id"] not in variant["discovery_interpretations"]: # 's'
+            variant_patch_payload["discovery_interpretations"] = variant["discovery_interpretations"]
+            variant_patch_payload["discovery_interpretations"].append(ln["discovery_interpretation"]["@id"])
+
+        # Add to Gene.discovery_interpretations
+        for gene in genes:
+            if not gene.get("discovery_interpretations"): # 's'
+                genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
+                genes_patch_payloads[gene["@id"]]["discovery_interpretations"] = [
+                    ln["discovery_interpretation"]["@id"]
+                ]
+            elif ln["discovery_interpretation"]["@id"] not in gene["discovery_interpretations"]: # 's'
+                genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
+                genes_patch_payloads[gene["@id"]]["discovery_interpretations"] = gene["discovery_interpretations"]
+                genes_patch_payloads[gene["@id"]]["discovery_interpretations"].append(ln["discovery_interpretation"]["@id"])
+
+        # Update Note status if is not already current.
+        if ln["discovery_interpretation"]["status"] != "current":
+            note_patch_payloads[ln["discovery_interpretation"]["@id"]] = { "status" : "current" }
+
+
+    if "variant_notes" in ln:
+        if not variant.get("variant_notes"):
+            variant_patch_payload["variant_notes"] = [
+                ln["variant_notes"]["@id"]
+            ]
+        elif ln["variant_notes"]["@id"] not in variant["variant_notes"]: # 's'
+            variant_patch_payload["variant_notes"] = variant["variant_notes"]
+            variant_patch_payload["variant_notes"].append(ln["variant_notes"]["@id"])
+
+        # Update Note status if is not already current.
+        if ln["variant_notes"]["status"] != "current":
+            note_patch_payloads[ln["variant_notes"]["@id"]] = { "status" : "current" }
+
+    if "gene_notes" in ln:
+        # Add to Gene.gene_notes
+        for gene in genes:
+            if not gene.get("gene_notes"): # 's'
+                genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
+                genes_patch_payloads[gene["@id"]]["gene_notes"] = [
+                    ln["gene_notes"]["@id"]
+                ]
+            elif ln["gene_notes"]["@id"] not in gene["gene_notes"]: # 's'
+                genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
+                genes_patch_payloads[gene["@id"]]["gene_notes"] = gene["gene_notes"]
+                genes_patch_payloads[gene["@id"]]["gene_notes"].append(ln["gene_notes"]["@id"])
+
+        # Update Note status if is not already current.
+        if ln["gene_notes"]["status"] != "current":
+            note_patch_payloads[ln["gene_notes"]["@id"]] = { "status" : "current" }
+
+
+    # Perform the PATCHes!
+
+    # TODO: Consider parallelizing.
+    # Currently - Gene and Variant patches are performed first before Note status is updated.
+    # This is in part to simplify UI logic where only Note status is checked to assert if a Note is already saved to Project.
+
+    def perform_patch(item_atid, patch_payload):
+        patch_subreq = make_subrequest(request, item_atid, "PATCH", patch_payload)
+        patch_result = request.invoke_subrequest(patch_subreq)
+        if patch_result["status"] != "success":
+            raise HTTPServerError("Couldn't update Item " + item_atid)
+        print("\nPATCH RESULT\n", patch_result)
+
+    gene_patch_count = 0
+    if need_gene_patch:
+        for gene_atid, gene_payload in genes_patch_payloads.items():
+            perform_patch(gene_atid, gene_payload)
+            gene_patch_count += 1
+
+    variant_patch_count = 0
+    if need_variant_patch:
+        perform_patch(variant["@id"], variant_patch_payload)
+        variant_patch_count += 1
+
+    note_patch_count = 0
+    for note_atid, note_payload in note_patch_payloads.items():
+        perform_patch(note_atid, note_payload)
+        note_patch_count += 1
+
+
+    return {
+        "success" : True,
+        "patch_results": {
+            "Gene": gene_patch_count,
+            "Variant": variant_patch_count,
+            "Note": note_patch_count,
+        }
+    }
+
+
+
 
 
 @collection(

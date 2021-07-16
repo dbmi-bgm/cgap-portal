@@ -40,10 +40,11 @@ class CustomEmbed:
 
     def __init__(self, request, item, embed_props):
         self.request = request
-        self.ignored_embeds = embed_props["ignored_embeds"]
-        self.desired_embeds = embed_props["desired_embeds"]
-        self.embed_depth = embed_props["embed_depth"]
-        self.requested_fields = embed_props["requested_fields"]
+        self.ignored_embeds = embed_props.get("ignored_embeds", [])
+        self.desired_embeds = embed_props.get("desired_embeds", [])
+        self.embed_depth = embed_props.get("embed_depth", 4)
+        self.requested_fields = embed_props.get("requested_fields", [])
+
         self.cache = {}
         self.invalid_ids = []
         if self.requested_fields:

@@ -63,7 +63,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                     <CaseSpecificSelectionsPanel {...commonProps} />
                 </NoteSubSelectionStateController>
                 <hr />
-                <VariantSampleSelectionList {...commonProps} parentTabType={parentTabTypes.FINALIZECASE} />
+                <VariantSampleSelectionList {...commonProps} parentTabType={parentTabTypes.CASEREVIEW} />
             </div>
         </React.Fragment>
     );
@@ -152,7 +152,6 @@ class SaveNotesToProjectButton extends React.PureComponent {
         const notePatchPayloads = {};
 
         const checkIfCompleted = () => {
-            console.log("TTT", requestCount, requestCompletedCount);
             // Check if all requests have completed, and call `onComplete` if so.
             if (requestCount === requestCompletedCount) {
                 onComplete({ variantPatchPayloads, genePatchPayloads, notePatchPayloads });
