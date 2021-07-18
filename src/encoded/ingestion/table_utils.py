@@ -1074,6 +1074,96 @@ class VariantTableParser(object):
         return inserts
 
 
+class StructuralVariantTableParser(VariantTableParser):
+    """
+    Subclass of VariantTableParser used for intake of SV mapping table.
+
+    Note: this class differs from the parent class in two important ways:
+        - it is designed only to update the 'properties' field of the
+           relevant schema
+        - it does not create annotation field inserts.
+    """
+    SV_SCHEMA_PATH = resolve_file_path("schemas/structural_variant.json")
+    SV_SAMPLE_SCHEMA_PATH = resolve_file_path("schemas/structural_variant_sample.json")
+    EMBEDDED_VARIANT_FIELDS = resolve_file_path("schemas/structural_variant_embeds.json")
+    EMBEDDED_VARIANT_SAMPLE_FIELDS = resolve_file_path(
+        "schemas/structural_variant_sample_embeds.json"
+    )
+    EMBEDS_TO_GENERATE = [
+        ("variant", EMBEDDED_VARIANT_FIELDS),
+        ("variant_sample", EMBEDDED_VARIANT_SAMPLE_FIELDS),
+    ]
+
+    # Rather than rewriting existing schema fields that aren't in mapping table,
+    # declare them here.
+    # NOTE: Check/update these lists for each mapping table intake
+    SV_PROPERTIES_TO_KEEP = ["annotation_id", "variant_notes"] 
+    SV_SAMPLE_PROPERTIES_TO_KEEP = [
+        "annotation_id",
+        "bam_snapshot",
+        "discovery_interpretation",
+        "file",
+        "gene_notes",
+        "interpretation",
+        "structural_variant",
+        "variant_notes",
+    ]
+
+    @staticmethod
+    def generate_schema(self, var_props, old_schema, props_to_keep):
+        """
+        Generate new schema by updating the properties of the old schema
+        according to the new mapping table, leaving the remainder of the
+        schema the same. 
+
+        :params :
+
+        :returns :
+        """
+        schema = {}
+        for key in old_schema:
+            if key != "properties":
+                schema[key] = old_schema[key]
+        schema["properties"] = var_props
+        for field in props_to_keep:
+            try:
+                schema["properties"][field] = old_schema["properties"][field]
+            except KeyError:
+                raise MappingTableIntakeException(
+                    "Expected field '%s' not found within the 'properties' of the"
+                    " %s schema." % (field, old_schema["title"])
+                )
+        return schema
+
+    def run(self, write=True):
+        """
+        Runs mapping table intake for SVs, writing new 'properties' fields
+        for structural variants and structural variant samples.
+
+        :params  :
+        :returns
+        """
+        inserts = self.process_annotation_field_inserts()
+        sv_props, _, _ = self.generate_properties(
+            self.filter_fields_by_variant(inserts)
+        )
+        sv_sample_props, _, _ = self.generate_properties(
+            self.filter_fields_by_sample(inserts), variant=False
+        )
+        old_sv_schema = json.load(io.open(self.SV_SCHEMA_PATH))
+        old_sv_sample_schema = json.load(io.open(self.SV_SAMPLE_SCHEMA_PATH))
+        new_sv_schema = self.generate_schema(
+            sv_props, old_sv_schema, self.SV_PROPERTIES_TO_KEEP
+        )
+        new_sv_sample_schema = self.generate_schema(
+            sv_sample_props, old_sv_sample_schema, self.SV_SAMPLE_PROPERTIES_TO_KEEP
+        )
+        if write:
+            self.write_schema(new_sv_schema, self.SV_SCHEMA_PATH)
+            self.write_schema(new_sv_sample_schema, self.SV_SAMPLE_SCHEMA_PATH)
+            logger.info("Successfully wrote schemas")
+
+
 class GeneTableParser(VariantTableParser):
     """ Subclass of MappingTableParser that overrides methods required for any differences across tables. """
 
