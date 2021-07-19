@@ -138,7 +138,7 @@ To build production-ready bundles, do::
 
 To build development bundles and continue updating them as you edit source files, run::
 
-   $ npm run dev
+   $ npm run dev-quick
 
 The development bundles are not minified, to speed up building.
 
