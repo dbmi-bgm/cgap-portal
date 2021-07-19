@@ -1,20 +1,15 @@
 'use strict';
 
-import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
 import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 import Overlay from 'react-bootstrap/esm/Overlay';
-import Button from 'react-bootstrap/esm/Button';
 import memoize from 'memoize-one';
 import Popover  from 'react-bootstrap/esm/Popover';
-import SplitButton from 'react-bootstrap/esm/SplitButton';
-import DropdownButton from 'react-bootstrap/esm/DropdownButton';
-import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import Collapse from 'react-bootstrap/esm/Collapse';
-import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+import { console, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { acmgUtil } from '../../util';
 import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
