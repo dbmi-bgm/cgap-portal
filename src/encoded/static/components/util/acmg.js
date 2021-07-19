@@ -88,7 +88,10 @@ export class AutoClassify {
      * @returns {boolean}
      */
     static isPathogenic(vstrong, strong, moderate, supporting){
-        if (vstrong >= 1) {                             // (i) 1 Very strong (PVS1) AND
+        if (vstrong > 1) {
+            return true;    // Modded ACMG Rule -- since 1 strong and 1 very strong === pathogenic, 2 very strongs should equal pathogenic
+        }
+        if (vstrong === 1) {                             // (i) 1 Very strong (PVS1) AND
             if ((strong >= 1) ||                        //      a) ≥1 Strong (PS1–PS4) OR
                 (moderate >= 2) ||                      //      b) ≥2 Moderate (PM1–PM6) OR
                 (moderate === 1 && supporting === 1) || //      c) 1 Moderate (PM1–PM6) and 1 supporting (PP1–PP5) OR
