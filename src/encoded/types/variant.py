@@ -628,13 +628,15 @@ def process_notes(context, request):
 
             # Compare UUID submitted vs UUID present on VS Item
             if stpn[note_type_name] != context.properties[note_type_name]:
-                raise HTTPBadRequest("Not all submitted Note UUIDs are present on VariantSample.")
+                raise HTTPBadRequest("Not all submitted Note UUIDs are present on VariantSample. " + \
+                    "Check 'save_to_project_notes." + note_type_name + "'.")
 
             # Get @@object view of Note to check permissions, status, etc.
             loaded_note = request.embed("/" + stpn[note_type_name], "@@object", as_user=True)
             item_resource = find_resource(request.root, loaded_note["@id"])
             if not request.has_permission("edit", item_resource):
-                raise HTTPBadRequest("No edit permission for at least one submitted Note UUID.")
+                raise HTTPBadRequest("No edit permission for at least one submitted Note UUID. " + \
+                    "Check 'save_to_project_notes." + note_type_name + "'.")
 
             ln[note_type_name] = loaded_note
 
@@ -765,8 +767,18 @@ def process_notes(context, request):
     # This is in part to simplify UI logic where only Note status is checked to assert if a Note is already saved to Project.
 
     def perform_patch(item_atid, patch_payload):
-        patch_subreq = make_subrequest(request, item_atid, "PATCH", patch_payload)
-        patch_result = request.invoke_subrequest(patch_subreq)
+        print("\nPATCH REQUEST\n", item_atid, patch_payload)
+        request.remote_user = "alexander_balashov@hms.harvard.edu"
+        request.environ["REMOTE_USER"] = "EMBED"
+        patch_subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=True)
+        #patch_subreq.remote_user = "EMBED"
+        #patch_subreq.environ["REMOTE_USER"] = "EMBED"
+        del patch_subreq.environ['HTTP_COOKIE']
+        patch_subreq.authorization = None
+
+        # import pdb; pdb.set_trace()
+        
+        patch_result = request.invoke_subrequest(patch_subreq).json_body
         if patch_result["status"] != "success":
             raise HTTPServerError("Couldn't update Item " + item_atid)
         print("\nPATCH RESULT\n", patch_result)

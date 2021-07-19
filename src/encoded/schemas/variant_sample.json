@@ -620,6 +620,12 @@
         "interpretation.classification": {
             "title": "Classification",
             "default_hidden": true
+        },
+        "project": {
+            "title": "Project",
+            "description": "Project to which this Sample Variant belongs to.",
+            "order": 200,
+            "default_hidden": true
         }
     },
     "facets": {
