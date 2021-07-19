@@ -572,7 +572,7 @@ function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStren
         <Popover id={"acmg-strength-pop-"+rule}>
             <Popover.Title className="m-0" as="h4">Select ACMG Rule Strength</Popover.Title>
             <Popover.Content className="p-0">
-                <div className="list-group list-group-flush acmg-strengths">
+                <div className="list-group list-group-flush acmg-popover-strengths">
                     { strengthOptions.map((options) => {
                         const { strengthOption, selected = false, defaultStr = false } = options;
 
@@ -584,7 +584,8 @@ function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStren
 
                         return (
                             <button type="button" disabled={selected} onClick={() => invokerFx({ acmg_rule_name: rule, rule_strength: ( defaultStr ? "Default" : strengthOption ) }, () => setACMGStrengthPopoverFx(null))}
-                                key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active disabled': ""}`}>
+                                key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active disabled': ""}`}
+                                data-criteria={rule} data-invoked={selected}>
                                 {rule}{ defaultStr ? null: "_" + (strengthOptionNoSpaces || strengthOption) }
                             </button>);
                     })}
