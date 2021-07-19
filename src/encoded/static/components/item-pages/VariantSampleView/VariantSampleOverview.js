@@ -467,6 +467,13 @@ function ACMGInvoker(props) {
     const [ acmgStrengthPopover, setACMGStrengthPopover ] = useState(null);
     const { target: targetIndicatorRef, jsx: acmgStrengthPopoverJSX } = acmgStrengthPopover || {};
 
+    function onRootClickHide(e) {
+        // If they clicked on another acmg rule, don't close popover after switching popover info
+        if (e.target.className !== targetIndicatorRef.current.className) {
+            setACMGStrengthPopover(null);
+        }
+    }
+
     return (
         <div className="card flex-row my-3 mt-0">
             <div className="text-600 acmg-guidelines-title">ACMG Rules
@@ -483,7 +490,8 @@ function ACMGInvoker(props) {
             </div>
             <ACMGScrollableList {...{ setACMGStrengthPopover, invoked, acmgTip, toggleInvocation, invokeAtStrength }} />
             { acmgStrengthPopover ?
-                <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} transition={true} placement="bottom">
+                <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} transition={true} placement="bottom"
+                    rootClose rootCloseEvent="click" onHide={onRootClickHide}>
                     { acmgStrengthPopoverJSX }
                 </Overlay>: null }
         </div>
