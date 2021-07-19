@@ -2,7 +2,10 @@ import logging
 import argparse
 from pyramid.paster import get_app
 from dcicutils.misc_utils import VirtualApp
-from encoded.ingestion.table_utils import VariantTableParser
+from encoded.ingestion.table_utils import (
+    VariantTableParser,
+    StructuralVariantTableParser,
+)
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
@@ -21,6 +24,7 @@ def main():
             --institution: institution to post under
             --write-schemas: default True, will write schemas to given output files
             --post-inserts: default False, will post inserts using testapp if specified
+            --structural-variant: default False, will use SV table parser
 
             config_uri: path to app config (usually production.ini)
             --app-name: app name, usually 'app'
@@ -49,15 +53,24 @@ def main():
                         help='If specified will write new schemas to given locations')
     parser.add_argument('--post-inserts', action='store_true', default=False,
                         help='If specified will post inserts, by default False')
+    parser.add_argument('--structural_variant', action='store_true', default=False,
+                        help='If specified will use SV parser')
     args = parser.parse_args()
 
     # read/process mapping table, build inserts
     logger.info('Building annotations from mapping table: %s' % args.mp)
-    parser = VariantTableParser(args.mp, args.annotation_field_schema)
-    inserts = parser.run(args.sample, args.variant,
-                         institution=args.institution, project=args.project,
-                         write=args.write_schemas)
+    if args.structural_variant:
+        parser = StructuralVariantTableParser(args.mp, args.annotation_field_schema)
+        inserts = parser.run(  # Schema locations hard-coded for SVTableParser
+            project=args.project, institution=args.institution, write=args.write_schemas
+        )
+    else:
+        parser = VariantTableParser(args.mp, args.annotation_field_schema)
+        inserts = parser.run(args.sample, args.variant,
+                             institution=args.institution, project=args.project,
+                             write=args.write_schemas)
 
+    import pdb; pdb.set_trace()
     # if not a dry run try to post inserts
     if args.post_inserts:  # do imports here as they will fail in certain scenarios
         environ = {

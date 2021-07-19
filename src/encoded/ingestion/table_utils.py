@@ -1109,8 +1109,20 @@ class StructuralVariantTableParser(VariantTableParser):
         "variant_notes",
     ]
 
+    def provision_embeds(self):
+        """ 
+        Does setup necessary for writing embeds to JSON files in the
+        schemas directory.
+
+        Called by initializer based on EMBEDS_TO_GENERATE.
+        """
+        for field, f in self.EMBEDS_TO_GENERATE:
+            field = "structural_" + field
+            with io.open(f, 'w+') as fd:
+                json.dump({field: {}}, fd)
+
     @staticmethod
-    def generate_schema(self, var_props, old_schema, props_to_keep):
+    def generate_schema(var_props, old_schema, props_to_keep):
         """
         Generate new schema by updating the properties of the old schema
         according to the new mapping table, leaving the remainder of the
@@ -1121,21 +1133,16 @@ class StructuralVariantTableParser(VariantTableParser):
         :returns :
         """
         schema = {}
-        for key in old_schema:
-            if key != "properties":
-                schema[key] = old_schema[key]
-        schema["properties"] = var_props
         for field in props_to_keep:
-            try:
-                schema["properties"][field] = old_schema["properties"][field]
-            except KeyError:
-                raise MappingTableIntakeException(
-                    "Expected field '%s' not found within the 'properties' of the"
-                    " %s schema." % (field, old_schema["title"])
-                )
+            var_props[field] = old_schema["properties"][field]
+        for key in old_schema:
+            if key == "properties":
+                schema["properties"] = var_props
+            else:
+                schema[key] = old_schema[key]
         return schema
 
-    def run(self, write=True):
+    def run(self, project=None, institution=None, write=True):
         """
         Runs mapping table intake for SVs, writing new 'properties' fields
         for structural variants and structural variant samples.
@@ -1162,6 +1169,13 @@ class StructuralVariantTableParser(VariantTableParser):
             self.write_schema(new_sv_schema, self.SV_SCHEMA_PATH)
             self.write_schema(new_sv_sample_schema, self.SV_SAMPLE_SCHEMA_PATH)
             logger.info("Successfully wrote schemas")
+        if project or institution:
+            for insert in inserts:
+                if project:
+                    insert['project'] = project
+                if institution:
+                    insert['institution'] = institution
+        return inserts
 
 
 class GeneTableParser(VariantTableParser):
