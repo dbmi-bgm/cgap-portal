@@ -823,10 +823,17 @@ function ACMGPicker(props) {
 
     const picked = selections.map((selection, i) => {
         const { rule_strength: strength, acmg_rule_name: rule } = selection;
+
+        // Display "Very Strong" as "VeryStrong" to match ACMG standard instead of schema enum
+        let strengthNoSpaces;
+        if (strength === "Very Strong") {
+            strengthNoSpaces = strength.split(" ").join("");
+        }
+
         return (
             <div className={`acmg-invoker text-600 ${isFallback ? "unclickable" : "clickable"} text-monospace text-center mr-01 ml-01`} key={rule} data-criteria={rule} data-invoked={true}
                 data-tip={!isFallback ? "Click to deselect this rule": null} onClick={!isFallback ? () => toggleInvocation(selection): undefined}>
-                { rule }{ strength && strength !== "Default" ? ("_" + strength) : null }
+                { rule }{ strength && strength !== "Default" ? ("_" + (strengthNoSpaces || strength)) : null }
             </div>
         );
     });

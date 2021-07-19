@@ -488,7 +488,7 @@ function ACMGInvoker(props) {
             </div>
             <ACMGScrollableList {...{ setACMGStrengthPopover, invoked, acmgTip, toggleInvocation, invokeAtStrength }} />
             { acmgStrengthPopover ?
-                <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} transition={true} placement="bottom" >
+                <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} transition={true} placement="bottom">
                     { acmgStrengthPopoverJSX }
                 </Overlay>: null }
         </div>
@@ -575,10 +575,17 @@ function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStren
                 <div className="list-group list-group-flush acmg-strengths">
                     { strengthOptions.map((options) => {
                         const { strengthOption, selected = false, defaultStr = false } = options;
+
+                        // Display "Very Strong as VeryStrong"
+                        let strengthOptionNoSpaces;
+                        if (strengthOption === "Very Strong") {
+                            strengthOptionNoSpaces = strengthOption.split(" ").join("");
+                        }
+
                         return (
-                            <button type="button" onClick={() => invokerFx({ acmg_rule_name: rule, rule_strength: ( defaultStr ? "Default" : strengthOption ) }, () => setACMGStrengthPopoverFx(null))}
-                                key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active': ""}`}>
-                                {rule}_{ strengthOption } { defaultStr ? "(default)": null }
+                            <button type="button" disabled={selected} onClick={() => invokerFx({ acmg_rule_name: rule, rule_strength: ( defaultStr ? "Default" : strengthOption ) }, () => setACMGStrengthPopoverFx(null))}
+                                key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active disabled': ""}`}>
+                                {rule}{ defaultStr ? null: "_" + (strengthOptionNoSpaces || strengthOption) }
                             </button>);
                     })}
                 </div>
