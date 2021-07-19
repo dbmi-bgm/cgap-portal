@@ -546,7 +546,10 @@ function calculateACMGRuleStrengthOptions(rule, selectedStrength) {
     // Populate list of strengths
     let possibleStrengths;
     if (evidenceType === "benign") {
-        possibleStrengths = ["Supporting", "Strong", "Standalone"];
+        possibleStrengths = ["Supporting", "Strong"];
+        if (rule === "BA1") {
+            possibleStrengths.push("Standalone");
+        }
     } else { // Pathogenic
         possibleStrengths = ["Supporting", "Moderate", "Strong", "Very Strong"];
     }
