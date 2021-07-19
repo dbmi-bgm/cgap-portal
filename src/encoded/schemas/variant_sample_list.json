@@ -69,7 +69,8 @@
                         "type": "string",
                         "description": "Person who made this selection",
                         "serverDefault": "userid",
-                        "linkTo": "User"
+                        "linkTo": "User",
+                        "permission": "restricted_fields"
                     },
                     "date_selected": {
                         "title": "Date Selected",
@@ -82,7 +83,8 @@
                             {
                                 "format": "date"
                             }
-                        ]
+                        ],
+                        "permission": "restricted_fields"
                     }
                 }
             }
