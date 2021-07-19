@@ -10,5 +10,15 @@
         "individual": "5ec91041-78a0-4758-abef-21c7f5fd9f12",
         "cohort": "cc7d83a2-6886-4ca0-9402-7c49734cf111",
         "meta_workflow_run": "2a481229-03dd-44b9-b235-a8a005608262"
-    }
+    },
+    {
+        "case_id": "hms12345",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "shared",
+        "uuid": "9cbcf467-1e17-46e4-b26d-80ecd316476f",
+        "sample_processing": "33dcd73c-f48e-475b-84bb-7a4514750657",
+        "family": "415fa8aa-8482-43d0-a90a-540c0ee9c1e0",
+        "individual": "5ec91041-78a0-4758-abef-21c7f5fd9ffc"
+    }   
 ]

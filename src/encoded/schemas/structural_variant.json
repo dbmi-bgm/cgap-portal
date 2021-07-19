@@ -1,0 +1,161 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "institution",
+        "project",
+        "CHROM",
+        "START",
+        "END",
+        "SV_TYPE"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "annotation_id"
+    ],
+    "additionalProperties": false,
+    "title": "Structural Variant",
+    "description": "Schema for structural variants",
+    "id": "/profiles/structural_variant.json",
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/notes"
+        },
+        {
+            "$ref": "mixins.json#/interpretation"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        }
+    ],
+    "properties": {
+        "CHROM": {
+            "title": "Chromosome",
+            "field_name": "CHROM",
+            "vcf_field": "CHROM",
+            "type": "string",
+            "enum": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+                "13",
+                "14",
+                "15",
+                "16",
+                "17",
+                "18",
+                "19",
+                "20",
+                "21",
+                "22",
+                "X",
+                "Y",
+                "M"
+            ],
+            "description": "Chromosome",
+            "schema_title": "Chromosome"
+        },
+        "START": {
+            "title": "Start Position",
+            "field_name": "START",
+            "type": "integer",
+            "vcf_field": "POS",
+            "description": "Start Position",
+            "min": 1
+        },
+        "END": {
+            "title": "End Position",
+            "field_name": "END",
+            "type": "integer",
+            "vcf_field": "END",
+            "description": "End Position",
+            "min": 1
+        },
+        "SV_TYPE": {
+            "title": "Variant Type",
+            "field_name": "SV_TYPE",
+            "type": "string",
+            "enum": [
+                "DEL",
+                "DUP"
+            ],
+            "vcf_field": "SVTYPE",
+            "description": "The type of structural variant"
+        },
+        "annotation_id": {
+            "title": "Annotation ID",
+            "type": "string",
+            "uniqueKey": true
+        },
+        "variant_notes": {
+            "title": "Variant Notes",
+            "description": "Notes related to this Variant",
+            "type": "array",
+            "items": {
+                "title": "Variant Note",
+                "type": "string",
+                "linkTo": "NoteStandard"
+            }
+        },
+        "schema_version": {
+            "default": "1"
+        }
+    },
+    "facets": {
+        "CHROM": {
+            "title": "Chromosome",
+            "order": 1,
+            "grouping": "Position"
+        },
+        "START": {
+            "title": "Start Position",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 2,
+            "grouping": "Position"
+        },
+        "END": {
+            "title": "End Position",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 3,
+            "grouping": "Position"
+        },
+        "SV_TYPE": {
+            "title": "Variant Type",
+            "order": 10,
+            "grouping": "Variant Type"
+        }
+    }
+}

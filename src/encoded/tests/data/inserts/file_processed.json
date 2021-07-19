@@ -48,5 +48,25 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "submitted_by": "soohyun_lee@hms.harvard.edu"
+    },
+    {
+        "status": "shared",
+        "uuid": "6b113e31-d4dd-465a-99b2-16fb0c3928fb",
+        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa5",
+        "accession": "GAPFIFYGNO4A",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_type": "full annotated VCF",
+        "variant_type": "SV"
+    },
+    {
+        "status": "shared",
+        "uuid": "5593ddd6-13d1-4bf3-b412-bb0a01dfc922",
+        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa5",
+        "accession": "GAPFIFYGNO4B",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_type": "Higlass SV VCF",
+        "variant_type": "SV"
     }
 ]
