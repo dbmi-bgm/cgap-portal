@@ -17,6 +17,25 @@ def bgm_test_variant_sample2(bgm_test_variant_sample):
 
 
 @pytest.fixture
+def bgm_test_variant_sample_for_note_patch_process(institution, bgm_project):
+    # IS NOT pre-POSTed into DB.
+    return {
+        'status': 'in review',
+        'note_text': 'dummy text 1',
+        'project': bgm_project['@id'],
+        'institution': institution['@id']
+    }
+
+@pytest.fixture
+def bgm_test_variant_sample_for_note_patch_process2(bgm_test_variant_sample_for_note_patch_process):
+    # IS NOT pre-POSTed into DB.
+    bgm_test_variant_sample_for_note_patch_process_copy = bgm_test_variant_sample_for_note_patch_process.copy()
+    bgm_test_variant_sample_for_note_patch_process_copy['note_text'] = 'dummy text 2'
+    return bgm_test_variant_sample_for_note_patch_process_copy
+
+
+
+@pytest.fixture
 def y_variant(bgm_user_testapp, bgm_project, institution):
     item = {
         'project': bgm_project['@id'],
@@ -91,6 +110,41 @@ def test_variant_sample_list_post(bgm_user_testapp, variant_sample_list1):
     bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201)
 
 
+def test_variant_sample_patch_notes_process_success(bgm_user, bgm_user_testapp, bgm_test_variant_sample, bgm_test_variant_sample_for_note_patch_process, bgm_test_variant_sample_for_note_patch_process2):
+    
+    # Load up some data
+    note1 = bgm_user_testapp.post_json('/notes-standard', bgm_test_variant_sample_for_note_patch_process, status=201).json['@graph'][0]
+    note2 = bgm_user_testapp.post_json('/notes-interpretation', bgm_test_variant_sample_for_note_patch_process2, status=201).json['@graph'][0]
+
+    bgm_test_variant_sample_copy = bgm_test_variant_sample.copy()
+    bgm_test_variant_sample_copy['file'] = 'other-file-name2'
+    bgm_test_variant_sample_copy['variant_notes'] = note1['@id']
+    bgm_test_variant_sample_copy['interpretation'] = note2['@id']
+
+    variant_sample = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample_copy, status=201).json['@graph'][0]
+
+    # Test /@@process-notes/ endpoint
+    patch_process_payload = {
+        "save_to_project_notes" : {
+            "variant_notes": note1['uuid'],
+            "interpretation": note2['uuid']
+        }
+    }
+
+    resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@process-notes/", patch_process_payload, status=200).json['@graph'][0]
+
+    assert resp["success"] == True
+    assert resp["patch_results"]["Variant"] == 1
+    assert resp["patch_results"]["Note"] == 2
+
+    note1_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database", status = 200)
+    assert note1_reloaded["status"] == "current"
+
+    variant_reloaded = bgm_user_testapp.get(variant_sample["variant"]["@id"] + "?datastore=database", status = 200)
+    assert note1["@id"] in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
+    assert note2["@id"] in [ inp["@id"] for inp in variant_reloaded["interpretations"] ]
+
+
 def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_sample_list1, bgm_test_variant_sample, bgm_test_variant_sample2):
     vsl = bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201).json['@graph'][0]
     vs1 = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample, status=201).json['@graph'][0]
@@ -101,9 +155,6 @@ def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_s
             {
                 "variant_sample_item": vs1['@id'],
                 "filter_blocks_request_at_time_of_selection": '{"search_type":"VariantSample","global_flags":"CALL_INFO=NA12879_sample&file=GAPFI2VBKGM7&additional_facet=associated_genotype_labels.mother_genotype_label&additional_facet=associated_genotype_labels.father_genotype_label&sort=date_created","intersect":false,"filter_blocks":[{"query":"variant.genes.genes_most_severe_consequence.coding_effect=Missense","flags_applied":[]},{"query":"variant.mutanno_variant_class=SNV","flags_applied":[]}]}',
-                # Existing values for following 2 fields should be preserved -
-                "date_selected": "2021-01-25T16:41:47.787+00:00",
-                "userid" : "1234-test-1234"
             },
             {
                 "variant_sample_item": vs2['@id'],

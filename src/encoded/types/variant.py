@@ -768,15 +768,16 @@ def process_notes(context, request):
 
     def perform_patch(item_atid, patch_payload):
         print("\nPATCH REQUEST\n", item_atid, patch_payload)
-        request.remote_user = "alexander_balashov@hms.harvard.edu"
-        request.environ["REMOTE_USER"] = "EMBED"
+        request.remote_user = "EMBED"
+        #request.environ["REMOTE_USER"] = "EMBED"
         patch_subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=True)
         #patch_subreq.remote_user = "EMBED"
         #patch_subreq.environ["REMOTE_USER"] = "EMBED"
-        del patch_subreq.environ['HTTP_COOKIE']
-        patch_subreq.authorization = None
+        #if 'HTTP_COOKIE' in patch_subreq.environ:
+        #    del patch_subreq.environ['HTTP_COOKIE']
+        #patch_subreq.authorization = None
 
-        # import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         
         patch_result = request.invoke_subrequest(patch_subreq).json_body
         if patch_result["status"] != "success":

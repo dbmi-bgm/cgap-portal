@@ -178,8 +178,12 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         So basically this is used to do a login, instead of the actual
         login view... not sure why, but yeah..
         '''
+
         # we will cache it for the life of this request, cause pyramids does traversal
         cached = getattr(request, '_auth0_authenticated', _fake_user)
+
+        # print("AUTH1", cached, request.authorization)
+
         if cached is not _fake_user:
             return cached
 
@@ -195,6 +199,8 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
             return None
 
         email = request._auth0_authenticated = jwt_info['email'].lower()
+
+        # print("AUTH2", email, jwt_info, request.headers["Authorization"])
 
         # At this point, email has been authenticated with their Auth0 provider, but we don't know yet if this email is in our database.
         # If not authenticated (not in our DB), request.user_info will throw an HTTPUnauthorized error.
