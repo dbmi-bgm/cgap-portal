@@ -8,9 +8,7 @@ from pyramid.httpexceptions import (
     HTTPServerError
 )
 from pyramid.traversal import find_resource
-from dcicutils import ff_utils
-from dcicutils.misc_utils import VirtualApp
-from pyramid.paster import get_app
+from pyramid.request import Request
 
 import boto3
 import negspy.coordinates as nc
@@ -766,38 +764,45 @@ def process_notes(context, request):
     # Currently - Gene and Variant patches are performed first before Note status is updated.
     # This is in part to simplify UI logic where only Note status is checked to assert if a Note is already saved to Project.
 
-    def perform_patch(item_atid, patch_payload):
-        print("\nPATCH REQUEST\n", item_atid, patch_payload)
-        request.remote_user = "EMBED"
-        #request.environ["REMOTE_USER"] = "EMBED"
-        patch_subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=True)
-        #patch_subreq.remote_user = "EMBED"
-        #patch_subreq.environ["REMOTE_USER"] = "EMBED"
-        #if 'HTTP_COOKIE' in patch_subreq.environ:
-        #    del patch_subreq.environ['HTTP_COOKIE']
-        #patch_subreq.authorization = None
+    def perform_patch_as_user(item_atid, patch_payload):
+        subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=True)
+        patch_result = request.invoke_subrequest(subreq).json
 
-        #import pdb; pdb.set_trace()
-        
-        patch_result = request.invoke_subrequest(patch_subreq).json_body
         if patch_result["status"] != "success":
             raise HTTPServerError("Couldn't update Item " + item_atid)
-        print("\nPATCH RESULT\n", patch_result)
+
+    def perform_patch_as_admin(item_atid, patch_payload):
+
+        kwargs = {
+            "environ": request.environ,
+            "content_type": "application/json",
+        }
+        subreq = Request.blank(item_atid, **kwargs)
+        subreq.environ["PATH_INFO"] = item_atid
+        subreq.environ["REQUEST_METHOD"] = "PATCH"
+        subreq.environ["REMOTE_USER"] = "TEST"
+        subreq.json = patch_payload
+        patch_result = request.invoke_subrequest(subreq).json
+
+        if patch_result["status"] != "success":
+            raise HTTPServerError("Couldn't update Item " + item_atid)
+
+
 
     gene_patch_count = 0
     if need_gene_patch:
         for gene_atid, gene_payload in genes_patch_payloads.items():
-            perform_patch(gene_atid, gene_payload)
+            perform_patch_as_admin(gene_atid, gene_payload)
             gene_patch_count += 1
 
     variant_patch_count = 0
     if need_variant_patch:
-        perform_patch(variant["@id"], variant_patch_payload)
+        perform_patch_as_admin(variant["@id"], variant_patch_payload)
         variant_patch_count += 1
 
     note_patch_count = 0
     for note_atid, note_payload in note_patch_payloads.items():
-        perform_patch(note_atid, note_payload)
+        perform_patch_as_user(note_atid, note_payload)
         note_patch_count += 1
 
 

@@ -131,16 +131,17 @@ def test_variant_sample_patch_notes_process_success(bgm_user, bgm_user_testapp, 
         }
     }
 
-    resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@process-notes/", patch_process_payload, status=200).json['@graph'][0]
+    resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@process-notes/", patch_process_payload, status=200).json
 
     assert resp["success"] == True
     assert resp["patch_results"]["Variant"] == 1
     assert resp["patch_results"]["Note"] == 2
 
-    note1_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database", status = 200)
+    note1_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database&frame=object", status=200).json
     assert note1_reloaded["status"] == "current"
+    assert note1_reloaded["approved_by"] == bgm_user["@id"] # Ensure this is set for us
 
-    variant_reloaded = bgm_user_testapp.get(variant_sample["variant"]["@id"] + "?datastore=database", status = 200)
+    variant_reloaded = bgm_user_testapp.get(variant_sample["variant"] + "?datastore=database", status=200).json
     assert note1["@id"] in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
     assert note2["@id"] in [ inp["@id"] for inp in variant_reloaded["interpretations"] ]
 
