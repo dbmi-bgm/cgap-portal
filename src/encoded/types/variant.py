@@ -767,7 +767,7 @@ def process_notes(context, request):
     def perform_patch(item_atid, patch_payload, as_admin=False):
         subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=True)
         if as_admin:
-            subreq.remote_user = "TEST"
+            subreq.remote_user = "UPGRADE"
         patch_result = request.invoke_subrequest(subreq).json
 
         if patch_result["status"] != "success":
