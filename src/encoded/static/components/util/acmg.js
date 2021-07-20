@@ -39,6 +39,9 @@ export const metadata = {
  * Converts an array into a map of rules to invoked state
  * @param {Array} arr An array of invoked criteria
  * @returns {Object} structured such that { [ACMG_Rule]: rulestrength }
+ * Note: Uninvoked rules can be represented with a value of undefined (never invoked) or false (after first invocation);
+ * additionally, rules can be invoked at "Default" (in which the value used in auto-classification calculation will be taken
+ * from acmgUtil.metadata[rule].strength) or at a modded strength level.
  */
 export function criteriaArrayToStateMap(arr) {
     const stateObj = {};
@@ -76,6 +79,12 @@ export function flattenStateMapIntoArray(obj) {
 
 /**
  * Based on https://www.mgz-muenchen.com/files/Public/Downloads/2018/ACMG%20Classification%20of%20Sequence%20Variants.pdf (pg 3)
+ *
+ * Structured as a class so that a single instance can be initiated and then updated via invocation methods. Test calculations in browser console
+ * by instantiating a new class and attaching to window (see) ; this can be useful in determining whether bugs are due to calculation error or front-end
+ * code.
+ *
+ * Note: there is currently not a method to switch strengths of a rule already invoked; to do this uninvoke the old rule, and invoke the new one.
  */
 export class AutoClassify {
 

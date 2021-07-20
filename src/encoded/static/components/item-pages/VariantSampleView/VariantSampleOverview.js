@@ -299,17 +299,23 @@ class InterpretationController extends React.Component {
         this.classifier = null;
     }
 
+    // componentDidMount() { // use for testing ACMG auto classification calculation in browser console
+    //     if (window) {
+    //         window.acmgClass = new acmgUtil.AutoClassify([]);
+    //     }
+    // }
+
     componentDidUpdate(pastProps) {
         const { newContext = null, newVSLoading } = this.props;
         const { newContext: pastNC = null, newVSLoading: pastVSLoadStatus } = pastProps;
 
         // If just loaded new context
         if (!pastNC && !newVSLoading && newContext) {
-            console.log("log1: just loaded new context");
+            // console.log("log1: just loaded new context");
             this.initializeACMGFromContext();
         } else if (pastVSLoadStatus && !newVSLoading && !newContext) {
             // If just attempted to load new context and failed... do the same thing (it's handled slightly differently in-method)
-            console.log("log1: just failed at loading new context");
+            // console.log("log1: just failed at loading new context");
             this.initializeACMGFromContext();
         }
         console.log(`pastVSLoading=${pastVSLoadStatus}, newVSLoading=${newVSLoading}, newContext=${newContext}`);
@@ -320,7 +326,7 @@ class InterpretationController extends React.Component {
      */
     initializeACMGFromContext() {
         const { context = null, newContext = null } = this.props;
-        console.log("log1: initializing ACMG from context");
+        // console.log("log1: initializing ACMG from context");
 
         let acmg_rules_invoked;
         if (newContext) { // if new context is loaded in
@@ -332,7 +338,7 @@ class InterpretationController extends React.Component {
         }
 
         // Initialize classifier and prepare new state
-        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_rules_invoked);
+        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_rules_invoked); // object that maps { rule: strength }
         const classifier = new acmgUtil.AutoClassify(acmgSelections);
         const classification = classifier.getClassification();
         this.classifier = classifier;
