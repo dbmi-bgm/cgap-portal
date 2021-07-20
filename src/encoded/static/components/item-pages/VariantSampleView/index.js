@@ -93,8 +93,12 @@ class OverviewTabView extends React.Component {
                 "ids": [ uuid ],
                 "fields": [
                     "@id",
+                    "institution.@id",
+                    "project.@id",
 
                     // Variant and Gene Notes
+                    "gene_notes.@id",
+                    "gene_notes.uuid",
                     "gene_notes.status",
                     "gene_notes.approved_by.display_title",
                     "gene_notes.note_text",
@@ -102,6 +106,9 @@ class OverviewTabView extends React.Component {
                     "gene_notes.last_modified.date_modified",
                     "gene_notes.last_modified.modified_by.display_title",
                     "gene_notes.principles_allowed",
+                    "gene_notes.institution.@id",
+                    "gene_notes.project.@id",
+                    "variant_notes.@id",
                     "variant_notes.status",
                     "variant_notes.approved_by.display_title",
                     "variant_notes.note_text",
@@ -109,8 +116,12 @@ class OverviewTabView extends React.Component {
                     "variant_notes.last_modified.date_modified",
                     "variant_notes.last_modified.modified_by.display_title",
                     "variant_notes.principles_allowed",
+                    "variant_notes.institution.@id",
+                    "variant_notes.project.@id",
 
                     // Interpretation Notes
+                    "interpretation.@id",
+                    "interpretation.uuid",
                     "interpretation.status",
                     "interpretation.note_text",
                     "interpretation.conclusion",
@@ -121,8 +132,12 @@ class OverviewTabView extends React.Component {
                     "interpretation.last_modified.date_modified",
                     "interpretation.last_modified.modified_by.display_title",
                     "interpretation.principles_allowed",
+                    "interpretation.institution.@id",
+                    "interpretation.project.@id",
 
                     // Discovery Notes
+                    "discovery_interpretation.uuid",
+                    "discovery_interpretation.@id",
                     "discovery_interpretation.status",
                     "discovery_interpretation.note_text",
                     "discovery_interpretation.variant_candidacy",
@@ -131,7 +146,9 @@ class OverviewTabView extends React.Component {
                     "discovery_interpretation.approved_by.display_title",
                     "discovery_interpretation.last_modified.date_modified",
                     "discovery_interpretation.last_modified.modified_by.display_title",
-                    "discovery_interpretation.principles_allowed"
+                    "discovery_interpretation.principles_allowed",
+                    "discovery_interpretation.institution.@id",
+                    "discovery_interpretation.project.@id",
                 ]
             })
         );
