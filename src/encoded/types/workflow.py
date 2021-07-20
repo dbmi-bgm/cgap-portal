@@ -24,8 +24,9 @@ from .base import (
 
 
 TIBANNA_CODE_NAME = 'zebra'
-TIBANNA_WORKFLOW_RUNNER_LAMBDA_FUNCTION = 'run_workflow_zebra'
-TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION = 'status_wfr_zebra'
+# XXX: get this from env variable
+TIBANNA_WORKFLOW_RUNNER_LAMBDA_FUNCTION = 'run_workflow_zebra_cgap-mastertest'
+TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION = 'status_wfr_zebra_cgap-mastertest'
 
 ENV_WEBDEV = CGAP_ENV_WEBDEV
 
