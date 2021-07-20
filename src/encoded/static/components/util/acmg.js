@@ -4,6 +4,7 @@ import memoize from 'memoize-one';
 
 export const rules = ["BA1", "BS1", "BS2", "BS3", "BS4", "BP1", "BP2", "BP3", "BP4", "BP5", "BP6", "BP7", "PP1", "PP2", "PP3", "PP4", "PP5", "PM1", "PM2", "PM3", "PM4", "PM5", "PM6", "PS1", "PS2", "PS3", "PS4", "PVS1"];
 
+// Note: order key currently organizes rules from strongest benign evidence to strongest pathogenic evidence.
 export const metadata = {
     "BA1": { type: "benign", strength: "Standalone", order: 1, description: "Allele frequency is >5% in Exome Sequencing Project, 1000 Genomes Project, or Exome Aggregation Consortium" },
     "BS1": { type: "benign", strength: "Strong", order: 2, description: "Allele frequency is greater than expected for disorder (see Table 6)" },
@@ -37,8 +38,8 @@ export const metadata = {
 
 /**
  * Converts an array into a map of rules to invoked state
- * @param {Array} arr An array of invoked criteria
- * @returns {Object} structured such that { [ACMG_Rule]: rulestrength }
+ * @param {Array} arr An array of invoked criteria objects structured for/from acmg_guidelines_invoked field
+ * @returns {Object} structured such that { [ACMG_Rule]: rulestrength } for using in InterpretationController state
  * Note: Uninvoked rules can be represented with a value of undefined (never invoked) or false (after first invocation);
  * additionally, rules can be invoked at "Default" (in which the value used in auto-classification calculation will be taken
  * from acmgUtil.metadata[rule].strength) or at a modded strength level.
@@ -56,8 +57,8 @@ export function criteriaArrayToStateMap(arr) {
 
 /**
  * Converts a rule state map back into an array of invoked items
- * @param {Object} obj structured such that { [ACMG_Rule]: rulestrength }
- * @returns {Array} An array of invoked criteria, sorted from least to most pathogenic
+ * @param {Object} obj structured such that { [ACMG_Rule]: rulestrength } for using in InterpretationController state
+ * @returns {Array} An array of invoked criteria, sorted from least to most pathogenic (according to default rule strength)
  */
 export function flattenStateMapIntoArray(obj) {
     // Flatten into an array of invoked items
@@ -79,10 +80,10 @@ export function flattenStateMapIntoArray(obj) {
 
 /**
  * Based on https://www.mgz-muenchen.com/files/Public/Downloads/2018/ACMG%20Classification%20of%20Sequence%20Variants.pdf (pg 3)
+ * with additional consultation from https://www.nature.com/articles/gim201530 (Tables 3-5)
  *
  * Structured as a class so that a single instance can be initiated and then updated via invocation methods. Test calculations in browser console
- * by instantiating a new class and attaching to window (see) ; this can be useful in determining whether bugs are due to calculation error or front-end
- * code.
+ * by instantiating a new class and attaching to window (see); this can be useful in determining whether bugs are due to calculation error or react implementation.
  *
  * Note: there is currently not a method to switch strengths of a rule already invoked; to do this uninvoke the old rule, and invoke the new one.
  */
@@ -197,11 +198,12 @@ export class AutoClassify {
         // Flatten into an array of invoked items
         const invokedFlat = flattenStateMapIntoArray(invoked);
 
-        // Collect counts of various evidence types (take into consideration non-default strengths)
+        // Collect counts of various evidence types
         invokedFlat.forEach((invoked) => {
             const { rule_strength: strength, acmg_rule_name: rule } = invoked;
             const { strength: defaultStrength, type } = metadata[rule];
 
+            // Takes into consideration non-default strengths, if present
             const selectedStrength = (strength && strength !== "Default") ? strength : defaultStrength;
 
             if (type === "pathogenic") {
@@ -224,6 +226,13 @@ export class AutoClassify {
         this.updateClassification();
     }
 
+    /**
+     * Uses the current evidence counts for Benign or Pathogenic impact to calculate a classification.
+     * @returns {string} a classification (one of "Benign", "Likely Benign", "Uncertain significance", "Likely Pathogenic", or "Pathogenic")
+     * Note: the line in the ACMG Guidelines about contradictory "criteria for benign and pathogenic" resulting in uncertain significance
+     * classification has been expanded to also apply to contradictory criteria for likely benign and likely pathogenic; so collections of
+     * rules and strengths that result in both likely benign and likely pathogenic classifications will return uncertain significance.
+     */
     classify() {
         const {
             Standalone: standalone = null,
@@ -275,7 +284,12 @@ export class AutoClassify {
         return "Uncertain significance";
     }
 
-    /** Adjusts evidence on new invocation */
+    /**
+     * Adjusts evidence according to newly invoked rules/strengths and re-calculates classification
+     * @param {String} rule ACMG Rule
+     * @param {String} strength Can be "Default" or a modded strength. If falsy, default strength is invoked.
+     * @returns {String} new classification
+     */
     invoke(rule, strength) {
         if (!rule) {
             throw new Error ("ACMG rule to invoke was not passed in");
@@ -302,7 +316,12 @@ export class AutoClassify {
         return this.updateClassification();
     }
 
-    /** Adjusts evidence and re-calculates classification on un-invocation */
+    /**
+     * Adjusts evidence according to newly uninvoked rules/strengths and re-calculates classification
+     * @param {String} rule ACMG Rule
+     * @param {String} strength Can be "Default" or a modded strength. If falsy, default strength is uninvoked.
+     * @returns {String} new classification
+     */
     uninvoke(rule, strength) {
         if (!rule) {
             throw new Error ("ACMG rule to uninvoke was not passed in");
