@@ -198,8 +198,6 @@ def security_tween_factory(handler, registry):
                             # renderer.js. Is used to get access to User Info on initial web page render.
                             response.headers['X-Request-JWT'] = request.cookies.get('jwtToken', '')
                             user_info = request.user_info.copy()  # Re-ified property set in authentication.py
-                            # Redundant - don't need this in SSR nor browser as get from X-Request-JWT.
-                            del user_info["id_token"]
                             response.headers['X-User-Info'] = json.dumps(user_info)
                         else:
                             response.headers['X-Request-JWT'] = "null"

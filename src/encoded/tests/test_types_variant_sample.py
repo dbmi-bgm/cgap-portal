@@ -146,6 +146,7 @@ def test_variant_sample_patch_notes_process_success(bgm_user, bgm_user_testapp, 
     assert note2["@id"] in [ inp["@id"] for inp in variant_reloaded["interpretations"] ]
 
 
+
 def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_sample_list1, bgm_test_variant_sample, bgm_test_variant_sample2):
     vsl = bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201).json['@graph'][0]
     vs1 = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample, status=201).json['@graph'][0]

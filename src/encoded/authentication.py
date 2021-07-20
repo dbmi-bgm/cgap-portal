@@ -132,12 +132,37 @@ class NamespacedAuthenticationPolicy(object):
         super(NamespacedAuthenticationPolicy, self).__init__(*args, **kw)
 
     def unauthenticated_userid(self, request):
-        cls  = super(NamespacedAuthenticationPolicy, self)
         userid = super(NamespacedAuthenticationPolicy, self) \
             .unauthenticated_userid(request)
         if userid is not None:
             userid = self._namespace_prefix + userid
         return userid
+
+    def authenticated_userid(self, request):
+        """
+        Adds `request.user_info` for all authentication types.
+        Fetches and returns some user details if called.
+        """
+        namespaced_userid = super(NamespacedAuthenticationPolicy, self) \
+            .authenticated_userid(request)
+
+        if namespaced_userid is not None:
+            namespace, userid = namespaced_userid.split(".", 1)
+
+            # Allow access basic user credentials from request obj after authenticating & saving request
+            def get_user_info(request):
+                user_props = request.embed('/session-properties', as_user=userid) # Performs an authentication against DB for user.
+                if not user_props.get('details'):
+                    raise HTTPUnauthorized(
+                        title="Could not find user info for {}".format(userid),
+                        headers={'WWW-Authenticate': "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain) }
+                    )
+                return user_props
+
+            # If not authenticated (not in our DB), request.user_info will throw an HTTPUnauthorized error.
+            request.set_property(get_user_info, "user_info", True)
+
+        return namespaced_userid
 
     def remember(self, request, principal, **kw):
         if not principal.startswith(self._namespace_prefix):
@@ -182,8 +207,6 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         # we will cache it for the life of this request, cause pyramids does traversal
         cached = getattr(request, '_auth0_authenticated', _fake_user)
 
-        # print("AUTH1", cached, request.authorization)
-
         if cached is not _fake_user:
             return cached
 
@@ -200,23 +223,9 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
 
         email = request._auth0_authenticated = jwt_info['email'].lower()
 
-        # print("AUTH2", email, jwt_info, request.headers["Authorization"])
+        # At this point, email has been authenticated with their Auth0 provider and via `get_token_info`,
+        # but we don't know yet if this email is in our database. `authenticated_userid` should take care of this.
 
-        # At this point, email has been authenticated with their Auth0 provider, but we don't know yet if this email is in our database.
-        # If not authenticated (not in our DB), request.user_info will throw an HTTPUnauthorized error.
-
-        # Allow access basic user credentials from request obj after authenticating & saving request
-        def get_user_info(request):
-            user_props = request.embed('/session-properties', as_user=email) # Performs an authentication against DB for user.
-            if not user_props.get('details'):
-                raise HTTPUnauthorized(
-                    title="Could not find user info for {}".format(email),
-                    headers={'WWW-Authenticate': "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain) }
-                )
-            user_props['id_token'] = id_token
-            return user_props
-
-        request.set_property(get_user_info, "user_info", True)
         return email
 
     @staticmethod

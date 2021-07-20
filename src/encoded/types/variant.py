@@ -597,6 +597,35 @@ class VariantSample(Item):
 
 
 
+@view_config(name='download', context=VariantSample, request_method='GET',
+             permission='view', subpath_segments=[0, 1])
+@debug_log
+def download(context, request):
+    """ Navigates to the IGV snapshot hrf on the bam_snapshot field. """
+    calculated = calculate_properties(context, request)
+    s3_client = boto3.client('s3')
+    params_to_get_obj = {
+        'Bucket': request.registry.settings.get('file_wfout_bucket'),
+        'Key': calculated['bam_snapshot']
+    }
+    location = s3_client.generate_presigned_url(
+        ClientMethod='get_object',
+        Params=params_to_get_obj,
+        ExpiresIn=36*60*60
+    )
+
+    if asbool(request.params.get('soft')):
+        expires = int(parse_qs(urlparse(location).query)['Expires'][0])
+        return {
+            '@type': ['SoftRedirect'],
+            'location': location,
+            'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
+        }
+
+    # 307 redirect specifies to keep original method
+    raise HTTPTemporaryRedirect(location=location)  # 307
+
+
 @view_config(
     name='process-notes',
     context=VariantSample,
@@ -836,30 +865,20 @@ class VariantSampleList(Item):
     ]
 
 
-@view_config(name='download', context=VariantSample, request_method='GET',
+
+@view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 @debug_log
-def download(context, request):
-    """ Navigates to the IGV snapshot hrf on the bam_snapshot field. """
-    calculated = calculate_properties(context, request)
-    s3_client = boto3.client('s3')
-    params_to_get_obj = {
-        'Bucket': request.registry.settings.get('file_wfout_bucket'),
-        'Key': calculated['bam_snapshot']
-    }
-    location = s3_client.generate_presigned_url(
-        ClientMethod='get_object',
-        Params=params_to_get_obj,
-        ExpiresIn=36*60*60
-    )
+def variant_sample_list_spreadsheet(context, request):
+    """
+    Returns spreasheet containing information about every VariantSample selection
+    in the VariantSampleList Item.
+    TODO:
+      Figure out fields needed, use CustomEmbed class to fetch them, then
+      plop them out as a download stream. See 4DN/fourfront's batch_download
+      for precedent example (downloading/streaming a TSV from /search/ request).
+    """
 
-    if asbool(request.params.get('soft')):
-        expires = int(parse_qs(urlparse(location).query)['Expires'][0])
-        return {
-            '@type': ['SoftRedirect'],
-            'location': location,
-            'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
-        }
 
-    # 307 redirect specifies to keep original method
-    raise HTTPTemporaryRedirect(location=location)  # 307
+    return { "status": "in development" }
+
