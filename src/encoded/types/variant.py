@@ -764,45 +764,30 @@ def process_notes(context, request):
     # Currently - Gene and Variant patches are performed first before Note status is updated.
     # This is in part to simplify UI logic where only Note status is checked to assert if a Note is already saved to Project.
 
-    def perform_patch_as_user(item_atid, patch_payload):
+    def perform_patch(item_atid, patch_payload, as_admin=False):
         subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=True)
+        if as_admin:
+            subreq.remote_user = "TEST"
         patch_result = request.invoke_subrequest(subreq).json
 
         if patch_result["status"] != "success":
             raise HTTPServerError("Couldn't update Item " + item_atid)
-
-    def perform_patch_as_admin(item_atid, patch_payload):
-
-        kwargs = {
-            "environ": request.environ,
-            "content_type": "application/json",
-        }
-        subreq = Request.blank(item_atid, **kwargs)
-        subreq.environ["PATH_INFO"] = item_atid
-        subreq.environ["REQUEST_METHOD"] = "PATCH"
-        subreq.environ["REMOTE_USER"] = "TEST"
-        subreq.json = patch_payload
-        patch_result = request.invoke_subrequest(subreq).json
-
-        if patch_result["status"] != "success":
-            raise HTTPServerError("Couldn't update Item " + item_atid)
-
 
 
     gene_patch_count = 0
     if need_gene_patch:
         for gene_atid, gene_payload in genes_patch_payloads.items():
-            perform_patch_as_admin(gene_atid, gene_payload)
+            perform_patch(gene_atid, gene_payload, True)
             gene_patch_count += 1
 
     variant_patch_count = 0
     if need_variant_patch:
-        perform_patch_as_admin(variant["@id"], variant_patch_payload)
+        perform_patch(variant["@id"], variant_patch_payload, True)
         variant_patch_count += 1
 
     note_patch_count = 0
     for note_atid, note_payload in note_patch_payloads.items():
-        perform_patch_as_user(note_atid, note_payload)
+        perform_patch(note_atid, note_payload)
         note_patch_count += 1
 
 
