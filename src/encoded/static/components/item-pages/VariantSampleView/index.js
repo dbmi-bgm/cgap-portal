@@ -61,8 +61,8 @@ class OverviewTabView extends React.Component {
     }
 
     /**
-     * Currently this only pulls updated notes; may be possible ot expand to also pull newest fields for annotation
-     * space, however due to the infrequency of anticipated updates there, this hasn't been implemented.
+     * Currently this only pulls updated notes; may be possible to expand to also pull newest fields for annotation
+     * space, however due to the infrequency of anticipated updates to those fields, this hasn't been implemented.
      */
     loadNewestNotesFromVS() {
         const { context: { uuid = null } = {} } = this.props;
