@@ -43,10 +43,11 @@ def variant_sample_list_1(bgm_user):
     }
 
 
-def test_upgrade_variant_sample_list_to_version_2(app, variant_sample_list_1):
+def test_upgrade_variant_sample_list_to_version_2(app, variant_sample_list_1, bgm_user):
     upgrader = app.registry['upgrader']
     value = upgrader.upgrade('variant_sample_list', variant_sample_list_1, current_version='1', target_version='2')
     assert value['schema_version'] == '2'
     for vs_object in value.get("variant_samples", []):
         assert "userid" not in vs_object
+        assert vs_object["selected_by"] == bgm_user["uuid"]
 
