@@ -794,9 +794,11 @@ def process_notes(context, request):
     # This is in part to simplify UI logic where only Note status is checked to assert if a Note is already saved to Project.
 
     def perform_patch(item_atid, patch_payload, as_admin=False):
-        subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=True)
+        subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=(False if as_admin else True))
         if as_admin:
             subreq.remote_user = "UPGRADE"
+            if 'HTTP_COOKIE' in subreq.environ:
+                del subreq.environ['HTTP_COOKIE']
         patch_result = request.invoke_subrequest(subreq).json
 
         if patch_result["status"] != "success":

@@ -147,6 +147,7 @@ class NamespacedAuthenticationPolicy(object):
             .authenticated_userid(request)
 
         if namespaced_userid is not None:
+            # userid, if present, may be in form of UUID (if remoteuser) or an email (if Auth0).
             namespace, userid = namespaced_userid.split(".", 1)
 
             # Allow access basic user credentials from request obj after authenticating & saving request

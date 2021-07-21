@@ -109,7 +109,7 @@ class SaveNotesToProjectButton extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.getPatchPayloadsProcess = this.getPatchPayloadsProcess.bind(this);
+        this.getPatchPayloads = this.getPatchPayloads.bind(this);
         this.patchItemsProcess = this.patchItemsProcess.bind(this);
         this.patchNotesStatus = this.patchNotesStatus.bind(this);
         this.onClick = this.onClick.bind(this);
@@ -190,9 +190,9 @@ class SaveNotesToProjectButton extends React.PureComponent {
                 }
             }
 
-            if (Object.keys(payload.save_to_project_notes) > 0) {
+            if (Object.keys(payload.save_to_project_notes).length > 0) {
                 payloads.push([
-                    variantSampleAtID,
+                    variantSampleAtID + "/@@process-notes/",
                     payload
                 ]);
             }
@@ -211,7 +211,7 @@ class SaveNotesToProjectButton extends React.PureComponent {
         const checkIfCompleted = () => {
             // Check if all requests have completed, and call `onComplete` if so.
             if (patchesToComplete === countCompleted) {
-                onComplete({ countCompleted });
+                onComplete({ countCompleted, patchErrors });
             } else {
                 const patchingPercentageComplete = patchesToComplete === 0 ? 0 : countCompleted / patchesToComplete;
                 this.setState({ patchingPercentageComplete });
@@ -222,11 +222,11 @@ class SaveNotesToProjectButton extends React.PureComponent {
 
         // Browser can't send more than 6 reqs anyway, so limit concurrent reqs.
 
-        function performRequest([ itemID, itemPatchPayload ]) {
-            return ajax.promise(itemID, "PATCH", {}, JSON.stringify(itemPatchPayload))
+        function performRequest([ patchURL, itemPatchPayload ]) {
+            return ajax.promise(patchURL, "PATCH", {}, JSON.stringify(itemPatchPayload))
                 .then(function(response){
-                    const { status: respStatus } = response;
-                    if (respStatus !== "success") {
+                    const { success } = response;
+                    if (!success) {
                         throw response;
                     }
                 }).catch(function(error){
@@ -259,25 +259,26 @@ class SaveNotesToProjectButton extends React.PureComponent {
             const patchPayloads = this.getPatchPayloads();
 
             console.log("Generated PATCH '../@@process-notes/' payloads - ", patchPayloads);
-            // this.patchItemsProcess(patchPayloads, ({ countCompleted }) => {
-            //     console.info("Patching Completed, count Items PATCHed -", countCompleted);
-            //     this.setState({
-            //         "isPatching": true,
-            //         "patchingPercentageComplete": 1
-            //     }, () => {
-            //         const { fetchVariantSampleListItem, resetSendToProjectStoreItems } = this.props;
-            //         if (countCompleted > 0) {
-            //             if (typeof resetSendToProjectStoreItems === "function") {
-            //                 console.info("Reset 'send to project' store items.");
-            //                 resetSendToProjectStoreItems();
-            //             }
-            //             if (typeof fetchVariantSampleListItem === "function") {
-            //                 console.info("Refreshing our VariantSampleListItem with updated Note Item statuses.");
-            //                 fetchVariantSampleListItem();
-            //             }
-            //         }
-            //     });
-            // });
+            this.patchItemsProcess(patchPayloads, ({ countCompleted, patchErrors }) => {
+                console.info("Patching Completed, count Items PATCHed -", countCompleted);
+                this.setState({
+                    "isPatching": true,
+                    "patchingPercentageComplete": 1,
+                    patchErrors
+                }, () => {
+                    const { fetchVariantSampleListItem, resetSendToProjectStoreItems } = this.props;
+                    if (countCompleted > 0 && patchErrors.length === 0) {
+                        if (typeof resetSendToProjectStoreItems === "function") {
+                            console.info("Reset 'send to project' store items.");
+                            resetSendToProjectStoreItems();
+                        }
+                        if (typeof fetchVariantSampleListItem === "function") {
+                            console.info("Refreshing our VariantSampleListItem with updated Note Item statuses.");
+                            fetchVariantSampleListItem();
+                        }
+                    }
+                });
+            });
 
         });
     }
@@ -292,26 +293,31 @@ class SaveNotesToProjectButton extends React.PureComponent {
     }
 
     onReset(){
+        const { patchingPercentageComplete } = this.state;
+        if (patchingPercentageComplete !== 1) {
+            // Not allowed until PATCHes completed (or timed out / failed / etc).
+            return false;
+        }
         this.setState({
             "isPatching": false,
-            "patchingPercentageComplete": 0
+            "patchingPercentageComplete": 0,
+            "patchErrors": []
         });
     }
 
     render(){
         const { sendToProjectStore, variantSampleListItem } = this.props;
-        const { isPatching, patchingPercentageComplete } = this.state;
+        const { isPatching, patchingPercentageComplete, patchErrors } = this.state;
         const selectionStoreSize = this.memoized.selectionStoreSize(sendToProjectStore);
         const variantSamplesWithAnySelectionSize = this.memoized.variantSamplesWithAnySelectionSize(variantSampleListItem, sendToProjectStore);
-        const onHide = patchingPercentageComplete === 1 ? this.onReset : null;
         return (
             <React.Fragment>
-                <button type="button" className="btn btn-primary" onClick={this.onClick} disabled={isFetching || isPatching || selectionStoreSize === 0}
+                <button type="button" className="btn btn-primary" onClick={this.onClick} disabled={isPatching || selectionStoreSize === 0}
                     data-tip={`${selectionStoreSize} Note selections from ${variantSamplesWithAnySelectionSize} Sample Variants`}>
                     Share Note Selections to <span className="text-600">Project</span>
                 </button>
                 { isPatching ?
-                    <ProgressModal {...{ isPatching, patchingPercentageComplete, onHide }} />
+                    <ProgressModal {...{ isPatching, patchingPercentageComplete, patchErrors }} onHide={this.onReset} />
                     : null }
             </React.Fragment>
         );
@@ -319,13 +325,16 @@ class SaveNotesToProjectButton extends React.PureComponent {
 }
 
 const ProgressModal = React.memo(function ProgressModal (props) {
-    const { isPatching, patchingPercentageComplete, onHide } = props;
+    const { isPatching, patchingPercentageComplete, onHide, patchErrors } = props;
 
     const percentCompleteFormatted = Math.round(patchingPercentageComplete * 1000) / 10;
     const finished = patchingPercentageComplete === 1;
+    const errorsLen = patchErrors.length;
 
     let body;
-    if (finished) {
+    if (errorsLen > 0){
+        body = "" + errorsLen + " errors";
+    } else if (finished) {
         body = "Done";
     } else if (isPatching) {
         body = "Updating...";
@@ -333,7 +342,7 @@ const ProgressModal = React.memo(function ProgressModal (props) {
 
     return (
         <Modal show onHide={onHide}>
-            <Modal.Header closeButton={!!onHide}>
+            <Modal.Header closeButton={finished}>
                 <Modal.Title>{ finished ? "Update Complete" : "Please wait..." }</Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -342,7 +351,7 @@ const ProgressModal = React.memo(function ProgressModal (props) {
                     <div className="progress-bar" role="progressbar" style={{ "width": percentCompleteFormatted + "%" }}
                         aria-valuenow={percentCompleteFormatted} aria-valuemin="0" aria-valuemax="100"/>
                 </div>
-                { onHide?
+                { finished ?
                     <button type="button" className="mt-24 btn btn-block btn-primary" onClick={onHide}>
                         Close
                     </button>

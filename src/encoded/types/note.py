@@ -42,8 +42,10 @@ def note_edit(context, request, render=None):
     next_status = request.validated.get("status")
     if next_status != previous_status and next_status == "current":
         request.validated["approved_date"] = datetime.datetime.utcnow().isoformat() + "+00:00"
-        auth_source, authid = request.authenticated_userid.split(".", 1)
-        request.validated["approved_by"] = authid
+        # auth_source, authid = request.authenticated_userid.split(".", 1) would be faster as no subrequest is done, but authid
+        # is in form of email in that case if using Auth0. If there's a way to submit email (or ambiguous userid), then
+        # we can migrate to that for perf (or if can get user UUID in more performant way).
+        request.validated["approved_by"] = request.user_info["details"]["uuid"]
 
     return sno_item_edit(context, request, render)
 
