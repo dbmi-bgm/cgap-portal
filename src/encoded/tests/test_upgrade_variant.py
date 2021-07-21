@@ -37,6 +37,8 @@ def variant_sample_list_1(bgm_user):
             {
                 "userid": bgm_user["uuid"],
                 "date_selected": "2021-07-20T22:36:11.302712+00:00",
+                # This fixture never gets POSTed to DB, just upgraded, so
+                # "some-uuid-here" should be OK for time being.
                 "variant_sample_item": "some-uuid-here"
             }
         ]
