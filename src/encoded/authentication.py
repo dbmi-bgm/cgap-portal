@@ -517,7 +517,7 @@ def impersonate_user(context, request):
 
     id_token = jwt.encode(
         jwt_contents,
-        b64decode(auth0_secret, '-_'),
+        auth0_secret,
         algorithm=JWT_ENCODING_ALGORITHM
 	)
 
