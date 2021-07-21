@@ -613,13 +613,14 @@
             "order": 70,
             "default_hidden": true
         },
-        "bam_snapshot": {
-            "title": "Genome Snapshot",
-            "order": 81
-        },
         "interpretation.classification": {
             "title": "Classification",
-            "default_hidden": true
+            "default_hidden": true,
+            "order": 75
+        },
+        "bam_snapshot": {
+            "title": "Genome Snapshot",
+            "order": 100
         },
         "project": {
             "title": "Project",
