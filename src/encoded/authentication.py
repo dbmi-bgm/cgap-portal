@@ -260,14 +260,13 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         This is only called if we receive a Bearer token in Authorization header.
         '''
         try:
-
             # lets see if we have an auth0 token or our own
             registry = request.registry
             auth0_client = registry.settings.get('auth0.client')
             auth0_secret = registry.settings.get('auth0.secret')
             if auth0_client and auth0_secret:
                 # leeway accounts for clock drift between us and auth0
-                payload = jwt.decode(token, b64decode(auth0_secret, '-_'),
+                payload = jwt.decode(token, auth0_secret,
                                      algorithms=JWT_DECODING_ALGORITHMS,
                                      audience=auth0_client, leeway=30)
                 if 'email' in payload and Auth0AuthenticationPolicy.email_is_partners_or_hms(payload):
@@ -534,7 +533,7 @@ def impersonate_user(context, request):
 
     id_token = jwt.encode(
         jwt_contents,
-        b64decode(auth0_secret, '-_'),
+        auth0_secret,
         algorithm=JWT_ENCODING_ALGORITHM
 	)
 
