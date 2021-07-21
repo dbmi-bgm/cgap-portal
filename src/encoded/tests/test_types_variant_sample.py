@@ -162,7 +162,7 @@ def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_s
                 "variant_sample_item": vs2['@id'],
                 "filter_blocks_request_at_time_of_selection": '{"search_type":"VariantSample","global_flags":"CALL_INFO=NA12879_sample&file=GAPFI2VBKGM7&additional_facet=associated_genotype_labels.mother_genotype_label&additional_facet=associated_genotype_labels.father_genotype_label&sort=date_created","intersect":false,"filter_blocks":[{"query":"variant.genes.genes_most_severe_consequence.coding_effect=Missense","flags_applied":[]},{"query":"variant.mutanno_variant_class=SNV","flags_applied":[]}]}',
                 # "date_selected": "2021-01-25T16:41:47.787+00:00", # Should be auto-filled by server.
-                # "userid" : ... # <- This should be auto-filled by server, we'll test it .. sometime.
+                # "selected_by" : ... # <- This should be auto-filled by server, we'll test it .. sometime.
             }
         ]
     }
@@ -171,7 +171,7 @@ def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_s
     assert resp['variant_samples'][0]["variant_sample_item"] == vs1['@id']
     assert resp['variant_samples'][1]["variant_sample_item"] == vs2['@id']
     assert len(resp['variant_samples'][1]["date_selected"]) > 10 # Check that datetime is auto-populated
-    assert resp['variant_samples'][1]["userid"] == bgm_user["uuid"] # Check that userid is auto-populated
+    assert resp['variant_samples'][1]["selected_by"] == bgm_user["uuid"] # Check that userid is auto-populated
 
 
 def test_variant_sample_list_patch_fail(bgm_variant, bgm_user_testapp, variant_sample_list1):
