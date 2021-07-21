@@ -1,5 +1,4 @@
 import datetime
-from pyramid.view import view_config
 from snovault.util import debug_log
 from snovault import (
     abstract_collection,
@@ -7,11 +6,6 @@ from snovault import (
     collection,
     load_schema,
 )
-from snovault.validators import (
-    validate_item_content_patch,
-    no_validate_item_content_patch
-)
-from snovault.crud_views import item_edit as sno_item_edit
 from .base import (
     Item
 )
@@ -33,21 +27,6 @@ class Note(Item):
 
 
 
-
-@view_config(context=Note, permission='edit', request_method='PATCH',
-             validators=[validate_item_content_patch])
-@debug_log
-def note_edit(context, request, render=None):
-    previous_status = context.properties.get("status")
-    next_status = request.validated.get("status")
-    if next_status != previous_status and next_status == "current":
-        request.validated["approved_date"] = datetime.datetime.utcnow().isoformat() + "+00:00"
-        # auth_source, authid = request.authenticated_userid.split(".", 1) would be faster as no subrequest is done, but authid
-        # is in form of email in that case if using Auth0. If there's a way to submit email (or ambiguous userid), then
-        # we can migrate to that for perf (or if can get user UUID in more performant way).
-        request.validated["approved_by"] = request.user_info["details"]["uuid"]
-
-    return sno_item_edit(context, request, render)
 
 
 

@@ -274,6 +274,8 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                     return payload
 
             else:  # we don't have the key, let auth0 do the work for us
+                warn_msg = "No Auth0 keys present - falling back to making outbound network request to have Auth0 validate for us"
+                log.warning(warn_msg)
                 user_url = "https://{domain}/tokeninfo".format(domain='hms-dbmi.auth0.com')
                 resp = requests.post(user_url, {'id_token':token})
                 payload = resp.json()

@@ -40,8 +40,8 @@
             ],
             "permission": "restricted_fields"
         },
-        "approved_date": {
-            "title": "Approved At",
+        "date_approved": {
+            "title": "Time of Approval",
             "type": "string",
             "description": "Timestamp when this note was approved for a case",
             "anyOf": [
@@ -56,20 +56,6 @@
                 "FFedit-create"
             ],
             "permission": "restricted_fields"
-        },
-        "status": {
-            "title": "Status",
-            "type": "string",
-            "default": "in review",
-            "enum": [
-                "shared",
-                "obsolete",
-                "current",
-                "inactive",
-                "in review",
-                "deleted"
-            ],
-            "notes": "This is copy of mixins->status, but without permissions:restricted_fields to allow users to control."
         },
         "associated_items": {
             "title": "Associated Items",

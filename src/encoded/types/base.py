@@ -414,7 +414,7 @@ def create(context, request):
         }
 
 @snovault.calculated_property(context=Item, category='action')
-def create(context, request):
+def clone(context, request):
     if request.has_permission('clone'):
         return {
             'name': 'clone',

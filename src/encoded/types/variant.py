@@ -673,21 +673,24 @@ def process_notes(context, request):
     if len(ln) == 0:
         raise HTTPBadRequest("No Note UUIDs supplied.")
 
-    variant = None
-    genes = None
+
 
 
     variant_patch_payload = {} # Can be converted to dict of variants if need to PATCH multiple in future
     genes_patch_payloads = {} # Keyed by @id, along with `note_patch_payloads`
     note_patch_payloads = {}
 
+
+
+
     need_variant_patch = "interpretation" in stpn \
         or "discovery_interpretation" in stpn \
         or "variant_notes" in stpn
-
     need_gene_patch = "discovery_interpretation" in stpn \
         or "gene_notes" in stpn
 
+    variant = None
+    genes = None # We may have multiple different genes from same variant; at moment we save note to each of them.
 
     if need_variant_patch or need_gene_patch:
         variant_uuid = context.properties["variant"]
@@ -711,6 +714,22 @@ def process_notes(context, request):
 
 
 
+
+    curr_date = datetime.datetime.utcnow().isoformat() + "+00:00"
+    auth_source, curr_user_id = request.authenticated_userid.split(".", 1)
+
+    def create_note_patch_payload(note_atid):
+        note_patch_payloads[note_atid] = {
+            # All 3 of these fields have permissions: restricted_fields
+            # and may only be manually editable by an admin.
+            "status": "current",
+            "approved_by": curr_user_id,
+            "date_approved": curr_date
+        }
+
+
+
+
     # Set or extend variant.interpretations, discovery_interpretations, and variant_notes
     if "interpretation" in ln:
         # Add to Variant.interpretations
@@ -719,15 +738,17 @@ def process_notes(context, request):
                 ln["interpretation"]["@id"]
             ]
         elif ln["interpretation"]["@id"] not in variant["interpretations"]: # 's'
-            # TODO: If note from same project (?) then replace existing note and make new note point to it as
+            # TODO: If note from same project exists (?), then replace existing note and make new note point to it as
             # a linked list.
-            variant_patch_payload["interpretations"] = variant["interpretations"]
+            variant_patch_payload["interpretations"] = [ note_atid for note_atid in variant["interpretations"] ]
             variant_patch_payload["interpretations"].append(ln["interpretation"]["@id"])
 
         # Update Note status if is not already current.
-        # Note fields "approved_by" and "approved_date" are set by PATCH/item-edit handler for Note Items, not here.
         if ln["interpretation"]["status"] != "current":
-            note_patch_payloads[ln["interpretation"]["@id"]] = { "status" : "current" }
+            create_note_patch_payload(ln["interpretation"]["@id"])
+
+
+
 
     if "discovery_interpretation" in ln:
         # Add to Variant.discovery_interpretations
@@ -736,7 +757,9 @@ def process_notes(context, request):
                 ln["discovery_interpretation"]["@id"]
             ]
         elif ln["discovery_interpretation"]["@id"] not in variant["discovery_interpretations"]: # 's'
-            variant_patch_payload["discovery_interpretations"] = variant["discovery_interpretations"]
+            # TODO: If note from same project exists (?), then replace existing note and make new note point to it as
+            # a linked list.
+            variant_patch_payload["discovery_interpretations"] = [ note_atid for note_atid in variant["discovery_interpretations"] ]
             variant_patch_payload["discovery_interpretations"].append(ln["discovery_interpretation"]["@id"])
 
         # Add to Gene.discovery_interpretations
@@ -747,13 +770,17 @@ def process_notes(context, request):
                     ln["discovery_interpretation"]["@id"]
                 ]
             elif ln["discovery_interpretation"]["@id"] not in gene["discovery_interpretations"]: # 's'
+                # TODO: If note from same project exists (?), then replace existing note and make new note point to it as
+                # a linked list.
                 genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
-                genes_patch_payloads[gene["@id"]]["discovery_interpretations"] = gene["discovery_interpretations"]
+                genes_patch_payloads[gene["@id"]]["discovery_interpretations"] = [ note_atid for note_atid in gene["discovery_interpretations"] ]
                 genes_patch_payloads[gene["@id"]]["discovery_interpretations"].append(ln["discovery_interpretation"]["@id"])
 
         # Update Note status if is not already current.
         if ln["discovery_interpretation"]["status"] != "current":
-            note_patch_payloads[ln["discovery_interpretation"]["@id"]] = { "status" : "current" }
+            create_note_patch_payload(ln["discovery_interpretation"]["@id"])
+
+
 
 
     if "variant_notes" in ln:
@@ -762,12 +789,17 @@ def process_notes(context, request):
                 ln["variant_notes"]["@id"]
             ]
         elif ln["variant_notes"]["@id"] not in variant["variant_notes"]: # 's'
-            variant_patch_payload["variant_notes"] = variant["variant_notes"]
+            # TODO: If note from same project exists (?), then replace existing note and make new note point to it as
+            # a linked list.
+            variant_patch_payload["variant_notes"] = [ note_atid for note_atid in variant["variant_notes"] ]
             variant_patch_payload["variant_notes"].append(ln["variant_notes"]["@id"])
 
         # Update Note status if is not already current.
         if ln["variant_notes"]["status"] != "current":
-            note_patch_payloads[ln["variant_notes"]["@id"]] = { "status" : "current" }
+            create_note_patch_payload(ln["variant_notes"]["@id"])
+
+
+
 
     if "gene_notes" in ln:
         # Add to Gene.gene_notes
@@ -778,13 +810,17 @@ def process_notes(context, request):
                     ln["gene_notes"]["@id"]
                 ]
             elif ln["gene_notes"]["@id"] not in gene["gene_notes"]: # 's'
+                # TODO: If note from same project exists (?), then replace existing note and make new note point to it as
+                # a linked list.
                 genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
-                genes_patch_payloads[gene["@id"]]["gene_notes"] = gene["gene_notes"]
+                genes_patch_payloads[gene["@id"]]["gene_notes"] = [ note_atid for note_atid in gene["gene_notes"] ]
                 genes_patch_payloads[gene["@id"]]["gene_notes"].append(ln["gene_notes"]["@id"])
 
         # Update Note status if is not already current.
         if ln["gene_notes"]["status"] != "current":
-            note_patch_payloads[ln["gene_notes"]["@id"]] = { "status" : "current" }
+            create_note_patch_payload(ln["gene_notes"]["@id"])
+
+
 
 
     # Perform the PATCHes!
@@ -793,14 +829,12 @@ def process_notes(context, request):
     # Currently - Gene and Variant patches are performed first before Note status is updated.
     # This is in part to simplify UI logic where only Note status is checked to assert if a Note is already saved to Project.
 
-    def perform_patch(item_atid, patch_payload, as_admin=False):
-        subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=(False if as_admin else True))
-        if as_admin:
-            subreq.remote_user = "UPGRADE"
-            if 'HTTP_COOKIE' in subreq.environ:
-                del subreq.environ['HTTP_COOKIE']
+    def perform_patch_as_admin(item_atid, patch_payload):
+        subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=False)
+        subreq.remote_user = "UPGRADE"
+        if 'HTTP_COOKIE' in subreq.environ:
+            del subreq.environ['HTTP_COOKIE']
         patch_result = request.invoke_subrequest(subreq).json
-
         if patch_result["status"] != "success":
             raise HTTPServerError("Couldn't update Item " + item_atid)
 
@@ -808,17 +842,17 @@ def process_notes(context, request):
     gene_patch_count = 0
     if need_gene_patch:
         for gene_atid, gene_payload in genes_patch_payloads.items():
-            perform_patch(gene_atid, gene_payload, True)
+            perform_patch_as_admin(gene_atid, gene_payload)
             gene_patch_count += 1
 
     variant_patch_count = 0
     if need_variant_patch:
-        perform_patch(variant["@id"], variant_patch_payload, True)
+        perform_patch_as_admin(variant["@id"], variant_patch_payload)
         variant_patch_count += 1
 
     note_patch_count = 0
     for note_atid, note_payload in note_patch_payloads.items():
-        perform_patch(note_atid, note_payload)
+        perform_patch_as_admin(note_atid, note_payload)
         note_patch_count += 1
 
 
