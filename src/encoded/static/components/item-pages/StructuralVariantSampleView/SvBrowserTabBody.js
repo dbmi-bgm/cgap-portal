@@ -1,10 +1,12 @@
 'use strict';
 
 import React, { useRef, useEffect } from 'react';
+import { SvBrowser } from './SvBrowser';
 
 
 export const SvBrowserTabBody = React.memo(function SvBrowserTabBody (props) {
     const { context, schemas, active = false } = props;
+    console.log(props)
 
     return (
         <div className={"browser-tab-body card-body" + (!active ? " d-none" : "")}>
@@ -17,11 +19,12 @@ export const SvBrowserTabBody = React.memo(function SvBrowserTabBody (props) {
                             </h4>
                         </div>
                         <div className="info-body">
-                            {/* Browser comes here */}
+                            <SvBrowser {...props}/>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     );
+
 });

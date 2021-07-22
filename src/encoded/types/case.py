@@ -307,6 +307,10 @@ def _build_case_embedded_list():
         # File linkTo
         "vcf_file.file_ingestion_status",
         "vcf_file.accession",
+
+        # File linkTo
+        "structural_variant_vcf_file.file_ingestion_status",
+        "structural_variant_vcf_file.accession",
     ]
 
 

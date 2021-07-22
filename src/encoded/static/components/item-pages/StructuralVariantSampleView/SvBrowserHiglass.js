@@ -9,19 +9,22 @@ import { HiGlassAjaxLoadContainer } from './../components/HiGlass/HiGlassAjaxLoa
 // import { HiGlassPlainContainer } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/HiGlass/HiGlassPlainContainer';
 
 
-export const BamFileBrowserTabBody = React.memo(function BamFileBrowserTabBody (props) {
+export const SvBrowserHiglass = React.memo(function SvBrowserHiglass (props) {
     const { context, schemas, active = false } = props;
     const higlassContainerRef = useRef(null);
+
     const {
         file,
         CALL_INFO: bamSampleId,
-        variant: {
-            POS_ABS: variantPositionAbsCoord
+        structural_variant: {
+            START_ABS: variantStartAbsCoord,
+            END_ABS: variantEndAbsCoord,
         }
     } = context;
 
     useEffect(function(){
         if (!active) return;
+        props.assignHGC(higlassContainerRef);
         const hgc = higlassContainerRef.current.getHiGlassComponent();
         // hgc only exists when we visit the tab a second time
         if(hgc){
@@ -31,19 +34,10 @@ export const BamFileBrowserTabBody = React.memo(function BamFileBrowserTabBody (
     }, [ active ]);
 
     return (
-        <div className={"browser-tab-body card-body" + (!active ? " d-none" : "")}>
-            <div className="row">
-                <div className="col-12">
-                    <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
-                        <div className="info-header-title">
-                            <h4>
-                                BAM File Browser
-                            </h4>
-                        </div>
-                        <div className="info-body">
-                            <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantPositionAbsCoord} ref={higlassContainerRef} requestingTab="bam" bamSampleId={bamSampleId} file={file}/>
-                        </div>
-                    </div>
+        <div className="row">
+            <div className="col-12">
+                <div className="flex-grow-1 pb-2 pb-xl-1">
+                    <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantStartAbsCoord} variantEndAbsCoord={variantEndAbsCoord} ref={higlassContainerRef} requestingTab="sv" bamSampleId={bamSampleId} samples={props.samples} higlassSvVcf={props.higlassSvVcf} file={file}/>
                 </div>
             </div>
         </div>

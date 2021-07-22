@@ -116,7 +116,12 @@ def get_higlass_viewconf(context, request):
     requesting_tab = request.json_body.get('requesting_tab', None)
     requesting_tab = requesting_tab if requesting_tab else "annotation"
 
-    viewconf_uuid = "00000000-1111-0000-1111-000000000000" if requesting_tab == "annotation" else "9146eeba-ebb8-41aa-93a8-ada8efaff64b"
+    viewconf_uuid = "00000000-1111-0000-1111-000000000000"
+
+    if requesting_tab == "bam":
+        viewconf_uuid = "9146eeba-ebb8-41aa-93a8-ada8efaff64b"
+    elif requesting_tab == "sv":
+        viewconf_uuid = "cc459f25-601c-4e00-8404-fc3bd1b3b6c2"
 
     default_higlass_viewconf = get_item_or_none(request, viewconf_uuid)
     higlass_viewconfig = default_higlass_viewconf["viewconfig"] if default_higlass_viewconf else None
@@ -129,51 +134,33 @@ def get_higlass_viewconf(context, request):
             "viewconfig": None
         }
 
-    # We need absolute URLs for the BAM and GnomAD Worker
-    # XXX: this needs a better workaround - Will June 22 2021
-    host_url = 'localhost:6543'
-    if 'IDENTITY' in os.environ:  # detect use of global application configuration
-        host_url = "http://c4ecstrialalphacgapmastertest-273357903.us-east-1.elb.amazonaws.com"
-    if request.registry.settings.get('env.name') == CGAP_ENV_WEBPROD:
-        host_url = CGAP_PUBLIC_URL_PRD
-    elif request.registry.settings.get('env.name') == CGAP_ENV_MASTERTEST:
-        host_url = f"http://{CGAP_ENV_MASTERTEST}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
-    elif request.registry.settings.get('env.name') == CGAP_ENV_DEV:
-        host_url = f"http://{CGAP_ENV_DEV}.9wzadzju3p.us-east-1.elasticbeanstalk.com"
+    variant_pos = request.json_body.get('variant_pos_abs', None)  
+    variant_pos = variant_pos if variant_pos else 100000
+    window_size_small = 20 # window size for the interpretation space
+    window_size_large = 5000 # window size for the overview
 
-    if requesting_tab == "annotation":
-        variant_pos = request.json_body.get('variant_pos_abs', None)
-        variant_pos = variant_pos if variant_pos else 100000
-        window_size_small = 20 # window size for the interpretation space
-        window_size_large = 5000 # window size for the overview
+    # Overview
+    higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
+    higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large 
 
-        # Overview
-        higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
-        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large
+    # Details
+    higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
+    higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small 
 
-        # Details
-        higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
-        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small
+    # Vertical rules
+    higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
+    higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
 
-        # Vertical rules
-        higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
-        higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
+    s3_bucket = request.registry.settings.get('file_wfout_bucket')
+    #s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
 
-        wsl = higlass_viewconfig['views'][1]['tracks']['top'][17]['options']['workerScriptLocation']
-        higlass_viewconfig['views'][1]['tracks']['top'][17]['options']['workerScriptLocation'] = host_url + wsl
 
-    elif requesting_tab == "bam":
-        variant_pos = request.json_body.get('variant_pos_abs', None)
-        variant_pos = variant_pos if variant_pos else 100000
+    if requesting_tab == "bam":
+
         # This is the id of the variant sample that we are currently looking at.
         # This should be the first file in the Higlass viewconf
         bam_sample_id = request.json_body.get('bam_sample_id', None)
-        window_size_small = 20 # window size for the interpretation space
-        window_size_large = 5000 # window size for the overview
-
-        #s3_bucket = request.registry.settings.get('file_wfout_bucket')
-        s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
-
+  
         samples_pedigree = request.json_body.get('samples_pedigree', None)
         samples_pedigree.sort(key=lambda x: x['sample_name'] == bam_sample_id, reverse=True)
 
@@ -206,21 +193,150 @@ def get_higlass_viewconf(context, request):
             pileup_track_sample["uid"] = uuid.uuid4()
             bam_key = sample["bam_location"]
             bai_key = bam_key + ".bai"
-            pileup_track_sample['options']['workerScriptLocation'] = host_url + pileup_track_sample['options']['workerScriptLocation']
             pileup_track_sample['data']['bamUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=bam_key)
             pileup_track_sample['data']['baiUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=bai_key)
             top_tracks.append(pileup_track_sample)
 
-        # Show the correct location
-        higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
-        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large
+    elif requesting_tab == "sv":
 
-        higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
-        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small
+        variant_start = request.json_body.get('variant_pos_abs', None)  
+        variant_end = request.json_body.get('variant_end_abs', None) 
+        variant_start = variant_start if variant_start else 100000
+        variant_end = variant_end if variant_end else variant_start + 1
+
+        window_size_small = round((variant_end - variant_start)/8.0) # window size for the interpretation space
+        window_size_large = 6000 # window size for the overview
+
+        # Overview
+        higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_start - window_size_large
+        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_end + window_size_large 
+
+        # Details
+        higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_start - window_size_small
+        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_end + window_size_small 
 
         # Vertical rules
-        higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
-        higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
+        higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_start
+        higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_end
+        # This is the id of the variant sample that we are currently looking at.
+        # This should be the first file in the Higlass viewconf
+        bam_sample_id = request.json_body.get('bam_sample_id', None)  
+
+        # The samples already come in sorted
+        samples_pedigree = request.json_body.get('samples_pedigree', None) 
+        bam_visibilty = request.json_body.get('bam_visibilty', None) 
+        sv_vcf_visibilty = request.json_body.get('sv_vcf_visibilty', None) 
+
+        top_tracks = higlass_viewconfig['views'][1]['tracks']['top']
+        empty_track_a = deepcopy(top_tracks[5])
+        text_track = deepcopy(top_tracks[6])
+        empty_track_b = deepcopy(top_tracks[7])
+        pileup_track = deepcopy(top_tracks[8])
+        cgap_sv_track = deepcopy(top_tracks[9])
+        gnomad_track = deepcopy(top_tracks[10])
+
+
+        current_viewconf = request.json_body.get('current_viewconf', None) 
+        original_options = {}
+        if current_viewconf is not None:
+            higlass_viewconfig = current_viewconf
+            top_tracks = higlass_viewconfig['views'][1]['tracks']['top']
+            # Store the original options
+            for top_track in top_tracks:
+                key = top_track['type']
+                key = key + top_track['options']['dataSource'] if key == "sv" else key
+                if key not in original_options:
+                    original_options[key] = top_track['options']
+
+        # Delete original tracks from the insert, replace them with adjusted data
+        # from the sample data. If there is no data, we only show the sequence track
+        del top_tracks[5:] 
+        # print(json.dumps(top_tracks, indent=2))
+
+        higlass_sv_vcf = request.json_body.get('higlass_sv_vcf', None) 
+        higlass_sv_vcf_presigned = None
+        higlass_sv_tbi_presigned = None
+        if higlass_sv_vcf is not None:
+            #s3_bucket = "elasticbeanstalk-fourfront-cgapwolf-wfoutput"
+            higlass_sv_vcf_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf)
+            higlass_sv_tbi_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf+".tbi")
+
+        for sample in samples_pedigree:
+            accession = sample["sample_accession"]
+
+            # If the accession is not in the option list, something went wrong
+            if accession not in bam_visibilty or accession not in sv_vcf_visibilty:
+                continue
+
+            if(bam_visibilty[accession] == True or sv_vcf_visibilty[accession] == True):
+                empty_track_sample = deepcopy(empty_track_a)
+                empty_track_sample["uid"] = "empty_above_text" + accession
+                top_tracks.append(empty_track_sample)
+
+                text_track_sample = deepcopy(text_track)
+                text_track_sample["uid"] = "text" + accession
+                text_track_sample["options"]["text"] = "%s (%s)" % (sample["relationship"].capitalize(),sample["sample_name"])
+                top_tracks.append(text_track_sample)
+
+            if(bam_visibilty[accession] == True):
+
+                empty_track_sample = deepcopy(empty_track_b)
+                empty_track_sample["uid"] = "empty_above_pileup" + accession
+                top_tracks.append(empty_track_sample)
+
+                pileup_track_sample = deepcopy(pileup_track)
+                pileup_track_sample["uid"] = "pileup" + accession
+                bam_key = sample["bam_location"]
+                bai_key = bam_key + ".bai"
+
+                pileup_track_sample['data']['bamUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=bam_key)
+                pileup_track_sample['data']['baiUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=bai_key)
+                if 'pileup' in original_options:
+                    pileup_track_sample['options'] = deepcopy(original_options['pileup'])
+                top_tracks.append(pileup_track_sample)
+
+            if(sv_vcf_visibilty[accession] == True):
+                empty_track_sample = deepcopy(empty_track_b)
+                empty_track_sample["uid"] = "empty_above_vcf" + accession
+                top_tracks.append(empty_track_sample)
+
+
+
+                cgap_sv_track_sample = deepcopy(cgap_sv_track)
+                # cgap_sv_track_sample['data']['vcfUrl'] = "https://aveit.s3.amazonaws.com/misc/GAPFIAFHF16S.vcf.gz"
+                # cgap_sv_track_sample['data']['tbiUrl'] = "https://aveit.s3.amazonaws.com/misc/GAPFIAFHF16S.vcf.gz.tbi"
+                cgap_sv_track_sample['data']['vcfUrl'] = higlass_sv_vcf_presigned
+                cgap_sv_track_sample['data']['tbiUrl'] = higlass_sv_tbi_presigned
+
+                cgap_sv_track_sample["uid"] = "vcf" + accession
+                if 'svcgap' in original_options:
+                    cgap_sv_track_sample['options'] = deepcopy(original_options['svcgap'])
+                    cgap_sv_track_sample['options']['dataSource'] = 'cgap'
+                    #cgap_sv_track_sample['options']['sampleName'] = 'NA24149_sample'
+                    cgap_sv_track_sample['options']['sampleName'] = sample["sample_name"]
+
+                if higlass_sv_vcf_presigned is not None:
+                    top_tracks.append(cgap_sv_track_sample)
+
+        accession = "gnomad-sv"
+        if(accession in sv_vcf_visibilty and sv_vcf_visibilty[accession] == True):
+            empty_track_sample = deepcopy(empty_track_a)
+            empty_track_sample["uid"] = "empty_above_text" + accession
+            top_tracks.append(empty_track_sample)
+
+            text_track_sample = deepcopy(text_track)
+            text_track_sample["uid"] = "text" + accession
+            text_track_sample["options"]["text"] = "GnomAD SV"
+            top_tracks.append(text_track_sample)
+
+            empty_track_sample = deepcopy(empty_track_b)
+            empty_track_sample["uid"] = "empty_above_gnomad" + accession
+            top_tracks.append(empty_track_sample)
+
+            if 'svgnomad' in original_options:
+                gnomad_track['options'] = deepcopy(original_options['svgnomad'])
+                gnomad_track['options']['dataSource'] = 'gnomad'
+            top_tracks.append(gnomad_track)
 
     return {
         "success" : True,
