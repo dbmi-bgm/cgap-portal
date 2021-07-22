@@ -59,8 +59,8 @@ export class InterpretationSpaceWrapper extends React.Component {
         const cleanedNote = { ...noteState };
 
         const fieldsToCleanFromInterpretation = ["gene_candidacy", "variant_candidacy"];
-        const fieldsToCleanFromDiscovery = ["acmg_guidelines", "conclusion", "classification"];
-        const fieldsToCleanFromStandard = ["acmg_guidelines", "conclusion", "classification", "gene_candidacy", "variant_candidacy"];
+        const fieldsToCleanFromDiscovery = ["acmg_rules_invoked", "conclusion", "classification"];
+        const fieldsToCleanFromStandard = ["acmg_rules_invoked", "conclusion", "classification", "gene_candidacy", "variant_candidacy"];
 
         switch(noteType) {
             case "note_interpretation":
@@ -293,14 +293,14 @@ export class InterpretationSpaceController extends React.Component {
             gene_candidacy: lastSavedGeneCandidacy = null,
             variant_candidacy: lastSavedVariantCandidacy = null,
             note_text: lastSavedNoteText = "",
-            acmg_guidelines: lastSavedACMG = []
+            acmg_rules_invoked: lastSavedACMG = [],
         } = lastSavedNote || {};
         const {
             classification: currClassification = null,
             gene_candidacy: currGeneCandidacy = null,
             variant_candidacy: currVariantCandidacy = null,
             note_text: currNoteText = "",
-            acmg_guidelines: currACMG = []
+            acmg_rules_invoked: currACMG = []
         } = currNote || {};
 
         if (currClassification !== lastSavedClassification ||
@@ -395,7 +395,7 @@ export class InterpretationSpaceController extends React.Component {
 
         // Add ACMG from WIP
         const interpretationWIP = { ...interpretation_wip };
-        interpretationWIP["acmg_guidelines"] = wipACMGSelections;
+        interpretationWIP["acmg_rules_invoked"] = wipACMGSelections;
         const isDraftInterpretationUnsaved = InterpretationSpaceController.hasNoteChanged(interpretationWIP, lastSavedInterpretation);
 
         const hasEditPermission = this.memoized.haveEditPermission(actions);
@@ -508,7 +508,7 @@ class GenericInterpretationPanel extends React.PureComponent {
         const { setIsSubmitting, wipACMGSelections, isSubmitting, lastSavedNote, otherDraftsUnsaved } = this.props;
 
         const savedState = { ...this.state };
-        savedState.acmg_guidelines = wipACMGSelections;
+        savedState.acmg_rules_invoked = wipACMGSelections;
 
         const isThisNoteUnsaved = InterpretationSpaceController.hasNoteChanged(lastSavedNote, savedState);
         const anyNotesUnsaved = otherDraftsUnsaved || isThisNoteUnsaved;
@@ -540,7 +540,7 @@ class GenericInterpretationPanel extends React.PureComponent {
     saveStateAsDraft() {
         const { saveAsDraft, retainWIPStateOnUnmount, noteType, saveToField, wipACMGSelections } = this.props;
         const stateToSave = { ...this.state };
-        stateToSave.acmg_guidelines = wipACMGSelections;
+        stateToSave.acmg_rules_invoked = wipACMGSelections;
         saveAsDraft(stateToSave, saveToField, noteType);
         retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
     }
@@ -572,7 +572,7 @@ class GenericInterpretationPanel extends React.PureComponent {
 
 
         const stateToSave = { ...this.state };
-        stateToSave.acmg_guidelines = wipACMGSelections;
+        stateToSave.acmg_rules_invoked = wipACMGSelections;
 
         const noteChangedSinceLastSave = InterpretationSpaceController.hasNoteChanged(lastSavedNote, stateToSave);
         const noteTextPresent = !!noteText;
@@ -596,7 +596,7 @@ class GenericInterpretationPanel extends React.PureComponent {
                     : null}
                 <AutoGrowTextArea {...{ isFallback }} cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
-                    <GenericFieldForm {...{ isFallback }} fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_guidelines', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    <GenericFieldForm {...{ isFallback }} fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_rules_invoked', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
                 { noteType === "note_discovery" ?
                     <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
@@ -794,7 +794,7 @@ function GenericFieldForm(props) {
     const fieldsJSX = useMemo(function() {
         return fieldsArr.map((fieldDataObj) => {
             const { field, value, autoClassification, toggleInvocation } = fieldDataObj;
-            if (field === "acmg_guidelines") {
+            if (field === "acmg_rules_invoked") {
                 return (
                     <ACMGPicker key={field} selections={value} {...{ schemas, field, autoClassification, toggleInvocation, getFieldProperties, isFallback }}/>
                 );
@@ -821,12 +821,22 @@ function ACMGPicker(props) {
     const fieldSchema = getFieldProperties(field);
     const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
 
-    const picked = selections.map((selection, i) => (
-        <div className={`acmg-invoker text-600 ${isFallback ? "unclickable" : "clickable"} text-monospace text-center mr-01 ml-01`} key={selection} data-criteria={selection} data-invoked={true}
-            data-tip={!isFallback ? "Click to deselect this rule": null} onClick={!isFallback ? () => toggleInvocation(selection): undefined}>
-            { selection }
-        </div>
-    ));
+    const picked = selections.map((selection, i) => {
+        const { rule_strength: strength, acmg_rule_name: rule } = selection;
+
+        // Display "Very Strong" as "VeryStrong" to match ACMG standard instead of schema enum
+        let strengthNoSpaces;
+        if (strength === "Very Strong") {
+            strengthNoSpaces = strength.split(" ").join("");
+        }
+
+        return (
+            <div className={`acmg-invoker text-600 ${isFallback ? "unclickable" : "clickable"} text-monospace text-center mr-01 ml-01`} key={rule} data-criteria={rule} data-invoked={true}
+                data-tip={!isFallback ? "Click to deselect this rule": null} onClick={!isFallback ? () => toggleInvocation(selection): undefined}>
+                { rule }{ strength && strength !== "Default" ? ("_" + (strengthNoSpaces || strength)) : null }
+            </div>
+        );
+    });
 
     return (
         <React.Fragment>

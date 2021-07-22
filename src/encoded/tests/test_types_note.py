@@ -12,6 +12,13 @@ def new_interpretation():
         "project": "hms-dbmi",
         "institution": "hms-dbmi",
         "note_text": "This variant is reported in the ClinVar database as associated with Syndrome X.",
+        "acmg_guidelines": ["PVS1", "PM2"],
+        "acmg_rules_invoked": [
+            {"acmg_rule_name": "PM3", "rule_strength": "Strong"},
+            {"acmg_rule_name": "PM6"},
+            {"acmg_rule_name": "PP1", "rule_strength": "Moderate"},
+            {"acmg_rule_name": "PP2", "rule_strength": "Default"}
+        ],
         "conclusion": "For this reason, the variant has been classified as likely pathogenic.",
         "classification": "Likely pathogenic"
     }
@@ -95,6 +102,18 @@ def test_patch_note_interpretation_fail(workbook, es_testapp, new_interpretation
         'associated_items': {"item_type": "Variant", "item_identifier": variant_with_note}  # wrong type
     }
     es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
+
+def test_note_interpretation_acmg_rules_modified(workbook, es_testapp, new_interpretation):
+    """
+    Tests the acmg_rules_with_modifier calculated property.
+    Tests that
+    - each rule in acmg_rules_invoked is added to calc prop with correct modifier (or none)
+    - none of the deprecated acmg_guidelines get added
+    """
+    resp = post_note(es_testapp, new_interpretation).json['@graph'][0]
+    rules_with_strength = resp.get('acmg_rules_with_modifier')
+    assert rules_with_strength
+    assert sorted(rules_with_strength) == ["PM3_Strong", "PM6", "PP1_Moderate", "PP2"]
 
 def test_add_note_discovery_success(workbook, es_testapp, new_discovery_note):
     """ test NoteDiscovery item posts successfully """
