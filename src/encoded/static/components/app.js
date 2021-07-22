@@ -1129,8 +1129,10 @@ export default class App extends React.PureComponent {
             "img-src 'self' https://*",
             "child-src 'none'",
             "script-src 'self' https://www.google-analytics.com https://cdn.auth0.com https://secure.gravatar.com" + (typeof BUILDTYPE === "string" && BUILDTYPE === "quick" ? " 'unsafe-eval'" : ""),
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-            "font-src 'self' https://fonts.gstatic.com"
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com  https://unpkg.com",
+            "font-src 'self' https://fonts.gstatic.com",
+            "worker-src 'self' blob:",
+            "connect-src 'self' https://cgap-higlass.com https://*.s3.amazonaws.com https://rest.ensembl.org"
         ].join("; ");
 
         // `lastCSSBuildTime` is used for both CSS and JS because is most likely they change at the same time on production from recompiling
