@@ -1128,7 +1128,8 @@ export default class App extends React.PureComponent {
             "default-src 'self'",
             "img-src 'self' https://*",
             "child-src 'none'",
-            "script-src 'self' https://www.google-analytics.com https://cdn.auth0.com https://secure.gravatar.com" + (typeof BUILDTYPE === "string" && BUILDTYPE === "quick" ? " 'unsafe-eval'" : ""),
+            // Allowing unsafe-eval temporarily re: 'box-intersect' dependency of some HiGlass tracks.
+            "script-src 'self' https://www.google-analytics.com https://cdn.auth0.com https://secure.gravatar.com 'unsafe-eval'", // + (typeof BUILDTYPE === "string" && BUILDTYPE === "quick" ? " 'unsafe-eval'" : ""),
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com  https://unpkg.com",
             "font-src 'self' https://fonts.gstatic.com",
             "worker-src 'self' blob:",

@@ -69,8 +69,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                 ajax.load(
                     "/search/?type=Case&sample.bam_sample_id="+bamSampleId+"&vcf_file.accession="+file,
                     (resp) => {
-                        
-                        if(resp["@graph"].length > 0 && resp["@graph"][0]["sample_processing"]){
+                        if (resp["@graph"].length > 0 && resp["@graph"][0]["sample_processing"]){
                             const samplesPedigree = resp["@graph"][0]["sample_processing"]["samples_pedigree"] ??  null;
                             const payload = {
                                 'variant_pos_abs' : variantPositionAbsCoord,
@@ -79,9 +78,9 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                                 'bam_sample_id' : bamSampleId,
                             };
                             this.getViewconf(payload, fallbackCallback);
-                        }else{
+                        } else {
                             console.warn("There are no BAM files for this case.");
-                        } 
+                        }
                     },
                     'GET',
                     fallbackCallback
@@ -129,10 +128,9 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                     'variant_pos_abs' : variantPositionAbsCoord,
                     'requesting_tab' : requestingTab
                 };
-
-                this.getViewconf(payload, fallbackCallback)
+                this.getViewconf(payload, fallbackCallback);
             }
-        
+
         });
     }
 
@@ -143,7 +141,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
             (resp) => {
                 const higlassItem = {
                     viewconfig:  resp.viewconfig
-                }
+                };
                 this.setState({ 'higlassItem' : higlassItem,'loading': false });
             },
             'POST',
@@ -163,7 +161,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
         }
 
         // Use the height to make placeholder message when loading.
-        var placeholderStyle = { "height" : height || 600 };
+        const placeholderStyle = { "height" : height || 600 };
         if (placeholderStyle.height >= 140) {
             placeholderStyle.paddingTop = (placeholderStyle.height / 2) - 40;
         }
@@ -177,7 +175,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
         if (!higlassItem || !higlassItem.viewconfig) {
             return (
                 <div className="text-center" style={placeholderStyle}>
-                    <HiGlassLoadingIndicator icon="exclamation-triangle" title="No HiGlass content found. Please go back or try again later." />
+                    <HiGlassLoadingIndicator icon="exclamation-triangle fas" title="No HiGlass content found. Please go back or try again later." />
                 </div>
             );
         }
