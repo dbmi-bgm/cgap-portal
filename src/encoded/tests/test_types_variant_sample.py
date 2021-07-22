@@ -20,7 +20,7 @@ def bgm_test_variant_sample2(bgm_test_variant_sample):
 def bgm_test_variant_sample_for_note_patch_process(institution, bgm_project):
     # IS NOT pre-POSTed into DB.
     return {
-        'status': 'in review',
+        # 'status': 'in review', # Can't be explicitly supplied by non-admin user.
         'note_text': 'dummy text 1',
         'project': bgm_project['@id'],
         'institution': institution['@id']
@@ -110,11 +110,16 @@ def test_variant_sample_list_post(bgm_user_testapp, variant_sample_list1):
     bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201)
 
 
-def test_variant_sample_patch_notes_process_success(bgm_user, bgm_user_testapp, bgm_test_variant_sample, bgm_test_variant_sample_for_note_patch_process, bgm_test_variant_sample_for_note_patch_process2):
+def test_variant_sample_patch_notes_process_success(bgm_user, testapp, bgm_user_testapp, bgm_test_variant_sample, bgm_test_variant_sample_for_note_patch_process, bgm_test_variant_sample_for_note_patch_process2):
     
-    # Load up some data
+    # Load up some data - these are notes to be added with "/@@process-notes/"
     note1 = bgm_user_testapp.post_json('/notes-standard', bgm_test_variant_sample_for_note_patch_process, status=201).json['@graph'][0]
     note2 = bgm_user_testapp.post_json('/notes-interpretation', bgm_test_variant_sample_for_note_patch_process2, status=201).json['@graph'][0]
+
+    # "pre-existing" variant note from _same Project_.
+    bgm_test_variant_sample_for_note_patch_process3 = bgm_test_variant_sample_for_note_patch_process2.copy()
+    bgm_test_variant_sample_for_note_patch_process3['note_text'] = 'dummy text 3'
+    note3 = bgm_user_testapp.post_json('/notes-standard', bgm_test_variant_sample_for_note_patch_process3, status=201).json['@graph'][0]
 
     bgm_test_variant_sample_copy = bgm_test_variant_sample.copy()
     bgm_test_variant_sample_copy['file'] = 'other-file-name2'
@@ -122,6 +127,9 @@ def test_variant_sample_patch_notes_process_success(bgm_user, bgm_user_testapp, 
     bgm_test_variant_sample_copy['interpretation'] = note2['@id']
 
     variant_sample = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample_copy, status=201).json['@graph'][0]
+
+    # Add the pre-existing variant note (as admin)
+    testapp.patch_json(variant_sample["variant"], { "variant_notes": [ note3["@id"] ] }, status=200)
 
     # Test /@@process-notes/ endpoint
     patch_process_payload = {
@@ -144,6 +152,11 @@ def test_variant_sample_patch_notes_process_success(bgm_user, bgm_user_testapp, 
     variant_reloaded = bgm_user_testapp.get(variant_sample["variant"] + "?datastore=database", status=200).json
     assert note1["@id"] in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
     assert note2["@id"] in [ inp["@id"] for inp in variant_reloaded["interpretations"] ]
+
+    # Since note3 (pre-existing) has same Project (BGM), it should have been removed and instead available via note1.previous_note
+    assert note3["@id"] not in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
+    assert note1_reloaded["previous_note"] == note3["@id"]
+
 
 
 
