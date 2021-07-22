@@ -49,6 +49,9 @@
         },
         "previous_note": {
             "linkTo": "NoteStandard"
+        },
+        "superseding_note": {
+            "linkTo": "NoteStandard"
         }
     },
     "facets": {},

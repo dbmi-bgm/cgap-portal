@@ -733,7 +733,6 @@ def process_notes(context, request):
             "date_approved": timestamp
         }
 
-    # project_cache = {} # We probably only have 1 ever, but who knows...
     def add_or_replace_note_for_project_on_vg_item(note_type_name, vg_item, payload):
         pluralized = {
             "interpretation": "interpretations",
@@ -741,30 +740,36 @@ def process_notes(context, request):
             "gene_notes": "gene_notes",
             "variant_notes": "variant_notes"
         }
-        if not vg_item.get(pluralized[note_type_name]):
-            payload[pluralized[note_type_name]] = [
-                ln[note_type_name]["@id"]
-            ]
+        note_type_name_plural = pluralized[note_type_name]
+        new_note_id = ln[note_type_name]["@id"]
+        if not vg_item.get(note_type_name_plural):
+            payload[note_type_name_plural] = [ new_note_id ]
         else:
-            existing_node_ids = [ note["@id"] for note in vg_item[pluralized[note_type_name]] ]
-            if ln[note_type_name]["@id"] not in existing_node_ids: # 's'
+            existing_node_ids = [ note["@id"] for note in vg_item[note_type_name_plural] ]
+            if new_note_id not in existing_node_ids: # 's'
                 # Check if note from same project exists and remove it (link to it from Note.previous_note instd.)
                 # Ensure we compare to Note.project and not User.project, in case an admin or someone else is manually editing.
                 existing_note_from_project_idx = None
-                for note_idx, note in enumerate(vg_item[pluralized[note_type_name]]):
+                for note_idx, note in enumerate(vg_item[note_type_name_plural]):
                     if note["project"] == ln[note_type_name]["project"]:
                         existing_note_from_project_idx = note_idx
                         break
 
-                payload[pluralized[note_type_name]] = existing_node_ids
+                payload[note_type_name_plural] = existing_node_ids
 
                 if existing_note_from_project_idx != None:
                     # Link to existing Note from newly-shared Note
-                    note_patch_payloads[ln[note_type_name]["@id"]]["previous_note"] = \
-                        vg_item[pluralized[note_type_name]][existing_note_from_project_idx]["@id"]
-                    del payload[pluralized[note_type_name]][existing_note_from_project_idx]
+                    existing_node_from_project_id = vg_item[note_type_name_plural][existing_note_from_project_idx]["@id"]
+                    note_patch_payloads[new_note_id]["previous_note"] = existing_node_from_project_id
+                    # Link to newly-shared Note from existing note (adds new PATCH request)
+                    note_patch_payloads[existing_node_from_project_id] = {
+                        "superseding_note": new_note_id,
+                        "status": "obsolete"
+                    }
+                    # Remove existing Note from Variant or Gene Notes list
+                    del payload[note_type_name_plural][existing_note_from_project_idx]
 
-                payload[pluralized[note_type_name]].append(ln[note_type_name]["@id"])
+                payload[note_type_name_plural].append(new_note_id)
 
 
 

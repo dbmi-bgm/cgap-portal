@@ -104,6 +104,9 @@
         },
         "previous_note": {
             "linkTo": "NoteInterpretation"
+        },
+        "superseding_note": {
+            "linkTo": "NoteInterpretation"
         }
     },
     "facets": {

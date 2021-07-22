@@ -71,6 +71,9 @@
         },
         "previous_note": {
             "linkTo": "NoteDiscovery"
+        },
+        "superseding_note": {
+            "linkTo": "NoteDiscovery"
         }
     },
     "facets": {

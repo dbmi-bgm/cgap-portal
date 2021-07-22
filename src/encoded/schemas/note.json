@@ -25,6 +25,12 @@
             "type": "string",
             "linkTo": "Note"
         },
+        "superseding_note": {
+            "title": "Superseding Note",
+            "description": "Newer note from same Project, if any",
+            "type": "string",
+            "linkTo": "Note"
+        },
         "note_text": {
             "title": "Note Text",
             "type": "string",

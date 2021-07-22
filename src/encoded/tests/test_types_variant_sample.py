@@ -116,10 +116,10 @@ def test_variant_sample_patch_notes_process_success(bgm_user, testapp, bgm_user_
     note1 = bgm_user_testapp.post_json('/notes-standard', bgm_test_variant_sample_for_note_patch_process, status=201).json['@graph'][0]
     note2 = bgm_user_testapp.post_json('/notes-interpretation', bgm_test_variant_sample_for_note_patch_process2, status=201).json['@graph'][0]
 
-    # "pre-existing" variant note from _same Project_.
+    # Create a "pre-existing" variant_note with same Project (BGM).
     bgm_test_variant_sample_for_note_patch_process3 = bgm_test_variant_sample_for_note_patch_process2.copy()
     bgm_test_variant_sample_for_note_patch_process3['note_text'] = 'dummy text 3'
-    note3 = bgm_user_testapp.post_json('/notes-standard', bgm_test_variant_sample_for_note_patch_process3, status=201).json['@graph'][0]
+    note_pre_existing = bgm_user_testapp.post_json('/notes-standard', bgm_test_variant_sample_for_note_patch_process3, status=201).json['@graph'][0]
 
     bgm_test_variant_sample_copy = bgm_test_variant_sample.copy()
     bgm_test_variant_sample_copy['file'] = 'other-file-name2'
@@ -128,8 +128,8 @@ def test_variant_sample_patch_notes_process_success(bgm_user, testapp, bgm_user_
 
     variant_sample = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample_copy, status=201).json['@graph'][0]
 
-    # Add the pre-existing variant note (as admin)
-    testapp.patch_json(variant_sample["variant"], { "variant_notes": [ note3["@id"] ] }, status=200)
+    # Add the pre-existing variant_note by PATCHING VariantSample.variant.variant_notes (as admin)
+    testapp.patch_json(variant_sample["variant"], { "variant_notes": [ note_pre_existing["@id"] ] }, status=200)
 
     # Test /@@process-notes/ endpoint
     patch_process_payload = {
@@ -143,7 +143,7 @@ def test_variant_sample_patch_notes_process_success(bgm_user, testapp, bgm_user_
 
     assert resp["success"] == True
     assert resp["patch_results"]["Variant"] == 1
-    assert resp["patch_results"]["Note"] == 2
+    assert resp["patch_results"]["Note"] == 3 # 2 Newly-shared Notes, +1 "superseding_notes" field to existing Note PATCH
 
     note1_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database&frame=object", status=200).json
     assert note1_reloaded["status"] == "current"
@@ -153,9 +153,12 @@ def test_variant_sample_patch_notes_process_success(bgm_user, testapp, bgm_user_
     assert note1["@id"] in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
     assert note2["@id"] in [ inp["@id"] for inp in variant_reloaded["interpretations"] ]
 
-    # Since note3 (pre-existing) has same Project (BGM), it should have been removed and instead available via note1.previous_note
-    assert note3["@id"] not in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
-    assert note1_reloaded["previous_note"] == note3["@id"]
+    # Since note_pre_existing (pre-existing) has same Project (BGM), it should have been removed and instead available via note1.previous_note
+    assert note_pre_existing["@id"] not in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
+    assert note1_reloaded["previous_note"] == note_pre_existing["@id"]
+
+    note_pre_existing_reloaded = bgm_user_testapp.get(note_pre_existing["@id"] + "?datastore=database&frame=object", status=200).json
+    assert note_pre_existing_reloaded["superseding_note"] == note1["@id"]
 
 
 
