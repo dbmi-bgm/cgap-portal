@@ -38,5 +38,19 @@
         "proband": "5ec91041-78a0-4758-abef-21c7f5fd9f35",
         "original_pedigree": "dcf15d5e-40aa-43bc-b81c-32c70c9afc52",
         "description": "This family been affected by a novel disease which can emerge at any age. The initial symptoms include gastrointestinal pains followed a few days later by appearance of a green tint in some extremities."
+    },
+    {
+        "title": "Family001",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "family_id": "hms56789a",
+        "status": "shared",
+        "uuid": "415fa8aa-8482-43d0-a90a-540c0ee9c1e0",
+        "members": [
+            "5ec91041-78a0-4758-abef-21c7f5fd9ffc",
+            "5c302401-88f6-44b8-9cf9-f062dfaa98c4",
+            "96974f2e-de0a-4f3a-9be5-543359da74a1"
+        ],
+        "proband": "5ec91041-78a0-4758-abef-21c7f5fd9ffc"
     }
 ]

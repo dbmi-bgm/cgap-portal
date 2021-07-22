@@ -102,6 +102,46 @@
                       "description": "tarred read counts (rck) file"
                   }
               }
+          },
+          {
+              "name": "bamsnap-extra-dimension",
+              "workflow": "8fb51fb5-df13-45df-bc9c-2817a29de2b3",
+              "input": [
+                  {
+                      "argument_name": "input_bams",
+                      "argument_type": "file",
+                      "source_argument_name": "bam",
+                      "extra_dimension": 1
+                  }
+              ],
+              "config": {
+                  "instance_type": "m5.xlarge",
+                  "ebs_size": "2.5x",
+                  "EBS_optimized": true,
+                  "spot_instance": true,
+                  "log_bucket": "tibanna-output",
+                  "behavior_on_capacity_limit": "wait_and_retry"
+              }
+          },
+          {
+              "name": "bamsnap-gather",
+              "workflow": "8fb51fb5-df13-45df-bc9c-2817a29de2b3",
+              "input": [
+                  {
+                      "argument_name": "input_bams",
+                      "argument_type": "file",
+                      "source_argument_name": "bam",
+                      "gather": 1
+                  }
+              ],
+              "config": {
+                  "instance_type": "m5.xlarge",
+                  "ebs_size": "2.5x",
+                  "EBS_optimized": true,
+                  "spot_instance": true,
+                  "log_bucket": "tibanna-output",
+                  "behavior_on_capacity_limit": "wait_and_retry"
+              }
           }
       ]
     }
