@@ -35,7 +35,8 @@ CMPHET_UNPHASED_WEAK = 'Compound Het (Unphased/weak_pair)'
 # Shared embeds for variants and variant samples also used for corresponding SV items
 SHARED_VARIANT_EMBEDS = [
     "interpretations.classification",
-    "interpretations.acmg_guidelines",
+    "interpretations.acmg_rules_invoked.*",
+    "interpretations.acmg_rules_with_modifier",
     "interpretations.conclusion",
     "interpretations.note_text",
     "interpretations.version",
@@ -54,6 +55,7 @@ SHARED_VARIANT_EMBEDS = [
     "discovery_interpretations.last_modified.date_modified",
     "discovery_interpretations.last_modified.modified_by.display_title"
 ]
+
 SHARED_VARIANT_SAMPLE_EMBEDS = [
     "variant_notes.note_text",
     "variant_notes.version",
@@ -70,7 +72,8 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "gene_notes.last_modified.date_modified",
     "gene_notes.last_modified.modified_by.display_title",
     "interpretation.classification",
-    "interpretation.acmg_guidelines",
+    "interpretation.acmg_rules_invoked.*",
+    "interpretation.acmg_rules_with_modifier",
     "interpretation.conclusion",
     "interpretation.note_text",
     "interpretation.version",

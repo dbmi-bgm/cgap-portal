@@ -4,6 +4,7 @@ from operator import itemgetter
 import jwt
 import datetime
 from base64 import b64decode
+import structlog
 
 from passlib.context import CryptContext
 from urllib.parse import urlencode, urlparse
@@ -43,6 +44,10 @@ from snovault.validators import no_validate_item_content_post
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.schema_utils import validate_request
 from snovault.util import debug_log
+
+
+log = structlog.getLogger(__name__)
+
 
 CRYPT_CONTEXT = __name__ + ':crypt_context'
 
@@ -239,14 +244,13 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         This is only called if we receive a Bearer token in Authorization header.
         '''
         try:
-
             # lets see if we have an auth0 token or our own
             registry = request.registry
             auth0_client = registry.settings.get('auth0.client')
             auth0_secret = registry.settings.get('auth0.secret')
             if auth0_client and auth0_secret:
                 # leeway accounts for clock drift between us and auth0
-                payload = jwt.decode(token, b64decode(auth0_secret, '-_'),
+                payload = jwt.decode(token, auth0_secret,
                                      algorithms=JWT_DECODING_ALGORITHMS,
                                      audience=auth0_client, leeway=30)
                 if 'email' in payload and Auth0AuthenticationPolicy.email_is_partners_or_hms(payload):
@@ -261,9 +265,15 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                     request.set_property(lambda r: False, 'auth0_expired')
                     return payload
 
+        except jwt.exceptions.ExpiredSignatureError as e:
+            # Normal/expected expiration.
+            request.set_property(lambda r: True, 'auth0_expired')  # Allow us to return 403 code &or unset cookie in renderers.py
+            return None
+
         except (ValueError, jwt.exceptions.InvalidTokenError, jwt.exceptions.InvalidKeyError) as e:
-            # Catch errors from decoding JWT
+            # Catch errors from decoding JWT or unauthorized users.
             print('Invalid JWT assertion : %s (%s)' % (e, type(e).__name__))
+            log.error("Error with JWT token (now unset) - " + str(e))
             request.set_property(lambda r: True, 'auth0_expired')  # Allow us to return 403 code &or unset cookie in renderers.py
             return None
 
@@ -507,7 +517,7 @@ def impersonate_user(context, request):
 
     id_token = jwt.encode(
         jwt_contents,
-        b64decode(auth0_secret, '-_'),
+        auth0_secret,
         algorithm=JWT_ENCODING_ALGORITHM
 	)
 
