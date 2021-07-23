@@ -6,7 +6,6 @@ import { SvBrowser } from './SvBrowser';
 
 export const SvBrowserTabBody = React.memo(function SvBrowserTabBody (props) {
     const { context, schemas, active = false } = props;
-    console.log(props)
 
     return (
         <div className={"browser-tab-body card-body" + (!active ? " d-none" : "")}>

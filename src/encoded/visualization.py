@@ -151,8 +151,9 @@ def get_higlass_viewconf(context, request):
     higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
     higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
 
-    s3_bucket = request.registry.settings.get('file_wfout_bucket')
-    #s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
+    ## CHANGE BEFORE MERGE
+    #s3_bucket = request.registry.settings.get('file_wfout_bucket')
+    s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
 
 
     if requesting_tab == "bam":
@@ -216,6 +217,8 @@ def get_higlass_viewconf(context, request):
         higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_end + window_size_small 
 
         # Vertical rules
+        higlass_viewconfig['views'][0]['tracks']['whole'][0]['x'] = variant_start
+        higlass_viewconfig['views'][0]['tracks']['whole'][1]['x'] = variant_end
         higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_start
         higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_end
         # This is the id of the variant sample that we are currently looking at.
@@ -257,7 +260,8 @@ def get_higlass_viewconf(context, request):
         higlass_sv_vcf_presigned = None
         higlass_sv_tbi_presigned = None
         if higlass_sv_vcf is not None:
-            #s3_bucket = "elasticbeanstalk-fourfront-cgapwolf-wfoutput"
+            ## CHANGE BEFORE MERGE
+            s3_bucket = "elasticbeanstalk-fourfront-cgapwolf-wfoutput"
             higlass_sv_vcf_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf)
             higlass_sv_tbi_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf+".tbi")
 
@@ -312,8 +316,8 @@ def get_higlass_viewconf(context, request):
                 if 'svcgap' in original_options:
                     cgap_sv_track_sample['options'] = deepcopy(original_options['svcgap'])
                     cgap_sv_track_sample['options']['dataSource'] = 'cgap'
-                    #cgap_sv_track_sample['options']['sampleName'] = 'NA24149_sample'
-                    cgap_sv_track_sample['options']['sampleName'] = sample["sample_name"]
+
+                cgap_sv_track_sample['options']['sampleName'] = sample["sample_name"]
 
                 if higlass_sv_vcf_presigned is not None:
                     top_tracks.append(cgap_sv_track_sample)

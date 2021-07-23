@@ -87,26 +87,30 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                 );
             }
             else if(requestingTab === "sv"){
+                // In contrast to the bam case above, we already got the case in SvBrowser.js. We are reusing that data here.
+                
                 if(samples === null){
                     console.warn("No available samples");
                     return;
                 }
 
-                const variantEndAbsCoord = this.state.variantEndAbsCoord === null ? variantPositionAbsCoord : this.state.variantEndAbsCoord;
+                const variantEndAbsCoord = 
+                    this.state.variantEndAbsCoord === null 
+                        ? variantPositionAbsCoord 
+                        : this.state.variantEndAbsCoord;
                 const higlassSvVcf = this.state.higlassSvVcf;
 
-                // Default settings for initial load - show only the proband files
+                // Default settings for initial load - show only the proband bam files
                 const svBamVisibility = {}
                 const svVcfVisibility = {}
                 samples.forEach((sample) => {
                     if(sample.sample_name === bamSampleId){
                         svBamVisibility[sample.sample_accession] = true;
-                        svVcfVisibility[sample.sample_accession] = true;
                     }
                     else{
                         svBamVisibility[sample.sample_accession] = false;
-                        svVcfVisibility[sample.sample_accession] = false;
                     }
+                    svVcfVisibility[sample.sample_accession] = true;
                     svVcfVisibility["gnomad-sv"] = true;
                 });
 
