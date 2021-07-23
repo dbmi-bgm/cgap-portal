@@ -151,9 +151,8 @@ def get_higlass_viewconf(context, request):
     higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
     higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
 
-    ## CHANGE BEFORE MERGE
-    #s3_bucket = request.registry.settings.get('file_wfout_bucket')
-    s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
+    s3_bucket = request.registry.settings.get('file_wfout_bucket')
+    #s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
 
 
     if requesting_tab == "bam":
@@ -238,7 +237,6 @@ def get_higlass_viewconf(context, request):
         cgap_sv_track = deepcopy(top_tracks[9])
         gnomad_track = deepcopy(top_tracks[10])
 
-
         current_viewconf = request.json_body.get('current_viewconf', None) 
         original_options = {}
         if current_viewconf is not None:
@@ -254,14 +252,12 @@ def get_higlass_viewconf(context, request):
         # Delete original tracks from the insert, replace them with adjusted data
         # from the sample data. If there is no data, we only show the sequence track
         del top_tracks[5:] 
-        # print(json.dumps(top_tracks, indent=2))
 
         higlass_sv_vcf = request.json_body.get('higlass_sv_vcf', None) 
         higlass_sv_vcf_presigned = None
         higlass_sv_tbi_presigned = None
         if higlass_sv_vcf is not None:
-            ## CHANGE BEFORE MERGE
-            s3_bucket = "elasticbeanstalk-fourfront-cgapwolf-wfoutput"
+            #s3_bucket = "elasticbeanstalk-fourfront-cgapwolf-wfoutput"
             higlass_sv_vcf_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf)
             higlass_sv_tbi_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf+".tbi")
 
@@ -304,11 +300,7 @@ def get_higlass_viewconf(context, request):
                 empty_track_sample["uid"] = "empty_above_vcf" + accession
                 top_tracks.append(empty_track_sample)
 
-
-
                 cgap_sv_track_sample = deepcopy(cgap_sv_track)
-                # cgap_sv_track_sample['data']['vcfUrl'] = "https://aveit.s3.amazonaws.com/misc/GAPFIAFHF16S.vcf.gz"
-                # cgap_sv_track_sample['data']['tbiUrl'] = "https://aveit.s3.amazonaws.com/misc/GAPFIAFHF16S.vcf.gz.tbi"
                 cgap_sv_track_sample['data']['vcfUrl'] = higlass_sv_vcf_presigned
                 cgap_sv_track_sample['data']['tbiUrl'] = higlass_sv_tbi_presigned
 
