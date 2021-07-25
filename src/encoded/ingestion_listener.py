@@ -28,7 +28,7 @@ from pyramid.request import Request
 from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
-from .ingestion.vcf_utils import VCFParser
+from .ingestion.vcf_utils import VCFParser, StructuralVariantVCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
 from .commands.add_altcounts_by_gene import main as add_altcounts
 from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
@@ -37,7 +37,7 @@ from .ingestion.processors import get_ingestion_processor
 # from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
-    resolve_file_path,  # gunzip_content,
+    resolve_file_path, gunzip_content,
     debuglog, get_trusted_email, beanstalk_env_from_request,
     subrequest_object, register_path_content_type, vapp_for_email, vapp_for_ingestion,
 )
@@ -573,11 +573,14 @@ class IngestionListener:
                                                      institution=file_meta['institution']['@id'])
                 elif vcf_variant_type == "SV":
                     # No reformatting necesssary for SV VCF
-                    parser = VCFParser(
+                    decoded_content = gunzip_content(raw_content)
+                    debuglog('Got decoded content: %s' % decoded_content[:20])
+
+                    parser = StructuralVariantVCFParser(
                         None,
                         STRUCTURAL_VARIANT_SCHEMA,
                         STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
-                        reader=Reader(formatted_vcf),
+                        reader=Reader(decoded_content),
                     )
                     variant_builder = StructuralVariantBuilder(
                         self.vapp,
