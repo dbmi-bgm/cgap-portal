@@ -70,7 +70,6 @@ def main():
                              institution=args.institution, project=args.project,
                              write=args.write_schemas)
 
-    import pdb; pdb.set_trace()
     # if not a dry run try to post inserts
     if args.post_inserts:  # do imports here as they will fail in certain scenarios
         environ = {

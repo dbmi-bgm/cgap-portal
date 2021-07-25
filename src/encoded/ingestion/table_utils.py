@@ -1078,10 +1078,8 @@ class StructuralVariantTableParser(VariantTableParser):
     """
     Subclass of VariantTableParser used for intake of SV mapping table.
 
-    Note: this class differs from the parent class in two important ways:
-        - it is designed only to update the 'properties' field of the
-           relevant schema
-        - it does not create annotation field inserts.
+    Note: this class differs from the parent class in that it is designed
+    explicitly to update the "properties" field of the relevant schema only.
     """
     SV_SCHEMA_PATH = resolve_file_path("schemas/structural_variant.json")
     SV_SAMPLE_SCHEMA_PATH = resolve_file_path("schemas/structural_variant_sample.json")
@@ -1094,20 +1092,76 @@ class StructuralVariantTableParser(VariantTableParser):
         ("variant_sample", EMBEDDED_VARIANT_SAMPLE_FIELDS),
     ]
 
-    # Rather than rewriting existing schema fields that aren't in mapping table,
-    # declare them here.
-    # NOTE: Check/update these lists for each mapping table intake
-    SV_PROPERTIES_TO_KEEP = ["annotation_id", "variant_notes"] 
-    SV_SAMPLE_PROPERTIES_TO_KEEP = [
-        "annotation_id",
-        "bam_snapshot",
-        "discovery_interpretation",
-        "file",
-        "gene_notes",
-        "interpretation",
-        "structural_variant",
-        "variant_notes",
-    ]
+    def __init__(self, *args, **kwargs):
+        super(StructuralVariantTableParser, self).__init__(*args, **kwargs)
+        self.old_sv_schema = json.load(io.open(self.SV_SCHEMA_PATH))
+        self.old_sv_sample_schema = json.load(io.open(self.SV_SAMPLE_SCHEMA_PATH))
+        self.sv_non_vcf_props = {}
+        self.sv_sample_non_vcf_props = {}
+        self.get_vcf_props()
+
+    def get_vcf_props(self):
+        """
+        NOTE: This will obviously fail if the "vcf_file" key is dropped
+        from the mapping table.
+        """
+        for key, value in self.old_sv_schema["properties"].items():
+            vcf_field = self._is_vcf_field(key, value)
+            if not vcf_field:
+                self.sv_non_vcf_props[key] = ""
+            else:
+                sub_embeds_to_keep = self._collect_non_vcf_sub_embeds(key, value)
+                if sub_embeds_to_keep:
+                    self.sv_non_vcf_props[key] = sub_embeds_to_keep
+        for key, value in self.old_sv_sample_schema["properties"].items():
+            vcf_field = self._is_vcf_field(key, value)
+            if not vcf_field:
+                self.sv_sample_non_vcf_props[key] = ""
+            else:
+                sub_embeds_to_keep = self._collect_non_vcf_sub_embeds(key, value)
+                if sub_embeds_to_keep:
+                    self.sv_sample_non_vcf_props[key] = sub_embeds_to_keep
+               
+    def _is_vcf_field(self, key, value):
+        """
+        """
+        result = False
+        item_type = value.get("type", "")
+        vcf_field = value.get("vcf_field", "")
+        if not vcf_field:
+            if item_type == "array":
+                item_dict = value["items"]
+                if "properties" in item_dict:  # Array of objects
+                    for item_key, item_value in item_dict["properties"].items():
+                        result = self._is_vcf_field(item_key, item_value)
+                        if result:
+                            break
+                else:
+                    result = self._is_vcf_field(key, item_dict)
+        else:
+            result = True
+        return result
+
+    def _collect_non_vcf_sub_embeds(self, key, value):
+        """
+        """
+        result = []
+        item_type = value.get("type", "")
+        vcf_field = value.get("vcf_field", "")
+        if not vcf_field:
+            if item_type == "array":
+                item_dict = value["items"]
+                if "properties" in item_dict:  # Array of objects
+                    for item_key, item_value in item_dict["properties"].items():
+                        sub_item_type = item_value.get("type", "")
+                        sub_item_vcf_field = item_value.get("vcf_field", "")
+                        if sub_item_type == "array":
+                            sub_item_vcf_field = (
+                                item_value["items"].get("vcf_field", "")
+                            )
+                        if not sub_item_vcf_field:
+                            result.append(item_key)
+        return result
 
     def provision_embeds(self):
         """ 
@@ -1133,8 +1187,34 @@ class StructuralVariantTableParser(VariantTableParser):
         :returns :
         """
         schema = {}
+        old_schema_props = old_schema["properties"]
         for field in props_to_keep:
-            var_props[field] = old_schema["properties"][field]
+            sub_embeds_to_keep = props_to_keep[field]
+            if not sub_embeds_to_keep:
+                var_props[field] = old_schema_props[field]
+            else:
+                if field in var_props:
+                    try:
+                        var_prop_sub_embeds = var_props[field]["items"]["properties"]
+                        old_schema_prop_sub_embeds = (
+                            old_schema_props[field]["items"]["properties"]
+                        )
+                        for sub_embed in sub_embeds_to_keep:
+                            var_prop_sub_embeds[sub_embed] = (
+                                old_schema_prop_subembeds[sub_embed]
+                            )
+                    except KeyError:
+                        # Field went from array of objects to other type, so don't
+                        # attempt to sub-embed previous non-vcf fields
+                        continue
+                else:
+                    var_props[field] = old_schema_props[field]
+                    tmp = [
+                        key for key in old_schema_props[field]["items"]["properties"]
+                    ]
+                    for sub_embed in tmp:
+                        if sub_embed not in sub_embeds_to_keep:
+                            del var_props[field]["items"]["properties"][sub_embed]
         for key in old_schema:
             if key == "properties":
                 schema["properties"] = var_props
@@ -1157,13 +1237,11 @@ class StructuralVariantTableParser(VariantTableParser):
         sv_sample_props, _, _ = self.generate_properties(
             self.filter_fields_by_sample(inserts), variant=False
         )
-        old_sv_schema = json.load(io.open(self.SV_SCHEMA_PATH))
-        old_sv_sample_schema = json.load(io.open(self.SV_SAMPLE_SCHEMA_PATH))
         new_sv_schema = self.generate_schema(
-            sv_props, old_sv_schema, self.SV_PROPERTIES_TO_KEEP
+            sv_props, self.old_sv_schema, self.sv_non_vcf_props
         )
         new_sv_sample_schema = self.generate_schema(
-            sv_sample_props, old_sv_sample_schema, self.SV_SAMPLE_PROPERTIES_TO_KEEP
+            sv_sample_props, self.old_sv_sample_schema, self.sv_sample_non_vcf_props
         )
         if write:
             self.write_schema(new_sv_schema, self.SV_SCHEMA_PATH)

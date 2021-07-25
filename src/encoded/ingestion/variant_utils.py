@@ -192,16 +192,22 @@ class VariantBuilder:
         """ Ingests the VCF, building/posting variants and variant samples until done, creating a report
             at the end of the run. """
         sample_relations = self.extract_sample_relations()
+        all_variants = []
+        all_variant_samples = []
         for idx, record in enumerate(self.parser if not use_tqdm else tqdm(self.parser)):
 
             # build the items
             try:
                 variant = self.build_variant(record)
+                all_variants.append(variant)
                 variant_samples = self.build_variant_samples(variant, record, sample_relations)
+                for sample in variant_samples:
+                    all_variant_samples.append(sample)
             except Exception as e:
                 log.info('Error encountered building variant/variant_sample: %s' % e)
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
                 continue
+
 
             # Post/Patch Variants/Samples
             try:
@@ -218,6 +224,7 @@ class VariantBuilder:
 
 class StructuralVariantBuilderError(Exception):
     pass
+
 
 class StructuralVariantBuilder(VariantBuilder):
     """Class to build SVs/SV samples."""
@@ -286,7 +293,7 @@ class StructuralVariantBuilder(VariantBuilder):
                 )
 
     def build_variant(self, record):
-        """ Builds a raw variant from the given VCF record. """
+        """ Builds a raw structural variant from the given VCF record. """
         raw_variant = self.parser.create_variant_from_record(record)
         self._check_variant(raw_variant)
         self._add_project_and_institution(raw_variant)
@@ -310,6 +317,7 @@ class StructuralVariantBuilder(VariantBuilder):
                 variant["SV_TYPE"], variant["CHROM"], variant["START"], variant["END"],
             )
             sample["file"] = self.file
+            self.parser.format_variant_sample_sub_embedded_objects(sample)
 
             # add familial relations to samplegeno field
             for geno in sample.get("samplegeno", []):
