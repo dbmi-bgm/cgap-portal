@@ -460,6 +460,38 @@ class Case(Item):
         return add_on
 
     @calculated_property(schema={
+        "title": "Search Query Filter String Add-On For SVs",
+        "description": (
+            "String to be appended to the initial search query to limit structural"
+            " variant sample results to those related to this case."
+        ),
+        "type": "string"
+    })
+    def sv_initial_search_href_filter_addon(
+            self, request, sample_processing=None, individual=None
+    ):
+        """
+        Use SV vcf file and sample accessions to limit structural variants/
+        structural variant samples to this case.
+        """
+        if not individual or not sample_processing:
+            return ''
+        sample = self.sample(request, individual, sample_processing)
+        if not sample:
+            return ''
+        vcf = self.structural_variant_vcf_file(request, sample_processing)
+        if not vcf:
+            return ''
+        sp_data = get_item_or_none(request, sample, 'sample')
+        sample_read_group = sp_data.get('bam_sample_id', '')
+        if not sample_read_group:
+            return ''
+        vcf_acc = vcf.split('/')[2]
+        add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
+        return add_on
+
+
+    @calculated_property(schema={
         "title": "Additional Variant Sample Facets",
         "description": "Additional facets relevant to this case.",
         "type": "array",
