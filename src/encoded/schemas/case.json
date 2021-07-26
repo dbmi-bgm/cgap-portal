@@ -124,8 +124,14 @@
             }
         },
         "meta_workflow_run": {
-            "title": "MetaWorkflowRun",
-            "description": "Meta-workflow-run associated with this case",
+            "title": "MetaWorkflowRun for SNV",
+            "description": "SNV Meta-workflow-run associated with this case",
+            "type": "string",
+            "linkTo": "MetaWorkflowRun"
+        },
+        "meta_workflow_run_sv": {
+            "title": "MetaWorkflowRun for SV",
+            "description": "SV Meta-workflow-run associated with this case",
             "type": "string",
             "linkTo": "MetaWorkflowRun"
         }
