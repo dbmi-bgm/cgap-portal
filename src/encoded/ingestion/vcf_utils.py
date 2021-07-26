@@ -688,17 +688,24 @@ class VCFParser(object):
             variants.append(v)
         return variant_samples, variants
 
+
 class StructuralVariantVCFParser(VCFParser):
     """
     Class for parsing SV VCFs with constants/methods that differ
     from parsing SNV VCFs.
 
     The main differences here are:
-        - OVERWRITE_FIELDS is automatically generated from SV/SV sample
-            schemas
-        - VCF_FIELDS fields not included in variant by default
-        - Sub-embedded fields generated from the schema rather than the VCF
-            since no VCF pre-processing occurring
+        - Variants and variant samples are parsed with the same method,
+            rather than two different approaches for SNVs
+        - Record parsing gathers fields that should come from the VCF
+            from the schema, similar to SNV variant sample parsing
+        - Sub-embedded VCF fields are identified from the schema and
+            handled accordingly, eliminating the need for VCF reformatters
+            to generate separate headers
+
+    The class is backwards-compatible, in the sense that it will still
+    successfully process annotation fields with sub-embedded info as
+    found in SNV VCFs.
     """
     SCHEMA_VCF_FIELD_KEY = "vcf_field"
     SCHEMA_SUB_EMBED_KEY = "sub_embedding_group"
@@ -771,7 +778,7 @@ class StructuralVariantVCFParser(VCFParser):
                 if "properties" in item_dict:  # Array of objects
                     for item_key, item_value in item_dict["properties"].items():
                         item_type = item_value.get("type")
-                        if item_type not in ["array", "object"]:
+                        if item_type not in ["array"]:
                             self._add_schema_vcf_field(item_key, item_value, result)
                         elif item_type == "array":
                             item_sub_dict = item_value["items"]
@@ -786,29 +793,34 @@ class StructuralVariantVCFParser(VCFParser):
         """
         Parses an individual (sub-embedded) INFO header.
         For SV class, no need to verify fields in schema since only
-        fields from schema are search for in record.
+        fields from schema are searched for in record.
 
-        :param hdr: hdr to process, MUST contain 'Subembedded' (see parse_vcf_info below).
-                    Format:
+        :param hdr: hdr to process, MUST contain 'Subembedded'
         :return: a list of fields on this sub-embedded object
         """
-        sub_embedded = self._strip(hdr.desc.split(':')[1:2][0])  # extracts string that comes after 'Subembedded'
+        sub_embedded = self._strip(hdr.desc.split(':')[1:2][0])
         self.sub_embedded_mapping[hdr.id] = sub_embedded
-        entries = hdr.desc.split(':')[3:][0].split('|')  # get everything after 'Format', split on field sep
-        entries = list(map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries))  # ID + stripped field name
+
+        # get everything after 'Format', split on field sep
+        entries = hdr.desc.split(':')[3:][0].split('|')
+
+        # ID + stripped field name
+        entries = list(map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries))
         return entries
 
     def parse_info_header(self, hdr):
         """
         Parses an individual INFO header.
         For SV class, no need to verify fields in schema since only
-        fields from schema are search for in record.
+        fields from schema are searched for in record.
 
         :param hdr: hdr to process, must NOT contain 'Subembedded'
         :return: list of fields in this annotation grouping (but not part of a sub-embedded object)
         """
         entries = hdr.desc.split(':')[1:][0].split('|')  # extract 'Format' string
-        entries = list(map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries))  # ID + stripped field name
+
+        # ID + stripped field name
+        entries = list(map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries))
         return entries
 
     def add_result_value(
