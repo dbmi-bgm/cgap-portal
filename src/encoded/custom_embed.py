@@ -68,7 +68,7 @@ class CustomEmbed:
         root_resource = self.request.root
         item_path = item["@id"]
         item_resource = find_resource(root_resource, item_path)
-        for action in ["edit", "create", "clone"]:
+        for action in ["edit", "create"]:
             if self.request.has_permission(action, item_resource):
                 actions.append({
                     "name": action,
