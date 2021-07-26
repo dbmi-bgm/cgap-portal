@@ -815,7 +815,7 @@ class StructuralVariantVCFParser(VCFParser):
         fields from schema are searched for in record.
 
         :param hdr: hdr to process, must NOT contain 'Subembedded'
-        :return: list of fields in this annotation grouping (but not part of a sub-embedded object)
+        :return: list of fields in this annotation grouping
         """
         entries = hdr.desc.split(':')[1:][0].split('|')  # extract 'Format' string
 
