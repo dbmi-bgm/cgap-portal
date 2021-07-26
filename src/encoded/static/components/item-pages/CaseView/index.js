@@ -151,7 +151,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         accession: caseAccession,
         individual: caseIndividual,
         sample_processing: sampleProcessing = null,
-        initial_search_href_filter_addon: filterHrefAddon = ""
+        initial_search_href_filter_addon: snvFilterHrefAddon = "",
+        sv_initial_search_href_filter_addon: svFilterHrefAddon = ""
     } = context;
 
     const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
@@ -240,8 +241,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const { processed_files = [] } = sampleProcessing || {};
     const disableBioinfo = !(processed_files.length > 0);
 
-    // Use availability of search query filter string add-on to determine if Filtering tab should be displayed
-    const disableFiltering = !filterHrefAddon;
+    // Use availability of search query filter string add-ons to determine if Filtering tab should be displayed
+    const disableFiltering = !snvFilterHrefAddon && !svFilterHrefAddon;
 
     return (
         <React.Fragment>
