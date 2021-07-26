@@ -227,7 +227,11 @@ class StructuralVariantBuilderError(Exception):
 
 
 class StructuralVariantBuilder(VariantBuilder):
-    """Class to build SVs/SV samples."""
+    """
+    Class to build SVs/SV samples. Similar to VariantBuilder with updated
+    methods for SVs and inclusion, with a check_variant method to
+    catch possible bioinformatics errors unique to SVs.
+    """
 
     def _post_or_patch_variant(self, variant):
         """ POST/PATCH the structural variant ie: create it if it doesn't exist,
@@ -258,7 +262,7 @@ class StructuralVariantBuilder(VariantBuilder):
         """ POST/PATCH the structural_variant_sample ie: create it if it doesn't
             exist, or update existing.
 
-            The StructuralVariantSample annotation_id format is (see variant.py):
+            The StructuralVariantSample annotation_id format is
                 "CALL_INFO:structural_variant_uuid:file_accession"
 
             NOTE: snovault does not implement standard HTTP PUT.
@@ -285,6 +289,9 @@ class StructuralVariantBuilder(VariantBuilder):
         """
         Sanity checks for SVs that should cause an ingestion to fail,
         intended to catch bioinformatics-related issues to address.
+
+        :param variant: dict variant object
+        :raise: StructuralVariantBuilderError if checks fail
         """
         if variant["SV_TYPE"] in ["DEL", "DUP"]:
             if variant["START"] >= variant["END"]:
