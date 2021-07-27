@@ -787,11 +787,11 @@ function FilteringTabWrapper(props) {
 
 function FilteringTabTableToggle({ currViewName, setCurrViewName }) {
     return (
-        <div style={{ width: "max-content" }} className="card p-2 flex-row mb-3 filtering-tab-toggle">
-            <div onClick={currViewName !== "SNV" ? () => setCurrViewName("SNV"): undefined} className={`mr-2 ${currViewName === "SNV" ? "active unclickable": ""}`}>
+        <div className="card py-2 px-3 flex-row mb-3 filtering-tab-toggle">
+            <div onClick={currViewName !== "SNV" ? () => setCurrViewName("SNV"): undefined} className={`mr-2 text-600  ${currViewName === "SNV" ? "active unclickable": "clickable"}`}>
                 SNV Filtering
             </div>
-            <div onClick={currViewName !== "CNVSV" ? () => setCurrViewName("CNVSV"): undefined} className={`${currViewName === "CNVSV" ? "active unclickable": ""}`}>
+            <div onClick={currViewName !== "CNVSV" ? () => setCurrViewName("CNVSV"): undefined} className={`text-600 ${currViewName === "CNVSV" ? "active unclickable": "clickable"}`}>
                 CNV / SV Filtering
             </div>
         </div>
