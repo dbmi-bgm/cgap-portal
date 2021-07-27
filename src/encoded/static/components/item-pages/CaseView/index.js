@@ -302,7 +302,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
-                        <FilteringTabWrapper {...{ snvFilteringProps, filteringProps, svFilteringProps }} />
+                        <FilteringTabWrapper {...{ snvFilteringProps, filteringProps, svFilteringProps, snvFilterHrefAddon, svFilterHrefAddon }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle={
                         <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
@@ -762,10 +762,15 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     );
 });
 
+/**
+ * Handles tab switching between the SNV and CNV/SV tabs
+ */
 function FilteringTabWrapper(props) {
 
-    const { snvFilteringProps = {}, svFilteringProps = {}, filteringProps = {} } = props;
-    const [ currViewName, setCurrViewName ] = useState("SNV");
+    const { snvFilteringProps = {}, svFilteringProps = {}, filteringProps = {}, snvFilterHrefAddon = "", svFilterHrefAddon = "" } = props;
+
+    const defaultTab = (!snvFilterHrefAddon && svFilterHrefAddon) ? "CNVSV" : "SNV";
+    const [ currViewName, setCurrViewName ] = useState(defaultTab);
 
     const currentTitle = currViewName === "SNV" ? "SNV" : "CNV / SV";
 
