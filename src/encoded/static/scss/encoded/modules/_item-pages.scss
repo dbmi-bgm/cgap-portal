@@ -690,6 +690,9 @@ i.status-indicator-dot {
 			color: #fff;
 			background-color: #31098D;
 		}
+		&:focus {
+			outline-color: #31098D;
+		}
 	}
 	// Strong Benign Evidence - 
 	&[data-criteria="BS1"],
@@ -702,6 +705,9 @@ i.status-indicator-dot {
 		&[data-invoked="true"] {
 			color: #fff;
 			background-color: #47419a;
+		}
+		&:focus {
+			outline-color: #47419a;
 		}
 	}
 
@@ -720,6 +726,9 @@ i.status-indicator-dot {
 			color: #fff;
 			background-color: #0063D6;
 		}
+		&:focus {
+			outline-color: #0063D6;
+		}
 	}
 
 	// Supporting Pathogenic Evidence
@@ -734,6 +743,9 @@ i.status-indicator-dot {
 		&[data-invoked="true"] {
 			color: #fff;
 			background-color: #C4AA1D;
+		}
+		&:focus {
+			outline-color: #C4AA1D;
 		}
 	}
 
@@ -751,6 +763,9 @@ i.status-indicator-dot {
 			color: #fff;
 			background-color: #D36900;
 		}
+		&:focus {
+			outline-color: #D36900;
+		}
 	}
 
 	// Strong Pathogenic Evidence
@@ -765,6 +780,9 @@ i.status-indicator-dot {
 			color: #fff;
 			background-color: #a90d0b;
 		}
+		&:focus {
+			outline-color: #a90d0b;
+		}
 	}
 
 	// Very Strong Pathogenic Evidence
@@ -775,6 +793,10 @@ i.status-indicator-dot {
 		&[data-invoked="true"] {
 			color: #fff;
 			background-color: #9A0000;
+		}
+
+		&:focus {
+			outline-color: #9A0000;
 		}
 	}
 
@@ -789,12 +811,22 @@ i.status-indicator-dot {
     font-size: 0.7em;
     letter-spacing: 1px;
 
-	// &:hover { // a little janky ATM; needs tweaking
-	// 	font-size: large;
-	// 	padding: 5px 7px;
-	// }
-
 	@include acmgColorStyles;
+}
+
+.acmg-popover-strengths {
+	>button.list-group-item { /* override the active color to match acmg rule color*/
+		&.active {
+			@include acmgColorStyles;
+			border-color: rgba(0,0,0,0);
+		}
+
+		&:focus {
+			color: inherit !important;
+			@include acmgColorStyles();
+		}
+		
+	}
 }
 
 .acmg-guidelines-title {
