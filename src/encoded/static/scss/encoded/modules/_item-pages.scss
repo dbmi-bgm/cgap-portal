@@ -2426,6 +2426,7 @@ $download-button-width : 100px;
 
 					&.active {
 						background-color: lighten($primary, 40%);
+						color: $primary-dark;
 						border-radius: 0.4em;
 					} 
 				}
