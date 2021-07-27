@@ -3273,6 +3273,12 @@ $download-button-width : 100px;
 	}
 }
 
+@include media-breakpoint-up(lg){
+	.sv-browser-settings {
+		max-width: 215px;
+	}
+}
+
 
 /**********************************************************
 		User Profile Page

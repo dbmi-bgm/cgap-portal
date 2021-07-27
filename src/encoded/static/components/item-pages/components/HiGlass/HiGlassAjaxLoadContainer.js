@@ -25,8 +25,11 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
             'loading': false,
             'higlassItem' : null,
             'variantPositionAbsCoord' : props.variantPositionAbsCoord ? props.variantPositionAbsCoord : null,
+            'variantEndAbsCoord' : props.variantEndAbsCoord ? props.variantEndAbsCoord : null,
             'requestingTab' : props.requestingTab,
             'bamSampleId' : props.bamSampleId ? props.bamSampleId : null,
+            'samples' : props.samples ? props.samples : null,
+            'higlassSvVcf': props.higlassSvVcf ? props.higlassSvVcf : null,
             'file' : props.file ? props.file : null,
         };
         this.containerRef = React.createRef();
@@ -59,7 +62,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                 console.warn(errResp);
             };
 
-            const { variantPositionAbsCoord, requestingTab, bamSampleId, file } = this.state;
+            const { variantPositionAbsCoord, requestingTab, bamSampleId, file, samples } = this.state;
 
             if(requestingTab === "bam" && bamSampleId !== null && file !== null){
                 // Get the associated case and extract BAM infos from there
@@ -82,7 +85,49 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                     'GET',
                     fallbackCallback
                 );
-            } else {
+            }
+            else if(requestingTab === "sv"){
+                // In contrast to the bam case above, we already got the case in SvBrowser.js. We are reusing that data here.
+                
+                if(samples === null){
+                    console.warn("No available samples");
+                    return;
+                }
+
+                const variantEndAbsCoord = 
+                    this.state.variantEndAbsCoord === null 
+                        ? variantPositionAbsCoord 
+                        : this.state.variantEndAbsCoord;
+                const higlassSvVcf = this.state.higlassSvVcf;
+
+                // Default settings for initial load - show only the proband bam files
+                const svBamVisibility = {}
+                const svVcfVisibility = {}
+                samples.forEach((sample) => {
+                    if(sample.sample_name === bamSampleId){
+                        svBamVisibility[sample.sample_accession] = true;
+                    }
+                    else{
+                        svBamVisibility[sample.sample_accession] = false;
+                    }
+                    svVcfVisibility[sample.sample_accession] = true;
+                    svVcfVisibility["gnomad-sv"] = true;
+                });
+
+                const payload = {
+                    'variant_pos_abs' : variantPositionAbsCoord,
+                    'variant_end_abs' : variantEndAbsCoord,
+                    'requesting_tab' : requestingTab,
+                    'samples_pedigree' : samples,
+                    'bam_sample_id' : bamSampleId,
+                    'bam_visibilty': svBamVisibility,
+                    'sv_vcf_visibilty': svVcfVisibility,
+                    'higlass_sv_vcf': higlassSvVcf
+                };
+                this.getViewconf(payload, fallbackCallback);
+            }
+            else{
+
                 const payload = {
                     'variant_pos_abs' : variantPositionAbsCoord,
                     'requesting_tab' : requestingTab
