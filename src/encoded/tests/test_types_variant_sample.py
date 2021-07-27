@@ -91,7 +91,6 @@ def test_variant_sample_list_post(bgm_user_testapp, variant_sample_list1):
     bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201)
 
 
-
 def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_sample_list1, bgm_test_variant_sample, bgm_test_variant_sample2):
     vsl = bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201).json['@graph'][0]
     vs1 = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample, status=201).json['@graph'][0]
@@ -128,6 +127,33 @@ def test_variant_sample_list_patch_fail(bgm_variant, bgm_user_testapp, variant_s
         'variant_samples': [bgm_variant["@id"]]  # wrong data structure and item type
     }
     bgm_user_testapp.patch_json(vsl['@id'], patch, status=422)
+
+
+def test_variant_sample_list_revlink(testapp, variant_sample_list):
+    """Ensure revlink from VSL to variant sample established."""
+    vsl_atid = variant_sample_list["@id"]
+    vs_atid = variant_sample_list["variant_samples"][0]["variant_sample_item"]
+    variant_sample = testapp.get(vs_atid, status=200).json
+    assert vsl_atid == variant_sample["variant_sample_list"]["@id"]
+
+
+def test_variant_sample_list_sv_patch(
+    testapp, variant_sample_list, structural_variant, structural_variant_sample
+):
+    """Test adding SV samples to variant sample list and rev link to SV sample."""
+    vsl_atid = variant_sample_list["@id"]
+    sv_sample = testapp.post_json(
+        "/structural_variant_sample", structural_variant_sample, status=201
+    ).json["@graph"][0]
+    sv_sample_atid = sv_sample["@id"]
+    vsl_patch = {
+        "structural_variant_samples": [{"structural_variant_sample_item": sv_sample_atid}]
+    }
+    resp = testapp.patch_json(vsl_atid, vsl_patch, status=200).json["@graph"][0]
+    vsl_struct_var = resp["structural_variant_samples"][0]["structural_variant_sample_item"]
+    sv_sample = testapp.get(sv_sample_atid).json
+    assert vsl_struct_var == sv_sample["@id"]
+    assert "variant_sample_list" in sv_sample.keys()
 
 
 @pytest.mark.parametrize('call_info,variant_uuid,file_accession', [

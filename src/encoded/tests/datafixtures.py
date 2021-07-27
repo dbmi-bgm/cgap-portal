@@ -810,6 +810,7 @@ def file_vcf(testapp, institution, project, file_formats):
         'institution': institution['@id'],
         'project': project['@id'],
         'status': 'uploaded',  # avoid s3 upload codepath
+        'file_type': 'full annotated VCF',
     }
     return testapp.post_json('/file_processed', item).json['@graph'][0]
 
@@ -1310,5 +1311,56 @@ def bgm_variant_sample(bgm_project, institution, variant):
         "variant": variant["@id"],
         "CALL_INFO": "some_bgm_sample",
         "file": "some_bgm_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def variant_sample_list(
+    testapp, variant_sample, variant_sample_2, genelist, project, institution
+):
+    vs_1 = testapp.post_json(
+        "/variant-samples", variant_sample, status=201
+    ).json["@graph"][0]
+    vs_2 = testapp.post_json(
+        "/variant-samples", variant_sample_2, status=201
+    ).json["@graph"][0]
+    vs_list = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "variant_samples": [
+            {"variant_sample_item": vs_1["@id"]},
+            {"variant_sample_item": vs_2["@id"]},
+        ],
+        "created_for_case": "GAPCAK111111",
+    }
+    response = testapp.post_json(
+        "/variant-sample-lists", vs_list, status=201
+    ).json["@graph"][0]
+    return response
+
+
+@pytest.fixture
+def structural_variant(testapp, project, institution):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "1",
+        "START": 1000,
+        "END": 2000,
+        "SV_TYPE": "DEL",
+    }
+    return testapp.post_json("/structural_variant", item).json["@graph"][0]
+
+
+@pytest.fixture
+def structural_variant_sample(project, institution, structural_variant):
+    """This item is not pre-posted to database."""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "structural_variant": structural_variant["@id"],
+        "CALL_INFO": "some_sample",
+        "file": "some_vcf_file",
     }
     return item

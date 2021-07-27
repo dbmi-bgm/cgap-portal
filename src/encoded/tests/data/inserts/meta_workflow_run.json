@@ -43,7 +43,27 @@
                   "mpileup:1",
                   "mpileup:2"
               ]
-          }
+          },
+          {
+              "name": "bamsnap-extra-dimension",
+              "status": "pending",
+              "shard": "0"
+          },
+          {
+              "name": "bamsnap-extra-dimension",
+              "status": "pending",
+              "shard": "1"
+          },
+          {
+              "name": "bamsnap-extra-dimension",
+              "status": "pending",
+              "shard": "2"
+          },
+          {
+              "name": "bamsnap-gather",
+              "status": "pending",
+              "shard": "0"
+          }       
       ],
       "input": [
           {
@@ -75,6 +95,10 @@
           "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
           "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
       },
-      "final_status": "failed"
+      "final_status": "failed",
+      "overall_qcs": [
+          {"name": "linecount_test", "value": "PASS"},
+          {"name": "some_other_test", "value": "FAIL"}
+      ]
     }
 ]

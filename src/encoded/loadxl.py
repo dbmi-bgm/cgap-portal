@@ -37,7 +37,12 @@ ORDER = [
     'user',
     'file_format',
     'workflow',
+    'meta_workflow',
+    'workflow_run',
+    'meta_workflow_run',
     'variant',
+    'structural_variant',
+    'structural_variant_sample',
     'higlass_view_config'
 ]
 
