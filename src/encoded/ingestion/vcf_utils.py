@@ -881,7 +881,7 @@ class StructuralVariantVCFParser(VCFParser):
         sub_embedded_group = schema_props.get("sub_embedded_group", "")
         field_default = schema_props.get("default", None)
         if field_value is None or field_value == "":
-            if field_default not None:  # Re-do but use default
+            if field_default is not None:  # Re-do but use default
                 self.add_result_value(
                     result, schema_key, schema_props, field_default, index=index
                 )
