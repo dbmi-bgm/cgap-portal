@@ -571,16 +571,20 @@ class IngestionListener:
                     variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
                                                      project=file_meta['project']['@id'],
                                                      institution=file_meta['institution']['@id'])
-                elif vcf_variant_type == "SV":
+                elif vcf_type == "SV":
                     # No reformatting necesssary for SV VCF
                     decoded_content = gunzip_content(raw_content)
                     debuglog('Got decoded content: %s' % decoded_content[:20])
-
+                    formatted_vcf = tempfile.NamedTemporaryFile(
+                        mode="w+", encoding="utf-8"
+                    )
+                    formatted_vcf.write(decoded_content)
+                    formatted_vcf.seek(0)
                     parser = StructuralVariantVCFParser(
                         None,
                         STRUCTURAL_VARIANT_SCHEMA,
                         STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
-                        reader=Reader(decoded_content),
+                        reader=Reader(formatted_vcf),
                     )
                     variant_builder = StructuralVariantBuilder(
                         self.vapp,
