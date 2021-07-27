@@ -192,22 +192,16 @@ class VariantBuilder:
         """ Ingests the VCF, building/posting variants and variant samples until done, creating a report
             at the end of the run. """
         sample_relations = self.extract_sample_relations()
-        all_variants = []
-        all_variant_samples = []
         for idx, record in enumerate(self.parser if not use_tqdm else tqdm(self.parser)):
 
             # build the items
             try:
                 variant = self.build_variant(record)
-                all_variants.append(variant)
                 variant_samples = self.build_variant_samples(variant, record, sample_relations)
-                for sample in variant_samples:
-                    all_variant_samples.append(sample)
             except Exception as e:
                 log.info('Error encountered building variant/variant_sample: %s' % e)
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
                 continue
-
 
             # Post/Patch Variants/Samples
             try:
