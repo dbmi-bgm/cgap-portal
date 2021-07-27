@@ -324,7 +324,7 @@ class StructuralVariantBuilder(VariantBuilder):
                 variant["SV_TYPE"], variant["CHROM"], variant["START"], variant["END"],
             )
             sample["file"] = self.file
-            self.parser.format_variant_sample_sub_embedded_objects(sample)
+            self.parser.format_variant_sub_embedded_objects(sample, sample=True)
 
             # add familial relations to samplegeno field
             for geno in sample.get("samplegeno", []):
