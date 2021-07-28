@@ -960,6 +960,11 @@ class StructuralVariantVCFParser(VCFParser):
                             field_value,
                             index=sample_idx,
                         )
+                elif vcf_field == self.SAMPLE_ID_VCF_FIELD:
+                    field_value = sample.sample
+                    self.add_result_value(
+                        result, schema_key, schema_props, field_value
+                    )
                 else:  # Field only from this sample
                     sample_dict = sample.data._asdict()
                     field_value = sample_dict[vcf_field]
