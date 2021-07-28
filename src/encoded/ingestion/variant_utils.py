@@ -233,23 +233,24 @@ class StructuralVariantBuilder(VariantBuilder):
 
             NOTE: snovault does not implement standard HTTP PUT.
         """
-        try:
-            res = self.vapp.post_json("/structural_variant", variant, status=201)
-        except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
-            log.info(
-                "Exception encountered on structural_variant post (attempting patch): %s"
-                % e
-            )
-            res = self.vapp.patch_json(
-                "/structural_variant/%s" % build_structural_variant_display_title(
-                    variant["SV_TYPE"],
-                    variant["CHROM"],
-                    variant["START"],
-                    variant["END"],
-                ),
-                variant,
-                status=200
-            )
+        res = self.vapp.post_json("/structural_variant", variant, status=201)
+#        try:
+#            res = self.vapp.post_json("/structural_variant", variant, status=201)
+#        except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
+#            log.info(
+#                "Exception encountered on structural_variant post (attempting patch): %s"
+#                % e
+#            )
+#            res = self.vapp.patch_json(
+#                "/structural_variant/%s" % build_structural_variant_display_title(
+#                    variant["SV_TYPE"],
+#                    variant["CHROM"],
+#                    variant["START"],
+#                    variant["END"],
+#                ),
+#                variant,
+#                status=200
+#            )
         return res.json
 
     def _post_or_patch_variant_sample(self, variant_sample, variant_uuid):
