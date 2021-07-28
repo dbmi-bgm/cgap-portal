@@ -2418,17 +2418,30 @@ $download-button-width : 100px;
 				}
 			}
 
-			.filtering-tab-toggle {
-				width: max-content; 
+			/* Filtering Tab Specific styles */
+			&#case-info\.filtering {
+				// Styling overrides specific to embedded search table results for Structural Variants in case filtering
+				.embedded-search-container .search-view-controls-and-results[data-search-item-type="StructuralVariantSample"] {
+					.search-result-row.detail-closed .columns.result-table-row {
+						.search-result-column-block[data-field="display_title"][data-first-visible-column="true"] {
+							// Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate
+							padding-left: 0 !important; // important necessary to override default style (this is short term override/will be deleted soon so hopefully ok)
+						}
+					}
+				}
 
-				> div {
-					padding: 5px 40px;
-
-					&.active {
-						background-color: lighten($primary, 40%);
-						color: $primary-dark;
-						border-radius: 0.4em;
-					} 
+				.filtering-tab-toggle {
+					width: max-content; 
+	
+					> div {
+						padding: 5px 40px;
+	
+						&.active {
+							background-color: lighten($primary, 40%);
+							color: $primary-dark;
+							border-radius: 0.4em;
+						} 
+					}
 				}
 			}
 		}
