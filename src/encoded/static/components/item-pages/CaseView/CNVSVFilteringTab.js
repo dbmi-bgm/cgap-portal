@@ -6,6 +6,7 @@ import _ from 'underscore';
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
+import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 
 
 
@@ -22,7 +23,6 @@ export function CNVSVFilteringTab(props) {
         sv_initial_search_href_filter_addon = "",
         additional_variant_sample_facets = []
     } = context || {};
-
 
     const searchHrefBase = (
         "/search/?type=StructuralVariantSample"
@@ -99,7 +99,31 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                     }
                     return null;
                 }
+            },
+            "genotype_labels": {
+                "render": function(result, props) {
+                    const { align = "center" } = props;
+                    const { genotype_labels = [] } = result;
+                    const rows = [];
+
+                    let probandLabelPresent = false;
+                    genotype_labels.forEach((labelObj) => {
+                        const { role = null, labels: { 0: genotype = null } = [] } = labelObj;
+                        if (role === "proband" && genotype) {
+                            rows.push(<div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{genotype}</div>);
+                        } else if (role === "mother" && genotype) {
+                            rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{genotype || "-"}</div>);
+                        } else if (role === "father" && genotype) {
+                            rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{genotype || "-"}</div>);
+                        }
+                    })
+                    if (!probandLabelPresent) {
+                        return null;
+                    }
+                    return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
+                }
             }
+            
         };
     }, [ originalColExtMap ]);
 
