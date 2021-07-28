@@ -2465,6 +2465,12 @@ i.status-indicator-dot {
 	}
 }
 
+@include media-breakpoint-up(lg){
+	.sv-browser-settings {
+		max-width: 215px;
+	}
+}
+
 
 /**********************************************************
 		User Profile Page
