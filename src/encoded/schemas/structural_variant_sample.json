@@ -51,46 +51,23 @@
             "title": "Sample ID",
             "field_name": "CALL_INFO",
             "type": "string",
-            "vcf_field": "CALL_INFO",
-            "description": "Calling info",
+            "do_import": true,
+            "vcf_field": "sample",
+            "source_name": "VCF",
+            "description": "Sample Identifier",
+            "scope": "sample_variant",
             "schema_title": "Sample ID"
         },
-        "file": {
-            "title": "File",
-            "description": "String Accession of the vcf file used in digestion",
-            "type": "string"
-        },
-        "structural_variant": {
-            "title": "Structural Variant",
+        "GT": {
+            "title": "Genotype",
+            "field_name": "GT",
             "type": "string",
-            "linkTo": "StructuralVariant"
-        },
-        "discovery_interpretation": {
-            "title": "Discovery Interpretation",
-            "description": "Gene/Variant Discovery interpretation note connected to this item",
-            "type": "string",
-            "linkTo": "NoteDiscovery"
-        },
-        "gene_notes": {
-            "title": "Gene Notes",
-            "description": "Note item related to this Gene",
-            "type": "string",
-            "linkTo": "NoteStandard"
-        },
-        "interpretation": {
-            "title": "Clinical Interpretation",
-            "description": "Clinical Interpretation Note connected to this item",
-            "type": "string",
-            "linkTo": "NoteInterpretation"
-        },
-        "schema_version": {
-            "default": "1"
-        },
-        "variant_notes": {
-            "title": "Variant Notes",
-            "description": "Notes related to the relevant Variant",
-            "type": "string",
-            "linkTo": "NoteStandard"
+            "do_import": true,
+            "vcf_field": "GT",
+            "source_name": "VCF",
+            "description": "Genotype",
+            "scope": "sample_variant",
+            "schema_title": "Genotype"
         },
         "annotation_id": {
             "title": "Annotation ID",
@@ -101,6 +78,104 @@
             "title": "Genome Snapshot",
             "description": "Link to Genome Snapshot Image",
             "type": "string"
+        },
+        "discovery_interpretation": {
+            "title": "Discovery Interpretation",
+            "description": "Gene/Variant Discovery interpretation note connected to this item",
+            "type": "string",
+            "linkTo": "NoteDiscovery"
+        },
+        "file": {
+            "title": "File",
+            "description": "String Accession of the vcf file used in digestion",
+            "type": "string"
+        },
+        "gene_notes": {
+            "title": "Gene Notes",
+            "description": "Note item related to this Gene",
+            "type": "string",
+            "linkTo": "NoteStandard"
+        },
+        "genotype_labels": {
+            "title": "Genotype Labels",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "role": {
+                        "title": "Role",
+                        "type": "string"
+                    },
+                    "labels": {
+                        "title": "Genotype Labels",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "inheritance_modes": {
+            "title": "Inheritance Modes",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "interpretation": {
+            "title": "Clinical Interpretation",
+            "description": "Clinical Interpretation Note connected to this item",
+            "type": "string",
+            "linkTo": "NoteInterpretation"
+        },
+        "samplegeno": {
+            "title": "Sample Genotype",
+            "type": "array",
+            "items": {
+                "title": "Sample Genotype",
+                "type": "object",
+                "properties": {
+                    "samplegeno_numgt": {
+                        "title": "Sample Genotype (Numeric)",
+                        "field_name": "samplegeno_numgt",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "GT",
+                        "source_name": "VCF",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Sample genotype (number format)",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype (Numeric)"
+                    },
+                    "samplegeno_sampleid": {
+                        "title": "Sample Genotype (Sample ID)",
+                        "field_name": "samplegeno_sampleid",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "sample",
+                        "source_name": "VCF",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Sample ID",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype (Sample ID)"
+                    }
+                }
+            }
+        },
+        "schema_version": {
+            "default": "1"
+        },
+        "structural_variant": {
+            "title": "Structural Variant",
+            "type": "string",
+            "linkTo": "StructuralVariant"
+        },
+        "variant_notes": {
+            "title": "Variant Notes",
+            "description": "Notes related to the relevant Variant",
+            "type": "string",
+            "linkTo": "NoteStandard"
         }
     },
     "columns": {

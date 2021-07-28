@@ -1031,7 +1031,6 @@ class StructuralVariantVCFParser(VCFParser):
                 self.variant_sample_vcf_props, record, sample=sample
             )
             sample_variant = dict(self.variant_sample_defaults, **sample_variant)
-            sample_variant["CALL_INFO"] = sample.sample
             result.append(sample_variant)
         return result
 
