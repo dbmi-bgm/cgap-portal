@@ -74,14 +74,29 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
             //     "widthMap": { 'lg' : 250, 'md' : 220, 'sm' : 200 },
             //     "minColumnWidth" : (originalColExtMap.display_title.minColumnWidth || 100) + 20,
             //     "render": function(result, parentProps){
-            //         const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-            //         return (
-            //             <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-            //                 {result.display_title}
-            //             </DisplayTitleColumnWrapper>
-            //         );
+            //         // const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+            //         const { "@id": atID, structural_variant = null } = result;
+            //         const { display_title, annotation_id } = structural_variant || {};
+            //         return <a href={atID} target="_blank" rel="noreferrer">{annotation_id || display_title || result.display_title}</a>;
             //     }
             // }
+            'bam_snapshot': {
+                "noSort": true,
+                "widthMap": { 'lg' : 150, 'md' : 150, 'sm' : 60 },
+                "render": function(result, props) {
+                    const { bam_snapshot = null, uuid = null } = result;
+                    if (bam_snapshot) {
+                        return (
+                            <div className="mx-auto text-truncate">
+                                <a target="_blank" className="" rel="noreferrer" href={`/${uuid}/@@download`} data-html>
+                                    SV Browser <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>
+                                </a>
+                            </div>
+                        );
+                    }
+                    return null;
+                }
+            }
         };
     }, [ originalColExtMap ]);
 
