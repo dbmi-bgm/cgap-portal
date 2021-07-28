@@ -68,21 +68,24 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
     const columnExtensionMap = useMemo(function() {
         return {
             ...originalColExtMap,
-            // "display_title" : {
-            //     // Preserve existing 'display_title' extension properties but overwrite render, minColumnWidth..
-            //     ...originalColExtMap.display_title,
-            //     "widthMap": { 'lg' : 250, 'md' : 220, 'sm' : 200 },
-            //     "minColumnWidth" : (originalColExtMap.display_title.minColumnWidth || 100) + 20,
-            //     "render": function(result, parentProps){
-            //         // const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-            //         const { "@id": atID, structural_variant = null } = result;
-            //         const { display_title, annotation_id } = structural_variant || {};
-            //         return <a href={atID} target="_blank" rel="noreferrer">{annotation_id || display_title || result.display_title}</a>;
-            //     }
-            // }
+            "display_title" : {
+                // Preserve existing 'display_title' extension properties but overwrite render, minColumnWidth..
+                ...originalColExtMap.display_title,
+                "widthMap": { 'lg' : 250, 'md' : 220, 'sm' : 200 },
+                "minColumnWidth" : (originalColExtMap.display_title.minColumnWidth || 100) + 20,
+                "render": function(result, parentProps){
+                    // const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+                    const { "@id": atID, structural_variant = null } = result;
+                    const { display_title = "", annotation_id = "" } = structural_variant || {};
+                
+                    // annotationID structured like <type>_chr...etc; need just the part after underscore
+                    const splitAnnotationID = (annotation_id || display_title).split("_");
+                    return <a href={atID} target="_blank" rel="noreferrer">{splitAnnotationID[1]}</a>;
+                }
+            },
             'bam_snapshot': {
                 "noSort": true,
-                "widthMap": { 'lg' : 150, 'md' : 150, 'sm' : 60 },
+                "widthMap": { 'lg' : 150, 'md' : 150, 'sm' : 150 },
                 "render": function(result, props) {
                     const { bam_snapshot = null, uuid = null } = result;
                     if (bam_snapshot) {
