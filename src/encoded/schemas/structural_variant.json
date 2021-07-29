@@ -560,7 +560,7 @@
                     "csq_strand": {
                         "title": "Strand",
                         "field_name": "csq_strand",
-                        "type": "integer",
+                        "type": "boolean",
                         "do_import": true,
                         "vcf_field": "csq_strand",
                         "source_name": "VEP",
