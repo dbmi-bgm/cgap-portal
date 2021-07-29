@@ -65,7 +65,7 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
         ...passProps
     } = props;
 
-    const columnExtensionMap = useMemo(function() {
+    const columnExtensionMap = useMemo(function() { // TODO: move this into its own colextmap file if it gets longer; see about sharing info between multiple
         return {
             ...originalColExtMap,
             "display_title" : {
@@ -125,14 +125,14 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                     }
                     return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
                 },
-                "structural_variant.transcript.csq_gene.display_title": {
-                    "render": function(result, props) {
-                        // TODO: Why isn't this render f(x) overriding this col?
-                        console.log("result test", result);
-                        return null;
-                    }
-                }
-            }
+            },
+            // "structural_variant.transcript.csq_gene.display_title": {
+            //     "render": function(result, props) {
+            //         // TODO: show first and last gene separated by "..."
+            //         console.log("result test", result);
+            //         return null;
+            //     }
+            // }
         };
     }, [ originalColExtMap ]);
 
