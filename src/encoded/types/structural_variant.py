@@ -127,13 +127,8 @@ class StructuralVariant(Item):
             "type": "number",
         }
     )
-    def size(self, request, structural_variant):
-        structural_variant = get_item_or_none(
-            request, structural_variant, "StructuralVariant", frame="raw"
-        )
-        end = structural_variant["END"]
-        start = structural_variant["START"]
-        return start - end + 1
+    def size(self, request, START, END):
+        return END - START + 1
 
 
 @collection(
