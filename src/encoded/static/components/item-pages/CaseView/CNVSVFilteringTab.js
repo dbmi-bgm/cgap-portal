@@ -27,7 +27,7 @@ export function CNVSVFilteringTab(props) {
     const searchHrefBase = (
         "/search/?type=StructuralVariantSample"
         + (sv_initial_search_href_filter_addon ? "&" + sv_initial_search_href_filter_addon : "")
-        + (additional_variant_sample_facets.length > 0 ? "&" + additional_variant_sample_facets.map(function(fac){ return "additional_facet=" + encodeURIComponent(fac); }).join("&") : "")
+        // + (additional_variant_sample_facets.length > 0 ? "&" + additional_variant_sample_facets.map(function(fac){ return "additional_facet=" + encodeURIComponent(fac); }).join("&") : "")
         + "&sort=date_created"
     );
 
