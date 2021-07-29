@@ -107,6 +107,10 @@
         "structural_variant.SV_TYPE": {
             "title": "Type",
             "order": 0
+        },
+        "bam_snapshot": {
+            "title": "Browser",
+            "order": 80
         }
     },
     "facets": {
