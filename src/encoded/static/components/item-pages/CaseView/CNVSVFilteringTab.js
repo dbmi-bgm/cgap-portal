@@ -77,7 +77,7 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                     // const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     const { "@id": atID, structural_variant = null } = result;
                     const { display_title = "", annotation_id = "" } = structural_variant || {};
-                
+
                     // annotationID structured like <type>_chr...etc; need just the part after underscore
                     const splitAnnotationID = (annotation_id || display_title).split("_");
                     return <a href={atID} target="_blank" rel="noreferrer">{splitAnnotationID[1]}</a>;
@@ -92,7 +92,7 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                         return (
                             <div className="mx-auto text-truncate">
                                 <a target="_blank" className="" rel="noreferrer" href={`/${uuid}/@@download`} data-html>
-                                    SV Browser <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>
+                                    SV Browser <i className="ml-07 icon-sm icon fas icon-external-link-alt"></i>
                                 </a>
                             </div>
                         );
@@ -116,14 +116,14 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                         } else if (role === "father" && genotype) {
                             rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{genotype || "-"}</div>);
                         }
-                    })
+                        probandLabelPresent = true;
+                    });
                     if (!probandLabelPresent) {
                         return null;
                     }
                     return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
                 }
             }
-            
         };
     }, [ originalColExtMap ]);
 
