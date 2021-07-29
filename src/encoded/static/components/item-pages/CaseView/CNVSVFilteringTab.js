@@ -21,7 +21,7 @@ export function CNVSVFilteringTab(props) {
     const {
         accession: caseAccession,
         sv_initial_search_href_filter_addon = "",
-        additional_variant_sample_facets = []
+        additional_variant_sample_facets = [] // TODO: needs updates to calc property + schemas to not break searches
     } = context || {};
 
     const searchHrefBase = (
@@ -100,7 +100,9 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                     return null;
                 }
             },
-            "genotype_labels": {
+            "associated_genotype_labels.proband_genotype_label": {
+                // TODO: sorts are broken on this col; I think due to schema issue
+                "noSort": true, // TODO: once sort is fixed; remove this
                 "render": function(result, props) {
                     const { align = "center" } = props;
                     const { genotype_labels = [] } = result;
@@ -111,17 +113,24 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                         const { role = null, labels: { 0: genotype = null } = [] } = labelObj;
                         if (role === "proband" && genotype) {
                             rows.push(<div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{genotype}</div>);
+                            probandLabelPresent = true;
                         } else if (role === "mother" && genotype) {
                             rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{genotype || "-"}</div>);
                         } else if (role === "father" && genotype) {
                             rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{genotype || "-"}</div>);
                         }
-                        probandLabelPresent = true;
                     });
                     if (!probandLabelPresent) {
                         return null;
                     }
                     return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
+                },
+                "structural_variant.transcript.csq_gene.display_title": {
+                    "render": function(result, props) {
+                        // TODO: Why isn't this render f(x) overriding this col?
+                        console.log("result test", result);
+                        return null;
+                    }
                 }
             }
         };
