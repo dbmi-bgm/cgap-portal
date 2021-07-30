@@ -47,7 +47,7 @@ export function CNVSVFilteringTab(props) {
         maxHeight,
         session,
         // embeddedTableHeader,
-        // "key": searchTableKey,
+        "key": searchTableKey,
         searchHref: searchHrefBase
     };
 
@@ -83,15 +83,17 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                     return <a href={atID} target="_blank" rel="noreferrer">{splitAnnotationID[1]}</a>;
                 }
             },
+
+            // TODO: Remove this in favor of re-using the 'bam_snapshot' defined in browse/variantSampleColumnExtensionMap.js once more columns available?
             'bam_snapshot': {
                 "noSort": true,
                 "widthMap": { 'lg' : 150, 'md' : 150, 'sm' : 150 },
                 "render": function(result, props) {
-                    const { bam_snapshot = null, uuid = null } = result;
+                    const { bam_snapshot = null, atID } = result;
                     if (bam_snapshot) {
                         return (
                             <div className="mx-auto text-truncate">
-                                <a target="_blank" className="" rel="noreferrer" href={`/${uuid}/@@download`} data-html>
+                                <a target="_blank" className="" rel="noreferrer" href={atID} data-html>
                                     SV Browser <i className="ml-07 icon-sm icon fas icon-external-link-alt"></i>
                                 </a>
                             </div>
@@ -100,33 +102,38 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                     return null;
                 }
             },
-            "associated_genotype_labels.proband_genotype_label": {
-                // TODO: sorts are broken on this col; I think due to schema issue
-                "noSort": true, // TODO: once sort is fixed; remove this
-                "render": function(result, props) {
-                    const { align = "center" } = props;
-                    const { genotype_labels = [] } = result;
-                    const rows = [];
 
-                    let probandLabelPresent = false;
-                    genotype_labels.forEach((labelObj) => {
-                        const { role = null, labels: { 0: genotype = null } = [] } = labelObj;
-                        if (role === "proband" && genotype) {
-                            rows.push(<div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{genotype}</div>);
-                            probandLabelPresent = true;
-                        } else if (role === "mother" && genotype) {
-                            rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{genotype || "-"}</div>);
-                        } else if (role === "father" && genotype) {
-                            rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{genotype || "-"}</div>);
-                        }
-                    });
-                    if (!probandLabelPresent) {
-                        return null;
-                    }
-                    return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
-                },
-            },
-            // "structural_variant.transcript.csq_gene.display_title": {
+            // Does this "associated_genotype_labels.proband_genotype_label" below supercede or augment the "associated_genotype_labels.proband_genotype_label"
+            // defined in variantSampleColumnExtensionMap.js?
+            // If so, we should update it there (and delete from here).
+
+            // "associated_genotype_labels.proband_genotype_label": {
+            //     // TODO: sorts are broken on this col; I think due to schema issue
+            //     "noSort": true, // TODO: once sort is fixed; remove this
+            //     "render": function(result, props) {
+            //         const { align = "center" } = props;
+            //         const { genotype_labels = [] } = result;
+            //         const rows = [];
+
+            //         let probandLabelPresent = false;
+            //         genotype_labels.forEach((labelObj) => {
+            //             const { role = null, labels: [ genotype = null ] = [] } = labelObj;
+            //             if (role === "proband" && genotype) {
+            //                 rows.push(<div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{genotype}</div>);
+            //                 probandLabelPresent = true;
+            //             } else if (role === "mother" && genotype) {
+            //                 rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{genotype || "-"}</div>);
+            //             } else if (role === "father" && genotype) {
+            //                 rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{genotype || "-"}</div>);
+            //             }
+            //         });
+            //         if (!probandLabelPresent) {
+            //             return null;
+            //         }
+            //         return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
+            //     },
+            // },
+            // // "structural_variant.transcript.csq_gene.display_title": {
             //     "render": function(result, props) {
             //         // TODO: show first and last gene separated by "..."
             //         console.log("result test", result);

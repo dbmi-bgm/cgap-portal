@@ -158,7 +158,7 @@ export class SvBrowser extends React.PureComponent {
             // We apply the filter to all tracks. Possibly exclude the GnomAD track?
             view.tracks.top.forEach((track) => {
                 if (track.type === "sv") {
-                    // Could also do `track.options = { ...track.options, svViewSettings }` to get new obj reference for options.
+                    // Could also do `track.options = { ...track.options, ...svViewSettings }` to get new obj reference for options.
                     Object.assign(track.options, svViewSettings);
                 }
             });
