@@ -166,7 +166,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                                 parentTabType === parentTabTypes.CASEREVIEW ?
                                     <React.Fragment>
                                         { variantDisplayTitle }
-                                        { noSavedNotes ? <i className="icon icon-exclamation-triangle fas ml-12 text-muted" data-tip="No notes saved for this Sample Variant in interpretation"/> : null }
+                                        { noSavedNotes ? <i className="icon icon-exclamation-triangle fas ml-12 text-warning" data-tip="No notes saved for this Sample Variant in interpretation"/> : null }
                                     </React.Fragment>
                                     : (
                                         <React.Fragment>
@@ -185,7 +185,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                     <div className="flex-auto">
 
                         { parentTabType === parentTabTypes.CASEREVIEW ?
-                            <button type="button" className={"btn btn-sm btn-" + (noSavedNotes ? "outline-warning" : "primary")} onClick={toggleIsExpanded} disabled={noSavedNotes}>
+                            <button type="button" className={"btn btn-sm btn-" + (noSavedNotes ? "outline-dark" : "primary")} onClick={toggleIsExpanded} disabled={noSavedNotes}>
                                 <i className={"icon fas mr-07 icon-" + (!isExpanded ? "plus" : "minus")} />
                                 { !isExpanded ? "Review Variant Notes & Classification" : "Hide Variant Notes & Classification" }
                             </button>
