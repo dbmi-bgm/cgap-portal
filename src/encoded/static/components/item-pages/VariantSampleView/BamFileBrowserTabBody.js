@@ -37,7 +37,7 @@ export const BamFileBrowserTabBody = React.memo(function BamFileBrowserTabBody (
                     <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
                         <div className="info-header-title">
                             <h4>
-                                BAM File Viewer
+                                BAM File Browser
                             </h4>
                         </div>
                         <div className="info-body">
