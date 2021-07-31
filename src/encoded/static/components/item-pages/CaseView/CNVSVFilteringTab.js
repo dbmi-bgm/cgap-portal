@@ -89,11 +89,11 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                 "noSort": true,
                 "widthMap": { 'lg' : 150, 'md' : 150, 'sm' : 150 },
                 "render": function(result, props) {
-                    const { bam_snapshot = null, atID } = result;
+                    const { bam_snapshot = null, "@id": atID } = result;
                     if (bam_snapshot) {
                         return (
                             <div className="mx-auto text-truncate">
-                                <a target="_blank" className="" rel="noreferrer" href={atID} data-html>
+                                <a target="_blank" rel="noreferrer" href={atID} data-html>
                                     SV Browser <i className="ml-07 icon-sm icon fas icon-external-link-alt"></i>
                                 </a>
                             </div>
