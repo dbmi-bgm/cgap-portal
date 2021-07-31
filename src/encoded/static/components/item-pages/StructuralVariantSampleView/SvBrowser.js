@@ -1,9 +1,10 @@
+/* eslint-disable react/jsx-no-bind */
 'use strict';
 
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, ajax, memoizedUrlParse, valueTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 
 import { SvBrowserHiglass } from './SvBrowserHiglass';
@@ -11,10 +12,7 @@ import { SvBrowserHiglass } from './SvBrowserHiglass';
 function SvSettingsCheckbox({ label, checked, onChange, disabled, loading = false }) {
     if (typeof onChange !== 'function') return null;
     if (typeof checked === 'undefined') return null;
-    const spinnerClass = 
-        loading 
-            ? "spinner-border text-secondary ml-1 spinner-border-sm" 
-            : "spinner-border text-secondary ml-1 spinner-border-sm d-none";
+    const spinnerClass = "spinner-border text-secondary ml-1 spinner-border-sm" + (!loading ? " d-none" : "");
 
     return (
         <Checkbox checked={checked} onChange={onChange} disabled={disabled || checked === null}
@@ -25,10 +23,6 @@ function SvSettingsCheckbox({ label, checked, onChange, disabled, loading = fals
         </Checkbox>
 
     );
-}
-
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 export class SvBrowser extends React.PureComponent {
@@ -89,13 +83,16 @@ export class SvBrowser extends React.PureComponent {
         ajax.load(
             "/search/?type=Case&sample.bam_sample_id=" + bamSampleId + "&structural_variant_vcf_file.accession=" + file,
             (resp) => {
+                const { "@graph": [ caseItem = null ] = [] } = resp;
+                const { sample_processing: sampleProcessingItem = null } = caseItem || {};
+
                 const svBamVisibility = {};
                 const svBamLoadingStatus = {};
                 const svVcfVisibility = {};
                 const svVcfLoadingStatus = {};
 
-                if (resp["@graph"].length > 0 && resp["@graph"][0]["sample_processing"]) {
-                    const samplesPedigree = resp["@graph"][0]["sample_processing"]["samples_pedigree"] ?? null;
+                if (sampleProcessingItem) {
+                    const { samples_pedigree: samplesPedigree = null, processed_files: processedFiles = [] } = sampleProcessingItem;
                     const samplesPedigreeSorted = [];
 
                     // Determines which tracks are visible by default
@@ -116,21 +113,20 @@ export class SvBrowser extends React.PureComponent {
                     });
 
                     // Get the Higlass SV vcf location
-                    const processed_files = resp["@graph"][0]["sample_processing"]["processed_files"];
                     let higlassSvVcf = null;
-                    processed_files.forEach((file) => {
+                    processedFiles.forEach(function(file){
                         if (file["file_type"] === "Higlass SV VCF") {
                             higlassSvVcf = file["upload_key"];
                         }
                     });
 
                     this.setState({
-                        samples: samplesPedigreeSorted,
-                        svBamVisibility: svBamVisibility,
-                        svBamLoadingStatus: svBamLoadingStatus,
-                        svVcfVisibility: svVcfVisibility,
-                        svVcfLoadingStatus: svVcfLoadingStatus,
-                        higlassSvVcf: higlassSvVcf
+                        "samples": samplesPedigreeSorted,
+                        "svBamVisibility": svBamVisibility,
+                        "svBamLoadingStatus": svBamLoadingStatus,
+                        "svVcfVisibility": svVcfVisibility,
+                        "svVcfLoadingStatus": svVcfLoadingStatus,
+                        "higlassSvVcf": higlassSvVcf
                     });
                 }
                 else {
@@ -152,20 +148,18 @@ export class SvBrowser extends React.PureComponent {
 
         if (!hgc) {
             console.warn("Higlass component not found.");
-            return
+            return;
         }
 
         const viewconf = hgc.api.getViewConfig();
+        const { svViewSettings = {} } = this.state;
+
         viewconf.views.forEach((view) => {
             // We apply the filter to all tracks. Possibly exclude the GnomAD track?
             view.tracks.top.forEach((track) => {
                 if (track.type === "sv") {
-                    track.options.showDeletions = this.state.svViewSettings.showDeletions;
-                    track.options.showDuplications = this.state.svViewSettings.showDuplications;
-                    track.options.showInsertions = this.state.svViewSettings.showInsertions;
-                    track.options.showInversions = this.state.svViewSettings.showInversions;
-                    track.options.minVariantLength = this.state.svViewSettings.minVariantLength;
-                    track.options.maxVariantLength = this.state.svViewSettings.maxVariantLength;
+                    // Could also do `track.options = { ...track.options, ...svViewSettings }` to get new obj reference for options.
+                    Object.assign(track.options, svViewSettings);
                 }
             });
         });
@@ -174,101 +168,72 @@ export class SvBrowser extends React.PureComponent {
     }
 
     updateSvType(event, svType) {
+        this.setState(function(existingState){
+            const { svViewSettings: existingSvSettings } = existingState;
+            const { showDeletions, showDuplications, showInsertions, showInversions } = existingSvSettings;
+            const svViewSettings = { ...existingSvSettings };
 
-        const svViewSettings = { ...this.state.svViewSettings };
-        svViewSettings['showDeletions'] =
-            svType === "del"
-                ? !this.state.svViewSettings.showDeletions
-                : this.state.svViewSettings.showDeletions;
-        svViewSettings['showDuplications'] = 
-            svType === "dup" 
-                ? !this.state.svViewSettings.showDuplications 
-                : this.state.svViewSettings.showDuplications;
-        svViewSettings['showInsertions'] = 
-            svType === "ins" 
-                ? !this.state.svViewSettings.showInsertions 
-                : this.state.svViewSettings.showInsertions;
-        svViewSettings['showInversions'] = 
-            svType === "inv" 
-                ? !this.state.svViewSettings.showInversions 
-                : this.state.svViewSettings.showInversions;
+            svViewSettings['showDeletions']     = svType === "del" ? !showDeletions : showDeletions;
+            svViewSettings['showDuplications']  = svType === "dup" ? !showDuplications : showDuplications;
+            svViewSettings['showInsertions']    = svType === "ins" ? !showInsertions : showInsertions;
+            svViewSettings['showInversions']    = svType === "inv" ? !showInversions : showInversions;
 
-        this.setState({
-            svViewSettings: svViewSettings
+            return { svViewSettings };
         });
-
     }
 
     updateSvLength(event, minMax) {
-
-        const svViewSettings = { ...this.state.svViewSettings };
-        let parsed = parseInt(event.currentTarget.value, 10);
-
-        if (isNaN(parsed)) {
-            if (minMax === 'min') {
-                parsed = 1;
-            } else if (minMax === 'max') {
-                parsed = Number.MAX_SAFE_INTEGER;
+        this.setState(function(existingState){
+            const { svViewSettings: existingSvSettings } = existingState;
+            let parsed = parseInt(event.currentTarget.value, 10);
+            if (isNaN(parsed)) {
+                if (minMax === 'min') {
+                    parsed = 1;
+                } else if (minMax === 'max') {
+                    parsed = Number.MAX_SAFE_INTEGER;
+                }
             }
-        }
 
-        if (minMax === 'min') {
-            svViewSettings['minVariantLength'] = Math.max(parsed, 1);
-        } else if (minMax === 'max') {
-            svViewSettings['maxVariantLength'] = Math.max(parsed, svViewSettings['minVariantLength']);
-        }
+            const svViewSettings = { ...existingSvSettings };
 
-        this.setState({
-            svViewSettings: svViewSettings
+            if (minMax === 'min') {
+                svViewSettings['minVariantLength'] = Math.max(parsed, 1);
+            } else if (minMax === 'max') {
+                svViewSettings['maxVariantLength'] = Math.max(parsed, svViewSettings['minVariantLength']);
+            }
+
+            return { svViewSettings };
         });
-
     }
 
     updateBamVisibility(accession) {
-
-        const svBamVisibility = { ...this.state.svBamVisibility };
-        svBamVisibility[accession] = !svBamVisibility[accession];
-
-        const svBamLoadingStatus = { ...this.state.svBamLoadingStatus };
-        svBamLoadingStatus[accession] = true;
-
-        this.setState({
-            svBamVisibility: svBamVisibility,
-            svBamLoadingStatus: svBamLoadingStatus
+        this.setState(function({ svBamVisibility: existingVisibility, svBamLoadingStatus: existingLoadingStatus }){
+            const svBamVisibility = { ...existingVisibility, [accession]: !existingVisibility[accession] };
+            const svBamLoadingStatus = { ...existingLoadingStatus, [accession]: true };
+            return { svBamVisibility, svBamLoadingStatus };
         }, this.updateViewconf);
-
     }
 
     updateVcfVisibility(accession) {
-
-        const svVcfVisibility = { ...this.state.svVcfVisibility };
-        svVcfVisibility[accession] = !svVcfVisibility[accession];
-
-        const svVcfLoadingStatus = { ...this.state.svVcfLoadingStatus };
-        svVcfLoadingStatus[accession] = true;
-
-        this.setState({
-            svVcfVisibility: svVcfVisibility,
-            svVcfLoadingStatus, svVcfLoadingStatus
+        this.setState(function({ svVcfVisibility: existingVisibility, svVcfLoadingStatus: existingLoadingStatus }){
+            const svVcfVisibility = { ...existingVisibility, [accession]: !existingVisibility[accession] };
+            const svVcfLoadingStatus = { ...existingLoadingStatus, [accession]: true };
+            return { svVcfVisibility, svVcfLoadingStatus };
         }, this.updateViewconf);
-
     }
 
     resetLoadingStatus() {
-
-        const svVcfLoadingStatus = { ...this.state.svVcfLoadingStatus };
-        const svBamLoadingStatus = { ...this.state.svBamLoadingStatus };
-        Object.keys(svVcfLoadingStatus).map(function (key, index) {
-            svVcfLoadingStatus[key] = false;
+        this.setState(function({ svVcfLoadingStatus: existingVcfLoadingStatus, svBamLoadingStatus: existingBamLoadingStatus }){
+            const svVcfLoadingStatus = { ...existingVcfLoadingStatus };
+            const svBamLoadingStatus = { ...existingBamLoadingStatus };
+            Object.keys(svVcfLoadingStatus).forEach(function (key) {
+                svVcfLoadingStatus[key] = false;
+            });
+            Object.keys(svBamLoadingStatus).forEach(function (key) {
+                svBamLoadingStatus[key] = false;
+            });
+            return { svBamLoadingStatus, svVcfLoadingStatus };
         });
-        Object.keys(svBamLoadingStatus).map(function (key, index) {
-            svBamLoadingStatus[key] = false;
-        });
-        this.setState({
-            svBamLoadingStatus: svBamLoadingStatus,
-            svVcfLoadingStatus, svVcfLoadingStatus
-        });
-
     }
 
     assignHGC(ref) {
@@ -286,19 +251,29 @@ export class SvBrowser extends React.PureComponent {
             console.warn(errResp);
         };
 
+        if (!hgc) {
+            console.error("No HGC available");
+            return;
+        }
+
         const hgc = this.higlassContainer.getHiGlassComponent();
         const currentViewconf = hgc.api.getViewConfig();
+        const {
+            variantStartAbsCoord, variantEndAbsCoord,
+            samples, bamSampleId, svBamVisibility, svVcfVisibility,
+            higlassSvVcf
+        } = this.state;
 
         const payload = {
-            'variant_pos_abs': this.state.variantStartAbsCoord,
-            'variant_end_abs': this.state.variantEndAbsCoord,
+            'variant_pos_abs': variantStartAbsCoord,
+            'variant_end_abs': variantEndAbsCoord,
             'requesting_tab': "sv",
-            'samples_pedigree': this.state.samples,
-            'bam_sample_id': this.state.bamSampleId,
-            'bam_visibilty': this.state.svBamVisibility,
-            'sv_vcf_visibilty': this.state.svVcfVisibility,
+            'samples_pedigree': samples,
+            'bam_sample_id': bamSampleId,
+            'bam_visibilty': svBamVisibility,
+            'sv_vcf_visibilty': svVcfVisibility,
             'current_viewconf': currentViewconf,
-            'higlass_sv_vcf': this.state.higlassSvVcf
+            'higlass_sv_vcf': higlassSvVcf
         };
 
         ajax.load(
@@ -311,7 +286,7 @@ export class SvBrowser extends React.PureComponent {
                             if (track.type === "sv") {
                                 const trackObj = hgc.api.getTrackObject(viewId, track.uid);
                                 if (trackObj) {
-                                    // We need to rerender because for some reason the labels in these tracks vanish, 
+                                    // We need to rerender because for some reason the labels in these tracks vanish,
                                     // when we update the viewconf
                                     trackObj.forceRerender();
                                 }
@@ -340,10 +315,10 @@ export class SvBrowser extends React.PureComponent {
         const commonBodyProps = { context, schemas, "active": true };
 
         const {
-            svViewSettings, samples, svBamVisibility, svVcfVisibility, svBamLoadingStatus, svVcfLoadingStatus
+            hasError, svViewSettings, samples, svBamVisibility, svVcfVisibility, svBamLoadingStatus, svVcfLoadingStatus, higlassSvVcf
         } = this.state;
 
-        if (this.state.hasError) {
+        if (hasError) {
             return (
                 <div className="text-center my-5">We had trouble loading the required data.</div>
             );
@@ -355,21 +330,21 @@ export class SvBrowser extends React.PureComponent {
                     <div className="spinner-border text-secondary"></div>
                     <div className="text-secondary mt-2">Loading samples</div>
                 </div>
-            )
+            );
         }
 
         const bamCheckboxes = [];
         const vcfCheckboxes = [];
 
-        samples.forEach(sample => {
-            const label = `${capitalizeFirstLetter(sample.relationship)}`;
-            const accession = sample.sample_accession;
-            bamCheckboxes.push(<SvSettingsCheckbox label={label} loading={svBamLoadingStatus[accession]} checked={svBamVisibility[accession]} onChange={e => this.updateBamVisibility(accession)} />);
-            vcfCheckboxes.push(<SvSettingsCheckbox label={label} loading={svVcfLoadingStatus[accession]} checked={svVcfVisibility[accession]} onChange={e => this.updateVcfVisibility(accession)} />);
+        samples.forEach((sample) => {
+            const { relationship, sample_accession: accession } = sample;
+            const label = valueTransforms.capitalize(relationship);
+            bamCheckboxes.push(<SvSettingsCheckbox label={label} loading={svBamLoadingStatus[accession]} checked={svBamVisibility[accession]} onChange={(e) => this.updateBamVisibility(accession)} />);
+            vcfCheckboxes.push(<SvSettingsCheckbox label={label} loading={svVcfLoadingStatus[accession]} checked={svVcfVisibility[accession]} onChange={(e) => this.updateVcfVisibility(accession)} />);
         });
         const gnomadSvLabel = "GnomAD SV";
         const accession = "gnomad-sv";
-        vcfCheckboxes.push(<SvSettingsCheckbox label={gnomadSvLabel} checked={svVcfVisibility[accession]} onChange={e => this.updateVcfVisibility(accession)} />);
+        vcfCheckboxes.push(<SvSettingsCheckbox label={gnomadSvLabel} checked={svVcfVisibility[accession]} onChange={(e) => this.updateVcfVisibility(accession)} />);
 
         return (
             <div className="row flex-column flex-lg-row">
@@ -395,20 +370,20 @@ export class SvBrowser extends React.PureComponent {
                             <small >SV FILTER</small>
                         </div>
                         <div className="d-block mb-2">
-                            <SvSettingsCheckbox label={"Show deletions"} checked={svViewSettings.showDeletions} onChange={e => this.updateSvType(e, "del")} />
-                            <SvSettingsCheckbox label={"Show duplications"} checked={svViewSettings.showDuplications} onChange={e => this.updateSvType(e, "dup")} />
-                            <SvSettingsCheckbox label={"Show insertions"} checked={svViewSettings.showInsertions} onChange={e => this.updateSvType(e, "ins")} />
-                            <SvSettingsCheckbox label={"Show inversions"} checked={svViewSettings.showInversions} onChange={e => this.updateSvType(e, "inv")} />
+                            <SvSettingsCheckbox label="Show deletions" checked={svViewSettings.showDeletions} onChange={(e) => this.updateSvType(e, "del")} />
+                            <SvSettingsCheckbox label="Show duplications" checked={svViewSettings.showDuplications} onChange={(e) => this.updateSvType(e, "dup")} />
+                            <SvSettingsCheckbox label="Show insertions" checked={svViewSettings.showInsertions} onChange={(e) => this.updateSvType(e, "ins")} />
+                            <SvSettingsCheckbox label="Show inversions" checked={svViewSettings.showInversions} onChange={(e) => this.updateSvType(e, "inv")} />
                         </div>
                         <div className="d-block mb-1">
                             <form>
                                 <div className="form-group">
                                     <label className="font-weight-normal">Minimal SV length (bp):</label>
-                                    <input type="number" className="form-control form-control-sm" onChange={e => this.updateSvLength(e, "min")} />
+                                    <input type="number" className="form-control form-control-sm" onChange={(e) => this.updateSvLength(e, "min")} />
                                 </div>
                                 <div className="form-group">
                                     <label className="font-weight-normal">Maximal SV length (bp):</label>
-                                    <input type="number" className="form-control form-control-sm" onChange={e => this.updateSvLength(e, "max")} />
+                                    <input type="number" className="form-control form-control-sm" onChange={(e) => this.updateSvLength(e, "max")} />
                                 </div>
 
                             </form>
@@ -424,7 +399,7 @@ export class SvBrowser extends React.PureComponent {
                     </div>
                     <div className="info-body">
 
-                        <SvBrowserHiglass {...commonBodyProps} samples={this.state.samples} higlassSvVcf={this.state.higlassSvVcf} assignHGC={this.assignHGC} />
+                        <SvBrowserHiglass {...commonBodyProps} {...{ samples, higlassSvVcf }} assignHGC={this.assignHGC} />
 
                     </div>
                 </div>

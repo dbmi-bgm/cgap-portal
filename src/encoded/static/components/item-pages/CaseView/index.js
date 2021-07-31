@@ -26,6 +26,7 @@ import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
+import { CNVSVFilteringTab } from './CNVSVFilteringTab';
 import { InterpretationTab } from './InterpretationTab';
 import CaseSubmissionView from './CaseSubmissionView';
 
@@ -151,7 +152,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         accession: caseAccession,
         individual: caseIndividual,
         sample_processing: sampleProcessing = null,
-        initial_search_href_filter_addon: filterHrefAddon = ""
+        initial_search_href_filter_addon: snvFilterHrefAddon = "",
+        sv_initial_search_href_filter_addon: svFilterHrefAddon = ""
     } = context;
 
     const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
@@ -240,8 +242,16 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const { processed_files = [] } = sampleProcessing || {};
     const disableBioinfo = !(processed_files.length > 0);
 
-    // Use availability of search query filter string add-on to determine if Filtering tab should be displayed
-    const disableFiltering = !filterHrefAddon;
+    // Use availability of search query filter string add-ons to determine if Filtering tab should be displayed
+    const disableFiltering = !snvFilterHrefAddon && !svFilterHrefAddon;
+
+    // Filtering props shared among both tables, then SV and SNV specific props
+    const filteringTableProps = {
+        context, windowHeight, session, schemas,
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem
+    };
 
     return (
         <React.Fragment>
@@ -294,10 +304,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
-                        <SelectedItemsController isMultiselect>
-                            <FilteringTab {...{ context, windowHeight, session, schemas, setIsSubmitting, variantSampleListItem,
-                                updateVariantSampleListID, savedVariantSampleIDMap, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
-                        </SelectedItemsController>
+                        <FilteringTabWrapper {...filteringTableProps} {...{ snvFilterHrefAddon, svFilterHrefAddon }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle={
                         <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
@@ -757,6 +764,66 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     );
 });
 
+/**
+ * Handles tab switching between the SNV and CNV/SV tabs
+ */
+function FilteringTabWrapper(props) {
+    // const { snvFilterHrefAddon = "", svFilterHrefAddon = "" } = props;
+    const {
+        context, windowHeight, session, schemas,
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem,
+        snvFilterHrefAddon = "", svFilterHrefAddon = ""
+    } = props;
+
+    const defaultTab = (!snvFilterHrefAddon && svFilterHrefAddon) ? "CNVSV" : "SNV";
+    const [ currViewName, setCurrViewName ] = useState(defaultTab);
+
+    const currentTitle = currViewName === "SNV" ? "SNV" : "CNV / SV";
+
+    const commonProps = { context, windowHeight, session, schemas };
+
+    const svFilteringProps = {};
+
+    const snvFilteringProps = {
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem
+    };
+
+    return (
+        <React.Fragment>
+            <FilteringTabTableToggle {...{ currViewName, setCurrViewName }}/>
+            <div className="row mb-24 mt-0">
+                <h1 className="col my-0">
+                    {currentTitle} <span className="text-300">Variant Filtering and Technical Review</span>
+                </h1>
+            </div>
+            <div className={currViewName === "SNV" ? "" : "d-none"}>
+                <SelectedItemsController isMultiselect>
+                    <FilteringTab {...commonProps} {...snvFilteringProps } />
+                </SelectedItemsController>
+            </div>
+            <div className={currViewName === "CNVSV" ? "" : "d-none"}>
+                <CNVSVFilteringTab {...commonProps} {...svFilteringProps} />
+            </div>
+        </React.Fragment>
+    );
+}
+
+function FilteringTabTableToggle({ currViewName, setCurrViewName }) {
+    return (
+        <div className="card py-2 px-3 flex-row mb-3 filtering-tab-toggle">
+            <div onClick={currViewName !== "SNV" ? () => setCurrViewName("SNV"): undefined} className={`mr-2 text-600  ${currViewName === "SNV" ? "active unclickable": "clickable"}`}>
+                SNV Filtering
+            </div>
+            <div onClick={currViewName !== "CNVSV" ? () => setCurrViewName("CNVSV"): undefined} className={`text-600 ${currViewName === "CNVSV" ? "active unclickable": "clickable"}`}>
+                CNV / SV Filtering
+            </div>
+        </div>
+    );
+}
 
 function ReportingTab(props) {
     return <h1>This is the reporting tab</h1>;
