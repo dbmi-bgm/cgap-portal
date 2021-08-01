@@ -12,19 +12,8 @@ import { SvBrowserTabBody } from './SvBrowserTabBody';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
-    constructor(props){
-        super(props);
-    }
-
-    componentDidMount(){
-    }
-
-    componentDidUpdate(pastProps, pastState){
-    }
-
-
     render(){
-        const { context = null, schemas, href} = this.props;
+        const { context = null, schemas, href } = this.props;
         const passProps = { context, schemas, href };
 
         const { query: {

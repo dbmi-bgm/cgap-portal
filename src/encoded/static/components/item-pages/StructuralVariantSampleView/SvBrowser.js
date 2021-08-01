@@ -183,9 +183,10 @@ export class SvBrowser extends React.PureComponent {
     }
 
     updateSvLength(event, minMax) {
+        const inputValue = event.currentTarget.value;
         this.setState(function(existingState){
             const { svViewSettings: existingSvSettings } = existingState;
-            let parsed = parseInt(event.currentTarget.value, 10);
+            let parsed = parseInt(inputValue, 10);
             if (isNaN(parsed)) {
                 if (minMax === 'min') {
                     parsed = 1;
