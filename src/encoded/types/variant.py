@@ -721,7 +721,8 @@ def process_notes(context, request):
             genes = [ gene_subobject["genes_most_severe_gene"] for gene_subobject in variant["genes"] ]
 
 
-    timestamp = datetime.datetime.utcnow().isoformat() + "+00:00"
+    # Using `.now(pytz.utc)` appends "+00:00" for us (making the datetime timezone-aware), while `.utcnow()` doesn't.
+    timestamp = datetime.datetime.now(pytz.utc).isoformat()
     auth_source, user_id = request.authenticated_userid.split(".", 1)
 
     def create_note_patch_payload(note_atid):

@@ -134,11 +134,10 @@ class NamespacedAuthenticationPolicy(object):
         return super(NamespacedAuthenticationPolicy, klass).__new__(klass)
 
     def __init__(self, namespace, base, *args, **kw):
-        super(NamespacedAuthenticationPolicy, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
 
     def unauthenticated_userid(self, request):
-        userid = super(NamespacedAuthenticationPolicy, self) \
-            .unauthenticated_userid(request)
+        userid = super().unauthenticated_userid(request)
         if userid is not None:
             userid = self._namespace_prefix + userid
         return userid
@@ -148,8 +147,7 @@ class NamespacedAuthenticationPolicy(object):
         Adds `request.user_info` for all authentication types.
         Fetches and returns some user details if called.
         """
-        namespaced_userid = super(NamespacedAuthenticationPolicy, self) \
-            .authenticated_userid(request)
+        namespaced_userid = super().authenticated_userid(request)
 
         if namespaced_userid is not None:
             # userid, if present, may be in form of UUID (if remoteuser) or an email (if Auth0).
@@ -174,8 +172,7 @@ class NamespacedAuthenticationPolicy(object):
         if not principal.startswith(self._namespace_prefix):
             return []
         principal = principal[len(self._namespace_prefix):]
-        return super(NamespacedAuthenticationPolicy, self) \
-            .remember(request, principal, **kw)
+        return super().remember(request, principal, **kw)
 
 
 class BasicAuthAuthenticationPolicy(_BasicAuthAuthenticationPolicy):
@@ -183,14 +180,14 @@ class BasicAuthAuthenticationPolicy(_BasicAuthAuthenticationPolicy):
         # Dotted name support makes it easy to configure with pyramid_multiauth
         name_resolver = DottedNameResolver(caller_package())
         check = name_resolver.maybe_resolve(check)
-        super(BasicAuthAuthenticationPolicy, self).__init__(check, *args, **kw)
+        super().__init__(check, *args, **kw)
 
 
 class LoginDenied(HTTPUnauthorized):
     title = 'Login Failure'
 
     def __init__(self, domain=None, *args, **kwargs):
-        super(LoginDenied, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not self.headers.get('WWW-Authenticate') and domain:
             # headers['WWW-Authenticate'] might be set in constructor thru headers
             self.headers['WWW-Authenticate'] = "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(domain, domain)
