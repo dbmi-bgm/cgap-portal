@@ -144,7 +144,7 @@
             "title": "Final VCF Status"
         },
         "individual.sex": {
-            "title": "Gender",
+            "title": "Sex",
             "grouping": "Individual"
         }
     },
