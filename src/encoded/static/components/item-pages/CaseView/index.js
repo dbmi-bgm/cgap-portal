@@ -17,6 +17,7 @@ import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
 import { VariantSampleListController } from './VariantSampleListController';
+import { CaseReviewDataStore } from './VariantSampleSelection';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -28,8 +29,8 @@ import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
 import { CNVSVFilteringTab } from './CNVSVFilteringTab';
 import { InterpretationTab } from './InterpretationTab';
+import { CaseReviewTab } from './CaseReviewTab';
 import CaseSubmissionView from './CaseSubmissionView';
-
 
 
 
@@ -122,23 +123,26 @@ export default class CaseView extends DefaultItemView {
 
 const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const {
+        // Passed in from App or redux
         context = {},
         href,
         session,
         schemas,
-        graphData,
-        selectedDiseaseIdxMap,
         windowWidth,
         windowHeight,
-        idToGraphIdentifier,
+        addToBodyClassList,
+        removeFromBodyClassList,
         setIsSubmitting,
+        graphData,
+        selectedDiseaseIdxMap,
+        idToGraphIdentifier,
         PedigreeVizLibrary = null,
         // Passed in from VariantSampleListController which wraps this component in `getTabObject`
         variantSampleListItem = null,
         isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
         savedVariantSampleIDMap = {},
-        fetchVariantSampleListItem
+        fetchVariantSampleListItem,
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
 
@@ -312,10 +316,17 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             Interpretation
                         </span>
                     } dotPath=".interpretation" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
-                        <InterpretationTab {...{ variantSampleListItem, schemas, caseAccession, isLoadingVariantSampleListItem }} />
+                        <InterpretationTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
-                        <ReportingTab {...props} />
+                    <DotRouterTab tabTitle={
+                        <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
+                            { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
+                            Case Review
+                        </span>
+                    } dotPath=".finalize" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
+                        <CaseReviewDataStore>
+                            <CaseReviewTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                        </CaseReviewDataStore>
                     </DotRouterTab>
                 </DotRouter>
                 : null }
@@ -440,12 +451,13 @@ class DotRouter extends React.PureComponent {
     }
 }
 
-function DotRouterTab(props) {
+const DotRouterTab = React.memo(function DotRouterTab(props) {
     const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
 
     const onClick = useCallback(function(){
         const targetDotPath = prependDotPath + dotPath;
-        navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
+        const navOpts = { "skipRequest": true, "replace": true, "dontScrollToTop": true };
+        navigate("#" + targetDotPath, navOpts, function(){
             // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
             // layout.animateScrollTo(targetDotPath);
         });
@@ -471,7 +483,16 @@ function DotRouterTab(props) {
             </div>
         </div>
     );
-}
+}, function(prevProps, nextProps){
+    // Custom equality comparison func.
+    // Skip comparing the hardcoded `prependDotPath` & `dotPath` -- revert if those props become dynamic.
+    // Also skip checking for props.children, since that is rendered by `DotRouter` and not this `DotRouterTab`.
+    const compareKeys = ["disabled", "active", "tabTitle"];
+    const anyChanged = _.any(compareKeys, function(k){
+        return prevProps[k] !== nextProps[k];
+    });
+    return !anyChanged;
+});
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context, currFamily, secondary_families = [] } = props;
@@ -721,10 +742,10 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         // original_pedigree: { display_title: pedFileName } = {},
         display_title: familyDisplayTitle
     } = family;
-    const onClick = useMemo(function(){
-        return function(evt){
-            navigate(`${vcfAtId}#provenance`, { replace: true });
-        };
+
+    const onClick = useCallback(function(evt){
+        evt.stopPropagation();
+        navigate(`${vcfAtId}#provenance`, { replace: true });
     }, []);
 
     const title = (
@@ -748,13 +769,13 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                 <span className="pull-right">3/28/20</span>
             </div> */}
             <div className="tab-inner-container card">
-                <h4 className="card-header section-header">Quality Control Metrics (QC)</h4>
+                <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
                 <div className="card-body">
                     <BioinfoStats {...{ caseSample, sampleProcessing }} />
                 </div>
             </div>
             <div className="tab-inner-container card">
-                <h4 className="card-header section-header">Multisample Analysis Table</h4>
+                <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
                 <div className="card-body family-index-0" data-is-current-family={true}>
                     { title }
                     <CaseSummaryTable {...family} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
@@ -795,7 +816,7 @@ function FilteringTabWrapper(props) {
     return (
         <React.Fragment>
             <FilteringTabTableToggle {...{ currViewName, setCurrViewName }}/>
-            <div className="row mb-24 mt-0">
+            <div className="row mb-36 mt-0">
                 <h1 className="col my-0">
                     {currentTitle} <span className="text-300">Variant Filtering and Technical Review</span>
                 </h1>
@@ -823,8 +844,4 @@ function FilteringTabTableToggle({ currViewName, setCurrViewName }) {
             </div>
         </div>
     );
-}
-
-function ReportingTab(props) {
-    return <h1>This is the reporting tab</h1>;
 }

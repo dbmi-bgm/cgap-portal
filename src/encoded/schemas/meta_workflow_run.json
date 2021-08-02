@@ -70,78 +70,78 @@
             "description": "The list of workflow runs with their status and output files",
             "type": "array",
             "items": {
-              "title": "Workflow Run",
-              "description": "Individual workflow run the meta workflow run.",
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                  "name": {
-                      "title": "Name",
-                      "description": "Name of the corresponding workflow defined in the meta-workflow",
-                      "type": "string"
-                  },
-                  "status": {
-                      "title": "Status",
-                      "description": "Status of the current workflow run",
-                      "type": "string",
-                      "enum": [
-                          "pending",
-                          "running",
-                          "completed",
-                          "failed"
-                      ]
-                  },
-                  "shard": {
-                      "title": "Shard",
-                      "description": "Shard of the current workflow run in the format of x (1D) | x:x (2D) | x:x:x (3D)",
-                      "type": "string"
-                  },
-                  "dependencies": {
-                      "title": "Dependencies",
-                      "description": "Dependencies of the current workflow run",
-                      "type": "array",
-                      "items": {
-                          "title": "Dependency",
-                          "description": "A dependency of the current workflow run, in the format of name:shard.",
-                          "type": "string"
-                      }
-                  },
-                  "output": {
-                      "title": "Output",
-                      "description": "Output of the current workflow run",
-                      "type": "array",
-                      "items": {
-                          "title": "Output",
-                          "description": "An output of the current workflow run.",
-                          "type": "object",
-                          "additionalProperties": false,
-                          "properties": {
-                              "argument_name": {
-                                  "title": "Argument Name",
-                                  "description": "Name of the output argument",
-                                  "type": "string"
-                              },
-                              "file": {
-                                  "title": "File",
-                                  "description": "the actual output file (link to a file item)",
-                                  "type": "string",
-                                  "linkTo": "File"
-                              }
-                          }
-                      }
-                  },
-                  "workflow_run": {
-                      "title": "Workflow Run",
-                      "description": "Link to the corresponding workflow run item",
-                      "type": "string",
-                      "linkTo": "WorkflowRun"
-                  },
-                  "jobid": {
-                      "title": "Job ID",
-                      "description": "Job ID of the current workflow run",
-                      "type": "string"
-                  }
-              }
+                "title": "Workflow Run",
+                "description": "Individual workflow run the meta workflow run.",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the corresponding workflow defined in the meta-workflow",
+                        "type": "string"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Status of the current workflow run",
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "running",
+                            "completed",
+                            "failed"
+                        ]
+                    },
+                    "shard": {
+                        "title": "Shard",
+                        "description": "Shard of the current workflow run in the format of x (1D) | x:x (2D) | x:x:x (3D)",
+                        "type": "string"
+                    },
+                    "dependencies": {
+                        "title": "Dependencies",
+                        "description": "Dependencies of the current workflow run",
+                        "type": "array",
+                        "items": {
+                            "title": "Dependency",
+                            "description": "A dependency of the current workflow run, in the format of name:shard.",
+                            "type": "string"
+                        }
+                    },
+                    "output": {
+                        "title": "Output",
+                        "description": "Output of the current workflow run",
+                        "type": "array",
+                        "items": {
+                            "title": "Output",
+                            "description": "An output of the current workflow run.",
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "argument_name": {
+                                    "title": "Argument Name",
+                                    "description": "Name of the output argument",
+                                    "type": "string"
+                                },
+                                "file": {
+                                    "title": "File",
+                                    "description": "the actual output file (link to a file item)",
+                                    "type": "string",
+                                    "linkTo": "File"
+                                }
+                            }
+                        }
+                    },
+                    "workflow_run": {
+                        "title": "Workflow Run",
+                        "description": "Link to the corresponding workflow run item",
+                        "type": "string",
+                        "linkTo": "WorkflowRun"
+                    },
+                    "jobid": {
+                        "title": "Job ID",
+                        "description": "Job ID of the current workflow run",
+                        "type": "string"
+                    }
+                }
             }
         },
         "input": {
@@ -177,7 +177,7 @@
                         "title": "Value Type",
                         "description": "Type of the specific input parameter value",
                         "type": "string",
-                        "enum":[
+                        "enum": [
                             "string",
                             "integer",
                             "float",
@@ -186,8 +186,8 @@
                         ]
                     },
                     "files": {
-                        "title" : "File",
-                        "description" : "Default file item of the file type argument",
+                        "title": "File",
+                        "description": "Default file item of the file type argument",
                         "type": "array",
                         "items": {
                             "title": "Default Files",
@@ -196,14 +196,14 @@
                             "additionalProperties": false,
                             "properties": {
                                 "file": {
-                                    "title" : "File",
-                                    "type" : "string",
+                                    "title": "File",
+                                    "type": "string",
                                     "linkTo": "File"
                                 },
                                 "dimension": {
-                                    "title" : "Dimension",
+                                    "title": "Dimension",
                                     "description": "Dimension of file in the input argument (unset for a singleton, '0', '1', '2'.. for a list, '0,0', '0,1' ... for a nested list)",
-                                    "type" : "string",
+                                    "type": "string",
                                     "default": "0"
                                 }
                             }
@@ -241,27 +241,27 @@
             "description": "QC tests for a given pipeline",
             "type": "array",
             "items": {
-              "title": "Overall QC",
-              "description": "A list of objects describing QC tests",
-              "type": "object",
-              "additionalProperties": false,
-              "enable_nested": true,
-              "properties": {
-                  "name": {
-                      "title" : "Name",
-                      "description": "Name of the QC test",
-                      "type" : "string"
-                  },
-                  "value": {
-                      "title" : "Value",
-                      "description": "Value of the QC test result",
-                      "type" : "string",
-                      "enum": [
-                          "PASS",
-                          "FAIL"
-                      ]
-                  }
-              }
+                "title": "Overall QC",
+                "description": "A list of objects describing QC tests",
+                "type": "object",
+                "additionalProperties": false,
+                "enable_nested": true,
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the QC test",
+                        "type": "string"
+                    },
+                    "value": {
+                        "title": "Value",
+                        "description": "Value of the QC test result",
+                        "type": "string",
+                        "enum": [
+                            "PASS",
+                            "FAIL"
+                        ]
+                    }
+                }
             }
         }
     },

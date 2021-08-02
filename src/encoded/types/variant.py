@@ -3,6 +3,12 @@ import io
 import json
 import os
 from urllib.parse import parse_qs, urlparse
+from pyramid.httpexceptions import (
+    HTTPBadRequest,
+    HTTPServerError
+)
+from pyramid.traversal import find_resource
+from pyramid.request import Request
 
 import boto3
 import negspy.coordinates as nc
@@ -14,11 +20,14 @@ from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
 from snovault.util import debug_log
+from snovault.embed import make_subrequest
 
 from encoded.ingestion.common import CGAP_CORE_PROJECT
 from encoded.inheritance_mode import InheritanceMode
 from encoded.util import resolve_file_path
 from encoded.types.base import Item, get_item_or_none
+
+from ..custom_embed import CustomEmbed
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
@@ -590,35 +599,6 @@ class VariantSample(Item):
         return associated_genelists
 
 
-@collection(
-    name='variant-sample-lists',
-    properties={
-        'title': 'Variant Sample Lists',
-        'description': 'Collection of all variant sample lists'
-    })
-class VariantSampleList(Item):
-    """ VariantSampleList class """
-
-    item_type = 'variant_sample_list'
-    schema = load_schema('encoded:schemas/variant_sample_list.json')
-    embedded_list = [
-        'variant_samples.variant_sample_item.variant.display_title',
-        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title',
-        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript',
-        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc',
-        'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp',
-        'variant_samples.variant_sample_item.interpretation.classification',
-        'variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy',
-        'variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy',
-        'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
-        'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
-        'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label',
-        'structural_variant_samples.structural_variant_sample_item.structural_variant.display_title',
-        'structural_variant_samples.structural_variant_sample_item.interpretation.classification',
-        'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.gene_candidacy',
-        'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.variant_candidacy',
-    ]
-
 
 @view_config(name='download', context=VariantSample, request_method='GET',
              permission='view', subpath_segments=[0, 1])
@@ -647,3 +627,285 @@ def download(context, request):
 
     # 307 redirect specifies to keep original method
     raise HTTPTemporaryRedirect(location=location)  # 307
+
+
+@view_config(
+    name='process-notes',
+    context=VariantSample,
+    request_method='PATCH',
+    permission='edit'
+)
+def process_notes(context, request):
+    """
+    This endpoint is used to process notes attached to this (in-context) VariantSample.
+    Currently, "saving to project" is supported, but more functions may be available in future.
+
+    ### Usage
+
+    The endpoint currently accepts the following as JSON body of a POST request, and will then
+    change the status of each note to "shared" upon asserting edit permissions from PATCHer for each note,
+    and save it to the proper field on the Variant and Gene item(s) linked to from this VariantSample.::
+
+        {
+            "save_to_project_notes" : {
+                "variant_notes": <UUID4>,
+                "gene_notes": <UUID4>,
+                "interpretation": <UUID4>,
+                "discovery_interpretation": <UUID4>,
+            }
+        }
+    """
+
+    request_body = request.json
+    stpn = request_body["save_to_project_notes"]
+    ln = {} # 'loaded notes'
+
+    def validate_and_load_note(note_type_name):
+        # Initial Validation - ensure each requested UUID is present in own properties and editable
+        if note_type_name in stpn:
+
+            # Compare UUID submitted vs UUID present on VS Item
+            if stpn[note_type_name] != context.properties[note_type_name]:
+                raise HTTPBadRequest("Not all submitted Note UUIDs are present on VariantSample. " + \
+                    "Check 'save_to_project_notes." + note_type_name + "'.")
+
+            # Get @@object view of Note to check permissions, status, etc.
+            loaded_note = request.embed("/" + stpn[note_type_name], "@@object", as_user=True)
+            item_resource = find_resource(request.root, loaded_note["@id"])
+            if not request.has_permission("edit", item_resource):
+                raise HTTPBadRequest("No edit permission for at least one submitted Note UUID. " + \
+                    "Check 'save_to_project_notes." + note_type_name + "'.")
+
+            ln[note_type_name] = loaded_note
+
+    for note_type_name in ["interpretation", "discovery_interpretation", "variant_notes", "gene_notes"]:
+        validate_and_load_note(note_type_name)
+
+    if len(ln) == 0:
+        raise HTTPBadRequest("No Note UUIDs supplied.")
+
+
+    variant_patch_payload = {} # Can be converted to dict of variants if need to PATCH multiple in future
+    genes_patch_payloads = {} # Keyed by @id, along with `note_patch_payloads`
+    note_patch_payloads = {}
+
+    need_variant_patch = "interpretation" in stpn or "discovery_interpretation" in stpn or "variant_notes" in stpn
+    need_gene_patch = "discovery_interpretation" in stpn or "gene_notes" in stpn
+
+    variant = None
+    genes = None # We may have multiple different genes from same variant; at moment we save note to each of them.
+
+    if need_variant_patch or need_gene_patch:
+        variant_uuid = context.properties["variant"]
+        variant_fields = [
+            "@id",
+            "interpretations.@id",
+            "interpretations.project",
+            "discovery_interpretations.@id",
+            "discovery_interpretations.project",
+            "variant_notes.@id",
+            "variant_notes.project"
+        ]
+
+        if need_gene_patch:
+            variant_fields.append("genes.genes_most_severe_gene.@id")
+            variant_fields.append("genes.genes_most_severe_gene.discovery_interpretations.@id")
+            variant_fields.append("genes.genes_most_severe_gene.discovery_interpretations.project")
+            variant_fields.append("genes.genes_most_severe_gene.gene_notes.@id")
+            variant_fields.append("genes.genes_most_severe_gene.gene_notes.project")
+
+        variant_embed = CustomEmbed(request, variant_uuid, embed_props={ "requested_fields": variant_fields })
+        variant = variant_embed.result
+
+        if need_gene_patch:
+            genes = [ gene_subobject["genes_most_severe_gene"] for gene_subobject in variant["genes"] ]
+
+
+    # Using `.now(pytz.utc)` appends "+00:00" for us (making the datetime timezone-aware), while `.utcnow()` doesn't.
+    timestamp = datetime.datetime.now(pytz.utc).isoformat()
+    auth_source, user_id = request.authenticated_userid.split(".", 1)
+
+    def create_note_patch_payload(note_atid):
+        # This payload may still get updated further with "previous_note" by `add_or_replace_note_for_project_on_vg_item`
+        note_patch_payloads[note_atid] = {
+            # All 3 of these fields below have permissions: restricted_fields
+            # and may only be manually editable by an admin.
+            "status": "current",
+            "approved_by": user_id,
+            "date_approved": timestamp
+        }
+
+    def add_or_replace_note_for_project_on_vg_item(note_type_name, vg_item, payload):
+        pluralized = {
+            "interpretation": "interpretations",
+            "discovery_interpretation": "discovery_interpretations",
+            "gene_notes": "gene_notes",
+            "variant_notes": "variant_notes"
+        }
+        note_type_name_plural = pluralized[note_type_name]
+        new_note_id = ln[note_type_name]["@id"]
+        if not vg_item.get(note_type_name_plural): # Variant or Gene Item has no existing notes for `note_type_name_plural` field.
+            payload[note_type_name_plural] = [ new_note_id ]
+        else:
+            existing_node_ids = [ note["@id"] for note in vg_item[note_type_name_plural] ]
+            if new_note_id not in existing_node_ids:
+                # Check if note from same project exists and remove it (link to it from Note.previous_note instd.)
+                # Ensure we compare to Note.project and not User.project, in case an admin or similar is making edit.
+                existing_note_from_project_idx = None
+                for note_idx, note in enumerate(vg_item[note_type_name_plural]):
+                    if note["project"] == ln[note_type_name]["project"]:
+                        existing_note_from_project_idx = note_idx
+                        break # Assumption is we only have 1 note per project in this list, so don't need to search further.
+
+                payload[note_type_name_plural] = existing_node_ids
+
+                if existing_note_from_project_idx != None:
+                    # Link to existing Note from newly-shared Note
+                    existing_node_from_project_id = vg_item[note_type_name_plural][existing_note_from_project_idx]["@id"]
+                    note_patch_payloads[new_note_id]["previous_note"] = existing_node_from_project_id
+                    # Link to newly-shared Note from existing note (adds new PATCH request)
+                    note_patch_payloads[existing_node_from_project_id] = {
+                        "superseding_note": new_note_id,
+                        "status": "obsolete"
+                    }
+                    # Remove existing Note from Variant or Gene Notes list
+                    del payload[note_type_name_plural][existing_note_from_project_idx]
+
+                payload[note_type_name_plural].append(new_note_id)
+
+
+    if "interpretation" in ln:
+        # Update Note status if is not already current.
+        if ln["interpretation"]["status"] != "current":
+            create_note_patch_payload(ln["interpretation"]["@id"])
+        # Add to Variant.interpretations
+        add_or_replace_note_for_project_on_vg_item("interpretation", variant, variant_patch_payload)
+
+    if "discovery_interpretation" in ln:
+        # Update Note status if is not already current.
+        if ln["discovery_interpretation"]["status"] != "current":
+            create_note_patch_payload(ln["discovery_interpretation"]["@id"])
+        # Add to Variant.discovery_interpretations
+        add_or_replace_note_for_project_on_vg_item("discovery_interpretation", variant, variant_patch_payload)
+        # Add to Gene.discovery_interpretations
+        for gene in genes:
+            genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
+            add_or_replace_note_for_project_on_vg_item("discovery_interpretation", gene, genes_patch_payloads[gene["@id"]])
+
+    if "variant_notes" in ln:
+        # Update Note status if is not already current.
+        if ln["variant_notes"]["status"] != "current":
+            create_note_patch_payload(ln["variant_notes"]["@id"])
+        # Add to Variant.variant_notes
+        add_or_replace_note_for_project_on_vg_item("variant_notes", variant, variant_patch_payload)
+
+    if "gene_notes" in ln:
+        # Update Note status if is not already current.
+        if ln["gene_notes"]["status"] != "current":
+            create_note_patch_payload(ln["gene_notes"]["@id"])
+        # Add to Gene.gene_notes
+        for gene in genes:
+            genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
+            add_or_replace_note_for_project_on_vg_item("gene_notes", gene, genes_patch_payloads[gene["@id"]])
+
+
+    # Perform the PATCHes!
+
+    # TODO: Consider parallelizing.
+    # Currently Gene and Variant patches are performed before Note statuses are updated.
+    # This is in part to simplify UI logic where only Note status == "current" is checked to
+    # assert if a Note is already saved to Project or not.
+
+    def perform_patch_as_admin(item_atid, patch_payload):
+        """Patches Items as 'UPGRADER' user/permissions."""
+        if len(patch_payload) == 0:
+            log.warning("Skipped PATCHing " + item_atid + " due to empty payload.")
+            return # skip empty patches (e.g. if duplicate note uuid is submitted that a Gene has already)
+        subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=False)
+        subreq.remote_user = "UPGRADE"
+        if 'HTTP_COOKIE' in subreq.environ:
+            del subreq.environ['HTTP_COOKIE']
+        patch_result = request.invoke_subrequest(subreq).json
+        if patch_result["status"] != "success":
+            raise HTTPServerError("Couldn't update Item " + item_atid)
+
+
+    gene_patch_count = 0
+    if need_gene_patch:
+        for gene_atid, gene_payload in genes_patch_payloads.items():
+            perform_patch_as_admin(gene_atid, gene_payload)
+            gene_patch_count += 1
+
+    variant_patch_count = 0
+    if need_variant_patch:
+        perform_patch_as_admin(variant["@id"], variant_patch_payload)
+        variant_patch_count += 1
+
+    note_patch_count = 0
+    for note_atid, note_payload in note_patch_payloads.items():
+        perform_patch_as_admin(note_atid, note_payload)
+        note_patch_count += 1
+
+
+    return {
+        "success" : True,
+        "patch_results": {
+            "Gene": gene_patch_count,
+            "Variant": variant_patch_count,
+            "Note": note_patch_count,
+        }
+    }
+
+
+
+
+
+@collection(
+    name='variant-sample-lists',
+    properties={
+        'title': 'Variant Sample Lists',
+        'description': 'Collection of all variant sample lists'
+    })
+class VariantSampleList(Item):
+    """ VariantSampleList class """
+
+    item_type = 'variant_sample_list'
+    schema = load_schema('encoded:schemas/variant_sample_list.json')
+
+    # Populate `embedded_list` if we want to make this Item searchable, else we can exclude from /search/.
+    embedded_list = [
+        # 'variant_samples.variant_sample_item.variant.display_title',
+        # 'variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title',
+        # 'variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript',
+        # 'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc',
+        # 'variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp',
+        # 'variant_samples.variant_sample_item.interpretation.classification',
+        # 'variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy',
+        # 'variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy',
+        # 'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
+        # 'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
+        # 'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label',
+        # 'structural_variant_samples.structural_variant_sample_item.structural_variant.display_title',
+        # 'structural_variant_samples.structural_variant_sample_item.interpretation.classification',
+        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.gene_candidacy',
+        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.variant_candidacy',
+    ]
+
+
+
+@view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
+             permission='view', subpath_segments=[0, 1])
+@debug_log
+def variant_sample_list_spreadsheet(context, request):
+    """
+    Returns spreasheet containing information about every VariantSample selection
+    in the VariantSampleList Item.
+    TODO:
+      Figure out fields needed, use CustomEmbed class to fetch them, then
+      plop them out as a download stream. See 4DN/fourfront's batch_download
+      for precedent example (downloading/streaming a TSV from /search/ request).
+    """
+
+
+    return { "status": "in development" }
+
