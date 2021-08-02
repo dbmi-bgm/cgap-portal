@@ -15,7 +15,7 @@ function SvSettingsCheckbox({ label, checked, onChange, disabled, loading = fals
     const spinnerClass = "spinner-border text-secondary ml-1 spinner-border-sm" + (!loading ? " d-none" : "");
 
     return (
-        <Checkbox checked={checked} onChange={onChange} disabled={disabled || checked === null}
+        <Checkbox checked={checked} onChange={onChange} disabled={disabled || checked === null || loading}
             labelClassName="mb-0 font-weight-normal"
             className="checkbox-container">
             {label}
@@ -122,11 +122,11 @@ export class SvBrowser extends React.PureComponent {
 
                     this.setState({
                         "samples": samplesPedigreeSorted,
-                        "svBamVisibility": svBamVisibility,
-                        "svBamLoadingStatus": svBamLoadingStatus,
-                        "svVcfVisibility": svVcfVisibility,
-                        "svVcfLoadingStatus": svVcfLoadingStatus,
-                        "higlassSvVcf": higlassSvVcf
+                        svBamVisibility,
+                        svBamLoadingStatus,
+                        svVcfVisibility,
+                        svVcfLoadingStatus,
+                        higlassSvVcf
                     });
                 }
                 else {
@@ -158,8 +158,7 @@ export class SvBrowser extends React.PureComponent {
             // We apply the filter to all tracks. Possibly exclude the GnomAD track?
             view.tracks.top.forEach((track) => {
                 if (track.type === "sv") {
-                    // Could also do `track.options = { ...track.options, ...svViewSettings }` to get new obj reference for options.
-                    Object.assign(track.options, svViewSettings);
+                    track.options = { ...track.options, ...svViewSettings };
                 }
             });
         });
@@ -246,18 +245,18 @@ export class SvBrowser extends React.PureComponent {
     }
 
     updateViewconf() {
-
         const fallbackCallback = (errResp, xhr) => {
             // Error callback
             console.warn(errResp);
         };
+
+        const hgc = this.higlassContainer.getHiGlassComponent();
 
         if (!hgc) {
             console.error("No HGC available");
             return;
         }
 
-        const hgc = this.higlassContainer.getHiGlassComponent();
         const currentViewconf = hgc.api.getViewConfig();
         const {
             variantStartAbsCoord, variantEndAbsCoord,
@@ -340,12 +339,18 @@ export class SvBrowser extends React.PureComponent {
         samples.forEach((sample) => {
             const { relationship, sample_accession: accession } = sample;
             const label = valueTransforms.capitalize(relationship);
-            bamCheckboxes.push(<SvSettingsCheckbox label={label} loading={svBamLoadingStatus[accession]} checked={svBamVisibility[accession]} onChange={(e) => this.updateBamVisibility(accession)} />);
-            vcfCheckboxes.push(<SvSettingsCheckbox label={label} loading={svVcfLoadingStatus[accession]} checked={svVcfVisibility[accession]} onChange={(e) => this.updateVcfVisibility(accession)} />);
+            bamCheckboxes.push(
+                <SvSettingsCheckbox key={accession} label={label} loading={svBamLoadingStatus[accession]}
+                    checked={svBamVisibility[accession]} onChange={(e) => this.updateBamVisibility(accession)} />
+            );
+            vcfCheckboxes.push(
+                <SvSettingsCheckbox key={accession} label={label} loading={svVcfLoadingStatus[accession]}
+                    checked={svVcfVisibility[accession]} onChange={(e) => this.updateVcfVisibility(accession)} />
+            );
         });
-        const gnomadSvLabel = "GnomAD SV";
-        const accession = "gnomad-sv";
-        vcfCheckboxes.push(<SvSettingsCheckbox label={gnomadSvLabel} checked={svVcfVisibility[accession]} onChange={(e) => this.updateVcfVisibility(accession)} />);
+        vcfCheckboxes.push(
+            <SvSettingsCheckbox key="vcf" label="GnomAD SV" checked={svVcfVisibility["gnomad-sv"]} onChange={(e) => this.updateVcfVisibility("gnomad-sv")} />
+        );
 
         return (
             <div className="row flex-column flex-lg-row">
