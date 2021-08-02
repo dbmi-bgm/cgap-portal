@@ -410,25 +410,6 @@ export const columnExtensionMap = {
             }
             return <span className="value">{ retLink }</span>;
         }
-    },
-    'bam_snapshot': {
-        "noSort": true,
-        "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-        "colTitle": <i className="icon icon-fw icon-image fas" />,
-        "render": function(result, props) {
-            const { bam_snapshot = null, uuid = null } = result;
-            if (bam_snapshot) {
-                return (
-                    <div className="mx-auto text-truncate">
-                        <a target="_blank" className="btn btn-outline-dark btn-sm" rel="noreferrer"
-                            href={`/${uuid}/@@download`} data-html data-tip="View BAM Snapshot <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>">
-                            <i className="icon icon-fw icon-image fas" />
-                        </a>
-                    </div>
-                );
-            }
-            return null;
-        }
     }
 };
 

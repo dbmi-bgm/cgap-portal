@@ -302,58 +302,48 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         return (
             // TODO 1: Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
-            <React.Fragment>
+            <div className="above-variantsample-table-ui">
 
-                <div className="row mb-36 mt-0">
-                    <h1 className="col my-0">
-                        <span className="text-300">Variant Filtering and Technical Review</span>
-                    </h1>
-                </div>
-
-                <div className="above-variantsample-table-ui">
-
-                    <div className="filterset-outer-container" data-is-open={bodyOpen}>
-                        <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} />
-                        <Collapse in={bodyOpen} appear>
-                            <div>
-                                <div className="d-flex flex-column flex-md-row">
-                                    <div className="filterset-preset-selection-outer-column">
-                                        <PresetFilterSetSelectionUI {...presetSelectionUIProps} />
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        { fsuiBlocksBody }
-                                    </div>
+                <div className="filterset-outer-container" data-is-open={bodyOpen}>
+                    <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} />
+                    <Collapse in={bodyOpen} appear>
+                        <div>
+                            <div className="d-flex flex-column flex-md-row">
+                                <div className="filterset-preset-selection-outer-column">
+                                    <PresetFilterSetSelectionUI {...presetSelectionUIProps} />
+                                </div>
+                                <div className="flex-grow-1">
+                                    { fsuiBlocksBody }
                                 </div>
                             </div>
-                        </Collapse>
-                    </div>
-
-                    <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
-                        panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
-                        <h4 className="text-400 col my-0">
-                            <strong className="mr-1">{ totalCount }</strong>
-                            <span>
-                                Variant Matches for { currentFilterBlockName ?
-                                    <em>{ currentFilterBlockName }</em>
-                                    // TODO: Allow to toggle Union vs Intersection in FilterSetController
-                                    : (
-                                        <React.Fragment>
-                                            <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
-                                            { ` of ${selectedFilterBlockCount} Filter Blocks` }
-                                        </React.Fragment>
-                                    ) }
-                            </span>
-                        </h4>
-                        { selectedVariantSamples instanceof Map ?
-                            <div className="col-auto pr-06">
-                                <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIndices,
-                                    variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
-                            </div>
-                            : null }
-                    </AboveTableControlsBase>
+                        </div>
+                    </Collapse>
                 </div>
 
-            </React.Fragment>
+                <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
+                    panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
+                    <h4 className="text-400 col my-0">
+                        <strong className="mr-1">{ totalCount }</strong>
+                        <span>
+                            Variant Matches for { currentFilterBlockName ?
+                                <em>{ currentFilterBlockName }</em>
+                                // TODO: Allow to toggle Union vs Intersection in FilterSetController
+                                : (
+                                    <React.Fragment>
+                                        <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
+                                        { ` of ${selectedFilterBlockCount} Filter Blocks` }
+                                    </React.Fragment>
+                                ) }
+                        </span>
+                    </h4>
+                    { selectedVariantSamples instanceof Map ?
+                        <div className="col-auto pr-06">
+                            <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIndices,
+                                variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
+                        </div>
+                        : null }
+                </AboveTableControlsBase>
+            </div>
         );
     }
 }

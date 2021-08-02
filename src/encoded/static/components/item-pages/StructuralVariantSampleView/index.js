@@ -19,7 +19,7 @@ export default class VariantSampleView extends DefaultItemView {
 
 }
 
-class OverviewTabView extends React.Component {
+class OverviewTabView extends React.PureComponent {
 
     static getTabObject(props) {
         return {
@@ -32,13 +32,6 @@ class OverviewTabView extends React.Component {
             'key' : 'overview',
             'content' : <OverviewTabView {...props} />
         };
-    }
-
-    constructor(props) {
-        super(props);
-    }
-
-    componentDidMount() {
     }
 
     render() {
