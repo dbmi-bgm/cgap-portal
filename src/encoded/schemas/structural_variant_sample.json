@@ -233,11 +233,6 @@
             "order": 2,
             "grouping": "Position"
         },
-        "structural_variant.size": {
-            "title": "Size",
-            "aggregation_type": "stats",
-            "number_step": "any"
-        },
         "structural_variant.transcript.csq_gene.display_title": {
             "title": "Gene",
             "order": 10,
@@ -790,6 +785,12 @@
             "number_step": "any",
             "order": 73,
             "grouping": "Constraint Metrics"
+        },
+        "structural_variant.size": {
+            "title": "Size",
+            "order": 80,
+            "aggregation_type": "stats",
+            "number_step": "any"
         }
     }
 }
