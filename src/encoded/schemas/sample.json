@@ -284,8 +284,8 @@
             "lookup": 144
         },
         "specimen_accession": {
-            "title": "Specimen Accession",
-            "description": "Accession of specimen from sequencing lab",
+            "title": "Specimen ID",
+            "description": "Identifier of specimen from sequencing lab",
             "label": "requisition",
             "type": "string",
             "lookup": 80

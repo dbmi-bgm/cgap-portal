@@ -39,12 +39,6 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 			flex: 1 1 0px;
 			width: 100%;
 
-			.top-row,
-			.col-date,
-			.col-main {
-				@include text-truncate();
-			}
-
 			.top-row {
 				display: flex;
 				justify-content: space-between;
@@ -56,14 +50,31 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 			.col-date {
 				line-height: 20px;
 				white-space: nowrap;
+				@include text-truncate();
 			}
 			.col-main {
 				margin: 0;
 				font-weight: 400;
-				text-align: center;
+				/*
+				Given we have a 80px row height, we increase this from default (~30px) for visual appeal.
+				We could also use flex+flex-grow to increase this up to available space in row height, but
+				setting explicit min-height instead allows to make quicker fine-tuning. Can change more later.
+				*/
+				min-height: 34px;
+				display: flex;
+				align-items: center;
+				> span {
+					flex-grow: 1;
+					text-align: center;
+					width: 100%;
+					@include text-truncate();
+				}
 			}
 			.col-topleft {
 				font-size: 0.75em;
+			}
+			.col-date {
+				text-align: center;
 			}
 		}
 	}

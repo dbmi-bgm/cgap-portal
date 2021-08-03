@@ -4,24 +4,57 @@
     "id": "/profiles/meta_workflow.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["title", "name", "project", "institution"],
-    "additionalProperties": false,
-    "identifyingProperties": ["uuid", "aliases", "accession"],
-    "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/documents" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/static_embeds" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/accession" }
+    "required": [
+        "title",
+        "name",
+        "project",
+        "institution"
     ],
-    "mixinFacets" : [
-        { "$ref": "mixins.json#/facets_common" }
+    "additionalProperties": false,
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "accession"
+    ],
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/documents"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        }
+    ],
+    "mixinFacets": [
+        {
+            "$ref": "mixins.json#/facets_common"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -67,7 +100,7 @@
             "description": "Version upgrade log",
             "type": "string"
         },
-        "workflows" : {
+        "workflows": {
             "title": "Workflows",
             "type": "array",
             "items": {
@@ -75,32 +108,32 @@
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                    "name" : {
-                        "title" : "Name",
-                        "description" : "Name of the workflow, unique within the meta workflow",
-                        "type" : "string"
+                    "name": {
+                        "title": "Name",
+                        "description": "Name of the workflow, unique within the meta workflow",
+                        "type": "string"
                     },
-                    "workflow" : {
-                        "title" : "Workflow",
-                        "description" : "Link to the workflow item",
-                        "type" : "string",
+                    "workflow": {
+                        "title": "Workflow",
+                        "description": "Link to the workflow item",
+                        "type": "string",
                         "linkTo": "Workflow"
                     },
-                    "input" : {
-                        "title" : "Workflow Inputs",
-                        "type" : "array",
-                        "items" : {
-                            "type" : "object",
-                            "properties" : {
-                                "argument_name" : {
-                                    "title" : "Input Argument Name",
-                                    "type" : "string"
+                    "input": {
+                        "title": "Workflow Inputs",
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "argument_name": {
+                                    "title": "Input Argument Name",
+                                    "type": "string"
                                 },
-                                "argument_type" : {
-                                    "title" : "Input Argument type",
-                                    "description" : "input argument type (either file or parameter)",
-                                    "type" : "string",
-                                    "enum" : [
+                                "argument_type": {
+                                    "title": "Input Argument type",
+                                    "description": "input argument type (either file or parameter)",
+                                    "type": "string",
+                                    "enum": [
                                         "file",
                                         "parameter"
                                     ]
@@ -114,7 +147,7 @@
                                     "title": "Value Type",
                                     "description": "Type of the specific input parameter value",
                                     "type": "string",
-                                    "enum":[
+                                    "enum": [
                                         "string",
                                         "integer",
                                         "float",
@@ -122,45 +155,45 @@
                                         "boolean"
                                     ]
                                 },
-                                "source" : {
-                                    "title" : "Source Workflow",
-                                    "description" : "Where this input file came from (source workflow name). If this field is null or undefined, the input is global and not from another workflow's output.",
-                                    "type" : "string"
+                                "source": {
+                                    "title": "Source Workflow",
+                                    "description": "Where this input file came from (source workflow name). If this field is null or undefined, the input is global and not from another workflow's output.",
+                                    "type": "string"
                                 },
-                                "source_argument_name" : {
-                                    "title" : "Argument name in the Source Workflow",
-                                    "description" : "Output argument name in the source workflow",
-                                    "type" : "string"
+                                "source_argument_name": {
+                                    "title": "Argument name in the Source Workflow",
+                                    "description": "Output argument name in the source workflow",
+                                    "type": "string"
                                 },
                                 "scatter": {
                                     "title": "Scatter",
-                                    "description" : "The input dimension decrease if scattered into mutiple runs (default: not set)",
-                                    "type" : "integer"
+                                    "description": "The input dimension decrease if scattered into mutiple runs (default: not set)",
+                                    "type": "integer"
                                 },
                                 "gather": {
                                     "title": "Gather",
-                                    "description" : "The input dimension increase from multiple runs of the source workflow (default: not set)",
-                                    "type" : "integer"
+                                    "description": "The input dimension increase from multiple runs of the source workflow (default: not set)",
+                                    "type": "integer"
                                 },
                                 "extra_dimension": {
                                     "title": "Extra Dimension",
-                                    "description" : "The extra input dimension increase other than that defined by gather (default: not set)",
-                                    "type" : "integer"
+                                    "description": "The extra input dimension increase other than that defined by gather (default: not set)",
+                                    "type": "integer"
                                 },
                                 "mount": {
                                     "title": "Mount",
-                                    "description" : "Whether the input is mounted",
-                                    "type" : "boolean"
+                                    "description": "Whether the input is mounted",
+                                    "type": "boolean"
                                 },
                                 "rename": {
                                     "title": "Rename",
-                                    "description" : "What the input should be renamed to when downloaded to EC2 for execution",
-                                    "type" : "string"
+                                    "description": "What the input should be renamed to when downloaded to EC2 for execution",
+                                    "type": "string"
                                 },
                                 "unzip": {
                                     "title": "Unzip",
-                                    "description" : "How the input should be decompressed when downloaded to EC2 for execution",
-                                    "type" : "string",
+                                    "description": "How the input should be decompressed when downloaded to EC2 for execution",
+                                    "type": "string",
                                     "enum": [
                                         "gz",
                                         "bz2"
@@ -179,22 +212,22 @@
                             "type": "string"
                         }
                     },
-                    "config" : {
-                        "title" : "Config",
-                        "description" : "Tibanna configuration for execution",
-                        "type" : "object",
+                    "config": {
+                        "title": "Config",
+                        "description": "Tibanna configuration for execution",
+                        "type": "object",
                         "additionalProperties": true
                     },
-                    "custom_pf_fields" : {
-                        "title" : "Custom PF fields",
-                        "description" : "Custom fields to be added to processed file items through Tibanna",
-                        "type" : "object",
+                    "custom_pf_fields": {
+                        "title": "Custom PF fields",
+                        "description": "Custom fields to be added to processed file items through Tibanna",
+                        "type": "object",
                         "additionalProperties": true
                     },
-                    "custom_qc_fields" : {
-                        "title" : "Custom QC fields",
-                        "description" : "Custom fields to be added to QC items through Tibanna",
-                        "type" : "object",
+                    "custom_qc_fields": {
+                        "title": "Custom QC fields",
+                        "description": "Custom fields to be added to QC items through Tibanna",
+                        "type": "object",
                         "additionalProperties": true
                     }
                 }
@@ -210,26 +243,26 @@
                 "type": "object",
                 "additionalProperties": true,
                 "properties": {
-                    "argument_name" : {
-                        "title" : "Argument Name",
-                        "description" : "Name of the workflow, unique within the meta workflow",
-                        "type" : "string"
+                    "argument_name": {
+                        "title": "Argument Name",
+                        "description": "Name of the workflow, unique within the meta workflow",
+                        "type": "string"
                     },
-                    "argument_type" : {
-                        "title" : "Argument Type",
-                        "description" : "Name of the workflow, unique within the meta workflow",
-                        "type" : "string"
+                    "argument_type": {
+                        "title": "Argument Type",
+                        "description": "Name of the workflow, unique within the meta workflow",
+                        "type": "string"
                     },
                     "value": {
-                        "title" : "Default value",
-                        "description" : "Default value of the parameter-type argument",
-                        "type" : "string"
+                        "title": "Default value",
+                        "description": "Default value of the parameter-type argument",
+                        "type": "string"
                     },
                     "value_type": {
                         "title": "Value Type",
                         "description": "Type of the specific input parameter value",
                         "type": "string",
-                        "enum":[
+                        "enum": [
                             "string",
                             "integer",
                             "float",
@@ -238,8 +271,8 @@
                         ]
                     },
                     "files": {
-                        "title" : "Default files",
-                        "description" : "Default file item(s) of the file argument",
+                        "title": "Default files",
+                        "description": "Default file item(s) of the file argument",
                         "type": "array",
                         "items": {
                             "title": "Default Files",
@@ -247,14 +280,14 @@
                             "type": "object",
                             "properties": {
                                 "file": {
-                                    "title" : "File",
-                                    "type" : "string",
+                                    "title": "File",
+                                    "type": "string",
                                     "linkTo": "File"
                                 },
                                 "dimension": {
-                                    "title" : "Dimension",
+                                    "title": "Dimension",
                                     "description": "Dimension of file in the input argument (unset for a singleton, '0', '1', '2'.. for a list, '0,0', '0,1' ... for a nested list)",
-                                    "type" : "string"
+                                    "type": "string"
                                 }
                             }
                         }
@@ -263,18 +296,18 @@
             }
         }
     },
-    "facets" : {
+    "facets": {
         "workflows.workflow.display_title": {
-            "title" : "Workflow"
+            "title": "Workflow"
         }
     },
-    "columns" : {
+    "columns": {
         "name": {
             "title": "Name"
         },
         "version": {
             "title": "Version",
-            "colTitle" : "Version"
+            "colTitle": "Version"
         }
     }
 }

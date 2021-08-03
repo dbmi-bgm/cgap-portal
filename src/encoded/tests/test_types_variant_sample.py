@@ -1,6 +1,9 @@
 import pytest
 import webtest
 import requests  # XXX: C4-211
+import datetime
+import pytz
+from dateutil.parser import isoparse
 from encoded.tests.variant_fixtures import VARIANT_SAMPLE_URL
 from encoded.types.variant import build_variant_sample_annotation_id
 from encoded.ingestion.common import CGAP_CORE_PROJECT
@@ -14,6 +17,25 @@ def bgm_test_variant_sample2(bgm_test_variant_sample):
     bgm_test_variant_sample_copy = bgm_test_variant_sample.copy()
     bgm_test_variant_sample_copy['file'] = 'other-file-name'
     return bgm_test_variant_sample_copy
+
+
+@pytest.fixture
+def bgm_note_for_patch_process(institution, bgm_project):
+    # IS NOT pre-POSTed into DB.
+    return {
+        # 'status': 'in review', # Can't be explicitly supplied by non-admin user.
+        'note_text': 'dummy text 1',
+        'project': bgm_project['@id'],
+        'institution': institution['@id']
+    }
+
+@pytest.fixture
+def bgm_note_for_patch_process2(bgm_note_for_patch_process):
+    # IS NOT pre-POSTed into DB.
+    bgm_note_for_patch_process_copy = bgm_note_for_patch_process.copy()
+    bgm_note_for_patch_process_copy['note_text'] = 'dummy text 2'
+    return bgm_note_for_patch_process_copy
+
 
 
 @pytest.fixture
@@ -91,6 +113,102 @@ def test_variant_sample_list_post(bgm_user_testapp, variant_sample_list1):
     bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201)
 
 
+def test_variant_sample_patch_notes_process_success(
+    testapp,
+    bgm_user,
+    bgm_user_testapp,
+    bgm_test_variant_sample2, # This VS is from BGM project and has no "genes" on it initially.
+    bgm_note_for_patch_process,
+    bgm_note_for_patch_process2,
+    gene, # These 2 Gene are from ENCODED project (not BGM)
+    gene_2
+):
+    
+    # Load up some data - these are notes to be added with "/@@process-notes/"
+    note1 = bgm_user_testapp.post_json('/notes-standard', bgm_note_for_patch_process, status=201).json['@graph'][0]
+    note2 = bgm_user_testapp.post_json('/notes-interpretation', bgm_note_for_patch_process2, status=201).json['@graph'][0]
+
+    note3_json = bgm_note_for_patch_process2.copy()
+    note3_json["note_text"] = "gene discovery note text"
+    note4_json = bgm_note_for_patch_process2.copy()
+    note4_json["note_text"] = "gene note text"
+    note3 = bgm_user_testapp.post_json('/notes-discovery', note3_json, status=201).json['@graph'][0]
+    note4 = bgm_user_testapp.post_json('/notes-standard', note4_json, status=201).json['@graph'][0]
+
+    # Create a "pre-existing" variant_note with same Project (BGM).
+    bgm_note_for_patch_process_preexisting = bgm_note_for_patch_process2.copy()
+    bgm_note_for_patch_process_preexisting['note_text'] = 'dummy text 3'
+    note_pre_existing = bgm_user_testapp.post_json('/notes-standard', bgm_note_for_patch_process_preexisting, status=201).json['@graph'][0]
+
+    # Create our VariantSample Item w. linked Variant & Gene (already has Variant)
+    bgm_test_variant_sample_copy = bgm_test_variant_sample2.copy()
+    bgm_test_variant_sample_copy['file'] = 'other-file-name2'
+
+    # Notes need to be on VariantSample before they can be shared to project
+    bgm_test_variant_sample_copy['variant_notes'] = note1['@id']
+    bgm_test_variant_sample_copy['interpretation'] = note2['@id']
+    bgm_test_variant_sample_copy['discovery_interpretation'] = note3['@id']
+    bgm_test_variant_sample_copy['gene_notes'] = note4['@id']
+    variant_sample = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample_copy, status=201).json['@graph'][0]
+
+    # Add the pre-existing variant_note by PATCHING VariantSample.variant.variant_notes (as admin)
+    # Also ensure we have gene(s)
+    variant_payload_for_initial_state = {
+        "variant_notes": [ note_pre_existing["@id"] ],
+        "genes": [ {"genes_most_severe_gene": gene["@id"] }, {"genes_most_severe_gene": gene_2["@id"] } ]
+    }
+    variant_loaded = testapp.patch_json(variant_sample["variant"], variant_payload_for_initial_state, status=200).json['@graph'][0]
+
+    prepatch_datetime = datetime.datetime.now(pytz.utc)
+
+    # Test /@@process-notes/ endpoint
+    patch_process_payload = {
+        "save_to_project_notes" : {
+            "variant_notes": note1["uuid"],
+            "interpretation": note2["uuid"],
+            "discovery_interpretation": note3["uuid"],
+            "gene_notes": note4["uuid"]
+        }
+    }
+
+    resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@process-notes/", patch_process_payload, status=200).json
+
+    assert resp["success"] == True
+    assert resp["patch_results"]["Variant"] == 1
+    assert resp["patch_results"]["Note"] == 5 # 4 Newly-shared Notes, +1 "superseding_notes" field to existing Note PATCH
+
+    note1_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database&frame=object", status=200).json
+    note3_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database&frame=object", status=200).json
+    assert note1_reloaded["status"] == "current"
+    assert note3_reloaded["status"] == "current"
+    assert note1_reloaded["approved_by"] == bgm_user["@id"] # Ensure this is set for us
+    assert note3_reloaded["approved_by"] == bgm_user["@id"]
+    assert isoparse(note1_reloaded["date_approved"]) >= prepatch_datetime # Datetime of approval is same or after the datetime at which we started PATCH
+    assert isoparse(note3_reloaded["date_approved"]) >= prepatch_datetime # Datetime of approval is same or after the datetime at which we started PATCH
+
+    variant_reloaded = bgm_user_testapp.get(variant_sample["variant"] + "?datastore=database", status=200).json
+    assert note1["@id"] in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
+    assert note2["@id"] in [ inp["@id"] for inp in variant_reloaded["interpretations"] ]
+
+    # Gene notes not embedded by default on variant, we GET Gene first to check on it.
+    gene_loaded = bgm_user_testapp.get(variant_reloaded["genes"][0]["genes_most_severe_gene"]["@id"] + "?datastore=database", status=200).json
+    gene_2_loaded = bgm_user_testapp.get(variant_reloaded["genes"][1]["genes_most_severe_gene"]["@id"] + "?datastore=database", status=200).json
+    assert note3["@id"] in [ inp["@id"] for inp in gene_loaded["discovery_interpretations"] ]
+    assert note4["@id"] in [ inp["@id"] for inp in gene_loaded["gene_notes"] ]
+    assert note3["@id"] in [ inp["@id"] for inp in gene_2_loaded["discovery_interpretations"] ]
+    assert note4["@id"] in [ inp["@id"] for inp in gene_2_loaded["gene_notes"] ]
+
+    # Since note_pre_existing (pre-existing) has same Project (BGM), it should have been removed and instead available via note1.previous_note
+    assert note_pre_existing["@id"] not in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
+    assert note1_reloaded["previous_note"] == note_pre_existing["@id"]
+
+    # Make sure it acts like a linked-list, ""
+    note_pre_existing_reloaded = bgm_user_testapp.get(note_pre_existing["@id"] + "?datastore=database&frame=object", status=200).json
+    assert note_pre_existing_reloaded["superseding_note"] == note1["@id"]
+
+
+
+
 def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_sample_list1, bgm_test_variant_sample, bgm_test_variant_sample2):
     vsl = bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201).json['@graph'][0]
     vs1 = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample, status=201).json['@graph'][0]
@@ -101,15 +219,12 @@ def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_s
             {
                 "variant_sample_item": vs1['@id'],
                 "filter_blocks_request_at_time_of_selection": '{"search_type":"VariantSample","global_flags":"CALL_INFO=NA12879_sample&file=GAPFI2VBKGM7&additional_facet=associated_genotype_labels.mother_genotype_label&additional_facet=associated_genotype_labels.father_genotype_label&sort=date_created","intersect":false,"filter_blocks":[{"query":"variant.genes.genes_most_severe_consequence.coding_effect=Missense","flags_applied":[]},{"query":"variant.mutanno_variant_class=SNV","flags_applied":[]}]}',
-                # Existing values for following 2 fields should be preserved -
-                "date_selected": "2021-01-25T16:41:47.787+00:00",
-                "userid" : "1234-test-1234"
             },
             {
                 "variant_sample_item": vs2['@id'],
                 "filter_blocks_request_at_time_of_selection": '{"search_type":"VariantSample","global_flags":"CALL_INFO=NA12879_sample&file=GAPFI2VBKGM7&additional_facet=associated_genotype_labels.mother_genotype_label&additional_facet=associated_genotype_labels.father_genotype_label&sort=date_created","intersect":false,"filter_blocks":[{"query":"variant.genes.genes_most_severe_consequence.coding_effect=Missense","flags_applied":[]},{"query":"variant.mutanno_variant_class=SNV","flags_applied":[]}]}',
                 # "date_selected": "2021-01-25T16:41:47.787+00:00", # Should be auto-filled by server.
-                # "userid" : ... # <- This should be auto-filled by server, we'll test it .. sometime.
+                # "selected_by" : ... # <- This should be auto-filled by server, we'll test it .. sometime.
             }
         ]
     }
@@ -118,7 +233,7 @@ def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_s
     assert resp['variant_samples'][0]["variant_sample_item"] == vs1['@id']
     assert resp['variant_samples'][1]["variant_sample_item"] == vs2['@id']
     assert len(resp['variant_samples'][1]["date_selected"]) > 10 # Check that datetime is auto-populated
-    assert resp['variant_samples'][1]["userid"] == bgm_user["uuid"] # Check that userid is auto-populated
+    assert resp['variant_samples'][1]["selected_by"] == bgm_user["@id"] # Check that userid is auto-populated
 
 
 def test_variant_sample_list_patch_fail(bgm_variant, bgm_user_testapp, variant_sample_list1):
