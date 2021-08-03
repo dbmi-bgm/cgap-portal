@@ -1,4 +1,5 @@
 import datetime
+import gzip
 import json
 import mock
 import pytest
@@ -9,6 +10,7 @@ from uuid import uuid4
 from pyramid.testing import DummyRequest
 from ..ingestion_listener import (
     IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
+    STATUS_INGESTED,
 )
 from ..ingestion.common import IngestionReport, IngestionError
 from ..util import debuglog
@@ -253,3 +255,75 @@ def test_ingestion_report_basic(success):
     assert report.grand_total == success + 1
     assert report.total_successful() == success
     assert report.total_errors() == 1
+
+
+def mock_request_get(*args, **kwargs):
+    """Mock request.get() result for SV VCF ingestion."""
+    class MockContent:
+        @property
+        def content(self):
+            """
+            """
+            file_contents = (
+                "##fileformat=VCFv4.0"
+                "\n##fileDate=20210801"
+                '\n##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of Samples'
+                ' With Data">'
+                '\n##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">'
+                "\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT"
+                "\tNA12879_sample\tNA12878_sample\tNA12877_sample"
+                "\nchr1\t31908111\trs6054257\tG\tA\t108\tPASS\tNS=3\tGT\t0/0\t0/1\t0/0"
+            )
+            file_contents = file_contents.encode("utf-8")
+            content = gzip.compress(file_contents)
+            return content
+    return MockContent()
+
+def mock_ingest_vcf(*args, **kwargs):
+    """
+    Mock for StructuralVariantBuilder.ingest_vcf() for SV VCF ingestion.
+    """
+    return [1, 0]
+
+@mock.patch("requests.get", new=mock_request_get)
+@mock.patch(
+    "encoded.ingestion.variant_utils.StructuralVariantBuilder.ingest_vcf",
+    new=mock_ingest_vcf
+)
+def test_ingestion_listener_run(
+        workbook, es_testapp, fresh_ingestion_queue_manager_for_testing
+):
+    """
+    Test successful SV VCF recognition, read, and hand-off to ingestion
+    within the endpoint, while SV VCF ingestion tested elsewhere. 
+
+    Mocks a simple gzipped VCF for reading by vcf.Reader as well as
+    ingestion results to result in patch of file indicating VCF was
+	successfully processed.
+    """
+    uuid = "b153279a-7521-4f7d-a360-831aeba0a595"  # File contents mocked above
+    queue_manager = fresh_ingestion_queue_manager_for_testing
+    queue_manager.add_uuids([uuid])
+    wait_for_queue_to_catch_up(queue_manager, 0)
+
+    # configure run for 10 seconds
+    start_time = datetime.datetime.utcnow()
+    end_delta = datetime.timedelta(seconds=10)
+    end_time = start_time + end_delta
+    debuglog("start_time [%s] + end_delta [%s] = end_time [%s]" % (start_time, end_delta, end_time))
+
+    def mocked_should_remain_online(override=None):
+        ignored(override)
+        current_time = datetime.datetime.utcnow()
+        recommendation = current_time < end_time
+        debuglog("At %s, should_remain_online=%s" % (current_time, recommendation))
+        return recommendation
+
+    with mock.patch.object(
+        IngestionListener, 'should_remain_online', new=mocked_should_remain_online
+    ):
+        run(es_testapp, _queue_manager=queue_manager)
+        vcf_file_response = es_testapp.get(
+            "/" + uuid + "/?datastore=database"
+        ).follow().json
+        assert vcf_file_response["file_ingestion_status"] == STATUS_INGESTED
