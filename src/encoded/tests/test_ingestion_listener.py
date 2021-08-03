@@ -298,7 +298,7 @@ def test_ingestion_listener_run(
     within the endpoint, while SV VCF ingestion tested elsewhere. 
 
     Mocks a simple gzipped VCF for reading by vcf.Reader as well as
-    ingestion results to result in patch of file indicating VCF was
+    ingestion results to prompt patch of file indicating VCF was
 	successfully processed.
     """
     uuid = "b153279a-7521-4f7d-a360-831aeba0a595"  # File contents mocked above
