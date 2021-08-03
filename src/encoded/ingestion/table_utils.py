@@ -1239,7 +1239,9 @@ class StructuralVariantTableParser(VariantTableParser):
                     link_type = 'embedded_field'
                     prefix = ''
                     if item.get('sub_embedding_group', None):
-                        prefix = self.format_sub_embedding_group_name(item.get('sub_embedding_group'), t='key') + '.'
+                        prefix = self.format_sub_embedding_group_name(
+                            item.get('sub_embedding_group'), t='key'
+                        ) + '.'
                     if link_type not in embeds[t]:
                         embeds[t][link_type] = [prefix + item[self.NAME_FIELD]]
                     else:

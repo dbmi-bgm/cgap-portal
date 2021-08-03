@@ -299,7 +299,7 @@ def test_ingestion_listener_run(
 
     Mocks a simple gzipped VCF for reading by vcf.Reader as well as
     ingestion results to prompt patch of file indicating VCF was
-	successfully processed.
+    successfully processed.
     """
     uuid = "b153279a-7521-4f7d-a360-831aeba0a595"  # File contents mocked above
     queue_manager = fresh_ingestion_queue_manager_for_testing
