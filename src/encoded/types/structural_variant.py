@@ -151,6 +151,25 @@ class StructuralVariantSample(Item):
     )}
     embedded_list = build_structural_variant_sample_embedded_list()
 
+    POSSIBLE_GENOTYPE_LABEL_FIELDS = [
+        "proband_genotype_label",
+        "mother_genotype_label",
+        "father_genotype_label",
+        "sister_genotype_label",
+        "sister_II_genotype_label",
+        "sister_III_genotype_label",
+        "sister_IV_genotype_label",
+        "brother_genotype_label",
+        "brother_II_genotype_label",
+        "brother_III_genotype_label",
+        "brother_IV_genotype_label"
+        "co_parent_genotype_label",
+        "daughter_genotype_label",
+        "daughter_II_genotype_label",
+        "son_genotype_label",
+        "son_II_genotype_label",
+    ]
+
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
         """Sets the annotation_id field on this structural variant sample
@@ -195,3 +214,144 @@ class StructuralVariantSample(Item):
         result = self.rev_link_atids(request, "variant_sample_list")
         if result:
             return result[0]  # expected one list per case
+
+    @calculated_property(schema={
+        "title": "Inheritance Modes",
+        "description": "Inheritance Modes (only including those relevant to a proband-only analysis)",
+        "type": "array",
+        "items": {
+            "type": "string"
+        }
+    })
+    def proband_only_inheritance_modes(
+            self, request, structural_variant, inheritance_modes=[]
+    ):
+        proband_modes = []
+        structural_variant = get_item_or_none(
+            request, structural_variant, "StructuralVariant", frame="raw"
+        )
+        if variant["CHROM"] in ["X", "Y"]:
+            proband_modes.append(f"{variant['CHROM']}-linked")
+        if proband_modes:
+            return proband_modes
+        return None
+
+    @calculated_property(schema={
+        "title": "Associated Genotype Labels",
+        "description": "Named Genotype Label fields that can be searched on",
+        "type": "object",
+        "additional_properties": True,
+        "properties": {
+            "proband_genotype_label": {
+                "title": "Proband Genotype",
+                "type": "string"
+            },
+            "mother_genotype_label": {
+                "title": "Mother Genotype",
+                "type": "string"
+            },
+            "father_genotype_label": {
+                "title": "Father Genotype",
+                "type": "string"
+            },
+            "sister_genotype_label": {
+                "title": "Sister Genotype",
+                "type": "string"
+            },
+            "sister_II_genotype_label": {
+                "title": "Sister II Genotype",
+                "type": "string"
+            },
+            "sister_III_genotype_label": {
+                "title": "Sister III Genotype",
+                "type": "string"
+            },
+            "sister_IV_genotype_label": {
+                "title": "Sister IV Genotype",
+                "type": "string"
+            },
+            "brother_genotype_label": {
+                "title": "Brother Genotype",
+                "type": "string"
+            },
+            "brother_II_genotype_label": {
+                "title": "Brother II Genotype",
+                "type": "string"
+            },
+            "brother_III_genotype_label": {
+                "title": "Brother III Genotype",
+                "type": "string"
+            },
+            "brother_IV_genotype_label": {
+                "title": "Brother IV Genotype",
+                "type": "string"
+            },
+            "co_parent_genotype_label": {
+                "title": "Co-Parent Genotype",
+                "type": "string"
+            },
+            "daughter_genotype_label": {
+                "title": "Daughter Genotype",
+                "type": "string"
+            },
+            "daughter_II_genotype_label": {
+                "title": "Daughter II Genotype",
+                "type": "string"
+            },
+            "son_genotype_label": {
+                "title": "Son Genotype",
+                "type": "string"
+            },
+            "son_II_genotype_label": {
+                "title": "Son II Genotype",
+                "type": "string"
+            }
+        }
+    })
+    def associated_genotype_labels(
+            self, structural_variant, CALL_INFO, samplegeno=None, genotype_labels=None
+    ):
+        """
+        Builds the above sub-embedded object so we can search on the
+        genotype labels.
+        """
+
+        possible_keys_set = set(StructuralVariantSample.POSSIBLE_GENOTYPE_LABEL_FIELDS)
+
+        # XXX: will be useful if we want to have this field be "centric" WRT the
+        # person who submitted this variant_sample
+        def my_role(samplegeno, CALL_INFO):
+            for entry in samplegeno:
+                if entry['samplegeno_sampleid'] == CALL_INFO:
+                    return entry['samplegeno_role']
+            return None
+
+        def infer_key_from_role(role):
+            return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
+
+        # variant always starts with chr* where * is the chrom we are looking for
+        def extract_chrom_from_variant(v):
+            chrom_string = v.split("_")[1]
+            return chrom_string[3]
+
+        # drop if there are no genotype labels or no samplegeno field or this is a
+        # mitochondrial variant
+        if (
+            not genotype_labels or not samplegeno
+            or extract_chrom_from_variant(structural_variant) == 'M'
+        ):
+            return None
+
+        new_labels = {}
+        for entry in genotype_labels:
+            role = entry.get('role', '')
+            label = entry.get('labels', [])
+            role_key = infer_key_from_role(role)
+            if role_key not in possible_keys_set:
+                continue
+            elif len(label) == 1:
+                new_labels[role_key] = label[0]
+            else:
+                new_labels[role_key] = ' '.join(label)  # just in case
+
+        return new_labels
