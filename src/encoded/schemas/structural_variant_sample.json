@@ -252,7 +252,7 @@
             "title": "Size",
             "aggregation_type": "stats",
             "number_step": "any",
-			"order": 20
+            "order": 20
         },
         "structural_variant.transcript.csq_gene.display_title": {
             "title": "Gene",
@@ -289,11 +289,11 @@
             "order": 43,
             "grouping": "Constraint Metrics"
         },
-         "structural_variant.transcript.csq_consequence.display_title": {
+        "structural_variant.transcript.csq_consequence.display_title": {
             "title": "Consequence",
             "order": 50
         },
-         "associated_genotype_labels.proband_genotype_label": {
+        "associated_genotype_labels.proband_genotype_label": {
             "title": "Proband Genotype",
             "order": 60,
             "grouping": "Genotype",
@@ -772,7 +772,7 @@
                 "-"
             ]
         },
-         "structural_variant.CHROM": {
+        "structural_variant.CHROM": {
             "title": "Chromosome",
             "order": 90,
             "grouping": "Location"

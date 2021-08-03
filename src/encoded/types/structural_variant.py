@@ -230,8 +230,8 @@ class StructuralVariantSample(Item):
         structural_variant = get_item_or_none(
             request, structural_variant, "StructuralVariant", frame="raw"
         )
-        if variant["CHROM"] in ["X", "Y"]:
-            proband_modes.append(f"{variant['CHROM']}-linked")
+        if structural_variant["CHROM"] in ["X", "Y"]:
+            proband_modes.append(f"{structural_variant['CHROM']}-linked")
         if proband_modes:
             return proband_modes
         return None
