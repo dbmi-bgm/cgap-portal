@@ -28,7 +28,6 @@ def x_structural_variant_sample(testapp, project, institution, x_structural_vari
     return testapp.post_json(SV_SAMPLE_URL, item).json["@graph"][0]
 
 def test_sttructural_variant_sample_inheritance(x_structural_variant_sample):
-    """ """
-    import pdb; pdb.set_trace()
+    """Test proband-only inheritance mode calc prop."""
     assert x_structural_variant_sample["proband_only_inheritance_modes"] == ["X-linked"]
  
