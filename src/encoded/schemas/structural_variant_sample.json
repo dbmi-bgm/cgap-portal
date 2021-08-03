@@ -215,12 +215,11 @@
     },
     "facets": {
         "structural_variant.gnomadg_af": {
-            "title": "gnomAD SV",
+            "title": "gnomAD Allele Frequency",
             "aggregation_type": "range",
             "number_step": "any",
             "order": 0,
             "hide_facet_counts": true,
-            "grouping": "Allele Frequency",
             "ranges": [
                 {
                     "from": 0,
