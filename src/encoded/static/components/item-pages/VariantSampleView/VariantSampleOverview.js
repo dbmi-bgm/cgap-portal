@@ -180,7 +180,8 @@ class VariantSampleOverviewTabView extends React.PureComponent {
         const { defaultTab = null } = props;
         this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
         this.state = {
-            "currentTab" : defaultTab < 5 ? defaultTab : 1 // Validate that is 0-5
+            // Validate that is 0-5
+            "currentTab": (typeof defaultTab === "number" && defaultTab < 5) ? defaultTab : 1
         };
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }

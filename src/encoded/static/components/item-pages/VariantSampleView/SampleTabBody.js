@@ -367,9 +367,9 @@ function QualityTable(props) {
 }
 QualityTable.propTypes = {
     genotypeLikelihood: PropTypes.string,
-    genotypeQuality: PropTypes.string,
-    variantQuality: PropTypes.string,
-    strandFisherScore: PropTypes.string,
+    genotypeQuality: PropTypes.number,
+    variantQuality: PropTypes.number,
+    strandFisherScore: PropTypes.number,
     getTipForField: PropTypes.func
 };
 
@@ -402,7 +402,7 @@ DeNovoTable.propTypes = {
     novoPP: PropTypes.string
 };
 
-function CompoundHetTable(props) {
+const CompoundHetTable = React.memo(function CompoundHetTable(props) {
     const { cmphetArr } = props;
 
     if (cmphetArr.length === 0) {
@@ -486,7 +486,7 @@ function CompoundHetTable(props) {
             </tbody>
         </table>
     );
-}
+});
 CompoundHetTable.propTypes = {
     getTipForField: PropTypes.func,
     cmphetArr: PropTypes.array
@@ -496,27 +496,29 @@ CompoundHetTable.propTypes = {
 class CompoundHetTableWrapper extends React.Component {
     constructor(props) {
         super();
+        this.getMateData = this.getMateData.bind(this);
+        this.constructGetMatesQuery = this.constructGetMatesQuery.bind(this);
 
         // Derive initial state from cmphetArr prop
-        const { cmphetArr = [] } = props;
-        const initialState = [];
-        cmphetArr.forEach((cmphet) => {
+        const { cmphetArr: propCmphetArr = [] } = props;
+        const cmphetArr = [];
+        propCmphetArr.forEach((cmphet) => {
             const cmphetCopy = { ...cmphet };
             cmphetCopy["location"] = "loading";
             cmphetCopy["coding_effect"] = "loading";
-            initialState.push(cmphetCopy);
+            cmphetArr.push(cmphetCopy);
         });
 
-        this.state = {
-            cmphetArr: initialState
-        };
-
-        this.getMateData = this.getMateData.bind(this);
-        this.constructGetMatesQuery = this.constructGetMatesQuery.bind(this);
+        this.state = { cmphetArr };
     }
 
     componentDidMount() {
         // start doing ajax requests to pull in data for each mate
+        const { cmphetArr } = this.state;
+        if (cmphetArr.length === 0) {
+            // No cmphets to get info for, skip doing request.
+            return false;
+        }
         this.getMateData();
     }
 
@@ -537,7 +539,6 @@ class CompoundHetTableWrapper extends React.Component {
     }
 
     getMateData() {
-        const { cmphetArr = [] } = this.state;
         const encodedQueryString = this.constructGetMatesQuery();
         // console.log("getQueryString", encodedQueryString);
 
@@ -545,90 +546,93 @@ class CompoundHetTableWrapper extends React.Component {
         return ajax.promise(encodedQueryString, 'GET', {})
             .then((response) => {
                 console.log("getMateData response", response); // for testing
-                // Pull href from graph and add to state
-                const newState = []; // update each object in state with href
 
-                if (response.status && response.status !== 'success'){
-                    throw res;
+                const { "@graph": responseItems = [], total } = response;
+
+                if (typeof total !== 'number'){
+                    // TODO if we have >25, show error/warning that only first 25 are updated.
+                    // Can also add 'limit=100' or some other to increase limit from 25.
+                    throw response;
                 }
 
-                if (response['@graph'] && response['@graph'].length > 0) { // request succeeded and provided results
-                    const variantToStateIndexMap = {};
-                    const variantToGeneMap = {};
+                this.setState(function({ cmphetArr: prevCmphetArr = [] }){
 
-                    // create copies of each state object
-                    cmphetArr.forEach((cmphet, i) => {
-                        const { comhet_mate_variant: variant, comhet_gene: gene } = cmphet;
-                        const cmphetCopy = { ...cmphet };
-                        variantToStateIndexMap[variant] = i;
-                        newState.push(cmphetCopy);
+                    const cmphetArr = []; // update each object in state with href
 
-                        // add associated gene to map
-                        variantToGeneMap[variant] = gene;
-                    });
+                    if (responseItems.length > 0) { // request succeeded and provided results
+                        const variantToStateIndexMap = {};
+                        const variantToGeneMap = {};
 
-                    // update each state object with link data
-                    response['@graph'].forEach((svObj) => {
-                        const { "@id": svAtId = null, variant = null } = svObj;
-                        // console.log("svObj", svObj);
-                        const { display_title: variantTitle = null, genes = [] } = variant || {};
-                        if (variantToStateIndexMap[variantTitle] != undefined) {
-                            const stateIndex = variantToStateIndexMap[variantTitle];
-                            newState[stateIndex]["href"] = svAtId;
+                        // create copies of each state object
+                        prevCmphetArr.forEach(function(cmphet, i){
+                            const { comhet_mate_variant: variant, comhet_gene: gene } = cmphet;
+                            const cmphetCopy = { ...cmphet };
+                            variantToStateIndexMap[variant] = i;
+                            cmphetArr.push(cmphetCopy);
 
-                            // if there's an associated gene for this comphet, find it's location and coding effect
-                            genes.forEach((gene) => {
-                                const {
-                                    genes_most_severe_consequence = null,
-                                    genes_most_severe_gene = null
-                                } = gene || {};
+                            // add associated gene to map
+                            variantToGeneMap[variant] = gene;
+                        });
 
-                                const { "@id": geneAtId = "" } = genes_most_severe_gene || {};
-                                const geneSplit = geneAtId.split("/");
-                                const { 2: thisGene = null } = geneSplit || [];
+                        // update each state object with link data
+                        responseItems.forEach(function(svObj){
+                            const { "@id": svAtId = null, variant = null } = svObj;
+                            // console.log("svObj", svObj);
+                            const { display_title: variantTitle = null, genes = [] } = variant || {};
+                            if (variantToStateIndexMap[variantTitle] != undefined) {
+                                const stateIndex = variantToStateIndexMap[variantTitle];
+                                cmphetArr[stateIndex]["href"] = svAtId;
 
-                                const associatedGene = variantToGeneMap[variantTitle];
-                                if (thisGene === associatedGene) {
-                                    const { location = null, coding_effect = null } = genes_most_severe_consequence || {};
+                                // if there's an associated gene for this comphet, find it's location and coding effect
+                                genes.forEach(function(gene){
+                                    const {
+                                        genes_most_severe_consequence = null,
+                                        genes_most_severe_gene = null
+                                    } = gene || {};
 
-                                    newState[stateIndex]["location"] = location;
-                                    newState[stateIndex]["coding_effect"] = coding_effect;
-                                } else {
-                                    newState[stateIndex]["location"] = null;
-                                    newState[stateIndex]["coding_effect"] = null;
-                                }
-                            });
-                        }
-                    });
-                    // console.log("newState", newState);
-                    // console.log("variantToStateIndexMap", variantToStateIndexMap);
-                    // console.log("variantToGeneMap", variantToGeneMap);
+                                    const { "@id": geneAtId = "" } = genes_most_severe_gene || {};
+                                    const geneSplit = geneAtId.split("/");
+                                    const [ ,, thisGene = null ] = geneSplit || [];
 
-                    // Update state with links, then go ahead and pull/populate with gene data
-                    this.setState({ cmphetArr : newState });
-                } else {
-                    // No results... update to stop loading
-                    const newState = [];
-                    cmphetArr.forEach((cmphet) => {
-                        const cmphetCopy = { ...cmphet };
-                        cmphetCopy["location"] = null;
-                        cmphetCopy["coding_effect"] = null;
-                        newState.push(cmphetCopy);
-                    });
-                    this.setState({ cmphetArr : newState });
-                }
+                                    const associatedGene = variantToGeneMap[variantTitle];
+                                    if (thisGene === associatedGene) {
+                                        const { location = null, coding_effect = null } = genes_most_severe_consequence || {};
+
+                                        cmphetArr[stateIndex]["location"] = location;
+                                        cmphetArr[stateIndex]["coding_effect"] = coding_effect;
+                                    } else {
+                                        cmphetArr[stateIndex]["location"] = null;
+                                        cmphetArr[stateIndex]["coding_effect"] = null;
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        // No results... update to stop loading
+                        prevCmphetArr.forEach((cmphet) => {
+                            const cmphetCopy = { ...cmphet };
+                            cmphetCopy["location"] = null;
+                            cmphetCopy["coding_effect"] = null;
+                            cmphetArr.push(cmphetCopy);
+                        });
+                    }
+
+                    return { cmphetArr };
+                });
             })
             .catch((error) => {
                 console.log("Error occurred", error);
                 // Update to stop loading, replace with a load-failed indicator
-                const newState = [];
-                cmphetArr.forEach((cmphet) => {
-                    const cmphetCopy = { ...cmphet };
-                    cmphetCopy["location"] =  "error";
-                    cmphetCopy["coding_effect"] =  "error";
-                    newState.push(cmphetCopy);
+                this.setState(function({ cmphetArr: prevCmphetArr = [] }){
+                    const cmphetArr = [];
+                    prevCmphetArr.forEach((cmphet) => {
+                        const cmphetCopy = { ...cmphet };
+                        cmphetCopy["location"] =  "error";
+                        cmphetCopy["coding_effect"] =  "error";
+                        cmphetArr.push(cmphetCopy);
+                    });
+                    return { cmphetArr };
                 });
-                this.setState({ cmphetArr : newState });
             });
     }
 

@@ -321,7 +321,8 @@ export class InterpretationSpaceController extends React.Component {
             "gene_notes_wip": lastSavedGeneNote,
             "interpretation_wip": lastSavedInterpretation,
             "discovery_interpretation_wip": lastSavedDiscovery,
-            "currentTab": (defaultTab >= 0 && defaultTab < InterpretationSpaceController.tabNames.length) ? defaultTab : 0, // TODO: validate elsewhere - default to variantnotes
+            // TODO: validate elsewhere - default to variantnotes
+            "currentTab": (typeof defaultTab === "number" && defaultTab >= 0 && defaultTab < InterpretationSpaceController.tabNames.length) ? defaultTab : 0,
             "isExpanded": false // TODO - currently unused; V2
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
