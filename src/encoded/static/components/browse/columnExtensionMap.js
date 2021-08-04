@@ -243,7 +243,7 @@ export const columnExtensionMap = {
             }
 
             return (
-                <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Accessioned:"
+                <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Accession Date"
                     topLeft={<span className="accession text-muted">{ accession }</span>}
                     mainTitle={<a href={atId} className="adv-block-link">{ individualTitle }</a>}/>
             );

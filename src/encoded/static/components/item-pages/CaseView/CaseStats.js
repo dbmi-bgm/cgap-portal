@@ -108,7 +108,7 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) 
                 <label className="mb-0">Status:</label> &nbsp;{ Schemas.Term.toName("status", status, true) || fallbackElem }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Accessioned:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : fallbackElem }
+                <label className="mb-0">Accession Date:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : fallbackElem }
             </div>
         </React.Fragment>
     );
