@@ -760,7 +760,10 @@ i.status-indicator-dot {
 	border: 1px solid #efefef;
 	padding: 3px 7px;
     font-size: 0.7em;
-    letter-spacing: 1px;
+    letter-spacing: 0.05em;
+	text-align: center;
+	font-family: $font-family-monospace;
+	font-weight: 600;
 
 	@include acmgColorStyles;
 }
@@ -2435,6 +2438,10 @@ i.status-indicator-dot {
 				}
 			}
 		}
+	}
+
+	.interpretation-space-wrapper-column {
+		flex-basis: 375px;
 	}
 
 	.interpretation-space {
