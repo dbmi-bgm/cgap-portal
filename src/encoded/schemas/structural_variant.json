@@ -583,30 +583,121 @@
             }
         }
     },
+    "columns": {
+        "SV_TYPE": {
+            "title": "Type",
+            "order": 10
+        },
+        "size": {
+            "title": "Size",
+            "order": 20
+        },
+        "transcript.csq_gene.display_title": {
+            "title": "Gene(s)",
+            "order": 30
+        },
+        "gnomadg_af": {
+            "title": "Allele Frequency",
+            "order": 40
+        }
+    },
     "facets": {
+        "gnomadg_af": {
+            "title": "gnomAD Allele Frequency",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 0,
+            "hide_facet_counts": true,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0,
+                    "label": "unobserved"
+                },
+                {
+                    "from": 0,
+                    "to": 0.001,
+                    "label": "ultra-rare"
+                },
+                {
+                    "from": 0,
+                    "to": 0.01,
+                    "label": "rare"
+                },
+                {
+                    "from": 0.01,
+                    "to": 1,
+                    "label": "common"
+                }
+            ]
+        },
+        "SV_TYPE": {
+            "title": "Variant Type",
+            "order": 10
+        },
+        "size": {
+            "title": "Size",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 20
+        },
+        "transcript.csq_gene.display_title": {
+            "title": "Gene",
+            "order": 30,
+            "grouping": "Genes",
+            "search_type": "sayt_without_terms",
+            "sayt_item_type": "Gene"
+        },
+        "transcript.csq_gene.s_het": {
+            "title": "S_het",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 40,
+            "grouping": "Constraint Metrics"
+        },
+        "transcript.csq_gene.oe_lof_upper": {
+            "title": "LOEUF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 41,
+            "grouping": "Constraint Metrics"
+        },
+        "transcript.csq_gene.oe_mis": {
+            "title": "o/e (missense)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 42,
+            "grouping": "Constraint Metrics"
+        },
+        "transcript.csq_gene.oe_lof": {
+            "title": "o/e (LoF)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 43,
+            "grouping": "Constraint Metrics"
+        },
+        "transcript.csq_consequence.display_title": {
+            "title": "Consequence",
+            "order": 50
+        },
         "CHROM": {
             "title": "Chromosome",
-            "order": 1,
-            "grouping": "Position"
+            "order": 60,
+            "grouping": "Location"
         },
         "START": {
             "title": "Start Position",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 2,
-            "grouping": "Position"
+            "order": 61,
+            "grouping": "Location"
         },
         "END": {
             "title": "End Position",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 3,
-            "grouping": "Position"
-        },
-        "SV_TYPE": {
-            "title": "Variant Type",
-            "order": 10,
-            "grouping": "Variant Type"
+            "order": 62,
+            "grouping": "Location"
         }
     }
 }
