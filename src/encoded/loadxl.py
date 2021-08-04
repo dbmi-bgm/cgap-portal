@@ -568,3 +568,12 @@ def load_prod_data(app, overwrite=False):
         None if successful, otherwise Exception encountered
     """
     return load_data(app, indir='master-inserts', overwrite=overwrite)
+
+def load_deploy_data(app, overwrite=False):
+    """
+    Load deploy-inserts
+
+    Returns:
+        None if successful, otherwise Exception encountered
+    """
+    reutrn load_data(app, indir="deploy-inserts", overwrite=overwrite)
