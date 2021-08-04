@@ -329,7 +329,7 @@ class StructuralVariantSample(Item):
         def infer_key_from_role(role):
             return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
 
-        # variant always starts with chr* where * is the chrom we are looking for
+        # structural variant starts with sv-type_chr* where * is the chrom 
         def extract_chrom_from_variant(v):
             chrom_string = v.split("_")[1]
             return chrom_string[3]
