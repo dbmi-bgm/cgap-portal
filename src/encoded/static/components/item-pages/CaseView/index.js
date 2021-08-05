@@ -262,7 +262,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             <div className="container-wide">
                 <h3 className="tab-section-title">
                     <div>
-                        <span className="text-500">Case Info: </span>
+                        <span className="text-400">Case Info: </span>
                         <span className="text-300"> { caseTitle }</span>
                     </div>
                 </h3>
@@ -651,7 +651,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     const { reads = {}, coverage = {}, totalVariants = {}, transTansRatio = {}, heterozygosity = {}, deNovo = {}, filteredVariants = {} } = msaStats;
 
     return (
-        <div className="row">
+        <div className="row py-3">
             <BioinfoStatsEntry label="Total Number of Reads" tooltip={reads.tooltip}>
                 { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : "-" }
             </BioinfoStatsEntry>
@@ -680,18 +680,16 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
 
 function BioinfoStatsEntry({ tooltip, label, children }){
     return (
-        <div className="col-12 col-md-6 col-xl-4 mb-04">
-            <div className="row qc-summary">
-                <div className="col-12 col-sm-8 text-600">
+        <div className="col-12 col-md-6 col-lg-4 col-xl-3 mt-04 mb-04">
+            <div className="qc-summary">
+                <label className="d-block mb-0">
                     { label }:
                     { tooltip ?
                         <i className="icon icon-info-circle fas icon-fw ml-05"
                             data-tip={tooltip} data-place="right"/>
                         : null }
-                </div>
-                <div className="col-12 col-sm-4">
-                    { children }
-                </div>
+                </label>
+                <div>{ children }</div>
             </div>
         </div>
     );
@@ -723,13 +721,13 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
     const title = (
         <h4 data-family-index={0} className="my-0 d-inline-block w-100">
-            <span className="font-italic text-500">{ familyDisplayTitle }</span>
+            <span className="text-400">{ familyDisplayTitle }</span>
             {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
             <button type="button" className="btn btn-sm btn-primary pull-right"
                 data-tip="Click to view the provenance graph for the most up-to-date annotated VCF"
                 onClick={onClick} disabled={(!vcfAtId)}>
                 <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-1 small" />
-                View <span className="text-500">Provenance Graph</span>
+                View <span className="text-600">Provenance Graph</span>
             </button>
         </h4>
     );
@@ -743,7 +741,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             </div> */}
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
-                <div className="card-body">
+                <div className="card-body py-0">
                     <BioinfoStats {...{ caseSample, sampleProcessing }} />
                 </div>
             </div>

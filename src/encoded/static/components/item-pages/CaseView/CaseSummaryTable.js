@@ -525,14 +525,14 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     const membersWithoutViewPermissionsLen = membersWithoutViewPermissions.length;
 
     const renderedSummary = (membersWithoutSamplesLen + membersWithoutViewPermissionsLen) > 0 ? (
-        <div className="processing-summary">
+        <div className="processing-summary mt-04 px-3">
             { membersWithoutSamplesLen > 0 ?
-                <p className="pl-1 mb-0">
+                <p className="my-0">
                     <span className="text-600">{ membersWithoutSamplesLen }</span> members without samples.
                 </p>
                 : null }
             { membersWithoutViewPermissionsLen > 0 ?
-                <p className="mb-0">
+                <p className="my-0">
                     <span className="text-600">{ membersWithoutViewPermissionsLen }</span> members without view permissions.
                 </p>
                 : null }
