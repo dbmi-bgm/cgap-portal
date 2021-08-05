@@ -1687,7 +1687,10 @@ i.status-indicator-dot {
 
 	@include navbar-fixed-position {
 		width: 320px;
+		flex-basis: 320px;
 	}
+
+	flex-shrink: 0;
 
 	/** -- **/
 

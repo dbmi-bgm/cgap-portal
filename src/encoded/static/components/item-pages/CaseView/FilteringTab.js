@@ -101,7 +101,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         additional_variant_sample_facets = []
     } = context || {};
 
-    const {  "@id" : activeFilterSetID = null } = active_filterset || {};
+    const { "@id" : activeFilterSetID = null } = active_filterset || {};
 
     const searchHrefBase = (
         "/search/?type=VariantSample"
@@ -185,7 +185,13 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     const onFailInitialFilterSetItemLoad = useCallback(function(){
         if (session) {
-            Alerts.queue(Alerts.ConnectionError);
+            // todo add sentry.io call here.
+            Alerts.queue({
+                "title": "FilterSet not loaded",
+                "message": `Couldn't load the existing saved FilterSet selections Item "${activeFilterSetID}", check permissions.`,
+                "style" : "warning",
+                "navigationDissappearThreshold": 1
+            });
         }
         // Else nothing -- is expected; perhaps user got logged out during
         // navigation or loading something else and hasn't refreshed page yet.
