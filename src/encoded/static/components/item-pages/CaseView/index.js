@@ -558,10 +558,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     // Note: Can probably clean up the render method of this a little bit by breaking each row
     // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
     // may also be necessary to add to/edit rows individually in the future.
-    const {
-        caseSample = null,
-        sampleProcessing = null
-    } = props;
+    const { caseSample = null, sampleProcessing = null } = props;
 
     const {
         bam_sample_id: caseSampleId = null,
@@ -571,158 +568,121 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
         processed_files: msaProcFiles = []
     } = sampleProcessing || {};
 
-    const msaStats = {};
+    const msaStats = useMemo(function(){
+        const msaStats = {};
 
-    // Pull coverage and reads values from this case's sample's bam file
-    caseProcFiles.forEach((procFile) => {
-        const {
-            quality_metric: {
-                "@type": [ qmType ]=[],
-                quality_metric_summary: qmSummaries = []
-            }={}
-        } = procFile;
-        // Only continue if qclist (bamQC should only exist if there is also bamcheck)
-        if (qmType === "QualityMetricQclist") {
-            // Coverage and total reads should only be present in BAM, update if found
-            qmSummaries.forEach((qmSummary) => {
-                const { title = null, value = null, tooltip = null } = qmSummary;
-                if (title === "Coverage") {
-                    msaStats.coverage = { value, tooltip };
-                } else if (title === "Total Reads") {
-                    msaStats.reads = { value, tooltip };
-                }
-            });
-        }
-    });
-
-    // Pull variant stats, T-T ratio, heterozygosity ratio, etc. from sample_processing
-    msaProcFiles.forEach((procFile) => {
-        const {
-            quality_metric: {
-                "@type": [ qmType ]=[],
-                quality_metric_summary: qmSummaries = []
-            }={}
-        } = procFile;
-
-        // Only continue if qclist (vcfQC should only exist if there is also vcfcheck)
-        if (qmType === "QualityMetricQclist") {
-            // Stats should only be present in combined VCF, update if found
-            qmSummaries.forEach((qmSummary) => {
-                const { title = null, value = null, sample = null, tooltip = null } = qmSummary;
-                if (sample && sample === caseSampleId) {
-                    switch (title) {
-                        case "De Novo Fraction":
-                            msaStats.deNovo = { value, tooltip };
-                            break;
-                        case "Heterozygosity Ratio":
-                            msaStats.heterozygosity = { value, tooltip };
-                            break;
-                        case "Transition-Transversion Ratio":
-                            msaStats.transTansRatio = { value, tooltip };
-                            break;
-                        case "Total Variants Called":
-                            msaStats.totalVariants = { value, tooltip };
-                            break;
-                        case "Filtered Variants":
-                            msaStats.filteredVariants = { value, tooltip };
-                            break;
-                        default:
-                            break;
+        // Pull coverage and reads values from this case's sample's bam file
+        caseProcFiles.forEach(function(procFile){
+            const {
+                quality_metric: {
+                    "@type": [ qmType ]=[],
+                    quality_metric_summary: qmSummaries = []
+                } = {}
+            } = procFile;
+            // Only continue if qclist (bamQC should only exist if there is also bamcheck)
+            if (qmType === "QualityMetricQclist") {
+                // Coverage and total reads should only be present in BAM, update if found
+                qmSummaries.forEach(function(qmSummary){
+                    const { title = null, value = null, tooltip = null } = qmSummary;
+                    if (title === "Coverage") {
+                        msaStats.coverage = { value, tooltip };
+                    } else if (title === "Total Reads") {
+                        msaStats.reads = { value, tooltip };
                     }
-                }
-            });
-        }
-    });
+                });
+            }
+        });
+
+        // Pull variant stats, T-T ratio, heterozygosity ratio, etc. from sample_processing
+        msaProcFiles.forEach(function(procFile){
+            const {
+                quality_metric: {
+                    "@type": [ qmType ]=[],
+                    quality_metric_summary: qmSummaries = []
+                }={}
+            } = procFile;
+
+            // Only continue if qclist (vcfQC should only exist if there is also vcfcheck)
+            if (qmType === "QualityMetricQclist") {
+                // Stats should only be present in combined VCF, update if found
+                qmSummaries.forEach(function(qmSummary){
+                    const { title = null, value = null, sample = null, tooltip = null } = qmSummary;
+                    if (sample && sample === caseSampleId) {
+                        switch (title) {
+                            case "De Novo Fraction":
+                                msaStats.deNovo = { value, tooltip };
+                                break;
+                            case "Heterozygosity Ratio":
+                                msaStats.heterozygosity = { value, tooltip };
+                                break;
+                            case "Transition-Transversion Ratio":
+                                msaStats.transTansRatio = { value, tooltip };
+                                break;
+                            case "Total Variants Called":
+                                msaStats.totalVariants = { value, tooltip };
+                                break;
+                            case "Filtered Variants":
+                                msaStats.filteredVariants = { value, tooltip };
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+            }
+        });
+
+        return msaStats;
+    }, [ caseProcFiles, msaProcFiles ]);
+
+    const { reads = {}, coverage = {}, totalVariants = {}, transTansRatio = {}, heterozygosity = {}, deNovo = {}, filteredVariants = {} } = msaStats;
 
     return (
-        <React.Fragment>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Total Number of Reads:
-                    { msaStats.reads && msaStats.reads.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.reads.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* 452.3 Million */}
-                    { (msaStats.reads && msaStats.reads.value) || "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Coverage:
-                    { msaStats.coverage && msaStats.coverage.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.coverage.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* 30x */}
-                    { (msaStats.coverage && msaStats.coverage.value) || "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Total Number of Variants Called:
-                    { msaStats.totalVariants && msaStats.totalVariants.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.totalVariants.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* 4,769,578 */}
-                    { (msaStats.totalVariants && msaStats.totalVariants.value) ? decorateNumberWithCommas(msaStats.totalVariants.value): "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Transition-Tansversion ratio:
-                    { msaStats.transTansRatio && msaStats.transTansRatio.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.transTansRatio.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* Ex. 1.96 */}
-                    { (msaStats.transTansRatio && msaStats.transTansRatio.value) || "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Heterozygosity ratio:
-                    { msaStats.heterozygosity && msaStats.heterozygosity.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.heterozygosity.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* Ex. 1.24 */}
-                    { (msaStats.heterozygosity && msaStats.heterozygosity.value) || "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    De novo Fraction:
-                    { msaStats.deNovo && msaStats.deNovo.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.deNovo.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* Ex. 2% */}
-                    { (msaStats.deNovo && msaStats.deNovo.value) ?  msaStats.deNovo.value + "%" : "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Variants after hard filters:
-                    { msaStats.filteredVariants && msaStats.filteredVariants.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.filteredVariants.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4"> {/* Ex. 1,273 */}
-                    { (msaStats.filteredVariants && msaStats.filteredVariants.value) ? decorateNumberWithCommas(msaStats.filteredVariants.value) : "" }
-                </div>
-            </div>
-        </React.Fragment>
+        <div className="row">
+            <BioinfoStatsEntry label="Total Number of Reads" tooltip={reads.tooltip}>
+                { typeof reads.value === "number" ? reads.value : "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Coverage" tooltip={coverage.tooltip}>
+                { coverage.value || "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Total Number of Variants Called" tooltip={totalVariants.tooltip}>
+                { typeof totalVariants.value === "number" ? decorateNumberWithCommas(totalVariants.value): "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Transition-Tansversion ratio" tooltip={transTansRatio.tooltip}>
+                { typeof transTansRatio.value === "number" ? transTansRatio.value || "0.0" : "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Heterozygosity ratio" tooltip={heterozygosity.tooltip}>
+                { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="De novo Fraction" tooltip={deNovo.tooltip}>
+                { typeof deNovo.value === "number" ? deNovo.value + "%" : "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Variants after hard filters" tooltip={filteredVariants.tooltip}>
+                { typeof filteredVariants.value === "number" ? decorateNumberWithCommas(filteredVariants.value) : "-" }
+            </BioinfoStatsEntry>
+        </div>
     );
 });
+
+
+function BioinfoStatsEntry({ tooltip, label, children }){
+    return (
+        <div className="col-12 col-md-6 col-lg-4 col-xl-3">
+            <div className="row qc-summary">
+                <div className="col-sm-8 col-xl-9 text-600">
+                    { label }:
+                    { tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={tooltip} data-place="right"/>
+                        : null }
+                </div>
+                <div className="col-sm-4 col-xl-3"> {/* Ex. 1,273 */}
+                    { children }
+                </div>
+            </div>
+        </div>
+    );
+}
 
 const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
