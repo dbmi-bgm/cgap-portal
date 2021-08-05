@@ -372,11 +372,8 @@ export class FamilyReportStackedTable extends React.PureComponent {
         });
 
         return (
-            <StackedBlock hideNameOnHover={false} columnClass="individual"
-                key={atId} id={atId}
-                label={
-                    <StackedBlockNameLabel title="CGAP ID" accession={accession} subtitleVisible/>}
-            >
+            <StackedBlock hideNameOnHover={false} columnClass="individual" key={atId} id={atId}
+                label={<StackedBlockNameLabel title="CGAP ID" accession={accession} subtitleVisible/>}>
                 <StackedBlockName>
                     { atId ? <a href={atId} className="name-title text-capitalize">{ role || display_title }</a> : <span className="name-title text-capitalize">{ role || display_title }</span>}
                     { individual_id ? `(${individual_id})`: null }
@@ -477,8 +474,8 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         // Keeping these builtInHeader methods separate in case we want to build in custom columns later
         return [
             { columnClass: 'individual',    title: 'Individual',            initialWidth: 220   },
-            { columnClass: 'libraries',     title: 'Sequencing Libraries',  initialWidth: 220   },
-            { columnClass: 'report',        title: 'Report',                initialWidth: 200  }
+            { columnClass: 'libraries',     title: 'Sequencing',            initialWidth: 220   },
+            { columnClass: 'report',        title: 'Report',                initialWidth: 200   }
         ];
     }
 
@@ -563,7 +560,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                             </tr>: null }
                         { specimen_accession ?
                             <tr>
-                                <td className="accession-table-title">Specimen Accession</td>
+                                <td className="accession-table-title">Specimen ID</td>
                                 <td>{ specimen_accession }</td>
                             </tr>: null
                         }
