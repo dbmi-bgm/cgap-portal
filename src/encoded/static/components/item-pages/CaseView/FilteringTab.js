@@ -1,14 +1,14 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import queryString from 'query-string';
-import moment from 'moment';
 
 import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
 import { FilteringTableFilterSetUI, FilterSetController, SaveFilterSetButtonController, SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI';
 import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
+import { Alerts } from '../../../../../../../ext-projects/shared-portal-components/es/components/ui/Alerts';
 
 /**
  * @todo maybe reuse somewhere
@@ -183,10 +183,19 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         </SaveFilterSetButtonController>
     );
 
+    const onFailInitialFilterSetItemLoad = useCallback(function(){
+        if (session) {
+            Alerts.queue(Alerts.ConnectionError);
+        }
+        // Else nothing -- is expected; perhaps user got logged out during
+        // navigation or loading something else and hasn't refreshed page yet.
+    });
+
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
     const embeddedTableHeader = activeFilterSetID ? (
-        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
+        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
+            onFail={onFailInitialFilterSetItemLoad}>
             <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets}>
                 { embeddedTableHeaderBody }
             </FilterSetController>

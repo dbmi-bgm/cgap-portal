@@ -1049,6 +1049,14 @@ i.status-indicator-dot {
 	Move into own file?
 **********************************************************/
 
+.primary-header {
+	background-color: $primary-dark !important;
+	color: #ffffff;
+	h1, h2, h3, h4, h5, h6 {
+		color: inherit;
+	}
+}
+
 .item-page-container {
 
 	.case-summary-card-row{
@@ -1137,8 +1145,6 @@ i.status-indicator-dot {
 		// }
 
 		div.pedigree-vis-heading {
-			background-color: $primary-dark; // previous value: $navbar-background-color (#20445f);
-			color: #ffffff;
 
 			.view-pedigree-btn {
 				background-color: cornflowerblue; // TODO: Once settle on good color, maybe apply it to our theme under a SCSS variable for re-use. Then ctrl+find+replace.

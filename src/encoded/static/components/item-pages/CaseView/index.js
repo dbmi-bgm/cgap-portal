@@ -235,7 +235,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             // Potential to-do, onComponentDidUpdate, find height in DOM of container, set to state, pass down here.
             pedBlock = (
                 <div className="pedigree-pane-wrapper flex-fill">
-                    <PedigreeVizView {...graphData} width={pedWidth} height={300} disableSelect showNotes={false}
+                    <PedigreeVizView {...graphData} width={pedWidth} height={340} disableSelect showNotes={false}
                         visibleDiseaseIdxMap={selectedDiseaseIdxMap} showZoomControls={false} enablePinchZoom={false} />
                 </div>
             );
@@ -275,9 +275,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     </div>
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
                         <div className="card d-flex flex-column">
-                            <div className="pedigree-vis-heading card-header d-flex justify-content-between">
+                            <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
                                 <div>
-                                    <i className="icon icon-sitemap fas icon-fw mr-1"></i>
+                                    <i className="icon icon-sitemap fas icon-fw mr-1"/>
                                     <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
                                         Pedigree
                                     </h4>

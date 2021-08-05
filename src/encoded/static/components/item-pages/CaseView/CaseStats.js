@@ -30,8 +30,8 @@ function mapFeaturesToBadges(features = []) {
 export const CaseStats = React.memo(function CaseStats(props){
     const { caseItem = null } = props;
     const { individual = null, family = null } = caseItem || {};
-    const { individual_id = null, phenotypic_features = [] } = individual || {};
-    const { accession: famAccession = null, family_phenotypic_features = [] } = family || {};
+    const { phenotypic_features = [] } = individual || {};
+    const { family_phenotypic_features = [] } = family || {};
 
     const renderedPatientPhenotypicFeatures = useMemo(function(){
         const onlyPhenotypicFeatures = phenotypic_features.map((feature) => {
@@ -50,9 +50,12 @@ export const CaseStats = React.memo(function CaseStats(props){
         <div id="case-stats" className="row">
             <div className="col-12 col-sm mb-2 mb-sm-0">
                 <div className="card h-100">
-                    <h4 className="card-header mt-0 text-600">
-                        Patient Info: <span className="text-300">{ individual_id }</span>
-                    </h4>
+                    <div className="card-header primary-header">
+                        <i className="icon icon-user fas icon-fw mr-1"/>
+                        <h4 className="my-0 text-400 d-inline-block">
+                            Patient Info
+                        </h4>
+                    </div>
                     <div className="card-body">
                         <PatientInfo {...props} />
                     </div>
@@ -64,9 +67,12 @@ export const CaseStats = React.memo(function CaseStats(props){
             </div>
             <div className="col-12 col-sm">
                 <div className="card h-100">
-                    <h4 className="card-header mt-0 text-600">
-                        Family Info: <span className="text-300">{ famAccession }</span>
-                    </h4>
+                    <div className="card-header primary-header">
+                        <i className="icon icon-users fas icon-fw mr-1"/>
+                        <h4 className="my-0 text-400 d-inline-block">
+                            Family Info
+                        </h4>
+                    </div>
                     <div className="card-body">
                         <FamilyInfo {...{ family, caseItem }} />
                     </div>
@@ -85,8 +91,10 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) 
     const { individual = null } = caseItem || {};
     const {
         accession = fallbackElem,
+        individual_id = fallbackElem,
         sex = fallbackElem,
-        age = null, age_units = null,
+        age = null,
+        age_units = null,
         status = null,
         date_created = null,
     } = individual || {};
@@ -95,6 +103,9 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) 
 
     return (
         <React.Fragment>
+            <div className="card-text mb-1">
+                <label className="mb-0">Individual ID:</label> { individual_id }
+            </div>
             <div className="card-text mb-1">
                 <label className="mb-0">CGAP Individual ID:</label> { accession }
             </div>
@@ -116,30 +127,31 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) 
 
 
 export const FamilyInfo = React.memo(function FamilyInfo({ family, caseItem }) {
+    const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
     const {
+        accession: familyAccession,
         display_title : familyDisplayTitle = null,
         title: familyTitle= null,
-        project = null
+        project: { display_title: projectTitle } = {}
     } = family || {};
-    const { display_title: projectTitle } = project || {};
-    const {
-        cohort = null
-    } = caseItem || {};
-    const { display_title: cohortTitle = null } = cohort || {};
+    const { cohort: { display_title: cohortTitle } = {} } = caseItem || {};
 
-    // TODO later maybe use card footer Bootstrap component if such exists.
+    // TODO later perhaps make Project value into a hyperlink once have a Project page/view.
 
     return (
-        <>
+        <React.Fragment>
             <div className="card-text mb-1">
-                <label className="mb-0">Family:</label> { familyTitle || familyDisplayTitle || null }
+                <label className="mb-0">Family ID:</label> { familyTitle || familyDisplayTitle || fallbackElem }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Cohort:</label> { cohortTitle || null }
+                <label className="mb-0">CGAP Family ID:</label> { familyAccession }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Project:</label> { projectTitle || null }
+                <label className="mb-0">Cohort:</label> { cohortTitle || fallbackElem }
             </div>
-        </>
+            <div className="card-text mb-1">
+                <label className="mb-0">Project:</label> { projectTitle || fallbackElem }
+            </div>
+        </React.Fragment>
     );
 });
