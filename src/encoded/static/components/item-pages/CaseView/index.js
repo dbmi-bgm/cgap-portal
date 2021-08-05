@@ -571,6 +571,19 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     const msaStats = useMemo(function(){
         const msaStats = {};
 
+        function transformValueType(numberType, value){
+            const useFunc = { // Probably can just use `parseFloat` for any number but what the heck.
+                "integer": parseInt,
+                "float": parseFloat,
+                "percent": parseFloat
+            }[numberType];
+            if (useFunc) {
+                const transformedValue = useFunc(value);
+                if (!isNaN(transformedValue)) return transformedValue;
+            }
+            return value;
+        }
+
         // Pull coverage and reads values from this case's sample's bam file
         caseProcFiles.forEach(function(procFile){
             const {
@@ -583,11 +596,11 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
             if (qmType === "QualityMetricQclist") {
                 // Coverage and total reads should only be present in BAM, update if found
                 qmSummaries.forEach(function(qmSummary){
-                    const { title = null, value = null, tooltip = null } = qmSummary;
+                    const { title = null, value = null, tooltip = null, numberType = "string" } = qmSummary;
                     if (title === "Coverage") {
-                        msaStats.coverage = { value, tooltip };
+                        msaStats.coverage = { value: transformValueType(numberType, value), tooltip };
                     } else if (title === "Total Reads") {
-                        msaStats.reads = { value, tooltip };
+                        msaStats.reads = { value: transformValueType(numberType, value), tooltip };
                     }
                 });
             }
@@ -606,23 +619,23 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
             if (qmType === "QualityMetricQclist") {
                 // Stats should only be present in combined VCF, update if found
                 qmSummaries.forEach(function(qmSummary){
-                    const { title = null, value = null, sample = null, tooltip = null } = qmSummary;
+                    const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
                     if (sample && sample === caseSampleId) {
                         switch (title) {
                             case "De Novo Fraction":
-                                msaStats.deNovo = { value, tooltip };
+                                msaStats.deNovo = { value: transformValueType(numberType, value), tooltip };
                                 break;
                             case "Heterozygosity Ratio":
-                                msaStats.heterozygosity = { value, tooltip };
+                                msaStats.heterozygosity = { value: transformValueType(numberType, value), tooltip };
                                 break;
                             case "Transition-Transversion Ratio":
-                                msaStats.transTansRatio = { value, tooltip };
+                                msaStats.transTansRatio = { value: transformValueType(numberType, value), tooltip };
                                 break;
                             case "Total Variants Called":
-                                msaStats.totalVariants = { value, tooltip };
+                                msaStats.totalVariants = { value: transformValueType(numberType, value), tooltip };
                                 break;
                             case "Filtered Variants":
-                                msaStats.filteredVariants = { value, tooltip };
+                                msaStats.filteredVariants = { value: transformValueType(numberType, value), tooltip };
                                 break;
                             default:
                                 break;
@@ -640,7 +653,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     return (
         <div className="row">
             <BioinfoStatsEntry label="Total Number of Reads" tooltip={reads.tooltip}>
-                { typeof reads.value === "number" ? reads.value : "-" }
+                { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : "-" }
             </BioinfoStatsEntry>
             <BioinfoStatsEntry label="Coverage" tooltip={coverage.tooltip}>
                 { coverage.value || "-" }
@@ -667,16 +680,16 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
 
 function BioinfoStatsEntry({ tooltip, label, children }){
     return (
-        <div className="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div className="col-12 col-md-6 col-xl-4 mb-04">
             <div className="row qc-summary">
-                <div className="col-sm-8 col-xl-9 text-600">
+                <div className="col-12 col-sm-8 text-600">
                     { label }:
                     { tooltip ?
                         <i className="icon icon-info-circle fas icon-fw ml-05"
                             data-tip={tooltip} data-place="right"/>
                         : null }
                 </div>
-                <div className="col-sm-4 col-xl-3"> {/* Ex. 1,273 */}
+                <div className="col-12 col-sm-4">
                     { children }
                 </div>
             </div>

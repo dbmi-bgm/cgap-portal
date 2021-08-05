@@ -182,26 +182,23 @@ class FamilySection extends React.Component {
  * and report/case in that family. Result rows are sorted by individual (first proband, then individuals
  * with samples, then the rest).
  *
- * TODO: highlight current case throughout the table using 'result' prop.
+ * @todo (?) Highlight current case throughout the table using 'result' prop.
+ * @todo Maybe we can migrate to simpler flex/css instead of StackedTable eventually..
  */
 export class FamilyReportStackedTable extends React.PureComponent {
 
-    static StackedBlock = StackedBlock
-
-    static builtInHeaders(){
-        // Keeping these builtInHeader methods separate in case we want to build in custom columns later
-        return [
-            { columnClass: 'individual',    className: 'text-left',         title: 'Individual',                initialWidth: 220   },
-            { columnClass: 'libraries',     className: 'text-left',         title: 'Sequencing Libraries',      initialWidth: 220   },
-            { columnClass: 'analysis',                                      title: 'Analysis',                  initialWidth: 200   },
-            /* report column has no label, but has left alignment, so we add 12px padding left to visually align header to it better */
-            { columnClass: 'report',        className: 'text-left pl-12',   title: 'Report',                    initialWidth: 200   }
-        ];
-    }
+    // Keeping these builtInHeader methods separate in case we want to build in custom columns later
+    static builtInHeaders = [
+        { columnClass: 'individual',    className: 'text-left',         title: 'Individual',                initialWidth: 220   },
+        { columnClass: 'libraries',     className: 'text-left',         title: 'Sequencing Libraries',      initialWidth: 220   },
+        { columnClass: 'analysis',                                      title: 'Analysis',                  initialWidth: 200   },
+        /* report column has no label, but has left alignment, so we add 12px padding left to visually align header to it better */
+        { columnClass: 'report',        className: 'text-left pl-12',   title: 'Report',                    initialWidth: 200   }
+    ];
 
     /* Built-in headers */
     static staticColumnHeaders(columnHeaders){
-        return FamilyReportStackedTable.builtInHeaders().map(function(staticCol){
+        return FamilyReportStackedTable.builtInHeaders.map(function(staticCol){
             const foundColumnFromParamHeaders = _.findWhere(columnHeaders, { 'title' : staticCol.title });
             return { ...staticCol, ...(foundColumnFromParamHeaders || {}) };
         });
@@ -355,8 +352,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
             } else { // render an appropriate block when there is a case but no report by mapping case+[caseAtID] : JSX block
                 reportToReportBlockMap['case-' + caseAtId] = (
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
-                        label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}
-                    >
+                        label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}>
                         <StackedBlockName>
                             <div className="d-flex text-left">
                                 <span className="mr-07 text-nowrap">Case ID:</span>
@@ -468,25 +464,19 @@ export class FamilyReportStackedTable extends React.PureComponent {
  */
 export class FamilyAccessionStackedTable extends React.PureComponent {
 
-    static StackedBlock = StackedBlock
-
-    static builtInHeaders(){
-        // Keeping these builtInHeader methods separate in case we want to build in custom columns later
-        return [
-            { columnClass: 'individual',    title: 'Individual',            initialWidth: 220   },
-            { columnClass: 'libraries',     title: 'Sequencing',            initialWidth: 220   },
-            { columnClass: 'report',        title: 'Report',                initialWidth: 200   }
-        ];
-    }
+    // Keeping these builtInHeaders separate in case we want to build in custom columns later
+    static builtInHeaders = [
+        { columnClass: 'individual',    title: 'Individual',            initialWidth: 220   },
+        { columnClass: 'libraries',     title: 'Sequencing',            initialWidth: 220   },
+        { columnClass: 'report',        title: 'Report',                initialWidth: 200   }
+    ];
 
     /* Built-in headers */
     static staticColumnHeaders(columnHeaders){
-        return _.map(FamilyAccessionStackedTable.builtInHeaders(), function(staticCol){
-            return _.extend(
-                _.clone(staticCol),
-                _.findWhere(columnHeaders, { 'title' : staticCol.title }) || {}
-            );
-        }) || [];
+        return FamilyAccessionStackedTable.builtInHeaders.map(function(staticCol){
+            const foundColumnFromParamHeaders = _.findWhere(columnHeaders, { 'title' : staticCol.title });
+            return { ...staticCol, ...(foundColumnFromParamHeaders || {}) };
+        });
     }
 
     static propTypes = {
