@@ -2064,8 +2064,8 @@ function FilterSetUIBlockBottomUI(props){
     }
 
     return (
-        <div className="row pb-16 pt-16 px-3">
-            <div className="col-12 col-xl mb-12 mb-xl-0">
+        <div className="row pb-04 pt-16 px-3">
+            <div className="col-auto mb-12">
                 <div className="btn-group" role="group" aria-label="Selection Controls">
                     <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
                         <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
@@ -2078,8 +2078,8 @@ function FilterSetUIBlockBottomUI(props){
                     </button>
                 </div>
             </div>
-            <div className="col-12 col-xl-auto">
-                <div className="btn-group" role="group" aria-label="Creation Controls">
+            <div className="col-auto mb-12 flex-grow-1 d-flex justify-content-between flex-wrap">
+                <div className="btn-group mr-08" role="group" aria-label="Creation Controls">
                     <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
                         <i className="icon icon-fw icon-plus fas mr-1" />
                         Add Filter Block
@@ -2089,7 +2089,7 @@ function FilterSetUIBlockBottomUI(props){
                         <i className="icon icon-fw icon-clone far" />
                     </button>
                 </div>
-                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark ml-08"/>
+                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark"/>
             </div>
         </div>
     );
