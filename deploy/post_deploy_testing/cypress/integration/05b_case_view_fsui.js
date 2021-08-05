@@ -37,7 +37,8 @@ describe('Case View - FSUI', function () {
             .get(".tab-router .dot-tab-nav-list .arrow-tab")
             .eq(2)
             .should("have.class", "active")
-            .should("have.text", "Filtering")
+            .should("have.text", "Filtering").end()
+            .get("#case-info\\.filtering .above-variantsample-table-ui .filter-set-ui-header h4").should("not.have.text", "Loading Filter Set").end()
             .get("#case-info\\.filtering .above-variantsample-table-ui .blocks-container .filterset-block").should("have.length.greaterThan", 0).then(function($fsBlocks){
                 countFBInitial = $fsBlocks.length;
                 Cypress.log({
@@ -77,12 +78,14 @@ describe('Case View - FSUI', function () {
     it("Selecting term from FacetList adds to the new filter block", function(){
 
         cy.once('uncaught:exception', onSupersededAjaxRequestHandler).end()
-            .get(".facets-column .facets-container .facets-body").within(function($facetsBody){
-                // Find facet with Proband Genotype, open it.
-                cy.contains("Proband Genotype").click();
-                cy.contains("Heterozygous").click().end()
-                    .get(".facet-list-element[data-key=\"Heterozygous\"]").should("have.class", "selected");
-            }).end()
+            .get(".facets-column > .facets-container > .facets-body div.facet[data-field=\"associated_genotype_labels.proband_genotype_label\"] .facet-title")
+            .click()
+            .get(".facets-column > .facets-container > .facets-body div.facet[data-field=\"associated_genotype_labels.proband_genotype_label\"] .facet-list-element[data-key=\"Heterozygous\"]")
+            .should("not.have.class", "selected")
+            .click()
+            // Get it again, else might be referring to non-existing/unmounted elem as term changes locations.
+            .get(".facets-column > .facets-container > .facets-body div.facet[data-field=\"associated_genotype_labels.proband_genotype_label\"] .facet-list-element[data-key=\"Heterozygous\"]")
+            .should("have.class", "selected").end()
             .get(".filterset-blocks-container .blocks-container .filterset-block:last-child .field-block").should("have.length", 1)
             .within(function($fb){
                 cy.get(".field-name").should("have.text", "Proband Genotype").end()
