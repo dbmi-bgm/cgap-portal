@@ -56,9 +56,9 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
             <h4 className="col-main" data-tip={titleTip} data-delay-show={titleTipDelayShow} data-html={tooltipEnableHtml}>
                 <span>{ mainTitle || "-" }</span>
             </h4>
-            <div className="col-date text-smaller">
-                <span className="text-600">{ dateTitle } </span>
-                { date ? <LocalizedTime timestamp={date} formatType="date-xs"/> : "N/A" }
+            <div className="col-date text-smaller text-secondary">
+                <span className="mr-04">{ dateTitle }</span>
+                { date ? <LocalizedTime timestamp={date} formatType="date-xs" className="text-600"/> : "N/A" }
             </div>
         </div>
     );
@@ -243,7 +243,7 @@ export const columnExtensionMap = {
             }
 
             return (
-                <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Accession Date"
+                <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Accession Date:"
                     topLeft={<span className="accession text-muted">{ accession }</span>}
                     mainTitle={<a href={atId} className="adv-block-link">{ individualTitle }</a>}/>
             );
