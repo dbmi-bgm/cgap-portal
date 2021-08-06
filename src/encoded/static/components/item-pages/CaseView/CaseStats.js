@@ -78,7 +78,7 @@ export const CaseStats = React.memo(function CaseStats(props){
                     </div>
                     <div className="card-footer">
                         <label className="py-1 mb-0 text-large">Family Phenotypic Features: </label>
-                        <div>{renderedFamilyPhenotypicFeatures}</div>
+                        <div>{ renderedFamilyPhenotypicFeatures }</div>
                     </div>
                 </div>
             </div>

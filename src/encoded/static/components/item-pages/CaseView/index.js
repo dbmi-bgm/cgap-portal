@@ -30,6 +30,7 @@ import { FilteringTab } from './FilteringTab';
 import { CNVSVFilteringTab } from './CNVSVFilteringTab';
 import { InterpretationTab } from './InterpretationTab';
 import { CaseReviewTab } from './CaseReviewTab';
+import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 import CaseSubmissionView from './CaseSubmissionView';
 
 
@@ -178,15 +179,25 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         return { countIndividuals, countIndividualsWSamples };
     }, [ currFamily ]);
 
-    const onViewPedigreeBtnClick = useMemo(function(){
-        return function(evt){
-            evt.preventDefault();
-            evt.stopPropagation();
-            if (!currFamily) return false;
-            // By default, click on link elements would trigger ajax request to get new context.
-            // (unless are external links)
-            navigate("#pedigree", { skipRequest: true, replace: true });
-        };
+    const anyAnnotatedVariantSamples = useMemo(function(){
+        const vsSelectionsLen = vsSelections.length;
+        for (var i = 0; i < vsSelectionsLen; i++) {
+            const { variant_sample_item } = vsSelections[i];
+            const notesForVS = getAllNotesFromVariantSample(variant_sample_item);
+            if (notesForVS.length > 0) {
+                return true;
+            }
+        }
+        return false;
+    }, [ vsSelections ]);
+
+    const onViewPedigreeBtnClick = useCallback(function(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
+        if (!currFamily) return false;
+        // By default, click on link elements would trigger ajax request to get new context.
+        // (unless are external links)
+        navigate("#pedigree", { skipRequest: true, replace: true });
     }, [ /* empty == executed only once ever */ ]);
 
     let caseSearchTables;
@@ -235,7 +246,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             // Potential to-do, onComponentDidUpdate, find height in DOM of container, set to state, pass down here.
             pedBlock = (
                 <div className="pedigree-pane-wrapper flex-fill">
-                    <PedigreeVizView {...graphData} width={pedWidth} height={340} disableSelect showNotes={false}
+                    <PedigreeVizView {...graphData} width={pedWidth} height={320} disableSelect showNotes={false}
                         visibleDiseaseIdxMap={selectedDiseaseIdxMap} showZoomControls={false} enablePinchZoom={false} />
                 </div>
             );
@@ -301,29 +312,23 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
 
             { currFamily && caseIndividual ?
                 <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
-                    <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
+                    <DotRouterTab dotPath=".accessioning" default tabTitle="Accessioning">
                         <AccessioningTab {...{ context, href, currFamily, secondary_families }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false} disabled={disableBioinfo}>
+                    <DotRouterTab dotPath=".bioinformatics" disabled={disableBioinfo} tabTitle="Bioinformatics">
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
+                    <DotRouterTab dotPath=".filtering" cache disabled={disableFiltering} tabTitle="Filtering">
                         <FilteringTabWrapper {...filteringTableProps} {...{ snvFilterHrefAddon, svFilterHrefAddon }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle={
+                    <DotRouterTab dotPath=".interpretation" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} tabTitle={
                         <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
                             { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
                             Interpretation
-                        </span>
-                    } dotPath=".interpretation" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
+                        </span>}>
                         <InterpretationTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle={
-                        <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
-                            { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
-                            Case Review
-                        </span>
-                    } dotPath=".finalize" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
+                    <DotRouterTab dotPath=".review" disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
                         <CaseReviewDataStore>
                             <CaseReviewTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
                         </CaseReviewDataStore>
@@ -408,6 +413,8 @@ class DotRouter extends React.PureComponent {
             for (let i = 0; i < children.length; i++) {
                 const currChild = children[i];
                 if (currChild.props.dotPath === dotPath && !currChild.props.disabled) {
+                    // Maybe consider removing `&& !currChild.props.disabled` check from if condition
+                    // for UX-URL consistency (show case review tab if go there, even if nothing to show).
                     return currChild;
                 }
             }
@@ -424,7 +431,7 @@ class DotRouter extends React.PureComponent {
         const allTabContents = [];
 
         const adjustedChildren = React.Children.map(children, function(childTab, index){
-            const { props : { dotPath, children: tabChildren, cache = true } } = childTab;
+            const { props : { dotPath, children: tabChildren, cache = false } } = childTab;
             const active = currTabDotPath === dotPath;
             if (active || cache) {
                 allTabContents.push(
@@ -525,7 +532,7 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
                     <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
                         persistent={[
                             <div key={currFamilyID} className="primary-family">
-                                <h4 className="mt-0 mb-05 text-400">
+                                <h4 className="mt-0 mb-16 text-400">
                                     <span className="text-300">Primary Cases from </span>
                                     { primaryFamilyTitle }
                                 </h4>

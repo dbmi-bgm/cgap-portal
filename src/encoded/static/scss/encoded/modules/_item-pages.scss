@@ -1303,6 +1303,8 @@ i.status-indicator-dot {
 
 					@include media-breakpoint-up(lg) {
 
+						flex-basis: 20%; /* <- dependendent on there being 5 of these tabs (keep in sync w. amount of tabs) */
+
 						&:first-child {
 							> .btn-prepend {
 								display: none;
