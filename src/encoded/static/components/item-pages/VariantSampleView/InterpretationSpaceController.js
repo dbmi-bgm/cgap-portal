@@ -176,7 +176,7 @@ export class InterpretationSpaceWrapper extends React.Component {
             console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
             const { "@id": noteAtID = null } = lastSavedNote;
 
-            this.setState({ loading: true }, () => {
+            this.setState({ "loading": true }, () => {
                 this.patchPreviouslySavedNote(note, noteType, noteAtID)
                     .then((response) => {
                         const { '@graph': graph = [], status } = response;
@@ -190,7 +190,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                     })
                     .then((noteWithEmbeds) => {
                         console.log("Successfully retrieved @@embedded representation of note", noteWithEmbeds);
-                        this.setState({ loading: false, [stateFieldToUpdate]: noteWithEmbeds });
+                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds });
                     })
                     .catch((err) => {
                         const { error: { message = null } = {} } = err || {};
@@ -200,13 +200,13 @@ export class InterpretationSpaceWrapper extends React.Component {
                             message: message || "Your changes may not be saved.",
                             style: "danger"
                         });
-                        this.setState({ loading: false });
+                        this.setState({ "loading": false });
                     });
             });
         } else { // Create a whole new item, and patch to VS
             let newNoteID;
 
-            this.setState({ loading: true }, () => {
+            this.setState({ "loading": true }, () => {
                 this.postNewNote(note, noteType)
                     .then((response) => {
                         const { '@graph': noteItems = [], status } = response;
@@ -223,6 +223,12 @@ export class InterpretationSpaceWrapper extends React.Component {
                         return this.patchNewNoteToVS(newNoteID, stateFieldToUpdate);
                     })
                     .then((resp) => {
+                        const { '@graph': [ noteItem ], status } = resp;
+                        if (status !== "success") {
+                            // Assert this.patchNewNoteToVS(newNoteID, stateFieldToUpdate) succeeded.
+                            // TODO: Check integrity of @graph
+                            throw new Error(resp);
+                        }
                         console.log("Successfully linked note object to variant sample", resp);
                         return ajax.promise(noteAtID + "?datastore=database", 'GET');
                     })
@@ -230,7 +236,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                         console.log("Successfully retrieved @@embedded representation of note: ", noteWithEmbeds);
 
                         // Full representation of item fetched... add this to state
-                        this.setState({ loading: false, [stateFieldToUpdate]: noteWithEmbeds });
+                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds });
                     })
                     .catch((err) => {
                         const { error: { message = null } = {} } = err || {};
@@ -240,7 +246,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                             message: message || "Your changes may not be saved.",
                             style: "danger"
                         });
-                        this.setState({ loading: false });
+                        this.setState({ "loading": false });
                     });
             });
         }
