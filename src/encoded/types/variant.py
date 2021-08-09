@@ -2,7 +2,7 @@ import datetime
 import io
 import json
 import os
-from functools import lru_cache
+import csv
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
     HTTPBadRequest,
@@ -10,6 +10,7 @@ from pyramid.httpexceptions import (
 )
 from pyramid.traversal import find_resource
 from pyramid.request import Request
+from pyramid.response import Response
 
 import boto3
 import negspy.coordinates as nc
@@ -20,7 +21,7 @@ from pyramid.settings import asbool
 from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
-from snovault.util import debug_log
+from snovault.util import simple_path_ids, debug_log
 from snovault.embed import make_subrequest
 
 from encoded.ingestion.common import CGAP_CORE_PROJECT
@@ -911,22 +912,18 @@ class VariantSampleList(Item):
 
 def get_spreadsheet_mappings():
 
-    @lru_cache(maxsize=1)
     def get_canonical_transcript(variant_sample):
-        '''Create+call cloned copy of this function wrapped in `@lru_cache(maxsize=1)`'''
         for transcript in variant_sample.get("transcript", []):
             if transcript.get("csq_canonical", False) == True:
                 return transcript
         return None
 
-    @lru_cache(maxsize=1)
     def get_most_severe_transcript(variant_sample):
         for transcript in variant_sample.get("transcript", []):
             if transcript.get("csq_most_severe", False) == True:
                 return transcript
         return None
 
-    @lru_cache(maxsize=2) # Assume will be called for 2 transcripts - canonical and most severe
     def get_most_severe_consequence(variant_sample_transcript):
         csq_consequences = variant_sample_transcript.get("csq_consequence", [])
         if not csq_consequences:
@@ -937,7 +934,7 @@ def get_spreadsheet_mappings():
             "LOW" : 2,
             "MODIFIER" : 3
         }
-        return next(sorted(csq_consequences, key=lambda x: impact_map[x] ))
+        return next(sorted(csq_consequences, key=lambda x: impact_map[x["impact"]] if "impact" in x else 100 ))
 
 
     def canonical_transcript_csq_feature(variant_sample):
@@ -1000,9 +997,34 @@ def get_spreadsheet_mappings():
             return None
         return location_name(most_severe_transcript)
 
+    def canonical_transcript_consequence_display_title(variant_sample):
+        canonical_transcript = get_canonical_transcript(variant_sample)
+        if not canonical_transcript:
+            return None
+        most_severe_consequence = get_most_severe_consequence(canonical_transcript)
+        if not most_severe_consequence:
+            return None
+        return most_severe_consequence["display_title"]
+
+    def most_severe_transcript_consequence_display_title(variant_sample):
+        most_severe_transcript = get_most_severe_transcript(variant_sample)
+        if not most_severe_transcript:
+            return None
+        most_severe_consequence = get_most_severe_consequence(most_severe_transcript)
+        if not most_severe_consequence:
+            return None
+        return most_severe_consequence["display_title"]
+
+    def url_to_variantsample(variant_sample):
+        # TODO: Prepend request hostname, scheme, etc.
+        at_id = variant_sample["@id"]
+        return at_id
+
 
     return [
-    #   Column Title                                CGAP Field (if not custom function)                             Description
+    ##  Column Title                             |  CGAP Field (if not custom function)                          |  Description
+    ##  ---------------------------------------  |  -----------------------------------------------------------  |  --------------------------------------------------------------------------
+        ("URL",                                     url_to_variantsample,                                           "URL to Sample Variant on this row"),
         ("Chrom (hg38)",                            "variant.CHROM",                                                "Chromosome (hg38 assembly)"),
         ("Pos (hg38)",                              "variant.POS",                                                  "Start Position (hg38 assembly)"),
         ("Chrom (hg19)",                            "variant.hg19_chr",                                             "Chromosome (hg19 assembly)"),
@@ -1023,13 +1045,13 @@ def get_spreadsheet_mappings():
         # ONLY FOR variant.transcript.csq_canonical=true; use `variant.transcript.csq_intron` if `variant.transcript.csq_exon` not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
         ("Canonical transcript location",           canonical_transcript_location,                                  "Number of exon or intron variant is located in canonical transcript, out of total"),
         # ONLY FOR variant.transcript.csq_canonical=true
-        ("Canonical transcript coding effect",      "variant.transcript.csq_consequence.display_title",             "Coding effect of variant in canonical transcript"),
+        ("Canonical transcript coding effect",      canonical_transcript_consequence_display_title,                 "Coding effect of variant in canonical transcript"),
         # ONLY FOR variant.transcript.csq_most_severe=true
         ("Most severe transcript ID",               most_severe_transcript_csq_feature,                             "Ensembl ID of transcript with worst annotation for variant"),
         # ONLY FOR variant.transcript.csq_most_severe=true; use csq_intron if csq_exon not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
         ("Most severe transcript location",         most_severe_transcript_location,                                "Number of exon or intron variant is located in most severe transcript, out of total"),
         # ONLY FOR variant.transcript.csq_most_severe=true
-        ("Most severe transcript coding effect",    "variant.transcript.csq_consequence.display_title",             "Coding effect of variant in most severe transcript"),
+        ("Most severe transcript coding effect",    most_severe_transcript_consequence_display_title,               "Coding effect of variant in most severe transcript"),
         ("Inheritance modes",                       "inheritance_modes",                                            "Inheritance Modes of variant"),
         ("NovoPP",                                  "novoPP",                                                       "Novocaller Posterior Probability"),
         ("Cmphet mate",                             "cmphet.comhet_mate_variant",                                   "Variant ID of mate, if variant is part of a compound heterozygous group"),
@@ -1069,15 +1091,31 @@ def get_spreadsheet_mappings():
         ("Discovery notes (curr)",                  "discovery_interpretation.note_text",                           "Gene/variant discovery notes written for this case"),
         ("Variant notes (curr)",                    "variant_notes.note_text",                                      "Additional notes on variant written for this case"),
         ("Gene notes (curr)",                       "gene_notes.note_text",                                         "Additional notes on gene written for this case"),
-        ("ACMG classification (prev)",              "variant.interpretations[0].classification",                    "ACMG classification for variant in previous cases"),
-        ("ACMG rules (prev)",                       "variant.interpretations[0].acmg",                              "ACMG rules invoked for variant in previous cases"),
-        ("Clinical interpretation (prev)",          "variant.interpretations[0].note_text",                         "Clinical interpretation notes written for previous cases"),
-        ("Gene candidacy (prev)",                   "variant.discovery_interpretations[0].gene_candidacy",          "Gene candidacy level selected for previous cases"),
-        ("Variant candidacy (prev)",                "variant.discovery_interpretations[0].variant_candidacy",       "Variant candidacy level selected for previous cases"),
-        ("Discovery notes (prev)",                  "variant.discovery_interpretations[0].note_text",               "Gene/variant discovery notes written for previous cases"),
-        ("Variant notes (prev)",                    "variant.variant_notes[0].note_text",                           "Additional notes on variant written for previous cases"),
+        ("ACMG classification (prev)",              "variant.interpretations.classification",                       "ACMG classification for variant in previous cases"), # First interpretation only
+        ("ACMG rules (prev)",                       "variant.interpretations.acmg",                                 "ACMG rules invoked for variant in previous cases"), # First interpretation only
+        ("Clinical interpretation (prev)",          "variant.interpretations.note_text",                            "Clinical interpretation notes written for previous cases"), # First interpretation only
+        ("Gene candidacy (prev)",                   "variant.discovery_interpretations.gene_candidacy",             "Gene candidacy level selected for previous cases"), # First discovery_interpretations only
+        ("Variant candidacy (prev)",                "variant.discovery_interpretations.variant_candidacy",          "Variant candidacy level selected for previous cases"), # First discovery_interpretations only
+        ("Discovery notes (prev)",                  "variant.discovery_interpretations.note_text",                  "Gene/variant discovery notes written for previous cases"), # First discovery_interpretations only
+        ("Variant notes (prev)",                    "variant.variant_notes.note_text",                              "Additional notes on variant written for previous cases"), # First variant_notes only
         ("Gene notes (prev)",                       "variant.genes.genes_most_severe_gene.gene_notes.note_text",    "Additional notes on gene written for previous cases"),
     ]
+
+
+def get_values_for_field(item, field, remove_duplicates=True):
+    """Copied over from 4DN / batch_download / metadata.tsv endpoint code"""
+    c_value = []
+
+    if remove_duplicates:
+        for value in simple_path_ids(item, field):
+            str_value = str(value)
+            if str_value not in c_value:
+                c_value.append(str_value)
+    else:
+        for value in simple_path_ids(item, field):
+            c_value.append(str(value))
+
+    return ", ".join(c_value)
 
 
 def convert_variant_sample_item_to_sheet_dict(variant_sample_item, spreadsheet_mappings):
@@ -1085,16 +1123,81 @@ def convert_variant_sample_item_to_sheet_dict(variant_sample_item, spreadsheet_m
     We assume we have @@embedded representation of VariantSample here.
     May need to request more fields.
     '''
-    pass
 
-def convert_variant_samples_to_sheet_dicts(variant_samples_iterable):
-    '''
-    Generator that returns dicts of VS items representing row data.
-    '''
+    vs_sheet_dict = {} # OrderedDict() # Keyed by column title. Maybe OrderedDict not necessary now..
 
-    spreadsheet_mappings = get_spreadsheet_mappings()
-    for variant_sample_item in variant_samples_iterable:
-        yield convert_variant_sample_item_to_sheet_dict(variant_sample_item, spreadsheet_mappings)
+    for column_title, cgap_field_or_func, description in spreadsheet_mappings:
+        if cgap_field_or_func is None: # Skip
+            continue
+
+        is_field_str = isinstance(cgap_field_or_func, str)
+
+        if not is_field_str: # Assume render or custom-logic function
+            vs_sheet_dict[column_title] = cgap_field_or_func(variant_sample_item)
+        else:
+            vs_sheet_dict[column_title] = get_values_for_field(variant_sample_item, cgap_field_or_func)
+
+    return vs_sheet_dict
+
+
+
+
+class DummyFileInterfaceImplementation(object):
+    def __init__(self):
+        self._line = None
+    def write(self, line):
+        self._line = line
+    def read(self):
+        return self._line
+
+
+
+def stream_tsv_output(dictionaries_iterable, spreadsheet_mappings, file_format = "tsv"):
+    '''
+    Generator which converts iterable of column:value dictionaries into a TSV stream.
+    :param dictionaries_iterable: Iterable of dictionaries, each containing TSV_MAPPING keys and values from a file in ExperimentSet.
+    '''
+    line = DummyFileInterfaceImplementation()
+    writer = csv.writer(line, delimiter= '\t' if file_format == "tsv" else ", ")
+
+    # Initial 2 lines: Intro, Headers
+    # writer.writerow([
+    #     '###', 'N.B.: File summary located at bottom of TSV file.', '', '', '', '',
+    #     'Suggested command to download: ', '', '', 'cut -f 1 ./{} | tail -n +3 | grep -v ^# | xargs -n 1 curl -O -L --user <access_key_id>:<access_key_secret>'.format(filename_to_suggest)
+    # ])
+    # yield line.read().encode('utf-8')
+
+    # Headers (column title)
+    title_headers = []
+    description_headers = []
+    for column_title, cgap_field_or_func, description in spreadsheet_mappings:
+        title_headers.append(column_title)
+        description_headers.append(description)
+    title_headers[0] = "# " + title_headers[0] # Add comment hash in case people using this spreadsheet file programmatically.
+    description_headers[0] = "# " + description_headers[0] # Add comment hash in case people using this spreadsheet file programmatically.
+
+    writer.writerow(title_headers)
+    yield line.read().encode('utf-8')
+
+    writer.writerow(description_headers)
+    yield line.read().encode('utf-8')
+
+    del title_headers
+    del description_headers
+
+    for vs_dict in dictionaries_iterable:
+        writer.writerow([ vs_dict.get(sm[0]) or 'N/A' for sm in spreadsheet_mappings ])
+        yield line.read().encode('utf-8')
+
+    # for summary_line in generate_summary_lines():
+    #     writer.writerow(summary_line)
+    #     yield line.read().encode('utf-8')
+
+
+############################
+## Spreadsheet Generation Code Specific to VariantSampleList Items 
+############################
+
 
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
@@ -1119,6 +1222,12 @@ def variant_sample_list_spreadsheet(context, request):
         pass
 
     file_format = request_body.get("file_format", request.GET.get("file_format", "tsv")).lower()
+    if file_format not in { "tsv", "csv" }: # TODO: Add support for xslx.
+        raise HTTPBadRequest("Expected a valid file_format such as TSV or CSV.")
+    suggested_filename = request_body.get("file_format", request.GET.get("file_format", None))
+    if not suggested_filename:
+        suggested_filename = "case-interpretation" # TODO: Datetime
+
     requested_variant_sample_uuids = request_body.get("variant_sample_uuids", [])
 
 
@@ -1131,13 +1240,48 @@ def variant_sample_list_spreadsheet(context, request):
         variant_sample_objects = context.properties.get("variant_samples", [])
         variant_sample_item_uuids = [ vso["variant_sample_item"] for vso in variant_sample_objects ]
 
-    # We want to grab datastore=database version of Items here since is likely that user has _just_ finished making
-    # an edit when they decide to export the spreadsheet from the InterpretationTab UI.
+    spreadsheet_mappings = get_spreadsheet_mappings()
+    fields_to_embed = [
+        # Most of these are needed for columns with render/transform/custom-logic functions in place of (string) CGAP field.
+        # Keep up-to-date with any custom logic.
+        "@id",
+        "@type",
+        "variant.transcript.csq_canonical",
+        "variant.transcript.csq_most_severe",
+        "variant.transcript.csq_feature",
+        "variant.transcript.csq_consequence.impact",
+        "variant.transcript.csq_consequence.var_conseq_name",
+        "variant.transcript.csq_consequence.display_title",
+        "variant.transcript.csq_exon",
+        "variant.transcript.csq_intron"
+    ]
+    for column_title, cgap_field_or_func, description in spreadsheet_mappings:
+        if isinstance(cgap_field_or_func, str):
+            # We don't expect any duplicate fields (else would've used a set in place of list) ... pls avoid duplicates in spreadsheet_mappings.
+            fields_to_embed.append(cgap_field_or_func)
+
+    def load_variant_sample(vs_uuid):
+        '''
+        We want to grab datastore=database version of Items here since is likely that user has _just_ finished making
+        an edit when they decide to export the spreadsheet from the InterpretationTab UI.
+        '''
+        vs_embedding_instance = CustomEmbed(request, vs_uuid, embed_props={ "requested_fields": fields_to_embed })
+        return vs_embedding_instance.result
 
 
+    spreadsheet_body_iterable = stream_tsv_output(
+        map(
+            lambda x: convert_variant_sample_item_to_sheet_dict(x, spreadsheet_mappings),
+            map(
+                load_variant_sample, variant_sample_item_uuids
+            )
+        ),
+        spreadsheet_mappings,
+        file_format
+    )
 
-
-    print('\nctx', variant_sample_item_uuids)
-
-    return { "status": "in development" }
-
+    return Response(
+        content_type='text/' + file_format,
+        app_iter = spreadsheet_body_iterable,
+        content_disposition='attachment;filename="%s"' % suggested_filename
+    )
