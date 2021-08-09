@@ -893,6 +893,61 @@ class VariantSampleList(Item):
 
 
 
+
+
+
+
+
+
+spreadsheet_field_mappings = [
+    # Column Key                    # Column Title                                          # CGAP Field (if not custom calc)                           # Description
+    ("genes",                       "Gene",                                                 "variant.genes.genes_most_severe_gene.display_title",       "HGNC gene symbol"), # gene symbol from Ensembl rather than HGNC - we don't pull in the HGNC symbol
+    ("seq_region_name",             "Chromosome",                                           "variant.CHROM",                                            "Chromosome number or symbol"), # see below
+    ("start",                       "Genomic coordinate HG19",                              "variant.hg19_pos",                                         "HG19 coordinate of variant"),
+    ("hg38",                        "Genomic coordinate HG38",                              "variant.POS",                                              "HG38 coordinate of variant"), # I suggest switching these column names to "start" and "hg19" so that hg38 is in the "start" column instead
+    ("ref",                         "Ref",                                                  "variant.REF",                                              "Reference nucelotide"),
+    ("alt",                         "Alt",                                                  "variant.ALT",                                              "Alternative nucleotide"),
+    ("proband_genotype",            "Proband Genotype",                                     "associated_genotype_labels.proband_genotype_label",        "Proband nucleotides"),
+    ("maternal_genotype",           "Maternal Genotype",                                    "associated_genotype_labels.mother_genotype_label",         "Maternal nucleotides"),
+    ("paternal_genotype",           "Paternal Genotype",                                    "associated_genotype_labels.father_genotype_label",         "Paternal nucleotides"),
+    ("cpos_canonical",              "cPos",                                                 "variant.genes.genes_most_severe_hgvsc",                    "HGVS cPos nomenclature"),
+    ("ppos_canonical",              "pPos",                                                 "variant.genes.genes_most_severe_hgvsp",                    "HGVS pPos nomenclature"),
+    ("worst_annotation",            "Worst Annotation",                                     "variant.transcript.csq_consequence.display_title",         "Worst variant annotation class, as in the \"RefSeq Transcript (Sev)\""),
+    ("refseq_transcript_worst",     "RefSeq Transcript (Worst Annotation)",                 "variant.transcript.csq_mane",                              "Accession # of RefSeq protein transcript with most severe class of variant"), # only transcript where csq_most_severe=true
+    ("variant_exon_intron_worst",   "Variant Exon/Intron # (Worst Annotation)",             "variant.transcript.csq_exon",                              "In transcript with most severe variant annotation, number of exon or intron in which variant is located"), # 1. we have this as a fraction (e.g. 2/27) so this and col below can be combined
+    ("total_exon_intron_worst",     "Total Exons (Worst Annotation)",                       None,                                                       "Exons in transcript with most severe variant annotation"), # 2. only transcript where csq_most_severe=true
+    ("refseq_transcript_canonical", "RefSeq Transcript (Canonical)",                        "variant.transcript.csq_mane",                              "Accession # of canonical RefSeq protein transcript"), # only transcript where csq_canonical=true
+    ("variant_exon_intron_canonical", "Variant Exon/Intron # (Canonical)",                  "variant.transcript.csq_exon",                              "In canonical transcript, number of exon or intron in which variant is located"), # 1. we have this as a fraction (e.g. 2/27) so this and col below can be combined
+    ("total_exon_intron_canonical", "Total Exons (Canonical)",                              None,                                                       "Exons in canonical transcript"), # 2. only transcript where csq_canonical=true
+    ("allelic_depth",               "Var Allele Count",                                     "AD_ALT",                                                   "# of reads with variant allele"),
+    ("read_depth",                  "Tot Allele Count",                                     "DP",                                                       "# of total reads at varaint position"),
+    ("Strand Odds Ratio",           "Strand Bias Odds Ratio",                               "FS",                                                       "\"StrandOddsRAatio\" from INFO field in VCF"), # this uses FisherStrand from GATK instead of StrandOddsRatio so is slightly different but still represents Strand Bias
+    ("Mapping Quality",             "Mapping Quality Score",                                None,                                                       "\"MQ\" from VCF"), # in the schema it looks like we only have GQ?
+    ("Variant Call Quality",        "Variant Call Quality Score",                           "QUAL",                                                     "\"QUAL\" in VCF"),
+    ("af",                          "GnomAD AF (overall)",                                  None,                                                       "Allele frequency in gnomAD including exomes and genomes"), # not sure we have this - calculate from g_ac + e2_ac / g_an + e2_an?
+    ("exome_af",                    "GnomAD AF (exomes)",                                   "variant.csq_gnomade2_af",                                  "Allele frequency in gnomAD exomes"),
+    ("genome_af",                   "GnomAD AF (genomes)",                                  "variant.csq_gnomadg_af",                                   "Allele frequency in gnomAD genomes"),
+    ("popmax",                      "gnomAD PopMax #1",                                     "variant.csq_gnomadg_af_popmax",                            "Highest allele frequency by ancestral group"),
+    ("popmax_af",                   "gnomAD PopMax #1 Ancestry",                            None,                                                       "Ancestral group associated with gnomaD PopMax #1"), # this would have to be calculated
+    ("omim_ids",                    "OMIM Phenotype(s)",                                    None,                                                       "Phenotypes associated with gene in OMIM database"), # I think we only have OMIM ID
+    ("pli",                         "pLI",                                                  None,                                                       "Probability that a given gene falls into the Haploinsufficient category, therefore is intolerant of loss-of-function variation"), # not sure if we have this
+    ("hgmd_tags",                   "HGMD Classification",                                  None,                                                       "(need to specify field from HGMD)"), # not sure we have this - gwas catalog instead?
+    ("hgmd_pmids",                  "HGMD Associated PMIDs",                                None,                                                       "PMIDs of publications associated with variant in HGMD"), # not sure we have this - gwas catalog instead?
+    ("clinVar",                     "ClinVar Link",                                         "variant.csq_clinvar",                                      "Link to ClinVar search for variant"), # use link in prop field
+    ("conservation",                "Evolutionary Conservation (amino acid)",               None,                                                       ""),
+    ("polyphen",                    "Polyphen",                                             "variant.csq_polyphen2_hvar_pred",                          "Polyphen classification"),
+    ("sift",                        "SIFT",                                                 "variant.csq_sift_pred",                                    "SIFT classification"),
+    ("mutation_taster",             "Mutation Taster",                                      None,                                                       "Mutation Taster classification"), # N/A
+    ("revel",                       "REVEL",                                                "variant.csq_revel_score",                                  "REVEL score"),
+    ("fathmm",                      "FATHMM",                                               None,                                                       "FATHMM classification"), # N/A
+    ("cadd_phred",                  "CADD",                                                 None,                                                       "CADD score"),
+    ("mutation_assessor",           "MutationAssessor",                                     None,                                                       "MutationAssessor score"),
+    ("dist_from_exon_worst",        "Distance From Intron/Exon Boundary (Worst Annotation)", None,                                                      "In transcript with most severe variant annotation, the distance in base pairs from nearest intron/exon border in the transcript containing the most damaging variant annotation"),
+    ("dist_from_exon_canonical",    "Distance From Intron/Exon Boundary (Canonical)",       None,                                                       "In the canonical transcript the distance in base pairs from nearest intron/exon border in the transcript containing the most damaging variant annotation")
+]
+
+
+
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 @debug_log
@@ -906,6 +961,10 @@ def variant_sample_list_spreadsheet(context, request):
       for precedent example (downloading/streaming a TSV from /search/ request).
     """
 
+    requested_format = request.GET.get("file_format", "TSV")
+
+    print('\nrequest', request.GET)
+    print('\nctx', context)
 
     return { "status": "in development" }
 
