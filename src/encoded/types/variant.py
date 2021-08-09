@@ -1080,8 +1080,26 @@ def get_spreadsheet_mappings():
     ]
 
 
+def convert_variant_sample_item_to_sheet_dict(variant_sample_item, spreadsheet_mappings):
+    '''
+    We assume we have @@embedded representation of VariantSample here.
+    May need to request more fields.
+    '''
+    pass
+
+def convert_variant_samples_to_sheet_dicts(variant_samples_iterable):
+    '''
+    Generator that returns dicts of VS items representing row data.
+    '''
+
+    spreadsheet_mappings = get_spreadsheet_mappings()
+    for variant_sample_item in variant_samples_iterable:
+        yield convert_variant_sample_item_to_sheet_dict(variant_sample_item, spreadsheet_mappings)
+
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
+             permission='view', subpath_segments=[0, 1])
+@view_config(name='spreadsheet', context=VariantSampleList, request_method='POST',
              permission='view', subpath_segments=[0, 1])
 @debug_log
 def variant_sample_list_spreadsheet(context, request):
@@ -1094,10 +1112,32 @@ def variant_sample_list_spreadsheet(context, request):
       for precedent example (downloading/streaming a TSV from /search/ request).
     """
 
-    requested_format = request.GET.get("file_format", "TSV")
+    request_body = {}
+    try:
+        request_body = request.json
+    except:
+        pass
 
-    print('\nrequest', request.GET)
-    print('\nctx', context)
+    file_format = request_body.get("file_format", request.GET.get("file_format", "tsv")).lower()
+    requested_variant_sample_uuids = request_body.get("variant_sample_uuids", [])
+
+
+    variant_sample_item_uuids = None
+    if requested_variant_sample_uuids:
+        variant_sample_item_uuids = requested_variant_sample_uuids
+        # Return only selected VariantSamples
+    else:
+        # Return all VariantSamples
+        variant_sample_objects = context.properties.get("variant_samples", [])
+        variant_sample_item_uuids = [ vso["variant_sample_item"] for vso in variant_sample_objects ]
+
+    # We want to grab datastore=database version of Items here since is likely that user has _just_ finished making
+    # an edit when they decide to export the spreadsheet from the InterpretationTab UI.
+
+
+
+
+    print('\nctx', variant_sample_item_uuids)
 
     return { "status": "in development" }
 
