@@ -922,16 +922,77 @@ def get_spreadsheet_mappings():
     @lru_cache(maxsize=1)
     def get_most_severe_transcript(variant_sample):
         for transcript in variant_sample.get("transcript", []):
-            if transcript.get("csq_canonical", False) == True:
+            if transcript.get("csq_most_severe", False) == True:
                 return transcript
         return None
 
-    def canonical_csq_feature(variant_sample):
+    @lru_cache(maxsize=2) # Assume will be called for 2 transcripts - canonical and most severe
+    def get_most_severe_consequence(variant_sample_transcript):
+        csq_consequences = variant_sample_transcript.get("csq_consequence", [])
+        if not csq_consequences:
+            return None
+        impact_map = {
+            "HIGH" : 0,
+            "MODERATE" : 1,
+            "LOW" : 2,
+            "MODIFIER" : 3
+        }
+        return next(sorted(csq_consequences, key=lambda x: impact_map[x] ))
+
+
+    def canonical_transcript_csq_feature(variant_sample):
         ''' Returns `variant.transcript.csq_feature` '''
         canonical_transcript = get_canonical_transcript(variant_sample)
         if canonical_transcript:
             return canonical_transcript.get("csq_feature", None)
         return None
+
+    # TODO: Consider making `canonical_transcript_location` + `most_severe_transcript_location` as calculated properties
+    def location_name(transcript):
+        most_severe_consequence = get_most_severe_consequence(transcript)
+        consequence_name = most_severe_consequence["var_conseq_name"].lower() if most_severe_consequence is not None and "var_conseq_name" in most_severe_consequence else None
+
+        return_str = None
+
+        csq_exon = transcript.get("csq_exon", None)
+        csq_intron = transcript.get("csq_intron", None)
+        csq_distance = transcript.get("csq_distance", None)
+
+        if csq_exon is not None:
+            return_str = "Exon " + csq_exon
+        elif csq_intron is not None:
+            return_str = "Intron " + csq_intron
+        elif csq_distance is not None and consequence_name is not None:
+            if consequence_name == "downstream_gene_variant":
+                return_str = csq_distance + "bp downstream"
+            elif consequence_name == "upstream_gene_variant":
+                return_str = csq_distance + "bp upstream"
+
+        if consequence_name == "3_prime_utr_variant":
+            if return_str:
+                return_str += " (3′ UTR)"
+            else:
+                return_str = "3′ UTR"
+        elif consequence_name == "5_prime_utr_variant":
+            if return_str:
+                return_str += " (5′ UTR)"
+            else:
+                return_str = "5′ UTR"
+
+        return return_str
+
+    def canonical_transcript_location(variant_sample):
+        canonical_transcript = get_canonical_transcript(variant_sample)
+        if not canonical_transcript:
+            return None
+        return location_name(canonical_transcript)
+
+    def most_severe_transcript_location(variant_sample):
+        most_severe_transcript = get_most_severe_transcript(variant_sample)
+        if not most_severe_transcript:
+            return None
+        return location_name(most_severe_transcript)
+
 
     return [
     #   Column Title                                CGAP Field (if not custom function)                             Description
@@ -951,15 +1012,15 @@ def get_spreadsheet_mappings():
         ("Genes",                                   "variant.genes.genes_most_severe_gene.display_title",           "Gene symbol(s)"),
         ("Gene type",                               "variant.genes.genes_most_severe_gene.gene_biotype",            "Type of Gene"),
         # ONLY FOR variant.transcript.csq_canonical=true
-        ("Canonical transcript ID",                 canonical_csq_feature,                                          "Ensembl ID of canonical transcript of gene variant is in"),
+        ("Canonical transcript ID",                 canonical_transcript_csq_feature,                               "Ensembl ID of canonical transcript of gene variant is in"),
         # ONLY FOR variant.transcript.csq_canonical=true; use `variant.transcript.csq_intron` if `variant.transcript.csq_exon` not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
-        ("Canonical transcript location",           None,                                                           "Number of exon or intron variant is located in canonical transcript, out of total"),
+        ("Canonical transcript location",           canonical_transcript_location,                                  "Number of exon or intron variant is located in canonical transcript, out of total"),
         # ONLY FOR variant.transcript.csq_canonical=true
         ("Canonical transcript coding effect",      "variant.transcript.csq_consequence.display_title",             "Coding effect of variant in canonical transcript"),
         # ONLY FOR variant.transcript.csq_most_severe=true
         ("Most severe transcript ID",               "variant.transcript.csq_feature",                               "Ensembl ID of transcript with worst annotation for variant"),
         # ONLY FOR variant.transcript.csq_most_severe=true; use csq_intron if csq_exon not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
-        ("Most severe transcript location",         "variant.transcript.csq_exon | variant.transcript.csq_intron",  "Number of exon or intron variant is located in most severe transcript, out of total"),
+        ("Most severe transcript location",         most_severe_transcript_location,                            "Number of exon or intron variant is located in most severe transcript, out of total"),
         # ONLY FOR variant.transcript.csq_most_severe=true
         ("Most severe transcript coding effect",    "variant.transcript.csq_consequence.display_title",             "Coding effect of variant in most severe transcript"),
         ("Inheritance modes",                       "inheritance_modes",                                            "Inheritance Modes of variant"),
