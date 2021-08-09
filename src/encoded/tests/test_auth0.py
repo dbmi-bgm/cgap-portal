@@ -77,17 +77,17 @@ def auth0_4dn_user_profile():
 
 
 @Retry.retry_allowed(retries_allowed=20, wait_seconds=0.5)
-def _auth0_await_user(testapp, user_uuid):
+def _auth0_await_user(testapp, user_at_id):
     """
     Wait (for a reasonable time) for a given user's uuid to appear in a /users/ response.
 
     This function will retry at half-second intervals until the query doesn't fail
     or the retry conditions are exceeded.
     """
-    url = "/users/%s" + user_uuid
+    url = user_at_id
     response = testapp.get('/users/')
     assert response.status_code == 200, "Expected %s to exist." % url
-    assert any(user['uuid'] == user_uuid for user in response.json['@graph'])
+    assert any(user["@id"] == user_at_id for user in response.json['@graph'])
     return response
 
 
@@ -106,7 +106,7 @@ def auth0_existing_4dn_user_profile(testapp, auth0_4dn_user_profile):
     [user] = testapp.post_json(url, item, status=201).json['@graph']
     assert user['display_title'] == first_name + " " + last_name  # Validate that useful processing occurred.
 
-    _auth0_await_user(testapp, user['uuid'])
+    _auth0_await_user(testapp, user['@id'])
 
     return user  # Now that it exists
 

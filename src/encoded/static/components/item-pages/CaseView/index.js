@@ -17,6 +17,7 @@ import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
 import { VariantSampleListController } from './VariantSampleListController';
+import { CaseReviewDataStore } from './VariantSampleSelection';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -26,9 +27,10 @@ import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
+import { CNVSVFilteringTab } from './CNVSVFilteringTab';
 import { InterpretationTab } from './InterpretationTab';
+import { CaseReviewTab } from './CaseReviewTab';
 import CaseSubmissionView from './CaseSubmissionView';
-
 
 
 
@@ -121,23 +123,26 @@ export default class CaseView extends DefaultItemView {
 
 const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const {
+        // Passed in from App or redux
         context = {},
         href,
         session,
         schemas,
-        graphData,
-        selectedDiseaseIdxMap,
         windowWidth,
         windowHeight,
-        idToGraphIdentifier,
+        addToBodyClassList,
+        removeFromBodyClassList,
         setIsSubmitting,
+        graphData,
+        selectedDiseaseIdxMap,
+        idToGraphIdentifier,
         PedigreeVizLibrary = null,
         // Passed in from VariantSampleListController which wraps this component in `getTabObject`
         variantSampleListItem = null,
         isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
         savedVariantSampleIDMap = {},
-        fetchVariantSampleListItem
+        fetchVariantSampleListItem,
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
 
@@ -151,7 +156,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         accession: caseAccession,
         individual: caseIndividual,
         sample_processing: sampleProcessing = null,
-        initial_search_href_filter_addon: filterHrefAddon = ""
+        initial_search_href_filter_addon: snvFilterHrefAddon = "",
+        sv_initial_search_href_filter_addon: svFilterHrefAddon = ""
     } = context;
 
     const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
@@ -240,8 +246,16 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const { processed_files = [] } = sampleProcessing || {};
     const disableBioinfo = !(processed_files.length > 0);
 
-    // Use availability of search query filter string add-on to determine if Filtering tab should be displayed
-    const disableFiltering = !filterHrefAddon;
+    // Use availability of search query filter string add-ons to determine if Filtering tab should be displayed
+    const disableFiltering = !snvFilterHrefAddon && !svFilterHrefAddon;
+
+    // Filtering props shared among both tables, then SV and SNV specific props
+    const filteringTableProps = {
+        context, windowHeight, session, schemas,
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem
+    };
 
     return (
         <React.Fragment>
@@ -294,10 +308,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
-                        <SelectedItemsController isMultiselect>
-                            <FilteringTab {...{ context, windowHeight, session, schemas, setIsSubmitting, variantSampleListItem,
-                                updateVariantSampleListID, savedVariantSampleIDMap, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
-                        </SelectedItemsController>
+                        <FilteringTabWrapper {...filteringTableProps} {...{ snvFilterHrefAddon, svFilterHrefAddon }} />
                     </DotRouterTab>
                     <DotRouterTab tabTitle={
                         <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
@@ -305,10 +316,17 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             Interpretation
                         </span>
                     } dotPath=".interpretation" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
-                        <InterpretationTab {...{ variantSampleListItem, schemas, caseAccession, isLoadingVariantSampleListItem }} />
+                        <InterpretationTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
-                        <ReportingTab {...props} />
+                    <DotRouterTab tabTitle={
+                        <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
+                            { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
+                            Case Review
+                        </span>
+                    } dotPath=".finalize" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
+                        <CaseReviewDataStore>
+                            <CaseReviewTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                        </CaseReviewDataStore>
                     </DotRouterTab>
                 </DotRouter>
                 : null }
@@ -433,12 +451,13 @@ class DotRouter extends React.PureComponent {
     }
 }
 
-function DotRouterTab(props) {
+const DotRouterTab = React.memo(function DotRouterTab(props) {
     const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
 
     const onClick = useCallback(function(){
         const targetDotPath = prependDotPath + dotPath;
-        navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
+        const navOpts = { "skipRequest": true, "replace": true, "dontScrollToTop": true };
+        navigate("#" + targetDotPath, navOpts, function(){
             // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
             // layout.animateScrollTo(targetDotPath);
         });
@@ -464,7 +483,16 @@ function DotRouterTab(props) {
             </div>
         </div>
     );
-}
+}, function(prevProps, nextProps){
+    // Custom equality comparison func.
+    // Skip comparing the hardcoded `prependDotPath` & `dotPath` -- revert if those props become dynamic.
+    // Also skip checking for props.children, since that is rendered by `DotRouter` and not this `DotRouterTab`.
+    const compareKeys = ["disabled", "active", "tabTitle"];
+    const anyChanged = _.any(compareKeys, function(k){
+        return prevProps[k] !== nextProps[k];
+    });
+    return !anyChanged;
+});
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context, currFamily, secondary_families = [] } = props;
@@ -714,10 +742,10 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         // original_pedigree: { display_title: pedFileName } = {},
         display_title: familyDisplayTitle
     } = family;
-    const onClick = useMemo(function(){
-        return function(evt){
-            navigate(`${vcfAtId}#provenance`, { replace: true });
-        };
+
+    const onClick = useCallback(function(evt){
+        evt.stopPropagation();
+        navigate(`${vcfAtId}#provenance`, { replace: true });
     }, []);
 
     const title = (
@@ -741,13 +769,13 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                 <span className="pull-right">3/28/20</span>
             </div> */}
             <div className="tab-inner-container card">
-                <h4 className="card-header section-header">Quality Control Metrics (QC)</h4>
+                <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
                 <div className="card-body">
                     <BioinfoStats {...{ caseSample, sampleProcessing }} />
                 </div>
             </div>
             <div className="tab-inner-container card">
-                <h4 className="card-header section-header">Multisample Analysis Table</h4>
+                <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
                 <div className="card-body family-index-0" data-is-current-family={true}>
                     { title }
                     <CaseSummaryTable {...family} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
@@ -757,7 +785,63 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     );
 });
 
+/**
+ * Handles tab switching between the SNV and CNV/SV tabs
+ */
+function FilteringTabWrapper(props) {
+    // const { snvFilterHrefAddon = "", svFilterHrefAddon = "" } = props;
+    const {
+        context, windowHeight, session, schemas,
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem,
+        snvFilterHrefAddon = "", svFilterHrefAddon = ""
+    } = props;
 
-function ReportingTab(props) {
-    return <h1>This is the reporting tab</h1>;
+    const defaultTab = (!snvFilterHrefAddon && svFilterHrefAddon) ? "CNVSV" : "SNV";
+    const [ currViewName, setCurrViewName ] = useState(defaultTab);
+
+    const currentTitle = currViewName === "SNV" ? "SNV" : "CNV / SV";
+
+    const commonProps = { context, windowHeight, session, schemas };
+
+    const svFilteringProps = {};
+
+    const snvFilteringProps = {
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem
+    };
+
+    return (
+        <React.Fragment>
+            <FilteringTabTableToggle {...{ currViewName, setCurrViewName }}/>
+            <div className="row mb-36 mt-0">
+                <h1 className="col my-0">
+                    {currentTitle} <span className="text-300">Variant Filtering and Technical Review</span>
+                </h1>
+            </div>
+            <div className={currViewName === "SNV" ? "" : "d-none"}>
+                <SelectedItemsController isMultiselect>
+                    <FilteringTab {...commonProps} {...snvFilteringProps } />
+                </SelectedItemsController>
+            </div>
+            <div className={currViewName === "CNVSV" ? "" : "d-none"}>
+                <CNVSVFilteringTab {...commonProps} {...svFilteringProps} />
+            </div>
+        </React.Fragment>
+    );
+}
+
+function FilteringTabTableToggle({ currViewName, setCurrViewName }) {
+    return (
+        <div className="card py-2 px-3 flex-row mb-3 filtering-tab-toggle">
+            <div onClick={currViewName !== "SNV" ? () => setCurrViewName("SNV"): undefined} className={`mr-2 text-600  ${currViewName === "SNV" ? "active unclickable": "clickable"}`}>
+                SNV Filtering
+            </div>
+            <div onClick={currViewName !== "CNVSV" ? () => setCurrViewName("CNVSV"): undefined} className={`text-600 ${currViewName === "CNVSV" ? "active unclickable": "clickable"}`}>
+                CNV / SV Filtering
+            </div>
+        </div>
+    );
 }

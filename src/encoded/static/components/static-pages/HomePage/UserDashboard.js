@@ -158,7 +158,7 @@ class ProjectFilterCheckbox extends React.PureComponent {
         const { isChanging } = this.state;
         return (
             <Checkbox disabled={isContextLoading} onChange={this.onChange} checked={checked}
-                labelClassName={"mb-0 text-400 px-2 py-3" + (isChanging ? " is-changing position-relative" : "")}>
+                labelClassName={"mb-0 px-2 py-3" + (isChanging ? " is-changing position-relative" : "")}>
                 <span className="text-small">
                     { isChanging ? <i className="icon icon-circle-notch icon-spin fas mr-07 text-small" /> : null }
                     { children }

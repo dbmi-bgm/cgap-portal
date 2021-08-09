@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
@@ -481,7 +481,7 @@ function InterpretationSpaceTabs(props) {
     );
 }
 
-class GenericInterpretationPanel extends React.Component {
+class GenericInterpretationPanel extends React.PureComponent {
     constructor(props) {
         super(props);
 
@@ -848,12 +848,12 @@ function ACMGPicker(props) {
             </div>
 
             { autoClassification ? (
-                <>
+                <React.Fragment>
                     <label className="w-100 text-small">CGAP&apos;s Classification:</label>
                     <div className="w-100 mb-08 ml-1">
                         <i className="status-indicator-dot ml-1 mr-1" data-status={autoClassification} />{autoClassification}
                     </div>
-                </>)
+                </React.Fragment>)
                 : null }
         </React.Fragment>
     );
@@ -918,13 +918,17 @@ function GenericInterpretationSubmitButton(props) {
 function UnsavedInterpretationModal(props) {
     const { href, setIsSubmitting } = props;
 
-    function discardAndNavigate() {
+    const onHide = useCallback(function(){
+        setIsSubmitting(false, null, false);
+    });
+
+    const discardAndNavigate = useCallback(function(){
         setIsSubmitting(false, () => navigate(href, { 'skipRequest' : false, 'replace': false }), false);
-    }
+    });
 
     return (
         <React.Fragment>
-            <Modal show={true} onHide={() => setIsSubmitting(false, null, false)} centered>
+            <Modal show={true} onHide={onHide} centered>
                 <Modal.Header closeButton style={{ backgroundColor: "#bdcbd9", color: "#1e435e" }}>
                     <Modal.Title>
                         <div className="modal-title font-italic text-600 h4">
@@ -938,12 +942,12 @@ function UnsavedInterpretationModal(props) {
                     <div className="text-small text-center mb-2">Are you sure you want to navigate away?</div>
                 </Modal.Body>
                 <Modal.Footer className="d-flex" style={{ backgroundColor: "#eff0f0" }}>
-                    <Button className="flex-grow-1" variant="danger" onClick={discardAndNavigate}>
+                    <button type="button" className="btn btn-danger flex-grow-1" onClick={discardAndNavigate}>
                         Navigate Away & Discard Notes
-                    </Button>
-                    <Button className="flex-grow-1" variant="primary" onClick={() => setIsSubmitting(false, null, false)}>
+                    </button>
+                    <button type="button" className="btn btn-primary flex-grow-1" variant="primary" onClick={onHide}>
                         Back to Notes
-                    </Button>
+                    </button>
                 </Modal.Footer>
             </Modal>
         </React.Fragment>

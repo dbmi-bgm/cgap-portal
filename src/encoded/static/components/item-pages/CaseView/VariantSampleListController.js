@@ -84,7 +84,8 @@ export class VariantSampleListController extends React.PureComponent {
         console.info("Fetching VariantSampleList ...");
         const vslFetchCallback = (resp) => {
             console.info("Fetched VariantSampleList", resp);
-            const { "@id": vslID, error = null } = resp;
+            const [ variantSampleListItem ] = resp;
+            const { "@id": vslID, error = null } = variantSampleListItem;
 
             if (scopedRequest !== this.currentRequest) {
                 // Request superseded, cancel it.
@@ -101,7 +102,7 @@ export class VariantSampleListController extends React.PureComponent {
             this.setState(function({ refreshCount: prevRefreshCount, variantSampleListItem: prevItem }){
                 const { "@id": prevAtID = null } = prevItem || {};
                 const nextState = {
-                    "variantSampleListItem": resp,
+                    variantSampleListItem,
                     "isLoadingVariantSampleListItem": false
                 };
                 if (prevAtID && vslID !== prevAtID) {
@@ -115,10 +116,39 @@ export class VariantSampleListController extends React.PureComponent {
         // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
         this.setState({ "isLoadingVariantSampleListItem": true }, () => {
             scopedRequest = this.currentRequest = ajax.load(
-                variantSampleListID + "?datastore=database",
+                "/embed",
                 vslFetchCallback,
-                "GET",
-                vslFetchCallback
+                "POST",
+                vslFetchCallback,
+                JSON.stringify({
+                    "ids": [ variantSampleListID ],
+                    "fields": [
+
+                        // Fields for list view (for InterpretationTab & CaseReviewTab)
+
+                        "@id",
+                        "variant_samples.date_selected",
+                        // For future:
+                        // "variant_samples.filter_blocks_request_at_time_of_selection",
+                        // "variant_samples.selected_by.@id",
+                        // "variant_samples.selected_by.display_title",
+                        "variant_samples.variant_sample_item.@id",
+                        "variant_samples.variant_sample_item.display_title",
+                        "variant_samples.variant_sample_item.variant.@id",
+                        "variant_samples.variant_sample_item.variant.display_title",
+                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.@id",
+                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title",
+                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript",
+                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
+                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
+                        "variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",
+                        "variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
+                        "variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
+
+                        // VariantSampleItem Notes (for CaseReviewTab)
+                        ...variantSampleListItemNoteEmbeds
+                    ]
+                })
             );
         });
     }
@@ -149,3 +179,32 @@ export class VariantSampleListController extends React.PureComponent {
     }
 
 }
+
+/**
+ * List of Note item fields to embed from VariantSampleList Items.
+ * To be used as a part of `fields` /embed payload(s).
+ */
+export const variantSampleListItemNoteEmbeds = [
+    "variant_samples.variant_sample_item.interpretation.@id",
+    "variant_samples.variant_sample_item.interpretation.uuid",
+    "variant_samples.variant_sample_item.interpretation.note_text",
+    "variant_samples.variant_sample_item.interpretation.status",
+    "variant_samples.variant_sample_item.interpretation.classification",
+
+    "variant_samples.variant_sample_item.discovery_interpretation.@id",
+    "variant_samples.variant_sample_item.discovery_interpretation.uuid",
+    "variant_samples.variant_sample_item.discovery_interpretation.note_text",
+    "variant_samples.variant_sample_item.discovery_interpretation.status",
+    "variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy",
+    "variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy",
+
+    "variant_samples.variant_sample_item.variant_notes.@id",
+    "variant_samples.variant_sample_item.variant_notes.uuid",
+    "variant_samples.variant_sample_item.variant_notes.note_text",
+    "variant_samples.variant_sample_item.variant_notes.status",
+
+    "variant_samples.variant_sample_item.gene_notes.@id",
+    "variant_samples.variant_sample_item.gene_notes.uuid",
+    "variant_samples.variant_sample_item.gene_notes.note_text",
+    "variant_samples.variant_sample_item.gene_notes.status",
+];

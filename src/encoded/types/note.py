@@ -1,3 +1,5 @@
+import datetime
+from snovault.util import debug_log
 from snovault import (
     abstract_collection,
     calculated_property,
@@ -22,6 +24,10 @@ class Note(Item):
     base_types = ['Note'] + Item.base_types
     schema = load_schema('encoded:schemas/note.json')
     embedded_list = []
+
+
+
+
 
 
 @collection(

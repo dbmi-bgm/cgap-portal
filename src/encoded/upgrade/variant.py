@@ -18,3 +18,19 @@ def variant_1_2(value, system):
 
     if 'csq_clinvar_clnhgvs' in value:
         del value['csq_clinvar_clnhgvs']
+
+
+
+@upgrade_step('variant_sample_list', '1', '2')
+def variant_sample_list_1_2(value, system):
+    """
+    Update `variant_samples.userid` to `variant_samples.selected_by`.
+    We now can embed the user as linkto so simply calling it userid makes less sense.
+    We by default don't have `selected_by` in elasticsearch embedded_list, but can get
+    it when needed through the `/embed` API.
+    """
+
+    for vs_object in value.get("variant_samples", []):
+        if "userid" in vs_object:
+            vs_object["selected_by"] = vs_object["userid"]
+            del vs_object["userid"]

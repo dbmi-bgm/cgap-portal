@@ -25,6 +25,12 @@
             "type": "string",
             "linkTo": "Note"
         },
+        "superseding_note": {
+            "title": "Superseding Note",
+            "description": "Newer note from same Project, if any",
+            "type": "string",
+            "linkTo": "Note"
+        },
         "note_text": {
             "title": "Note Text",
             "type": "string",
@@ -34,10 +40,14 @@
             "title": "Approved By",
             "type": "string",
             "description": "The user who approved this note for a case",
-            "linkTo": "User"
+            "linkTo": "User",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "permission": "restricted_fields"
         },
-        "approved_date": {
-            "title": "Approved At",
+        "date_approved": {
+            "title": "Time of Approval",
             "type": "string",
             "description": "Timestamp when this note was approved for a case",
             "anyOf": [
@@ -47,7 +57,11 @@
                 {
                     "format": "date"
                 }
-            ]
+            ],
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "permission": "restricted_fields"
         },
         "associated_items": {
             "title": "Associated Items",
