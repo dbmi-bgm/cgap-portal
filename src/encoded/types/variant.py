@@ -947,6 +947,13 @@ def get_spreadsheet_mappings():
             return canonical_transcript.get("csq_feature", None)
         return None
 
+    def most_severe_transcript_csq_feature(variant_sample):
+        ''' Returns `variant.transcript.csq_feature` '''
+        most_severe_transcript = get_most_severe_transcript(variant_sample)
+        if most_severe_transcript:
+            return most_severe_transcript.get("csq_feature", None)
+        return None
+
     # TODO: Consider making `canonical_transcript_location` + `most_severe_transcript_location` as calculated properties
     def location_name(transcript):
         most_severe_consequence = get_most_severe_consequence(transcript)
@@ -1018,9 +1025,9 @@ def get_spreadsheet_mappings():
         # ONLY FOR variant.transcript.csq_canonical=true
         ("Canonical transcript coding effect",      "variant.transcript.csq_consequence.display_title",             "Coding effect of variant in canonical transcript"),
         # ONLY FOR variant.transcript.csq_most_severe=true
-        ("Most severe transcript ID",               "variant.transcript.csq_feature",                               "Ensembl ID of transcript with worst annotation for variant"),
+        ("Most severe transcript ID",               most_severe_transcript_csq_feature,                             "Ensembl ID of transcript with worst annotation for variant"),
         # ONLY FOR variant.transcript.csq_most_severe=true; use csq_intron if csq_exon not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
-        ("Most severe transcript location",         most_severe_transcript_location,                            "Number of exon or intron variant is located in most severe transcript, out of total"),
+        ("Most severe transcript location",         most_severe_transcript_location,                                "Number of exon or intron variant is located in most severe transcript, out of total"),
         # ONLY FOR variant.transcript.csq_most_severe=true
         ("Most severe transcript coding effect",    "variant.transcript.csq_consequence.display_title",             "Coding effect of variant in most severe transcript"),
         ("Inheritance modes",                       "inheritance_modes",                                            "Inheritance Modes of variant"),
