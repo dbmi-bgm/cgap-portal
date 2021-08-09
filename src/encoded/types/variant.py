@@ -2,6 +2,7 @@ import datetime
 import io
 import json
 import os
+from functools import lru_cache
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
     HTTPBadRequest,
@@ -899,52 +900,116 @@ class VariantSampleList(Item):
 
 
 
-spreadsheet_field_mappings = [
-    # Column Key                    # Column Title                                          # CGAP Field (if not custom calc)                           # Description
-    ("genes",                       "Gene",                                                 "variant.genes.genes_most_severe_gene.display_title",       "HGNC gene symbol"), # gene symbol from Ensembl rather than HGNC - we don't pull in the HGNC symbol
-    ("seq_region_name",             "Chromosome",                                           "variant.CHROM",                                            "Chromosome number or symbol"), # see below
-    ("start",                       "Genomic coordinate HG19",                              "variant.hg19_pos",                                         "HG19 coordinate of variant"),
-    ("hg38",                        "Genomic coordinate HG38",                              "variant.POS",                                              "HG38 coordinate of variant"), # I suggest switching these column names to "start" and "hg19" so that hg38 is in the "start" column instead
-    ("ref",                         "Ref",                                                  "variant.REF",                                              "Reference nucelotide"),
-    ("alt",                         "Alt",                                                  "variant.ALT",                                              "Alternative nucleotide"),
-    ("proband_genotype",            "Proband Genotype",                                     "associated_genotype_labels.proband_genotype_label",        "Proband nucleotides"),
-    ("maternal_genotype",           "Maternal Genotype",                                    "associated_genotype_labels.mother_genotype_label",         "Maternal nucleotides"),
-    ("paternal_genotype",           "Paternal Genotype",                                    "associated_genotype_labels.father_genotype_label",         "Paternal nucleotides"),
-    ("cpos_canonical",              "cPos",                                                 "variant.genes.genes_most_severe_hgvsc",                    "HGVS cPos nomenclature"),
-    ("ppos_canonical",              "pPos",                                                 "variant.genes.genes_most_severe_hgvsp",                    "HGVS pPos nomenclature"),
-    ("worst_annotation",            "Worst Annotation",                                     "variant.transcript.csq_consequence.display_title",         "Worst variant annotation class, as in the \"RefSeq Transcript (Sev)\""),
-    ("refseq_transcript_worst",     "RefSeq Transcript (Worst Annotation)",                 "variant.transcript.csq_mane",                              "Accession # of RefSeq protein transcript with most severe class of variant"), # only transcript where csq_most_severe=true
-    ("variant_exon_intron_worst",   "Variant Exon/Intron # (Worst Annotation)",             "variant.transcript.csq_exon",                              "In transcript with most severe variant annotation, number of exon or intron in which variant is located"), # 1. we have this as a fraction (e.g. 2/27) so this and col below can be combined
-    ("total_exon_intron_worst",     "Total Exons (Worst Annotation)",                       None,                                                       "Exons in transcript with most severe variant annotation"), # 2. only transcript where csq_most_severe=true
-    ("refseq_transcript_canonical", "RefSeq Transcript (Canonical)",                        "variant.transcript.csq_mane",                              "Accession # of canonical RefSeq protein transcript"), # only transcript where csq_canonical=true
-    ("variant_exon_intron_canonical", "Variant Exon/Intron # (Canonical)",                  "variant.transcript.csq_exon",                              "In canonical transcript, number of exon or intron in which variant is located"), # 1. we have this as a fraction (e.g. 2/27) so this and col below can be combined
-    ("total_exon_intron_canonical", "Total Exons (Canonical)",                              None,                                                       "Exons in canonical transcript"), # 2. only transcript where csq_canonical=true
-    ("allelic_depth",               "Var Allele Count",                                     "AD_ALT",                                                   "# of reads with variant allele"),
-    ("read_depth",                  "Tot Allele Count",                                     "DP",                                                       "# of total reads at varaint position"),
-    ("Strand Odds Ratio",           "Strand Bias Odds Ratio",                               "FS",                                                       "\"StrandOddsRAatio\" from INFO field in VCF"), # this uses FisherStrand from GATK instead of StrandOddsRatio so is slightly different but still represents Strand Bias
-    ("Mapping Quality",             "Mapping Quality Score",                                None,                                                       "\"MQ\" from VCF"), # in the schema it looks like we only have GQ?
-    ("Variant Call Quality",        "Variant Call Quality Score",                           "QUAL",                                                     "\"QUAL\" in VCF"),
-    ("af",                          "GnomAD AF (overall)",                                  None,                                                       "Allele frequency in gnomAD including exomes and genomes"), # not sure we have this - calculate from g_ac + e2_ac / g_an + e2_an?
-    ("exome_af",                    "GnomAD AF (exomes)",                                   "variant.csq_gnomade2_af",                                  "Allele frequency in gnomAD exomes"),
-    ("genome_af",                   "GnomAD AF (genomes)",                                  "variant.csq_gnomadg_af",                                   "Allele frequency in gnomAD genomes"),
-    ("popmax",                      "gnomAD PopMax #1",                                     "variant.csq_gnomadg_af_popmax",                            "Highest allele frequency by ancestral group"),
-    ("popmax_af",                   "gnomAD PopMax #1 Ancestry",                            None,                                                       "Ancestral group associated with gnomaD PopMax #1"), # this would have to be calculated
-    ("omim_ids",                    "OMIM Phenotype(s)",                                    None,                                                       "Phenotypes associated with gene in OMIM database"), # I think we only have OMIM ID
-    ("pli",                         "pLI",                                                  None,                                                       "Probability that a given gene falls into the Haploinsufficient category, therefore is intolerant of loss-of-function variation"), # not sure if we have this
-    ("hgmd_tags",                   "HGMD Classification",                                  None,                                                       "(need to specify field from HGMD)"), # not sure we have this - gwas catalog instead?
-    ("hgmd_pmids",                  "HGMD Associated PMIDs",                                None,                                                       "PMIDs of publications associated with variant in HGMD"), # not sure we have this - gwas catalog instead?
-    ("clinVar",                     "ClinVar Link",                                         "variant.csq_clinvar",                                      "Link to ClinVar search for variant"), # use link in prop field
-    ("conservation",                "Evolutionary Conservation (amino acid)",               None,                                                       ""),
-    ("polyphen",                    "Polyphen",                                             "variant.csq_polyphen2_hvar_pred",                          "Polyphen classification"),
-    ("sift",                        "SIFT",                                                 "variant.csq_sift_pred",                                    "SIFT classification"),
-    ("mutation_taster",             "Mutation Taster",                                      None,                                                       "Mutation Taster classification"), # N/A
-    ("revel",                       "REVEL",                                                "variant.csq_revel_score",                                  "REVEL score"),
-    ("fathmm",                      "FATHMM",                                               None,                                                       "FATHMM classification"), # N/A
-    ("cadd_phred",                  "CADD",                                                 None,                                                       "CADD score"),
-    ("mutation_assessor",           "MutationAssessor",                                     None,                                                       "MutationAssessor score"),
-    ("dist_from_exon_worst",        "Distance From Intron/Exon Boundary (Worst Annotation)", None,                                                      "In transcript with most severe variant annotation, the distance in base pairs from nearest intron/exon border in the transcript containing the most damaging variant annotation"),
-    ("dist_from_exon_canonical",    "Distance From Intron/Exon Boundary (Canonical)",       None,                                                       "In the canonical transcript the distance in base pairs from nearest intron/exon border in the transcript containing the most damaging variant annotation")
-]
+
+
+
+############################
+## Spreadsheet Generation ##
+############################
+
+
+
+def get_spreadsheet_mappings():
+
+    @lru_cache(maxsize=1)
+    def get_canonical_transcript(variant_sample):
+        '''Create+call cloned copy of this function wrapped in `@lru_cache(maxsize=1)`'''
+        for transcript in variant_sample.get("transcript", []):
+            if transcript.get("csq_canonical", False) == True:
+                return transcript
+        return None
+
+    @lru_cache(maxsize=1)
+    def get_most_severe_transcript(variant_sample):
+        for transcript in variant_sample.get("transcript", []):
+            if transcript.get("csq_canonical", False) == True:
+                return transcript
+        return None
+
+    def canonical_csq_feature(variant_sample):
+        ''' Returns `variant.transcript.csq_feature` '''
+        canonical_transcript = get_canonical_transcript(variant_sample)
+        if canonical_transcript:
+            return canonical_transcript.get("csq_feature", None)
+        return None
+
+    return [
+    #   Column Title                                CGAP Field (if not custom function)                             Description
+        ("Chrom (hg38)",                            "variant.CHROM",                                                "Chromosome (hg38 assembly)"),
+        ("Pos (hg38)",                              "variant.POS",                                                  "Start Position (hg38 assembly)"),
+        ("Chrom (hg19)",                            "variant.hg19_chr",                                             "Chromosome (hg19 assembly)"),
+        ("Pos (hg19)",                              "variant.hg19_pos",                                             "Start Position (hg19 assembly)"),
+        ("Ref",                                     "variant.REF",                                                  "Reference Nucleotide"),
+        ("Alt",                                     "variant.ALT",                                                  "Alternate Nucleotide"),
+        ("Proband genotype",                        "associated_genotype_labels.proband_genotype_label",            "Proband Genotype"),
+        ("Mother genotype",                         "associated_genotype_labels.mother_genotype_label",             "Mother Genotype"),
+        ("Father genotype",                         "associated_genotype_labels.father_genotype_label",             "Father Genotype"),
+        ("HGVSG",                                   "variant.hgvsg",                                                "HGVS genomic nomenclature"),
+        ("HGVSC",                                   "variant.genes.genes_most_severe_hgvsc",                        "HGVS cPos nomenclature"),
+        ("HGVSP",                                   "variant.genes.genes_most_severe_hgvsp",                        "HGVS pPos nomenclature"),
+        ("dbSNP ID",                                "variant.ID",                                                   "dbSNP ID of variant"),
+        ("Genes",                                   "variant.genes.genes_most_severe_gene.display_title",           "Gene symbol(s)"),
+        ("Gene type",                               "variant.genes.genes_most_severe_gene.gene_biotype",            "Type of Gene"),
+        # ONLY FOR variant.transcript.csq_canonical=true
+        ("Canonical transcript ID",                 canonical_csq_feature,                                          "Ensembl ID of canonical transcript of gene variant is in"),
+        # ONLY FOR variant.transcript.csq_canonical=true; use `variant.transcript.csq_intron` if `variant.transcript.csq_exon` not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
+        ("Canonical transcript location",           None,                                                           "Number of exon or intron variant is located in canonical transcript, out of total"),
+        # ONLY FOR variant.transcript.csq_canonical=true
+        ("Canonical transcript coding effect",      "variant.transcript.csq_consequence.display_title",             "Coding effect of variant in canonical transcript"),
+        # ONLY FOR variant.transcript.csq_most_severe=true
+        ("Most severe transcript ID",               "variant.transcript.csq_feature",                               "Ensembl ID of transcript with worst annotation for variant"),
+        # ONLY FOR variant.transcript.csq_most_severe=true; use csq_intron if csq_exon not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
+        ("Most severe transcript location",         "variant.transcript.csq_exon | variant.transcript.csq_intron",  "Number of exon or intron variant is located in most severe transcript, out of total"),
+        # ONLY FOR variant.transcript.csq_most_severe=true
+        ("Most severe transcript coding effect",    "variant.transcript.csq_consequence.display_title",             "Coding effect of variant in most severe transcript"),
+        ("Inheritance modes",                       "inheritance_modes",                                            "Inheritance Modes of variant"),
+        ("NovoPP",                                  "novoPP",                                                       "Novocaller Posterior Probability"),
+        ("Cmphet mate",                             "cmphet.comhet_mate_variant",                                   "Variant ID of mate, if variant is part of a compound heterozygous group"),
+        ("Variant Quality",                         "QUAL",                                                         "Variant call quality score"),
+        ("Genotype Quality",                        "GQ",                                                           "Genotype call quality score"),
+        ("Strand Bias",                             "FS",                                                           "Strand bias estimated using Fisher's exact test"),
+        ("Allele Depth",                            "AD_ALT",                                                       "Number of reads with variant allele"),
+        ("Read Depth",                              "DP",                                                           "Total number of reads at position"),
+        ("clinvar ID",                              "variant.csq_clinvar",                                          "Clinvar ID of variant"),
+        ("gnomADv3 total AF",                       "variant.csq_gnomadg_af",                                       "Total allele frequency in gnomad v3 (genomes)"),
+        ("gnomADv3 popmax AF",                      "variant.csq_gnomadg_af_popmax",                                "Max. allele frequency in gnomad v3 (genomes)"),
+        # Name of population where `csq_gnomadg_af-<***> == csq_gnomadg_af_popmax`; use name in title (e.g. African-American/African)
+        ("gnomADv3 popmax population",              None,                                                           "Population with max. allele frequency in gnomad v3 (genomes)"),
+        ("gnomADv2 exome total AF",                 "variant.csq_gnomade2_af",                                      "Total allele frequency in gnomad v2 (exomes)"),
+        ("gnomADv2 exome popmax AF",                "variant.csq_gnomade2_af_popmax",                               "Max. allele frequency in gnomad v2 (exomes)"),
+        # Name of population where `csq_gnomade2_af-<***> == csq_gnomade2_af_popmax`; use name in title (e.g. African-American/African)
+        ("gnomADv2 exome popmax population",        None,                                                           "Population with max. allele frequency in gnomad v2 (exomes)"),
+        ("GERP++",                                  "variant.csq_gerp_rs",                                          "GERP++ score"),
+        ("CADD",                                    "variant.csq_cadd_phred",                                       "CADD score"),
+        ("phyloP-30M",                              "variant.csq_phylop30way_mammalian",                            "phyloP (30 Mammals) score"),
+        ("phyloP-100V",                             "variant.csq_phylop100way_vertebrate",                          "phyloP (100 Vertebrates) score"),
+        ("phastCons-100V",                          "variant.csq_phastcons100way_vertebrate",                       "phastCons (100 Vertebrates) score"),
+        ("SIFT",                                    "variant.csq_sift_pred",                                        "SIFT prediction"),
+        ("PolyPhen2",                               "variant.csq_polyphen2_hvar_pred",                              "PolyPhen2 prediction"),
+        ("PrimateAI",                               "variant.csq_primateai_pred",                                   "Primate AI prediction"),
+        ("REVEL",                                   "variant.csq_revel_score",                                      "REVEL score"),
+        ("SpliceAI",                                "variant.spliceaiMaxds",                                        "SpliceAI score"),
+        ("LOEUF",                                   "variant.genes.genes_most_severe_gene.oe_lof_upper",            "Loss-of-function observed/expected upper bound fraction"),
+        ("RVIS (ExAC)",                             "variant.genes.genes_most_severe_gene.rvis_exac",               "RVIS (Residual Variation Intolerance Score) genome-wide percentile from ExAC"),
+        ("S-het",                                   "variant.genes.genes_most_severe_gene.s_het",                   "Estimates of heterozygous selection (source: Cassa et al 2017 Nat Genet doi:10.1038/ng.3831)"),
+        ("MaxEntScan",                              "variant.genes.genes_most_severe_maxentscan_diff",              "Difference in MaxEntScan scores (Maximum Entropy based scores of splicing strength) between Alt and Ref alleles"),
+        ("ACMG classification (curr)",              "interpretation.classification",                                "ACMG classification for variant in this case"),
+        ("ACMG rules (curr)",                       "interpretation.acmg_rules_invoked.acmg_rule_name",             "ACMG rules invoked for variant in this case"),
+        ("Clinical interpretation notes (curr)",    "interpretation.note_text",                                     "Clinical interpretation notes written for this case"),
+        ("Gene candidacy (curr)",                   "discovery_interpretation.gene_candidacy",                      "Gene candidacy level selected for this case"),
+        ("Variant candidacy (curr)",                "discovery_interpretation.variant_candidacy",                   "Variant candidacy level selected for this case"),
+        ("Discovery notes (curr)",                  "discovery_interpretation.note_text",                           "Gene/variant discovery notes written for this case"),
+        ("Variant notes (curr)",                    "variant_notes.note_text",                                      "Additional notes on variant written for this case"),
+        ("Gene notes (curr)",                       "gene_notes.note_text",                                         "Additional notes on gene written for this case"),
+        ("ACMG classification (prev)",              "variant.interpretations[0].classification",                    "ACMG classification for variant in previous cases"),
+        ("ACMG rules (prev)",                       "variant.interpretations[0].acmg",                              "ACMG rules invoked for variant in previous cases"),
+        ("Clinical interpretation (prev)",          "variant.interpretations[0].note_text",                         "Clinical interpretation notes written for previous cases"),
+        ("Gene candidacy (prev)",                   "variant.discovery_interpretations[0].gene_candidacy",          "Gene candidacy level selected for previous cases"),
+        ("Variant candidacy (prev)",                "variant.discovery_interpretations[0].variant_candidacy",       "Variant candidacy level selected for previous cases"),
+        ("Discovery notes (prev)",                  "variant.discovery_interpretations[0].note_text",               "Gene/variant discovery notes written for previous cases"),
+        ("Variant notes (prev)",                    "variant.variant_notes[0].note_text",                           "Additional notes on variant written for previous cases"),
+        ("Gene notes (prev)",                       "variant.genes.genes_most_severe_gene.gene_notes.note_text",    "Additional notes on gene written for previous cases"),
+    ]
 
 
 
