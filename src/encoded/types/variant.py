@@ -908,18 +908,32 @@ class VariantSampleList(Item):
 ## Spreadsheet Generation ##
 ############################
 
-
+def get_population_suffix_title_tuples():
+    return [
+        ("afr", "African-American/African"), 
+        ("ami", "Amish"),
+        ("amr", "Latino"),
+        ("asj", "Ashkenazi Jewish"),
+        ("eas", "East Asian"),
+        ("fin", "Finnish"),
+        ("mid", "Middle Eastern"),
+        ("nfe", "Non-Finnish European"),
+        ("oth", "Other Ancestry"),
+        ("sas", "South Asian")
+    ]
 
 def get_spreadsheet_mappings():
 
     def get_canonical_transcript(variant_sample):
-        for transcript in variant_sample.get("transcript", []):
+        variant = variant_sample.get("variant", {})
+        for transcript in variant.get("transcript", []):
             if transcript.get("csq_canonical", False) == True:
                 return transcript
         return None
 
     def get_most_severe_transcript(variant_sample):
-        for transcript in variant_sample.get("transcript", []):
+        variant = variant_sample.get("variant", {})
+        for transcript in variant.get("transcript", []):
             if transcript.get("csq_most_severe", False) == True:
                 return transcript
         return None
@@ -934,7 +948,15 @@ def get_spreadsheet_mappings():
             "LOW" : 2,
             "MODIFIER" : 3
         }
-        return next(sorted(csq_consequences, key=lambda x: impact_map[x["impact"]] if "impact" in x else 100 ))
+        most_severe_impact_val = 100
+        most_severe_consequence = None
+        for consequence in csq_consequences:
+            impact_val = impact_map[consequence["impact"]]
+            if impact_val < most_severe_impact_val:
+                most_severe_consequence = consequence
+                most_severe_impact_val = impact_val
+
+        return most_severe_consequence
 
 
     def canonical_transcript_csq_feature(variant_sample):
@@ -1015,6 +1037,28 @@ def get_spreadsheet_mappings():
             return None
         return most_severe_consequence["display_title"]
 
+    def gnomadv3_popmax_population(variant_sample):
+        variant = variant_sample.get("variant", {})
+        csq_gnomadg_af_popmax = variant.get("csq_gnomadg_af_popmax")
+        if not csq_gnomadg_af_popmax: # Return None for 0, also.
+            return None
+        for pop_suffix, pop_name in get_population_suffix_title_tuples():
+            pop_val = variant.get("csq_gnomadg_af-" + pop_suffix)
+            if pop_val is not None and pop_val == csq_gnomadg_af_popmax:
+                return pop_name
+        return None
+
+    def gnomadv2_popmax_population(variant_sample):
+        variant = variant_sample.get("variant", {})
+        csq_gnomade2_af_popmax = variant.get("csq_gnomade2_af_popmax")
+        if not csq_gnomade2_af_popmax: # Return None for 0, also.
+            return None
+        for pop_suffix, pop_name in get_population_suffix_title_tuples():
+            pop_val = variant.get("csq_gnomade2_af-" + pop_suffix)
+            if pop_val is not None and pop_val == csq_gnomade2_af_popmax:
+                return pop_name
+        return None
+
     def url_to_variantsample(variant_sample):
         # TODO: Prepend request hostname, scheme, etc.
         at_id = variant_sample["@id"]
@@ -1064,11 +1108,11 @@ def get_spreadsheet_mappings():
         ("gnomADv3 total AF",                       "variant.csq_gnomadg_af",                                       "Total allele frequency in gnomad v3 (genomes)"),
         ("gnomADv3 popmax AF",                      "variant.csq_gnomadg_af_popmax",                                "Max. allele frequency in gnomad v3 (genomes)"),
         # Name of population where `csq_gnomadg_af-<***> == csq_gnomadg_af_popmax`; use name in title (e.g. African-American/African)
-        ("gnomADv3 popmax population",              None,                                                           "Population with max. allele frequency in gnomad v3 (genomes)"),
+        ("gnomADv3 popmax population",              gnomadv3_popmax_population,                                     "Population with max. allele frequency in gnomad v3 (genomes)"),
         ("gnomADv2 exome total AF",                 "variant.csq_gnomade2_af",                                      "Total allele frequency in gnomad v2 (exomes)"),
         ("gnomADv2 exome popmax AF",                "variant.csq_gnomade2_af_popmax",                               "Max. allele frequency in gnomad v2 (exomes)"),
         # Name of population where `csq_gnomade2_af-<***> == csq_gnomade2_af_popmax`; use name in title (e.g. African-American/African)
-        ("gnomADv2 exome popmax population",        None,                                                           "Population with max. allele frequency in gnomad v2 (exomes)"),
+        ("gnomADv2 exome popmax population",        gnomadv2_popmax_population,                                     "Population with max. allele frequency in gnomad v2 (exomes)"),
         ("GERP++",                                  "variant.csq_gerp_rs",                                          "GERP++ score"),
         ("CADD",                                    "variant.csq_cadd_phred",                                       "CADD score"),
         ("phyloP-30M",                              "variant.csq_phylop30way_mammalian",                            "phyloP (30 Mammals) score"),
@@ -1091,6 +1135,7 @@ def get_spreadsheet_mappings():
         ("Discovery notes (curr)",                  "discovery_interpretation.note_text",                           "Gene/variant discovery notes written for this case"),
         ("Variant notes (curr)",                    "variant_notes.note_text",                                      "Additional notes on variant written for this case"),
         ("Gene notes (curr)",                       "gene_notes.note_text",                                         "Additional notes on gene written for this case"),
+        # TODO: For next 6, grab only from note from same project as user? From newest for which have view permission?
         ("ACMG classification (prev)",              "variant.interpretations.classification",                       "ACMG classification for variant in previous cases"), # First interpretation only
         ("ACMG rules (prev)",                       "variant.interpretations.acmg",                                 "ACMG rules invoked for variant in previous cases"), # First interpretation only
         ("Clinical interpretation (prev)",          "variant.interpretations.note_text",                            "Clinical interpretation notes written for previous cases"), # First interpretation only
@@ -1123,6 +1168,11 @@ def convert_variant_sample_item_to_sheet_dict(variant_sample_item, spreadsheet_m
     We assume we have @@embedded representation of VariantSample here.
     May need to request more fields.
     '''
+
+    print("ABD", variant_sample_item)
+
+    if not "@id" in variant_sample_item:
+        return None
 
     vs_sheet_dict = {} # OrderedDict() # Keyed by column title. Maybe OrderedDict not necessary now..
 
@@ -1186,7 +1236,12 @@ def stream_tsv_output(dictionaries_iterable, spreadsheet_mappings, file_format =
     del description_headers
 
     for vs_dict in dictionaries_iterable:
-        writer.writerow([ vs_dict.get(sm[0]) or 'N/A' for sm in spreadsheet_mappings ])
+        if vs_dict is None: # No view permissions (?)
+            row = [ "" for sm in spreadsheet_mappings ]
+            row[0] = "# Not Available"
+            writer.writerow(row)
+        else:
+            writer.writerow([ vs_dict.get(sm[0]) or 'N/A' for sm in spreadsheet_mappings ])
         yield line.read().encode('utf-8')
 
     # for summary_line in generate_summary_lines():
@@ -1255,6 +1310,9 @@ def variant_sample_list_spreadsheet(context, request):
         "variant.transcript.csq_exon",
         "variant.transcript.csq_intron"
     ]
+    for pop_suffix, pop_name in get_population_suffix_title_tuples():
+        fields_to_embed.append("variant.csq_gnomadg_af-" + pop_suffix)
+        fields_to_embed.append("variant.csq_gnomade2_af-" + pop_suffix)
     for column_title, cgap_field_or_func, description in spreadsheet_mappings:
         if isinstance(cgap_field_or_func, str):
             # We don't expect any duplicate fields (else would've used a set in place of list) ... pls avoid duplicates in spreadsheet_mappings.
@@ -1265,6 +1323,7 @@ def variant_sample_list_spreadsheet(context, request):
         We want to grab datastore=database version of Items here since is likely that user has _just_ finished making
         an edit when they decide to export the spreadsheet from the InterpretationTab UI.
         '''
+        #return get_item_or_none(request, vs_uuid, 'VariantSample', frame='embedded') 
         vs_embedding_instance = CustomEmbed(request, vs_uuid, embed_props={ "requested_fields": fields_to_embed })
         return vs_embedding_instance.result
 
