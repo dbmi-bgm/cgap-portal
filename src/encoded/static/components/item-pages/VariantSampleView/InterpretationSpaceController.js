@@ -230,7 +230,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                             throw new Error(resp);
                         }
                         console.log("Successfully linked note object to variant sample", resp);
-                        return ajax.promise(noteAtID + "?datastore=database", 'GET');
+                        return ajax.promise(newNoteID + "?datastore=database", 'GET');
                     })
                     .then((noteWithEmbeds) => {
                         console.log("Successfully retrieved @@embedded representation of note: ", noteWithEmbeds);

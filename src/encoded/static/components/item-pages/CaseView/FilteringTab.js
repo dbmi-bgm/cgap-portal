@@ -8,7 +8,7 @@ import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es
 
 import { FilteringTableFilterSetUI, FilterSetController, SaveFilterSetButtonController, SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI';
 import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
-import { Alerts } from '../../../../../../../ext-projects/shared-portal-components/es/components/ui/Alerts';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 /**
  * @todo maybe reuse somewhere
