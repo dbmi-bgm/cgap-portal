@@ -949,7 +949,7 @@ export default class App extends React.PureComponent {
              * via its `target` property.
              */
             currentRequestInThisScope.catch((err)=>{
-                console.log('ERRR', err);
+                console.error('App Navigate Error -', err);
                 this.setState(function({ slowLoad }){
                     if (!slowLoad) return null;
                     return { 'slowLoad' : false };
@@ -964,28 +964,30 @@ export default class App extends React.PureComponent {
                     fallbackCallback(err);
                 }
 
-                console.error('Error in App.navigate():', err);
-
-                if (err.status === 500){
+                if (err.code === 500){
                     analytics.exception('Server Error: ' + err.status + ' - ' + targetHref);
                 }
 
-                if (err.status === 404){
+                if (err.code === 404){
                     analytics.exception('Page Not Found - ' + targetHref);
                 }
 
-                if (err.message === 'HTTPForbidden'){
+                if (err.code === 403){
                     // An error may be thrown in Promise response chain with this message ("HTTPForbidden") if received a 403 status code in response
                     if (typeof callback === 'function'){
                         callback(err);
                     }
-                } else if (typeof err.status === 'number' && [502, 503, 504, 505, 598, 599, 444, 499, 522, 524].indexOf(err.status) > -1) {
+                } else if ({ 502:1, 503:1, 504:1, 505:1, 598:1, 599:1, 444:1, 499:1, 522:1, 524:1 }[err.code] > -1) {
                     // Bad connection
                     Alerts.queue(Alerts.ConnectionError);
-                    analytics.exception('Network Error: ' + err.status + ' - ' + targetHref);
+                    const msg = 'Network Error: ' + err.status + ' - ' + targetHref;
+                    analytics.exception(msg);
+                    console.warn(msg);
                 } else {
                     Alerts.queue(Alerts.ConnectionError);
-                    analytics.exception('Unknown Network Error: ' + err.status + ' - ' + targetHref);
+                    const msg = 'Unknown Network Error: ' + err.status + ' - ' + targetHref;
+                    analytics.exception(msg);
+                    console.err(msg);
                     // Unknown/unanticipated error: Bubble it up (won't break app).
                     throw err;
                 }

@@ -640,6 +640,22 @@
             "type": "boolean"
         }
     },
+    "columns": {
+        "institution": {
+            "title": "Institution"
+        },
+        "project": {
+            "title": "Project"
+        },
+        "project_roles.role": {
+            "title": "Project Role",
+            "default_hidden": true
+        },
+        "job_title": {
+            "title": "Job Title",
+            "default_hidden": true
+        }
+    },
     "facets": {
         "institution.display_title": {
             "title": "Institution"

@@ -15,16 +15,7 @@ $inner-tab-contents-full-height: calc(100vh - 216px);
 	min-height: $inner-tab-contents-full-height !important;
 }
 
-/***********************************************************
-Custom Classes & Styling for Item Pages (e.g. Experiment Sets)
-************************************************************/
 
-.item-page-container {
-	/** Override margin-bottom for margin pages so accession and title are close to each other **/
-	h1.page-title {
-		margin-bottom: 2px;
-	}
-}
 
 /*************************
         TabbedView
@@ -100,7 +91,6 @@ hr.tab-section-title-horiz-divider {
         }
         > label {
             margin-bottom: 0;
-            font-weight: 400;
         }
     }
 
@@ -470,54 +460,10 @@ $tabbar-height: 46px;
 
 
 /*************************
-    Item Page Headings
-**************************/
-
-
-.flexible-description-box {
-	box-sizing: border-box;
-	padding: 0;
-	margin: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	transition: height .4s;
-
-	.description-expand-button {
-		padding: 0px;
-		width: 24px;
-		height: 21px;
-		margin-left: 6px;
-		box-sizing: border-box;
-		border: none;
-		background: none;
-		outline: none;
-	}
-
-	p {
-		overflow: inherit;
-		text-overflow: inherit;
-		&:last-child {
-			margin-bottom : 0;
-		}
-	}
-}
-
-.flexcol-heading,
-.submission-page-heading {
-    position: relative;
-    background-color: #f4f4f4;
-
-    h1, h2, h3, h4, h5, h6 {
-        margin: 0;
-    }
-
-
-}
-
-
-/*************************
 		SUBMISSIONS
 **************************/
+
+/** TODO: perhaps move into own file **/
 
 // For submissions page headers
 h3.submission-subtitle {
@@ -526,11 +472,16 @@ h3.submission-subtitle {
 }
 
 .submission-page-heading {
-    /** Extends .flexible-description-box **/
+    position: relative;
+    background-color: #f4f4f4;
 	border-radius: 2px;
 	border: 1px solid #ddd;
 	min-height: 42px;
 	padding: 10px 15px 8px;
+
+	h1, h2, h3, h4, h5, h6 {
+        margin: 0;
+    }
 }
 
 .submission-btn {
@@ -1089,813 +1040,6 @@ i.status-indicator-dot {
 	}
 }
 
-/*** Partial or Expandable Lists ***/
-
-.expandable-list {
-	margin-bottom: 10px;
-
-	ul {
-		margin-bottom: 0px;
-	}
-
-}
-
-/*** Files In Set Table ***/
-
-$download-button-width : 100px;
-
-
-.files-in-set-table-title {
-	font-weight: 300;
-	padding-bottom: 10px;
-    margin-bottom: 2px;
-    border-bottom: 1px solid #f4f4f4;
-	margin-top: 20px;
-}
-
-/**********************************************************
-				Files in Set Table
-**********************************************************/
-
-.files-in-set-table {
-
-	margin-bottom: 20px;
-
-	.row {
-
-
-
-		> div {
-			padding-top: 5px;
-			padding-bottom: 5px;
-		}
-
-		h6.accession {
-			margin: 0;
-			font-size: 0.925rem;
-			font-weight: 400;
-			> a {
-				color: #777;
-				&:hover {
-					color: #000;
-				}
-			}
-		}
-
-		> .title {
-			vertical-align: middle;
-			text-align: left;
-			padding-top: 10px;
-		}
-
-		> .description {
-			padding-top: 1px;
-    		padding-bottom: 0px;
-		}
-
-		> .lab {
-			text-align: right;
-			.lab-icon {
-				&.no-lab {
-					opacity: 0.125;
-				}
-			}
-			a.lab-icon {
-				color: #555;
-				transition: color .5s;
-				&:hover {
-					color : #000;
-				}
-			}
-		}
-
-		> .submitter {
-			small {
-				line-height: 1rem;
-				color: #777;
-			}
-		}
-
-		> div.divider-column {
-			padding-bottom: 0;
-			padding-top: 0;
-			> .divider {
-				border-bottom: 1px solid #f4f4f4;
-				height: 1px;
-			}
-		}
-
-		&.header-row {
-			user-select: none;
-
-			> div {
-				font-weight: 500;
-			}
-			> div.divider-column > .divider {
-				border-bottom: 1px solid #ddd;
-			}
-			> .download-button-title {
-				> i.icon {
-					width: 32px;
-					text-align: center;
-				}
-				> span.file {
-					display: inline-block;
-					min-width: $download-button-width;
-					text-align: left;
-				}
-				> span.docs {
-					width : 33px;
-					margin-left: 6px;
-					display: inline-block;
-					text-align: center;
-				}
-			}
-		}
-
-		> .download-button{
-			position: relative;
-			z-index: 10;
-			> a.btn, > button.btn {
-				&.button-dl-doc {
-					margin-left: 5px;
-					&.disabled {
-						opacity: 0.33;
-					}
-				}
-				&.button-dl-file {
-					min-width: $download-button-width;
-				}
-			}
-
-		}
-
-	}
-}
-
-// Tablet & mobile screen size adjustments
-@include media-breakpoint-down(md){
-	.files-in-set-table .row > .download-button {
-		margin-bottom: -50px;
-	}
-}
-
-// Large screen adjustments
-@include media-breakpoint-up(lg){
-
-	.files-in-set-table-title {
-		margin-top: 20px;
-	}
-
-	.files-in-set-table {
-		.row {
-
-			> div, h6 {
-				line-height: 30px;
-			}
-
-			h6.accession {
-				text-align: right;
-			}
-
-
-
-			> .title {
-				padding-top: 5px;
-				padding-bottom: 5px;
-				text-align: right;
-			}
-
-			> .description {
-				min-height: 30px;
-				padding-top: 12px;
-				padding-bottom: 12px;
-				line-height: normal;
-			}
-
-			> .download-button {
-				height: 40px;
-                padding-top: 3px;
-                padding-bottom: 3px;
-			}
-
-		}
-	}
-	.files-in-set-table.smaller-version {
-		.title h6 {
-			margin: 0;
-		}
-	}
-}
-
-
-/**********************************************************
-				Formatted Info Panel/Block
-**********************************************************/
-
-// Mixin for top-left label. To be re-used in other areas.4s
-
-@mixin small-block-label(){
-	font-weight: 500;
-	color: #646464;
-	margin-bottom: 7px;
-	margin-top: 0px;
-
-	&:after {
-		content : "\f105";
-		font-family: "FontAwesome";
-		padding-left: 6px;
-	}
-}
-
-@mixin icon-container-child(){
-
-	.icon-container {
-		text-align: center;
-		padding-top: 4px;
-		font-size: 20px;
-		//margin-bottom: -10px;
-
-		&.col-xs-2 {
-			padding-right: 0px;
-			padding-left: 5px;
-		}
-	}
-
-}
-
-.formatted-info-panel {
-	padding : 0 10px 12px;
-	/* border-bottom: 1px solid #e2e2e2; */
-	margin-bottom: 8px;
-
-	/* Adjustments based on available props, ToDo: .no-title */
-
-	&.has-border {
-		padding : 8px 18px 15px;
-	}
-
-	&.no-icon {
-		padding : 0;
-		margin-bottom: 0;
-		&.loading {
-			min-height: 36.5px;
-		}
-	}
-
-	> h6 {
-		margin-left : -10px;
-		@include small-block-label();
-
-	}
-
-	.row .icon-container {
-		max-width: 50px;
-	}
-
-	h5 {
-		margin-bottom: 0;
-		margin-top: 2px;
-		font-weight: 600;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		word-break: normal;
-
-		a {
-			/* display: block; */
-			overflow: inherit;
-			text-overflow: inherit;
-		}
-
-		&.no-link {
-			font-weight: 500;
-		}
-
-	}
-
-	&.error-block.no-icon h5:before {
-		content: "\f06a";
-		font-family: FontAwesome;
-		margin-right: 6px;
-		color: #999;
-	}
-
-	div.details-col {
-
-		&.no-more-details {
-			h5.block-title {
-				margin-top: 8px;
-			}
-		}
-
-		div.more-details {
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-
-			&.error-message {
-				white-space: pre-line;
-				white-space: normal;
-				opacity: 0.5;
-			}
-
-			div.correspondence {
-				> ol, > ul {
-					padding-left: 25px;
-					> li.contact-person {
-						font-size: 0.925rem;
-						float: none;
-						clear: both;
-						> .pull-right {
-							max-width: 90%;
-						}
-					}
-				}
-			}
-		}
-
-	}
-
-	@include icon-container-child();
-
-}
-
-.formatted-info-panel,
-.formatted-info-panel-list {
-
-	&.formatted-wrapper {
-
-		ul {
-			margin-bottom: 0;
-			padding-left: 18px;
-		}
-
-		&.single-item {
-			ul {
-				margin-bottom: 1px;
-				margin-top: 7px;
-			}
-		}
-
-		.details {
-			> .details-row {
-				margin-top: 7px;
-			}
-		}
-
-		.label-col {
-			user-select: none;
-		}
-
-		.label-col span {
-			position: relative;
-			.icon.abstract-toggle {
-				cursor : pointer;
-				color : #888;
-				position: absolute;
-				left: -20px;
-				top: 2px;
-			}
-
-		}
-
-		@include icon-container-child();
-	}
-
-}
-
-
-
-/**********************************************************
-		     Embedded Static Sections
-**********************************************************/
-
-.extra-info-for-higlass-display {
-	/** This gets placed at top of embedded HiGlass displays, which have their own 10px padding. **/
-	margin-bottom: -6px;
-
-	display: flex;
-	flex-direction: row;
-
-	/** Keep section above padding/margins of HiGlassComponent **/
-	position: relative;
-	z-index: 5;
-
-	&.right-align {
-		flex-direction: row-reverse;
-	}
-
-	> .description {
-		flex: 1;
-		padding-top: 4px;
-		padding-bottom: 4px;
-	}
-
-	> .btn-container {
-		padding-left: 10px;
-	}
-}
-
-
-/**********************************************************
-					OverViewBody
-**********************************************************/
-
-@mixin overview-block-value-block {
-	background-color: #f8f8f8;
-	padding: 6px 12px;
-}
-
-.item-page-container {
-
-	.overview-blocks-header {
-		&.with-background {
-
-			background: #fbfbfb;
-			padding-left: 16px;
-			padding-right: 16px;
-			padding-bottom: 2px;
-			border: 1px solid #f4f4f4;
-			transition: background-color .5s, border-radius .5s, box-shadow .5s;
-
-			> .inner > .overview-blocks {
-				padding-bottom: 10px;
-			}
-
-			/** Cases when markdown parses out a single <span> instead of a <p> (when 1 markdown line) **/
-			> .inner > .static-section-header > div > span:only-child {
-				/* Imitate a <p> */
-				display: block;
-				margin-bottom: 10px;
-			}
-
-			&.is-closed {
-				background-color: #f4f4f4;
-				border-color: #eee;
-				border-radius: 3px;
-				transition: border-color .5s, background-color .5s, border-radius .5s, box-shadow .5s;
-				box-shadow: 0 4px 4px -4px rgba(0,0,0,0.25);
-			}
-		}
-
-		> h4.tab-section-title:first-child {
-			padding-top: 14px;
-			padding-bottom: 13px;
-			font-weight: 400;
-			user-select: none;
-			color: #000;
-		}
-
-		> h5.release-section-title:first-child {
-			font-weight: 450;
-			> span {
-				i.expand-icon,
-				i.title-icon {
-					margin-right: 12px;
-					font-size: 0.8rem;
-					position: relative;
-				}
-			}
-		}
-
-		> h3.tab-section-title:first-child {
-			padding-top: 19px;
-		}
-		> h3.tab-section-title:first-child, > h4.tab-section-title:first-child {
-
-			&.with-accent {
-
-				padding-left: 17px;
-				padding-right: 17px;
-				margin-left: -17px;
-				margin-right: -17px;
-				margin-top: -1px; // Account for border
-				margin-bottom: -3px;
-				padding-top: 14px;
-				padding-bottom: 14px;
-				//background-color: #22656d;
-				//color: #fff;
-				border-radius: 3px;
-				position: relative;
-				z-index: 2;
-
-			}
-
-
-			> span {
-				i.icon-caret-right, i.icon-angle-right {
-					opacity: 0.66;
-					transition: transform .5s, opacity .25s;
-					padding-left: 3px;
-					margin-left: 5px;
-					font-size: 1.125rem;
-				}
-				i.expand-icon,
-				i.title-icon {
-					margin-right: 12px;
-					font-size: 1rem;
-					position: relative;
-				}
-			}
-			&:hover > span {
-				i.icon-caret-right, i.icon-angle-right {
-					opacity: 1;
-				}
-			}
-		}
-
-		&.is-open {
-			> h4.tab-section-title:first-child {
-				border-radius: 0;
-				> span {
-					i.icon-caret-right, i.icon-angle-right {
-						opacity: 0.33;
-					}
-				}
-				&:hover > span {
-					i.icon-caret-right, i.icon-angle-right {
-						opacity: 1;
-					}
-				}
-			}
-		}
-
-
-		> .inner > .static-section-header > .extra-info-for-higlass-display {
-			margin-bottom: -4px;
-			> .description {
-				padding-top: 6px;
-				padding-bottom: 6px;
-			}
-		}
-
-	}
-
-	.supplementary-files-section-part {
-		//margin-top: 10px;
-		padding-top: 5px;
-		padding-bottom: 0px;
-		border-bottom: 1px solid #ccc;
-		> h4 {
-			padding-top: 10px;
-			padding-bottom: 0;
-			margin-top: 0;
-			margin-bottom: 0;
-			font-weight: 500;
-			i.icon-fw {
-				width: 16px;
-				margin-right: 5px;
-			}
-		}
-
-		> .description {
-			margin-left: 21px;
-			margin-bottom: 15px;
-			> p {
-				margin: 0;
-			}
-		}
-
-		> .table-for-collection {
-			margin-left: 21px;
-			overflow: hidden;
-		}
-
-		&[data-open="false"]{
-			border-bottom-color: #eee;
-			padding-top: 5px;
-			padding-bottom: 0px;
-			> h4 {
-				font-weight: 400;
-			}
-		}
-	}
-
-	.overview-blocks {
-		> div {
-			> .inner {
-				padding: 15px 0 5px;
-
-				.tooltip-info-container {
-					> span {
-						> i.icon-info-circle {
-							margin-left: 5px;
-						}
-					}
-				}
-
-				h5 {
-					margin-top: 0;
-					margin-bottom: 5px;
-					font-weight: 500;
-				}
-
-				ol.overview-list-elements-container,
-				ul.overview-list-elements-container {
-					margin-bottom: 0;
-					padding-left: 30px;
-				}
-
-				a.btn {
-					i.icon-external-link {
-						margin-left: 5px;
-						position: relative;
-						top: 1px;
-						&.small {
-							font-size: .65rem;
-							top: -1px;
-						}
-					}
-					i.icon-cloud-download,
-					i.icon-picture-o,
-					i.icon-file-pdf-o {
-						margin-right: 3px;
-					}
-					&.btn-block {
-						padding-left: 4px;
-						padding-right: 4px;
-					}
-					&.btn-sm {
-						padding-bottom: 4px; // Overrides 5
-					}
-				}
-
-				// Embedded Items w/ Attachments
-				.embedded-item-with-attachment {
-					background-color: #f8f8f8;
-					border-radius: $border-radius-base;
-					.link-to-item-col {
-						white-space: nowrap;
-						text-overflow: ellipsis;
-						overflow: hidden;
-						> .inner {
-							line-height: 28px;
-							> span, > a {
-								vertical-align: middle;
-							}
-							> a {
-								display: inline-block;
-								white-space: nowrap;
-								text-overflow: ellipsis;
-								overflow: hidden;
-								max-width: 100%;
-							}
-						}
-					}
-					.view-attachment-button-col {
-						padding-right: 4px;
-					}
-
-					&.is-image {
-						margin-left: -5px;
-						margin-right: -5px;
-						> .inner {
-							> a.image-wrapper {
-								display: block;
-								margin: 0 auto;
-							}
-							> .caption {
-								padding: 10px 0 5px;
-								font-style: italic;
-							}
-						}
-						img.embedded-item-image {
-							max-width: 100%;
-						}
-					}
-
-				}
-
-				> div.overview-single-element {
-					&.block {
-						padding: 0;
-						margin-bottom: 0;
-						&:not(.no-value){
-							margin-top: 10px;
-							@include overview-block-value-block;
-							i.icon-caret-right {
-								transition: opacity .25s, transform .5s;
-								padding-left: 3px;
-								margin-left: 5px;
-								opacity: 0.33;
-								&:not(.icon-rotate-90){
-									opacity: 0.66;
-								}
-								&:hover {
-									opacity: 1;
-								}
-							}
-						}
-					}
-				}
-
-
-				> div.overview-list-elements-container {
-					margin-top: 10px;
-
-					> div.overview-list-element {
-						@include overview-block-value-block;
-						margin-bottom: 5px;
-						&:last-child {
-							border-bottom: none;
-						}
-					}
-
-				}
-
-			}
-		}
-	}
-}
-
-/**********************************************************
-					AdjustableDividerRow
-**********************************************************/
-
-.adjustable-divider-row {
-	margin-left: 0;
-	margin-right: 0;
-	@include media-breakpoint-up(lg) {
-		> .left-panel {
-			padding-right: 10px;
-		}
-		> .right-panel {
-			padding-left: 10px;
-		}
-	}
-}
-
-/**********************************************************
-				Experiments Set View
-**********************************************************/
-
-.exp-table-section {
-
-	h3 {
-
-		span.exp-number {
-			padding-top: 5px;
-		}
-
-	}
-
-	.expset-higlass-panel {
-		@include media-breakpoint-up(lg){
-			margin-bottom: -20px;
-		}
-	}
-
-	/*
-	table tbody tr:first-child td {
-
-		&:nth-child(1),
-		&:nth-child(2) {
-			border-bottom-color: #c0c0c0;
-		}
-	}
-	*/
-}
-
-
-.exp-table-container {
-	overflow-x: auto;
-	display: block;
-}
-
-.draggable-border {
-	height: 100%;
-	padding-left: 5px;
-	padding-right: 5px;
-	position: absolute;
-	top: 0px;
-	cursor: ew-resize;
-	z-index: 5;
-	> .inner {
-		height: 100%;
-		width: 0;
-		border-left: 1px solid #eee;
-		> .drag-handle {
-			position: absolute;
-			left: 3px;
-			width: 5px;
-			background-color: transparent;
-			border-left: 1px solid #ddd;
-			border-right: 1px solid #ddd;
-		}
-	}
-	&:hover,
-	&.react-draggable-dragging {
-		> .inner {
-			border-color: #888;
-			box-shadow: 0 0 1px #999;
-			> .drag-handle {
-				border-color: #999;
-			}
-		}
-	}
-}
-
 
 /**********************************************************
 	Processing Summary Table (CaseView > Bioinfo Tab)
@@ -2227,7 +1371,7 @@ $download-button-width : 100px;
 				/* todo: consider using an h2 instead, as is 2.1rem by default (close to the 2rem set here) and */
 				/* possibly more semantically accurate (i.e. is a section title, not page title) (subjective) */
 				font-size: 2rem;
-				margin-bottom: 20px;
+				margin-bottom: 36px; /* matches padding-bottom of timeline/tabs nav */
 				margin-top: 0px;
 			}
 
@@ -2416,7 +1560,34 @@ $download-button-width : 100px;
 					}
 		
 				}
-			}	
+			}
+
+			/* Filtering Tab Specific styles */
+			&#case-info\.filtering {
+				// Styling overrides specific to embedded search table results for Structural Variants in case filtering
+				.embedded-search-container .search-view-controls-and-results[data-search-item-type="StructuralVariantSample"] {
+					.search-result-row.detail-closed .columns.result-table-row {
+						.search-result-column-block[data-field="display_title"][data-first-visible-column="true"] {
+							// Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate
+							padding-left: 0 !important; // important necessary to override default style (this is short term override/will be deleted soon so hopefully ok)
+						}
+					}
+				}
+
+				.filtering-tab-toggle {
+					width: max-content; 
+	
+					> div {
+						padding: 5px 40px;
+	
+						&.active {
+							background-color: lighten($primary, 40%);
+							color: $primary-dark;
+							border-radius: 0.4em;
+						} 
+					}
+				}
+			}
 		}
 	}
 	
@@ -2867,6 +2038,54 @@ $download-button-width : 100px;
 
 }
 
+/**********************************************************
+	CaseView -> InterpretationTab + CaseReviewTab
+**********************************************************/
+
+.variant-sample-selection {
+
+	h4.selected-vsl-title {
+		font-size: 1.275rem; /* Slight decrease from h4 default of 1.3rem */
+		i.icon {
+			font-size: 0.725em;
+		}
+		a + i.icon-pen {
+			color: transparent;
+		}
+		a:hover + i.icon-pen {
+			color: $gray-400;
+		}
+	}
+
+	.note-content-area {
+
+		margin-top: 12px;
+	
+		@include media-breakpoint-up(md){
+			min-height: 150px;
+			max-height: 270px;
+		}
+	
+		@include media-breakpoint-up(lg){
+			max-height: 400px;
+		}
+	
+		@include media-breakpoint-up(xl){
+			max-height: 500px;
+		}
+	
+		> .note-text-content {
+			border-radius: $border-radius-sm;
+			border: 1px solid #eee;
+			padding: 12px;
+			overflow: auto;
+			white-space: pre-wrap;
+		}
+	
+	}
+	
+}
+
 
 /**********************************************************
   HiGlass Views
@@ -3270,6 +2489,12 @@ $download-button-width : 100px;
 				}
 			}
 		}
+	}
+}
+
+@include media-breakpoint-up(lg){
+	.sv-browser-settings {
+		max-width: 215px;
 	}
 }
 

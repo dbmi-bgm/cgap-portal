@@ -131,7 +131,7 @@ Cypress.Commands.add('loginCGAP', function(options = { 'useEnvToken' : true, 'em
         "iss": "https://hms-dbmi.auth0.com/"
     };
 
-    jwt_token = jwt.sign(jwtPayload, new Buffer(auth0secret, 'base64'));
+    jwt_token = jwt.sign(jwtPayload, Buffer.from(auth0secret, 'utf-8'));
     expect(jwt_token).to.have.length.greaterThan(0);
     Cypress.log({
         'name' : "Login 4DN",

@@ -69,7 +69,7 @@ function ShowAllRunsCheckbox({ checked, onChange, disabled }){
     if (typeof checked === 'undefined') return null;
     return (
         <Checkbox checked={checked || checked === null} onChange={onChange} disabled={disabled || checked === null}
-            className="checkbox-container for-state-allRuns">
+            className="checkbox-container for-state-allRuns" name="allRuns">
             All Runs
         </Checkbox>
     );

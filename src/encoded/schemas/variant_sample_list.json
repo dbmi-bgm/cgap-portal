@@ -44,7 +44,7 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "1"
+            "default": "2"
         },
         "variant_samples": {
             "title": "Variant Samples",
@@ -64,12 +64,13 @@
                         "type": "string",
                         "description": "Stringified JSON representing the compound filter block request made when this Variant Sample was selected"
                     },
-                    "userid": {
-                        "title": "User ID",
+                    "selected_by": {
+                        "title": "Selector",
                         "type": "string",
-                        "description": "User ID of person who made this selection",
+                        "description": "Person who made this selection",
                         "serverDefault": "userid",
-                        "format": "uuid"
+                        "linkTo": "User",
+                        "permission": "restricted_fields"
                     },
                     "date_selected": {
                         "title": "Date Selected",
@@ -82,7 +83,8 @@
                             {
                                 "format": "date"
                             }
-                        ]
+                        ],
+                        "permission": "restricted_fields"
                     }
                 }
             }

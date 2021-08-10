@@ -40,7 +40,9 @@ export function EmbeddedItemSearchTable (props){
         rowHeight = 90, // Keep in sync w CSS
         openRowHeight = 90,
         tableColumnClassName: propTableColumnClassName,
-        facetColumnClassName: propFacetColumnClassName
+        facetColumnClassName: propFacetColumnClassName,
+        // Used for FacetList / ExtendedDescriptionPopover:
+        addToBodyClassList, removeFromBodyClassList
     } = props;
 
     const schemas = propSchemas || getSchemas() || null; // We might not have this e.g. in placeholders in StaticSections
@@ -61,6 +63,7 @@ export function EmbeddedItemSearchTable (props){
         onClearFiltersVirtual, isClearFiltersBtnVisible,
         aboveTableComponent, aboveFacetListComponent,
         embeddedTableHeader, embeddedTableFooter,
+        addToBodyClassList, removeFromBodyClassList,
         // TODO: belowTableComponent, belowFacetListComponent,
         filterFacetFxn, hideFacets,
         filterColumnFxn, hideColumns,

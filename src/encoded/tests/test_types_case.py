@@ -78,6 +78,7 @@ def test_case_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case)
     assert proband['vcf_file']['@id'] == file_id
     assert mother['vcf_file']['@id'] == file_id
 
+
 def test_case_sv_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
     file_id = file_vcf["@id"]
     testapp.patch_json(file_id, {"variant_type": "SV"}, status=200)
@@ -88,6 +89,7 @@ def test_case_sv_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_ca
     mother = testapp.get(mother_case["@id"]).json
     assert proband["structural_variant_vcf_file"]["@id"] == file_id
     assert mother["structural_variant_vcf_file"]["@id"] == file_id
+
 
 def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
     # add ann_vcf to sample_processing
@@ -100,6 +102,23 @@ def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case
     mother_sample_tag = "ext_id_003"
     assert proband['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(proband_sample_tag, file_acc)
     assert mother['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
+
+
+def test_case_sv_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
+    file_id = file_vcf["@id"]
+    testapp.patch_json(file_id, {"variant_type": "SV"}, status=200)
+    testapp.patch_json(
+        sample_proc_fam["@id"], {"processed_files": [file_id]}, status=200
+    )
+    proband = testapp.get(proband_case["@id"]).json
+    mother = testapp.get(mother_case["@id"]).json
+    file_acc = file_id.split('/')[2]
+    proband_sample_tag = "ext_id_006"
+    mother_sample_tag = "ext_id_003"
+    proband_flag = "CALL_INFO={}&file={}".format(proband_sample_tag, file_acc)
+    mother_flag = "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
+    assert proband['sv_initial_search_href_filter_addon'] == proband_flag
+    assert mother['sv_initial_search_href_filter_addon'] == mother_flag
 
 
 @pytest.fixture

@@ -76,7 +76,7 @@ describe('Case View - Initial', function () {
                 .should("have.text", "Filtering")
                 .click()
                 .should("have.class", "active").end()
-                .get("#case-info\\.filtering .embedded-search-container h1").contains("Variant Filtering and Technical Review").end()
+                .get("#case-info\\.filtering h1").contains("Variant Filtering and Technical Review").end()
                 .get("#case-info\\.filtering .above-variantsample-table-ui .blocks-container .filterset-block").should("have.length.greaterThan", 0);
         });
 
