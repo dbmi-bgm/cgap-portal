@@ -438,8 +438,8 @@ export default class App extends React.PureComponent {
         // Ensure this is a plain click
         if (nativeEvent.which > 1 || nativeEvent.shiftKey || nativeEvent.altKey || nativeEvent.metaKey) return;
 
-        // Skip links with a data-bypass attribute.
-        if (target.getAttribute('data-bypass')){
+        // Skip links with a data-bypass attribute or with download attribute.
+        if (target.getAttribute('data-bypass') !== null || target.getAttribute('download') !== null){
             return false;
         }
 
@@ -987,7 +987,7 @@ export default class App extends React.PureComponent {
                     Alerts.queue(Alerts.ConnectionError);
                     const msg = 'Unknown Network Error: ' + err.status + ' - ' + targetHref;
                     analytics.exception(msg);
-                    console.err(msg);
+                    console.error(msg);
                     // Unknown/unanticipated error: Bubble it up (won't break app).
                     throw err;
                 }
