@@ -196,7 +196,7 @@ class LuceneBuilder:
         if len(my_filters) == 0:
             return {}
         elif len(my_filters) == 1:  # see standard bool/match query
-            return {BOOL: {MUST: [{MATCH: {query_field: my_filters[0]}}]}}
+            return [{BOOL: {MUST: [{MATCH: {query_field: my_filters[0]}}]}}]
         else:
             sub_queries = {BOOL: {MUST: {BOOL: {SHOULD: []}}}}  # wrap SHOULD with MUST so the sub-clause is required
             for option in my_filters:  # see how to combine queries on the same field
@@ -597,24 +597,42 @@ class LuceneBuilder:
         }
 
     @classmethod
-    def handle_nested_filters_v2(cls, nested_filters, nested_query, es_mapping, key=MUST):
-        """ New version of 'handle_nested_filters' that works more intelligently now that
-            elasticsearch_dsl is gone.
-        """
-        nested_path_to_index_map = {}  # maps a nested path to it's index in nested_query
-        for field, query in nested_filters:
-            nested_path = find_nested_path(field, es_mapping)
+    def handle_nested_filters_v2(cls, must_nested_filters, must_not_nested_filters, es_mapping):
+        """ This function constructs a nested query from a base nested_query, passed by the caller.
 
-            # we've discovered a new nested path - must create a new sub-query
-            # for it where we will combine all selections on this path
+
+        """
+        # Build base query structure
+        nested_query = {
+            BOOL: {
+                MUST: [],
+                MUST_NOT: []
+            }
+        }
+
+        # maps a nested path to a 2-tuple of it's key, index
+        nested_path_to_index_map = {}
+
+        # if we only have 1 or the other
+        if must_nested_filters and not must_not_nested_filters:
+            filters_to_work_on = must_nested_filters
+            key = MUST
+        elif must_not_nested_filters and not must_nested_filters:
+            filters_to_work_on = must_not_nested_filters
+            key = MUST_NOT
+        else:
+            import pdb; pdb.set_trace()
+            filters_to_work_on = []
+            key = MUST
+
+        for field, query in filters_to_work_on:
+            nested_path = find_nested_path(field, es_mapping)
             if nested_path not in nested_path_to_index_map:
 
-                # set index in our tracking metadata
-                new_index = len(nested_query)
-                nested_path_to_index_map[nested_path] = new_index
+                # set in tracking
+                new_index = len(nested_query[BOOL][key])
+                nested_path_to_index_map[nested_path] = (key, new_index)
 
-                # build the query
-                # if we have >1 selection on this path, we must combine
                 if len(query) > 1:
                     combined_query = {
                         BOOL: {
@@ -641,21 +659,30 @@ class LuceneBuilder:
                                     )
                                 _sub_query = _sub_query[0]
                             combined_query[BOOL][key].append(_sub_query)
-                    nested_query.append(cls.build_nested_query(nested_path, combined_query))
+                    nested_query[BOOL][key].append(cls.build_nested_query(nested_path, combined_query))
                 else:
-                    nested_query.append(cls.build_nested_query(nested_path, query))
-
-            # we've seen this path before - must combine it with existing
-            # query however is needed
+                    nested_query[BOOL][key].append(cls.build_nested_query(nested_path, query))
             else:
-                path_index = nested_path_to_index_map[nested_path]
-                combined_query_clauses = nested_query[path_index][NESTED][QUERY][BOOL][key]
+                key, path_index = nested_path_to_index_map[nested_path]
+
+                # its possible we're combining with a different query type, in which case we can simply
+                # add these together
+                query_start = nested_query[path_index][NESTED][QUERY]
+                if isinstance(query_start, list):
+                    query_start += query
+                    continue
+
+                # its possible even though we've seen this path, we've seen a MUST
+                # but no MUST_NOT clause, so add it
+                if key not in query_start[BOOL]:
+                    query_start[BOOL][key] = []
+                combined_query_clauses = query_start[BOOL][key]
                 for sub_query in query:
                     if BOOL not in sub_query:
                         combined_query_clauses.append(sub_query)
                     else:
                         # can only contain one sub_query but does have list structure
-                        _sub_query = sub_query[BOOL][key]
+                        _sub_query = sub_query[BOOL][MUST]  # at this level, we are always using must
                         if isinstance(_sub_query, list):
                             if len(_sub_query) > 1:
                                 raise QueryConstructionException(
@@ -665,7 +692,6 @@ class LuceneBuilder:
                                 )
                             _sub_query = _sub_query[0]
                         combined_query_clauses.append(_sub_query)
-
         return nested_query
 
     @classmethod
@@ -725,10 +751,10 @@ class LuceneBuilder:
 
         # initialize filter hierarchy
         final_filters = {BOOL: {MUST: [f for _, f in must_filters], MUST_NOT: [f for _, f in must_not_filters]}}
-        nested_query = cls.handle_nested_filters_v2(must_filters_nested, [], es_mapping, key=MUST)
-        final_nested_query = cls.handle_nested_filters_v2(must_not_filters_nested, nested_query, es_mapping,
-                                                          key=MUST_NOT)
-        final_filters[BOOL][MUST] += final_nested_query
+
+        # Build nested queries
+        final_nested_query = cls.handle_nested_filters_v2(must_filters_nested, must_not_filters_nested, es_mapping)
+        final_filters[BOOL][MUST].append(final_nested_query)
         # cls.handle_nested_filters(must_filters_nested, final_filters, es_mapping, key=MUST)
         # cls.handle_nested_filters(must_not_filters_nested, final_filters, es_mapping, key=MUST_NOT)
 

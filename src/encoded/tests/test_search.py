@@ -814,12 +814,11 @@ class TestNestedSearch(object):
                 '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
             ]
 
-    def test_negative_search_on_clinic_notes(self, workbook, es_testapp):
+    def test_negative_search_on_hg_19(self, workbook, es_testapp):
         """ Do an OR search with hg19_post with a negative, should eliminate a variant """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_chrom=chr1'
                           '&hg19.hg19_pos!=12185955&debug=true').follow().json
-        import pdb; pdb.set_trace()
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
             assert variant['uuid'] in [
@@ -836,9 +835,9 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
         es_testapp.get('/search/?type=Variant'  # should give no results
-                    '&hg19.hg19_chrom=chr2'  # change should be sufficient for no results
-                    '&hg19.hg19_pos=12185955'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404).follow()
+                       '&hg19.hg19_chrom=chr2'  # change should be sufftest_search_nested_field_no_valueicient for no results
+                       '&hg19.hg19_pos=12185955'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow(status=404)
 
     @pytest.mark.skip  # re-enable once workbook inserts are built out more
     def test_and_search_that_matches_multiple(self, workbook, es_testapp):
@@ -890,8 +889,8 @@ class TestNestedSearch(object):
             should give no results (no matter the ordering) """
         #import pdb; pdb.set_trace()
         res = es_testapp.get('/search/?type=Variant'
-                       '&hg19.hg19_pos=No+value'
-                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow()
+                             '&hg19.hg19_pos=No+value'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow(status=404)
         es_testapp.get('/search/?type=Variant'
                        '&hg19.hg19_pos=No+value'
                        '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow(status=404)
@@ -909,28 +908,34 @@ class TestNestedSearch(object):
             you only want to consider items that have the field defined. Previously we would not enforce
             this and have queries like this match variants that do not have an hg19 field.
         """
-        es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos!=11720331'
-                    '&POS=88832', status=404)
-        es_testapp.get('/search/?type=Variant'
-                    '&POS=88832&hg19.hg19_pos!=11720331', status=404)
+        # es_testapp.get('/search/?type=Variant'
+        #                '&hg19.hg19_pos!=11720331'
+        #                '&POS=88832', status=404)  # searching a nested field also checks its existence
+        import pdb; pdb.set_trace()
         res = es_testapp.get('/search/?type=Variant'
-                          '&POS=88832&hg19.hg19_pos!=11720331&hg19.hg19_pos=No+value').follow().json
+                             '&POS=88832&hg19=No+value&debug').follow().json  # should match 1
+        import pdb;
+        pdb.set_trace()
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
+        es_testapp.get('/search/?type=Variant'
+                       '&POS=11720331&hg19.hg19_pos=11720331', status=404)
+        res = es_testapp.get('/search/?type=Variant'
+                             '&POS=11720331&hg19.hg19_pos=11780388').json
+        self.assert_length_is_expected(res, 1)
+        import pdb; pdb.set_trace()
 
     def test_search_nested_no_value_with_multiple_other_fields(self, workbook, es_testapp):
         """ Tests that combining a 'No value' search with another nested search and a different non-nested
             field works correctly """
         res = es_testapp.get('/search/?type=Variant'
-                          '&POS=88832'
-                          '&REF=A').json
+                             '&POS=88832'
+                             '&REF=A').json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
         es_testapp.get('/search/?type=Variant'
-                    '&POS=88832'
-                    '&hg19.hg19_pos=No+value'
-                    '&REF=G', status=404)  # REF should disqualify
+                       '&POS=88832'
+                       '&hg19.hg19_pos=No+value'
+                       '&REF=G', status=404)  # REF should disqualify
 
     def test_search_nested_facets_are_correct(self, workbook, es_testapp):
         """ Tests that nested facets are properly rendered both on a normal search and when selecting on
