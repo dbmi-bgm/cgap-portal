@@ -4,10 +4,12 @@ import React, { useMemo } from 'react';
 import queryString from 'query-string';
 import moment from 'moment';
 
-import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
-import { FilteringTableFilterSetUI, FilterSetController, SaveFilterSetButtonController, SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI';
+import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
+import { SaveFilterSetButtonController } from './SaveFilterSetButton';
+import { SaveFilterSetPresetButtonController } from './SaveFilterSetPresetButton';
 import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
 
 /**
