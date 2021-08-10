@@ -1169,8 +1169,6 @@ def convert_variant_sample_item_to_sheet_dict(variant_sample_item, spreadsheet_m
     May need to request more fields.
     '''
 
-    print("ABD", variant_sample_item)
-
     if not "@id" in variant_sample_item:
         return None
 
