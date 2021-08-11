@@ -4,6 +4,7 @@ aws_account=
 env_name=
 do_login=
 do_help=
+do_debug=
 creds_file=$HOME/.aws_test/test_creds.sh
 
 if [ -f "${creds_file}" ]; then
@@ -25,17 +26,29 @@ while [ $# -gt 0 ]; do
   elif [ "$1" = "--help" ]; then
     do_help=TRUE
     shift 1
+  elif [ "$1" = "--debug" ]; then
+    do_debug=TRUE
+    shift 1
   else
     do_help=TRUE
     break
   fi
 done
 
+if [ -n "${do_debug}" ]; then
+  echo ""
+  echo " aws_account=${aws_account}"
+  echo " env_name=${env_name}"
+  echo " do_login=${do_login}"
+  echo ""
+fi
+
 if [ -n "${do_help}" ]; then
-  echo "Syntax: $0 { --aws_account <account> | --env_name <env> | --login | --help }"
+  echo "Syntax: $0 { --aws_account <account> | --env_name <env> | --login | --debug | --help }"
   echo ""
   echo " This will execute 'make build-docker-production AWS_ACCOUNT=<account> ENV_NAME=<env>'."
   echo " If --login is given, 'make ecr-login AWS_ACCOUNT=<account>' will be done first."
+  echo " If --debug is given, additional instrumentation output will happen as it goes."
   echo " If unspecified, <account> defaults to '${aws_account}' (from 'export ACCOUNT_NUMBER=...' in ${creds_file})."
   echo " If unspecified, <env> defaults to '${env_name}' (from 'export ENV_NAME=...' in ${creds_file}.)"
   if [ ! -f "${creds_file}" ]; then
@@ -55,7 +68,33 @@ if [ -z "${env_name}" ]; then
   exit 1
 fi
 
-if [ -n "${do_login}" ]; then
-    make ecr-login AWS_ACCOUNT="${aws_account}"
+if [ -n "${do_debug}" ]; then
+  echo "Using settings from ${creds_file} ..."
 fi
+
+. ${creds_file}
+
+if [ "${aws_account}" != "${ACCOUNT_NUMBER}" ]; then
+  echo "Data mismatch. \$aws_account='${aws_account}' but \$ACCOUNT_NUMBER='${ACCOUNT_NUMBER}'."
+  exit 1
+fi
+
+if [ "${env_name}" != "${ENV_NAME}" ]; then
+  echo "Data mismatch. \$env_name='${env_name}' but \$ENV_NAME='${ENV_NAME}'."
+  exit 1
+fi
+
+if [ -n "${do_login}" ]; then
+  options=
+  if [ -n "${do_debug}" ]; then
+    options="${options} --debug"
+  fi
+  $(dirname $0)/ecr-test-login --aws_account "${aws_account}" ${options}
+fi
+
+if [ -n "${do_debug}" ]; then
+  echo "SIMULATED BUILD"
+  exit 1
+fi
+
 make build-docker-production AWS_ACCOUNT="${aws_account}" ENV_NAME="${env_name}"
