@@ -279,7 +279,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                         }
                         return true;
                     }).map((analysisGroup) => {
-                        const { analysis_type = null, cases: groupCases = [] } = analysisGroup || {};
+                        const { analysis_type = null, analysis_version = null, cases: groupCases = [] } = analysisGroup || {};
 
                         // Figure out which report is associated with the current analysis group & sample
                         const groupCase = groupCases.find(function(groupCase){
@@ -294,6 +294,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
 
                         const reportBlockId = caseToReportMap[groupCaseAtId];
                         const fallbackKey = 'case-' + groupCaseAtId;
+                        const analysis_title = analysis_type + (analysis_version ? " (" + analysis_version + ")" : "");
                         let reportBlock = null;
 
                         if (reportBlockId) {
@@ -307,7 +308,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                             <StackedBlock key={analysis_type} columnClass="analysis" hideNameOnHover={false}
                                 label={<StackedBlockNameLabel title={null} subtitle={null} accession={null} subtitleVisible/>}>
                                 <StackedBlockName>
-                                    <span className="name-title">{ analysis_type }</span>
+                                    <span className="name-title">{ analysis_title }</span>
                                 </StackedBlockName>
                                 <StackedBlockList className="report" title="Report">
                                     { reportBlock ? <StackedBlockList className="report" title="Report">{reportBlock}</StackedBlockList> : FamilyReportStackedTable.renderEmptyBlock("report") }
@@ -656,11 +657,11 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
             // Search each analysis group for one with the current case
             analysisGroups.forEach((analysisGroup) => {
-                const { cases: casesInAnalysisGroup = [], analysis_type = null } = analysisGroup || {};
+                const { cases: casesInAnalysisGroup = [], analysis_type = null, analysis_version = null } = analysisGroup || {};
                 casesInAnalysisGroup.forEach((agCase) => {
                     const { '@id': agCaseAtId } = agCase || {};
                     if (agCaseAtId === caseAtId) {
-                        analysisType = analysis_type;
+                        analysisType = analysis_type + (analysis_version ? " (" + analysis_version + ")" : "");
                     }
                 });
             });
@@ -833,4 +834,3 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         );
     }
 }
-
