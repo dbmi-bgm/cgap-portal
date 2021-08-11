@@ -204,186 +204,6 @@ class LuceneBuilder:
             return sub_queries
 
     @classmethod
-    def handle_nested_filters(cls, nested_filters, final_filters, es_mapping, key='must'):
-        """
-        Helper function for build_filters that collapses nested filters together into a single lucene sub-query
-        and attaching it to final_filters (modifying in place).
-
-        :param nested_filters: All nested fields that we would like to search on
-        :param final_filters: Collection of filters formatted in lucene, to be extended with nested filters
-        :param key: 'must' or 'must_not'
-        """
-        complement_key_map = {MUST: MUST_NOT, MUST_NOT: MUST}
-        if key not in complement_key_map:
-            raise QueryConstructionException(
-                query_type='nested',
-                func='handle_nested_filters',
-                msg='Tried to handle nested filter with key other than must/must_not: %s' % key
-            )
-
-        # iterate through all nested filters
-        for field, query in nested_filters:
-
-            # iterate through all sub_query parts - note that this is modified in place hence the need
-            # to re-iterate after every nested filer is applied
-            nested_path = find_nested_path(field, es_mapping)
-            sub_queries = final_filters['bool'][key]
-            found = False
-            for _q in sub_queries:
-
-                # Try to add to an existing 'nested' sub-query if possible
-                if _q.get(NESTED, None):
-                    if _q[NESTED][PATH] == nested_path:
-                        try:
-
-                            # Determine if this nested query is a MUST or MUST NOT
-                            opposite_key = complement_key_map[key]
-                            for sub_sub_query in query:
-                                if BOOL in sub_sub_query:
-                                    if key in sub_sub_query[BOOL]:
-                                        _q[NESTED][QUERY][BOOL][key] += sub_sub_query[BOOL][key]
-                                    elif opposite_key in sub_sub_query[BOOL]:
-                                        _q[NESTED][QUERY][BOOL][opposite_key] += sub_sub_query[BOOL][opposite_key]
-                                    else:
-                                        raise QueryConstructionException(
-                                            query_type='nested',
-                                            func='handle_nested_filters',
-                                            msg='Malformed entry on query field: %s' % query
-                                        )
-                            found = True
-                            break
-
-                            # if isinstance(query, list):  # reject list structure, if present
-                            #     if len(query) != 1:
-                            #         raise QueryConstructionException(
-                            #             query_type='nested',
-                            #             func='handle_nested_filters',
-                            #             msg='Malformed entry on query field: %s' % query
-                            #         )
-                            #     query = query[0]
-                            #
-                            # if key not in query[BOOL]:  # we are combining a different type of query on this nested path
-                            #     opposite_key = complement_key_map[key]
-                            #     if opposite_key in query[BOOL]:
-                            #         _q[NESTED][QUERY][BOOL][opposite_key] = query[BOOL][opposite_key]
-                            #         found = True
-                            #         break
-                            # else:
-                            #
-                            #     # check if this field has multiple options
-                            #     options = query[BOOL][key][0][MATCH][field].split(',')
-                            #     if len(options) > 1:
-                            #
-                            #         # construct SHOULD sub-query for all options
-                            #         sub_query = cls.handle_should_query(field, options)
-                            #         _q[NESTED][QUERY][BOOL][key].append(sub_query)
-                            #
-                            #     # if we don't have options, our original 'query' is what we need
-                            #     else:
-                            #         insertion_point = _q[NESTED][QUERY][BOOL]
-                            #         if key not in insertion_point:  # this can happen if we are combining with 'No value'
-                            #             insertion_point[key] = query[BOOL][key][0]
-                            #         else:
-                            #             insertion_point[key].append(query[BOOL][key][0])
-
-                                # found = True  # break is not sufficient, see below
-                                # break
-                        except QueryConstructionException:
-                            raise
-                        except Exception:  # Why? We found a 'range' nested query and must add this one separately
-                            continue  # This behavior is absurd. Somehow it knows to combine separate nested range
-                            # queries with AND, but of course not regular queries and of course you cannot
-                            # combine the range query here due to syntax  - Will
-            if not found:
-
-                # It's possible we're looking at a sub-query that's wrapped in a (length 1) list
-                if type(query) == list:
-                    if len(query) == 1:
-                        query = query[0]
-
-                    # Handle queries with different query types ie: exists + match
-                    # Note: this kind of query will always return no results when combined with No value,
-                    # since the truth values are computed in separate clauses (in ES6). This limitation is
-                    # not ideal but needs a more well thought out solution.
-                    # TODO: refactor nested into normal query building step (not post-pass)
-                    # (always gives no results)
-                    else:
-                        inner_query = []
-                        for _q in query:
-                            if BOOL in _q:
-                                inner = _q[BOOL].get(key, [])
-                            else:
-                                inner = _q
-                            if isinstance(inner, list):
-                                inner_query += inner
-                            else:
-                                inner_query.append(inner)
-                        if inner_query:
-                            final_filters[BOOL][key].append({
-                                NESTED: {
-                                    PATH: nested_path,
-                                    QUERY: {
-                                        BOOL: {
-                                            MUST: inner_query
-                                        }
-                                    }
-                                }
-                            })
-                        continue
-
-                # if there is no boolean clause in this sub-query, add it directly to final_filters
-                # otherwise continue logic below
-                if BOOL not in query:
-                    final_filters[BOOL][key].append({
-                        NESTED: {
-                            PATH: nested_path,
-                            QUERY: query
-                        }
-                    })
-                    continue
-
-                # Check that key is in the sub-query first, it's possible that it in fact uses it's opposite
-                # This can happen when adding no value, the opposite 'key' can occur in the sub-query
-                opposite_key = None
-                if key not in query[BOOL]:
-                    opposite_key = complement_key_map[key]
-                    outer_query = query[BOOL][opposite_key]
-                else:
-                    outer_query = query[BOOL][key]
-
-                # It's possible we have multiple options for the same field (OR). Take those in place.
-                if BOOL in outer_query:
-                    if SHOULD in outer_query[BOOL]:
-                        sub_query = query
-                    else:
-                        raise QueryConstructionException(
-                            query_type='bool',
-                            func='handle_nested_filters',
-                            msg='BOOL container in parent query requires SHOULD component in sub-query, got: %s' % query
-                        )
-
-                # Otherwise, we have a standard 'match' and must repeat 'options' work here since its
-                # possible we are the first nested field on the given path
-                else:
-                    if opposite_key:  # in case we are in an 'opposite scenario', pass query directly
-                        options = []
-                    else:
-                        options = query[BOOL][key][0][MATCH][field].split(',')
-
-                    if len(options) > 1:
-                        sub_query = cls.handle_should_query(field, options)
-                    else:
-                        sub_query = query
-
-                # add the 'nested' sub query to the main query for this path
-                # all remaining nested filters on this path will be part of this object unless they are of type 'range'
-                # in which case they will get their own NESTED sub-query
-                final_filters[BOOL][key].append({
-                    NESTED: {PATH: nested_path,
-                             QUERY: sub_query}
-                })
-
-    @classmethod
     def extract_field_from_to(cls, query_part):
         """ Neat helper method provided by Kent to clean up a step in 'handle_range_filters'.
             Extracts the field_name and whether it is a 'from' or 'to' query
@@ -598,9 +418,17 @@ class LuceneBuilder:
 
     @classmethod
     def handle_nested_filters_v2(cls, must_nested_filters, must_not_nested_filters, es_mapping):
-        """ This function constructs a nested query from a base nested_query, passed by the caller.
+        """ This function implements nested query construction.
 
+            When building a nested query, unlike with traditional queries, selections on the same
+            field must occur in the same nested sub-query in order to be applied as an intersect
+            condition on the object field. Previously we would create separate nested sub-queries
+            per field selection, which causes them to be OR'd.
 
+            :param must_nested_filters: conditions filtered on in the affirmative
+            :param must_not_nested_filters: conditions filtered on in the negative
+            :param es_mapping: the ES mapping of the type we are searching on
+            :returns: a nested sub-query that can be added directly to the parent query
         """
         # Build base query structure
         nested_query = {
@@ -610,10 +438,10 @@ class LuceneBuilder:
             }
         }
 
-        # maps a nested path to a 2-tuple of it's key, index
+        # Maps a nested path to a 2-tuple of it's key (must/must_not) and index
         nested_path_to_index_map = {}
 
-        # Build array of key, field, query so we can process
+        # Build array of key, (field, query) so we can process the filters in a single pass
         filters_to_work_on = []
         if must_nested_filters:
             filters_to_work_on += zip([MUST] * len(must_nested_filters), must_nested_filters)
@@ -621,6 +449,7 @@ class LuceneBuilder:
             filters_to_work_on += zip([MUST_NOT] * len(must_not_nested_filters), must_not_nested_filters)
 
         # Process key (must/must_not), field (target of search), query (condition)
+        # iteratively building nested_query
         for key, (field, query) in filters_to_work_on:
             nested_path = find_nested_path(field, es_mapping)
 
@@ -639,10 +468,11 @@ class LuceneBuilder:
                         }
                     }
                     for sub_query in query:
-                        # raw valid lucene
                         if BOOL not in sub_query:
                             combined_query[BOOL][key].append(sub_query)
-                        # has duplicated bool -> must, so traverse down
+
+                        # sub_query has duplicated bool -> must, so traverse down to examine
+                        # the actual sub-query and propagate it
                         else:
                             # can only contain one sub_query but does have list structure
                             try:
@@ -686,6 +516,7 @@ class LuceneBuilder:
                 if key not in query_start[BOOL]:
                     query_start[BOOL][key] = []
 
+                # this sub-query must have already been created in a previous branch
                 combined_query_clauses = query_start[BOOL][key]
                 for sub_query in query:
                     if BOOL not in sub_query:
@@ -765,8 +596,6 @@ class LuceneBuilder:
         # Build nested queries
         final_nested_query = cls.handle_nested_filters_v2(must_filters_nested, must_not_filters_nested, es_mapping)
         final_filters[BOOL][MUST].append(final_nested_query)
-        # cls.handle_nested_filters(must_filters_nested, final_filters, es_mapping, key=MUST)
-        # cls.handle_nested_filters(must_not_filters_nested, final_filters, es_mapping, key=MUST_NOT)
 
         # at this point, final_filters is valid lucene and can be dropped into the query directly
         query[QUERY][BOOL][FILTER] = final_filters
