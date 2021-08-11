@@ -103,6 +103,7 @@ def health_check(config):
             "elasticsearch": settings.get('elasticsearch.server'),
             "file_upload_bucket": settings.get('file_upload_bucket'),
             "foursight": foursight_url,
+            "identity": settings.get("identity"),
             "indexer": settings.get("indexer"),
             "index_server": settings.get("index_server"),
             "load_data": settings.get('load_test_data'),
@@ -112,6 +113,7 @@ def health_check(config):
             'project_version': settings.get('encoded_version'),
             'snovault_version': settings.get('snovault_version'),
             "system_bucket": settings.get('system_bucket'),
+            "tibanna_logs_bucket": settings.get('tibanna_logs_bucket'),
             'uptime': uptime_info(),
             'utils_version': settings.get('utils_version'),
 

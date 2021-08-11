@@ -80,9 +80,9 @@ export default class HealthView extends React.PureComponent {
                 title : "Foursight",
                 description : "URI of corresponding Foursight page."
             },
-            'metadata_bundles_bucket' : {
-                title: "MetaData Bundles Bucket",
-                description : "Name of S3 bucket used for metadata bundles."
+            'identity': {
+                title : "Identity",
+                description : "An application configuration key that represents the current environment."
             },
             'indexer' : {
                 title : "Indexer",
@@ -95,6 +95,10 @@ export default class HealthView extends React.PureComponent {
             'load_data' : {
                 title : "Loaded Data",
                 description : "Data which was loaded into database on initialization or boot."
+            },
+            'metadata_bundles_bucket' : {
+                title: "MetaData Bundles Bucket",
+                description : "Name of S3 bucket used for metadata bundles."
             },
             'namespace': {
                 title : "Namespace",
@@ -123,6 +127,10 @@ export default class HealthView extends React.PureComponent {
             'system_bucket' : {
                 title : 'System Bucket',
                 description : "Name of S3 Bucket used for system data."
+            },
+            'tibanna_logs_bucket': {
+                title : "Tibanna Logs Bucket",
+                description : "Name of S3 bucket used for tibanna logs."
             },
             'uptime': {
                 title : 'Uptime',
