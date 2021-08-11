@@ -189,6 +189,7 @@ AWS_ACCOUNT ?= 645819926742
 
 ecr-login:
 	@echo "Making ecr-login AWS_ACCOUNT=${AWS_ACCOUNT} ..."
+	scripts/assure-awscli
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com
 
 ecr-test-login:  # for ecr-login to account in ~/aws_test. More info in https://hms-dbmi.atlassian.net/browse/C4-684
