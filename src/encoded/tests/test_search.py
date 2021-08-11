@@ -771,7 +771,7 @@ class TestNestedSearch(object):
                 return
 
     def test_search_on_single_nested_field(self, workbook, es_testapp):
-        """ One match for variant with hg19.hg19_pos=12185955 """
+        """ Two matches for variant with hg19.hg19_pos=12185955 """
         res = es_testapp.get('/search/?type=Variant'
                           '&hg19.hg19_pos=12185955').json
         self.assert_length_is_expected(res, 2)
@@ -789,18 +789,41 @@ class TestNestedSearch(object):
             assert variant['uuid'] in ['f6aef055-4c88-4a3e-a306-d37a71535d8b', '852bb349-203e-437d-974a-e8d6cb56810a']
 
     def test_and_search_on_nested_field_that_does_not_match(self, workbook, es_testapp):
-        """ This has a chrom value that does not match the position, so will give no results """
+        """ Test various non-matching searches """
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=12185955'
-                    '&hg19.hg19_chrom=chr3', status=404)
+                       '&hg19.hg19_chrom=chr4', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_pos=12185955'
+                       '&hg19.hg19_chrom=chr3', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_chrom=chr1'
+                       '&hg19.hg19_pos.to=0', status=404)  # disqualify on ranges
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_chrom=chr1'
+                       '&hg19.hg19_pos.from=99999999', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_chrom=chr1'
+                       '&hg19.hg19_pos.from=9999999999'
+                       '&hg19.hg19_pos.to=99999999999', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19=No+value'
+                       '&POS.from=100000', status=404)
 
     def test_and_search_on_nested_field_that_matches_one(self, workbook, es_testapp):
         """ This has the correct 'hg19_chrom', so should match one """
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_pos=12185955'
-                          '&hg19.hg19_chrom=chr1').json
+                             '&hg19.hg19_pos=12185955'
+                             '&hg19.hg19_chrom=chr1').json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos.to=12185955'
+                             '&hg19.hg19_chrom=chr2').json
+        self.assert_length_is_expected(res, 1)
+        assert res['@graph'][0]['uuid'] == '852bb349-203e-437d-974a-e8d6cb56810a'
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19=No+value').json
+        self.assert_length_is_expected(res, 1)
 
     def test_or_search_on_nested_hg_19_multiple_match(self, workbook, es_testapp):
         """ Do an OR search on hg19.hg19_chrom, matching three variants """
@@ -813,6 +836,17 @@ class TestNestedSearch(object):
                 '852bb349-203e-437d-974a-e8d6cb56810a',
                 '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
             ]
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos.to=12125898').json
+        self.assert_length_is_expected(res, 4)
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos.to=12125898'
+                             '&hg19.hg19_pos.from=88832').json
+        self.assert_length_is_expected(res, 3)
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos.to=12125898'
+                             '&hg19.hg19_pos.from=11720331').json
+        self.assert_length_is_expected(res, 2)
 
     def test_negative_search_on_hg_19(self, workbook, es_testapp):
         """ Do an OR search with hg19_post with a negative, should eliminate a variant """
@@ -857,20 +891,20 @@ class TestNestedSearch(object):
     def test_and_search_that_matches_multiple(self, workbook, es_testapp):
         """ Check two properties that occur in the same sub-embedded object in 3 variants """
         res = es_testapp.get('/search/?type=Variant'
-                          '&families.members.mother.display_title=GAPIDISC7R73'
-                          '&families.members.father.display_title=GAPID3PW26SK').json
+                             '&families.members.mother.display_title=GAPIDISC7R73'
+                             '&families.members.father.display_title=GAPID3PW26SK').json
         self.assert_length_is_expected(res, 3)
 
     def test_and_search_on_three_fields(self, workbook, es_testapp):
         """ OR search that will match all variants with these fields"""
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_chrom=chr1'
-                          '&hg19.hg19_pos=12185955'
-                          '&hg19.hg19_pos=11901816'
-                          '&hg19.hg19_pos=11780388'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow().json
+                             '&hg19.hg19_chrom=chr1'
+                             '&hg19.hg19_pos=12185955'
+                             '&hg19.hg19_pos=11901816'
+                             '&hg19.hg19_pos=11780388'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow().json
         self.assert_length_is_expected(res, 3)
         for variant in res['@graph']:
             assert variant['uuid'] in [
@@ -883,19 +917,19 @@ class TestNestedSearch(object):
         """ Test that swapping around fields that would match across different sub-embedded objects
             does not actually do so (ie: returns no results). """
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=12185955'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T', status=404)
+                       '&hg19.hg19_pos=12185955'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T', status=404)
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=11901816'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A', status=404)
+                       '&hg19.hg19_pos=11901816'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A', status=404)
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=11780388'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+                       '&hg19.hg19_pos=11780388'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
 
     def test_nested_search_with_no_value(self, workbook, es_testapp):
         """ Tests searching on 'No value' alone on a nested field """
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_chrom!=No+value').follow().json
+                             '&hg19.hg19_chrom!=No+value').follow().json
         self.assert_length_is_expected(res, 3)
 
     def test_nested_search_with_no_value_combined(self, workbook, es_testapp):
@@ -953,13 +987,31 @@ class TestNestedSearch(object):
             field works correctly """
         res = es_testapp.get('/search/?type=Variant'
                              '&POS=88832'
+                             '&hg19=No+value'
                              '&REF=A').json
+        self.assert_length_is_expected(res, 1)
+        assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
+        res = es_testapp.get('/search/?type=Variant'
+                             '&CHROM=1'
+                             '&hg19=No+value'
+                             '&POS.from=0').json
+        self.assert_length_is_expected(res, 1)
+        assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
+        res = es_testapp.get('/search/?type=Variant'
+                             '&CHROM=1'
+                             '&hg19=No+value'
+                             '&POS.from=0'
+                             '&genes.genes_most_severe_gene.display_title!=No+value').follow().json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
         es_testapp.get('/search/?type=Variant'
                        '&POS=88832'
                        '&hg19.hg19_pos=No+value'
                        '&REF=G', status=404)  # REF should disqualify
+        es_testapp.get('/search/?type=Variant'
+                       '&POS=88832'
+                       '&hg19=No+value'
+                       '&REF=G', status=404)
 
     def test_search_nested_facets_are_correct(self, workbook, es_testapp):
         """ Tests that nested facets are properly rendered both on a normal search and when selecting on
