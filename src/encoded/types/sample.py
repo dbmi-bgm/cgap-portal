@@ -26,7 +26,7 @@ def _build_sample_embedded_list():
         # File linkTo
         "processed_files.accession",
         "processed_files.file_format.file_format",
-        "processed_files.workflow_run_outputs"
+        "processed_files.workflow_run_outputs.@id"
     ]
 
 
