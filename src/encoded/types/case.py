@@ -210,6 +210,7 @@ def _build_case_embedded_list():
 
         # Sample Processing linkTo
         "sample_processing.analysis_type",
+        "sample_processing.analysis_version",
         "sample_processing.last_modified.*",
         "sample_processing.completed_processes",
         "sample_processing.samples_pedigree.*",
@@ -402,7 +403,7 @@ class Case(Item):
         if not files_processed:
             return vcf_file
         for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
-            file_data = get_item_or_none(request, file_processed, 'files-processed') 
+            file_data = get_item_or_none(request, file_processed, 'files-processed')
             file_type = file_data.get("file_type", "")
             file_variant_type = file_data.get("variant_type", "")
             if file_type == "full annotated VCF" and file_variant_type != "SV":
@@ -430,7 +431,7 @@ class Case(Item):
         if not files_processed:
             return sv_vcf_file
         for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
-            file_data = get_item_or_none(request, file_processed, 'files-processed') 
+            file_data = get_item_or_none(request, file_processed, 'files-processed')
             file_type = file_data.get("file_type", "")
             file_variant_type = file_data.get("variant_type", "")
             if file_type == "full annotated VCF" and file_variant_type == "SV":
@@ -522,7 +523,7 @@ class Case(Item):
                     if relation in included_relations:
                         relation = relation.replace(' ', '_').replace('-', '_')
                         fields.append(f'associated_genotype_labels.{relation}_genotype_label')
-            elif analysis_type in ['WGS', 'WES']:  # proband-only analysis types 
+            elif analysis_type in ['WGS', 'WES']:  # proband-only analysis types
                 fields.append('proband_only_inheritance_modes')
         return fields
 

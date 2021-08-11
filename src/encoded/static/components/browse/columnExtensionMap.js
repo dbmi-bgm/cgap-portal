@@ -422,6 +422,7 @@ const BioinformaticsMultiLevelColumn = React.memo(function BioinformaticsMultiLe
     const { sample, sample_processing, vcf_file, '@id': resultHrefPath } = result;
     const {
         analysis_type = null,
+        analysis_version = null,
         last_modified: { date_modified: date = null } = {}
     } = sample_processing;
     const {
@@ -430,6 +431,7 @@ const BioinformaticsMultiLevelColumn = React.memo(function BioinformaticsMultiLe
     } = sample || {};
 
     const filesLen = files.length;
+    const mainTitle = analysis_type + (analysis_version ? " (" + analysis_version + ")" : "");
 
     let status = null;
     let statusTip = null;

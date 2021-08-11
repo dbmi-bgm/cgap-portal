@@ -278,7 +278,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                         }
                         return true;
                     }).map((analysisGroup) => {
-                        const { analysis_type = null, cases: groupCases = [] } = analysisGroup || {};
+                        const { analysis_type = null, analysis_version = null, cases: groupCases = [] } = analysisGroup || {};
 
                         // Figure out which report is associated with the current analysis group & sample
                         const groupCase = groupCases.find(function(groupCase){
@@ -293,6 +293,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
 
                         const reportBlockId = caseToReportMap[groupCaseAtId];
                         const fallbackKey = 'case-' + groupCaseAtId;
+                        const analysis_title = analysis_type + (analysis_version ? " (" + analysis_version + ")" : "");
                         let reportBlock = null;
 
                         if (reportBlockId) {
@@ -306,7 +307,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                             <StackedBlock key={analysis_type} columnClass="analysis" hideNameOnHover={false}
                                 label={<StackedBlockNameLabel title={null} subtitle={null} accession={null} subtitleVisible/>}>
                                 <StackedBlockName>
-                                    <span className="name-title text-left d-block">{ analysis_type }</span>
+                                    <span className="name-title text-left d-block">{ analysis_title }</span>
                                 </StackedBlockName>
                                 <StackedBlockList className="report" title="Report">
                                     { reportBlock ? <StackedBlockList className="report" title="Report">{reportBlock}</StackedBlockList> : FamilyReportStackedTable.renderEmptyBlock("report") }
@@ -650,15 +651,15 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
             const isResultCase = caseAtId === resultCaseAtId;
 
             // Used as title for report/case block
-            let analysisType = null;
+            let analysisTitle = null;
 
             // Search each analysis group for one with the current case
             analysisGroups.forEach((analysisGroup) => {
-                const { cases: casesInAnalysisGroup = [], analysis_type = null } = analysisGroup || {};
+                const { cases: casesInAnalysisGroup = [], analysis_type = null, analysis_version = null } = analysisGroup || {};
                 casesInAnalysisGroup.forEach((agCase) => {
                     const { '@id': agCaseAtId } = agCase || {};
                     if (agCaseAtId === caseAtId) {
-                        analysisType = analysis_type;
+                        analysisTitle = analysis_type + (analysis_version ? " (" + analysis_version + ")" : "");
                     }
                 });
             });
@@ -670,8 +671,8 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                             <div className="d-flex">
                                 { reportAtId ?
                                     <a href={reportAtId} className={"name-title" + (isResultCase ? " current-case": "")}>
-                                        { analysisType }
-                                    </a> : <span className={"name-title" + (isResultCase ? " current-case": "")}>{ analysisType }</span>}
+                                        { analysisTitle }
+                                    </a> : <span className={"name-title" + (isResultCase ? " current-case": "")}>{ analysisTitle }</span>}
                             </div>
                             <div className="w-100" style={{ maxWidth: "70%" }}>
                                 <table className="accession-table w-100">
@@ -831,4 +832,3 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         );
     }
 }
-
