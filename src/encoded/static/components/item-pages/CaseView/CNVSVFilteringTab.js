@@ -83,25 +83,23 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                     return <a href={atID} target="_blank" rel="noreferrer">{splitAnnotationID[1]}</a>;
                 }
             },
-
-            // TODO: Remove this in favor of re-using the 'bam_snapshot' defined in browse/variantSampleColumnExtensionMap.js once more columns available?
-            'bam_snapshot': {
-                "noSort": true,
-                "widthMap": { 'lg' : 150, 'md' : 150, 'sm' : 150 },
-                "render": function(result, props) {
-                    const { bam_snapshot = null, "@id": atID } = result;
-                    if (bam_snapshot) {
-                        return (
-                            <div className="mx-auto text-truncate">
-                                <a target="_blank" rel="noreferrer" href={atID} data-html>
-                                    SV Browser <i className="ml-07 icon-sm icon fas icon-external-link-alt"></i>
-                                </a>
-                            </div>
-                        );
-                    }
-                    return null;
-                }
-            },
+            // 'bam_snapshot': { // Note: not going to be added until a few versions from now; this may need updates specific to SVs when finally implemented
+            //     "noSort": true,
+            //     "widthMap": { 'lg' : 150, 'md' : 150, 'sm' : 150 },
+            //     "render": function(result, props) {
+            //         const { bam_snapshot = null, "@id": atID } = result;
+            //         if (bam_snapshot) {
+            //             return (
+            //                 <div className="mx-auto text-truncate">
+            //                     <a target="_blank" rel="noreferrer" href={atID} data-html>
+            //                         SV Browser <i className="ml-07 icon-sm icon fas icon-external-link-alt"></i>
+            //                     </a>
+            //                 </div>
+            //             );
+            //         }
+            //         return null;
+            //     }
+            // },
             // // "structural_variant.transcript.csq_gene.display_title": {
             //     "render": function(result, props) {
             //         // TODO: show first and last gene separated by "..."
