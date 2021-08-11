@@ -613,26 +613,25 @@ class LuceneBuilder:
         # maps a nested path to a 2-tuple of it's key, index
         nested_path_to_index_map = {}
 
-        # if we only have 1 or the other
-        if must_nested_filters and not must_not_nested_filters:
-            filters_to_work_on = must_nested_filters
-            key = MUST
-        elif must_not_nested_filters and not must_nested_filters:
-            filters_to_work_on = must_not_nested_filters
-            key = MUST_NOT
-        else:
-            import pdb; pdb.set_trace()
-            filters_to_work_on = []
-            key = MUST
+        # Build array of key, field, query so we can process
+        filters_to_work_on = []
+        if must_nested_filters:
+            filters_to_work_on += zip([MUST] * len(must_nested_filters), must_nested_filters)
+        if must_not_nested_filters:
+            filters_to_work_on += zip([MUST_NOT] * len(must_not_nested_filters), must_not_nested_filters)
 
-        for field, query in filters_to_work_on:
+        # Process key (must/must_not), field (target of search), query (condition)
+        for key, (field, query) in filters_to_work_on:
             nested_path = find_nested_path(field, es_mapping)
+
+            # if we've never seen this path before, bootstrap a sub-query for it
             if nested_path not in nested_path_to_index_map:
 
                 # set in tracking
                 new_index = len(nested_query[BOOL][key])
                 nested_path_to_index_map[nested_path] = (key, new_index)
 
+                # if the query has multiple parts, they must be appropriately combined
                 if len(query) > 1:
                     combined_query = {
                         BOOL: {
@@ -660,22 +659,33 @@ class LuceneBuilder:
                                 _sub_query = _sub_query[0]
                             combined_query[BOOL][key].append(_sub_query)
                     nested_query[BOOL][key].append(cls.build_nested_query(nested_path, combined_query))
+
+                # if a single sub-query, can be added directly
                 else:
                     nested_query[BOOL][key].append(cls.build_nested_query(nested_path, query))
-            else:
-                key, path_index = nested_path_to_index_map[nested_path]
 
-                # its possible we're combining with a different query type, in which case we can simply
-                # add these together
-                query_start = nested_query[path_index][NESTED][QUERY]
+            # We have seen this nested_path before, so in order to achieve proper intersect
+            # behavior all conditions must be present on the same nested sub-query
+            else:
+
+                # extract the location of the nested query we would like to add to
+                # note that the key under which the previous query was added could differ
+                # from the key we are seeing now ie: EXIST (must) combined with != (must_not)
+                prev_key, path_index = nested_path_to_index_map[nested_path]
+
+                # if the top level of this query is simply a list of sub-queries,
+                # add the new sub-query directly
+                # XXX: is this always correct?
+                query_start = nested_query[BOOL][prev_key][path_index][NESTED][QUERY]
                 if isinstance(query_start, list):
                     query_start += query
                     continue
 
-                # its possible even though we've seen this path, we've seen a MUST
-                # but no MUST_NOT clause, so add it
+                # its possible even though we've seen this path, we've only seen prev_key
+                # that differs from key - if so add a new sub-query array for the missing key
                 if key not in query_start[BOOL]:
                     query_start[BOOL][key] = []
+
                 combined_query_clauses = query_start[BOOL][key]
                 for sub_query in query:
                     if BOOL not in sub_query:
