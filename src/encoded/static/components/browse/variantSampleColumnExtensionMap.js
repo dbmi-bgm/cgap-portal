@@ -88,7 +88,8 @@ export const variantSampleColumnExtensionMap = {
                 return (
                     <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"}>
                         <StackedRowColumn className={"text-" + align} {...{ rows }} />
-                    </a>);
+                    </a>
+                );
             }
             return null;
         }
@@ -108,9 +109,10 @@ export const variantSampleColumnExtensionMap = {
             }
 
             return (
-                <a href={link ? link: atID ? atID + '?annotationTab=1' : "#"}>
+                <a href={link ? link : (atID ? atID + '?annotationTab=1' : "#")}>
                     <GenesMostSevereHGVSCColumn gene={firstGene} {...{ align }} />
-                </a>);
+                </a>
+            );
         }
     },
     "variant.genes.genes_most_severe_consequence.coding_effect": { // Coding Effect column

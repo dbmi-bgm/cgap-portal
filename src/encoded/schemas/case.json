@@ -150,7 +150,7 @@
     },
     "columns": {
         "display_title": {
-            "title": "Case",
+            "title": "Case ID",
             "sort_fields": [
                 {
                     "field": "accession",
@@ -163,7 +163,7 @@
             ]
         },
         "family": {
-            "title": "Family",
+            "title": "Family ID",
             "sort_fields": [
                 {
                     "field": "family.accession",
@@ -180,7 +180,7 @@
             ]
         },
         "individual": {
-            "title": "Individual",
+            "title": "Individual ID",
             "description": "Proband Individual of this Case",
             "sort_fields": [
                 {
