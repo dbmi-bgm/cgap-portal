@@ -1126,14 +1126,13 @@ class StructuralVariantTableParser(VariantTableParser):
         mapping table ingestion, as indicated by lack of VCF_FIELD_KEY
         on the object. 
 
-        Expects sub-embedded objects from previous mapping table ingestion
-        to be one-layer deep, e.g. an array of objects that are not
-        themselves arrays of objects. 
+        Updates self.sv_non_vcf_props and self.sv_sample_non_vcf_props
+        dicts with keys as top-level "properties" fields to keep and
+        values as list of sub-embedded fields to keep if applicable.
 
-        :return : updates self.sv_non_vcf_props and
-            self.sv_sample_non_vcf_props dicts with keys as
-            top-level "properties" fields to keep and values as list of
-            sub-embedded fields to keep if applicable
+        Expects sub-embedded objects from previous mapping table
+        ingestion to be one-layer deep, e.g. an array of objects that
+        are not themselves arrays of objects. 
 
         NOTE: This will obviously fail if the VCF_FIELD_KEY is dropped
         from the mapping table.
