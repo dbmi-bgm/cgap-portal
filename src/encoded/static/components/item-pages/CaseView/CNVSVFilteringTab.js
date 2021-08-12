@@ -100,13 +100,17 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
             //         return null;
             //     }
             // },
-            // // "structural_variant.transcript.csq_gene.display_title": {
-            //     "render": function(result, props) {
-            //         // TODO: show first and last gene separated by "..."
-            //         console.log("result test", result);
-            //         return null;
-            //     }
-            // },
+            "structural_variant.transcript.csq_gene.display_title": { // TODO: Needs to point to Gene tab when that is complete
+                "render": function(result, props) {
+                    const { "@id": atID, structural_variant: { transcript = [] } = {} } = result;
+                    console.log("transcript", transcript);
+                    const path = atID; // + "?annotationTab=0"
+                    if (transcript.length < 2) {
+                        return <a href={path}>{transcript.map((t) => t.csq_gene.display_title)}</a>;
+                    } // show first and last gene separated by "..."
+                    return <a href={path}>{`${transcript[0].csq_gene.display_title}...${transcript[transcript.length-1].csq_gene.display_title}`}</a> ;
+                }
+            },
             "structural_variant.size": {
                 "render": function(result, props) {
                     const { structural_variant: { size = null } = {} } = result;
