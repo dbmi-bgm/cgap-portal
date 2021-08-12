@@ -279,13 +279,21 @@ class StructuralVariantBuilder(VariantBuilder):
             )
 
     @staticmethod
-    def _check_variant(variant):
+    def _validate_structural_variant(variant):
         """
         Sanity checks for SVs that should cause an ingestion to fail,
         intended to catch bioinformatics-related issues to address.
 
         :param variant: dict variant object
-        :raise: StructuralVariantBuilderError if checks fail
+        """
+        _validate_sv_position(variant)
+
+    @staticmethod
+    def _validate_sv_position(variant):
+        """
+        Ensure deletions and duplications have START < END.
+
+        :param variant: dict variant object
         """
         if variant["SV_TYPE"] in ["DEL", "DUP"]:
             if variant["START"] >= variant["END"]:
@@ -296,7 +304,7 @@ class StructuralVariantBuilder(VariantBuilder):
     def build_variant(self, record):
         """ Builds a raw structural variant from the given VCF record. """
         raw_variant = self.parser.create_variant_from_record(record)
-        self._check_variant(raw_variant)
+        self._validate_structural_variant(raw_variant)
         self._add_project_and_institution(raw_variant)
         self._set_shared_obj_status(raw_variant)
         self.parser.format_variant_sub_embedded_objects(raw_variant)
