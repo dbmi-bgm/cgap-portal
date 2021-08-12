@@ -292,6 +292,32 @@
             "title": "Consequence",
             "order": 50
         },
+        "inheritance_modes": {
+            "title": "Inheritance Modes",
+            "order": 55,
+            "grouping": "Inheritance",
+            "default_hidden": true,
+            "rescue_terms": [
+                "de novo (strong)",
+                "de novo (medium)",
+                "de novo (weak)",
+                "de novo (chrXY)",
+                "Homozygous recessive",
+                "Loss of Heterozygosity",
+                "Dominant (maternal)",
+                "Dominant (paternal)",
+                "X-linked recessive (Maternal)",
+                "X-linked dominant (Maternal)",
+                "X-linked dominant (Paternal)",
+                "Y-linked dominant",
+                "Low relevance, homozygous in a parent",
+                "Low relevance, multiallelic site family",
+                "Low relevance, present in both parent(s)",
+                "Low relevance, missing call(s) in family",
+                "Low relevance, mismatching chrXY genotype(s)",
+                "Low relevance, other"
+            ]
+        },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Proband Genotype",
             "order": 60,

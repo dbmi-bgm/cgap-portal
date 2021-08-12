@@ -130,6 +130,25 @@ class StructuralVariant(Item):
     def size(self, request, START, END):
         return END - START + 1
 
+    @calculated_property(
+        schema={
+            "title": "Structural Variant Size Display",
+            "description": "The abbreviated size of this structural variant",
+            "type": "string",
+        }
+    )
+    def size_display(self, request, START, END):
+        result = None
+        size = END - START + 1
+        unit_max_exponents = [3, 6, 9, 12]  # Gb should be max given chromosome sizes
+        display_units = ["bp", "Kb", "Mb", "Gb"]
+        for exponent, unit in zip(unit_max_exponents, display_units):
+            if size < 10**exponent:
+                display_number = round(size*10**(-exponent+3), 1)
+                result = str(display_number) + " " + unit
+                break
+        return result
+
 
 @collection(
     name="structural-variant-samples",
