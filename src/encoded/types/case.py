@@ -513,7 +513,7 @@ class Case(Item):
         analysis_type = sp_item.get('analysis_type')
         if analysis_type:
             if (analysis_type.endswith('-Trio') or analysis_type.endswith('-Group')):
-                fields.append('inheritance_modes')
+                # fields.append('inheritance_modes')
                 included_relations = [item.get('relationship') for item in sp_item.get('samples_pedigree', [{}])]
                 for relation in ['mother', 'father', 'sister', 'brother', 'co-parent',
                                 'daughter', 'son', 'daughter II', 'son II',
@@ -523,8 +523,8 @@ class Case(Item):
                     if relation in included_relations:
                         relation = relation.replace(' ', '_').replace('-', '_')
                         fields.append(f'associated_genotype_labels.{relation}_genotype_label')
-            elif analysis_type in ['WGS', 'WES']:  # proband-only analysis types
-                fields.append('proband_only_inheritance_modes')
+            # elif analysis_type in ['WGS', 'WES']:  # proband-only analysis types
+            #    fields.append('proband_only_inheritance_modes')
         return fields
 
     @calculated_property(schema={
