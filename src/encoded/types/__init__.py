@@ -1,8 +1,6 @@
 """init.py lists all the collections that do not have a dedicated types file."""
 
 import transaction
-
-# from pyramid.traversal import find_root
 from snovault import (
     calculated_property,
     collection,
@@ -133,30 +131,6 @@ class Document(ItemWithAttachment, Item):
 
     class Collection(Item.Collection):
         pass
-
-
-@collection(
-    name='file-formats',
-    unique_key='file_format:file_format',
-    lookup_key='file_format',
-    properties={
-        'title': 'File Formats',
-        'description': 'Listing of file formats used by 4DN'
-    }
-)
-class FileFormat(Item, ItemWithAttachment):
-    """The class to store information about 4DN file formats"""
-    item_type = 'file_format'
-    schema = load_schema('encoded:schemas/file_format.json')
-    name_key = 'file_format'
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "File Format name or extension.",
-        "type": "string"
-    })
-    def display_title(self, file_format):
-        return file_format
 
 
 @collection(
