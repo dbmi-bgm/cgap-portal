@@ -686,3 +686,369 @@ class VCFParser(object):
             self.format_variant_sub_embedded_objects(v)
             variants.append(v)
         return variant_samples, variants
+
+
+class StructuralVariantVCFParser(VCFParser):
+    """
+    Class for parsing SV VCFs with constants/methods that differ
+    from parsing SNV VCFs.
+
+    The main differences here are:
+        - Variants and variant samples are parsed with the same method,
+            rather than the two different approaches for SNVs
+        - Record parsing gathers fields that should come from the VCF
+            from the schema, similar to SNV variant sample parsing
+        - Sub-embedded VCF fields are identified from the schema and
+            handled accordingly, eliminating the need for VCF
+            reformatters to generate separate headers.
+
+    The class is backwards-compatible, in the sense that it will still
+    successfully process annotation fields with sub-embedded info as
+    found in SNV VCFs.
+    """
+    SCHEMA_VCF_FIELD_KEY = "vcf_field"
+    SCHEMA_SUB_EMBED_KEY = "sub_embedding_group"
+    SAMPLE_ID_VCF_FIELD = "sample"
+
+    @property
+    def variant_vcf_props(self):
+        """
+        Dictionary of VCF fields in variant schema with key, value
+        pairs of schema field name and select properties of the field.
+
+        Explicit property to facilitate mocking.
+        """
+        return self.parse_props_for_vcf_info(self.variant_props)
+
+    @property
+    def variant_sample_vcf_props(self):
+        """
+        Dictionary of VCF fields in variant sample schema with key,
+        value pairs of schema field name and select properties of the
+        field.
+
+        Explicit property to facilitate mocking.
+        """
+        return self.parse_props_for_vcf_info(self.variant_sample_props)
+
+    @property
+    def variant_sub_embedded_groups(self):
+        """
+        Extracts all sub-embedded groups present from VCF fields
+        from variant schema.
+
+        :return result: list of unique sub-embedded groups
+        """
+        result = []
+        for value in self.variant_vcf_props.values():
+            sub_embedded_group = value.get("sub_embedded_group", "")
+            if sub_embedded_group and sub_embedded_group not in result:
+                result.append(sub_embedded_group)
+        return result
+
+    @property
+    def variant_sample_sub_embedded_groups(self):
+        """
+        Extracts all sub-embedded groups present from VCF fields
+        from variant sample schema.
+
+        :return result: list of unique sub-embedded groups
+        """
+        result = []
+        for value in self.variant_sample_vcf_props.values():
+            sub_embedded_group = value.get("sub_embedded_group", "")
+            if sub_embedded_group and sub_embedded_group not in result:
+                result.append(sub_embedded_group)
+        return result
+
+    def _add_schema_vcf_field(self, key, value, result, array=False):
+        """
+        Helper function to self.parse_props_for_vcf_info that parses
+        a given schema field, checks if it comes from the VCF, and
+        updates result with the schema field and some of its properties
+        as applicable.
+
+        :param key: str schema field name
+        :param value: dict of schema field properties
+        :param result: dict of VCF schema fields/properties to update
+        :param array: bool if schema field nested in array of objects
+        """
+        value_type = value.get("type", "")
+        vcf_field = value.get(self.SCHEMA_VCF_FIELD_KEY, "")
+        sub_embedded_field = value.get(self.SCHEMA_SUB_EMBED_KEY, "")
+        field_default = value.get("default", None) 
+        if vcf_field:
+            result[key] = {"vcf_field": vcf_field, "type": value_type}
+            if sub_embedded_field:
+                sub_embedded_group = json.loads(sub_embedded_field)["key"]
+                result[key]["sub_embedded_group"] = sub_embedded_group
+            if array:
+                result[key]["sub_type"] = value_type
+                result[key]["type"] = "array"
+            if field_default is not None:
+                result[key]["default"] = field_default
+
+    def parse_props_for_vcf_info(self, schema_props): 
+        """
+        Searches through schema "properties" fields and extracts those
+        that come from the VCF.
+
+        Note: Assumes all VCF fields in schema are at most nested as
+        array of objects. If the fields can be arbitrarily nested,
+        consider making function recursive.
+
+        :param schema_props: dict of schema "properties" field
+        :return result: dict of VCF fields from schema with key,
+            value pairs of schema field name and certain properties
+            of the field (e.g. "type", "vcf_field", etc.)
+        """
+        result = {}
+        for key, value in schema_props.items():
+            value_type = value.get("type", "")
+            if value_type not in ["array", "object"]:
+                self._add_schema_vcf_field(key, value, result)
+            elif value_type == "array":
+                item_dict = value["items"]
+                if "properties" in item_dict:  # Array of objects
+                    for item_key, item_value in item_dict["properties"].items():
+                        item_type = item_value.get("type")
+                        if item_type not in ["array"]:
+                            self._add_schema_vcf_field(item_key, item_value, result)
+                        elif item_type == "array":
+                            item_sub_dict = item_value["items"]
+                            self._add_schema_vcf_field(
+                                item_key, item_sub_dict, result, array=True
+                            )
+                else:
+                    self._add_schema_vcf_field(key, item_dict, result, array=True)
+        return result
+
+    def parse_subembedded_info_header(self, hdr):
+        """
+        Parses an individual (sub-embedded) INFO header.
+        For SV class, no need to verify fields in schema since only
+        fields from schema are searched for in record.
+
+        :param hdr: hdr to process, MUST contain 'Subembedded'
+        :return: a list of fields on this sub-embedded object
+        """
+        sub_embedded = self._strip(hdr.desc.split(':')[1:2][0])
+        self.sub_embedded_mapping[hdr.id] = sub_embedded
+
+        # get everything after 'Format', split on field sep
+        entries = hdr.desc.split(':')[3:][0].split('|')
+
+        # ID + stripped field name
+        entries = list(map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries))
+        return entries
+
+    def parse_info_header(self, hdr):
+        """
+        Parses an individual INFO header.
+        For SV class, no need to verify fields in schema since only
+        fields from schema are searched for in record.
+
+        :param hdr: hdr to process, must NOT contain 'Subembedded'
+        :return: list of fields in this annotation grouping
+        """
+        entries = hdr.desc.split(':')[1:][0].split('|')  # extract 'Format' string
+
+        # ID + stripped field name
+        entries = list(map(lambda f: hdr.id.lower() + '_' + self._strip(f), entries))
+        return entries
+
+    def add_result_value(
+            self, result, schema_key, schema_props, field_value, index=None
+    ):
+        """
+        Helper function for self.parse_record_for_schema_vcf_fields to
+        process value found in record according to its schema properties
+        and build variant/variant sample dict accordingly.
+
+        Handles formatting of sub-embedded groups and inserting defaults,
+        if present. Calls to self.cast_field_value to format value.
+
+        :param result: dict of variant or variant sample
+        :param schema_key: str field in schema
+        :param schema_props: dict of schema field properties
+        :param field_value: object found in VCF record for the schema field
+        :param index: int provided for sub-embedded objects from field
+            found in annotations
+        """
+        vcf_field = schema_props["vcf_field"]
+        field_type = schema_props["type"]
+        field_sub_type = schema_props.get("sub_type", "")
+        sub_embedded_group = schema_props.get("sub_embedded_group", "")
+        field_default = schema_props.get("default", None)
+        if field_value is None or field_value == "":
+            if field_default is not None:  # Re-do but use default
+                self.add_result_value(
+                    result, schema_key, schema_props, field_default, index=index
+                )
+        elif sub_embedded_group:
+            if sub_embedded_group not in result:
+                result[sub_embedded_group] = {}
+            if index is not None:
+                if index not in result[sub_embedded_group]:
+                    result[sub_embedded_group][index] = {}
+                result[sub_embedded_group][index][schema_key] = self.cast_field_value(
+                    field_type, field_value, sub_type=field_sub_type
+                )
+            else:
+                result[sub_embedded_group][schema_key] = self.cast_field_value(
+                    field_type, field_value, sub_type=field_sub_type
+                )
+        else:
+            result[schema_key] = self.cast_field_value(
+                field_type, field_value, sub_type=field_sub_type
+            )
+
+    def parse_record_for_schema_vcf_fields(
+            self, schema_vcf_fields, record, sample=None
+    ):
+        """
+        Process record for all VCF-specific fields from the given schema,
+        used to create both variants and variant samples. Once a field is
+        found, value extracted and self.add_result_value called to create
+        appropriate format according to field type from schema.
+
+        Note: Some SV-specific handling here for ALT key not applicable 
+        to SNVs.
+
+        :param schema_vcf_fields: dict of VCF-specific fields from schema
+            created by self.parse_props_for_vcf_info
+        :param record: class representing one VCF entry
+        :param sample: sample object for variant samples
+        """
+        result = {}
+        for schema_key, schema_props in schema_vcf_fields.items():
+            vcf_field = schema_props["vcf_field"]
+            sub_embedded_group = schema_props.get("sub_embedded_group", "")
+            if vcf_field in self.VCF_FIELDS:  # Variant field
+                field_value = getattr(record, vcf_field)
+                if vcf_field == "CHROM":
+                    field_value = self.remove_prefix("chr", field_value)
+                elif vcf_field == "ALT":  # Unlikely for SVs, but handled here
+                    field_value = field_value[0].type
+                self.add_result_value(result, schema_key, schema_props, field_value)
+            elif vcf_field in self.VCF_SAMPLE_FIELDS:  # Variant sample field
+                if vcf_field == "FILTER":
+                    field_value = getattr(record, vcf_field)
+                    if not field_value:
+                        field_value = "PASS"
+                else:
+                    field_value = getattr(record, vcf_field)
+                self.add_result_value(
+                    result, schema_key, schema_props, field_value
+                )
+            elif (
+                sample and vcf_field in (
+                    sample.data._fields + tuple([self.SAMPLE_ID_VCF_FIELD])
+                )
+            ): # Genotype fields
+                if sub_embedded_group == "samplegeno":  # Field from all samples
+                    for sample_idx, sample_item in enumerate(record.samples):
+                        sample_dict = sample_item.data._asdict()
+                        if vcf_field in sample_dict:
+                            field_value = sample_dict[vcf_field]
+                        elif vcf_field == self.SAMPLE_ID_VCF_FIELD:
+                            field_value = sample_item.sample
+                        self.add_result_value(
+                            result,
+                            schema_key,
+                            schema_props,
+                            field_value,
+                            index=sample_idx,
+                        )
+                elif vcf_field == self.SAMPLE_ID_VCF_FIELD:
+                    field_value = sample.sample
+                    self.add_result_value(
+                        result, schema_key, schema_props, field_value
+                    )
+                else:  # Field only from this sample
+                    sample_dict = sample.data._asdict()
+                    field_value = sample_dict[vcf_field]
+                    self.add_result_value(
+                        result, schema_key, schema_props, field_value
+                    )
+            elif vcf_field in record.INFO:  # INFO non-annotation field
+                field_value = record.INFO.get(vcf_field)
+                self.add_result_value(result, schema_key, schema_props, field_value)
+            else:  # INFO annotation fields
+                field_not_found = True
+                for annotation in self.annotation_keys:
+                    if vcf_field in self.format[annotation]:
+                        field_not_found = False
+                        annotation_items = record.INFO.get(annotation)
+                        if not annotation_items:
+                            continue
+                        annotation_items = self.parse_annotation_field_value(
+                            annotation_items
+                        )
+                        vcf_field_idx = self.format[annotation].index(vcf_field)
+                        for idx, annotation_item in enumerate(annotation_items):
+                            field_value = annotation_item[vcf_field_idx]
+                            self.add_result_value(
+                                result,
+                                schema_key,
+                                schema_props,
+                                field_value,
+                                index=idx,
+                            )
+                            if field_value != "" and not sub_embedded_group:
+                                # Value will be same or "" for all subsequent
+                                # annotation items.
+                                break
+                        break
+                if field_not_found:
+                    # vcf_field not found in any areas of the VCF. This shouldn't
+                    # happen with an up-to-date mapping table and correctly processed
+                    # VCF, but there may be remnant fields that we don't want to
+                    # delete. We send out to add_result_value to add the field with
+                    # its default, if present.
+                    self.add_result_value(result, schema_key, schema_props, None)
+        return result
+            
+    def create_variant_from_record(self, record):
+        """
+        Process record for variant fields.
+
+        :param record: class representing one VCF entry
+        :return result: list of variant sample dicts
+        """
+        result = self.parse_record_for_schema_vcf_fields(self.variant_vcf_props, record)
+        return dict(self.variant_defaults, **result)  # copy defaults, merge in result
+
+
+    def create_sample_variant_from_record(self, record):
+        """
+        Process record for variant sample fields, creating variant
+        sample items for all samples if sample genotype is appropriate.
+
+        :param record: class representing one VCF entry
+        :return result: list of variant sample dicts
+        """
+        result = []
+        for sample in record.samples:
+            if sample.data.GT in [self.GT_REF, self.GT_MISSING, self.GT_REF_PHASED]:
+                continue
+            sample_variant = self.parse_record_for_schema_vcf_fields(
+                self.variant_sample_vcf_props, record, sample=sample
+            )
+            sample_variant = dict(self.variant_sample_defaults, **sample_variant)
+            result.append(sample_variant)
+        return result
+
+    def format_variant_sub_embedded_objects(self, result, sample=False):
+        """
+        Reformat sub-embedded dicts of form {0: {...}, 1: {...}, ...} to
+        list of dicts of form [{...}, {...}, ...].
+
+        :param result: dict variant/variant sample to reformat
+        :param sample: bool if variant sample
+        """
+        sub_embedded_groups = self.variant_sub_embedded_groups
+        if sample:
+            sub_embedded_groups = self.variant_sample_sub_embedded_groups
+        for key in sub_embedded_groups:
+            self.format_variant(result, seo=key)

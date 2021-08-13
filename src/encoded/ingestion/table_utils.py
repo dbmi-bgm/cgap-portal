@@ -1074,6 +1074,269 @@ class VariantTableParser(object):
         return inserts
 
 
+class StructuralVariantTableParser(VariantTableParser):
+    """
+    Subclass of VariantTableParser used for intake of SV mapping table.
+
+    Main differences from the parent class are:
+        - Explicitly updates methods only related to "properties" field
+            of the relevant schema; all other fields in schema will
+            be same as in existing schema.
+        - Searches schema "properties" objects and embedded objects for
+            field indicative of the property coming from the mapping
+            table as implied by presence of VCF_FIELD_KEY
+        - All "properties" objects that do not come from the mapping
+            table are included in the new schema, while those from
+            previous mapping table ingestion are dropped and will
+            only be re-generated if present in current mapping table.
+    """
+    SV_SCHEMA_PATH = resolve_file_path("schemas/structural_variant.json")
+    SV_SAMPLE_SCHEMA_PATH = resolve_file_path("schemas/structural_variant_sample.json")
+    EMBEDDED_VARIANT_FIELDS = resolve_file_path("schemas/structural_variant_embeds.json")
+    EMBEDDED_VARIANT_SAMPLE_FIELDS = resolve_file_path(
+        "schemas/structural_variant_sample_embeds.json"
+    )
+    EMBEDS_TO_GENERATE = [
+        ("variant", EMBEDDED_VARIANT_FIELDS),
+        ("variant_sample", EMBEDDED_VARIANT_SAMPLE_FIELDS),
+    ]
+    VCF_FIELD_KEY = "vcf_field"
+
+    def __init__(self, *args, **kwargs):
+        super(StructuralVariantTableParser, self).__init__(*args, **kwargs)
+        self.sv_non_vcf_props = {}
+        self.sv_sample_non_vcf_props = {}
+        self.get_vcf_props()
+
+    @property
+    def old_sv_schema(self):
+        """Explicit property for easier mocking."""
+        return json.load(io.open(self.SV_SCHEMA_PATH))
+
+    @property
+    def old_sv_sample_schema(self):
+        """Explicit property for easier mocking."""
+        return json.load(io.open(self.SV_SAMPLE_SCHEMA_PATH))
+
+
+    def get_vcf_props(self):
+        """
+        Searches through existing SV and SV sample schemas to identify
+        existing "properties" objects that did not come from previous
+        mapping table ingestion, as indicated by lack of VCF_FIELD_KEY
+        on the object. 
+
+        Updates self.sv_non_vcf_props and self.sv_sample_non_vcf_props
+        dicts with keys as top-level "properties" fields to keep and
+        values as list of sub-embedded fields to keep if applicable.
+
+        Expects sub-embedded objects from previous mapping table
+        ingestion to be one-layer deep, e.g. an array of objects that
+        are not themselves arrays of objects. 
+
+        NOTE: This will obviously fail if the VCF_FIELD_KEY is dropped
+        from the mapping table.
+        """
+        for key, value in self.old_sv_schema["properties"].items():
+            vcf_field = self._is_vcf_field(key, value)
+            if not vcf_field:
+                self.sv_non_vcf_props[key] = ""
+            else:
+                sub_embeds_to_keep = self._collect_non_vcf_sub_embeds(key, value)
+                if sub_embeds_to_keep:
+                    self.sv_non_vcf_props[key] = sub_embeds_to_keep
+        for key, value in self.old_sv_sample_schema["properties"].items():
+            vcf_field = self._is_vcf_field(key, value)
+            if not vcf_field:
+                self.sv_sample_non_vcf_props[key] = ""
+            else:
+                sub_embeds_to_keep = self._collect_non_vcf_sub_embeds(key, value)
+                if sub_embeds_to_keep:
+                    self.sv_sample_non_vcf_props[key] = sub_embeds_to_keep
+               
+    def _is_vcf_field(self, key, value):
+        """
+        Helper function to self.get_vcf_props() to identify 
+        "properties" fields that stem from previous mapping table
+        ingestion as indicated by VCF_FIELD_KEY.
+
+        :param key: str field name
+        :param value: dict corresponding to key
+        :return result: bool if key corresponds to a vcf field
+        """
+        result = False
+        item_type = value.get("type", "")
+        vcf_field = value.get(self.VCF_FIELD_KEY, "")
+        if not vcf_field:
+            if item_type == "array":
+                item_dict = value["items"]
+                if "properties" in item_dict:  # Array of objects
+                    for item_key, item_value in item_dict["properties"].items():
+                        result = self._is_vcf_field(item_key, item_value)
+                        if result:
+                            break
+                else:
+                    result = self._is_vcf_field(key, item_dict)
+        else:
+            result = True
+        return result
+
+    def _collect_non_vcf_sub_embeds(self, key, value):
+        """
+        Helper function to self.get_vcf_props that collects non-vcf
+        fields nested within an object that contains at least one vcf field.
+
+        :param key: str field name
+        :param value: dict corresponding to key
+        :return result: list of nested non-vcf fields
+        """
+        result = []
+        item_type = value.get("type", "")
+        vcf_field = value.get(self.VCF_FIELD_KEY, "")
+        if not vcf_field:
+            if item_type == "array":
+                item_dict = value["items"]
+                if "properties" in item_dict:  # Array of objects
+                    for item_key, item_value in item_dict["properties"].items():
+                        sub_item_type = item_value.get("type", "")
+                        sub_item_vcf_field = item_value.get(self.VCF_FIELD_KEY, "")
+                        if sub_item_type == "array":
+                            sub_item_vcf_field = (
+                                item_value["items"].get(self.VCF_FIELD_KEY, "")
+                            )
+                        if not sub_item_vcf_field:
+                            result.append(item_key)
+        return result
+
+    def provision_embeds(self):
+        """ 
+        Does setup necessary for writing embeds to JSON files in the
+        schemas directory.
+
+        Called by initializer based on EMBEDS_TO_GENERATE.
+        """
+        for field, f in self.EMBEDS_TO_GENERATE:
+            field = "structural_" + field
+            with open(f, 'w+') as fd:
+                json.dump({field: {}}, fd)
+
+    def update_embeds(self, item, scope):
+        """ 
+        Updates the EMBEDDED_FIELDS location JSON containing the embeds
+        for structural variant.
+        NOTE: the files are overwritten every time you run the process!
+
+        :param item: embedded field to be written
+        :param scope: which item type this embed is for
+        """
+        # XXX: This does NOT work properly if for linkTos, embeds required .keyword!
+        for t, f in self.EMBEDS_TO_GENERATE:
+            if scope == t:
+                t = "structural_" + t
+                with open(f, 'rb') as fd:
+                    embeds = json.load(fd)
+                    link_type = 'embedded_field'
+                    prefix = ''
+                    if item.get('sub_embedding_group', None):
+                        prefix = self.format_sub_embedding_group_name(
+                            item.get('sub_embedding_group'), t='key'
+                        ) + '.'
+                    if link_type not in embeds[t]:
+                        embeds[t][link_type] = [prefix + item[self.NAME_FIELD]]
+                    else:
+                        embeds[t][link_type].append(prefix + item[self.NAME_FIELD])
+                with open(f, 'w+') as wfd:
+                    json.dump(embeds, wfd)
+                    wfd.write('\n')  # write newline at EOF
+
+
+    @staticmethod
+    def generate_schema(var_props, old_schema, props_to_keep):
+        """
+        Generate new schema by updating the properties of the old schema
+        according to the new mapping table, leaving the remainder of the
+        schema the same. 
+
+        :param var_props: dict of new props from mapping table ingested
+        :param old_schema: dict of existing schema
+        :param props_to_keep: dict of non-vcf fields and sub-embedded
+            non-vcf fields to keep, if applicable
+        :return schema: dict of updated schema with "properties" field
+            containing all new props and existing non-vcf fields
+        """
+        schema = {}
+        old_schema_props = old_schema["properties"]
+        for field in props_to_keep:
+            sub_embeds_to_keep = props_to_keep[field]
+            if not sub_embeds_to_keep:
+                var_props[field] = old_schema_props[field]
+            else:
+                if field in var_props:
+                    try:
+                        var_prop_sub_embeds = var_props[field]["items"]["properties"]
+                        old_schema_prop_sub_embeds = (
+                            old_schema_props[field]["items"]["properties"]
+                        )
+                        for sub_embed in sub_embeds_to_keep:
+                            var_prop_sub_embeds[sub_embed] = (
+                                old_schema_prop_sub_embeds[sub_embed]
+                            )
+                    except KeyError:
+                        # Field went from array of objects to other type, so don't
+                        # attempt to sub-embed previous non-vcf fields
+                        continue
+                else:
+                    var_props[field] = old_schema_props[field]
+                    tmp = [
+                        key for key in old_schema_props[field]["items"]["properties"]
+                    ]
+                    for sub_embed in tmp:
+                        if sub_embed not in sub_embeds_to_keep:
+                            del var_props[field]["items"]["properties"][sub_embed]
+        for key in old_schema:
+            if key == "properties":
+                schema["properties"] = var_props
+            else:
+                schema[key] = old_schema[key]
+        return schema
+
+    def run(self, project=None, institution=None, write=True):
+        """
+        Runs mapping table intake for SVs, writing new 'properties' fields
+        for structural variants and structural variant samples.
+
+        :param project: str project identifier
+        :param institution: str institution identifier
+        :param write: bool to write new schema
+        :return inserts: list of dicts corresponding to props of ingested
+            mapping table
+        """
+        inserts = self.process_annotation_field_inserts()
+        sv_props, _, _ = self.generate_properties(
+            self.filter_fields_by_variant(inserts)
+        )
+        sv_sample_props, _, _ = self.generate_properties(
+            self.filter_fields_by_sample(inserts), variant=False
+        )
+        new_sv_schema = self.generate_schema(
+            sv_props, self.old_sv_schema, self.sv_non_vcf_props
+        )
+        new_sv_sample_schema = self.generate_schema(
+            sv_sample_props, self.old_sv_sample_schema, self.sv_sample_non_vcf_props
+        )
+        if write:
+            self.write_schema(new_sv_schema, self.SV_SCHEMA_PATH)
+            self.write_schema(new_sv_sample_schema, self.SV_SAMPLE_SCHEMA_PATH)
+            logger.info("Successfully wrote schemas")
+        if project or institution:
+            for insert in inserts:
+                if project:
+                    insert['project'] = project
+                if institution:
+                    insert['institution'] = institution
+        return inserts
+
+
 class GeneTableParser(VariantTableParser):
     """ Subclass of MappingTableParser that overrides methods required for any differences across tables. """
 

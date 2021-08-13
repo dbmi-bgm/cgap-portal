@@ -7,6 +7,7 @@ from ..inheritance_mode import InheritanceMode
 from ..server_defaults import add_last_modified
 from ..loadxl import LOADXL_USER_UUID
 from ..types.variant import build_variant_display_title, ANNOTATION_ID_SEP, build_variant_sample_annotation_id
+from ..types.structural_variant import build_structural_variant_display_title
 from ..util import resolve_file_path
 from .common import CGAP_CORE_PROJECT, CGAP_CORE_INSTITUTION, IngestionReport
 
@@ -213,3 +214,129 @@ class VariantBuilder:
                 log.info('Error encountered posting variant/variant_sample: %s' % e)
                 self.ingestion_report.mark_failure(body=str(e), row=idx)
         return self.ingestion_report.total_successful(), self.ingestion_report.total_errors()
+
+
+class StructuralVariantBuilderError(Exception):
+    pass
+
+
+class StructuralVariantBuilder(VariantBuilder):
+    """
+    Class to build SVs/SV samples. Similar to VariantBuilder with updated
+    methods for SVs and inclusion, with a check_variant method to
+    catch possible bioinformatics errors unique to SVs.
+    """
+
+    def _post_or_patch_variant(self, variant):
+        """ POST/PATCH the structural variant ie: create it if it doesn't exist,
+            or update existing.
+
+            NOTE: snovault does not implement standard HTTP PUT.
+        """
+        try:
+            res = self.vapp.post_json("/structural_variant", variant, status=201)
+        except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
+            log.info(
+                "Exception encountered on structural_variant post (attempting patch): %s"
+                % e
+            )
+            res = self.vapp.patch_json(
+                "/structural_variant/%s" % build_structural_variant_display_title(
+                    variant["SV_TYPE"],
+                    variant["CHROM"],
+                    variant["START"],
+                    variant["END"],
+                ),
+                variant,
+                status=200
+            )
+        return res.json
+
+    def _post_or_patch_variant_sample(self, variant_sample, variant_uuid):
+        """ POST/PATCH the structural_variant_sample ie: create it if it doesn't
+            exist, or update existing.
+
+            The StructuralVariantSample annotation_id format is
+                "CALL_INFO:structural_variant_uuid:file_accession"
+
+            NOTE: snovault does not implement standard HTTP PUT.
+        """
+        try:
+            self.vapp.post_json("/structural_variant_sample", variant_sample, status=201)
+        except Exception as e:  # noqa exceptions thrown by the above call are not reported correctly
+            log.info(
+                "Exception encountered on structural_variant_sample post"
+                " (attempting patch): %s" % e
+            )
+            self.vapp.patch_json(
+                "/structural_variant_sample/%s" % (
+                    build_variant_sample_annotation_id(
+                        variant_sample["CALL_INFO"], variant_uuid, self.file,
+                    )
+                ),
+                variant_sample,
+                status=200,
+            )
+
+    @staticmethod
+    def _validate_structural_variant(variant):
+        """
+        Sanity checks for SVs that should cause an ingestion to fail,
+        intended to catch bioinformatics-related issues to address.
+
+        :param variant: dict variant object
+        """
+        _validate_sv_position(variant)
+
+    @staticmethod
+    def _validate_sv_position(variant):
+        """
+        Ensure deletions and duplications have START < END.
+
+        :param variant: dict variant object
+        """
+        if variant["SV_TYPE"] in ["DEL", "DUP"]:
+            if variant["START"] >= variant["END"]:
+                raise StructuralVariantBuilderError(
+                    "Variant has START >= END: %s." % variant
+                )
+
+    def build_variant(self, record):
+        """ Builds a raw structural variant from the given VCF record. """
+        raw_variant = self.parser.create_variant_from_record(record)
+        self._validate_structural_variant(raw_variant)
+        self._add_project_and_institution(raw_variant)
+        self._set_shared_obj_status(raw_variant)
+        self.parser.format_variant_sub_embedded_objects(raw_variant)
+        add_last_modified(raw_variant, userid=LOADXL_USER_UUID)
+        return raw_variant
+
+    def build_variant_samples(self, variant, record, sample_relations):
+        """
+        Builds structural variant samples from the record row, returning
+        the resulting samples.
+        """
+        if variant is None:
+            return []
+        variant_samples = self.parser.create_sample_variant_from_record(record)
+        for sample in variant_samples:
+            sample["project"] = self.project
+            sample["institution"] = self.institution
+            sample["structural_variant"] = build_structural_variant_display_title(
+                variant["SV_TYPE"], variant["CHROM"], variant["START"], variant["END"],
+            )
+            sample["file"] = self.file
+            self.parser.format_variant_sub_embedded_objects(sample, sample=True)
+
+            # add familial relations to samplegeno field
+            for geno in sample.get("samplegeno", []):
+                sample_id = geno["samplegeno_sampleid"]
+                if sample_id in sample_relations:
+                    geno.update(sample_relations[sample_id])
+
+            # add inheritance mode information
+            variant_name = sample["structural_variant"]
+            chrom = variant_name[variant_name.index("chr") + 3]  # find chr* and get *
+            sample.update(InheritanceMode.compute_inheritance_modes(sample, chrom=chrom))
+            add_last_modified(variant, userid=LOADXL_USER_UUID)
+        return variant_samples

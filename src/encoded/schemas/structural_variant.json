@@ -54,7 +54,6 @@
         "CHROM": {
             "title": "Chromosome",
             "field_name": "CHROM",
-            "vcf_field": "CHROM",
             "type": "string",
             "enum": [
                 "1",
@@ -83,23 +82,35 @@
                 "Y",
                 "M"
             ],
+            "do_import": true,
+            "vcf_field": "CHROM",
+            "source_name": "VCF",
             "description": "Chromosome",
+            "scope": "variant",
             "schema_title": "Chromosome"
-        },
-        "START": {
-            "title": "Start Position",
-            "field_name": "START",
-            "type": "integer",
-            "vcf_field": "POS",
-            "description": "Start Position",
-            "min": 1
         },
         "END": {
             "title": "End Position",
             "field_name": "END",
             "type": "integer",
+            "do_import": true,
             "vcf_field": "END",
+            "source_name": "VCF",
             "description": "End Position",
+            "scope": "variant",
+            "schema_title": "End Position",
+            "min": 1
+        },
+        "START": {
+            "title": "Start Position",
+            "field_name": "START",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "POS",
+            "source_name": "VCF",
+            "description": "Start Position",
+            "scope": "variant",
+            "schema_title": "Start Position",
             "min": 1
         },
         "SV_TYPE": {
@@ -107,16 +118,459 @@
             "field_name": "SV_TYPE",
             "type": "string",
             "enum": [
-                "DEL",
-                "DUP"
+                "DUP",
+                "DEL"
             ],
+            "do_import": true,
             "vcf_field": "SVTYPE",
-            "description": "The type of structural variant"
+            "source_name": "VCF",
+            "description": "Structural variant type",
+            "scope": "variant",
+            "schema_title": "Variant Type"
         },
         "annotation_id": {
             "title": "Annotation ID",
             "type": "string",
             "uniqueKey": true
+        },
+        "gnomadg_ac": {
+            "title": "gnomAD-SV Alt Allele Count",
+            "field_name": "gnomadg_ac",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "AC",
+            "source_name": "gnomAD",
+            "description": "Alternate allele count for samples",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt Allele Count",
+            "min": 0
+        },
+        "gnomadg_ac-afr": {
+            "title": "gnomAD-SV Alt AC - African-American/African",
+            "field_name": "gnomadg_ac-afr",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "AFR_AC",
+            "source_name": "gnomAD",
+            "description": "Alternate allele count for samples of African-American/African ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AC - African-American/African",
+            "min": 0
+        },
+        "gnomadg_ac-amr": {
+            "title": "gnomAD-SV Alt AC - Latino",
+            "field_name": "gnomadg_ac-amr",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "AMR_AC",
+            "source_name": "gnomAD",
+            "description": "Alternate allele count for samples of Latino ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AC - Latino",
+            "min": 0
+        },
+        "gnomadg_ac-eas": {
+            "title": "gnomAD-SV Alt AC - East Asian",
+            "field_name": "gnomadg_ac-eas",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "EAS_AC",
+            "source_name": "gnomAD",
+            "description": "Alternate allele count for samples of East Asian ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AC - East Asian",
+            "min": 0
+        },
+        "gnomadg_ac-eur": {
+            "title": "gnomAD-SV Alt AC - European",
+            "field_name": "gnomadg_ac-eur",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "EUR_AC",
+            "source_name": "gnomAD",
+            "description": "Alternate allele count for samples of European ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AC - European",
+            "min": 0
+        },
+        "gnomadg_ac-oth": {
+            "title": "gnomAD-SV Alt AC - Other",
+            "field_name": "gnomadg_ac-oth",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "OTH_AC",
+            "source_name": "gnomAD",
+            "description": "Alternate allele count for samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AC - Other",
+            "min": 0
+        },
+        "gnomadg_af": {
+            "title": "gnomAD-SV Alt Allele Frequency",
+            "field_name": "gnomadg_af",
+            "type": "number",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "AF",
+            "source_name": "gnomAD",
+            "description": "Alternate allele frequency in samples",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt Allele Frequency",
+            "min": 0,
+            "max": 1
+        },
+        "gnomadg_af-afr": {
+            "title": "gnomAD-SV Alt AF - African-American/African",
+            "field_name": "gnomadg_af-afr",
+            "type": "number",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "AFR_AF",
+            "source_name": "gnomAD",
+            "description": "Alternate allele frequency in samples of African-American/African ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AF - African-American/African",
+            "min": 0,
+            "max": 1
+        },
+        "gnomadg_af-amr": {
+            "title": "gnomAD-SV Alt AF - Latino",
+            "field_name": "gnomadg_af-amr",
+            "type": "number",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "AMR_AF",
+            "source_name": "gnomAD",
+            "description": "Alternate allele frequency in samples of Latino ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AF - Latino",
+            "min": 0,
+            "max": 1
+        },
+        "gnomadg_af-eas": {
+            "title": "gnomAD-SV Alt AF - East Asian",
+            "field_name": "gnomadg_af-eas",
+            "type": "number",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "EAS_AF",
+            "source_name": "gnomAD",
+            "description": "Alternate allele frequency in samples of East Asian ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AF - East Asian",
+            "min": 0,
+            "max": 1
+        },
+        "gnomadg_af-eur": {
+            "title": "gnomAD-SV Alt AF - European",
+            "field_name": "gnomadg_af-eur",
+            "type": "number",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "EUR_AF",
+            "source_name": "gnomAD",
+            "description": "Alternate allele frequency in samples of European ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AF - European",
+            "min": 0,
+            "max": 1
+        },
+        "gnomadg_af-oth": {
+            "title": "gnomAD-SV Alt AF - Other",
+            "field_name": "gnomadg_af-oth",
+            "type": "number",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "OTH_AF",
+            "source_name": "gnomAD",
+            "description": "Alternate allele frequency in samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AF - Other",
+            "min": 0,
+            "max": 1
+        },
+        "gnomadg_an": {
+            "title": "gnomAD-SV Alt Allele Number",
+            "field_name": "gnomadg_an",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "AN",
+            "source_name": "gnomAD",
+            "description": "Total number of alleles in samples",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt Allele Number",
+            "min": 0
+        },
+        "gnomadg_an-afr": {
+            "title": "gnomAD-SV Alt AN - African-American/African",
+            "field_name": "gnomadg_an-afr",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "AFR_AN",
+            "source_name": "gnomAD",
+            "description": "Total number of alleles in samples of African-American/African ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AN - African-American/African",
+            "min": 0
+        },
+        "gnomadg_an-amr": {
+            "title": "gnomAD-SV Alt AN - Latino",
+            "field_name": "gnomadg_an-amr",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "AMR_AN",
+            "source_name": "gnomAD",
+            "description": "Total number of alleles in samples of Latino ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AN - Latino",
+            "min": 0
+        },
+        "gnomadg_an-eas": {
+            "title": "gnomAD-SV Alt AN - East Asian",
+            "field_name": "gnomadg_an-eas",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "EAS_AN",
+            "source_name": "gnomAD",
+            "description": "Total number of alleles in samples of East Asian ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AN - East Asian",
+            "min": 0
+        },
+        "gnomadg_an-eur": {
+            "title": "gnomAD-SV Alt AN - European",
+            "field_name": "gnomadg_an-eur",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "EUR_AN",
+            "source_name": "gnomAD",
+            "description": "Total number of alleles in samples of European ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AN - European",
+            "min": 0
+        },
+        "gnomadg_an-oth": {
+            "title": "gnomAD-SV Alt AN - Other",
+            "field_name": "gnomadg_an-oth",
+            "type": "integer",
+            "do_import": true,
+            "add_no_value": true,
+            "vcf_field": "OTH_AN",
+            "source_name": "gnomAD",
+            "description": "Total number of alleles in samples of Other ancestry",
+            "scope": "variant",
+            "schema_title": "gnomAD-SV Alt AN - Other",
+            "min": 0
+        },
+        "schema_version": {
+            "default": "1"
+        },
+        "transcript": {
+            "title": "Transcript",
+            "type": "array",
+            "items": {
+                "title": "Transcript",
+                "type": "object",
+                "properties": {
+                    "csq_consequence": {
+                        "title": "csq_consequence",
+                        "type": "array",
+                        "items": {
+                            "title": "Variant Consequence",
+                            "field_name": "csq_consequence",
+                            "type": "string",
+                            "linkTo": "VariantConsequence",
+                            "do_import": true,
+                            "vcf_field": "csq_consequence",
+                            "source_name": "VEP",
+                            "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                            "description": "Transcript Consequence Type",
+                            "scope": "variant",
+                            "schema_title": "Variant Consequence"
+                        }
+                    },
+                    "csq_gene": {
+                        "title": "Gene",
+                        "field_name": "csq_gene",
+                        "type": "string",
+                        "linkTo": "Gene",
+                        "do_import": true,
+                        "vcf_field": "csq_gene",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Transcript Gene",
+                        "scope": "variant",
+                        "schema_title": "Gene"
+                    },
+                    "csq_feature": {
+                        "title": "Transcript (Ensembl)",
+                        "field_name": "csq_feature",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_feature",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Transcript Ensembl ID",
+                        "scope": "variant",
+                        "schema_title": "Transcript (Ensembl)"
+                    },
+                    "csq_biotype": {
+                        "title": "Biotype",
+                        "field_name": "csq_biotype",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_biotype",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Biotype of transcript or regulatory feature",
+                        "scope": "variant",
+                        "schema_title": "Biotype"
+                    },
+                    "csq_exon": {
+                        "title": "Exon",
+                        "field_name": "csq_exon",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_exon",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Exon number(s) / total",
+                        "scope": "variant",
+                        "schema_title": "Exon"
+                    },
+                    "csq_intron": {
+                        "title": "Intron",
+                        "field_name": "csq_intron",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_intron",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Intron number(s) / total",
+                        "scope": "variant",
+                        "schema_title": "Intron"
+                    },
+                    "csq_hgvsc": {
+                        "title": "HGVS-coding",
+                        "field_name": "csq_hgvsc",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_hgvsc",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "HGVS coding sequence name",
+                        "scope": "variant",
+                        "schema_title": "HGVS-coding"
+                    },
+                    "csq_hgvsp": {
+                        "title": "HGVS-protein",
+                        "field_name": "csq_hgvsp",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_hgvsp",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "HGVS protein sequence name",
+                        "scope": "variant",
+                        "schema_title": "HGVS-protein"
+                    },
+                    "csq_cdna_position": {
+                        "title": "cDNA position",
+                        "field_name": "csq_cdna_position",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_cdna_position",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Relative position of base pair in cDNA sequence",
+                        "scope": "variant",
+                        "schema_title": "cDNA position"
+                    },
+                    "csq_cds_position": {
+                        "title": "CDS position",
+                        "field_name": "csq_cds_position",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_cds_position",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Relative position of base pair in coding sequence",
+                        "scope": "variant",
+                        "schema_title": "CDS position"
+                    },
+                    "csq_protein_position": {
+                        "title": "Amino Acid Position",
+                        "field_name": "csq_protein_position",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_protein_position",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Relative position of amino acid in protein",
+                        "scope": "variant",
+                        "schema_title": "Amino Acid Position"
+                    },
+                    "csq_amino_acids": {
+                        "title": "Amino Acid Change",
+                        "field_name": "csq_amino_acids",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_amino_acids",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Reference and variant amino acids",
+                        "scope": "variant",
+                        "schema_title": "Amino Acid Change"
+                    },
+                    "csq_codons": {
+                        "title": "Codon Change",
+                        "field_name": "csq_codons",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_codons",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Reference and variant codon sequence",
+                        "scope": "variant",
+                        "schema_title": "Codon Change"
+                    },
+                    "csq_distance": {
+                        "title": "Distance to Transcript",
+                        "field_name": "csq_distance",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_distance",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Shortest distance from variant to transcript",
+                        "scope": "variant",
+                        "schema_title": "Distance to Transcript"
+                    },
+                    "csq_strand": {
+                        "title": "Strand",
+                        "field_name": "csq_strand",
+                        "type": "boolean",
+                        "do_import": true,
+                        "vcf_field": "csq_strand",
+                        "source_name": "VEP",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Strand of the feature",
+                        "scope": "variant",
+                        "schema_title": "Strand"
+                    }
+                }
+            }
         },
         "variant_notes": {
             "title": "Variant Notes",
@@ -127,9 +581,6 @@
                 "type": "string",
                 "linkTo": "NoteStandard"
             }
-        },
-        "schema_version": {
-            "default": "1"
         }
     },
     "facets": {

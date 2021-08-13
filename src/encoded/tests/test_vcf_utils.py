@@ -1,7 +1,6 @@
 import pytest
-from ..ingestion.vcf_utils import (
-    VCFParser
-)
+from ..ingestion.vcf_utils import VCFParser, StructuralVariantVCFParser
+from ..util import resolve_file_path
 from .variant_fixtures import (  # noqa
     GENE_URL,
     GENE_WORKBOOK,
@@ -16,6 +15,9 @@ TEST_VCF = './src/encoded/annotations/GAPFIBVPFEP5_v0.5.4.reformat.altcounts.vcf
 EXPECTED_ANNOTATION_FIELDS = ['comHet', 'CSQ']
 VARIANT_SCHEMA = './src/encoded/schemas/variant.json'
 VARIANT_SAMPLE_SCHEMA = './src/encoded/schemas/variant_sample.json'
+TEST_SV_VCF = resolve_file_path("annotations/GAPFIDTAWSY3_v0.0.2.vcf.subset")
+SV_SCHEMA = resolve_file_path("schemas/structural_variant.json")
+SV_SAMPLE_SCHEMA = resolve_file_path("schemas/structural_variant_sample.json")
 
 
 @pytest.fixture
@@ -202,3 +204,82 @@ class TestIngestVCF:
 #             res2 = es_testapp.post_json(VARIANT_SAMPLE_URL, sample, status=201).json
 #             assert 'annotation_id' in res2['@graph'][0]
 #             assert 'bam_snapshot' in res2['@graph'][0]
+
+@pytest.fixture
+def test_sv_vcf():
+    parser = StructuralVariantVCFParser(TEST_SV_VCF, SV_SCHEMA, SV_SAMPLE_SCHEMA)
+    return parser
+
+
+class TestIngestStructuralVariantVCF(TestIngestVCF):
+
+    VEP_IDENTIFIER = "transcript"  # In case of future divergence from SNV tests
+
+    def test_build_variants(self, test_sv_vcf):
+        """
+        Test accurate processing of multiple records for subset of all
+        expected fields that can be ingested.
+        """
+
+        # record 1 - Basics + Transcript fields
+        record = test_sv_vcf.read_next_record()
+        result = test_sv_vcf.create_variant_from_record(record)
+
+        assert self.get_top_level_field(result, "CHROM") == "1"
+        assert self.get_top_level_field(result, "START") == 31908111
+        assert self.get_top_level_field(result, "END") == 31908161
+        assert self.get_top_level_field(result, "SV_TYPE") == "DEL"
+        assert len(result["transcript"]) == 9
+        assert self.get_transcript_field(result, 0, "csq_consequence") == [
+            "downstream_gene_variant"
+        ]
+        assert self.get_transcript_field(result, 0, "csq_gene") == "ENSG00000184007"
+        assert self.get_transcript_field(result, 0, "csq_feature") == "ENST00000457805"
+        assert self.get_transcript_field(result, 0, "csq_biotype") == "protein_coding"
+        assert self.get_transcript_field(result, 0, "csq_distance") == "373"
+        assert self.get_transcript_field(result, 0, "csq_strand") is True
+        assert self.get_transcript_field(result, 6, "csq_exon") == "5/5"
+        assert self.get_transcript_field(result, 6, "csq_intron") == "3/3"
+        assert self.get_transcript_field(result, 6, "csq_hgvsc") == "Foo"
+        assert self.get_transcript_field(result, 6, "csq_hgvsp") == "Bar"
+        assert self.get_transcript_field(result, 6, "csq_cdna_position") == "1613-1662"
+        variant_keys = result.keys()
+        for key in variant_keys:
+            assert "gnomadg" not in key
+
+        # record 2 - gnomAD-SV values
+        record = test_sv_vcf.read_next_record()
+        result = test_sv_vcf.create_variant_from_record(record)
+
+        assert self.get_top_level_field(result, "gnomadg_ac") == 8
+        assert self.get_top_level_field(result, "gnomadg_af-afr") == 0.000757
+        assert self.get_top_level_field(result, "gnomadg_an-eur") == 7608
+
+    def test_build_variant_samples(self, test_sv_vcf):
+        """
+        Test accurate processing of multiple records for subset of all
+        expected fields that can be ingested.
+        """
+
+        # record 1 - Basics + Samplegeno fields
+        record = test_sv_vcf.read_next_record()
+        result = test_sv_vcf.create_sample_variant_from_record(record)
+        
+        assert len(result) == 1
+        assert self.get_top_level_field(result[0], "GT") == "0/1"
+        assert self.get_top_level_field(result[0], "CALL_INFO") == "NA12878_sample"
+        sample_geno = self.get_top_level_field(result[0], "samplegeno")
+        assert len(sample_geno) == 3
+        assert sample_geno[0]["samplegeno_numgt"] == "0/0"
+        assert sample_geno[2]["samplegeno_sampleid"] == "NA12877_sample"
+
+        # record 2 - Basics + Samplegeno fields
+        record = test_sv_vcf.read_next_record()
+        result = test_sv_vcf.create_sample_variant_from_record(record)
+
+        assert len(result) == 2
+        sample_geno = self.get_top_level_field(result[1], "samplegeno")
+        assert len(sample_geno) == 3
+        assert sample_geno[1]["samplegeno_sampleid"] == "NA12878_sample"
+        assert sample_geno[2]["samplegeno_numgt"] == "0/1"
+        
