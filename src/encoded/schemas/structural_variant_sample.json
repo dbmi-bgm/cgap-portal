@@ -318,6 +318,16 @@
                 "Low relevance, other"
             ]
         },
+        "proband_only_inheritance_modes": {
+            "title": "Inheritance Modes",
+            "order": 55,
+            "grouping": "Inheritance",
+            "default_hidden": true,
+            "rescue_terms": [
+                "X-linked",
+                "Y-linked"
+            ]
+        },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Proband Genotype",
             "order": 60,
