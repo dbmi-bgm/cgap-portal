@@ -7,7 +7,7 @@ import { console, ajax, valueTransforms } from '@hms-dbmi-bgm/shared-portal-comp
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
-
+import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 
 
 export function CNVSVFilteringTab(props) {
@@ -51,9 +51,11 @@ export function CNVSVFilteringTab(props) {
         searchHref: searchHrefBase
     };
 
+    const aboveTableComponent = (<CNVSVEmbeddedTableHeader {...{ href: searchHrefBase, session }}/>);
+
     return (
         <div>
-            <CaseViewEmbeddedStructuralVariantSearchTable {...tableProps} />
+            <CaseViewEmbeddedStructuralVariantSearchTable {...tableProps} embeddedTableHeader={aboveTableComponent}/>
         </div>);
 }
 
@@ -124,3 +126,35 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
 
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
+
+/** This left section for Search should be made prettier, either kept in 4DN or re-used. */
+export const CNVSVEmbeddedTableHeader = React.memo(function CNVSVEmbeddedTableHeader(props){
+    const { context, currentAction, topLeftChildren, isFullscreen, windowWidth, toggleFullScreen, sortBy } = props;
+    const { total: showTotalResults = 0 } = context || {};
+
+    // Case if on SearchView
+    let total = null;
+    if (typeof showTotalResults === 'number') {
+        total = (
+            <div className="d-inline-block">
+                <span className="text-600" id="results-count">
+                    { showTotalResults }
+                </span>
+            </div>
+        );
+    }
+
+    return (
+        // TODO refactor out panelMap stuff.
+        <AboveTableControlsBase {...{ isFullscreen, windowWidth,toggleFullScreen, sortBy }}
+            panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(props)}>
+            { total ?
+                <h4 className="col my-0">
+                    <strong className="mr-1">{ total }</strong>
+                    <span className="text-400">
+                        CNV / SV Variant Matches
+                    </span>
+                </h4>: null }
+        </AboveTableControlsBase>
+    );
+});

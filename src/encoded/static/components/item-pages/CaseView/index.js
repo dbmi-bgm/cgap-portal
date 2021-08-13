@@ -816,7 +816,7 @@ function FilteringTabWrapper(props) {
     return (
         <React.Fragment>
             <FilteringTabTableToggle {...{ currViewName, setCurrViewName }}/>
-            <div className="row mb-36 mt-0">
+            <div className="row mb-1 mt-0">
                 <h1 className="col my-0">
                     {currentTitle} <span className="text-300">Variant Filtering and Technical Review</span>
                 </h1>
