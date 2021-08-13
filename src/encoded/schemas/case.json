@@ -124,8 +124,14 @@
             }
         },
         "meta_workflow_run": {
-            "title": "MetaWorkflowRun",
-            "description": "Meta-workflow-run associated with this case",
+            "title": "MetaWorkflowRun for SNV",
+            "description": "SNV Meta-workflow-run associated with this case",
+            "type": "string",
+            "linkTo": "MetaWorkflowRun"
+        },
+        "meta_workflow_run_sv": {
+            "title": "MetaWorkflowRun for SV",
+            "description": "SV Meta-workflow-run associated with this case",
             "type": "string",
             "linkTo": "MetaWorkflowRun"
         }
@@ -138,13 +144,13 @@
             "title": "Final VCF Status"
         },
         "individual.sex": {
-            "title": "Gender",
+            "title": "Sex",
             "grouping": "Individual"
         }
     },
     "columns": {
         "display_title": {
-            "title": "Case",
+            "title": "Case ID",
             "sort_fields": [
                 {
                     "field": "accession",
@@ -157,7 +163,7 @@
             ]
         },
         "family": {
-            "title": "Family",
+            "title": "Family ID",
             "sort_fields": [
                 {
                     "field": "family.accession",
@@ -174,7 +180,7 @@
             ]
         },
         "individual": {
-            "title": "Individual",
+            "title": "Individual ID",
             "description": "Proband Individual of this Case",
             "sort_fields": [
                 {

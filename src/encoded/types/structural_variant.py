@@ -120,6 +120,16 @@ class StructuralVariant(Item):
         chrom_info = nc.get_chrominfo("hg38")
         return nc.chr_pos_to_genome_pos("chr" + CHROM, END, chrom_info)
 
+    @calculated_property(
+        schema={
+            "title": "Structural Variant Size",
+            "description": "The size of this structural variant",
+            "type": "number",
+        }
+    )
+    def size(self, request, START, END):
+        return END - START + 1
+
 
 @collection(
     name="structural-variant-samples",
@@ -159,7 +169,7 @@ class StructuralVariantSample(Item):
             "type": "string",
         }
     )
-    def display_title(self, request, CALL_INFO, structural_variant=None):
+    def display_title(self, request, CALL_INFO, structural_variant):
         structural_variant = get_item_or_none(
             request, structural_variant, "StructuralVariant", frame="raw"
         )
@@ -185,26 +195,3 @@ class StructuralVariantSample(Item):
         result = self.rev_link_atids(request, "variant_sample_list")
         if result:
             return result[0]  # expected one list per case
-
-    @calculated_property(
-        schema={
-            "title": "BAM Snapshot",
-            "description": "Link to Genome Snapshot Image",
-            "type": "string",
-        }
-    )
-    def bam_snapshot(self, request, file, structural_variant):
-        structural_variant_props = get_item_or_none(
-            request, structural_variant, "StructuralVariant", frame="raw"
-        )
-        if structural_variant_props is None:
-            raise RuntimeError("Got none for something that definitely exists")
-        file_path = (
-            "%s/bamsnap/chr%s_%s.png"
-            % (  # file = accession of associated VCF file
-                file,
-                structural_variant_props["CHROM"],
-                structural_variant_props["START"],
-            )
-        )
-        return file_path

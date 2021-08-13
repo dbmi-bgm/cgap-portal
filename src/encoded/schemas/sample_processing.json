@@ -61,6 +61,11 @@
                 "Custom"
             ]
         },
+        "analysis_version": {
+            "title": "Analysis Version",
+            "description": "The version of the pipeline that is intended to be run",
+            "type": "string"
+        },
         "samples": {
             "title": "Samples",
             "description": "Samples used in the analysis",

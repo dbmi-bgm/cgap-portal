@@ -1,18 +1,15 @@
 'use strict';
 
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
 import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
-import Button from 'react-bootstrap/esm/Button';
+import Overlay from 'react-bootstrap/esm/Overlay';
 import memoize from 'memoize-one';
 import Popover  from 'react-bootstrap/esm/Popover';
-import DropdownButton from 'react-bootstrap/esm/DropdownButton';
-import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import Collapse from 'react-bootstrap/esm/Collapse';
-import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+import { console, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { acmgUtil } from '../../util';
 import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
@@ -21,7 +18,7 @@ import { GeneTabBody } from './GeneTabBody';
 import { SampleTabBody } from './SampleTabBody';
 import { AnnotationBrowserTabBody } from './AnnotationBrowserTabBody';
 import { BamFileBrowserTabBody } from './BamFileBrowserTabBody';
-import { InterpretationSpaceController, InterpretationSpaceWrapper } from './InterpretationSpaceController';
+import { InterpretationSpaceWrapper, InterpretationSpaceHeader } from './InterpretationSpaceController';
 
 
 
@@ -114,18 +111,37 @@ export class VariantSampleOverview extends React.PureComponent {
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
         const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
 
-        const { query: {
-            showInterpretation = true,      // used only if "True" (toggles showing of interpretation sidebar/pane)
-            annotationTab = null,           // used only if can be parsed to integer (Variant = 0, Gene = 1, Sample = 2, AnnotationBrowser = 3, BAM Browser = 4)
-            interpretationTab = null,       // used only if can be parsed to integer (Variant Notes = 0, Gene Notes = 1, Clinical = 2, Discovery = 3)
-            caseSource = null
-        } } = memoizedUrlParse(href);
+        const {
+            query: {
+                showInterpretation: showInterpretationFromQuery = null, // used only if "True" (toggles showing of interpretation sidebar/pane)
+                annotationTab: annotationTabFromQuery = null,           // used only if can be parsed to integer (Variant = 0, Gene = 1, Sample = 2, AnnotationBrowser = 3, BAM Browser = 4)
+                interpretationTab: interpretationTabFromQuery = null,   // used only if can be parsed to integer (Variant Notes = 0, Gene Notes = 1, Clinical = 2, Discovery = 3)
+                caseSource = null
+            }
+        } = memoizedUrlParse(href);
+
+        // Change types to bool & int where applicable.
+        const showInterpretation = showInterpretationFromQuery === "True";
+        let annotationTab = null;
+        if (annotationTabFromQuery !== null) {
+            annotationTab = parseInt(annotationTabFromQuery);
+            if (isNaN(annotationTab)) {
+                annotationTab = null;
+            }
+        }
+        let interpretationTab = null;
+        if (interpretationTabFromQuery !== null) {
+            interpretationTab = parseInt(interpretationTabFromQuery);
+            if (isNaN(interpretationTab)) {
+                interpretationTab = null;
+            }
+        }
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <InterpretationController {...passProps} interpretationTab={parseInt(interpretationTab) !== isNaN ? parseInt(interpretationTab): null} {...{ showInterpretation, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading }}>
+                <InterpretationController {...passProps} {...{ showInterpretation, interpretationTab, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading }}>
                     <VariantSampleInfoHeader {...passProps} onSelectTranscript={this.onSelectTranscript} />
-                    <VariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
+                    <VariantSampleOverviewTabView {...passProps} defaultTab={annotationTab} />
                 </InterpretationController>
             </div>
         );
@@ -164,7 +180,8 @@ class VariantSampleOverviewTabView extends React.PureComponent {
         const { defaultTab = null } = props;
         this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
         this.state = {
-            "currentTab" : defaultTab < 5 ? defaultTab : 1 // Validate that is 0-5
+            // Validate that is 0-5
+            "currentTab": (typeof defaultTab === "number" && defaultTab < 5) ? defaultTab : 1
         };
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
@@ -277,7 +294,7 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
  * this markup for layout purposes, but wanted to keep separation of functionality, so that component is defined/props are passed
  * in inside VariantSampleOverview).
  */
-class InterpretationController extends React.Component {
+class InterpretationController extends React.PureComponent {
 
     constructor(props) {
         super(props);
@@ -292,6 +309,7 @@ class InterpretationController extends React.Component {
 
         this.toggleACMGInvoker = this.toggleACMGInvoker.bind(this);
         this.toggleInvocation = this.toggleInvocation.bind(this);
+        this.invokeAtStrength = this.invokeAtStrength.bind(this);
 
         this.memoized = {
             flattenGlobalACMGStateIntoArray: memoize(acmgUtil.flattenStateMapIntoArray)
@@ -301,20 +319,26 @@ class InterpretationController extends React.Component {
         this.classifier = null;
     }
 
+    // componentDidMount() { // use for testing ACMG auto classification calculation in browser console
+    //     if (window) {
+    //         window.acmgClass = new acmgUtil.AutoClassify([]);
+    //     }
+    // }
+
     componentDidUpdate(pastProps) {
         const { newContext = null, newVSLoading } = this.props;
         const { newContext: pastNC = null, newVSLoading: pastVSLoadStatus } = pastProps;
 
         // If just loaded new context
         if (!pastNC && !newVSLoading && newContext) {
-            console.log("log1: just loaded new context");
+            // console.log("log1: just loaded new context");
             this.initializeACMGFromContext();
         } else if (pastVSLoadStatus && !newVSLoading && !newContext) {
             // If just attempted to load new context and failed... do the same thing (it's handled slightly differently in-method)
-            console.log("log1: just failed at loading new context");
+            // console.log("log1: just failed at loading new context");
             this.initializeACMGFromContext();
         }
-        console.log(`pastVSLoading=${pastVSLoadStatus}, newVSLoading=${newVSLoading}, newContext=${newContext}`);
+        console.log("pastVSLoading:", pastVSLoadStatus, "\nnewVSLoading:", newVSLoading, "\nnewContext:", newContext);
     }
 
     /**
@@ -322,19 +346,19 @@ class InterpretationController extends React.Component {
      */
     initializeACMGFromContext() {
         const { context = null, newContext = null } = this.props;
-        console.log("log1: initializing ACMG from context");
+        // console.log("log1: initializing ACMG from context");
 
-        let acmg_guidelines;
+        let acmg_rules_invoked;
         if (newContext) { // if new context is loaded in
             const { interpretation = {} } = newContext;
-            acmg_guidelines = interpretation.acmg_guidelines || [];
+            acmg_rules_invoked = interpretation.acmg_rules_invoked || [];
         } else { // not successfully loaded in; default to old context
             const { interpretation = {} } = context || {};
-            acmg_guidelines = interpretation.acmg_guidelines || [];
+            acmg_rules_invoked = interpretation.acmg_rules_invoked || [];
         }
 
         // Initialize classifier and prepare new state
-        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_guidelines);
+        const acmgSelections = acmgUtil.criteriaArrayToStateMap(acmg_rules_invoked); // object that maps { rule: strength }
         const classifier = new acmgUtil.AutoClassify(acmgSelections);
         const classification = classifier.getClassification();
         this.classifier = classifier;
@@ -352,42 +376,71 @@ class InterpretationController extends React.Component {
         this.setState({ showACMGInvoker: !showACMGInvoker }, callback);
     }
 
-    /**
-     * Called when a new rule is invoked or uninvoked
-     * @param {String} criteria     An ACMG rule
-     * @param {Function} callback   An optional function to call upon state setting
-     */
-    toggleInvocation(criteria, callback) {
+    invokeAtStrength(criteria, callback) {
+        console.log("invokeAtStrength", criteria, this);
+        const { acmg_rule_name: rule = criteria, rule_strength: strength } = criteria;
+
         const { globalACMGSelections = {} } = this.state;
         const newInvocations = { ...globalACMGSelections };
 
-        if (newInvocations[criteria] !== undefined) { // already set
-            const newState = !newInvocations[criteria];
-            newInvocations[criteria] = newState;
-            if (newState) {
-                this.classifier.invoke(criteria);
-            } else {
-                this.classifier.uninvoke(criteria);
-            }
-        } else { // first time setting
-            newInvocations[criteria] = true;
-            this.classifier.invoke(criteria);
+        if (newInvocations[rule] && newInvocations[rule] !== strength) {
+            this.classifier.uninvoke(rule, newInvocations[rule]);
+            this.classifier.invoke(rule, strength);
+            newInvocations[rule] = strength;
+        } else {
+            this.classifier.invoke(rule, strength);
+            newInvocations[rule] = strength;
         }
 
         const classification = this.classifier.getClassification();
 
-        this.setState({ globalACMGSelections: newInvocations, autoClassification: classification }, callback);
+        const newState = { globalACMGSelections: newInvocations, autoClassification: classification };
+        this.setState(newState, () => callback ? callback(newState): undefined );
+    }
+
+
+    /**
+     * Called when a new rule is invoked (to default only) or uninvoked
+     * @param {Object} criteria     An object with an ACMG rule & strength pair
+     * @param {Function} callback   An optional function to call upon state setting
+     */
+    toggleInvocation(criteria, callback) {
+        console.log("toggleInvocation criteria", criteria);
+        const { acmg_rule_name: rule = criteria, rule_strength: strength } = criteria;
+        const { globalACMGSelections = {} } = this.state;
+        const newInvocations = { ...globalACMGSelections };
+
+        const selectedStrength = strength ? strength: "Default";
+        if (newInvocations[rule] !== undefined) { // already set (may have strength)
+            const newState = newInvocations[rule] ? false: selectedStrength;
+            newInvocations[rule] = newState;
+            if (newState) {
+                this.classifier.invoke(rule, selectedStrength);
+            } else {
+                this.classifier.uninvoke(rule, selectedStrength);
+            }
+        } else { // first time setting (won't have strength)
+            newInvocations[rule] = selectedStrength;
+            this.classifier.invoke(rule, selectedStrength);
+        }
+
+        const classification = this.classifier.getClassification();
+
+        const newState = { globalACMGSelections: newInvocations, autoClassification: classification };
+
+        this.setState(newState, () => callback ? callback(newState): undefined);
     }
 
     render() {
         const { showACMGInvoker, globalACMGSelections, autoClassification } = this.state;
-        const { newVSLoading, newContext = null, context, schemas, children, showInterpretation, interpretationTab, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
+        const { newVSLoading, newContext = null, context, schemas, children, showInterpretation, interpretationTab, href,
+            caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const passProps = { schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
 
         // Pulling actions and checking for note errors with newcontext; use context if not present
         const {
             actions = [],
-            acmg_guidelines = [],
+            acmg_rules_invoked = [],
             interpretation: { error: interpError = null } = {},
             variant_notes: { error: varNoteError = null } = {},
             gene_notes: { error: geneNoteError = null } = {},
@@ -398,14 +451,21 @@ class InterpretationController extends React.Component {
 
         const wipACMGSelections = this.memoized.flattenGlobalACMGStateIntoArray(globalACMGSelections);
 
-        const showInterpretationSpace = showInterpretation == 'True' && !anyNotePermErrors && newContext && !newVSLoading;
-        const showFallbackInterpretationSpace = showInterpretation == 'True' && !anyNotePermErrors && !newContext && !newVSLoading;
+        const showInterpretationSpace = showInterpretation && !anyNotePermErrors && newContext && !newVSLoading;
+        // const showFallbackInterpretationSpace = showInterpretation && !anyNotePermErrors && !newContext && !newVSLoading;
+
+        // TODOs:
+        // (1) Probably remove 'isFallback' case (here & downstream) and show some error instead (or nothing).
+        //     If user has permission to see the page then they'll get the newContext.
+        //     Edit: Removed rendering of it for now since we don't embed notes info on existing context/embedded_list anymore.
+        // (2) Possibly rename 'newContext' to 'newestVariantSample' as in index.js just for clarity of where
+        //     it's coming from (and since it doesn't have nearly all fields a full context might.. idk)
 
         return (
             <React.Fragment>
-                <Collapse in={showACMGInvoker && newContext}>
+                <Collapse in={!!(showACMGInvoker && newContext)}>
                     <div>{/** Collapse seems not to work without wrapper element */}
-                        <ACMGInvoker invokedFromSavedNote={acmg_guidelines} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} />
+                        <ACMGInvoker invokedFromSavedNote={acmg_rules_invoked} {...{ globalACMGSelections }} toggleInvocation={this.toggleInvocation} invokeAtStrength={this.invokeAtStrength} />
                     </div>
                 </Collapse>
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
@@ -413,27 +473,54 @@ class InterpretationController extends React.Component {
                         {/* Annotation Space passed as child */}
                         { children }
                     </div>
+                    { newVSLoading ? <LoadingInterpretationSpacePlaceHolder/> : null }
                     { showInterpretationSpace ?
-                        <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
+                        <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
+                            <InterpretationSpaceWrapper {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation}
+                                wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
                         </div> : null }
-                    { showFallbackInterpretationSpace ?
-                        <div className="col flex-grow-1 flex-lg-grow-0" style={{ flexBasis: "375px" }} >
-                            <InterpretationSpaceWrapper isFallback {...{ autoClassification, actions, context }} toggleInvocation={this.toggleInvocation} wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
-                        </div> : null }
+                    {/* showFallbackInterpretationSpace ?
+                        // Deprecated since if viewer can see original context they'll definitely get back the new one?
+                        <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
+                            <InterpretationSpaceWrapper isFallback {...{ autoClassification, actions, context }} toggleInvocation={this.toggleInvocation}
+                                wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
+                        </div> : null */}
                 </div>
             </React.Fragment>
         );
     }
 }
 
+const LoadingInterpretationSpacePlaceHolder = React.memo(function LoadingInterpretationSpacePlaceHolder () {
+    return (
+        <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
+            <div className="card interpretation-space">
+                <InterpretationSpaceHeader />
+                <div className="card-body">
+                    <div className="text-center py-3">
+                        <i className="icon icon-spin icon-circle-notch icon-2x text-muted fas"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+});
+
 /**
  * 28 ACMG Rules, made clickable and "invokable"; uses passed in methods/state from InterpretationController.
  */
-function ACMGInvoker(props) {
-    const { globalACMGSelections: invoked = {}, toggleInvocation } = props || {};
+const ACMGInvoker = React.memo(function ACMGInvoker(props) {
+    const { globalACMGSelections: invoked = {}, toggleInvocation, invokeAtStrength } = props || {};
 
-    const acmgTip = (criteria, description) => ( criteria && description ? `<h5 class="my-0 mw-10 text-600">${criteria}</h5><div style="max-width: 250px">${description}</div>`: null);
+    const [ acmgStrengthPopover, setACMGStrengthPopover ] = useState(null);
+    const { target: targetIndicatorRef, jsx: acmgStrengthPopoverJSX } = acmgStrengthPopover || {};
+
+    function onRootClickHide(e) {
+        // If they clicked on another acmg rule, don't close popover after switching popover info
+        if (e.target.className !== targetIndicatorRef.current.className) {
+            setACMGStrengthPopover(null);
+        }
+    }
 
     return (
         <div className="card flex-row my-3 mt-0">
@@ -449,19 +536,127 @@ function ACMGInvoker(props) {
                     </div>
                 }/>
             </div>
-            <div className="d-flex acmg-guidelines-invoker align-items-center">
-                {acmgUtil.rules.map((rule) => {
-                    const { [rule]: { description } = {} } = acmgUtil.metadata;
-                    return (
-                        <div className="acmg-invoker clickable text-600 text-center ml-02 mr-02" key={rule} data-criteria={rule} data-invoked={invoked[rule]}
-                            onClick={() => toggleInvocation(rule)} style={{ flex: "1" }} data-html data-tip={acmgTip(rule, description)}>
-                            { rule }
-                        </div>
-                    );}
-                )}
-            </div>
+            <ACMGScrollableList {...{ setACMGStrengthPopover, invoked, toggleInvocation, invokeAtStrength }} />
+            { acmgStrengthPopover ?
+                <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} transition={true} placement="bottom"
+                    rootClose rootCloseEvent="click" onHide={onRootClickHide}>
+                    { acmgStrengthPopoverJSX }
+                </Overlay>: null }
         </div>
     );
+});
+
+function ACMGScrollableList(props) {
+    const { invoked, setACMGStrengthPopover, toggleInvocation, invokeAtStrength } = props;
+    const commonChildProps = { setACMGStrengthPopover, toggleInvocation, invokeAtStrength };
+
+    return (
+        <div className="d-flex acmg-guidelines-invoker align-items-center">
+            {acmgUtil.rules.map(function(rule){
+                const { [rule]: { description } = {} } = acmgUtil.metadata;
+                const strength = invoked[rule];
+                return <ACMGInvokableRule key={rule} {...commonChildProps} {...{ rule, strength, description }} />;
+            })}
+        </div>
+    );
+}
+
+const ACMGInvokableRule = React.memo(function ACMGInvokableRule(props) {
+    const thisRef = useRef(null);
+    const { rule, strength, description, toggleInvocation, setACMGStrengthPopover, acmgStrengthPopover, invokeAtStrength } = props;
+
+    const toggleRuleStrengthOptionsPopover = useCallback(function(newState){
+        const { globalACMGSelections: { [rule]: newStrength } = {} } = newState;
+        if (!acmgStrengthPopover) {
+            setACMGStrengthPopover({
+                target: thisRef,
+                jsx: generateACMGRulePopover(rule, newStrength, invokeAtStrength, setACMGStrengthPopover)
+            });
+        } else {
+            setACMGStrengthPopover(null);
+        }
+    }, [ setACMGStrengthPopover, thisRef, invokeAtStrength, rule ]);
+
+    const onClick = useCallback(function(e){
+        return toggleInvocation({ "acmg_rule_name": rule, "rule_strength": strength }, toggleRuleStrengthOptionsPopover);
+    }, [ toggleRuleStrengthOptionsPopover, strength ]); // 'rule' is already compared in toggleRuleStrengthOptionsPopover useCallback wrapper.
+
+    return (
+        <div ref={thisRef} className="acmg-invoker clickable ml-02 mr-02 flex-grow-1" key={rule} data-criteria={rule} data-invoked={!!strength}
+            onClick={onClick} data-html data-tip={acmgTip(rule, description)}>
+            { rule }
+        </div>);
+});
+
+function acmgTip(criteria, description){
+    if (criteria && description) {
+        return `<h5 class="my-0 mw-10 text-600">${criteria}</h5><div style="max-width: 250px">${description}</div>`;
+    }
+    return null;
+}
+
+function calculateACMGRuleStrengthOptions(rule, selectedStrength) {
+    const ruleStrengthOptions = [];
+
+    // Pull ACMG metadata from util
+    const evidenceType = acmgUtil.metadata[rule].type;
+    const defaultRuleStrength = acmgUtil.metadata[rule].strength;
+
+    // Find true value of current strength (resolve undefined or "Default" values)
+    const currStrength = selectedStrength === undefined || selectedStrength === "Default" ? defaultRuleStrength: selectedStrength;
+
+    // Populate list of strengths
+    let possibleStrengths;
+    if (evidenceType === "benign") {
+        possibleStrengths = ["Supporting", "Strong"];
+        if (rule === "BA1") {
+            possibleStrengths.push("Standalone");
+        }
+    } else { // Pathogenic
+        possibleStrengths = ["Supporting", "Moderate", "Strong", "Very Strong"];
+    }
+
+    possibleStrengths.forEach((strength) => {
+        const optionData = { "strengthOption": strength };
+        if (strength === defaultRuleStrength) { // if default strength for the rule
+            optionData.defaultStr = true;
+        }
+        if (strength === currStrength) { // if currently selected strength for the rule
+            optionData.selected = true;
+        }
+        ruleStrengthOptions.push(optionData);
+    });
+
+    return ruleStrengthOptions;
+}
+
+function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStrengthPopoverFx) {
+    const strengthOptions = calculateACMGRuleStrengthOptions(rule, selectedStrength);
+
+    return (
+        <Popover id={"acmg-strength-pop-"+rule}>
+            <Popover.Title className="m-0" as="h4">Select ACMG Rule Strength</Popover.Title>
+            <Popover.Content className="p-0">
+                <div className="list-group list-group-flush acmg-popover-strengths">
+                    { strengthOptions.map((options) => {
+                        const { strengthOption, selected = false, defaultStr = false } = options;
+
+                        // Display "Very Strong as VeryStrong"
+                        let strengthOptionNoSpaces;
+                        if (strengthOption === "Very Strong") {
+                            strengthOptionNoSpaces = strengthOption.split(" ").join("");
+                        }
+
+                        return (
+                            <button type="button" disabled={selected} onClick={() => invokerFx({ acmg_rule_name: rule, rule_strength: ( defaultStr ? "Default" : strengthOption ) }, () => setACMGStrengthPopoverFx(null))}
+                                key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active disabled': ""}`}
+                                data-criteria={rule} data-invoked={selected}>
+                                {rule}{ defaultStr ? null: "_" + (strengthOptionNoSpaces || strengthOption) }
+                            </button>);
+                    })}
+                </div>
+            </Popover.Content>
+        </Popover>);
 }
 
 function QuickPopover(props) {

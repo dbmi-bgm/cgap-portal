@@ -1,3 +1,5 @@
+import datetime
+from snovault.util import debug_log
 from snovault import (
     abstract_collection,
     calculated_property,
@@ -22,6 +24,10 @@ class Note(Item):
     base_types = ['Note'] + Item.base_types
     schema = load_schema('encoded:schemas/note.json')
     embedded_list = []
+
+
+
+
 
 
 @collection(
@@ -84,6 +90,22 @@ class NoteInterpretation(Note):
         except Exception:
             properties = self.upgrade_properties()
             return properties.get('uuid', None)
+
+    @calculated_property(schema={
+        "title": "ACMG Rule",
+        "description": "ACMG Rule with Strength Modifier",
+        "type": "string"
+    })
+    def acmg_rules_with_modifier(self, acmg_rules_invoked=None):
+        if not acmg_rules_invoked:
+            return
+        rules_display = []
+        for rule in acmg_rules_invoked:
+            rule_string = rule['acmg_rule_name']
+            if rule.get('rule_strength') and rule['rule_strength'] != 'Default':
+                rule_string += '_' + rule['rule_strength']
+            rules_display.append(rule_string)
+        return rules_display
 
 
 @collection(

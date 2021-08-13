@@ -87,14 +87,6 @@ body {
 
 }
 
-.page-container,
-.item-page-container,
-.browse-page-container,
-.static-page {
-	/* Consistent margin between top navbar & content among pages */
-	/* margin-top: 35px; */
-}
-
 
 #content {
 
@@ -143,12 +135,21 @@ body {
 
 	/* top padding for small & large screens re: fixed nav & sticky footer */
 	@include media-breakpoint-up(md) {
-		padding-top: 80px;
+		&:before {
+			content: "";
+			display: block;
+			height: 80px;
+			background-color: $navbar-background-color;
+		}
+		// padding-top: 80px;
 		padding-bottom: 50px;
 		body.scolled-past-top &,
 		body.is-full-screen &,
 		body.is-item-view & {
-			padding-top: 40px;
+			&:before {
+				height: 40px;
+			}
+			// padding-top: 40px;
 		}
 
 	}

@@ -21,9 +21,6 @@
             "$ref": "mixins.json#/uuid"
         },
         {
-            "$ref": "mixins.json#/status"
-        },
-        {
             "$ref": "mixins.json#/aliases"
         },
         {
@@ -36,6 +33,9 @@
             "$ref": "mixins.json#/modified"
         },
         {
+            "$ref": "mixins.json#/status"
+        },
+        {
             "$ref": "mixins.json#/tags"
         },
         {
@@ -44,9 +44,13 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "1"
+            "default": "2",
+            "notes": "v2 renamed approved_date to date_approved in note.json"
         },
         "previous_note": {
+            "linkTo": "NoteStandard"
+        },
+        "superseding_note": {
             "linkTo": "NoteStandard"
         }
     },

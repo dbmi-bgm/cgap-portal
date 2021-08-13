@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
@@ -59,8 +59,8 @@ export class InterpretationSpaceWrapper extends React.Component {
         const cleanedNote = { ...noteState };
 
         const fieldsToCleanFromInterpretation = ["gene_candidacy", "variant_candidacy"];
-        const fieldsToCleanFromDiscovery = ["acmg_guidelines", "conclusion", "classification"];
-        const fieldsToCleanFromStandard = ["acmg_guidelines", "conclusion", "classification", "gene_candidacy", "variant_candidacy"];
+        const fieldsToCleanFromDiscovery = ["acmg_rules_invoked", "conclusion", "classification"];
+        const fieldsToCleanFromStandard = ["acmg_rules_invoked", "conclusion", "classification", "gene_candidacy", "variant_candidacy"];
 
         switch(noteType) {
             case "note_interpretation":
@@ -96,9 +96,13 @@ export class InterpretationSpaceWrapper extends React.Component {
 
     constructor(props) {
         super(props);
+        this.postNewNote = this.postNewNote.bind(this);
+        this.patchNewNoteToVS = this.patchNewNoteToVS.bind(this);
+        this.patchPreviouslySavedNote = this.patchPreviouslySavedNote.bind(this);
+        this.saveAsDraft = this.saveAsDraft.bind(this);
+
         const { context = null } = props;
         this.state = InterpretationSpaceWrapper.initializeNoteState(context); // Ex. { variantNotes: <note linkto>, loading: false }
-        this.saveAsDraft = this.saveAsDraft.bind(this);
     }
 
     /**
@@ -108,23 +112,23 @@ export class InterpretationSpaceWrapper extends React.Component {
      */
     postNewNote(note, noteType) {
         const { context: { institution = null, project = null } = {} } = this.props;
-        const { '@id': institutionID } = institution || {};
-        const { '@id': projectID } = project || {};
+        const { '@id': variantSampleInstitutionID } = institution || {};
+        const { '@id': variantSampleProjectID } = project || {};
 
         const noteToSubmit = InterpretationSpaceWrapper.cleanUpNoteStateForPostPatch(note, noteType); // returns a cleaned clone
 
-        noteToSubmit.institution = institutionID;
-        noteToSubmit.project = projectID;
+        noteToSubmit.institution = variantSampleInstitutionID;
+        noteToSubmit.project = variantSampleProjectID;
 
         return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(noteToSubmit));
     }
 
-    patchNewNoteToVS(noteID, saveToField) {
+    patchNewNoteToVS(noteAtID, saveToField) {
         const { context: { '@id': vsAtID = null } = {} } = this.props;
-        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteID }));
+        return ajax.promise(vsAtID, 'PATCH', {}, JSON.stringify({ [saveToField]: noteAtID }));
     }
 
-    patchPreviouslySavedNote(noteToPatch, noteType, noteID) { // ONLY USED FOR DRAFTS -- other notes are cloned
+    patchPreviouslySavedNote(noteToPatch, noteType, noteAtID) { // ONLY USED FOR DRAFTS -- other notes are cloned
         const { interpretation = null, discovery_interpretation = null } = this.state;
         const { classification: previousClassification = null } = interpretation || {};
         const { variant_candidacy: previousVarCandidacy = null, gene_candidacy: previousGeneCandidacy = null } = discovery_interpretation || {};
@@ -137,7 +141,7 @@ export class InterpretationSpaceWrapper extends React.Component {
         // Returns a clone, cleaned of unneccessary state fields
         const cleanedNoteToPatch = InterpretationSpaceWrapper.cleanUpNoteStateForPostPatch(noteToPatch, noteType);
 
-        let patchURL = noteID;
+        let patchURL = noteAtID;
 
         // Check for deleted fields and add to patch URL
         switch(noteType) {
@@ -164,23 +168,16 @@ export class InterpretationSpaceWrapper extends React.Component {
         return ajax.promise(patchURL, 'PATCH', {}, JSON.stringify(cleanedNoteToPatch));
     }
 
-    getNote(uuid, noteType) {
-        console.log("Fetching @@embedded representation of " + uuid + " with " + noteType);
-        const path = `/${noteType}/${uuid}/?datastore=database`;
-        return ajax.promise(path, 'GET');
-    }
-
     saveAsDraft(note, stateFieldToUpdate, noteType = "note_standard") {
         const { [stateFieldToUpdate]: lastSavedNote } = this.state;
-        const urlFormattedNoteType = noteType.split('_').join('s-');
 
         // Does a draft already exist?
         if (lastSavedNote) { // Patch the pre-existing draft item & overwrite it
             console.log("Note already exists... need to patch pre-existing draft", lastSavedNote);
-            const { "@id": noteAtID = null, "uuid": noteUUID } = lastSavedNote;
+            const { "@id": noteAtID = null } = lastSavedNote;
 
-            this.setState({ loading: true }, () => {
-                this.patchPreviouslySavedNote(note, noteType, noteAtID || noteUUID)
+            this.setState({ "loading": true }, () => {
+                this.patchPreviouslySavedNote(note, noteType, noteAtID)
                     .then((response) => {
                         const { '@graph': graph = [], status } = response;
                         // Some handling for various fail responses/codes
@@ -189,11 +186,11 @@ export class InterpretationSpaceWrapper extends React.Component {
                         }
 
                         console.log("Successfully overwritten previous draft of note", response);
-                        return this.getNote(noteUUID, urlFormattedNoteType);
+                        return ajax.promise(noteAtID + "?datastore=database", 'GET');
                     })
                     .then((noteWithEmbeds) => {
                         console.log("Successfully retrieved @@embedded representation of note", noteWithEmbeds);
-                        this.setState({ loading: false, [stateFieldToUpdate]: noteWithEmbeds });
+                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds });
                     })
                     .catch((err) => {
                         const { error: { message = null } = {} } = err || {};
@@ -203,13 +200,13 @@ export class InterpretationSpaceWrapper extends React.Component {
                             message: message || "Your changes may not be saved.",
                             style: "danger"
                         });
-                        this.setState({ loading: false });
+                        this.setState({ "loading": false });
                     });
             });
         } else { // Create a whole new item, and patch to VS
             let newNoteID;
 
-            this.setState({ loading: true }, () => {
+            this.setState({ "loading": true }, () => {
                 this.postNewNote(note, noteType)
                     .then((response) => {
                         const { '@graph': noteItems = [], status } = response;
@@ -219,28 +216,27 @@ export class InterpretationSpaceWrapper extends React.Component {
                             throw new Error(response);
                         }
 
-                        const { 0: noteItem } = noteItems;
-                        newNoteID = noteItem.uuid;
+                        const [ noteItem ] = noteItems;
+                        newNoteID = noteItem["@id"];
                         console.log("Successfully created new item", noteItem);
 
                         return this.patchNewNoteToVS(newNoteID, stateFieldToUpdate);
                     })
                     .then((resp) => {
-                        const { '@graph': noteItem, status } = resp;
-
-                        if (status === "error") {
+                        const { '@graph': [ noteItem ], status } = resp;
+                        if (status !== "success") {
+                            // Assert this.patchNewNoteToVS(newNoteID, stateFieldToUpdate) succeeded.
                             // TODO: Check integrity of @graph
                             throw new Error(resp);
                         }
                         console.log("Successfully linked note object to variant sample", resp);
-
-                        return this.getNote(newNoteID, urlFormattedNoteType);
+                        return ajax.promise(newNoteID + "?datastore=database", 'GET');
                     })
                     .then((noteWithEmbeds) => {
                         console.log("Successfully retrieved @@embedded representation of note: ", noteWithEmbeds);
 
                         // Full representation of item fetched... add this to state
-                        this.setState({ loading: false, [stateFieldToUpdate]: noteWithEmbeds });
+                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds });
                     })
                     .catch((err) => {
                         const { error: { message = null } = {} } = err || {};
@@ -250,7 +246,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                             message: message || "Your changes may not be saved.",
                             style: "danger"
                         });
-                        this.setState({ loading: false });
+                        this.setState({ "loading": false });
                     });
             });
         }
@@ -293,14 +289,14 @@ export class InterpretationSpaceController extends React.Component {
             gene_candidacy: lastSavedGeneCandidacy = null,
             variant_candidacy: lastSavedVariantCandidacy = null,
             note_text: lastSavedNoteText = "",
-            acmg_guidelines: lastSavedACMG = []
+            acmg_rules_invoked: lastSavedACMG = [],
         } = lastSavedNote || {};
         const {
             classification: currClassification = null,
             gene_candidacy: currGeneCandidacy = null,
             variant_candidacy: currVariantCandidacy = null,
             note_text: currNoteText = "",
-            acmg_guidelines: currACMG = []
+            acmg_rules_invoked: currACMG = []
         } = currNote || {};
 
         if (currClassification !== lastSavedClassification ||
@@ -327,12 +323,13 @@ export class InterpretationSpaceController extends React.Component {
 
         this.state = {
             // Initialize WIP states to last saved - if a tab is closed WIP progress is temporarily saved here
-            variant_notes_wip: lastSavedVariantNote,
-            gene_notes_wip: lastSavedGeneNote,
-            interpretation_wip: lastSavedInterpretation,
-            discovery_interpretation_wip: lastSavedDiscovery,
-            currentTab: (defaultTab >= 0 && defaultTab < InterpretationSpaceController.tabNames.length) ? defaultTab : 0, // TODO: validate elsewhere - default to variantnotes
-            isExpanded: false // TODO - currently unused; V2
+            "variant_notes_wip": lastSavedVariantNote,
+            "gene_notes_wip": lastSavedGeneNote,
+            "interpretation_wip": lastSavedInterpretation,
+            "discovery_interpretation_wip": lastSavedDiscovery,
+            // TODO: validate elsewhere - default to variantnotes
+            "currentTab": (typeof defaultTab === "number" && defaultTab >= 0 && defaultTab < InterpretationSpaceController.tabNames.length) ? defaultTab : 0,
+            "isExpanded": false // TODO - currently unused; V2
         };
         this.toggleExpanded = this.toggleExpanded.bind(this);
         this.switchToTab = this.switchToTab.bind(this);
@@ -395,7 +392,7 @@ export class InterpretationSpaceController extends React.Component {
 
         // Add ACMG from WIP
         const interpretationWIP = { ...interpretation_wip };
-        interpretationWIP["acmg_guidelines"] = wipACMGSelections;
+        interpretationWIP["acmg_rules_invoked"] = wipACMGSelections;
         const isDraftInterpretationUnsaved = InterpretationSpaceController.hasNoteChanged(interpretationWIP, lastSavedInterpretation);
 
         const hasEditPermission = this.memoized.haveEditPermission(actions);
@@ -446,7 +443,19 @@ export class InterpretationSpaceController extends React.Component {
     }
 }
 
-function InterpretationSpaceHeader(props) { // Expanded items commented out until V2
+/**
+ * @module
+ * @todo
+ * Potentially move stuff below this line (and maybe above <div className="card interpretation-space">...</div>
+ * from InterpretationSpaceController) into new file InterpretationSpaceView.js.
+ */
+
+/**
+ * @todo
+ * Expanded items commented out until V2
+ * We should probably have it expand out horizontally from side (?).
+ */
+export function InterpretationSpaceHeader(props) {
     const { toggleExpanded, isExpanded } = props;
     return (
         <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
@@ -481,7 +490,7 @@ function InterpretationSpaceTabs(props) {
     );
 }
 
-class GenericInterpretationPanel extends React.Component {
+class GenericInterpretationPanel extends React.PureComponent {
     constructor(props) {
         super(props);
 
@@ -508,7 +517,7 @@ class GenericInterpretationPanel extends React.Component {
         const { setIsSubmitting, wipACMGSelections, isSubmitting, lastSavedNote, otherDraftsUnsaved } = this.props;
 
         const savedState = { ...this.state };
-        savedState.acmg_guidelines = wipACMGSelections;
+        savedState.acmg_rules_invoked = wipACMGSelections;
 
         const isThisNoteUnsaved = InterpretationSpaceController.hasNoteChanged(lastSavedNote, savedState);
         const anyNotesUnsaved = otherDraftsUnsaved || isThisNoteUnsaved;
@@ -540,7 +549,7 @@ class GenericInterpretationPanel extends React.Component {
     saveStateAsDraft() {
         const { saveAsDraft, retainWIPStateOnUnmount, noteType, saveToField, wipACMGSelections } = this.props;
         const stateToSave = { ...this.state };
-        stateToSave.acmg_guidelines = wipACMGSelections;
+        stateToSave.acmg_rules_invoked = wipACMGSelections;
         saveAsDraft(stateToSave, saveToField, noteType);
         retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
     }
@@ -572,7 +581,7 @@ class GenericInterpretationPanel extends React.Component {
 
 
         const stateToSave = { ...this.state };
-        stateToSave.acmg_guidelines = wipACMGSelections;
+        stateToSave.acmg_rules_invoked = wipACMGSelections;
 
         const noteChangedSinceLastSave = InterpretationSpaceController.hasNoteChanged(lastSavedNote, stateToSave);
         const noteTextPresent = !!noteText;
@@ -596,7 +605,7 @@ class GenericInterpretationPanel extends React.Component {
                     : null}
                 <AutoGrowTextArea {...{ isFallback }} cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
                 { noteType === "note_interpretation" ?
-                    <GenericFieldForm {...{ isFallback }} fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_guidelines', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    <GenericFieldForm {...{ isFallback }} fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_rules_invoked', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
                 { noteType === "note_discovery" ?
                     <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
@@ -794,7 +803,7 @@ function GenericFieldForm(props) {
     const fieldsJSX = useMemo(function() {
         return fieldsArr.map((fieldDataObj) => {
             const { field, value, autoClassification, toggleInvocation } = fieldDataObj;
-            if (field === "acmg_guidelines") {
+            if (field === "acmg_rules_invoked") {
                 return (
                     <ACMGPicker key={field} selections={value} {...{ schemas, field, autoClassification, toggleInvocation, getFieldProperties, isFallback }}/>
                 );
@@ -821,12 +830,9 @@ function ACMGPicker(props) {
     const fieldSchema = getFieldProperties(field);
     const { title = null, description = null, enum: static_enum = [] } = fieldSchema;
 
-    const picked = selections.map((selection, i) => (
-        <div className={`acmg-invoker text-600 ${isFallback ? "unclickable" : "clickable"} text-monospace text-center mr-01 ml-01`} key={selection} data-criteria={selection} data-invoked={true}
-            data-tip={!isFallback ? "Click to deselect this rule": null} onClick={!isFallback ? () => toggleInvocation(selection): undefined}>
-            { selection }
-        </div>
-    ));
+    const picked = selections.map(function(selection, i){
+        return <ACMGPickerOption {...{ selection, toggleInvocation, isFallback }} key={i} />;
+    });
 
     return (
         <React.Fragment>
@@ -837,17 +843,51 @@ function ACMGPicker(props) {
                 { selections.length > 0 ? picked : <div className="acmg-invoker text-muted" data-tip={"Use the picker above to make invocations."} data-criteria="none">None</div>}
             </div>
 
-            { autoClassification ? (
-                <>
+            { autoClassification ?
+                <React.Fragment>
                     <label className="w-100 text-small">CGAP&apos;s Classification:</label>
                     <div className="w-100 mb-08 ml-1">
                         <i className="status-indicator-dot ml-1 mr-1" data-status={autoClassification} />{autoClassification}
                     </div>
-                </>)
+                </React.Fragment>
                 : null }
         </React.Fragment>
     );
 }
+
+export const ACMGPickerOption = React.memo(function ACMGPickerOption (props) {
+    const {
+        selection,
+        isFallback = false,
+        toggleInvocation,
+        onToggleCallback = null,
+        className = "mr-01 ml-01"
+    } = props;
+    const {
+        rule_strength: strength,
+        acmg_rule_name: rule
+    } = selection;
+
+    const onClick = useCallback(function(e){
+        if (isFallback) return false;
+        return toggleInvocation(selection, onToggleCallback);
+    }, [ selection, onToggleCallback ]);
+
+    // Display "Very Strong" as "VeryStrong" to match ACMG standard instead of schema enum
+    let strengthNoSpaces;
+    if (strength === "Very Strong") {
+        strengthNoSpaces = strength.split(" ").join("");
+    }
+
+    const cls = "acmg-invoker " + (isFallback ? "unclickable" : "clickable") + (className? " " + className : "");
+
+    return (
+        <div className={cls} key={rule} data-criteria={rule} data-invoked={!!(strength)}
+            data-tip={!isFallback ? "Click to deselect this rule": null} onClick={onClick}>
+            { rule }{ strength && strength !== "Default" ? ("_" + (strengthNoSpaces || strength)) : null }
+        </div>
+    );
+});
 
 function getTooltipPerNoteType(noteType) {
     switch(noteType) {
@@ -892,7 +932,8 @@ function GenericInterpretationSubmitButton(props) {
                 <Button variant="primary btn-block" disabled className={cls}>
                     { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
                 </Button>
-            </div>);
+            </div>
+        );
     } else { // Brand new draft OR previous draft; allow saving or re-saving as draft
         return (
             <div data-tip={dataTip}>
@@ -908,13 +949,17 @@ function GenericInterpretationSubmitButton(props) {
 function UnsavedInterpretationModal(props) {
     const { href, setIsSubmitting } = props;
 
-    function discardAndNavigate() {
+    const onHide = useCallback(function(){
+        setIsSubmitting(false, null, false);
+    });
+
+    const discardAndNavigate = useCallback(function(){
         setIsSubmitting(false, () => navigate(href, { 'skipRequest' : false, 'replace': false }), false);
-    }
+    });
 
     return (
         <React.Fragment>
-            <Modal show={true} onHide={() => setIsSubmitting(false, null, false)} centered>
+            <Modal show={true} onHide={onHide} centered>
                 <Modal.Header closeButton style={{ backgroundColor: "#bdcbd9", color: "#1e435e" }}>
                     <Modal.Title>
                         <div className="modal-title font-italic text-600 h4">
@@ -928,12 +973,12 @@ function UnsavedInterpretationModal(props) {
                     <div className="text-small text-center mb-2">Are you sure you want to navigate away?</div>
                 </Modal.Body>
                 <Modal.Footer className="d-flex" style={{ backgroundColor: "#eff0f0" }}>
-                    <Button className="flex-grow-1" variant="danger" onClick={discardAndNavigate}>
+                    <button type="button" className="btn btn-danger flex-grow-1" onClick={discardAndNavigate}>
                         Navigate Away & Discard Notes
-                    </Button>
-                    <Button className="flex-grow-1" variant="primary" onClick={() => setIsSubmitting(false, null, false)}>
+                    </button>
+                    <button type="button" className="btn btn-primary flex-grow-1" variant="primary" onClick={onHide}>
                         Back to Notes
-                    </Button>
+                    </button>
                 </Modal.Footer>
             </Modal>
         </React.Fragment>

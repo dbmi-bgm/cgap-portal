@@ -38,12 +38,49 @@ export const Term = {
 
         let name = null;
 
-        switch (field) {
-            case '@id':
-                return term;
-            case 'type':
-                return getTitleForType(term, get());
-            case 'status':
+
+        function returnLocalizedTime(){
+            if (allowJSXOutput){
+                return <LocalizedTime timestamp={term} localize={false} />;
+            }
+            return dateFormat(term);
+        }
+
+        function returnTerm(){ return term; }
+
+        function returnBoolean(){
+            if (typeof term === "boolean"){
+                // Boolean, or undefined to be considered as "false"
+                return (term && "True") || "False";
+            }
+            if (typeof term === "undefined") {
+                return "False";
+            }
+            // Common cases, e.g. from search result:
+            if (term === "true") return "True";
+            if (term === "false") return "False";
+            if (term === "No value") return term; // Ideally could have this as "False" but then get 2+ "False" values in list of Facet terms.
+            return term;
+        }
+
+        function returnFileSize(){
+            let val = term;
+            if (typeof term === 'number'){
+                val = term;
+            } else if (!isNaN(parseInt(term))) {
+                val = parseInt(term);
+            }
+            if (typeof val === 'number' && !isNaN(val)){
+                return bytesToLargerUnit(val);
+            } else {
+                return null;
+            }
+        }
+
+        const exactFieldNameDict = {
+            "@id": returnTerm,
+            "type": function(){ return getTitleForType(term, get()); },
+            "status" : function(){
                 if (allowJSXOutput){
                     return (
                         <React.Fragment>
@@ -53,92 +90,67 @@ export const Term = {
                     );
                 }
                 return capitalizeSentence(term);
-            case 'date_created':
-            case 'last_modified.date_modified':
-            case 'date_modified':
-            case 'public_release':
-            case 'project_release':
-            case 'approved_date':
-                if (allowJSXOutput){
-                    return <LocalizedTime timestamp={term} localize={false} />;
-                }
-                return dateFormat(term);
-            case 'accession':
-                //if (allowJSXOutput) {
-                //    return <span className="accession text-small">{ term }</span>;
-                //}
-                return term;
-
+            },
+            "date_created": returnLocalizedTime,
+            "last_modified.date_modified": returnLocalizedTime,
+            "date_modified": returnLocalizedTime,
+            "public_release": returnLocalizedTime,
+            "project_release": returnLocalizedTime,
+            "approved_date": returnLocalizedTime,
+            "accession": returnTerm,
             /** Fields that are lowercase with underscores but could be ~ proper nouns otherwise */
-            case "project_roles.project": // Related to User (hardcoded enum field)
-            case "gene_biotype":
+            "project_roles.project": function(){
                 if (typeof term !== 'string') return term;
                 return term.split("_").map(capitalize).join(" ");
-
-            /** Related to Individual Items: */
-            case 'is_pregnancy':
-            case 'is_spontaneous_abortion':
-            case 'is_infertile':
-            case 'is_termination_of_pregnancy':
-            case 'is_still_birth':
-            case 'is_deceased':
-                if (typeof term === "boolean"){
-                    // Boolean, or undefined to be considered as "false"
-                    return (term && "True") || "False";
-                }
-                if (typeof term === "undefined") {
-                    return "False";
-                }
-                // Common cases, e.g. from search result:
-                if (term === "true") return "True";
-                if (term === "false") return "False";
-                if (term === "No value") return term; // Ideally could have this as "False" but then get 2+ "False" values in list of Facet terms.
-                return term;
-            case 'sex':
-                if (term === "M") name = "Male";
-                if (term === "F") name = "Female";
-                if (term === "U") name = "Undetermined";
+            },
+            "gene_biotype": function(){
+                if (typeof term !== 'string') return term;
+                return term.split("_").map(capitalize).join(" ");
+            },
+            /** Related to Individual Items, mostly: */
+            "is_pregnancy": returnBoolean,
+            "is_spontaneous_abortion": returnBoolean,
+            "is_infertile": returnBoolean,
+            "is_termination_of_pregnancy": returnBoolean,
+            "is_still_birth": returnBoolean,
+            "is_deceased": returnBoolean,
+            "sex": function(){
+                let txtName = null;
+                if (term === "M") txtName = "Male";
+                if (term === "F") txtName = "Female";
+                if (term === "U") txtName = "Undetermined";
                 if (allowJSXOutput) {
                     return (
                         <React.Fragment>
                             <i className={`mr-03 icon icon-fw icon-${Term.genderCharacterToIcon(term)}`}/>
-                            { name }
+                            { txtName }
                         </React.Fragment>
                     );
                 }
-                return name;
+                return txtName;
+            },
+            "file_type": capitalizeSentence,
+            "file_classification": capitalizeSentence,
+            "file_type_detailed": capitalizeSentence,
+            "files.file_type": capitalizeSentence,
+            "files.file_classification": capitalizeSentence,
+            "files.file_type_detailed": capitalizeSentence,
+            "ancestry": capitalizeSentence,
+            "life_status": capitalize,
+            "project_roles.role": capitalize,
+            "file_size": returnFileSize,
+            "attachment.size": returnFileSize
+        };
 
-            /** Related to File Items: */
-            case 'file_type':
-            case 'file_classification':
-            case 'file_type_detailed':
-            case 'files.file_type':
-            case 'files.file_classification':
-            case 'files.file_type_detailed':
-            case 'ancestry':
-                return capitalizeSentence(term);
-            case 'life_status':
-                return capitalize(term);
-            case 'file_size':
-            case 'attachment.size':
-                if (typeof term === 'number'){
-                    name = term;
-                } else if (!isNaN(parseInt(term))) {
-                    name = parseInt(term);
-                }
-                if (typeof name === 'number' && !isNaN(name)){
-                    return bytesToLargerUnit(name);
-                } else {
-                    name = null;
-                }
-                break;
 
-            default:
-                break;
+        const termTranslateFunc = exactFieldNameDict[field];
+
+        if (termTranslateFunc) {
+            return termTranslateFunc(term);
         }
 
 
-        // Custom stuff
+        // Custom stuff - todo consider converting to dict lookup also
         if (field.indexOf('quality_metric.') > -1){
             if (field.slice(-11) === 'Total reads')     return roundLargeNumber(term);
             if (field.slice(-15) === 'Total Sequences') return roundLargeNumber(term);

@@ -31,19 +31,37 @@ export const variantSampleColumnExtensionMap = {
     "associated_genotype_labels.proband_genotype_label" : {
         widthMap: { 'lg' : 240, 'md' : 230, 'sm' : 200 },
         render: function(result, props) {
-            const { align = "center" } = props;
+            const { align = "left" } = props;
             const { associated_genotype_labels : { proband_genotype_label = null, mother_genotype_label = null, father_genotype_label = null } = {} } = result;
             const rows = [];
             if (proband_genotype_label) {
-                rows.push(<div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{proband_genotype_label}</div>);
+                rows.push(
+                    // rows.push(<div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{proband_genotype_label}</div>);
+                    <div key="proband_gt" className="d-block text-truncate">
+                        <i className="icon icon-user icon-fw fas mr-04" data-tip="Proband Genotype"/>
+                        { proband_genotype_label }
+                    </div>
+                );
             } else {
                 return null;
             }
             if (mother_genotype_label) {
-                rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{mother_genotype_label || "-"}</div>);
+                // rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{mother_genotype_label || "-"}</div>);
+                rows.push(
+                    <div key="mother_gt" className="d-block text-truncate">
+                        <i className="text-small icon icon-circle icon-fw far mr-04" data-tip="Mother Genotype"/>
+                        { mother_genotype_label || "-" }
+                    </div>
+                );
             }
             if (father_genotype_label) {
-                rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
+                // rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
+                rows.push(
+                    <div key="father_gt" className="d-block text-truncate">
+                        <i className="text-small icon icon-square icon-fw far mr-04" data-tip="Father Genotype"/>
+                        { father_genotype_label || "-" }
+                    </div>
+                );
             }
             return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
         }
@@ -70,7 +88,8 @@ export const variantSampleColumnExtensionMap = {
                 return (
                     <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"}>
                         <StackedRowColumn className={"text-" + align} {...{ rows }} />
-                    </a>);
+                    </a>
+                );
             }
             return null;
         }
@@ -90,9 +109,10 @@ export const variantSampleColumnExtensionMap = {
             }
 
             return (
-                <a href={link ? link: atID ? atID + '?annotationTab=1' : "#"}>
+                <a href={link ? link : (atID ? atID + '?annotationTab=1' : "#")}>
                     <GenesMostSevereHGVSCColumn gene={firstGene} {...{ align }} />
-                </a>);
+                </a>
+            );
         }
     },
     "variant.genes.genes_most_severe_consequence.coding_effect": { // Coding Effect column
@@ -146,6 +166,25 @@ export const variantSampleColumnExtensionMap = {
             }
             return <StackedRowColumn className="text-center" {...{ rows }}/>;
         }
+    },
+    'bam_snapshot': {
+        "noSort": true,
+        "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
+        "colTitle": <i className="icon icon-fw icon-image fas" />,
+        "render": function(result, props) {
+            const { bam_snapshot = null, uuid = null } = result;
+            if (bam_snapshot) {
+                return (
+                    <div className="mx-auto text-truncate">
+                        <a target="_blank" className="btn btn-outline-dark btn-sm" rel="noreferrer"
+                            href={`/${uuid}/@@download`} data-html data-tip="View BAM Snapshot <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>">
+                            <i className="icon icon-fw icon-image fas" />
+                        </a>
+                    </div>
+                );
+            }
+            return null;
+        }
     }
 };
 
@@ -186,7 +225,7 @@ export const VariantSampleDisplayTitleColumn = React.memo(function VariantSample
     );
 });
 
-const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene, align }){
+const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene, align = "center" }){
     const {
         genes_most_severe_hgvsc = null,
         genes_most_severe_hgvsp = null
@@ -196,20 +235,22 @@ const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColum
     // Memoized on the 1 prop it receives which is dependency for its calculation.
     if (genes_most_severe_hgvsc) {
         const hgvscSplit = genes_most_severe_hgvsc.split(":");
-        var scSplit = hgvscSplit[1].split(".");
+        const scSplit = hgvscSplit[1].split(".");
         rows.push(
             <div className="text-truncate d-block" key="sc">
                 <span className="text-600">{ scSplit[0] }.</span><span>{ scSplit[1] }</span>
-            </div>);
+            </div>
+        );
     }
 
     if (genes_most_severe_hgvsp) {
         const hgvspSplit = genes_most_severe_hgvsp.split(":");
-        var spSplit = hgvspSplit[1].split(".");
+        const spSplit = hgvspSplit[1].split(".");
         rows.push(
             <div className="text-truncate d-block" key="sp">
                 <span className="text-600">{ spSplit[0] }.</span><span>{ spSplit[1] }</span>
-            </div>);
+            </div>
+        );
     }
 
     return <StackedRowColumn className={"text-" + align} {...{ rows }} />;

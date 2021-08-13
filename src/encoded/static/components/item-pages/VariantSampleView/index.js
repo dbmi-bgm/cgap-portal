@@ -53,21 +53,25 @@ class OverviewTabView extends React.Component {
             newVSLoading: true,
         };
 
-        this.loadNewestVariantSample = this.loadNewestVariantSample.bind(this);
+        this.loadNewestNotesFromVS = this.loadNewestNotesFromVS.bind(this);
     }
 
     componentDidMount() {
-        this.loadNewestVariantSample();
+        this.loadNewestNotesFromVS();
     }
 
-    loadNewestVariantSample() {
+    /**
+     * Currently this only pulls updated notes; may be possible to expand to also pull newest fields for annotation
+     * space, however due to the infrequency of anticipated updates to those fields, this hasn't been implemented.
+     */
+    loadNewestNotesFromVS() {
         const { context: { uuid = null } = {} } = this.props;
-        // Do AJAX request to get new variant sample
-        // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
+        // Do AJAX request to get new variant sample w/only relevant notes
+        // Using embed API instead of datastore=database in order to prevent gene-list related slowdown and to target request
 
         const vsFetchCallback = (resp) => {
-            const { 0: { "@id": atID = null } = {} } = resp;
-            console.log("pulling new VS resp", resp);
+            const [ { "@id": atID = null } = {} ] = resp;
+            console.log("pulling new notes from VS", resp);
 
             if (!atID) {
                 Alerts.queue({
@@ -77,7 +81,7 @@ class OverviewTabView extends React.Component {
                 });
             }
 
-            this.setState({ newVSLoading: false, newestVariantSample: resp[0] });
+            this.setState({ "newVSLoading": false, "newestVariantSample": resp[0] });
         };
 
         ajax.load(
@@ -85,7 +89,58 @@ class OverviewTabView extends React.Component {
             vsFetchCallback,
             "POST",
             vsFetchCallback,
-            JSON.stringify({ ids: [ uuid ], depth: 1 })
+            JSON.stringify({
+                "ids": [ uuid ],
+                "fields": [
+                    "@id",
+                    "institution.@id",
+                    "project.@id",
+
+                    // Variant and Gene Notes
+                    "gene_notes.@id",
+                    "gene_notes.status",
+                    "gene_notes.approved_by.display_title",
+                    "gene_notes.note_text",
+                    "gene_notes.approved_date",
+                    "gene_notes.last_modified.date_modified",
+                    "gene_notes.last_modified.modified_by.display_title",
+                    "gene_notes.principles_allowed",
+
+                    "variant_notes.@id",
+                    "variant_notes.status",
+                    "variant_notes.approved_by.display_title",
+                    "variant_notes.note_text",
+                    "variant_notes.approved_date",
+                    "variant_notes.last_modified.date_modified",
+                    "variant_notes.last_modified.modified_by.display_title",
+                    "variant_notes.principles_allowed",
+
+                    // Interpretation Notes
+                    "interpretation.@id",
+                    "interpretation.status",
+                    "interpretation.note_text",
+                    "interpretation.conclusion",
+                    "interpretation.classification",
+                    "interpretation.acmg_rules_invoked",
+                    "interpretation.approved_date",
+                    "interpretation.approved_by.display_title",
+                    "interpretation.last_modified.date_modified",
+                    "interpretation.last_modified.modified_by.display_title",
+                    "interpretation.principles_allowed",
+
+                    // Discovery Notes
+                    "discovery_interpretation.@id",
+                    "discovery_interpretation.status",
+                    "discovery_interpretation.note_text",
+                    "discovery_interpretation.variant_candidacy",
+                    "discovery_interpretation.gene_candidacy",
+                    "discovery_interpretation.approved_date",
+                    "discovery_interpretation.approved_by.display_title",
+                    "discovery_interpretation.last_modified.date_modified",
+                    "discovery_interpretation.last_modified.modified_by.display_title",
+                    "discovery_interpretation.principles_allowed",
+                ]
+            })
         );
     }
 

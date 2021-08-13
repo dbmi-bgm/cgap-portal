@@ -31,7 +31,8 @@ if (mode === 'production') {
     chunkFilename = '[name].[chunkhash].js';
     devTool = 'source-map';
 } else if (env === 'quick') {
-    devTool = 'eval'; // Fastest
+    // `eval` is fastest but doesn't abide by production Content-Security-Policy, so we check for env=="quick" in app.js to adjust the CSP accordingly.
+    devTool = 'eval';
 } else if (env === 'development') {
     devTool = 'inline-source-map';
 }

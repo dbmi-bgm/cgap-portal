@@ -17,6 +17,7 @@ import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
 import { VariantSampleListController } from './VariantSampleListController';
+import { CaseReviewDataStore } from './VariantSampleSelection';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -26,9 +27,11 @@ import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
+import { CNVSVFilteringTab } from './CNVSVFilteringTab';
 import { InterpretationTab } from './InterpretationTab';
+import { CaseReviewTab } from './CaseReviewTab';
+import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 import CaseSubmissionView from './CaseSubmissionView';
-
 
 
 
@@ -121,23 +124,26 @@ export default class CaseView extends DefaultItemView {
 
 const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const {
+        // Passed in from App or redux
         context = {},
         href,
         session,
         schemas,
-        graphData,
-        selectedDiseaseIdxMap,
         windowWidth,
         windowHeight,
-        idToGraphIdentifier,
+        addToBodyClassList,
+        removeFromBodyClassList,
         setIsSubmitting,
+        graphData,
+        selectedDiseaseIdxMap,
+        idToGraphIdentifier,
         PedigreeVizLibrary = null,
         // Passed in from VariantSampleListController which wraps this component in `getTabObject`
         variantSampleListItem = null,
         isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
         savedVariantSampleIDMap = {},
-        fetchVariantSampleListItem
+        fetchVariantSampleListItem,
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
 
@@ -151,7 +157,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         accession: caseAccession,
         individual: caseIndividual,
         sample_processing: sampleProcessing = null,
-        initial_search_href_filter_addon: filterHrefAddon = ""
+        initial_search_href_filter_addon: snvFilterHrefAddon = "",
+        sv_initial_search_href_filter_addon: svFilterHrefAddon = ""
     } = context;
 
     const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
@@ -172,15 +179,25 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         return { countIndividuals, countIndividualsWSamples };
     }, [ currFamily ]);
 
-    const onViewPedigreeBtnClick = useMemo(function(){
-        return function(evt){
-            evt.preventDefault();
-            evt.stopPropagation();
-            if (!currFamily) return false;
-            // By default, click on link elements would trigger ajax request to get new context.
-            // (unless are external links)
-            navigate("#pedigree", { skipRequest: true, replace: true });
-        };
+    const anyAnnotatedVariantSamples = useMemo(function(){
+        const vsSelectionsLen = vsSelections.length;
+        for (var i = 0; i < vsSelectionsLen; i++) {
+            const { variant_sample_item } = vsSelections[i];
+            const notesForVS = getAllNotesFromVariantSample(variant_sample_item);
+            if (notesForVS.length > 0) {
+                return true;
+            }
+        }
+        return false;
+    }, [ vsSelections ]);
+
+    const onViewPedigreeBtnClick = useCallback(function(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
+        if (!currFamily) return false;
+        // By default, click on link elements would trigger ajax request to get new context.
+        // (unless are external links)
+        navigate("#pedigree", { skipRequest: true, replace: true });
     }, [ /* empty == executed only once ever */ ]);
 
     let caseSearchTables;
@@ -229,7 +246,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             // Potential to-do, onComponentDidUpdate, find height in DOM of container, set to state, pass down here.
             pedBlock = (
                 <div className="pedigree-pane-wrapper flex-fill">
-                    <PedigreeVizView {...graphData} width={pedWidth} height={300} disableSelect showNotes={false}
+                    <PedigreeVizView {...graphData} width={pedWidth} height={320} disableSelect showNotes={false}
                         visibleDiseaseIdxMap={selectedDiseaseIdxMap} showZoomControls={false} enablePinchZoom={false} />
                 </div>
             );
@@ -240,15 +257,23 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const { processed_files = [] } = sampleProcessing || {};
     const disableBioinfo = !(processed_files.length > 0);
 
-    // Use availability of search query filter string add-on to determine if Filtering tab should be displayed
-    const disableFiltering = !filterHrefAddon;
+    // Use availability of search query filter string add-ons to determine if Filtering tab should be displayed
+    const disableFiltering = !snvFilterHrefAddon && !svFilterHrefAddon;
+
+    // Filtering props shared among both tables, then SV and SNV specific props
+    const filteringTableProps = {
+        context, windowHeight, session, schemas,
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem
+    };
 
     return (
         <React.Fragment>
             <div className="container-wide">
                 <h3 className="tab-section-title">
                     <div>
-                        <span className="text-500">Case Info: </span>
+                        <span className="text-400">Case Info: </span>
                         <span className="text-300"> { caseTitle }</span>
                     </div>
                 </h3>
@@ -261,9 +286,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     </div>
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
                         <div className="card d-flex flex-column">
-                            <div className="pedigree-vis-heading card-header d-flex justify-content-between">
+                            <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
                                 <div>
-                                    <i className="icon icon-sitemap fas icon-fw mr-1"></i>
+                                    <i className="icon icon-sitemap fas icon-fw mr-1"/>
                                     <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
                                         Pedigree
                                     </h4>
@@ -287,28 +312,26 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
 
             { currFamily && caseIndividual ?
                 <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
-                    <DotRouterTab tabTitle="Accessioning" dotPath=".accessioning" default cache={false}>
+                    <DotRouterTab dotPath=".accessioning" default tabTitle="Accessioning">
                         <AccessioningTab {...{ context, href, currFamily, secondary_families }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Bioinformatics" dotPath=".bioinformatics" cache={false} disabled={disableBioinfo}>
+                    <DotRouterTab dotPath=".bioinformatics" disabled={disableBioinfo} tabTitle="Bioinformatics">
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Filtering" dotPath=".filtering" disabled={disableFiltering}>
-                        <SelectedItemsController isMultiselect>
-                            <FilteringTab {...{ context, windowHeight, session, schemas, setIsSubmitting, variantSampleListItem,
-                                updateVariantSampleListID, savedVariantSampleIDMap, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
-                        </SelectedItemsController>
+                    <DotRouterTab dotPath=".filtering" cache disabled={disableFiltering} tabTitle="Filtering">
+                        <FilteringTabWrapper {...filteringTableProps} {...{ snvFilterHrefAddon, svFilterHrefAddon }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle={
+                    <DotRouterTab dotPath=".interpretation" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} tabTitle={
                         <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
                             { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
                             Interpretation
-                        </span>
-                    } dotPath=".interpretation" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} cache={false}>
-                        <InterpretationTab {...{ variantSampleListItem, schemas, caseAccession, isLoadingVariantSampleListItem }} />
+                        </span>}>
+                        <InterpretationTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem }} />
                     </DotRouterTab>
-                    <DotRouterTab tabTitle="Finalize Case" dotPath=".reporting" disabled cache={false}>
-                        <ReportingTab {...props} />
+                    <DotRouterTab dotPath=".review" disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
+                        <CaseReviewDataStore>
+                            <CaseReviewTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                        </CaseReviewDataStore>
                     </DotRouterTab>
                 </DotRouter>
                 : null }
@@ -390,6 +413,8 @@ class DotRouter extends React.PureComponent {
             for (let i = 0; i < children.length; i++) {
                 const currChild = children[i];
                 if (currChild.props.dotPath === dotPath && !currChild.props.disabled) {
+                    // Maybe consider removing `&& !currChild.props.disabled` check from if condition
+                    // for UX-URL consistency (show case review tab if go there, even if nothing to show).
                     return currChild;
                 }
             }
@@ -406,7 +431,7 @@ class DotRouter extends React.PureComponent {
         const allTabContents = [];
 
         const adjustedChildren = React.Children.map(children, function(childTab, index){
-            const { props : { dotPath, children: tabChildren, cache = true } } = childTab;
+            const { props : { dotPath, children: tabChildren, cache = false } } = childTab;
             const active = currTabDotPath === dotPath;
             if (active || cache) {
                 allTabContents.push(
@@ -433,12 +458,13 @@ class DotRouter extends React.PureComponent {
     }
 }
 
-function DotRouterTab(props) {
+const DotRouterTab = React.memo(function DotRouterTab(props) {
     const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
 
     const onClick = useCallback(function(){
         const targetDotPath = prependDotPath + dotPath;
-        navigate("#" + targetDotPath, { skipRequest: true, replace: true, dontScrollToTop: true }, function(){
+        const navOpts = { "skipRequest": true, "replace": true, "dontScrollToTop": true };
+        navigate("#" + targetDotPath, navOpts, function(){
             // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
             // layout.animateScrollTo(targetDotPath);
         });
@@ -464,7 +490,16 @@ function DotRouterTab(props) {
             </div>
         </div>
     );
-}
+}, function(prevProps, nextProps){
+    // Custom equality comparison func.
+    // Skip comparing the hardcoded `prependDotPath` & `dotPath` -- revert if those props become dynamic.
+    // Also skip checking for props.children, since that is rendered by `DotRouter` and not this `DotRouterTab`.
+    const compareKeys = ["disabled", "active", "tabTitle"];
+    const anyChanged = _.any(compareKeys, function(k){
+        return prevProps[k] !== nextProps[k];
+    });
+    return !anyChanged;
+});
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context, currFamily, secondary_families = [] } = props;
@@ -497,7 +532,7 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
                     <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
                         persistent={[
                             <div key={currFamilyID} className="primary-family">
-                                <h4 className="mt-0 mb-05 text-400">
+                                <h4 className="mt-0 mb-16 text-400">
                                     <span className="text-300">Primary Cases from </span>
                                     { primaryFamilyTitle }
                                 </h4>
@@ -530,10 +565,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     // Note: Can probably clean up the render method of this a little bit by breaking each row
     // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
     // may also be necessary to add to/edit rows individually in the future.
-    const {
-        caseSample = null,
-        sampleProcessing = null
-    } = props;
+    const { caseSample = null, sampleProcessing = null } = props;
 
     const {
         bam_sample_id: caseSampleId = null,
@@ -543,158 +575,132 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
         processed_files: msaProcFiles = []
     } = sampleProcessing || {};
 
-    const msaStats = {};
+    const msaStats = useMemo(function(){
+        const msaStats = {};
 
-    // Pull coverage and reads values from this case's sample's bam file
-    caseProcFiles.forEach((procFile) => {
-        const {
-            quality_metric: {
-                "@type": [ qmType ]=[],
-                quality_metric_summary: qmSummaries = []
-            }={}
-        } = procFile;
-        // Only continue if qclist (bamQC should only exist if there is also bamcheck)
-        if (qmType === "QualityMetricQclist") {
-            // Coverage and total reads should only be present in BAM, update if found
-            qmSummaries.forEach((qmSummary) => {
-                const { title = null, value = null, tooltip = null } = qmSummary;
-                if (title === "Coverage") {
-                    msaStats.coverage = { value, tooltip };
-                } else if (title === "Total Reads") {
-                    msaStats.reads = { value, tooltip };
-                }
-            });
+        function transformValueType(numberType, value){
+            const useFunc = { // Probably can just use `parseFloat` for any number but what the heck.
+                "integer": parseInt,
+                "float": parseFloat,
+                "percent": parseFloat
+            }[numberType];
+            if (useFunc) {
+                const transformedValue = useFunc(value);
+                if (!isNaN(transformedValue)) return transformedValue;
+            }
+            return value;
         }
-    });
 
-    // Pull variant stats, T-T ratio, heterozygosity ratio, etc. from sample_processing
-    msaProcFiles.forEach((procFile) => {
-        const {
-            quality_metric: {
-                "@type": [ qmType ]=[],
-                quality_metric_summary: qmSummaries = []
-            }={}
-        } = procFile;
-
-        // Only continue if qclist (vcfQC should only exist if there is also vcfcheck)
-        if (qmType === "QualityMetricQclist") {
-            // Stats should only be present in combined VCF, update if found
-            qmSummaries.forEach((qmSummary) => {
-                const { title = null, value = null, sample = null, tooltip = null } = qmSummary;
-                if (sample && sample === caseSampleId) {
-                    switch (title) {
-                        case "De Novo Fraction":
-                            msaStats.deNovo = { value, tooltip };
-                            break;
-                        case "Heterozygosity Ratio":
-                            msaStats.heterozygosity = { value, tooltip };
-                            break;
-                        case "Transition-Transversion Ratio":
-                            msaStats.transTansRatio = { value, tooltip };
-                            break;
-                        case "Total Variants Called":
-                            msaStats.totalVariants = { value, tooltip };
-                            break;
-                        case "Filtered Variants":
-                            msaStats.filteredVariants = { value, tooltip };
-                            break;
-                        default:
-                            break;
+        // Pull coverage and reads values from this case's sample's bam file
+        caseProcFiles.forEach(function(procFile){
+            const {
+                quality_metric: {
+                    "@type": [ qmType ]=[],
+                    quality_metric_summary: qmSummaries = []
+                } = {}
+            } = procFile;
+            // Only continue if qclist (bamQC should only exist if there is also bamcheck)
+            if (qmType === "QualityMetricQclist") {
+                // Coverage and total reads should only be present in BAM, update if found
+                qmSummaries.forEach(function(qmSummary){
+                    const { title = null, value = null, tooltip = null, numberType = "string" } = qmSummary;
+                    if (title === "Coverage") {
+                        msaStats.coverage = { value: transformValueType(numberType, value), tooltip };
+                    } else if (title === "Total Reads") {
+                        msaStats.reads = { value: transformValueType(numberType, value), tooltip };
                     }
-                }
-            });
-        }
-    });
+                });
+            }
+        });
+
+        // Pull variant stats, T-T ratio, heterozygosity ratio, etc. from sample_processing
+        msaProcFiles.forEach(function(procFile){
+            const {
+                quality_metric: {
+                    "@type": [ qmType ]=[],
+                    quality_metric_summary: qmSummaries = []
+                }={}
+            } = procFile;
+
+            // Only continue if qclist (vcfQC should only exist if there is also vcfcheck)
+            if (qmType === "QualityMetricQclist") {
+                // Stats should only be present in combined VCF, update if found
+                qmSummaries.forEach(function(qmSummary){
+                    const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
+                    if (sample && sample === caseSampleId) {
+                        switch (title) {
+                            case "De Novo Fraction":
+                                msaStats.deNovo = { value: transformValueType(numberType, value), tooltip };
+                                break;
+                            case "Heterozygosity Ratio":
+                                msaStats.heterozygosity = { value: transformValueType(numberType, value), tooltip };
+                                break;
+                            case "Transition-Transversion Ratio":
+                                msaStats.transTansRatio = { value: transformValueType(numberType, value), tooltip };
+                                break;
+                            case "Total Variants Called":
+                                msaStats.totalVariants = { value: transformValueType(numberType, value), tooltip };
+                                break;
+                            case "Filtered Variants":
+                                msaStats.filteredVariants = { value: transformValueType(numberType, value), tooltip };
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+            }
+        });
+
+        return msaStats;
+    }, [ caseProcFiles, msaProcFiles ]);
+
+    const { reads = {}, coverage = {}, totalVariants = {}, transTansRatio = {}, heterozygosity = {}, deNovo = {}, filteredVariants = {} } = msaStats;
 
     return (
-        <React.Fragment>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Total Number of Reads:
-                    { msaStats.reads && msaStats.reads.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.reads.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* 452.3 Million */}
-                    { (msaStats.reads && msaStats.reads.value) || "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Coverage:
-                    { msaStats.coverage && msaStats.coverage.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.coverage.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* 30x */}
-                    { (msaStats.coverage && msaStats.coverage.value) || "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Total Number of Variants Called:
-                    { msaStats.totalVariants && msaStats.totalVariants.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.totalVariants.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* 4,769,578 */}
-                    { (msaStats.totalVariants && msaStats.totalVariants.value) ? decorateNumberWithCommas(msaStats.totalVariants.value): "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Transition-Tansversion ratio:
-                    { msaStats.transTansRatio && msaStats.transTansRatio.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.transTansRatio.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* Ex. 1.96 */}
-                    { (msaStats.transTansRatio && msaStats.transTansRatio.value) || "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Heterozygosity ratio:
-                    { msaStats.heterozygosity && msaStats.heterozygosity.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.heterozygosity.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* Ex. 1.24 */}
-                    { (msaStats.heterozygosity && msaStats.heterozygosity.value) || "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    De novo Fraction:
-                    { msaStats.deNovo && msaStats.deNovo.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.deNovo.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4">{/* Ex. 2% */}
-                    { (msaStats.deNovo && msaStats.deNovo.value) ?  msaStats.deNovo.value + "%" : "" }
-                </div>
-            </div>
-            <div className="row qc-summary">
-                <div className="col-sm-8 text-600">
-                    Variants after hard filters:
-                    { msaStats.filteredVariants && msaStats.filteredVariants.tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={msaStats.filteredVariants.tooltip} data-place="right"/>
-                        : null }
-                </div>
-                <div className="col-sm-4"> {/* Ex. 1,273 */}
-                    { (msaStats.filteredVariants && msaStats.filteredVariants.value) ? decorateNumberWithCommas(msaStats.filteredVariants.value) : "" }
-                </div>
-            </div>
-        </React.Fragment>
+        <div className="row py-3">
+            <BioinfoStatsEntry label="Total Number of Reads" tooltip={reads.tooltip}>
+                { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Coverage" tooltip={coverage.tooltip}>
+                { coverage.value || "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Total Number of Variants Called" tooltip={totalVariants.tooltip}>
+                { typeof totalVariants.value === "number" ? decorateNumberWithCommas(totalVariants.value): "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Transition-Tansversion ratio" tooltip={transTansRatio.tooltip}>
+                { typeof transTansRatio.value === "number" ? transTansRatio.value || "0.0" : "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Heterozygosity ratio" tooltip={heterozygosity.tooltip}>
+                { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="De novo Fraction" tooltip={deNovo.tooltip}>
+                { typeof deNovo.value === "number" ? deNovo.value + "%" : "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Variants after hard filters" tooltip={filteredVariants.tooltip}>
+                { typeof filteredVariants.value === "number" ? decorateNumberWithCommas(filteredVariants.value) : "-" }
+            </BioinfoStatsEntry>
+        </div>
     );
 });
+
+
+function BioinfoStatsEntry({ tooltip, label, children }){
+    return (
+        <div className="col-12 col-md-6 col-lg-4 col-xl-3 mt-04 mb-04">
+            <div className="qc-summary">
+                <label className="d-block mb-0">
+                    { label }:
+                    { tooltip ?
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={tooltip} data-place="right"/>
+                        : null }
+                </label>
+                <div>{ children }</div>
+            </div>
+        </div>
+    );
+}
 
 const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
@@ -714,21 +720,21 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         // original_pedigree: { display_title: pedFileName } = {},
         display_title: familyDisplayTitle
     } = family;
-    const onClick = useMemo(function(){
-        return function(evt){
-            navigate(`${vcfAtId}#provenance`, { replace: true });
-        };
+
+    const onClick = useCallback(function(evt){
+        evt.stopPropagation();
+        navigate(`${vcfAtId}#provenance`, { replace: true });
     }, []);
 
     const title = (
         <h4 data-family-index={0} className="my-0 d-inline-block w-100">
-            <span className="font-italic text-500">{ familyDisplayTitle }</span>
+            <span className="text-400">{ familyDisplayTitle }</span>
             {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
             <button type="button" className="btn btn-sm btn-primary pull-right"
                 data-tip="Click to view the provenance graph for the most up-to-date annotated VCF"
                 onClick={onClick} disabled={(!vcfAtId)}>
                 <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-1 small" />
-                View <span className="text-500">Provenance Graph</span>
+                View <span className="text-600">Provenance Graph</span>
             </button>
         </h4>
     );
@@ -741,13 +747,13 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                 <span className="pull-right">3/28/20</span>
             </div> */}
             <div className="tab-inner-container card">
-                <h4 className="card-header section-header">Quality Control Metrics (QC)</h4>
-                <div className="card-body">
+                <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
+                <div className="card-body py-0">
                     <BioinfoStats {...{ caseSample, sampleProcessing }} />
                 </div>
             </div>
             <div className="tab-inner-container card">
-                <h4 className="card-header section-header">Multisample Analysis Table</h4>
+                <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
                 <div className="card-body family-index-0" data-is-current-family={true}>
                     { title }
                     <CaseSummaryTable {...family} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
@@ -757,7 +763,63 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     );
 });
 
+/**
+ * Handles tab switching between the SNV and CNV/SV tabs
+ */
+function FilteringTabWrapper(props) {
+    // const { snvFilterHrefAddon = "", svFilterHrefAddon = "" } = props;
+    const {
+        context, windowHeight, session, schemas,
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem,
+        snvFilterHrefAddon = "", svFilterHrefAddon = ""
+    } = props;
 
-function ReportingTab(props) {
-    return <h1>This is the reporting tab</h1>;
+    const defaultTab = (!snvFilterHrefAddon && svFilterHrefAddon) ? "CNVSV" : "SNV";
+    const [ currViewName, setCurrViewName ] = useState(defaultTab);
+
+    const currentTitle = currViewName === "SNV" ? "SNV" : "CNV / SV";
+
+    const commonProps = { context, windowHeight, session, schemas };
+
+    const svFilteringProps = {};
+
+    const snvFilteringProps = {
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem
+    };
+
+    return (
+        <React.Fragment>
+            <FilteringTabTableToggle {...{ currViewName, setCurrViewName }}/>
+            <div className="row mb-36 mt-0">
+                <h1 className="col my-0">
+                    {currentTitle} <span className="text-300">Variant Filtering and Technical Review</span>
+                </h1>
+            </div>
+            <div className={currViewName === "SNV" ? "" : "d-none"}>
+                <SelectedItemsController isMultiselect>
+                    <FilteringTab {...commonProps} {...snvFilteringProps } />
+                </SelectedItemsController>
+            </div>
+            <div className={currViewName === "CNVSV" ? "" : "d-none"}>
+                <CNVSVFilteringTab {...commonProps} {...svFilteringProps} />
+            </div>
+        </React.Fragment>
+    );
+}
+
+function FilteringTabTableToggle({ currViewName, setCurrViewName }) {
+    return (
+        <div className="card py-2 px-3 flex-row mb-3 filtering-tab-toggle">
+            <div onClick={currViewName !== "SNV" ? () => setCurrViewName("SNV"): undefined} className={`mr-2 text-600  ${currViewName === "SNV" ? "active unclickable": "clickable"}`}>
+                SNV Filtering
+            </div>
+            <div onClick={currViewName !== "CNVSV" ? () => setCurrViewName("CNVSV"): undefined} className={`text-600 ${currViewName === "CNVSV" ? "active unclickable": "clickable"}`}>
+                CNV / SV Filtering
+            </div>
+        </div>
+    );
 }

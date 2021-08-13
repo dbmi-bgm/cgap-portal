@@ -19,8 +19,8 @@ export const LoginNavItem = React.memo(function LoginNavItem(props){
     }, [ showLock ]);
     return (
         <React.Fragment>
-            <a role="button" href="#" className="nav-link user-account-item" id={id}
-                active={!!(unverifiedUserEmail)} onClick={onClick} disabled={!isAuth0LibraryLoaded}>
+            <a role="button" href="#" className={"nav-link user-account-item" + (unverifiedUserEmail ? " active" : "")}
+                id={id} onClick={onClick} disabled={!isAuth0LibraryLoaded}>
                 { isLoading ? (
                     <span className="pull-right">
                         <i className="account-icon icon icon-spin icon-circle-notch fas align-middle"/>

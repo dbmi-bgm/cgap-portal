@@ -257,6 +257,7 @@
         "specimen_collection_date": {
             "title": "Specimen Collection Date",
             "description": "Date of specimen collection",
+            "notes": "We could perhaps rename this to be `date_specimen_collection`",
             "type": "string",
             "label": "specimen",
             "lookup": 130,
@@ -284,8 +285,8 @@
             "lookup": 144
         },
         "specimen_accession": {
-            "title": "Specimen Accession",
-            "description": "Accession of specimen from sequencing lab",
+            "title": "Specimen ID",
+            "description": "Identifier of specimen from sequencing lab",
             "label": "requisition",
             "type": "string",
             "lookup": 80

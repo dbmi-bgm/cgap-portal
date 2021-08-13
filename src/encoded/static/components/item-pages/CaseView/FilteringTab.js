@@ -1,14 +1,14 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import queryString from 'query-string';
-import moment from 'moment';
 
 import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
 import { FilteringTableFilterSetUI, FilterSetController, SaveFilterSetButtonController, SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI';
 import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 /**
  * @todo maybe reuse somewhere
@@ -81,15 +81,17 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         windowWidth,
         onCancelSelection,          // Not used -- passed in from SelectedItemsController and would close window.
         onCompleteSelection,        // Not used -- passed in from SelectedItemsController and would send selected items back to parent window.
-        selectedItems,              // passed in from SelectedItemsController
-        onSelectItem,               // passed in from SelectedItemsController
-        onResetSelectedItems,       // passed in from SelectedItemsController
+        selectedItems: selectedVariantSamples,                  // passed in from SelectedItemsController
+        onSelectItem: onSelectVariantSample,                    // passed in from SelectedItemsController
+        onResetSelectedItems: onResetSelectedVariantSamples,    // passed in from SelectedItemsController
         variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
         updateVariantSampleListID,  // Passed in from VariantSampleListController
         savedVariantSampleIDMap,    // Passed in from VariantSampleListController
         fetchVariantSampleListItem, // Passed in from VariantSampleListController
         isLoadingVariantSampleListItem, // Passed in from VariantSampleListController
-        setIsSubmitting             // Passed in from App
+        setIsSubmitting,            // Passed in from App
+        addToBodyClassList,         // Passed in from App
+        removeFromBodyClassList     // Passed in from App
     } = props;
 
     const {
@@ -99,7 +101,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         additional_variant_sample_facets = []
     } = context || {};
 
-    const {  "@id" : activeFilterSetID = null } = active_filterset || {};
+    const { "@id" : activeFilterSetID = null } = active_filterset || {};
 
     const searchHrefBase = (
         "/search/?type=VariantSample"
@@ -161,14 +163,14 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem };
     }, [ context ]);
 
-    // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedItems there.
+    // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedVariantSamples there.
     const fsuiProps = {
         schemas, session,
         variantSampleListItem,
         updateVariantSampleListID,
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem,
-        selectedItems,
+        selectedVariantSamples,
         // setIsSubmitting,
         // "caseItem": context
     };
@@ -181,18 +183,33 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         </SaveFilterSetButtonController>
     );
 
+    const onFailInitialFilterSetItemLoad = useCallback(function(){
+        if (session) {
+            // todo add sentry.io call here.
+            Alerts.queue({
+                "title": "FilterSet not loaded",
+                "message": `Couldn't load the existing saved FilterSet selections Item "${activeFilterSetID}", check permissions.`,
+                "style" : "warning",
+                "navigationDissappearThreshold": 1
+            });
+        }
+        // Else nothing -- is expected; perhaps user got logged out during
+        // navigation or loading something else and hasn't refreshed page yet.
+    });
+
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
     const embeddedTableHeader = activeFilterSetID ? (
-        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
-            <FilterSetController {...{ searchHrefBase, onResetSelectedItems }} excludeFacets={hideFacets}>
+        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
+            onFail={onFailInitialFilterSetItemLoad}>
+            <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets}>
                 { embeddedTableHeaderBody }
             </FilterSetController>
         </ajax.FetchedItem>
     ) : (
         // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
         // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase, onResetSelectedItems }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+        <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
             { embeddedTableHeaderBody }
         </FilterSetController>
     );
@@ -209,7 +226,8 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
 
     const tableProps = {
         hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader,
-        selectedItems, onSelectItem,
+        addToBodyClassList, removeFromBodyClassList,
+        selectedVariantSamples, onSelectVariantSample,
         savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
         isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
         "key": searchTableKey

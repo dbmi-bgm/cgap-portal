@@ -231,7 +231,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             isFetchingInitialFilterSetItem = false,
 
             // From SelectedItemsController:
-            selectedItems, onResetSelectedItems,
+            selectedVariantSamples, onResetSelectedVariantSamples,
 
             // From VariantSampleListController (in index.js, wraps CaseInfoTabView)
             variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem
@@ -298,62 +298,52 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             isFetchingInitialFilterSetItem, lastSavedPresetFilterSet
         };
 
-        console.info("Current Case FilterSet:", filterSet);
+        // console.info("Current Case FilterSet:", filterSet);
 
         return (
             // TODO 1: Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
-            <React.Fragment>
+            <div className="above-variantsample-table-ui">
 
-                <div className="row mb-24 mt-0">
-                    <h1 className="col my-0">
-                        <span className="text-300">Variant Filtering and Technical Review</span>
-                    </h1>
-                </div>
-
-                <div className="above-variantsample-table-ui">
-
-                    <div className="filterset-outer-container" data-is-open={bodyOpen}>
-                        <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} />
-                        <Collapse in={bodyOpen} appear>
-                            <div>
-                                <div className="d-flex flex-column flex-md-row">
-                                    <div className="filterset-preset-selection-outer-column">
-                                        <PresetFilterSetSelectionUI {...presetSelectionUIProps} />
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        { fsuiBlocksBody }
-                                    </div>
+                <div className="filterset-outer-container" data-is-open={bodyOpen}>
+                    <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} />
+                    <Collapse in={bodyOpen} appear>
+                        <div>
+                            <div className="d-flex flex-column flex-md-row">
+                                <div className="filterset-preset-selection-outer-column">
+                                    <PresetFilterSetSelectionUI {...presetSelectionUIProps} />
+                                </div>
+                                <div className="flex-grow-1">
+                                    { fsuiBlocksBody }
                                 </div>
                             </div>
-                        </Collapse>
-                    </div>
-
-                    <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
-                        panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
-                        <h4 className="text-400 col my-0">
-                            <strong className="mr-1">{ totalCount }</strong>
-                            <span>
-                                Variant Matches for { currentFilterBlockName ?
-                                    <em>{ currentFilterBlockName }</em>
-                                    // TODO: Allow to toggle Union vs Intersection in FilterSetController
-                                    : (
-                                        <React.Fragment>
-                                            <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
-                                            { ` of ${selectedFilterBlockCount} Filter Blocks` }
-                                        </React.Fragment>
-                                    ) }
-                            </span>
-                        </h4>
-                        { selectedItems instanceof Map ?
-                            <div className="col-auto pr-06">
-                                <AddToVariantSampleListButton {...{ selectedItems, onResetSelectedItems, caseItem, filterSet, selectedFilterBlockIndices,
-                                    variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
-                            </div>
-                            : null }
-                    </AboveTableControlsBase>
+                        </div>
+                    </Collapse>
                 </div>
 
-            </React.Fragment>
+                <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
+                    panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
+                    <h4 className="text-400 col my-0">
+                        <strong className="mr-1">{ totalCount }</strong>
+                        <span>
+                            Variant Matches for { currentFilterBlockName ?
+                                <em>{ currentFilterBlockName }</em>
+                                // TODO: Allow to toggle Union vs Intersection in FilterSetController
+                                : (
+                                    <React.Fragment>
+                                        <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
+                                        { ` of ${selectedFilterBlockCount} Filter Blocks` }
+                                    </React.Fragment>
+                                ) }
+                        </span>
+                    </h4>
+                    { selectedVariantSamples instanceof Map ?
+                        <div className="col-auto pr-06">
+                            <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIndices,
+                                variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
+                        </div>
+                        : null }
+                </AboveTableControlsBase>
+            </div>
         );
     }
 }
@@ -642,12 +632,14 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
                             <a href="/search/?type=FilterSet" className="text-body" target="_blank" data-delay-show={1000} data-tip="View all saved FilterSets">Presets</a>
                             { nextToTitleIcon }
                         </h5>
-                        <div className="col-auto text-small">
-                            { totalResultCount } total
-                            { (totalResultCount || 0) >= 250 ?
-                                <i className="icon icon-exclamation-triangle fas ml-1" data-tip="Showing most recent 250 results only.<br/><small>(Eventually we'll show more)</small>" data-html />
-                                : null }
-                        </div>
+                        { !isCheckingForNewFilterSet && !isLoadingPresets ?
+                            <div className="col-auto text-small">
+                                { totalResultCount } total
+                                { (totalResultCount || 0) >= 250 ?
+                                    <i className="icon icon-exclamation-triangle fas ml-1" data-tip="Showing most recent 250 results only.<br/><small>(Eventually we'll show more)</small>" data-html />
+                                    : null }
+                            </div>
+                            : null }
                     </div>
                 </div>
                 { body }
@@ -658,7 +650,7 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
 
 
 
-function PresetFilterSetResult (props) {
+const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) {
     const {
         presetFilterSet,
         caseItem,
@@ -944,14 +936,14 @@ function PresetFilterSetResult (props) {
             </div>
         </div>
     );
-}
+});
 
 
 
 function AddToVariantSampleListButton(props){
     const {
-        selectedItems,
-        onResetSelectedItems,
+        selectedVariantSamples,
+        onResetSelectedVariantSamples,
         variantSampleListItem = null,
         updateVariantSampleListID,
         caseItem = null,
@@ -972,184 +964,191 @@ function AddToVariantSampleListButton(props){
 
     /** PATCH or create new VariantSampleList w. additions */
 
-    const onButtonClick = function(){
-
-        if (!filterSet) {
-            throw new Error("Expected some filterSet to be present");
-        }
-
-        if (selectedItems.size === 0) {
-            throw new Error("Expected selected items");
-        }
-
-        setIsPatchingVSL(true);
-
-        function addToSelectionsList(variantSampleSelectionsList){
-
-            let filterBlocksRequestData = _.pick(filterSet, "filter_blocks", "flags", "uuid");
-
-            // Only keep filter_blocks which were used in this query --
-            filterBlocksRequestData.filter_blocks = filterBlocksRequestData.filter_blocks.filter(function(fb, fbIdx){
-                return selectedFilterBlockIndices[fbIdx];
-            });
-
-            // Convert to string (avoid needing to add to schema for now)
-            filterBlocksRequestData = JSON.stringify(filterBlocksRequestData);
-
-            // selectedItems is type (literal) Map, so param signature is `value, key, map`
-            // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
-            selectedItems.forEach(function(variantSampleItem, variantSampleATID){
-                variantSampleSelectionsList.push({
-                    "variant_sample_item": variantSampleATID, // Will become linkTo (embedded),
-                    "filter_blocks_request_at_time_of_selection": filterBlocksRequestData
-                    // "userid" & "date_selected" are filled in by serverDefaults on backend.
-                });
-            });
-        }
-
-        let requestPromiseChain;
-
-
-        if (!variantSampleListItem) {
-            // Create new Item, then PATCH its @id to `Case.variant_sample_list_id` field.
-            const createVSLPayload = {
-                "variant_samples": [],
-                "institution": caseInstitutionID,
-                "project": caseProjectID
-            };
-
-            if (caseAccession) {
-                createVSLPayload.created_for_case = caseAccession;
-            }
-
-            addToSelectionsList(createVSLPayload.variant_samples);
-
-            requestPromiseChain = ajax.promise("/variant-sample-lists/", "POST", {}, JSON.stringify(createVSLPayload))
-                .then(function(respVSL){
-                    console.log('VSL POST response', respVSL);
-                    const {
-                        "@graph": [{
-                            "@id": vslAtID
-                        }],
-                        error: vslError
-                    } = respVSL;
-
-                    if (vslError || !vslAtID) {
-                        throw new Error("Didn't succeed in creating new VSL Item");
-                    }
-
-                    updateVariantSampleListID(vslAtID, function(){
-                        // Wait to reset selected items until after loading updated VSL so that checkboxes still appear checked during VSL PATCH+GET request.
-                        fetchVariantSampleListItem(onResetSelectedItems);
-                    });
-
-                    // PATCH Case w. variant_sample_list_id
-                    return ajax.promise(caseAtID, "PATCH", {}, JSON.stringify({ "variant_sample_list_id": vslAtID }));
-                }).then(function(respCase){
-                    console.log('Case PATCH response from after VSL POST', respCase);
-                    const {
-                        "@graph": [{
-                            "@id": respCaseAtID
-                        }],
-                        error: caseError
-                    } = respCase;
-                    if (caseError || !respCaseAtID) {
-                        throw new Error("Didn't succeed in PATCHing Case Item");
-                    }
-                    console.info("Updated Case.variant_sample_list_id", respCase);
-                    // TODO Maybe local-patch in-redux-store Case with new last_modified + variant_sample_list_id stuff? Idk.
-                });
-
-        } else {
-            // patch existing
-            const {
-                "@id": vslAtID,
-                variant_samples: existingVariantSampleSelections = []
-            } = variantSampleListItem;
-
-            const patchVSLPayload = { "variant_samples": [ ...existingVariantSampleSelections ] };
-
-            // Need to convert embedded linkTos into just @ids before PATCHing -
-            patchVSLPayload.variant_samples = existingVariantSampleSelections.map(function(existingSelection){
-                const { variant_sample_item: { "@id": vsItemID } } = existingSelection;
-                if (!vsItemID) {
-                    throw new Error("Expected all variant samples to have an ID -- likely a view permissions issue.");
-                }
-                return { ...existingSelection, "variant_sample_item": vsItemID };
-            });
-
-            // Add in new selections
-            addToSelectionsList(patchVSLPayload.variant_samples);
-
-            requestPromiseChain = ajax.promise(vslAtID, "PATCH", {}, JSON.stringify(patchVSLPayload) )
-                .then(function(respVSL){
-                    console.log('VSL PATCH response', respVSL);
-                    const {
-                        "@graph": [{
-                            "@id": vslAtID
-                        }],
-                        error: vslError
-                    } = respVSL;
-
-                    if (vslError || !vslAtID) {
-                        throw new Error("Didn't succeed in patching VSL Item");
-                    }
-
-                    // Wait to reset selected items until after loading updated VSL so that checkboxes still appear checked during VSL PATCH+GET request.
-                    fetchVariantSampleListItem(onResetSelectedItems);
-
-                });
-
-            // We shouldn't have any duplicates since prev-selected VSes should appear as checked+disabled in table.
-            // But maybe should still check to be safer (todo later)
-        }
-
-
-        // Show any errors using an alert and unset isPatchingVSL state on completion.
-        requestPromiseChain.catch(function(error){
-            // TODO: add analytics exception event for this
-            console.error(error);
-            Alerts.queue({
-                "title" : "Error PATCHing or POSTing VariantSampleList",
-                "message" : JSON.stringify(err),
-                "style" : "danger"
-            });
-        }).finally(function(){
-            setIsPatchingVSL(false);
-        });
-
-    };
-
-    let btnTitle = null;
     if (isLoadingVariantSampleListItem) {
-        btnTitle = (
-            <span className="d-flex align-items-center">
-                <i className="icon icon-circle-notch icon-spin fas mr-1"/>
-                Loading most recent selections...
-            </span>
+        return (
+            <button type="button" className="btn btn-primary" disabled>
+                <span className="d-flex align-items-center">
+                    <i className="icon icon-circle-notch icon-spin fas mr-1"/>
+                    Loading most recent selections...
+                </span>
+            </button>
         );
     } else if (isPatchingVSL) {
-        btnTitle = (
-            <span className="d-flex align-items-center">
-                <i className="icon icon-circle-notch icon-spin fas mr-1"/>
-                Saving selections...
-            </span>
+        return (
+            <button type="button" className="btn btn-primary" disabled>
+                <span className="d-flex align-items-center">
+                    <i className="icon icon-circle-notch icon-spin fas mr-1"/>
+                    Saving selections...
+                </span>
+            </button>
+        );
+    } else if (selectedVariantSamples.size === 0) {
+        return (
+            <button type="button" className="btn btn-primary" disabled>
+                <span>
+                    No Sample Variants selected
+                </span>
+            </button>
         );
     } else {
-        btnTitle = (
-            <span>
-                Add <strong>{ selectedItems.size }</strong> selected Variant Samples to Interpretation
-            </span>
+
+        const onButtonClick = function(){
+
+            if (!filterSet) {
+                throw new Error("Expected some filterSet to be present");
+            }
+
+            setIsPatchingVSL(true);
+
+            /** Adds/transforms props.selectedVariantSamples to param `variantSampleSelectionsList` */
+            function addToSelectionsList(variantSampleSelectionsList){
+
+                let filterBlocksRequestData = _.pick(filterSet, "filter_blocks", "flags", "uuid");
+
+                // Only keep filter_blocks which were used in this query --
+                filterBlocksRequestData.filter_blocks = filterBlocksRequestData.filter_blocks.filter(function(fb, fbIdx){
+                    return selectedFilterBlockIndices[fbIdx];
+                });
+
+                // Convert to string (avoid needing to add to schema for now)
+                filterBlocksRequestData = JSON.stringify(filterBlocksRequestData);
+
+                // selectedVariantSamples is type (literal) Map, so param signature is `value, key, map`.
+                // These are sorted in order of insertion/selection.
+                // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
+                selectedVariantSamples.forEach(function(variantSampleItem, variantSampleAtID){
+                    variantSampleSelectionsList.push({
+                        "variant_sample_item": variantSampleAtID, // Will become linkTo (embedded),
+                        "filter_blocks_request_at_time_of_selection": filterBlocksRequestData
+                        // The below 2 fields are filled in on backend (configured via `serverDefaults` in Item schema for these fields)
+                        // "selected_by",
+                        // "date_selected"
+                    });
+                });
+            }
+
+            let requestPromiseChain;
+
+
+            if (!variantSampleListItem) {
+                // Create new Item, then PATCH its @id to `Case.variant_sample_list_id` field.
+                const createVSLPayload = {
+                    "variant_samples": [],
+                    "institution": caseInstitutionID,
+                    "project": caseProjectID
+                };
+
+                if (caseAccession) {
+                    createVSLPayload.created_for_case = caseAccession;
+                }
+
+                addToSelectionsList(createVSLPayload.variant_samples);
+
+                requestPromiseChain = ajax.promise("/variant-sample-lists/", "POST", {}, JSON.stringify(createVSLPayload))
+                    .then(function(respVSL){
+                        console.log('VSL POST response', respVSL);
+                        const {
+                            "@graph": [{
+                                "@id": vslAtID
+                            }],
+                            error: vslError
+                        } = respVSL;
+
+                        if (vslError || !vslAtID) {
+                            throw new Error("Didn't succeed in creating new VSL Item");
+                        }
+
+                        updateVariantSampleListID(vslAtID, function(){
+                            // Wait to reset selected items until after loading updated VSL so that checkboxes still appear checked during VSL PATCH+GET request.
+                            fetchVariantSampleListItem(onResetSelectedVariantSamples);
+                        });
+
+                        // PATCH Case w. variant_sample_list_id
+                        return ajax.promise(caseAtID, "PATCH", {}, JSON.stringify({ "variant_sample_list_id": vslAtID }));
+                    }).then(function(respCase){
+                        console.log('Case PATCH response from after VSL POST', respCase);
+                        const {
+                            "@graph": [{
+                                "@id": respCaseAtID
+                            }],
+                            error: caseError
+                        } = respCase;
+                        if (caseError || !respCaseAtID) {
+                            throw new Error("Didn't succeed in PATCHing Case Item");
+                        }
+                        console.info("Updated Case.variant_sample_list_id", respCase);
+                        // TODO Maybe local-patch in-redux-store Case with new last_modified + variant_sample_list_id stuff? Idk.
+                    });
+
+            } else {
+                // patch existing
+                const {
+                    "@id": vslAtID,
+                    variant_samples: existingVariantSampleSelections = []
+                } = variantSampleListItem;
+
+                // Need to convert embedded linkTos into just @ids before PATCHing -
+                const variantSamplesPatchList = existingVariantSampleSelections.map(function(existingSelection){
+                    const { variant_sample_item: { "@id": vsItemID } } = existingSelection;
+                    if (!vsItemID) {
+                        throw new Error("Expected all variant samples to have an ID -- likely a view permissions issue.");
+                    }
+                    return {
+                        ...existingSelection,
+                        "variant_sample_item": vsItemID
+                    };
+                });
+
+                // Add in new selections
+                addToSelectionsList(variantSamplesPatchList);
+
+                requestPromiseChain = ajax.promise(vslAtID, "PATCH", {}, JSON.stringify({ "variant_samples": variantSamplesPatchList }) )
+                    .then(function(respVSL){
+                        console.log('VSL PATCH response', respVSL);
+                        const {
+                            "@graph": [{
+                                "@id": vslAtID
+                            }],
+                            error: vslError
+                        } = respVSL;
+
+                        if (vslError || !vslAtID) {
+                            throw new Error("Didn't succeed in patching VSL Item");
+                        }
+
+                        // Wait to reset selected items until after loading updated VSL so that checkboxes still appear checked during VSL PATCH+GET request.
+                        fetchVariantSampleListItem(onResetSelectedVariantSamples);
+
+                    });
+
+                // We shouldn't have any duplicates since prev-selected VSes should appear as checked+disabled in table.
+                // But maybe should still check to be safer (todo later)
+            }
+
+
+            // Show any errors using an alert and unset isPatchingVSL state on completion.
+            requestPromiseChain.catch(function(error){
+                // TODO: add analytics exception event for this
+                console.error(error);
+                Alerts.queue({
+                    "title" : "Error PATCHing or POSTing VariantSampleList",
+                    "message" : JSON.stringify(err),
+                    "style" : "danger"
+                });
+            }).finally(function(){
+                setIsPatchingVSL(false);
+            });
+
+        };
+
+        return (
+            <button type="button" className="btn btn-primary" onClick={onButtonClick}>
+                <span>
+                    Add <strong>{ selectedVariantSamples.size }</strong> selected Sample Variants to Interpretation
+                </span>
+            </button>
         );
     }
-
-    const disabled = isLoadingVariantSampleListItem || isPatchingVSL || selectedItems.size === 0;
-
-    return (
-        <button type="button" className="btn btn-primary" disabled={disabled} onClick={disabled ? null : onButtonClick}>
-            { btnTitle }
-        </button>
-    );
 }
 
 
@@ -2065,9 +2064,9 @@ function FilterSetUIBlockBottomUI(props){
     }
 
     return (
-        <div className="row pb-16 pt-16 px-3">
-            <div className="col">
-                <div className="btn-group mr-08" role="group" aria-label="Selection Controls">
+        <div className="row pb-04 pt-16 px-3">
+            <div className="col-auto mb-12">
+                <div className="btn-group" role="group" aria-label="Selection Controls">
                     <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
                         <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
                         Select All
@@ -2078,10 +2077,9 @@ function FilterSetUIBlockBottomUI(props){
                         Intersect
                     </button>
                 </div>
-                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark"/>
             </div>
-            <div className="col-auto">
-                <div className="btn-group" role="group" aria-label="Creation Controls">
+            <div className="col-auto mb-12 flex-grow-1 d-flex justify-content-between flex-wrap">
+                <div className="btn-group mr-08" role="group" aria-label="Creation Controls">
                     <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
                         <i className="icon icon-fw icon-plus fas mr-1" />
                         Add Filter Block
@@ -2091,6 +2089,7 @@ function FilterSetUIBlockBottomUI(props){
                         <i className="icon icon-fw icon-clone far" />
                     </button>
                 </div>
+                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark"/>
             </div>
         </div>
     );
@@ -2451,7 +2450,7 @@ export class FilterSetController extends React.PureComponent {
         "navigate" : PropTypes.func.isRequired,
         "initialSelectedFilterBlockIndices" : PropTypes.arrayOf(PropTypes.number),
         "isFetchingInitialFilterSetItem" : PropTypes.bool,
-        "onResetSelectedItems": PropTypes.func
+        "onResetSelectedVariantSamples": PropTypes.func
     };
 
     static defaultProps = {
@@ -2688,7 +2687,7 @@ export class FilterSetController extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
-        const { initialFilterSetItem, context: searchContext, onResetSelectedItems } = this.props;
+        const { initialFilterSetItem, context: searchContext, onResetSelectedVariantSamples } = this.props;
         const { initialFilterSetItem: pastInitialFilterSet, context: pastSearchContext } = pastProps;
 
         // Just some debugging for dev environments.
@@ -2711,9 +2710,9 @@ export class FilterSetController extends React.PureComponent {
         //     }
         // }
 
-        if (onResetSelectedItems && searchContext !== pastSearchContext) {
+        if (onResetSelectedVariantSamples && searchContext !== pastSearchContext) {
             console.info("Resetting selected VS items");
-            onResetSelectedItems();
+            onResetSelectedVariantSamples();
         }
 
         // If a new FilterSet gets fetched in; should only occur for initial FS being loaded in (where pastInitialFilterSet is null).
