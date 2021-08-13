@@ -7,7 +7,7 @@
 import os
 import logging
 from dcicutils.qa_utils import override_environ
-from dcicutils.deployment_utils import IniFileManager
+from dcicutils.deployment_utils import BasicOrchestratedCGAPIniFileManager
 from dcicutils.secrets_utils import assume_identity
 
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__file__)
 _MY_DIR = os.path.dirname(__file__)
 
 
-class CGAPDockerIniFileManager(IniFileManager):
+class CGAPDockerIniFileManager(BasicOrchestratedCGAPIniFileManager):
     """ This runs at top level, so path is slightly different. """
     # should work but doesn't (missing cgap-portal): os.path.join(os.path.dirname(_MY_DIR), "pyproject.toml")
     # expected = <hardwired>

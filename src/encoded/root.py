@@ -113,7 +113,7 @@ def health_check(config):
             'project_version': settings.get('encoded_version'),
             'snovault_version': settings.get('snovault_version'),
             "system_bucket": settings.get('system_bucket'),
-            "tibanna_logs_bucket": settings.get('tibanna_logs_bucket'),
+            "tibanna_output_bucket": settings.get('tibanna_output_bucket'),
             'uptime': uptime_info(),
             'utils_version': settings.get('utils_version'),
 
