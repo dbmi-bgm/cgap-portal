@@ -6,7 +6,7 @@ from os import walk
 # use ff_utils to find inserts and write data
 from dcicutils.ff_utils import search_metadata, expand_es_metadata, dump_results_to_json
 # use this function to read inserts
-from .commands.run_upgrader_on_inserts import get_inserts
+from .run_upgrader_on_inserts import get_inserts
 
 logger = structlog.getLogger(__name__)
 EPILOG = __doc__
