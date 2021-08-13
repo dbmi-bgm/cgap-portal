@@ -1,8 +1,6 @@
 """init.py lists all the collections that do not have a dedicated types file."""
 
 import transaction
-
-# from pyramid.traversal import find_root
 from snovault import (
     calculated_property,
     collection,
