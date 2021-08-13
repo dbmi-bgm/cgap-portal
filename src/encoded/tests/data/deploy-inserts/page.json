@@ -181,22 +181,6 @@
         "uuid": "9204be0a-98d4-4794-84a2-a05daefecc7c"
     },
     {
-        "name": "help/uploading_cohort",
-        "title": "Uploading Cohorts",
-        "status": "inactive",
-        "aliases": [
-            "hms-dbmi:uploading_cohort"
-        ],
-        "content": [
-            "7d236ae6-ac9d-4f48-bdc1-b578ec415cfb"
-        ],
-        "table-of-contents": {
-            "enabled": false,
-            "header-depth": 4
-        },
-        "uuid": "811f87d9-c608-47a9-aafa-42b28bf0094d"
-    },
-    {
         "name": "help/annotation_browser",
         "title": "Annotation Browser",
         "status": "public",
