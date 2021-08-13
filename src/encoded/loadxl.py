@@ -570,7 +570,7 @@ def load_prod_data(app, overwrite=False):
     return load_data(app, indir='master-inserts', overwrite=overwrite)
 
 
-def load_deploy_data(app, overwrite=False):
+def load_deploy_data(app, overwrite=True):
     """
     Load deploy-inserts and master-inserts.
 
