@@ -102,15 +102,22 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
             //         return null;
             //     }
             // },
-            "structural_variant.transcript.csq_gene.display_title": { // TODO: Needs to point to Gene tab when that is complete
+            "structural_variant.transcript.csq_gene.display_title": {
                 "render": function(result, props) {
-                    const { "@id": atID, structural_variant: { transcript = [] } = {} } = result;
-                    console.log("transcript", transcript);
-                    const path = atID; // + "?annotationTab=0"
-                    if (transcript.length < 2) {
-                        return <a href={path}>{transcript.map((t) => t.csq_gene.display_title)}</a>;
+                    const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result;
+                    const path = atID; // + "?annotationTab=0" // TODO: Needs to point to Gene tab when that is complete
+
+                    const transcriptsDeduped = {};
+                    transcripts.forEach((transcript) => {
+                        const { csq_gene: { display_title = null } = {} } = transcript;
+                        transcriptsDeduped[display_title] = true;
+                    });
+                    const genes = Object.keys(transcriptsDeduped);
+
+                    if (genes.length <= 2) {
+                        return <a href={path}>{genes.join(", ")}</a>;
                     } // show first and last gene separated by "..."
-                    return <a href={path}>{`${transcript[0].csq_gene.display_title}...${transcript[transcript.length-1].csq_gene.display_title}`}</a> ;
+                    return <a href={path}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
                 }
             },
             "structural_variant.size": {
