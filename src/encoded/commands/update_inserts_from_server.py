@@ -6,8 +6,7 @@ from os import walk
 # use ff_utils to find inserts and write data
 from dcicutils.ff_utils import search_metadata, expand_es_metadata, dump_results_to_json
 # use this function to read inserts
-from encoded.commands.run_upgrader_on_inserts import get_inserts
-from encoded.util import resolve_file_path
+from .commands.run_upgrader_on_inserts import get_inserts
 
 logger = structlog.getLogger(__name__)
 EPILOG = __doc__
@@ -75,7 +74,7 @@ def main():
 
     args = parser.parse_args()
     # this will work since bin/ commands are run from root FF directory
-    inserts_location = resolve_file_path('tests/data')
+    inserts_location = 'src/encoded/tests/data'
     # hardcode these to prevent accidental creation of inserts files
     inserts_files = ['inserts', 'master-inserts', 'perf-testing', 'workbook-inserts',
                      'temp-local-inserts', 'deploy-inserts']
