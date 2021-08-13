@@ -28,7 +28,7 @@ from pyramid.request import Request
 from pyramid.view import view_config
 from snovault.util import debug_log
 from vcf import Reader
-from .ingestion.vcf_utils import VCFParser
+from .ingestion.vcf_utils import VCFParser, StructuralVariantVCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
 from .commands.add_altcounts_by_gene import main as add_altcounts
 from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
@@ -37,12 +37,12 @@ from .ingestion.processors import get_ingestion_processor
 # from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
-    resolve_file_path,  # gunzip_content,
+    resolve_file_path, gunzip_content,
     debuglog, get_trusted_email, beanstalk_env_from_request,
     subrequest_object, register_path_content_type, vapp_for_email, vapp_for_ingestion,
 )
 from .ingestion.queue_utils import IngestionQueueManager
-from .ingestion.variant_utils import VariantBuilder
+from .ingestion.variant_utils import VariantBuilder, StructuralVariantBuilder
 
 
 log = structlog.getLogger(__name__)
@@ -56,6 +56,10 @@ STATUS_DISABLED = 'Ingestion disabled'
 STATUS_ERROR = 'Error'
 STATUS_IN_PROGRESS = 'In progress'
 SHARED = 'shared'
+STRUCTURAL_VARIANT_SCHEMA = resolve_file_path("./schemas/structural_variant.json")
+STRUCTURAL_VARIANT_SAMPLE_SCHEMA = resolve_file_path(
+    "./schemas/structural_variant_sample.json"
+)
 
 
 def includeme(config):
@@ -540,31 +544,55 @@ class IngestionListener:
                 # decoded_content = gunzip_content(raw_content)
                 # debuglog('Got decoded content: %s' % decoded_content[:20])
 
-                # Apply VCF reformat
-                vcf_to_be_formatted = tempfile.NamedTemporaryFile(suffix='.gz')
-                vcf_to_be_formatted.write(raw_content)
-                formatted = tempfile.NamedTemporaryFile()
-                reformat_args = {
-                    'inputfile': vcf_to_be_formatted.name,
-                    'outputfile': formatted.name,
-                    'verbose': False
-                }
-                reformat_vcf(reformat_args)
+                vcf_type = file_meta.get("variant_type", "SNV")
+                if vcf_type == "SNV":
+                    # Apply VCF reformat
+                    vcf_to_be_formatted = tempfile.NamedTemporaryFile(suffix='.gz')
+                    vcf_to_be_formatted.write(raw_content)
+                    formatted = tempfile.NamedTemporaryFile()
+                    reformat_args = {
+                        'inputfile': vcf_to_be_formatted.name,
+                        'outputfile': formatted.name,
+                        'verbose': False
+                    }
+                    reformat_vcf(reformat_args)
 
-                # Add altcounts by gene
-                # Note: you cannot pass this file object to vcf.Reader if it's in rb mode
-                # It's also not guaranteed that it reads utf-8, so pass explicitly
-                formatted_with_alt_counts = tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8')
-                alt_counts_args = {
-                    'inputfile': formatted.name,
-                    'outputfile': formatted_with_alt_counts.name
-                }
-                add_altcounts(alt_counts_args)
-                parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
-                                   reader=Reader(formatted_with_alt_counts))
-                variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
-                                                 project=file_meta['project']['@id'],
-                                                 institution=file_meta['institution']['@id'])
+                    # Add altcounts by gene
+                    # Note: you cannot pass this file object to vcf.Reader if it's in rb mode
+                    # It's also not guaranteed that it reads utf-8, so pass explicitly
+                    formatted_with_alt_counts = tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8')
+                    alt_counts_args = {
+                        'inputfile': formatted.name,
+                        'outputfile': formatted_with_alt_counts.name
+                    }
+                    add_altcounts(alt_counts_args)
+                    parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
+                                       reader=Reader(formatted_with_alt_counts))
+                    variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
+                                                     project=file_meta['project']['@id'],
+                                                     institution=file_meta['institution']['@id'])
+                elif vcf_type == "SV":
+                    # No reformatting necesssary for SV VCF
+                    decoded_content = gunzip_content(raw_content)
+                    debuglog('Got decoded content: %s' % decoded_content[:20])
+                    formatted_vcf = tempfile.NamedTemporaryFile(
+                        mode="w+", encoding="utf-8"
+                    )
+                    formatted_vcf.write(decoded_content)
+                    formatted_vcf.seek(0)
+                    parser = StructuralVariantVCFParser(
+                        None,
+                        STRUCTURAL_VARIANT_SCHEMA,
+                        STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
+                        reader=Reader(formatted_vcf),
+                    )
+                    variant_builder = StructuralVariantBuilder(
+                        self.vapp,
+                        parser,
+                        file_meta["accession"],
+                        project=file_meta["project"]["@id"],
+                        institution=file_meta["institution"]["@id"],
+                    )
                 try:
                     success, error = variant_builder.ingest_vcf()
                 except Exception as e:
