@@ -1,11 +1,14 @@
 import io
 import json
+import mock
 import pytest
 
 from dcicutils.diff_utils import DiffManager
 from dcicutils.misc_utils import file_contents
 from ..util import resolve_file_path
-from ..ingestion.table_utils import VariantTableParser, MappingTableHeader
+from ..ingestion.table_utils import (
+    VariantTableParser, MappingTableHeader, StructuralVariantTableParser
+)
 from .variant_fixtures import ANNOTATION_FIELD_URL
 
 
@@ -255,3 +258,141 @@ def test_post_inserts_via_run(MTParser, project, institution, testapp):
 
     assert not variant_schema_delta
     assert not variant_sample_schema_delta
+
+@pytest.fixture
+def sv_schema():
+    schema = {
+        "$schema": "http://json-schema.org/draft-04/schema#",
+        "type": "object",
+        "identifyingProperties": ["uuid", "aliases", "annotation_id"],
+        "additionalProperties": False,
+        "title": "Structural Variant",
+        "description": "Schema for structural variants",
+        "id": "/profiles/structural_variant.json",
+        "properties": {
+            "vcf_field_to_drop": {"type": "string", "vcf_field": "something"},
+            "non_vcf_field_to_keep": {"type": "number", "min": 1},
+            "vcf_field_with_non_vcf_subembed": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "some_vcf_field": {
+                            "type": "string",
+                            "vcf_field": "something else",
+                        },
+                        "another_non_vcf_field": {"type": "integer", "max": 20},
+                    },
+                },
+            },
+            "non_vcf_field_with_non_vcf_subembed": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "non_vcf_field": {"type": "array", "items": {"type": "string"}}
+                    },
+                },
+            },
+        },
+        "columns": {"first_columns": {"order": 0}},
+        "facets": {"non_vcf_field_to_keep": {"order": 0}},
+    }
+    return schema
+
+
+@pytest.fixture
+def props_from_inserts():
+    props = {
+        "mapping_table_field_1": {"type": "string", "vcf_field": "new_vcf_field_1"},
+        "vcf_field_with_non_vcf_subembed": {
+            "type": "array",
+            "items": {"properties": {"mapping_table_field_2": {"type": "number"}}},
+        },
+    }
+    return props
+
+
+class TestSVTableParser:
+    """
+    Mock builtins.open method for all these tests to prevent over-writing
+    structural_variant_embeds.json schema with test mocking table results.
+    """
+
+    @mock.patch("builtins.open", new_callable=mock.mock_open())
+    @mock.patch(
+        "encoded.ingestion.table_utils.StructuralVariantTableParser.old_sv_schema",
+        new_callable=mock.PropertyMock,
+    )
+    def test_get_vcf_props(self, mock_sv_schema, mock_open_file, sv_schema):
+        """
+        Test existing schema "properties" fields are correctly parsed
+        according to whether they are or contain fields coming from a previous
+        mapping table ingestion.
+        """
+        mock_sv_schema.return_value = sv_schema
+        parser = StructuralVariantTableParser(MT_LOC, ANNOTATION_FIELD_SCHEMA)
+        assert "non_vcf_field_to_keep" in parser.sv_non_vcf_props
+        assert "non_vcf_field_with_non_vcf_subembed" in parser.sv_non_vcf_props
+        assert parser.sv_non_vcf_props["vcf_field_with_non_vcf_subembed"] == [
+            "another_non_vcf_field"
+        ]
+
+    @mock.patch("builtins.open", new_callable=mock.mock_open)
+    def test_provision_and_update_embeds(self, mock_open_file):
+        """
+        Test structural_variant_embeds.json correctly updated with embeds
+        from mapping table.
+        """
+        parser = StructuralVariantTableParser(MT_LOC, ANNOTATION_FIELD_SCHEMA)
+        mock_open_file().write.assert_any_call('"structural_variant"')
+        mock_open_file().write.assert_any_call('"structural_variant_sample"')
+
+        # Mock json.load so embed writes go to mock_open_file
+        with mock.patch("json.load", new_callable=mock.MagicMock) as mock_json_load:
+            mock_json_load.return_value = {"structural_variant": {}}
+            inserts = parser.process_annotation_field_inserts()
+            sv_props, _, _ = parser.generate_properties(
+                parser.filter_fields_by_variant(inserts)
+            )
+        # Depending on mapping table (MT_LOC), what's written may vary, so check only
+        # for writing of new line (\n) which should occur if anything written. If
+        # failing after change to MT_LOC, can provide fixture for mapping table.
+        # drr 07-26-2021
+        mock_open_file().write.assert_any_call("\n")
+
+    @mock.patch("builtins.open", new_callable=mock.mock_open)
+    @mock.patch(
+        "encoded.ingestion.table_utils.StructuralVariantTableParser.old_sv_schema",
+        new_callable=mock.PropertyMock,
+    )
+    def test_generate_schema(
+            self, mock_sv_schema, mock_open_file, sv_schema, props_from_inserts
+    ):
+        """
+        Test new schema generation from existing schema. Only schema
+        "properties" should be updated with new fields from mapping table,
+        and existing fields that did not come from a mapping table ingestion
+        should also be present in the new schema "properties".
+        """
+        mock_sv_schema.return_value = sv_schema
+        parser = StructuralVariantTableParser(MT_LOC, ANNOTATION_FIELD_SCHEMA)
+        new_sv_schema = parser.generate_schema(
+            props_from_inserts, parser.old_sv_schema, parser.sv_non_vcf_props
+        )
+        new_schema_props = new_sv_schema["properties"]
+        old_schema_props = sv_schema["properties"]
+        for key, value in sv_schema.items():
+            if key == "properties":
+                assert new_sv_schema[key] != value
+                continue
+            assert new_sv_schema[key] == value
+        for key, value in parser.sv_non_vcf_props.items():
+            if not value:
+                assert new_schema_props[key] == old_schema_props[key]
+            else:
+                # Indicates sub-embed of non-vcf field inside field with vcf field
+                # sub-embed, so should still be present.
+                sub_embeds = new_schema_props[key]["items"]["properties"]
+                for sub_embed_item in value:
+                    assert sub_embed_item in sub_embeds
