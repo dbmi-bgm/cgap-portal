@@ -45,6 +45,10 @@ export default class HealthView extends React.PureComponent {
     static defaultProps = {
         "excludedKeys" : [ ...ItemDetailList.Detail.defaultProps.excludedKeys, 'content' ],
         "keyTitleDescriptionMapConfig" : {
+            'application_bucket_prefix' : {
+                title : "Application Bucket Prefix",
+                description : "Ecosystem-specific name prefix for this server's application buckets."
+            },
             'aggregations' : {
                 title : 'Aggregations',
                 description : "Aggregations of ES-indexed data."
@@ -79,6 +83,10 @@ export default class HealthView extends React.PureComponent {
             'foursight' : {
                 title : "Foursight",
                 description : "URI of corresponding Foursight page."
+            },
+            'foursight_bucket_prefix' : {
+                title : "Foursight Bucket Prefix",
+                description : "Ecosystem-specific name prefix for this server's foursight buckets."
             },
             'identity': {
                 title : "Identity",
@@ -129,8 +137,8 @@ export default class HealthView extends React.PureComponent {
                 description : "Name of S3 Bucket used for system data."
             },
             'tibanna_output_bucket': {
-                title : "Tibanna Logs Bucket",
-                description : "Name of S3 bucket used for tibanna logs."
+                title : "Tibanna Output Bucket",
+                description : "Name of S3 bucket used for tibanna output."
             },
             'uptime': {
                 title : 'Uptime',

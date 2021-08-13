@@ -95,6 +95,7 @@ def health_check(config):
             "@id": "/health",
             "content": None,
 
+            "application_bucket_prefix": settings.get('application_bucket_prefix'),
             'beanstalk_app_version': settings.get('eb_app_version'),
             "beanstalk_env": env_name,
             "blob_bucket": settings.get('blob_bucket'),
@@ -103,6 +104,7 @@ def health_check(config):
             "elasticsearch": settings.get('elasticsearch.server'),
             "file_upload_bucket": settings.get('file_upload_bucket'),
             "foursight": foursight_url,
+            "foursight_bucket_prefix": settings.get('foursight_bucket_prefix'),
             "identity": settings.get("identity"),
             "indexer": settings.get("indexer"),
             "index_server": settings.get("index_server"),
