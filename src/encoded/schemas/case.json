@@ -153,8 +153,16 @@
             "title": "Case ID",
             "sort_fields": [
                 {
+                    "field": "case_title",
+                    "title": "Case Title"
+                },
+                {
                     "field": "accession",
-                    "title": "Accession (CGAP ID)"
+                    "title": "Case Accession (CGAP ID)"
+                },
+                {
+                    "field": "date_created",
+                    "title": "Case Accession Date"
                 },
                 {
                     "field": "aliases",
@@ -166,16 +174,20 @@
             "title": "Family ID",
             "sort_fields": [
                 {
+                    "field": "family.family_id",
+                    "title": "Family ID"
+                },
+                {
                     "field": "family.accession",
                     "title": "Family Accession (CGAP ID)"
                 },
                 {
-                    "field": "family.title",
-                    "title": "Family Title"
+                    "field": "family.last_modified.date_modified",
+                    "title": "Family Last Modified Date"
                 },
                 {
-                    "field": "family.family_id",
-                    "title": "Family ID"
+                    "field": "family.title",
+                    "title": "Family Title"
                 }
             ]
         },
@@ -184,41 +196,87 @@
             "description": "Proband Individual of this Case",
             "sort_fields": [
                 {
+                    "field": "individual.individual_id",
+                    "title": "Individual ID"
+                },
+                {
                     "field": "individual.accession",
                     "title": "Individual Accession (CGAP ID)"
                 },
                 {
-                    "field": "individual.aliases",
-                    "title": "User-Defined Alias"
+                    "field": "individual.date_created",
+                    "title": "Individual Accession Date"
                 },
                 {
-                    "field": "individual.uuid",
-                    "title": "UUID"
+                    "field": "individual.aliases",
+                    "title": "User-Defined Alias"
                 }
             ]
         },
         "sample.specimen_type": {
-            "title": "Sample"
+            "title": "Sample",
+            "sort_fields": [
+                {
+                    "field": "sample.specimen_type",
+                    "title": "Specimen Type"
+                },
+                {
+                    "field": "sample.accession",
+                    "title": "Sample Accession (CGAP ID)"
+                },
+                {
+                    "field": "sample.specimen_collection_date",
+                    "title": "Specimen Collection Date"
+                },
+                {
+                    "field": "individual.aliases",
+                    "title": "User-Defined Alias"
+                }
+            ]
         },
         "sample": {
             "title": "Sequencing",
             "notes": "The primary sample calculated for a particular case.",
             "sort_fields": [
                 {
-                    "field": "sample.specimen_collection_date",
-                    "title": "Sample Collection Date"
+                    "field": "sample.workup_type",
+                    "title": "Sample Workup Type"
                 },
                 {
-                    "field": "sample.accession",
-                    "title": "Sample Accession (CGAP ID)"
+                    "field": "sample.sequencing_date",
+                    "title": "Sample Sequence Date"
                 }
             ]
         },
         "sample_processing.analysis_type": {
-            "title": "Bioinformatics"
+            "title": "Bioinformatics",
+            "sort_fields": [
+                {
+                    "field": "sample_processing.analysis_type",
+                    "title": "Bioinformatics Analysis Type"
+                },
+                {
+                    "field": "sample_processing.last_modified.date_modified",
+                    "title": "Bioinformatics Last Modified Date"
+                }
+            ]
         },
         "report": {
-            "title": "Report"
+            "title": "Report",
+            "sort_fields": [
+                {
+                    "field": "report.display_title",
+                    "title": "Report Title"
+                },
+                {
+                    "field": "report.accession",
+                    "title": "Report Accession (CGAP ID)"
+                },
+                {
+                    "field": "report.last_modified.date_modified",
+                    "title": "Report Last Modified Date"
+                }
+            ]
         }
     }
 }

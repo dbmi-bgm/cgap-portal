@@ -98,7 +98,7 @@ function AboveCasesTableOptions(props){
                             <ProjectSelectDropdown {...{ context, onFilter, isContextLoading, navigate }} />
                         </div>
                     </h3>
-                    <DropdownButton variant="primary text-600 text-capitalize" title={<span><i className="icon fas icon-plus mr-08"/>Submit New...</span>} id="submit-new">
+                    <DropdownButton variant="primary" title={<span><i className="icon fas icon-plus mr-08"/>Submit New...</span>} id="submit-new">
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add">
                             Case(s)
                         </Dropdown.Item>
