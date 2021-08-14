@@ -18,7 +18,7 @@ def _build_gene_embedded_list():
     return [
         'gene_lists.title',
         'interpretations.classification',
-        'interpretations.acmg_guidelines',
+        'interpretations.acmg_rules_invoked.*',
         'interpretations.conclusion',
         'interpretations.note_text'
     ]
