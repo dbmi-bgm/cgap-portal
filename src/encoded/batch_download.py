@@ -3,6 +3,7 @@ import io
 import json
 import os
 import structlog
+from math import inf
 from urllib.parse import parse_qs, urlparse
 from collections import OrderedDict
 from itertools import chain
@@ -63,7 +64,7 @@ def get_population_suffix_title_tuples():
         ("sas", "South Asian")
     ]
 
-def get_spreadsheet_mappings():
+def get_spreadsheet_mappings(request = None):
 
     def get_canonical_transcript(variant_sample):
         variant = variant_sample.get("variant", {})
@@ -89,7 +90,7 @@ def get_spreadsheet_mappings():
             "LOW" : 2,
             "MODIFIER" : 3
         }
-        most_severe_impact_val = 100
+        most_severe_impact_val = inf
         most_severe_consequence = None
         for consequence in csq_consequences:
             impact_val = impact_map[consequence["impact"]]
@@ -201,8 +202,10 @@ def get_spreadsheet_mappings():
         return None
 
     def url_to_variantsample(variant_sample):
-        # TODO: Prepend request hostname, scheme, etc.
         at_id = variant_sample["@id"]
+        if request:
+            # Prepend request hostname, scheme, etc.
+            return request.resource_url(request.root) + variant_sample["@id"][1:]
         return at_id
 
 
@@ -372,6 +375,7 @@ def stream_tsv_output(dictionaries_iterable, spreadsheet_mappings, file_format =
             row[0] = "# Not Available"
             yield writer.writerow(row)
         else:
+            print("Printing", vs_dict)
             yield writer.writerow([ vs_dict.get(sm[0]) or "" for sm in spreadsheet_mappings ])
 
 
@@ -446,7 +450,7 @@ def variant_sample_list_spreadsheet(context, request):
         requested_variant_sample_uuids = [ vso["variant_sample_item"] for vso in variant_sample_objects ]
 
 
-    spreadsheet_mappings = get_spreadsheet_mappings()
+    spreadsheet_mappings = get_spreadsheet_mappings(request)
     fields_to_embed = [
         # Most of these are needed for columns with render/transform/custom-logic functions in place of (string) CGAP field.
         # Keep up-to-date with any custom logic.

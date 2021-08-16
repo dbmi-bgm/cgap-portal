@@ -38,13 +38,6 @@ const ExportSpreadsheetButton = React.memo(function ExportSpreadsheetButton({ va
     const baseHref = "/variant-sample-list-spreadsheet/?variant_sample_list_id=" + encodeURIComponent(atId);
     return (
         <DropdownButton variant="primary" disabled={vsObjects.length === 0} title="Export as...">
-            {/* Testing -- }
-            <form method="POST" action={baseHref + "&file_format=tsv"} className="d-inline-block">
-                <button type="submit" className="dropdown-item" role="button" download>
-                    <span className="text-600">TSV</span> spreadsheet
-                </button>
-            </form>
-            */}
             <a href={baseHref + "&file_format=tsv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
                 <span className="text-600">TSV</span> spreadsheet
             </a>
