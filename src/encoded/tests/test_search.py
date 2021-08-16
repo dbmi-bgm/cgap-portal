@@ -837,16 +837,17 @@ class TestNestedSearch(object):
                 '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
             ]
         res = es_testapp.get('/search/?type=Variant'
-                             '&hg19.hg19_pos.to=12125898').json
-        self.assert_length_is_expected(res, 4)
-        res = es_testapp.get('/search/?type=Variant'
-                             '&hg19.hg19_pos.to=12125898'
-                             '&hg19.hg19_pos.from=88832').json
+                             '&hg19.hg19_pos.to=12185956').json
         self.assert_length_is_expected(res, 3)
         res = es_testapp.get('/search/?type=Variant'
-                             '&hg19.hg19_pos.to=12125898'
-                             '&hg19.hg19_pos.from=11720331').json
+                             '&hg19.hg19_pos.to=12185955'
+                             '&hg19.hg19_pos.from=88832').json
+
         self.assert_length_is_expected(res, 2)
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos.to=12185956'
+                             '&hg19.hg19_pos.from=11720331').json
+        self.assert_length_is_expected(res, 1)
 
     def test_negative_search_on_hg_19(self, workbook, es_testapp):
         """ Do an OR search with hg19_post with a negative, should eliminate a variant """
@@ -859,6 +860,18 @@ class TestNestedSearch(object):
                 '852bb349-203e-437d-974a-e8d6cb56810a',
                 '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
             ]
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos!=12185955'
+                             '&hg19.hg19_chrom=chr1').follow().json
+        self.assert_length_is_expected(res, 2)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                '852bb349-203e-437d-974a-e8d6cb56810a',
+                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+            ]
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos!=12345').follow().json
+        self.assert_length_is_expected(res, 3)
 
     def test_and_search_that_matches_one(self, workbook, es_testapp):
         """ Check three properties that occur in the same sub-embedded object in 1 variant """
