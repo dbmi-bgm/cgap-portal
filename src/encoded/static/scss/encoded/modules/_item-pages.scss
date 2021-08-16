@@ -760,7 +760,10 @@ i.status-indicator-dot {
 	border: 1px solid #efefef;
 	padding: 3px 7px;
     font-size: 0.7em;
-    letter-spacing: 1px;
+    letter-spacing: 0.05em;
+	text-align: center;
+	font-family: $font-family-monospace;
+	font-weight: 600;
 
 	@include acmgColorStyles;
 }
@@ -1046,6 +1049,14 @@ i.status-indicator-dot {
 	Move into own file?
 **********************************************************/
 
+.primary-header {
+	background-color: $primary-dark !important;
+	color: #ffffff;
+	h1, h2, h3, h4, h5, h6 {
+		color: inherit;
+	}
+}
+
 .item-page-container {
 
 	.case-summary-card-row{
@@ -1134,8 +1145,6 @@ i.status-indicator-dot {
 		// }
 
 		div.pedigree-vis-heading {
-			background-color: $primary-dark; // previous value: $navbar-background-color (#20445f);
-			color: #ffffff;
 
 			.view-pedigree-btn {
 				background-color: cornflowerblue; // TODO: Once settle on good color, maybe apply it to our theme under a SCSS variable for re-use. Then ctrl+find+replace.
@@ -1293,6 +1302,8 @@ i.status-indicator-dot {
 					}
 
 					@include media-breakpoint-up(lg) {
+
+						flex-basis: 20%; /* <- dependendent on there being 5 of these tabs (keep in sync w. amount of tabs) */
 
 						&:first-child {
 							> .btn-prepend {
@@ -1683,7 +1694,10 @@ i.status-indicator-dot {
 
 	@include navbar-fixed-position {
 		width: 320px;
+		flex-basis: 320px;
 	}
+
+	flex-shrink: 0;
 
 	/** -- **/
 
@@ -2440,6 +2454,10 @@ i.status-indicator-dot {
 				}
 			}
 		}
+	}
+
+	.interpretation-space-wrapper-column {
+		flex-basis: 375px;
 	}
 
 	.interpretation-space {

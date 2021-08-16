@@ -210,6 +210,7 @@ def test_sv_vcf():
     parser = StructuralVariantVCFParser(TEST_SV_VCF, SV_SCHEMA, SV_SAMPLE_SCHEMA)
     return parser
 
+
 class TestIngestStructuralVariantVCF(TestIngestVCF):
 
     VEP_IDENTIFIER = "transcript"  # In case of future divergence from SNV tests
@@ -272,3 +273,13 @@ class TestIngestStructuralVariantVCF(TestIngestVCF):
         assert sample_geno[0]["samplegeno_numgt"] == "0/0"
         assert sample_geno[2]["samplegeno_sampleid"] == "NA12877_sample"
 
+        # record 2 - Basics + Samplegeno fields
+        record = test_sv_vcf.read_next_record()
+        result = test_sv_vcf.create_sample_variant_from_record(record)
+
+        assert len(result) == 2
+        sample_geno = self.get_top_level_field(result[1], "samplegeno")
+        assert len(sample_geno) == 3
+        assert sample_geno[1]["samplegeno_sampleid"] == "NA12878_sample"
+        assert sample_geno[2]["samplegeno_numgt"] == "0/1"
+        

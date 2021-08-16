@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import memoize from 'memoize-one';
 
 import { object, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { StackedBlockTable, StackedBlock, StackedBlockList, StackedBlockName, StackedBlockNameLabel } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/StackedBlockTable';
@@ -181,31 +182,26 @@ class FamilySection extends React.Component {
  * and report/case in that family. Result rows are sorted by individual (first proband, then individuals
  * with samples, then the rest).
  *
- * TODO: highlight current case throughout the table using 'result' prop.
+ * @todo (?) Highlight current case throughout the table using 'result' prop.
+ * @todo Maybe we can migrate to simpler flex/css instead of StackedTable eventually..
  */
 export class FamilyReportStackedTable extends React.PureComponent {
 
-    static StackedBlock = StackedBlock
-
-    static builtInHeaders(){
-        // Keeping these builtInHeader methods separate in case we want to build in custom columns later
-        return [
-            { columnClass: 'individual',    className: 'text-left',         title: 'Individual',    initialWidth: 220   },
-            { columnClass: 'libraries',     className: 'text-left',         title: 'Libraries',     initialWidth: 220   },
-            { columnClass: 'analysis',                                      title: 'Analysis',      initialWidth: 200   },
-            /* report column has no label, but has left alignment, so we add 12px padding left to visually align header to it better */
-            { columnClass: 'report',        className: 'text-left pl-12',   title: 'Report',        initialWidth: 200   }
-        ];
-    }
+    // Keeping these builtInHeader methods separate in case we want to build in custom columns later
+    static builtInHeaders = [
+        { columnClass: 'individual',    className: 'text-left',         title: 'Individual',                initialWidth: 200   },
+        { columnClass: 'libraries',     className: 'text-left',         title: 'Sequencing Libraries',      initialWidth: 80    },
+        /* report + analysis columns have no labels, but have left alignment, so we add 12px padding left to visually align header to it better */
+        { columnClass: 'analysis',      className: 'text-left pl-12',         title: 'Analysis',            initialWidth: 80    },
+        { columnClass: 'report',        className: 'text-left pl-12',   title: 'Report',                    initialWidth: 260   }
+    ];
 
     /* Built-in headers */
     static staticColumnHeaders(columnHeaders){
-        return _.map(FamilyReportStackedTable.builtInHeaders(), function(staticCol){
-            return _.extend(
-                _.clone(staticCol),
-                _.findWhere(columnHeaders, { 'title' : staticCol.title }) || {}
-            );
-        }) || [];
+        return FamilyReportStackedTable.builtInHeaders.map(function(staticCol){
+            const foundColumnFromParamHeaders = _.findWhere(columnHeaders, { 'title' : staticCol.title });
+            return { ...staticCol, ...(foundColumnFromParamHeaders || {}) };
+        });
     }
 
     static propTypes = {
@@ -240,6 +236,9 @@ export class FamilyReportStackedTable extends React.PureComponent {
         this.renderSampleBlock = this.renderSampleBlock.bind(this);
         this.renderIndividualBlock = this.renderIndividualBlock.bind(this);
         this.renderIndividualBlockList = this.renderIndividualBlockList.bind(this);
+        this.memoized = {
+            staticColumnHeaders: memoize(FamilyReportStackedTable.staticColumnHeaders)
+        };
     }
 
     /**
@@ -262,9 +261,9 @@ export class FamilyReportStackedTable extends React.PureComponent {
             <StackedBlock columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}
                 label={<StackedBlockNameLabel title="Sample" subtitle="Library" accession={accession} subtitleVisible/>}>
                 <StackedBlockName>
-                    <span className="name-title">
-                        { atId ? <a href={atId} className="name-title">{ workup_type }</a> : <span className="name-title">{ workup_type }</span>}
-                    </span>
+                    <div className="name-title text-left pt-2 pb-2">
+                        { atId ? <a href={atId}>{ workup_type }</a> : <span>{ workup_type }</span> }
+                    </div>
                 </StackedBlockName>
                 <StackedBlockList className="analysis" title="Analysis">
                     { analysisGroups.filter(function({ samples: analysisGroupSamples = [] }){
@@ -279,7 +278,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                         }
                         return true;
                     }).map((analysisGroup) => {
-                        const { analysis_type = null, cases: groupCases = [] } = analysisGroup || {};
+                        const { analysis_type = null, analysis_version = null, cases: groupCases = [] } = analysisGroup || {};
 
                         // Figure out which report is associated with the current analysis group & sample
                         const groupCase = groupCases.find(function(groupCase){
@@ -294,6 +293,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
 
                         const reportBlockId = caseToReportMap[groupCaseAtId];
                         const fallbackKey = 'case-' + groupCaseAtId;
+                        const analysis_title = analysis_type + (analysis_version ? " (" + analysis_version + ")" : "");
                         let reportBlock = null;
 
                         if (reportBlockId) {
@@ -307,7 +307,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                             <StackedBlock key={analysis_type} columnClass="analysis" hideNameOnHover={false}
                                 label={<StackedBlockNameLabel title={null} subtitle={null} accession={null} subtitleVisible/>}>
                                 <StackedBlockName>
-                                    <span className="name-title">{ analysis_type }</span>
+                                    <span className="name-title text-left d-block">{ analysis_title }</span>
                                 </StackedBlockName>
                                 <StackedBlockList className="report" title="Report">
                                     { reportBlock ? <StackedBlockList className="report" title="Report">{reportBlock}</StackedBlockList> : FamilyReportStackedTable.renderEmptyBlock("report") }
@@ -353,8 +353,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
             } else { // render an appropriate block when there is a case but no report by mapping case+[caseAtID] : JSX block
                 reportToReportBlockMap['case-' + caseAtId] = (
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
-                        label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}
-                    >
+                        label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}>
                         <StackedBlockName>
                             <div className="d-flex text-left">
                                 <span className="mr-07 text-nowrap">Case ID:</span>
@@ -370,16 +369,20 @@ export class FamilyReportStackedTable extends React.PureComponent {
         });
 
         return (
-            <StackedBlock hideNameOnHover={false} columnClass="individual"
-                key={atId} id={atId}
-                label={
-                    <StackedBlockNameLabel title="CGAP ID" accession={accession} subtitleVisible/>}
-            >
+            <StackedBlock hideNameOnHover={false} columnClass="individual" key={atId} id={atId}
+                label={<StackedBlockNameLabel title="CGAP ID" accession={accession} subtitleVisible/>}>
                 <StackedBlockName>
-                    { atId ? <a href={atId} className="name-title text-capitalize">{ role || display_title }</a> : <span className="name-title text-capitalize">{ role || display_title }</span>}
-                    { individual_id ? `(${individual_id})`: null }
+                    <div className="name-title pt-2 pb-2 text-left">
+                        { atId ?
+                            <a href={atId} className="text-capitalize">
+                                { role || display_title }
+                            </a>
+                            : <span className="text-capitalize">{ role || display_title }</span>
+                        }
+                        { individual_id ? <span> ({individual_id})</span> : null }
+                    </div>
                 </StackedBlockName>
-                <StackedBlockList className="libraries" title="Libraries">
+                <StackedBlockList className="libraries" title="Sequencing Libraries">
                     { indvSamples.map((thisSample) => this.renderSampleBlock(thisSample, reportToReportBlockMap, caseToReportMap))}
                 </StackedBlockList>
             </StackedBlock>
@@ -444,11 +447,11 @@ export class FamilyReportStackedTable extends React.PureComponent {
      */
     render(){
         const { columnHeaders: propColHeaders, showMetricsColumns, width, preventExpand = false } = this.props;
-        const columnHeaders = FamilyReportStackedTable.staticColumnHeaders(propColHeaders, showMetricsColumns);
+        const columnHeaders = this.memoized.staticColumnHeaders(propColHeaders, showMetricsColumns);
         return (
             <div className="stacked-block-table-outer-container overflow-auto">
                 <StackedBlockTable {...{ preventExpand, columnHeaders, width }} stackDepth="0" collapseShow="3"
-                    fadeIn allFiles={[]} collapseLongLists={true} defaultCollapsed={true}
+                    fadeIn collapseLongLists={true} defaultCollapsed={true}
                     handleFileCheckboxChange={this.handleFileCheckboxChange}>
                     { this.renderIndividualBlockList()}
                 </StackedBlockTable>
@@ -458,34 +461,30 @@ export class FamilyReportStackedTable extends React.PureComponent {
 }
 
 /**
- * Used within Accessioning tab on Case View
+ * Used within Accessioning tab on Case View.
  *
  * Takes in the current case item ('result' prop) and a single family associated with said case
  * and renders a table containing all of the accessions/various IDs for each individual, sample,
  * and report/case in that family. Current case is highlighted throughout the table, and results
  * are sorted by individual (first proband, then individuals with samples, then the rest).
+ *
+ * @todo Move into static/item-pages/CaseView (either own file or inside index.js or (preferred?) new file AccesioningTab.js)
  */
 export class FamilyAccessionStackedTable extends React.PureComponent {
 
-    static StackedBlock = StackedBlock
-
-    static builtInHeaders(){
-        // Keeping these builtInHeader methods separate in case we want to build in custom columns later
-        return [
-            { columnClass: 'individual',    title: 'Individual',     initialWidth: 220   },
-            { columnClass: 'libraries',     title: 'Sequencing Libraries',    initialWidth: 220   },
-            { columnClass: 'report',    title: 'Report',          initialWidth: 200  }
-        ];
-    }
+    // Keeping these builtInHeaders separate in case we want to build in custom columns later
+    static builtInHeaders = [
+        { columnClass: 'individual',    title: 'Individual',            initialWidth: 220   },
+        { columnClass: 'libraries',     title: 'Sequencing',            initialWidth: 220   },
+        { columnClass: 'report',        title: 'Report',                initialWidth: 200   }
+    ];
 
     /* Built-in headers */
     static staticColumnHeaders(columnHeaders){
-        return _.map(FamilyAccessionStackedTable.builtInHeaders(), function(staticCol){
-            return _.extend(
-                _.clone(staticCol),
-                _.findWhere(columnHeaders, { 'title' : staticCol.title }) || {}
-            );
-        }) || [];
+        return FamilyAccessionStackedTable.builtInHeaders.map(function(staticCol){
+            const foundColumnFromParamHeaders = _.findWhere(columnHeaders, { 'title' : staticCol.title });
+            return { ...staticCol, ...(foundColumnFromParamHeaders || {}) };
+        });
     }
 
     static propTypes = {
@@ -559,7 +558,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                             </tr>: null }
                         { specimen_accession ?
                             <tr>
-                                <td className="accession-table-title">Specimen Accession</td>
+                                <td className="accession-table-title">Specimen ID</td>
                                 <td>{ specimen_accession }</td>
                             </tr>: null
                         }
@@ -652,15 +651,15 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
             const isResultCase = caseAtId === resultCaseAtId;
 
             // Used as title for report/case block
-            let analysisType = null;
+            let analysisTitle = null;
 
             // Search each analysis group for one with the current case
             analysisGroups.forEach((analysisGroup) => {
-                const { cases: casesInAnalysisGroup = [], analysis_type = null } = analysisGroup || {};
+                const { cases: casesInAnalysisGroup = [], analysis_type = null, analysis_version = null } = analysisGroup || {};
                 casesInAnalysisGroup.forEach((agCase) => {
                     const { '@id': agCaseAtId } = agCase || {};
                     if (agCaseAtId === caseAtId) {
-                        analysisType = analysis_type;
+                        analysisTitle = analysis_type + (analysis_version ? " (" + analysis_version + ")" : "");
                     }
                 });
             });
@@ -672,8 +671,8 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                             <div className="d-flex">
                                 { reportAtId ?
                                     <a href={reportAtId} className={"name-title" + (isResultCase ? " current-case": "")}>
-                                        { analysisType }
-                                    </a> : <span className={"name-title" + (isResultCase ? " current-case": "")}>{ analysisType }</span>}
+                                        { analysisTitle }
+                                    </a> : <span className={"name-title" + (isResultCase ? " current-case": "")}>{ analysisTitle }</span>}
                             </div>
                             <div className="w-100" style={{ maxWidth: "70%" }}>
                                 <table className="accession-table w-100">
@@ -747,7 +746,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                         </table>
                     </div>
                 </StackedBlockName>
-                <StackedBlockList className="libraries" title="Libraries">
+                <StackedBlockList className="libraries" title="Sequencing Libraries">
                     { indvSamples.map((thisSample) =>
                     {
                         const { '@id' : thisSampleAtId } = thisSample || {};
@@ -833,4 +832,3 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         );
     }
 }
-
