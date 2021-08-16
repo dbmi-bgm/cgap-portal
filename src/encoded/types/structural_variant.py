@@ -138,6 +138,17 @@ class StructuralVariant(Item):
         }
     )
     def size_display(self, request, START, END):
+        """
+        Create user-friendly display of size.
+
+        Finds appropriate units "bucket" according to number of digits
+        in the size, then rounds to 1 decimal place within the "bucket".
+
+        :param request: cls pyramid request
+        :param START: int start location of SV
+        :param END: int end location of SV
+        :return result: str size plus unit
+        """
         result = None
         size = END - START + 1
         unit_max_exponents = [3, 6, 9, 12]  # Gb should be max given chromosome sizes
