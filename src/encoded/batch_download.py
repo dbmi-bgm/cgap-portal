@@ -66,19 +66,18 @@ def get_population_suffix_title_tuples():
 
 def get_spreadsheet_mappings(request = None):
 
-    def get_canonical_transcript(variant_sample):
+    def get_boolean_transcript_field(variant_sample, field):
         variant = variant_sample.get("variant", {})
         for transcript in variant.get("transcript", []):
-            if transcript.get("csq_canonical", False) == True:
+            if transcript.get(field, False) is True:
                 return transcript
         return None
+    
+    def get_canonical_transcript(variant_sample):
+        return get_boolean_transcript_field(variant_sample, "csq_canonical")
 
     def get_most_severe_transcript(variant_sample):
-        variant = variant_sample.get("variant", {})
-        for transcript in variant.get("transcript", []):
-            if transcript.get("csq_most_severe", False) == True:
-                return transcript
-        return None
+        return get_boolean_transcript_field(variant_sample, "csq_most_severe")
 
     def get_most_severe_consequence(variant_sample_transcript):
         csq_consequences = variant_sample_transcript.get("csq_consequence", [])
