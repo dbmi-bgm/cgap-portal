@@ -898,7 +898,11 @@ class SearchBuilder:
             # Minor improvement for UI/UX -- if no 'validation errors' facet is included
             # but only 1 "No value" term, then exclude the facet so is not shown
             if field == "validation_errors.name":
-                if len(result_facet["terms"]) < 2 and result_facet["terms"][0]["key"] == "No value":
+                validation_errors_terms_len = len(result_facet["terms"])
+                if (
+                    validation_errors_terms_len == 0 or
+                    (validation_errors_terms_len == 1 and result_facet["terms"][0]["key"] == "No value")
+                ):
                     continue
 
             result.append(result_facet)
