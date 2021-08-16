@@ -163,7 +163,7 @@ class VariantSampleOverviewTabView extends React.PureComponent {
         const numTabs = VariantSampleOverviewTabView.tabNames.length;
 
         this.state = {
-            "currentTab" : defaultTab < numTabs ? defaultTab : 1 // Validate that is 0-5
+            "currentTab" : defaultTab < numTabs ? defaultTab : 1
         };
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }

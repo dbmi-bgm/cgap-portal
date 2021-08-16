@@ -7,8 +7,8 @@ import ReactTooltip from 'react-tooltip';
 import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { SvBrowserTabBody } from './SvBrowserTabBody';
-
-
+import { VariantSampleInfoHeader } from '../VariantSampleView/VariantSampleInfoHeader';
+import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
@@ -22,6 +22,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
+                <VariantSampleInfoHeader {...passProps} showTranscriptSelection={false} />
                 <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
             </div>
         );
@@ -43,6 +44,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
     static tabNames = [
+        "Gene",
         "SV Browser"
     ];
 
@@ -51,8 +53,9 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
         const { defaultTab = null } = props;
         this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
         const numTabs = StructuralVariantSampleOverviewTabView.tabNames.length;
+
         this.state = {
-            "currentTab" : defaultTab < numTabs ? defaultTab : 0 // Validate that is 0. Increase when there are more tabs
+            "currentTab" : defaultTab < numTabs ? defaultTab : 0
         };
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
@@ -85,8 +88,9 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas } = this.props;
+        const { context, schemas, currentGeneItem, currentGeneItemLoading, currentTranscriptIdx } = this.props;
         const { currentTab } = this.state;
+        console.log("context", context);
 
         const tabTitleElements = [];
         const tabBodyElements = [];
@@ -100,8 +104,11 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
                 const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
                 switch (index) {
                     case 0:
+                        tabBodyElements.push(<SVGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
+                        break;
+                    case 1:
                         tabBodyElements.push(<SvBrowserTabBody {...commonBodyProps} />);
-                        this.openPersistentTabs[0] = true; // Persist open after first appearance.
+                        this.openPersistentTabs[1] = true; // Persist open after first appearance.
                         break;
                     default:
                         throw new Error("Unsupported tab");
@@ -138,3 +145,28 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
         </button>
     );
 });
+
+
+class SVGeneTabBody extends React.Component {
+
+    render() {
+        const {
+            columnExtensionMap:  originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
+            ...passProps
+        } = this.props;
+        return (
+            <div className="variant-tab-body card-body">
+                <div className="row flex-column flex-lg-row">
+                    <div className="inner-card-section col pb-2 pb-lg-0">
+                        <div className="info-header-title">
+                            <h4>Gene List</h4>
+                        </div>
+                        <div className="info-body">
+                            <EmbeddedItemSearchTable {...passProps} facets={null} searchHref="/search/?type=Gene"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
