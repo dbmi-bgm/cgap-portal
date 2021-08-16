@@ -49,8 +49,8 @@ SHARED_VARIANT_EMBEDS = [
     "interpretations.conclusion",
     "interpretations.note_text",
     "interpretations.version",
-    "interpretations.project",
-    "interpretations.institution",
+    "interpretations.project.@id",
+    "interpretations.institution.@id",
     "interpretations.status",
     "interpretations.last_modified.date_modified",
     "interpretations.last_modified.modified_by.display_title",
@@ -58,8 +58,8 @@ SHARED_VARIANT_EMBEDS = [
     "discovery_interpretations.variant_candidacy",
     "discovery_interpretations.note_text",
     "discovery_interpretations.version",
-    "discovery_interpretations.project",
-    "discovery_interpretations.institution",
+    "discovery_interpretations.project.@id",
+    "discovery_interpretations.institution.@id",
     "discovery_interpretations.status",
     "discovery_interpretations.last_modified.date_modified",
     "discovery_interpretations.last_modified.modified_by.display_title"
@@ -909,4 +909,3 @@ def variant_sample_list_spreadsheet(context, request):
 
 
     return { "status": "in development" }
-

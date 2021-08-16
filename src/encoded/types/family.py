@@ -65,8 +65,8 @@ def _build_family_embedded_list():
         "members.samples.completed_processes",
 
         # File linkTo / QC
-        "members.samples.processed_files.workflow_run_outputs",
-        "members.samples.processed_files.quality_metric",
+        "members.samples.processed_files.workflow_run_outputs.@id",
+        "members.samples.processed_files.quality_metric.@id",
         "members.samples.processed_files.quality_metric.qc_list.qc_type",
         "members.samples.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "members.samples.processed_files.quality_metric.qc_list.value.url",
@@ -76,7 +76,7 @@ def _build_family_embedded_list():
         "members.samples.processed_files.quality_metric.status",
 
         # QC
-        "members.samples.files.quality_metric",
+        "members.samples.files.quality_metric.@id",
         "members.samples.files.quality_metric.qc_list.qc_type",
         "members.samples.files.quality_metric.qc_list.value.overall_quality_status",
         "members.samples.files.quality_metric.qc_list.value.url",
@@ -89,8 +89,8 @@ def _build_family_embedded_list():
         "analysis_groups.samples.accession",
 
         # QC
-        "analysis_groups.processed_files",
-        "analysis_groups.processed_files.quality_metric",
+        "analysis_groups.processed_files.@id",
+        "analysis_groups.processed_files.quality_metric.@id",
         "analysis_groups.processed_files.quality_metric.qc_list.qc_type",
         "analysis_groups.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "analysis_groups.processed_files.quality_metric.qc_list.value.url",
@@ -100,9 +100,8 @@ def _build_family_embedded_list():
         "analysis_groups.processed_files.quality_metric.status",
 
         # QC
-        "analysis_groups.sample_processed_files",
         "analysis_groups.sample_processed_files.sample.accession",
-        "analysis_groups.sample_processed_files.processed_files.quality_metric",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric.@id",
         "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.qc_type",
         "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.value.url",
