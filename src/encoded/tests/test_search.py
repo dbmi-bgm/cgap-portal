@@ -1047,7 +1047,7 @@ class TestSearchHiddenAndAdditionalFacets:
     """ Encapsulates tests meant for testing behavior associated with default_hidden, hidden
         and additional_facets
     """
-    DEFAULT_FACETS = ['first_name', 'validation_errors.name']
+    DEFAULT_FACETS = ['first_name'] # 'validation_errors.name'
     DEFAULT_HIDDEN_FACETS = ['last_name', 'sid']
     ADDITIONAL_FACETS = ['unfaceted_string', 'unfaceted_integer']
     DISABLED_FACETS = ['disabled_string', 'disabled_integer']
