@@ -1,8 +1,7 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import queryString from 'query-string';
-import moment from 'moment';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
@@ -11,6 +10,7 @@ import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTable
 import { SaveFilterSetButtonController } from './SaveFilterSetButton';
 import { SaveFilterSetPresetButtonController } from './SaveFilterSetPresetButton';
 import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 /**
  * @todo maybe reuse somewhere
@@ -103,7 +103,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         additional_variant_sample_facets = []
     } = context || {};
 
-    const {  "@id" : activeFilterSetID = null } = active_filterset || {};
+    const { "@id" : activeFilterSetID = null } = active_filterset || {};
 
     const searchHrefBase = (
         "/search/?type=VariantSample"
@@ -185,10 +185,25 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         </SaveFilterSetButtonController>
     );
 
+    const onFailInitialFilterSetItemLoad = useCallback(function(){
+        if (session) {
+            // todo add sentry.io call here.
+            Alerts.queue({
+                "title": "FilterSet not loaded",
+                "message": `Couldn't load the existing saved FilterSet selections Item "${activeFilterSetID}", check permissions.`,
+                "style" : "warning",
+                "navigationDissappearThreshold": 1
+            });
+        }
+        // Else nothing -- is expected; perhaps user got logged out during
+        // navigation or loading something else and hasn't refreshed page yet.
+    });
+
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
     const embeddedTableHeader = activeFilterSetID ? (
-        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem">
+        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
+            onFail={onFailInitialFilterSetItemLoad}>
             <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets}>
                 { embeddedTableHeaderBody }
             </FilterSetController>

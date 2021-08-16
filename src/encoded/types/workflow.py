@@ -653,8 +653,8 @@ def _build_workflows_embedded_list():
             'steps.name',
 
             # Objects
-            'steps.inputs',
-            'steps.outputs',
+            'steps.inputs.*',
+            'steps.outputs.*',
 
             # Software linkTo
             'steps.meta.software_used.name',
