@@ -229,7 +229,7 @@
                     "title": "Specimen Collection Date"
                 },
                 {
-                    "field": "individual.aliases",
+                    "field": "sample.aliases",
                     "title": "User-Defined Alias"
                 }
             ]
