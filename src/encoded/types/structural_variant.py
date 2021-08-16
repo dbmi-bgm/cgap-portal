@@ -334,16 +334,7 @@ class StructuralVariantSample(Item):
         Builds the above sub-embedded object so we can search on the
         genotype labels.
         """
-
         possible_keys_set = set(StructuralVariantSample.POSSIBLE_GENOTYPE_LABEL_FIELDS)
-
-        # XXX: will be useful if we want to have this field be "centric" WRT the
-        # person who submitted this variant_sample
-        def my_role(samplegeno, CALL_INFO):
-            for entry in samplegeno:
-                if entry['samplegeno_sampleid'] == CALL_INFO:
-                    return entry['samplegeno_role']
-            return None
 
         def infer_key_from_role(role):
             return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
