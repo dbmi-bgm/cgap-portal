@@ -8,7 +8,7 @@ import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-po
 
 import { SvBrowserTabBody } from './SvBrowserTabBody';
 import { VariantSampleInfoHeader } from '../VariantSampleView/VariantSampleInfoHeader';
-import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
+import { SvGeneTabBody } from './SVGeneTabBody';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
@@ -22,7 +22,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <VariantSampleInfoHeader {...passProps} showTranscriptSelection={false} />
+                {/* TODO: Re-enable in next version; <VariantSampleInfoHeader {...passProps} showTranscriptSelection={false} /> */}
                 <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
             </div>
         );
@@ -44,7 +44,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
     static tabNames = [
-        "Gene",
+        // "Gene", TODO: Re-add once more complete in future version
         "SV Browser"
     ];
 
@@ -103,12 +103,12 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
             if (index === currentTab || this.openPersistentTabs[index]) {
                 const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
                 switch (index) {
+                    // case 0:
+                    //     tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
+                    //     break;
                     case 0:
-                        tabBodyElements.push(<SVGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
-                        break;
-                    case 1:
                         tabBodyElements.push(<SvBrowserTabBody {...commonBodyProps} />);
-                        this.openPersistentTabs[1] = true; // Persist open after first appearance.
+                        this.openPersistentTabs[0] = true; // Persist open after first appearance.
                         break;
                     default:
                         throw new Error("Unsupported tab");
@@ -145,28 +145,3 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
         </button>
     );
 });
-
-
-class SVGeneTabBody extends React.Component {
-
-    render() {
-        const {
-            columnExtensionMap:  originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
-            ...passProps
-        } = this.props;
-        return (
-            <div className="variant-tab-body card-body">
-                <div className="row flex-column flex-lg-row">
-                    <div className="inner-card-section col pb-2 pb-lg-0">
-                        <div className="info-header-title">
-                            <h4>Gene List</h4>
-                        </div>
-                        <div className="info-body">
-                            <EmbeddedItemSearchTable {...passProps} facets={null} searchHref="/search/?type=Gene"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-}
