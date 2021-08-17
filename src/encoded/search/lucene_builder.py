@@ -410,9 +410,9 @@ class LuceneBuilder:
             given path.
         """
         return {
-            'nested': {
-                'path': nested_path,
-                'query': query
+            NESTED: {
+                PATH: nested_path,
+                QUERY: query
             }
         }
 
@@ -443,6 +443,7 @@ class LuceneBuilder:
         nested_path_to_index_map = {}
 
         # Build array of key, (field, query) so we can process the filters in a single pass
+        # note that MUST queries are always processed first
         filters_to_work_on = []
         if must_nested_filters:
             filters_to_work_on += zip([MUST] * len(must_nested_filters), must_nested_filters)
@@ -502,6 +503,7 @@ class LuceneBuilder:
                 # from the key we are seeing now ie: EXIST (must) combined with != (must_not)
                 prev_key, path_index = nested_path_to_index_map[nested_path]
                 leaf_query = nested_query[BOOL][prev_key][path_index][NESTED][QUERY][BOOL][key]
+
                 # this is the sub-query we want to build off of
                 if isinstance(query, list):
                     leaf_query += query

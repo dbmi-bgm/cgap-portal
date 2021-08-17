@@ -829,6 +829,15 @@ class TestNestedSearch(object):
     def test_or_search_on_nested_hg_19_multiple_match(self, workbook, es_testapp):
         """ Do an OR search on hg19.hg19_chrom, matching three variants """
         res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos!=12345').follow().json
+        self.assert_length_is_expected(res, 3)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                'f6aef055-4c88-4a3e-a306-d37a71535d8b',
+                '852bb349-203e-437d-974a-e8d6cb56810a',
+                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+            ]
+        res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_chrom=chr1').json
         self.assert_length_is_expected(res, 3)
         for variant in res['@graph']:
@@ -849,6 +858,20 @@ class TestNestedSearch(object):
                              '&hg19.hg19_pos.to=12185954'
                              '&hg19.hg19_pos.from=11720331').json
         self.assert_length_is_expected(res, 2)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                '852bb349-203e-437d-974a-e8d6cb56810a',
+                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+            ]
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos.to=12185956'
+                             '&hg19.hg19_pos.from=12185954').json
+        self.assert_length_is_expected(res, 2)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                '852bb349-203e-437d-974a-e8d6cb56810a',
+                'f6aef055-4c88-4a3e-a306-d37a71535d8b'
+            ]
 
     def test_negative_search_on_hg_19(self, workbook, es_testapp):
         """ Do an OR search with hg19_post with a negative, should eliminate a variant """
