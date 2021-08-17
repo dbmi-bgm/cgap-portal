@@ -278,15 +278,14 @@ class StructuralVariantBuilder(VariantBuilder):
                 status=200,
             )
 
-    @staticmethod
-    def _validate_structural_variant(variant):
+    def _validate_structural_variant(self, variant):
         """
         Sanity checks for SVs that should cause an ingestion to fail,
         intended to catch bioinformatics-related issues to address.
 
         :param variant: dict variant object
         """
-        _validate_sv_position(variant)
+        self._validate_sv_position(variant)
 
     @staticmethod
     def _validate_sv_position(variant):
