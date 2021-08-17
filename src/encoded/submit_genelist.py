@@ -6,8 +6,8 @@ from dcicutils.misc_utils import VirtualApp, VirtualAppError
 from openpyxl import load_workbook
 from webtest import AppError
 
-from encoded.util import s3_local_file
-from encoded.ingestion.common import CGAP_CORE_PROJECT
+from .util import s3_local_file
+from .ingestion.common import CGAP_CORE_PROJECT
 
 CGAP_CORE_PROJECT = CGAP_CORE_PROJECT + "/"
 
