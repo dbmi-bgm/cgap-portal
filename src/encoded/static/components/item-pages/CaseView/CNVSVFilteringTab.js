@@ -1,12 +1,10 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import _ from 'underscore';
 
-import { console, ajax, valueTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+import { console, valueTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
-import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 
 
@@ -19,7 +17,6 @@ export function CNVSVFilteringTab(props) {
     } = props;
 
     const {
-        accession: caseAccession,
         sv_initial_search_href_filter_addon = "",
         additional_variant_sample_facets = [] // TODO: needs updates to calc property + schemas to not break searches
     } = context || {};
@@ -31,7 +28,7 @@ export function CNVSVFilteringTab(props) {
         + "&sort=date_created"
     );
 
-    console.log("searchHrefBase", searchHrefBase);
+    console.log("sv table searchHref:", searchHrefBase);
 
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
@@ -153,7 +150,7 @@ export const CNVSVEmbeddedTableHeader = React.memo(function CNVSVEmbeddedTableHe
 
     return (
         // TODO refactor out panelMap stuff.
-        <AboveTableControlsBase {...{ isFullscreen, windowWidth,toggleFullScreen, sortBy }}
+        <AboveTableControlsBase {...{ isFullscreen, windowWidth, toggleFullScreen, sortBy, showMultiColumnSort: false }}
             panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(props)}>
             { total ?
                 <h4 className="col my-0">
