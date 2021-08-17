@@ -1,8 +1,8 @@
 import json
 import pytest
 
-from encoded.tests.test_access_key import basic_auth
-from encoded.submit_genelist import (
+from .test_access_key import basic_auth
+from ..submit_genelist import (
     GeneListSubmission,
     VariantUpdateSubmission,
     CommonUtils,
