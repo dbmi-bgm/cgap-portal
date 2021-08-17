@@ -18,7 +18,7 @@ export function CNVSVFilteringTab(props) {
 
     const {
         sv_initial_search_href_filter_addon = "",
-        additional_variant_sample_facets = [] // TODO: needs updates to calc property + schemas to not break searches
+        additional_variant_sample_facets = []
     } = context || {};
 
     const searchHrefBase = (
@@ -40,10 +40,8 @@ export function CNVSVFilteringTab(props) {
     const searchTableKey = "session:" + session;
 
     const tableProps = {
-        // hideFacets,
         maxHeight,
         session,
-        // embeddedTableHeader,
         "key": searchTableKey,
         searchHref: searchHrefBase
     };
@@ -64,7 +62,7 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
         ...passProps
     } = props;
 
-    const columnExtensionMap = useMemo(function() { // TODO: move this into its own colextmap file if it gets longer; see about sharing info between multiple
+    const columnExtensionMap = useMemo(function() {
         return {
             ...originalColExtMap,
             "display_title" : {
@@ -111,7 +109,7 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                     });
                     const genes = Object.keys(transcriptsDeduped);
 
-                    if (genes.length <= 2) {
+                    if (genes.length <= 2) { // show comma separated
                         return <a href={path}>{genes.join(", ")}</a>;
                     } // show first and last gene separated by "..."
                     return <a href={path}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
@@ -131,12 +129,10 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
 
-/** This left section for Search should be made prettier, either kept in 4DN or re-used. */
 export const CNVSVEmbeddedTableHeader = React.memo(function CNVSVEmbeddedTableHeader(props){
-    const { context, currentAction, topLeftChildren, isFullscreen, windowWidth, toggleFullScreen, sortBy } = props;
+    const { context, isFullscreen, windowWidth, toggleFullScreen, sortBy } = props;
     const { total: showTotalResults = 0 } = context || {};
 
-    // Case if on SearchView
     let total = null;
     if (typeof showTotalResults === 'number') {
         total = (
@@ -149,7 +145,6 @@ export const CNVSVEmbeddedTableHeader = React.memo(function CNVSVEmbeddedTableHe
     }
 
     return (
-        // TODO refactor out panelMap stuff.
         <AboveTableControlsBase {...{ isFullscreen, windowWidth, toggleFullScreen, sortBy, showMultiColumnSort: false }}
             panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(props)}>
             { total ?
