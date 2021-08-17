@@ -8,7 +8,7 @@ import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-po
 
 import { SvBrowserTabBody } from './SvBrowserTabBody';
 import { VariantSampleInfoHeader } from '../VariantSampleView/VariantSampleInfoHeader';
-import { SvGeneTabBody } from './SVGeneTabBody';
+import { SvGeneTabBody } from './SvGeneTabBody';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
