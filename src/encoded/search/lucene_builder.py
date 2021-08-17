@@ -431,10 +431,11 @@ class LuceneBuilder:
             :returns: a nested sub-query that can be added directly to the parent query
         """
         # Build base query structure
+        # always use MUST + sub queries for MUST_NOT
         nested_query = {
             BOOL: {
                 MUST: [],
-                MUST_NOT: []
+                MUST_NOT: [],
             }
         }
 
@@ -472,31 +473,22 @@ class LuceneBuilder:
                 # add to combined_query
                 if len(query) > 1:
                     for sub_query in query:
-                        if BOOL not in sub_query:
-                            combined_query[BOOL][key].append(sub_query)
 
-                        # sub_query has duplicated bool -> must, so traverse down to examine
-                        # the actual sub-query and propagate it
+                        # Special case for EXISTS, since we cannot construct these like normal
+                        # queries - add DOES NOT EXIST queries to MUST branches, as these are
+                        # automatically added to MUST_NOT branch
+                        if EXISTS in sub_query and key == MUST_NOT:
+                            combined_query[BOOL][MUST].append(sub_query)
                         else:
-                            # can only contain one sub_query but does have list structure
-                            try:
-                                _sub_query = sub_query[BOOL][MUST]
-                            except KeyError:
-                                _sub_query = sub_query[BOOL][MUST_NOT]
-                            if isinstance(_sub_query, list):
-                                if len(_sub_query) > 1:
-                                    raise QueryConstructionException(
-                                        query_type='nested',
-                                        func='handle_nested_filters_v2',
-                                        msg='Unexpected query structure: %s' % _sub_query
-                                    )
-                                _sub_query = _sub_query[0]
-                            combined_query[BOOL][key].append(_sub_query)
+                            combined_query[BOOL][key].append(sub_query)
 
                 # if a single sub-query, could still be a part of a larger query later on,
                 # so still bootstrap a combined query with just the single qualifier
                 else:
-                    combined_query[BOOL][key].append(query[0])
+                    if EXISTS in query[0] and key == MUST_NOT:
+                        combined_query[BOOL][MUST].append(query[0])
+                    else:
+                        combined_query[BOOL][key].append(query[0])
 
                 # add the combined_query for this nested path to the global nested query
                 nested_query[BOOL][key].append(cls.build_nested_query(nested_path, combined_query))
@@ -510,15 +502,17 @@ class LuceneBuilder:
                 # from the key we are seeing now ie: EXIST (must) combined with != (must_not)
                 prev_key, path_index = nested_path_to_index_map[nested_path]
                 leaf_query = nested_query[BOOL][prev_key][path_index][NESTED][QUERY][BOOL][key]
-                if isinstance(query, list):
-                    if len(query) == 1:
-                        query = query[0]
-                    else:
-                        import pdb; pdb.set_trace()
-                        raise Exception
-
                 # this is the sub-query we want to build off of
-                leaf_query.append(query)
+                if isinstance(query, list):
+                    leaf_query += query
+                elif isinstance(query, dict):
+                    leaf_query.append(query)
+                else:
+                    raise QueryConstructionException(
+                        query_type='nested',
+                        func='handle_nested_filters_v2',
+                        msg='passed a query with a bad type: %s' % query
+                    )
 
         return nested_query
 

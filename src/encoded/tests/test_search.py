@@ -629,6 +629,7 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
                 pass
 
 @pytest.mark.manual
+@pytest.mark.skip
 def test_index_data_workbook_after_posting_deleted_page_c4_570(workbook, es_testapp, html_es_testapp):
     """
     Regression test for C4-570.
@@ -841,13 +842,13 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 3)
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_pos.to=12185955'
-                             '&hg19.hg19_pos.from=88832').json
+                             '&hg19.hg19_pos.from=88832&debug=true').json
 
-        self.assert_length_is_expected(res, 2)
+        self.assert_length_is_expected(res, 3)
         res = es_testapp.get('/search/?type=Variant'
-                             '&hg19.hg19_pos.to=12185956'
+                             '&hg19.hg19_pos.to=12185954'
                              '&hg19.hg19_pos.from=11720331').json
-        self.assert_length_is_expected(res, 1)
+        self.assert_length_is_expected(res, 2)
 
     def test_negative_search_on_hg_19(self, workbook, es_testapp):
         """ Do an OR search with hg19_post with a negative, should eliminate a variant """
