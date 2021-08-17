@@ -795,6 +795,22 @@ class VariantUpdateSubmission:
             self.errors.append("No gene uuids were found in the input file")
         return gene_uuids, bam_sample_ids
 
+    def _search_for_variants(self, genes, project=None, add_on=None):
+        """
+        """
+        result = []
+        search_tuples = [
+            ("VariantSample", "variant.genes.genes_most_severe_gene.uuid"),
+            ("StructuralVariantSample", "structural_variant.transcript.csq_gene.uuid"),
+        ]
+        for item_type, search_term in search_tuples:
+            variant_search = CommonUtils.batch_search(
+                self.vapp, genes, search_term, batch_size=4, item_type=item_type,
+                project=project, add_on=add_on, fields=["uuid"]
+            )
+            result += variant_search
+        return result
+
     def find_associated_variants(self):
         """
         Finds associated variant samples for the genes of
@@ -815,26 +831,13 @@ class VariantUpdateSubmission:
             variant_sample_search = []
             for sample_id in self.bam_sample_ids:
                 add_on = "&CALL_INFO=" + sample_id
-                vs_addon_search = CommonUtils.batch_search(
-                    self.vapp,
-                    genes_to_search,
-                    "variant.genes.genes_most_severe_gene.uuid",
-                    batch_size=4,
-                    item_type="VariantSample",
-                    project=project,
-                    add_on=add_on,
-                    fields=["uuid"],
+                search = self._search_for_variants(
+                    genes_to_search, project=project, add_on=add_on
                 )
-                variant_sample_search += vs_addon_search
+                variant_sample_search += search
         else:
-            variant_sample_search = CommonUtils.batch_search(
-                self.vapp,
-                genes_to_search,
-                "variant.genes.genes_most_severe_gene.uuid",
-                batch_size=5,
-                item_type="VariantSample",
-                project=project,
-                fields=["uuid"],
+            variant_sample_search = self._search_for_variants(
+                genes_to_search, project=project
             )
         variant_sample_uuids = [item["uuid"] for item in variant_sample_search]
         to_invalidate = list(set(variant_sample_uuids))

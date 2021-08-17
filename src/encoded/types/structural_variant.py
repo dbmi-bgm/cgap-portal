@@ -195,3 +195,63 @@ class StructuralVariantSample(Item):
         result = self.rev_link_atids(request, "variant_sample_list")
         if result:
             return result[0]  # expected one list per case
+
+    @calculated_property(schema={
+        "title": "Associated Gene Lists",
+        "field_name": "associated_genelists",
+        "description": "Gene lists associated with project or case of variant sample",
+        "type": "array",
+        "items": {
+            "title": "Gene list title",
+            "type": "string",
+            "description": "Gene list title"
+        }
+    })
+    def associated_genelists(self, request, project, structural_variant, CALL_INFO):
+        """
+        Identifies gene lists associated with the project or project and
+        CALL_INFO of the structural variant sample, if the gene list has
+        associated BAM sample IDs.
+
+        NOTE: Gene lists retrieved with @@raw view to prevent costly
+        @@object view of large gene lists.
+        """
+        gene_atids = []
+        genelist_atids = []
+        genelist_info = {}
+        associated_genelists = []
+        core_project = CGAP_CORE_PROJECT + "/"
+        potential_projects = [core_project, project]
+        variant_props = get_item_or_none(request, structural_variant)
+        transcripts = variant_props.get("transcript", [])
+        for transcript in transcripts:
+            gene_atid = transcript.get("csq_gene")
+            if gene_atid not in gene_atids:
+                gene_atids.append(gene_atid)
+        genes_object = [get_item_or_none(request, atid) for atid in gene_atids]
+        for gene in genes_object:
+            genelist_atids += gene.get("gene_lists", [])
+        genelist_atids = list(set(genelist_atids))
+        genelists_raw = [
+            get_item_or_none(request, atid, frame="raw") for atid in genelist_atids
+        ]
+        for genelist in genelists_raw:
+            title = genelist.get("title", "")
+            bam_sample_ids = genelist.get("bam_sample_ids", [])
+            project_uuid = genelist.get("project")
+            project_object = get_item_or_none(request, project_uuid)
+            project_atid = project_object.get("@id")
+            genelist_info[title] = {
+                "project": project_atid, "bam_sample_ids": bam_sample_ids
+            }
+        for genelist_title, genelist_props in genelist_info.items():
+            if genelist_title in associated_genelists:
+                continue
+            bam_sample_ids = genelist_props.get("bam_sample_ids")
+            if genelist_props["project"] in potential_projects:
+                if bam_sample_ids:
+                    if CALL_INFO in bam_sample_ids:
+                        associated_genelists.append(genelist_title)
+                else:
+                    associated_genelists.append(genelist_title)
+        return associated_genelists
