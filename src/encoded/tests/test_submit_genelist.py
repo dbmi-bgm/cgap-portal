@@ -276,7 +276,7 @@ class TestVariantUpdateSubmission:
             es_testapp,
         )
         assert len(variant_update.gene_uuids) == 3
-        assert len(variant_update.variant_samples) == 2
+        assert len(variant_update.variant_samples) == 4
         assert variant_update.validate_output
         assert variant_update.post_output
         assert not variant_update.errors
@@ -294,7 +294,7 @@ class TestVariantUpdateSubmission:
             es_testapp,
         )
         assert len(variant_update.gene_uuids) == 3
-        assert len(variant_update.variant_samples) == 1
+        assert len(variant_update.variant_samples) == 2
         assert len(variant_update.bam_sample_ids) == 1
         assert not variant_update.errors
 
@@ -309,7 +309,7 @@ class TestVariantUpdateSubmission:
             wb_institution["@id"],
             es_testapp,
         )
-        assert len(variant_update.variant_samples) == 3
+        assert len(variant_update.variant_samples) == 6
 
     def test_variant_update_endpoint(
         self, testapp, bgm_project, bgm_access_key, institution
