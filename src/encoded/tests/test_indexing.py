@@ -344,7 +344,7 @@ class TestInvalidationScopeViewCGAP:
     @pytest.mark.parametrize('source_type, target_type, invalidated', [
         # Test WorkflowRun (same as fourfront)
         ('FileProcessed', 'WorkflowRunAwsem',
-            DEFAULT_SCOPE + ['accession', 'file_format', 'filename', 'file_size']
+            DEFAULT_SCOPE + ['accession', 'filename', 'file_format', 'file_size']
          ),
         ('Software', 'WorkflowRunAwsem',
             DEFAULT_SCOPE + ['name', 'title', 'version', 'source_url']
