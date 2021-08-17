@@ -799,7 +799,7 @@ function FilteringTabWrapper(props) {
                     {currentTitle} <span className="text-300">Variant Filtering and Technical Review</span>
                 </h1>
             </div>
-            <div className={currViewName === "SNV" ? "" : "d-none"}>
+            <div className={currViewName === "SNV" ? "mt-36" : "d-none"}>
                 <SelectedItemsController isMultiselect>
                     <FilteringTab {...commonProps} {...snvFilteringProps } />
                 </SelectedItemsController>
