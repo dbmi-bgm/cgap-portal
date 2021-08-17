@@ -210,6 +210,9 @@ build-docker-test:
 	@# ~/.aws_test/test_creds.sh looking for ACCOUNT_NUMBER (note: not AWS_ACCOUNT) and ENV_NAME.
 	scripts/build-docker-test --login
 
+build-docker-test-main:
+	scripts/build-docker-test --login --ecosystem main
+
 build-docker-production:
 	@echo "Making build-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
 	docker build -t ${ENV_NAME}:latest .
