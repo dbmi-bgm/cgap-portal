@@ -31,6 +31,10 @@ from encoded.util import resolve_file_path
 from encoded.types.base import Item, get_item_or_none
 
 from ..custom_embed import CustomEmbed
+from ..batch_download_utils import (
+    stream_tsv_output,
+    convert_item_to_sheet_dict
+)
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
@@ -897,6 +901,114 @@ class VariantSampleList(Item):
 
 
 
+
+
+
+
+@view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
+             permission='view', subpath_segments=[0, 1])
+@debug_log
+def variant_sample_list_spreadsheet(context, request):
+
+    # TODO: Add datetime - maybe from UI so as to localize it to user's timezone?
+    suggested_filename = None
+    if request.subpath:
+        suggested_filename, = request.subpath
+    file_format = request.GET.get("file_format", None)
+
+    if not file_format and suggested_filename:
+        if suggested_filename.endswith(".tsv"):
+            file_format = "tsv"
+        if suggested_filename.endswith(".csv"):
+            file_format = "csv"
+        if suggested_filename.endswith(".xlsx"):
+            file_format = "xlsx"
+
+    if not file_format:
+        file_format = "tsv"
+    elif file_format not in { "tsv", "csv" }: # TODO: Add support for xslx.
+        raise HTTPBadRequest("Expected a valid `file_format` such as TSV or CSV.")
+
+    if not suggested_filename:
+        # TODO: Add datetime
+        timestamp = datetime.datetime.now(pytz.utc).isoformat()
+        suggested_filename = "case-interpretation-" + timestamp + "." + file_format
+
+
+    variant_sample_uuids = [ vso["variant_sample_item"] for vso in context.properties.get("variant_samples", []) ]
+
+
+    spreadsheet_mappings = get_spreadsheet_mappings(request)
+    fields_to_embed = [
+        # Most of these are needed for columns with render/transform/custom-logic functions in place of (string) CGAP field.
+        # Keep up-to-date with any custom logic.
+        "@id",
+        "@type",
+        "project", # Used to get most recent variant note of this project
+        "variant.transcript.csq_canonical",
+        "variant.transcript.csq_most_severe",
+        "variant.transcript.csq_feature",
+        "variant.transcript.csq_consequence.impact",
+        "variant.transcript.csq_consequence.var_conseq_name",
+        "variant.transcript.csq_consequence.display_title",
+        "variant.transcript.csq_exon",
+        "variant.transcript.csq_intron",
+        "variant.interpretations.classification",
+        "variant.interpretations.acmg",
+        "variant.interpretations.note_text",
+        "variant.interpretations.project",
+        "variant.discovery_interpretations.gene_candidacy",
+        "variant.discovery_interpretations.variant_candidacy",
+        "variant.discovery_interpretations.note_text",
+        "variant.discovery_interpretations.project",
+        "variant.variant_notes.note_text",
+        "variant.variant_notes.project"
+    ]
+    for pop_suffix, pop_name in POPULATION_SUFFIX_TITLE_TUPLES:
+        fields_to_embed.append("variant.csq_gnomadg_af-" + pop_suffix)
+        fields_to_embed.append("variant.csq_gnomade2_af-" + pop_suffix)
+    for column_title, cgap_field_or_func, description in spreadsheet_mappings:
+        if isinstance(cgap_field_or_func, str):
+            # We don't expect any duplicate fields (else would've used a set in place of list) ... pls avoid duplicates in spreadsheet_mappings.
+            fields_to_embed.append(cgap_field_or_func)
+
+
+    def load_variant_sample(vs_uuid):
+        '''
+        We want to grab datastore=database version of Items here since is likely that user has _just_ finished making
+        an edit when they decide to export the spreadsheet from the InterpretationTab UI.
+        '''
+        vs_embedding_instance = CustomEmbed(request, vs_uuid, embed_props={ "requested_fields": fields_to_embed })
+        result = vs_embedding_instance.result
+        print("\n\nLoaded VS", result)
+        return result
+
+    return Response(
+        app_iter = stream_tsv_output(
+            map(
+                lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
+                map(
+                    load_variant_sample,
+                    variant_sample_uuids
+                )
+            ),
+            spreadsheet_mappings,
+            file_format
+        ),
+        headers={
+            'X-Accel-Buffering': 'no',
+            'Content-Encoding': 'utf-8',
+            'Content-Disposition': 'attachment; filename=' + suggested_filename,
+            'Content-Type': 'text/' + file_format,
+            'Content-Description': 'File Transfer',
+            'Cache-Control': 'no-cache'
+        },
+        # content_type='text/' + file_format,
+        # content_encoding='utf-8',
+        # content_disposition='attachment;filename="%s"' % suggested_filename
+    )
+
+
 ############################################################
 ### Spreadsheet Generation for Variant Sample Item Lists ###
 ############################################################
@@ -1015,19 +1127,19 @@ def get_spreadsheet_mappings(request = None):
         canonical_transcript = get_canonical_transcript(variant_sample)
         if not canonical_transcript:
             return None
-        most_severe_consequence = get_most_severe_consequence(canonical_transcript)
-        if not most_severe_consequence:
+        csq_consequences = canonical_transcript.get("csq_consequence", [])
+        if not csq_consequences:
             return None
-        return most_severe_consequence["display_title"]
+        return ", ".join([ c["display_title"] for c in csq_consequences ])
 
     def most_severe_transcript_consequence_display_title(variant_sample):
         most_severe_transcript = get_most_severe_transcript(variant_sample)
         if not most_severe_transcript:
             return None
-        most_severe_consequence = get_most_severe_consequence(most_severe_transcript)
-        if not most_severe_consequence:
+        csq_consequences = most_severe_transcript.get("csq_consequence", [])
+        if not csq_consequences:
             return None
-        return most_severe_consequence["display_title"]
+        return ", ".join([ c["display_title"] for c in csq_consequences ])
 
     def gnomadv3_popmax_population(variant_sample):
         variant = variant_sample.get("variant", {})
@@ -1057,6 +1169,29 @@ def get_spreadsheet_mappings(request = None):
             # Prepend request hostname, scheme, etc.
             return request.resource_url(request.root) + variant_sample["@id"][1:]
         return at_id
+
+    def get_most_recent_note_of_project(notes_iterable, project_at_id):
+        for note in reversed(list(notes_iterable)):
+            if project_at_id == note["project"]:
+                return note
+        return None
+
+    def create_func_own_project_note(note_field_of_vs, note_field):
+
+        def callable(variant_sample):
+            notes_iterable = simple_path_ids(variant_sample, note_field_of_vs)
+            vs_project_at_id = variant_sample.get("project")
+            if not vs_project_at_id:
+                return None
+
+            note_item = get_most_recent_note_of_project(notes_iterable, vs_project_at_id)
+
+            if note_item:
+                return note_item.get(note_field)
+            else:
+                return None
+
+        return callable
 
 
     return [
@@ -1130,13 +1265,13 @@ def get_spreadsheet_mappings(request = None):
         ("Variant notes (curr)",                    "variant_notes.note_text",                                      "Additional notes on variant written for this case"),
         ("Gene notes (curr)",                       "gene_notes.note_text",                                         "Additional notes on gene written for this case"),
         # TODO: For next 6, grab only from note from same project as user? From newest for which have view permission?
-        ("ACMG classification (prev)",              "variant.interpretations.classification",                       "ACMG classification for variant in previous cases"), # First interpretation only
-        ("ACMG rules (prev)",                       "variant.interpretations.acmg",                                 "ACMG rules invoked for variant in previous cases"), # First interpretation only
-        ("Clinical interpretation (prev)",          "variant.interpretations.note_text",                            "Clinical interpretation notes written for previous cases"), # First interpretation only
-        ("Gene candidacy (prev)",                   "variant.discovery_interpretations.gene_candidacy",             "Gene candidacy level selected for previous cases"), # First discovery_interpretations only
-        ("Variant candidacy (prev)",                "variant.discovery_interpretations.variant_candidacy",          "Variant candidacy level selected for previous cases"), # First discovery_interpretations only
-        ("Discovery notes (prev)",                  "variant.discovery_interpretations.note_text",                  "Gene/variant discovery notes written for previous cases"), # First discovery_interpretations only
-        ("Variant notes (prev)",                    "variant.variant_notes.note_text",                              "Additional notes on variant written for previous cases"), # First variant_notes only
-        ("Gene notes (prev)",                       "variant.genes.genes_most_severe_gene.gene_notes.note_text",    "Additional notes on gene written for previous cases"),
+        ("ACMG classification (prev)",              create_func_own_project_note("variant.interpretations", "classification"),              "ACMG classification for variant in previous cases"), # First interpretation only
+        ("ACMG rules (prev)",                       create_func_own_project_note("variant.interpretations", "acmg"),                        "ACMG rules invoked for variant in previous cases"), # First interpretation only
+        ("Clinical interpretation (prev)",          create_func_own_project_note("variant.interpretations", "note_text"),                   "Clinical interpretation notes written for previous cases"), # First interpretation only
+        ("Gene candidacy (prev)",                   create_func_own_project_note("variant.discovery_interpretations", "gene_candidacy"),    "Gene candidacy level selected for previous cases"), # First discovery_interpretations only
+        ("Variant candidacy (prev)",                create_func_own_project_note("variant.discovery_interpretations", "variant_candidacy"), "Variant candidacy level selected for previous cases"), # First discovery_interpretations only
+        ("Discovery notes (prev)",                  create_func_own_project_note("variant.discovery_interpretations", "note_text"),         "Gene/variant discovery notes written for previous cases"), # First discovery_interpretations only
+        ("Variant notes (prev)",                    create_func_own_project_note("variant.variant_notes", "note_text"),                     "Additional notes on variant written for previous cases"), # First variant_notes only
+        ("Gene notes (prev)",                       "variant.genes.genes_most_severe_gene.gene_notes.note_text",    "Additional notes on gene written for previous cases"), # First gene_notes only
     ]
 

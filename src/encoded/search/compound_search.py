@@ -33,8 +33,8 @@ class CompoundSearchBuilder:
     FLAGS_APPLIED = 'flags_applied'
     BUILD_QUERY_URL = '/build_query/'
 
-    @classmethod
-    def build_subreq_from_single_query(cls, request, query, route='/search/', from_=0, to=10):
+    @staticmethod
+    def build_subreq_from_single_query(request, query, route='/search/', from_=0, to=10):
         """ Builds a Request object that is a proper sub-request of the given request.
             Passes flags directly as query string params. Intended for use with search.
 
@@ -86,7 +86,7 @@ class CompoundSearchBuilder:
         return urllib.parse.urlencode(dict_to_merge_into, doseq=True)
 
     @staticmethod
-    def format_filter_set_results(request, es_results, filter_set, result_sort, search_builder_instance):
+    def format_result_for_endpoint_response(request, es_results, filter_set, result_sort, search_builder_instance):
         """ Formats es_results from filter_set into a dictionary containing total and @graph,
             setting status on the request if needed.
 
@@ -94,12 +94,6 @@ class CompoundSearchBuilder:
         :param es_results: response from ES
         :return: dictionary response
         """
-
-        # RETURN_GENERATOR IS NOT CURRENTLY SUPPORTED FOR COMPOUND FILTER SETS - EVENTUALLY COULD BE PASSED IN BY `get_iterable_search_results`
-        # if `get_iterable_search_results` made to support compound filter sets. Will be done in tandem with allowing limit=all, if this becomes needed.
-
-        # if request.__parent__ is not None or getattr(search_builder_instance, "return_generator", False):
-        #     return [ hit['_source']['embedded'] for hit in es_results['hits']['hits'] ]
 
         if es_results['hits']['total'] == 0:
             request.response.status_code = 404  # see google webmaster doc on why
@@ -117,7 +111,7 @@ class CompoundSearchBuilder:
         }
 
     @staticmethod
-    def invoke_search(context, request, subreq, search_type):
+    def invoke_search(context, request, subreq, search_type, return_generator=False):
         """
         Wrapper method that invokes the core search API (/search/) with the given subreq and
         copies over status code to parent response.
@@ -128,7 +122,7 @@ class CompoundSearchBuilder:
         :return: response from /search/
         """
         # Calls SearchBuilder.format_results internally, incl. adding searchSessionID cookie to response.
-        response = single_query_search(context, subreq, search_type)
+        response = single_query_search(context, subreq, search_type, return_generator)
         if subreq.response.status_code == 404:
             request.response.status_code = 404
         return response
@@ -149,8 +143,13 @@ class CompoundSearchBuilder:
 
         return flags
 
-    @classmethod
-    def execute_filter_set(cls, context, request, filter_set, from_=0, to=10,
+    @staticmethod
+    def es_results_generator(es_results):
+        for hit in es_results['hits']['hits']:
+            yield hit['_source']['embedded']
+
+    @staticmethod
+    def execute_filter_set(context, request, filter_set, from_=0, to=10,
                            global_flags=None, return_generator=False, intersect=False):
         """ Executes the given filter_set. This function contains the core functionality of the class.
             A filter_set with respect to this function is just a dictionary containing the following things:
@@ -164,6 +163,7 @@ class CompoundSearchBuilder:
                 search will be executed. If just 'flags' is specified with no filter_blocks, the
                 flags will be ignored (since there are no filter_blocks to apply it to).
         """
+        cls = CompoundSearchBuilder
         filter_blocks = filter_set.get(FILTER_BLOCKS, [])
         flags = filter_set.get(FLAGS, None)
         doc_type = filter_set.get(CompoundSearchBuilder.TYPE)
@@ -178,7 +178,7 @@ class CompoundSearchBuilder:
             else:
                 query = type_flag
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return CompoundSearchBuilder.invoke_search(context, request, subreq, search_type)
+            return CompoundSearchBuilder.invoke_search(context, request, subreq, search_type, return_generator)
 
         # if we specified global_flags, combine that query with the single filter_block,
         # otherwise pass the filter_block query directly
@@ -191,7 +191,7 @@ class CompoundSearchBuilder:
                 query = block_query
             query = cls._add_type_to_flag_if_needed(query, type_flag)
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return CompoundSearchBuilder.invoke_search(context, request, subreq, search_type)
+            return CompoundSearchBuilder.invoke_search(context, request, subreq, search_type, return_generator)
 
         # Extract query string and list of applied flags, add global_flags to block_query first
         # then add flags as applied and type_flag if needed.
@@ -209,7 +209,7 @@ class CompoundSearchBuilder:
                         break
             query = cls._add_type_to_flag_if_needed(query, type_flag)
             subreq = cls.build_subreq_from_single_query(request, query, from_=from_, to=to)
-            return CompoundSearchBuilder.invoke_search(context, request, subreq, search_type)
+            return CompoundSearchBuilder.invoke_search(context, request, subreq, search_type, return_generator)
 
         # Build the compound_query
         # Iterate through filter_blocks, adding global_flags if specified and adding flags if specified
@@ -242,65 +242,85 @@ class CompoundSearchBuilder:
 
             sort, result_sort = build_sort_dicts(requested_sorts, request, [ doc_type ])
 
-            search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query)
+            search_builder_instance = SearchBuilder.from_search(context, compound_subreq, compound_query, return_generator=return_generator)
             search_builder_instance.assure_session_id()
             search_builder_instance.query['sort'] = sort
-            es_results = execute_search(es=search_builder_instance.es,
-                                        query=search_builder_instance.query,
-                                        index=search_builder_instance.es_index,
-                                        from_=from_, size=to, session_id=search_builder_instance.search_session_id)
-            return cls.format_filter_set_results(request, es_results, filter_set, result_sort, search_builder_instance)
+            es_results = None
+            if return_generator and to == "all":
+                print("RETURN GENEATOR?", return_generator, '\n\n', dir(search_builder_instance))
+                es_results = search_builder_instance.execute_search_for_all_results()
+                # THIS WILL ALREADY BE A GENERATOR/ITERATOR -- SEE search.py:execute_search_for_all_results
+                # (Unless result count is <100, in which case will be a list)
+                return es_results["hits"]["hits"]
+            elif return_generator and to != "all":
+                # TODO: Consider enabling somehow
+                raise HTTPBadRequest("`return_generator` without `limit=all` not yet supported")
+            elif to == "all":
+                raise HTTPBadRequest("`limit=all` is not permitted without `return_generator`")
+            else:
+                es_results = execute_search(
+                    es=search_builder_instance.es,
+                    query=search_builder_instance.query,
+                    index=search_builder_instance.es_index,
+                    from_=from_,
+                    size=to,
+                    session_id=search_builder_instance.search_session_id
+                )
+                return cls.format_result_for_endpoint_response(request, es_results, filter_set, result_sort, search_builder_instance)
 
-    @classmethod
-    def validate_flag(cls, flag):
+    @staticmethod
+    def validate_flag(flag):
         """ Validates a given flag has the correct structure/types """
-        if cls.NAME not in flag or cls.QUERY not in flag:  # existence
+        if CompoundSearchBuilder.NAME not in flag or CompoundSearchBuilder.QUERY not in flag:  # existence
             raise HTTPBadRequest('Passed a bad flag with missing structure: %s' % flag)
-        elif not isinstance(flag[cls.NAME], str):  # type
-            raise HTTPBadRequest('Passed a bad flag with incorrect parameter for field %s: %s' % (cls.NAME, flag))
-        elif not isinstance(flag[cls.QUERY], str):  # type
-            raise HTTPBadRequest('Passed a bad flag with incorrect parameter for field %s: %s' % (cls.QUERY, flag))
+        elif not isinstance(flag[CompoundSearchBuilder.NAME], str):  # type
+            raise HTTPBadRequest('Passed a bad flag with incorrect parameter for field %s: %s' % (CompoundSearchBuilder.NAME, flag))
+        elif not isinstance(flag[CompoundSearchBuilder.QUERY], str):  # type
+            raise HTTPBadRequest('Passed a bad flag with incorrect parameter for field %s: %s' % (CompoundSearchBuilder.QUERY, flag))
 
-    @classmethod
-    def validate_filter_block(cls, filter_block):
+    @staticmethod
+    def validate_filter_block(filter_block):
         """ Validates a given filter_block has correct structure/types """
-        if cls.QUERY not in filter_block or cls.FLAGS_APPLIED not in filter_block:
+        if CompoundSearchBuilder.QUERY not in filter_block or CompoundSearchBuilder.FLAGS_APPLIED not in filter_block:
             raise HTTPBadRequest('Passed a bad filter_block with missing structure: %s' % filter_block)
-        elif not isinstance(filter_block[cls.QUERY], str):
-            raise HTTPBadRequest('Passed a bad filter_block with wrong type for field %s: %s' % (cls.QUERY, filter_block))
-        elif not isinstance(filter_block[cls.FLAGS_APPLIED], list):
+        elif not isinstance(filter_block[CompoundSearchBuilder.QUERY], str):
+            raise HTTPBadRequest('Passed a bad filter_block with wrong type for field %s: %s' % (CompoundSearchBuilder.QUERY, filter_block))
+        elif not isinstance(filter_block[CompoundSearchBuilder.FLAGS_APPLIED], list):
             raise HTTPBadRequest('Passed a bad filter_block with wrong type for field %s: %s' %
-                                 (cls.FLAGS_APPLIED, filter_block))
+                                 (CompoundSearchBuilder.FLAGS_APPLIED, filter_block))
 
-    @classmethod
-    def extract_filter_set_from_search_body(cls, request, body):
+    @staticmethod
+    def extract_filter_set_from_search_body(request, body):
         """ Validates the compound_search POST request body, returning a dictionary filter_set item.
 
         :param request: current request
         :param body: body of POST request (in JSON)
         :return: a filter_set, to be executed
         """
-        if cls.ID in body:  # prioritize @id
-            return get_item_or_none(request, body[cls.ID])
+        if CompoundSearchBuilder.ID in body:  # prioritize @id
+            return get_item_or_none(request, body[CompoundSearchBuilder.ID])
         else:
             filter_set = {}
-            if cls.TYPE in body:
-                filter_set[cls.TYPE] = body[cls.TYPE]
+            if CompoundSearchBuilder.TYPE in body:
+                filter_set[CompoundSearchBuilder.TYPE] = body[CompoundSearchBuilder.TYPE]
             else:
                 raise HTTPBadRequest('Tried to execute a filter_set without specifying a type!')
             if FLAGS in body:
                 if not isinstance(body[FLAGS], list):
                     raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a list.' % body[FLAGS])
                 for flag in body[FLAGS]:
-                    cls.validate_flag(flag)
+                    CompoundSearchBuilder.validate_flag(flag)
                 filter_set[FLAGS] = body[FLAGS]
             if FILTER_BLOCKS in body:
                 if not isinstance(body[FILTER_BLOCKS], list):
                     raise HTTPBadRequest('Passed a bad value for flags: %s -- Expected a list.' % body[FILTER_BLOCKS])
                 for filter_block in body[FILTER_BLOCKS]:
-                    cls.validate_filter_block(filter_block)
+                    CompoundSearchBuilder.validate_filter_block(filter_block)
                 filter_set[FILTER_BLOCKS] = body[FILTER_BLOCKS]
             return filter_set
+
+
+
 
 
 @view_config(route_name='build_query', request_method='GET', permission='search')
@@ -366,7 +386,9 @@ def compound_search(context, request):
 
     """
     body = json.loads(request.body)
+
     filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, body)
+    global_flags = body.get('global_flags', None)
     intersect = True if body.get('intersect', False) else False
 
     # Disabled for time being to allow test(s) to pass. Not sure whether to add Project to FilterSet schema 'search_type' enum.
@@ -379,7 +401,6 @@ def compound_search(context, request):
         raise HTTPBadRequest("compound_search does not support limit=all at this time.")
     if limit > 1000:
         limit = 1000
-    global_flags = body.get('global_flags', None)
     if from_ < 0 or limit < 0:
         raise HTTPBadRequest('Passed bad from, to request body params: %s, %s' % (from_, limit))
 
@@ -391,4 +412,5 @@ def compound_search(context, request):
         to=limit,
         global_flags=global_flags,
         intersect=intersect,
+        return_generator=False
     )

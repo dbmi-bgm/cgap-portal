@@ -137,7 +137,7 @@ class SearchBuilder:
         return self.forced_type.lower()
 
     @classmethod
-    def from_search(cls, context, request, s):
+    def from_search(cls, context, request, s, return_generator=False):
         """ Builds a SearchBuilder object with a pre-built search by skipping the bootstrap
             initialization and setting self.query directly.
 
@@ -146,7 +146,7 @@ class SearchBuilder:
         :param s: dictionary of lucene query
         :return: instance of this class with the search query dropped in
         """
-        search_builder_instance = cls(context, request, skip_bootstrap=True)  # bypass (most of) bootstrap
+        search_builder_instance = cls(context, request, return_generator=return_generator, skip_bootstrap=True)  # bypass (most of) bootstrap
         search_builder_instance.query = s  # parse compound query
         return search_builder_instance
 

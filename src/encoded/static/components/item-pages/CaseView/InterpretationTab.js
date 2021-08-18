@@ -30,13 +30,13 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
 
 const ExportSpreadsheetButton = React.memo(function ExportSpreadsheetButton({ variantSampleListItem }) {
     const { "@id": atId, variant_samples: vsObjects = [] } = variantSampleListItem || {};
-    const baseHref = "/variant-sample-list-spreadsheet/?variant_sample_list_id=" + encodeURIComponent(atId);
+    const baseHref = atId + "/@@spreadsheet/";
     return (
         <DropdownButton variant="primary" disabled={vsObjects.length === 0} title="Export as...">
-            <a href={baseHref + "&file_format=tsv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
+            <a href={baseHref + "?file_format=tsv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
                 <span className="text-600">TSV</span> spreadsheet
             </a>
-            <a href={baseHref + "&file_format=csv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
+            <a href={baseHref + "?file_format=csv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
                 <span className="text-600">CSV</span> spreadsheet
             </a>
             <a href="#" className="dropdown-item disabled" target="_blank" rel="noopener noreferrer" role="button">
