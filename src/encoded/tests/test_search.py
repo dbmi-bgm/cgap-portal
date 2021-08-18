@@ -774,7 +774,7 @@ class TestNestedSearch(object):
     def test_search_on_single_nested_field(self, workbook, es_testapp):
         """ Two matches for variant with hg19.hg19_pos=12185955 """
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_pos=12185955').json
+                             '&hg19.hg19_pos=12185955').json
         self.assert_length_is_expected(res, 2)
         uuids = [res['@graph'][0]['uuid'], res['@graph'][1]['uuid']]
         assert 'f6aef055-4c88-4a3e-a306-d37a71535d8b' in uuids
@@ -783,8 +783,8 @@ class TestNestedSearch(object):
     def test_or_search_on_same_nested_field(self, workbook, es_testapp):
         """ Should match 2 since OR on this field """
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T').follow().json
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T').follow().json
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
             assert variant['uuid'] in ['f6aef055-4c88-4a3e-a306-d37a71535d8b', '852bb349-203e-437d-974a-e8d6cb56810a']
@@ -877,7 +877,7 @@ class TestNestedSearch(object):
         """ Do an OR search with hg19_post with a negative, should eliminate a variant """
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_chrom=chr1'
-                             '&hg19.hg19_pos!=12185955&debug=true').follow().json
+                             '&hg19.hg19_pos!=12185955').follow().json
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
             assert variant['uuid'] in [
@@ -909,6 +909,12 @@ class TestNestedSearch(object):
                              '&hg19.hg19_chrom=chr2' 
                              '&hg19.hg19_pos=12185955'
                              '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json
+        self.assert_length_is_expected(res, 1)
+        assert res['@graph'][0]['uuid'] == '852bb349-203e-437d-974a-e8d6cb56810a'
+        res = es_testapp.get('/search/?type=Variant'  # re-order above test
+                             '&hg19.hg19_pos=12185955'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+                             '&hg19.hg19_chrom=chr2').follow().json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == '852bb349-203e-437d-974a-e8d6cb56810a'
         es_testapp.get('/search/?type=Variant'
@@ -1096,6 +1102,10 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 1)
         res = es_testapp.get('/search/?type=Variant&hg19!=No+value').follow().json
         self.assert_length_is_expected(res, 3)
+        es_testapp.get('/search/?type=Variant&hg19=No+value'
+                       '&CHROM=2', status=404)  # disqualify on positive CHROM
+        es_testapp.get('/search/?type=Variant&hg19=No+value'
+                       '&CHROM!=1', status=404)  # disqualify on negative CHROM
 
 
 @pytest.fixture(scope='session')

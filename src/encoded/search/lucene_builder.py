@@ -486,6 +486,7 @@ class LuceneBuilder:
                 # if a single sub-query, could still be a part of a larger query later on,
                 # so still bootstrap a combined query with just the single qualifier
                 else:
+                    # EXISTS special case still a concern
                     if EXISTS in query[0] and key == MUST_NOT:
                         combined_query[BOOL][MUST].append(query[0])
                     else:
@@ -504,7 +505,8 @@ class LuceneBuilder:
                 prev_key, path_index = nested_path_to_index_map[nested_path]
                 leaf_query = nested_query[BOOL][prev_key][path_index][NESTED][QUERY][BOOL][key]
 
-                # this is the sub-query we want to build off of
+                # leaf_query is the sub-query we want to build off of
+                # its possible our current query contains multiple conditions
                 if isinstance(query, list):
                     leaf_query += query
                 elif isinstance(query, dict):
