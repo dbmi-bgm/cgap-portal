@@ -126,7 +126,10 @@ def variant_sample_search_spreadsheet(context, request):
         return_generator=True
     )
 
-    print("SEARCH", [ r for r in compound_search_res ])
+    print("SEARCH", next(compound_search_res) )
+
+    # TODO: Request in any fields missing from embedded response of VariantSample, for example variant & gene notes perhaps.
+    # TODO: Run through 
 
     return { "test": 1 }
     return Response(
@@ -134,8 +137,7 @@ def variant_sample_search_spreadsheet(context, request):
             map(
                 lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
                 map(
-                    load_variant_sample,
-                    requested_variant_sample_uuids
+                    # TODO: Iterable of all populated VariantSamples
                 )
             ),
             spreadsheet_mappings,

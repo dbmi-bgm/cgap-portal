@@ -145,7 +145,7 @@ class CompoundSearchBuilder:
 
     @staticmethod
     def es_results_generator(es_results):
-        for hit in es_results['hits']['hits']:
+        for hit in es_results['hits'].get('hits'):
             yield hit['_source']['embedded']
 
     @staticmethod
@@ -249,9 +249,9 @@ class CompoundSearchBuilder:
             if return_generator and to == "all":
                 print("RETURN GENEATOR?", return_generator, '\n\n', dir(search_builder_instance))
                 es_results = search_builder_instance.execute_search_for_all_results()
-                # THIS WILL ALREADY BE A GENERATOR/ITERATOR -- SEE search.py:execute_search_for_all_results
+                # es_results['hits']['hits'] WILL ALREADY BE A GENERATOR/ITERATOR -- SEE search.py:execute_search_for_all_results
                 # (Unless result count is <100, in which case will be a list)
-                return es_results["hits"]["hits"]
+                return cls.es_results_generator(es_results)
             elif return_generator and to != "all":
                 # TODO: Consider enabling somehow
                 raise HTTPBadRequest("`return_generator` without `limit=all` not yet supported")
