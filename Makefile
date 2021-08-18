@@ -189,6 +189,7 @@ AWS_ACCOUNT ?= 645819926742
 
 ecr-login:
 	@echo "Making ecr-login AWS_ACCOUNT=${AWS_ACCOUNT} ..."
+	scripts/assure-awscli
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com
 
 ecr-test-login:  # for ecr-login to account in ~/aws_test. More info in https://hms-dbmi.atlassian.net/browse/C4-684
@@ -208,6 +209,9 @@ build-docker-test:
 	@# because it has to infer the correct AWS_ACCOUNT and ENV_NAME by nosing into
 	@# ~/.aws_test/test_creds.sh looking for ACCOUNT_NUMBER (note: not AWS_ACCOUNT) and ENV_NAME.
 	scripts/build-docker-test --login
+
+build-docker-test-main:
+	scripts/build-docker-test --login --ecosystem main
 
 build-docker-production:
 	@echo "Making build-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
