@@ -14,6 +14,32 @@ from snovault.util import simple_path_ids, debug_log
 
 log = structlog.getLogger(__name__)
 
+# Unsure if we might prefer the below approach to avoid recursion or not-
+# def simple_path_ids(obj, path):
+#     if isinstance(path, str):
+#         path = path.split('.')
+#     path.reverse()
+#     value = None
+#     curr_obj_q = []
+#     if isinstance(obj, list):
+#         curr_obj_q = obj
+#     else:
+#         curr_obj_q = [obj]
+#     while len(path) > 0:
+#         name = path.pop()
+#         next_q = []
+#         for curr_obj in curr_obj_q:
+#             value = curr_obj.get(name, None)
+#             if value is None:
+#                 continue
+#             if not isinstance(value, list):
+#                 value = [value]
+#             for v in value:
+#                 next_q.append(v)
+#         curr_obj_q = next_q
+#     else:
+#         return curr_obj_q
+
 
 ##############################
 ### Spreadsheet Generation ###

@@ -28,7 +28,8 @@ from snovault.embed import make_subrequest
 from encoded.types.base import Item, get_item_or_none
 from encoded.types.variant import (
     POPULATION_SUFFIX_TITLE_TUPLES,
-    get_spreadsheet_mappings
+    get_spreadsheet_mappings,
+    get_fields_to_embed
 )
 from .custom_embed import CustomEmbed
 from .batch_download_utils import stream_tsv_output, convert_item_to_sheet_dict
@@ -85,9 +86,6 @@ def variant_sample_search_spreadsheet(context, request):
         suggested_filename = "variant-sample-filtering." + file_format # TODO: Datetime
 
 
-
-
-
     spreadsheet_mappings = get_spreadsheet_mappings(request)
 
     # TEMPORARY - WE WILL GET THIS FROM POST BODY IN NEAR FUTURE - MUST NOT CONTAIN `limit`
@@ -96,14 +94,14 @@ def variant_sample_search_spreadsheet(context, request):
         "global_flags":"CALL_INFO=SAM10254-S1&file=GAPFI3EBH4X2&additional_facet=proband_only_inheritance_modes&sort=date_created",
         "intersect": False,
         "filter_blocks":[
-            # {
-            #     "query":"associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Breast+Cancer+%2828%29&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
-            #     "flags_applied":[]
-            # },
-            # {
-            #     "query":"GQ.from=60&GQ.to=99&associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Familial+Cancer+%28148%29&variant.csq_clinvar_clnsig=Uncertain_significance&variant.csq_clinvar_clnsig=Pathogenic&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
-            #     "flags_applied":[]
-            # },
+            {
+                "query":"associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Breast+Cancer+%2828%29&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
+                "flags_applied":[]
+            },
+            {
+                "query":"GQ.from=60&GQ.to=99&associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Familial+Cancer+%28148%29&variant.csq_clinvar_clnsig=Uncertain_significance&variant.csq_clinvar_clnsig=Pathogenic&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
+                "flags_applied":[]
+            },
             {
                 "query":"variant.csq_gnomade2_af.from=0&variant.csq_gnomade2_af.to=0.001&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001",
                 "flags_applied":[]
@@ -126,19 +124,17 @@ def variant_sample_search_spreadsheet(context, request):
         return_generator=True
     )
 
-    print("SEARCH", next(compound_search_res) )
+    def variant_samples_gen():
+        for embedded_representation_variant_sample in compound_search_res:
+            embed_and_merge_note_items_to_variant_sample(request, embedded_representation_variant_sample)
+            yield embedded_representation_variant_sample
 
-    # TODO: Request in any fields missing from embedded response of VariantSample, for example variant & gene notes perhaps.
-    # TODO: Run through 
 
-    return { "test": 1 }
     return Response(
         app_iter = stream_tsv_output(
             map(
                 lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
-                map(
-                    # TODO: Iterable of all populated VariantSamples
-                )
+                variant_samples_gen()
             ),
             spreadsheet_mappings,
             file_format
@@ -146,11 +142,33 @@ def variant_sample_search_spreadsheet(context, request):
         headers={
             'X-Accel-Buffering': 'no',
             'Content-Encoding': 'utf-8',
-            'Content-Disposition': 'attachment;filename="%s"' % suggested_filename,
-            'Content-Type': 'text/' + file_format
+            'Content-Disposition': 'attachment; filename=' + suggested_filename,
+            'Content-Type': 'text/' + file_format,
+            'Content-Description': 'File Transfer',
+            'Cache-Control': 'no-cache'
         },
         # content_type='text/' + file_format,
         # content_encoding='utf-8',
         # content_disposition='attachment;filename="%s"' % suggested_filename
     )
 
+
+def embed_and_merge_note_items_to_variant_sample(request, embedded_vs):
+    '''Important: Modifies `embedded_vs` in-place.'''
+    note_containing_fields = [
+        "variant.interpretations",
+        "variant.discovery_interpretations",
+        "variant.variant_notes",
+        "variant.genes.genes_most_severe_gene.gene_notes",
+        "interpretation",
+        "discovery_interpretation",
+        "variant_notes",
+        "gene_notes"
+    ]
+    # TODO: Parallelize?
+    for note_field in note_containing_fields:
+        for incomplete_note_obj in simple_path_ids(embedded_vs, note_field):
+            # Using request.embed instead of CustomEmbed because we're fine with getting from ES (faster)
+            # for search-based spreadsheet requests.
+            full_embedded_note = request.embed(incomplete_note_obj["@id"])
+            incomplete_note_obj.update(full_embedded_note)

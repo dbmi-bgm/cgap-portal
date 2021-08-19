@@ -50,6 +50,7 @@ CMPHET_UNPHASED_WEAK = 'Compound Het (Unphased/weak_pair)'
 
 # Shared embeds for variants and variant samples also used for corresponding SV items
 SHARED_VARIANT_EMBEDS = [
+    "interpretations.@id",
     "interpretations.classification",
     "interpretations.acmg_rules_invoked.*",
     "interpretations.acmg_rules_with_modifier",
@@ -61,6 +62,7 @@ SHARED_VARIANT_EMBEDS = [
     "interpretations.status",
     "interpretations.last_modified.date_modified",
     "interpretations.last_modified.modified_by.display_title",
+    "discovery_interpretations.@id",
     "discovery_interpretations.gene_candidacy",
     "discovery_interpretations.variant_candidacy",
     "discovery_interpretations.note_text",
@@ -69,11 +71,13 @@ SHARED_VARIANT_EMBEDS = [
     "discovery_interpretations.institution.@id",
     "discovery_interpretations.status",
     "discovery_interpretations.last_modified.date_modified",
-    "discovery_interpretations.last_modified.modified_by.display_title"
+    "discovery_interpretations.last_modified.modified_by.display_title",
+    "variant_notes.@id",
 ]
 
 SHARED_VARIANT_SAMPLE_EMBEDS = [
     # The following fields are now requested through /embed API.
+    "variant_notes.@id",
     # "variant_notes.note_text",
     # "variant_notes.version",
     # "variant_notes.project",
@@ -81,6 +85,7 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     # "variant_notes.status",
     # "variant_notes.last_modified.date_modified",
     # "variant_notes.last_modified.modified_by.display_title",
+    "gene_notes.@id",
     # "gene_notes.note_text",
     # "gene_notes.version",
     # "gene_notes.project",
@@ -88,6 +93,7 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     # "gene_notes.status",
     # "gene_notes.last_modified.date_modified",
     # "gene_notes.last_modified.modified_by.display_title",
+    "interpretation.@id",
     # "interpretation.classification",
     # "interpretation.acmg_rules_invoked.*",
     # "interpretation.acmg_rules_with_modifier",
@@ -99,6 +105,7 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     # "interpretation.status",
     # "interpretation.last_modified.date_modified",
     # "interpretation.last_modified.modified_by.display_title",
+    "discovery_interpretation.@id",
     # "discovery_interpretation.gene_candidacy",
     # "discovery_interpretation.variant_candidacy",
     # "discovery_interpretation.note_text",
@@ -141,7 +148,9 @@ def build_variant_embedded_list():
 
         :returns: list of variant embeds
     """
-    embedded_list = SHARED_VARIANT_EMBEDS + []
+    embedded_list = SHARED_VARIANT_EMBEDS + [
+        "genes.genes_most_severe_gene.gene_notes.@id", # `genes` not present on StructuralVariant
+    ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
     return embedded_list + Item.embedded_list
@@ -936,41 +945,8 @@ def variant_sample_list_spreadsheet(context, request):
 
 
     variant_sample_uuids = [ vso["variant_sample_item"] for vso in context.properties.get("variant_samples", []) ]
-
-
     spreadsheet_mappings = get_spreadsheet_mappings(request)
-    fields_to_embed = [
-        # Most of these are needed for columns with render/transform/custom-logic functions in place of (string) CGAP field.
-        # Keep up-to-date with any custom logic.
-        "@id",
-        "@type",
-        "project", # Used to get most recent variant note of this project
-        "variant.transcript.csq_canonical",
-        "variant.transcript.csq_most_severe",
-        "variant.transcript.csq_feature",
-        "variant.transcript.csq_consequence.impact",
-        "variant.transcript.csq_consequence.var_conseq_name",
-        "variant.transcript.csq_consequence.display_title",
-        "variant.transcript.csq_exon",
-        "variant.transcript.csq_intron",
-        "variant.interpretations.classification",
-        "variant.interpretations.acmg",
-        "variant.interpretations.note_text",
-        "variant.interpretations.project",
-        "variant.discovery_interpretations.gene_candidacy",
-        "variant.discovery_interpretations.variant_candidacy",
-        "variant.discovery_interpretations.note_text",
-        "variant.discovery_interpretations.project",
-        "variant.variant_notes.note_text",
-        "variant.variant_notes.project"
-    ]
-    for pop_suffix, pop_name in POPULATION_SUFFIX_TITLE_TUPLES:
-        fields_to_embed.append("variant.csq_gnomadg_af-" + pop_suffix)
-        fields_to_embed.append("variant.csq_gnomade2_af-" + pop_suffix)
-    for column_title, cgap_field_or_func, description in spreadsheet_mappings:
-        if isinstance(cgap_field_or_func, str):
-            # We don't expect any duplicate fields (else would've used a set in place of list) ... pls avoid duplicates in spreadsheet_mappings.
-            fields_to_embed.append(cgap_field_or_func)
+    fields_to_embed = get_fields_to_embed(spreadsheet_mappings)
 
 
     def load_variant_sample(vs_uuid):
@@ -1043,6 +1019,7 @@ def get_spreadsheet_mappings(request = None):
         return get_boolean_transcript_field(variant_sample, "csq_most_severe")
 
     def get_most_severe_consequence(variant_sample_transcript):
+        ''' Used only for "Location" '''
         csq_consequences = variant_sample_transcript.get("csq_consequence", [])
         if not csq_consequences:
             return None
@@ -1172,15 +1149,22 @@ def get_spreadsheet_mappings(request = None):
 
     def get_most_recent_note_of_project(notes_iterable, project_at_id):
         for note in reversed(list(notes_iterable)):
+            note_project_id = note["project"]
+            if isinstance(note_project_id, dict):
+                # We might get string OR @@embedded representation, e.g. if from search response.
+                note_project_id = note_project_id.get("@id")
             if project_at_id == note["project"]:
                 return note
         return None
 
-    def create_func_own_project_note(note_field_of_vs, note_field):
+    def own_project_note_factory(note_field_of_vs, note_field):
 
         def callable(variant_sample):
             notes_iterable = simple_path_ids(variant_sample, note_field_of_vs)
             vs_project_at_id = variant_sample.get("project")
+            if isinstance(vs_project_at_id, dict):
+                # We might get string OR @@embedded representation, e.g. if from search response.
+                vs_project_at_id = vs_project_at_id.get("@id")
             if not vs_project_at_id:
                 return None
 
@@ -1264,14 +1248,51 @@ def get_spreadsheet_mappings(request = None):
         ("Discovery notes (curr)",                  "discovery_interpretation.note_text",                           "Gene/variant discovery notes written for this case"),
         ("Variant notes (curr)",                    "variant_notes.note_text",                                      "Additional notes on variant written for this case"),
         ("Gene notes (curr)",                       "gene_notes.note_text",                                         "Additional notes on gene written for this case"),
-        # TODO: For next 6, grab only from note from same project as user? From newest for which have view permission?
-        ("ACMG classification (prev)",              create_func_own_project_note("variant.interpretations", "classification"),              "ACMG classification for variant in previous cases"), # First interpretation only
-        ("ACMG rules (prev)",                       create_func_own_project_note("variant.interpretations", "acmg"),                        "ACMG rules invoked for variant in previous cases"), # First interpretation only
-        ("Clinical interpretation (prev)",          create_func_own_project_note("variant.interpretations", "note_text"),                   "Clinical interpretation notes written for previous cases"), # First interpretation only
-        ("Gene candidacy (prev)",                   create_func_own_project_note("variant.discovery_interpretations", "gene_candidacy"),    "Gene candidacy level selected for previous cases"), # First discovery_interpretations only
-        ("Variant candidacy (prev)",                create_func_own_project_note("variant.discovery_interpretations", "variant_candidacy"), "Variant candidacy level selected for previous cases"), # First discovery_interpretations only
-        ("Discovery notes (prev)",                  create_func_own_project_note("variant.discovery_interpretations", "note_text"),         "Gene/variant discovery notes written for previous cases"), # First discovery_interpretations only
-        ("Variant notes (prev)",                    create_func_own_project_note("variant.variant_notes", "note_text"),                     "Additional notes on variant written for previous cases"), # First variant_notes only
-        ("Gene notes (prev)",                       "variant.genes.genes_most_severe_gene.gene_notes.note_text",    "Additional notes on gene written for previous cases"), # First gene_notes only
+        # For next 6, grab only from note from same project as the VariantSample
+        ("ACMG classification (prev)",              own_project_note_factory("variant.interpretations", "classification"),                      "ACMG classification for variant in previous cases"),
+        ("ACMG rules (prev)",                       own_project_note_factory("variant.interpretations", "acmg"),                                "ACMG rules invoked for variant in previous cases"),
+        ("Clinical interpretation (prev)",          own_project_note_factory("variant.interpretations", "note_text"),                           "Clinical interpretation notes written for previous cases"),
+        ("Gene candidacy (prev)",                   own_project_note_factory("variant.discovery_interpretations", "gene_candidacy"),            "Gene candidacy level selected for previous cases"),
+        ("Variant candidacy (prev)",                own_project_note_factory("variant.discovery_interpretations", "variant_candidacy"),         "Variant candidacy level selected for previous cases"),
+        ("Discovery notes (prev)",                  own_project_note_factory("variant.discovery_interpretations", "note_text"),                 "Gene/variant discovery notes written for previous cases"),
+        ("Variant notes (prev)",                    own_project_note_factory("variant.variant_notes", "note_text"),                             "Additional notes on variant written for previous cases"),
+        ("Gene notes (prev)",                       own_project_note_factory("variant.genes.genes_most_severe_gene.gene_notes", "note_text"),   "Additional notes on gene written for previous cases"),
     ]
 
+def get_fields_to_embed(spreadsheet_mappings):
+    fields_to_embed = [
+        ## Most of these are needed for columns with render/transform/custom-logic functions in place of (string) CGAP field.
+        ## Keep up-to-date with any custom logic.
+        "@id",
+        "@type",
+        "project", # Used to get most recent notes of same project from Variant & Gene
+        "variant.transcript.csq_canonical",
+        "variant.transcript.csq_most_severe",
+        "variant.transcript.csq_feature",
+        "variant.transcript.csq_consequence.impact",
+        "variant.transcript.csq_consequence.var_conseq_name",
+        "variant.transcript.csq_consequence.display_title",
+        "variant.transcript.csq_exon",
+        "variant.transcript.csq_intron",
+        ## Notes (e.g. as used by `own_project_note_factory`)
+        "variant.interpretations.classification",
+        "variant.interpretations.acmg",
+        "variant.interpretations.note_text",
+        "variant.interpretations.project", # @id (string) form
+        "variant.discovery_interpretations.gene_candidacy",
+        "variant.discovery_interpretations.variant_candidacy",
+        "variant.discovery_interpretations.note_text",
+        "variant.discovery_interpretations.project", # @id (string) form
+        "variant.variant_notes.note_text",
+        "variant.variant_notes.project", # @id (string) form
+        "variant.genes.genes_most_severe_gene.gene_notes.note_text",
+        "variant.genes.genes_most_severe_gene.gene_notes.project"
+    ]
+    for pop_suffix, pop_name in POPULATION_SUFFIX_TITLE_TUPLES:
+        fields_to_embed.append("variant.csq_gnomadg_af-" + pop_suffix)
+        fields_to_embed.append("variant.csq_gnomade2_af-" + pop_suffix)
+    for column_title, cgap_field_or_func, description in spreadsheet_mappings:
+        if isinstance(cgap_field_or_func, str):
+            # We don't expect any duplicate fields (else would've used a set in place of list) ... pls avoid duplicates in spreadsheet_mappings.
+            fields_to_embed.append(cgap_field_or_func)
+    return fields_to_embed

@@ -145,7 +145,7 @@ class CompoundSearchBuilder:
 
     @staticmethod
     def es_results_generator(es_results):
-        for hit in es_results['hits'].get('hits'):
+        for hit in es_results['hits'].get('hits', []):
             yield hit['_source']['embedded']
 
     @staticmethod
