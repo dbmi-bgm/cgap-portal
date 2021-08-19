@@ -255,6 +255,7 @@ info:
 	   $(info - Use 'make deploy-docker-local' start up the cluster - pserve output will follow if successful.)
 	   $(info - Use 'make deploy-docker-local-daemon' will start the cluster in daemon mode.)
 	   $(info - Use 'make ecr-login' to login to ECR with the currently sourced AWS creds.)
-	   $(info - Use 'make build-docker-test' to login to ECR with ~/.aws_test creds.)
+	   $(info - Use 'make build-docker-test' to login+build+upload to ECR repo for config env with ~/.aws_test creds.)
+	   $(info - Use 'make build-docker-test-main' to login+build+upload to ECR repo 'main' with ~/.aws_test creds.)
 	   $(info - Use 'make build-docker-production' to build/tag/push a production image.)
 	   $(info - Use 'make build-docker-test' to do a ecr-test-login + build-docker-production with ~/.aws_test creds.)
