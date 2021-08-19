@@ -202,8 +202,10 @@ class StructuralVariantSample(Item):
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
-        """Sets the annotation_id field on this structural variant sample
-        prior to passing on."""
+        """
+        Sets the annotation_id field on this structural variant sample
+        prior to passing on.
+        """
         properties[ANNOTATION_ID] = "%s:%s:%s" % (
             properties["CALL_INFO"],
             properties["structural_variant"],
@@ -316,6 +318,13 @@ class StructuralVariantSample(Item):
     def proband_only_inheritance_modes(
             self, request, structural_variant, inheritance_modes=[]
     ):
+        """
+        Inheritance modes for proband-only cases. 
+
+        NOTE: Limited only to sex-chromosome-linked inheritance modes
+        at the moment. If compound hets aren't going to be included for
+        SVs, can consider discarding this property.
+        """
         proband_modes = []
         structural_variant = get_item_or_none(
             request, structural_variant, "StructuralVariant", frame="raw"

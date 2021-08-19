@@ -98,7 +98,13 @@ def test_project_specific_structural_variant_sample_genelist(
     cgap_core_structural_variant_sample,
     structural_variant_sample_2,
 ):
-    """"""
+    """
+    Test structural variant samples correctly matched with gene lists
+    based on gene list project. 
+
+    If project is CGAP_CORE_PROJECT or same as variant sample project,
+    the two should be associated.
+    """
     response = testapp.post_json(
         SV_SAMPLE_URL, structural_variant_sample, status=201
     ).json["@graph"][0]
@@ -128,7 +134,11 @@ def test_project_specific_structural_variant_sample_genelist(
 def test_case_specific_structural_variant_sample_genelist(
     testapp, genelist, cgap_core_genelist, structural_variant_sample
 ):
-    """"""
+    """
+    Test structural variant samples correctly matched with gene lists
+    based on project and cases (via gene list bam_sample_ids) when
+    gene lists have case info.
+    """
     genelist_title = genelist["display_title"]
 
     bam_sample_id = "some_sample"
