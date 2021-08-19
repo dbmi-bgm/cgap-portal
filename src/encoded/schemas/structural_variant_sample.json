@@ -260,6 +260,13 @@
             "search_type": "sayt_without_terms",
             "sayt_item_type": "Gene"
         },
+        "associated_genelists": {
+            "title": "Gene List",
+            "extended_description": "src/encoded/docs/extended_description_Variantsample_genelist.html",
+            "order": 31,
+            "grouping": "Genes",
+            "description": "Groups of genes that are relevant to a disease or condition"
+        },
         "structural_variant.transcript.csq_gene.s_het": {
             "title": "S_het",
             "aggregation_type": "stats",
