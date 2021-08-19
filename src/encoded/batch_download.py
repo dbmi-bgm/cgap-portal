@@ -154,7 +154,13 @@ def variant_sample_search_spreadsheet(context, request):
 
 
 def embed_and_merge_note_items_to_variant_sample(request, embedded_vs):
-    '''Important: Modifies `embedded_vs` in-place.'''
+    '''
+    Important: Modifies `embedded_vs` in-place.
+
+    This function requires that `embedded_vs` contain the below
+    `note_containing_fields` with at least a populated `@id` field
+    (if present).
+    '''
     note_containing_fields = [
         "variant.interpretations",
         "variant.discovery_interpretations",
