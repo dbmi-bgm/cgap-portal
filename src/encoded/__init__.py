@@ -128,9 +128,8 @@ def main(global_config, **local_config):
     # settings['snovault.jsonld.terms_namespace'] = 'https://www.encodeproject.org/terms/'
     settings['snovault.jsonld.terms_prefix'] = 'encode'
     # set auth0 keys
-    if not settings.get('auth0.client', None):
-        settings['auth0.secret'] = os.environ.get("Auth0Secret")
-        settings['auth0.client'] = os.environ.get("Auth0Client")
+    settings['auth0.client'] = settings.get('auth0.client', os.environ.get('Auth0Client'))
+    settings['auth0.secret'] = settings.get('auth0.secret', os.environ.get('Auth0Secret'))
     # set google reCAPTCHA keys
     settings['g.recaptcha.key'] = os.environ.get('reCaptchaKey')
     settings['g.recaptcha.secret'] = os.environ.get('reCaptchaSecret')
