@@ -262,7 +262,7 @@
         },
         "associated_genelists": {
             "title": "Gene List",
-            "extended_description": "src/encoded/docs/extended_description_Variantsample_genelist.html",
+            "extended_description": "src/encoded/docs/extended_description_VariantSample_genelist.html",
             "order": 31,
             "grouping": "Genes",
             "description": "Groups of genes that are relevant to a disease or condition"
