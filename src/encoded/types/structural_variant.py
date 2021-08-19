@@ -130,6 +130,36 @@ class StructuralVariant(Item):
     def size(self, request, START, END):
         return END - START + 1
 
+    @calculated_property(
+        schema={
+            "title": "Structural Variant Size Display",
+            "description": "The abbreviated size of this structural variant",
+            "type": "string",
+        }
+    )
+    def size_display(self, request, START, END):
+        """
+        Create user-friendly display of size.
+
+        Finds appropriate units "bucket" according to number of digits
+        in the size, then rounds to 1 decimal place within the "bucket".
+
+        :param request: cls pyramid request
+        :param START: int start location of SV
+        :param END: int end location of SV
+        :return result: str size plus unit
+        """
+        result = None
+        size = END - START + 1
+        unit_max_exponents = [3, 6, 9, 12]  # Gb should be max given chromosome sizes
+        display_units = ["bp", "Kb", "Mb", "Gb"]
+        for exponent, unit in zip(unit_max_exponents, display_units):
+            if size < 10**exponent:
+                display_number = round(size*10**(-exponent+3), 1)
+                result = str(display_number) + " " + unit
+                break
+        return result
+
 
 @collection(
     name="structural-variant-samples",
@@ -150,6 +180,25 @@ class StructuralVariantSample(Item):
         "VariantSampleList", "structural_variant_samples.structural_variant_sample_item"
     )}
     embedded_list = build_structural_variant_sample_embedded_list()
+
+    POSSIBLE_GENOTYPE_LABEL_FIELDS = [
+        "proband_genotype_label",
+        "mother_genotype_label",
+        "father_genotype_label",
+        "sister_genotype_label",
+        "sister_II_genotype_label",
+        "sister_III_genotype_label",
+        "sister_IV_genotype_label",
+        "brother_genotype_label",
+        "brother_II_genotype_label",
+        "brother_III_genotype_label",
+        "brother_IV_genotype_label"
+        "co_parent_genotype_label",
+        "daughter_genotype_label",
+        "daughter_II_genotype_label",
+        "son_genotype_label",
+        "son_II_genotype_label",
+    ]
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
@@ -255,3 +304,135 @@ class StructuralVariantSample(Item):
                 else:
                     associated_genelists.append(genelist_title)
         return associated_genelists
+
+    @calculated_property(schema={
+        "title": "Inheritance Modes",
+        "description": "Inheritance Modes (only including those relevant to a proband-only analysis)",
+        "type": "array",
+        "items": {
+            "type": "string"
+        }
+    })
+    def proband_only_inheritance_modes(
+            self, request, structural_variant, inheritance_modes=[]
+    ):
+        proband_modes = []
+        structural_variant = get_item_or_none(
+            request, structural_variant, "StructuralVariant", frame="raw"
+        )
+        if structural_variant["CHROM"] in ["X", "Y"]:
+            proband_modes.append(f"{structural_variant['CHROM']}-linked")
+        if proband_modes:
+            return proband_modes
+        return None
+
+    @calculated_property(schema={
+        "title": "Associated Genotype Labels",
+        "description": "Named Genotype Label fields that can be searched on",
+        "type": "object",
+        "additional_properties": True,
+        "properties": {
+            "proband_genotype_label": {
+                "title": "Proband Genotype",
+                "type": "string"
+            },
+            "mother_genotype_label": {
+                "title": "Mother Genotype",
+                "type": "string"
+            },
+            "father_genotype_label": {
+                "title": "Father Genotype",
+                "type": "string"
+            },
+            "sister_genotype_label": {
+                "title": "Sister Genotype",
+                "type": "string"
+            },
+            "sister_II_genotype_label": {
+                "title": "Sister II Genotype",
+                "type": "string"
+            },
+            "sister_III_genotype_label": {
+                "title": "Sister III Genotype",
+                "type": "string"
+            },
+            "sister_IV_genotype_label": {
+                "title": "Sister IV Genotype",
+                "type": "string"
+            },
+            "brother_genotype_label": {
+                "title": "Brother Genotype",
+                "type": "string"
+            },
+            "brother_II_genotype_label": {
+                "title": "Brother II Genotype",
+                "type": "string"
+            },
+            "brother_III_genotype_label": {
+                "title": "Brother III Genotype",
+                "type": "string"
+            },
+            "brother_IV_genotype_label": {
+                "title": "Brother IV Genotype",
+                "type": "string"
+            },
+            "co_parent_genotype_label": {
+                "title": "Co-Parent Genotype",
+                "type": "string"
+            },
+            "daughter_genotype_label": {
+                "title": "Daughter Genotype",
+                "type": "string"
+            },
+            "daughter_II_genotype_label": {
+                "title": "Daughter II Genotype",
+                "type": "string"
+            },
+            "son_genotype_label": {
+                "title": "Son Genotype",
+                "type": "string"
+            },
+            "son_II_genotype_label": {
+                "title": "Son II Genotype",
+                "type": "string"
+            }
+        }
+    })
+    def associated_genotype_labels(
+            self, structural_variant, CALL_INFO, samplegeno=None, genotype_labels=None
+    ):
+        """
+        Builds the above sub-embedded object so we can search on the
+        genotype labels.
+        """
+        possible_keys_set = set(StructuralVariantSample.POSSIBLE_GENOTYPE_LABEL_FIELDS)
+
+        def infer_key_from_role(role):
+            return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
+
+        # structural variant starts with sv-type_chr* where * is the chrom 
+        def extract_chrom_from_variant(v):
+            chrom_string = v.split("_")[1]
+            return chrom_string[3]
+
+        # drop if there are no genotype labels or no samplegeno field or this is a
+        # mitochondrial variant
+        if (
+            not genotype_labels or not samplegeno
+            or extract_chrom_from_variant(structural_variant) == 'M'
+        ):
+            return None
+
+        new_labels = {}
+        for entry in genotype_labels:
+            role = entry.get('role', '')
+            label = entry.get('labels', [])
+            role_key = infer_key_from_role(role)
+            if role_key not in possible_keys_set:
+                continue
+            elif len(label) == 1:
+                new_labels[role_key] = label[0]
+            else:
+                new_labels[role_key] = ' '.join(label)  # just in case
+
+        return new_labels

@@ -45,6 +45,10 @@ export default class HealthView extends React.PureComponent {
     static defaultProps = {
         "excludedKeys" : [ ...ItemDetailList.Detail.defaultProps.excludedKeys, 'content' ],
         "keyTitleDescriptionMapConfig" : {
+            'application_bucket_prefix' : {
+                title : "Application Bucket Prefix",
+                description : "Ecosystem-specific name prefix for this server's application buckets."
+            },
             'aggregations' : {
                 title : 'Aggregations',
                 description : "Aggregations of ES-indexed data."
@@ -80,9 +84,13 @@ export default class HealthView extends React.PureComponent {
                 title : "Foursight",
                 description : "URI of corresponding Foursight page."
             },
-            'metadata_bundles_bucket' : {
-                title: "MetaData Bundles Bucket",
-                description : "Name of S3 bucket used for metadata bundles."
+            'foursight_bucket_prefix' : {
+                title : "Foursight Bucket Prefix",
+                description : "Ecosystem-specific name prefix for this server's foursight buckets."
+            },
+            'identity': {
+                title : "Identity",
+                description : "An application configuration key that represents the current environment."
             },
             'indexer' : {
                 title : "Indexer",
@@ -95,6 +103,10 @@ export default class HealthView extends React.PureComponent {
             'load_data' : {
                 title : "Loaded Data",
                 description : "Data which was loaded into database on initialization or boot."
+            },
+            'metadata_bundles_bucket' : {
+                title: "MetaData Bundles Bucket",
+                description : "Name of S3 bucket used for metadata bundles."
             },
             'namespace': {
                 title : "Namespace",
@@ -123,6 +135,10 @@ export default class HealthView extends React.PureComponent {
             'system_bucket' : {
                 title : 'System Bucket',
                 description : "Name of S3 Bucket used for system data."
+            },
+            'tibanna_output_bucket': {
+                title : "Tibanna Output Bucket",
+                description : "Name of S3 bucket used for tibanna output."
             },
             'uptime': {
                 title : 'Uptime',
