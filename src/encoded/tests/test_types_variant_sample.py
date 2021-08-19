@@ -1,13 +1,14 @@
-import pytest
-import webtest
-import requests  # XXX: C4-211
 import datetime
-import pytz
-from dateutil.parser import isoparse
-from encoded.tests.variant_fixtures import VARIANT_SAMPLE_URL
-from encoded.types.variant import build_variant_sample_annotation_id
-from encoded.ingestion.common import CGAP_CORE_PROJECT
 
+import pytest
+import pytz
+import requests  # XXX: C4-211
+import webtest
+from dateutil.parser import isoparse
+
+from ..ingestion.common import CGAP_CORE_PROJECT
+from ..types.variant import build_variant_sample_annotation_id
+from .variant_fixtures import VARIANT_SAMPLE_URL
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.workbook]
 
@@ -207,8 +208,6 @@ def test_variant_sample_patch_notes_process_success(
     assert note_pre_existing_reloaded["superseding_note"] == note1["@id"]
 
 
-
-
 def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_sample_list1, bgm_test_variant_sample, bgm_test_variant_sample2):
     vsl = bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201).json['@graph'][0]
     vs1 = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample, status=201).json['@graph'][0]
@@ -302,13 +301,18 @@ def test_project_specific_variant_sample_genelist(
           project, then the two are associated (via variant sample's
           associated_genelists property)
     """
-    response = testapp.post_json("/variant-samples", variant_sample).json["@graph"][0]
+    response = testapp.post_json(
+        "/variant-samples", variant_sample, status=201
+    ).json["@graph"][0]
     cgap_core_response = testapp.post_json(
-        "/variant-samples", cgap_core_variant_sample).json["@graph"][0]
+        "/variant-samples", cgap_core_variant_sample, status=201
+    ).json["@graph"][0]
     bgm_response = testapp.post_json(
-        "/variant-samples", bgm_variant_sample).json["@graph"][0]
+        "/variant-samples", bgm_variant_sample, status=201
+    ).json["@graph"][0]
     no_genelists_response = testapp.post_json(
-        "/variant-samples", variant_sample_2).json["@graph"][0]
+        "/variant-samples", variant_sample_2, status=201
+    ).json["@graph"][0]
     assert set(response["associated_genelists"]) == {
         genelist["display_title"],
         cgap_core_genelist["display_title"]}
@@ -331,22 +335,24 @@ def test_case_specific_variant_sample_genelist(
 
     bam_sample_id = "some_sample"
     genelist_patch = {"bam_sample_ids": [bam_sample_id]}
-    testapp.patch_json(genelist["@id"], genelist_patch)
+    testapp.patch_json(genelist["@id"], genelist_patch, status=200)
     variant_sample["CALL_INFO"] = bam_sample_id
-    vs_post = testapp.post_json("/variant-samples", variant_sample).json["@graph"][0]
+    vs_post = testapp.post_json(
+        "/variant-samples", variant_sample, status=201
+    ).json["@graph"][0]
     assert genelist_title in vs_post["associated_genelists"]
 
     new_bam_sample_id = "another_sample"
     genelist_patch = {"bam_sample_ids": [new_bam_sample_id]}
-    testapp.patch_json(genelist["@id"], genelist_patch)
-    vs_patch = testapp.patch_json(vs_post["@id"], {}).json["@graph"][0]
+    testapp.patch_json(genelist["@id"], genelist_patch, status=200)
+    vs_patch = testapp.patch_json(vs_post["@id"], {}, status=200).json["@graph"][0]
     assert genelist_title not in vs_patch["associated_genelists"]
 
-    testapp.patch_json(cgap_core_genelist["@id"], genelist_patch)
-    vs_patch = testapp.patch_json(vs_post["@id"], {}).json["@graph"][0]
+    testapp.patch_json(cgap_core_genelist["@id"], genelist_patch, status=200)
+    vs_patch = testapp.patch_json(vs_post["@id"], {}, status=200).json["@graph"][0]
     assert not vs_patch["associated_genelists"]
 
     genelist_patch = {"bam_sample_ids": [bam_sample_id, new_bam_sample_id]}
-    testapp.patch_json(genelist["@id"], genelist_patch)
-    vs_patch = testapp.patch_json(vs_post["@id"], {}).json["@graph"][0]
+    testapp.patch_json(genelist["@id"], genelist_patch, status=200)
+    vs_patch = testapp.patch_json(vs_post["@id"], {}, status=200).json["@graph"][0]
     assert genelist_title in vs_patch["associated_genelists"]
