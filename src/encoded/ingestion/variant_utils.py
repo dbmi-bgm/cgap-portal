@@ -222,9 +222,9 @@ class StructuralVariantBuilderError(Exception):
 
 class StructuralVariantBuilder(VariantBuilder):
     """
-    Class to build SVs/SV samples. Similar to VariantBuilder with updated
-    methods for SVs and inclusion, with a check_variant method to
-    catch possible bioinformatics errors unique to SVs.
+    Class to build SVs/SV samples. Similar to VariantBuilder with
+    updated methods for SVs and a validation method to catch possible
+    bioinformatics errors unique to SVs.
     """
 
     def _post_or_patch_variant(self, variant):
@@ -293,6 +293,7 @@ class StructuralVariantBuilder(VariantBuilder):
         Ensure deletions and duplications have START < END.
 
         :param variant: dict variant object
+        :raises StrucuralVariantBuilderError: if START >= END
         """
         if variant["SV_TYPE"] in ["DEL", "DUP"]:
             if variant["START"] >= variant["END"]:
@@ -337,5 +338,5 @@ class StructuralVariantBuilder(VariantBuilder):
             variant_name = sample["structural_variant"]
             chrom = variant_name[variant_name.index("chr") + 3]  # find chr* and get *
             sample.update(InheritanceMode.compute_inheritance_modes(sample, chrom=chrom))
-            add_last_modified(variant, userid=LOADXL_USER_UUID)
+            add_last_modified(sample, userid=LOADXL_USER_UUID)
         return variant_samples
