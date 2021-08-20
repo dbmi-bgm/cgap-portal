@@ -793,7 +793,7 @@ function FilteringTabWrapper(props) {
 
     return (
         <React.Fragment>
-            <FilteringTabTableToggle {...{ currViewName, setCurrViewName }}/>
+            <FilteringTabTableToggle {...{ currViewName, setCurrViewName, svFilterHrefAddon, snvFilterHrefAddon }}/>
             <div className="row mb-1 mt-0">
                 <h1 className="col my-0">
                     {currentTitle} <span className="text-300">Variant Filtering and Technical Review</span>
@@ -811,13 +811,14 @@ function FilteringTabWrapper(props) {
     );
 }
 
-function FilteringTabTableToggle({ currViewName, setCurrViewName }) {
+function FilteringTabTableToggle(props) {
+    const { currViewName, setCurrViewName, svFilterHrefAddon, snvFilterHrefAddon } = props;
     return (
         <div className="card py-2 px-3 flex-row mb-3 filtering-tab-toggle">
-            <div onClick={currViewName !== "SNV" ? () => setCurrViewName("SNV"): undefined} className={`mr-2 text-600  ${currViewName === "SNV" ? "active unclickable": "clickable"}`}>
+            <div onClick={currViewName !== "SNV" && snvFilterHrefAddon ? () => setCurrViewName("SNV"): undefined} className={`mr-2 text-600  ${currViewName === "SNV" ? "active unclickable": "clickable"}`}>
                 SNV Filtering
             </div>
-            <div onClick={currViewName !== "CNVSV" ? () => setCurrViewName("CNVSV"): undefined} className={`text-600 ${currViewName === "CNVSV" ? "active unclickable": "clickable"}`}>
+            <div onClick={currViewName !== "CNVSV" && svFilterHrefAddon ? () => setCurrViewName("CNVSV"): undefined} className={`text-600 ${currViewName === "CNVSV" ? "active unclickable": "clickable"}`}>
                 CNV / SV Filtering
             </div>
         </div>
