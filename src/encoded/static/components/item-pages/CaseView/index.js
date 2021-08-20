@@ -812,13 +812,19 @@ function FilteringTabWrapper(props) {
 }
 
 function FilteringTabTableToggle(props) {
-    const { currViewName, setCurrViewName, svFilterHrefAddon, snvFilterHrefAddon } = props;
+    const { currViewName, setCurrViewName, svFilterHrefAddon: svEnabled = false, snvFilterHrefAddon: snvEnabled = false } = props;
+
+    const currentlyOnSNV = currViewName === "SNV";
+    const currentlyOnSV = currViewName === "CNVSV";
+
     return (
         <div className="card py-2 px-3 flex-row mb-3 filtering-tab-toggle">
-            <div onClick={currViewName !== "SNV" && snvFilterHrefAddon ? () => setCurrViewName("SNV"): undefined} className={`mr-2 text-600  ${currViewName === "SNV" ? "active unclickable": "clickable"}`}>
+            <div onClick={!currentlyOnSV && snvEnabled ? () => setCurrViewName("SNV"): undefined}
+                className={`mr-2 text-600  ${currentlyOnSNV ? "active ": (snvEnabled ? "clickable": "unclickable text-muted")}`}>
                 SNV Filtering
             </div>
-            <div onClick={currViewName !== "CNVSV" && svFilterHrefAddon ? () => setCurrViewName("CNVSV"): undefined} className={`text-600 ${currViewName === "CNVSV" ? "active unclickable": "clickable"}`}>
+            <div onClick={!currentlyOnSNV && svEnabled ? () => setCurrViewName("CNVSV"): undefined}
+                className={`text-600 ${currentlyOnSV ? "active ": (svEnabled ? "clickable": "unclickable text-muted")}`}>
                 CNV / SV Filtering
             </div>
         </div>
