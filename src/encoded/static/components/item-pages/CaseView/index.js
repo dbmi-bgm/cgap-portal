@@ -818,11 +818,11 @@ function FilteringTabTableToggle(props) {
 
     return (
         <div className="card py-2 px-3 flex-row mb-3 filtering-tab-toggle">
-            <div onClick={!currentlyOnSV && snvEnabled ? () => setCurrViewName("SNV"): undefined}
+            <div onClick={currentlyOnSV && snvEnabled ? () => setCurrViewName("SNV"): undefined}
                 className={`mr-2 text-600  ${currentlyOnSNV ? "active ": (snvEnabled ? "clickable": "unclickable text-muted")}`}>
                 SNV Filtering
             </div>
-            <div onClick={!currentlyOnSNV && svEnabled ? () => setCurrViewName("CNVSV"): undefined}
+            <div onClick={currentlyOnSNV && svEnabled ? () => setCurrViewName("CNVSV"): undefined}
                 className={`text-600 ${currentlyOnSV ? "active ": (svEnabled ? "clickable": "unclickable text-muted")}`}>
                 CNV / SV Filtering
             </div>
