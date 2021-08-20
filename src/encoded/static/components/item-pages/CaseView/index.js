@@ -767,7 +767,6 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
  * Handles tab switching between the SNV and CNV/SV tabs
  */
 function FilteringTabWrapper(props) {
-    // const { snvFilterHrefAddon = "", svFilterHrefAddon = "" } = props;
     const {
         context, windowHeight, session, schemas,
         setIsSubmitting, variantSampleListItem,
