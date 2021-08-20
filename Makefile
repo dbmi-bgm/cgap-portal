@@ -189,7 +189,12 @@ AWS_ACCOUNT ?= 645819926742
 
 ecr-login:
 	@echo "Making ecr-login AWS_ACCOUNT=${AWS_ACCOUNT} ..."
+	scripts/assure-awscli
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com
+
+ecr-test-login:  # for ecr-login to account in ~/aws_test. More info in https://hms-dbmi.atlassian.net/browse/C4-684
+	@echo "Making ecr-login for your .aws_test account ..."
+	scripts/ecr-test-login
 
 rebuild-docker-production:
 	@echo "Remaking build-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
@@ -197,13 +202,16 @@ rebuild-docker-production:
 	make tag-and-push-docker-production
 
 build-docker-test:
-	# This will do the equivalent of
-	#    make ecr-login AWS_ACCOUNT=<selected-test-account>
-	#    make build-docker-production AWS_ACCOUNT=<selected-test-account> ENV_NAME=<selected-env>
-	# but it has to do the login inside the script, we can't do it separately here
-	# because it has to infer the correct AWS_ACCOUNT and ENV_NAME by nosing into
-	# ~/.aws_test/test_creds.sh looking for ACCOUNT_NUMBER (note: not AWS_ACCOUNT) and ENV_NAME.
-	scripts/build-docker-test --login  # The login must be done inside the script, after inferring account number
+	@# This will do the equivalent of
+	@#    make ecr-login AWS_ACCOUNT=<selected-test-account>
+	@#    make build-docker-production AWS_ACCOUNT=<selected-test-account> ENV_NAME=<selected-env>
+	@# but it has to do the login inside the script, we can't do it separately here
+	@# because it has to infer the correct AWS_ACCOUNT and ENV_NAME by nosing into
+	@# ~/.aws_test/test_creds.sh looking for ACCOUNT_NUMBER (note: not AWS_ACCOUNT) and ENV_NAME.
+	scripts/build-docker-test --login
+
+build-docker-test-main:
+	scripts/build-docker-test --login --ecosystem main
 
 build-docker-production:
 	@echo "Making build-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
@@ -213,7 +221,9 @@ build-docker-production:
 tag-and-push-docker-production:
 	@echo "Making tag-and-push-docker-production AWS_ACCOUNT=${AWS_ACCOUNT} ENV_NAME=${ENV_NAME} ..."
 	docker tag ${ENV_NAME}:latest ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/${ENV_NAME}:latest
+	date
 	docker push ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/${ENV_NAME}:latest
+	date
 
 help:
 	@make info
@@ -247,4 +257,7 @@ info:
 	   $(info - Use 'make deploy-docker-local' start up the cluster - pserve output will follow if successful.)
 	   $(info - Use 'make deploy-docker-local-daemon' will start the cluster in daemon mode.)
 	   $(info - Use 'make ecr-login' to login to ECR with the currently sourced AWS creds.)
+	   $(info - Use 'make build-docker-test' to login+build+upload to ECR repo for config env with ~/.aws_test creds.)
+	   $(info - Use 'make build-docker-test-main' to login+build+upload to ECR repo 'main' with ~/.aws_test creds.)
 	   $(info - Use 'make build-docker-production' to build/tag/push a production image.)
+	   $(info - Use 'make build-docker-test' to do a ecr-test-login + build-docker-production with ~/.aws_test creds.)

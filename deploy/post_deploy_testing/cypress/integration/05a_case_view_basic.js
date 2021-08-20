@@ -32,9 +32,9 @@ describe('Case View - Initial', function () {
     context("Top area", function(){
 
         it("Has panels for patient info and family info with phenotypic features", function(){
-            cy.get(".col-stats #case-stats > div:first-child .card-header").contains("Patient Info: IND10254").end()
+            cy.get(".col-stats #case-stats > div:first-child .card-header").contains("Patient Info").end()
                 .get(".col-stats #case-stats > div:first-child .card-footer > div a.badge").should('have.length', 1)
-                .get(".col-stats #case-stats > div:last-child .card-header").contains("Family Info: GAPFA9X3A8LE").end()
+                .get(".col-stats #case-stats > div:last-child .card-header").contains("Family Info").end()
                 .get(".col-stats #case-stats > div:last-child .card-footer > div a.badge").should('have.length', 4);
         });
 
@@ -65,8 +65,10 @@ describe('Case View - Initial', function () {
                 .should("have.class", "active").end()
                 .get("#case-info\\.bioinformatics > h1").contains("Bioinformatics Analysis").end()
                 .get("#case-info\\.bioinformatics .tab-inner-container.card:first-of-type .card-body .qc-summary")
-                .eq(0).contains("Total Number of Reads:466477333")
-                .next().contains("Coverage:47.2X");
+                .should("have.length", 7)
+                .eq(0).should("have.text", "Total Number of Reads:466,477,333")
+                .get("#case-info\\.bioinformatics .tab-inner-container.card:first-of-type .card-body .qc-summary")
+                .eq(1).should("have.text", "Coverage:47.2X");
         });
 
         it("Click 3rd tab, see FSUI & Filtering Table", function(){
@@ -76,7 +78,7 @@ describe('Case View - Initial', function () {
                 .should("have.text", "Filtering")
                 .click()
                 .should("have.class", "active").end()
-                .get("#case-info\\.filtering .embedded-search-container h1").contains("Variant Filtering and Technical Review").end()
+                .get("#case-info\\.filtering h1").contains("Variant Filtering and Technical Review").end()
                 .get("#case-info\\.filtering .above-variantsample-table-ui .blocks-container .filterset-block").should("have.length.greaterThan", 0);
         });
 

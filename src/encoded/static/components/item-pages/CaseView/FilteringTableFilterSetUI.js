@@ -632,12 +632,14 @@ class PresetFilterSetSelectionUI extends React.PureComponent {
                             <a href="/search/?type=FilterSet" className="text-body" target="_blank" data-delay-show={1000} data-tip="View all saved FilterSets">Presets</a>
                             { nextToTitleIcon }
                         </h5>
-                        <div className="col-auto text-small">
-                            { totalResultCount } total
-                            { (totalResultCount || 0) >= 250 ?
-                                <i className="icon icon-exclamation-triangle fas ml-1" data-tip="Showing most recent 250 results only.<br/><small>(Eventually we'll show more)</small>" data-html />
-                                : null }
-                        </div>
+                        { !isCheckingForNewFilterSet && !isLoadingPresets ?
+                            <div className="col-auto text-small">
+                                { totalResultCount } total
+                                { (totalResultCount || 0) >= 250 ?
+                                    <i className="icon icon-exclamation-triangle fas ml-1" data-tip="Showing most recent 250 results only.<br/><small>(Eventually we'll show more)</small>" data-html />
+                                    : null }
+                            </div>
+                            : null }
                     </div>
                 </div>
                 { body }
@@ -2062,9 +2064,9 @@ function FilterSetUIBlockBottomUI(props){
     }
 
     return (
-        <div className="row pb-16 pt-16 px-3">
-            <div className="col">
-                <div className="btn-group mr-08" role="group" aria-label="Selection Controls">
+        <div className="row pb-04 pt-16 px-3">
+            <div className="col-auto mb-12">
+                <div className="btn-group" role="group" aria-label="Selection Controls">
                     <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
                         <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
                         Select All
@@ -2075,10 +2077,9 @@ function FilterSetUIBlockBottomUI(props){
                         Intersect
                     </button>
                 </div>
-                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark"/>
             </div>
-            <div className="col-auto">
-                <div className="btn-group" role="group" aria-label="Creation Controls">
+            <div className="col-auto mb-12 flex-grow-1 d-flex justify-content-between flex-wrap">
+                <div className="btn-group mr-08" role="group" aria-label="Creation Controls">
                     <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
                         <i className="icon icon-fw icon-plus fas mr-1" />
                         Add Filter Block
@@ -2088,6 +2089,7 @@ function FilterSetUIBlockBottomUI(props){
                         <i className="icon icon-fw icon-clone far" />
                     </button>
                 </div>
+                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark"/>
             </div>
         </div>
     );

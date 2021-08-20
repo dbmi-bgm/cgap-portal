@@ -154,10 +154,9 @@ def _build_case_embedded_list():
         # TODO fixme file linkTo
         "individual.samples.processed_files.file_format.file_format",
         "individual.samples.processed_files.accession",
-        "individual.samples.processed_files.workflow_run_outputs",
+        "individual.samples.processed_files.workflow_run_outputs.display_title",
 
         # QC
-        "individual.samples.processed_files.quality_metric",
         "individual.samples.processed_files.quality_metric.qc_list.qc_type",
         "individual.samples.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "individual.samples.processed_files.quality_metric.qc_list.value.url",
@@ -171,7 +170,6 @@ def _build_case_embedded_list():
         "individual.samples.files.accession",
 
         # QC
-        "individual.samples.files.quality_metric",
         "individual.samples.files.quality_metric.qc_list.qc_type",
         "individual.samples.files.quality_metric.qc_list.value.overall_quality_status",
         "individual.samples.files.quality_metric.qc_list.value.url",
@@ -210,6 +208,7 @@ def _build_case_embedded_list():
 
         # Sample Processing linkTo
         "sample_processing.analysis_type",
+        "sample_processing.analysis_version",
         "sample_processing.last_modified.*",
         "sample_processing.completed_processes",
         "sample_processing.samples_pedigree.*",
@@ -242,10 +241,9 @@ def _build_case_embedded_list():
         # Case linkTo
         # XXX: should it embed sample processing as well?
         "sample_processing.families.members.case.case_id",
-        "sample_processing.families.members.case.report",
         "sample_processing.families.members.case.report.accession",
-        "sample_processing.families.members.case.family",
-        "sample_processing.families.members.case.individual",
+        "sample_processing.families.members.case.family.family_id",
+        "sample_processing.families.members.case.individual.individual_id",
         "sample_processing.families.members.case.sample.accession",
 
         # Sample linkTo
@@ -273,19 +271,9 @@ def _build_case_embedded_list():
         "sample_processing.sample_processed_files.sample.accession",
 
         # QC
-        "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.title",
-        "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.sample",
-        "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.value",
-        "sample_processing.samples.processed_files.quality_metric.quality_metric_summary.numberType",
-        "sample_processing.samples.processed_files.quality_metric.filtering_condition",
         "sample_processing.samples.processed_files.quality_metric.*",
 
         # QC
-        "sample_processing.processed_files.quality_metric.quality_metric_summary.title",
-        "sample_processing.processed_files.quality_metric.quality_metric_summary.sample",
-        "sample_processing.processed_files.quality_metric.quality_metric_summary.value",
-        "sample_processing.processed_files.quality_metric.quality_metric_summary.numberType",
-        "sample_processing.processed_files.quality_metric.filtering_condition",
         "sample_processing.processed_files.quality_metric.*",
 
         # Report linkTo
@@ -402,7 +390,7 @@ class Case(Item):
         if not files_processed:
             return vcf_file
         for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
-            file_data = get_item_or_none(request, file_processed, 'files-processed') 
+            file_data = get_item_or_none(request, file_processed, 'files-processed')
             file_type = file_data.get("file_type", "")
             file_variant_type = file_data.get("variant_type", "")
             if file_type == "full annotated VCF" and file_variant_type != "SV":
@@ -430,7 +418,7 @@ class Case(Item):
         if not files_processed:
             return sv_vcf_file
         for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
-            file_data = get_item_or_none(request, file_processed, 'files-processed') 
+            file_data = get_item_or_none(request, file_processed, 'files-processed')
             file_type = file_data.get("file_type", "")
             file_variant_type = file_data.get("variant_type", "")
             if file_type == "full annotated VCF" and file_variant_type == "SV":
@@ -522,7 +510,7 @@ class Case(Item):
                     if relation in included_relations:
                         relation = relation.replace(' ', '_').replace('-', '_')
                         fields.append(f'associated_genotype_labels.{relation}_genotype_label')
-            elif analysis_type in ['WGS', 'WES']:  # proband-only analysis types 
+            elif analysis_type in ['WGS', 'WES']:  # proband-only analysis types
                 fields.append('proband_only_inheritance_modes')
         return fields
 
