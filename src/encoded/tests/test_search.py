@@ -758,6 +758,15 @@ def test_find_nested_path(sample_processing_mapping, field, nested_path):
 
 class TestNestedSearch(object):
     """ This class encapsulates all helper methods and tests needed to test out nested searches """
+    VARIANT_HG19_ABSENT = "cedff838-99af-4936-a0ae-4dfc63ba8bf4"
+    VARIANT_HG19_CHR1_GA = "842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f"
+    VARIANT_HG19_CHR1_2_AT_DEL = "852bb349-203e-437d-974a-e8d6cb56810a"
+    VARIANT_HG19_CHR1_DEL = "f6aef055-4c88-4a3e-a306-d37a71535d8b"
+    VARIANTS_WITH_HG19 = [
+        VARIANT_HG19_CHR1_GA,
+        VARIANT_HG19_CHR1_2_AT_DEL,
+        VARIANT_HG19_CHR1_DEL
+    ]
 
     @staticmethod
     def assert_length_is_expected(result, expected):
@@ -777,8 +786,8 @@ class TestNestedSearch(object):
                              '&hg19.hg19_pos=12185955').json
         self.assert_length_is_expected(res, 2)
         uuids = [res['@graph'][0]['uuid'], res['@graph'][1]['uuid']]
-        assert 'f6aef055-4c88-4a3e-a306-d37a71535d8b' in uuids
-        assert '852bb349-203e-437d-974a-e8d6cb56810a' in uuids
+        assert self.VARIANT_HG19_CHR1_DEL in uuids
+        assert self.VARIANT_HG19_CHR1_2_AT_DEL in uuids
 
     def test_or_search_on_same_nested_field(self, workbook, es_testapp):
         """ Should match 2 since OR on this field """
@@ -787,7 +796,10 @@ class TestNestedSearch(object):
                              '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T').follow().json
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
-            assert variant['uuid'] in ['f6aef055-4c88-4a3e-a306-d37a71535d8b', '852bb349-203e-437d-974a-e8d6cb56810a']
+            assert variant['uuid'] in [
+                self.VARIANT_HG19_CHR1_DEL,
+                self.VARIANT_HG19_CHR1_2_AT_DEL
+            ]
 
     def test_and_search_on_nested_field_that_does_not_match(self, workbook, es_testapp):
         """ Test various non-matching searches """
@@ -809,22 +821,21 @@ class TestNestedSearch(object):
         es_testapp.get('/search/?type=Variant'
                        '&hg19=No+value'
                        '&POS.from=100000', status=404)
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos=No+value').json
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_ABSENT
 
     def test_and_search_on_nested_field_that_matches_one(self, workbook, es_testapp):
         """ This has the correct 'hg19_chrom', so should match one """
         res = es_testapp.get('/search/?type=Variant'
-                             '&hg19.hg19_pos=12185955'
-                             '&hg19.hg19_chrom=chr1').json
-        self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
-        res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_pos.to=12185955'
                              '&hg19.hg19_chrom=chr2').json
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == '852bb349-203e-437d-974a-e8d6cb56810a'
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_CHR1_2_AT_DEL
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19=No+value').json
         self.assert_length_is_expected(res, 1)
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_ABSENT
 
     def test_or_search_on_nested_hg_19_multiple_match(self, workbook, es_testapp):
         """ Do an OR search on hg19.hg19_chrom, matching three variants """
@@ -832,27 +843,18 @@ class TestNestedSearch(object):
                              '&hg19.hg19_pos!=12345').follow().json
         self.assert_length_is_expected(res, 3)
         for variant in res['@graph']:
-            assert variant['uuid'] in [
-                'f6aef055-4c88-4a3e-a306-d37a71535d8b',
-                '852bb349-203e-437d-974a-e8d6cb56810a',
-                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
-            ]
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_chrom=chr1').json
         self.assert_length_is_expected(res, 3)
         for variant in res['@graph']:
-            assert variant['uuid'] in [
-                'f6aef055-4c88-4a3e-a306-d37a71535d8b',
-                '852bb349-203e-437d-974a-e8d6cb56810a',
-                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
-            ]
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_pos.to=12185956').json
         self.assert_length_is_expected(res, 3)
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_pos.to=12185955'
-                             '&hg19.hg19_pos.from=88832&debug=true').json
-
+                             '&hg19.hg19_pos.from=88832').json
         self.assert_length_is_expected(res, 3)
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_pos.to=12185954'
@@ -860,8 +862,8 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
             assert variant['uuid'] in [
-                '852bb349-203e-437d-974a-e8d6cb56810a',
-                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+                self.VARIANT_HG19_CHR1_2_AT_DEL,
+                self.VARIANT_HG19_CHR1_GA
             ]
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_pos.to=12185956'
@@ -869,8 +871,8 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
             assert variant['uuid'] in [
-                '852bb349-203e-437d-974a-e8d6cb56810a',
-                'f6aef055-4c88-4a3e-a306-d37a71535d8b'
+                self.VARIANT_HG19_CHR1_2_AT_DEL,
+                self.VARIANT_HG19_CHR1_DEL
             ]
 
     def test_negative_search_on_hg_19(self, workbook, es_testapp):
@@ -881,8 +883,8 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
             assert variant['uuid'] in [
-                '852bb349-203e-437d-974a-e8d6cb56810a',
-                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+                self.VARIANT_HG19_CHR1_GA,
+                self.VARIANT_HG19_CHR1_2_AT_DEL
             ]
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_pos!=12185955'
@@ -890,12 +892,14 @@ class TestNestedSearch(object):
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
             assert variant['uuid'] in [
-                '852bb349-203e-437d-974a-e8d6cb56810a',
-                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+                self.VARIANT_HG19_CHR1_GA,
+                self.VARIANT_HG19_CHR1_2_AT_DEL
             ]
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_pos!=12345').follow().json
         self.assert_length_is_expected(res, 3)
+        for variant in res['@graph']:
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
 
     def test_and_search_that_matches_one(self, workbook, es_testapp):
         """ Check three properties that occur in the same sub-embedded object in 1 variant """
@@ -904,19 +908,19 @@ class TestNestedSearch(object):
                              '&hg19.hg19_pos=12185955'
                              '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_CHR1_DEL
         res = es_testapp.get('/search/?type=Variant' 
                              '&hg19.hg19_chrom=chr2' 
                              '&hg19.hg19_pos=12185955'
                              '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == '852bb349-203e-437d-974a-e8d6cb56810a'
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_CHR1_2_AT_DEL
         res = es_testapp.get('/search/?type=Variant'  # re-order above test
                              '&hg19.hg19_pos=12185955'
                              '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
                              '&hg19.hg19_chrom=chr2').follow().json
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == '852bb349-203e-437d-974a-e8d6cb56810a'
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_CHR1_2_AT_DEL
         es_testapp.get('/search/?type=Variant'
                        '&hg19.hg19_chrom=chr3'  # diff
                        '&hg19.hg19_pos=12185955'
@@ -950,11 +954,17 @@ class TestNestedSearch(object):
                              '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow().json
         self.assert_length_is_expected(res, 3)
         for variant in res['@graph']:
-            assert variant['uuid'] in [
-                'f6aef055-4c88-4a3e-a306-d37a71535d8b',
-                '852bb349-203e-437d-974a-e8d6cb56810a',
-                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
-            ]
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_chrom=chr1'
+                             '&hg19.hg19_pos.to=12185955'  # use range instead
+                             '&hg19.hg19_pos.from=11780388'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow().json
+        self.assert_length_is_expected(res, 3)
+        for variant in res['@graph']:
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
 
     def test_search_with_non_existant_combinations(self, workbook, es_testapp):
         """ Test that swapping around fields that would match across different sub-embedded objects
@@ -974,6 +984,14 @@ class TestNestedSearch(object):
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_chrom!=No+value').follow().json
         self.assert_length_is_expected(res, 3)
+        for variant in res['@graph']:
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_chrom=No+value&debug=').json
+        import pdb; pdb.set_trace()
+        self.assert_length_is_expected(res, 1)
+        for variant in res['@graph']:
+            assert variant['uuid'] == self.VARIANT_HG19_ABSENT
 
     def test_nested_search_with_no_value_combined(self, workbook, es_testapp):
         """ Tests searching on 'No value' combined with another nested field, in this case
@@ -992,6 +1010,8 @@ class TestNestedSearch(object):
                              '&hg19.hg19_pos=11780388'
                              '&hg19.hg19_hgvsg!=No+value').follow().json
         self.assert_length_is_expected(res, 1)
+        for variant in res['@graph']:
+            assert variant['uuid'] == self.VARIANT_HG19_CHR1_GA
 
     def test_search_nested_with_non_nested_fields(self, workbook, es_testapp):
         """ Tests that combining a nested search with a non-nested one works in any order
@@ -1004,13 +1024,17 @@ class TestNestedSearch(object):
                        '&hg19.hg19_pos!=11720331'
                        '&POS=88832', status=404)  # searching a nested field also checks its existence
         res = es_testapp.get('/search/?type=Variant'
-                             '&POS=88832&hg19=No+value&debug').follow().json  # should match 1
+                             '&POS=88832&hg19=No+value').json  # should match 1
         self.assert_length_is_expected(res, 1)
+        for variant in res['@graph']:
+            assert variant['uuid'] == self.VARIANT_HG19_ABSENT
         es_testapp.get('/search/?type=Variant'
                        '&POS=11720331&hg19.hg19_pos=11720331', status=404)
         res = es_testapp.get('/search/?type=Variant'
                              '&POS=11720331&hg19.hg19_pos=11780388').json
         self.assert_length_is_expected(res, 1)
+        for variant in res['@graph']:
+            assert variant['uuid'] == self.VARIANT_HG19_CHR1_GA
         es_testapp.get('/search/?type=Variant'
                        '&POS=11720331'
                        '&hg19.hg19_pos=11780388'
@@ -1024,6 +1048,8 @@ class TestNestedSearch(object):
                              '&hg19.hg19_pos=11780388'
                              '&REF=G').json
         self.assert_length_is_expected(res, 1)
+        for variant in res['@graph']:
+            assert variant['uuid'] == self.VARIANT_HG19_CHR1_GA
 
     def test_search_nested_no_value_with_multiple_other_fields(self, workbook, es_testapp):
         """ Tests that combining a 'No value' search with another nested search and a different non-nested
@@ -1033,20 +1059,20 @@ class TestNestedSearch(object):
                              '&hg19=No+value'
                              '&REF=A').json
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_ABSENT
         res = es_testapp.get('/search/?type=Variant'
                              '&CHROM=1'
                              '&hg19=No+value'
                              '&POS.from=0').json
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_ABSENT
         res = es_testapp.get('/search/?type=Variant'
                              '&CHROM=1'
                              '&hg19=No+value'
                              '&POS.from=0'
                              '&genes.genes_most_severe_gene.display_title!=No+value').follow().json
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_ABSENT
         es_testapp.get('/search/?type=Variant'
                        '&POS=88832'
                        '&hg19.hg19_pos=No+value'

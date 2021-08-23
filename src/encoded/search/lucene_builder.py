@@ -198,8 +198,8 @@ class LuceneBuilder:
         elif len(my_filters) == 1:  # see standard bool/match query
             return {MATCH: {query_field: my_filters[0]}}
         else:
-            sub_queries = {BOOL: {SHOULD: []}}  # wrap SHOULD with MUST so the sub-clause is required
-            for option in my_filters:  # see how to combine queries on the same field
+            sub_queries = {BOOL: {SHOULD: []}}  # combine all options under SHOULD
+            for option in my_filters:
                 sub_queries[BOOL][SHOULD].append({MATCH: {query_field: option}})
             return sub_queries
 
@@ -470,27 +470,14 @@ class LuceneBuilder:
                         MUST_NOT: []
                     }
                 }
-
-                # add to combined_query
-                if len(query) > 1:
-                    for sub_query in query:
-
-                        # Special case for EXISTS, since we cannot construct these like normal
-                        # queries - add DOES NOT EXIST queries to MUST branches, as these are
-                        # automatically added to MUST_NOT branch
-                        if EXISTS in sub_query and key == MUST_NOT:
-                            combined_query[BOOL][MUST].append(sub_query)
-                        else:
-                            combined_query[BOOL][key].append(sub_query)
-
-                # if a single sub-query, could still be a part of a larger query later on,
-                # so still bootstrap a combined query with just the single qualifier
-                else:
-                    # EXISTS special case still a concern
-                    if EXISTS in query[0] and key == MUST_NOT:
-                        combined_query[BOOL][MUST].append(query[0])
+                for sub_query in query:
+                    # Special case for EXISTS, since we cannot construct these like normal
+                    # queries - add DOES NOT EXIST queries to MUST branches, as these are
+                    # automatically added to MUST_NOT branch
+                    if EXISTS in sub_query and key == MUST_NOT:
+                        combined_query[BOOL][MUST].append(sub_query)
                     else:
-                        combined_query[BOOL][key].append(query[0])
+                        combined_query[BOOL][key].append(sub_query)
 
                 # add the combined_query for this nested path to the global nested query
                 nested_query[BOOL][key].append(cls.build_nested_query(nested_path, combined_query))
@@ -574,6 +561,7 @@ class LuceneBuilder:
         must_filters_nested, must_not_filters_nested = cls.build_sub_queries(field_filters, es_mapping)
         # add range limits to filters if given
         cls.apply_range_filters(range_filters, must_filters, es_mapping)
+        #import pdb; pdb.set_trace()
 
         # initialize filter hierarchy
         final_filters = {BOOL: {MUST: [f for _, f in must_filters], MUST_NOT: [f for _, f in must_not_filters]}}
