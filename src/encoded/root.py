@@ -2,6 +2,7 @@ import uptime
 
 from collections import OrderedDict
 from dcicutils import lang_utils
+from dcicutils.s3_utils import s3Utils
 from encoded import APP_VERSION_REGISTRY_KEY
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
@@ -60,6 +61,17 @@ def uptime_info():
         return "unavailable"
 
 
+# Correspondence with s3Utils tested elsewhere.
+
+class HealthPageKey:
+    BLOB_BUCKET = 'blob_bucket'                          # s3Utils.BLOB_BUCKET_HEALTH_PAGE_KEY
+    FILE_UPLOAD_BUCKET = 'file_upload_bucket'            # s3Utils.RAW_BUCKET_HEALTH_PAGE_KEY
+    METADATA_BUNDLES_BUCKET = 'metadata_bundles_bucket'  # s3Utils.METADATA_BUCKET_HEALTH_PAGE_KEY
+    PROCESSED_FILE_BUCKET = 'processed_file_bucket'      # s3Utils.OUTFILE_BUCKET_HEALTH_PAGE_KEY
+    SYSTEM_BUCKET = 'system_bucket'                      # s3Utils.SYS_BUCKET_HEALTH_PAGE_KEY
+    TIBANNA_OUTPUT_BUCKET = 'tibanna_output_bucket'      # s3Utils.TIBANNA_OUTPUT_BUCKET_HEALTH_PAGE_KEY
+
+
 def health_check(config):
     """
     Emulate a lite form of Alex's static page routing
@@ -70,6 +82,8 @@ def health_check(config):
     )
 
     def health_page_view(request):
+
+        h = HealthPageKey
 
         response = request.response
         response.content_type = 'application/json; charset=utf-8'
@@ -98,24 +112,24 @@ def health_check(config):
             "application_bucket_prefix": settings.get('application_bucket_prefix'),
             'beanstalk_app_version': settings.get('eb_app_version'),
             "beanstalk_env": env_name,
-            "blob_bucket": settings.get('blob_bucket'),
+            h.BLOB_BUCKET: settings.get('blob_bucket'),
             "database": settings.get('sqlalchemy.url').split('@')[1],  # don't show user /password
             "display_title": "CGAP Status and Foursight Monitoring",
             "elasticsearch": settings.get('elasticsearch.server'),
-            "file_upload_bucket": settings.get('file_upload_bucket'),
+            h.FILE_UPLOAD_BUCKET: settings.get('file_upload_bucket'),
             "foursight": foursight_url,
             "foursight_bucket_prefix": settings.get('foursight_bucket_prefix'),
             "identity": settings.get("identity"),
             "indexer": settings.get("indexer"),
             "index_server": settings.get("index_server"),
             "load_data": settings.get('load_test_data'),
-            "metadata_bundles_bucket": settings.get('metadata_bundles_bucket'),
+            h.METADATA_BUNDLES_BUCKET: settings.get('metadata_bundles_bucket'),
             "namespace": settings.get('indexer.namespace'),
-            "processed_file_bucket": settings.get('file_wfout_bucket'),
+            h.PROCESSED_FILE_BUCKET: settings.get('file_wfout_bucket'),
             'project_version': settings.get('encoded_version'),
             'snovault_version': settings.get('snovault_version'),
-            "system_bucket": settings.get('system_bucket'),
-            "tibanna_output_bucket": settings.get('tibanna_output_bucket'),
+            h.SYSTEM_BUCKET: settings.get('system_bucket'),
+            h.TIBANNA_OUTPUT_BUCKET: settings.get('tibanna_output_bucket'),
             'uptime': uptime_info(),
             'utils_version': settings.get('utils_version'),
 
