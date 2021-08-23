@@ -1,9 +1,10 @@
 'use strict';
 
 import React, { useMemo } from 'react';
-import _ from 'underscore';
+import queryString from 'query-string';
 
 import { console, valueTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 
@@ -28,7 +29,28 @@ export function CNVSVFilteringTab(props) {
         + "&sort=date_created"
     );
 
-    console.log("sv table searchHref:", searchHrefBase);
+    // Hide facets that are ones used to initially narrow down results to those related to this case.
+    const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible } = useMemo(function(){
+
+        const onClearFiltersVirtual = function(virtualNavigateFxn, callback) {
+            // By default, EmbeddedSearchItemView will reset to props.searchHref.
+            // We override with searchHrefBase.
+            return virtualNavigateFxn(searchHrefBase, {}, callback);
+        };
+
+        const isClearFiltersBtnVisible = function(virtualHref){
+            // Re-use same algo for determining if is visible, but compare virtualhref
+            // against searchHrefBase (without the current filter(s)) rather than
+            // `props.searchHref` which contains the current filters.
+            return VirtualHrefController.isClearFiltersBtnVisible(virtualHref, searchHrefBase);
+        };
+
+        let hideFacets = ["type", "validation_errors.name"];
+        if (sv_initial_search_href_filter_addon) {
+            hideFacets = hideFacets.concat(Object.keys(queryString.parse(sv_initial_search_href_filter_addon)));
+        }
+        return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible };
+    }, [ context ]);
 
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
@@ -43,7 +65,10 @@ export function CNVSVFilteringTab(props) {
         maxHeight,
         session,
         "key": searchTableKey,
-        searchHref: searchHrefBase
+        searchHref: searchHrefBase,
+        hideFacets,
+        onClearFiltersVirtual,
+        isClearFiltersBtnVisible
     };
 
     const aboveTableComponent = (<CNVSVEmbeddedTableHeader {...{ href: searchHrefBase, session }}/>);
