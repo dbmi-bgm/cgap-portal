@@ -476,6 +476,8 @@ class LuceneBuilder:
                     # automatically added to MUST_NOT branch
                     if EXISTS in sub_query and key == MUST_NOT:
                         combined_query[BOOL][MUST].append(sub_query)
+                    elif sub_query.get(BOOL, {}).get(MUST, {}).get(EXISTS, None):
+                        combined_query[BOOL][MUST].append(sub_query)
                     else:
                         combined_query[BOOL][key].append(sub_query)
 
@@ -561,7 +563,6 @@ class LuceneBuilder:
         must_filters_nested, must_not_filters_nested = cls.build_sub_queries(field_filters, es_mapping)
         # add range limits to filters if given
         cls.apply_range_filters(range_filters, must_filters, es_mapping)
-        #import pdb; pdb.set_trace()
 
         # initialize filter hierarchy
         final_filters = {BOOL: {MUST: [f for _, f in must_filters], MUST_NOT: [f for _, f in must_not_filters]}}

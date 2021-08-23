@@ -988,7 +988,6 @@ class TestNestedSearch(object):
             assert variant['uuid'] in self.VARIANTS_WITH_HG19
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_chrom=No+value&debug=').json
-        import pdb; pdb.set_trace()
         self.assert_length_is_expected(res, 1)
         for variant in res['@graph']:
             assert variant['uuid'] == self.VARIANT_HG19_ABSENT
