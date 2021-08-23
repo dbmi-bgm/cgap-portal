@@ -8,6 +8,7 @@ import os
 import pyramid.request
 import re
 import tempfile
+from zipfile import ZipFile
 
 from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity
 from io import BytesIO
@@ -57,13 +58,21 @@ def deduplicate_list(lst):
 
 
 def gunzip_content(content):
-    """ Helper that will gunzip content """
+    """ Helper that will gunzip content (into memory) """
     f_in = BytesIO()
     f_in.write(content)
     f_in.seek(0)
     with gzip.GzipFile(fileobj=f_in, mode='rb') as f:
         gunzipped_content = f.read()
     return gunzipped_content.decode('utf-8')
+
+
+def unzip_content(content):
+    """ Helper that will unzip content (into memory)
+        See: https://stackoverflow.com/questions/10908877/extracting-a-zipfile-to-memory """
+    input_zip = ZipFile(content)
+    import pdb; pdb.set_trace()
+    return {name: input_zip.read(name) for name in input_zip.namelist()}
 
 
 DEBUGLOG = os.environ.get('DEBUGLOG', "")
