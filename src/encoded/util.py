@@ -71,7 +71,6 @@ def unzip_content(content):
     """ Helper that will unzip content (into memory)
         See: https://stackoverflow.com/questions/10908877/extracting-a-zipfile-to-memory """
     input_zip = ZipFile(content)
-    import pdb; pdb.set_trace()
     return {name: input_zip.read(name) for name in input_zip.namelist()}
 
 
