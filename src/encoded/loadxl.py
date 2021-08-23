@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Load collections and determine the order."""
 
+import gzip
 import json
 import magic
 import mimetypes
@@ -331,7 +332,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         if os.path.isdir(inserts):  # we've specified a directory
             if not inserts.endswith('/'):
                 inserts += '/'
-            files = [i for i in os.listdir(inserts) if i.endswith('.json') or i.endswith('.json.zip')]
+            files = [i for i in os.listdir(inserts) if i.endswith('.json') or i.endswith('.json.gz')]
         elif os.path.isfile(inserts):  # we've specified a single file
             files = [inserts]
             # use the item type if provided AND not a list
@@ -349,13 +350,9 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             if use_itype:
                 item_type = itype
             else:
-                item_type = a_file.split('/')[-1].replace(".json", "").replace(".zip", "")
+                item_type = a_file.split('/')[-1].split(".")[0]
                 a_file = inserts + a_file
-            with open(a_file) as f:
-                if not a_file.endswith('.zip'):
-                    store[item_type] = json.loads(f.read())
-                else:
-                    store[item_type] = json.loads(unzip_content(f.read()))
+            store[item_type] = json_file_to_dict(a_file)
 
     # if there is a defined set of items, subtract the rest
     if itype:
@@ -485,6 +482,24 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
 
     # explicit return upon finish
     return None
+
+
+def json_file_to_dict(filename):
+    """
+    Helper function to obtain dicts from (compressed) json files.
+
+    :param filename: str file path
+    :returns: dict loaded from file
+    """
+    if filename.endswith(".json"):
+        with open(filename) as f:
+            result = json.loads(f.read())
+    elif filename.endswith(".json.gz"):
+        with gzip.open(filename) as f:
+            result = json.loads(f.read())
+    else:
+        raise Exception("Expecting a .json or .json.gz file but found %s." % filename)
+    return result
 
 
 def load_data(app, indir='inserts', docsdir=None, overwrite=False,
