@@ -338,6 +338,7 @@ def execute_search(*, es, query, index, from_, size, session_id=None):
     es_results = None
     try:
         # set timeout
+        # log.error(query['query'])  # uncomment to get queries in pytest - Will Aug 23 2021
         es_results = es.search(index=index, body=query, from_=from_, size=size, timeout='30s', preference=session_id)
     except ConnectionTimeout:
         err_exp = 'The search failed due to a timeout. Please try a different query.'
