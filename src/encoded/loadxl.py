@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Load collections and determine the order."""
 
+import gzip
 import json
 import magic
 import mimetypes
@@ -330,7 +331,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         if os.path.isdir(inserts):  # we've specified a directory
             if not inserts.endswith('/'):
                 inserts += '/'
-            files = [i for i in os.listdir(inserts) if i.endswith('.json')]
+            files = [i for i in os.listdir(inserts) if i.endswith('.json') or i.endswith('.json.gz')]
         elif os.path.isfile(inserts):  # we've specified a single file
             files = [inserts]
             # use the item type if provided AND not a list
@@ -348,10 +349,10 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             if use_itype:
                 item_type = itype
             else:
-                item_type = a_file.split('/')[-1].replace(".json", "")
+                item_type = a_file.split('/')[-1].split(".")[0]
                 a_file = inserts + a_file
-            with open(a_file) as f:
-                store[item_type] = json.loads(f.read())
+            store[item_type] = get_json_file_content(a_file)
+
     # if there is a defined set of items, subtract the rest
     if itype:
         if isinstance(itype, list):
@@ -482,6 +483,24 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
     return None
 
 
+def get_json_file_content(filename):
+    """
+    Helper function to obtain objects from (compressed) json files.
+
+    :param filename: str file path
+    :returns: object loaded from file
+    """
+    if filename.endswith(".json"):
+        with open(filename) as f:
+            result = json.loads(f.read())
+    elif filename.endswith(".json.gz"):
+        with gzip.open(filename) as f:
+            result = json.loads(f.read())
+    else:
+        raise Exception("Expecting a .json or .json.gz file but found %s." % filename)
+    return result
+
+
 def load_data(app, indir='inserts', docsdir=None, overwrite=False,
               use_master_inserts=True):
     """
@@ -551,7 +570,7 @@ def load_local_data(app, overwrite=False):
     for test_insert_dir in test_insert_dirs:
         chk_dir = resource_filename('encoded', "tests/data/" + test_insert_dir)
         for (dirpath, dirnames, filenames) in os.walk(chk_dir):
-            if any([fn for fn in filenames if fn.endswith('.json')]):
+            if any([fn for fn in filenames if fn.endswith('.json') or fn.endswith('.json.gz')]):
                 logger.info('Loading inserts from "{}" directory.'.format(test_insert_dir))
                 return load_data(app, docsdir='documents', indir=test_insert_dir, use_master_inserts=True,
                                  overwrite=overwrite)

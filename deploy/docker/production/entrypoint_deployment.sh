@@ -6,9 +6,11 @@ echo "Running a CGAP deployment on the given environment"
 # secrets manager - this builds production.ini
 poetry run python -m assume_identity
 
-# Clear db/es since this is the local entry point
-# 'skip' is provided as an argument so that this step doesn't run
-poetry run clear-db-es-contents production.ini --app-name app --env skip
+# Clear db/es on cgap-devtest if we run an "initial" deploy
+# Do nothing on other environments
+if [ -n "${INITIAL_DEPLOYMENT}" ]; then
+  poetry run clear-db-es-contents production.ini --app-name app --env cgap-devtest
+fi
 
 ## Create mapping
 poetry run create-mapping-on-deploy production.ini --app-name app
