@@ -1,13 +1,12 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback } from 'react';
-import _ from 'underscore';
+import React, { useMemo } from 'react';
+import queryString from 'query-string';
 
-import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+import { console, valueTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
-import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
-
+import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 
 
 export function CNVSVFilteringTab(props) {
@@ -19,19 +18,39 @@ export function CNVSVFilteringTab(props) {
     } = props;
 
     const {
-        accession: caseAccession,
         sv_initial_search_href_filter_addon = "",
-        additional_variant_sample_facets = [] // TODO: needs updates to calc property + schemas to not break searches
+        additional_variant_sample_facets = []
     } = context || {};
 
     const searchHrefBase = (
         "/search/?type=StructuralVariantSample"
         + (sv_initial_search_href_filter_addon ? "&" + sv_initial_search_href_filter_addon : "")
-        // + (additional_variant_sample_facets.length > 0 ? "&" + additional_variant_sample_facets.map(function(fac){ return "additional_facet=" + encodeURIComponent(fac); }).join("&") : "")
+        + (additional_variant_sample_facets.length > 0 ? "&" + additional_variant_sample_facets.map(function(fac){ return "additional_facet=" + encodeURIComponent(fac); }).join("&") : "")
         + "&sort=date_created"
     );
 
-    console.log("searchHrefBase", searchHrefBase);
+    // Hide facets that are ones used to initially narrow down results to those related to this case.
+    const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible } = useMemo(function(){
+
+        const onClearFiltersVirtual = function(virtualNavigateFxn, callback) {
+            // By default, EmbeddedSearchItemView will reset to props.searchHref.
+            // We override with searchHrefBase.
+            return virtualNavigateFxn(searchHrefBase, {}, callback);
+        };
+
+        const isClearFiltersBtnVisible = function(virtualHref){
+            // Re-use same algo for determining if is visible, but compare virtualhref
+            // against searchHrefBase (without the current filter(s)) rather than
+            // `props.searchHref` which contains the current filters.
+            return VirtualHrefController.isClearFiltersBtnVisible(virtualHref, searchHrefBase);
+        };
+
+        let hideFacets = ["type", "validation_errors.name"];
+        if (sv_initial_search_href_filter_addon) {
+            hideFacets = hideFacets.concat(Object.keys(queryString.parse(sv_initial_search_href_filter_addon)));
+        }
+        return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible };
+    }, [ context ]);
 
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
@@ -43,17 +62,20 @@ export function CNVSVFilteringTab(props) {
     const searchTableKey = "session:" + session;
 
     const tableProps = {
-        // hideFacets,
         maxHeight,
         session,
-        // embeddedTableHeader,
         "key": searchTableKey,
-        searchHref: searchHrefBase
+        searchHref: searchHrefBase,
+        hideFacets,
+        onClearFiltersVirtual,
+        isClearFiltersBtnVisible
     };
+
+    const aboveTableComponent = (<CNVSVEmbeddedTableHeader {...{ href: searchHrefBase, session }}/>);
 
     return (
         <div>
-            <CaseViewEmbeddedStructuralVariantSearchTable {...tableProps} />
+            <CaseViewEmbeddedStructuralVariantSearchTable {...tableProps} embeddedTableHeader={aboveTableComponent}/>
         </div>);
 }
 
@@ -65,7 +87,7 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
         ...passProps
     } = props;
 
-    const columnExtensionMap = useMemo(function() { // TODO: move this into its own colextmap file if it gets longer; see about sharing info between multiple
+    const columnExtensionMap = useMemo(function() {
         return {
             ...originalColExtMap,
             "display_title" : {
@@ -80,68 +102,83 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
 
                     // annotationID structured like <type>_chr...etc; need just the part after underscore
                     const splitAnnotationID = (annotation_id || display_title).split("_");
-                    return <a href={atID} target="_blank" rel="noreferrer">{splitAnnotationID[1]}</a>;
+                    return <div className="text-left pl-25"><a href={atID}>{splitAnnotationID[1]}</a></div>;
                 }
             },
-
-            // TODO: Remove this in favor of re-using the 'bam_snapshot' defined in browse/variantSampleColumnExtensionMap.js once more columns available?
-            'bam_snapshot': {
-                "noSort": true,
-                "widthMap": { 'lg' : 150, 'md' : 150, 'sm' : 150 },
-                "render": function(result, props) {
-                    const { bam_snapshot = null, "@id": atID } = result;
-                    if (bam_snapshot) {
-                        return (
-                            <div className="mx-auto text-truncate">
-                                <a target="_blank" rel="noreferrer" href={atID} data-html>
-                                    SV Browser <i className="ml-07 icon-sm icon fas icon-external-link-alt"></i>
-                                </a>
-                            </div>
-                        );
-                    }
-                    return null;
-                }
-            },
-
-            // Does this "associated_genotype_labels.proband_genotype_label" below supercede or augment the "associated_genotype_labels.proband_genotype_label"
-            // defined in variantSampleColumnExtensionMap.js?
-            // If so, we should update it there (and delete from here).
-
-            // "associated_genotype_labels.proband_genotype_label": {
-            //     // TODO: sorts are broken on this col; I think due to schema issue
-            //     "noSort": true, // TODO: once sort is fixed; remove this
+            // 'bam_snapshot': { // Note: not going to be added until a few versions from now; this may need updates specific to SVs when finally implemented
+            //     "noSort": true,
+            //     "widthMap": { 'lg' : 150, 'md' : 150, 'sm' : 150 },
             //     "render": function(result, props) {
-            //         const { align = "center" } = props;
-            //         const { genotype_labels = [] } = result;
-            //         const rows = [];
-
-            //         let probandLabelPresent = false;
-            //         genotype_labels.forEach((labelObj) => {
-            //             const { role = null, labels: [ genotype = null ] = [] } = labelObj;
-            //             if (role === "proband" && genotype) {
-            //                 rows.push(<div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{genotype}</div>);
-            //                 probandLabelPresent = true;
-            //             } else if (role === "mother" && genotype) {
-            //                 rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{genotype || "-"}</div>);
-            //             } else if (role === "father" && genotype) {
-            //                 rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{genotype || "-"}</div>);
-            //             }
-            //         });
-            //         if (!probandLabelPresent) {
-            //             return null;
+            //         const { bam_snapshot = null, "@id": atID } = result;
+            //         if (bam_snapshot) {
+            //             return (
+            //                 <div className="mx-auto text-truncate">
+            //                     <a target="_blank" rel="noreferrer" href={atID} data-html>
+            //                         SV Browser <i className="ml-07 icon-sm icon fas icon-external-link-alt"></i>
+            //                     </a>
+            //                 </div>
+            //             );
             //         }
-            //         return <StackedRowColumn className={"text-" + align} {...{ rows }}/>;
-            //     },
-            // },
-            // // "structural_variant.transcript.csq_gene.display_title": {
-            //     "render": function(result, props) {
-            //         // TODO: show first and last gene separated by "..."
-            //         console.log("result test", result);
             //         return null;
             //     }
-            // }
+            // },
+            "structural_variant.transcript.csq_gene.display_title": {
+                "render": function(result, props) {
+                    const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result;
+                    const path = atID; // + "?annotationTab=0" // TODO: Needs to point to Gene tab when that is complete
+
+                    const transcriptsDeduped = {};
+                    transcripts.forEach((transcript) => {
+                        const { csq_gene: { display_title = null } = {} } = transcript;
+                        transcriptsDeduped[display_title] = true;
+                    });
+                    const genes = Object.keys(transcriptsDeduped);
+
+                    if (genes.length <= 2) { // show comma separated
+                        return <a href={path}>{genes.join(", ")}</a>;
+                    } // show first and last gene separated by "..."
+                    return <a href={path}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
+                }
+            },
+            "structural_variant.size": {
+                "render": function(result, props) {
+                    const { structural_variant: { size = null } = {} } = result;
+
+                    if (size === null) { return size; }
+                    return valueTransforms.bytesToLargerUnit(size);
+                }
+            }
         };
     }, [ originalColExtMap ]);
 
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
+
+export const CNVSVEmbeddedTableHeader = React.memo(function CNVSVEmbeddedTableHeader(props){
+    const { context, isFullscreen, windowWidth, toggleFullScreen, sortBy } = props;
+    const { total: showTotalResults = 0 } = context || {};
+
+    let total = null;
+    if (typeof showTotalResults === 'number') {
+        total = (
+            <div className="d-inline-block">
+                <span className="text-600" id="results-count">
+                    { showTotalResults }
+                </span>
+            </div>
+        );
+    }
+
+    return (
+        <AboveTableControlsBase {...{ isFullscreen, windowWidth, toggleFullScreen, sortBy, showMultiColumnSort: false }}
+            panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(props)}>
+            { total ?
+                <h4 className="col my-0">
+                    <strong className="mr-1">{ total }</strong>
+                    <span className="text-400">
+                        CNV / SV Variant Matches
+                    </span>
+                </h4>: null }
+        </AboveTableControlsBase>
+    );
+});

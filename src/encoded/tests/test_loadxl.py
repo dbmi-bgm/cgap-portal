@@ -1,8 +1,10 @@
+import gzip
 import json
 import pytest
 
 from past.builtins import basestring
 from pkg_resources import resource_filename
+from tempfile import NamedTemporaryFile
 from unittest import mock
 from dcicutils.env_utils import CGAP_ENV_MASTERTEST, CGAP_ENV_WEBPROD, CGAP_ENV_DEV, CGAP_ENV_WOLF
 from .. import loadxl
@@ -203,3 +205,22 @@ def test_load_data_should_proceed():
     assert load_data_should_proceed(CGAP_ENV_DEV, False) is False
     assert load_data_should_proceed(CGAP_ENV_WEBPROD, True) is True  # XXX: Do we really want this?
     assert load_data_should_proceed(CGAP_ENV_WEBPROD, False) is False
+
+
+def test_get_json_file_content():
+    """Test loading of objects from (compressed) json file."""
+    dummy_dict = {"a_key": "a_value"}
+    dummy_json_bytes = json.dumps(dummy_dict).encode("utf-8")
+    with NamedTemporaryFile(suffix=".json") as tmp:
+        tmp.write(dummy_json_bytes)
+        tmp.seek(0)
+        assert loadxl.get_json_file_content(tmp.name) == dummy_dict
+    with NamedTemporaryFile(suffix=".json.gz") as tmp:
+        tmp.write(gzip.compress(dummy_json_bytes))
+        tmp.seek(0)
+        assert loadxl.get_json_file_content(tmp.name) == dummy_dict
+    with NamedTemporaryFile() as tmp:  # File path ending not acceptable
+        tmp.write(dummy_json_bytes)
+        tmp.seek(0)
+        with pytest.raises(Exception):
+            loadxl.get_json_file_content(tmp.name)
