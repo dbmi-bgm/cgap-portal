@@ -351,7 +351,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             else:
                 item_type = a_file.split('/')[-1].split(".")[0]
                 a_file = inserts + a_file
-            store[item_type] = json_file_to_dict(a_file)
+            store[item_type] = get_json_file_content(a_file)
 
     # if there is a defined set of items, subtract the rest
     if itype:
@@ -483,12 +483,12 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
     return None
 
 
-def json_file_to_dict(filename):
+def get_json_file_content(filename):
     """
-    Helper function to obtain dicts from (compressed) json files.
+    Helper function to obtain objects from (compressed) json files.
 
     :param filename: str file path
-    :returns: dict loaded from file
+    :returns: object loaded from file
     """
     if filename.endswith(".json"):
         with open(filename) as f:

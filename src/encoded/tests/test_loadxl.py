@@ -207,20 +207,20 @@ def test_load_data_should_proceed():
     assert load_data_should_proceed(CGAP_ENV_WEBPROD, False) is False
 
 
-def test_json_file_to_dict():
-    """Test loading of dict from (compressed) json file."""
+def test_get_json_file_content():
+    """Test loading of objects from (compressed) json file."""
     dummy_dict = {"a_key": "a_value"}
     dummy_json_bytes = json.dumps(dummy_dict).encode("utf-8")
     with NamedTemporaryFile(suffix=".json") as tmp:
         tmp.write(dummy_json_bytes)
         tmp.seek(0)
-        assert loadxl.json_file_to_dict(tmp.name) == dummy_dict
+        assert loadxl.get_json_file_content(tmp.name) == dummy_dict
     with NamedTemporaryFile(suffix=".json.gz") as tmp:
         tmp.write(gzip.compress(dummy_json_bytes))
         tmp.seek(0)
-        assert loadxl.json_file_to_dict(tmp.name) == dummy_dict
+        assert loadxl.get_json_file_content(tmp.name) == dummy_dict
     with NamedTemporaryFile() as tmp:
         tmp.write(dummy_json_bytes)
         tmp.seek(0)
         with pytest.raises(Exception):
-            loadxl.json_file_to_dict(tmp.name)
+            loadxl.get_json_file_content(tmp.name)
