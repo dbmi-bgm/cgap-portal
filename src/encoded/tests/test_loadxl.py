@@ -219,7 +219,7 @@ def test_get_json_file_content():
         tmp.write(gzip.compress(dummy_json_bytes))
         tmp.seek(0)
         assert loadxl.get_json_file_content(tmp.name) == dummy_dict
-    with NamedTemporaryFile() as tmp:
+    with NamedTemporaryFile() as tmp:  # File path ending not acceptable
         tmp.write(dummy_json_bytes)
         tmp.seek(0)
         with pytest.raises(Exception):
