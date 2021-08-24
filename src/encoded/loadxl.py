@@ -19,7 +19,6 @@ from pyramid.response import Response
 from pyramid.view import view_config
 from snovault.util import debug_log
 from .server_defaults import add_last_modified
-from .util import unzip_content
 
 
 text = type(u'')
@@ -571,7 +570,7 @@ def load_local_data(app, overwrite=False):
     for test_insert_dir in test_insert_dirs:
         chk_dir = resource_filename('encoded', "tests/data/" + test_insert_dir)
         for (dirpath, dirnames, filenames) in os.walk(chk_dir):
-            if any([fn for fn in filenames if fn.endswith('.json') or fn.endswith('.json.zip')]):
+            if any([fn for fn in filenames if fn.endswith('.json') or fn.endswith('.json.gz')]):
                 logger.info('Loading inserts from "{}" directory.'.format(test_insert_dir))
                 return load_data(app, docsdir='documents', indir=test_insert_dir, use_master_inserts=True,
                                  overwrite=overwrite)
