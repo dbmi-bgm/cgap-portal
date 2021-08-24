@@ -1582,6 +1582,11 @@ i.status-indicator-dot {
 							// Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate
 							padding-left: 0 !important; // important necessary to override default style (this is short term override/will be deleted soon so hopefully ok)
 						}
+						.search-result-column-block[data-field="status"],
+						.search-result-column-block[data-field="date_created"] {
+							display: flex;
+							justify-content: center;
+						}
 					}
 				}
 
