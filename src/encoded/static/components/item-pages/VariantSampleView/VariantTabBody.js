@@ -6,7 +6,7 @@ import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { ExternalDatabasesSection } from './ExternalDatabasesSection';
+import { ExternalDatabasesSection } from './AnnotationSections';
 
 /**
  * Excluding the Gene Area (under position in mockuop https://gyazo.com/81d5b75b167bddef1b4c0a97f1640c51)
