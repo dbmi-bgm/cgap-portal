@@ -165,7 +165,6 @@ class StructuralVariant(Item):
         """"""
         if not transcript:
             return
-        import pdb; pdb.set_trace()
         csq_five_prime = "csq_variant_5_prime_location"
         csq_three_prime = "csq_variant_3_prime_location"
         downstream_consequences = ["downstream_gene_variant"]
