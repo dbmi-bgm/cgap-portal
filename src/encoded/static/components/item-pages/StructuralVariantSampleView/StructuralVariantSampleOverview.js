@@ -107,7 +107,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
                         tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
                         break;
                     case 1:
-                        tabBodyElements.push(<SvBrowserTabBody {...commonBodyProps} />);
+                        tabBodyElements.push(<SvBrowserTabBody {...commonBodyProps}/>);
                         this.openPersistentTabs[1] = true; // Persist open after first appearance.
                         break;
                     default:

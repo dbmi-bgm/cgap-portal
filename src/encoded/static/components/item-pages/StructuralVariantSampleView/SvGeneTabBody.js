@@ -1,10 +1,12 @@
 'use strict';
 
-import React from 'react';
+import React, { useCallback } from 'react';
+
+import { SvGeneDetailPane } from './SvDetailPanes';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 
 
-export default class SvGeneTabBody extends React.Component {
+export class SvGeneTabBody extends React.Component {
 
     render() {
         const { // TODO: Will need to expand colExtMap for this in future versions
@@ -19,7 +21,8 @@ export default class SvGeneTabBody extends React.Component {
                             <h4>Gene List</h4>
                         </div>
                         <div className="info-body">
-                            <EmbeddedItemSearchTable {...passProps} facets={null} searchHref="/search/?type=Gene"/>
+                            <EmbeddedItemSearchTable {...passProps} facets={null} searchHref="/search/?type=Gene"
+                                renderDetailPane={(result, rowNumber, containerWidth, propsFromTable) => <SvGeneDetailPane {...{ result, rowNumber, containerWidth }} {...propsFromTable} />}/>
                         </div>
                     </div>
                 </div>
