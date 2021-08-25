@@ -174,7 +174,7 @@ class StructuralVariant(Item):
         for item in transcript:
             exons = item.get("csq_exon", "")
             introns = item.get("csq_intron", "")
-            consequences = item.get("csq_consequence")
+            consequences = item.get("csq_consequence", [])
             consequence_names = []
             for consequence in consequences:
                 consequence_raw = get_item_or_none(request, consequence, frame="raw")
@@ -195,11 +195,10 @@ class StructuralVariant(Item):
                 else:
                     item[csq_five_prime] = item[csq_three_prime] = error_msg
             elif exons or introns:
-                exons = exons.split("/")
-                introns = introns.split("/")
                 if introns and not exons:
                     item[csq_five_prime] = item[csq_three_prime] = "intronic"
                 elif exons and not introns:
+                    exons = exons.split("/")
                     exons_affected = exons[0].split("-")
                     exons_total = exons[1]
                     if len(exons_affected) == 1:  # Shouldn't be > 1 exon with no intron
@@ -214,6 +213,8 @@ class StructuralVariant(Item):
                     else:
                         item[csq_five_prime] = item[csq_three_prime] = error_msg
                 else:
+                    exons = exons.split("/")
+                    introns = introns.split("/")
                     exons_affected = exons[0].split("-")
                     exons_total = exons[1]
                     introns_affected = introns[0].split("-")
@@ -241,7 +242,7 @@ class StructuralVariant(Item):
                         item[csq_five_prime] = error_msg
             else:
                 item[csq_five_prime] = item[csq_three_prime] = error_msg
-        return transcript
+        return
 
 
 @collection(

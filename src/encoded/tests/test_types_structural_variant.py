@@ -37,9 +37,12 @@ def transcript_amplification(testapp):
 def test_transcript_breakpoints(testapp, structural_variant, transcript_ablation,
         transcript_amplification):
     """"""
-    import pdb; pdb.set_trace()
     variant_atid = structural_variant["@id"]
     patch_body = {"transcript": [{"csq_consequence": [transcript_ablation["uuid"]]}]}
+    testapp.patch_json(variant_atid, patch_body, status=200)
+    result = testapp.get(structural_variant["@id"] + "?datastore=database").json
+    import pdb; pdb.set_trace()
+    patch_body = {"transcript": [{"csq_exon": "1/4"}]}
     testapp.patch_json(variant_atid, patch_body, status=200)
     result = testapp.get(structural_variant["@id"] + "?datastore=database").json
     import pdb; pdb.set_trace()
