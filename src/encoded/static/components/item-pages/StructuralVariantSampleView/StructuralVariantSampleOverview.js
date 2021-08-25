@@ -22,7 +22,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                {/* TODO: Re-enable in next version; <VariantSampleInfoHeader {...passProps} showTranscriptSelection={false} /> */}
+                <VariantSampleInfoHeader {...passProps} showTranscriptSelection={false} />
                 <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
             </div>
         );
@@ -44,7 +44,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
     static tabNames = [
-        // "Gene", TODO: Re-add once more complete in future version
+        "Gene",
         "SV Browser"
     ];
 
@@ -103,12 +103,12 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
             if (index === currentTab || this.openPersistentTabs[index]) {
                 const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
                 switch (index) {
-                    // case 0:
-                    //     tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
-                    //     break;
                     case 0:
+                        tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
+                        break;
+                    case 1:
                         tabBodyElements.push(<SvBrowserTabBody {...commonBodyProps} />);
-                        this.openPersistentTabs[0] = true; // Persist open after first appearance.
+                        this.openPersistentTabs[1] = true; // Persist open after first appearance.
                         break;
                     default:
                         throw new Error("Unsupported tab");
