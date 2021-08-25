@@ -557,6 +557,16 @@
                         "scope": "variant",
                         "schema_title": "Distance to Transcript"
                     },
+                    "csq_variant_5_prime_location": {
+                        "title": "Transcript's 5' Variant Endpoint", 
+                        "description": "The relative location of the end of the structural variant positioned at the 5 prime end of the transcript",
+                        "type": "string"
+                    },
+                    "csq_variant_3_prime_location": {
+                        "title": "Transcript's 3' Variant Endpoint", 
+                        "description": "The relative location of the end of the structural variant positioned at the 3 prime end of the transcript",
+                        "type": "string"
+                    },
                     "csq_strand": {
                         "title": "Strand",
                         "field_name": "csq_strand",

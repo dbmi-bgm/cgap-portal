@@ -127,7 +127,7 @@ class StructuralVariant(Item):
             "type": "number",
         }
     )
-    def size(self, request, START, END):
+    def size(self, START, END):
         return END - START + 1
 
     @calculated_property(
@@ -137,7 +137,7 @@ class StructuralVariant(Item):
             "type": "string",
         }
     )
-    def size_display(self, request, START, END):
+    def size_display(self, START, END):
         """
         Create user-friendly display of size.
 
@@ -159,6 +159,90 @@ class StructuralVariant(Item):
                 result = str(display_number) + " " + unit
                 break
         return result
+
+    @calculated_property()
+    def transcript_variant_endpoints(self, request, transcript=None):
+        """"""
+        if not transcript:
+            return
+        import pdb; pdb.set_trace()
+        csq_five_prime = "csq_variant_5_prime_location"
+        csq_three_prime = "csq_variant_3_prime_location"
+        downstream_consequences = ["downstream_gene_variant"]
+        upstream_consequences = ["upstream_gene_variant"]
+        whole_transcript_consequences = ["transcript_amplification", "transcript_ablation"]
+        error_msg = "Unsure"
+        for item in transcript:
+            exons = item.get("csq_exon", "")
+            introns = item.get("csq_intron", "")
+            consequences = item.get("csq_consequence")
+            consequence_names = []
+            for consequence in consequences:
+                consequence_raw = get_item_or_none(request, consequence, frame="raw")
+                consequence_names.append(consequence_raw.get("var_conseq_name"))
+            if consequence_names and not (exons or introns):
+                if len(consequence_names) != 1:
+                    item[csq_five_prime] = item[csq_three_prime] = error_msg
+                consequence = consequence_names[0]
+                if consequence in whole_transcript_consequences:
+                    item[csq_five_prime] = "upstream"
+                    item[csq_three_prime] = "downstream"
+                elif consequence in downstream_consequences: 
+                    item[csq_five_prime] = "downstream"
+                    item[csq_three_prime] = "downstream"
+                elif consequence in upstream_consequences:
+                    item[csq_five_prime] = "upstream"
+                    item[csq_three_prime] = "upstream"
+                else:
+                    item[csq_five_prime] = item[csq_three_prime] = error_msg
+            elif exons or introns:
+                exons = exons.split("/")
+                introns = introns.split("/")
+                if introns and not exons:
+                    item[csq_five_prime] = item[csq_three_prime] = "intronic"
+                elif exons and not introns:
+                    exons_affected = exons[0].split("-")
+                    exons_total = exons[1]
+                    if len(exons_affected) == 1:  # Shouldn't be > 1 exon with no intron
+                        if "5_prime_UTR_variant" in consequence_names:
+                            item[csq_five_prime] = "5' UTR or upstream"
+                            item[csq_three_prime] = "exonic"
+                        elif "3_prime_UTR_variant" in consequence_names:
+                            item[csq_five_prime] = "exonic"
+                            item[csq_three_prime] = "3' UTR or upstream"
+                        else:
+                            item[csq_five_prime] = item[csq_three_prime] = "exonic"
+                    else:
+                        item[csq_five_prime] = item[csq_three_prime] = error_msg
+                else:
+                    exons_affected = exons[0].split("-")
+                    exons_total = exons[1]
+                    introns_affected = introns[0].split("-")
+                    introns_total = introns[1]
+                    if exons_total in exons_affected:
+                        if "3_prime_UTR_variant" in consequence_names:
+                            item[csq_three_prime] = "3' UTR or downstream"
+                        else:
+                            item[csq_three_prime] = "exonic"
+                    elif introns_total in introns_affected:
+                        item[csq_three_prime] = "intronic"
+                    elif introns_affected[-1] == exons_affected[-1]:
+                        item[csq_three_prime] = "intronic"
+                    elif exons_affected[-1] > introns_affected[-1]:
+                        item[csq_three_prime] = "exonic"
+                    else:
+                        item[csq_three_prime] = error_msg
+                    if "5_prime_UTR_variant" in consequence_names:
+                        item[csq_five_prime] = "5' UTR or upstream"
+                    elif introns_affected[0] == exons_affected[0]:
+                        item[csq_five_prime] = "exonic"
+                    elif introns_affected[0] < exons_affected[0]:
+                        item[csq_five_prime] = "intronic"
+                    else:
+                        item[csq_five_prime] = error_msg
+            else:
+                item[csq_five_prime] = item[csq_three_prime] = error_msg
+        return transcript
 
 
 @collection(
