@@ -207,7 +207,7 @@ class StructuralVariant(Item):
                             item[csq_three_prime] = "exonic"
                         elif "3_prime_UTR_variant" in consequence_names:
                             item[csq_five_prime] = "exonic"
-                            item[csq_three_prime] = "3' UTR or upstream"
+                            item[csq_three_prime] = "3' UTR or downstream"
                         else:
                             item[csq_five_prime] = item[csq_three_prime] = "exonic"
                     else:
