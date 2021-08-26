@@ -9,6 +9,8 @@ import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-po
 import { SvBrowserTabBody } from './SvBrowserTabBody';
 import { VariantSampleInfoHeader } from '../VariantSampleView/VariantSampleInfoHeader';
 import { SvGeneTabBody } from './SvGeneTabBody';
+import { SvVariantTabBody } from './SvVariantTabBody';
+import { SvSampleTabBody } from './SvSampleTabBody';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
@@ -45,6 +47,8 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
     static tabNames = [
         "Gene",
+        "Variant",
+        "Sample",
         "SV Browser"
     ];
 
@@ -103,12 +107,19 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
             if (index === currentTab || this.openPersistentTabs[index]) {
                 const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
                 switch (index) {
-                    case 0:
+                    case 0: // Gene
                         tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
+                        this.openPersistentTabs[0] = true; // Persist open after first appearance.
                         break;
-                    case 1:
+                    case 1: // Variant
+                        tabBodyElements.push(<SvVariantTabBody {...commonBodyProps} />);
+                        break;
+                    case 2: // Sample
+                        tabBodyElements.push(<SvSampleTabBody {...commonBodyProps} />);
+                        break;
+                    case 3: // SV Browser
                         tabBodyElements.push(<SvBrowserTabBody {...commonBodyProps}/>);
-                        this.openPersistentTabs[1] = true; // Persist open after first appearance.
+                        this.openPersistentTabs[3] = true; // Persist open after first appearance.
                         break;
                     default:
                         throw new Error("Unsupported tab");
