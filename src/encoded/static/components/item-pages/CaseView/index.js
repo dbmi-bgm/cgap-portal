@@ -647,9 +647,6 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                                 case "Filtered Variants":
                                     msaStats.filteredSNVIndelVariants = { value: transformValueType(numberType, value), tooltip };
                                     break;
-                                case "total unique variants in vcf":
-                                    msaStats.totalUniqueVariants = { value: transformValueType(numberType, value), tooltip };
-                                    break;
                                 default:
                                     break;
                             }
@@ -677,7 +674,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     }, [ caseProcFiles, msaProcFiles ]);
 
     const { reads = {}, coverage = {}, totalSNVIndelVars = {}, transTansRatio = {}, heterozygosity = {}, deNovo = {},
-        filteredSNVIndelVariants = {}, totalUniqueVariants = {}, filteredSVVariants = {} } = msaStats;
+        filteredSNVIndelVariants = {}, filteredSVVariants = {} } = msaStats;
 
     return (
         <div className="row py-3">
@@ -701,9 +698,6 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
             </BioinfoStatsEntry>
             <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" tooltip={filteredSNVIndelVariants.tooltip}>
                 { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Total Unique Variants in VCF" tooltip={totalUniqueVariants.tooltip}>
-                { typeof totalUniqueVariants.value === "number" ? decorateNumberWithCommas(totalUniqueVariants.value) : "-" }
             </BioinfoStatsEntry>
             <BioinfoStatsEntry label="Structural Variants After Hard Filters" tooltip={filteredSVVariants.tooltip}>
                 { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : "-" }
