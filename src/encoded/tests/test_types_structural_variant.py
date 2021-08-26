@@ -41,9 +41,6 @@ def test_transcript_breakpoints(testapp, structural_variant, transcript_ablation
     patch_body = {"transcript": [{"csq_consequence": [transcript_ablation["uuid"]]}]}
     testapp.patch_json(variant_atid, patch_body, status=200)
     result = testapp.get(structural_variant["@id"] + "?datastore=database").json
-    import pdb; pdb.set_trace()
-    patch_body = {"transcript": [{"csq_exon": "1/4"}]}
+    patch_body = {"transcript": [{"csq_exon": "10/11", "csq_intron": "9-10/10"}]}
     testapp.patch_json(variant_atid, patch_body, status=200)
     result = testapp.get(structural_variant["@id"] + "?datastore=database").json
-    import pdb; pdb.set_trace()
-    print("foo")

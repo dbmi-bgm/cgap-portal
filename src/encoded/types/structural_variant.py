@@ -228,7 +228,7 @@ class StructuralVariant(Item):
                         item[csq_three_prime] = "intronic"
                     elif introns_affected[-1] == exons_affected[-1]:
                         item[csq_three_prime] = "intronic"
-                    elif exons_affected[-1] > introns_affected[-1]:
+                    elif int(exons_affected[-1]) > int(introns_affected[-1]):
                         item[csq_three_prime] = "exonic"
                     else:
                         item[csq_three_prime] = error_msg
@@ -236,7 +236,7 @@ class StructuralVariant(Item):
                         item[csq_five_prime] = "5' UTR or upstream"
                     elif introns_affected[0] == exons_affected[0]:
                         item[csq_five_prime] = "exonic"
-                    elif introns_affected[0] < exons_affected[0]:
+                    elif int(introns_affected[0]) < int(exons_affected[0]):
                         item[csq_five_prime] = "intronic"
                     else:
                         item[csq_five_prime] = error_msg
