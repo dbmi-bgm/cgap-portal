@@ -18,7 +18,8 @@ export function VariantSampleInfoHeader(props) {
         currentGeneItemLoading,
         onSelectTranscript,
         schemas,
-        caseID = <span className="text-muted"> - </span> // null
+        caseID = <span className="text-muted"> - </span>, // null
+        showTranscriptSelection = true
     } = props;
     const { variant: { ID = fallbackElem } = {} } = context;
 
@@ -78,9 +79,9 @@ export function VariantSampleInfoHeader(props) {
 
                         </div>
                     </div>
-
-                    <TranscriptSelectionSection {...{ context, currentTranscriptIdx, currentGeneItemLoading, onSelectTranscript, schemas }} />
-
+                    { showTranscriptSelection ?
+                        <TranscriptSelectionSection {...{ context, currentTranscriptIdx, currentGeneItemLoading, onSelectTranscript, schemas }} />
+                        : null }
                 </div>
             </div>
         </div>

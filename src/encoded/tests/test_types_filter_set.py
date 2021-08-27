@@ -301,10 +301,11 @@ def test_filter_set_selectively_apply_flags(workbook, es_testapp, filter_set_wit
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 2
 
-    # add chr=2 flag, giving no results
+    # add chr=2 flag, giving 1 result
     for filter_block in filter_set['filter_blocks']:
         filter_block['flags_applied'].append('hg19_chrom_is_two')
-    es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set, status=404)
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
+    assert len(compound_search_res) == 1
 
     # disable all flags, still only giving 2 results
     for filter_block in filter_set['filter_blocks']:
