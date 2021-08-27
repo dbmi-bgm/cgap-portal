@@ -11,10 +11,11 @@ export class SvGeneTabBody extends React.Component {
     render() {
         const { // TODO: Will need to expand colExtMap for this in future versions
             columnExtensionMap:  originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
+            active = false,
             ...passProps
         } = this.props;
         return (
-            <div className="variant-tab-body card-body">
+            <div className={`gene-tab-body card-body ${!active ? "d-none": ""}`}>
                 <div className="row flex-column flex-lg-row">
                     <div className="inner-card-section col pb-2 pb-lg-0">
                         <div className="info-header-title">

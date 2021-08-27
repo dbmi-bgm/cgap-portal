@@ -59,8 +59,10 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
         const numTabs = StructuralVariantSampleOverviewTabView.tabNames.length;
 
         this.state = {
-            "currentTab" : defaultTab < numTabs ? defaultTab : 0
+            "currentTab" : defaultTab < numTabs ? defaultTab : 1 // default to Variant unless otherwise specified
         };
+
+        // Setting persistence requires setting index to true for tab in render + using active prop in tabBody component to trigger d-none class when inactive
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
@@ -92,9 +94,8 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, currentGeneItem, currentGeneItemLoading, currentTranscriptIdx } = this.props;
+        const { context, schemas, currentGeneItem, currentGeneItemLoading } = this.props;
         const { currentTab } = this.state;
-        console.log("context", context);
 
         const tabTitleElements = [];
         const tabBodyElements = [];
