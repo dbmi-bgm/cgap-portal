@@ -1,6 +1,6 @@
 import pytest
 
-pytestmark = [pytest.mark.working, pytest.mark.shema]
+pytestmark = [pytest.mark.working, pytest.mark.schema]
 
 def test_size_display(testapp, structural_variant):
     """Test size_display for rounding and units."""

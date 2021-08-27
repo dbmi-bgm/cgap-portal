@@ -893,8 +893,9 @@ class VariantUpdateSubmission:
         }
         queue_response = self.admin_vapp.post_json("/queue_indexing", queue_body).json
         if queue_response["notification"] == "Success":
-            msg = "%s variant samples successfully updated." % str(
-                len(self.variant_samples)
+            msg = (
+                "%s variant samples successfully updated."
+                % str(len(self.variant_samples))
             )
             return msg
         else:

@@ -249,7 +249,6 @@ class StructuralVariantSample(Item):
 
     @calculated_property(schema={
         "title": "Associated Gene Lists",
-        "field_name": "associated_genelists",
         "description": "Gene lists associated with project or case of variant sample",
         "type": "array",
         "items": {

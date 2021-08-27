@@ -1,6 +1,6 @@
 import pytest
 
-pytestmark = [pytest.mark.working, pytest.mark.shema]
+pytestmark = [pytest.mark.working, pytest.mark.schema]
 
 SV_URL = "/structural_variant"
 SV_SAMPLE_URL = "/structural_variant_sample"
