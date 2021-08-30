@@ -46,7 +46,7 @@ export const SvVariantTabBody = React.memo(function SvVariantTabBody({ context, 
 
     const titleDict = useMemo(function(){
         return {
-            "SV": <React.Fragment><span className="text-600">gnomAD</span> SV</React.Fragment>,
+            "SV": <React.Fragment>gnomAD <span className="text-400">SV</span></React.Fragment>,
         };
     });
 
@@ -57,47 +57,42 @@ export const SvVariantTabBody = React.memo(function SvVariantTabBody({ context, 
         <div className="variant-tab-body card-body">
             <div className="row flex-column flex-lg-row">
                 <div className="inner-card-section col pb-2 pb-lg-0">
-                    <div className="info-header-title">
-                        <h4>Variant</h4>
-                    </div>
-                    <div className="info-body">
-                        <div className="row">
-                            <div className="col-12 d-flex flex-column">
-                                <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
-                                    <div className="info-header-title">
-                                        <h4>
-                                            ClinVar
-                                            { clinvarExternalHref ?
-                                                <a href={clinvarExternalHref} rel="noopener noreferrer" target="_blank"
-                                                    className="px-1" data-tip="View this variant in ClinVar">
-                                                    <i className="icon icon-external-link-alt fas ml-07 text-small"/>
-                                                </a>
-                                                : null }
-                                        </h4>
-                                    </div>
-                                    <div className="info-body clinvar-info-body">
-                                        <ClinVarSection {...{ getTipForField, context, schemas, clinvarExternalHref }} />
-                                    </div>
+                    {/* <div className="row">
+                        <div className="col-12 d-flex flex-column">
+                            <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
+                                <div className="info-header-title">
+                                    <h4>
+                                        ClinVar
+                                        { clinvarExternalHref ?
+                                            <a href={clinvarExternalHref} rel="noopener noreferrer" target="_blank"
+                                                className="px-1" data-tip="View this variant in ClinVar">
+                                                <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                                            </a>
+                                            : null }
+                                    </h4>
+                                </div>
+                                <div className="info-body clinvar-info-body">
+                                    <ClinVarSection {...{ getTipForField, context, schemas, clinvarExternalHref }} />
                                 </div>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-12 d-flex flex-column">
-                                <div className="inner-card-section flex-grow-0 pb-2 pb-xl-0">
-                                    <div className="info-header-title justify-content-start">
-                                        <h4>{titleDict[showingTable]}</h4>
-                                        { gnomadExternalLink ?
-                                            <h4>
-                                                <a href={gnomadExternalLink} target="_blank" rel="noopener noreferrer"
-                                                    className="text-small px-1" data-tip={"View this variant in gnomAD " + showingTable}>
-                                                    <i className="icon icon-external-link-alt fas"/>
-                                                </a>
-                                            </h4>
-                                            : null }
-                                    </div>
-                                    <div className="info-body overflow-auto">
-                                        <SVGnomADTable {...{ context, schemas, getTipForField }} />
-                                    </div>
+                    </div> */}
+                    <div className="row">
+                        <div className="col-12 d-flex flex-column">
+                            <div className="inner-card-section flex-grow-0 pb-2 pb-xl-0">
+                                <div className="info-header-title justify-content-start">
+                                    <h4>{titleDict[showingTable]}</h4>
+                                    { gnomadExternalLink ?
+                                        <h4>
+                                            <a href={gnomadExternalLink} target="_blank" rel="noopener noreferrer"
+                                                className="text-small px-1" data-tip={"View this variant in gnomAD " + showingTable}>
+                                                <i className="icon icon-external-link-alt fas"/>
+                                            </a>
+                                        </h4>
+                                        : null }
+                                </div>
+                                <div className="info-body overflow-auto">
+                                    <SVGnomADTable {...{ context, schemas, getTipForField }} />
                                 </div>
                             </div>
                         </div>
