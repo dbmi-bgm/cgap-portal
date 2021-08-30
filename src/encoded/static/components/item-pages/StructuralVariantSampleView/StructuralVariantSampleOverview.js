@@ -4,10 +4,9 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
-import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, ajax, memoizedUrlParse, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { SvBrowserTabBody } from './SvBrowserTabBody';
-import { VariantSampleInfoHeader } from '../VariantSampleView/VariantSampleInfoHeader';
 import { SvGeneTabBody } from './SvGeneTabBody';
 import { SvVariantTabBody } from './SvVariantTabBody';
 import { SvSampleTabBody } from './SvSampleTabBody';
@@ -24,14 +23,153 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <VariantSampleInfoHeader {...passProps} showTranscriptSelection={false} />
+                <StructuralVariantSampleInfoHeader {...passProps} />
                 <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
             </div>
         );
     }
 }
 
+function StructuralVariantSampleInfoHeader(props){
+    const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
+    const {
+        context,
+        schemas,
+        caseID = <span className="text-muted"> - </span>, // null
+    } = props;
+    const { variant: { ID = fallbackElem } = {} } = context;
 
+    function getTipForField(field, itemType = "StructuralVariantSample"){
+        if (!schemas) return null;
+        const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
+        return (schemaProperty || {}).description || null;
+    }
+
+    return (
+        // Stack these into flex column until large responsive size, then make into row.
+        <div className="card mb-24 sample-variant-info-header">
+            <div className="card-body">
+                <div className="row flex-column flex-lg-row">
+
+                    { caseID ?
+                        <div className="inner-card-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
+                            <div className="info-header-title">
+                                <h4 className="text-truncate">Case ID</h4>
+                            </div>
+                            <div className="info-body flex-grow-1 d-flex align-items-center">
+                                <h4 className="text-400 text-center w-100">{ caseID }</h4>
+                            </div>
+                        </div>
+                        : null }
+
+                    <div className="inner-card-section col pb-2 pb-lg-0">
+                        <div className="info-header-title">
+                            <h4>Variant Info</h4>
+                        </div>
+                        <div className="info-body">
+                            <div className="row mb-03">
+                                <VariantInfoSection {...{ context }} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="inner-card-section col pb-2 pb-lg-0">
+                        <div className="info-header-title">
+                            <h4>Gene Info</h4>
+                        </div>
+                        <div className="info-body">
+                            <GeneInfoSection {...{ context }} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+
+function VariantInfoSection({ context }) {
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
+    const { structural_variant = {} } = context;
+    const {
+        annotation_id = fallbackElem, // TODO: pull from actual location info
+        size_display = fallbackElem,
+        cytoband = fallbackElem
+    } = structural_variant;
+
+    return (
+        <div className="col-12">
+            <div className="row pb-1 pb-md-03">
+                <div className="col-12 col-md-2">
+                    <label className="mb-0">Location:</label>
+                </div>
+                <div className="col-12 col-md-9">
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <span id="vi_location"> {annotation_id}</span>
+                        </div>
+                        <div className="col-12 col-md-3">
+                            <label htmlFor="vi_size" className="mb-0">Size:</label>
+                        </div>
+                        <div className="col-12 col-md-3">
+                            <span id="vi_size"> {size_display}</span>
+                        </div>
+                    </div>
+                    <div className="row pb-1 pb-md-03">
+                        <div className="col-12 col-md-6">
+                            <span id="vi_location2"> {fallbackElem}</span>
+                        </div>
+                        <div className="col-12 col-md-3">
+                            <label htmlFor="vi_cytoband" className="mb-0">Cytoband:</label>
+                        </div>
+                        <div className="col-12 col-md-3">
+                            <span id="vi_cytoband"> {cytoband}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function GeneInfoSection({ context }) {
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
+    return (
+        <div className="col-12">
+            <div className="row pb-1 pb-md-03">
+                <div className="col-12 col-md-8">
+                    <label htmlFor="contained-genes" className="mb-0">Contained Genes:</label>
+                </div>
+                <div id="contained-genes" className="col-12 col-md-4">
+                    (Need Fieldname)
+                </div>
+            </div>
+            <div className="row pb-1 pb-md-03">
+                <div className="col-12 col-md-8">
+                    <label htmlFor="genes-at-breakpoints" className="mb-0">Genes At Breakpoints:</label>
+                </div>
+                <div id="genes-at-breakpoints" className="col-12 col-md-4">
+                    (Need Fieldname)
+                </div>
+            </div>
+            <div className="row pb-1 pb-md-03">
+                <div className="col-12 col-md-8">
+                    <label htmlFor="omim-genes" className="mb-0">OMIM Genes:</label>
+                </div>
+                <div id="omim-genes" className="col-12 col-md-4">
+                    (Need Fieldname)
+                </div>
+            </div>
+            <div className="row pb-1 pb-md-03">
+                <div className="col-12 col-md-8">
+                    <label htmlFor="omim-genes-w-phenotype" className="mb-0">OMIM Genes with Phenotype:</label>
+                </div>
+                <div id="omim-genes-w-phenotype" className="col-12 col-md-4">
+                    (Need Fieldname)
+                </div>
+            </div>
+        </div>
+    );
+}
 
 /**
  * We don't want to include DotRouter (or its functionality) in here yet/for-now since
@@ -48,7 +186,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
     static tabNames = [
         "Gene",
         "Variant",
-        "Sample",
+        "Sample Quality",
         "SV Browser"
     ];
 
