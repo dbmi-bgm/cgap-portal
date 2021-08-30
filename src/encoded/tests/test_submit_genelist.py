@@ -1,8 +1,8 @@
 import json
 import pytest
 
-from encoded.tests.test_access_key import basic_auth
-from encoded.submit_genelist import (
+from .test_access_key import basic_auth
+from ..submit_genelist import (
     GeneListSubmission,
     VariantUpdateSubmission,
     CommonUtils,
@@ -266,8 +266,9 @@ class TestGeneListSubmission:
 class TestVariantUpdateSubmission:
     def test_variant_update(self, es_testapp, workbook, wb_project, wb_institution):
         """
-        Ensure variant_update ingestion class parses file of input gene uuids
-        and queues project-associated variant samples for indexing.
+        Ensure variant_update ingestion class parses file of input gene
+        uuids and queues project-associated (structural) variant
+        samples for indexing.
         """
         variant_update = VariantUpdateSubmission(
             VARIANT_UPDATE_PATH + "test-variant-update.json",
@@ -276,16 +277,16 @@ class TestVariantUpdateSubmission:
             es_testapp,
         )
         assert len(variant_update.gene_uuids) == 3
-        assert len(variant_update.variant_samples) == 2
+        assert len(variant_update.variant_samples) == 4
         assert variant_update.validate_output
         assert variant_update.post_output
         assert not variant_update.errors
 
     def test_variant_update_with_case(self, es_testapp, wb_project, wb_institution):
         """
-        Test that submission with case information (BAM sample IDs) is correctly
-        parsed and only variant samples associated with the case are queued for
-        indexing.
+        Test that submission with case information (BAM sample IDs) is
+        correctly parsed and only (structural) variant samples
+        associated with the case are queued for indexing.
         """
         variant_update = VariantUpdateSubmission(
             VARIANT_UPDATE_PATH + "test_variant_update_with_case.json",
@@ -294,14 +295,14 @@ class TestVariantUpdateSubmission:
             es_testapp,
         )
         assert len(variant_update.gene_uuids) == 3
-        assert len(variant_update.variant_samples) == 1
+        assert len(variant_update.variant_samples) == 2
         assert len(variant_update.bam_sample_ids) == 1
         assert not variant_update.errors
 
     def test_core_variant_update(self, es_testapp, core_project, wb_institution):
         """
-        Test that submission from CGAP_CORE_PROJECT will update all variant
-        samples regardless of project.
+        Test that submission from CGAP_CORE_PROJECT will update all
+        (structural) variant samples regardless of project.
         """
         variant_update = VariantUpdateSubmission(
             VARIANT_UPDATE_PATH + "test-variant-update.json",
@@ -309,13 +310,14 @@ class TestVariantUpdateSubmission:
             wb_institution["@id"],
             es_testapp,
         )
-        assert len(variant_update.variant_samples) == 3
+        assert len(variant_update.variant_samples) == 6
 
     def test_variant_update_endpoint(
         self, testapp, bgm_project, bgm_access_key, institution
     ):
         """
-        Test for valid posting to variant_endpoint endpoint via ingestion listener.
+        Test for valid posting to variant_endpoint endpoint via
+        ingestion listener.
         """
         creation_post_url = "/IngestionSubmission"
         creation_post_data = {
