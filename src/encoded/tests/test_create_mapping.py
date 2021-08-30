@@ -1,7 +1,11 @@
+import mock
 import pytest
 
 from snovault import COLLECTIONS, TYPES
-from snovault.elasticsearch.create_mapping import type_mapping
+from snovault.elasticsearch.create_mapping import (
+    type_mapping,
+    run as run_create_mapping,
+)
 from snovault.util import add_default_embeds
 from unittest.mock import patch, MagicMock
 from .conftest_settings import ORDER
@@ -80,3 +84,38 @@ def test_get_deployment_config_other():
     cfg = get_deployment_config(None)
     assert cfg['ENV_NAME'] == 'fourfront-cgapother'
     assert cfg['WIPE_ES'] is False
+
+@mock.patch("snovault.elasticsearch.indexer_queue.QueueManager.add_uuids")
+def test_run_create_mapping_with_upgrader(mock_add_uuids, es_testapp, workbook):
+    """
+    Test for catching items in need of upgrading when running
+    create_mapping.
+
+    Indexer queue method mocked to check correct calls, so no items
+    actually indexed/upgraded.
+    """
+    app = es_testapp.app
+    type_to_upgrade = "Document"
+
+    search_query = "/search/?type=Document&frame=object"
+    document_search = es_testapp.get(search_query, status=200).json["@graph"]
+    document_uuids = sorted([x["uuid"] for x in document_search])
+
+    # No schema version change, so nothing needs indexing
+    run_create_mapping(app, check_first=True)
+    (_, uuids_to_index), _ = mock_add_uuids.call_args
+    assert not uuids_to_index
+
+    # Change Document schema version in registry so all posted
+    # documents "need" to be upgraded
+    registry_schema = app.registry[TYPES][type_to_upgrade].schema
+    schema_version_default = registry_schema["properties"]["schema_version"]["default"]
+    updated_schema_version = str(int(schema_version_default) + 1)
+    registry_schema["properties"]["schema_version"]["default"] = updated_schema_version
+
+    run_create_mapping(app, check_first=True)
+    (_, uuids_to_index), _ = mock_add_uuids.call_args
+    assert sorted(uuids_to_index) == document_uuids
+
+    # Revert Document schema version
+    registry_schema["properties"]["schema_version"]["default"] = schema_version_default
