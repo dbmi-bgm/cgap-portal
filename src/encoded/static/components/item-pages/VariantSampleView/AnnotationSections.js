@@ -445,3 +445,72 @@ function shortenToSignificantDigits(numberToShorten, countDigits = 3) {
 
     return numberToShorten.toPrecision(countDigits);
 }
+
+// TODO: Potentially more work and more testing needed to modularize
+export function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref }){
+    const { variant = null, structural_variant = null } = context;
+    const {
+        csq_clinvar: variationID,
+        csq_clinvar_clnsig: clinicalSignificance,
+        csq_clinvar_clnsigconf: conflictingClinicalSignificance,
+        clinvar_submission = [], // TODO - missing in data rn.
+        csq_clinvar_clnrevstat: reviewStatus
+    } = variant || structural_variant;
+
+    if (!variationID) {
+        // No ClinVar info available ??
+        return (
+            <div className="d-flex align-items-center justify-content-center text-large h-100">
+                <h4 className="font-italic text-400 my-0 pb-08">No record in ClinVar</h4>
+            </div>
+        );
+    }
+
+    return (
+        <React.Fragment>
+
+            <div className="mb-1">
+                <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
+                { clinvarExternalHref?
+                    <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
+                        { variationID }
+                        <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                    </a>
+                    : <span>{ variationID }</span> }
+            </div>
+
+            <div className="row">
+                <div className="col-3">
+                    <label data-tip={getTipForField("csq_clinvar_clnsig")} className="mb-03">Interpretation: </label>
+                </div>
+                <div className="col-9">
+                    { clinicalSignificance }
+                </div>
+            </div>
+
+            <div className="row">
+                <div className="col-3">
+                    <label data-tip={getTipForField("csq_clinvar_clnrevstat")} className="mb-0">Review Status: </label>
+                </div>
+                <div className="col-9">
+                    { reviewStatus }
+                </div>
+            </div>
+
+        </React.Fragment>
+    );
+}
+
+
+/**
+ * In some scenarios we may have arrays for some fields, esp for SNV gnomad v2 exome.
+ * This is a simple workaround to standardize to show only first value, if this is case & >1 value (rare).
+ * In future we may change how this logic works (so instead of [0], the index of the least rare total frequency to be shown.)
+ */
+export function standardizeGnomadValue(value, fallbackElem = <em data-tip="Not Available"> - </em>){
+    if (typeof value === "number") return value;
+    if (Array.isArray(value) && _.every(value, function(v){ return typeof v === "number"; })) {
+        return value[0]; // Pick first
+    }
+    return fallbackElem;
+}
