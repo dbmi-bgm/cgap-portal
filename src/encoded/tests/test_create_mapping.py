@@ -1,4 +1,3 @@
-import mock
 import pytest
 
 from snovault import COLLECTIONS, TYPES
@@ -85,7 +84,8 @@ def test_get_deployment_config_other():
     assert cfg['ENV_NAME'] == 'fourfront-cgapother'
     assert cfg['WIPE_ES'] is False
 
-@mock.patch("snovault.elasticsearch.indexer_queue.QueueManager.add_uuids")
+
+@patch("snovault.elasticsearch.indexer_queue.QueueManager.add_uuids")
 def test_run_create_mapping_with_upgrader(mock_add_uuids, es_testapp, workbook):
     """
     Test for catching items in need of upgrading when running
@@ -97,17 +97,17 @@ def test_run_create_mapping_with_upgrader(mock_add_uuids, es_testapp, workbook):
     app = es_testapp.app
     type_to_upgrade = "Document"
 
-    search_query = "/search/?type=Document&frame=object"
-    document_search = es_testapp.get(search_query, status=200).json["@graph"]
-    document_uuids = sorted([x["uuid"] for x in document_search])
+    search_query = "/search/?type=" + type_to_upgrade + "&frame=object"
+    search = es_testapp.get(search_query, status=200).json["@graph"]
+    item_type_uuids = sorted([x["uuid"] for x in search])
 
     # No schema version change, so nothing needs indexing
     run_create_mapping(app, check_first=True)
     (_, uuids_to_index), _ = mock_add_uuids.call_args
     assert not uuids_to_index
 
-    # Change Document schema version in registry so all posted
-    # documents "need" to be upgraded
+    # Change schema version in registry so all posted items of this type
+    # "need" to be upgraded
     registry_schema = app.registry[TYPES][type_to_upgrade].schema
     schema_version_default = registry_schema["properties"]["schema_version"]["default"]
     updated_schema_version = str(int(schema_version_default) + 1)
@@ -115,7 +115,7 @@ def test_run_create_mapping_with_upgrader(mock_add_uuids, es_testapp, workbook):
 
     run_create_mapping(app, check_first=True)
     (_, uuids_to_index), _ = mock_add_uuids.call_args
-    assert sorted(uuids_to_index) == document_uuids
+    assert sorted(uuids_to_index) == item_type_uuids
 
-    # Revert Document schema version
+    # Revert item type schema version
     registry_schema["properties"]["schema_version"]["default"] = schema_version_default
