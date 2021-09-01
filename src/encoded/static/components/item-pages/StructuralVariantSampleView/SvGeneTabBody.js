@@ -1,51 +1,61 @@
 'use strict';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { SvGeneDetailPane } from './SvDetailPanes';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 
 
-export class SvGeneTabBody extends React.Component {
+export function SvGeneTabBody (props){
 
-    render() {
-        const { // TODO: Will need to expand colExtMap for this in future versions
-            columnExtensionMap:  originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
-            active = false,
-            context,
-            ...passProps
-        } = this.props;
+    const {
+        columnExtensionMap:  originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
+        active = false,
+        context,
+        ...passProps
+    } = props;
 
-        const { structural_variant: { transcript = [] } = {} } = context;
+    const columnExtensionMap = useMemo(function(){
+        return {
+            ...originalColExtMap,
+            "spos": {
+                "render": function(result, parentProps){
+                    const { spos, epos } = result || {};
+                    return <div className="text-center w-100">{spos} - <br/>{epos}</div>;
+                }
+            },
+        };
+    });
 
-        const transcriptsDeduped = {};
-        transcript.forEach((t) => {
-            const { csq_gene: { ensgid = null } = {} } = t;
-            transcriptsDeduped[ensgid] = true;
-        });
-        const genes = Object.keys(transcriptsDeduped);
+    const { structural_variant: { transcript = [] } = {} } = context;
 
-        let searchHref = "/search/?type=Gene";
-        genes.forEach((gene) => {
-            searchHref += ("&ensgid=" + gene);
-        });
+    const transcriptsDeduped = {};
+    transcript.forEach((t) => {
+        const { csq_gene: { ensgid = null } = {} } = t;
+        transcriptsDeduped[ensgid] = true;
+    });
+    const genes = Object.keys(transcriptsDeduped);
 
-        return (
-            <div className={`gene-tab-body card-body ${!active ? "d-none": ""}`}>
-                <div className="row flex-column flex-lg-row">
-                    <div className="inner-card-section col pb-2 pb-lg-0">
-                        <div className="info-header-title">
-                            <h4>Gene List</h4>
-                        </div>
-                        <div className="info-body">
-                            <EmbeddedItemSearchTable {...passProps} facets={null} {...{ searchHref }} columns={geneTableColumns}
-                                renderDetailPane={(result, rowNumber, containerWidth, propsFromTable) => <SvGeneDetailPane {...{ result, rowNumber, containerWidth, context }} {...propsFromTable} />}/>
-                        </div>
+    let searchHref = "/search/?type=Gene";
+    genes.forEach((gene) => {
+        searchHref += ("&ensgid=" + gene);
+    });
+
+    return (
+        <div className={`gene-tab-body card-body ${!active ? "d-none": ""}`}>
+            <div className="row flex-column flex-lg-row">
+                <div className="inner-card-section col pb-2 pb-lg-0">
+                    <div className="info-header-title">
+                        <h4>Gene List</h4>
+                    </div>
+                    <div className="info-body">
+                        <EmbeddedItemSearchTable {...passProps} facets={null} {...{ searchHref, columnExtensionMap }} columns={geneTableColumns}
+                            renderDetailPane={(result, rowNumber, containerWidth, propsFromTable) => <SvGeneDetailPane {...{ result, rowNumber, containerWidth, context }} {...propsFromTable} />}/>
                     </div>
                 </div>
             </div>
-        );
-    }
+        </div>
+    );
 }
 
 const geneTableColumns = {
