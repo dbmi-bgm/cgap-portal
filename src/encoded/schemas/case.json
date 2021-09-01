@@ -146,6 +146,9 @@
         "individual.sex": {
             "title": "Sex",
             "grouping": "Individual"
+        },
+        "status": {
+            "title": "Status"
         }
     },
     "columns": {
