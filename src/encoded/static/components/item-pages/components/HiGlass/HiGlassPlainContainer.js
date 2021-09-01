@@ -127,7 +127,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
                     'higlass-dependencies'
                 ).then((loadedDeps) =>{
                     higlassDependencies = loadedDeps;
-                    const { higlassRegister, SequenceTrack, TranscriptsTrack, ClinvarTrack, TextTrack, OrthologsTrack, PileupTrack, GnomadTrack, SvTrack } = higlassDependencies;
+                    const { higlassRegister, SequenceTrack, TranscriptsTrack, ClinvarTrack, TextTrack, OrthologsTrack, PileupTrack, GnomadTrack, SvTrack, GeneralVcfTrack } = higlassDependencies;
 
                     higlassRegister({
                         name: 'SequenceTrack',
@@ -168,6 +168,11 @@ export class HiGlassPlainContainer extends React.PureComponent {
                         name: 'SvTrack',
                         track: SvTrack,
                         config: SvTrack.config,
+                    });
+                    higlassRegister({
+                        name: 'GeneralVcfTrack',
+                        track: GeneralVcfTrack,
+                        config: GeneralVcfTrack.config,
                     });
 
                     finish();
