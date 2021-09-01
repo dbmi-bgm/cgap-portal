@@ -82,7 +82,7 @@ export function SvGeneDetailPane(props) {
                                 transcripts={resultTranscripts}/>
                         </div>
                         <div className="info-body">
-                            <ConsequenceOfSNVSection currentTranscript={resultTranscripts[currentTranscriptIdx]}/>
+                            <ConsequenceOfSNVSection currentTranscript={resultTranscripts[currentTranscriptIdx]} {...{ fallbackElem }}/>
                         </div>
                     </div>
                 </div>
@@ -149,39 +149,38 @@ function ConsequenceOfSNVSection({ currentTranscript }) {
             </div>);
     }
 
-    // const { } = currentTranscript;
-    console.log("currentTranscript", currentTranscript);
-    // TODO: Add Consequence and Breakpoints once they are added
+    const { fallbackElem, csq_consequence: { 0 : consequence = null } = [] } = currentTranscript;
+    // TODO: Add breakpoints once they are ready
 
     return (
         <React.Fragment>
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
-                    <label htmlFor="" className="mb-0" data-tip={null}>
+                    <label htmlFor="snv-consequence" className="mb-0" data-tip={null}>
                         Consequence:
                     </label>
                 </div>
-                <div className="col-12 col-xl-9" id="">
-                    (Need Fieldname)
+                <div className="col-12 col-xl-9" id="snv-consequence">
+                    { consequence ? consequence.display_title: fallbackElem }
                 </div>
             </div>
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
-                    <label htmlFor="" className="mb-0" data-tip={null}>
+                    <label htmlFor="snv-con-break1" className="mb-0" data-tip={null}>
                         Breakpoint 1:
                     </label>
                 </div>
-                <div className="col-12 col-xl-9" id="">
+                <div className="col-12 col-xl-9" id="snv-con-break1">
                     (Need Fieldname)
                 </div>
             </div>
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
-                    <label htmlFor="" className="mb-0" data-tip={null}>
+                    <label htmlFor="snv-con-break2" className="mb-0" data-tip={null}>
                         Breakpoint 2:
                     </label>
                 </div>
-                <div className="col-12 col-xl-9" id="">
+                <div className="col-12 col-xl-9" id="snv-con-break2">
                     (Need Fieldname)
                 </div>
             </div>
