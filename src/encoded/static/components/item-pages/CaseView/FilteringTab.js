@@ -197,7 +197,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         }
         // Else nothing -- is expected; perhaps user got logged out during
         // navigation or loading something else and hasn't refreshed page yet.
-    });
+    }, [ session ]);
 
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.

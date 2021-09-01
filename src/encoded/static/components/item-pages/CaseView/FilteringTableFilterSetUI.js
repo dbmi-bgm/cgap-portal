@@ -342,6 +342,20 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
     }
 }
 
+
+const ExportSearchSpreadsheetButton = React.memo(function ExportSearchSpreadsheetButton(props){
+    const { selectedFilterBlockIndices, filterSet, searchHrefBase, intersectFilterBlocks } = props;
+
+    const virtualCompoundFilterSet = FilterSetController.createCompoundSearchRequest(selectedFilterBlockIndices, filterSet, searchHrefBase, intersectFilterBlocks);
+
+    return (
+        <form method="POST" action="/variant-sample-search-spreadsheet/">
+            <input type="hidden" name="compound_search_request" value={JSON.stringify(virtualCompoundFilterSet)} />
+        </form>
+    );
+});
+
+
 /**
  * @todo Pass in props.importFromPresetFilterSet from FilterSetController (and create it)
  * @todo Consider using react-virtualized or react-window library for this later.
@@ -1646,6 +1660,58 @@ export class FilterSetController extends React.PureComponent {
     }
 
     /**
+     * Generates POST body for /compound_search endpoint, given
+     * some props and state available from `FilterSetController`.
+     *
+     * @param {Object.<string,boolean>} selectedFilterBlockIndices - From FiltersetController state.
+     * @param {{ filter_blocks: Object[], search_type: string }} currFilterSet - From FiltersetController state.
+     * @param {string} searchHrefBase - Root href, as passed in via props.
+     * @returns {{ search_type: string, global_flags: string, intersect: boolean, flags: {}[]?, filter_blocks: { query: string, flags_applied: string[]? }[] }} Compound search request payload
+     */
+    static createCompoundSearchRequest(selectedFilterBlockIndices, currFilterSet, searchHrefBase, intersectFilterBlocks = false){
+        const selectedIdxList = Object.keys(selectedFilterBlockIndices);
+        const selectedIdxCount = selectedIdxList.length;
+
+        if (!currFilterSet) {
+            console.error("No current filterset to navigate to. Fine if expected (i.e. initial filterset item still being fetched).");
+            return null;
+        }
+
+        const { filter_blocks, search_type = "VariantSample" } = currFilterSet;
+
+        let global_flags = url.parse(searchHrefBase, false).search;
+        if (global_flags) {
+            // Not particularly necessary but helps make less redundant since we have `search_type` already.
+            global_flags = global_flags.slice(1).replace("type=VariantSample&", "");
+        }
+
+        const selectedFilterBlocks = selectedIdxCount === 0 ? filter_blocks : filter_blocks.filter(function(fb, fbIdx){
+            return selectedFilterBlockIndices[fbIdx];
+        });
+
+        return {
+            search_type,
+            global_flags,
+            "intersect": intersectFilterBlocks,
+            // We create our own names for flags & flags_applied here rather
+            // than using filterSet.flags since filterSet.flags might potentially
+            // be populated from other places; idk...
+            // "flags": [
+            //     {
+            //         "name": "CurrentFilterSet",
+            //         "query": global_flags
+            //     }
+            // ],
+            "filter_blocks": selectedFilterBlocks.map(function({ query }){
+                return {
+                    query,
+                    "flags_applied": [] // ["CurrentFilterSet"]
+                };
+            })
+        };
+    }
+
+    /**
      * Update state.currFilterSet.filter_blocks[selectedFilterBlockIdx].query from search response if needed.
      * (unless amid some other update or amid initialization)
      *
@@ -1967,87 +2033,20 @@ export class FilterSetController extends React.PureComponent {
     }
 
     navigateToCurrentBlock(){
-        const { navigate: virtualNavigate, searchHrefBase, context: searchContext } = this.props; // props.navigate passed down in from SPC EmbeddedSearchView VirtualHrefController
+        const { navigate: virtualNavigate, searchHrefBase } = this.props; // props.navigate passed down in from SPC EmbeddedSearchView VirtualHrefController
         const { selectedFilterBlockIndices, currFilterSet, intersectFilterBlocks } = this.state;
-
-        const selectedIdxList = Object.keys(selectedFilterBlockIndices);
-        const selectedIdxCount = selectedIdxList.length;
-
-
-        console.info("navigate to current block", this.props, this.state);
 
         if (!currFilterSet) {
             console.error("No current filterset to navigate to. Fine if expected (i.e. initial filterset item still being fetched).");
             return null;
         }
 
-        const { filter_blocks, search_type = "VariantSample" } = currFilterSet;
+        const virtualCompoundFilterSet = FilterSetController.createCompoundSearchRequest(selectedFilterBlockIndices, currFilterSet, searchHrefBase, intersectFilterBlocks);
+        console.log("Navigating to virtualCompoundFilterSet", virtualCompoundFilterSet, this.props, this.state);
 
-        if (selectedIdxCount > 1 || (selectedIdxCount === 0 && filter_blocks.length > 1)) {
-            // Navigate using compound fs.
-            // Having 0 filter_blocks selected is effectively same as having all filter_blocks selected.
-
-            let global_flags = url.parse(searchHrefBase, false).search;
-            if (global_flags) {
-                // Not particularly necessary but helps make less redundant since we have `search_type` already.
-                global_flags = global_flags.slice(1).replace("type=VariantSample&", "");
-            }
-
-            const selectedFilterBlocks = selectedIdxCount === 0 ? filter_blocks : filter_blocks.filter(function(fb, fbIdx){
-                return selectedFilterBlockIndices[fbIdx];
-            });
-
-            // We create our own names for flags & flags_applied here rather
-            // than using filterSet.flags since filterSet.flags might potentially
-            // be populated from other places; idk...
-            const virtualCompoundFilterSet = {
-                search_type,
-                global_flags,
-                "intersect": intersectFilterBlocks,
-                // "flags": [
-                //     {
-                //         "name": "CurrentFilterSet",
-                //         "query": global_flags
-                //     }
-                // ],
-                "filter_blocks": selectedFilterBlocks.map(function({ query }){
-                    return {
-                        query,
-                        "flags_applied": [] // ["CurrentFilterSet"]
-                    };
-                })
-            };
-
-            console.log("WILL USE virtualCompoundFilterSet", global_flags, virtualCompoundFilterSet);
-
-            virtualNavigate(virtualCompoundFilterSet, null, (res)=>{
-                this.setState({ "isSettingFilterBlockIdx": false });
-            });
-
-            return;
-        } else {
-            // Navigate as if using single search URL href.
-            const [ selectedFilterBlockIdx = 0 ] = selectedIdxList;
-            // Parse to int, since object keys are always strings.
-            const currFilterSetQuery = filter_blocks[parseInt(selectedFilterBlockIdx)].query;
-            const { "@id": currSearchHref = null } = searchContext || {};
-            const nextSearchHref = searchHrefBase + (currFilterSetQuery ? "&" + currFilterSetQuery : "");
-
-            // Compares full hrefs, incl searchHrefBase params
-            const haveSearchParamsChanged = !currSearchHref || !_.isEqual(
-                url.parse(nextSearchHref, true).query,
-                url.parse(currSearchHref, true).query
-            );
-
-            if (haveSearchParamsChanged) {
-                virtualNavigate(nextSearchHref, null, (res)=>{
-                    this.setState({ "isSettingFilterBlockIdx": false });
-                });
-            } else {
-                this.setState({ "isSettingFilterBlockIdx": false });
-            }
-
-        }
+        virtualNavigate(virtualCompoundFilterSet, null, (res)=>{
+            this.setState({ "isSettingFilterBlockIdx": false });
+        });
     }
 
     selectFilterBlockIdx(index = null, deselectOthers = true){
