@@ -13,6 +13,7 @@ import { default as OrthologsTrack } from 'higlass-orthologs/es/OrthologsTrack';
 import { default as PileupTrack } from 'higlass-pileup/es/PileupTrack';
 import { default as GnomadTrack } from 'higlass-gnomad/es/GnomadTrack';
 import { default as SvTrack } from 'higlass-sv/es/SvTrack';
+import { default as GeneralVcfTrack } from 'higlass-general-vcf/es/GeneralVcfTrack';
 
 export {
     HiGlassComponent,
@@ -24,5 +25,6 @@ export {
     OrthologsTrack,
     PileupTrack,
     GnomadTrack,
-    SvTrack
+    SvTrack,
+    GeneralVcfTrack
 };
