@@ -138,17 +138,25 @@
     },
     "facets": {
         "project.display_title": {
-            "title": "Project"
+            "title": "Project",
+            "order": 1
+        },
+        "proband_case": {
+            "title": "Proband Case",
+            "order": 2
         },
         "vcf_file.file_ingestion_status": {
-            "title": "Final VCF Status"
+            "title": "Final VCF Status",
+            "order": 3
         },
         "individual.sex": {
             "title": "Sex",
-            "grouping": "Individual"
+            "grouping": "Individual",
+            "order": 4
         },
         "status": {
-            "title": "Status"
+            "title": "Status",
+            "order": 5
         }
     },
     "columns": {
