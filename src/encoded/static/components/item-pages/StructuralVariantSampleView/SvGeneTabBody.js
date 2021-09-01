@@ -38,7 +38,7 @@ export class SvGeneTabBody extends React.Component {
                             <h4>Gene List</h4>
                         </div>
                         <div className="info-body">
-                            <EmbeddedItemSearchTable {...passProps} facets={null} {...{ searchHref }}
+                            <EmbeddedItemSearchTable {...passProps} facets={null} {...{ searchHref }} columns={geneTableColumns}
                                 renderDetailPane={(result, rowNumber, containerWidth, propsFromTable) => <SvGeneDetailPane {...{ result, rowNumber, containerWidth, context }} {...propsFromTable} />}/>
                         </div>
                     </div>
@@ -47,3 +47,30 @@ export class SvGeneTabBody extends React.Component {
         );
     }
 }
+
+const geneTableColumns = {
+    "display_title": {
+        "title": "Gene, Transcript",
+        "order": 1,
+        "sort_fields": [
+            {
+                "field": "display_title",
+                "title": "Gene"
+            }
+        ]
+    },
+    "spos": {
+        "title": "Location",
+        "order": 2,
+        "sort_fields": [
+            {
+                "field": "spos",
+                "title": "Start Position"
+            },
+            {
+                "field": "epos",
+                "title": "End Position"
+            }
+        ]
+    },
+};
