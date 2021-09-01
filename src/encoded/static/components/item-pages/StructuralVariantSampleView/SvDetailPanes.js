@@ -2,11 +2,13 @@
 
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { object, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { responsiveGridState } from './../../util/layout';
 
-import { ExternalDatabasesSection, GeneOverview, ConstraintScoresSection } from '../VariantSampleView/AnnotationSections';
+import { ExternalDatabasesSection, GeneOverview, ConstraintScoresSection, GeneTranscriptDisplayTitle } from '../VariantSampleView/AnnotationSections';
 
 /** Reuse this method for SNVs if it remains the same */
 function getInitialTranscriptIndex(transcript) {
@@ -76,6 +78,8 @@ export function SvGeneDetailPane(props) {
                     <div className="flex-grow-0 pb-2 pb-md-0">
                         <div className="info-header-title">
                             <h4>Consequence of SNV</h4>
+                            <TranscriptSelectionDropdown {...{ context, schemas, currentTranscriptIdx, setTranscriptIdx }}
+                                transcripts={resultTranscripts}/>
                         </div>
                         <div className="info-body">
                             <ConsequenceOfSNVSection currentTranscript={resultTranscripts[currentTranscriptIdx]}/>
@@ -104,6 +108,34 @@ export function SvGeneDetailPane(props) {
                 </div>
             </div>
         </div>
+    );
+}
+
+function TranscriptSelectionDropdown(props){
+    const { setTranscriptIdx, currentTranscriptIdx, context, schemas, transcripts } = props;
+
+    const currentTranscript = transcripts[currentTranscriptIdx] || null;
+    const geneListOptions = transcripts.map(function(transcript, idx){
+        return (
+            <DropdownItem key={idx} eventKey={idx.toString()} active={idx === currentTranscriptIdx}>
+                <GeneTranscriptDisplayTitle transcript={transcript} />
+            </DropdownItem>
+        );
+    });
+    const geneTranscriptListLen = geneListOptions.length;
+    let dropdownTitleToShow;
+
+    if (geneTranscriptListLen === 0) {
+        dropdownTitleToShow = <em>No transcripts available</em>;
+    } else {
+        dropdownTitleToShow = <GeneTranscriptDisplayTitle transcript={currentTranscript} />;
+    }
+
+    return (
+        <DropdownButton title={dropdownTitleToShow} size="sm py-1" variant="outline-secondary select-transcript" onSelect={setTranscriptIdx}
+            disabled={geneTranscriptListLen === 0} data-tip="Select a transcript (& gene) to view their details">
+            { geneListOptions }
+        </DropdownButton>
     );
 }
 
