@@ -171,7 +171,7 @@ function ConsequenceOfSNVSection({ currentTranscript }) {
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="snv-con-break1">
-                    (Need Fieldname)
+                    <span className="font-italic text-muted">(Coming Soon)</span>
                 </div>
             </div>
             <div className="row mb-03">
@@ -181,7 +181,7 @@ function ConsequenceOfSNVSection({ currentTranscript }) {
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="snv-con-break2">
-                    (Need Fieldname)
+                    <span className="font-italic text-muted">(Coming Soon)</span>
                 </div>
             </div>
         </React.Fragment>
