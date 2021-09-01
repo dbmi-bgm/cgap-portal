@@ -2,6 +2,7 @@ import uptime
 
 from collections import OrderedDict
 from dcicutils import lang_utils
+from dcicutils.s3_utils import s3Utils
 from encoded import APP_VERSION_REGISTRY_KEY
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
@@ -60,6 +61,56 @@ def uptime_info():
         return "unavailable"
 
 
+# Correspondence with s3Utils tested elsewhere.
+
+class HealthPageKey:
+    APPLICATION_BUCKET_PREFIX = 'application_bucket_prefix'
+    BEANSTALK_APP_VERSION = 'beanstalk_app_version'
+    BEANSTALK_ENV = 'beanstalk_env'
+    BLOB_BUCKET = 'blob_bucket'                              # s3Utils.BLOB_BUCKET_HEALTH_PAGE_KEY
+    DATABASE = 'database'
+    DISPLAY_TITLE = 'display_title'
+    ELASTICSEARCH = 'elasticsearch'
+    FILE_UPLOAD_BUCKET = 'file_upload_bucket'                # s3Utils.RAW_BUCKET_HEALTH_PAGE_KEY
+    FOURSIGHT = 'foursight'
+    FOURSIGHT_BUCKET_PREFIX = 'foursight_bucket_prefix'
+    IDENTITY = 'identity'
+    INDEXER = 'indexer'
+    INDEX_SERVER = 'index_server'
+    LOAD_DATA = 'load_data'
+    METADATA_BUNDLES_BUCKET = 'metadata_bundles_bucket'      # s3Utils.METADATA_BUCKET_HEALTH_PAGE_KEY
+    NAMESPACE = 'namespace'
+    PROCESSED_FILE_BUCKET = 'processed_file_bucket'          # s3Utils.OUTFILE_BUCKET_HEALTH_PAGE_KEY
+    PROJECT_VERSION = 'project_version'
+    SNOVAULT_VERSION = 'snovault_version'
+    SYSTEM_BUCKET = 'system_bucket'                          # s3Utils.SYS_BUCKET_HEALTH_PAGE_KEY
+    TIBANNA_OUTPUT_BUCKET = 'tibanna_output_bucket'          # s3Utils.TIBANNA_OUTPUT_BUCKET_HEALTH_PAGE_KEY
+    UPTIME = 'uptime'
+    UTILS_VERSION = 'utils_version'
+
+
+class SettingsKey:
+    APPLICATION_BUCKET_PREFIX = 'application_bucket_prefix'
+    BLOB_BUCKET = 'blob_bucket'
+    EB_APP_VERSION = 'eb_app_version'
+    ELASTICSEARCH_SERVER = 'elasticsearch.server'
+    ENCODED_VERSION = 'encoded_version'
+    FILE_UPLOAD_BUCKET = 'file_upload_bucket'
+    FILE_WFOUT_BUCKET = 'file_wfout_bucket'
+    FOURSIGHT_BUCKET_PREFIX = 'foursight_bucket_prefix'
+    IDENTITY = 'identity'
+    INDEXER = 'indexer'
+    INDEXER_NAMESPACE = 'indexer.namespace'
+    INDEX_SERVER = 'index_server'
+    LOAD_TEST_DATA = 'load_test_data'
+    METADATA_BUNDLES_BUCKET = 'metadata_bundles_bucket'
+    SNOVAULT_VERSION = 'snovault_version'
+    SQLALCHEMY_URL = 'sqlalchemy.url'
+    SYSTEM_BUCKET = 'system_bucket'
+    TIBANNA_OUTPUT_BUCKET = 'tibanna_output_bucket'
+    UTILS_VERSION = 'utils_version'
+
+
 def health_check(config):
     """
     Emulate a lite form of Alex's static page routing
@@ -70,6 +121,9 @@ def health_check(config):
     )
 
     def health_page_view(request):
+
+        h = HealthPageKey
+        s = SettingsKey
 
         response = request.response
         response.content_type = 'application/json; charset=utf-8'
@@ -95,29 +149,29 @@ def health_check(config):
             "@id": "/health",
             "content": None,
 
-            "application_bucket_prefix": settings.get('application_bucket_prefix'),
-            'beanstalk_app_version': settings.get('eb_app_version'),
-            "beanstalk_env": env_name,
-            "blob_bucket": settings.get('blob_bucket'),
-            "database": settings.get('sqlalchemy.url').split('@')[1],  # don't show user /password
-            "display_title": "CGAP Status and Foursight Monitoring",
-            "elasticsearch": settings.get('elasticsearch.server'),
-            "file_upload_bucket": settings.get('file_upload_bucket'),
-            "foursight": foursight_url,
-            "foursight_bucket_prefix": settings.get('foursight_bucket_prefix'),
-            "identity": settings.get("identity"),
-            "indexer": settings.get("indexer"),
-            "index_server": settings.get("index_server"),
-            "load_data": settings.get('load_test_data'),
-            "metadata_bundles_bucket": settings.get('metadata_bundles_bucket'),
-            "namespace": settings.get('indexer.namespace'),
-            "processed_file_bucket": settings.get('file_wfout_bucket'),
-            'project_version': settings.get('encoded_version'),
-            'snovault_version': settings.get('snovault_version'),
-            "system_bucket": settings.get('system_bucket'),
-            "tibanna_output_bucket": settings.get('tibanna_output_bucket'),
-            'uptime': uptime_info(),
-            'utils_version': settings.get('utils_version'),
+            h.APPLICATION_BUCKET_PREFIX: settings.get(s.APPLICATION_BUCKET_PREFIX),
+            h.BEANSTALK_APP_VERSION: settings.get(s.EB_APP_VERSION),
+            h.BEANSTALK_ENV: env_name,
+            h.BLOB_BUCKET: settings.get(s.BLOB_BUCKET),
+            h.DATABASE: settings.get(s.SQLALCHEMY_URL).split('@')[1],  # don't show user /password
+            h.DISPLAY_TITLE: "CGAP Status and Foursight Monitoring",
+            h.ELASTICSEARCH: settings.get(s.ELASTICSEARCH_SERVER),
+            h.FILE_UPLOAD_BUCKET: settings.get(s.FILE_UPLOAD_BUCKET),
+            h.FOURSIGHT: foursight_url,
+            h.FOURSIGHT_BUCKET_PREFIX: settings.get(s.FOURSIGHT_BUCKET_PREFIX),
+            h.IDENTITY: settings.get(s.IDENTITY),
+            h.INDEXER: settings.get(s.INDEXER),
+            h.INDEX_SERVER: settings.get(s.INDEX_SERVER),
+            h.LOAD_DATA: settings.get(s.LOAD_TEST_DATA),
+            h.METADATA_BUNDLES_BUCKET: settings.get(s.METADATA_BUNDLES_BUCKET),
+            h.NAMESPACE: settings.get(s.INDEXER_NAMESPACE),
+            h.PROCESSED_FILE_BUCKET: settings.get(s.FILE_WFOUT_BUCKET),
+            h.PROJECT_VERSION: settings.get(s.ENCODED_VERSION),
+            h.SNOVAULT_VERSION: settings.get(s.SNOVAULT_VERSION),
+            h.SYSTEM_BUCKET: settings.get(s.SYSTEM_BUCKET),
+            h.TIBANNA_OUTPUT_BUCKET: settings.get(s.TIBANNA_OUTPUT_BUCKET),
+            h.UPTIME: uptime_info(),
+            h.UTILS_VERSION: settings.get(s.UTILS_VERSION),
 
         }
 

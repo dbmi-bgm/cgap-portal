@@ -6,8 +6,8 @@ from dcicutils.misc_utils import VirtualApp, VirtualAppError
 from openpyxl import load_workbook
 from webtest import AppError
 
-from encoded.util import s3_local_file
-from encoded.ingestion.common import CGAP_CORE_PROJECT
+from .util import s3_local_file
+from .ingestion.common import CGAP_CORE_PROJECT
 
 CGAP_CORE_PROJECT = CGAP_CORE_PROJECT + "/"
 
@@ -18,17 +18,18 @@ def submit_genelist(
     """
     Handles processing of a submitted gene list.
 
-    Args:
-        s3_client: a boto3 s3 client object
-        bucket: the name of the s3 bucket that contains the data to be
-            processed
-        key: the name of a key within the given bucket that contains the data
-            to be processed
-        project: a project identifier
-        institution: an institution identifier
-        vapp: a vapp object
-        validate_only: a bool. If True, only do validation, not posting;
-            otherwise (if False), do posting, too.
+    :param s3_client: a boto3 s3 client object
+    :param bucket: str name of the s3 bucket that contains the data to be
+        processed
+    :param key: str name of key within the given bucket that contains the data
+        to be processed
+    :param project: str project identifier
+    :param institution: str institution identifier
+    :param vapp: a vapp object
+    :param validate_only: bool if True, only do validation, not posting;
+        otherwise, do posting, too.
+
+    :returns: dict information concerning output of processing
     """
 
     with s3_local_file(s3_client, bucket=bucket, key=key) as filename:
@@ -100,10 +101,11 @@ class GeneListSubmission:
         line, searches for starting word of "title" or "case" and makes
         corresponding assignment; otherwise, line is assumed to be a gene.
 
-        Returns:
-            - title string
-            - list of associated cases
-            - list of genes
+        :param txt_file: file object
+        :returns:
+            - title - str gene list title
+            - cases - list of strings of associated cases
+            - genelist - list of genes from provided gene list
         """
         genelist = []
         non_gene_items = {term: [] for term in self.non_gene_terms}
@@ -114,7 +116,7 @@ class GeneListSubmission:
                 if line.lower().startswith(term):
                     term_line = line
                     term_idx = term_line.lower().index(term)
-                    term_line = term_line[(term_idx + len(term)):]
+                    term_line = term_line[(term_idx + len(term)) :]
                     term_line = term_line.translate({ord(i): None for i in ':;"\n"'})
                     term_line = term_line.strip()
                     if term_line:
@@ -135,10 +137,11 @@ class GeneListSubmission:
         the rows underneath appropriately (though title is taken to be the first
         non-empty row under the header).
 
-        Returns:
-            - title string
-            - list of cases
-            - list of genes
+        :param xlsx_file: file object
+        :returns:
+            - title - str gene list title
+            - cases - list of strings of associated cases
+            - genelist - list of genes from provided gene list
         """
         possible_items = {term: [] for term in self.non_gene_terms}
         possible_items["genes"] = []
@@ -163,7 +166,12 @@ class GeneListSubmission:
 
     @staticmethod
     def _create_case_atids(case_list):
-        """Convert case accession list to list of case @ids."""
+        """
+        Convert case accession list to list of case @ids.
+
+        :param case_list: list of strings of case identifiers
+        :returns: list of strings of potential case @ids
+        """
         cases = []
         case_atids = []
         for case in case_list:
@@ -184,11 +192,11 @@ class GeneListSubmission:
         Assumes gene list is txt file with line-separated title/genes or an
         xlsx file with standard formatting defined.
 
-        Returns:
-            - gene list title (None if not found)
-            - a unique gene list (possibly empty)
-            - list of associated cases (possibly empty)
-
+        :returns:
+            - genelist - list of strings of unique genes as provided
+                in submission
+            - title - str gene list title (or None)
+            - cases - list of strings of case @ids
         """
 
         genes_with_spaces = []
@@ -245,9 +253,8 @@ class GeneListSubmission:
         only one instance is included, so the gene list produced may be shorter
         than the one submitted.
 
-        Returns one of:
-            - list of gene uuids in CGAP gene title alphabetical order
-            - None if no genes were passed in or >= 1 gene could not be matched
+        :returns: list of gene uuids in CGAP gene title alphabetical
+            order or None
         """
 
         if not self.genes:
@@ -367,8 +374,7 @@ class GeneListSubmission:
         For each case accession provided, identify the associated sample's BAM
         Sample ID, if it exists.
 
-        Returns:
-            - list of BAM sample IDs
+        :returns: list of BAM sample IDs
         """
         bam_sample_ids = []
         project_mismatch = []
@@ -384,7 +390,9 @@ class GeneListSubmission:
                 sample = response.get("sample", {})
                 case_bam_sample_id = sample.get("bam_sample_id", "")
                 if not case_bam_sample_id:
-                    cases_without_sample_ids.append(self._accession_from_atid(case_atid))
+                    cases_without_sample_ids.append(
+                        self._accession_from_atid(case_atid)
+                    )
                 else:
                     bam_sample_ids.append(case_bam_sample_id)
             except (VirtualAppError, AppError):
@@ -415,9 +423,7 @@ class GeneListSubmission:
         """
         Creates gene list and document bodies for posting.
 
-        Returns:
-            - List of bodies to post: [document, gene list]
-              (None if no matched genes)
+        :returns: list of bodies to post (document, gene list) or None
         """
 
         if not self.gene_ids:
@@ -472,13 +478,14 @@ class GeneListSubmission:
         gene list and document will be patched and updated. If no match is
         found, a new document and gene list will be posted.
 
-        Returns:
-            - List with information on validation (None if no matched genes)
-            - Previously existing gene list uuid (None if no match)
-            - Previously existing document uuid (None if no match)
-            - List of genes that were removed from the previous gene list (None
-              if not applicable).
-            - List of BAM sample IDs from existing gene list
+        :returns:
+            - validate_result - list with validation information or None
+            - genelist_uuid - str previously existing gene list uuid or None
+            - document_uuid - str previously existing document uuid or None
+            - previous_genelist_gene_ids - list of genes from existing gene
+                list or None
+            - prior_sample_ids - list of BAM sample IDs from existing gene
+                list or None
         """
 
         if not self.gene_ids:
@@ -575,7 +582,8 @@ class GeneListSubmission:
             validate_result["Associated cases"] = ", ".join(case_accessions)
         if prior_sample_ids:
             removed_sample_ids = [
-                sample_id for sample_id in prior_sample_ids
+                sample_id
+                for sample_id in prior_sample_ids
                 if sample_id not in self.bam_sample_ids
             ]
         if removed_sample_ids:
@@ -608,10 +616,9 @@ class GeneListSubmission:
         """
         Attempts to post document and gene list.
 
-        Returns:
-            - List with posting information (None if errors earlier in
-              processing).
-            - @id of gene list posted/patched
+        :returns:
+            - post_result - list with posting information or None
+            - genelist_at_id - str @id of gene list posted/patched
         """
         if self.errors:
             return None, None
@@ -620,7 +627,8 @@ class GeneListSubmission:
         genelist_json = self.post_bodies[1]
         if self.patch_document_uuid:
             document_post = self.vapp.patch_json(
-                "/Document/" + self.patch_document_uuid, document_json,
+                "/Document/" + self.patch_document_uuid,
+                document_json,
             ).json
         else:
             document_post = self.vapp.post_json("/Document/", document_json).json
@@ -712,20 +720,18 @@ def submit_variant_update(
     Processes a submitted list of gene uuids to re-index associated variant
     samples.
 
-    Args:
-        s3_client: a boto3 s3 client object
-        bucket: the name of the s3 bucket that contains the data to be
-            processed
-        key: the name of a key within the given bucket that contains the data
-            to be processed
-        project: a project identifier
-        institution: an institution identifier
-        vapp: a vapp object
-        validate_only: a bool. If True, only do validation, not posting;
-            otherwise (if False), do posting, too.
+    :param s3_client: a boto3 s3 client object
+    :param bucket: str name of the s3 bucket that contains the data to be
+        processed
+    :param key: str name of key within the given bucket that contains the data
+        to be processed
+    :param project: str project identifier
+    :param institution: str institution identifier
+    :param vapp: a vapp object
+    :param validate_only: bool if True, only do validation, not posting;
+        otherwise, do posting, too.
 
-    Returns:
-        results: information concerning output of processing
+    :returns: dict information concerning output of processing
     """
 
     with s3_local_file(s3_client, bucket=bucket, key=key) as filename:
@@ -780,11 +786,12 @@ class VariantUpdateSubmission:
 
     def genes_from_file(self):
         """
-        Extracts gene uuids and associated BAM sample IDs from input json file.
+        Extracts gene uuids and associated BAM sample IDs from input
+        json file.
 
-        Returns:
-            - List of gene uuids
-            - List of bam sample ids
+        :returns:
+            - gene_uuids - list of gene uuids
+            - bam_sample_ids - list of BAM sample IDs
         """
         gene_uuids = []
         with open(self.filename, "r") as genelist_file:
@@ -795,18 +802,46 @@ class VariantUpdateSubmission:
             self.errors.append("No gene uuids were found in the input file")
         return gene_uuids, bam_sample_ids
 
+    def _search_for_variants(self, genes, project=None, add_on=None):
+        """
+        Helper function to search for variant samples and structural
+        variant samples.
+
+        :param genes: list of gene uuids
+        :param project: str project identifier
+        :param add_on: str search add-on
+        :returns: list of search response items
+        """
+        result = []
+        search_tuples = [
+            ("VariantSample", "variant.genes.genes_most_severe_gene.uuid"),
+            ("StructuralVariantSample", "structural_variant.transcript.csq_gene.uuid"),
+        ]
+        for item_type, search_term in search_tuples:
+            variant_search = CommonUtils.batch_search(
+                self.vapp,
+                genes,
+                search_term,
+                batch_size=4,
+                item_type=item_type,
+                project=project,
+                add_on=add_on,
+                fields=["uuid"],
+            )
+            result += variant_search
+        return result
+
     def find_associated_variants(self):
         """
         Finds associated variant samples for the genes of
         interest.
 
-        Returns:
-            - List of unique variant sample uuids (None if no gene
-              uuids)
-            - Validation output msg
+        :returns:
+            - to_invalidate - list of variant sample uuids (or None)
+            - validation_output - str validation message (or None)
         """
         if not self.gene_uuids:
-            return None
+            return None, None
         project = self.project
         genes_to_search = list(set(self.gene_uuids))
         if self.project == CGAP_CORE_PROJECT:
@@ -815,26 +850,13 @@ class VariantUpdateSubmission:
             variant_sample_search = []
             for sample_id in self.bam_sample_ids:
                 add_on = "&CALL_INFO=" + sample_id
-                vs_addon_search = CommonUtils.batch_search(
-                    self.vapp,
-                    genes_to_search,
-                    "variant.genes.genes_most_severe_gene.uuid",
-                    batch_size=4,
-                    item_type="VariantSample",
-                    project=project,
-                    add_on=add_on,
-                    fields=["uuid"],
+                search = self._search_for_variants(
+                    genes_to_search, project=project, add_on=add_on
                 )
-                variant_sample_search += vs_addon_search
+                variant_sample_search += search
         else:
-            variant_sample_search = CommonUtils.batch_search(
-                self.vapp,
-                genes_to_search,
-                "variant.genes.genes_most_severe_gene.uuid",
-                batch_size=5,
-                item_type="VariantSample",
-                project=project,
-                fields=["uuid"],
+            variant_sample_search = self._search_for_variants(
+                genes_to_search, project=project
             )
         variant_sample_uuids = [item["uuid"] for item in variant_sample_search]
         to_invalidate = list(set(variant_sample_uuids))
@@ -845,12 +867,11 @@ class VariantUpdateSubmission:
         """
         Create VirtualApp with admin permissions for posting to the
         indexing queue.
+
+        :returns: class virtual app
         """
         app = self.vapp.app
-        config = {
-            "HTTP_ACCEPT": "application/json",
-            "REMOTE_USER": "IMPORT"
-        }
+        config = {"HTTP_ACCEPT": "application/json", "REMOTE_USER": "IMPORT"}
         admin_vapp = VirtualApp(app, config)
         return admin_vapp
 
@@ -858,9 +879,7 @@ class VariantUpdateSubmission:
         """
         Queues all variant samples for indexing.
 
-        Returns:
-            - String info about post (None if validation failed or posting
-              failed)
+        :returns: str info about post (or None)
         """
         if self.errors:
             return None
@@ -868,7 +887,9 @@ class VariantUpdateSubmission:
             msg = "No variant samples were posted to the indexing queue."
             return msg
         queue_body = {
-            "uuids": self.variant_samples, "target_queue": "primary", "strict": True
+            "uuids": self.variant_samples,
+            "target_queue": "primary",
+            "strict": True,
         }
         queue_response = self.admin_vapp.post_json("/queue_indexing", queue_body).json
         if queue_response["notification"] == "Success":
@@ -880,8 +901,7 @@ class VariantUpdateSubmission:
         else:
             self.errors.append(
                 "Variant samples were not properly queued for indexing."
-                " Response to POSTing to /queue_indexing was: %s."
-                % queue_response
+                " Response to POSTing to /queue_indexing was: %s." % queue_response
             )
             return None
 
@@ -911,8 +931,16 @@ class CommonUtils:
         API calls and capture all search results (as default behavior
         of vapp.get("/search/") is to return only first 25 items).
 
-        Returns:
-            - List of all items found by search
+        :param app: class virtual app for search
+        :param item_list: list of str items to include in search query
+        :param search_term: str search term for all items in item_list
+        :param batch_size: int number of items from item_list to batch
+        :param item_type: str CGAP item type
+        :param project: str project identifier
+        :param institution: str institution identifier
+        :param add_on: str search query add-on
+        :param fields: list search query fields to return
+        :returns: list of all items found by search
         """
         batch = []
         results = []
@@ -958,7 +986,10 @@ class CommonUtils:
     @staticmethod
     def is_ascii(s):
         """
-        Check if characters in string s are ascii.
+        Check if characters in string are ascii.
+
+        :param s: str
+        :returns: bool if input string is ascii
         """
         if not isinstance(s, str):
             return False

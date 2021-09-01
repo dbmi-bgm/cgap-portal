@@ -1,0 +1,26 @@
+[
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "structural_variant": "0ab92af3-26f5-4865-a3d0-f47c200f7b32",
+        "file": "GAPFIZ123456",
+        "CALL_INFO": "SomeString",
+        "uuid": "ba71ec9d-2ee0-488a-9e91-825e6a5ed699"
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "structural_variant": "0ab92af3-26f5-4865-a3d0-f47c200f7b32",
+        "file": "GAPFIZ123456",
+        "CALL_INFO": "Sample_ID",
+        "uuid": "c372c2da-84e3-43e0-a45b-da00192f5c50"
+    },
+    {
+        "project": "cgap-core",
+        "institution": "hms-dbmi",
+        "structural_variant": "0ab92af3-26f5-4865-a3d0-f47c200f7b32",
+        "file": "GAPFIZ654321",
+        "CALL_INFO": "SomeString",
+        "uuid": "5e33c693-ff90-49cf-9a1b-67ea859ab39e"
+    }
+]

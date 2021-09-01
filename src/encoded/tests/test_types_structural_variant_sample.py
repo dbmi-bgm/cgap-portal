@@ -1,5 +1,7 @@
 import pytest
 
+pytestmark = [pytest.mark.working, pytest.mark.schema]
+
 SV_URL = "/structural_variant"
 SV_SAMPLE_URL = "/structural_variant_sample"
 
@@ -84,3 +86,87 @@ def test_associated_genotype_labels(
     patch_body = {"structural_variant": mito_structural_variant["@id"]}
     sample_patch = testapp.patch_json(sample_post["@id"], patch_body, status=200).json
     assert "associated_genotype_labels" not in sample_patch
+
+
+def test_project_specific_structural_variant_sample_genelist(
+    testapp,
+    genelist,
+    cgap_core_genelist,
+    bgm_genelist,
+    structural_variant_sample,
+    bgm_structural_variant_sample,
+    cgap_core_structural_variant_sample,
+    structural_variant_sample_2,
+):
+    """
+    Test structural variant samples correctly matched with gene lists
+    based on gene list project. 
+
+    If project is CGAP_CORE_PROJECT or same as variant sample project,
+    the two should be associated.
+    """
+    response = testapp.post_json(
+        SV_SAMPLE_URL, structural_variant_sample, status=201
+    ).json["@graph"][0]
+    cgap_core_response = testapp.post_json(
+        SV_SAMPLE_URL, cgap_core_structural_variant_sample, status=201
+    ).json["@graph"][0]
+    bgm_response = testapp.post_json(
+        SV_SAMPLE_URL, bgm_structural_variant_sample, status=201
+    ).json["@graph"][0]
+    no_genelists_response = testapp.post_json(
+        SV_SAMPLE_URL, structural_variant_sample_2, status=201
+    ).json["@graph"][0]
+    assert set(response["associated_genelists"]) == {
+        genelist["display_title"],
+        cgap_core_genelist["display_title"],
+    }
+    assert set(cgap_core_response["associated_genelists"]) == {
+        cgap_core_genelist["display_title"]
+    }
+    assert set(bgm_response["associated_genelists"]) == {
+        bgm_genelist["display_title"],
+        cgap_core_genelist["display_title"],
+    }
+    assert not no_genelists_response["associated_genelists"]
+
+
+def test_case_specific_structural_variant_sample_genelist(
+    testapp, genelist, cgap_core_genelist, structural_variant_sample
+):
+    """
+    Test structural variant samples correctly matched with gene lists
+    based on project and cases (via gene list bam_sample_ids) when
+    gene lists have case info.
+    """
+    genelist_title = genelist["display_title"]
+
+    bam_sample_id = "some_sample"
+    genelist_patch = {"bam_sample_ids": [bam_sample_id]}
+    testapp.patch_json(genelist["@id"], genelist_patch)
+    structural_variant_sample["CALL_INFO"] = bam_sample_id
+    structural_variant_sample_post = testapp.post_json(
+        SV_SAMPLE_URL, structural_variant_sample, status=201
+    ).json["@graph"][0]
+    assert genelist_title in structural_variant_sample_post["associated_genelists"]
+
+    new_bam_sample_id = "another_sample"
+    genelist_patch = {"bam_sample_ids": [new_bam_sample_id]}
+    testapp.patch_json(genelist["@id"], genelist_patch, status=200)
+    structural_variant_sample_patch = testapp.patch_json(
+        structural_variant_sample_post["@id"], {}, status=200
+    ).json["@graph"][0]
+    assert genelist_title not in structural_variant_sample_patch["associated_genelists"]
+
+    testapp.patch_json(cgap_core_genelist["@id"], genelist_patch, status=200)
+    structural_variant_sample_patch = testapp.patch_json(
+        structural_variant_sample_post["@id"], {}, status=200
+    ).json["@graph"][0]
+    assert not structural_variant_sample_patch["associated_genelists"]
+
+    genelist_patch = {"bam_sample_ids": [bam_sample_id, new_bam_sample_id]}
+    testapp.patch_json(genelist["@id"], genelist_patch, status=200)
+    structural_variant_sample_patch = testapp.patch_json(
+        structural_variant_sample_post["@id"], {}, status=200
+    ).json["@graph"][0]
+    assert genelist_title in structural_variant_sample_patch["associated_genelists"]
