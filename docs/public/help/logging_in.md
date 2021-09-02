@@ -22,13 +22,13 @@ email, Auth0 will callback to the IdP of the supported institution to
 authenticate the user. The email will be rejected if the institutional
 login is not supported by our Auth0 application. We add new institutions
 on a case-by-case basis as needed by our users. It is preferred that 
-standard (non-internal) users stick with authenticating through their 
-respective institutions rather than bypassing it by creating an
+standard (non-internal) users stick with authentication through their 
+respective institutions rather than through an
 associated Google Account.
 
-As of writing we support the below institutional logins. If your institution
+As of writing, we support the below institutional logins. If your institution
 is not supported, and you are a current or planned user, please contact us so that we
-can provide support for the new institution. CGAP plans to support all IdP's that
+can provide support for the new institution. CGAP plans to support all IdPs that
 our authentication solution (Auth0) supports.
     
 * Google - note that all emails can create an associated Google Account 
@@ -60,8 +60,8 @@ two options:
   Note that internal users who have created Google Accounts for their 
   `hms.harvard.edu` emails can choose to login via either pathway.
   
-* If your account is associated with a harvard.edu, partners.org or BCH email 
+* If your account is associated with a `harvard.edu`, `partners.org`, or BCH email 
   account, and you do not have an associated Google Account, you must login by 
   entering the institutional email associated with your CGAP user into the login box. 
-  After filling this and clicking "Log In", you will then see another popup 
+  After filling this and clicking "Log In", you will then see another pop-up 
   that prompts you to sign in with your respective IdP.
