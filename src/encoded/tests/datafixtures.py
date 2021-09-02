@@ -1341,7 +1341,7 @@ def variant_sample_list(
 
 
 @pytest.fixture
-def structural_variant(testapp, project, institution):
+def structural_variant(testapp, project, institution, gene):
     item = {
         "project": project["@id"],
         "institution": institution["@id"],
@@ -1349,6 +1349,21 @@ def structural_variant(testapp, project, institution):
         "START": 1000,
         "END": 2000,
         "SV_TYPE": "DEL",
+        "transcript": [{"csq_gene": gene["@id"]}],
+    }
+    return testapp.post_json("/structural_variant", item).json["@graph"][0]
+
+
+@pytest.fixture
+def structural_variant_2(testapp, project, institution, gene_2):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "3",
+        "START": 34500,
+        "END": 56000,
+        "SV_TYPE": "DUP",
+        "transcript": [{"csq_gene": gene_2["@id"]}],
     }
     return testapp.post_json("/structural_variant", item).json["@graph"][0]
 
@@ -1362,5 +1377,46 @@ def structural_variant_sample(project, institution, structural_variant):
         "structural_variant": structural_variant["@id"],
         "CALL_INFO": "some_sample",
         "file": "some_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def structural_variant_sample_2(project, institution, structural_variant_2):
+    """This item is not pre-posted to database."""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "structural_variant": structural_variant_2["@id"],
+        "CALL_INFO": "some_sample",
+        "file": "some_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def cgap_core_structural_variant_sample(
+    cgap_core_project, institution, structural_variant
+):
+    """This item is not pre-posted to database."""
+    item = {
+        "project": cgap_core_project["@id"],
+        "institution": institution["@id"],
+        "structural_variant": structural_variant["@id"],
+        "CALL_INFO": "some_cgap_core_sample",
+        "file": "some_cgap_core_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def bgm_structural_variant_sample(bgm_project, institution, structural_variant):
+    """This item is not pre-posted to database."""
+    item = {
+        "project": bgm_project["@id"],
+        "institution": institution["@id"],
+        "structural_variant": structural_variant["@id"],
+        "CALL_INFO": "some_bgm_sample",
+        "file": "some_bgm_vcf_file",
     }
     return item

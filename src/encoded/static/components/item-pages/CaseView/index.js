@@ -820,12 +820,12 @@ function FilteringTabWrapper(props) {
                     {currentTitle} <span className="text-300">Variant Filtering and Technical Review</span>
                 </h1>
             </div>
-            <div className={currViewName === "SNV" ? "mt-36" : "d-none"}>
+            <div id="snv-filtering" className={currViewName === "SNV" ? "mt-36" : "d-none"}>
                 <SelectedItemsController isMultiselect>
                     <FilteringTab {...commonProps} {...snvFilteringProps } />
                 </SelectedItemsController>
             </div>
-            <div className={currViewName === "CNVSV" ? "" : "d-none"}>
+            <div id="cnvsv-filtering" className={currViewName === "CNVSV" ? "" : "d-none"}>
                 <CNVSVFilteringTab {...commonProps} {...svFilteringProps} />
             </div>
         </React.Fragment>
