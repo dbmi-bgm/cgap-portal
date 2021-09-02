@@ -17,7 +17,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                     Interpretation
                 </h1>
                 <div>
-                    <ExportSpreadsheetButton {...{ variantSampleListItem }} />
+                    <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem }} />
                 </div>
             </div>
             <div>
@@ -28,7 +28,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
 });
 
 
-const ExportSpreadsheetButton = React.memo(function ExportSpreadsheetButton({ variantSampleListItem }) {
+const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpretationSpreadsheetButton({ variantSampleListItem }) {
     const { "@id": atId, variant_samples: vsObjects = [] } = variantSampleListItem || {};
     const baseHref = atId + "/@@spreadsheet/";
     return (

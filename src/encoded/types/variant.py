@@ -939,7 +939,6 @@ def variant_sample_list_spreadsheet(context, request):
         raise HTTPBadRequest("Expected a valid `file_format` such as TSV or CSV.")
 
     if not suggested_filename:
-        # TODO: Add datetime
         timestamp = datetime.datetime.now(pytz.utc).isoformat()
         suggested_filename = "case-interpretation-" + timestamp + "." + file_format
 
@@ -1140,13 +1139,6 @@ def get_spreadsheet_mappings(request = None):
                 return pop_name
         return None
 
-    def url_to_variantsample(variant_sample):
-        at_id = variant_sample["@id"]
-        if request:
-            # Prepend request hostname, scheme, etc.
-            return request.resource_url(request.root) + variant_sample["@id"][1:]
-        return at_id
-
     def get_most_recent_note_of_project(notes_iterable, project_at_id):
         for note in reversed(list(notes_iterable)):
             note_project_id = note["project"]
@@ -1178,10 +1170,12 @@ def get_spreadsheet_mappings(request = None):
         return callable
 
 
+    # portal_root_url = request.resource_url(request.root)[:-1]
+
     return [
     ##  Column Title                             |  CGAP Field (if not custom function)                          |  Description
     ##  ---------------------------------------  |  -----------------------------------------------------------  |  --------------------------------------------------------------------------
-        ("URL",                                     url_to_variantsample,                                           "URL to Sample Variant on this row"),
+        ("Identifier",                              "@id",                                                          "URL path to the Sample Variant on this row"),
         ("Chrom (hg38)",                            "variant.CHROM",                                                "Chromosome (hg38 assembly)"),
         ("Pos (hg38)",                              "variant.POS",                                                  "Start Position (hg38 assembly)"),
         ("Chrom (hg19)",                            "variant.hg19_chr",                                             "Chromosome (hg19 assembly)"),

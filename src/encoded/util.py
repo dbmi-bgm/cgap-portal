@@ -320,7 +320,7 @@ CONTENT_TYPE_SPECIAL_CASES = {
         # Single legacy special case to allow us to POST to metadata TSV requests via form submission.
         # All other special case values should be added using register_path_content_type.
         '/metadata/',
-        '/variant-sample-list-spreadsheet/',
+        '/variant-sample-search-spreadsheet/',
         r'/variant-sample-lists/[\da-z-]+/@@spreadsheet/'
     ]
 }

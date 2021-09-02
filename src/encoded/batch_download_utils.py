@@ -111,7 +111,7 @@ def stream_tsv_output(dictionaries_iterable, spreadsheet_mappings, file_format =
     # ])
     # yield line.read().encode('utf-8')
 
-    # Headers (column title)
+    ## Add in headers (column title) and descriptions
     title_headers = []
     description_headers = []
     for column_title, cgap_field_or_func, description in spreadsheet_mappings:
@@ -133,10 +133,11 @@ def stream_tsv_output(dictionaries_iterable, spreadsheet_mappings, file_format =
             row[0] = "# Not Available"
             yield writer.writerow(row)
         else:
-            print("Printing", vs_dict)
+            # print("Printing", vs_dict)
             yield writer.writerow([ vs_dict.get(sm[0]) or "" for sm in spreadsheet_mappings ])
 
-
+    # TODO: Figure out what we need in summary (if anything) and gather at some place.
+    # Could be implemented based on request._stats, e.g. `setattr(vs_dict, "_stats", { "countX" : 0, "countY": 0 })`
     # for summary_line in generate_summary_lines():
     #     writer.writerow(summary_line)
     #     yield line.read().encode('utf-8')

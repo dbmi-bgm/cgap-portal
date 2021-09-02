@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import url from 'url';
@@ -202,7 +202,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
 
             // From FilteringTab (& higher, e.g. App/redux-store):
-            caseItem, schemas, session,
+            caseItem, schemas, session, searchHrefBase,
 
             // From SaveFilterSetButtonController:
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet, haveEditPermission,
@@ -316,7 +316,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
                 <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
                     panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
-                    <h4 className="text-400 col my-0">
+                    <h4 className="text-400 col-12 col-lg my-0 py-1">
                         <strong className="mr-1">{ totalCount }</strong>
                         <span>
                             Variant Matches for { currentFilterBlockName ?
@@ -330,12 +330,15 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                                 ) }
                         </span>
                     </h4>
-                    { selectedVariantSamples instanceof Map ?
-                        <div className="col-auto pr-06">
-                            <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIndices,
-                                variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
-                        </div>
-                        : null }
+                    <div className="col col-lg-auto pr-06 d-flex">
+                        { selectedVariantSamples instanceof Map ?
+                            <div className="pr-14">
+                                <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIndices,
+                                    variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
+                            </div>
+                            : null }
+                        <ExportSearchSpreadsheetButton {...{ selectedFilterBlockIndices, filterSet, searchHrefBase, intersectFilterBlocks }} />
+                    </div>
                 </AboveTableControlsBase>
             </div>
         );
@@ -345,12 +348,28 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
 const ExportSearchSpreadsheetButton = React.memo(function ExportSearchSpreadsheetButton(props){
     const { selectedFilterBlockIndices, filterSet, searchHrefBase, intersectFilterBlocks } = props;
-
     const virtualCompoundFilterSet = FilterSetController.createCompoundSearchRequest(selectedFilterBlockIndices, filterSet, searchHrefBase, intersectFilterBlocks);
+    const formRef = useRef(null);
+    const onSelect = useCallback(function(eventKey, e){
+        formRef.current.action = "/variant-sample-search-spreadsheet/?file_format=" + eventKey;
+        formRef.current.submit();
+        return false;
+    }, [ formRef ]);
 
     return (
-        <form method="POST" action="/variant-sample-search-spreadsheet/">
+        <form method="POST" className="mb-0" ref={formRef}>
             <input type="hidden" name="compound_search_request" value={JSON.stringify(virtualCompoundFilterSet)} />
+            <DropdownButton variant="outline-primary" title="Export results as..." onSelect={onSelect} disabled={!filterSet}>
+                <DropdownItem eventKey="tsv">
+                    <span className="text-600">TSV</span> spreadsheet
+                </DropdownItem>
+                <DropdownItem eventKey="csv">
+                    <span className="text-600">CSV</span> spreadsheet
+                </DropdownItem>
+                <DropdownItem eventKey="xlsx" disabled>
+                    <span className="text-600">XLSX</span> spreadsheet
+                </DropdownItem>
+            </DropdownButton>
         </form>
     );
 });

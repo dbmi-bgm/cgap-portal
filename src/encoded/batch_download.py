@@ -2,6 +2,8 @@ import csv
 import io
 import json
 import os
+import datetime
+import pytz
 import structlog
 from math import inf
 from urllib.parse import parse_qs, urlparse
@@ -70,12 +72,10 @@ def variant_sample_search_spreadsheet(context, request):
 
     request_body = {}
     try:
+        # This is what we should be receiving
         request_body = request.POST
     except:
-        try:
-            request_body = request.json
-        except:
-            pass
+        pass
 
 
     file_format = request_body.get("file_format", request.GET.get("file_format", "tsv")).lower()
@@ -83,12 +83,12 @@ def variant_sample_search_spreadsheet(context, request):
         raise HTTPBadRequest("Expected a valid `file_format` such as TSV or CSV.")
     suggested_filename = request_body.get("suggested_filename", request.GET.get("suggested_filename", None))
     if not suggested_filename:
-        suggested_filename = "variant-sample-filtering." + file_format # TODO: Datetime
-
+        timestamp = datetime.datetime.now(pytz.utc).isoformat()
+        suggested_filename = "variant-sample-filtering-" + timestamp + "." + file_format
 
     spreadsheet_mappings = get_spreadsheet_mappings(request)
 
-    # TEMPORARY - WE WILL GET THIS FROM POST BODY IN NEAR FUTURE - MUST NOT CONTAIN `limit`
+    # TEMPORARY FOR TESTING - WE GET THIS SOLELY FROM POST BODY SOON
     filterset_blocks_request = {
         "search_type":"VariantSample",
         "global_flags":"CALL_INFO=SAM10254-S1&file=GAPFI3EBH4X2&additional_facet=proband_only_inheritance_modes&sort=date_created",
@@ -98,16 +98,22 @@ def variant_sample_search_spreadsheet(context, request):
                 "query":"associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Breast+Cancer+%2828%29&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
                 "flags_applied":[]
             },
-            {
-                "query":"GQ.from=60&GQ.to=99&associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Familial+Cancer+%28148%29&variant.csq_clinvar_clnsig=Uncertain_significance&variant.csq_clinvar_clnsig=Pathogenic&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
-                "flags_applied":[]
-            },
-            {
-                "query":"variant.csq_gnomade2_af.from=0&variant.csq_gnomade2_af.to=0.001&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001",
-                "flags_applied":[]
-            }
+            # {
+            #     "query":"GQ.from=60&GQ.to=99&associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Familial+Cancer+%28148%29&variant.csq_clinvar_clnsig=Uncertain_significance&variant.csq_clinvar_clnsig=Pathogenic&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
+            #     "flags_applied":[]
+            # },
+            # {
+            #     "query":"variant.csq_gnomade2_af.from=0&variant.csq_gnomade2_af.to=0.001&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001",
+            #     "flags_applied":[]
+            # }
         ]
     }
+
+    # Must not contain `limit`
+    filterset_blocks_request = request_body["compound_search_request"]
+    if isinstance(filterset_blocks_request, str):
+        # Assuming is from a www-form-encoded POST request, which has value stringified.
+        filterset_blocks_request = json.loads(filterset_blocks_request)
 
     filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, filterset_blocks_request)
     global_flags = filterset_blocks_request.get('global_flags', None)
@@ -171,10 +177,14 @@ def embed_and_merge_note_items_to_variant_sample(request, embedded_vs):
         "variant_notes",
         "gene_notes"
     ]
-    # TODO: Parallelize?
+    # TODO: Parallelize (^ notes per VS)?
     for note_field in note_containing_fields:
         for incomplete_note_obj in simple_path_ids(embedded_vs, note_field):
             # Using request.embed instead of CustomEmbed because we're fine with getting from ES (faster)
             # for search-based spreadsheet requests.
-            full_embedded_note = request.embed(incomplete_note_obj["@id"])
-            incomplete_note_obj.update(full_embedded_note)
+            note_subreq = make_subrequest(request, incomplete_note_obj["@id"])
+            # We don't get _stats on subreq of www-encoded-form POST requests; need to look into (could perhaps amend in snovault)
+            # Add this in to prevent error in snovault's `after_cursor_execute`
+            setattr(note_subreq, "_stats", request._stats)
+            note_response = request.invoke_subrequest(note_subreq)
+            incomplete_note_obj.update(note_response.json)
