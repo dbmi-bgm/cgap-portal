@@ -160,7 +160,7 @@
     {
         "file": "/docs/public/help/developer_facing_docs.md",
         "name": "help.developer_facing_docs.content",
-        "title": "Informatics Documentation",
+        "title": "Links for Further Documentation",
         "status": "public",
         "aliases": [
             "hms-dbmi:developer_facing_docs.content"
