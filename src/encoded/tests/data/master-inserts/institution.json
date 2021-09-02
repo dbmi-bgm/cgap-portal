@@ -6,6 +6,7 @@
         "country": "USA",
         "fax": "000-000-0000",
         "name": "hms-dbmi",
+        "status": "shared",
         "phone1": "000-000-0000",
         "phone2": "000-000-0000",
         "pi": "dvuzman@research.bwh.harvard.edu",
@@ -20,11 +21,13 @@
     {
         "name": "cgap-personas",
         "title": "CGAP Personas",
+        "status": "shared",
         "uuid": "59024e8e-eaea-477c-8f9b-df0bd722cfcb"
     },
     {
         "name": "cgap-backend-team",
         "title": "CGAP Backend Team",
+        "status": "shared",
         "uuid": "87199845-51b5-4352-bdea-583edae4bb6a"
     },
     {
@@ -34,6 +37,7 @@
         "country": "USA",
         "fax": "000-000-0000",
         "name": "bwh",
+        "status": "shared",
         "phone1": "000-000-0000",
         "phone2": "000-000-0000",
         "pi": "jkrier@bwh.harvard.edu",
@@ -52,6 +56,7 @@
         "country": "USA",
         "fax": "000-000-0000",
         "name": "bch",
+        "status": "shared",
         "phone1": "000-000-0000",
         "phone2": "000-000-0000",
         "pi": "dvuzman@research.bwh.harvard.edu",
@@ -67,6 +72,7 @@
         "name": "msa-coalition",
         "title": "Multiple System Atrophy Coalition",
         "aliases": ["msa:msa-institution"],
+        "status": "shared",
         "date_created": "2020-11-03T22:19:15.807261+00:00",
         "uuid": "232539d0-41aa-4cdc-835d-7f164f1462ea"
     }

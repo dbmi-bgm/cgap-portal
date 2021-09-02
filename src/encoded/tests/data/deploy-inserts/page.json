@@ -164,7 +164,7 @@
     },
     {
         "name": "help/developer_facing_documentation",
-        "title": "Developer-Facing Documentation",
+        "title": "Informatics Documentation",
         "status": "public",
         "aliases": [
             "hms-dbmi:developer_facing_documentation"

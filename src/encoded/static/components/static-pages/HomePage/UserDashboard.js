@@ -53,6 +53,7 @@ const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, wi
         "/search/?type=Case"
         + "&report.uuid!=No+value"
         + "&proband_case=true"
+        + "&status!=inactive"
         + "&sort=-last_modified.date_modified"
     );
     const maxHeight = typeof windowHeight === "number" ?

@@ -13,7 +13,7 @@ DBMI_INSTITUTION_ID = '/institutions/%s/' % DBMI_INSTITUTION_NAME
 
 # Available in master_inserts, workbook_inserts
 
-DBMI_PROJECT = master_lookup('Project', name='hms-dbmi')
+DBMI_PROJECT = master_lookup('Project', name='cgap-core')
 DBMI_PROJECT_UUID = DBMI_PROJECT['uuid']
 DBMI_PROJECT_NAME = DBMI_PROJECT['name']
 DBMI_PROJECT_ID = '/projects/%s/' % DBMI_PROJECT_NAME

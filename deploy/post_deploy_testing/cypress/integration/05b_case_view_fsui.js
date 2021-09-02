@@ -65,33 +65,44 @@ describe('Case View - FSUI', function () {
 
         // New FB block created+selected may cancel an existing search request for previous filterset block selection
         cy.once('uncaught:exception', onSupersededAjaxRequestHandler).end()
-            .get(".above-variantsample-table-ui div[aria-label=\"Creation Controls\"] button:first-child")
-            .should("have.text", "Add Filter Block").click().end()
-            .get("#case-info\\.filtering .above-variantsample-table-ui .filterset-blocks-container")
-            .should("have.attr", "data-all-selected", "false").end()
-            .get("#case-info\\.filtering .above-variantsample-table-ui .filterset-blocks-container .blocks-container .filterset-block").should("have.length", countFBInitial + 1)
-            .eq(-1)
-            .should("have.class", "selected")
-            .contains("No Filters Selected").end();
+            .get("#case-info\\.filtering #snv-filtering").within(function(){
+                cy.get(".above-variantsample-table-ui div[aria-label=\"Creation Controls\"] button:first-child")
+                    .should("have.text", "Add Filter Block").click().end()
+                    .get(".above-variantsample-table-ui .filterset-blocks-container")
+                    .should("have.attr", "data-all-selected", "false").end()
+                    .get(".above-variantsample-table-ui .filterset-blocks-container .blocks-container .filterset-block").should("have.length", countFBInitial + 1)
+                    .eq(-1)
+                    .should("have.class", "selected").within(function($fb){
+                        // Wait until is finished loading (else next test may fail)
+                        return cy.get("i.icon").should("have.class", "icon-times-circle");
+                    })
+                    .contains("No Filters Selected").end();
+            });
     });
 
     it("Selecting term from FacetList adds to the new filter block", function(){
 
         cy.once('uncaught:exception', onSupersededAjaxRequestHandler).end()
-            .get(".facets-column > .facets-container > .facets-body div.facet[data-field=\"associated_genotype_labels.proband_genotype_label\"] .facet-title")
-            .click()
-            .get(".facets-column > .facets-container > .facets-body div.facet[data-field=\"associated_genotype_labels.proband_genotype_label\"] .facet-list-element[data-key=\"Heterozygous\"]")
-            .should("not.have.class", "selected")
-            .click()
-            // Get it again, else might be referring to non-existing/unmounted elem as term changes locations.
-            .get(".facets-column > .facets-container > .facets-body div.facet[data-field=\"associated_genotype_labels.proband_genotype_label\"] .facet-list-element[data-key=\"Heterozygous\"]")
-            .should("have.class", "selected").end()
-            .get(".filterset-blocks-container .blocks-container .filterset-block:last-child .field-block").should("have.length", 1)
-            .within(function($fb){
-                cy.get(".field-name").should("have.text", "Proband Genotype").end()
-                    .get(".value-blocks .value-block")
-                    .should("have.text", "Heterozygous");
+            .get("#case-info\\.filtering  #snv-filtering").within(function(){
+                // Open "Genotype" grouping facet -- allow this to fail as `Proband Genotype` might be ungrouped
+                //.get(".facets-column > .facets-container > .facets-body div.facet[data-group=\"Genotype\"] .facet-title")
+                // Open "Proband Genotype" field facet
+                cy.get(".facets-column > .facets-container > .facets-body div.facet[data-field=\"associated_genotype_labels.proband_genotype_label\"] .facet-title")
+                    .click()
+                    .get(".facets-column > .facets-container > .facets-body div.facet[data-field=\"associated_genotype_labels.proband_genotype_label\"] .facet-list-element[data-key=\"Heterozygous\"]")
+                    .should("not.have.class", "selected")
+                    .click()
+                    // Get it again, else might be referring to non-existing/unmounted elem as term changes locations.
+                    .get(".facets-column > .facets-container > .facets-body div.facet[data-field=\"associated_genotype_labels.proband_genotype_label\"] .facet-list-element[data-key=\"Heterozygous\"]")
+                    .should("have.class", "selected").end()
+                    .get(".filterset-blocks-container .blocks-container .filterset-block:last-child .field-block").should("have.length", 1)
+                    .within(function($fb){
+                        cy.get(".field-name").should("have.text", "Proband Genotype").end()
+                            .get(".value-blocks .value-block")
+                            .should("have.text", "Heterozygous");
+                    });
             });
+
     });
 
     // TODO: Test RangeFacets
