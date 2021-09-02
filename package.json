@@ -104,6 +104,7 @@
     "higlass-clinvar": "0.2.3",
     "higlass-pileup": "1.2.0",
     "higlass-gnomad": "0.2.0",
+    "higlass-general-vcf": "0.1.0",
     "higlass-sv": "0.1.5",
     "markdown-to-jsx": "^6.11.4",
     "memoize-one": "^5.1.1",
