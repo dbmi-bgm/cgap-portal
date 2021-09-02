@@ -142,10 +142,8 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
             },
             "structural_variant.size": {
                 "render": function(result, props) {
-                    const { structural_variant: { size = null } = {} } = result;
-
-                    if (size === null) { return size; }
-                    return valueTransforms.bytesToLargerUnit(size);
+                    const { structural_variant: { size_display = null } = {} } = result;
+                    return size_display;
                 }
             }
         };
