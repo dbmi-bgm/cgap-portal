@@ -658,7 +658,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                         const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
                         if (sample && sample === caseSampleId) {
                             switch (title) { // Leaving this as switch case, since more fields may be added in future (may also be worth creating a function to encompass SV & SNV options as this grows)
-                                case "total variant lines in vcf":
+                                case "Filtered Variants":
                                     msaStats.filteredSVVariants = { value: transformValueType(numberType, value), tooltip };
                                     break;
                                 default:
