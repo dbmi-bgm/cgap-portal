@@ -58,6 +58,17 @@
             "scope": "sample_variant",
             "schema_title": "Sample ID"
         },
+        "GQ": {
+            "title": "Genotype Quality",
+            "field_name": "GQ",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "GQ",
+            "source_name": "VCF",
+            "description": "Genotype quality",
+            "scope": "sample_variant",
+            "schema_title": "Genotype Quality"
+        },
         "GT": {
             "title": "Genotype",
             "field_name": "GT",
@@ -69,10 +80,43 @@
             "scope": "sample_variant",
             "schema_title": "Genotype"
         },
+        "PL": {
+            "title": "Genotype Likelihoods",
+            "field_name": "PL",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "PL",
+            "source_name": "VCF",
+            "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",
+            "scope": "sample_variant",
+            "schema_title": "Genotype Likelihoods"
+        },
         "annotation_id": {
             "title": "Annotation ID",
             "type": "string",
             "uniqueKey": true
+        },
+        "confidence_interval_end": {
+            "title": "End Position Confidence Interval",
+            "field_name": "confidence_interval_end",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "CIEND",
+            "source_name": "VCF",
+            "description": "Confidence interval of end position in basepairs",
+            "scope": "sample_variant",
+            "schema_title": "End Position Confidence Interval"
+        },
+        "confidence_interval_start": {
+            "title": "Start Position Confidence Interval",
+            "field_name": "confidence_interval_start",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "CIPOS",
+            "source_name": "VCF",
+            "description": "Confidence interval of start position in basepairs",
+            "scope": "sample_variant",
+            "schema_title": "Start Position Confidence Interval"
         },
         "discovery_interpretation": {
             "title": "Discovery Interpretation",
@@ -110,6 +154,17 @@
                     }
                 }
             }
+        },
+        "imprecise": {
+            "title": "Imprecise Structural Variant",
+            "field_name": "imprecise",
+            "type": "boolean",
+            "do_import": true,
+            "vcf_field": "IMPRECISE",
+            "source_name": "VCF",
+            "description": "Imprecise structural variant flag from Manta",
+            "scope": "sample_variant",
+            "schema_title": "Imprecise Structural Variant"
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
