@@ -2453,6 +2453,12 @@ i.status-indicator-dot {
 					border-top-left-radius: 0px;
 				}
 			}
+
+			.info-header-title {
+				> .dropdown > .btn-outline-secondary {
+					@include button-variant(#fff, #e0e0e0);
+				}
+			}
 		}
 	}
 
