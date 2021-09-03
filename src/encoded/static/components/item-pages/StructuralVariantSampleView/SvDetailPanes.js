@@ -77,12 +77,12 @@ export function SvGeneDetailPane(props) {
 
                     <div className="flex-grow-0 pb-2 pb-md-0">
                         <div className="info-header-title">
-                            <h4>Consequence of SNV</h4>
+                            <h4>Consequence of CNV/SV</h4>
                             <TranscriptSelectionDropdown {...{ context, schemas, currentTranscriptIdx, setTranscriptIdx }}
                                 transcripts={resultTranscripts}/>
                         </div>
                         <div className="info-body">
-                            <ConsequenceOfSNVSection currentTranscript={resultTranscripts[currentTranscriptIdx]} {...{ fallbackElem }}/>
+                            <ConsequenceOfSVSection currentTranscript={resultTranscripts[currentTranscriptIdx]} {...{ fallbackElem }}/>
                         </div>
                     </div>
                 </div>
@@ -139,7 +139,7 @@ function TranscriptSelectionDropdown(props){
     );
 }
 
-function ConsequenceOfSNVSection({ currentTranscript }) {
+function ConsequenceOfSVSection({ currentTranscript }) {
     if (!currentTranscript){
         return (
             <div className="row mb-03">
