@@ -135,9 +135,9 @@
             "type": "string",
             "linkTo": "MetaWorkflowRun"
         },
-        "superceded_by": {
-            "title": "Superceded By",
-            "description": "The new case whose updated analysis will supercede this case",
+        "superseded_by": {
+            "title": "Superseded By",
+            "description": "The new case whose updated analysis will supersede this case",
             "type": "string",
             "format": "accession",
             "permission": "restricted_fields",
