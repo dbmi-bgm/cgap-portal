@@ -39,7 +39,7 @@ function SvQualityTable(props) {
         <table className="w-100">
             <thead>
                 <tr>
-                    <th className="text-left">Quality</th>
+                    <th className="text-left w-50">Quality</th>
                     <th className="text-left">Value</th>
                 </tr>
             </thead>

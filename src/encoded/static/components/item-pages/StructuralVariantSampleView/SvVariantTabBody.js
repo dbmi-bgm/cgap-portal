@@ -13,6 +13,8 @@ export const SvVariantTabBody = React.memo(function SvVariantTabBody({ context, 
     const { structural_variant } = context;
     const { csq_clinvar: variationID, annotation_id: annotationID, hg19_chr, hg19_pos, ALT, REF, transcript } = structural_variant;
 
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
+
     const [ showingTable, setShowingTable ] = useState("SV"); // Currently only "SV" allowed; more will be added in future
 
     const onSelectShowingTable = useCallback(function(evtKey, e){
@@ -92,7 +94,7 @@ export const SvVariantTabBody = React.memo(function SvVariantTabBody({ context, 
                                         : null }
                                 </div>
                                 <div className="info-body overflow-auto">
-                                    <SVGnomADTable {...{ context, schemas, getTipForField }} />
+                                    <SVGnomADTable {...{ context, schemas, getTipForField, fallbackElem }} />
                                 </div>
                             </div>
                         </div>
@@ -104,7 +106,7 @@ export const SvVariantTabBody = React.memo(function SvVariantTabBody({ context, 
 });
 
 const SVGnomADTable = React.memo(function SVGnomADTable(props) {
-    const { context, getTipForField, prefix = "gnomadg" } = props;
+    const { fallbackElem, context, getTipForField, prefix = "gnomadg" } = props;
     const { structural_variant } = context;
 
     const {
@@ -158,9 +160,9 @@ const SVGnomADTable = React.memo(function SVGnomADTable(props) {
             <tbody>
                 <tr>
                     <td className="text-600 text-left">gnomAD SV</td>
-                    <td>{gnomad_ac}</td>
-                    <td>{gnomad_an}</td>
-                    <td className="text-left">{gnomad_af}</td>
+                    <td>{gnomad_ac || fallbackElem}</td>
+                    <td>{gnomad_an || fallbackElem}</td>
+                    <td className="text-left">{gnomad_af || fallbackElem}</td>
                 </tr>
                 { ancestryTableRows }
             </tbody>
