@@ -134,6 +134,14 @@
             "description": "SV Meta-workflow-run associated with this case",
             "type": "string",
             "linkTo": "MetaWorkflowRun"
+        },
+        "superceded_by": {
+            "title": "Superceded By",
+            "description": "The new case whose updated analysis will supercede this case",
+            "type": "string",
+            "format": "accession",
+            "permission": "restricted_fields",
+            "exclude_from": ["FFedit-create"]
         }
     },
     "facets": {
