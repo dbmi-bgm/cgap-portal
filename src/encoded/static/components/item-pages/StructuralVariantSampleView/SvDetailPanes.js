@@ -77,7 +77,7 @@ export function SvGeneDetailPane(props) {
 
                     <div className="flex-grow-0 pb-2 pb-md-0">
                         <div className="info-header-title">
-                            <h4>Consequence of CNV/SV</h4>
+                            <h4>Consequence of SV</h4>
                             <TranscriptSelectionDropdown {...{ context, schemas, currentTranscriptIdx, setTranscriptIdx }}
                                 transcripts={resultTranscripts}/>
                         </div>
@@ -149,7 +149,7 @@ function ConsequenceOfSVSection({ currentTranscript }) {
             </div>);
     }
 
-    const { fallbackElem, csq_consequence: { 0 : consequence = null } = [] } = currentTranscript;
+    const { fallbackElem, csq_consequence = [] } = currentTranscript;
     // TODO: Add breakpoints once they are ready
 
     return (
@@ -161,7 +161,7 @@ function ConsequenceOfSVSection({ currentTranscript }) {
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="snv-consequence">
-                    { consequence ? consequence.display_title: fallbackElem }
+                    { csq_consequence.map((c) => c.display_title).join(", ") || fallbackElem}
                 </div>
             </div>
             <div className="row mb-03">
