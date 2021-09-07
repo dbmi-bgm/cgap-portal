@@ -123,9 +123,10 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
             //     }
             // },
             "structural_variant.transcript.csq_gene.display_title": {
+                "noSort": true, // not currently a useful or informative sort.
                 "render": function(result, props) {
                     const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result;
-                    const path = atID; // + "?annotationTab=0" // TODO: Needs to point to Gene tab when that is complete
+                    const path = atID + "?annotationTab=0";
 
                     const transcriptsDeduped = {};
                     transcripts.forEach((transcript) => {
