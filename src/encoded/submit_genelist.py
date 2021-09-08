@@ -94,6 +94,8 @@ class GeneListSubmission:
         if not validate_only:
             self.post_output, self.at_id = self.post_items()
             self.submit_variant_update()
+        if self.errors:
+            self.add_default_error_message()
 
     def extract_txt_file(self, txt_file):
         """
@@ -339,24 +341,13 @@ class GeneListSubmission:
                                 non_ensgids.remove(item)
                                 break
         if non_ensgids:
-            for gene in non_ensgids:
-                try:
-                    response = self.vapp.get("/search/?type=Gene&q=" + gene).json[
-                        "@graph"
-                    ]
-                    options = [option["gene_symbol"] for option in response]
-                    self.errors.append(
-                        "No perfect match found for gene %s. "
-                        "Consider replacing with one of the following: %s."
-                        % (gene, ", ".join(options))
-                    )
-                except (VirtualAppError, AppError):
-                    unmatched_genes_without_options.append(gene)
-        if unmatched_genes_without_options:
             self.errors.append(
-                "The gene(s) %s could not be found in our database. "
+                "The following gene(s) could not be found in our database: %s. "
                 "Consider replacement with an alias name or an Ensembl ID."
-                % ", ".join(unmatched_genes_without_options)
+                "As a reminder, only coding genes exist in our database, so "
+                "pseudogenes, non-coding genes, etc. will cause a gene list submission "
+                "to fail."
+                % ", ".join(non_ensgids)
             )
         sorted_gene_names = sorted(gene_ids)
         matched_gene_uuids = []
@@ -711,6 +702,17 @@ class GeneListSubmission:
                 "to the CGAP team and alert them of this issue."
             )
         return
+
+    def add_default_error_message(self):
+        """
+        Adds default message to self.errors explicitly stating no gene
+        list item has been created.
+        """
+        msg = (
+            "Due to the errors above, no gene list has been added to CGAP. Please"
+            " re-submit the gene list once the errors have been addressed."
+        )
+        self.errors.append(msg)
 
 
 def submit_variant_update(
