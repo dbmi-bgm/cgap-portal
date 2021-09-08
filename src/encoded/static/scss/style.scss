@@ -6,7 +6,8 @@
 @import "encoded/base";
 
 // Bootstrap
-@import "bootstrap/bootstrap";
+// @import "bootstrap/bootstrap";
+@import "../../../../node_modules/bootstrap/scss/bootstrap";
 
 // Some are used in shared-portal-components scss
 @import "encoded/bootstrap-theme-overrides";

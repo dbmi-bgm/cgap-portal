@@ -7,7 +7,6 @@ import url from 'url';
 import queryString from 'query-string';
 import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
-import Infinite from 'react-infinite';
 
 import Collapse from "react-bootstrap/esm/Collapse";
 import DropdownButton from "react-bootstrap/esm/DropdownButton";

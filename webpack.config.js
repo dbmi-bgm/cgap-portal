@@ -107,6 +107,10 @@ serverPlugins.push(new webpack.DefinePlugin({
     'BUILDTYPE' : JSON.stringify(env)
 }));
 
+// From https://github.com/jsdom/jsdom/issues/3042
+serverPlugins.push(
+    new webpack.IgnorePlugin(/canvas/, /jsdom$/)
+);
 
 if (env === 'development'){
     // Skip for `npm run dev-quick` (`env === "quick"`) since takes a while
@@ -163,7 +167,10 @@ module.exports = [
         //     dns: "empty",
         // },
         externals: [
-            { 'xmlhttprequest' : '{XMLHttpRequest:XMLHttpRequest}' }
+            {
+                'xmlhttprequest' : '{XMLHttpRequest:XMLHttpRequest}',
+                'jsdom': '{JSDOM:{}}'
+            }
         ],
         module: {
             rules: rules
