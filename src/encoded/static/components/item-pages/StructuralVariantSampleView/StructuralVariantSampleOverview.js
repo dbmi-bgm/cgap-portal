@@ -186,7 +186,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
     static tabNames = [
         "Gene",
         "Variant",
-        "Sample Quality",
+        "Sample",
         "SV Browser"
     ];
 
