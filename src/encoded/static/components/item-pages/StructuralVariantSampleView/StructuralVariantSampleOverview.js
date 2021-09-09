@@ -93,36 +93,62 @@ function VariantInfoSection({ context }) {
     const {
         annotation_id = fallbackElem, // TODO: pull from actual location info
         size_display = fallbackElem,
-        cytoband = fallbackElem
+        cytoband = fallbackElem,
+        SV_TYPE = fallbackElem,
     } = structural_variant;
 
     return (
         <div className="col-12">
             <div className="row pb-1 pb-md-03">
-                <div className="col-12 col-md-2">
-                    <label className="mb-0">Location:</label>
-                </div>
-                <div className="col-12 col-md-9">
+                <div className="col-12 col-md-6">
                     <div className="row">
                         <div className="col-12 col-md-6">
-                            <span id="vi_location"> {annotation_id}</span>
+                            <label htmlFor="vi_type" className="mb-0">Type:</label>
                         </div>
-                        <div className="col-12 col-md-3">
-                            <label htmlFor="vi_size" className="mb-0">Size:</label>
-                        </div>
-                        <div className="col-12 col-md-3">
-                            <span id="vi_size"> {size_display}</span>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_type">{SV_TYPE}</span>
                         </div>
                     </div>
-                    <div className="row pb-1 pb-md-03">
+                    <div className="row">
                         <div className="col-12 col-md-6">
-                            <span id="vi_location2"> {fallbackElem}</span>
+                            <label htmlFor="vi_grch38" className="mb-0">GRCh38:</label>
                         </div>
-                        <div className="col-12 col-md-3">
+                        <div className="col-12 col-md-6">
+                            <span id="vi_grch38">Need Info</span>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_grch37">Need Info</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-12 col-md-6">
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_genotype" className="mb-0">Genotype:</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_genotype">Need Info</span>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_size" className="mb-0">Size:</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_size">{size_display}</span>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
                             <label htmlFor="vi_cytoband" className="mb-0">Cytoband:</label>
                         </div>
-                        <div className="col-12 col-md-3">
-                            <span id="vi_cytoband"> {cytoband}</span>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_cytoband">{cytoband}</span>
                         </div>
                     </div>
                 </div>
