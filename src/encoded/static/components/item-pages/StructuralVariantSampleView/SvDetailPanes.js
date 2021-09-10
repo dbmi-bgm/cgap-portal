@@ -118,7 +118,7 @@ function TranscriptSelectionDropdown(props){
     const geneListOptions = transcripts.map(function(transcript, idx){
         return (
             <DropdownItem key={idx} eventKey={idx.toString()} active={idx === currentTranscriptIdx}>
-                <GeneTranscriptDisplayTitle transcript={transcript} />
+                <GeneTranscriptDisplayTitle transcript={transcript} hideGene />
             </DropdownItem>
         );
     });
@@ -128,12 +128,12 @@ function TranscriptSelectionDropdown(props){
     if (geneTranscriptListLen === 0) {
         dropdownTitleToShow = <em>No transcripts available</em>;
     } else {
-        dropdownTitleToShow = <GeneTranscriptDisplayTitle transcript={currentTranscript} />;
+        dropdownTitleToShow = <GeneTranscriptDisplayTitle transcript={currentTranscript} hideGene />;
     }
 
     return (
         <DropdownButton title={dropdownTitleToShow} size="sm py-1" variant="outline-secondary select-transcript" onSelect={setTranscriptIdx}
-            disabled={geneTranscriptListLen === 0} data-tip="Select a transcript (& gene) to view their details">
+            disabled={geneTranscriptListLen <= 1} data-tip={"Select a transcript to view their details"}>
             { geneListOptions }
         </DropdownButton>
     );
