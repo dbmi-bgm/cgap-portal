@@ -522,7 +522,7 @@ export function standardizeGnomadValue(value, fallbackElem = <em data-tip="Not A
 }
 
 
-export function GeneTranscriptDisplayTitle({ transcript }){
+export function GeneTranscriptDisplayTitle({ transcript, hideGene }){
     if (!transcript) return null;
     const {
         csq_canonical = false,
@@ -536,7 +536,9 @@ export function GeneTranscriptDisplayTitle({ transcript }){
     return (
         <React.Fragment>
             <span className="text-600">{ csq_mane || csq_feature }</span>
-            <span className="text-400"> ({ geneDisplayTitle || <em>No Gene</em> })</span>
+            { !hideGene ?
+                <span className="text-400"> ({ geneDisplayTitle || <em>No Gene</em> })</span>
+                : null}
             { csq_canonical ? <span className="text-300"> (canonical)</span> : null }
         </React.Fragment>
     );
