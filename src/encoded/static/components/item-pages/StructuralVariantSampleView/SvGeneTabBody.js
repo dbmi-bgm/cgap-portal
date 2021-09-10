@@ -60,7 +60,7 @@ export function SvGeneTabBody (props){
 
 const geneTableColumns = {
     "display_title": {
-        "title": "Gene, Transcript",
+        "title": "Gene",
         "order": 1,
         "sort_fields": [
             {
@@ -83,4 +83,8 @@ const geneTableColumns = {
             }
         ]
     },
+    "oe_lof": {
+        "title": "o/e (LoF)",
+        "order": 3
+    }
 };
