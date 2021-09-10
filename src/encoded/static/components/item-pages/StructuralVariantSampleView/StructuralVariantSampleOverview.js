@@ -117,6 +117,8 @@ function StructuralVariantInfoSection({ context }) {
         END = ""
     } = structural_variant;
 
+    const longFormTypeMap = { DUP: "Duplication", DEL: "Deletion" }; // may need to update if sv schema is updated
+
     const genotype = calculateGenotype(CALL_INFO, genotype_labels) || fallbackElem;
 
     return (
@@ -128,7 +130,7 @@ function StructuralVariantInfoSection({ context }) {
                             <label htmlFor="vi_type" className="mb-0">Type:</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_type">{SV_TYPE}</span>
+                            <span id="vi_type">{longFormTypeMap[SV_TYPE]}</span>
                         </div>
                     </div>
                     <div className="row">
