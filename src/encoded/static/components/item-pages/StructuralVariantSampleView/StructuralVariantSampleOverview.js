@@ -68,7 +68,7 @@ function StructuralVariantSampleInfoHeader(props){
                         </div>
                         <div className="info-body">
                             <div className="row mb-03">
-                                <VariantInfoSection {...{ context }} />
+                                <StructuralVariantInfoSection {...{ context }} />
                             </div>
                         </div>
                     </div>
@@ -87,15 +87,37 @@ function StructuralVariantSampleInfoHeader(props){
 }
 
 
-function VariantInfoSection({ context }) {
+/**
+ * Takes a sample ID and genotypeLabels array and returns the one associated with the current sample,
+ * if any; otherwise returns null.
+ */
+function calculateGenotype(CALL_INFO, labels) {
+    for (let i = 0; i < labels.length; i++) {
+        const { sample_id = null, labels: [genotypeLabel] = [] } = labels[i];
+        if (CALL_INFO === sample_id) {
+            return genotypeLabel;
+        }
+    }
+    return null;
+}
+
+function StructuralVariantInfoSection({ context }) {
     const fallbackElem = <em data-tip="Not Available"> - </em>;
-    const { structural_variant = {} } = context;
     const {
-        annotation_id = fallbackElem, // TODO: pull from actual location info
+        structural_variant = {},
+        CALL_INFO = null,
+        genotype_labels = {}
+    } = context;
+    const {
         size_display = fallbackElem,
-        cytoband = fallbackElem,
+        cytoband = fallbackElem, // Next version of bioinfo
         SV_TYPE = fallbackElem,
+        CHROM = "",
+        START = "",
+        END = ""
     } = structural_variant;
+
+    const genotype = calculateGenotype(CALL_INFO, genotype_labels) || fallbackElem;
 
     return (
         <div className="col-12">
@@ -114,7 +136,7 @@ function VariantInfoSection({ context }) {
                             <label htmlFor="vi_grch38" className="mb-0">GRCh38:</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_grch38">Need Info</span>
+                            <span id="vi_grch38">{`chr${CHROM}:${START}-${END}`}</span>
                         </div>
                     </div>
                     <div className="row">
@@ -122,17 +144,17 @@ function VariantInfoSection({ context }) {
                             <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_grch37">Need Info</span>
+                            <span id="vi_grch37">{fallbackElem}</span>
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-md-6">
+                <div className="col-12 col-md-6 pl-2">
                     <div className="row">
                         <div className="col-12 col-md-6">
                             <label htmlFor="vi_genotype" className="mb-0">Genotype:</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_genotype">Need Info</span>
+                            <span id="vi_genotype">{genotype}</span>
                         </div>
                     </div>
                     <div className="row">
@@ -148,7 +170,7 @@ function VariantInfoSection({ context }) {
                             <label htmlFor="vi_cytoband" className="mb-0">Cytoband:</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_cytoband">{cytoband}</span>
+                            <span id="vi_cytoband">{fallbackElem}</span>
                         </div>
                     </div>
                 </div>
