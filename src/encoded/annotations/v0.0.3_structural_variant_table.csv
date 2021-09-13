@@ -8,7 +8,7 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 5,CALL_INFO,sample,Sample ID,Y,NA12877_sample,sample_variant,VCF,,Sample Identifier,string,,N,,,,,,,,,,,,,,,
 6,GT,GT,Genotype,Y,0/1,sample_variant,VCF,,Genotype,string,,N,,,,,,,,,,,,,,,
 7,GQ,GQ,Genotype Quality,Y,603,sample_variant,VCF,,Genotype quality,integer,,N,,,,,,,,,,,,,,,
-8,PL,PL,Genotype Likelihoods,Y,"859,0,600",sample_variant,VCF,,"Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",string,,N,,,,,,,,,,,,,,,
+8,PL,PL,"Genotype Likelihoods (0/0, 0/1, 1/1)",Y,"859,0,600",sample_variant,VCF,,"Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",string,,N,,,,,,,,,,,,,,,
 9,gnomadg_af,AF,gnomAD-SV Alt Allele Frequency,Y,0.0345,variant,gnomAD,v2.1,Alternate allele frequency in samples,number,,N,,,,,0,1,,,,,,,,,Y
 10,gnomadg_ac,AC,gnomAD-SV Alt Allele Count,Y,210,variant,gnomAD,v2.1,Alternate allele count for samples,integer,,N,,,,,0,,,,,,,,,,Y
 11,gnomadg_an,AN,gnomAD-SV Alt Allele Number,Y,1032,variant,gnomAD,v2.1,Total number of alleles in samples,integer,,N,,,,,0,,,,,,,,,,Y
@@ -56,9 +56,10 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 53,csq_amino_acids,csq_amino_acids,Amino Acid Change,Y,S,variant,VEP,v101,Reference and variant amino acids,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,,,,,,,,,,
 54,csq_codons,csq_codons,Codon Change,Y,tcA/tcG,variant,VEP,v101,Reference and variant codon sequence,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,,,,,,,,,,
 55,csq_distance,csq_distance,Distance to Transcript,Y,1863,variant,VEP,v101,Shortest distance from variant to transcript,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,,,,,,,,,,
-56,csq_strand,csq_strand,Strand,Y,1,variant,VEP,v101,Strand of the feature,boolean,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,,,,,,,,,,
-57,samplegeno_numgt,GT,Sample Genotype (Numeric),Y,0/1,sample_variant,VCF,,Sample genotype (number format),string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,,,,,,,,,,,,,,,
-58,samplegeno_sampleid,sample,Sample Genotype (Sample ID),Y,NA12877_sample,sample_variant,VCF,,Sample ID,string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,,,,,,,,,,,,,,,
-59,imprecise,IMPRECISE,Imprecise Structural Variant,Y,,sample_variant,VCF,,Imprecise structural variant flag from Manta,boolean,,N,,,,,,,,,,,,,,,
-60,confidence_interval_start,CIPOS,Start Position Confidence Interval,Y,"-496,497",sample_variant,VCF,,Confidence interval of start position in basepairs,integer,,Y,,,,,,,,,,,,,,,
-61,confidence_interval_end,CIEND,End Position Confidence Interval,Y,"-310,310",sample_variant,VCF,,Confidence interval of end position in basepairs,integer,,Y,,,,,,,,,,,,,,,
+56,csq_canonical,csq_canonical,Canonical Transcript,Y,YES,variant,VEP,v101,Transcript is canonical for gene per Ensembl,boolean,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,,,,,,,,,,
+57,csq_strand,csq_strand,Strand,Y,1,variant,VEP,v101,Strand of the feature,boolean,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,,,,,,,,,,
+58,samplegeno_numgt,GT,Sample Genotype (Numeric),Y,0/1,sample_variant,VCF,,Sample genotype (number format),string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,,,,,,,,,,,,,,,
+59,samplegeno_sampleid,sample,Sample Genotype (Sample ID),Y,NA12877_sample,sample_variant,VCF,,Sample ID,string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,,,,,,,,,,,,,,,
+60,imprecise,IMPRECISE,Imprecise Structural Variant,Y,,sample_variant,VCF,,Imprecise structural variant flag from Manta,boolean,,N,,,,,,,,,,,,,,,
+61,confidence_interval_start,CIPOS,Start Position Confidence Interval,Y,"-496,496",sample_variant,VCF,,Confidence interval of start position in basepairs,integer,,Y,,,,,,,,,,,,,,,
+62,confidence_interval_end,CIEND,End Position Confidence Interval,Y,"-310,310",sample_variant,VCF,,Confidence interval of end position in basepairs,integer,,Y,,,,,,,,,,,,,,,

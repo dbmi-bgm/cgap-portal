@@ -89,7 +89,7 @@
             "source_name": "VCF",
             "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",
             "scope": "sample_variant",
-            "schema_title": "Genotype Likelihoods"
+            "schema_title": "Genotype Likelihoods (0/0, 0/1, 1/1)"
         },
         "annotation_id": {
             "title": "Annotation ID",

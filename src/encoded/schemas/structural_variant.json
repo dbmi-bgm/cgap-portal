@@ -612,6 +612,19 @@
                         "scope": "variant",
                         "schema_title": "Distance to Transcript"
                     },
+                    "csq_canonical": {
+                        "title": "Canonical Transcript",
+                        "field_name": "csq_canonical",
+                        "type": "boolean",
+                        "do_import": true,
+                        "vcf_field": "csq_canonical",
+                        "source_name": "VEP",
+                        "source_version": "v101",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Transcript is canonical for gene per Ensembl",
+                        "scope": "variant",
+                        "schema_title": "Canonical Transcript"
+                    },
                     "csq_strand": {
                         "title": "Strand",
                         "field_name": "csq_strand",

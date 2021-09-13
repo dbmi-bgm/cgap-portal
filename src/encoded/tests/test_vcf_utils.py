@@ -245,11 +245,12 @@ class TestIngestStructuralVariantVCF(TestIngestVCF):
         assert self.get_transcript_field(result, 6, "csq_exon") == "5/5"
         assert not self.get_transcript_field(result, 6, "csq_intron")
         assert self.get_transcript_field(result, 6, "csq_cdna_position") == "1613-1662"
+        assert self.get_transcript_field(result, 7, "csq_canonical") is True
         variant_keys = result.keys()
         for key in variant_keys:
             assert "gnomadg" not in key
 
-        # record 2 - gnomAD-SV values
+        # record 2 - gnomAD-SV values + Transcript intron
         record = test_sv_vcf.read_next_record()
         result = test_sv_vcf.create_variant_from_record(record)
 
@@ -257,6 +258,7 @@ class TestIngestStructuralVariantVCF(TestIngestVCF):
         assert self.get_top_level_field(result, "gnomadg_af-afr") == 0.000757
         assert self.get_top_level_field(result, "gnomadg_an-eur") == 7608
         assert self.get_transcript_field(result, 5, "csq_intron") == "1/1"
+        assert self.get_transcript_field(result, 0, "csq_strand") is True
 
         # record 3 - Additional Transcript fields
         record = test_sv_vcf.read_next_record()
