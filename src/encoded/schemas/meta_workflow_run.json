@@ -230,6 +230,16 @@
                 "inactive"
             ]
         },
+        "failed_jobs": {
+            "title": "Failed Jobs",
+            "description": "List of failed Tibanna job ids for this meta workflow run",
+            "type": "array",
+            "items": {
+                "title": "Failed Job Id",
+                "description": "Failed Tibanna job in this meta workflow run",
+                "type": "string"
+            }
+        },
         "common_fields": {
             "title": "Common Fields",
             "description": "Common fields that go into all workflow_run, processed_files and qc items",
