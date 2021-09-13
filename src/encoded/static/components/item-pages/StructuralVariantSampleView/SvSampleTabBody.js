@@ -4,7 +4,7 @@ import React from 'react';
 
 
 export function SvSampleTabBody(props){
-    const { context = {} } = props;
+    const { context = {}, comingSoonElem } = props;
     return (
         <div className="sample-tab-body card-body">
             <div className="row flex-column flex-lg-row">
@@ -13,7 +13,7 @@ export function SvSampleTabBody(props){
                         <h4>Breakpoint Confidence Intervals</h4>
                     </div>
                     <div className="info-body">
-                        <SvQualityTable {...{ context }} />
+                        <SvQualityTable {...{ context, comingSoonElem }} />
                     </div>
                 </div>
             </div>
@@ -23,7 +23,7 @@ export function SvSampleTabBody(props){
                         <h4>Genotype</h4>
                     </div>
                     <div className="info-body">
-                        <GenotypeQualityTable {...{ context }} />
+                        <GenotypeQualityTable {...{ context, comingSoonElem }} />
                     </div>
                 </div>
             </div>
@@ -33,7 +33,7 @@ export function SvSampleTabBody(props){
 
 
 function SvQualityTable(props) {
-    const { context = {} } = props;
+    const { context = {}, comingSoonElem } = props;
     const fallbackElem = <em> - </em>;
     return (
         <table className="w-100">
@@ -46,15 +46,15 @@ function SvQualityTable(props) {
             <tbody>
                 <tr>
                     <td className="text-600 text-left">Precise/Imprecise</td>
-                    <td className="text-left">{fallbackElem}</td>
+                    <td className="text-left">{comingSoonElem}</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Confidence interval around left breakpoint</td>
-                    <td className="text-left">{fallbackElem}</td>
+                    <td className="text-left">{comingSoonElem}</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Confidence interval around right breakpoint</td>
-                    <td className="text-left">{fallbackElem}</td>
+                    <td className="text-left">{comingSoonElem}</td>
                 </tr>
             </tbody>
         </table>
@@ -64,7 +64,7 @@ function SvQualityTable(props) {
 
 // TODO: Update with Genotype Quality & Likelihoods when fields are available
 function GenotypeQualityTable(props) {
-    const { context: { samplegeno = [] } = {} } = props;
+    const { context: { samplegeno = [] } = {}, comingSoonElem } = props;
     const fallbackElem = <em> - </em>;
 
     const rows = samplegeno.map((sg) => {
@@ -80,8 +80,8 @@ function GenotypeQualityTable(props) {
                 <td className="text-capitalize text-left">{samplegeno_role}</td>
                 <td className="text-left">{samplegeno_sampleid}</td>
                 <td className="text-left">{samplegeno_numgt}</td>
-                <td className="text-left">{fallbackElem}</td>
-                <td className="text-left">{fallbackElem}</td>
+                <td className="text-left">{comingSoonElem}</td>
+                <td className="text-left">{comingSoonElem}</td>
             </tr>
         );
     });

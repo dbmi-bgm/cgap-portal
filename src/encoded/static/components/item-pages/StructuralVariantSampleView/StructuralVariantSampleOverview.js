@@ -15,7 +15,8 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
     render(){
         const { context = null, schemas, href } = this.props;
-        const passProps = { context, schemas, href };
+        const comingSoonElem = <span className="font-italic text-muted">(Coming Soon)</span>;
+        const passProps = { context, schemas, href, comingSoonElem };
 
         const { query: {
             annotationTab = null,           // used only if can be parsed to integer (SvBrowser = 0)
@@ -33,6 +34,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 function StructuralVariantSampleInfoHeader(props){
     const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
     const {
+        comingSoonElem,
         context,
         schemas,
         caseID = <span className="text-muted"> - </span>, // null
@@ -68,7 +70,7 @@ function StructuralVariantSampleInfoHeader(props){
                         </div>
                         <div className="info-body">
                             <div className="row mb-03">
-                                <StructuralVariantInfoSection {...{ context }} />
+                                <StructuralVariantInfoSection {...{ context, comingSoonElem }} />
                             </div>
                         </div>
                     </div>
@@ -77,7 +79,7 @@ function StructuralVariantSampleInfoHeader(props){
                             <h4>Gene Info</h4>
                         </div>
                         <div className="info-body">
-                            <GeneInfoSection {...{ context }} />
+                            <GeneInfoSection {...{ context, comingSoonElem }} />
                         </div>
                     </div>
                 </div>
@@ -101,7 +103,7 @@ function calculateGenotype(CALL_INFO, labels) {
     return null;
 }
 
-function StructuralVariantInfoSection({ context }) {
+function StructuralVariantInfoSection({ context, comingSoonElem }) {
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
         structural_variant = {},
@@ -146,7 +148,7 @@ function StructuralVariantInfoSection({ context }) {
                             <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_grch37">{fallbackElem}</span>
+                            <span id="vi_grch37">{comingSoonElem}</span>
                         </div>
                     </div>
                 </div>
@@ -172,7 +174,7 @@ function StructuralVariantInfoSection({ context }) {
                             <label htmlFor="vi_cytoband" className="mb-0">Cytoband:</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_cytoband">{fallbackElem}</span>
+                            <span id="vi_cytoband">{comingSoonElem}</span>
                         </div>
                     </div>
                 </div>
@@ -181,7 +183,7 @@ function StructuralVariantInfoSection({ context }) {
     );
 }
 
-function GeneInfoSection({ context }) {
+function GeneInfoSection({ context, comingSoonElem }) {
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     return (
         <div className="col-12">
@@ -190,7 +192,7 @@ function GeneInfoSection({ context }) {
                     <label htmlFor="contained-genes" className="mb-0">Contained Genes:</label>
                 </div>
                 <div id="contained-genes" className="col-12 col-md-4">
-                    <span className="font-italic text-muted">(Coming Soon)</span>
+                    {comingSoonElem}
                 </div>
             </div>
             <div className="row pb-1 pb-md-03">
@@ -198,7 +200,7 @@ function GeneInfoSection({ context }) {
                     <label htmlFor="genes-at-breakpoints" className="mb-0">Genes At Breakpoints:</label>
                 </div>
                 <div id="genes-at-breakpoints" className="col-12 col-md-4">
-                    <span className="font-italic text-muted">(Coming Soon)</span>
+                    {comingSoonElem}
                 </div>
             </div>
             <div className="row pb-1 pb-md-03">
@@ -206,7 +208,7 @@ function GeneInfoSection({ context }) {
                     <label htmlFor="omim-genes" className="mb-0">OMIM Genes:</label>
                 </div>
                 <div id="omim-genes" className="col-12 col-md-4">
-                    <span className="font-italic text-muted">(Coming Soon)</span>
+                    {comingSoonElem}
                 </div>
             </div>
             <div className="row pb-1 pb-md-03">
@@ -214,7 +216,7 @@ function GeneInfoSection({ context }) {
                     <label htmlFor="omim-genes-w-phenotype" className="mb-0">OMIM Genes with Phenotype:</label>
                 </div>
                 <div id="omim-genes-w-phenotype" className="col-12 col-md-4">
-                    <span className="font-italic text-muted">(Coming Soon)</span>
+                    {comingSoonElem}
                 </div>
             </div>
         </div>
@@ -282,7 +284,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, currentGeneItem, currentGeneItemLoading } = this.props;
+        const { context, schemas, currentGeneItem, currentGeneItemLoading, comingSoonElem } = this.props;
         const { currentTab } = this.state;
 
         const tabTitleElements = [];
@@ -294,7 +296,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
             tabTitleElements.push(<OverviewTabTitle {...tabTitleElemProps} />);
 
             if (index === currentTab || this.openPersistentTabs[index]) {
-                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
+                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index, comingSoonElem };
                 switch (index) {
                     case 0: // Gene
                         tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
