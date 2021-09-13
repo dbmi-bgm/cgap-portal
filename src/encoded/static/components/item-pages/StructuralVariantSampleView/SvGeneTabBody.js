@@ -138,7 +138,7 @@ const geneTableColumns = {
         ]
     },
     "consequence": {
-        "title": "Consequence",
+        "title": "Worst Consequence",
         "noSort": true,
         "order": 3
     },
