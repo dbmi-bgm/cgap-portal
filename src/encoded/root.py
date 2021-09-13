@@ -135,10 +135,10 @@ def health_check(config):
 
         env_name = settings.get('env.name')
         # TODO: Move this logic to dcicutils.env_utils
-        # change when we get a CGAP-specific Foursight
+        # CGAP-specific Foursight
         if env_name and env_name.startswith('fourfront-'):
             fs_env = env_name[len('fourfront-'):]
-            foursight_url = 'https://foursight.4dnucleome.org/view/' + fs_env
+            foursight_url = 'https://u9feld4va7.execute-api.us-east-1.amazonaws.com/api/view/' + fs_env
         else:
             foursight_url = None
 
