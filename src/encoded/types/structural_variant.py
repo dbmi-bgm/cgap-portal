@@ -100,7 +100,7 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "Start position (genome coordinates)",
+            "title": "Start Absolute Position",
             "description": "Start absolute position in genome coordinates",
             "type": "integer",
         }
@@ -111,7 +111,7 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "End position (genome coordinates)",
+            "title": "End Absolute Position",
             "description": "End absolute position in genome coordinates",
             "type": "integer",
         }
@@ -167,7 +167,7 @@ class StructuralVariant(Item):
             "type": "object",
             "properties": {
                 "contained": {
-                    "title": "contained",
+                    "title": "Genes Contained in SV",
                     "type": "string",
                     "description": (
                         "The number of genes entirely within the structural variant out"
@@ -175,7 +175,7 @@ class StructuralVariant(Item):
                     )
                 },
                 "at_breakpoint": {
-                    "title": "at_breakpoint",
+                    "title": "Genes Crossing an SV Breakpoint",
                     "type": "string",
                     "description": (
                         "The number of genes overlapping the ends of the structural"
@@ -183,7 +183,7 @@ class StructuralVariant(Item):
                     )
                 },
                 "omim_genes": {
-                    "title": "omim_genes",
+                    "title": "Genes with OMIM IDs",
                     "type": "string",
                     "description": (
                         "The number of genes affected by the structural variant that"
