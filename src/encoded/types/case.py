@@ -299,6 +299,10 @@ def _build_case_embedded_list():
         # File linkTo
         "structural_variant_vcf_file.file_ingestion_status",
         "structural_variant_vcf_file.accession",
+
+        # MetaWorkflowRun linkTo
+        "meta_workflow_run.meta_workflow.name",
+        "meta_workflow_run.meta_workflow.version"
     ]
 
 
