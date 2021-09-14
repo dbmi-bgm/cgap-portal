@@ -616,6 +616,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
         // Pull variant stats, T-T ratio, heterozygosity ratio, etc. from sample_processing
         msaProcFiles.forEach(function(procFile){
             const {
+                variant_type: variantType = "SNV", // SVs are always labelled, SNVs may or may not be (ask bioinfo team for details)
                 quality_metric: {
                     "@type": [ qmType ]=[],
                     quality_metric_summary: qmSummaries = []
@@ -624,38 +625,56 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
 
             // Only continue if qclist (vcfQC should only exist if there is also vcfcheck)
             if (qmType === "QualityMetricQclist") {
-                // Stats should only be present in combined VCF, update if found
-                qmSummaries.forEach(function(qmSummary){
-                    const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
-                    if (sample && sample === caseSampleId) {
-                        switch (title) {
-                            case "De Novo Fraction":
-                                msaStats.deNovo = { value: transformValueType(numberType, value), tooltip };
-                                break;
-                            case "Heterozygosity Ratio":
-                                msaStats.heterozygosity = { value: transformValueType(numberType, value), tooltip };
-                                break;
-                            case "Transition-Transversion Ratio":
-                                msaStats.transTansRatio = { value: transformValueType(numberType, value), tooltip };
-                                break;
-                            case "Total Variants Called":
-                                msaStats.totalVariants = { value: transformValueType(numberType, value), tooltip };
-                                break;
-                            case "Filtered Variants":
-                                msaStats.filteredVariants = { value: transformValueType(numberType, value), tooltip };
-                                break;
-                            default:
-                                break;
+                // SNV fields are unique from SV ones; so ensure the correct ones are added to msaStats for each
+                if (variantType === "SNV") {
+                    // Stats should only be present in combined VCF, update if found
+                    qmSummaries.forEach(function(qmSummary){
+                        const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
+                        if (sample && sample === caseSampleId) {
+                            switch (title) {
+                                case "De Novo Fraction":
+                                    msaStats.deNovo = { value: transformValueType(numberType, value), tooltip };
+                                    break;
+                                case "Heterozygosity Ratio":
+                                    msaStats.heterozygosity = { value: transformValueType(numberType, value), tooltip };
+                                    break;
+                                case "Transition-Transversion Ratio":
+                                    msaStats.transTansRatio = { value: transformValueType(numberType, value), tooltip };
+                                    break;
+                                case "Total Variants Called":
+                                    msaStats.totalSNVIndelVars = { value: transformValueType(numberType, value), tooltip };
+                                    break;
+                                case "Filtered Variants":
+                                    msaStats.filteredSNVIndelVariants = { value: transformValueType(numberType, value), tooltip };
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-                    }
-                });
+                    });
+                } else if (variantType === "SV") {
+                    // Stats should only be present in combined VCF, update if found
+                    qmSummaries.forEach(function(qmSummary){
+                        const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
+                        if (sample && sample === caseSampleId) {
+                            switch (title) { // Leaving this as switch case, since more fields may be added in future (may also be worth creating a function to encompass SV & SNV options as this grows)
+                                case "Filtered Variants":
+                                    msaStats.filteredSVVariants = { value: transformValueType(numberType, value), tooltip };
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    });
+                }
             }
         });
 
         return msaStats;
     }, [ caseProcFiles, msaProcFiles ]);
 
-    const { reads = {}, coverage = {}, totalVariants = {}, transTansRatio = {}, heterozygosity = {}, deNovo = {}, filteredVariants = {} } = msaStats;
+    const { reads = {}, coverage = {}, totalSNVIndelVars = {}, transTansRatio = {}, heterozygosity = {}, deNovo = {},
+        filteredSNVIndelVariants = {}, filteredSVVariants = {} } = msaStats;
 
     return (
         <div className="row py-3">
@@ -665,8 +684,8 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
             <BioinfoStatsEntry label="Coverage" tooltip={coverage.tooltip}>
                 { coverage.value || "-" }
             </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Total Number of Variants Called" tooltip={totalVariants.tooltip}>
-                { typeof totalVariants.value === "number" ? decorateNumberWithCommas(totalVariants.value): "-" }
+            <BioinfoStatsEntry label="Total Number of SNVs/Indels called" tooltip={totalSNVIndelVars.tooltip}>
+                { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): "-" }
             </BioinfoStatsEntry>
             <BioinfoStatsEntry label="Transition-Tansversion ratio" tooltip={transTansRatio.tooltip}>
                 { typeof transTansRatio.value === "number" ? transTansRatio.value || "0.0" : "-" }
@@ -677,8 +696,11 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
             <BioinfoStatsEntry label="De novo Fraction" tooltip={deNovo.tooltip}>
                 { typeof deNovo.value === "number" ? deNovo.value + "%" : "-" }
             </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Variants after hard filters" tooltip={filteredVariants.tooltip}>
-                { typeof filteredVariants.value === "number" ? decorateNumberWithCommas(filteredVariants.value) : "-" }
+            <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" tooltip={filteredSNVIndelVariants.tooltip}>
+                { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : "-" }
+            </BioinfoStatsEntry>
+            <BioinfoStatsEntry label="Structural Variants After Hard Filters" tooltip={filteredSVVariants.tooltip}>
+                { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : "-" }
             </BioinfoStatsEntry>
         </div>
     );
