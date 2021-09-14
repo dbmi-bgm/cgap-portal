@@ -424,6 +424,8 @@ class VariantSample(Item):
         variant_props = get_item_or_none(request, variant, 'Variant', frame='raw')
         if variant_props is None:
             raise RuntimeError('Got none for something that definitely exists')
+        if variant_props['CHROM'] == 'M':
+            return None  # no bamsnap images for chrM
         file_path = '%s/bamsnap/chr%s_%s.png' % (  # file = accession of associated VCF file
             file, variant_props['CHROM'], variant_props['POS']
         )
