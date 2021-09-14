@@ -242,6 +242,7 @@ class TestIngestStructuralVariantVCF(TestIngestVCF):
         assert self.get_transcript_field(result, 0, "csq_biotype") == "protein_coding"
         assert self.get_transcript_field(result, 0, "csq_distance") == "373"
         assert self.get_transcript_field(result, 0, "csq_strand") is False
+        assert not self.get_transcript_field(result, 0, "csq_canonical")
         assert self.get_transcript_field(result, 6, "csq_exon") == "5/5"
         assert not self.get_transcript_field(result, 6, "csq_intron")
         assert self.get_transcript_field(result, 6, "csq_cdna_position") == "1613-1662"
