@@ -215,10 +215,11 @@ class StructuralVariant(Item):
         contained_count = 0
         breakpoint_count = 0
         omim_count = 0
-        for item in transcript:
-            gene = item.get("csq_gene")
-            if gene and gene not in genes:
-                genes.append(gene)
+        if transcript:
+            for item in transcript:
+                gene = item.get("csq_gene")
+                if gene and gene not in genes:
+                    genes.append(gene)
         for gene in genes:
             gene = get_item_or_none(request, gene, "Gene", frame="raw")
             gene_start = gene.get("spos")
