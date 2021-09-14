@@ -40,6 +40,7 @@ def test_health_page_view_constants():
     assert h.PROCESSED_FILE_BUCKET == 'processed_file_bucket' == s3Utils.OUTFILE_BUCKET_HEALTH_PAGE_KEY
     assert h.SYSTEM_BUCKET == 'system_bucket' == s3Utils.SYS_BUCKET_HEALTH_PAGE_KEY
     assert h.TIBANNA_OUTPUT_BUCKET == 'tibanna_output_bucket' == s3Utils.TIBANNA_OUTPUT_BUCKET_HEALTH_PAGE_KEY
+    assert h.TIBANNA_CWLS_BUCKET == 'tibanna_cwls_bucket'  # == s3Utils.TIBANNA_OUTPUT_BUCKET_HEALTH_PAGE_KEY
 
 
 def test_registry_settings_in_orchestrated_ini_template():

@@ -404,7 +404,10 @@ def test_transitional_equivalence():
             class ProdChecker(Checker):
 
                 def check(self, line):
-                    if 'bucket =' in line and 'tibanna_output_bucket' not in line:
+                    # Or is the rule just ('bucket =' in line and ('tibanna' not in line)) ?
+                    if ('bucket =' in line
+                            and ('tibanna_output_bucket' not in line and
+                                 'tibanna_cwls_bucket' not in line)):
                         fragment = 'fourfront-cgap'
                         if fragment not in line:
                             return "'%s' missing in '%s'" % (fragment, line)
