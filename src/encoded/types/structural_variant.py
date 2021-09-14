@@ -160,6 +160,86 @@ class StructuralVariant(Item):
                 break
         return result
 
+    @calculated_property(
+        schema={
+            "title": "Affected Genes Information Summary",
+            "description": "",
+            "type": "object",
+            "properties": {
+                "contained": {
+                    "title": "contained",
+                    "type": "string",
+                    "description": (
+                        "The number of genes entirely within the structural variant out"
+                        " of all genes affected"
+                    )
+                },
+                "at_breakpoint": {
+                    "title": "at_breakpoint",
+                    "type": "string",
+                    "description": (
+                        "The number of genes overlapping the ends of the structural"
+                        " variant out of all genes affected"
+                    )
+                },
+                "omim_genes": {
+                    "title": "omim_genes",
+                    "type": "string",
+                    "description": (
+                        "The number of genes affected by the structural variant that"
+                        " exist in the OMIM database out of all genes affected"
+                    )
+                }
+            }
+        }
+    )
+    def affected_genes(self, request, START, END, transcript=None):
+        """
+        Calculate summary characteristics of genes affected by the
+        structural variant.
+
+        NOTE: Genes "affected" here are only those that have some
+        overlap with the given SV; genes entirely up-/downstream of the
+        SV are not contributing towards any counts (including the
+        total).
+
+        :param request: cls pyramid request
+        :param START: int SV hg38 start position
+        :param END: int SV hg38 end position
+        :param transcript: list of VEP annotations
+        :returns: dict of summary characteristics
+        """
+        result = {}
+        genes = []
+        gene_count = 0
+        contained_count = 0
+        breakpoint_count = 0
+        omim_count = 0
+        for item in transcript:
+            gene = item.get("csq_gene")
+            if gene and gene not in genes:
+                genes.append(gene)
+        for gene in genes:
+            gene = get_item_or_none(request, gene, "Gene", frame="raw")
+            gene_start = gene.get("spos")
+            gene_end = gene.get("epos")
+            gene_omim_id = gene.get("omim_id")
+            if gene_start and gene_end:  # True for all genes as of 09-14-2021 drr
+                if int(gene_start) >= START and int(gene_end) <= END:
+                    gene_count += 1
+                    contained_count += 1
+                    if gene_omim_id:
+                        omim_count += 1
+                elif int(gene_start) <= END and int(gene_end) >= START:
+                    gene_count += 1
+                    breakpoint_count += 1
+                    if gene_omim_id:
+                        omim_count += 1
+        result["contained"] = str(contained_count) + "/" + str(gene_count)
+        result["at_breakpoint"] = str(breakpoint_count) + "/" + str(gene_count)
+        result["omim_genes"] = str(omim_count) + "/" + str(gene_count)
+        return result
+
 
 @collection(
     name="structural-variant-samples",
