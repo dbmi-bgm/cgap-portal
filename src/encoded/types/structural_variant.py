@@ -162,8 +162,8 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "Affected Genes Information Summary",
-            "description": "",
+            "title": "Gene Summary",
+            "description": "An overview of genes overlapping this structural variant",
             "type": "object",
             "properties": {
                 "contained": {
@@ -193,12 +193,12 @@ class StructuralVariant(Item):
             }
         }
     )
-    def affected_genes(self, request, START, END, transcript=None):
+    def gene_summary(self, request, START, END, transcript=None):
         """
-        Calculate summary characteristics of genes affected by the
+        Calculate summary characteristics of genes overlapped by the
         structural variant.
 
-        NOTE: Genes "affected" here are only those that have some
+        NOTE: Genes included here are only those that have some
         overlap with the given SV; genes entirely up-/downstream of the
         SV are not contributing towards any counts (including the
         total).

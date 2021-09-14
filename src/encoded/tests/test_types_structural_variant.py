@@ -61,11 +61,11 @@ def affected_gene_result(total, contained, at_breakpoint, omim_genes):
         ),
     ],
 )
-def test_affected_genes(
+def test_gene_summary(
     testapp, project, institution, structural_variant, locations, result
 ):
     """
-    Tests affected_genes calcprop output. Posts genes with given
+    Tests gene_summary calcprop output. Posts genes with given
     locations and adds each to the SV item as a separate transcript
     gene.
 
@@ -78,4 +78,4 @@ def test_affected_genes(
     for gene_atid in gene_atids:
         patch_body["transcript"].append({"csq_gene": gene_atid})
     resp = testapp.patch_json(sv_atid, patch_body, status=200).json["@graph"][0]
-    assert resp["affected_genes"] == result
+    assert resp["gene_summary"] == result
