@@ -2,28 +2,21 @@
 """
 
 import copy
-import boto3
 import cProfile
 import io
 import json
 import pstats
 
 from collections import OrderedDict, deque
-from dcicutils.env_utils import CGAP_ENV_WEBDEV, is_stg_or_prd_env, prod_bucket_env
+from dcicutils.env_utils import is_stg_or_prd_env, prod_bucket_env
 from inspect import signature
-from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPBadRequest
 from pyramid.response import Response
-from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema, CONNECTION, TYPES
-from snovault.util import debug_log
-from time import sleep
 from .base import (
     Item,
     # lab_award_attribution_embed_list
 )
 
-
-ENV_WEBDEV = CGAP_ENV_WEBDEV
 
 steps_run_data_schema = {
     "type": "object",
