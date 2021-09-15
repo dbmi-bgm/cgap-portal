@@ -325,7 +325,7 @@
         },
         "structural_variant.unrelated_count": {
             "title": "CGAP Reference Frequency",
-            "aggregation_type": "range",
+            "aggregation_type": "stats",
             "number_step": "any",
             "order": 1,
             "grouping": "Allele Frequency"

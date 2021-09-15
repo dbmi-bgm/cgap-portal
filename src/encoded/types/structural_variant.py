@@ -122,7 +122,7 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "Structural Variant Size",
+            "title": "Size",
             "description": "The size of this structural variant",
             "type": "number",
         }
@@ -132,7 +132,7 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "Structural Variant Size Display",
+            "title": "Size Display",
             "description": "The abbreviated size of this structural variant",
             "type": "string",
         }
@@ -162,7 +162,7 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "Structural Variant Cytoband(s)",
+            "title": "Cytoband(s)",
             "description": "The cytoband(s) of this structural variant",
             "type": "string",
         }
