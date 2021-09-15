@@ -11,7 +11,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 
 // Taken largely from bootstrap / spacing.scss
 // Overrides ONLY mb-, mt-, pb-, pt-, ml-, mr-, pl-, and pr- util classnames to use
-// increments of _pixels_ in place of rem units (not too difficult to convert between them when necessary; 16px, 24px, 32px, ..).
+// more fine-grained increments of _pixels-at-default-zoom_ so that e.g. mr-16 is equivalent to having margin-right: 16px at default zoom.
 @each $breakpoint in map-keys($grid-breakpoints) {
 	@include media-breakpoint-up($breakpoint) {
 	  	$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
@@ -19,30 +19,30 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 	  	@each $prop, $abbrev in (margin: m, padding: p) {
 			@each $util-size in $margin-util-sizes {
 				.#{$abbrev}t#{$infix}-#{$util-size} {
-					#{$prop}-top: $util-size * 10px !important;
+					#{$prop}-top: $util-size * 0.625rem !important;
 				}
 				.#{$abbrev}r#{$infix}-#{$util-size} {
-					#{$prop}-right: $util-size * 10px !important;
+					#{$prop}-right: $util-size * 0.625rem !important;
 				}
 				.#{$abbrev}b#{$infix}-#{$util-size} {
-					#{$prop}-bottom: $util-size * 10px !important;
+					#{$prop}-bottom: $util-size * 0.625rem !important;
 				}
 				.#{$abbrev}l#{$infix}-#{$util-size} {
-					#{$prop}-left: $util-size * 10px !important;
+					#{$prop}-left: $util-size * 0.625rem !important;
 				}
 
 				@each $util-mini-size in $margin-util-sizes-mini {
 					.#{$abbrev}t#{$infix}-#{$util-size}#{$util-mini-size} {
-						#{$prop}-top: $util-size * 10px + ($util-mini-size * 1px) !important;
+						#{$prop}-top: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
 					.#{$abbrev}r#{$infix}-#{$util-size}#{$util-mini-size} {
-						#{$prop}-right: $util-size * 10px + ($util-mini-size * 1px) !important;
+						#{$prop}-right: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
 					.#{$abbrev}b#{$infix}-#{$util-size}#{$util-mini-size} {
-						#{$prop}-bottom: $util-size * 10px + ($util-mini-size * 1px) !important;
+						#{$prop}-bottom: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
 					.#{$abbrev}l#{$infix}-#{$util-size}#{$util-mini-size} {
-						#{$prop}-left: $util-size * 10px + ($util-mini-size * 1px) !important;
+						#{$prop}-left: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
 				}
 
