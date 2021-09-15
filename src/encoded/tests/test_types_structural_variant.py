@@ -16,6 +16,31 @@ def test_size_display(testapp, structural_variant):
         assert result["size_display"] == expected_result
 
 
+@pytest.mark.parametrize(
+    "cytoband_start, cytoband_end, result",
+    [
+        ("p12", "p12", "1p12"),
+        ("p11", "p12", "1p11-1p12"),
+        ("p10", "q3", "1p10-1q3"),
+        ("p12", None, None),
+        (None, "p12", None),
+        (None, None, None)
+    ]
+)
+def test_cytoband_display(testapp, structural_variant, cytoband_start, cytoband_end,
+        result):
+    """Test rendering of cytoband display."""
+    sv_atid = structural_variant["@id"]
+    patch_body = {}
+    if cytoband_start:
+        patch_body["cytoband_start"] = cytoband_start
+    if cytoband_end:
+        patch_body["cytoband_end"] = cytoband_end
+    resp = testapp.patch_json(sv_atid, patch_body, status=200).json["@graph"][0]
+    cytoband_display = resp.get("cytoband_display")
+    assert cytoband_display == result
+
+
 def genes(testapp, project, institution, locations):
     """
     Posts a gene for every given location pair.

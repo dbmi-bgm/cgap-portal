@@ -147,7 +147,7 @@ class StructuralVariant(Item):
         :param request: cls pyramid request
         :param START: int start location of SV
         :param END: int end location of SV
-        :return result: str size plus unit
+        :return: str size plus unit
         """
         result = None
         size = END - START + 1
@@ -158,6 +158,35 @@ class StructuralVariant(Item):
                 display_number = round(size*10**(-exponent+3), 1)
                 result = str(display_number) + " " + unit
                 break
+        return result
+
+    @calculated_property(
+        schema={
+            "title": "Structural Variant Cytoband(s)",
+            "description": "The cytoband(s) of this structural variant",
+            "type": "string",
+        }
+    )
+    def cytoband_display(self, request, CHROM, cytoband_start=None, cytoband_end=None):
+        """
+        Create cytoband to display in portal.
+
+        Requires cytobands at both start and end locations, and result
+        is single either single cytoband if both identical or dash-
+        separated cytobands if different.
+
+        :param request: cls pyramid request
+        :param CHROM: str chromosome
+        :param cytoband_start: str cytoband at SV START
+        :param cytoband_end: str cytoband at SV END
+        :returns: str cytoband to display
+        """
+        result = None
+        if cytoband_start and cytoband_end:
+            if cytoband_start == cytoband_end:
+                result = CHROM + cytoband_start
+            else:
+                result = CHROM + cytoband_start + "-" + CHROM + cytoband_end
         return result
 
     @calculated_property(
