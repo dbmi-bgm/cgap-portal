@@ -165,13 +165,14 @@ export const columnExtensionMap = {
         'render': function renderReportColumn(result, parentProps) {
             const {
                 '@id' : resultHref,
-                '@type' : itemTypeList = ["Item"],
                 report = null
             } = result;
             const {
                 display_title: reportTitle = null,
                 accession = null,
-                last_modified : { date_modified: date = null } = {}
+                last_modified: {
+                    date_modified = null
+                } = {},
             } = report || {};
 
             if (!report || !report.accession) {
@@ -180,7 +181,8 @@ export const columnExtensionMap = {
 
             const showAccessionSeparately = accession !== reportTitle;
             return (
-                <MultiLevelColumn date={date} status="not implemented" statusTip="Not Implemented" dateTitle="Last Modified:"
+                <MultiLevelColumn status="not implemented" statusTip="Not Implemented" dateTitle="Last Modified:"
+                    date={date_modified}
                     topLeft={showAccessionSeparately ? <span className="accession text-muted">{ accession }</span> : null}
                     mainTitle={<a href={resultHref} className="adv-block-link">{ reportTitle }</a>}/>
             );
@@ -188,12 +190,14 @@ export const columnExtensionMap = {
     },
     'family': {
         'render' : function renderFamilyColumn(result, parentProps) {
-            const { '@type' : itemTypeList = ["Item"], family } = result;
+            const { family } = result;
             if (!family) return null;
             const {
                 '@id' : atId = null,
                 accession = null,
-                date_created: date = null,
+                last_modified: {
+                    date_modified: date = null
+                } = {},
                 family_id = null,
                 uuid = null
             } = family;
@@ -299,7 +303,7 @@ export const columnExtensionMap = {
             */
 
             return (
-                <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Sequenced:"
+                <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Sequence Date:"
                     mainTitle={<a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">{ workup_type }</a>}/>
             );
         }
@@ -464,7 +468,7 @@ const BioinformaticsMultiLevelColumn = React.memo(function BioinformaticsMultiLe
 
     // Unlikely to show in non-Case item results, so didn't add Case filter
     return (
-        <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Last Update:"
+        <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Last Modified:"
             mainTitle={
                 <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
                     { analysis_type }

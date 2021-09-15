@@ -609,7 +609,7 @@ class SearchBuilder:
             # ('date_created', {'title': 'Date Created', 'hide_from_view' : True, 'aggregation_type' : 'date_histogram' })
         ]
         validation_error_facets = [
-            ('validation_errors.name', {'title': 'Validation Errors', 'order': 999})
+            ('validation_errors.name', { 'title': 'Validation Errors', 'order': 999 })
         ]
         current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
         self._initialize_additional_facets(append_facets, current_type_schema)
@@ -709,7 +709,7 @@ class SearchBuilder:
         # list unless were already added via schemas, etc.
         used_facet_fields = { facet[0] for facet in facets } # Reset this
         for ap_facet in append_facets + validation_error_facets:
-            if ap_facet[0] not in used_facet_fields:
+            if ap_facet[0] not in used_facet_fields and ap_facet[0] not in disabled_facet_fields:
                 used_facet_fields.add(ap_facet[0])
                 facets.append(ap_facet)
         return facets
@@ -894,6 +894,16 @@ class SearchBuilder:
                 if len(aggregations[full_agg_name].keys()) > 2:
                     result_facet['extra_aggs'] = {k: v for k, v in aggregations[full_agg_name].items() if
                                                   k not in ('doc_count', 'primary_agg')}
+
+            # Minor improvement for UI/UX -- if no 'validation errors' facet is included
+            # but only 1 "No value" term, then exclude the facet so is not shown
+            if field == "validation_errors.name":
+                validation_errors_terms_len = len(result_facet["terms"])
+                if (
+                    validation_errors_terms_len == 0 or
+                    (validation_errors_terms_len == 1 and result_facet["terms"][0]["key"] == "No value")
+                ):
+                    continue
 
             result.append(result_facet)
 
