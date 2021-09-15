@@ -911,14 +911,5 @@ class WorkflowMapping(Item):
     embedded_list = Item.embedded_list  # + lab_award_attribution_embed_list
 
 
-def validate_input_json(context, request):
-    input_json = request.json
-    wkfl_uuid = input_json.get('workflow_uuid', 'None')
-    # if not context.get(wkfl_uuid):
-    #    request.errors.add('body', None, 'workflow_uuid %s not found in the system' % wkfl_uuid)
-    if not input_json.get('metadata_only'):
-        request.errors.add('body', 'Workflow: metadata_only False', 'metadata_only must be set to true in input_json')
-
-
 def _wfoutput_bucket_for_env(env):
     return 'elasticbeanstalk-%s-wfoutput' % (prod_bucket_env(env) if is_stg_or_prd_env(env) else env)
