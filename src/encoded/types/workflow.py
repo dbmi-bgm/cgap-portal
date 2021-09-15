@@ -909,7 +909,3 @@ class WorkflowMapping(Item):
     item_type = 'workflow_mapping'
     schema = load_schema('encoded:schemas/workflow_mapping.json')
     embedded_list = Item.embedded_list  # + lab_award_attribution_embed_list
-
-
-def _wfoutput_bucket_for_env(env):
-    return 'elasticbeanstalk-%s-wfoutput' % (prod_bucket_env(env) if is_stg_or_prd_env(env) else env)
