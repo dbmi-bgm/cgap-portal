@@ -8,7 +8,6 @@ import json
 import pstats
 
 from collections import OrderedDict, deque
-from dcicutils.env_utils import is_stg_or_prd_env, prod_bucket_env
 from inspect import signature
 from pyramid.response import Response
 from snovault import calculated_property, collection, load_schema, CONNECTION, TYPES
