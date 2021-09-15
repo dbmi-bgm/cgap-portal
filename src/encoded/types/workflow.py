@@ -23,8 +23,6 @@ from .base import (
 )
 
 
-TIBANNA_CODE_NAME = 'zebra'
-
 ENV_WEBDEV = CGAP_ENV_WEBDEV
 
 steps_run_data_schema = {
