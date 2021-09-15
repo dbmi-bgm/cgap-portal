@@ -171,7 +171,7 @@ function ConsequenceOfSVSection({ currentTranscript }) {
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="snv-con-break1">
-                    <span className="font-italic text-muted">(Coming Soon)</span>
+                    <span className="font-italic text-muted">{/*(Coming Soon)*/}</span>
                 </div>
             </div>
             <div className="row mb-03">
@@ -181,7 +181,7 @@ function ConsequenceOfSVSection({ currentTranscript }) {
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="snv-con-break2">
-                    <span className="font-italic text-muted">(Coming Soon)</span>
+                    <span className="font-italic text-muted">{/*(Coming Soon)*/}</span>
                 </div>
             </div>
         </React.Fragment>

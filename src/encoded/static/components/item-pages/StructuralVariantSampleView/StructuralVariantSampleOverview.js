@@ -15,7 +15,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
     render(){
         const { context = null, schemas, href } = this.props;
-        const comingSoonElem = <span className="font-italic text-muted">(Coming Soon)</span>;
+        const comingSoonElem = <span className="font-italic">{null}</span>;
         const passProps = { context, schemas, href, comingSoonElem };
 
         const { query: {
