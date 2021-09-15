@@ -247,7 +247,7 @@
             "title": "Type",
             "order": 20
         },
-        "structural_variant.size_display": {
+        "structural_variant.size": {
             "title": "Size",
             "order": 30
         },
@@ -275,15 +275,26 @@
         },
         "structural_variant.gnomadg_af": {
             "title": "Allele Frequency",
-            "order": 70
+            "order": 70,
+            "sort_fields": [
+                {
+                    "field": "structural_variant.gnomadg_af",
+                    "title": "gnomAD AF"
+                },
+                {
+                    "field": "structural_variant.unrelated_count".
+                    "title": "Internal AF"
+                }
+            ]
         }
     },
     "facets": {
         "structural_variant.gnomadg_af": {
-            "title": "gnomAD Allele Frequency",
+            "title": "gnomAD SV",
             "aggregation_type": "range",
             "number_step": "any",
             "order": 0,
+            "grouping": "Allele Frequency",
             "hide_facet_counts": true,
             "ranges": [
                 {
@@ -307,6 +318,13 @@
                     "label": "common"
                 }
             ]
+        },
+        "structural_variant.unrelated_count": {
+            "title": "CGAP Reference Frequency",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 1,
+            "grouping": "Allele Frequency"
         },
         "structural_variant.SV_TYPE": {
             "title": "Variant Type",
