@@ -200,6 +200,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             // From EmbeddedSearchView:
             context: searchContext, // Current Search Response (not that of this filterSet, necessarily)
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
+            requestedCompoundFilterSet, // From SPC/VirtualHrefController
 
             // From FilteringTab (& higher, e.g. App/redux-store):
             caseItem, schemas, session, searchHrefBase,
@@ -337,7 +338,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                                     variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
                             </div>
                             : null }
-                        <ExportSearchSpreadsheetButton {...{ selectedFilterBlockIndices, filterSet, searchHrefBase, intersectFilterBlocks }} />
+                        <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} />
                     </div>
                 </AboveTableControlsBase>
             </div>
@@ -347,19 +348,34 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
 
 const ExportSearchSpreadsheetButton = React.memo(function ExportSearchSpreadsheetButton(props){
-    const { selectedFilterBlockIndices, filterSet, searchHrefBase, intersectFilterBlocks } = props;
-    const virtualCompoundFilterSet = FilterSetController.createCompoundSearchRequest(selectedFilterBlockIndices, filterSet, searchHrefBase, intersectFilterBlocks);
+    const { requestedCompoundFilterSet, caseItem } = props;
     const formRef = useRef(null);
     const onSelect = useCallback(function(eventKey, e){
+        const {
+            accession: caseAccession
+        } = caseItem;
         formRef.current.action = "/variant-sample-search-spreadsheet/?file_format=" + eventKey;
+        // `requestedCompoundFilterSet` passed in from VirtualHrefController of the EmbeddedSearchView
+        formRef.current.children[0].value = JSON.stringify(requestedCompoundFilterSet);
+        // In UTC/ISO (not localized), for simplicity. Transformed to be more filename-friendly.
+        const dateStr = (new Date()).toISOString().replaceAll(":", "_").slice(0, -5) + "Z";
+        formRef.current.children[1].value = (
+            "variant-sample-filtering_case-"
+            + caseAccession
+            + "_" + dateStr
+            + "." + eventKey
+        );
         formRef.current.submit();
         return false;
-    }, [ formRef ]);
+    }, [ formRef, requestedCompoundFilterSet, caseItem ]);
+
+    const disabled = !requestedCompoundFilterSet; // TODO: Check if >0 results, as well.
 
     return (
         <form method="POST" className="mb-0" ref={formRef}>
-            <input type="hidden" name="compound_search_request" value={JSON.stringify(virtualCompoundFilterSet)} />
-            <DropdownButton variant="outline-primary" title="Export results as..." onSelect={onSelect} disabled={!filterSet}>
+            <input type="hidden" name="compound_search_request" />
+            <input type="hidden" name="suggested_filename" />
+            <DropdownButton variant="outline-primary" title="Export results as..." onSelect={onSelect} disabled={disabled}>
                 <DropdownItem eventKey="tsv">
                     <span className="text-600">TSV</span> spreadsheet
                 </DropdownItem>

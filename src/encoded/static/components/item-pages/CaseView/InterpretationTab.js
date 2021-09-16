@@ -17,7 +17,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                     Interpretation
                 </h1>
                 <div>
-                    <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem }} />
+                    <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem, context }} />
                 </div>
             </div>
             <div>
@@ -28,15 +28,22 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
 });
 
 
-const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpretationSpreadsheetButton({ variantSampleListItem }) {
+const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpretationSpreadsheetButton({ variantSampleListItem, context }) {
+    const { accession: caseAccession, case_id: caseNamedID } = context; // Case Item
     const { "@id": atId, variant_samples: vsObjects = [] } = variantSampleListItem || {};
-    const baseHref = atId + "/@@spreadsheet/";
+    const dateStr = (new Date()).toISOString().replaceAll(":", "_").slice(0, -5) + "Z";
+    const suggestedFilename = (
+        "case-interpretation-"
+        + (caseAccession || caseNamedID)
+        + "_" + dateStr
+    );
+    const baseHref = atId + "/@@spreadsheet/" + suggestedFilename;
     return (
         <DropdownButton variant="primary" disabled={vsObjects.length === 0} title="Export as...">
-            <a href={baseHref + "?file_format=tsv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
+            <a href={baseHref + ".tsv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
                 <span className="text-600">TSV</span> spreadsheet
             </a>
-            <a href={baseHref + "?file_format=csv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
+            <a href={baseHref + ".csv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
                 <span className="text-600">CSV</span> spreadsheet
             </a>
             <a href="#" className="dropdown-item disabled" target="_blank" rel="noopener noreferrer" role="button">

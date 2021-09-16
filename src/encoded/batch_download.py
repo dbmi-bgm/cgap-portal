@@ -75,6 +75,7 @@ def variant_sample_search_spreadsheet(context, request):
         # This is what we should be receiving
         request_body = request.POST
     except:
+        # TODO: Consider accepting JSON body for unit test purposes only
         pass
 
 
@@ -89,25 +90,25 @@ def variant_sample_search_spreadsheet(context, request):
     spreadsheet_mappings = get_spreadsheet_mappings(request)
 
     # TEMPORARY FOR TESTING - WE GET THIS SOLELY FROM POST BODY SOON
-    filterset_blocks_request = {
-        "search_type":"VariantSample",
-        "global_flags":"CALL_INFO=SAM10254-S1&file=GAPFI3EBH4X2&additional_facet=proband_only_inheritance_modes&sort=date_created",
-        "intersect": False,
-        "filter_blocks":[
-            {
-                "query":"associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Breast+Cancer+%2828%29&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
-                "flags_applied":[]
-            },
-            # {
-            #     "query":"GQ.from=60&GQ.to=99&associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Familial+Cancer+%28148%29&variant.csq_clinvar_clnsig=Uncertain_significance&variant.csq_clinvar_clnsig=Pathogenic&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
-            #     "flags_applied":[]
-            # },
-            # {
-            #     "query":"variant.csq_gnomade2_af.from=0&variant.csq_gnomade2_af.to=0.001&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001",
-            #     "flags_applied":[]
-            # }
-        ]
-    }
+    # filterset_blocks_request = {
+    #     "search_type":"VariantSample",
+    #     "global_flags":"CALL_INFO=SAM10254-S1&file=GAPFI3EBH4X2&additional_facet=proband_only_inheritance_modes&sort=date_created",
+    #     "intersect": False,
+    #     "filter_blocks":[
+    #         {
+    #             "query":"associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Breast+Cancer+%2828%29&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
+    #             "flags_applied":[]
+    #         },
+    #         # {
+    #         #     "query":"GQ.from=60&GQ.to=99&associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Familial+Cancer+%28148%29&variant.csq_clinvar_clnsig=Uncertain_significance&variant.csq_clinvar_clnsig=Pathogenic&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
+    #         #     "flags_applied":[]
+    #         # },
+    #         # {
+    #         #     "query":"variant.csq_gnomade2_af.from=0&variant.csq_gnomade2_af.to=0.001&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001",
+    #         #     "flags_applied":[]
+    #         # }
+    #     ]
+    # }
 
     # Must not contain `limit`
     filterset_blocks_request = request_body["compound_search_request"]

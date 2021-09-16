@@ -154,6 +154,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         description = null,
         // actions: permissibleActions = [],
         display_title: caseTitle,
+        case_title: caseNamedTitle,
+        case_id: caseNamedID,
         accession: caseAccession,
         individual: caseIndividual,
         sample_processing: sampleProcessing = null,
@@ -272,9 +274,13 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         <React.Fragment>
             <div className="container-wide">
                 <h3 className="tab-section-title">
-                    <div>
-                        <span className="text-400">Case Info: </span>
-                        <span className="text-300"> { caseTitle }</span>
+                    <div className="pt-12 pb-06">
+                        <span>
+                            { caseNamedTitle || caseNamedID }
+                        </span>
+                        <div className="text-smaller text-muted text-monospace text-400">
+                            { caseAccession }
+                        </div>
                     </div>
                 </h3>
             </div>
@@ -787,6 +793,8 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
 /**
  * Handles tab switching between the SNV and CNV/SV tabs
+ *
+ * @todo Consider renaming to `FilteringTab`, and rename existing FilteringTab to ~ `SVFilteringTab`.
  */
 function FilteringTabWrapper(props) {
     const {
@@ -838,13 +846,21 @@ function FilteringTabTableToggle(props) {
     const currentlyOnSNV = currViewName === "SNV";
     const currentlyOnSV = currViewName === "CNVSV";
 
+    const onClickSNV = useCallback(function(e){
+        setCurrViewName("SNV");
+    });
+
+    const onClickCNSNV = useCallback(function(e){
+        setCurrViewName("CNSNV");
+    });
+
     return (
         <div className="card py-2 px-3 flex-row mb-3 filtering-tab-toggle">
-            <div onClick={currentlyOnSV && snvEnabled ? () => setCurrViewName("SNV"): undefined}
+            <div onClick={currentlyOnSV && snvEnabled ? onClickSNV : null}
                 className={`mr-2 text-600  ${currentlyOnSNV ? "active ": (snvEnabled ? "clickable": "unclickable text-muted")}`}>
                 SNV Filtering
             </div>
-            <div onClick={currentlyOnSNV && svEnabled ? () => setCurrViewName("CNVSV"): undefined}
+            <div onClick={currentlyOnSNV && svEnabled ? onClickCNSNV : null}
                 className={`text-600 ${currentlyOnSV ? "active ": (svEnabled ? "clickable": "unclickable text-muted")}`}>
                 CNV / SV Filtering
             </div>
