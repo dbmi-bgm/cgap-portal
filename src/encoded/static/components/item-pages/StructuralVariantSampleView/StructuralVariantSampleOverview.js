@@ -183,8 +183,11 @@ function StructuralVariantInfoSection({ context, comingSoonElem }) {
     );
 }
 
-function GeneInfoSection({ context, comingSoonElem }) {
+function GeneInfoSection({ context }) {
     const fallbackElem = <em data-tip="Not Available"> - </em>;
+    const {
+        structural_variant: { gene_summary: { contained = fallbackElem, at_breakpoint = fallbackElem, omim_genes = fallbackElem } = {} } = {}
+    } = context;
     return (
         <div className="col-12">
             <div className="row pb-1 pb-md-03">
@@ -192,7 +195,7 @@ function GeneInfoSection({ context, comingSoonElem }) {
                     <label htmlFor="contained-genes" className="mb-0">Contained Genes:</label>
                 </div>
                 <div id="contained-genes" className="col-12 col-md-4">
-                    {comingSoonElem}
+                    {contained}
                 </div>
             </div>
             <div className="row pb-1 pb-md-03">
@@ -200,7 +203,7 @@ function GeneInfoSection({ context, comingSoonElem }) {
                     <label htmlFor="genes-at-breakpoints" className="mb-0">Genes At Breakpoints:</label>
                 </div>
                 <div id="genes-at-breakpoints" className="col-12 col-md-4">
-                    {comingSoonElem}
+                    {at_breakpoint}
                 </div>
             </div>
             <div className="row pb-1 pb-md-03">
@@ -208,7 +211,7 @@ function GeneInfoSection({ context, comingSoonElem }) {
                     <label htmlFor="omim-genes" className="mb-0">OMIM Genes:</label>
                 </div>
                 <div id="omim-genes" className="col-12 col-md-4">
-                    {comingSoonElem}
+                    {omim_genes}
                 </div>
             </div>
             <div className="row pb-1 pb-md-03">
@@ -216,7 +219,7 @@ function GeneInfoSection({ context, comingSoonElem }) {
                     <label htmlFor="omim-genes-w-phenotype" className="mb-0">OMIM Genes with Phenotype:</label>
                 </div>
                 <div id="omim-genes-w-phenotype" className="col-12 col-md-4">
-                    {comingSoonElem}
+                    {/* coming soon */}
                 </div>
             </div>
         </div>
