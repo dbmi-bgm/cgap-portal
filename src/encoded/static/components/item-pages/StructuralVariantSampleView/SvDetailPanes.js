@@ -65,16 +65,6 @@ export function SvGeneDetailPane(props) {
         <div className="gene-tab-body card-body">
             <div className="row">
                 <div className="col-12 col-md-6 d-flex flex-column">
-
-                    <div className="inner-card-section flex-grow-1 pb-2 pb-xl-0">
-                        <div className="info-header-title">
-                            <h4>Overview</h4>
-                        </div>
-                        <div className="info-body">
-                            <GeneOverview currentGeneItem={result} {...{ schemas, fallbackElem, getTipForField }} />
-                        </div>
-                    </div>
-
                     <div className="flex-grow-0 pb-2 pb-md-0">
                         <div className="info-header-title">
                             <h4>Consequence of SV</h4>
@@ -83,6 +73,14 @@ export function SvGeneDetailPane(props) {
                         </div>
                         <div className="info-body">
                             <ConsequenceOfSVSection currentTranscript={resultTranscripts[currentTranscriptIdx]} {...{ fallbackElem }}/>
+                        </div>
+                    </div>
+                    <div className="inner-card-section flex-grow-1 pb-2 pb-xl-0">
+                        <div className="info-header-title">
+                            <h4>Gene Info</h4>
+                        </div>
+                        <div className="info-body">
+                            <GeneOverview currentGeneItem={result} {...{ schemas, fallbackElem, getTipForField }} />
                         </div>
                     </div>
                 </div>
