@@ -972,7 +972,7 @@ def variant_sample_list_spreadsheet(context, request):
         ),
         headers={
             'X-Accel-Buffering': 'no',
-            'Content-Encoding': 'utf-8',
+            # 'Content-Encoding': 'utf-8', # Disabled so that Python unit test may work (TODO: Look into more?)
             'Content-Disposition': 'attachment; filename=' + suggested_filename,
             'Content-Type': 'text/' + file_format,
             'Content-Description': 'File Transfer',

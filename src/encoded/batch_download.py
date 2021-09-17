@@ -148,7 +148,7 @@ def variant_sample_search_spreadsheet(context, request):
         ),
         headers={
             'X-Accel-Buffering': 'no',
-            'Content-Encoding': 'utf-8',
+            # 'Content-Encoding': 'utf-8', # Commented out -- unit test's TestApp won't decode otherwise.
             'Content-Disposition': 'attachment; filename=' + suggested_filename,
             'Content-Type': 'text/' + file_format,
             'Content-Description': 'File Transfer',
