@@ -1,0 +1,23 @@
+[
+    {
+        "status": "shared",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "variant_samples": [
+            {
+                "userid": "834559db-a3f6-462c-81a4-f5d7e5e65707",
+                "date_selected": "2021-07-09T16:42:23.689035+00:00",
+                "variant_sample_item": "d62836a0-2de3-4970-bf14-eba3ca758a82",
+                "filter_blocks_request_at_time_of_selection": "{\"filter_blocks\":[{\"name\":\"Breast cancer\",\"query\":\"associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Breast+Cancer+%2828%29&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH\"}],\"uuid\":\"1592bb50-f8db-41ee-8c27-73a8f7471d55\"}"
+            },
+            {
+                "userid": "834559db-a3f6-462c-81a4-f5d7e5e65707",
+                "date_selected": "2021-07-09T16:42:23.690915+00:00",
+                "variant_sample_item": "e43be20e-5dda-4db2-bb23-8c103323fc0f",
+                "filter_blocks_request_at_time_of_selection": "{\"filter_blocks\":[{\"name\":\"Breast cancer\",\"query\":\"associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Breast+Cancer+%2828%29&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH\"}],\"uuid\":\"1592bb50-f8db-41ee-8c27-73a8f7471d55\"}"
+            }
+        ],
+        "created_for_case": "GAPCAJQ1L99X",
+        "uuid": "292250e7-5cb7-4543-85b2-80cd318287b2"
+    }
+]
