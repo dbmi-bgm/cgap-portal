@@ -955,7 +955,7 @@ def variant_sample_list_spreadsheet(context, request):
         '''
         vs_embedding_instance = CustomEmbed(request, vs_uuid, embed_props={ "requested_fields": fields_to_embed })
         result = vs_embedding_instance.result
-        print("\n\nLoaded VS", result)
+        # print("\n\nLoaded VS", result)
         return result
 
     return Response(
