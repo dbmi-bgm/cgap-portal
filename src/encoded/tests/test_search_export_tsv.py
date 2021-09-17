@@ -1,20 +1,5 @@
 import json
-import mock
 import pytest
-import webtest
-
-from datetime import datetime, timedelta
-from dcicutils.misc_utils import Retry, ignored
-from dcicutils.qa_utils import notice_pytest_fixtures, local_attrs
-from pyramid.httpexceptions import HTTPBadRequest
-from snovault import TYPES, COLLECTIONS
-from snovault.elasticsearch import create_mapping
-from snovault.elasticsearch.indexer_utils import get_namespaced_index
-from snovault.schema_utils import load_schema
-from snovault.util import add_default_embeds
-from webtest import AppError
-from ..search.lucene_builder import LuceneBuilder
-from ..search.search_utils import find_nested_path
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search, pytest.mark.workbook]
 
