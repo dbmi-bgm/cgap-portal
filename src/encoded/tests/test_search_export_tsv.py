@@ -123,7 +123,7 @@ def test_interpretation_tab(workbook, html_es_testapp):
     assert 'text/csv' in res.content_type
 
     # All values are of type string when parsed below.
-    result_rows = [ row.rstrip(' \r').split('\t') for row in res.body.decode('utf-8').split('\n') ]
+    result_rows = [ row.rstrip(' \r').split(',') for row in res.body.decode('utf-8').split('\n') ]
     colname_to_index = { col_name: col_idx for col_idx, col_name in enumerate(result_rows[0]) }
 
     check_spreadsheet_rows(result_rows, colname_to_index)
