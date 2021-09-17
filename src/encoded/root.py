@@ -2,7 +2,8 @@ import uptime
 
 from collections import OrderedDict
 from dcicutils import lang_utils
-from dcicutils.s3_utils import s3Utils
+from dcicutils.s3_utils import HealthPageKey
+# from dcicutils.s3_utils import s3Utils
 from encoded import APP_VERSION_REGISTRY_KEY
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
@@ -63,30 +64,31 @@ def uptime_info():
 
 # Correspondence with s3Utils tested elsewhere.
 
-class HealthPageKey:
-    APPLICATION_BUCKET_PREFIX = 'application_bucket_prefix'
-    BEANSTALK_APP_VERSION = 'beanstalk_app_version'
-    BEANSTALK_ENV = 'beanstalk_env'
-    BLOB_BUCKET = 'blob_bucket'                              # s3Utils.BLOB_BUCKET_HEALTH_PAGE_KEY
-    DATABASE = 'database'
-    DISPLAY_TITLE = 'display_title'
-    ELASTICSEARCH = 'elasticsearch'
-    FILE_UPLOAD_BUCKET = 'file_upload_bucket'                # s3Utils.RAW_BUCKET_HEALTH_PAGE_KEY
-    FOURSIGHT = 'foursight'
-    FOURSIGHT_BUCKET_PREFIX = 'foursight_bucket_prefix'
-    IDENTITY = 'identity'
-    INDEXER = 'indexer'
-    INDEX_SERVER = 'index_server'
-    LOAD_DATA = 'load_data'
-    METADATA_BUNDLES_BUCKET = 'metadata_bundles_bucket'      # s3Utils.METADATA_BUCKET_HEALTH_PAGE_KEY
-    NAMESPACE = 'namespace'
-    PROCESSED_FILE_BUCKET = 'processed_file_bucket'          # s3Utils.OUTFILE_BUCKET_HEALTH_PAGE_KEY
-    PROJECT_VERSION = 'project_version'
-    SNOVAULT_VERSION = 'snovault_version'
-    SYSTEM_BUCKET = 'system_bucket'                          # s3Utils.SYS_BUCKET_HEALTH_PAGE_KEY
-    TIBANNA_OUTPUT_BUCKET = 'tibanna_output_bucket'          # s3Utils.TIBANNA_OUTPUT_BUCKET_HEALTH_PAGE_KEY
-    UPTIME = 'uptime'
-    UTILS_VERSION = 'utils_version'
+# class HealthPageKey:
+#     APPLICATION_BUCKET_PREFIX = 'application_bucket_prefix'
+#     BEANSTALK_APP_VERSION = 'beanstalk_app_version'
+#     BEANSTALK_ENV = 'beanstalk_env'
+#     BLOB_BUCKET = 'blob_bucket'                              # s3Utils.BLOB_BUCKET_HEALTH_PAGE_KEY
+#     DATABASE = 'database'
+#     DISPLAY_TITLE = 'display_title'
+#     ELASTICSEARCH = 'elasticsearch'
+#     FILE_UPLOAD_BUCKET = 'file_upload_bucket'                # s3Utils.RAW_BUCKET_HEALTH_PAGE_KEY
+#     FOURSIGHT = 'foursight'
+#     FOURSIGHT_BUCKET_PREFIX = 'foursight_bucket_prefix'
+#     IDENTITY = 'identity'
+#     INDEXER = 'indexer'
+#     INDEX_SERVER = 'index_server'
+#     LOAD_DATA = 'load_data'
+#     METADATA_BUNDLES_BUCKET = 'metadata_bundles_bucket'      # s3Utils.METADATA_BUCKET_HEALTH_PAGE_KEY
+#     NAMESPACE = 'namespace'
+#     PROCESSED_FILE_BUCKET = 'processed_file_bucket'          # s3Utils.OUTFILE_BUCKET_HEALTH_PAGE_KEY
+#     PROJECT_VERSION = 'project_version'
+#     SNOVAULT_VERSION = 'snovault_version'
+#     SYSTEM_BUCKET = 'system_bucket'                          # s3Utils.SYS_BUCKET_HEALTH_PAGE_KEY
+#     TIBANNA_OUTPUT_BUCKET = 'tibanna_output_bucket'          # s3Utils.TIBANNA_OUTPUT_BUCKET_HEALTH_PAGE_KEY
+#     TIBANNA_CWLS_BUCKET = 'tibanna_cwls_bucket'              # s3Utils.TIBANNA_CWLS_BUCKET_HEALTH_PAGE_KEY
+#     UPTIME = 'uptime'
+#     UTILS_VERSION = 'utils_version'
 
 
 class SettingsKey:
@@ -108,6 +110,7 @@ class SettingsKey:
     SQLALCHEMY_URL = 'sqlalchemy.url'
     SYSTEM_BUCKET = 'system_bucket'
     TIBANNA_OUTPUT_BUCKET = 'tibanna_output_bucket'
+    TIBANNA_CWLS_BUCKET = 'tibanna_cwls_bucket'
     UTILS_VERSION = 'utils_version'
 
 
@@ -169,6 +172,7 @@ def health_check(config):
             h.PROJECT_VERSION: settings.get(s.ENCODED_VERSION),
             h.SNOVAULT_VERSION: settings.get(s.SNOVAULT_VERSION),
             h.SYSTEM_BUCKET: settings.get(s.SYSTEM_BUCKET),
+            h.TIBANNA_CWLS_BUCKET: settings.get(s.TIBANNA_CWLS_BUCKET),
             h.TIBANNA_OUTPUT_BUCKET: settings.get(s.TIBANNA_OUTPUT_BUCKET),
             h.UPTIME: uptime_info(),
             h.UTILS_VERSION: settings.get(s.UTILS_VERSION),
