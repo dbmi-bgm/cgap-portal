@@ -100,7 +100,7 @@ class VCFParser(object):
     GT_REF_PHASED = '0|0'
     GT_MISSING = './.'
     BOOLEAN_TRUE = ["1", "YES", True]
-    BOOLEAN_FALSE = ["0", "-1", ""]
+    BOOLEAN_FALSE = ["0", "-1", "", False]
 
     def __init__(self, _vcf, variant, sample, reader=None):
         """ Constructor for the parser
