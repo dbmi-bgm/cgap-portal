@@ -5,7 +5,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
 
-import { console, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 import { SelectedItemsController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/SelectedItemsController';
@@ -278,9 +278,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <span>
                             { caseNamedTitle || caseNamedID }
                         </span>
-                        <div className="text-smaller text-muted text-monospace text-400">
+                        <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession}>
                             { caseAccession }
-                        </div>
+                        </object.CopyWrapper>
                     </div>
                 </h3>
             </div>
