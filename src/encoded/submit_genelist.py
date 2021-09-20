@@ -94,6 +94,8 @@ class GeneListSubmission:
         if not validate_only:
             self.post_output, self.at_id = self.post_items()
             self.submit_variant_update()
+        if self.errors:
+            self.add_default_error_message()
 
     def extract_txt_file(self, txt_file):
         """
@@ -210,8 +212,8 @@ class GeneListSubmission:
         else:
             title = None
             self.errors.append(
-                "No title was found in the gene list. Please check the "
-                "formatting of the submitted document."
+                "No title was found in the gene list. Please check the"
+                " formatting of the submitted document."
             )
         case_atids = self._create_case_atids(cases)
         genelist = [x for x in genelist if x != ""]
@@ -224,19 +226,19 @@ class GeneListSubmission:
                 non_ascii_genes.append(gene)
         if genes_with_spaces:
             self.errors.append(
-                "Gene symbols/IDs should not contain spaces. Please reformat "
-                "the following gene entries: %s." % ", ".join(genes_with_spaces)
+                "Gene symbols/IDs should not contain spaces. Please reformat"
+                " the following gene entries: %s." % ", ".join(genes_with_spaces)
             )
         if non_ascii_genes:
             self.errors.append(
-                "The following gene(s) contain non-ASCII characters: %s. "
-                "Please re-enter the genes using only ASCII characters."
+                "The following gene(s) contain non-ASCII characters: %s."
+                " Please re-enter the genes using only ASCII characters."
                 % ", ".join(non_ascii_genes)
             )
         if not genelist and not genes_with_spaces and not non_ascii_genes:
             self.errors.append(
-                "No genes were found in the gene list. Please check the "
-                "formatting of the submitted document."
+                "No genes were found in the gene list. Please check the"
+                " formatting of the submitted document."
             )
         genelist = list(set(genelist))
         return genelist, title, case_atids
@@ -339,24 +341,13 @@ class GeneListSubmission:
                                 non_ensgids.remove(item)
                                 break
         if non_ensgids:
-            for gene in non_ensgids:
-                try:
-                    response = self.vapp.get("/search/?type=Gene&q=" + gene).json[
-                        "@graph"
-                    ]
-                    options = [option["gene_symbol"] for option in response]
-                    self.errors.append(
-                        "No perfect match found for gene %s. "
-                        "Consider replacing with one of the following: %s."
-                        % (gene, ", ".join(options))
-                    )
-                except (VirtualAppError, AppError):
-                    unmatched_genes_without_options.append(gene)
-        if unmatched_genes_without_options:
             self.errors.append(
-                "The gene(s) %s could not be found in our database. "
-                "Consider replacement with an alias name or an Ensembl ID."
-                % ", ".join(unmatched_genes_without_options)
+                "The following gene(s) could not be found in our database: %s."
+                " Consider replacement with an alias name or an Ensembl ID."
+                " As a reminder, only coding genes exist in our database, so"
+                " pseudogenes, non-coding genes, etc. will cause a gene list submission"
+                " to fail."
+                % ", ".join(non_ensgids)
             )
         sorted_gene_names = sorted(gene_ids)
         matched_gene_uuids = []
@@ -600,8 +591,8 @@ class GeneListSubmission:
             validate_display.append("%s: %s" % (key, validate_result[key]))
         if genelist_uuid:
             validate_display.append(
-                "Existing gene list with the same title was found and will be "
-                "overwritten."
+                "Existing gene list with the same title was found and will be"
+                " overwritten."
             )
         validate_result = validate_display
         return (
@@ -702,15 +693,28 @@ class GeneListSubmission:
         ).json
         if submission_response["success"]:
             self.post_output.append(
-                "Variants should begin updating shortly but may take a few "
-                "hours depending on server load."
+                "Variants should begin updating shortly but may take up to a few hours"
+                " depending on server load. To ensure all variants on a case are"
+                " appropriately updated, please do not use the gene list for filtering"
+                " immediately."
             )
         else:
             self.post_output.append(
-                "Variants were not queued for updating. Please reach out "
-                "to the CGAP team and alert them of this issue."
+                "Variants were not queued for updating. Please reach out"
+                " to the CGAP team and alert them of this issue."
             )
         return
+
+    def add_default_error_message(self):
+        """
+        Adds default message to self.errors explicitly stating no gene
+        list item has been created.
+        """
+        msg = (
+            "Due to the errors above, no gene list has been added to CGAP. Please"
+            " re-submit the gene list once the errors have been addressed."
+        )
+        self.errors.append(msg)
 
 
 def submit_variant_update(
