@@ -4,7 +4,7 @@ const { spawn } = require('child_process');
 const PluginError = require('plugin-error');
 const log = require('fancy-log');
 const webpack = require('webpack');
-const sass = require('node-sass');
+const sass = require('sass');
 const fs = require('fs');
 
 
@@ -173,7 +173,7 @@ const sourceMapLocation = "./src/encoded/static/css/style.css.map";
 function doSassBuild(done, options = {}) {
     sass.render({
         file: './src/encoded/static/scss/style.scss',
-        outFile: './src/encoded/static/css/style-map.css', // sourceMap location
+        outFile: './src/encoded/static/css/style.css', // sourceMap location
         outputStyle: options.outputStyle || 'compressed',
         sourceMap: true
     }, function(error, result) { // node-style callback from v3.0.0 onwards

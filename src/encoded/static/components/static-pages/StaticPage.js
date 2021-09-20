@@ -93,10 +93,14 @@ export const StaticEntryContent = React.memo(function StaticEntryContent(props){
  */
 export default class StaticPage extends React.PureComponent {
 
-    static Wrapper = StaticPageBase.Wrapper
+    static Wrapper = StaticPageBase.Wrapper;
 
     render(){
-        return <StaticPageBase {...this.props} childComponent={StaticEntryContent} contentParseFxn={parseSectionsContent} />;
+        return (
+            <StaticPageBase {...this.props}
+                childComponent={StaticEntryContent} contentParseFxn={parseSectionsContent}
+                fixedPositionBreakpoint={1500} />
+        );
     }
 }
 
