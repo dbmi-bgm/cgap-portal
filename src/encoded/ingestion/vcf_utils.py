@@ -99,6 +99,8 @@ class VCFParser(object):
     GT_REF = '0/0'
     GT_REF_PHASED = '0|0'
     GT_MISSING = './.'
+    BOOLEAN_TRUE = ["1", "YES", True]
+    BOOLEAN_FALSE = ["0", "-1", "", False]
 
     def __init__(self, _vcf, variant, sample, reader=None):
         """ Constructor for the parser
@@ -378,9 +380,14 @@ class VCFParser(object):
                 except Exception:  # XXX: This shouldn't happen but does in case of malformed entries, see uk10k_esp_maf
                     return 0.0
         elif t == 'boolean':
-            if value == '0':
+            if value in self.BOOLEAN_FALSE:
                 return False
-            return True
+            elif value in self.BOOLEAN_TRUE:
+                return True
+            else:
+                raise VCFParserException(
+                    "Received an unexpected value for a boolean: %s." % value
+                )
         elif t == 'array':
             if sub_type:
                 if not isinstance(value, list):
@@ -968,6 +975,8 @@ class StructuralVariantVCFParser(VCFParser):
                 else:  # Field only from this sample
                     sample_dict = sample.data._asdict()
                     field_value = sample_dict[vcf_field]
+                    if isinstance(field_value, list):
+                        field_value = ",".join(map(str, field_value))
                     self.add_result_value(
                         result, schema_key, schema_props, field_value
                     )

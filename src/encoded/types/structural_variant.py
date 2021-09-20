@@ -100,7 +100,7 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "Start position (genome coordinates)",
+            "title": "Start Absolute Position",
             "description": "Start absolute position in genome coordinates",
             "type": "integer",
         }
@@ -111,7 +111,7 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "End position (genome coordinates)",
+            "title": "End Absolute Position",
             "description": "End absolute position in genome coordinates",
             "type": "integer",
         }
@@ -122,42 +122,150 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "Structural Variant Size",
+            "title": "Size",
             "description": "The size of this structural variant",
             "type": "number",
         }
     )
-    def size(self, request, START, END):
+    def size(self, START, END):
         return END - START + 1
 
     @calculated_property(
         schema={
-            "title": "Structural Variant Size Display",
+            "title": "Size Display",
             "description": "The abbreviated size of this structural variant",
             "type": "string",
         }
     )
-    def size_display(self, request, START, END):
+    def size_display(self, START, END):
         """
         Create user-friendly display of size.
 
         Finds appropriate units "bucket" according to number of digits
         in the size, then rounds to 1 decimal place within the "bucket".
 
-        :param request: cls pyramid request
         :param START: int start location of SV
         :param END: int end location of SV
-        :return result: str size plus unit
+        :return: str size plus unit
         """
         result = None
         size = END - START + 1
         unit_max_exponents = [3, 6, 9, 12]  # Gb should be max given chromosome sizes
         display_units = ["bp", "Kb", "Mb", "Gb"]
         for exponent, unit in zip(unit_max_exponents, display_units):
-            if size < 10**exponent:
-                display_number = round(size*10**(-exponent+3), 1)
+            if size < 10 ** exponent:
+                display_number = round(size * 10 ** (-exponent + 3), 1)
                 result = str(display_number) + " " + unit
                 break
+        return result
+
+    @calculated_property(
+        schema={
+            "title": "Cytoband(s)",
+            "description": "The cytoband(s) of this structural variant",
+            "type": "string",
+        }
+    )
+    def cytoband_display(self, CHROM, cytoband_start=None, cytoband_end=None):
+        """
+        Create cytoband to display in portal.
+
+        Requires cytobands at both start and end locations, and result
+        is either single cytoband if both identical or dash-separated
+        cytobands if different.
+
+        :param CHROM: str chromosome
+        :param cytoband_start: str cytoband at SV START
+        :param cytoband_end: str cytoband at SV END
+        :returns: str cytoband to display
+        """
+        result = None
+        if cytoband_start and cytoband_end:
+            if cytoband_start == cytoband_end:
+                result = CHROM + cytoband_start
+            else:
+                result = CHROM + cytoband_start + "-" + CHROM + cytoband_end
+        return result
+
+    @calculated_property(
+        schema={
+            "title": "Gene Summary",
+            "description": "An overview of genes overlapping this structural variant",
+            "type": "object",
+            "properties": {
+                "contained": {
+                    "title": "Genes Contained in SV",
+                    "type": "string",
+                    "description": (
+                        "The number of genes entirely within the structural variant out"
+                        " of all genes affected"
+                    ),
+                },
+                "at_breakpoint": {
+                    "title": "Genes Crossing an SV Breakpoint",
+                    "type": "string",
+                    "description": (
+                        "The number of genes overlapping the ends of the structural"
+                        " variant out of all genes affected"
+                    ),
+                },
+                "omim_genes": {
+                    "title": "Genes with OMIM IDs",
+                    "type": "string",
+                    "description": (
+                        "The number of genes affected by the structural variant that"
+                        " exist in the OMIM database out of all genes affected"
+                    ),
+                },
+            },
+        }
+    )
+    def gene_summary(self, request, START, END, transcript=None):
+        """
+        Calculate summary characteristics of genes overlapped by the
+        structural variant.
+
+        NOTE: Genes included here are only those that have some
+        overlap with the given SV; genes entirely up-/downstream of the
+        SV are not contributing towards any counts (including the
+        total).
+
+        :param request: cls pyramid request
+        :param START: int SV hg38 start position
+        :param END: int SV hg38 end position
+        :param transcript: list of VEP annotations
+        :returns: dict of summary characteristics
+        """
+        result = {}
+        genes = []
+        gene_count = 0
+        contained_count = 0
+        breakpoint_count = 0
+        omim_count = 0
+        if transcript:
+            for item in transcript:
+                gene = item.get("csq_gene")
+                if gene and gene not in genes:
+                    genes.append(gene)
+        for gene in genes:
+            gene = get_item_or_none(request, gene, "Gene", frame="raw")
+            gene_start = gene.get("spos")
+            gene_end = gene.get("epos")
+            gene_omim_id = gene.get("omim_id")
+            if gene_start and gene_end:  # True for all genes as of 09-14-2021 drr
+                if int(gene_start) >= START and int(gene_end) <= END:
+                    gene_count += 1
+                    contained_count += 1
+                    if gene_omim_id:
+                        omim_count += 1
+                elif int(gene_start) <= END and int(gene_end) >= START:
+                    gene_count += 1
+                    breakpoint_count += 1
+                    if gene_omim_id:
+                        omim_count += 1
+        result["contained"] = str(contained_count) + "/" + str(gene_count)
+        result["at_breakpoint"] = str(breakpoint_count) + "/" + str(gene_count)
+        result["omim_genes"] = str(omim_count) + "/" + str(gene_count)
         return result
 
 
@@ -176,9 +284,12 @@ class StructuralVariantSample(Item):
     schema = load_extended_descriptions_in_schemas(
         load_schema("encoded:schemas/structural_variant_sample.json")
     )
-    rev = {"variant_sample_list": (
-        "VariantSampleList", "structural_variant_samples.structural_variant_sample_item"
-    )}
+    rev = {
+        "variant_sample_list": (
+            "VariantSampleList",
+            "structural_variant_samples.structural_variant_sample_item",
+        )
+    }
     embedded_list = build_structural_variant_sample_embedded_list()
 
     POSSIBLE_GENOTYPE_LABEL_FIELDS = [
@@ -192,7 +303,7 @@ class StructuralVariantSample(Item):
         "brother_genotype_label",
         "brother_II_genotype_label",
         "brother_III_genotype_label",
-        "brother_IV_genotype_label"
+        "brother_IV_genotype_label",
         "co_parent_genotype_label",
         "daughter_genotype_label",
         "daughter_II_genotype_label",
@@ -247,16 +358,18 @@ class StructuralVariantSample(Item):
         if result:
             return result[0]  # expected one list per case
 
-    @calculated_property(schema={
-        "title": "Associated Gene Lists",
-        "description": "Gene lists associated with project or case of variant sample",
-        "type": "array",
-        "items": {
-            "title": "Gene list title",
-            "type": "string",
-            "description": "Gene list title"
+    @calculated_property(
+        schema={
+            "title": "Associated Gene Lists",
+            "description": "Gene lists associated with project or case of variant sample",
+            "type": "array",
+            "items": {
+                "title": "Gene list title",
+                "type": "string",
+                "description": "Gene list title",
+            },
         }
-    })
+    )
     def associated_genelists(self, request, project, structural_variant, CALL_INFO):
         """
         Identifies gene lists associated with the project or project and
@@ -292,7 +405,8 @@ class StructuralVariantSample(Item):
             project_object = get_item_or_none(request, project_uuid)
             project_atid = project_object.get("@id")
             genelist_info[title] = {
-                "project": project_atid, "bam_sample_ids": bam_sample_ids
+                "project": project_atid,
+                "bam_sample_ids": bam_sample_ids,
             }
         for genelist_title, genelist_props in genelist_info.items():
             if genelist_title in associated_genelists:
@@ -306,19 +420,19 @@ class StructuralVariantSample(Item):
                     associated_genelists.append(genelist_title)
         return associated_genelists
 
-    @calculated_property(schema={
-        "title": "Inheritance Modes",
-        "description": "Inheritance Modes (only including those relevant to a proband-only analysis)",
-        "type": "array",
-        "items": {
-            "type": "string"
+    @calculated_property(
+        schema={
+            "title": "Inheritance Modes",
+            "description": "Inheritance Modes (only including those relevant to a proband-only analysis)",
+            "type": "array",
+            "items": {"type": "string"},
         }
-    })
+    )
     def proband_only_inheritance_modes(
-            self, request, structural_variant, inheritance_modes=[]
+        self, request, structural_variant, inheritance_modes=[]
     ):
         """
-        Inheritance modes for proband-only cases. 
+        Inheritance modes for proband-only cases.
 
         NOTE: Limited only to sex-chromosome-linked inheritance modes
         at the moment. If compound hets aren't going to be included for
@@ -334,80 +448,67 @@ class StructuralVariantSample(Item):
             return proband_modes
         return None
 
-    @calculated_property(schema={
-        "title": "Associated Genotype Labels",
-        "description": "Named Genotype Label fields that can be searched on",
-        "type": "object",
-        "additional_properties": True,
-        "properties": {
-            "proband_genotype_label": {
-                "title": "Proband Genotype",
-                "type": "string"
+    @calculated_property(
+        schema={
+            "title": "Associated Genotype Labels",
+            "description": "Named Genotype Label fields that can be searched on",
+            "type": "object",
+            "additional_properties": True,
+            "properties": {
+                "proband_genotype_label": {
+                    "title": "Proband Genotype",
+                    "type": "string",
+                },
+                "mother_genotype_label": {"title": "Mother Genotype", "type": "string"},
+                "father_genotype_label": {"title": "Father Genotype", "type": "string"},
+                "sister_genotype_label": {"title": "Sister Genotype", "type": "string"},
+                "sister_II_genotype_label": {
+                    "title": "Sister II Genotype",
+                    "type": "string",
+                },
+                "sister_III_genotype_label": {
+                    "title": "Sister III Genotype",
+                    "type": "string",
+                },
+                "sister_IV_genotype_label": {
+                    "title": "Sister IV Genotype",
+                    "type": "string",
+                },
+                "brother_genotype_label": {
+                    "title": "Brother Genotype",
+                    "type": "string",
+                },
+                "brother_II_genotype_label": {
+                    "title": "Brother II Genotype",
+                    "type": "string",
+                },
+                "brother_III_genotype_label": {
+                    "title": "Brother III Genotype",
+                    "type": "string",
+                },
+                "brother_IV_genotype_label": {
+                    "title": "Brother IV Genotype",
+                    "type": "string",
+                },
+                "co_parent_genotype_label": {
+                    "title": "Co-Parent Genotype",
+                    "type": "string",
+                },
+                "daughter_genotype_label": {
+                    "title": "Daughter Genotype",
+                    "type": "string",
+                },
+                "daughter_II_genotype_label": {
+                    "title": "Daughter II Genotype",
+                    "type": "string",
+                },
+                "son_genotype_label": {"title": "Son Genotype", "type": "string"},
+                "son_II_genotype_label": {"title": "Son II Genotype", "type": "string"},
             },
-            "mother_genotype_label": {
-                "title": "Mother Genotype",
-                "type": "string"
-            },
-            "father_genotype_label": {
-                "title": "Father Genotype",
-                "type": "string"
-            },
-            "sister_genotype_label": {
-                "title": "Sister Genotype",
-                "type": "string"
-            },
-            "sister_II_genotype_label": {
-                "title": "Sister II Genotype",
-                "type": "string"
-            },
-            "sister_III_genotype_label": {
-                "title": "Sister III Genotype",
-                "type": "string"
-            },
-            "sister_IV_genotype_label": {
-                "title": "Sister IV Genotype",
-                "type": "string"
-            },
-            "brother_genotype_label": {
-                "title": "Brother Genotype",
-                "type": "string"
-            },
-            "brother_II_genotype_label": {
-                "title": "Brother II Genotype",
-                "type": "string"
-            },
-            "brother_III_genotype_label": {
-                "title": "Brother III Genotype",
-                "type": "string"
-            },
-            "brother_IV_genotype_label": {
-                "title": "Brother IV Genotype",
-                "type": "string"
-            },
-            "co_parent_genotype_label": {
-                "title": "Co-Parent Genotype",
-                "type": "string"
-            },
-            "daughter_genotype_label": {
-                "title": "Daughter Genotype",
-                "type": "string"
-            },
-            "daughter_II_genotype_label": {
-                "title": "Daughter II Genotype",
-                "type": "string"
-            },
-            "son_genotype_label": {
-                "title": "Son Genotype",
-                "type": "string"
-            },
-            "son_II_genotype_label": {
-                "title": "Son II Genotype",
-                "type": "string"
-            }
         }
-    })
+    )
     def associated_genotype_labels(
-            self, structural_variant, CALL_INFO, samplegeno=None, genotype_labels=None
+        self, structural_variant, CALL_INFO, samplegeno=None, genotype_labels=None
     ):
         """
         Builds the above sub-embedded object so we can search on the
@@ -416,9 +517,9 @@ class StructuralVariantSample(Item):
         possible_keys_set = set(StructuralVariantSample.POSSIBLE_GENOTYPE_LABEL_FIELDS)
 
         def infer_key_from_role(role):
-            return role.replace(' ', '_').replace('-', '_') + '_genotype_label'
+            return role.replace(" ", "_").replace("-", "_") + "_genotype_label"
 
-        # structural variant starts with sv-type_chr* where * is the chrom 
+        # structural variant starts with sv-type_chr* where * is the chrom
         def extract_chrom_from_variant(v):
             chrom_string = v.split("_")[1]
             return chrom_string[3]
@@ -426,21 +527,22 @@ class StructuralVariantSample(Item):
         # drop if there are no genotype labels or no samplegeno field or this is a
         # mitochondrial variant
         if (
-            not genotype_labels or not samplegeno
-            or extract_chrom_from_variant(structural_variant) == 'M'
+            not genotype_labels
+            or not samplegeno
+            or extract_chrom_from_variant(structural_variant) == "M"
         ):
             return None
 
         new_labels = {}
         for entry in genotype_labels:
-            role = entry.get('role', '')
-            label = entry.get('labels', [])
+            role = entry.get("role", "")
+            label = entry.get("labels", [])
             role_key = infer_key_from_role(role)
             if role_key not in possible_keys_set:
                 continue
             elif len(label) == 1:
                 new_labels[role_key] = label[0]
             else:
-                new_labels[role_key] = ' '.join(label)  # just in case
+                new_labels[role_key] = " ".join(label)  # just in case
 
         return new_labels
