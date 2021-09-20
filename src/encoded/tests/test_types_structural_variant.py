@@ -24,11 +24,12 @@ def test_size_display(testapp, structural_variant):
         ("p10", "q3", "1p10-1q3"),
         ("p12", None, None),
         (None, "p12", None),
-        (None, None, None)
-    ]
+        (None, None, None),
+    ],
 )
-def test_cytoband_display(testapp, structural_variant, cytoband_start, cytoband_end,
-        result):
+def test_cytoband_display(
+    testapp, structural_variant, cytoband_start, cytoband_end, result
+):
     """Test rendering of cytoband display."""
     sv_atid = structural_variant["@id"]
     patch_body = {}
