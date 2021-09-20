@@ -39,6 +39,7 @@ beanstalk.cfg
 /src/encoded/tests/data/temp-local-inserts/*
 /src/encoded/tests/data/temp-local-inserts*
 !/src/encoded/tests/data/temp-local-inserts/.gitkeep
+/src/encoded/tests/data/demo_inserts-*
 
 /bin
 !/bin/test
