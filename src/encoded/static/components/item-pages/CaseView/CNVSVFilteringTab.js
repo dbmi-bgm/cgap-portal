@@ -7,7 +7,7 @@ import { console, valueTransforms } from '@hms-dbmi-bgm/shared-portal-components
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
-
+import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 
 export function CNVSVFilteringTab(props) {
     const {
@@ -97,12 +97,12 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                 "minColumnWidth" : (originalColExtMap.display_title.minColumnWidth || 100) + 20,
                 "render": function(result, parentProps){
                     // const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-                    const { "@id": atID, structural_variant = null } = result;
+                    const { "@id": atID, structural_variant = null } = result || {};
                     const { display_title = "", annotation_id = "" } = structural_variant || {};
 
                     // annotationID structured like <type>_chr...etc; need just the part after underscore
                     const splitAnnotationID = (annotation_id || display_title).split("_");
-                    return <div className="text-left pl-25"><a href={atID}>{splitAnnotationID[1]}</a></div>;
+                    return <div className="text-left pl-25 text-truncate"><a href={atID}>{splitAnnotationID[1]}</a></div>;
                 }
             },
             // 'bam_snapshot': { // Note: not going to be added until a few versions from now; this may need updates specific to SVs when finally implemented
@@ -125,7 +125,7 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
             "structural_variant.transcript.csq_gene.display_title": {
                 "noSort": true, // not currently a useful or informative sort.
                 "render": function(result, props) {
-                    const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result;
+                    const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result || {};
                     const path = atID + "?annotationTab=0";
 
                     const transcriptsDeduped = {};
@@ -141,9 +141,25 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                     return <a href={path}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
                 }
             },
+            "structural_variant.gnomadg_af": {
+                "render": function(result, props) {
+                    const { structural_variant: { gnomadg_af = null, unrelated_count = null } = {} } = result || {};
+                    const { align = 'left' } = props;
+
+                    const rows = [
+                        <div className="d-block" key="gnomadAF"><span className="text-600">gnomAD: </span>{gnomadg_af !== null ? gnomadg_af: "-"}</div>
+                    ];
+
+                    if (unrelated_count !== null) {
+                        rows.push(<div className="d-block" key="internal"><span className="text-600">Internal: </span>{unrelated_count}</div>);
+                    }
+
+                    return <StackedRowColumn {...{ rows }} className={"text-truncate text-" + align} />;
+                }
+            },
             "structural_variant.size": {
                 "render": function(result, props) {
-                    const { structural_variant: { size_display = null } = {} } = result;
+                    const { structural_variant: { size_display = null } = {} } = result || {};
                     return size_display;
                 }
             }
