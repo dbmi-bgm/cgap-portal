@@ -34,7 +34,7 @@ from encoded.types.variant import (
     get_fields_to_embed
 )
 from .custom_embed import CustomEmbed
-from .batch_download_utils import stream_tsv_output, convert_item_to_sheet_dict
+from .batch_download_utils import stream_tsv_output, convert_item_to_sheet_dict, stream_xslx_output
 from .search.compound_search import CompoundSearchBuilder
 
 # from .search import (
@@ -136,16 +136,26 @@ def variant_sample_search_spreadsheet(context, request):
             embed_and_merge_note_items_to_variant_sample(request, embedded_representation_variant_sample)
             yield embedded_representation_variant_sample
 
+    result_dictionaries_iterable = map(
+        lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
+        variant_samples_gen()
+    )
 
-    return Response(
-        app_iter = stream_tsv_output(
-            map(
-                lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
-                variant_samples_gen()
-            ),
+    response_iterable = None
+    if file_format == "xlsx":
+        response_iterable = stream_xslx_output(
+            result_dictionaries_iterable,
+            spreadsheet_mappings
+        )
+    else:
+        response_iterable = stream_tsv_output(
+            result_dictionaries_iterable,
             spreadsheet_mappings,
             file_format
-        ),
+        )
+
+    return Response(
+        app_iter = response_iterable,
         headers={
             'X-Accel-Buffering': 'no',
             # 'Content-Encoding': 'utf-8', # Commented out -- unit test's TestApp won't decode otherwise.

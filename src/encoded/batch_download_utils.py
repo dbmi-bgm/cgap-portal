@@ -1,5 +1,7 @@
 import csv
 import structlog
+import xlsx_streaming
+from openpyxl import Workbook
 from pyramid.httpexceptions import (
     HTTPBadRequest,
     HTTPMovedPermanently,
@@ -143,14 +145,17 @@ def stream_tsv_output(dictionaries_iterable, spreadsheet_mappings, file_format =
     #     yield line.read().encode('utf-8')
 
 
-def build_xslx_spreadsheet(dictionaries_iterable, spreadsheet_mappings):
+def stream_xslx_output(dictionaries_iterable, spreadsheet_mappings):
     '''TODO'''
-    from tempfile import NamedTemporaryFile
-    from openpyxl import Workbook
+
+    # TODO: Create template with openpyxl
     wb = Workbook()
 
-    with NamedTemporaryFile() as tmp:
-        wb.save(tmp.name)
-        tmp.seek(0)
-        stream = tmp.read()
-        
+    def serializer(dict_item):
+        pass
+
+    return xlsx_streaming.stream_queryset_as_xlsx(
+        dictionaries_iterable,
+        wb,
+        batch_size=2
+    )
