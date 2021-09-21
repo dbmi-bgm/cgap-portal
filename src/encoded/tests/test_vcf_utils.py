@@ -15,7 +15,7 @@ TEST_VCF = './src/encoded/annotations/GAPFIBVPFEP5_v0.5.4.reformat.altcounts.vcf
 EXPECTED_ANNOTATION_FIELDS = ['comHet', 'CSQ']
 VARIANT_SCHEMA = './src/encoded/schemas/variant.json'
 VARIANT_SAMPLE_SCHEMA = './src/encoded/schemas/variant_sample.json'
-TEST_SV_VCF = resolve_file_path("annotations/GAPFIDTAWSY3_v0.0.2.vcf.subset")
+TEST_SV_VCF = resolve_file_path("annotations/GAPFIV4NLMMT_v0.0.3.vcf.subset")
 SV_SCHEMA = resolve_file_path("schemas/structural_variant.json")
 SV_SAMPLE_SCHEMA = resolve_file_path("schemas/structural_variant_sample.json")
 
@@ -85,7 +85,7 @@ class TestIngestVCF:
         assert self.get_transcript_field(result, 0, 'csq_consequence') == ['splice_region_variant']
         assert self.get_transcript_field(result, 0, 'csq_gene') == 'ENSG00000261236'
         assert self.get_transcript_field(result, 0, 'csq_feature') == 'ENST00000569669'
-        assert self.get_transcript_field(result, 0, 'csq_strand') is True
+        assert self.get_transcript_field(result, 0, 'csq_strand') is False
 
     def test_build_multiple_variants(self, test_vcf):
         """
@@ -107,6 +107,7 @@ class TestIngestVCF:
         assert len(result['transcript'].keys()) == 11
         assert self.get_transcript_field(result, 0, 'csq_consequence') == ['intron_variant']
         assert self.get_transcript_field(result, 0, 'csq_feature') == 'ENST00000341065'
+        assert self.get_transcript_field(result, 0, "csq_strand") is True
 
         # check genes
         assert self.get_genes_field(result, 0, 'genes_most_severe_gene') == 'ENSG00000187634'
@@ -229,6 +230,9 @@ class TestIngestStructuralVariantVCF(TestIngestVCF):
         assert self.get_top_level_field(result, "START") == 31908111
         assert self.get_top_level_field(result, "END") == 31908161
         assert self.get_top_level_field(result, "SV_TYPE") == "DEL"
+        assert self.get_top_level_field(result, "cytoband_start") == "p35.2"
+        assert self.get_top_level_field(result, "cytoband_end") == "p35.2"
+        assert self.get_top_level_field(result, "unrelated_count") == 1
         assert len(result["transcript"]) == 9
         assert self.get_transcript_field(result, 0, "csq_consequence") == [
             "downstream_gene_variant"
@@ -237,23 +241,38 @@ class TestIngestStructuralVariantVCF(TestIngestVCF):
         assert self.get_transcript_field(result, 0, "csq_feature") == "ENST00000457805"
         assert self.get_transcript_field(result, 0, "csq_biotype") == "protein_coding"
         assert self.get_transcript_field(result, 0, "csq_distance") == "373"
-        assert self.get_transcript_field(result, 0, "csq_strand") is True
+        assert self.get_transcript_field(result, 0, "csq_strand") is False
+        assert not self.get_transcript_field(result, 0, "csq_canonical")
         assert self.get_transcript_field(result, 6, "csq_exon") == "5/5"
-        assert self.get_transcript_field(result, 6, "csq_intron") == "3/3"
-        assert self.get_transcript_field(result, 6, "csq_hgvsc") == "Foo"
-        assert self.get_transcript_field(result, 6, "csq_hgvsp") == "Bar"
+        assert not self.get_transcript_field(result, 6, "csq_intron")
         assert self.get_transcript_field(result, 6, "csq_cdna_position") == "1613-1662"
+        assert self.get_transcript_field(result, 7, "csq_canonical") is True
         variant_keys = result.keys()
         for key in variant_keys:
             assert "gnomadg" not in key
 
-        # record 2 - gnomAD-SV values
+        # record 2 - gnomAD-SV values + Transcript intron
         record = test_sv_vcf.read_next_record()
         result = test_sv_vcf.create_variant_from_record(record)
 
         assert self.get_top_level_field(result, "gnomadg_ac") == 8
         assert self.get_top_level_field(result, "gnomadg_af-afr") == 0.000757
         assert self.get_top_level_field(result, "gnomadg_an-eur") == 7608
+        assert self.get_transcript_field(result, 5, "csq_intron") == "1/1"
+        assert self.get_transcript_field(result, 0, "csq_strand") is True
+
+        # record 3 - Additional Transcript fields
+        record = test_sv_vcf.read_next_record()
+        result = test_sv_vcf.create_variant_from_record(record)
+        
+        assert self.get_transcript_field(result, 0, "csq_cds_position") == "3594-4583"
+        assert self.get_transcript_field(
+            result, 0, "csq_protein_position"
+        ) == "1198-1528"
+        assert self.get_transcript_field(result, 0, "csq_codons").startswith("agTCTCCC")
+        assert self.get_transcript_field(result, 0, "csq_amino_acids").startswith(
+            "SLPSMQGDLK"
+        )
 
     def test_build_variant_samples(self, test_sv_vcf):
         """
@@ -268,6 +287,12 @@ class TestIngestStructuralVariantVCF(TestIngestVCF):
         assert len(result) == 1
         assert self.get_top_level_field(result[0], "GT") == "0/1"
         assert self.get_top_level_field(result[0], "CALL_INFO") == "NA12878_sample"
+        assert self.get_top_level_field(result[0], "GQ") == 43
+        assert self.get_top_level_field(result[0], "PL") == "158,0,40"
+        assert not self.get_top_level_field(result[0], "imprecise")
+        assert self.get_top_level_field(
+            result[0], "confidence_interval_start"
+        ) == [0, 1]
         sample_geno = self.get_top_level_field(result[0], "samplegeno")
         assert len(sample_geno) == 3
         assert sample_geno[0]["samplegeno_numgt"] == "0/0"
@@ -283,3 +308,16 @@ class TestIngestStructuralVariantVCF(TestIngestVCF):
         assert sample_geno[1]["samplegeno_sampleid"] == "NA12878_sample"
         assert sample_geno[2]["samplegeno_numgt"] == "0/1"
         
+        # record 4 - Confidence intervals and Imprecise
+        record = test_sv_vcf.read_next_record()
+        record = test_sv_vcf.read_next_record()
+        result = test_sv_vcf.create_sample_variant_from_record(record)
+
+        for idx in range(len(result)):
+            assert self.get_top_level_field(result[idx], "imprecise") is True
+            assert self.get_top_level_field(
+                result[idx], "confidence_interval_start"
+            ) == [-236, 237]
+            assert self.get_top_level_field(
+                result[idx], "confidence_interval_end"
+            ) == [-136, 136]

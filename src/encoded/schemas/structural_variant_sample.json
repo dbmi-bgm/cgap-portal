@@ -58,6 +58,17 @@
             "scope": "sample_variant",
             "schema_title": "Sample ID"
         },
+        "GQ": {
+            "title": "Genotype Quality",
+            "field_name": "GQ",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "GQ",
+            "source_name": "VCF",
+            "description": "Genotype quality",
+            "scope": "sample_variant",
+            "schema_title": "Genotype Quality"
+        },
         "GT": {
             "title": "Genotype",
             "field_name": "GT",
@@ -69,10 +80,53 @@
             "scope": "sample_variant",
             "schema_title": "Genotype"
         },
+        "PL": {
+            "title": "Genotype Likelihoods (0/0, 0/1, 1/1)",
+            "field_name": "PL",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "PL",
+            "source_name": "VCF",
+            "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",
+            "scope": "sample_variant",
+            "schema_title": "Genotype Likelihoods (0/0, 0/1, 1/1)"
+        },
         "annotation_id": {
             "title": "Annotation ID",
             "type": "string",
             "uniqueKey": true
+        },
+        "confidence_interval_end": {
+            "title": "End Position Confidence Interval",
+            "type": "array",
+            "field_name": "confidence_interval_end",
+            "items": {
+                "title": "End Position Confidence Interval",
+                "field_name": "confidence_interval_end",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "CIEND",
+                "source_name": "VCF",
+                "description": "Confidence interval of end position in basepairs",
+                "scope": "sample_variant",
+                "schema_title": "End Position Confidence Interval"
+            }
+        },
+        "confidence_interval_start": {
+            "title": "Start Position Confidence Interval",
+            "type": "array",
+            "field_name": "confidence_interval_start",
+            "items": {
+                "title": "Start Position Confidence Interval",
+                "field_name": "confidence_interval_start",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "CIPOS",
+                "source_name": "VCF",
+                "description": "Confidence interval of start position in basepairs",
+                "scope": "sample_variant",
+                "schema_title": "Start Position Confidence Interval"
+            }
         },
         "discovery_interpretation": {
             "title": "Discovery Interpretation",
@@ -110,6 +164,17 @@
                     }
                 }
             }
+        },
+        "imprecise": {
+            "title": "Imprecise Structural Variant",
+            "field_name": "imprecise",
+            "type": "boolean",
+            "do_import": true,
+            "vcf_field": "IMPRECISE",
+            "source_name": "VCF",
+            "description": "Imprecise structural variant flag from Manta",
+            "scope": "sample_variant",
+            "schema_title": "Imprecise Structural Variant"
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
@@ -210,15 +275,26 @@
         },
         "structural_variant.gnomadg_af": {
             "title": "Allele Frequency",
-            "order": 70
+            "order": 70,
+            "sort_fields": [
+                {
+                    "field": "structural_variant.gnomadg_af",
+                    "title": "gnomAD AF"
+                },
+                {
+                    "field": "structural_variant.unrelated_count",
+                    "title": "Internal AF"
+                }
+            ]
         }
     },
     "facets": {
         "structural_variant.gnomadg_af": {
-            "title": "gnomAD Allele Frequency",
+            "title": "gnomAD SV",
             "aggregation_type": "range",
             "number_step": "any",
             "order": 0,
+            "grouping": "Allele Frequency",
             "hide_facet_counts": true,
             "ranges": [
                 {
@@ -242,6 +318,13 @@
                     "label": "common"
                 }
             ]
+        },
+        "structural_variant.unrelated_count": {
+            "title": "CGAP Reference Frequency",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 1,
+            "grouping": "Allele Frequency"
         },
         "structural_variant.SV_TYPE": {
             "title": "Variant Type",
@@ -342,19 +425,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -366,19 +441,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -390,19 +457,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -414,19 +473,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -438,19 +489,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -462,19 +505,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -486,19 +521,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -510,19 +537,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -534,19 +553,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -558,19 +569,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -582,19 +585,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -606,19 +601,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -630,19 +617,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -654,19 +633,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -678,19 +649,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -702,19 +665,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -726,19 +681,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -750,19 +697,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -774,19 +713,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },
@@ -798,19 +729,11 @@
             "rescue_terms": [
                 "Heterozygous",
                 "Homozygous reference",
-                "Heterozygous  (multiallelic in family)",
-                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
                 "Homozygous alternate",
-                "Homozygous alternate  (multiallelic in family)",
                 "Missing",
-                "Homozygous reference  (multiallelic in family)",
                 "Hemizygous reference",
                 "False",
                 "Hemizygous alternate",
-                "Missing  (multiallelic in family)",
-                "False  (multiallelic in family)",
-                "Hemizygous alternate  (multiallelic in family)",
-                "Hemizygous reference  (multiallelic in family)",
                 "-"
             ]
         },

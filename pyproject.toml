@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "7.7.14"
+version = "7.8.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -42,8 +42,8 @@ certifi = ">=2021.5.30"
 chardet = "3.0.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
-dcicsnovault = "^4.8.3"
-dcicutils = "^2.1.0"
+dcicsnovault = "^4.8.5"
+dcicutils = "^2.3.2"
 elasticsearch = "6.8.1"
 execnet = "1.4.1"
 future = "^0.15.2"
@@ -217,5 +217,6 @@ ingester = "encoded.ingestion_listener:composite"
 memlimit = "encoded.memlimit:filter_app"
 
 [build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+

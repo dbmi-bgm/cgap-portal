@@ -4,7 +4,7 @@
 
 # Debian Buster with Python 3.6.13
 # TODO: maybe swap in ubuntu 20.04 and install Python manually?
-FROM python@sha256:db248d2d0494973550d323dd6b82af7fc2f4c1e0365769a758abd7fac2aa70db
+FROM python@sha256:8273b05f13fac06c1f3bfa14611f92ea50984279bea5d2bcf3b3be7598e28137
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
