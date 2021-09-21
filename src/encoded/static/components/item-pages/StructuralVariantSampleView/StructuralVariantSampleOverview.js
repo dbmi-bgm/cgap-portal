@@ -112,7 +112,7 @@ function StructuralVariantInfoSection({ context, comingSoonElem }) {
     } = context;
     const {
         size_display = fallbackElem,
-        cytoband = fallbackElem, // Next version of bioinfo
+        cytoband_display = fallbackElem, // Next version of bioinfo
         SV_TYPE = fallbackElem,
         CHROM = "",
         START = "",
@@ -174,7 +174,7 @@ function StructuralVariantInfoSection({ context, comingSoonElem }) {
                             <label htmlFor="vi_cytoband" className="mb-0">Cytoband:</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_cytoband">{comingSoonElem}</span>
+                            <span id="vi_cytoband">{cytoband_display}</span>
                         </div>
                     </div>
                 </div>
