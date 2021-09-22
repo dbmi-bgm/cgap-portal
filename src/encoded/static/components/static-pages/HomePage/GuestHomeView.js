@@ -10,7 +10,7 @@ import _ from 'underscore';
 export const GuestHomeView = React.memo(function GuestHomeView(props){
     return (
         <React.Fragment>
-            <div className="jumbotron mb-0" style={{ borderRadius: 0, backgroundImage: "url('/static/img/homepage-banner3.jpeg')", backgroundSize: "cover" }}>
+            <div className="jumbotron mb-0 rounded-0">
                 <div className="container">
                     <h2 className="homepage-section-title text-white">Streamline Your Bioinformatics Pipeline</h2>
                     <hr className="border-white" />
@@ -21,7 +21,6 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                         Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
                         nisi ut aliquip ex ea commodo consequat.
                     </p>
-                    {/* <button className="btn btn-outline-light btn-large">Request More Info</button> */}
                 </div>
             </div>
             <div className="container home-content-area" id="content">
@@ -68,7 +67,6 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
 const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
     return (
         <div className="homepage-links-column external-links">
-            {/* <h3 className="text-300 mb-2 mt-3">External Links</h3> */}
             <h4 className="text-400 mb-15 mt-25">Our Partners</h4>
             <div className="links-wrapper clearfix">
                 <div className="link-block">
