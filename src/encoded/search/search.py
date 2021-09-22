@@ -806,7 +806,7 @@ class SearchBuilder:
         # If no order is provided, assume 0 to
         # retain order of non-explicitly ordered facets
         for field, facet in sorted(self.facets, key=lambda fct: fct[1].get('order', 10000)):
-            if facet.get(self.DEFAULT_HIDDEN, False) or facet.get('disabled', False):  # skip if specified
+            if facet.get(self.DEFAULT_HIDDEN, False) and field not in self.additional_facets:  # skip if specified
                 continue
 
             # Build result frame for the front-end
