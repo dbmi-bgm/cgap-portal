@@ -2,32 +2,20 @@
 """
 
 import copy
-import boto3
 import cProfile
 import io
 import json
 import pstats
 
 from collections import OrderedDict, deque
-from dcicutils.env_utils import CGAP_ENV_WEBDEV, is_stg_or_prd_env, prod_bucket_env
 from inspect import signature
-from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPBadRequest
 from pyramid.response import Response
-from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema, CONNECTION, TYPES
-from snovault.util import debug_log
-from time import sleep
 from .base import (
     Item,
     # lab_award_attribution_embed_list
 )
 
-
-TIBANNA_CODE_NAME = 'zebra'
-TIBANNA_WORKFLOW_RUNNER_LAMBDA_FUNCTION = 'run_workflow_zebra'
-TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION = 'status_wfr_zebra'
-
-ENV_WEBDEV = CGAP_ENV_WEBDEV
 
 steps_run_data_schema = {
     "type": "object",
@@ -920,117 +908,3 @@ class WorkflowMapping(Item):
     item_type = 'workflow_mapping'
     schema = load_schema('encoded:schemas/workflow_mapping.json')
     embedded_list = Item.embedded_list  # + lab_award_attribution_embed_list
-
-
-def validate_input_json(context, request):
-    input_json = request.json
-    wkfl_uuid = input_json.get('workflow_uuid', 'None')
-    # if not context.get(wkfl_uuid):
-    #    request.errors.add('body', None, 'workflow_uuid %s not found in the system' % wkfl_uuid)
-    if not input_json.get('metadata_only'):
-        request.errors.add('body', 'Workflow: metadata_only False', 'metadata_only must be set to true in input_json')
-
-
-@view_config(name='pseudo-run', context=WorkflowRun.Collection, request_method='POST',
-             permission='add', validators=[validate_input_json])
-@debug_log
-def pseudo_run(context, request):
-    """ XXX: This needs documentation badly. """
-    input_json = request.json
-
-    # set env_name for awsem runner in tibanna
-    env = request.registry.settings.get('env.name')
-    # for testing
-    if not env:
-        env = ENV_WEBDEV
-    input_json['output_bucket'] = _wfoutput_bucket_for_env(env)
-    input_json['env_name'] = env
-    if input_json.get('app_name', None) is None:
-        input_json['app_name'] = 'pseudo-workflow-run'
-
-    # ideally select bucket from file metadata itself
-    for i, nput in enumerate(input_json['input_files']):
-        if not nput.get('bucket_name'):
-            input_json['input_files'][i]['bucket_name'] = 'elasticbeanstalk-%s-files' % env
-
-    # hand-off to tibanna for further processing
-    aws_lambda = boto3.client('lambda', region_name='us-east-1')
-    res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_RUNNER_LAMBDA_FUNCTION,
-                            Payload=json.dumps(input_json))
-    res_decode = res['Payload'].read().decode()
-    res_dict = json.loads(res_decode)
-
-    # propagate response and error up if encountered
-    try:
-        arn = res_dict['_tibanna']['response']['executionArn']
-    except Exception as e:
-        raise HTTPBadRequest('Exception encountered getting response from lambda: %s\n'
-                             'Response: %s' % (e, res_dict))
-
-    # just loop until we get proper status
-    for i in range(100):
-        res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION,
-                                Payload=json.dumps({'executionArn': arn}))
-        res_decode = res['Payload'].read().decode()
-        res_dict = json.loads(res_decode)
-        if res_dict['status'] != 'RUNNING':
-            break
-        sleep(2)
-    else:
-        res_dict['status'] = 'FOURFRONT-TIMEOUT'
-
-    if res_dict['status'] == 'FAILED':
-        # get error from execution and sent a 422 response
-        sfn = boto3.client('stepfunctions', region_name='us-east-1')
-        hist = sfn.get_execution_history(executionArn=res_dict['executionArn'], reverseOrder=True)
-        for event in hist['events']:
-            if event.get('type') == 'ExecutionFailed':
-                raise HTTPUnprocessableEntity(str(event['executionFailedEventDetails']))
-
-    return res_dict
-
-
-def _wfoutput_bucket_for_env(env):
-    return 'elasticbeanstalk-%s-wfoutput' % (prod_bucket_env(env) if is_stg_or_prd_env(env) else env)
-
-
-@view_config(name='run', context=WorkflowRun.Collection, request_method='POST',
-             permission='add')
-@debug_log
-def run_workflow(context, request):
-    input_json = request.json
-
-    # set env_name for awsem runner in tibanna
-    env = request.registry.settings.get('env.name')
-    # for testing
-    if not env:
-        env = ENV_WEBDEV
-    input_json['output_bucket'] = _wfoutput_bucket_for_env(env)
-    input_json['env_name'] = env
-
-    # hand-off to tibanna for further processing
-    aws_lambda = boto3.client('lambda', region_name='us-east-1')
-    res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_RUNNER_LAMBDA_FUNCTION,
-                            Payload=json.dumps(input_json))
-    res_decode = res['Payload'].read().decode()
-    res_dict = json.loads(res_decode)
-    arn = res_dict['_tibanna']['response']['executionArn']
-    # just loop until we get proper status
-    for _ in range(2):
-        res = aws_lambda.invoke(FunctionName=TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION,
-                                Payload=json.dumps({'executionArn': arn}))
-        res_decode = res['Payload'].read().decode()
-        res_dict = json.loads(res_decode)
-        if res_dict['status'] == 'RUNNING':
-            break
-        sleep(2)
-
-    if res_dict['status'] == 'FAILED':
-        # get error from execution and sent a 422 response
-        sfn = boto3.client('stepfunctions', region_name='us-east-1')
-        hist = sfn.get_execution_history(executionArn=res_dict['executionArn'], reverseOrder=True)
-        for event in hist['events']:
-            if event.get('type') == 'ExecutionFailed':
-                raise HTTPUnprocessableEntity(str(event['executionFailedEventDetails']))
-
-    return res_dict
