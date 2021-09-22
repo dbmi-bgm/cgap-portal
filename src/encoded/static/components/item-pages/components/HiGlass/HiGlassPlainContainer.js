@@ -241,9 +241,9 @@ const HiGlassPlainContainerBody = React.forwardRef(function HiGlassPlainContaine
     const { HiGlassComponent } = higlassDependencies || {};
 
     let hiGlassInstance = null;
+    const placeholderStyle = { width: width || null };
 
     if (isValidating || !mounted || !higlassInitialized || higlassVersionUsed === null){ // Still loading/initializing...
-        const placeholderStyle = { width: width || null };
         if (typeof height === 'number' && height >= 140){
             placeholderStyle.height = height;
             placeholderStyle.paddingTop = (height / 2) - 40;
