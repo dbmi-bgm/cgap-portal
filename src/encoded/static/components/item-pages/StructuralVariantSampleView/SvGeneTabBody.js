@@ -42,12 +42,12 @@ export function SvGeneTabBody (props){
                     if (filteredTranscripts.length > 0) {
                         const [ { csq_mane = null, csq_feature = null } = {} ] = filteredTranscripts;
                         const transcriptDisplay = csq_mane || csq_feature;
-                        rows.push(<span key="transcript" className="font-italic d-block text-truncate text-small">{ transcriptDisplay } </span>);
+                        rows.push(<span key="transcript" className="font-italic d-block text-small">{ transcriptDisplay } </span>);
                     }
 
                     return (
                         <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <a href={link || atID || "#"}>
+                            <a href={link || atID || "#"} className="text-truncate">
                                 <StackedRowColumn className={"text-" + align} {...{ rows }} />
                             </a>
                         </DisplayTitleColumnWrapper>
@@ -57,7 +57,7 @@ export function SvGeneTabBody (props){
             "spos": {
                 "render": function(result, parentProps){
                     const { spos, epos } = result || {};
-                    return <div className="text-center w-100">{spos} - <br/>{epos}</div>;
+                    return <div className="text-center w-100 text-truncate">{spos} - <br/>{epos}</div>;
                 }
             },
             "consequence": {
@@ -75,7 +75,7 @@ export function SvGeneTabBody (props){
                     // Displaying the first consequence that matches the gene. (same displayed under Transcript)
                     if (filteredTranscripts.length > 0) {
                         const [ { csq_consequence: [{ display_title = null } = {}] = [] } = {} ] = filteredTranscripts;
-                        return <div className="text-center w-100">{display_title}</div>;
+                        return <div className="text-center w-100 text-truncate">{display_title}</div>;
                     }
                     return null;
                 }

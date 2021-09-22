@@ -102,7 +102,7 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
 
                     // annotationID structured like <type>_chr...etc; need just the part after underscore
                     const splitAnnotationID = (annotation_id || display_title).split("_");
-                    return <div className="text-left pl-25"><a href={atID}>{splitAnnotationID[1]}</a></div>;
+                    return <div className="text-left pl-25 text-truncate"><a href={atID}>{splitAnnotationID[1]}</a></div>;
                 }
             },
             // 'bam_snapshot': { // Note: not going to be added until a few versions from now; this may need updates specific to SVs when finally implemented
