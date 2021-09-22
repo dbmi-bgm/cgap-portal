@@ -81,7 +81,7 @@ const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
                 </div>
                 <div className="link-block">
                     <a href="https://undiagnosed.hms.harvard.edu/" target="_blank" rel="noopener noreferrer" className="external-link">
-                        <span>Undiagnosed Diseased Network (UDN)</span>
+                        <span>Undiagnosed Diseases Network (UDN)</span>
                     </a>
                 </div>
                 <div className="link-block">
