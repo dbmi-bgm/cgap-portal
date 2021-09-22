@@ -20,6 +20,7 @@ from .types.base import get_item_or_none
 
 
 ENCODED_ROOT_DIR = os.path.dirname(__file__)
+PROJECT_DIR = os.path.dirname(os.path.dirname(ENCODED_ROOT_DIR))  # two levels of hierarchy up
 
 
 def resolve_file_path(path, file_loc=None):
