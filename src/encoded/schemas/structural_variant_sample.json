@@ -267,6 +267,10 @@
             "title": "Position",
             "order": 0
         },
+        "structural_variant.cytoband_display": {
+            "title": "Cytoband",
+            "order": 10
+        },
         "structural_variant.SV_TYPE": {
             "title": "Type",
             "order": 20
