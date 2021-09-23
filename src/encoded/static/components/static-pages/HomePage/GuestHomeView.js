@@ -16,10 +16,11 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     <hr className="border-white" />
                     <h4 className="text-500 text-white">Get Actionable Data, Fast.</h4>
                     <p className="text-white col-12 col-lg-9 px-0">
-                        CGAP (the Clinical Genome Analysis Project) lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor Harvard Medical School incididunt ut labore et dolore magna aliqua.
-                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                        nisi ut aliquip ex ea commodo consequat.
+                        CGAP (the Clinical Genome Analysis Project) is a web-based clinical and research application
+                        for analysis, annotation, visualization and reporting of genomic data. An ongoing effort of
+                        Harvard Medical School's Department of Biomedical Informatics developed in close connection
+                        with clinicians at BGM and UDN, CGAP
+                        merges powerful variant discovery workflows with clinical accuracy and reporting capabilities.
                     </p>
                 </div>
             </div>
@@ -35,8 +36,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                             backgroundSize: "cover"
                         }} />
                         <p style={{ marginTop: "1rem" }}>
-                            Excepteur sint occaecat cupidatat non in reprehenderit in
-                            proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            Effortlessly filter SNV/Indels and SVs, browse our annotation database, and work with intuitive, cutting-edge visualization tools.
                         </p>
                     </div>
                     <div className="col-xs-12 col-md-4">
@@ -49,8 +49,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                             backgroundSize: "cover"
                         }} />
                         <p style={{ marginTop: "1rem" }}>
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                            dolore <strong>CLIA-compatible workflow</strong> eu fugiat pariatur.
+                            Keep track of interpretation notes, publish customizable reports, and export findings in a flexible, but <strong>CLIA-compatible</strong> workflow.
                         </p>
                     </div>
                     <div className="col-xs-12 col-md-4 pull-right">
