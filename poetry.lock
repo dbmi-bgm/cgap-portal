@@ -570,79 +570,80 @@ python-versions = "*"
 
 [[package]]
 name = "dcicsnovault"
-version = "4.8.5"
+version = "4.8.5.1b0"
 description = "Storage support for 4DN Data Portals."
 category = "main"
 optional = false
-python-versions = ">=3.6,<3.7"
+python-versions = ">=3.6.1,<3.7"
 
 [package.dependencies]
 aws_requests_auth = ">=0.4.1,<0.5.0"
 "backports.statistics" = "0.1.0"
-boto3 = ">=1.7.42,<2.0.0"
-dcicutils = ">=1.8.3,<3"
+boto3 = ">=1.17.53,<2.0.0"
+dcicutils = "2.4.0.1b0"
+elasticsearch = "6.8.1"
 elasticsearch_dsl = ">=6.4.0,<7.0.0"
 future = ">=0.15.2,<0.16.0"
 futures = ">=3.1.1,<4.0.0"
 html5lib = "0.9999999"
-humanfriendly = ">=1.44.5,<2.0.0"
-jsonschema_serialize_fork = "2.1.1"
+humanfriendly = ">=1.44.9,<2.0.0"
+jsonschema_serialize_fork = ">=2.1.1,<3.0.0"
 MarkupSafe = ">=0.23,<1"
-netaddr = ">=0.7.18,<1"
-passlib = ">=1.6.5,<2.0.0"
+netaddr = ">=0.8.0,<1"
+passlib = ">=1.7.4,<2.0.0"
 Pillow = ">=6.2.2,<7.0.0"
-psutil = ">=5.6.6,<6.0.0"
-psycopg2 = ">=2.7.3,<3.0.0"
+psutil = ">=5.8.0,<6.0.0"
+psycopg2 = ">=2.9.1,<3.0.0"
 PyBrowserID = ">=0.10.0,<0.11.0"
 pyramid = "1.10.4"
 pyramid_localroles = ">=0.1,<1"
-pyramid-multiauth = ">=0.8.0,<1"
+pyramid-multiauth = ">=0.9.0,<1"
 pyramid-retry = ">=1.0,<2.0"
-pyramid-tm = ">=2.2.1,<3.0.0"
+pyramid-tm = ">=2.4,<3.0"
 pyramid-translogger = ">=0.1,<0.2"
-python-dateutil = ">=2.5.3,<3.0.0"
+python-dateutil = ">=2.8.2,<3.0.0"
 python_magic = "0.4.15"
-pytz = ">=2020.1"
+pytz = ">=2021.1"
 PyYAML = ">=5.1,<5.3"
 rdflib = ">=4.2.2,<5.0.0"
-rdflib-jsonld = ">=0.3.0,<1.0.0"
-rutter = ">=0.2,<1"
-simplejson = "3.17.0"
-SPARQLWrapper = ">=1.7.6,<2.0.0"
+rdflib-jsonld = ">=0.5.0,<1.0.0"
+rutter = ">=0.3,<1"
+simplejson = ">=3.17.0,<4.0.0"
+SPARQLWrapper = ">=1.8.5,<2.0.0"
 SQLAlchemy = "1.3.16"
-structlog = ">=18.1.0,<20"
+structlog = ">=19.2.0,<20"
 subprocess_middleware = ">=0.3,<1"
 transaction = ">=2.4.0,<3.0.0"
 venusian = ">=1.2.0,<2.0.0"
-WebOb = ">=1.8.5,<2.0.0"
-WebTest = ">=2.0.21,<3.0.0"
+WebOb = ">=1.8.7,<2.0.0"
+WebTest = ">=2.0.35,<3.0.0"
 WSGIProxy2 = "0.4.2"
 xlrd = ">=1.0.0,<2.0.0"
 "zope.deprecation" = ">=4.4.0,<5.0.0"
-"zope.interface" = ">=4.6.0,<5.0.0"
+"zope.interface" = ">=4.7.2,<5.0.0"
 "zope.sqlalchemy" = "1.3"
 
 [[package]]
 name = "dcicutils"
-version = "2.4.0"
+version = "2.4.0.1b0"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
-python-versions = ">=3.5,<3.8"
+python-versions = ">=3.6.1,<3.8"
 
 [package.dependencies]
 aws-requests-auth = ">=0.4.2,<1"
-boto3 = ">=1.10.46,<2.0.0"
-botocore = ">=1.13.46,<2.0.0"
+boto3 = ">=1.17.39,<2.0.0"
+botocore = ">=1.20.39,<2.0.0"
 docker = ">=4.4.4,<5.0.0"
 elasticsearch = "6.8.1"
 gitpython = ">=3.1.2,<4.0.0"
-pytz = ">=2016.4"
+pytz = ">=2020.4"
 requests = ">=2.21.0,<3.0.0"
 rfc3986 = ">=1.4.0,<2.0.0"
 structlog = ">=19.2.0,<20.0.0"
-toml = ">=0.10.0,<1"
-urllib3 = ">=1.24.3,<2.0.0"
+toml = ">=0.10.1,<1"
+urllib3 = ">=1.26.6,<2.0.0"
 webtest = ">=2.0.34,<3.0.0"
 
 [[package]]
@@ -1126,7 +1127,7 @@ version = "3.0.9"
 description = "A Python library to read/write Excel 2010 xlsx/xlsm files"
 category = "main"
 optional = false
-python-versions = ">=3.6,"
+python-versions = ">=3.6"
 
 [package.dependencies]
 et-xmlfile = "*"
@@ -2138,7 +2139,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<3.7"
-content-hash = "2f9ce3c86ad28da2cec745234a915f4582c52171695c5bc1a2b47d3bda609d85"
+content-hash = "c672ace9866e666c1d11b97fc6f1f4cb0b2ec4e466e1decc2d4159aabd7e4914"
 
 [metadata.files]
 apipkg = [
@@ -2353,12 +2354,12 @@ dcicpyvcf = [
     {file = "dcicpyvcf-1.0.0.tar.gz", hash = "sha256:c5bf8d585002ab3b95d13a47803376b456b931865e4189c38a18cca47b108449"},
 ]
 dcicsnovault = [
-    {file = "dcicsnovault-4.8.5-py3-none-any.whl", hash = "sha256:16f38cf4d1af5b0c7294b9b9c35ffb4f5759b72593d1207cba4acf987e6bfd90"},
-    {file = "dcicsnovault-4.8.5.tar.gz", hash = "sha256:f48f637229127401d699f21b33c20c16862c1ed9f2ba9fe8ec7b2232a75ea96e"},
+    {file = "dcicsnovault-4.8.5.1b0-py3-none-any.whl", hash = "sha256:11b32844a280196d91283d4db7eb5a6ea109fdbe72b7f31a4e9e7b79f29416e7"},
+    {file = "dcicsnovault-4.8.5.1b0.tar.gz", hash = "sha256:a9812c748f53f17151a58752ae74bb222498148ac7c8b5320ed68a1ed36cbf45"},
 ]
 dcicutils = [
-    {file = "dcicutils-2.4.0-py3-none-any.whl", hash = "sha256:508e55768388d50a254c733069271ae1b01ea96b5d16db2d92fb8df1661ed2f7"},
-    {file = "dcicutils-2.4.0.tar.gz", hash = "sha256:bf1abe15c5cda162167cec65a457ce012c11e08d7d3393822f89063a2051bf22"},
+    {file = "dcicutils-2.4.0.1b0-py3-none-any.whl", hash = "sha256:1ab2b72a07c21b844c0eb2b8b5e42de6f793c3d846de8120ad1a3f872525b2cf"},
+    {file = "dcicutils-2.4.0.1b0.tar.gz", hash = "sha256:e74448d43f902d708732d2a513526f79c5ad1316167ca1fb5743538685a61fef"},
 ]
 docker = [
     {file = "docker-4.4.4-py2.py3-none-any.whl", hash = "sha256:f3607d5695be025fa405a12aca2e5df702a57db63790c73b927eb6a94aac60af"},
