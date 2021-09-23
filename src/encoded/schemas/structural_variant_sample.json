@@ -219,6 +219,30 @@
                         "description": "Sample ID",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Sample ID)"
+                    },
+                    "samplegeno_quality": {
+                        "title": "Sample Genotype Quality",
+                        "field_name": "samplegeno_quality",
+                        "type": "integer",
+                        "do_import": true,
+                        "vcf_field": "GQ",
+                        "source_name": "VCF",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Sample Phred-scaled genotype quality",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype Quality"
+                    },
+                    "samplegeno_likelihood": {
+                        "title": "Sample Genotype Likelihoods (0/0, 0/1, 1/1)",
+                        "field_name": "samplegeno_likelihood",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "PL",
+                        "source_name": "VCF",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Sample normalized, Phred-scaled genotype likelihoods (0/0, 0/1, 1/1)",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype Likelihoods (0/0, 0/1, 1/1)"
                     }
                 }
             }
