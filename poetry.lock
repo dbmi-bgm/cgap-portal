@@ -1126,7 +1126,7 @@ version = "3.0.9"
 description = "A Python library to read/write Excel 2010 xlsx/xlsm files"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.6,"
 
 [package.dependencies]
 et-xmlfile = "*"
