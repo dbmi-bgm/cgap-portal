@@ -212,6 +212,60 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
     assert InheritanceMode.compute_inheritance_mode_trio(genotypes=gts, genotype_labels=gt_labels,
                                                          sexes=sexes, chrom=chrom, novoPP=novoPP) == expected_inh
 
+@pytest.mark.parametrize("genotypes, genotype_labels, sexes, chrom, result",
+    [
+        (  # test case 1 - autosomal de novo
+            {
+                "proband": "0/1",
+                "mother": "0/0",
+                "father": "0/0"
+            },
+            {
+                "proband": ["Heterozygous"],
+                "mother": ["Homozygous reference"],
+                "father": ["Homozygous reference"]
+            },
+            {
+                "proband": "F",
+                "mother": "F",
+                "father": "M"
+            },
+            "1",
+            [InheritanceMode.INHMODE_LABEL_SV_DE_NOVO]
+        ),
+        (  # test case 2 - autosomal de novo
+            {
+                "proband": "1/1",
+                "mother": "0/0",
+                "father": "0/0"
+            },
+            {
+                "proband": ["Homozygous alternate"],
+                "mother": ["Homozygous reference"],
+                "father": ["Homozygous reference"]
+            },
+            {
+                "proband": "F",
+                "mother": "F",
+                "father": "M"
+            },
+            "2",
+            [InheritanceMode.INHMODE_LABEL_SV_DE_NOVO]
+        ),
+    ]
+)
+def test_compute_inheritance_mode_trio_structural_variant(
+    genotypes, genotype_labels, sexes, chrom, result
+):
+    """"""
+    assert InheritanceMode.compute_inheritance_mode_trio(
+        genotypes=genotypes,
+        genotype_labels=genotype_labels,
+        sexes=sexes,
+        chrom=chrom,
+        novoPP=-1,
+        structural_variant=True,
+    ) == result
 
 @pytest.mark.parametrize('variant_sample, expected_new_fields', [
     (  # test case 1

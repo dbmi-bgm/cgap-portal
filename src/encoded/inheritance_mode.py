@@ -56,6 +56,8 @@ class InheritanceMode:
     INHMODE_LABEL_Y_LINKED = "Y-linked dominant"
     INHMODE_LABEL_LOH = "Loss of Heteozyogousity"
 
+    INHMODE_LABEL_SV_DE_NOVO = "Possibly de novo"
+
     INHMODE_LABEL_NONE_DOT = "Low relevance, missing call(s) in family"
     INHMODE_LABEL_NONE_MN = "Low relevance, multiallelic site family"
     INHMODE_LABEL_NONE_SEX_INCONSISTENT = "Low relevance, mismatching chrXY genotype(s)"
@@ -185,7 +187,10 @@ class InheritanceMode:
         return mother_gt == '0/0' and father_gt == '0/0'
 
     @classmethod
-    def compute_inheritance_mode_trio(cls, *, genotypes, genotype_labels, sexes, chrom, novoPP):
+    def compute_inheritance_mode_trio(
+        cls, *, genotypes, genotype_labels, sexes, chrom, novoPP,
+        structural_variant=False
+    ):
         """ Computes inheritence modes for the trio of 'self', 'mother', 'father'.
 
         :param genotypes: dictionary of role -> genotype mappings
@@ -228,6 +233,17 @@ class InheritanceMode:
             if novoPP == -1:
                 return [cls.INHMODE_LABEL_DE_NOVO_CHRXY]
 
+        # SV likely de novo (no novoPP, so based solely on genotypes)
+        if (
+                structural_variant
+                and cls.mother_father_ref_ref(
+                    genotypes[cls.MOTHER], genotypes[cls.FATHER]
+                )
+                and (not cls.is_sex_chromosome(chrom))  # No mito SV calls as of 09.24.21 -drr
+                and (genotypes[cls.SELF] in ["0/1", "1/1"])
+        ):
+            return [cls.INHMODE_LABEL_SV_DE_NOVO]
+                
         # If not a de novo, assign inheritance mode based solely on genotypes (from GATK)
         if (genotypes[cls.MOTHER] == "0/0"
                 and genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_0M
@@ -330,7 +346,9 @@ class InheritanceMode:
         return structured_labels
 
     @classmethod
-    def compute_inheritance_modes(cls, variant_sample, chrom=None):
+    def compute_inheritance_modes(
+        cls, variant_sample, chrom=None, structural_variant=False
+    ):
         """ Computes inheritance modes given a variant_sample.
             Intended to perform: variant_sample.update(new_fields) with result of this method.
 
@@ -363,9 +381,14 @@ class InheritanceMode:
             raise InheritanceModeError('Role "proband" not present in genotypes: %s' % genotypes)
 
         genotype_labels = cls.compute_family_genotype_labels(genotypes, sexes, chrom)
-        inheritance_modes = cls.compute_inheritance_mode_trio(genotypes=genotypes,
-                                                              genotype_labels=genotype_labels,
-                                                              sexes=sexes, chrom=chrom, novoPP=novoPP)
+        inheritance_modes = cls.compute_inheritance_mode_trio(
+            genotypes=genotypes,
+            genotype_labels=genotype_labels,
+            sexes=sexes, 
+            chrom=chrom, 
+            novoPP=novoPP,
+            structural_variant=structural_variant,
+        )
         inheritance_modes += cls.compute_cmphet_inheritance_modes(cmphet)
         if len(inheritance_modes) == 0:
             inheritance_modes = cls.inheritance_modes_other_labels(genotypes, genotype_labels)
