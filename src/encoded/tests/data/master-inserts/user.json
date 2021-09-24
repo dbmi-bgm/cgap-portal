@@ -94,8 +94,10 @@
         "last_name": "Persona",
         "uuid": "671a4e15-ccc1-4361-98bb-4c043e98ef4d",
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
-        "project_roles": [{"project": "f586dc9e-64eb-47fe-b140-624fd504d549",
-                           "role": "clinician"}],
+        "project_roles": [{
+            "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+            "role": "clinician"
+        }],
         "user_institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb"
     },
     {
