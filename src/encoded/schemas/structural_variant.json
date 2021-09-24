@@ -671,7 +671,7 @@
             "title": "Type",
             "order": 10
         },
-        "size_display": {
+        "size": {
             "title": "Size",
             "order": 20
         },

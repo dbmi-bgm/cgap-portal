@@ -7,6 +7,7 @@ import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, layout, ajax, object, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+import { GeneTranscriptDisplayTitle, getMostSevereConsequence, getTranscriptLocation } from './AnnotationSections';
 
 
 
@@ -262,81 +263,6 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
         </div>
     );
 }
-
-
-function GeneTranscriptDisplayTitle({ transcript }){
-    if (!transcript) return null;
-    const {
-        csq_canonical = false,
-        csq_mane = null,
-        csq_feature = <em>No Name</em>,
-        csq_biotype = null,
-        csq_gene : {
-            display_title: geneDisplayTitle = null
-        } = {}
-    } = transcript;
-    return (
-        <React.Fragment>
-            <span className="text-600">{ csq_mane || csq_feature }</span>
-            <span className="text-400"> ({ geneDisplayTitle || <em>No Gene</em> })</span>
-            { csq_canonical ? <span className="text-300"> (canonical)</span> : null }
-        </React.Fragment>
-    );
-}
-
-/** This will likely need/get feedback and may change */
-function getMostSevereConsequence(csq_consequence = []){
-    const impactMap = {
-        "HIGH" : 0,
-        "MODERATE" : 1,
-        "LOW" : 2,
-        "MODIFIER" : 3
-    };
-
-    if (csq_consequence.length === 0) {
-        return null;
-    }
-
-    const [ mostSevereConsequence ] = csq_consequence.slice().sort(function({ impact: iA }, { impact: iB }){
-        return impactMap[iA] - impactMap[iB];
-    });
-
-    return mostSevereConsequence;
-}
-
-function getTranscriptLocation(transcript, mostSevereConsequence = null){
-    const {
-        csq_exon = null,
-        csq_intron = null,
-        csq_distance = null,
-    } = transcript || {};
-
-    const { var_conseq_name = null } = mostSevereConsequence || {};
-    const consequenceName = (typeof var_conseq_name === "string" && var_conseq_name.toLowerCase()) || null;
-
-    let returnString = null;
-
-    if (csq_exon !== null) { // In case csq_exon is `0` or something (unsure if possible)
-        returnString = "Exon " + csq_exon;
-    } else if (csq_intron !== null) {
-        returnString = "Intron " + csq_intron;
-    } else if (csq_distance !== null) {
-        if (consequenceName === "downstream_gene_variant") {
-            returnString = csq_distance + "bp downstream";
-        } else if (consequenceName === "upstream_gene_variant") {
-            returnString = csq_distance + "bp upstream";
-        }
-    }
-
-    if (consequenceName === "3_prime_utr_variant"){
-        returnString = returnString ? returnString + " (3′ UTR)" : "3′ UTR" ;
-    } else if (consequenceName === "5_prime_utr_variant"){
-        returnString = returnString ? returnString + " (5′ UTR)" : "5′ UTR" ;
-    }
-
-    return returnString;
-}
-
 function GDNAList({ context }){
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const { variant = {} } = context;

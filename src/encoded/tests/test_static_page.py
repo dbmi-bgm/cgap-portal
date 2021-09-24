@@ -55,7 +55,10 @@ def test_get_help_page_deleted(workbook, anon_html_es_testapp, html_es_testapp, 
     wait_for_index(html_es_testapp)
     help_page_url = "/" + static_help_page_deleted['name']
     anon_html_es_testapp.get(help_page_url, status=403)
-    html_es_testapp.get(help_page_url, status=200)  # Why 200 and not 404? -kmp 23-Feb-2021
+    # The page is still in DB (and accessible by admins at its URL) but has status=deleted (so we get back status=200)
+    # Might be worth considering making it 404 for both admins & non-admins
+    # and then also ensuring is not accessible aside by its named path, only from by `/pages/<uuid>`?
+    html_es_testapp.get(help_page_url, status=200)
 
 
 def test_get_help_page_no_access(workbook, anon_es_testapp, es_testapp, anon_html_es_testapp, html_es_testapp,
