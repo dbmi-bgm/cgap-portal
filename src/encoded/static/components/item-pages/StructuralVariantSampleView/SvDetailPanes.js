@@ -77,7 +77,7 @@ export function SvGeneDetailPane(props) {
                     </div>
                     <div className="inner-card-section flex-grow-1 pb-2 mt-1 pb-xl-0">
                         <div className="info-header-title">
-                            <h4>Gene Info</h4>
+                            <h4>Gene Overview</h4>
                         </div>
                         <div className="info-body">
                             <GeneOverview currentGeneItem={result} {...{ schemas, fallbackElem, getTipForField }} />
