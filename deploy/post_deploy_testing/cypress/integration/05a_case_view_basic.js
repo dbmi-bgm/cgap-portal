@@ -65,7 +65,7 @@ describe('Case View - Initial', function () {
                 .should("have.class", "active").end()
                 .get("#case-info\\.bioinformatics > h1").contains("Bioinformatics Analysis").end()
                 .get("#case-info\\.bioinformatics .tab-inner-container.card:first-of-type .card-body .qc-summary")
-                .should("have.length", 7)
+                .should("have.length", 8)
                 .eq(0).should("have.text", "Total Number of Reads:466,477,333")
                 .get("#case-info\\.bioinformatics .tab-inner-container.card:first-of-type .card-body .qc-summary")
                 .eq(1).should("have.text", "Coverage:47.2X");
