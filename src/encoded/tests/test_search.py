@@ -841,12 +841,12 @@ class TestNestedSearch(object):
         """ Do an OR search on hg19.hg19_chrom, matching three variants """
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_pos!=12345').follow().json
-        self.assert_length_is_expected(res, 3)
+        self.assert_length_is_expected(res, 5)
         for variant in res['@graph']:
             assert variant['uuid'] in self.VARIANTS_WITH_HG19
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_chrom=chr1').json
-        self.assert_length_is_expected(res, 3)
+        self.assert_length_is_expected(res, 4)
         for variant in res['@graph']:
             assert variant['uuid'] in self.VARIANTS_WITH_HG19
         res = es_testapp.get('/search/?type=Variant'
@@ -880,7 +880,7 @@ class TestNestedSearch(object):
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_chrom=chr1'
                              '&hg19.hg19_pos!=12185955').follow().json
-        self.assert_length_is_expected(res, 2)
+        self.assert_length_is_expected(res, 3)
         for variant in res['@graph']:
             assert variant['uuid'] in [
                 self.VARIANT_HG19_CHR1_GA,
@@ -983,7 +983,7 @@ class TestNestedSearch(object):
         """ Tests searching on 'No value' alone on a nested field """
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_chrom!=No+value').follow().json
-        self.assert_length_is_expected(res, 3)
+        self.assert_length_is_expected(res, 5)
         for variant in res['@graph']:
             assert variant['uuid'] in self.VARIANTS_WITH_HG19
         res = es_testapp.get('/search/?type=Variant'
@@ -1126,7 +1126,7 @@ class TestNestedSearch(object):
         res = es_testapp.get('/search/?type=Variant&hg19=No+value').json
         self.assert_length_is_expected(res, 1)
         res = es_testapp.get('/search/?type=Variant&hg19!=No+value').follow().json
-        self.assert_length_is_expected(res, 3)
+        self.assert_length_is_expected(res, 5)
         es_testapp.get('/search/?type=Variant&hg19=No+value'
                        '&CHROM=2', status=404)  # disqualify on positive CHROM
         es_testapp.get('/search/?type=Variant&hg19=No+value'
@@ -1359,7 +1359,7 @@ class TestSearchHiddenAndAdditionalFacets:
         ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
         ('hg19.hg19_chrom', 1),
         ('hg19.hg19_hgvsg', 3),
-        ('REF', 3)
+        ('REF', 4)
     ])
     def test_search_additional_facets_workbook(self, workbook, es_testapp, _facet, n_expected):
         """ Tests using additional facets with workbook inserts (using Variant) """
@@ -1378,7 +1378,7 @@ class TestSearchHiddenAndAdditionalFacets:
         ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
         ('hg19.hg19_chrom', 1),
         ('hg19.hg19_hgvsg', 3),
-        ('REF', 3)
+        ('REF', 4)
     ])
     def test_search_additional_facets_workbook_multiple(self, workbook, es_testapp, _facet, n_expected):
         """ Does all 4 extra aggregations above, checking the resulting facets for correctness """
