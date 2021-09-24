@@ -102,7 +102,7 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
 
                     // annotationID structured like <type>_chr...etc; need just the part after underscore
                     const splitAnnotationID = (annotation_id || display_title).split("_");
-                    return <div className="text-left pl-25"><a href={atID}>{splitAnnotationID[1]}</a></div>;
+                    return <div className="text-left pl-25 text-truncate"><a href={atID}>{splitAnnotationID[1]}</a></div>;
                 }
             },
             // 'bam_snapshot': { // Note: not going to be added until a few versions from now; this may need updates specific to SVs when finally implemented
@@ -123,9 +123,10 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
             //     }
             // },
             "structural_variant.transcript.csq_gene.display_title": {
+                "noSort": true, // not currently a useful or informative sort.
                 "render": function(result, props) {
                     const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result;
-                    const path = atID; // + "?annotationTab=0" // TODO: Needs to point to Gene tab when that is complete
+                    const path = atID + "?annotationTab=0";
 
                     const transcriptsDeduped = {};
                     transcripts.forEach((transcript) => {
@@ -142,10 +143,8 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
             },
             "structural_variant.size": {
                 "render": function(result, props) {
-                    const { structural_variant: { size = null } = {} } = result;
-
-                    if (size === null) { return size; }
-                    return valueTransforms.bytesToLargerUnit(size);
+                    const { structural_variant: { size_display = null } = {} } = result;
+                    return size_display;
                 }
             }
         };

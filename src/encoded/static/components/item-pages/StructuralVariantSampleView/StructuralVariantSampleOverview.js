@@ -4,17 +4,19 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
-import { console, layout, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, layout, ajax, memoizedUrlParse, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { SvBrowserTabBody } from './SvBrowserTabBody';
-import { VariantSampleInfoHeader } from '../VariantSampleView/VariantSampleInfoHeader';
-// import { SvGeneTabBody } from './SvGeneTabBody';
+import { SvGeneTabBody } from './SvGeneTabBody';
+import { SvVariantTabBody } from './SvVariantTabBody';
+import { SvSampleTabBody } from './SvSampleTabBody';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
     render(){
         const { context = null, schemas, href } = this.props;
-        const passProps = { context, schemas, href };
+        const comingSoonElem = <span className="font-italic">{null}</span>;
+        const passProps = { context, schemas, href, comingSoonElem };
 
         const { query: {
             annotationTab = null,           // used only if can be parsed to integer (SvBrowser = 0)
@@ -22,14 +24,207 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                {/* TODO: Re-enable in next version; <VariantSampleInfoHeader {...passProps} showTranscriptSelection={false} /> */}
+                <StructuralVariantSampleInfoHeader {...passProps} />
                 <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
             </div>
         );
     }
 }
 
+function StructuralVariantSampleInfoHeader(props){
+    const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
+    const {
+        comingSoonElem,
+        context,
+        schemas,
+        caseID = <span className="text-muted"> - </span>, // null
+    } = props;
+    const { variant: { ID = fallbackElem } = {} } = context;
 
+    function getTipForField(field, itemType = "StructuralVariantSample"){
+        if (!schemas) return null;
+        const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
+        return (schemaProperty || {}).description || null;
+    }
+
+    return (
+        // Stack these into flex column until large responsive size, then make into row.
+        <div className="card mb-24 sample-variant-info-header">
+            <div className="card-body">
+                <div className="row flex-column flex-lg-row">
+
+                    { caseID ?
+                        <div className="inner-card-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
+                            <div className="info-header-title">
+                                <h4 className="text-truncate">Case ID</h4>
+                            </div>
+                            <div className="info-body flex-grow-1 d-flex align-items-center">
+                                <h4 className="text-400 text-center w-100">{ caseID }</h4>
+                            </div>
+                        </div>
+                        : null }
+
+                    <div className="inner-card-section col pb-2 pb-lg-0">
+                        <div className="info-header-title">
+                            <h4>Variant Info</h4>
+                        </div>
+                        <div className="info-body">
+                            <div className="row mb-03">
+                                <StructuralVariantInfoSection {...{ context, comingSoonElem }} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="inner-card-section col pb-2 pb-lg-0">
+                        <div className="info-header-title">
+                            <h4>Gene Info</h4>
+                        </div>
+                        <div className="info-body">
+                            <GeneInfoSection {...{ context, comingSoonElem }} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+
+/**
+ * Takes a sample ID and genotypeLabels array and returns the one associated with the current sample,
+ * if any; otherwise returns null.
+ */
+function calculateGenotype(CALL_INFO, labels) {
+    for (let i = 0; i < labels.length; i++) {
+        const { sample_id = null, labels: [genotypeLabel] = [] } = labels[i];
+        if (CALL_INFO === sample_id) {
+            return genotypeLabel;
+        }
+    }
+    return null;
+}
+
+function StructuralVariantInfoSection({ context, comingSoonElem }) {
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
+    const {
+        structural_variant = {},
+        CALL_INFO = null,
+        genotype_labels = {}
+    } = context;
+    const {
+        size_display = fallbackElem,
+        cytoband = fallbackElem, // Next version of bioinfo
+        SV_TYPE = fallbackElem,
+        CHROM = "",
+        START = "",
+        END = ""
+    } = structural_variant;
+
+    const longFormTypeMap = { DUP: "Duplication", DEL: "Deletion" }; // may need to update if sv schema is updated
+
+    const genotype = calculateGenotype(CALL_INFO, genotype_labels) || fallbackElem;
+
+    return (
+        <div className="col-12">
+            <div className="row pb-1 pb-md-03">
+                <div className="col-12 col-md-6">
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_type" className="mb-0">Type:</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_type">{longFormTypeMap[SV_TYPE]}</span>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_grch38" className="mb-0">GRCh38:</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_grch38">{`chr${CHROM}:${START}-${END}`}</span>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_grch37">{comingSoonElem}</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-12 col-md-6 pl-2">
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_genotype" className="mb-0">Genotype:</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_genotype">{genotype}</span>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_size" className="mb-0">Size:</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_size">{size_display}</span>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_cytoband" className="mb-0">Cytoband:</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_cytoband">{comingSoonElem}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function GeneInfoSection({ context }) {
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
+    const {
+        structural_variant: { gene_summary: { contained = fallbackElem, at_breakpoint = fallbackElem, omim_genes = fallbackElem } = {} } = {}
+    } = context;
+    return (
+        <div className="col-12">
+            <div className="row pb-1 pb-md-03">
+                <div className="col-12 col-md-8">
+                    <label htmlFor="contained-genes" className="mb-0">Contained Genes:</label>
+                </div>
+                <div id="contained-genes" className="col-12 col-md-4">
+                    {contained}
+                </div>
+            </div>
+            <div className="row pb-1 pb-md-03">
+                <div className="col-12 col-md-8">
+                    <label htmlFor="genes-at-breakpoints" className="mb-0">Genes At Breakpoints:</label>
+                </div>
+                <div id="genes-at-breakpoints" className="col-12 col-md-4">
+                    {at_breakpoint}
+                </div>
+            </div>
+            <div className="row pb-1 pb-md-03">
+                <div className="col-12 col-md-8">
+                    <label htmlFor="omim-genes" className="mb-0">OMIM Genes:</label>
+                </div>
+                <div id="omim-genes" className="col-12 col-md-4">
+                    {omim_genes}
+                </div>
+            </div>
+            <div className="row pb-1 pb-md-03">
+                <div className="col-12 col-md-8">
+                    <label htmlFor="omim-genes-w-phenotype" className="mb-0">OMIM Genes with Phenotype:</label>
+                </div>
+                <div id="omim-genes-w-phenotype" className="col-12 col-md-4">
+                    {/* coming soon */}
+                </div>
+            </div>
+        </div>
+    );
+}
 
 /**
  * We don't want to include DotRouter (or its functionality) in here yet/for-now since
@@ -44,7 +239,9 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
     static tabNames = [
-        // "Gene", TODO: Re-add once more complete in future version
+        "Gene",
+        "Variant",
+        "Sample",
         "SV Browser"
     ];
 
@@ -55,8 +252,10 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
         const numTabs = StructuralVariantSampleOverviewTabView.tabNames.length;
 
         this.state = {
-            "currentTab" : defaultTab < numTabs ? defaultTab : 0
+            "currentTab" : defaultTab < numTabs ? defaultTab : 1 // default to Variant unless otherwise specified
         };
+
+        // Setting persistence requires setting index to true for tab in render + using active prop in tabBody component to trigger d-none class when inactive
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
@@ -88,9 +287,8 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, currentGeneItem, currentGeneItemLoading, currentTranscriptIdx } = this.props;
+        const { context, schemas, currentGeneItem, currentGeneItemLoading, comingSoonElem } = this.props;
         const { currentTab } = this.state;
-        console.log("context", context);
 
         const tabTitleElements = [];
         const tabBodyElements = [];
@@ -101,14 +299,21 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
             tabTitleElements.push(<OverviewTabTitle {...tabTitleElemProps} />);
 
             if (index === currentTab || this.openPersistentTabs[index]) {
-                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
+                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index, comingSoonElem };
                 switch (index) {
-                    // case 0:
-                    //     tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
-                    //     break;
-                    case 0:
-                        tabBodyElements.push(<SvBrowserTabBody {...commonBodyProps} />);
+                    case 0: // Gene
+                        tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
                         this.openPersistentTabs[0] = true; // Persist open after first appearance.
+                        break;
+                    case 1: // Variant
+                        tabBodyElements.push(<SvVariantTabBody {...commonBodyProps} />);
+                        break;
+                    case 2: // Sample
+                        tabBodyElements.push(<SvSampleTabBody {...commonBodyProps} />);
+                        break;
+                    case 3: // SV Browser
+                        tabBodyElements.push(<SvBrowserTabBody {...commonBodyProps}/>);
+                        this.openPersistentTabs[3] = true; // Persist open after first appearance.
                         break;
                     default:
                         throw new Error("Unsupported tab");

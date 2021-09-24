@@ -613,7 +613,6 @@ class SearchBuilder:
         ]
         current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
         self._initialize_additional_facets(append_facets, current_type_schema)
-
         # hold disabled facets from schema; we also want to remove these from the prepared_terms facets
         disabled_facet_fields = set()
 
@@ -709,7 +708,7 @@ class SearchBuilder:
         # list unless were already added via schemas, etc.
         used_facet_fields = { facet[0] for facet in facets } # Reset this
         for ap_facet in append_facets + validation_error_facets:
-            if ap_facet[0] not in used_facet_fields and ap_facet[0] not in disabled_facet_fields:
+            if ap_facet[0] not in used_facet_fields:
                 used_facet_fields.add(ap_facet[0])
                 facets.append(ap_facet)
         return facets

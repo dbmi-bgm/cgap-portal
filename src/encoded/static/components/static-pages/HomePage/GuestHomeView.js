@@ -10,18 +10,18 @@ import _ from 'underscore';
 export const GuestHomeView = React.memo(function GuestHomeView(props){
     return (
         <React.Fragment>
-            <div className="jumbotron mb-0" style={{ borderRadius: 0, backgroundImage: "url('/static/img/homepage-banner3.jpeg')", backgroundSize: "cover" }}>
+            <div className="jumbotron mb-0 rounded-0">
                 <div className="container">
                     <h2 className="homepage-section-title text-white">Streamline Your Bioinformatics Pipeline</h2>
                     <hr className="border-white" />
                     <h4 className="text-500 text-white">Get Actionable Data, Fast.</h4>
                     <p className="text-white col-12 col-lg-9 px-0">
-                        CGAP (the Clinical Genome Analysis Project) lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                        sed do eiusmod tempor Harvard Medical School incididunt ut labore et dolore magna aliqua.
-                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                        nisi ut aliquip ex ea commodo consequat.
+                        CGAP (the Clinical Genome Analysis Project) is a web-based clinical and research application
+                        for analysis, annotation, visualization and reporting of genomic data. An ongoing effort of
+                        Harvard Medical School's Department of Biomedical Informatics and developed in close connection
+                        with clinicians at BGM and UDN, CGAP
+                        merges powerful variant discovery workflows with clinical accuracy and reporting capabilities.
                     </p>
-                    {/* <button className="btn btn-outline-light btn-large">Request More Info</button> */}
                 </div>
             </div>
             <div className="container home-content-area" id="content">
@@ -36,8 +36,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                             backgroundSize: "cover"
                         }} />
                         <p style={{ marginTop: "1rem" }}>
-                            Excepteur sint occaecat cupidatat non in reprehenderit in
-                            proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                            Effortlessly filter SNV/Indels and SVs, browse our annotation database, and work with intuitive, cutting-edge visualization tools.
                         </p>
                     </div>
                     <div className="col-xs-12 col-md-4">
@@ -50,8 +49,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                             backgroundSize: "cover"
                         }} />
                         <p style={{ marginTop: "1rem" }}>
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-                            dolore <strong>CLIA-compatible workflow</strong> eu fugiat pariatur.
+                            Keep track of interpretation notes, publish customizable reports, and export findings in a flexible, but <strong>CLIA-compatible</strong> workflow.
                         </p>
                     </div>
                     <div className="col-xs-12 col-md-4 pull-right">
@@ -68,7 +66,6 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
 const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
     return (
         <div className="homepage-links-column external-links">
-            {/* <h3 className="text-300 mb-2 mt-3">External Links</h3> */}
             <h4 className="text-400 mb-15 mt-25">Our Partners</h4>
             <div className="links-wrapper clearfix">
                 <div className="link-block">
@@ -83,7 +80,7 @@ const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
                 </div>
                 <div className="link-block">
                     <a href="https://undiagnosed.hms.harvard.edu/" target="_blank" rel="noopener noreferrer" className="external-link">
-                        <span>Undiagnosed Diseased Network (UDN)</span>
+                        <span>Undiagnosed Diseases Network (UDN)</span>
                     </a>
                 </div>
                 <div className="link-block">

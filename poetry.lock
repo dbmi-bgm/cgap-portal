@@ -1126,7 +1126,7 @@ version = "3.0.9"
 description = "A Python library to read/write Excel 2010 xlsx/xlsm files"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.6,"
 
 [package.dependencies]
 et-xmlfile = "*"
@@ -2138,7 +2138,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<3.7"
-content-hash = "fc4d106e107b380bd43d2bf87a58a2292922504be9a6461f1a402dc2b4fb35e0"
+content-hash = "2f9ce3c86ad28da2cec745234a915f4582c52171695c5bc1a2b47d3bda609d85"
 
 [metadata.files]
 apipkg = [

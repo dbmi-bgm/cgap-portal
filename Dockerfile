@@ -119,6 +119,7 @@ RUN chmod +x entrypoint_local.sh
 # Production setup
 RUN touch production.ini
 RUN chown nginx:nginx production.ini
+RUN chown nginx:nginx poetry.toml
 COPY deploy/docker/production/$INI_BASE deploy/ini_files/.
 COPY deploy/docker/production/entrypoint.sh .
 COPY deploy/docker/production/entrypoint_portal.sh .
