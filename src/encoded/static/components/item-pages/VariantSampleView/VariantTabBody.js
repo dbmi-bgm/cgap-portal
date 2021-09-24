@@ -6,7 +6,7 @@ import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { ExternalDatabasesSection } from './ExternalDatabasesSection';
+import { ExternalDatabasesSection, ClinVarSection, standardizeGnomadValue } from './AnnotationSections';
 
 /**
  * Excluding the Gene Area (under position in mockuop https://gyazo.com/81d5b75b167bddef1b4c0a97f1640c51)
@@ -28,7 +28,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
         return;
     });
 
-    const { getTipForField, clinvarExternalHref } = useMemo(function(){
+    const { getTipForField, clinvarExternalHref } = useMemo(function(){ // TODO: consider moving to AnnotationSections & sharing between SV & SNV
 
         const ret = {
             getTipForField: function(){ return null; },
@@ -153,19 +153,6 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
     );
 });
 
-/**
- * In some scenarios we may have arrays for some fields, esp for gnomad v2 exome.
- * This is a simple workaround to standardize to show only first value, if this is case & >1 value (rare).
- * In future we may change how this logic works (so instead of [0], the index of the least rare total frequency to be shown.)
- */
-function standardizeGnomadValue(value, fallbackElem = <em data-tip="Not Available"> - </em>){
-    if (typeof value === "number") return value;
-    if (Array.isArray(value) && _.every(value, function(v){ return typeof v === "number"; })) {
-        return value[0]; // Pick first
-    }
-    return fallbackElem;
-}
-
 const GnomADTable = React.memo(function GnomADTable(props){
     const { context, getTipForField, prefix = "csq_gnomadg" } = props;
     const { variant } = context;
@@ -266,61 +253,6 @@ const GnomADTable = React.memo(function GnomADTable(props){
     );
 });
 
-
-
-function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref }){
-    const { variant } = context;
-    const {
-        csq_clinvar: variationID,
-        csq_clinvar_clnsig: clinicalSignificance,
-        csq_clinvar_clnsigconf: conflictingClinicalSignificance,
-        clinvar_submission = [], // TODO - missing in data rn.
-        csq_clinvar_clnrevstat: reviewStatus
-    } = variant;
-
-    if (!variationID) {
-        // No ClinVar info available ??
-        return (
-            <div className="d-flex align-items-center justify-content-center text-large h-100">
-                <h4 className="font-italic text-400 my-0 pb-08">No record in ClinVar</h4>
-            </div>
-        );
-    }
-
-    return (
-        <React.Fragment>
-
-            <div className="mb-1">
-                <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
-                { clinvarExternalHref?
-                    <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
-                        { variationID }
-                        <i className="icon icon-external-link-alt fas ml-07 text-small"/>
-                    </a>
-                    : <span>{ variationID }</span> }
-            </div>
-
-            <div className="row">
-                <div className="col-3">
-                    <label data-tip={getTipForField("csq_clinvar_clnsig")} className="mb-03">Interpretation: </label>
-                </div>
-                <div className="col-9">
-                    { clinicalSignificance }
-                </div>
-            </div>
-
-            <div className="row">
-                <div className="col-3">
-                    <label data-tip={getTipForField("csq_clinvar_clnrevstat")} className="mb-0">Review Status: </label>
-                </div>
-                <div className="col-9">
-                    { reviewStatus }
-                </div>
-            </div>
-
-        </React.Fragment>
-    );
-}
 
 
 function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){

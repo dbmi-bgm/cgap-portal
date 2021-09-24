@@ -2349,7 +2349,11 @@ i.status-indicator-dot {
 			justify-content: space-between;
 			height: 32px;
 			position: relative;
-			z-index: 5;
+			// z-index: 5;
+
+			> .dropdown > .btn-outline-secondary {
+				@include button-variant(#fff, #e0e0e0);
+			}
 
 			> h4 {
 				// todo: maybe add color if to be just for this section (?)
@@ -2451,6 +2455,12 @@ i.status-indicator-dot {
 				&.card {
 					// Blend/align the topleft corner with the column of tab links
 					border-top-left-radius: 0px;
+				}
+			}
+
+			.embedded-search-view-outer-container .search-view-controls-and-results {
+				&[data-search-item-type="Gene"] .info-header-title .dropdown-menu.show {
+					max-height: 180px;
 				}
 			}
 		}
