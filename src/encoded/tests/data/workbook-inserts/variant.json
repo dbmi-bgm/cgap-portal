@@ -91,6 +91,13 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "hg19_chr": "1",
         "hg19_pos": 1962105,
+        "hg19": [
+            {
+                "hg19_pos": 1962105,
+                "hg19_chrom": "chr1",
+                "hg19_hgvsg": "NC_000001.11:g.2030666G>A"
+            }
+        ],
         "transcript": [
             {
                 "csq_ccds": "CCDS36.1",
@@ -222,6 +229,13 @@
         "project": "hms-dbmi",
         "hg19_chr": "16",
         "hg19_pos": 23641332,
+        "hg19": [
+            {
+                "hg19_pos": 23641332,
+                "hg19_chrom": "chr16",
+                "hg19_hgvsg": "NC_000016.10:g.23630011_23630012insTTA"
+            }
+        ],
         "transcript": [
             {
                 "csq_ccds": "CCDS32406.1",
