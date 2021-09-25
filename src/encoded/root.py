@@ -2,7 +2,7 @@ import uptime
 
 from collections import OrderedDict
 from dcicutils import lang_utils
-from dcicutils.s3_utils import s3Utils
+from dcicutils.s3_utils import s3Utils, HealthPageKey
 from encoded import APP_VERSION_REGISTRY_KEY
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
@@ -59,34 +59,6 @@ def uptime_info():
         return lang_utils.relative_time_string(uptime.uptime())
     except Exception:
         return "unavailable"
-
-
-# Correspondence with s3Utils tested elsewhere.
-
-class HealthPageKey:
-    APPLICATION_BUCKET_PREFIX = 'application_bucket_prefix'
-    BEANSTALK_APP_VERSION = 'beanstalk_app_version'
-    BEANSTALK_ENV = 'beanstalk_env'
-    BLOB_BUCKET = 'blob_bucket'                              # s3Utils.BLOB_BUCKET_HEALTH_PAGE_KEY
-    DATABASE = 'database'
-    DISPLAY_TITLE = 'display_title'
-    ELASTICSEARCH = 'elasticsearch'
-    FILE_UPLOAD_BUCKET = 'file_upload_bucket'                # s3Utils.RAW_BUCKET_HEALTH_PAGE_KEY
-    FOURSIGHT = 'foursight'
-    FOURSIGHT_BUCKET_PREFIX = 'foursight_bucket_prefix'
-    IDENTITY = 'identity'
-    INDEXER = 'indexer'
-    INDEX_SERVER = 'index_server'
-    LOAD_DATA = 'load_data'
-    METADATA_BUNDLES_BUCKET = 'metadata_bundles_bucket'      # s3Utils.METADATA_BUCKET_HEALTH_PAGE_KEY
-    NAMESPACE = 'namespace'
-    PROCESSED_FILE_BUCKET = 'processed_file_bucket'          # s3Utils.OUTFILE_BUCKET_HEALTH_PAGE_KEY
-    PROJECT_VERSION = 'project_version'
-    SNOVAULT_VERSION = 'snovault_version'
-    SYSTEM_BUCKET = 'system_bucket'                          # s3Utils.SYS_BUCKET_HEALTH_PAGE_KEY
-    TIBANNA_OUTPUT_BUCKET = 'tibanna_output_bucket'          # s3Utils.TIBANNA_OUTPUT_BUCKET_HEALTH_PAGE_KEY
-    UPTIME = 'uptime'
-    UTILS_VERSION = 'utils_version'
 
 
 class SettingsKey:
