@@ -408,16 +408,17 @@
         },
         "structural_variant.transcript.csq_consequence.display_title": {
             "title": "Consequence",
-            "order": 50
+            "order": 50,
+	    "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_consequence.html"
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
             "order": 55,
             "grouping": "Inheritance",
+	    "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode.html",
             "default_hidden": true,
             "rescue_terms": [
                 "Possibly de novo",
-		"de novo (chrXY)",
                 "Homozygous recessive",
                 "Loss of Heterozygosity",
                 "Dominant (maternal)",
@@ -437,6 +438,7 @@
             "title": "Inheritance Modes",
             "order": 55,
             "grouping": "Inheritance",
+	    "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode_proband_only.html",
             "default_hidden": true,
             "rescue_terms": [
                 "X-linked",
