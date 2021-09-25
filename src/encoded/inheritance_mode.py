@@ -193,11 +193,15 @@ class InheritanceMode:
     ):
         """ Computes inheritence modes for the trio of 'self', 'mother', 'father'.
 
+        Note: No NovoCaller for SVs, so all SV de novo calls are weak
+        and solely based on genotype.
+
         :param genotypes: dictionary of role -> genotype mappings
         :param genotype_labels: dictionary of role -> genotype_label mappings
         :param sexes: dictionary of role -> sex mappings
         :param chrom: relevant chromosome
         :param novoPP: novoCaller post-posterior probability (likely de novo), takes precedence
+        :param structural_variant: boolean True for SVs
         :returns: list of inheritance modes
         """
         # validate precondition
@@ -227,10 +231,10 @@ class InheritanceMode:
         # And de novo chrXY
         if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER])
                 and ((genotypes[cls.SELF] == '0/1' and sexes[cls.SELF] == cls.FEMALE and chrom == 'X')
-                     or (genotypes[cls.SELF] == '1/1' and sexes[cls.SELF] == cls.MALE and chrom != 'autosome'))):
+                     or (genotypes[cls.SELF] == '1/1' and sexes[cls.SELF] == cls.MALE and chrom != cls.AUTOSOME))):
             if novoPP > 0:
                 raise ValueError("novoPP is different from 0 or -1 on sex chromosome: %s" % novoPP)
-            if novoPP == -1:
+            if novoPP == -1 and not structural_variant:
                 return [cls.INHMODE_LABEL_DE_NOVO_CHRXY]
 
         # SV likely de novo (no novoPP, so based solely on genotypes)
@@ -239,7 +243,6 @@ class InheritanceMode:
                 and cls.mother_father_ref_ref(
                     genotypes[cls.MOTHER], genotypes[cls.FATHER]
                 )
-                and (not cls.is_sex_chromosome(chrom))  # No mito SV calls as of 09.24.21 -drr
                 and (genotypes[cls.SELF] in ["0/1", "1/1"])
         ):
             return [cls.INHMODE_LABEL_SV_DE_NOVO]
@@ -355,6 +358,9 @@ class InheritanceMode:
             Adds the following 2 fields to variant_sample given the complete information:
                 1. genotype_labels
                 2. inheritance_modes
+
+        Note: Only difference for SVs is in inheritance mode
+        calculation. Genotype labels identical to those for SNVs.
         """
         sample_geno = variant_sample.get('samplegeno', [])
         if not sample_geno:
