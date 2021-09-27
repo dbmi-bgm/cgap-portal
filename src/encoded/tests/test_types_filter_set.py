@@ -86,7 +86,7 @@ def simple_filter_set():
 def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
     """ Test posting a non-trivial (but simple) filter set """
     res = es_testapp.post_json(FILTER_SET_URL, simple_filter_set, status=201).json
-    uuid = res['@graph'][0]['@id']
+    at_id = res['@graph'][0]['@id']
     es_testapp.post_json('/index', {})
 
     # execute filter_blocks only
@@ -127,9 +127,9 @@ def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
     }).json['@graph']
     assert len(compound_search_res) == 5
 
-    # do similar search with @id
-    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 1
+    # do similar search with `simple_filter_set` FilterSet Item @id
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': at_id}).json['@graph']
+    assert len(compound_search_res) == 2
 
 
 @pytest.fixture
@@ -178,7 +178,7 @@ def test_filter_set_typical(workbook, es_testapp, typical_filter_set):
 
     # execute the more complicated filter_set by @id
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 3
+    assert len(compound_search_res) == 4
 
 
 @pytest.fixture
@@ -236,7 +236,7 @@ def test_filter_set_complex(workbook, es_testapp, complex_filter_set):
             block['query'] = 'POS.from=0&POS.to=80000'  # excludes 1/5 variants
             break
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
-    assert len(compound_search_res) == 3
+    assert len(compound_search_res) == 4
 
 
 def test_filter_set_intersection(workbook, es_testapp, complex_filter_set):
