@@ -958,15 +958,14 @@ def variant_sample_list_spreadsheet(context, request):
         # print("\n\nLoaded VS", result)
         return result
 
+    results_iterable = map(
+        lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
+        map(load_variant_sample, variant_sample_uuids)
+    )
+
     return Response(
         app_iter = stream_tsv_output(
-            map(
-                lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
-                map(
-                    load_variant_sample,
-                    variant_sample_uuids
-                )
-            ),
+            results_iterable,
             spreadsheet_mappings,
             file_format
         ),

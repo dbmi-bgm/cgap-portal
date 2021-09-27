@@ -134,7 +134,8 @@ def stream_tsv_output(dictionaries_iterable, spreadsheet_mappings, file_format =
             yield writer.writerow(row)
         else:
             # print("Printing", vs_dict)
-            yield writer.writerow([ vs_dict.get(sm[0]) or "" for sm in spreadsheet_mappings ])
+            row = [ vs_dict.get(sm[0]) or "" for sm in spreadsheet_mappings ]
+            yield writer.writerow(row)
 
     # TODO: Figure out what we need in summary (if anything) and gather at some place.
     # Could be implemented based on request._stats, e.g. `setattr(vs_dict, "_stats", { "countX" : 0, "countY": 0 })`
@@ -143,7 +144,7 @@ def stream_tsv_output(dictionaries_iterable, spreadsheet_mappings, file_format =
     #     yield line.read().encode('utf-8')
 
 
-def build_xslx_spreadsheet(dictionaries_iterable, spreadsheet_mappings):
+def build_xlsx_spreadsheet(dictionaries_iterable, spreadsheet_mappings):
     '''TODO'''
     from tempfile import NamedTemporaryFile
     from openpyxl import Workbook

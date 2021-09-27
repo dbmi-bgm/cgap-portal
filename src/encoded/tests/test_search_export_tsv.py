@@ -1,5 +1,6 @@
 import json
 import pytest
+import csv
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search, pytest.mark.workbook]
 
@@ -90,7 +91,7 @@ def test_filtering_tab(workbook, html_es_testapp):
     assert 'text/tsv' in res.content_type
 
     # All values are of type string when parsed below.
-    result_rows = [ row.rstrip(' \r').split('\t') for row in res.body.decode('utf-8').split('\n') ]
+    result_rows = list(csv.reader(res.body.decode('utf-8').split('\n'), delimiter='\t'))
     colname_to_index = { col_name: col_idx for col_idx, col_name in enumerate(result_rows[0]) }
 
     check_spreadsheet_rows(result_rows, colname_to_index)
@@ -108,7 +109,8 @@ def test_interpretation_tab(workbook, html_es_testapp):
     assert 'text/csv' in res.content_type
 
     # All values are of type string when parsed below.
-    result_rows = [ row.rstrip(' \r').split(',') for row in res.body.decode('utf-8').split('\n') ]
+    result_rows = list(csv.reader(res.body.decode('utf-8').split('\n'), delimiter=","))
+    
     colname_to_index = { col_name: col_idx for col_idx, col_name in enumerate(result_rows[0]) }
 
     check_spreadsheet_rows(result_rows, colname_to_index)

@@ -137,12 +137,15 @@ def variant_sample_search_spreadsheet(context, request):
             yield embedded_representation_variant_sample
 
 
+    results_iterable = map(
+        lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
+        variant_samples_gen()
+    )
+
+
     return Response(
         app_iter = stream_tsv_output(
-            map(
-                lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
-                variant_samples_gen()
-            ),
+            results_iterable,
             spreadsheet_mappings,
             file_format
         ),
