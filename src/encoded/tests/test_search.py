@@ -905,7 +905,7 @@ class TestNestedSearch(object):
             ]
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_pos!=12345').follow().json
-        self.assert_length_is_expected(res, 4)
+        self.assert_length_is_expected(res, 5)
         for variant in res['@graph']:
             assert variant['uuid'] in self.VARIANTS_WITH_HG19
 
