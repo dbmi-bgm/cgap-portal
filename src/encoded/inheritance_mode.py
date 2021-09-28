@@ -54,7 +54,7 @@ class InheritanceMode:
     INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER = "X-linked dominant (Maternal)"
     INHMODE_LABEL_X_LINKED_DOMINANT_FATHER = "X-linked dominant (Paternal)"
     INHMODE_LABEL_Y_LINKED = "Y-linked dominant"
-    INHMODE_LABEL_LOH = "Loss of Heteozyogousity"
+    INHMODE_LABEL_LOH = "Loss of Heterozygosity"
 
     INHMODE_LABEL_SV_DE_NOVO = "Possibly de novo"
 

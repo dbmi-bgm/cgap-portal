@@ -409,13 +409,13 @@
         "structural_variant.transcript.csq_consequence.display_title": {
             "title": "Consequence",
             "order": 50,
-	    "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_consequence.html"
+            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_consequence.html"
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
             "order": 55,
             "grouping": "Inheritance",
-	    "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode.html",
+            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode.html",
             "default_hidden": true,
             "rescue_terms": [
                 "Possibly de novo",
@@ -438,7 +438,7 @@
             "title": "Inheritance Modes",
             "order": 55,
             "grouping": "Inheritance",
-	    "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode_proband_only.html",
+            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode_proband_only.html",
             "default_hidden": true,
             "rescue_terms": [
                 "X-linked",
