@@ -1464,6 +1464,7 @@ i.status-indicator-dot {
 						}
 						td:not(.accession-table-title) {
 							text-align: right;
+							word-break: break-all;
 						}
 					}
 				}
