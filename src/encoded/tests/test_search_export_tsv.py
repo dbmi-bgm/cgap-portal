@@ -94,7 +94,7 @@ def test_filtering_tab(workbook, html_es_testapp):
     colname_to_index = { col_name: col_idx for col_idx, col_name in enumerate(result_rows[6]) }
 
     check_spreadsheet_rows(result_rows, colname_to_index, row_start=6)
-    
+
 
 
 

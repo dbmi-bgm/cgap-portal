@@ -944,7 +944,6 @@ def variant_sample_list_spreadsheet(context, request):
         '''
         vs_embedding_instance = CustomEmbed(request, vs_uuid, embed_props={ "requested_fields": fields_to_embed })
         result = vs_embedding_instance.result
-        # print("\n\nLoaded VS", result)
         return result
 
     def vs_dicts_generator():
@@ -966,10 +965,7 @@ def variant_sample_list_spreadsheet(context, request):
             'Content-Type': 'text/' + file_format,
             'Content-Description': 'File Transfer',
             'Cache-Control': 'no-store'
-        },
-        # content_type='text/' + file_format,
-        # content_encoding='utf-8',
-        # content_disposition='attachment;filename="%s"' % suggested_filename
+        }
     )
 
 

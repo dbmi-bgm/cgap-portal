@@ -1,49 +1,28 @@
-import csv
-import io
 import json
-import os
 import datetime
 import pytz
 import structlog
-from math import inf
-from urllib.parse import parse_qs, urlparse
-from collections import OrderedDict
-from itertools import chain
-from pyramid.compat import bytes_
 from pyramid.httpexceptions import (
     HTTPBadRequest,
     HTTPMovedPermanently,
     HTTPServerError,
     HTTPTemporaryRedirect
 )
-from base64 import b64decode
 from pyramid.view import view_config
-from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.traversal import find_resource
-from pyramid.settings import asbool
-from snovault import TYPES, calculated_property, collection, load_schema
 from snovault.util import simple_path_ids, debug_log
-from snovault.calculated import calculate_properties
 from snovault.embed import make_subrequest
 
-from encoded.types.base import Item, get_item_or_none
 from encoded.types.variant import (
-    POPULATION_SUFFIX_TITLE_TUPLES,
-    get_spreadsheet_mappings,
-    get_fields_to_embed
+    get_spreadsheet_mappings
 )
-from .custom_embed import CustomEmbed
-from .batch_download_utils import stream_tsv_output, convert_item_to_sheet_dict
+from .batch_download_utils import (
+    stream_tsv_output,
+    convert_item_to_sheet_dict,
+    human_readable_filter_block_queries
+)
 from .search.compound_search import CompoundSearchBuilder
-
-# from .search import (
-#     iter_search_results,
-#     build_table_columns,
-#     get_iterable_search_results,
-#     make_search_subreq
-# )
-
 
 
 
@@ -120,30 +99,14 @@ def variant_sample_search_spreadsheet(context, request):
             yield convert_item_to_sheet_dict(embedded_representation_variant_sample, spreadsheet_mappings)
 
 
-    parsed_filter_block_qs = []
-    for fb in filterset_blocks_request["filter_blocks"]:
-        if not fb["query"]:
-            parsed_filter_block_qs.append("( <Any> )")
-        else:
-            qs_dict = parse_qs(fb["query"])
-            curr_fb_q = []
-            for field, value in qs_dict.items():
-                formstr = field + " = "
-                if len(value) == 1:
-                    formstr += str(value[0])
-                else:
-                    formstr += "[ " + " | ".join([ str(v) for v in value ]) + " ]"
-                curr_fb_q.append(formstr)
-            parsed_filter_block_qs.append("( " + " & ".join(curr_fb_q) + " )")
-
     header_info_rows = [
         ["#"],
         ["#", "Case Accession:", "", case_accession or "Not Available"],
         ["#", "Case Title:", "", case_title or "Not Available"],
-        ["#", "Filters Selected:", "", (" AND " if intersect else " OR ").join(parsed_filter_block_qs) ],
+        ["#", "Filters Selected:", "", human_readable_filter_block_queries(filterset_blocks_request) ],
         #["#", "Filtering Query Used:", "", json.dumps({ "intersect": intersect, "filter_blocks": [ fb["query"] for fb in filter_set["filter_blocks"] ] })  ],
         ["#"],
-        ["## -------------------------"] # <- Slightly less than horizontal length of most VS @IDs
+        ["## -------------------------------------------------------"] # <- Slightly less than horizontal length of most VS @IDs
     ]
 
 
@@ -161,10 +124,7 @@ def variant_sample_search_spreadsheet(context, request):
             'Content-Type': 'text/' + file_format,
             'Content-Description': 'File Transfer',
             'Cache-Control': 'no-store'
-        },
-        # content_type='text/' + file_format,
-        # content_encoding='utf-8',
-        # content_disposition='attachment;filename="%s"' % suggested_filename
+        }
     )
 
 
@@ -197,3 +157,4 @@ def embed_and_merge_note_items_to_variant_sample(request, embedded_vs):
             setattr(note_subreq, "_stats", request._stats)
             note_response = request.invoke_subrequest(note_subreq)
             incomplete_note_obj.update(note_response.json)
+

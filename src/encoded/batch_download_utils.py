@@ -1,13 +1,6 @@
 import csv
+from urllib.parse import parse_qs
 import structlog
-from pyramid.httpexceptions import (
-    HTTPBadRequest,
-    HTTPMovedPermanently,
-    HTTPServerError,
-    HTTPTemporaryRedirect
-)
-from pyramid.request import Request
-from pyramid.response import Response
 from snovault.util import simple_path_ids, debug_log
 
 
@@ -89,6 +82,30 @@ def convert_item_to_sheet_dict(item, spreadsheet_mappings):
     return sheet_dict
 
 
+def human_readable_filter_block_queries(filterset_blocks_request):
+    parsed_filter_block_qs = []
+    fb_len = len(filterset_blocks_request["filter_blocks"])
+    for fb in filterset_blocks_request["filter_blocks"]:
+        curr_fb_str = None
+        if not fb["query"]:
+            curr_fb_str = "<Any>"
+            if fb_len > 1:
+                curr_fb_str = "( " + curr_fb_str + " )"
+        else:
+            qs_dict = parse_qs(fb["query"])
+            curr_fb_q = []
+            for field, value in qs_dict.items():
+                formstr = field + " = "
+                if len(value) == 1:
+                    formstr += str(value[0])
+                else:
+                    formstr += "[ " + " | ".join([ str(v) for v in value ]) + " ]"
+                curr_fb_q.append(formstr)
+            curr_fb_str = " & ".join(curr_fb_q)
+            if fb_len > 1:
+                curr_fb_str = "( " + curr_fb_str + " )"
+        parsed_filter_block_qs.append(curr_fb_str)
+    return (" AND " if filterset_blocks_request.get("intersect", False) else " OR ").join(parsed_filter_block_qs)
 
 
 class Echo(object):
@@ -114,7 +131,7 @@ def stream_tsv_output(
         quoting=csv.QUOTE_NONNUMERIC
     )
 
-    # yield writer.writerow("\xEF\xBB\xBF") # UTF-8 BOM
+    # yield writer.writerow("\xEF\xBB\xBF") # UTF-8 BOM - usually shows up as special chars (not useful)
 
     # Header/Intro Rows (if any)
     for row in (header_rows or []):
@@ -147,11 +164,6 @@ def stream_tsv_output(
             row = [ vs_dict.get(sm[0]) or "" for sm in spreadsheet_mappings ]
             yield writer.writerow(row)
 
-    # TODO: Figure out what we need in summary (if anything) and gather at some place.
-    # Could be implemented based on request._stats, e.g. `setattr(vs_dict, "_stats", { "countX" : 0, "countY": 0 })`
-    # for summary_line in generate_summary_lines():
-    #     writer.writerow(summary_line)
-    #     yield line.read().encode('utf-8')
 
 
 def build_xlsx_spreadsheet(dictionaries_iterable, spreadsheet_mappings):
