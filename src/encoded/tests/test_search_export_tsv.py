@@ -101,7 +101,7 @@ def test_filtering_tab(workbook, html_es_testapp):
 def test_interpretation_tab(workbook, html_es_testapp):
 
     res = html_es_testapp.get(
-        '/variant-sample-lists/292250e7-5cb7-4543-85b2-80cd318287b2/@@spreadsheet/suggested-filename-to-use.csv',
+        '/variant-sample-lists/292250e7-5cb7-4543-85b2-80cd318287b2/@@spreadsheet/?file_format=csv',
     )
 
     # Should infer from suggested filename ending in .tsv
