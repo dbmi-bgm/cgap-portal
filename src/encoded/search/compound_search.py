@@ -374,7 +374,7 @@ def compound_search(context, request):
     #    raise HTTPBadRequest("Passed bad {} body param: {}".format(CompoundSearchBuilder.TYPE, filter_set.get(CompoundSearchBuilder.TYPE)))
 
     from_ = body.get('from', 0)
-    limit = body.get('limit', 25)
+    limit = body.get('limit', 10)  # pagination size 10 works better with ECS
     if limit == "all":
         raise HTTPBadRequest("compound_search does not support limit=all at this time.")
     if limit > 1000:
