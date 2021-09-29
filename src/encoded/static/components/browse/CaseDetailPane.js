@@ -666,12 +666,12 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 const thisReportBlock = (
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}>
                         <StackedBlockName className="flex-row align-items-center justify-content-between">
-                            <div className="d-flex">
+                            {/* <div className="d-flex">
                                 { reportAtId ?
                                     <a href={reportAtId} className={"name-title" + (isResultCase ? " current-case": "")}>
                                         { analysisTitle }
                                     </a> : <span className={"name-title" + (isResultCase ? " current-case": "")}>{ analysisTitle }</span>}
-                            </div>
+                            </div> */}
                             <div className="w-100">
                                 <div className="accession-table">
                                     <tbody>
