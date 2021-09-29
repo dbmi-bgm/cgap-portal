@@ -120,13 +120,27 @@ def variant_sample_search_spreadsheet(context, request):
             yield convert_item_to_sheet_dict(embedded_representation_variant_sample, spreadsheet_mappings)
 
 
+    parsed_filter_block_qs = []
+    for fb in filterset_blocks_request["filter_blocks"]:
+        if not fb["query"]:
+            parsed_filter_block_qs.append("( <Any> )")
+        else:
+            qs_dict = parse_qs(fb["query"])
+            curr_fb_q = []
+            for field, value in qs_dict.items():
+                formstr = field + " = "
+                if len(value) == 1:
+                    formstr += str(value[0])
+                else:
+                    formstr += "[ " + " | ".join([ str(v) for v in value ]) + " ]"
+                curr_fb_q.append(formstr)
+            parsed_filter_block_qs.append("( " + " & ".join(curr_fb_q) + " )")
+
     header_info_rows = [
         ["#"],
         ["#", "Case Accession:", "", case_accession or "Not Available"],
         ["#", "Case Title:", "", case_title or "Not Available"],
-        ["#", "Filters Selected:", "", (" AND " if intersect else " OR ").join(
-            [ (fb["query"] or "<Any>") for fb in filterset_blocks_request["filter_blocks"] ]
-        )  ],
+        ["#", "Filters Selected:", "", (" AND " if intersect else " OR ").join(parsed_filter_block_qs) ],
         #["#", "Filtering Query Used:", "", json.dumps({ "intersect": intersect, "filter_blocks": [ fb["query"] for fb in filter_set["filter_blocks"] ] })  ],
         ["#"],
         ["## -------------------------"] # <- Slightly less than horizontal length of most VS @IDs
