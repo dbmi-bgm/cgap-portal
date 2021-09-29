@@ -104,7 +104,9 @@ RUN chown -R nginx:nginx /var/cache/nginx && \
     touch /var/log/nginx/access.log && \
     chown -R nginx:nginx /var/log/nginx/access.log && \
     touch /var/log/nginx/error.log && \
-    chown -R nginx:nginx /var/log/nginx/error.log
+    chown -R nginx:nginx /var/log/nginx/error.log && \
+    mkdir -p /data/nginx/cache && \
+    chown -R nginx:nginx /data/nginx/cache
 
 # Pull all required files
 # Note that *.ini must match the env name in secrets manager!
