@@ -915,32 +915,21 @@ class VariantSampleList(Item):
 
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
-             permission='view', subpath_segments=[0, 1])
+             permission='view')
 @debug_log
 def variant_sample_list_spreadsheet(context, request):
 
-    # TODO: Add datetime - maybe from UI so as to localize it to user's timezone?
-    suggested_filename = None
-    if request.subpath:
-        suggested_filename, = request.subpath
     file_format = request.GET.get("file_format", None)
-
-    if not file_format and suggested_filename:
-        if suggested_filename.endswith(".tsv"):
-            file_format = "tsv"
-        if suggested_filename.endswith(".csv"):
-            file_format = "csv"
-        if suggested_filename.endswith(".xlsx"):
-            file_format = "xlsx"
+    case_accession = request.GET.get("case_accession", context.properties.get("created_for_case"))
 
     if not file_format:
         file_format = "tsv"
     elif file_format not in { "tsv", "csv" }: # TODO: Add support for xslx.
         raise HTTPBadRequest("Expected a valid `file_format` such as TSV or CSV.")
 
-    if not suggested_filename:
-        timestamp = datetime.datetime.now(pytz.utc).isoformat()
-        suggested_filename = "case-interpretation-" + timestamp + "." + file_format
+
+    timestamp = datetime.datetime.now(pytz.utc).isoformat()[:-13] + "Z"
+    suggested_filename = (case_accession or "case") + "-interpretation-" + timestamp + "." + file_format
 
 
     variant_sample_uuids = [ vso["variant_sample_item"] for vso in context.properties.get("variant_samples", []) ]
@@ -958,14 +947,15 @@ def variant_sample_list_spreadsheet(context, request):
         # print("\n\nLoaded VS", result)
         return result
 
-    results_iterable = map(
-        lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
-        map(load_variant_sample, variant_sample_uuids)
-    )
+    def vs_dicts_generator():
+        for vs_uuid in variant_sample_uuids:
+            vs_result = load_variant_sample(vs_uuid)
+            yield convert_item_to_sheet_dict(vs_result, spreadsheet_mappings)
+
 
     return Response(
         app_iter = stream_tsv_output(
-            results_iterable,
+            vs_dicts_generator(),
             spreadsheet_mappings,
             file_format
         ),
@@ -975,7 +965,7 @@ def variant_sample_list_spreadsheet(context, request):
             'Content-Disposition': 'attachment; filename=' + suggested_filename,
             'Content-Type': 'text/' + file_format,
             'Content-Description': 'File Transfer',
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-store'
         },
         # content_type='text/' + file_format,
         # content_encoding='utf-8',
@@ -1174,7 +1164,7 @@ def get_spreadsheet_mappings(request = None):
     return [
     ##  Column Title                             |  CGAP Field (if not custom function)                          |  Description
     ##  ---------------------------------------  |  -----------------------------------------------------------  |  --------------------------------------------------------------------------
-        ("Identifier",                              "@id",                                                          "URL path to the Sample Variant on this row"),
+        ("ID",                                      "@id",                                                          "URL path to the Sample Variant on this row"),
         ("Chrom (hg38)",                            "variant.CHROM",                                                "Chromosome (hg38 assembly)"),
         ("Pos (hg38)",                              "variant.POS",                                                  "Start Position (hg38 assembly)"),
         ("Chrom (hg19)",                            "variant.hg19_chr",                                             "Chromosome (hg19 assembly)"),

@@ -10,14 +10,14 @@ pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search, pytes
 # design your tests accordingly
 
 
-def check_spreadsheet_rows(result_rows, colname_to_index):
+def check_spreadsheet_rows(result_rows, colname_to_index, row_start=0):
 
     # Check presence of columns in the doc
-    assert result_rows[0][1] == "Chrom (hg38)"
-    assert result_rows[0][2] == "Pos (hg38)"
-    assert result_rows[0][16] == "Canonical transcript ID"
-    assert result_rows[0][17] == "Canonical transcript location"
-    assert result_rows[0][25] == "Variant Quality"
+    assert result_rows[row_start][1] == "Chrom (hg38)"
+    assert result_rows[row_start][2] == "Pos (hg38)"
+    assert result_rows[row_start][16] == "Canonical transcript ID"
+    assert result_rows[row_start][17] == "Canonical transcript location"
+    assert result_rows[row_start][25] == "Variant Quality"
 
     # Add all test cases to here
     expected_data = [
@@ -45,11 +45,10 @@ def check_spreadsheet_rows(result_rows, colname_to_index):
         }
     ]
 
-    curr_row_idx = 2 # Result row at index=1 is column descriptions.
-    for ed in expected_data:
+    for data_idx, ed in enumerate(expected_data):
         for name, value in ed.items():
-            assert result_rows[curr_row_idx][colname_to_index[name]] == value
-        curr_row_idx += 1
+            # Data starts 2 rows after (header + description)
+            assert result_rows[data_idx + row_start + 2][colname_to_index[name]] == value
 
 
 def test_filtering_tab(workbook, html_es_testapp):
@@ -92,9 +91,9 @@ def test_filtering_tab(workbook, html_es_testapp):
 
     # All values are of type string when parsed below.
     result_rows = list(csv.reader(res.body.decode('utf-8').split('\n'), delimiter='\t'))
-    colname_to_index = { col_name: col_idx for col_idx, col_name in enumerate(result_rows[0]) }
+    colname_to_index = { col_name: col_idx for col_idx, col_name in enumerate(result_rows[6]) }
 
-    check_spreadsheet_rows(result_rows, colname_to_index)
+    check_spreadsheet_rows(result_rows, colname_to_index, row_start=6)
     
 
 

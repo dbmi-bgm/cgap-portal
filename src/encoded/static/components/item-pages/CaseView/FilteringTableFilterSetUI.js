@@ -349,32 +349,27 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
 const ExportSearchSpreadsheetButton = React.memo(function ExportSearchSpreadsheetButton(props){
     const { requestedCompoundFilterSet, caseItem } = props;
+    const { accession: caseAccession, case_title } = caseItem;
     const formRef = useRef(null);
     const onSelect = useCallback(function(eventKey, e){
-        const {
-            accession: caseAccession
-        } = caseItem;
-        formRef.current.action = "/variant-sample-search-spreadsheet/?file_format=" + eventKey;
+        // input[name="file_format"]
+        formRef.current.children[0].value = eventKey;
         // `requestedCompoundFilterSet` passed in from VirtualHrefController of the EmbeddedSearchView
-        formRef.current.children[0].value = JSON.stringify(requestedCompoundFilterSet);
-        // In UTC/ISO (not localized), for simplicity. Transformed to be more filename-friendly.
-        const dateStr = (new Date()).toISOString().replaceAll(":", "_").slice(0, -5) + "Z";
-        formRef.current.children[1].value = (
-            "variant-sample-filtering_case-"
-            + caseAccession
-            + "_" + dateStr
-            + "." + eventKey
-        );
+        // input[name="compound_search_request"]
+        formRef.current.children[1].value = JSON.stringify(requestedCompoundFilterSet);
         formRef.current.submit();
         return false;
-    }, [ formRef, requestedCompoundFilterSet, caseItem ]);
+    }, [ formRef, requestedCompoundFilterSet ]);
 
     const disabled = !requestedCompoundFilterSet; // TODO: Check if >0 results, as well.
 
     return (
-        <form method="POST" className="mb-0" ref={formRef}>
+        // target=_blank causes new tab to open (and then auto-close), but bypasses the isSubmitting onBeforeUnload check in app.js
+        <form method="POST" className="mb-0" action="/variant-sample-search-spreadsheet/" target="_blank" ref={formRef}>
+            <input type="hidden" name="file_format" />
             <input type="hidden" name="compound_search_request" />
-            <input type="hidden" name="suggested_filename" />
+            <input type="hidden" name="case_accession" value={caseAccession} />
+            <input type="hidden" name="case_title" value={case_title} />
             <DropdownButton variant="outline-primary" title="Export results as..." onSelect={onSelect} disabled={disabled}>
                 <DropdownItem eventKey="tsv">
                     <span className="text-600">TSV</span> spreadsheet

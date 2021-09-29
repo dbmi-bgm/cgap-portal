@@ -97,19 +97,28 @@ class Echo(object):
 
 
 
-def stream_tsv_output(dictionaries_iterable, spreadsheet_mappings, file_format = "tsv"):
+def stream_tsv_output(
+    dictionaries_iterable,
+    spreadsheet_mappings,
+    file_format = "tsv",
+    header_rows=None
+):
     '''
     Generator which converts iterable of column:value dictionaries into a TSV stream.
     :param dictionaries_iterable: Iterable of dictionaries, each containing TSV_MAPPING keys and values from a file in ExperimentSet.
     '''
-    writer = csv.writer(Echo(), delimiter= "\t" if file_format == "tsv" else ",")
 
-    # Initial 2 lines: Intro, Headers
-    # writer.writerow([
-    #     '###', 'N.B.: File summary located at bottom of TSV file.', '', '', '', '',
-    #     'Suggested command to download: ', '', '', 'cut -f 1 ./{} | tail -n +3 | grep -v ^# | xargs -n 1 curl -O -L --user <access_key_id>:<access_key_secret>'.format(filename_to_suggest)
-    # ])
-    # yield line.read().encode('utf-8')
+    writer = csv.writer(
+        Echo(),
+        delimiter= "\t" if file_format == "tsv" else ",",
+        quoting=csv.QUOTE_NONNUMERIC
+    )
+
+    # yield writer.writerow("\xEF\xBB\xBF") # UTF-8 BOM
+
+    # Header/Intro Rows (if any)
+    for row in (header_rows or []):
+        yield writer.writerow(row)
 
     ## Add in headers (column title) and descriptions
     title_headers = []
@@ -117,10 +126,11 @@ def stream_tsv_output(dictionaries_iterable, spreadsheet_mappings, file_format =
     for column_title, cgap_field_or_func, description in spreadsheet_mappings:
         title_headers.append(column_title)
         description_headers.append(description)
-    title_headers[0] = "## " + title_headers[0] # Add comment hash in case people using this spreadsheet file programmatically.
-    description_headers[0] = "## " + description_headers[0] # Add comment hash in case people using this spreadsheet file programmatically.
 
-    #yield writer.writerow("\xEF\xBB\xBF") # UTF-8 BOM
+    # Prepend comment hash in case people using this spreadsheet file programmatically.
+    title_headers[0] = "# " + title_headers[0]
+    description_headers[0] = "# " + description_headers[0]
+
     yield writer.writerow(title_headers)
     yield writer.writerow(description_headers)
 

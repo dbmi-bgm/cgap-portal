@@ -82,33 +82,15 @@ def variant_sample_search_spreadsheet(context, request):
     file_format = request_body.get("file_format", request.GET.get("file_format", "tsv")).lower()
     if file_format not in { "tsv", "csv" }: # TODO: Add support for xslx.
         raise HTTPBadRequest("Expected a valid `file_format` such as TSV or CSV.")
-    suggested_filename = request_body.get("suggested_filename", request.GET.get("suggested_filename", None))
-    if not suggested_filename:
-        timestamp = datetime.datetime.now(pytz.utc).isoformat()
-        suggested_filename = "variant-sample-filtering-" + timestamp + "." + file_format
+
+    case_accession = request_body.get("case_accession", request.GET.get("case_accession"))
+    case_title = request_body.get("case_title", request.GET.get("case_title"))
+
+    timestamp = datetime.datetime.now(pytz.utc).isoformat()[:-13] + "Z"
+    suggested_filename = (case_accession or "case") + "-filtering-" + timestamp + "." + file_format
 
     spreadsheet_mappings = get_spreadsheet_mappings(request)
 
-    # TEMPORARY FOR TESTING - WE GET THIS SOLELY FROM POST BODY SOON
-    # filterset_blocks_request = {
-    #     "search_type":"VariantSample",
-    #     "global_flags":"CALL_INFO=SAM10254-S1&file=GAPFI3EBH4X2&additional_facet=proband_only_inheritance_modes&sort=date_created",
-    #     "intersect": False,
-    #     "filter_blocks":[
-    #         {
-    #             "query":"associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Breast+Cancer+%2828%29&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
-    #             "flags_applied":[]
-    #         },
-    #         # {
-    #         #     "query":"GQ.from=60&GQ.to=99&associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Familial+Cancer+%28148%29&variant.csq_clinvar_clnsig=Uncertain_significance&variant.csq_clinvar_clnsig=Pathogenic&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH",
-    #         #     "flags_applied":[]
-    #         # },
-    #         # {
-    #         #     "query":"variant.csq_gnomade2_af.from=0&variant.csq_gnomade2_af.to=0.001&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001",
-    #         #     "flags_applied":[]
-    #         # }
-    #     ]
-    # }
 
     # Must not contain `limit`
     filterset_blocks_request = request_body["compound_search_request"]
@@ -131,23 +113,32 @@ def variant_sample_search_spreadsheet(context, request):
         return_generator=True
     )
 
-    def variant_samples_gen():
+    def vs_dicts_generator():
         for embedded_representation_variant_sample in compound_search_res:
+            # Extends `embedded_representation_variant_sample` in place
             embed_and_merge_note_items_to_variant_sample(request, embedded_representation_variant_sample)
-            yield embedded_representation_variant_sample
+            yield convert_item_to_sheet_dict(embedded_representation_variant_sample, spreadsheet_mappings)
 
 
-    results_iterable = map(
-        lambda x: convert_item_to_sheet_dict(x, spreadsheet_mappings),
-        variant_samples_gen()
-    )
+    header_info_rows = [
+        ["#"],
+        ["#", "Case Accession:", "", case_accession or "Not Available"],
+        ["#", "Case Title:", "", case_title or "Not Available"],
+        ["#", "Filters Selected:", "", (" AND " if intersect else " OR ").join(
+            [ (fb["query"] or "<Any>") for fb in filterset_blocks_request["filter_blocks"] ]
+        )  ],
+        #["#", "Filtering Query Used:", "", json.dumps({ "intersect": intersect, "filter_blocks": [ fb["query"] for fb in filter_set["filter_blocks"] ] })  ],
+        ["#"],
+        ["## -------------------------"] # <- Slightly less than horizontal length of most VS @IDs
+    ]
 
 
     return Response(
         app_iter = stream_tsv_output(
-            results_iterable,
+            vs_dicts_generator(),
             spreadsheet_mappings,
-            file_format
+            file_format=file_format,
+            header_rows=header_info_rows
         ),
         headers={
             'X-Accel-Buffering': 'no',
@@ -155,7 +146,7 @@ def variant_sample_search_spreadsheet(context, request):
             'Content-Disposition': 'attachment; filename=' + suggested_filename,
             'Content-Type': 'text/' + file_format,
             'Content-Description': 'File Transfer',
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-store'
         },
         # content_type='text/' + file_format,
         # content_encoding='utf-8',
