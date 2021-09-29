@@ -1,5 +1,5 @@
 ,#FILEFORMAT=VCFv4.1,,,,,,,,,,,,,,,,,,,,,,,,,,
-,#FILEDATE=09.13.2021,New this version,,,,,,,,,,,,,,,,,,,,,,,,,
+,#FILEDATE=09.22.2021,New this version,,,,,,,,,,,,,,,,,,,,,,,,,
 no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,source_version,description,field_type,sub_embedding_group,is_list,priority,source,pattern,default,min,max,enum_list,links_to,embedded_field,calculated_property,link,comments,annotation_space_location,abbreviation,add_no_value
 1,CHROM,CHROM,Chromosome,Y,1;2;3;4;5;6;22;X;Y;M,variant,VCF,,Chromosome,string,,N,,,,,,,"1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,M",,,,,,Position,,
 2,START,POS,Start Position,Y,1482001,variant,VCF,,Start Position,integer,,N,,,,,1,,,,,,,,,,
@@ -60,6 +60,8 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 57,csq_strand,csq_strand,Strand,Y,1,variant,VEP,v101,Strand of the feature,boolean,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,,,,,,,,,,
 58,samplegeno_numgt,GT,Sample Genotype (Numeric),Y,0/1,sample_variant,VCF,,Sample genotype (number format),string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,,,,,,,,,,,,,,,
 59,samplegeno_sampleid,sample,Sample Genotype (Sample ID),Y,NA12877_sample,sample_variant,VCF,,Sample ID,string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,,,,,,,,,,,,,,,
-60,imprecise,IMPRECISE,Imprecise Structural Variant,Y,,sample_variant,VCF,,Imprecise structural variant flag from Manta,boolean,,N,,,,,,,,,,,,,,,
-61,confidence_interval_start,CIPOS,Start Position Confidence Interval,Y,"-496,496",sample_variant,VCF,,Confidence interval of start position in basepairs,integer,,Y,,,,,,,,,,,,,,,
-62,confidence_interval_end,CIEND,End Position Confidence Interval,Y,"-310,310",sample_variant,VCF,,Confidence interval of end position in basepairs,integer,,Y,,,,,,,,,,,,,,,
+60,samplegeno_quality,GQ,Sample Genotype Quality,Y,603,sample_variant,VCF,,Sample genotype quality,integer,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,,,,,,,,,,,,,,,
+61,samplegeno_likelihood,PL,"Sample Genotype Likelihoods (0/0, 0/1, 1/1)",Y,"859,0,600",sample_variant,VCF,,"Sample normalized, Phred-scaled genotype likelihoods (0/0, 0/1, 1/1)",string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,,,,,,,,,,,,,,,
+62,imprecise,IMPRECISE,Imprecise Structural Variant,Y,,sample_variant,VCF,,Imprecise structural variant flag from Manta,boolean,,N,,,,,,,,,,,,,,,
+63,confidence_interval_start,CIPOS,Start Position Confidence Interval,Y,"-496,496",sample_variant,VCF,,Confidence interval of start position in basepairs,integer,,Y,,,,,,,,,,,,,,,
+64,confidence_interval_end,CIEND,End Position Confidence Interval,Y,"-310,310",sample_variant,VCF,,Confidence interval of end position in basepairs,integer,,Y,,,,,,,,,,,,,,,
