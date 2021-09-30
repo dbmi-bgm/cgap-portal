@@ -320,7 +320,9 @@ CONTENT_TYPE_SPECIAL_CASES = {
     'application/x-www-form-urlencoded': [
         # Single legacy special case to allow us to POST to metadata TSV requests via form submission.
         # All other special case values should be added using register_path_content_type.
-        '/metadata/'
+        '/metadata/',
+        '/variant-sample-search-spreadsheet/',
+        r'/variant-sample-lists/[\da-z-]+/@@spreadsheet/'
     ]
 }
 
@@ -353,9 +355,14 @@ def content_type_allowed(request):
     exceptions = CONTENT_TYPE_SPECIAL_CASES.get(request.content_type)
 
     if exceptions:
-        for text in exceptions:
-            if text in request.path:
-                return True
+        for path_condition in exceptions:
+            if isinstance(path_condition, str):
+                if path_condition in request.path:
+                    return True
+            else:
+                if re.match(path_condition, request.path):
+                    return True
+
 
     return False
 

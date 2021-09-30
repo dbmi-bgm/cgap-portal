@@ -68,5 +68,274 @@
                 "genes_most_severe_gene": "ad9883a2-6886-4ca0-9402-7c49734c12fb"
             }
         ]
+    },
+
+
+    {
+        "ID": "rs142404438",
+        "ALT": "A",
+        "POS": 2030666,
+        "REF": "G",
+        "CHROM": "1",
+        "genes": [
+            {
+                "genes_most_severe_gene": "f6490485-7910-4019-a45e-02d6fb96f3a5",
+                "genes_most_severe_hgvsc": "ENST00000378585.7:c.*384G>A",
+                "genes_most_severe_transcript": "ENST00000378585",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                "genes_most_severe_feature_ncbi": "NM_000815.5"
+            }
+        ],
+        "hgvsg": "NC_000001.11:g.2030666G>A",
+        "status": "shared",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "1",
+        "hg19_pos": 1962105,
+        "hg19": [
+            {
+                "hg19_pos": 1962105,
+                "hg19_chrom": "chr1",
+                "hg19_hgvsg": "NC_000001.11:g.2030666G>A"
+            }
+        ],
+        "transcript": [
+            {
+                "csq_ccds": "CCDS36.1",
+                "csq_ensp": "ENSP00000367848",
+                "csq_exon": "9/9",
+                "csq_gene": "f6490485-7910-4019-a45e-02d6fb96f3a5",
+                "csq_mane": "NM_000815.5",
+                "csq_hgvsc": "ENST00000378585.7:c.*384G>A",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000378585",
+                "csq_uniparc": "UPI0000070D0A",
+                "csq_canonical": true,
+                "csq_swissprot": "O14764",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "1822"
+            },
+            {
+                "csq_ensp": "ENSP00000491411",
+                "csq_exon": "8/8",
+                "csq_gene": "f6490485-7910-4019-a45e-02d6fb96f3a5",
+                "csq_hgvsc": "ENST00000640030.1:c.*384G>A",
+                "csq_strand": true,
+                "csq_trembl": "A0A1W2PPH3",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000640030",
+                "csq_uniparc": "UPI00097BA5BD",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "1527"
+            }
+        ],
+        "institution": "hms-dbmi",
+        "variantClass": "SNV",
+        "annotation_id": "chr1:2030666G_A",
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 0.613,
+        "csq_gnomadg_ac": 30,
+        "csq_gnomadg_af": 0.000197078,
+        "csq_gnomadg_an": 152224,
+        "csq_gnomadg_ac-xx": 16,
+        "csq_gnomadg_ac-xy": 14,
+        "csq_gnomadg_af-xx": 0.000205529,
+        "csq_gnomadg_af-xy": 0.000188233,
+        "csq_gnomadg_an-xx": 77848,
+        "csq_gnomadg_an-xy": 74376,
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 2,
+        "csq_gnomadg_ac-asj": 1,
+        "csq_gnomadg_ac-eas": 26,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 1,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.0,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.000130907,
+        "csq_gnomadg_af-asj": 0.000288184,
+        "csq_gnomadg_af-eas": 0.00500192,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 1.46968e-05,
+        "csq_gnomadg_af-oth": 0.0,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 41456,
+        "csq_gnomadg_an-ami": 912,
+        "csq_gnomadg_an-amr": 15278,
+        "csq_gnomadg_an-asj": 3470,
+        "csq_gnomadg_an-eas": 5198,
+        "csq_gnomadg_an-fin": 10626,
+        "csq_gnomadg_an-mid": 316,
+        "csq_gnomadg_an-nfe": 68042,
+        "csq_gnomadg_an-oth": 2094,
+        "csq_gnomadg_an-sas": 4832,
+        "csq_gnomadg_nhomalt": 1,
+        "csq_gnomadg_af_popmax": 0.00500192,
+        "csq_gnomadg_nhomalt-xx": 1,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 1,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": 49,
+        "csq_spliceai_pred_dp_al": -37,
+        "csq_spliceai_pred_dp_dg": -13,
+        "csq_spliceai_pred_dp_dl": 32,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "GABRD",
+        "csq_phylop30way_mammalian": -3.49499988555908,
+        "csq_phylop100way_vertebrate": -0.352999985218048,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "4af362a4-4f7f-4ad9-9c80-bf1f94bc143f"
+    },
+    {
+        "ID": "rs876658855",
+        "ALT": "CTTA",
+        "POS": 23630011,
+        "REF": "C",
+        "CHROM": "16",
+        "genes": [
+            {
+                "genes_most_severe_gene": "bc52317e-b10e-4a0a-9deb-553ea63b3b2b",
+                "genes_most_severe_hgvsc": "ENST00000261584.9:c.2142_2143insTAA",
+                "genes_most_severe_hgvsp": "ENSP00000261584.4:p.Asp714_Asp715insTer",
+                "genes_most_severe_transcript": "ENST00000261584",
+                "genes_most_severe_amino_acids": "-/*",
+                "genes_most_severe_consequence": "134ab0cf-a463-4d47-ae2d-a10c828bd48b",
+                "genes_most_severe_feature_ncbi": "NM_024675.4"
+            }
+        ],
+        "hgvsg": "NC_000016.10:g.23630011_23630012insTTA",
+        "status": "shared",
+        "project": "hms-dbmi",
+        "hg19_chr": "16",
+        "hg19_pos": 23641332,
+        "hg19": [
+            {
+                "hg19_pos": 23641332,
+                "hg19_chrom": "chr16",
+                "hg19_hgvsg": "NC_000016.10:g.23630011_23630012insTTA"
+            }
+        ],
+        "transcript": [
+            {
+                "csq_ccds": "CCDS32406.1",
+                "csq_ensp": "ENSP00000261584",
+                "csq_exon": "5/13",
+                "csq_gene": "bc52317e-b10e-4a0a-9deb-553ea63b3b2b",
+                "csq_mane": "NM_024675.4",
+                "csq_hgvsc": "ENST00000261584.9:c.2142_2143insTAA",
+                "csq_hgvsp": "ENSP00000261584.4:p.Asp714_Asp715insTer",
+                "csq_codons": "-/TAA",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR14662"
+                ],
+                "csq_feature": "ENST00000261584",
+                "csq_uniparc": "UPI000000DA86",
+                "csq_canonical": true,
+                "csq_swissprot": "Q86YC2",
+                "csq_amino_acids": "-/*",
+                "csq_consequence": [
+                    "134ab0cf-a463-4d47-ae2d-a10c828bd48b",
+                    "6020d169-f6b5-4317-8518-5576233e77c4"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "2142-2143",
+                "csq_cdna_position": "2295-2296",
+                "csq_protein_position": "714-715"
+            },
+            {
+                "csq_ensp": "ENSP00000459882",
+                "csq_gene": "bc52317e-b10e-4a0a-9deb-553ea63b3b2b",
+                "csq_hgvsc": "ENST00000565038.1:c.87-737_87-736insTAA",
+                "csq_intron": "1/3",
+                "csq_strand": true,
+                "csq_trembl": "I3L2S5",
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000565038",
+                "csq_uniparc": "UPI00025A2FB8",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "4507ceb2-f76e-441c-9d66-3eb22bb04095"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000454703",
+                "csq_exon": "5/13",
+                "csq_gene": "bc52317e-b10e-4a0a-9deb-553ea63b3b2b",
+                "csq_hgvsc": "ENST00000568219.5:c.1257_1258insTAA",
+                "csq_hgvsp": "ENSP00000454703.2:p.Asp419_Asp420insTer",
+                "csq_codons": "-/TAA",
+                "csq_strand": true,
+                "csq_trembl": "H3BN63",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR14662"
+                ],
+                "csq_feature": "ENST00000568219",
+                "csq_uniparc": "UPI0000EE75DE",
+                "csq_amino_acids": "-/*",
+                "csq_consequence": [
+                    "134ab0cf-a463-4d47-ae2d-a10c828bd48b",
+                    "6020d169-f6b5-4317-8518-5576233e77c4"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "1257-1258",
+                "csq_cdna_position": "2253-2254",
+                "csq_protein_position": "419-420"
+            }
+        ],
+        "csq_clinvar": "230941",
+        "institution": "hms-dbmi",
+        "variantClass": "INS",
+        "annotation_id": "chr16:23630011C_CTTA",
+        "spliceaiMaxds": 0,
+        "csq_clinvar_mc": [
+            "SO:0001587",
+            "nonsense"
+        ],
+        "csq_clinvar_clndn": [
+            "Hereditary_cancer-predisposing_syndrome"
+        ],
+        "csq_clinvar_clnvc": "Insertion",
+        "csq_clinvar_clnsig": "Pathogenic",
+        "csq_clinvar_origin": 1,
+        "csq_clinvar_clnvcso": "SO:0000667",
+        "csq_clinvar_clndisdb": [
+            "MONDO:MONDO:0015356",
+            "MedGen:C0027672",
+            "Orphanet:ORPHA140162",
+            "SNOMED_CT:699346009"
+        ],
+        "csq_clinvar_geneinfo": [
+            "PALB2:79728"
+        ],
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_single_submitter"
+        ],
+        "uuid": "09ed6e03-b770-4d09-9d71-32dc199c76a3"
     }
 ]

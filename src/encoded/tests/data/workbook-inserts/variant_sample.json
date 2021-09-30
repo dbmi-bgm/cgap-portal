@@ -22,5 +22,81 @@
         "file": "GAPFIZ654321",
         "CALL_INFO": "SomeString",
         "uuid": "421d9db2-b98a-4e8c-9b0f-addb6bdb0b15"
+    },
+    {
+        "AD": "10,10",
+        "DP": 20,
+        "FS": 6.249,
+        "GQ": 99,
+        "GT": "0/1",
+        "PL": "288,0,277",
+        "QUAL": 688.12,
+        "file": "GAPFI3EBH4X2",
+        "status": "in review",
+        "project": "cgap-core",
+        "variant": "4af362a4-4f7f-4ad9-9c80-bf1f94bc143f",
+        "CALL_INFO": "SAM10254-S1",
+        "samplegeno": [
+            {
+                "samplegeno_ac": 1,
+                "samplegeno_ad": "10/10",
+                "samplegeno_gt": "G/A",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "SAM10254-S1"
+            }
+        ],
+        "institution": "hms-dbmi",
+        "annotation_id": "SAM10254-S1:4af362a4-4f7f-4ad9-9c80-bf1f94bc143f:GAPFI3EBH4X2",
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "SAM10254-S1"
+            }
+        ],
+        "inheritance_modes": [],
+        "uuid": "e43be20e-5dda-4db2-bb23-8c103323fc0f"
+    },
+    {
+        "AD": "18,12",
+        "DP": 30,
+        "FS": 0,
+        "GQ": 24,
+        "GT": "0/1",
+        "PL": "24,0,206",
+        "QUAL": 261.94,
+        "file": "GAPFI3EBH4X2",
+        "status": "shared",
+        "project": "cgap-core",
+        "variant": "09ed6e03-b770-4d09-9d71-32dc199c76a3",
+        "CALL_INFO": "SAM10254-S1",
+        "samplegeno": [
+            {
+                "samplegeno_ac": 1,
+                "samplegeno_ad": "18/12",
+                "samplegeno_gt": "C/CTTA",
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "SAM10254-S1"
+            }
+        ],
+        "institution": "hms-dbmi",
+        "annotation_id": "SAM10254-S1:09ed6e03-b770-4d09-9d71-32dc199c76a3:GAPFI3EBH4X2",
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "SAM10254-S1"
+            }
+        ],
+        "inheritance_modes": [],
+        "uuid": "d62836a0-2de3-4970-bf14-eba3ca758a82"
     }
 ]

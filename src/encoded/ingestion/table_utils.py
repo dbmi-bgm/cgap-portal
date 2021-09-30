@@ -87,7 +87,7 @@ class VariantTableParser(object):
         """
         for field, f in self.EMBEDS_TO_GENERATE:
             with io.open(f, 'w+') as fd:
-                json.dump({field: {}}, fd)
+                json.dump({field: {}}, fd, indent=4)
 
     def read_mp_meta(self):
         """ Reads mapping table from file given to class. First 3 rows of the mapping
@@ -200,7 +200,7 @@ class VariantTableParser(object):
                     else:
                         embeds[t][link_type].append(prefix + item[self.NAME_FIELD])
                 with io.open(f, 'w+') as wfd:
-                    json.dump(embeds, wfd)
+                    json.dump(embeds, wfd, indent=4)
                     wfd.write('\n')  # write newline at EOF
 
     @staticmethod
@@ -1218,7 +1218,7 @@ class StructuralVariantTableParser(VariantTableParser):
         for field, f in self.EMBEDS_TO_GENERATE:
             field = "structural_" + field
             with open(f, 'w+') as fd:
-                json.dump({field: {}}, fd)
+                json.dump({field: {}}, fd, indent=4)
 
     def update_embeds(self, item, scope):
         """ 
@@ -1246,7 +1246,7 @@ class StructuralVariantTableParser(VariantTableParser):
                     else:
                         embeds[t][link_type].append(prefix + item[self.NAME_FIELD])
                 with open(f, 'w+') as wfd:
-                    json.dump(embeds, wfd)
+                    json.dump(embeds, wfd, indent=4)
                     wfd.write('\n')  # write newline at EOF
 
 

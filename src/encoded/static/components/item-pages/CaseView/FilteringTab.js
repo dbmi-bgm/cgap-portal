@@ -3,10 +3,12 @@
 import React, { useMemo, useCallback } from 'react';
 import queryString from 'query-string';
 
-import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
-import { FilteringTableFilterSetUI, FilterSetController, SaveFilterSetButtonController, SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI';
+import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
+import { SaveFilterSetButtonController } from './SaveFilterSetButton';
+import { SaveFilterSetPresetButtonController } from './SaveFilterSetPresetButton';
 import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
@@ -195,7 +197,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         }
         // Else nothing -- is expected; perhaps user got logged out during
         // navigation or loading something else and hasn't refreshed page yet.
-    });
+    }, [ session ]);
 
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
