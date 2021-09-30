@@ -80,7 +80,7 @@
             "type": "number"
         },
         "sex": {
-            "title": "Sex",
+            "title": "Sex (user-submitted)",
             "type": "string",
             "enum": [
                 "M",
@@ -555,7 +555,7 @@
             "title": "Life Status"
         },
         "sex": {
-            "title": "Sex"
+            "title": "Sex (user-submitted)"
         },
         "birth_year": {
             "title": "Birth Year",

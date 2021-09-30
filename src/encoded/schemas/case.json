@@ -158,7 +158,7 @@
             "order": 3
         },
         "individual.sex": {
-            "title": "Sex",
+            "title": "Proband Sex (user-submitted)",
             "grouping": "Individual",
             "order": 4
         },
