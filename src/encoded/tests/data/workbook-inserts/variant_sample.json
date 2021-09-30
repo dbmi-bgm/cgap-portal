@@ -59,7 +59,8 @@
             }
         ],
         "inheritance_modes": [],
-        "uuid": "e43be20e-5dda-4db2-bb23-8c103323fc0f"
+        "uuid": "e43be20e-5dda-4db2-bb23-8c103323fc0f",
+        "date_created": "2021-09-20T00:00:00.000000+00:00"
     },
     {
         "AD": "18,12",
@@ -97,6 +98,7 @@
             }
         ],
         "inheritance_modes": [],
-        "uuid": "d62836a0-2de3-4970-bf14-eba3ca758a82"
+        "uuid": "d62836a0-2de3-4970-bf14-eba3ca758a82",
+        "date_created": "2021-09-21T00:00:00.000000+00:00"
     }
 ]
