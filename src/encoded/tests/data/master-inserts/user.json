@@ -148,17 +148,6 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab245628888"
     },
     {
-        "email": "eric_berg@hms.harvard.edu",
-        "first_name": "Eric",
-        "last_name": "Berg",
-        "uuid": "3f0052c9-218d-42e1-94bd-4319d0615681",
-        "groups": ["admin"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}],
-        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-    },
-    {
         "email": "jkrier@bwh.harvard.edu",
         "first_name": "Joel",
         "last_name": "Krier",
@@ -174,17 +163,6 @@
         "first_name": "Andy",
         "last_name": "Schroeder",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267227777",
-        "groups": ["admin"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}],
-        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-    },
-    {
-        "email": "koray_kirli@hms.harvard.edu",
-        "first_name": "Koray",
-        "last_name": "Kirli",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "groups": ["admin"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -344,6 +322,17 @@
         "first_name": "Phil",
         "last_name": "Grayson",
         "uuid": "3846c019-f2c7-4612-b9b1-9c1375e0c2c4",
+        "groups": ["admin"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
+        "email": "shannon_ehmsen@hms.harvard.edu",
+        "first_name": "Shannon",
+        "last_name": "Ehmsen",
+        "uuid": "c58ac2fe-fccb-4d21-992d-62a078c2dbc0",
         "groups": ["admin"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
