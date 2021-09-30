@@ -850,8 +850,8 @@ function FilteringTabTableToggle(props) {
         setCurrViewName("SNV");
     });
 
-    const onClickCNSNV = useCallback(function(e){
-        setCurrViewName("CNSNV");
+    const onClickCNVSV = useCallback(function(e){
+        setCurrViewName("CNVSV");
     });
 
     return (
@@ -860,7 +860,7 @@ function FilteringTabTableToggle(props) {
                 className={`mr-2 text-600  ${currentlyOnSNV ? "active ": (snvEnabled ? "clickable": "unclickable text-muted")}`}>
                 SNV Filtering
             </div>
-            <div onClick={currentlyOnSNV && svEnabled ? onClickCNSNV : null}
+            <div onClick={currentlyOnSNV && svEnabled ? onClickCNVSV : null}
                 className={`text-600 ${currentlyOnSV ? "active ": (svEnabled ? "clickable": "unclickable text-muted")}`}>
                 CNV / SV Filtering
             </div>
