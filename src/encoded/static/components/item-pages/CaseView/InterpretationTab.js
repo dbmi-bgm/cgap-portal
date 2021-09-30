@@ -1,12 +1,7 @@
 'use strict';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import queryString from 'query-string';
-import moment from 'moment';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
-import { variantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './../../browse/variantSampleColumnExtensionMap';
 import { VariantSampleSelection, VariantSampleSelectionList } from './VariantSampleSelection';
 
 
@@ -22,14 +17,32 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                     Interpretation
                 </h1>
                 <div>
-                    <button type="button" className="btn btn-primary" disabled>
-                        Export all selections as <span className="text-600">TSV spreadsheet</span>
-                    </button>
+                    <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem }} />
                 </div>
             </div>
             <div>
                 <VariantSampleSelectionList {...{ isLoadingVariantSampleListItem, variantSampleListItem, schemas, context }} />
             </div>
         </React.Fragment>
+    );
+});
+
+
+const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpretationSpreadsheetButton({ variantSampleListItem, context }) {
+    // const { accession: caseAccession } = context; // Case Item
+    const { "@id": atId, variant_samples: vsObjects = [] } = variantSampleListItem || {};
+    const baseHref = atId + "/@@spreadsheet/?file_format=";
+    return (
+        <DropdownButton variant="primary" disabled={vsObjects.length === 0} title="Export as...">
+            <a href={baseHref + "tsv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
+                <span className="text-600">TSV</span> spreadsheet
+            </a>
+            <a href={baseHref + "csv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
+                <span className="text-600">CSV</span> spreadsheet
+            </a>
+            <a href="#" className="dropdown-item disabled" target="_blank" rel="noopener noreferrer" role="button">
+                <span className="text-600">XLSX</span> spreadsheet
+            </a>
+        </DropdownButton>
     );
 });

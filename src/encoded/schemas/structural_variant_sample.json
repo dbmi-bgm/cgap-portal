@@ -219,6 +219,30 @@
                         "description": "Sample ID",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Sample ID)"
+                    },
+                    "samplegeno_quality": {
+                        "title": "Sample Genotype Quality",
+                        "field_name": "samplegeno_quality",
+                        "type": "integer",
+                        "do_import": true,
+                        "vcf_field": "GQ",
+                        "source_name": "VCF",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Sample Phred-scaled genotype quality",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype Quality"
+                    },
+                    "samplegeno_likelihood": {
+                        "title": "Sample Genotype Likelihoods (0/0, 0/1, 1/1)",
+                        "field_name": "samplegeno_likelihood",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "PL",
+                        "source_name": "VCF",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Sample normalized, Phred-scaled genotype likelihoods (0/0, 0/1, 1/1)",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype Likelihoods (0/0, 0/1, 1/1)"
                     }
                 }
             }
@@ -242,6 +266,10 @@
         "display_title": {
             "title": "Position",
             "order": 0
+        },
+        "structural_variant.cytoband_display": {
+            "title": "Cytoband",
+            "order": 10
         },
         "structural_variant.SV_TYPE": {
             "title": "Type",
@@ -380,18 +408,17 @@
         },
         "structural_variant.transcript.csq_consequence.display_title": {
             "title": "Consequence",
-            "order": 50
+            "order": 50,
+            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_consequence.html"
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
             "order": 55,
             "grouping": "Inheritance",
+            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode.html",
             "default_hidden": true,
             "rescue_terms": [
-                "de novo (strong)",
-                "de novo (medium)",
-                "de novo (weak)",
-                "de novo (chrXY)",
+                "Possibly de novo",
                 "Homozygous recessive",
                 "Loss of Heterozygosity",
                 "Dominant (maternal)",
@@ -401,7 +428,6 @@
                 "X-linked dominant (Paternal)",
                 "Y-linked dominant",
                 "Low relevance, homozygous in a parent",
-                "Low relevance, multiallelic site family",
                 "Low relevance, present in both parent(s)",
                 "Low relevance, missing call(s) in family",
                 "Low relevance, mismatching chrXY genotype(s)",
@@ -412,6 +438,7 @@
             "title": "Inheritance Modes",
             "order": 55,
             "grouping": "Inheritance",
+            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode_proband_only.html",
             "default_hidden": true,
             "rescue_terms": [
                 "X-linked",
