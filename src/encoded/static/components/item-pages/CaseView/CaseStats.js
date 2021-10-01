@@ -110,7 +110,7 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) 
                 <label className="mb-0">CGAP Individual ID:</label> { accession }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Sex (submitted):</label> { sex }
+                <label className="mb-0">Sex (Submitted):</label> { sex }
             </div>
             <div className="card-text mb-1">
                 <label className="mb-0">Age: </label> { age && age_units ? `${age} ${age_units}(s)` : fallbackElem }

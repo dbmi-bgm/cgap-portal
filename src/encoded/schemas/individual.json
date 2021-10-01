@@ -80,7 +80,7 @@
             "type": "number"
         },
         "sex": {
-            "title": "Sex (user-submitted)",
+            "title": "Sex (User-Submitted)",
             "type": "string",
             "enum": [
                 "M",
@@ -555,7 +555,7 @@
             "title": "Life Status"
         },
         "sex": {
-            "title": "Sex (user-submitted)"
+            "title": "Sex (User-Submitted)"
         },
         "birth_year": {
             "title": "Birth Year",
@@ -657,7 +657,7 @@
         },
         "sex": {
             "title": "Sex",
-            "description": "Gender of Individual",
+            "description": "Sex of Individual",
             "widthMap": {
                 "lg": 120,
                 "md": 100,
