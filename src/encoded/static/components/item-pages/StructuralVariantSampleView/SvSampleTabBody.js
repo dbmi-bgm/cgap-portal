@@ -69,19 +69,20 @@ function GenotypeQualityTable(props) {
 
     const rows = samplegeno.map((sg) => {
         const {
-            samplegeno_sex = fallbackElem,
             samplegeno_role = fallbackElem,
             samplegeno_numgt = fallbackElem,
-            samplegeno_sampleid = fallbackElem
+            samplegeno_sampleid = fallbackElem,
+            samplegeno_quality = fallbackElem,
+            samplegeno_likelihood = fallbackElem
         } = sg;
 
         return (
             <tr key={samplegeno_sampleid + samplegeno_role}>
-                <td className="text-capitalize text-left">{samplegeno_role}</td>
-                <td className="text-left">{samplegeno_sampleid}</td>
-                <td className="text-left">{samplegeno_numgt}</td>
-                <td className="text-left">{comingSoonElem}</td>
-                <td className="text-left">{comingSoonElem}</td>
+                <td className="text-capitalize text-left text-truncate">{samplegeno_role}</td>
+                <td className="text-left text-truncate">{samplegeno_sampleid}</td>
+                <td className="text-left text-truncate">{samplegeno_numgt}</td>
+                <td className="text-left text-truncate">{samplegeno_quality}</td>
+                <td className="text-left text-truncate">{samplegeno_likelihood}</td>
             </tr>
         );
     });
