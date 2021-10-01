@@ -1,1 +1,23 @@
-{"variant": {"embedded_field": ["transcript.csq_consequence.var_conseq_id", "transcript.csq_consequence.definition", "transcript.csq_consequence.impact", "transcript.csq_consequence.location", "transcript.csq_consequence.coding_effect", "transcript.csq_consequence.var_conseq_name", "transcript.csq_gene.gene_symbol", "transcript.csq_gene.ensgid", "genes.genes_most_severe_gene.s_het", "genes.genes_most_severe_gene.oe_mis", "genes.genes_most_severe_gene.oe_lof", "genes.genes_most_severe_gene.oe_lof_upper", "genes.genes_most_severe_consequence.display_title", "genes.genes_most_severe_consequence.impact", "genes.genes_most_severe_consequence.location", "genes.genes_most_severe_consequence.coding_effect", "genes.genes_most_severe_gene.gene_lists.display_title"]}}
+{
+    "variant": {
+        "embedded_field": [
+            "transcript.csq_consequence.var_conseq_id",
+            "transcript.csq_consequence.definition",
+            "transcript.csq_consequence.impact",
+            "transcript.csq_consequence.location",
+            "transcript.csq_consequence.coding_effect",
+            "transcript.csq_consequence.var_conseq_name",
+            "transcript.csq_gene.gene_symbol",
+            "transcript.csq_gene.ensgid",
+            "genes.genes_most_severe_gene.s_het",
+            "genes.genes_most_severe_gene.oe_mis",
+            "genes.genes_most_severe_gene.oe_lof",
+            "genes.genes_most_severe_gene.oe_lof_upper",
+            "genes.genes_most_severe_consequence.display_title",
+            "genes.genes_most_severe_consequence.impact",
+            "genes.genes_most_severe_consequence.location",
+            "genes.genes_most_severe_consequence.coding_effect",
+            "genes.genes_most_severe_gene.gene_lists.display_title"
+        ]
+    }
+}

@@ -178,7 +178,7 @@ build-docker-local:
 	docker-compose build
 
 build-docker-local-clean:
-	docker-compose build --no-cache BUILD_PATH=deploy/docker/local
+	docker-compose build --no-cache
 
 deploy-docker-local:
 	docker-compose up -V

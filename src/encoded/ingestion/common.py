@@ -3,6 +3,7 @@ common.py - tools common to various parts of ingestion
 """
 
 from .exceptions import MissingParameter, BadParameter
+from ..util import CONTENT_TYPE_SPECIAL_CASES
 
 
 def metadata_bundles_bucket(registry):
@@ -11,25 +12,7 @@ def metadata_bundles_bucket(registry):
 
 # ==================================================
 
-# IMPLEMENTATION NOTE:
-#
-#    We have middleware that overrides various details about content type that are declared in the view_config.
-#    It used to work by having a wired set of exceptions, but this facility allows us to do it in a more data-driven
-#    way. Really I think we should just rely on the information in the view_config, but I didn't have time to explore
-#    why we are not using that.
-#
-#    See validate_request_tween_factory in renderers.py for where this is used. This declaration info is here
-#    rather than there to simplify the load order dependencies.
-#
-#    -kmp 1-Sep-2020
 
-CONTENT_TYPE_SPECIAL_CASES = {
-    'application/x-www-form-urlencoded': [
-        # Single legacy special case to allow us to POST to metadata TSV requests via form submission.
-        # All other special case values should be added using register_path_content_type.
-        '/metadata/'
-    ]
-}
 CGAP_CORE_PROJECT = '/projects/cgap-core'
 CGAP_CORE_INSTITUTION = '/institutions/hms-dbmi/'
 

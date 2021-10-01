@@ -60,6 +60,7 @@ class SearchBuilder:
     RESCUE_TERMS = 'rescue_terms'  # special facet field that contains terms that should always have buckets
     DEBUG = 'debug'  # search debug parameter
     CARDINALITY_RANGE = '-3.4028E38-*'
+    PAGINATION_SIZE = 10  # for ECS, 10 is much better than 25, and may even do better when lowered
     MISSING = object()
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
@@ -137,7 +138,7 @@ class SearchBuilder:
         return self.forced_type.lower()
 
     @classmethod
-    def from_search(cls, context, request, s):
+    def from_search(cls, context, request, s, return_generator=False):
         """ Builds a SearchBuilder object with a pre-built search by skipping the bootstrap
             initialization and setting self.query directly.
 
@@ -146,7 +147,7 @@ class SearchBuilder:
         :param s: dictionary of lucene query
         :return: instance of this class with the search query dropped in
         """
-        search_builder_instance = cls(context, request, skip_bootstrap=True)  # bypass (most of) bootstrap
+        search_builder_instance = cls(context, request, return_generator=return_generator, skip_bootstrap=True)  # bypass (most of) bootstrap
         search_builder_instance.query = s  # parse compound query
         return search_builder_instance
 
@@ -364,14 +365,14 @@ class SearchBuilder:
         Fill from_ and size parameters for search if given in the query string
         """
         from_ = self.request.normalized_params.get('from', 0)
-        size = self.request.normalized_params.get('limit', 25)
+        size = self.request.normalized_params.get('limit', self.PAGINATION_SIZE)
         if size in ('all', ''):
             size = "all"
         else:
             try:
                 size = int(size)
             except ValueError:
-                size = 25
+                size = self.PAGINATION_SIZE
             try:
                 from_ = int(from_)
             except ValueError:

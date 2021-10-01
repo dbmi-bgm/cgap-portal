@@ -59,5 +59,28 @@
         "proband": "5ec91041-78a0-4758-abef-21c7f5fd9f22",
         "original_pedigree": "dcf15d5e-40aa-43bc-b81c-32c70c9afc52",
         "description": "This family been affected by a novel disease which can emerge at any age. The initial symptoms include gastrointestinal pains followed a few days later by appearance of a green tint in some extremities."
+    },
+    {
+        "title": "Orangethumb Family",
+        "status": "shared",
+        "aliases": [
+            "hms-dbmi:fam10254"
+        ],
+        "members": [
+            "5ec91041-78a0-4758-abef-21c7f5fd9f21",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f22",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f23",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f24",
+            "5ec91041-78a0-4758-abef-21c7f5fd9f25"
+        ],
+        "proband": "5ec91041-78a0-4758-abef-21c7f5fd9f22",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPFA9X3A8LE",
+        "family_id": "BRCA-001",
+        "timestamp": "2020-09-27T16:59:35.591661+00:00",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "pedigree_source": "Proband app 2.0.0",
+        "original_pedigree": "dcf15d5e-40aa-43bc-b81c-32c70c9afc52",
+        "uuid": "abd99160-49b5-459e-aded-22bdbdf2c1e9"
     }
 ]
