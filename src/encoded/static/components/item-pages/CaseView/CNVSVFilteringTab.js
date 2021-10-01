@@ -147,13 +147,9 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
                     const { align = 'left' } = props;
 
                     const rows = [
-                        <div className="d-block" key="gnomadAF"><span className="text-600">gnomAD: </span>{gnomadg_af !== null ? gnomadg_af: "-"}</div>
+                        <div className="d-block text-truncate" key="gnomadAF"><span className="text-600">gnomAD: </span>{gnomadg_af !== null ? gnomadg_af: "-"}</div>,
+                        <div className="d-block text-truncate" key="internal"><span className="text-600">Internal: </span>{unrelated_count !== null ? unrelated_count: "-"}</div>
                     ];
-
-                    if (unrelated_count !== null) {
-                        rows.push(<div className="d-block" key="internal"><span className="text-600">Internal: </span>{unrelated_count}</div>);
-                    }
-
                     return <StackedRowColumn {...{ rows }} className={"text-truncate text-" + align} />;
                 }
             },
