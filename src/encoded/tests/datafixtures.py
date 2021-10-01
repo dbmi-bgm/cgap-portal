@@ -1,35 +1,30 @@
-import pytest
-
 from uuid import uuid4
 
+import pytest
+import webtest
 
-ORDER = [
-    'user', 'project', 'institution', 'filter_set', 'nexus',
-    'file_format', 'variant_consequence', 'phenotype',
-    'cohort', 'family', 'individual', 'sample', 'workflow',
-    'access_key', 'disorder', 'document', 'file_fastq',
-    'file_processed', 'file_reference', 'gene', 'gene_list', 'sample_processing',
-    'case', 'report', 'page', 'quality_metric_fastqc', 'evidence_dis_pheno',
-    'quality_metric_bamcheck', 'quality_metric_qclist', 'quality_metric_wgs_bamqc',
-    'quality_metric_cmphet', 'quality_metric_vcfcheck', 'quality_metric_workflowrun',
-    'quality_metric_vcfqc', 'quality_metric_bamqc', 'quality_metric_peddyqc',
-    'software', 'static_section', 'tracking_item', 'workflow_mapping',
-    'workflow_run_awsem', 'workflow_run', 'annotation_field', 'variant_sample',
-    'variant', 'gene_annotation_field', 'gene', 'higlass_view_config',
-    'ingestion_submission',
-]
+from encoded.ingestion.common import CGAP_CORE_PROJECT
 
 
 class MockedLogger(object):
 
-    def info(self, msg):
+    def info(self, msg):  # noQA - for mock it doesn't matter it could be static
         print('INFO: ' + msg)
 
-    def warn(self, msg):
+    def warn(self, msg):  # noQA - for mock it doesn't matter it could be static
         print('WARNING: ' + msg)
 
-    def error(self, msg):
+    def error(self, msg):  # noQA - for mock it doesn't matter it could be static
         print('ERROR: ' + msg)
+
+
+def remote_user_testapp(app, remote_user):
+    '''Use this to generate testapp fixtures acting as different users'''
+    environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': str(remote_user),
+    }
+    return webtest.TestApp(app, environ)
 
 
 @pytest.fixture
@@ -46,14 +41,15 @@ def connection():
     }
 
 
-@pytest.fixture
-def wrangler_testapp(wrangler, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, wrangler['uuid'])
-
-
-@pytest.fixture
-def submitter_testapp(submitter, app, external_tx, zsa_savepoints):
-    return remote_user_testapp(app, submitter['uuid'])
+# I'm not even sure this is needed, but can debug that later. -kmp 2-Apr-2021
+def post_if_needed(testapp, item_type_url, item):
+    http_created = 201
+    http_conflict = 409
+    res = testapp.post_json(item_type_url, item, status=(http_created, http_conflict))
+    if res.status_code == http_conflict:
+        return testapp.get(item_type_url + '/' + item['name'] + '/').json
+    else:
+        return res.json['@graph'][0]
 
 
 @pytest.fixture
@@ -62,7 +58,8 @@ def project(testapp):
         'name': 'encode-project',
         'title': 'ENCODE Project'
     }
-    return testapp.post_json('/project', item).json['@graph'][0]
+    return post_if_needed(testapp, '/project', item)
+    # return testapp.post_json('/project', item).json['@graph'][0]
 
 
 @pytest.fixture
@@ -71,7 +68,8 @@ def institution(testapp):
         'name': 'encode-institution',
         'title': 'ENCODE Institution'
     }
-    return testapp.post_json('/institution', item).json['@graph'][0]
+    return post_if_needed(testapp, '/institution', item)
+    # return testapp.post_json('/institution', item).json['@graph'][0]
 
 
 @pytest.fixture
@@ -80,7 +78,8 @@ def another_institution(testapp):
         'name': 'encode-institution2',
         'title': 'ENCODE Institution 2'
     }
-    return testapp.post_json('/institution', item).json['@graph'][0]
+    return post_if_needed(testapp, '/institution', item)
+    # return testapp.post_json('/institution', item).json['@graph'][0]
 
 
 @pytest.fixture
@@ -113,7 +112,8 @@ def disorder(testapp):
         "uuid": "231111bc-8535-4448-903e-854af460b254",
         "disorder_name": "Dummy Disorder",
         "disorder_id": "DD1",
-        "comment": "This comment is to test oranges"
+        "comment": "This comment is to test oranges",
+        "status": "in review"
     }
     res = testapp.post_json('/disorder', item)
     return testapp.get(res.location).json
@@ -125,7 +125,6 @@ def submitter(testapp, institution, project):
         'first_name': 'ENCODE',
         'last_name': 'Submitter',
         'email': 'encode_submitter@example.org',
-        'submits_for': [institution['@id']],
         'status': "current"
     }
     # User @@object view has keys omitted.
@@ -134,10 +133,137 @@ def submitter(testapp, institution, project):
 
 
 @pytest.fixture
-def access_key(testapp, submitter):
+def bgm_project(testapp):
+    item = {
+        'name': 'bgm-project',
+        'title': 'BGM Project',
+        'description': 'Brigham Genomic Medicine'
+    }
+    return testapp.post_json('/project', item).json['@graph'][0]
+
+
+@pytest.fixture
+def bgm_user(testapp, institution, bgm_project):
+    item = {
+        'first_name': 'BGM',
+        'last_name': 'user',
+        'email': 'bgmuser@example.org',
+        # Does it break tests to add this? -kmp 9-Dec-2020
+        'user_institution': institution['name'],
+        'institution': institution['name'],
+        'project_roles': [
+            {
+                'project': bgm_project['@id'],
+                'role': 'project_member'  # XXX: you probably want this
+            }
+        ],
+        'project': bgm_project['@id'],
+        'status': 'current'
+    }
+    # User @@object view has keys omitted.
+    res = testapp.post_json('/user', item)
+    return testapp.get(res.location).json
+
+
+@pytest.fixture
+def bgm_user_testapp(bgm_user, app, external_tx, zsa_savepoints):
+    '''TODO: maybe bring in more permissions-related fixtures into here'''
+    return remote_user_testapp(app, bgm_user['uuid'])
+
+@pytest.fixture
+def bgm_variant(bgm_user_testapp, bgm_project, institution):
+    '''Same thing as workbook inserts, but different project stuff'''
+    item = {
+        'project': bgm_project['@id'],
+        'institution': institution["name"],
+        # We do not supply an explicit UUID here anymore because it says we need "permission restricted items"
+        # Might be some other way of getting it in here, but idk nor have time to rly explore atm.
+        # "uuid": "f6aef055-4c88-4a3e-a306-d37a71535d8b",
+        "ID": "rs564328546",
+        "ALT": "T",
+        "POS": 12125898,
+        "REF": "TG",
+        "hg19": [
+        {
+            "hg19_pos": 12185955,
+            "hg19_chrom": "chr1",
+            "hg19_hgvsg": "NC_000001.11:g.12185956del"
+        }
+        ],
+        "CHROM": "1"
+    }
+    return bgm_user_testapp.post_json('/variants', item).json['@graph'][0]
+
+@pytest.fixture
+def bgm_test_variant_sample(bgm_variant, institution, bgm_project):
+    # IS NOT pre-POSTed into DB.
+    return {
+        'variant': bgm_variant['@id'],
+        'AD': '1,3',
+        'CALL_INFO': 'my_test_sample',
+        'file': 'dummy-file-name',
+        'project': bgm_project['@id'],
+        'institution': institution['@id']
+    }
+
+@pytest.fixture
+def access_key(testapp, bgm_user):
     description = 'My programmatic key'
     item = {
-        'user': submitter['@id'],
+        'user': bgm_user['@id'],
+        'description': description,
+    }
+    res = testapp.post_json('/access_key', item)
+    result = res.json['@graph'][0].copy()
+    result['secret_access_key'] = res.json['secret_access_key']
+    return result
+
+
+@pytest.fixture
+def bgm_access_key(access_key):
+    # An alias for access_key, useful for emphasis to compare to non_bgm_access_key
+    return access_key
+
+
+
+@pytest.fixture
+def non_bgm_project(testapp):
+    item = {
+        'name': 'not-bgm-project',
+        'title': 'Not BGM Project',
+        'description': 'Not Brigham Genomic Medicine'
+    }
+    return testapp.post_json('/project', item).json['@graph'][0]
+
+
+@pytest.fixture
+def non_bgm_user(testapp, institution, non_bgm_project):
+    item = {
+        'first_name': 'Not-BGM',
+        'last_name': 'user',
+        'email': 'notbgmuser@example.org',
+        # Whether we have 'user_institution' should depend on whether bgm_user does. -kmp 9-Dec-2020
+        'user_institution': institution['name'],  # bgm_project and non_bgm_project are both at same user_institution
+        'institution': institution['name'],  # bgm_project and non_bgm_project are both at same institution
+        'project_roles': [
+            {
+                'project': non_bgm_project['@id'],
+                'role': 'project_member'  # XXX: you probably want this
+            }
+        ],
+        'project': non_bgm_project['@id'],
+        'status': 'current'
+    }
+    # User @@object view has keys omitted.
+    res = testapp.post_json('/user', item)
+    return testapp.get(res.location).json
+
+
+@pytest.fixture
+def non_bgm_access_key(testapp, non_bgm_user):
+    description = 'My non-BGM programmatic key'
+    item = {
+        'user': non_bgm_user['@id'],
         'description': description,
     }
     res = testapp.post_json('/access_key', item)
@@ -154,7 +280,7 @@ def female_individual_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_001",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -166,7 +292,7 @@ def grandpa_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_002",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -178,7 +304,7 @@ def mother_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_003",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -190,7 +316,7 @@ def father_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_004",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -202,19 +328,32 @@ def uncle_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_005",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
 
 @pytest.fixture
-def child_sample(testapp, project, institution):
+def proband_processed_file(testapp, project, institution, file_formats):
+    """Add a bam file to test the samples_pedigree"""
+    item = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'file_format': file_formats.get('bam').get('uuid'),
+        'filename': 'test_proband_file.bam'
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
+
+
+@pytest.fixture
+def child_sample(testapp, project, institution, proband_processed_file):
     item = {
         "accession": "GAPSAPROBAND",
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_006",
-        "status": "released"
+        "status": "shared",
+        "processed_files": [proband_processed_file['@id'], ]
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -226,7 +365,7 @@ def cousin_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_007",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -238,7 +377,7 @@ def sister_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_008",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -250,7 +389,7 @@ def brother_sample(testapp, project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         "bam_sample_id": "ext_id_009",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -266,7 +405,7 @@ def female_individual(testapp, project, institution, female_individual_sample):
         'project': project['@id'],
         'institution': institution['@id'],
         "sex": "F",
-        "status": "released"
+        "status": "shared"
         # "uuid": "44d24e3f-bc5b-469a-8500-7ebd728f8ed5"
     }
     return testapp.post_json('/individual', item).json['@graph'][0]
@@ -282,7 +421,7 @@ def grandpa(testapp, project, institution, grandpa_sample):
         'project': project['@id'],
         'institution': institution['@id'],
         "sex": "M",
-        "status": "released"
+        "status": "shared"
     }
     return testapp.post_json('/individual', item).json['@graph'][0]
 
@@ -533,6 +672,18 @@ def a_case(project, institution, child, sample_proc):
     }
 
 
+@pytest.fixture  # NOTE: variant_sample is unused in workbook so this is ok, later on there should be default inserts
+def test_variant_sample():
+    return {
+        'variant': 'f6aef055-4c88-4a3e-a306-d37a71535d8b',
+        'AD': '1,3',
+        'CALL_INFO': 'my_test_sample',
+        'file': 'dummy-file-name',
+        'project': 'hms-dbmi',
+        'institution': 'hms-dbmi'
+    }
+
+
 @pytest.fixture
 def protocol_data(institution, project):
     return {'description': 'A Protocol',
@@ -659,6 +810,7 @@ def file_vcf(testapp, institution, project, file_formats):
         'institution': institution['@id'],
         'project': project['@id'],
         'status': 'uploaded',  # avoid s3 upload codepath
+        'file_type': 'full annotated VCF',
     }
     return testapp.post_json('/file_processed', item).json['@graph'][0]
 
@@ -797,9 +949,11 @@ def workflow_mapping(testapp, workflow_bam, institution, project):
         "data_input_type": "experiment",
         'institution': institution['@id'],
         'project': project['@id'],
-        "workflow_parameters": [
-            {"parameter": "bowtie_index", "value": "some value"}
-        ],
+        # TODO: This value of "workflow_parameters" is duplicated and should be removed or merged with the other.
+        #       Probably only the second value is being used right now. - Will and Kent 17-Dec-2020
+        # "workflow_parameters": [
+        #    {"parameter": "bowtie_index", "value": "some value"}
+        # ],
         "experiment_parameters": [
             {"parameter": "biosample.biosource.individual.organism", "value": "mouse"}
         ],
@@ -808,11 +962,6 @@ def workflow_mapping(testapp, workflow_bam, institution, project):
         ]
     }
     return testapp.post_json('/workflow_mapping', item).json['@graph'][0]
-
-
-@pytest.fixture
-def gene_item(testapp, institution, project):
-    return testapp.post_json('/gene', {'institution': institution['@id'], 'project': project['@id'], 'geneid': '5885'}).json['@graph'][0]
 
 
 @pytest.fixture
@@ -830,25 +979,25 @@ def rel_disorders():
     return [
         {
             'disorder_id': 'MONDO:0400005',
-            'status': 'released',
+            'status': 'shared',
             'disorder_name': 'refeeding syndrome',
             'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0400005',
         },
         {
             'disorder_id': 'MONDO:0400004',
-            'status': 'released',
+            'status': 'shared',
             'disorder_name': 'phrynoderma',
             'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0400004',
         },
         {
             'disorder_id': 'MONDO:0300000',
-            'status': 'released',
+            'status': 'shared',
             'disorder_name': 'SSR3-CDG',
             'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0300000',
         },
         {
             'disorder_id': 'MONDO:0200000',
-            'status': 'released',
+            'status': 'shared',
             'disorder_name': 'uterine ligament adenosarcoma',
             'disorder_url': 'http://purl.obolibrary.org/obo/MONDO_0200000'
         }
@@ -878,27 +1027,27 @@ def phenotypes():
     return [
         {
             'hpo_id': 'HP:0001507',
-            'status': 'released',
+            'status': 'shared',
             'phenotype_name': 'growth abnormality',
             'hpo_url': 'http://purl.obolibrary.org/obo/HP_00001507',
             'is_slim_for': 'Phenotype abnormality'
         },
         {
             'hpo_id': 'HP:0040064',
-            'status': 'released',
+            'status': 'shared',
             'phenotype_name': 'Abnormality of limbs',
             'hpo_url': 'http://purl.obolibrary.org/obo/HP_0040064',
             'is_slim_for': 'Phenotype abnormality'
         },
         {
             'hpo_id': 'HP:3000008',
-            'status': 'released',
+            'status': 'shared',
             'phenotype_name': 'Abnormality of mylohyoid muscle',
             'hpo_url': 'http://purl.obolibrary.org/obo/HP_3000008'
         },
         {
             'hpo_id': 'HP:0010708',
-            'status': 'released',
+            'status': 'shared',
             'phenotype_name': '1-5 finger syndactyly',
             'hpo_url': 'http://purl.obolibrary.org/obo/HP_0010708'
         }
@@ -992,3 +1141,282 @@ def embedded_item_dict():
             }
         ]
     }
+
+
+@pytest.fixture
+def cgap_core_project(testapp):
+    item = {
+        "name": CGAP_CORE_PROJECT.split("/")[-1],
+        "title": "cgap core",
+        "description": "The CGAP core project",
+    }
+    return testapp.post_json("/project", item).json["@graph"][0]
+
+
+@pytest.fixture
+def gene(testapp, project, institution):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "gene_symbol": "APC",
+        "ensgid": "ENSG00000001111",
+    }
+    return testapp.post_json("/gene", item).json["@graph"][0]
+
+
+@pytest.fixture
+def gene_2(testapp, project, institution):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "gene_symbol": "FBN1",
+        "ensgid": "ENSG00000002222",
+    }
+    return testapp.post_json("/gene", item).json["@graph"][0]
+
+
+@pytest.fixture
+def cgap_core_genelist(testapp, cgap_core_project, institution, gene):
+    item = {
+        "project": cgap_core_project["@id"],
+        "institution": institution["@id"],
+        "title": "CGAP Core gene list",
+        "genes": [gene["@id"]],
+    }
+    return testapp.post_json("/gene-lists", item).json["@graph"][0]
+
+
+@pytest.fixture
+def bgm_genelist(testapp, bgm_project, institution, gene):
+    item = {
+        "project": bgm_project["@id"],
+        "institution": institution["@id"],
+        "title": "BGM gene list",
+        "genes": [gene["@id"]],
+    }
+    return testapp.post_json("/gene-lists", item).json["@graph"][0]
+
+
+@pytest.fixture
+def genelist(testapp, project, institution, gene):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "title": "Simple gene list",
+        "genes": [gene["@id"]],
+    }
+    return testapp.post_json("/gene-lists", item).json["@graph"][0]
+
+
+@pytest.fixture
+def genelist_to_post(testapp, project, institution, gene_2):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "title": "Simple gene list",
+        "genes": [gene_2["@id"]],
+    }
+    return item
+
+
+@pytest.fixture
+def variant(testapp, project, institution, gene):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "1",
+        "REF": "A",
+        "ALT": "C",
+        "POS": 12345,
+        "genes": [{"genes_most_severe_gene": gene["@id"]}],
+    }
+    return testapp.post_json("/variant", item).json["@graph"][0]
+
+
+@pytest.fixture
+def variant_2(testapp, project, institution, gene_2):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "2",
+        "REF": "T",
+        "ALT": "G",
+        "POS": 45678,
+        "genes": [{"genes_most_severe_gene": gene_2["@id"]}],
+    }
+    return testapp.post_json("/variant", item).json["@graph"][0]
+
+
+@pytest.fixture
+def variant_sample(project, institution, variant):
+    """
+    This item is not pre-posted to database so gene list association with
+    variant samples can be tested (due to longer process of associating variant
+    samples with gene lists when the latter is posted after the former).
+    """
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "variant": variant["@id"],
+        "CALL_INFO": "some_sample",
+        "file": "some_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def variant_sample_2(project, institution, variant_2):
+    """
+    This item is not pre-posted to database so gene list association with
+    variant samples can be tested (due to longer process of associating variant
+    samples with gene lists when the latter is posted after the former).
+    """
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "variant": variant_2["@id"],
+        "CALL_INFO": "some_sample",
+        "file": "some_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def cgap_core_variant_sample(cgap_core_project, institution, variant):
+    """
+    This item is not pre-posted to database so gene list association with
+    variant samples can be tested (due to longer process of associating variant
+    samples with gene lists when the latter is posted after the former).
+    """
+    item = {
+        "project": cgap_core_project["@id"],
+        "institution": institution["@id"],
+        "variant": variant["@id"],
+        "CALL_INFO": "some_cgap_core_sample",
+        "file": "some_cgap_core_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def bgm_variant_sample(bgm_project, institution, variant):
+    """
+    This item is not pre-posted to database so gene list association with
+    variant samples can be tested (due to longer process of associating variant
+    samples with gene lists when the latter is posted after the former).
+    """
+    item = {
+        "project": bgm_project["@id"],
+        "institution": institution["@id"],
+        "variant": variant["@id"],
+        "CALL_INFO": "some_bgm_sample",
+        "file": "some_bgm_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def variant_sample_list(
+    testapp, variant_sample, variant_sample_2, genelist, project, institution
+):
+    vs_1 = testapp.post_json(
+        "/variant-samples", variant_sample, status=201
+    ).json["@graph"][0]
+    vs_2 = testapp.post_json(
+        "/variant-samples", variant_sample_2, status=201
+    ).json["@graph"][0]
+    vs_list = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "variant_samples": [
+            {"variant_sample_item": vs_1["@id"]},
+            {"variant_sample_item": vs_2["@id"]},
+        ],
+        "created_for_case": "GAPCAK111111",
+    }
+    response = testapp.post_json(
+        "/variant-sample-lists", vs_list, status=201
+    ).json["@graph"][0]
+    return response
+
+
+@pytest.fixture
+def structural_variant(testapp, project, institution, gene):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "1",
+        "START": 1000,
+        "END": 2000,
+        "SV_TYPE": "DEL",
+        "transcript": [{"csq_gene": gene["@id"]}],
+    }
+    return testapp.post_json("/structural_variant", item).json["@graph"][0]
+
+
+@pytest.fixture
+def structural_variant_2(testapp, project, institution, gene_2):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "3",
+        "START": 34500,
+        "END": 56000,
+        "SV_TYPE": "DUP",
+        "transcript": [{"csq_gene": gene_2["@id"]}],
+    }
+    return testapp.post_json("/structural_variant", item).json["@graph"][0]
+
+
+@pytest.fixture
+def structural_variant_sample(project, institution, structural_variant):
+    """This item is not pre-posted to database."""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "structural_variant": structural_variant["@id"],
+        "CALL_INFO": "some_sample",
+        "file": "some_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def structural_variant_sample_2(project, institution, structural_variant_2):
+    """This item is not pre-posted to database."""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "structural_variant": structural_variant_2["@id"],
+        "CALL_INFO": "some_sample",
+        "file": "some_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def cgap_core_structural_variant_sample(
+    cgap_core_project, institution, structural_variant
+):
+    """This item is not pre-posted to database."""
+    item = {
+        "project": cgap_core_project["@id"],
+        "institution": institution["@id"],
+        "structural_variant": structural_variant["@id"],
+        "CALL_INFO": "some_cgap_core_sample",
+        "file": "some_cgap_core_vcf_file",
+    }
+    return item
+
+
+@pytest.fixture
+def bgm_structural_variant_sample(bgm_project, institution, structural_variant):
+    """This item is not pre-posted to database."""
+    item = {
+        "project": bgm_project["@id"],
+        "institution": institution["@id"],
+        "structural_variant": structural_variant["@id"],
+        "CALL_INFO": "some_bgm_sample",
+        "file": "some_bgm_vcf_file",
+    }
+    return item

@@ -1,203 +1,16 @@
 'use strict';
 
-import React, { useState, useMemo } from 'react';
-import _ from 'underscore';
-import url from 'url';
+import React, { useMemo, useCallback } from 'react';
 import queryString from 'query-string';
 
-import { console, layout, navigate, ajax, itemUtil } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-
-import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
-import { DisplayTitleColumnWrapper, DisplayTitleColumnDefault } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
-const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ hgvsc }){
-    // Memoized on the 1 prop it receives which is dependency for its calculation.
-    const hgvscSplit = hgvsc.split(":");
-    const pSplit = hgvscSplit[1].split(".");
-    // Will add hgvsp when added in data/backend
-    const rows = [<div key="genes_severe_transcript"><span className="text-600">{ pSplit[0] }.</span><span>{ pSplit[1] }</span></div>];
-    return <StackedRowColumn rowKey="genes_hgvsc" className="align-items-center" {...{ rows }} />;
-});
-
-function CaseViewEmbeddedVariantSampleSearchTable(props){
-    const {
-        columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap, // Get/reuse default colExtMap from EmbeddedItemSearchTable
-        // onSelectVariant, // `onSelectVariant` theoretically passed down from FilteringTab or something; will perform AJAX request + update selected variantsample state.
-        ...passProps
-    } = props;
-
-    // Will use this method to inject modal open fx when Annotation/Interpretation spaces are moved to overlay
-    // const onSelectVariant = function(e) {
-    //     e.preventDefault();
-    //     console.log("thing happened, e", e);
-    // };
-    const columnExtensionMap = useMemo(function() {
-        // Generates new object `columnExtensionMap` only if `originalColExtMap` changes (if ever)
-        return {
-            ...originalColExtMap, // Copy in existing vals but overwrite display_title.render
-            "display_title" : {
-                ...originalColExtMap.display_title,
-                render: function(result, parentProps){
-                    const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-                    return (
-                        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <SelectableTitle />
-                        </DisplayTitleColumnWrapper>
-                    );
-                }
-            },
-            // TODO? We could potentially move some of these definitions into EmbeddedItemSearchTable.defaultProps.columnExtensionMap
-            "DP" : { // Coverage, VAF column
-                render: function(result, props) {
-                    const { DP = null, AF = null } = result;
-                    const rows = [
-                        <span key="DP">{DP || "-"}</span>,
-                        <span key="AF">{AF || "-"}</span>
-                    ];
-                    return <StackedRowColumn rowKey="Coverage, AF Row" className="align-items-center" {...{ rows }}/>;
-                }
-            },
-            "associated_genotype_labels.proband_genotype_label" : { // Genotype column
-                widthMap: { 'lg' : 280, 'md' : 250, 'sm' : 200 },
-                render: function(result, props) {
-                    const { associated_genotype_labels : { proband_genotype_label = null, mother_genotype_label = null, father_genotype_label = null } = {} } = result;
-                    const rows = [];
-                    if (proband_genotype_label) {
-                        rows.push(<div key="proband_gt"><span className="font-italic">Proband: </span>{proband_genotype_label}</div>);
-                    } else {
-                        return null;
-                    }
-                    if (mother_genotype_label) {
-                        rows.push(<div key="mother_gt"><span className="font-italic">Mother: </span>{mother_genotype_label || "-"}</div>);
-                    }
-                    if (father_genotype_label) {
-                        rows.push(<div key="father_gt"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
-                    }
-                    return <StackedRowColumn rowKey="genotype" className="align-items-center" {...{ rows }}/>;
-                }
-            },
-            "variant.genes.genes_ensg.display_title": { // Gene Transcript column
-                render: function(result, props) {
-                    const { variant : { genes : [firstGene = null] = [] } = {} } = result;
-                    const { genes_ensg: { display_title = null } = {}, genes_most_severe_transcript = null } = firstGene || {};
-
-                    if (firstGene) {
-                        const rows = [
-                            <span key="genes_ensg" className="font-italic">{ display_title} </span>,
-                            <span key="genes_severe_transcript" className="font-italic">{ genes_most_severe_transcript}</span>
-                        ];
-                        return <StackedRowColumn rowKey="genes_data" className="align-items-center" {...{ rows }} />;
-                    }
-                    return null;
-                }
-            },
-            "variant.genes.genes_most_severe_hgvsc": { // Variant column
-                render: function(result, props) {
-                    const { variant : { genes : [firstGene = null] = [] } = {} } = result;
-                    const { genes_most_severe_hgvsc = null } = firstGene || {};
-
-                    if (firstGene && genes_most_severe_hgvsc) {
-                        return <GenesMostSevereHGVSCColumn hgvsc={genes_most_severe_hgvsc} />;
-                    }
-                    return null;
-                }
-            },
-            "variant.genes.genes_most_severe_consequence.coding_effect": { // Coding Effect column
-                render: function(result, props) {
-                    const { variant : { genes : [firstGene = null] = [] } = {} } = result;
-                    const { genes_most_severe_consequence : { coding_effect = null } = {} } = firstGene || {};
-
-                    if (firstGene && coding_effect) {
-                        return <StackedRowColumn rowKey="genes_codingeffect" className="align-items-center" rows={[coding_effect]} />;
-                    }
-                    return null;
-                }
-            },
-            "variant.gnomad_af": { // Gnomad column
-                render: function(result, props){
-                    const { variant : { gnomad_af = null, max_pop_af_af_popmax = null } = {} } = result;
-                    const rows = [];
-
-                    if (!gnomad_af && !max_pop_af_af_popmax) {
-                        return null;
-                    }
-                    if (gnomad_af) {
-                        rows.push(<div key="gnomad_af"><span className="text-600">ALL: </span>{gnomad_af || "-"}</div>);
-                    }
-                    if (max_pop_af_af_popmax){
-                        rows.push(<div key="gnomad_af_popmax"><span className="text-600">MAX: </span>{max_pop_af_af_popmax || "-"}</div>);
-                    }
-                    return <StackedRowColumn rowKey="genes_gnomad" className="align-items-center" {...{ rows }}/>;
-                }
-            },
-            "variant.cadd_phred": { // Predictors column (cadd_phred, spliceai, phylop100)
-                render: function(result, props) {
-                    const { variant : { cadd_phred = null, spliceai_maxds = null, conservation_phylop100 = null } = {} } = result;
-                    const rows = [];
-
-                    if (!cadd_phred && !spliceai_maxds && !conservation_phylop100) {
-                        return null;
-                    }
-                    if (cadd_phred) {
-                        rows.push(<div key="cadd_phred"><span className="text-600">Cadd Phred: </span>{cadd_phred || "-"}</div>);
-                    }
-                    if (spliceai_maxds) {
-                        rows.push(<div key="spliceai_maxds"><span className="text-600">SpliceAI MaxDS: </span>{spliceai_maxds || "-"}</div>);
-                    }
-                    if (conservation_phylop100) {
-                        rows.push(<div key="phylop"><span className="text-600">PhyloP 100: </span>{conservation_phylop100 || "-"}</div>);
-                    }
-                    return <StackedRowColumn rowKey="genes_predictors" className="align-items-center" {...{ rows }}/>;
-                }
-            }
-        };
-    }, [ originalColExtMap ]);
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
-}
-
-function StackedRowColumn(props) {
-    const { rowKey = null, rows = [], className = null } = props;
-    const cls = ("w-100 d-flex flex-column text-ellipsis-container" + (className ? " " + className : ""));
-    return (
-        <div key={rowKey} className={cls} data-delay-dhow={750}>
-            { rows }
-        </div>
-    );
-}
-
-
-/**
- * An edited version of SPC's DisplayTitleColumnDefault
- */
-const VSDisplayTitleColumnDefault = React.memo(function VSDisplayTitleColumnDefault(props) {
-    const { result = null, link, onClick, className = null } = props;
-    const { variant = null } = result || {};
-    const { display_title = null, dbsnp_rs_number = null } = variant;
-
-    const cls = ("title-block text-ellipsis-container" + (className ? " " + className : ""));
-    const rows = [
-        <span key="variant-title" className="text-600">{display_title}</span>
-    ];
-
-    if (dbsnp_rs_number) {
-        rows.push(<span key="dbsnp" className="font-italic">{dbsnp_rs_number}</span>);
-    }
-
-    return (
-        <a key="title" href={link || '#'} onClick={onClick}>
-            <StackedRowColumn rowKey="title-container" {...{ rows, cls }}  />
-        </a>
-    );
-});
-
-function SelectableTitle({ onSelectVariant, result, link }){
-    // DisplayTitleColumnWrapper passes own 'onClick' func as prop to this component which would navigate to Item URL; don't use it here; intercept and instead use onSelectVariant from FilteringTab (or wherever).
-    // `link` is also from DisplayTitleColumnWrapper; I think good to keep as it'll translate into <a href={link}> in DisplayTitleColumnDefault and this will still allow to right-click + open in new tab (may need event.preventDefault() and/or event.stopPropagation() present in onSelectVariant).
-    return <VSDisplayTitleColumnDefault {...{ result, link }} onClick={onSelectVariant} />;
-}
+import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
+import { SaveFilterSetButtonController } from './SaveFilterSetButton';
+import { SaveFilterSetPresetButtonController } from './SaveFilterSetPresetButton';
+import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 /**
  * @todo maybe reuse somewhere
@@ -261,47 +74,148 @@ export function filterQueryByQuery(query1, query2){
 }
 
 
-
 export const FilteringTab = React.memo(function FilteringTab(props) {
-    const { context = null, windowHeight, session = false } = props;
     const {
-        display_title: caseDisplayTitle,
+        context = null,
+        session = false,
+        schemas,
+        windowHeight,
+        windowWidth,
+        onCancelSelection,          // Not used -- passed in from SelectedItemsController and would close window.
+        onCompleteSelection,        // Not used -- passed in from SelectedItemsController and would send selected items back to parent window.
+        selectedItems: selectedVariantSamples,                  // passed in from SelectedItemsController
+        onSelectItem: onSelectVariantSample,                    // passed in from SelectedItemsController
+        onResetSelectedItems: onResetSelectedVariantSamples,    // passed in from SelectedItemsController
+        variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
+        updateVariantSampleListID,  // Passed in from VariantSampleListController
+        savedVariantSampleIDMap,    // Passed in from VariantSampleListController
+        fetchVariantSampleListItem, // Passed in from VariantSampleListController
+        isLoadingVariantSampleListItem, // Passed in from VariantSampleListController
+        setIsSubmitting,            // Passed in from App
+        addToBodyClassList,         // Passed in from App
+        removeFromBodyClassList     // Passed in from App
+    } = props;
+
+    const {
+        accession: caseAccession,
         initial_search_href_filter_addon = "",
-        active_filterset: {
-            "@id" : activeFilterSetID,
-            display_title: activeFilterSetTitle,
-            filter_blocks = []
-        } = {}
+        active_filterset = null,
+        additional_variant_sample_facets = []
     } = context || {};
 
-    // TODO POST request w multiple of these filter_blocks, for now just first 1 is populated and used.
+    const { "@id" : activeFilterSetID = null } = active_filterset || {};
 
-    let searchHrefInitial = "/search/?type=VariantSample"; initial_search_href_filter_addon;
-    searchHrefInitial += initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "";
-    searchHrefInitial += "&sort=date_created";
+    const searchHrefBase = (
+        "/search/?type=VariantSample"
+        + (initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "")
+        + (additional_variant_sample_facets.length > 0 ? "&" + additional_variant_sample_facets.map(function(fac){ return "additional_facet=" + encodeURIComponent(fac); }).join("&") : "")
+        + "&sort=date_created"
+    );
 
-    const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
-    const searchHrefWithCurrentFilter = searchHrefInitial + (currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "");
+    // DEPRECATED - we no longer have filter_blocks present initially.
+    // const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
+    // const searchHrefWithCurrentFilter = searchHrefBase + (currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "");
 
     // Hide facets that are ones used to initially narrow down results to those related to this case.
-    const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible } = useMemo(function(){
+    const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem } = useMemo(function(){
+
         const onClearFiltersVirtual = function(virtualNavigateFxn, callback) {
             // By default, EmbeddedSearchItemView will reset to props.searchHref.
-            // We override with searchHrefInitial.
-            return virtualNavigateFxn(searchHrefInitial, {}, callback);
+            // We override with searchHrefBase.
+            return virtualNavigateFxn(searchHrefBase, {}, callback);
         };
+
         const isClearFiltersBtnVisible = function(virtualHref){
             // Re-use same algo for determining if is visible, but compare virtualhref
-            // against searchHrefInitial (without the current filter(s)) rather than
+            // against searchHrefBase (without the current filter(s)) rather than
             // `props.searchHref` which contains the current filters.
-            return VirtualHrefController.isClearFiltersBtnVisible(virtualHref, searchHrefInitial);
+            return VirtualHrefController.isClearFiltersBtnVisible(virtualHref, searchHrefBase);
         };
-        let hideFacets = null;
+
+        let hideFacets = ["type", "validation_errors.name"];
         if (initial_search_href_filter_addon) {
-            hideFacets = Object.keys(queryString.parse(initial_search_href_filter_addon));
+            hideFacets = hideFacets.concat(Object.keys(queryString.parse(initial_search_href_filter_addon)));
         }
-        return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible };
+
+        const blankFilterSetItem = {
+            "title" : "FilterSet for Case " + caseAccession,
+            "created_in_case_accession" : caseAccession,
+            "search_type": "VariantSample",
+            "filter_blocks" : [
+                {
+                    "name" : "Filter Block 1",
+                    "query" : ""
+                }
+            ]
+        };
+
+        // IMPORTANT:
+        // We preserve this, but we DO NOT utilize it in FilterSetController at moment
+        // because FilterSet Presets may be re-used for many different Cases.
+        // TODO: maybe remove
+        if (initial_search_href_filter_addon) {
+            blankFilterSetItem.flags = [
+                {
+                    "name" : "Case:" + caseAccession,
+                    "query" : initial_search_href_filter_addon
+                }
+            ];
+        }
+
+        return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem };
     }, [ context ]);
+
+    // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedVariantSamples there.
+    const fsuiProps = {
+        schemas, session,
+        variantSampleListItem,
+        updateVariantSampleListID,
+        fetchVariantSampleListItem,
+        isLoadingVariantSampleListItem,
+        selectedVariantSamples,
+        // setIsSubmitting,
+        // "caseItem": context
+    };
+
+    const embeddedTableHeaderBody = (
+        <SaveFilterSetButtonController caseItem={context} setIsSubmitting={setIsSubmitting}>
+            <SaveFilterSetPresetButtonController>
+                <FilteringTableFilterSetUI {...fsuiProps} />
+            </SaveFilterSetPresetButtonController>
+        </SaveFilterSetButtonController>
+    );
+
+    const onFailInitialFilterSetItemLoad = useCallback(function(){
+        if (session) {
+            // todo add sentry.io call here.
+            Alerts.queue({
+                "title": "FilterSet not loaded",
+                "message": `Couldn't load the existing saved FilterSet selections Item "${activeFilterSetID}", check permissions.`,
+                "style" : "warning",
+                "navigationDissappearThreshold": 1
+            });
+        }
+        // Else nothing -- is expected; perhaps user got logged out during
+        // navigation or loading something else and hasn't refreshed page yet.
+    }, [ session ]);
+
+    // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
+    // regardless of how much Case embeds.
+    const embeddedTableHeader = activeFilterSetID ? (
+        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
+            onFail={onFailInitialFilterSetItemLoad}>
+            <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets}>
+                { embeddedTableHeaderBody }
+            </FilterSetController>
+        </ajax.FetchedItem>
+    ) : (
+        // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
+        // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
+        <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+            { embeddedTableHeaderBody }
+        </FilterSetController>
+    );
+
 
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
@@ -309,225 +223,17 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // Overrides default 400px.
     const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 445) : undefined;
 
-    return (
-        <React.Fragment>
-            <h1 className="mb-0 mt-0">
-                { caseDisplayTitle }: <span className="text-300">Variant Filtering and Technical Review</span>
-            </h1>
-            <CaseViewEmbeddedVariantSampleSearchTable { ...{ hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible }} searchHref={searchHrefWithCurrentFilter} title={
-                <FilteringTabSubtitle caseItem={context} />
-            } key={"session:" + session} />
-        </React.Fragment>
-    );
+    // Table re-initializes upon change of key so we use it refresh table based on session.
+    const searchTableKey = "session:" + session;
+
+    const tableProps = {
+        hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader,
+        addToBodyClassList, removeFromBodyClassList,
+        selectedVariantSamples, onSelectVariantSample,
+        savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
+        isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
+        "key": searchTableKey
+    };
+
+    return <CaseViewEmbeddedVariantSampleSearchTable {...tableProps} />;
 });
-
-/** Inherits props from EmbeddedItemSearchTable -> EmbeddedSearchView -> VirtualHrefController */
-export function FilteringTabSubtitle(props){
-    const {
-        totalCount,
-        context: searchContext,
-        href: searchHref,
-        caseItem
-    } = props;
-    const {
-        "@id" : caseAtID,
-        accession: caseAccession = null,
-        initial_search_href_filter_addon = "",
-        active_filterset = null,
-        project: {
-            "@id" : caseProjectID
-        },
-        institution: {
-            "@id" : caseInstitutionID
-        }
-    } = caseItem;
-
-    const [ isLoading, setIsLoading ] = useState(false);
-    // From `state.lastFilterSetSaved` we use only non linkTo properties from it so doesn't matter if frame=object vs frame=page for it.
-    const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || null);
-
-    // See https://reactjs.org/docs/hooks-faq.html#how-do-i-implement-getderivedstatefromprops
-    // Basically would just update lastFilterSetSaved to have @@embedded representation instead of the @@object representation
-    // that we get in the PATCH response. Keeping lastFilterSetSaved around b.c. why not - it'll give us some info/feedback before
-    // Case is reindexed. Maybe/hopefully Case will reindex fast enough that won't worry about keeping state.lastFilterSaved around
-    // until updated Case `context`/`caseItem` with updated `active_filterset` arrives. At which point could prly just remove state.lastFilterSaved
-    // and do ~ function doPatch(){ setIsLoading(true); PATCH.. } ... -> ... useEffect(func(){ setIsLoading(false); }[ active_filterset ])
-    if (active_filterset && lastFilterSetSaved !== active_filterset && (!lastFilterSetSaved || lastFilterSetSaved.last_modified.date_modified < active_filterset.last_modified.date_modified)) {
-        setLastFilterSetSaved(active_filterset);
-    }
-
-    const { filter_blocks: [ { query: lastActiveFilterAppend } = {} ] = [] } = lastFilterSetSaved || {};
-
-    const { differsFromCurrentFilterSet, filterSetQueryStr, saveNewFilterset, saveFilterBtnTip } = useMemo(function(){
-        const { query: currentQuery } = url.parse(searchHref, false);
-        const parsedCurrentQueryFiltered = filterQueryByQuery(currentQuery, "type=VariantSample&sort=date_created&" + initial_search_href_filter_addon);
-        const filterSetQueryStr = queryString.stringify(parsedCurrentQueryFiltered);
-        const differsFromCurrentFilterSet = !!(
-            (/*!lastFilterSetSaved*/ !lastActiveFilterAppend && filterSetQueryStr) ||
-            (/*lastFilterSetSaved*/ lastActiveFilterAppend && !filterSetQueryStr) ||
-            (lastFilterSetSaved && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(lastActiveFilterAppend)))
-        );
-
-        function saveNewFilterset(e){
-
-            // Hmm maybe should redo as promises/use the promisequeue..
-
-            // TODO: Rename function once logic more cemented (i.e. it only PATCHes if we (rarely) get new FilterSet Item)
-            function patchCaseItem(nextFilterSetItem){
-                const { "@id" : nextFilterSetID, uuid: nextFilterSetUUID } = nextFilterSetItem;
-
-                if (lastFilterSetSaved && nextFilterSetID === lastFilterSetSaved["@id"]) {
-                    // Skip PATCHing, we just updated existing FilterSet.
-                    // Set as new `lastFilterSetSaved` (it has newly updated query) (later on won't need to do this and hopefully we just get updated context.active_filterset after websocket-notification-and-update)
-                    setLastFilterSetSaved(nextFilterSetItem);
-                    setIsLoading(false);
-                    return;
-
-                    // TODO: In future, upon @@embedded response from PATCH endpoint, we may be able to get rid of lastFilterSetSaved and do equivalent of:
-                    // newContext = context.copy()
-                    // newContext.active_filterset = nextFilterSetItem;
-                    // reduxStore.dispatch({ context: newContext })
-                } else {
-                    // Brand new FilterSet, continue with patch.
-                    console.log("Setting 'active_filterset'", nextFilterSetItem);
-                    ajax.load(caseAtID, function(res){
-                        console.info("PATCHed Case Item", res);
-                        setIsLoading(false);
-                        setLastFilterSetSaved(nextFilterSetItem);
-                    }, "PATCH", function(err){
-                        console.error("Error PATCHing Case", err);
-                        Alerts.queue({
-                            "title" : "Error PATCHing Case",
-                            "message" : JSON.stringify(err),
-                            "style" : "danger"
-                        });
-                        setIsLoading(false);
-                    }, JSON.stringify({ "active_filterset" : nextFilterSetUUID }));
-                }
-            }
-
-            // Will change in future if multiple filter_blocks.
-            const nextFilterBlocks = [{
-                "name": "Primary",
-                "query": filterSetQueryStr,
-                // "flags_applied" : "case:" + caseAccession ? idk
-            }];
-
-            function patchFilterSet(callback) {
-                const { "@id" : existingFilterID } = lastFilterSetSaved;
-                const patchBody = { "filter_blocks": nextFilterBlocks };
-                ajax.load(existingFilterID, function(res){
-                    const { "@graph" : [ existingFilterSetItem ] } = res;
-                    callback(existingFilterSetItem);
-
-                }, "PATCH", function(err){
-                    console.error("Error PATCHing existing FilterSet", err);
-                    Alerts.queue({
-                        "title" : "Error PATCHing existing FilterSet",
-                        "message" : JSON.stringify(err),
-                        "style" : "danger"
-                    });
-                    setIsLoading(false);
-                }, JSON.stringify(patchBody));
-            }
-
-            function createFilterSet(callback){
-                // TODO: Filter out initial_search_href_filter_addon
-                // If no filter, skip and just set Case `active_filterset` field to none.
-                const newFilterSetItem = {
-                    "title": "FilterSet Created For Case " + caseAccession,
-                    "search_type": "VariantSample",
-                    "institution": caseInstitutionID,
-                    "project": caseProjectID,
-                    "created_in_case_accession": caseAccession,
-                    "filter_blocks": nextFilterBlocks
-                };
-                ajax.load("/filter-sets/", function(res){
-                    const { "@graph" : [ newFilterSetItem ] } = res;
-                    callback(newFilterSetItem);
-                }, "POST", function(err){
-                    console.error("Error POSTing new FilterSet", err);
-                    Alerts.queue({
-                        "title" : "Error POSTing new FilterSet",
-                        "message" : JSON.stringify(err),
-                        "style" : "danger"
-                    });
-                    setIsLoading(false);
-                }, JSON.stringify(newFilterSetItem));
-            }
-
-            setIsLoading(true);
-            if (!lastFilterSetSaved){
-                createFilterSet(patchCaseItem);
-            } else {
-                patchFilterSet(patchCaseItem);
-            }
-        }
-
-        const saveFilterBtnTip = "<pre class='text-white mb-0'>" + JSON.stringify(parsedCurrentQueryFiltered, null, 4) + "</pre>";
-
-        return { filterSetQueryStr, differsFromCurrentFilterSet, saveNewFilterset, saveFilterBtnTip };
-    }, [ caseItem, searchHref, lastFilterSetSaved ]);
-
-    // console.log('TESTING', lastFilterSetSaved, '\n',
-    //     filterSetQueryStr, '\n',
-    //     differsFromCurrentFilterSet, '\n',
-    //     lastFilterSetSaved, '\n',
-    // );
-
-    let btnPrepend = null;
-    let btnDisabled = !differsFromCurrentFilterSet || isLoading; // TODO: maybe inform also via 'edit this FilterSet' and 'add any new FilterSet' actions/permissions.
-    let notYetReIndexed = false; // Not yet used. Should auto-update upon refresh of context
-    if (lastFilterSetSaved) {
-        // This will eventually likely be turned into tooltip or something on FilterSet blocks UI.
-        const {
-            // `error` would likely be present (and other fields not present) if no view permissions.
-            error: fsError = null,
-            display_title: fsTitle = null,
-            last_modified: {
-                date_modified: fsDateModified = null,
-                // I think we get back string from PATCH response for modified_by (linkTo), thus this not showing up properly..
-                modified_by: {
-                    // We're unlikely to have view permissions for User item unless logged in as admin or similar I think rn.. unsure.
-                    display_title: fsModifyAuthorTitle = null
-                } = {}
-            } = {}
-        } = lastFilterSetSaved;
-        if (fsDateModified && !fsError) {
-            btnPrepend = (
-                <div className="input-group-prepend">
-                    <div className="input-group-text" data-tip={fsTitle + " last modified by " + (fsModifyAuthorTitle || "you") /*(fsModifyAuthorTitle ? " last modified by " + fsModifyAuthorTitle : "")*/}>
-                        Saved
-                        &nbsp;<LocalizedTime timestamp={fsDateModified} formatType="date-time-lg" />
-                    </div>
-                </div>
-            );
-            notYetReIndexed = fsDateModified !== (active_filterset && active_filterset.last_modified && active_filterset.last_modified.date_modified);
-        } else { // Means no view (nor, transitively, edit) permission
-            btnDisabled = true;
-        }
-    }
-
-    // We give the span here an 'id' here so later on it'd be easy to find using Cypress
-    // or other testing framework.
-    return (
-        <div className="d-flex flex-column flex-lg-row mt-1 mb-2 align-items-start justify-content-between">
-            <h5 className="text-300 mt-0 mb-0">
-                <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
-                Variants found
-            </h5>
-            <h5 className="text-300 mt-0 mb-0">
-                <div className="btn-group" role="group" aria-label="FilterSet Controls">
-                    { btnPrepend }
-                    <button type="button" className="btn btn-primary" data-current-query={filterSetQueryStr} data-html
-                        disabled={btnDisabled} onClick={saveNewFilterset} data-tip={saveFilterBtnTip}>
-                        { isLoading ?
-                            <i className="icon icon-fw icon-spin icon-circle-notch fas mr-07" />
-                            : <i className="icon icon-fw icon-save fas mr-07" /> }
-                        { (lastFilterSetSaved && !lastFilterSetSaved.error) && !filterSetQueryStr ?  "Save Filter Removal" : "Save Current Filter" }
-                    </button>
-                </div>
-            </h5>
-        </div>
-    );
-}

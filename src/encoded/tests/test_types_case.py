@@ -79,6 +79,18 @@ def test_case_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case)
     assert mother['vcf_file']['@id'] == file_id
 
 
+def test_case_sv_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
+    file_id = file_vcf["@id"]
+    testapp.patch_json(file_id, {"variant_type": "SV"}, status=200)
+    testapp.patch_json(
+        sample_proc_fam["@id"], {"processed_files": [file_id]}, status=200
+    )
+    proband = testapp.get(proband_case["@id"]).json
+    mother = testapp.get(mother_case["@id"]).json
+    assert proband["structural_variant_vcf_file"]["@id"] == file_id
+    assert mother["structural_variant_vcf_file"]["@id"] == file_id
+
+
 def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
     # add ann_vcf to sample_processing
     file_id = file_vcf['@id']
@@ -90,6 +102,88 @@ def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case
     mother_sample_tag = "ext_id_003"
     assert proband['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(proband_sample_tag, file_acc)
     assert mother['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
+
+
+def test_case_sv_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
+    file_id = file_vcf["@id"]
+    testapp.patch_json(file_id, {"variant_type": "SV"}, status=200)
+    testapp.patch_json(
+        sample_proc_fam["@id"], {"processed_files": [file_id]}, status=200
+    )
+    proband = testapp.get(proband_case["@id"]).json
+    mother = testapp.get(mother_case["@id"]).json
+    file_acc = file_id.split('/')[2]
+    proband_sample_tag = "ext_id_006"
+    mother_sample_tag = "ext_id_003"
+    proband_flag = "CALL_INFO={}&file={}".format(proband_sample_tag, file_acc)
+    mother_flag = "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
+    assert proband['sv_initial_search_href_filter_addon'] == proband_flag
+    assert mother['sv_initial_search_href_filter_addon'] == mother_flag
+
+
+@pytest.fixture
+def new_sample_processing(testapp, project, institution, fam, file_vcf):
+    data = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'samples': [
+            "GAPSAPROBAND",
+            "GAPSAFATHER1",
+            "GAPSAMOTHER1",
+            "GAPSABROTHER"
+            ],
+        'families': [fam['@id']],
+        'processed_files': [file_vcf['@id']]
+    }
+    return data
+
+
+@pytest.fixture
+def new_case(testapp, project, institution, fam, new_sample_processing):
+    data = {
+        "accession": "GAPCAP4E4GMG",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'family': fam['@id'],
+        'individual': 'GAPIDPROBAND'
+    }
+    return data
+
+
+@pytest.mark.parametrize('num_samples, analysis_type, proband_only', [
+    (1, 'WGS', True),  # proband only
+    (2, 'WGS-Group', False),  # proband and father
+    (3, 'WES-Trio', False),  # proband, father, mother
+    (4, 'WES-Group', False)])  # proband, father, mother, brother
+def test_case_additional_facets(testapp, project, institution, new_case,
+                                new_sample_processing, num_samples, analysis_type, proband_only):
+    """
+    tests that additional facets are added to initial_search_href_filter_addon calc prop as appropriate:
+    none for proband only, mother and father genotype labels for trio, mother/father/sibling
+    genotype labels for quad.
+    """
+    genotype_relations = ['father', 'mother', 'brother', 'sister']
+    new_sample_processing['analysis_type'] = analysis_type
+    # limit samples to size of analysis we want to test
+    new_sample_processing['samples'] = new_sample_processing['samples'][:num_samples]
+    sp = testapp.post_json('/sample_processing', new_sample_processing).json['@graph'][0]
+    new_case['sample_processing'] = sp['@id']
+    case = testapp.post_json('/case', new_case).json['@graph'][0]
+    for relation in genotype_relations:
+        if genotype_relations.index(relation) + 2 <= num_samples:
+            # genotype labels for this relation should be an additional facet in prop
+            assert (f'associated_genotype_labels.{relation}_genotype_label'
+                    in case['additional_variant_sample_facets'])
+        else:
+            # genotype labels for this relation should NOT be an additional facet in this prop
+            assert (f'associated_genotype_labels.{relation}_genotype_label'
+                    not in case['additional_variant_sample_facets'])
+    if proband_only:
+        assert 'proband_only_inheritance_modes' in case['additional_variant_sample_facets']
+        assert 'inheritance_modes' not in case['additional_variant_sample_facets']
+    else:
+        assert 'proband_only_inheritance_modes' not in case['additional_variant_sample_facets']
+        assert 'inheritance_modes' in case['additional_variant_sample_facets']
 
 
 def test_case_proband_case(testapp, proband_case, mother_case):

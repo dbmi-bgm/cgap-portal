@@ -7,9 +7,8 @@ from ..commands import load_access_keys
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
 
-# TODO: test load_access_keys.get_existing_key_ids, which would use ES
-
-
+# TODO: Re-enable once running ECS in production
+@pytest.mark.skip
 def test_gen_access_keys(testapp, admin):
     with mock.patch.object(load_access_keys, 'get_beanstalk_real_url') as mocked_url:
         mocked_url.return_value = 'http://fourfront-hotseat'

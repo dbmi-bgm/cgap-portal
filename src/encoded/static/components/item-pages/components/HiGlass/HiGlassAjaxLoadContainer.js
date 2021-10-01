@@ -3,7 +3,7 @@
 import React from 'react';
 import _ from 'underscore';
 import memoize from 'memoize-one';
-import { console, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { HiGlassPlainContainer, HiGlassLoadingIndicator } from './HiGlassPlainContainer';
 
 
@@ -19,11 +19,18 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
         super(props);
 
         this.getFullHiglassItem = this.getFullHiglassItem.bind(this);
+        this.getHiGlassComponent = this.getHiGlassComponent.bind(this);
 
         this.state = {
             'loading': false,
             'higlassItem' : null,
-            'variantPositionAbsCoord' : props.variantPositionAbsCoord ? props.variantPositionAbsCoord : null
+            'variantPositionAbsCoord' : props.variantPositionAbsCoord ? props.variantPositionAbsCoord : null,
+            'variantEndAbsCoord' : props.variantEndAbsCoord ? props.variantEndAbsCoord : null,
+            'requestingTab' : props.requestingTab,
+            'bamSampleId' : props.bamSampleId ? props.bamSampleId : null,
+            'samples' : props.samples ? props.samples : null,
+            'higlassSvVcf': props.higlassSvVcf ? props.higlassSvVcf : null,
+            'file' : props.file ? props.file : null,
         };
         this.containerRef = React.createRef();
     }
@@ -55,31 +62,98 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                 console.warn(errResp);
             };
 
-            const { variantPositionAbsCoord } = this.state;
-        
-            const payload = {
-                'viewconfig_uuid' : "00000000-1111-0000-1111-000000000000", // Default CGAP viewconf
-                'variant_pos_abs' : variantPositionAbsCoord
-            };
-        
-            ajax.load(
-                "/get_higlass_viewconf/",
-                (resp) => {
-                    const higlassItem = {
-                        viewconfig:  resp.viewconfig
-                    }
-                    this.setState({ 'higlassItem' : higlassItem,'loading': false });
-                    console.log("Loading done")
-                },
-                'POST',
-                fallbackCallback,
-                JSON.stringify(payload)
-            );
+            const { variantPositionAbsCoord, requestingTab, bamSampleId, file, samples } = this.state;
 
+            if(requestingTab === "bam" && bamSampleId !== null && file !== null){
+                // Get the associated case and extract BAM infos from there
+                ajax.load(
+                    "/search/?type=Case&sample.bam_sample_id="+bamSampleId+"&vcf_file.accession="+file,
+                    (resp) => {
+                        if (resp["@graph"].length > 0 && resp["@graph"][0]["sample_processing"]){
+                            const samplesPedigree = resp["@graph"][0]["sample_processing"]["samples_pedigree"] ??  null;
+                            const payload = {
+                                'variant_pos_abs' : variantPositionAbsCoord,
+                                'requesting_tab' : requestingTab,
+                                'samples_pedigree' : samplesPedigree,
+                                'bam_sample_id' : bamSampleId,
+                            };
+                            this.getViewconf(payload, fallbackCallback);
+                        } else {
+                            console.warn("There are no BAM files for this case.");
+                        }
+                    },
+                    'GET',
+                    fallbackCallback
+                );
+            }
+            else if(requestingTab === "sv"){
+                // In contrast to the bam case above, we already got the case in SvBrowser.js. We are reusing that data here.
+                
+                if(samples === null){
+                    console.warn("No available samples");
+                    return;
+                }
+
+                const variantEndAbsCoord = 
+                    this.state.variantEndAbsCoord === null 
+                        ? variantPositionAbsCoord 
+                        : this.state.variantEndAbsCoord;
+                const higlassSvVcf = this.state.higlassSvVcf;
+
+                // Default settings for initial load - show only the proband bam files
+                const svBamVisibility = {}
+                const svVcfVisibility = {}
+                samples.forEach((sample) => {
+                    if(sample.sample_name === bamSampleId){
+                        svBamVisibility[sample.sample_accession] = true;
+                    }
+                    else{
+                        svBamVisibility[sample.sample_accession] = false;
+                    }
+                    svVcfVisibility[sample.sample_accession] = true;
+                    svVcfVisibility["gnomad-sv"] = true;
+                });
+
+                const payload = {
+                    'variant_pos_abs' : variantPositionAbsCoord,
+                    'variant_end_abs' : variantEndAbsCoord,
+                    'requesting_tab' : requestingTab,
+                    'samples_pedigree' : samples,
+                    'bam_sample_id' : bamSampleId,
+                    'bam_visibilty': svBamVisibility,
+                    'sv_vcf_visibilty': svVcfVisibility,
+                    'higlass_sv_vcf': higlassSvVcf
+                };
+                this.getViewconf(payload, fallbackCallback);
+            }
+            else{
+
+                const payload = {
+                    'variant_pos_abs' : variantPositionAbsCoord,
+                    'requesting_tab' : requestingTab
+                };
+                this.getViewconf(payload, fallbackCallback);
+            }
 
         });
     }
 
+    getViewconf(payload, fallbackCallback){
+
+        ajax.load(
+            "/get_higlass_viewconf/",
+            (resp) => {
+                const higlassItem = {
+                    viewconfig:  resp.viewconfig
+                };
+                this.setState({ 'higlassItem' : higlassItem,'loading': false });
+            },
+            'POST',
+            fallbackCallback,
+            JSON.stringify(payload)
+        );
+
+    }
 
     render(){
         const { higlassItem, loading } = this.state;
@@ -91,7 +165,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
         }
 
         // Use the height to make placeholder message when loading.
-        var placeholderStyle = { "height" : height || 600 };
+        const placeholderStyle = { "height" : height || 600 };
         if (placeholderStyle.height >= 140) {
             placeholderStyle.paddingTop = (placeholderStyle.height / 2) - 40;
         }
@@ -105,7 +179,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
         if (!higlassItem || !higlassItem.viewconfig) {
             return (
                 <div className="text-center" style={placeholderStyle}>
-                    <HiGlassLoadingIndicator icon="exclamation-triangle" title="No HiGlass content found. Please go back or try again later." />
+                    <HiGlassLoadingIndicator icon="exclamation-triangle fas" title="No HiGlass content found. Please go back or try again later." />
                 </div>
             );
         }

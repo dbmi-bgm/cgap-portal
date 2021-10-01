@@ -23,7 +23,6 @@ def no_login_submitter(testapp, institution, project):
         'first_name': 'ENCODE',
         'last_name': 'Submitter',
         'email': 'no_login_submitter@example.org',
-        'submits_for': [institution['@id']],
         'status': 'deleted',
     }
     # User @@object view has keys omitted.
@@ -59,21 +58,19 @@ def test_access_key_get_bad_password(anontestapp, access_key):
     anontestapp.get('/', headers=headers, status=401)
 
 
-def test_access_key_principals(anontestapp, execute_counter, access_key, submitter, institution):
+def test_access_key_principals(anontestapp, execute_counter, access_key, bgm_user, bgm_project, institution):
+    # TO DO - needs to be reviewed in context of what prinicipals do we want on access keys
     headers = {'Authorization': auth_header(access_key)}
     with execute_counter.expect(2):
         res = anontestapp.get('/@@testing-user', headers=headers)
-
     assert res.json['authenticated_userid'] == 'accesskey.' + access_key['access_key_id']
-
     assert sorted(res.json['effective_principals']) == [
         'accesskey.%s' % access_key['access_key_id'],
-        'group.submitter',
-        'institution.%s' % institution['uuid'],
-        'submits_for.%s' % institution['uuid'],
+        'editor_for.%s' % bgm_project['uuid'],
+        'group.project_editor',
         'system.Authenticated',
         'system.Everyone',
-        'userid.%s' % submitter['uuid'],
+        'userid.%s' % bgm_user['uuid'],
     ]
 
 
@@ -170,4 +167,4 @@ def test_access_key_uses_edw_hash(app, access_key):
     root = app.registry[COLLECTIONS]
     obj = root.by_item_type['access_key'][access_key['access_key_id']]
     pwhash = obj.properties['secret_access_key_hash']
-    assert EDWHash.encrypt(access_key['secret_access_key']) == pwhash
+    assert EDWHash.hash(access_key['secret_access_key']) == pwhash

@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """Load collections and determine the order."""
 
+import gzip
 import json
 import magic
 import mimetypes
 import os
 import structlog
 import webtest
+import traceback
 
 from base64 import b64encode
-from past.builtins import basestring
+from dcicutils.misc_utils import ignored
 from PIL import Image
 from pkg_resources import resource_filename
 from pyramid.paster import get_app
@@ -36,7 +38,12 @@ ORDER = [
     'user',
     'file_format',
     'workflow',
+    'meta_workflow',
+    'workflow_run',
+    'meta_workflow_run',
     'variant',
+    'structural_variant',
+    'structural_variant_sample',
     'higlass_view_config'
 ]
 
@@ -78,7 +85,7 @@ class LoadGenWrapper(object):
 @view_config(route_name='load_data', request_method='POST', permission='add')
 @debug_log
 def load_data_view(context, request):
-    '''
+    """
     expected input data
 
     {'local_path': path to a directory or file in file system
@@ -94,7 +101,8 @@ def load_data_view(context, request):
        itype can be optionally used to specify type of items loaded from files
     2) store in form of {'item_type': [items], 'item_type2': [items]}
        item_type should be same as insert file names i.e. file_fastq
-    '''
+    """
+    ignored(context)
     # this is a bit wierd but want to reuse load_data functionality so I'm rolling with it
     config_uri = request.json.get('config_uri', 'production.ini')
     patch_only = request.json.get('patch_only', False)
@@ -153,7 +161,7 @@ def trim(value):
         return {k: trim(v) for k, v in value.items()}
     if isinstance(value, list):
         return [trim(v) for v in value]
-    if isinstance(value, basestring) and len(value) > 160:
+    if isinstance(value, str) and len(value) > 160:
         return value[:77] + '...' + value[-80:]
     return value
 
@@ -279,13 +287,15 @@ def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=Fa
     # run the generator; don't worry about the output
     for _ in gen:
         pass
-    # gen.caught will str error message on error, otherwise None on success
-    if gen.caught is not None:
+    # gen.caught is None for success and an error message on failure
+    if gen.caught is None:
+        return None
+    else:
         return Exception(gen.caught)
-    return gen.caught
 
 
-def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False, post_only=False):
+def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False,
+                 patch_only=False, post_only=False):
     """
     Generator function that yields bytes information about each item POSTed/PATCHed.
     Is the base functionality of load_all function.
@@ -301,7 +311,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         itype (list or str): limit selection to certain type/types
         from_json (bool)   : if set to true, inserts should be dict instead of folder name
         patch_only (bool)  : if set to true will only do second round patch - no posts
-        post_only (bool)   : if set to true posts full item no second round or lookup - use with care - will not work if linkTos to items not in db yet
+        post_only (bool)   : if set to true posts full item no second round or lookup -
+                             use with care - will not work if linkTos to items not in db yet
     Yields:
         Bytes with information on POSTed/PATCHed items
 
@@ -320,26 +331,28 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         if os.path.isdir(inserts):  # we've specified a directory
             if not inserts.endswith('/'):
                 inserts += '/'
-            files = [i for i in os.listdir(inserts) if i.endswith('.json')]
+            files = [i for i in os.listdir(inserts) if i.endswith('.json') or i.endswith('.json.gz')]
         elif os.path.isfile(inserts):  # we've specified a single file
             files = [inserts]
             # use the item type if provided AND not a list
             # otherwise guess from the filename
-            use_itype = True if (itype and isinstance(itype, basestring)) else False
+            use_itype = True if (itype and isinstance(itype, str)) else False
         else:  # cannot get the file
             err_msg = 'Failure loading inserts from %s. Could not find matching file or directory.' % inserts
+            # import pdb; pdb.set_trace()
             print(err_msg)
             yield str.encode('ERROR: %s\n' % err_msg)
-            raise StopIteration
+            return
+            # raise StopIteration
         # load from the directory/file
         for a_file in files:
             if use_itype:
                 item_type = itype
             else:
-                item_type = a_file.split('/')[-1].replace(".json", "")
+                item_type = a_file.split('/')[-1].split(".")[0]
                 a_file = inserts + a_file
-            with open(a_file) as f:
-                store[item_type] = json.loads(f.read())
+            store[item_type] = get_json_file_content(a_file)
+
     # if there is a defined set of items, subtract the rest
     if itype:
         if isinstance(itype, list):
@@ -355,9 +368,11 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             err_msg = 'No items found in %s' % inserts
         if itype:
             err_msg += ' for item type(s) %s' % itype
+        # import pdb; pdb.set_trace()
         print(err_msg)
         yield str.encode('ERROR: %s' % err_msg)
-        raise StopIteration
+        return
+        # raise StopIteration
     # order Items
     all_types = list(store.keys())
     for ref_item in reversed(ORDER):
@@ -384,10 +399,9 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                 # file format is required for files, but its usability depends this field
                 if a_type in ['file_format', 'experiment_type']:
                     req_fields.append('valid_item_types')
-                first_fields = list(set(req_fields+ids))
+                first_fields = list(set(req_fields + ids))
             skip_existing_items = set()
             posted = 0
-            patched = 0
             skip_exist = 0
             for an_item in store[a_type]:
                 exists = False
@@ -412,7 +426,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                         to_post = {key: value for (key, value) in an_item.items() if key in first_fields}
                     to_post = format_for_attachment(to_post, docsdir)
                     try:
-                        res = testapp.post_json('/'+a_type, to_post)
+                        res = testapp.post_json('/' + a_type, to_post)
                         assert res.status_code == 201
                         posted += 1
                         # yield bytes to work with Response.app_iter
@@ -422,17 +436,21 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                               ''.format(a_type, str(first_fields), str(e)))
                         # remove newlines from error, since they mess with generator output
                         e_str = str(e).replace('\n', '')
+                        # import pdb; pdb.set_trace()
                         yield str.encode('ERROR: %s\n' % e_str)
-                        raise StopIteration
+                        return
+                        # raise StopIteration
             if not post_only:
                 second_round_items[a_type] = [i for i in store[a_type] if i['uuid'] not in skip_existing_items]
             logger.info('{} 1st: {} items posted, {} items exists.'.format(a_type, posted, skip_exist))
-            logger.info('{} 1st: {} items will be patched in second round'.format(a_type, str(len(second_round_items.get(a_type, [])))))
+            logger.info('{} 1st: {} items will be patched in second round'
+                        .format(a_type, str(len(second_round_items.get(a_type, [])))))
     elif overwrite and not post_only:
         logger.info('Posting round skipped')
         for a_type in all_types:
             second_round_items[a_type] = [i for i in store[a_type]]
-            logger.info('{}: {} items will be patched in second round'.format(a_type, str(len(second_round_items.get(a_type, [])))))
+            logger.info('{}: {} items will be patched in second round'
+                        .format(a_type, str(len(second_round_items.get(a_type, [])))))
 
     # Round II - patch the rest of the metadata
     rnd = ' 2nd' if not patch_only else ''
@@ -453,24 +471,45 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             except Exception as e:
                 print('Patching {} failed. Patch body:\n{}\n\nError Message:\n{}'.format(
                       a_type, str(an_item), str(e)))
+                print('Full error: %s' % traceback.format_exc())
                 e_str = str(e).replace('\n', '')
+                # import pdb; pdb.set_trace()
                 yield str.encode('ERROR: %s\n' % e_str)
-                raise StopIteration
+                return
+                # raise StopIteration
         logger.info('{}{}: {} items patched .'.format(a_type, rnd, patched))
 
     # explicit return upon finish
     return None
 
 
+def get_json_file_content(filename):
+    """
+    Helper function to obtain objects from (compressed) json files.
+
+    :param filename: str file path
+    :returns: object loaded from file
+    """
+    if filename.endswith(".json"):
+        with open(filename) as f:
+            result = json.loads(f.read())
+    elif filename.endswith(".json.gz"):
+        with gzip.open(filename) as f:
+            result = json.loads(f.read())
+    else:
+        raise Exception("Expecting a .json or .json.gz file but found %s." % filename)
+    return result
+
+
 def load_data(app, indir='inserts', docsdir=None, overwrite=False,
               use_master_inserts=True):
-    '''
+    """
     This function will take the inserts folder as input, and place them to the given environment.
     args:
         app:
         indir (inserts): inserts folder, should be relative to tests/data/
         docsdir (None): folder with attachment documents, relative to tests/data
-    '''
+    """
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -531,14 +570,13 @@ def load_local_data(app, overwrite=False):
     for test_insert_dir in test_insert_dirs:
         chk_dir = resource_filename('encoded', "tests/data/" + test_insert_dir)
         for (dirpath, dirnames, filenames) in os.walk(chk_dir):
-            if any([fn for fn in filenames if fn.endswith('.json')]):
+            if any([fn for fn in filenames if fn.endswith('.json') or fn.endswith('.json.gz')]):
                 logger.info('Loading inserts from "{}" directory.'.format(test_insert_dir))
-                return load_data(app, docsdir='documents', indir=test_insert_dir,
-                            use_master_inserts=True, overwrite=overwrite)
+                return load_data(app, docsdir='documents', indir=test_insert_dir, use_master_inserts=True,
+                                 overwrite=overwrite)
 
     # Default to 'inserts' if no temp inserts found.
-    return load_data(app, docsdir='documents', indir='inserts',
-                         use_master_inserts=True, overwrite=overwrite)
+    return load_data(app, docsdir='documents', indir='inserts', use_master_inserts=True, overwrite=overwrite)
 
 
 def load_prod_data(app, overwrite=False):
@@ -549,3 +587,13 @@ def load_prod_data(app, overwrite=False):
         None if successful, otherwise Exception encountered
     """
     return load_data(app, indir='master-inserts', overwrite=overwrite)
+
+
+def load_deploy_data(app, overwrite=True):
+    """
+    Load deploy-inserts and master-inserts.
+
+    Returns:
+        None if successful, otherwise Exception encountered
+    """
+    return load_data(app, indir="deploy-inserts", overwrite=overwrite)

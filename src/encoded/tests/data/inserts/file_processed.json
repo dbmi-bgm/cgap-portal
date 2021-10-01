@@ -1,6 +1,6 @@
 [
     {
-        "status": "released",
+        "status": "shared",
         "uuid": "10002377-49e5-4c33-afab-9ec90d65faf3",
         "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "accession": "GAPFIFYGNO9R",
@@ -10,7 +10,7 @@
         "submitted_by": "koray_kirli@hms.harvard.edu"
     },
     {
-        "status": "released",
+        "status": "shared",
         "uuid": "10002377-49e5-4c33-afab-9ec90d65faa1",
         "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "accession": "GAPFIFYGNO1A",
@@ -20,7 +20,7 @@
         "submitted_by": "koray_kirli@hms.harvard.edu"
     },
     {
-        "status": "released",
+        "status": "shared",
         "uuid": "10002377-49e5-4c33-afab-9ec90d65faa2",
         "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "accession": "GAPFIFYGNO2B",
@@ -30,7 +30,7 @@
         "submitted_by": "koray_kirli@hms.harvard.edu"
     },
     {
-        "status": "released",
+        "status": "shared",
         "uuid": "10002377-49e5-4c33-afab-9ec90d65faa3",
         "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "accession": "GAPFIFYGNO3C",
@@ -38,5 +38,35 @@
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "submitted_by": "koray_kirli@hms.harvard.edu"
+    },
+    {
+        "status": "shared",
+        "uuid": "9d165f81-fec0-4de6-af4d-c0558d835d2e",
+        "file_format": "a3693d56-d3ac-40f0-8a1a-4b02e8747478",
+        "accession": "GAPFIFYGNO3D",
+        "filename": "abcd.rck.gz",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "submitted_by": "soohyun_lee@hms.harvard.edu"
+    },
+    {
+        "status": "shared",
+        "uuid": "6b113e31-d4dd-465a-99b2-16fb0c3928fb",
+        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa5",
+        "accession": "GAPFIFYGNO4A",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_type": "full annotated VCF",
+        "variant_type": "SV"
+    },
+    {
+        "status": "shared",
+        "uuid": "5593ddd6-13d1-4bf3-b412-bb0a01dfc922",
+        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa5",
+        "accession": "GAPFIFYGNO4B",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_type": "Higlass SV VCF",
+        "variant_type": "SV"
     }
 ]

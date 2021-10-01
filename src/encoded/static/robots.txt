@@ -6,3 +6,9 @@ Disallow: /*@@download
 Disallow: /profiles/
 Disallow: /*@@download*
 Disallow: /cgi-bin/
+User-agent: SemrushBot
+Disallow: /
+User-agent: AhrefsBot
+Disallow: /
+User-agent: PetalBot
+Disallow: /

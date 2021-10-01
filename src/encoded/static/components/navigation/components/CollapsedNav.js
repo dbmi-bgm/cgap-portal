@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import url from 'url';
 import _ from 'underscore';
@@ -16,7 +16,7 @@ import {
     BigDropdownGroupController
 } from './BigDropdown';
 import { AccountNav } from './AccountNav';
-import { SearchBar } from './SearchBar';
+// import { SearchBar } from './SearchBar';
 
 
 export const CollapsedNav = React.memo(function CollapsedNav(props){
@@ -26,17 +26,18 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
         overlaysContainer, windowWidth, windowHeight,
         browseBaseState, testWarningVisible,
         addToBodyClassList, removeFromBodyClassList,
-        schemas, updateUserInfo
+        schemas, updateAppSessionState
     } = props;
 
     const leftNavProps = {
+        context,
         windowWidth, windowHeight, href, mounted, overlaysContainer, session,
         testWarningVisible, browseBaseState//, addToBodyClassList, removeFromBodyClassList
     };
 
     const userActionNavProps = {
         windowWidth, windowHeight, href, mounted, overlaysContainer, session,
-        schemas, updateUserInfo, testWarningVisible
+        schemas, updateAppSessionState, testWarningVisible
     };
 
     // We'll probably keep using NavbarCollapse for a bit since simpler than implementing own
@@ -70,23 +71,25 @@ function HelpNavItem(props){
 
 /**
  * @todo Test user actions or role for things to have here?
- * @todo Migrate to regular DOM elements from Nav.Link etc. See LeftNavGuest-ish.
  */
-const LeftNavAuthenticated = React.memo(function LeftNavAuthenticated(props){
-    const { href, ...passProps } = props;
-    const { query = {} } = url.parse(href, true);
-    const isCasesLinkActive = query.type === 'Case';
-    // TODO: query seems to be coming in empty, need to fix to get highlighting working again
-
+function LeftNavAuthenticated(props){
+    const { context, href } = props;
+    const isCasesLinkActive = useMemo(function(){
+        const { "@id": contextID } = context;
+        const { query = {} } = url.parse(href || contextID, true);
+        return query.type === 'Case';
+        // We assume href and context change together, so we memoize on context instead of href
+        // since is a more performant comparison.
+    }, [ context ]);
     return (
         <div className="navbar-nav mr-auto">
-            <a href="/cases/" className={"nav-link browse-nav-btn" + (isCasesLinkActive ? " active" : "")}>
+            <a href="/search/?type=Case&proband_case=true" className={"nav-link browse-nav-btn" + (isCasesLinkActive ? " active" : "")}>
                 Cases
             </a>
             <HelpNavItem {...props} />
         </div>
     );
-});
+}
 
 const LeftNavGuest = React.memo(function LeftNavGuest(props){
     const { href, ...passProps } = props;

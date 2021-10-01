@@ -1,7 +1,7 @@
 import pytest
 
 from ..util import resolve_file_path
-from ..commands.gene_table_intake import GeneTableParser
+from ..ingestion.table_utils import GeneTableParser
 from .test_variant_table_intake import ANNOTATION_FIELD_SCHEMA
 from .variant_fixtures import GENE_ANNOTATION_FIELD_URL
 

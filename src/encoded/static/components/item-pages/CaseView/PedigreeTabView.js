@@ -32,31 +32,32 @@ import { gatherPhenotypicFeatureItems, getPhenotypicFeatureStrings } from './fam
  * some which might use disorders instead of phenotypic strings,
  * for example.
  */
-function toggleSelectedDiseaseCallable(selectedDiseases, availableDiseases, setSelectedDiseases, diseaseStr){
-    const selDiseaseMap = {};
-    selectedDiseases.forEach(function(sd){
-        selDiseaseMap[sd] = true;
-    });
-    if (selDiseaseMap[diseaseStr]) { // Toggle
-        delete selDiseaseMap[diseaseStr];
+function toggleSelectedDiseaseCallable(selectedDiseaseIdxMap, availableDiseases, setSelectedDiseaseIdxMap, diseaseStr){
+    const nextMap = { ...selectedDiseaseIdxMap };
+    if (nextMap[diseaseStr]) { // Toggle
+        delete nextMap[diseaseStr];
     } else {
-        selDiseaseMap[diseaseStr] = true;
+        const invertedDiseaseIdxMap = _.invert(nextMap);
+        // Find lowest number not yet used (incl prev. deleted ones)
+        for (var lowestUnusedIdx = 1; lowestUnusedIdx < 10000; lowestUnusedIdx++) {
+            if (invertedDiseaseIdxMap[lowestUnusedIdx]) {
+                continue;
+            }
+            break;
+        }
+        nextMap[diseaseStr] = lowestUnusedIdx;
     }
-    // We want order to be maintained
-    const nextSelectedDiseases = availableDiseases.filter(function(ad){
-        const { display_title: title } = ad;
-        return selDiseaseMap[title] || false;
-    }).map(function(ad){
-        const { display_title: title } = ad;
-        return title;
-    });
-    setSelectedDiseases(nextSelectedDiseases);
+
+    setSelectedDiseaseIdxMap(nextMap);
 }
 
 /**
  * React hook to help get `selectedDiseases`/`visibleDiseases` to pass to PedigreeVizView.
  * Grabs phenotypic features from context and uses as initial `selectedDiseases`
  * state.
+ *
+ * `selectedDiseases` is an array whose order will determine its 'data-disease-index',
+ * to which colors are mapped to in CSS stylesheet.
  *
  * @todo (lower priority) React hook or functional equivalent of:
  *     ```
@@ -80,28 +81,56 @@ function toggleSelectedDiseaseCallable(selectedDiseases, availableDiseases, setS
  *     Worst case scenario can refactor back to Class component...
  */
 export function usePhenotypicFeatureStrings(currFamily){
-    const { family_phenotypic_features } = currFamily;
-    const contextPhenotypicFeatureStrings = useMemo(function(){
-        return getPhenotypicFeatureStrings(family_phenotypic_features);
+    const { family_phenotypic_features = [] } = currFamily || {};
+
+    // Initially-visible things
+    const { contextPhenotypicFeatureStrings, initialSelectedDiseaseIdxMap } = useMemo(function(){
+        const contextPhenotypicFeatureStrings = getPhenotypicFeatureStrings(family_phenotypic_features);
+        const initialSelectedDiseaseIdxMap = {};
+        contextPhenotypicFeatureStrings.forEach(function(diseaseStr, idx){
+            initialSelectedDiseaseIdxMap[diseaseStr] = idx + 1; // 1-based
+        });
+        return { contextPhenotypicFeatureStrings, initialSelectedDiseaseIdxMap };
     }, [ family_phenotypic_features ]);
-    const [ selectedDiseases, setSelectedDiseases ] = useState(contextPhenotypicFeatureStrings);
+
+    // Set as selectedDiseases/selectedDiseaseIdxMap
+    // Possible TODO: Update this state if (from props) `family_phenotypic_features` changes?
+    const [ selectedDiseaseIdxMap, setSelectedDiseaseIdxMap ] = useState(initialSelectedDiseaseIdxMap);
+
+    // All diseases present in family
     const availableDiseases = useMemo(
         function(){
-            return gatherPhenotypicFeatureItems(currFamily);
+            const selectedDiseaseOrder = {};
+            contextPhenotypicFeatureStrings.forEach(function(diseaseStr, idx){
+                // Normally is 1-based ordering for these but doesn't matter here as just for sorting availableDiseases.
+                selectedDiseaseOrder[diseaseStr] = idx;
+            });
+
+            return gatherPhenotypicFeatureItems(currFamily).sort(function({ display_title: titleA }, { display_title: titleB }){
+                const a = selectedDiseaseOrder[titleA];
+                const b = selectedDiseaseOrder[titleB];
+                if (typeof a === "number" && typeof b !== "number") return -1;
+                if (typeof a !== "number" && typeof b === "number") return 1;
+                if (typeof a === "number" && typeof b === "number") return a - b;
+                return 0;
+            });
         },
-        [ currFamily ]
+        // Though this could change as selectedDiseases changes, we only care about "initial" order and don't want to re-sort each time
+        // that selected diseases changes, just first time is rendered.
+        [ currFamily, contextPhenotypicFeatureStrings ]
     );
-    const onToggleSelectedDisease = useCallback( // `useMemo` & `useCallback` hooks are almost equivalent exc. for param signatures
-        function(evt){
-            const diseaseStr = evt.target.getAttribute("name");
-            if (!diseaseStr) return;
-            return toggleSelectedDiseaseCallable(selectedDiseases, availableDiseases, setSelectedDiseases, diseaseStr);
-        },
-        [ selectedDiseases, availableDiseases, setSelectedDiseases ]
-    );
+
+    // `useCallback(fn, deps)` is equivalent to `useMemo(() => fn, deps)`
+    // See https://reactjs.org/docs/hooks-reference.html#usecallback
+    const onToggleSelectedDisease = useCallback(function(evt){
+        const diseaseStr = evt.target.getAttribute("name");
+        if (!diseaseStr) return;
+        return toggleSelectedDiseaseCallable(selectedDiseaseIdxMap, availableDiseases, setSelectedDiseaseIdxMap, diseaseStr);
+    }, [ selectedDiseaseIdxMap, availableDiseases, setSelectedDiseaseIdxMap ]);
+
     return {
-        selectedDiseases,
-        setSelectedDiseases, // Potentially exclude ?
+        selectedDiseaseIdxMap,
+        setSelectedDiseaseIdxMap, // Potentially exclude ?
         onToggleSelectedDisease,
         availableDiseases
     };
@@ -124,12 +153,13 @@ export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabV
         return false;
     }
 
+    const { selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease } = usePhenotypicFeatureStrings(currentFamily);
+
     if (currentFamily) {
-        const { selectedDiseases, availableDiseases, onToggleSelectedDisease } = usePhenotypicFeatureStrings(currentFamily);
         const childProps = {
             ...props,
             availableDiseases,
-            selectedDiseases,
+            selectedDiseaseIdxMap,
             onToggleSelectedDisease,
             onTogglePedigreeOptionCheckbox,
             showOrderBasedName,
@@ -150,8 +180,9 @@ export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabV
  */
 export const PedigreeTabView = React.memo(function PedigreeTabView(props){
     const {
+        PedigreeVizLibrary,
         context, schemas, windowWidth, windowHeight, href, session, graphData,
-        availableDiseases, selectedDiseases, onToggleSelectedDisease, onTogglePedigreeOptionCheckbox,
+        availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease, onTogglePedigreeOptionCheckbox,
         showOrderBasedName,
         // showAsDiseases, setShowAsDiseases,
         // pedigreeFamilies: families,
@@ -165,10 +196,13 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
     }
 
     const pedigreeTabViewBodyProps = {
-        graphData, session, href,
-        context, showOrderBasedName,
+        session, href, context, schemas,
+        PedigreeVizLibrary,
+        graphData,
+        showOrderBasedName,
         windowWidth, windowHeight,
-        visibleDiseases: selectedDiseases
+        selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease
+        /// "visibleDiseaseIdxMap": selectedDiseaseIdxMap
     };
 
     return (
@@ -179,7 +213,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                     <CollapsibleItemViewButtonToolbar windowWidth={windowWidth}>
                         {/* <ColorAllDiseasesCheckbox checked={showAllDiseases} onChange={this.handleToggleCheckbox} /> */}
                         <UniqueIdentifiersCheckbox checked={!showOrderBasedName} onChange={onTogglePedigreeOptionCheckbox} />
-                        <SelectDiseasesDropdown {...{ selectedDiseases, availableDiseases }} onChange={onToggleSelectedDisease} />
+                        {/* <SelectDiseasesDropdown {...{ selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease }} /> */}
                         {/* <ShowAsDiseasesDropdown onSelect={setShowAsDiseases} showAsDiseases={showAsDiseases}  /> */}
                         {/* <FamilySelectionDropdown {...{ families, currentFamilyIdx: pedigreeFamiliesIdx }} onSelect={onFamilySelect} /> */}
                         <PedigreeFullScreenBtn />
@@ -206,53 +240,6 @@ PedigreeTabView.getTabObject = function(props){
     };
 };
 
-const SelectDiseasesDropdown = React.memo(function SelectDiseasesDropdown(props){
-    const {
-        availableDiseases = [],
-        selectedDiseases = [],
-        onChange,
-        title = "Select Case Phenotypic Features",
-    } = props;
-    if (availableDiseases.length === 0) {
-        return null;
-    }
-    const selectedMap = {};
-    selectedDiseases.forEach(function(sD){
-        selectedMap[sD] = true;
-    });
-    let diseaseIndexCounter = 0;
-    const optionItems = availableDiseases.map(function(aD){
-        const { display_title: title, '@id' : id } = aD;
-        const checked = selectedMap[title];
-        let diseaseIndex; // undefined
-        if (checked){
-            diseaseIndexCounter++;
-            diseaseIndex = diseaseIndexCounter;
-        }
-        return (
-            <div className="disease-option" key={id}>
-                <Checkbox checked={checked}
-                    onChange={onChange} name={title}
-                    className="text-400">
-                    <span className="align-middle text-400">{ title }</span>
-                </Checkbox>
-                <div className="disease-color-patch" data-disease-index={diseaseIndex}>
-                    <span>{ diseaseIndex }</span>
-                </div>
-            </div>
-        );
-    });
-    return (
-        <Dropdown alignRight>
-            <Dropdown.Toggle as={Button} variant="outline-dark">
-                { title }
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-                { optionItems }
-            </Dropdown.Menu>
-        </Dropdown>
-    );
-});
 
 const UniqueIdentifiersCheckbox = React.memo(function UniqueIdentifiersCheckbox({ checked, onChange }){
     return (
@@ -266,16 +253,16 @@ const UniqueIdentifiersCheckbox = React.memo(function UniqueIdentifiersCheckbox(
 
 /* DEPRECATED COMPONENTS */
 
-const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect }){
-    return (
-        <DropdownButton className="ml-05" onSelect={onSelect} title={showAsDiseases} variant="outline-dark" alignRight>
-            <DropdownItem active={showAsDiseases === "Case Phenotypic Features"} eventKey="Case Phenotypic Features">Case Phenotypic Features</DropdownItem>
-            <DropdownItem active={showAsDiseases === "All Phenotypic Features"} eventKey="All Phenotypic Features">All Phenotypic Features</DropdownItem>
-            <DropdownItem active={showAsDiseases === "Case Disorders"} disabled eventKey="Case Disorders">Case Disorders</DropdownItem>
-            <DropdownItem active={showAsDiseases === "All Disorders"} disabled eventKey="All Disorders">All Disorders</DropdownItem>
-        </DropdownButton>
-    );
-});
+// const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect }){
+//     return (
+//         <DropdownButton className="ml-05" onSelect={onSelect} title={showAsDiseases} variant="outline-dark" alignRight>
+//             <DropdownItem active={showAsDiseases === "Case Phenotypic Features"} eventKey="Case Phenotypic Features">Case Phenotypic Features</DropdownItem>
+//             <DropdownItem active={showAsDiseases === "All Phenotypic Features"} eventKey="All Phenotypic Features">All Phenotypic Features</DropdownItem>
+//             <DropdownItem active={showAsDiseases === "Case Disorders"} disabled eventKey="Case Disorders">Case Disorders</DropdownItem>
+//             <DropdownItem active={showAsDiseases === "All Disorders"} disabled eventKey="All Disorders">All Disorders</DropdownItem>
+//         </DropdownButton>
+//     );
+// });
 
 
 // const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(props){

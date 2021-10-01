@@ -2,6 +2,9 @@ import pytest
 from ..search.lucene_builder import LuceneBuilder
 
 
+pytestmark = [pytest.mark.setone, pytest.mark.broken]
+
+
 @pytest.fixture
 def type_query_facet_filters():
     """ Simple query that just searches on Variant Sample """
@@ -36,10 +39,11 @@ VARIANT_SAMPLE_FACETS = ['embedded.AF', 'embedded.DP', 'embedded.FS', 'embedded.
                          'embedded.variant.CHROM.raw', 'embedded.variant.POS', 'embedded.variant.cadd_phred',
                          'embedded.variant.clinvar_clnsig.raw', 'embedded.variant.conservation_phylop100',
                          'embedded.variant.cytoband_cytoband.raw',
-                         'embedded.variant.genes.genes_ensg.gene_lists.display_title.raw',
-                         'embedded.variant.genes.genes_ensg.oe_lof',
-                         'embedded.variant.genes.genes_ensg.oe_lof_upper', 'embedded.variant.genes.genes_ensg.oe_mis',
-                         'embedded.variant.genes.genes_ensg.s_het',
+                         'embedded.variant.genes.genes_most_severe_gene.gene_lists.display_title.raw',
+                         'embedded.variant.genes.genes_most_severe_gene.oe_lof',
+                         'embedded.variant.genes.genes_most_severe_gene.oe_lof_upper',
+                         'embedded.variant.genes.genes_most_severe_gene.oe_mis',
+                         'embedded.variant.genes.genes_most_severe_gene.s_het',
                          'embedded.variant.genes.genes_most_severe_consequence.coding_effect.raw',
                          'embedded.variant.genes.genes_most_severe_consequence.impact.raw',
                          'embedded.variant.genes.genes_most_severe_consequence.location.raw',

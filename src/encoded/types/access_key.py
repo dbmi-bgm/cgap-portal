@@ -8,10 +8,11 @@ from pyramid.security import (
     Everyone,
 )
 from pyramid.settings import asbool
+import datetime
 from .base import (
     Item,
-    DELETED,
-    ONLY_ADMIN_VIEW,
+    DELETED_ACL,
+    ONLY_ADMIN_VIEW_ACL,
 )
 from ..authentication import (
     generate_password,
@@ -48,16 +49,23 @@ from snovault.util import debug_log
     ])
 class AccessKey(Item):
     """AccessKey class."""
-
+    ACCESS_KEY_EXPIRATION_TIME = 90  # days
     item_type = 'access_key'
     schema = load_schema('encoded:schemas/access_key.json')
     name_key = 'access_key_id'
     embedded_list = []
 
     STATUS_ACL = {
-        'current': [(Allow, 'role.owner', ['view', 'edit'])] + ONLY_ADMIN_VIEW,
-        'deleted': DELETED,
+        'current': [(Allow, 'role.owner', ['view', 'edit'])] + ONLY_ADMIN_VIEW_ACL,
+        'deleted': DELETED_ACL,
     }
+
+    @classmethod
+    def create(cls, registry, uuid, properties, sheets=None):
+        """ Sets the access key timeout 90 days from creation. """
+        properties['expiration_date'] = (datetime.datetime.utcnow() + datetime.timedelta(
+            days=cls.ACCESS_KEY_EXPIRATION_TIME)).isoformat()
+        return super().create(registry, uuid, properties, sheets)
 
     def __ac_local_roles__(self):
         """grab and return user as owner."""
@@ -77,6 +85,9 @@ class AccessKey(Item):
             new_properties = self.properties.copy()
             new_properties.update(properties)
             properties = new_properties
+        # set new expiration
+        properties['expiration_date'] = (datetime.datetime.utcnow() + datetime.timedelta(
+            days=self.ACCESS_KEY_EXPIRATION_TIME)).isoformat()
         self._update(properties, sheets)
 
     class Collection(Item.Collection):
@@ -106,7 +117,7 @@ def access_key_add(context, request):
     password = None
     if 'secret_access_key_hash' not in request.validated:
         password = generate_password()
-        request.validated['secret_access_key_hash'] = crypt_context.encrypt(password)
+        request.validated['secret_access_key_hash'] = crypt_context.hash(password)
 
     result = collection_add(context, request)
 
@@ -129,7 +140,7 @@ def access_key_reset_secret(context, request):
     request.validated = context.properties.copy()
     crypt_context = request.registry[CRYPT_CONTEXT]
     password = generate_password()
-    new_hash = crypt_context.encrypt(password)
+    new_hash = crypt_context.hash(password)
     request.validated['secret_access_key_hash'] = new_hash
     result = item_edit(context, request, render=False)
     result['access_key_id'] = request.validated['access_key_id']

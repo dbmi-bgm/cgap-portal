@@ -8,13 +8,11 @@ from snovault import (
 from .base import (
     Item,
     get_item_or_none,
-    ALLOW_SUBMITTER_ADD,
 )
 
 
 @abstract_collection(
     name='evidences',
-    acl=ALLOW_SUBMITTER_ADD,
     properties={
         'title': 'Evidences',
         'description': 'Listing of Evidence Items',

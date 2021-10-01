@@ -38,6 +38,9 @@
             "$ref": "mixins.json#/notes"
         },
         {
+            "$ref": "mixins.json#/interpretation"
+        },
+        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
@@ -45,6 +48,9 @@
     "description": "Schema for Genes",
     "id": "/profiles/gene.json",
     "properties": {
+        "status": {
+            "default": "shared"
+        },
         "alias_name": {
             "title": "Alias gene name",
             "type": "array",
@@ -1068,6 +1074,16 @@
                 "description": "UniProt accession number",
                 "schema_title": "UniProt",
                 "link": "https://www.uniprot.org/uniprot/<ID>"
+            }
+        },
+        "gene_notes": {
+            "title": "Gene Notes",
+            "description": "Note items related to this Gene",
+            "type": "array",
+            "items": {
+                "title": "Gene Note",
+                "type": "string",
+                "linkTo": "NoteStandard"
             }
         }
     },

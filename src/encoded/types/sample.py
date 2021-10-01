@@ -10,6 +10,26 @@ from .base import (
 from .family import Family
 
 
+def _build_sample_embedded_list():
+    """Helper function to create embedded list for sample."""
+    return [
+        # File linkTo
+        "files.status",
+        "files.file_format.file_format",
+        "files.accession",
+
+        # File linkTo
+        "cram_files.status",
+        "cram_files.accession",
+        "cram_files.file_format.file_format",
+
+        # File linkTo
+        "processed_files.accession",
+        "processed_files.file_format.file_format",
+        "processed_files.workflow_run_outputs.@id"
+    ]
+
+
 @collection(
     name='samples',
     unique_key='accession',
@@ -22,11 +42,7 @@ class Sample(Item):
     name_key = 'accession'
     schema = load_schema('encoded:schemas/sample.json')
     rev = {'indiv': ('Individual', 'samples')}
-    embedded_list = [
-        "files.status",
-        "cram_files.status",
-        "processed_files.workflow_run_outputs"
-    ]
+    embedded_list = _build_sample_embedded_list()
 
     @calculated_property(schema={
         "title": "Individual",
@@ -61,6 +77,20 @@ class Sample(Item):
             return False
 
 
+def _build_sample_processing_embedded_list():
+    """Helper function to build embedded list for sample_processing."""
+    return [
+        # File linkTo
+        "processed_files.accession",  # used to locate this file from annotated VCF via search
+        "processed_files.variant_type",
+        "processed_files.file_type",
+
+        # Sample linkTo
+        "samples.completed_processes",
+        "samples.processed_files.uuid",
+    ]
+
+
 @collection(
     name='sample-processings',
     properties={
@@ -70,11 +100,7 @@ class Sample(Item):
 class SampleProcessing(Item):
     item_type = 'sample_processing'
     schema = load_schema('encoded:schemas/sample_processing.json')
-    embedded_list = [
-        'processed_files.accession',  # used to locate this file from annotated VCF via search
-        'samples.completed_processes',
-        "samples.processed_files.uuid",
-    ]
+    embedded_list = _build_sample_processing_embedded_list()
     rev = {'case': ('Case', 'sample_processing')}
 
     @calculated_property(schema={
@@ -140,7 +166,11 @@ class SampleProcessing(Item):
                 "relationship": {
                     "title": "Relationship",
                     "type": "string"
-                    }
+                },
+                "bam_location": {
+                    "title": "Bam File Location",
+                    "type": "string"
+                }
                 }
             }
         })
@@ -183,6 +213,7 @@ class SampleProcessing(Item):
                 "parents": [],
                 "relationship": "",
                 "sex": "",
+                # "bam_location": "" optional, add if exists
                 # "association": ""  optional, add if exists
             }
             mem_infos = [i for i in all_props if a_sample in i.get('samples', [])]
@@ -190,6 +221,24 @@ class SampleProcessing(Item):
                 continue
             mem_info = mem_infos[0]
             sample_info = get_item_or_none(request, a_sample, 'samples')
+
+            # find the bam file
+            sample_processed_files = sample_info.get('processed_files', [])
+            sample_bam_file = ''
+            # no info about file formats on object frame of sample
+            # cycle through files and check the format
+            for a_file in sample_processed_files:
+                file_info = get_item_or_none(request, a_file, 'files-processed')
+                if not file_info:
+                    continue
+                # if format is bam, record the upload key and exit loop
+                if file_info.get('file_format') == "/file-formats/bam/":
+                    sample_bam_file = file_info.get('upload_key', '')
+                    break
+            # if bam file location was found, add it to temp
+            if sample_bam_file:
+                temp['bam_location'] = sample_bam_file
+
             # fetch the calculated relation info
             relation_infos = [i for i in relations if i['individual'] == mem_info['accession']]
             # fill in temp dict

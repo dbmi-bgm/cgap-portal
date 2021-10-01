@@ -94,7 +94,7 @@ export class TabView extends React.PureComponent {
         };
     }
 
-    static calculateAdditionalTabs = memoize(function(staticContentList, contents){
+    static calculateAdditionalTabs(staticContentList, contents){
 
         // If func, run it to return contents.
         // Do this here so that memoization is useful, else will always be new instance
@@ -160,9 +160,9 @@ export class TabView extends React.PureComponent {
         });
 
         return resultArr;
-    });
+    }
 
-    static combineSystemAndCustomTabs = memoize(function(additionalTabs, contents){
+    static combineSystemAndCustomTabs(additionalTabs, contents){
         if (typeof contents === 'function') contents = contents();
         let allTabs;
         if (additionalTabs.length === 0){
@@ -179,7 +179,7 @@ export class TabView extends React.PureComponent {
             }
         }
         return allTabs;
-    });
+    }
 
     static propTypes = {
         'contents' : PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.shape({
@@ -213,6 +213,12 @@ export class TabView extends React.PureComponent {
             currentTabKey : (props.contents && TabView.getDefaultActiveKeyFromContents(props.contents)) || null
         };
 
+        this.memoized = {
+            combineSystemAndCustomTabs: memoize(TabView.combineSystemAndCustomTabs),
+            calculateAdditionalTabs: memoize(TabView.calculateAdditionalTabs),
+            currentTabIdx: memoize(function(allTabs, currentTabKey){ return _.findIndex(allTabs, { 'key' : currentTabKey }); })
+        };
+
         this.tabsRef = React.createRef();
     }
 
@@ -236,24 +242,31 @@ export class TabView extends React.PureComponent {
         this.setState({ 'currentTabKey' : nextKey });
     }
 
+    /**
+     * Returns null if on same tab as href.
+     * @todo Maybe consider moving that ^.
+     */
     getTabByHref(){
         const { contents, href } = this.props;
-        const hrefParts = memoizedUrlParse(href);
-        const hash = typeof hrefParts.hash === 'string' && hrefParts.hash.length > 0 && hrefParts.hash.slice(1);
+        const { hash } = memoizedUrlParse(href);
         const currKey = this.getActiveKey();
 
-        if (currKey === hash){
+        let firstHashPart = null;
+        if (typeof hash === "string" && hash.length > 1) {
+            [ firstHashPart ] = hash.slice(1).split(".");
+        }
+
+        if (currKey === firstHashPart){
             return null;
         }
 
-        const allContentObjs = hash && TabView.combineSystemAndCustomTabs(this.additionalTabs(), contents);
-        const foundContent = Array.isArray(allContentObjs) && _.findWhere(allContentObjs, { 'key' : hash });
+        const allContentObjs = (hash && this.memoized.combineSystemAndCustomTabs(this.additionalTabs(), contents)) || [];
+        const foundContent = allContentObjs.find(function({ key }){
+            const [ keyFirstHashPart ] = key.split(".");
+            return firstHashPart === keyFirstHashPart;
+        });
 
-        if (!foundContent){
-            return null;
-        }
-
-        return foundContent;
+        return foundContent || null;
     }
 
     maybeSwitchTabAccordingToHref(){
@@ -278,7 +291,7 @@ export class TabView extends React.PureComponent {
 
         if (static_content.length === 0) return []; // No content defined for Item.
 
-        return TabView.calculateAdditionalTabs(static_content, contents);
+        return this.memoized.calculateAdditionalTabs(static_content, contents);
     }
 
     onTabClick(tabKey, evt){
@@ -302,8 +315,8 @@ export class TabView extends React.PureComponent {
         const { contents, prefixTabs = [], suffixTabs = [] } = this.props;
         const { currentTabKey } = this.state;
 
-        const allTabs = TabView.combineSystemAndCustomTabs(this.additionalTabs(), contents);
-        const currentTabIdx = _.findIndex(allTabs, { 'key' : currentTabKey });
+        const allTabs = this.memoized.combineSystemAndCustomTabs(this.additionalTabs(), contents);
+        const currentTabIdx = this.memoized.currentTabIdx(allTabs, currentTabKey);
         const currentTab = allTabs[currentTabIdx];
 
         if (!currentTab) {

@@ -4,7 +4,7 @@ const { spawn } = require('child_process');
 const PluginError = require('plugin-error');
 const log = require('fancy-log');
 const webpack = require('webpack');
-const sass = require('node-sass');
+const sass = require('sass');
 const fs = require('fs');
 
 
@@ -21,6 +21,38 @@ function setQuick(done){
 function setDevelopment(done){
     process.env.NODE_ENV = 'development';
     done();
+}
+
+function cleanBuildDirectory(done){
+    const buildDir = "./src/encoded/static/build/";
+    const pathsToDelete = [];
+    fs.readdir(buildDir, function(err, files){
+        files.forEach(function(fileName){
+            if (fileName === ".gitignore") { // Skip
+                return;
+            }
+            const filePath = path.resolve(buildDir, fileName);
+            pathsToDelete.push(filePath);
+        });
+
+        const filesToDeleteLen = pathsToDelete.length;
+
+        if (filesToDeleteLen === 0) {
+            done();
+            return;
+        }
+
+        var countDeleted = 0;
+        pathsToDelete.forEach(function(filePath){
+            fs.unlink(filePath, function(err){
+                countDeleted++;
+                if (countDeleted === filesToDeleteLen) {
+                    console.log("Cleaned " + countDeleted + " files from " + buildDir);
+                    done();
+                }
+            });
+        });
+    });
 }
 
 function webpackOnBuild(done) {
@@ -50,21 +82,19 @@ function watch(done){
 
 function getLinkedSharedComponentsPath(){
     let sharedComponentPath = path.resolve(__dirname, 'node_modules/@hms-dbmi-bgm/shared-portal-components');
-    let isLinked = false;
-    try { // Get exact path to dir, else leave. Used to avoid needing to webpack dependency itself.
-        for (var i = 0; i < 10; i++) { // Incase multiple links.
-            sharedComponentPath = fs.readlinkSync(sharedComponentPath);
-            isLinked = true;
-        }
-    } catch (e){
-        // ... not linked
-    }
+    const origPath = sharedComponentPath;
+
+    // Follow any symlinks to get to real path.
+    sharedComponentPath = fs.realpathSync(sharedComponentPath);
+
+    const isLinked = origPath !== sharedComponentPath;
 
     console.log(
         "`@hms-dbmi-bgm/shared-portal-components` directory is",
         isLinked ? "sym-linked to `" + sharedComponentPath + "`." : "NOT sym-linked."
     );
-    return { isLinked, sharedComponentPath : isLinked ? sharedComponentPath : null };
+
+    return { isLinked, sharedComponentPath: isLinked ? sharedComponentPath : null };
 }
 
 function buildSharedPortalComponents(done){
@@ -88,7 +118,13 @@ function buildSharedPortalComponents(done){
         { stdio: "inherit" }
     );
 
+    subP.on("error", (err)=>{
+        console.log(`buildSharedPortalComponents errored - ${err}`);
+        return;
+    });
+
     subP.on("close", (code)=>{
+        console.log(`buildSharedPortalComponents process exited with code ${code}`);
         done();
     });
 
@@ -116,7 +152,13 @@ function watchSharedPortalComponents(done){
         { stdio: "inherit" }
     );
 
+    subP.on("error", (err)=>{
+        console.log(`watchSharedPortalComponents errored - ${err}`);
+        return;
+    });
+
     subP.on("close", (code)=>{
+        console.log(`watchSharedPortalComponents process exited with code ${code}`);
         done();
     });
 
@@ -131,7 +173,7 @@ const sourceMapLocation = "./src/encoded/static/css/style.css.map";
 function doSassBuild(done, options = {}) {
     sass.render({
         file: './src/encoded/static/scss/style.scss',
-        outFile: './src/encoded/static/css/style-map.css', // sourceMap location
+        outFile: './src/encoded/static/css/style.css', // sourceMap location
         outputStyle: options.outputStyle || 'compressed',
         sourceMap: true
     }, function(error, result) { // node-style callback from v3.0.0 onwards
@@ -175,18 +217,24 @@ function doSassBuild(done, options = {}) {
 
 
 const devQuick = gulp.series(
+    cleanBuildDirectory,
     setQuick,
     doWebpack,
     gulp.parallel(watch, watchSharedPortalComponents)
 );
 
 const devAnalyzed = gulp.series(
+    cleanBuildDirectory,
     setDevelopment,
     buildSharedPortalComponents,
     doWebpack
 );
 
-const build = gulp.series(setProduction, doWebpack);
+const build = gulp.series(
+    cleanBuildDirectory,
+    setProduction,
+    doWebpack
+);
 
 
 //gulp.task('dev', devSlow);

@@ -1,5 +1,5 @@
 import { getGraphHeight } from './layout-utilities-drawing';
-import { getRelationships, isRelationship, numberToRomanNumeral, sortByAge, sortByGender } from './data-utilities';
+import { getRelationships, isRelationshipNode, numberToRomanNumeral, sortByAge, sortByGender } from './data-utilities';
 
 
 
@@ -250,7 +250,7 @@ function countNodesInBetween(order, fromNode, toNode){
         const node = orderByHeightIndex[heightIndex][ord];
         //console.log('IN BETWEEN', node);
         num += 2; // A node in between - count 3x
-        if (isRelationship(node)){
+        if (isRelationshipNode(node)){
             //if (node.partners.indexOf(fromNode) > -1 || node.partners.indexOf(toNode) > -1){
             //    continue;
             //}
@@ -326,7 +326,7 @@ function countEdgeCrossingInstance(order, fromNode, toNode){
     const subsequentSiblingsInIndex = orderByHeightIndex[hiFrom].slice(orderLow + 1, orderHigh + 1);
     subsequentSiblingsInIndex.forEach(function(siblingInIndex){
         const { id, partners, children, _maritalRelationships, _parentalRelationship } = siblingInIndex;
-        if (isRelationship(siblingInIndex)) {
+        if (isRelationshipNode(siblingInIndex)) {
             //if (partners.indexOf(fromNode) === -1){
             //    crossings++;
             //}
@@ -371,7 +371,7 @@ function countEdgeCrossings(order){
         nodesInRow.forEach(function(node, indexInRow){ // left to right
             const { id, partners, children, _maritalRelationships, _parentalRelationship } = node;
             //if (!seenFrom[id]) seenFrom[id] = new Set();
-            if (isRelationship(node)) {
+            if (isRelationshipNode(node)) {
                 if (indexInRow === 0) {
                     crossings += 10;
                 }
@@ -658,20 +658,23 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
         return { orderByHeightIndex, seenOrderInIndex, seenPosInIndex };
     }
 
+    const directProbandAncestryPositions = buildAncestralPositions(
+        spansByHeightIndex,
+        [  [ objectGraph[0], 0, 0 ]  ] // Assume first node/indv in objectGraph is the proband.
+    );
+
     const {
         posByHeightIndex,
         positionedIndividuals,
         positionedRelationships,
         seenDirectInRelation,
         qAuxRelationships,
-    } = buildAncestralPositions(
-        spansByHeightIndex,
-        [  [ objectGraph[0], 0, 0 ]  ] // Assume first node/indv in objectGraph is the proband.
-    );
+    } = directProbandAncestryPositions;
 
     const graphSize = objectGraph.length;
     const allSeen = { ...seenDirectInRelation };
     const subtrees = [];
+
     const auxRelationsToMakeSubtreesFor = {}; // We delete from this once connected-to, as a sort of unordered queue.
     qAuxRelationships.forEach(function(qARItem){
         auxRelationsToMakeSubtreesFor[qARItem[0].id] = qARItem;
@@ -679,8 +682,15 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
 
     const skippedAuxRelationships = new Set();
 
+    // Arbitrary counter to terminate if issue present.
+    let runCount = 0;
     // eslint-disable-next-line no-constant-condition
     while (true){
+
+        runCount++;
+        if (runCount > 1000) {
+            throw Error("Hit over 1000 auxiliary relationships. This is possible but inprobable. Investigate if not enormous pedigree.");
+        }
 
         // Order creation of subtrees by auxiliary relations to facilitate connecting (~BFS)
         // back subtrees to parent subtree in order in case multiple layers of auxiliary relations/subtrees
@@ -726,7 +736,15 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
             }
         }
 
-        console.log('AAA', nextAuxRelationship, nextChildrenSet);
+        console.log(
+            'Func orderObjectGraph, run:', runCount,
+            nextAuxRelationship,
+            'nextChildrenSet:', nextChildrenSet,
+            'qAuxRelationships:', qAuxRelationships,
+            'objectGraph:', objectGraph,
+            'allSeen:', allSeen,
+            'skippedAuxRelationships:', skippedAuxRelationships
+        );
 
         let nodeAtLowestHI = null;
         for (let i = 0; i < nextChildrenSetCount; i++) {
@@ -966,7 +984,7 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
             n._drawing.orderInHeightIndex = seenOrderInIndex[n.id];
             n._drawing.origPosInHeightIndex = seenPosInIndex[n.id]; // for debugging only rn past this
 
-            if ( isRelationship(n) ) {
+            if ( isRelationshipNode(n) ) {
                 // Don't increment or add to node.
                 return currNum;
             }
@@ -1029,7 +1047,7 @@ export function positionObjectGraph(objectGraph, order, dims, memoized = {}){
                 q.push(ch);
             });
             // Own children
-            if (isRelationship(child)){
+            if (isRelationshipNode(child)){
                 (children || []).forEach(function(ch){
                     q.push(ch);
                 });
@@ -1076,7 +1094,7 @@ export function positionObjectGraph(objectGraph, order, dims, memoized = {}){
                 offsetFromPrevNode = prevNode._drawing.xCoord + dims.individualWidth + dims.individualXSpacing;
                 _drawing.xCoord = offsetFromPrevNode;
 
-                if (isRelationship(currNode)){
+                if (isRelationshipNode(currNode)){
                     const childrenWithAssignedXCoord = children.filter(function(c){
                         return typeof c._drawing.xCoord === 'number';
                     });

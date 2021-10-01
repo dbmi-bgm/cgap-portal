@@ -3,30 +3,77 @@
     "id": "/profiles/report.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["project", "institution"],
-    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "required": [
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "accession",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/accession" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/attribution" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        }
     ],
     "properties": {
         "schema_version": {
             "default": "1"
         },
-        "accession" : {
-            "accessionType" : "RE"
+        "accession": {
+            "accessionType": "RE"
         },
         "description": {
             "title": "Description",
             "description": "Description of the report",
             "type": "string"
+        },
+        "variant_samples": {
+            "title": "Variant Samples",
+            "description": "The variant samples included in this report",
+            "type": "array",
+            "items": {
+                "title": "Variant Sample",
+                "description": "A variant sample included in this report",
+                "type": "string",
+                "linkTo": "VariantSample"
+            }
+        },
+        "extra_notes": {
+            "title": "Additional Notes",
+            "description": "Notes for this report that are not attached to the Variant Samples",
+            "type": "array",
+            "items": {
+                "title": "Extra Note",
+                "type": "string",
+                "linkTo": "NoteStandard"
+            }
         }
     }
 }

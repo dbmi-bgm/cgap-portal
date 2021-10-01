@@ -3,113 +3,153 @@
     "id": "/profiles/static_section.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["name"],
+    "required": [
+        "name"
+    ],
     "additionalProperties": false,
-    "identifyingProperties": ["uuid", "name", "aliases"],
+    "identifyingProperties": [
+        "uuid",
+        "name",
+        "aliases"
+    ],
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "user_content.json#/properties" },
-        { "$ref": "mixins.json#/attribution" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "user_content.json#/properties"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        }
     ],
     "properties": {
         "schema_version": {
             "default": "2"
         },
-        "body":{
+        "status": {
+            "title": "Status",
+            "type": "string",
+            "permission": "restricted_fields",
+            "default": "current",
+            "enum": [
+                "public",
+                "shared",
+                "current",
+                "inactive",
+                "in review",
+                "deleted"
+            ]
+        },
+        "body": {
             "title": "Raw Body",
             "type": "string",
-            "comment" : "There should be no 'file' if this is set.",
+            "comment": "There should be no 'file' if this is set.",
             "description": "Plain html or text content of this section.",
             "formInput": "code",
-            "lookup" : 6
+            "lookup": 6
         },
         "file": {
             "title": "Source File Location",
             "type": "string",
-            "comment" : "There should be no 'body' if this is set.",
+            "comment": "There should be no 'body' if this is set.",
             "description": "Source file to use for populating content. Is superceded by contents of 'body', if one present.",
-            "lookup" : 7
+            "lookup": 7
         },
         "section_type": {
             "title": "Section Type",
             "type": "string",
             "description": "What this section is used for. Defaults to 'Page Section'.",
-            "permission" : "import_items",
             "default": "Page Section",
-            "enum" : [
+            "enum": [
                 "Page Section",
                 "Announcement",
                 "Search Info Header",
                 "Item Page Header",
                 "Home Page Slide"
             ],
-            "lookup" : 10
+            "lookup": 10
         },
         "options": {
             "title": "Options",
             "type": "object",
             "description": "Options for section display.",
-            "properties" : {
-                "filetype" : {
-                    "title" : "File Type",
+            "properties": {
+                "filetype": {
+                    "title": "File Type",
                     "description": "What type of file or content is contained. If not set, HTML or format of file (if any) is used.",
-                    "type" : "string",
-                    "lookup" : 1,
-                    "enum" : [ "md", "html", "txt", "csv", "jsx" ]
+                    "type": "string",
+                    "lookup": 1,
+                    "enum": [
+                        "md",
+                        "html",
+                        "txt",
+                        "csv",
+                        "jsx"
+                    ]
                 },
-                "collapsible" : {
-                    "title" : "Is Collapsible",
-                    "type" : "boolean",
+                "collapsible": {
+                    "title": "Is Collapsible",
+                    "type": "boolean",
                     "description": "Whether this StaticSection should be collapsible (wherever collapsibility is an option). This property is ignored in some places, e.g. lists where all sections are explicitly collapsible.",
                     "lookup": 2,
-                    "default" : false
+                    "default": false
                 },
-                "default_open" : {
-                    "title" : "Is Expanded by Default",
-                    "type" : "boolean",
+                "default_open": {
+                    "title": "Is Expanded by Default",
+                    "type": "boolean",
                     "description": "Whether this StaticSection should appear as expanded by default (in places where it may be collapsible). Does not necessarily depend on 'collapsible' being true, e.g. in lists where all sections are explicitly collapsible.",
                     "lookup": 3,
                     "default": true
                 },
-                "title_icon" : {
-                    "title" : "Title Icon",
+                "title_icon": {
+                    "title": "Title Icon",
                     "description": "Icon to be showed next to title in selected places.",
-                    "type" : "string",
-                    "lookup" : 5
+                    "type": "string",
+                    "lookup": 5
                 },
-                "link" : {
-                    "title" : "Link/URI",
+                "link": {
+                    "title": "Link/URI",
                     "description": "Another link with which this resource is associated with or should redirect to.",
-                    "type" : "string",
-                    "lookup" : 6
+                    "type": "string",
+                    "lookup": 6
                 },
-                "image" : {
-                    "title" : "Preview Image",
+                "image": {
+                    "title": "Preview Image",
                     "description": "Image or screenshot URL for this Item to use as a preview.",
-                    "type" : "string",
-                    "lookup" : 7
+                    "type": "string",
+                    "lookup": 7
                 }
             },
-            "lookup" : 25
-        }
-
-    },
-    "facets" : {
-        "section_type" : {
-            "title" : "Type"
+            "lookup": 25
         }
     },
-    "columns" : {
-        "name" : {
-            "title" : "Name / ID"
+    "facets": {
+        "section_type": {
+            "title": "Type"
+        }
+    },
+    "columns": {
+        "name": {
+            "title": "Name / ID"
         },
-        "section_type" : {
-            "title" : "Type"
+        "section_type": {
+            "title": "Type"
         }
     },
-    "excludedColumns" : ["lab.display_title"]
+    "excludedColumns": [
+        "lab.display_title"
+    ]
 }

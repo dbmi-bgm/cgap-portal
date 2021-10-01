@@ -49,12 +49,14 @@ class InheritanceMode:
     INHMODE_LABEL_DE_NOVO_CHRXY = "de novo (chrXY)"
     INHMODE_DOMINANT_FATHER = "Dominant (paternal)"
     INHMODE_DOMINANT_MOTHER = "Dominant (maternal)"
-    INHMODE_LABEL_RECESSIVE = "Recessive"
+    INHMODE_LABEL_RECESSIVE = "Homozygous recessive"
     INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER = "X-linked recessive (Maternal)"
     INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER = "X-linked dominant (Maternal)"
     INHMODE_LABEL_X_LINKED_DOMINANT_FATHER = "X-linked dominant (Paternal)"
     INHMODE_LABEL_Y_LINKED = "Y-linked dominant"
-    INHMODE_LABEL_LOH = "Loss of Heteozyogousity"
+    INHMODE_LABEL_LOH = "Loss of Heterozygosity"
+
+    INHMODE_LABEL_SV_DE_NOVO = "Possibly de novo"
 
     INHMODE_LABEL_NONE_DOT = "Low relevance, missing call(s) in family"
     INHMODE_LABEL_NONE_MN = "Low relevance, multiallelic site family"
@@ -185,14 +187,21 @@ class InheritanceMode:
         return mother_gt == '0/0' and father_gt == '0/0'
 
     @classmethod
-    def compute_inheritance_mode_trio(cls, *, genotypes, genotype_labels, sexes, chrom, novoPP):
+    def compute_inheritance_mode_trio(
+        cls, *, genotypes, genotype_labels, sexes, chrom, novoPP,
+        structural_variant=False
+    ):
         """ Computes inheritence modes for the trio of 'self', 'mother', 'father'.
+
+        Note: No NovoCaller for SVs, so all SV de novo calls are weak
+        and solely based on genotype.
 
         :param genotypes: dictionary of role -> genotype mappings
         :param genotype_labels: dictionary of role -> genotype_label mappings
         :param sexes: dictionary of role -> sex mappings
         :param chrom: relevant chromosome
         :param novoPP: novoCaller post-posterior probability (likely de novo), takes precedence
+        :param structural_variant: boolean True for SVs
         :returns: list of inheritance modes
         """
         # validate precondition
@@ -222,12 +231,22 @@ class InheritanceMode:
         # And de novo chrXY
         if (cls.mother_father_ref_ref(genotypes[cls.MOTHER], genotypes[cls.FATHER])
                 and ((genotypes[cls.SELF] == '0/1' and sexes[cls.SELF] == cls.FEMALE and chrom == 'X')
-                     or (genotypes[cls.SELF] == '1/1' and sexes[cls.SELF] == cls.MALE and chrom != 'autosome'))):
+                     or (genotypes[cls.SELF] == '1/1' and sexes[cls.SELF] == cls.MALE and chrom != cls.AUTOSOME))):
             if novoPP > 0:
                 raise ValueError("novoPP is different from 0 or -1 on sex chromosome: %s" % novoPP)
-            if novoPP == -1:
+            if novoPP == -1 and not structural_variant:
                 return [cls.INHMODE_LABEL_DE_NOVO_CHRXY]
 
+        # SV likely de novo (no novoPP, so based solely on genotypes)
+        if (
+                structural_variant
+                and cls.mother_father_ref_ref(
+                    genotypes[cls.MOTHER], genotypes[cls.FATHER]
+                )
+                and (genotypes[cls.SELF] in ["0/1", "1/1"])
+        ):
+            return [cls.INHMODE_LABEL_SV_DE_NOVO]
+                
         # If not a de novo, assign inheritance mode based solely on genotypes (from GATK)
         if (genotypes[cls.MOTHER] == "0/0"
                 and genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_0M
@@ -330,15 +349,22 @@ class InheritanceMode:
         return structured_labels
 
     @classmethod
-    def compute_inheritance_modes(cls, variant_sample, chrom=None):
+    def compute_inheritance_modes(
+        cls, variant_sample, chrom=None, structural_variant=False
+    ):
         """ Computes inheritance modes given a variant_sample.
             Intended to perform: variant_sample.update(new_fields) with result of this method.
 
             Adds the following 2 fields to variant_sample given the complete information:
                 1. genotype_labels
                 2. inheritance_modes
+
+        Note: Only difference for SVs is in inheritance mode
+        calculation. Genotype labels identical to those for SNVs.
         """
         sample_geno = variant_sample.get('samplegeno', [])
+        if not sample_geno:
+            return {}
         try:
             sample_ids = {s["samplegeno_role"]: s["samplegeno_sampleid"] for s in sample_geno}
             genotypes = {s["samplegeno_role"]: s["samplegeno_numgt"] for s in sample_geno}
@@ -347,7 +373,7 @@ class InheritanceMode:
             cmphet = variant_sample.get("cmphet")
             novoPP = variant_sample.get("novoPP", -1)
         except Exception as e:
-            log.error('Was not able to extract inheritance modes - the required fields do not exist!'
+            log.info('Was not able to extract inheritance modes - the required fields do not exist!'
                       '\n%s\n%s\n%s' % (sample_geno, variant_sample, e))
             return {}
 
@@ -361,9 +387,14 @@ class InheritanceMode:
             raise InheritanceModeError('Role "proband" not present in genotypes: %s' % genotypes)
 
         genotype_labels = cls.compute_family_genotype_labels(genotypes, sexes, chrom)
-        inheritance_modes = cls.compute_inheritance_mode_trio(genotypes=genotypes,
-                                                              genotype_labels=genotype_labels,
-                                                              sexes=sexes, chrom=chrom, novoPP=novoPP)
+        inheritance_modes = cls.compute_inheritance_mode_trio(
+            genotypes=genotypes,
+            genotype_labels=genotype_labels,
+            sexes=sexes, 
+            chrom=chrom, 
+            novoPP=novoPP,
+            structural_variant=structural_variant,
+        )
         inheritance_modes += cls.compute_cmphet_inheritance_modes(cmphet)
         if len(inheritance_modes) == 0:
             inheritance_modes = cls.inheritance_modes_other_labels(genotypes, genotype_labels)

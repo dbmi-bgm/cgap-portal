@@ -1,8 +1,10 @@
 import pytest
+
 from .variant_fixtures import test_genes, GENE_URL  # noqa (fixture)
 
 
-pytestmark = [pytest.mark.working, pytest.mark.ingestion]
+# This uses workbook indirectly through test_genes
+pytestmark = [pytest.mark.working, pytest.mark.ingestion, pytest.mark.workbook]
 
 
 def test_post_gene_inserts(testapp, project, institution, test_genes):

@@ -3,78 +3,133 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import memoize from 'memoize-one';
 
 import { object, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { StackedBlockTable, StackedBlock, StackedBlockList, StackedBlockName, StackedBlockNameLabel } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/StackedBlockTable';
+import { responsiveGridState } from './../util/layout';
 
 
-export const CaseDetailPane = React.memo(function CaseDetailPane (props) {
-    const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth } = props;
-    const { family = null, secondary_families = null } = result;
+export class CaseDetailPane extends React.PureComponent {
 
-    let usePadWidth = paddingWidth || 0;
-    if (paddingWidthMap){
-        usePadWidth = paddingWidthMap[layout.responsiveGridState(windowWidth)] || paddingWidth;
-    }
-    const commonFamilySectionProps = {
-        containerWidth, result, minimumWidth, paddingWidth: usePadWidth
+    static propTypes = {
+        'result' : PropTypes.object.isRequired,
+        'detailPaneStateCache' : PropTypes.object.isRequired,
+        'updateDetailPaneStateCache' : PropTypes.func.isRequired,
+        'setDetailHeightFromPane' : PropTypes.func.isRequired,
+        'containerWidth' : PropTypes.number,
+        'paddingWidth' : PropTypes.number,
+        'windowWidth' : PropTypes.number,
+        'href' : PropTypes.string,
+        'minimumWidth' : PropTypes.number
     };
 
-    let families = [];
-    if (family !== null) {
-        families.push(family);
-        if (secondary_families !== null && secondary_families.length > 0) {
-            families = families.concat(secondary_families);
-        }
+    static defaultProps = {
+        'paddingWidth' : 0,
+        'minimumWidth' : 725,
+    };
+
+    constructor(props){
+        super(props);
+        const { detailPaneStateCache = {}, result: { "@id": resultID } } = props;
+        this.toggleOpenFamily = this.toggleOpenFamily.bind(this);
+        this.state = detailPaneStateCache[resultID] || {
+            // Keyed by family index (b.c. unsure if a family "@id" exists, and if so, if lack of view permission for it is possible)
+            familiesOpen: {}
+        };
     }
 
-    // Once primary/other family objects added to Case schema, update to use those instead
-    const familySections = families.map(function(family){
-        return <FamilySection {...commonFamilySectionProps} key={family['@id']} {...{ result, family }} />;
-    });
+    /** Save own state to DetailPaneStateCache.detailPaneStateCache */
+    componentWillUnmount(){
+        const { result: { "@id": resultID }, updateDetailPaneStateCache } = this.props;
 
-    return (
-        <div className="family-info-wrapper">
-            <div className="family-addinfo">
-                <div className="row">
-                    <div className="col-md-6 addinfo-properties-section">
-                        <div className="row mb-05 clearfix">
-                            <div className="col-4 col-sm-3 text-500">
-                                Cohort:
+        if (typeof updateDetailPaneStateCache !== "function") {
+            return;
+        }
+
+        const { familiesOpen } = this.state;
+
+        const anyOpen = Object.keys(familiesOpen).length > 0;
+        updateDetailPaneStateCache(resultID, anyOpen ? { ...this.state } : null);
+    }
+
+    toggleOpenFamily(familyIndx){
+        this.setState(function({ familiesOpen: prevOpen }){
+            const familiesOpen = { ...prevOpen };
+            familiesOpen[familyIndx] = !(familiesOpen[familyIndx] || false);
+            return { familiesOpen };
+        }, ()=>{
+            const { setDetailHeightFromPane } = this.props;
+            if (typeof setDetailHeightFromPane === "function") {
+                setDetailHeightFromPane();
+            }
+        });
+    }
+
+    render(){
+        const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth, detailPaneStateCache, updateDetailPaneStateCache } = this.props;
+        const { familiesOpen } = this.state;
+        const { family = null, secondary_families = null, cohort, project } = result;
+
+        let usePadWidth = paddingWidth || 0;
+        if (paddingWidthMap){
+            usePadWidth = paddingWidthMap[responsiveGridState(windowWidth)] || paddingWidth;
+        }
+        const commonFamilySectionProps = {
+            containerWidth, result, minimumWidth, paddingWidth: usePadWidth,
+            detailPaneStateCache, updateDetailPaneStateCache
+        };
+
+        let families = [];
+        if (family !== null) {
+            families.push(family);
+            if (secondary_families !== null && secondary_families.length > 0) {
+                families = families.concat(secondary_families);
+            }
+        }
+
+        // Once primary/other family objects added to Case schema, update to use those instead
+        const familySections = families.map((family, familyIndex) => {
+            const { '@id': familyID } = family;
+            const open = familiesOpen[familyIndex];
+            return (
+                <FamilySection {...commonFamilySectionProps} {...{ family, familyIndex, open }}
+                    key={familyID} onToggleOpen={this.toggleOpenFamily} />
+            );
+        });
+
+        return (
+            <div className="family-info-wrapper">
+                <div className="family-addinfo">
+                    <div className="row">
+                        <div className="col-md-6 addinfo-properties-section">
+                            <div className="row mb-05 clearfix">
+                                <div className="col-4 col-sm-3 text-500">
+                                    Cohort:
+                                </div>
+                                <div className="col-8 col-sm-9 family-addinfo-val">
+                                    { object.itemUtil.generateLink(cohort) || <small><em>None</em></small> }
+                                </div>
                             </div>
-                            <div className="col-8 col-sm-9 family-addinfo-val">
-                                { object.itemUtil.generateLink(result.cohort) || <small><em>None</em></small> }
-                            </div>
-                        </div>
-                        <div className="row mb-05 clearfix">
-                            <div className="col-4 col-sm-3 text-500">
-                                Project:
-                            </div>
-                            <div className="col-8 col-sm-9 family-addinfo-val">
-                                { object.itemUtil.generateLink(result.project) || <small><em>None</em></small> }
+                            <div className="row mb-05 clearfix">
+                                <div className="col-4 col-sm-3 text-500">
+                                    Project:
+                                </div>
+                                <div className="col-8 col-sm-9 family-addinfo-val">
+                                    { object.itemUtil.generateLink(project) || <small><em>None</em></small> }
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div style={{ width: containerWidth ? (containerWidth - usePadWidth) : null }} className="family-tables-container overflow-auto"> {/*formerly files-tables-container */}
+                    { familySections }
+                </div>
             </div>
-            <div style={{ width: containerWidth ? (containerWidth - usePadWidth) : null }} className="family-tables-container overflow-auto"> {/*formerly files-tables-container */}
-                { familySections }
-            </div>
-        </div>
-    );
-});
-CaseDetailPane.propTypes = {
-    'result' : PropTypes.object.isRequired,
-    'containerWidth' : PropTypes.number,
-    'paddingWidth' : PropTypes.number,
-    'windowWidth' : PropTypes.number,
-    'href' : PropTypes.string,
-    'minimumWidth' : PropTypes.number
-};
-CaseDetailPane.defaultProps = {
-    'paddingWidth' : 0,
-    'minimumWidth' : 725,
-};
+        );
+    }
+}
+
 
 /**
  * Renders a collapsible button that opens to reveal a FamilyReportStackedTable containing information
@@ -84,20 +139,18 @@ class FamilySection extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            open: false,
-        };
         this.onToggle = _.throttle(this.onToggle.bind(this), 750, { 'trailing' : false });
     }
 
-    onToggle() {
-        const { open } = this.state;
-        this.setState({ open: !open });
+    onToggle(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const { onToggleOpen, familyIndex } = this.props;
+        onToggleOpen(familyIndex);
     }
 
     render() {
-        const { open } = this.state;
-        const { family, result, containerWidth, minimumWidth, paddingWidth } = this.props;
+        const { family, result, open, containerWidth, minimumWidth, paddingWidth } = this.props;
         return (
             <div className="family-table-section">
                 <h4 className="pane-section-title" onClick={this.onToggle}>
@@ -110,7 +163,7 @@ class FamilySection extends React.Component {
                 </h4>
                 { open ? (
                     <FamilyReportStackedTable
-                        {...{ result, family }} preventExpand={false}
+                        {...{ result, family }} preventExpand={true}
                         width={containerWidth ? (Math.max(containerWidth - paddingWidth, minimumWidth) /* account for padding of pane */) : null}
                         fadeIn={false} collapseLongLists
                     />
@@ -129,30 +182,26 @@ class FamilySection extends React.Component {
  * and report/case in that family. Result rows are sorted by individual (first proband, then individuals
  * with samples, then the rest).
  *
- * TODO: highlight current case throughout the table using 'result' prop.
+ * @todo (?) Highlight current case throughout the table using 'result' prop.
+ * @todo Maybe we can migrate to simpler flex/css instead of StackedTable eventually..
  */
 export class FamilyReportStackedTable extends React.PureComponent {
 
-    static StackedBlock = StackedBlock
-
-    static builtInHeaders(){
-        // Keeping these builtInHeader methods separate in case we want to build in custom columns later
-        return [
-            { columnClass: 'individual',     className: 'text-left',     title: 'Individual',     initialWidth: 220   },
-            { columnClass: 'libraries',    className: 'text-left',     title: 'Libraries',    initialWidth: 220   },
-            { columnClass: 'analysis',    title: 'Analysis',    initialWidth: 200   },
-            { columnClass: 'report',    title: 'Report',          initialWidth: 200  }
-        ];
-    }
+    // Keeping these builtInHeader methods separate in case we want to build in custom columns later
+    static builtInHeaders = [
+        { columnClass: 'individual',    className: 'text-left',         title: 'Individual',                initialWidth: 200   },
+        { columnClass: 'libraries',     className: 'text-left',         title: 'Sequencing Libraries',      initialWidth: 80    },
+        /* report + analysis columns have no labels, but have left alignment, so we add 12px padding left to visually align header to it better */
+        { columnClass: 'analysis',      className: 'text-left pl-12',         title: 'Analysis',            initialWidth: 80    },
+        { columnClass: 'report',        className: 'text-left pl-12',   title: 'Report',                    initialWidth: 260   }
+    ];
 
     /* Built-in headers */
     static staticColumnHeaders(columnHeaders){
-        return _.map(FamilyReportStackedTable.builtInHeaders(), function(staticCol){
-            return _.extend(
-                _.clone(staticCol),
-                _.findWhere(columnHeaders, { 'title' : staticCol.title }) || {}
-            );
-        }) || [];
+        return FamilyReportStackedTable.builtInHeaders.map(function(staticCol){
+            const foundColumnFromParamHeaders = _.findWhere(columnHeaders, { 'title' : staticCol.title });
+            return { ...staticCol, ...(foundColumnFromParamHeaders || {}) };
+        });
     }
 
     static propTypes = {
@@ -187,6 +236,9 @@ export class FamilyReportStackedTable extends React.PureComponent {
         this.renderSampleBlock = this.renderSampleBlock.bind(this);
         this.renderIndividualBlock = this.renderIndividualBlock.bind(this);
         this.renderIndividualBlockList = this.renderIndividualBlockList.bind(this);
+        this.memoized = {
+            staticColumnHeaders: memoize(FamilyReportStackedTable.staticColumnHeaders)
+        };
     }
 
     /**
@@ -209,47 +261,60 @@ export class FamilyReportStackedTable extends React.PureComponent {
             <StackedBlock columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}
                 label={<StackedBlockNameLabel title="Sample" subtitle="Library" accession={accession} subtitleVisible/>}>
                 <StackedBlockName>
-                    <span className="name-title">
-                        { atId ? <a href={atId} className="name-title">{ workup_type }</a> : <span className="name-title">{ workup_type }</span>}
-                    </span>
+                    <div className="name-title text-left pt-2 pb-2">
+                        { atId ? <a href={atId}>{ workup_type }</a> : <span>{ workup_type }</span> }
+                    </div>
                 </StackedBlockName>
                 <StackedBlockList className="analysis" title="Analysis">
-                    {analysisGroups.map((group) => {
-                        const { analysis_type = null, cases = [] } = group || {};
-                        let reportBlock = null;
+                    { analysisGroups.filter(function({ samples: analysisGroupSamples = [] }){
+                        if (analysisGroupSamples.length > 0) {
+                            if (_.any(analysisGroupSamples, function({ "@id": agSampleID }){
+                                return agSampleID === atId;
+                            })) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }).map((analysisGroup) => {
+                        const { analysis_type = null, analysis_version = null, cases: groupCases = [] } = analysisGroup || {};
 
                         // Figure out which report is associated with the current analysis group & sample
-                        cases.forEach((groupCase) => {
-                            const { '@id': thisCaseAtId = null, sample: caseSample = null } = groupCase || {};
-                            const { '@id': sampleAtId = null } = caseSample || {};
-                            if (sampleAtId === atId) {
-
-                                const reportBlockId = caseToReportMap[thisCaseAtId];
-                                const fallbackKey = 'case-' + thisCaseAtId;
-
-                                if (reportBlockId) {
-                                    reportBlock = reportBlockMapping[reportBlockId];
-                                // TODO: Rework this entire method of passing case through; didn't realize case was necessary early on and needed this
-                                } else if (
-                                    reportBlockMapping[fallbackKey]
-                                ) {
-                                    reportBlock = reportBlockMapping[fallbackKey] || null;
-                                }
+                        const groupCase = groupCases.find(function(groupCase){
+                            const { sample: { '@id': groupCaseSampleAtId = null } = {} } = groupCase || {};
+                            if (groupCaseSampleAtId === atId) {
+                                return true;
                             }
+                            return false;
                         });
+
+                        const { '@id': groupCaseAtId = null } = groupCase || {};
+
+                        const reportBlockId = caseToReportMap[groupCaseAtId];
+                        const fallbackKey = 'case-' + groupCaseAtId;
+                        const analysis_title = analysis_type + (analysis_version ? " (" + analysis_version + ")" : "");
+                        let reportBlock = null;
+
+                        if (reportBlockId) {
+                            reportBlock = reportBlockMapping[reportBlockId];
+                        // TODO: Rework this entire method of passing case through; didn't realize case was necessary early on and needed this
+                        } else if (reportBlockMapping[fallbackKey]) {
+                            reportBlock = reportBlockMapping[fallbackKey] || null;
+                        }
 
                         return (
                             <StackedBlock key={analysis_type} columnClass="analysis" hideNameOnHover={false}
                                 label={<StackedBlockNameLabel title={null} subtitle={null} accession={null} subtitleVisible/>}>
                                 <StackedBlockName>
-                                    <span className="name-title">{ analysis_type }</span>
+                                    <span className="name-title text-left d-block">{ analysis_title }</span>
                                 </StackedBlockName>
                                 <StackedBlockList className="report" title="Report">
                                     { reportBlock ? <StackedBlockList className="report" title="Report">{reportBlock}</StackedBlockList> : FamilyReportStackedTable.renderEmptyBlock("report") }
                                 </StackedBlockList>
-                            </StackedBlock>);
-                    }
-                    )}
+                            </StackedBlock>
+                        );
+                    }) }
                 </StackedBlockList>
             </StackedBlock>
         );
@@ -274,24 +339,29 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
                         label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}>
                         <StackedBlockName>
-                            <span className="d-inline">
-                                Case ID: { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
-                            </span>
-                            <span className="d-inline">
-                                { reportAtId ? <>Report: <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a></> : <>Report: <span className="name-title text-capitalize">{ reportTitle }</span></>}
-                            </span>
+                            <div className="d-flex text-left">
+                                <span className="mr-07 text-nowrap">Case ID:</span>
+                                { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
+                            </div>
+                            <div className="d-flex text-left">
+                                <span className="mr-07 text-nowrap">Report:</span>
+                                { reportAtId ? <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a> : <span className="name-title text-capitalize">{ reportTitle }</span>}
+                            </div>
                         </StackedBlockName>
                     </StackedBlock>);
                 caseToReportMap[caseAtId] = reportAtId;
             } else { // render an appropriate block when there is a case but no report by mapping case+[caseAtID] : JSX block
                 reportToReportBlockMap['case-' + caseAtId] = (
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
-                        label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}
-                    >
+                        label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}>
                         <StackedBlockName>
-                            <span className="d-inline">
-                                Case ID: { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
-                            </span>
+                            <div className="d-flex text-left">
+                                <span className="mr-07 text-nowrap">Case ID:</span>
+                                { caseAtId ?
+                                    <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a>
+                                    : <span className="name-title text-capitalize">{ case_title }</span>
+                                }
+                            </div>
                         </StackedBlockName>
                     </StackedBlock>);
                 caseToReportMap[caseAtId] = reportAtId;
@@ -299,16 +369,20 @@ export class FamilyReportStackedTable extends React.PureComponent {
         });
 
         return (
-            <StackedBlock hideNameOnHover={false} columnClass="individual"
-                key={atId} id={atId}
-                label={
-                    <StackedBlockNameLabel title="CGAP ID" accession={accession} subtitleVisible/>}
-            >
+            <StackedBlock hideNameOnHover={false} columnClass="individual" key={atId} id={atId}
+                label={<StackedBlockNameLabel title="CGAP ID" accession={accession} subtitleVisible/>}>
                 <StackedBlockName>
-                    { atId ? <a href={atId} className="name-title text-capitalize">{ role || display_title }</a> : <span className="name-title text-capitalize">{ role || display_title }</span>}
-                    { individual_id ? `(${individual_id})`: null }
+                    <div className="name-title pt-2 pb-2 text-left">
+                        { atId ?
+                            <a href={atId} className="text-capitalize">
+                                { role || display_title }
+                            </a>
+                            : <span className="text-capitalize">{ role || display_title }</span>
+                        }
+                        { individual_id ? <span> ({individual_id})</span> : null }
+                    </div>
                 </StackedBlockName>
-                <StackedBlockList className="libraries" title="Libraries">
+                <StackedBlockList className="libraries" title="Sequencing Libraries">
                     { indvSamples.map((thisSample) => this.renderSampleBlock(thisSample, reportToReportBlockMap, caseToReportMap))}
                 </StackedBlockList>
             </StackedBlock>
@@ -373,11 +447,11 @@ export class FamilyReportStackedTable extends React.PureComponent {
      */
     render(){
         const { columnHeaders: propColHeaders, showMetricsColumns, width, preventExpand = false } = this.props;
-        const columnHeaders = FamilyReportStackedTable.staticColumnHeaders(propColHeaders, showMetricsColumns);
+        const columnHeaders = this.memoized.staticColumnHeaders(propColHeaders, showMetricsColumns);
         return (
             <div className="stacked-block-table-outer-container overflow-auto">
                 <StackedBlockTable {...{ preventExpand, columnHeaders, width }} stackDepth="0" collapseShow="3"
-                    fadeIn allFiles={[]} collapseLongLists={true} defaultCollapsed={true}
+                    fadeIn collapseLongLists={true} defaultCollapsed={true}
                     handleFileCheckboxChange={this.handleFileCheckboxChange}>
                     { this.renderIndividualBlockList()}
                 </StackedBlockTable>
@@ -387,34 +461,30 @@ export class FamilyReportStackedTable extends React.PureComponent {
 }
 
 /**
- * Used within Accessioning tab on Case View
+ * Used within Accessioning tab on Case View.
  *
  * Takes in the current case item ('result' prop) and a single family associated with said case
  * and renders a table containing all of the accessions/various IDs for each individual, sample,
  * and report/case in that family. Current case is highlighted throughout the table, and results
  * are sorted by individual (first proband, then individuals with samples, then the rest).
+ *
+ * @todo Move into static/item-pages/CaseView (either own file or inside index.js or (preferred?) new file AccesioningTab.js)
  */
 export class FamilyAccessionStackedTable extends React.PureComponent {
 
-    static StackedBlock = StackedBlock
-
-    static builtInHeaders(){
-        // Keeping these builtInHeader methods separate in case we want to build in custom columns later
-        return [
-            { columnClass: 'individual',    title: 'Individual',     initialWidth: 220   },
-            { columnClass: 'libraries',     title: 'Sequencing Libraries',    initialWidth: 220   },
-            { columnClass: 'report',    title: 'Report',          initialWidth: 200  }
-        ];
-    }
+    // Keeping these builtInHeaders separate in case we want to build in custom columns later
+    static builtInHeaders = [
+        { columnClass: 'individual',    title: 'Individual',            initialWidth: 220   },
+        { columnClass: 'libraries',     title: 'Sequencing',            initialWidth: 220   },
+        { columnClass: 'report',        title: 'Report',                initialWidth: 200   }
+    ];
 
     /* Built-in headers */
     static staticColumnHeaders(columnHeaders){
-        return _.map(FamilyAccessionStackedTable.builtInHeaders(), function(staticCol){
-            return _.extend(
-                _.clone(staticCol),
-                _.findWhere(columnHeaders, { 'title' : staticCol.title }) || {}
-            );
-        }) || [];
+        return FamilyAccessionStackedTable.builtInHeaders.map(function(staticCol){
+            const foundColumnFromParamHeaders = _.findWhere(columnHeaders, { 'title' : staticCol.title });
+            return { ...staticCol, ...(foundColumnFromParamHeaders || {}) };
+        });
     }
 
     static propTypes = {
@@ -488,7 +558,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                             </tr>: null }
                         { specimen_accession ?
                             <tr>
-                                <td className="accession-table-title">Specimen Accession</td>
+                                <td className="accession-table-title">Specimen ID</td>
                                 <td>{ specimen_accession }</td>
                             </tr>: null
                         }
@@ -581,15 +651,15 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
             const isResultCase = caseAtId === resultCaseAtId;
 
             // Used as title for report/case block
-            let analysisType = null;
+            let analysisTitle = null;
 
             // Search each analysis group for one with the current case
             analysisGroups.forEach((analysisGroup) => {
-                const { cases: casesInAnalysisGroup = [], analysis_type = null } = analysisGroup || {};
+                const { cases: casesInAnalysisGroup = [], analysis_type = null, analysis_version = null } = analysisGroup || {};
                 casesInAnalysisGroup.forEach((agCase) => {
                     const { '@id': agCaseAtId } = agCase || {};
                     if (agCaseAtId === caseAtId) {
-                        analysisType = analysis_type;
+                        analysisTitle = analysis_type + (analysis_version ? " (" + analysis_version + ")" : "");
                     }
                 });
             });
@@ -601,8 +671,8 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                             <div className="d-flex">
                                 { reportAtId ?
                                     <a href={reportAtId} className={"name-title" + (isResultCase ? " current-case": "")}>
-                                        { analysisType }
-                                    </a> : <span className={"name-title" + (isResultCase ? " current-case": "")}>{ analysisType }</span>}
+                                        { analysisTitle }
+                                    </a> : <span className={"name-title" + (isResultCase ? " current-case": "")}>{ analysisTitle }</span>}
                             </div>
                             <div className="w-100" style={{ maxWidth: "70%" }}>
                                 <table className="accession-table w-100">
@@ -676,7 +746,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                         </table>
                     </div>
                 </StackedBlockName>
-                <StackedBlockList className="libraries" title="Libraries">
+                <StackedBlockList className="libraries" title="Sequencing Libraries">
                     { indvSamples.map((thisSample) =>
                     {
                         const { '@id' : thisSampleAtId } = thisSample || {};
@@ -762,4 +832,3 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         );
     }
 }
-

@@ -19,7 +19,8 @@ from pyramid.settings import asbool
 from pyramid.threadlocal import get_current_request
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
-from dcicutils.env_utils import CGAP_ENV_WEBPROD, CGAP_ENV_WOLF
+from dcicutils.secrets_utils import assume_identity
+from dcicutils.qa_utils import override_environ
 from snovault import (
     AfterModified,
     BeforeModified,
@@ -50,12 +51,13 @@ from ..authentication import session_properties
 from ..search.search import make_search_subreq
 from .base import (
     Item,
-    ALLOW_SUBMITTER_ADD,
     get_item_or_none,
     collection_add,
     item_edit,
+    PROJECT_MEMBER_CREATE_ACL,
     # lab_award_attribution_embed_list,
 )
+from ..util import check_user_is_logged_in
 
 
 logging.getLogger('boto3').setLevel(logging.CRITICAL)
@@ -109,12 +111,22 @@ def external_creds(bucket, key, name=None, profile_name=None):
                 }
             ]
         }
-        # boto.set_stream_logger('boto3')
-        conn = boto3.client('sts', aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
-                            aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"))
+        # In the new environment, extract S3 Keys from global application configuration
+        if 'IDENTITY' in os.environ:
+            identity = assume_identity()
+            with override_environ(**identity):
+                conn = boto3.client('sts', aws_access_key_id=os.environ.get('S3_AWS_ACCESS_KEY_ID'),
+                                    aws_secret_access_key=os.environ.get('S3_AWS_SECRET_ACCESS_KEY'))
+        # In the old account, we are always passing IAM User creds so these will just work
+        else:
+            conn = boto3.client('sts', aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+                                aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'))
         token = conn.get_federation_token(Name=name, Policy=json.dumps(policy))
         # 'access_key' 'secret_key' 'expiration' 'session_token'
         credentials = token.get('Credentials')
+        # Convert Expiration datetime object to string via cast
+        # Uncaught serialization error picked up by Docker - Will 2/25/2021
+        credentials['Expiration'] = str(credentials['Expiration'])
         credentials.update({
             'upload_url': 's3://{bucket}/{key}'.format(bucket=bucket, key=key),
             'federated_user_arn': token.get('FederatedUser').get('Arn'),
@@ -148,7 +160,7 @@ def property_closure(request, propname, root_uuid):
 @abstract_collection(
     name='files',
     unique_key='accession',
-    acl=ALLOW_SUBMITTER_ADD,
+    acl=PROJECT_MEMBER_CREATE_ACL,
     properties={
         'title': 'Files',
         'description': 'Listing of Files',
@@ -159,14 +171,19 @@ class File(Item):
     base_types = ['File'] + Item.base_types
     schema = load_schema('encoded:schemas/file.json')
     embedded_list = Item.embedded_list + [
+        # FileFormat linkTo
         'file_format.file_format',
+
+        # File linkTo
         'related_files.relationship_type',
         'related_files.file.accession',
-        'quality_metric.display_title',
+        'related_files.file.file_format.file_format',
+
+        # QC
         'quality_metric.@type',
         'quality_metric.qc_list.qc_type',
         'quality_metric.qc_list.value.uuid'
-    ]  # + lab_award_attribution_embed_list
+    ]
     name_key = 'accession'
 
     @calculated_property(schema={
@@ -710,6 +727,8 @@ def is_file_to_download(properties, file_format, expected_filename=None):
              permission='view', subpath_segments=[0, 1])
 def download(context, request):
     """ File download route. Generates a pre-signed S3 URL for the object that expires eventually. """
+    check_user_is_logged_in(request)
+
     # first check for restricted status
     try:
         user_props = session_properties(context, request)

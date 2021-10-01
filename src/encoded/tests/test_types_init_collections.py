@@ -1,6 +1,7 @@
 import pytest
 
 from datetime import datetime
+from dcicutils.misc_utils import utc_today_str
 from ..types.image import Image
 
 
@@ -44,13 +45,13 @@ def test_document_display_title_w_attachment(testapp, protocol_data, attachment)
 def test_document_display_title_wo_attachment(testapp, protocol_data):
     del(protocol_data['protocol_type'])
     res = testapp.post_json('/document', protocol_data).json['@graph'][0]
-    assert res.get('display_title') == 'Document from ' + str(datetime.utcnow())[:10]
+    assert res.get('display_title') == 'Document from ' + utc_today_str()
 
 
 @pytest.fixture
 def google_analytics_tracking_data():
     return {
-        "status": "released",
+        "status": "shared",
         "tracking_type": "google_analytics",
         "google_analytics": {
             "reports": {
@@ -104,7 +105,7 @@ def google_analytics(testapp, google_analytics_tracking_data):
 @pytest.fixture
 def download_tracking_item_data():
     return {
-        "status": "released",
+        "status": "shared",
         "tracking_type": "download_tracking",
         "download_tracking": {
             "geo_country": "NL",
@@ -148,7 +149,7 @@ def test_tracking_item_display_title_google_analytic(google_analytics):
 
 
 def test_tracking_item_display_title_download(download_tracking):
-    assert download_tracking.get('display_title') == 'Download Tracking Item from ' + str(datetime.utcnow())[:10]
+    assert download_tracking.get('display_title') == 'Download Tracking Item from ' + utc_today_str()
 
 
 def test_image_unique_key(registry, image_data):

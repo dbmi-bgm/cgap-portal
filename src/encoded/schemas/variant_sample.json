@@ -14,6 +14,9 @@
         "annotation_id"
     ],
     "additionalProperties": false,
+    "title": "Sample Variant",
+    "description": "Schema for variant info for sample",
+    "id": "/profiles/variant_sample.json",
     "mixinProperties": [
         {
             "$ref": "mixins.json#/schema_version"
@@ -43,21 +46,18 @@
             "$ref": "mixins.json#/static_embeds"
         }
     ],
-    "title": "Sample Variant",
-    "description": "Schema for variant info for sample",
-    "id": "/profiles/variant_sample.json",
     "properties": {
         "AD": {
-            "title": "AD",
+            "title": "Allelic Depth",
             "field_name": "AD",
             "type": "string",
             "do_import": true,
+            "vcf_field": "AD",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Variant Quality",
             "description": "Allelic depth",
             "scope": "sample_variant",
-            "schema_title": "AD"
+            "schema_title": "Allelic Depth"
         },
         "AD_ALT": {
             "title": "AD (Alt)",
@@ -65,12 +65,13 @@
             "type": "integer",
             "calculated_property": true,
             "do_import": true,
+            "vcf_field": "AD_ALT",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Variant Quality",
             "description": "Alternate allelic depth",
             "scope": "sample_variant",
-            "schema_title": "AD (Alt)"
+            "schema_title": "AD (Alt)",
+            "abbreviation": "AD"
         },
         "AD_REF": {
             "title": "AD (Ref)",
@@ -78,9 +79,9 @@
             "type": "integer",
             "calculated_property": true,
             "do_import": true,
+            "vcf_field": "AD_REF",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Variant Quality",
             "description": "Reference allelic depth",
             "scope": "sample_variant",
             "schema_title": "AD (Ref)"
@@ -91,14 +92,12 @@
             "type": "number",
             "calculated_property": true,
             "do_import": true,
+            "vcf_field": "AF",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Variant Quality",
             "description": "Variant allele fraction",
             "scope": "sample_variant",
             "schema_title": "VAF",
-            "column_order": 21,
-            "facet_order": 9,
             "min": 0,
             "max": 1
         },
@@ -107,9 +106,9 @@
             "field_name": "CALL_INFO",
             "type": "string",
             "do_import": true,
+            "vcf_field": "CALL_INFO",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Genotype",
             "description": "Calling info",
             "scope": "sample_variant",
             "schema_title": "Sample ID"
@@ -119,14 +118,12 @@
             "field_name": "DP",
             "type": "integer",
             "do_import": true,
+            "vcf_field": "DP",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Variant Quality",
             "description": "Approximate read depth",
             "scope": "sample_variant",
             "schema_title": "Coverage",
-            "column_order": 20,
-            "facet_order": 8,
             "min": 0
         },
         "FS": {
@@ -134,48 +131,45 @@
             "field_name": "FS",
             "type": "number",
             "do_import": true,
+            "vcf_field": "FS",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Variant Quality",
             "description": "Fisher strand score",
             "scope": "sample_variant",
-            "schema_title": "Strand Fisher Score",
-            "facet_order": 10
+            "schema_title": "Strand Fisher Score"
         },
         "GQ": {
             "title": "Genotype Quality",
             "field_name": "GQ",
             "type": "integer",
             "do_import": true,
+            "vcf_field": "GQ",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Variant Quality",
             "description": "phred-scaled quality score that the genotype is accurate [min(99,PL(max)-PL(second))]",
             "scope": "sample_variant",
-            "schema_title": "Genotype Quality",
-            "facet_order": 11
+            "schema_title": "Genotype Quality"
         },
         "GT": {
             "title": "Genotype",
             "field_name": "GT",
             "type": "string",
             "do_import": true,
+            "vcf_field": "GT",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Genotype",
             "description": "Genotype",
             "scope": "sample_variant",
-            "schema_title": "Genotype",
-            "column_order": 30
+            "schema_title": "Genotype"
         },
         "PGT": {
             "title": "Phasing information",
             "field_name": "PGT",
             "type": "string",
             "do_import": true,
+            "vcf_field": "PGT",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Genotype",
             "description": "Physical phasing haplotype information",
             "scope": "sample_variant",
             "schema_title": "Phasing information"
@@ -185,9 +179,9 @@
             "field_name": "PID",
             "type": "string",
             "do_import": true,
+            "vcf_field": "PID",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Genotype",
             "description": "Physical phasing ID information",
             "scope": "sample_variant",
             "schema_title": "Phasing ID"
@@ -197,9 +191,9 @@
             "field_name": "PL",
             "type": "string",
             "do_import": true,
+            "vcf_field": "PL",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Variant Quality",
             "description": "Phred-scaled likelihoods for genotype (Ref/Ref, Ref/Alt, Alt/Alt)",
             "scope": "sample_variant",
             "schema_title": "Genotype Likelihoods (0/0,0/1,1/1)"
@@ -209,9 +203,9 @@
             "field_name": "PS",
             "type": "integer",
             "do_import": true,
+            "vcf_field": "PS",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Genotype",
             "description": "Phasing set ID",
             "scope": "sample_variant",
             "schema_title": "Phasing Set"
@@ -221,9 +215,9 @@
             "field_name": "QUAL",
             "type": "number",
             "do_import": true,
+            "vcf_field": "QUAL",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Variant Quality",
             "description": "phred-scaled quality score for the assertion made in ALT (multi-sample)",
             "scope": "sample_variant",
             "schema_title": "Variant Quality"
@@ -250,8 +244,9 @@
                         "field_name": "comhet_phase",
                         "type": "string",
                         "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
+                        "vcf_field": "comhet_phase",
+                        "source_name": "comHet",
+                        "source_version": "v0.1.3",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                         "scope": "sample_variant"
                     },
@@ -260,8 +255,9 @@
                         "field_name": "comhet_gene",
                         "type": "string",
                         "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
+                        "vcf_field": "comhet_gene",
+                        "source_name": "comHet",
+                        "source_version": "v0.1.3",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                         "scope": "sample_variant"
                     },
@@ -273,8 +269,9 @@
                             "field_name": "comhet_transcript",
                             "type": "string",
                             "do_import": true,
-                            "source_name": "COMHET",
-                            "source_version": "v1",
+                            "vcf_field": "comhet_transcript",
+                            "source_name": "comHet",
+                            "source_version": "v0.1.3",
                             "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                             "scope": "sample_variant"
                         }
@@ -284,21 +281,21 @@
                         "field_name": "comhet_impact_gene",
                         "type": "string",
                         "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
+                        "vcf_field": "comhet_impact_gene",
+                        "source_name": "comHet",
+                        "source_version": "v0.1.3",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
-                        "annotation_category": "Genotype",
                         "scope": "sample_variant",
-                        "schema_title": "ComHet Impact",
-                        "facet_order": 17
+                        "schema_title": "ComHet Impact"
                     },
                     "comhet_impact_transcript": {
                         "title": "comhet_impact_transcript",
                         "field_name": "comhet_impact_transcript",
                         "type": "string",
                         "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
+                        "vcf_field": "comhet_impact_transcript",
+                        "source_name": "comHet",
+                        "source_version": "v0.1.3",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                         "scope": "sample_variant"
                     },
@@ -307,18 +304,31 @@
                         "field_name": "comhet_mate_variant",
                         "type": "string",
                         "do_import": true,
-                        "source_name": "COMHET",
-                        "source_version": "v1",
+                        "vcf_field": "comhet_mate_variant",
+                        "source_name": "comHet",
+                        "source_version": "v0.1.3",
                         "sub_embedding_group": "{\"key\": \"cmphet\", \"title\": \"Compound Het\"}",
                         "scope": "sample_variant"
                     }
                 }
             }
         },
+        "discovery_interpretation": {
+            "title": "Discovery Interpretation",
+            "description": "Gene/Variant Discovery interpretation note connected to this item",
+            "type": "string",
+            "linkTo": "NoteDiscovery"
+        },
         "file": {
             "title": "File",
             "description": "String Accession of the vcf file used in digestion",
             "type": "string"
+        },
+        "gene_notes": {
+            "title": "Gene Notes",
+            "description": "Note item related to this Gene",
+            "type": "string",
+            "linkTo": "NoteStandard"
         },
         "genotype_labels": {
             "title": "Genotype Labels",
@@ -343,34 +353,28 @@
         "inheritance_modes": {
             "title": "Inheritance Modes",
             "type": "array",
-            "extended_description" : "src/encoded/docs/extended_description_VariantSample_inheritance_mode.html",
             "items": {
                 "type": "string"
             }
         },
-        "multiallele_samplevariantkey": {
-            "title": "multiallele_samplevariantkey",
-            "field_name": "multiallele_samplevariantkey",
+        "interpretation": {
+            "title": "Clinical Interpretation",
+            "description": "Clinical Interpretation Note connected to this item",
             "type": "string",
-            "do_import": true,
-            "source_name": "MULTIALLELE",
-            "source_version": "v0.4",
-            "annotation_category": "Position",
-            "description": "key for multi-allelic variant ",
-            "scope": "sample_variant"
+            "linkTo": "NoteInterpretation"
         },
         "novoPP": {
             "title": "novoCaller PP",
             "field_name": "novoPP",
             "type": "number",
             "do_import": true,
+            "vcf_field": "novoPP",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "annotation_category": "Genotype",
             "description": "Posterior probability of de novo mutation",
             "scope": "sample_variant",
             "schema_title": "novoCaller PP",
-            "facet_order": 16,
+            "abbreviation": "novoPP",
             "min": 0,
             "max": 1
         },
@@ -386,10 +390,10 @@
                         "field_name": "samplegeno_numgt",
                         "type": "string",
                         "do_import": true,
+                        "vcf_field": "samplegeno_numgt",
                         "source_name": "SAMPLEGENO",
                         "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
-                        "annotation_category": "Genotype",
                         "description": "Sample genotype (number format)",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Numeric)"
@@ -399,10 +403,10 @@
                         "field_name": "samplegeno_gt",
                         "type": "string",
                         "do_import": true,
+                        "vcf_field": "samplegeno_gt",
                         "source_name": "SAMPLEGENO",
                         "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
-                        "annotation_category": "Genotype",
                         "description": "Sample genotype (nucletide format)",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Nucleotide)"
@@ -412,10 +416,10 @@
                         "field_name": "samplegeno_ad",
                         "type": "string",
                         "do_import": true,
+                        "vcf_field": "samplegeno_ad",
                         "source_name": "SAMPLEGENO",
                         "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
-                        "annotation_category": "Genotype",
                         "description": "Allelic depth",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Allele Depth)"
@@ -425,19 +429,32 @@
                         "field_name": "samplegeno_sampleid",
                         "type": "string",
                         "do_import": true,
+                        "vcf_field": "samplegeno_sampleid",
                         "source_name": "SAMPLEGENO",
                         "source_version": "v0.4",
                         "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
-                        "annotation_category": "Genotype",
                         "description": "Sample ID",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Sample ID)"
+                    },
+                    "samplegeno_ac": {
+                        "title": "Sample Genotype (Alt Allele Count Per Gene)",
+                        "field_name": "samplegeno_ac",
+                        "type": "integer",
+                        "do_import": true,
+                        "vcf_field": "samplegeno_ac",
+                        "source_name": "SAMPLEGENO",
+                        "source_version": "v0.4",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Alt allele count per gene",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype (Alt Allele Count Per Gene)"
                     },
                     "samplegeno_role": {
                         "title": "Familial Relation",
                         "description": "Relationship of the person who submitted this sample relative to the proband",
                         "type": "string",
-                        "enum": [
+                        "suggested_enum": [
                             "proband",
                             "father",
                             "mother",
@@ -449,6 +466,9 @@
                             "half-sibling",
                             "wife",
                             "husband",
+                            "son",
+                            "daughter",
+                            "child",
                             "grandson",
                             "granddaughter",
                             "grandchild",
@@ -478,128 +498,138 @@
             "title": "Variant",
             "type": "string",
             "linkTo": "Variant"
+        },
+        "variant_notes": {
+            "title": "Variant Notes",
+            "description": "Notes related to the relevant Variant",
+            "type": "string",
+            "linkTo": "NoteStandard"
         }
     },
     "columns": {
         "display_title": {
             "title": "Position",
-            "sort_fields" : [
-                { "field" : "variant.display_title", "title" : "Variant Display Title" },
-                { "field" : "variant.dbsnp_rs_number", "title": "dbSNP RS Number" }
+            "order": 0,
+            "sort_fields": [
+                {
+                    "field": "variant.display_title",
+                    "title": "Variant Display Title"
+                },
+                {
+                    "field": "variant.ID",
+                    "title": "dbSNP RS Number"
+                }
+            ]
+        },
+        "variant.genes.genes_most_severe_gene.display_title": {
+            "title": "Gene, Transcript",
+            "order": 10,
+            "sort_fields": [
+                {
+                    "field": "variant.genes.genes_most_severe_gene.display_title",
+                    "title": "Gene"
+                },
+                {
+                    "field": "variant.genes.genes_most_severe_transcript",
+                    "title": "Most Severe Transcript"
+                }
+            ]
+        },
+        "variant.genes.genes_most_severe_hgvsc": {
+            "title": "Variant",
+            "order": 20,
+            "sort_fields": [
+                {
+                    "field": "variant.genes.genes_most_severe_hgvsc",
+                    "title": "Coding Sequence"
+                },
+                {
+                    "field": "variant.genes.genes_most_severe_hgvsp",
+                    "title": "Protein Sequence"
+                }
+            ]
+        },
+        "variant.genes.genes_most_severe_consequence.coding_effect": {
+            "title": "Coding Effect",
+            "order": 30
+        },
+        "GT": {
+            "title": "Genotype",
+            "order": 32,
+            "default_hidden": true
+        },
+        "associated_genotype_labels.proband_genotype_label": {
+            "title": "Genotype",
+            "order": 35,
+            "sort_fields": [
+                {
+                    "field": "associated_genotype_labels.proband_genotype_label",
+                    "title": "Proband GT"
+                },
+                {
+                    "field": "associated_genotype_labels.mother_genotype_label",
+                    "title": "Mother GT"
+                },
+                {
+                    "field": "associated_genotype_labels.father_genotype_label",
+                    "title": "Father GT"
+                }
             ]
         },
         "DP": {
             "title": "Coverage, VAF",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 20,
+            "order": 42,
             "sort_fields": [
-                { "field" : "DP", "title" : "Coverage" },
-                { "field" : "AF", "title": "VAF" }
+                {
+                    "field": "DP",
+                    "title": "Coverage"
+                },
+                {
+                    "field": "AF",
+                    "title": "VAF"
+                }
             ]
         },
-        "associated_genotype_labels.proband_genotype_label": {
-            "title": "Genotype",
-            "order": 21,
-            "sort_fields": [
-                { "field" : "associated_genotype_labels.proband_genotype_label", "title": "Proband GT" },
-                { "field" : "associated_genotype_labels.mother_genotype_label", "title": "Mother GT" },
-                { "field": "associated_genotype_labels.father_genotype_label", "title": "Father GT" }
-            ]
-        },
-        "variant.genes.genes_ensg.display_title": {
-            "title": "Gene Transcript",
-            "order": 25
-        },
-        "variant.genes.genes_most_severe_hgvsc": {
-            "title": "Variant",
-            "order": 27,
-            "sort_fields": [
-                { "field": "variant.genes.genes.most_severe_hgvsc", "title": "Most Severe HGVSC" }
-            ]
-        },
-        "variant.genes.genes_most_severe_consequence.coding_effect": {
-            "title": "Coding Effect",
-            "order": 28,
-            "sort_fields": [
-                { "fields": "variant.genes.genes_most_severe_consequence.coding_effect", "title": "Coding Effect" }
-            ]
-        },
-        "variant.gnomad_af": {
-            "title": "GnomAD",
+        "variant.csq_gnomadg_af": {
+            "title": "gnomAD",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 60
+            "order": 60,
+            "sort_fields": [
+                {
+                    "field": "variant.csq_gnomadg_af",
+                    "title": "gnomad AF"
+                },
+                {
+                    "field": "variant.csq_gnomadg_af_popmax",
+                    "title": "gnomad AF Population Max"
+                }
+            ]
         },
-        "variant.cadd_phred": {
-            "title": "Predictors",
-            "order": 61
+        "variant.csq_clinvar": {
+            "title": "Clinvar ID",
+            "order": 70,
+            "default_hidden": true
+        },
+        "interpretation.classification": {
+            "title": "Classification",
+            "default_hidden": true,
+            "order": 75
         },
         "bam_snapshot": {
             "title": "Genome Snapshot",
-            "order": 81
+            "order": 100
+        },
+        "project": {
+            "title": "Project",
+            "description": "Project to which this Sample Variant belongs to.",
+            "order": 200,
+            "default_hidden": true
         }
     },
     "facets": {
-        "AF": {
-            "title": "VAF",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 9,
-            "grouping": "Variant Quality"
-        },
-        "DP": {
-            "title": "Coverage",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 8,
-            "grouping": "Variant Quality"
-        },
-        "FS": {
-            "title": "Strand Fisher Score",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 10,
-            "grouping": "Variant Quality"
-        },
-        "GQ": {
-            "title": "Genotype Quality",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 11,
-            "grouping": "Variant Quality"
-        },
-        "associated_genotype_labels.father_genotype_label": {
-            "title": "Father Genotype",
-            "order": 14,
-            "grouping": "Genotype"
-        },
-        "associated_genotype_labels.mother_genotype_label": {
-            "title": "Mother Genotype",
-            "order": 13,
-            "grouping": "Genotype"
-        },
-        "associated_genotype_labels.proband_genotype_label": {
-            "title": "Proband Genotype",
-            "order": 12,
-            "grouping": "Genotype"
-        },
-        "cmphet.comhet_impact_gene": {
-            "title": "ComHet Impact",
-            "order": 17,
-            "grouping": "Genotype"
-        },
-        "inheritance_modes": {
-            "title": "Inheritance Modes",
-            "order": 15
-        },
-        "novoPP": {
-            "title": "novoCaller PP",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 16,
-            "grouping": "Genotype"
-        },
         "variant.CHROM": {
             "title": "Chromosome",
             "order": 1,
@@ -612,138 +642,975 @@
             "order": 2,
             "grouping": "Position"
         },
-        "variant.cadd_phred": {
-            "title": "CADD",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 23,
-            "grouping": "Missense Predictors"
+        "variant.genes.genes_most_severe_gene.display_title": {
+            "title": "Gene",
+            "order": 1,
+            "grouping": "Genes",
+            "search_type": "sayt_without_terms",
+            "sayt_item_type": "Gene"
         },
-        "variant.clinvar_clnsig": {
-            "title": "Clinvar",
-            "order": 36,
-            "grouping": "variant database"
-        },
-        "variant.conservation_phylop100": {
-            "title": "PhyloP (100 Vertabrates)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 22,
-            "grouping": "Conservation"
-        },
-        "variant.cytoband_cytoband": {
-            "title": "Cytoband",
-            "order": 3,
-            "grouping": "Position"
-        },
-        "variant.genes.genes_ensg.gene_lists.display_title": {
+        "associated_genelists": {
             "title": "Gene List",
-            "order": 99,
-            "grouping": "Genes"
+            "extended_description": "src/encoded/docs/extended_description_VariantSample_genelist.html",
+            "order": 2,
+            "grouping": "Genes",
+            "description": "Groups of genes that are relevant for a disease or condition"
         },
-        "variant.genes.genes_ensg.oe_lof": {
-            "title": "o/e (LoF)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 35,
-            "grouping": "Constraint Metrics"
-        },
-        "variant.genes.genes_ensg.oe_lof_upper": {
-            "title": "LOEUF",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 33,
-            "grouping": "Constraint Metrics"
-        },
-        "variant.genes.genes_ensg.oe_mis": {
-            "title": "o/e (missense)",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 34,
-            "grouping": "Constraint Metrics"
-        },
-        "variant.genes.genes_ensg.s_het": {
-            "title": "S_het",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 32,
-            "grouping": "Constraint Metrics"
+        "variant.variantClass": {
+            "title": "Variant Type",
+            "order": 4,
+            "grouping": "Variant Type"
         },
         "variant.genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
             "order": 5,
-            "grouping": "Consequence"
+            "grouping": "Consequence",
+            "rescue_terms": [
+                "Missense",
+                "Synonymous",
+                "Frameshift",
+                "Inframe indel",
+                "Nonsense",
+                "Start lost",
+                "Stop lost"
+            ]
+        },
+        "variant.genes.genes_most_severe_consequence.location": {
+            "title": "Location",
+            "order": 6,
+            "grouping": "Consequence",
+            "rescue_terms": [
+                "UTR",
+                "CDS",
+                "splice site",
+                "intron",
+                "upstream",
+                "miRNA",
+                "downstream"
+            ]
         },
         "variant.genes.genes_most_severe_consequence.impact": {
             "title": "Impact",
             "order": 7,
             "grouping": "Consequence"
         },
-        "variant.genes.genes_most_severe_consequence.location": {
-            "title": "Location",
-            "order": 6,
-            "grouping": "Consequence"
-        },
-        "variant.genes.genes_most_severe_maxentscan_diff": {
-            "title": "MaxEntScan Diff",
+        "DP": {
+            "title": "Coverage",
             "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 8,
+            "grouping": "Variant Quality"
+        },
+        "AD_ALT": {
+            "title": "AD (Alt)",
+            "aggregation_type": "range",
+            "number_step": 1,
+            "order": 10,
+            "grouping": "Variant Quality",
+            "ranges": [
+                {
+                    "from": 1,
+                    "to": 4,
+                    "label": "Very Low"
+                },
+                {
+                    "from": 5,
+                    "to": 9,
+                    "label": "Low"
+                },
+                {
+                    "from": 10,
+                    "to": 19,
+                    "label": "Medium"
+                },
+                {
+                    "from": 20,
+                    "label": "High"
+                }
+            ]
+        },
+        "AF": {
+            "title": "VAF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 11,
+            "grouping": "Variant Quality"
+        },
+        "FS": {
+            "title": "Strand Fisher Score",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 12,
+            "grouping": "Variant Quality",
+            "ranges": [
+                {
+                    "to": 20,
+                    "label": "Low Strand Bias (P \u2265 0.01)"
+                },
+                {
+                    "from": 20,
+                    "label": "High Strand Bias (P < 0.01)"
+                }
+            ]
+        },
+        "GQ": {
+            "title": "Genotype Quality",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 13,
+            "grouping": "Variant Quality"
+        },
+        "associated_genotype_labels.proband_genotype_label": {
+            "title": "Proband Genotype",
+            "order": 12,
+            "grouping": "Genotype",
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.mother_genotype_label": {
+            "title": "Mother Genotype",
+            "order": 13,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.father_genotype_label": {
+            "title": "Father Genotype",
+            "order": 14,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.co_parent_genotype_label": {
+            "title": "Co-Parent Genotype",
+            "order": 1000,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_genotype_label": {
+            "title": "Sister Genotype",
+            "order": 1001,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_II_genotype_label": {
+            "title": "Sister II Genotype",
+            "order": 1002,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_III_genotype_label": {
+            "title": "Sister III Genotype",
+            "order": 1003,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_IV_genotype_label": {
+            "title": "Sister IV Genotype",
+            "order": 1004,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_genotype_label": {
+            "title": "Brother Genotype",
+            "order": 1005,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_II_genotype_label": {
+            "title": "Brother II Genotype",
+            "order": 1006,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_III_genotype_label": {
+            "title": "Brother III Genotype",
+            "order": 1007,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_IV_genotype_label": {
+            "title": "Brother IV Genotype",
+            "order": 1008,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_genotype_label": {
+            "title": "Daughter Genotype",
+            "order": 1009,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_II_genotype_label": {
+            "title": "Daughter II Genotype",
+            "order": 1010,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_III_genotype_label": {
+            "title": "Daughter III Genotype",
+            "order": 1011,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_IV_genotype_label": {
+            "title": "Daughter IV Genotype",
+            "order": 1012,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_genotype_label": {
+            "title": "Son Genotype",
+            "order": 1013,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_II_genotype_label": {
+            "title": "Son II Genotype",
+            "order": 1014,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_III_genotype_label": {
+            "title": "Son III Genotype",
+            "order": 1015,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_IV_genotype_label": {
+            "title": "Son IV Genotype",
+            "order": 1016,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Heterozygous  (multiallelic in family)",
+                "Heterozygous alt/alt -  multiallelic  (multiallelic in family)",
+                "Homozygous alternate",
+                "Homozygous alternate  (multiallelic in family)",
+                "Missing",
+                "Homozygous reference  (multiallelic in family)",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "Missing  (multiallelic in family)",
+                "False  (multiallelic in family)",
+                "Hemizygous alternate  (multiallelic in family)",
+                "Hemizygous reference  (multiallelic in family)",
+                "-"
+            ]
+        },
+        "inheritance_modes": {
+            "title": "Inheritance Modes",
+            "extended_description": "src/encoded/docs/extended_description_VariantSample_inheritance_mode.html",
+            "order": 15,
+            "grouping": "Inheritance",
+            "default_hidden": true,
+            "rescue_terms": [
+                "de novo (strong)",
+                "de novo (medium)",
+                "de novo (weak)",
+                "de novo (chrXY)",
+                "Homozygous recessive",
+                "Compound Het (Phased/strong_pair)",
+                "Compound Het (Phased/medium_pair)",
+                "Compound Het (Phased/weak_pair)",
+                "Compound Het (Unphased/strong_pair)",
+                "Compound Het (Unphased/medium_pair)",
+                "Compound Het (Unphased/weak_pair)",
+                "Loss of Heterozygosity",
+                "Dominant (maternal)",
+                "Dominant (paternal)",
+                "X-linked recessive (Maternal)",
+                "X-linked dominant (Maternal)",
+                "X-linked dominant (Paternal)",
+                "Y-linked dominant",
+                "Low relevance, homozygous in a parent",
+                "Low relevance, multiallelic site family",
+                "Low relevance, present in both parent(s)",
+                "Low relevance, missing call(s) in family",
+                "Low relevance, mismatching chrXY genotype(s)",
+                "Low relevance, other"
+            ]
+        },
+        "proband_only_inheritance_modes": {
+            "title": "Inheritance Modes",
+            "extended_description": "src/encoded/docs/extended_description_VariantSample_inheritance_mode_probandonly.html",
+            "order": 15,
+            "grouping": "Inheritance",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Compound Het (Unphased/strong_pair)",
+                "Compound Het (Unphased/medium_pair)",
+                "Compound Het (Unphased/weak_pair)",
+                "X-linked",
+                "Y-linked"
+            ]
+        },
+        "novoPP": {
+            "title": "novoCaller PP",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 16,
+            "grouping": "Inheritance",
+            "ranges": [
+                {
+                    "from": 0.1,
+                    "to": 0.9,
+                    "label": "de novo candidate (weak)"
+                },
+                {
+                    "from": 0.9,
+                    "label": "de novo candidate (strong)"
+                }
+            ]
+        },
+        "variant.csq_gnomadg_af": {
+            "title": "Alt Allele Frequency (v3)",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 18,
+            "hide_facet_counts": true,
+            "grouping": "Pop. Frequency (gnomAD v3)",
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0,
+                    "label": "unobserved"
+                },
+                {
+                    "from": 0,
+                    "to": 0.001,
+                    "label": "ultra-rare"
+                },
+                {
+                    "from": 0,
+                    "to": 0.01,
+                    "label": "rare"
+                },
+                {
+                    "from": 0.01,
+                    "to": 1,
+                    "label": "common"
+                }
+            ]
+        },
+        "variant.csq_gnomadg_af_popmax": {
+            "title": "Alt AF - PopMax (v3)",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 19,
+            "hide_facet_counts": true,
+            "grouping": "Pop. Frequency (gnomAD v3)",
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0,
+                    "label": "unobserved"
+                },
+                {
+                    "from": 0,
+                    "to": 0.001,
+                    "label": "ultra-rare"
+                },
+                {
+                    "from": 0,
+                    "to": 0.01,
+                    "label": "rare"
+                },
+                {
+                    "from": 0.01,
+                    "to": 1,
+                    "label": "common"
+                }
+            ]
+        },
+        "variant.csq_gnomadg_an": {
+            "title": "Total Allele Number (v3)",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 20,
+            "grouping": "Pop. Frequency (gnomAD v3)"
+        },
+        "variant.csq_gnomadg_nhomalt": {
+            "title": "Homozygous Count (v3)",
+            "aggregation_type": "range",
+            "hide_facet_counts": true,
+            "number_step": 1,
+            "order": 21,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0
+                },
+                {
+                    "from": 0,
+                    "to": 5
+                }
+            ],
+            "grouping": "Pop. Frequency (gnomAD v3)"
+        },
+        "variant.csq_gnomadg_ac-xy": {
+            "title": "Hemizygous Count (v3)",
+            "aggregation_type": "range",
+            "number_step": 1,
+            "order": 22,
+            "hide_facet_counts": true,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0
+                },
+                {
+                    "from": 0,
+                    "to": 5
+                }
+            ],
+            "grouping": "Pop. Frequency (gnomAD v3)"
+        },
+        "variant.csq_gnomade2_af": {
+            "title": "Alt Allele Frequency (v2)",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 30,
+            "hide_facet_counts": true,
+            "grouping": "Pop. Frequency (gnomAD v2 exome)",
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0,
+                    "label": "unobserved"
+                },
+                {
+                    "from": 0,
+                    "to": 0.001,
+                    "label": "ultra-rare"
+                },
+                {
+                    "from": 0,
+                    "to": 0.01,
+                    "label": "rare"
+                },
+                {
+                    "from": 0.01,
+                    "to": 1,
+                    "label": "common"
+                }
+            ]
+        },
+        "variant.csq_gnomade2_af_popmax": {
+            "title": "Alt AF - PopMax (v2)",
+            "aggregation_type": "range",
             "number_step": "any",
             "order": 31,
-            "grouping": "Splice Predictors"
+            "hide_facet_counts": true,
+            "grouping": "Pop. Frequency (gnomAD v2 exome)",
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0,
+                    "label": "unobserved"
+                },
+                {
+                    "from": 0,
+                    "to": 0.001,
+                    "label": "ultra-rare"
+                },
+                {
+                    "from": 0,
+                    "to": 0.01,
+                    "label": "rare"
+                },
+                {
+                    "from": 0.01,
+                    "to": 1,
+                    "label": "common"
+                }
+            ]
         },
-        "variant.genes.genes_most_severe_polyphen_score": {
-            "title": "PolyPhen score",
+        "variant.csq_gnomade2_an": {
+            "title": "Total Allele Number (v2)",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 32,
+            "grouping": "Pop. Frequency (gnomAD v2 exome)"
+        },
+        "variant.csq_gnomade2_nhomalt": {
+            "title": "Homozygous Count (v2)",
+            "aggregation_type": "range",
+            "hide_facet_counts": true,
+            "number_step": 1,
+            "order": 33,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0
+                },
+                {
+                    "from": 0,
+                    "to": 5
+                }
+            ],
+            "grouping": "Pop. Frequency (gnomAD v2 exome)"
+        },
+        "variant.csq_gnomade2_ac-xy": {
+            "title": "Hemizygous Count (v2)",
+            "aggregation_type": "range",
+            "number_step": 1,
+            "order": 34,
+            "hide_facet_counts": true,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0
+                },
+                {
+                    "from": 0,
+                    "to": 5
+                }
+            ],
+            "grouping": "Pop. Frequency (gnomAD v2 exome)"
+        },
+        "variant.csq_phylop100way_vertebrate": {
+            "title": "PhyloP (100 Vertebrates)",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 40,
+            "grouping": "Effect Predictors",
+            "ranges": [
+                {
+                    "from": -20,
+                    "to": -3,
+                    "label": "strong positive selection"
+                },
+                {
+                    "from": -3,
+                    "to": -2,
+                    "label": "positive selection"
+                },
+                {
+                    "from": -2,
+                    "to": 2,
+                    "label": "low selection"
+                },
+                {
+                    "from": 2,
+                    "to": 3,
+                    "label": "conserved"
+                },
+                {
+                    "from": 3,
+                    "to": 10,
+                    "label": "highly conserved"
+                }
+            ]
+        },
+        "variant.csq_cadd_phred": {
+            "title": "CADD Phred score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 25,
-            "grouping": "Missense Predictors"
+            "order": 41,
+            "grouping": "Effect Predictors"
         },
         "variant.genes.genes_most_severe_sift_score": {
             "title": "SIFT score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 24,
-            "grouping": "Missense Predictors"
+            "order": 42,
+            "grouping": "Effect Predictors"
         },
-        "variant.gnomad_af": {
-            "title": "GnomAD Alt Allele Frequency",
+        "variant.genes.genes_most_severe_polyphen_score": {
+            "title": "PolyPhen score",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 18,
-            "grouping": "Population Frequency"
+            "order": 43,
+            "grouping": "Effect Predictors"
         },
-        "variant.gnomad_an": {
-            "title": "GnomAD Total Allele Number",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 20,
-            "grouping": "Population Frequency"
-        },
-        "variant.gnomad_nhomalt": {
-            "title": "GnomAD Homozgyous Count",
-            "aggregation_type": "stats",
-            "number_step": 1,
-            "order": 21,
-            "grouping": "Population Frequency"
-        },
-        "variant.max_pop_af_af_popmax": {
-            "title": "GnomAD Alt AF - PopMax",
-            "aggregation_type": "stats",
-            "number_step": "any",
-            "order": 19,
-            "grouping": "Population Frequency"
-        },
-        "variant.mutanno_variant_class": {
-            "title": "Variant Type",
-            "order": 4,
-            "grouping": "Variant Type"
-        },
-        "variant.spliceai_maxds": {
+        "variant.spliceaiMaxds": {
             "title": "SpliceAI Max Delta",
             "aggregation_type": "stats",
             "number_step": "any",
-            "order": 27,
-            "grouping": "Splice Predictors"
+            "order": 50,
+            "grouping": "Effect Predictors"
+        },
+        "variant.genes.genes_most_severe_maxentscan_diff": {
+            "title": "MaxEntScan Diff",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 51,
+            "grouping": "Effect Predictors"
+        },
+        "variant.genes.genes_most_severe_gene.s_het": {
+            "title": "S_het",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 60,
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes_most_severe_gene.oe_lof_upper": {
+            "title": "LOEUF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 61,
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes_most_severe_gene.oe_mis": {
+            "title": "o/e (missense)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 62,
+            "grouping": "Constraint Metrics"
+        },
+        "variant.genes.genes_most_severe_gene.oe_lof": {
+            "title": "o/e (LoF)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 63,
+            "grouping": "Constraint Metrics"
+        },
+        "variant.csq_clinvar_clnsig": {
+            "title": "Clinvar",
+            "order": 70,
+            "grouping": "variant database"
         }
     }
 }

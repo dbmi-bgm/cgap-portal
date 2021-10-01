@@ -5,7 +5,6 @@ import logging
 from pyramid.paster import get_app
 from snovault.elasticsearch.create_mapping import run as run_create_mapping
 from dcicutils.log_utils import set_logging
-# from dcicutils.beanstalk_utils import whodaman
 
 log = structlog.getLogger(__name__)
 EPILOG = __doc__
@@ -26,12 +25,17 @@ ITEM_INDEX_ORDER = [
     'WorkflowMapping',
     'WorkflowRun',
     'WorkflowRunAwsem',
+    'MetaWorkflow',
+    'MetaWorkflowRun',
     'VariantConsequence',
     'FileFormat',
     'FileFastq',
     'FileProcessed',
     'FileReference',
     'Image',
+    'NoteInterpretation',
+    'NoteDiscovery',
+    'NoteStandard',
     'Gene',
     'GeneList',
     'Phenotype',
@@ -58,7 +62,10 @@ ITEM_INDEX_ORDER = [
     'Page',
     'AnnotationField',
     'Variant',
+    'StructuralVariant',
+    'VariantSampleList',
     'VariantSample',
+    'StructuralVariantSample',
     'EvidenceDisPheno',
     'Page',
     'GeneAnnotationField',
@@ -136,8 +143,9 @@ def get_deployment_config(app):
             log.info('Looks like we are on hotseat/cgapdev -- do not wipe ES')
             deploy_cfg['WIPE_ES'] = False
         else:
-            log.info('Looks like we are on cgaptest -- wipe ES')
-            deploy_cfg['WIPE_ES'] = True
+            # XXX: enable to force cgaptest reindexing
+            log.info('Looks like we are on cgaptest -- normally we would wipe ES but no longer.')
+            deploy_cfg['WIPE_ES'] = False
     else:
         log.warning('This environment is not recognized: %s' % my_env)
         log.warning('Proceeding without wiping ES')

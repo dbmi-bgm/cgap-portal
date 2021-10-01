@@ -4,6 +4,9 @@ from ..inheritance_mode import InheritanceMode, InheritanceModeError
 from ..util import resolve_file_path
 
 
+pytestmark = [pytest.mark.setone, pytest.mark.working]
+
+
 CSV_TESTS = resolve_file_path('tests/data/variant_workbook/inheritance_mode_test_data.csv')
 
 
@@ -209,6 +212,139 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
     assert InheritanceMode.compute_inheritance_mode_trio(genotypes=gts, genotype_labels=gt_labels,
                                                          sexes=sexes, chrom=chrom, novoPP=novoPP) == expected_inh
 
+@pytest.mark.parametrize("genotypes, sexes, chrom, result",
+    [
+        (  # test case 1 - autosomal de novo
+            {
+                "proband": "0/1",
+                "mother": "0/0",
+                "father": "0/0"
+            },
+            {
+                "proband": "F",
+                "mother": "F",
+                "father": "M"
+            },
+            "1",
+            [InheritanceMode.INHMODE_LABEL_SV_DE_NOVO]
+        ),
+        (  # test case 2 - autosomal de novo
+            {
+                "proband": "1/1",
+                "mother": "0/0",
+                "father": "0/0"
+            },
+            {
+                "proband": "F",
+                "mother": "F",
+                "father": "M"
+            },
+            "2",
+            [InheritanceMode.INHMODE_LABEL_SV_DE_NOVO]
+        ),
+        (  # test case 3 - X-linked female de novo
+            {
+                "proband": "0/1",
+                "mother": "0/0",
+                "father": "0/0"
+            },
+            {
+                "proband": "F",
+                "mother": "F",
+                "father": "M"
+            },
+            "X",
+            [InheritanceMode.INHMODE_LABEL_SV_DE_NOVO]
+        ),
+        (  # test case 4 - X-linked female de novo
+            {
+                "proband": "1/1",
+                "mother": "0/0",
+                "father": "0/0"
+            },
+            {
+                "proband": "F",
+                "mother": "F",
+                "father": "M"
+            },
+            "X",
+            [InheritanceMode.INHMODE_LABEL_SV_DE_NOVO]
+        ),
+        (  # test case 5 - X-linked male de novo
+            {
+                "proband": "1/1",
+                "mother": "0/0",
+                "father": "0/0"
+            },
+            {
+                "proband": "M",
+                "mother": "F",
+                "father": "M"
+            },
+            "X",
+            [InheritanceMode.INHMODE_LABEL_SV_DE_NOVO]
+        ),
+        (  # test case 6 - Y-linked male de novo
+            {
+                "proband": "1/1",
+                "mother": "0/0",
+                "father": "0/0"
+            },
+            {
+                "proband": "M",
+                "mother": "F",
+                "father": "M"
+            },
+            "Y",
+            [InheritanceMode.INHMODE_LABEL_SV_DE_NOVO]
+        ),
+        (  # test case 7 - X-linked male 0/1
+            {
+                "proband": "0/1",
+                "mother": "0/0",
+                "father": "0/0"
+            },
+            {
+                "proband": "M",
+                "mother": "F",
+                "father": "M"
+            },
+            "X",
+            []
+        ),
+        (  # test case 8 - Y-linked male 0/1
+            {
+                "proband": "0/1",
+                "mother": "0/0",
+                "father": "0/0"
+            },
+            {
+                "proband": "M",
+                "mother": "F",
+                "father": "M"
+            },
+            "Y",
+            []
+        ),
+    ]
+)
+def test_compute_inheritance_mode_trio_structural_variant(
+    genotypes, sexes, chrom, result
+):
+    """
+    Test for SV-specific inheritance mode calculations. 
+    """
+    genotype_labels = InheritanceMode.compute_family_genotype_labels(
+        genotypes, sexes, chrom
+    )
+    assert InheritanceMode.compute_inheritance_mode_trio(
+        genotypes=genotypes,
+        genotype_labels=genotype_labels,
+        sexes=sexes,
+        chrom=chrom,
+        novoPP=-1,
+        structural_variant=True,
+    ) == result
 
 @pytest.mark.parametrize('variant_sample, expected_new_fields', [
     (  # test case 1
@@ -319,7 +455,7 @@ def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, exp
                 {'labels': ['Heterozygous'], 'role': 'mother', 'sample_id': 'sample_id_2'},
                 {'labels': ['Heterozygous'], 'role': 'father', 'sample_id': 'sample_id_3'}
             ],
-            'inheritance_modes': ['Recessive']
+            'inheritance_modes': ['Homozygous recessive']
         }
     ),
     (  # test case 4 (no mother, father)
@@ -373,6 +509,74 @@ def test_compute_inheritance_modes(variant_sample, expected_new_fields):
     """ Tests end-to-end inheritance mode computation """
     assert InheritanceMode.compute_inheritance_modes(variant_sample) == expected_new_fields
 
+@pytest.mark.parametrize("structural_variant_sample, chromosome, result",
+    [
+        (
+            {
+                "samplegeno": [
+                    {
+                        "samplegeno_role": "proband",
+                        "samplegeno_sex": "F",
+                        "samplegeno_numgt": "0/1",
+                        "samplegeno_sampleid": "Sample1",
+                        "samplegeno_quality": 100,
+                        "samplegeno_likelihood": "100,0,100"
+                    },
+                    {
+                        "samplegeno_role": "mother",
+                        "samplegeno_sex": "F",
+                        "samplegeno_numgt": "0/0",
+                        "samplegeno_sampleid": "Sample2",
+                        "samplegeno_quality": 100,
+                        "samplegeno_likelihood": "100,0,100"
+                    },
+                    {
+                        "samplegeno_role": "father",
+                        "samplegeno_sex": "M",
+                        "samplegeno_numgt": "0/0",
+                        "samplegeno_sampleid": "Sample3",
+                        "samplegeno_quality": 100,
+                        "samplegeno_likelihood": "100,0,100"
+                    },
+                ]
+            },
+            "2",
+            {
+                "genotype_labels": [
+                    {
+                        "labels": ["Heterozygous"],
+                        "role": "proband",
+                        "sample_id": "Sample1",
+                    },
+                    {
+                        "labels": ["Homozygous reference"],
+                        "role": "mother",
+                        "sample_id": "Sample2",
+                    },
+                    {
+                        "labels": ["Homozygous reference"],
+                        "role": "father",
+                        "sample_id": "Sample3",
+                    },
+                ],
+                "inheritance_modes": [InheritanceMode.INHMODE_LABEL_SV_DE_NOVO]
+            }
+        )
+    ]
+)
+def test_compute_inheritance_modes_structural_variant(
+    structural_variant_sample, chromosome, result
+):
+    """
+    Test inheritance mode calculation as run during ingestion with
+    StructuralVariantBuilder.
+
+    Tests of SV-specific inheritance or genotype labels not included
+    here.
+    """
+    assert InheritanceMode.compute_inheritance_modes(
+        structural_variant_sample, chrom=chromosome, structural_variant=True
+    ) == result
 
 def test_compute_inheritance_modes_csv_tests():
     """ A larger, more involved test that reads test data from a CSV and generates test cases """
