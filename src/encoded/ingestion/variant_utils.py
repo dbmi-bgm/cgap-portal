@@ -337,6 +337,9 @@ class StructuralVariantBuilder(VariantBuilder):
             # add inheritance mode information
             variant_name = sample["structural_variant"]
             chrom = variant_name[variant_name.index("chr") + 3]  # find chr* and get *
-            sample.update(InheritanceMode.compute_inheritance_modes(sample, chrom=chrom))
+            inheritance_modes = InheritanceMode.compute_inheritance_modes(
+                sample, chrom=chrom, structural_variant=True
+            )
+            sample.update(inheritance_modes)
             add_last_modified(sample, userid=LOADXL_USER_UUID)
         return variant_samples

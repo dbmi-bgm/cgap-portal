@@ -35,5 +35,294 @@
         "prev_symbol": [
             "TPY8"
         ]
+    },
+    {
+        "gdp": "Medium",
+        "epos": 2030758,
+        "name": "gamma-aminobutyric acid type A receptor delta subunit",
+        "spos": 2019329,
+        "chrom": "1",
+        "lof_z": 3.8697,
+        "mis_z": 2.1673,
+        "s_het": 0.111583011,
+        "syn_z": -2.2294,
+        "ensgid": "ENSG00000187730",
+        "mgd_id": [
+            "MGI:95622"
+        ],
+        "oe_lof": 0.051581,
+        "oe_mis": 0.64398,
+        "oe_syn": 1.2409,
+        "status": "shared",
+        "strand": "+",
+        "string": [
+            "9606.ENSP00000367848"
+        ],
+        "biogrid": [
+            "108837"
+        ],
+        "ccds_id": [
+            "CCDS36"
+        ],
+        "exp_lof": 19.387,
+        "exp_mis": 293.49,
+        "exp_syn": 138.61,
+        "hgnc_id": "4084",
+        "marrvel": "GABRD",
+        "obs_lof": 1,
+        "obs_mis": 189,
+        "obs_syn": 172,
+        "omim_id": [
+            "137163"
+        ],
+        "project": "hms-dbmi",
+        "ucsc_id": "uc001aip.3",
+        "cytoband": [
+            "1p36.33"
+        ],
+        "orphanet": "121991",
+        "pharmgkb": [
+            "PA28498"
+        ],
+        "entrez_id": "2563",
+        "epos_hg19": 1962192,
+        "gdi_phred": 1.57817,
+        "genecards": "ENSG00000187730",
+        "prev_name": [
+            "gamma-aminobutyric acid (GABA) A receptor, delta"
+        ],
+        "rvis_exac": -0.52053282,
+        "spos_hg19": 1950780,
+        "alias_name": [
+            "GABA(A) receptor, delta"
+        ],
+        "cds_length": 1356,
+        "chrom_hg19": "1",
+        "gene_symbol": "GABRD",
+        "institution": "hms-dbmi",
+        "strand_hg19": "+",
+        "uniprot_ids": [
+            "O14764"
+        ],
+        "gene_biotype": "protein_coding",
+        "gene_summary": "Gamma-aminobutyric acid (GABA) is the major inhibitory neurotransmitter in the mammalian brain where it acts at GABA-A receptors, which are ligand-gated chloride channels. Chloride conductance of these channels can be modulated by agents such as benzodiazepines that bind to the GABA-A receptor. The GABA-A receptor is generally pentameric and there are five types of subunits: alpha, beta, gamma, delta, and rho. This gene encodes the delta subunit. Mutations in this gene have been associated with susceptibility to generalized epilepsy with febrile seizures, type 5. Alternatively spliced transcript variants have been described for this gene, but their biological validity has not been determined. [provided by RefSeq, Jul 2008].",
+        "gene_version": "9",
+        "oe_lof_lower": 0.017,
+        "oe_lof_upper": 0.245,
+        "oe_mis_upper": 0.727,
+        "oe_syn_lower": 1.095,
+        "oe_syn_upper": 1.408,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000367848",
+                "ensembl_trs": "ENST00000378585"
+            },
+            {
+                "ensembl_pro": "ENSP00000491632",
+                "ensembl_trs": "ENST00000638411"
+            },
+            {
+                "ensembl_pro": "ENSP00000491997",
+                "ensembl_trs": "ENST00000639045"
+            },
+            {
+                "ensembl_pro": "ENSP00000491844",
+                "ensembl_trs": "ENST00000640067"
+            },
+            {
+                "ensembl_pro": "ENSP00000492435",
+                "ensembl_trs": "ENST00000638771"
+            },
+            {
+                "ensembl_pro": "ENSP00000492500",
+                "ensembl_trs": "ENST00000640949"
+            },
+            {
+                "ensembl_pro": "ENSP00000491411",
+                "ensembl_trs": "ENST00000640030"
+            },
+            {
+                "ensembl_pro": "ENSP00000491287",
+                "ensembl_trs": "ENST00000640981"
+            },
+            {
+                "ensembl_pro": "ENSP00000492352",
+                "ensembl_trs": "ENST00000638763"
+            },
+            {
+                "ensembl_pro": "ENSP00000491871",
+                "ensembl_trs": "ENST00000638804"
+            }
+        ],
+        "mgi_mouse_gene": "Gabrd",
+        "gtex_expression": "ENSG00000187730.8",
+        "pathway_kegg_id": "hsa04080",
+        "brainspan_rnaseq": "ENSG00000187730",
+        "num_coding_exons": 9,
+        "refseq_accession": [
+            "NG_008168",
+            "NM_000815"
+        ],
+        "pathway_kegg_full": "Neuroactive ligand-receptor interaction",
+        "mgi_mouse_phenotype": "behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); reproductive system phenotype; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan)",
+        "brainspan_microarray": "GABRD",
+        "rvis_percentile_exac": 20.87223661,
+        "brainatlas_microarray": "GABRD",
+        "trait_association_gwas": [
+            "Body mass index"
+        ],
+        "trait_association_gwas_pmid": [
+            "26426971~26426971"
+        ],
+        "uuid": "f6490485-7910-4019-a45e-02d6fb96f3a5"
+    },
+    {
+        "gdp": "Medium",
+        "pdb": [
+            "2W18",
+            "3EU7"
+        ],
+        "epos": 23641310,
+        "name": "partner and localizer of BRCA2",
+        "spos": 23603160,
+        "chrom": "16",
+        "lof_z": 1.5174,
+        "mis_z": 0.27604,
+        "s_het": 0.011004153,
+        "syn_z": -0.73298,
+        "ensgid": "ENSG00000083093",
+        "mgd_id": [
+            "MGI:3040695"
+        ],
+        "oe_lof": 0.75888,
+        "oe_mis": 0.96793,
+        "oe_syn": 1.0624,
+        "status": "shared",
+        "strand": "-",
+        "string": [
+            "9606.ENSP00000261584"
+        ],
+        "biogrid": [
+            "122843"
+        ],
+        "ccds_id": [
+            "CCDS32406"
+        ],
+        "clingen": "26144",
+        "exp_lof": 46.121,
+        "exp_mis": 586.82,
+        "exp_syn": 223.07,
+        "hgnc_id": "26144",
+        "marrvel": "PALB2",
+        "obs_lof": 35,
+        "obs_mis": 568,
+        "obs_syn": 237,
+        "omim_id": [
+            "610355"
+        ],
+        "project": "hms-dbmi",
+        "ucsc_id": "uc002dlx.2",
+        "cytoband": [
+            "16p12.2"
+        ],
+        "orphanet": "139189",
+        "pharmgkb": [
+            "PA162398608"
+        ],
+        "entrez_id": "79728",
+        "epos_hg19": 23652631,
+        "gdi_phred": 3.67511,
+        "genecards": "ENSG00000083093",
+        "rvis_exac": -0.612722785,
+        "spos_hg19": 23614488,
+        "alias_name": [
+            "Fanconi anemia, complementation group N"
+        ],
+        "cds_length": 3558,
+        "chrom_hg19": "16",
+        "clingendis": [
+            {
+                "disease_id": "MONDO_0018630",
+                "disease_label": "hereditary nonpolyposis colon cancer",
+                "classification": "Limited"
+            },
+            {
+                "disease_id": "MONDO_0016419",
+                "disease_label": "hereditary breast carcinoma",
+                "classification": "Definitive"
+            },
+            {
+                "disease_id": "MONDO_0016248",
+                "disease_label": "familial ovarian cancer",
+                "classification": "Moderate"
+            },
+            {
+                "disease_id": "MONDO_0012565",
+                "disease_label": "Fanconi anemia complementation group N",
+                "classification": "Definitive"
+            }
+        ],
+        "gene_symbol": "PALB2",
+        "genereviews": [
+            "PALB2"
+        ],
+        "institution": "hms-dbmi",
+        "strand_hg19": "-",
+        "uniprot_ids": [
+            "Q86YC2"
+        ],
+        "alias_symbol": [
+            "FLJ21816",
+            "FANCN"
+        ],
+        "gene_biotype": "protein_coding",
+        "gene_summary": "This gene encodes a protein that may function in tumor suppression. This protein binds to and colocalizes with the breast cancer 2 early onset protein (BRCA2) in nuclear foci and likely permits the stable intranuclear localization and accumulation of BRCA2. [provided by RefSeq, Jul 2008].",
+        "gene_version": "10",
+        "oe_lof_lower": 0.579,
+        "oe_lof_upper": 1.006,
+        "oe_mis_upper": 1.037,
+        "oe_syn_lower": 0.955,
+        "oe_syn_upper": 1.183,
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000459237",
+                "ensembl_trs": "ENST00000566069"
+            },
+            {
+                "ensembl_pro": "ENSP00000454703",
+                "ensembl_trs": "ENST00000568219"
+            },
+            {
+                "ensembl_pro": "ENSP00000261584",
+                "ensembl_trs": "ENST00000261584"
+            },
+            {
+                "ensembl_pro": "ENSP00000459882",
+                "ensembl_trs": "ENST00000565038"
+            },
+            {
+                "ensembl_pro": "ENSP00000460666",
+                "ensembl_trs": "ENST00000561514"
+            }
+        ],
+        "mgi_mouse_gene": "Palb2",
+        "gtex_expression": "ENSG00000083093.9",
+        "brainspan_rnaseq": "ENSG00000083093",
+        "num_coding_exons": 13,
+        "refseq_accession": [
+            "NG_007406",
+            "NM_024675"
+        ],
+        "mgi_mouse_phenotype": "integument phenotype (the observable morphological and physiological characteristics of the skin and its associated structures, such as the hair, nails, sweat glands, sebaceous glands and other secretory glands that are manifested through development and lifespan); growth/size/body region phenotype; cellular phenotype; behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan); embryo phenotype; neoplasm; mortality/aging (the observable characteristics related to the ability of a mammalian organism to live and age that are manifested throughout development and life span); cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); limbs/digits/tail phenotype; nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan)",
+        "brainspan_microarray": "PALB2",
+        "rvis_percentile_exac": 17.89048852,
+        "brainatlas_microarray": "PALB2",
+        "trait_association_gwas": [
+            "Bipolar disorder"
+        ],
+        "trait_association_gwas_pmid": [
+            "17554300"
+        ],
+        "uuid": "bc52317e-b10e-4a0a-9deb-553ea63b3b2b"
     }
 ]
