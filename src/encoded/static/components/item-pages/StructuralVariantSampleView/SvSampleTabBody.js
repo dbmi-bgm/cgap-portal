@@ -1,7 +1,6 @@
 'use strict';
 
 import React from 'react';
-import ReactTooltip from 'react-tooltip';
 import _ from 'underscore';
 import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
