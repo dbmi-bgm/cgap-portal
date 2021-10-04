@@ -33,8 +33,17 @@ export function SvSampleTabBody(props){
 
 
 function SvQualityTable(props) {
-    const { context = {}, comingSoonElem } = props;
+    const {
+        context: {
+            confidence_interval_start = [],
+            confidence_interval_end = [],
+        } = {},
+        comingSoonElem
+    } = props;
     const fallbackElem = <em> - </em>;
+
+    const startExists = confidence_interval_start.length > 0;
+    const endExists = confidence_interval_end.length > 0;
     return (
         <table className="w-100">
             <thead>
@@ -50,11 +59,11 @@ function SvQualityTable(props) {
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Confidence interval around left breakpoint</td>
-                    <td className="text-left">{comingSoonElem}</td>
+                    <td className="text-left">{startExists ? confidence_interval_start.join(", "): fallbackElem}</td>
                 </tr>
                 <tr>
                     <td className="text-600 text-left">Confidence interval around right breakpoint</td>
-                    <td className="text-left">{comingSoonElem}</td>
+                    <td className="text-left">{endExists ? confidence_interval_end.join(", "): fallbackElem}</td>
                 </tr>
             </tbody>
         </table>
