@@ -6,55 +6,48 @@ import _ from 'underscore';
 import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 
-export class SvSampleTabBody extends React.Component{
+export const SvSampleTabBody = (props) => {
+    const { context = {}, schemas } = props;
 
-    componentDidMount() {
-        ReactTooltip.rebuild();
-    }
+    function getTipForField(field, itemType = "StructuralVariantSample", nestedField = ""){
+        if (!schemas) return null;
+        const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
 
-    render () {
-        const { context = {}, schemas } = this.props;
-
-        function getTipForField(field, itemType = "StructuralVariantSample", nestedField = ""){
-            if (!schemas) return null;
-            const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
-
-            if (!nestedField) {
-                return (schemaProperty || {}).description || null;
-            }
-
-            const pathToDescription = nestedField.split(".");
-            pathToDescription.push("description");
-
-            return _.get(schemaProperty || {}, pathToDescription, null);
+        if (!nestedField) {
+            return (schemaProperty || {}).description || null;
         }
 
-        return (
-            <div className="sample-tab-body card-body">
-                <div className="row flex-column flex-lg-row">
-                    <div className="inner-card-section col pb-2 pb-lg-0">
-                        <div className="info-header-title">
-                            <h4>Breakpoint Confidence Intervals</h4>
-                        </div>
-                        <div className="info-body">
-                            <SvQualityTable {...{ context, getTipForField }} />
-                        </div>
+        const pathToDescription = nestedField.split(".");
+        pathToDescription.push("description");
+
+        return _.get(schemaProperty || {}, pathToDescription, null);
+    }
+
+    return (
+        <div className="sample-tab-body card-body">
+            <div className="row flex-column flex-lg-row">
+                <div className="inner-card-section col pb-2 pb-lg-0">
+                    <div className="info-header-title">
+                        <h4>Breakpoint Confidence Intervals</h4>
                     </div>
-                </div>
-                <div className="row flex-column flex-lg-row">
-                    <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
-                        <div className="info-header-title">
-                            <h4>Genotype</h4>
-                        </div>
-                        <div className="info-body">
-                            <GenotypeQualityTable {...{ context, getTipForField }} />
-                        </div>
+                    <div className="info-body">
+                        <SvQualityTable {...{ context, getTipForField }} />
                     </div>
                 </div>
             </div>
-        );
-    }
-}
+            <div className="row flex-column flex-lg-row">
+                <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
+                    <div className="info-header-title">
+                        <h4>Genotype</h4>
+                    </div>
+                    <div className="info-body">
+                        <GenotypeQualityTable {...{ context, getTipForField }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 
 function SvQualityTable(props) {

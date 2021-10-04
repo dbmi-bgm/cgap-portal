@@ -252,13 +252,13 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
-    componentDidUpdate(pastProps){
-        const { currentTab: pastTab } = pastProps;
-        const { currentTab } = this.props;
+    componentDidUpdate(pastProps, pastState){
+        const { currentTab: pastTab } = pastState;
+        const { currentTab } = this.state;
         if (currentTab !== pastTab) {
             // ReactTooltip.rebuild is called by App upon navigation
             // to rebuild tooltips from current DOM.
-            // However most tabs' DOM contents not visible until swithc to them
+            // However most tabs' DOM contents not visible until switch to them
             // so we needa rebuild tooltip upon that.
             // If DotRouter can be reused/integrated here or similar, we can
             // remove this useEffect.
