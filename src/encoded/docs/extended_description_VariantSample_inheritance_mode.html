@@ -43,3 +43,12 @@
 <li> Variants on multiallelic sites (e.g. G, T, A in different individuals) are not assigned inheritance mode values, except possibly compound heterozygous.
 <li> Variants with missing calls (./.) or calls that mismatch the sex (0/1 on chrX for a male) are not assigned inheritance mode values.
 <li> Variants with genotypes that do not meet any of the high relevant criteria above are not assigned GATK-based labels.
+</ul>
+
+<p><b>Ambiguous</b>: </p>
+
+<p>
+  If a sample was submitted to CGAP with the sex indicated as "U" or "Unknown", then autosome inheritance modes and genotypes
+  will still be calculated normally but sex chromosome inheritance mode and genotype cannot be properly determined. These will
+  be marked ambiguous.
+</p>
