@@ -597,7 +597,11 @@ export function getTranscriptLocation(transcript, mostSevereConsequence = null){
     return returnString;
 }
 
-/** Reuse this method for SNVs if it remains the same */
+/**
+ * Takes in a list of transcripts and returns the most severe, canonical, or the first in the array
+ * @param {Array} transcript - array of SNV or SV transcripts
+ * @returns Number
+ */
 export function getInitialTranscriptIndex(transcript) {
     // Set initial index to most severe or canonical transcript.
     let initialIndex = transcript.findIndex(function({ csq_most_severe }){

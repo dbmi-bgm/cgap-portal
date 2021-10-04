@@ -105,14 +105,14 @@ function StructuralVariantInfoSection({ context }) {
     } = context;
     const {
         size_display = fallbackElem,
-        cytoband_display = fallbackElem, // Next version of bioinfo
+        cytoband_display = fallbackElem,
         SV_TYPE = fallbackElem,
         CHROM = "",
         START = "",
         END = ""
     } = structural_variant;
 
-    const longFormTypeMap = { DUP: "Duplication", DEL: "Deletion" }; // may need to update if sv schema is updated
+    const longFormTypeMap = { DUP: "Duplication", DEL: "Deletion" }; // may need to update if sv schema is updated/just pull from schema in future
 
     const genotype = calculateGenotype(CALL_INFO, genotype_labels) || fallbackElem;
 
