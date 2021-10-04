@@ -73,7 +73,7 @@ function StructuralVariantSampleInfoHeader(props){
                             </div>
                         </div>
                     </div>
-                    <div className="inner-card-section col pb-2 pb-lg-0">
+                    <div className="inner-card-section col-lg-4 pb-2 pb-lg-0">
                         <div className="info-header-title">
                             <h4>Gene Info</h4>
                         </div>
