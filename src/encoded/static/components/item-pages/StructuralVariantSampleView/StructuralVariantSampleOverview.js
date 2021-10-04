@@ -15,8 +15,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
     render(){
         const { context = null, schemas, href } = this.props;
-        const comingSoonElem = <span className="font-italic">{null}</span>;
-        const passProps = { context, schemas, href, comingSoonElem };
+        const passProps = { context, schemas, href };
 
         const { query: {
             annotationTab = null,           // used only if can be parsed to integer (SvBrowser = 0)
@@ -33,8 +32,8 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
 function StructuralVariantSampleInfoHeader(props){
     const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
+
     const {
-        comingSoonElem,
         context,
         schemas,
         caseID = <span className="text-muted"> - </span>, // null
@@ -70,7 +69,7 @@ function StructuralVariantSampleInfoHeader(props){
                         </div>
                         <div className="info-body">
                             <div className="row mb-03">
-                                <StructuralVariantInfoSection {...{ context, comingSoonElem }} />
+                                <StructuralVariantInfoSection {...{ context }} />
                             </div>
                         </div>
                     </div>
@@ -79,7 +78,7 @@ function StructuralVariantSampleInfoHeader(props){
                             <h4>Gene Info</h4>
                         </div>
                         <div className="info-body">
-                            <GeneInfoSection {...{ context, comingSoonElem }} />
+                            <GeneInfoSection {...{ context }} />
                         </div>
                     </div>
                 </div>
@@ -103,8 +102,9 @@ function calculateGenotype(CALL_INFO, labels) {
     return null;
 }
 
-function StructuralVariantInfoSection({ context, comingSoonElem }) {
+function StructuralVariantInfoSection({ context }) {
     const fallbackElem = <em data-tip="Not Available"> - </em>;
+    const comingSoonElem = <span className="font-italic">{null}</span>;
     const {
         structural_variant = {},
         CALL_INFO = null,
@@ -287,7 +287,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, currentGeneItem, currentGeneItemLoading, comingSoonElem } = this.props;
+        const { context, schemas, currentGeneItem, currentGeneItemLoading } = this.props;
         const { currentTab } = this.state;
 
         const tabTitleElements = [];
@@ -299,7 +299,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
             tabTitleElements.push(<OverviewTabTitle {...tabTitleElemProps} />);
 
             if (index === currentTab || this.openPersistentTabs[index]) {
-                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index, comingSoonElem };
+                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
                 switch (index) {
                     case 0: // Gene
                         tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
