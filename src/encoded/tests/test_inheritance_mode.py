@@ -74,6 +74,13 @@ def test_compute_genotype_label_raises_error(gt, sex, chrom):
     ('0/1', 'M', '3', InheritanceMode.GENOTYPE_LABEL_0M),
     ('1/1', 'M', '21', InheritanceMode.GENOTYPE_LABEL_MM),
     ('2/1', 'M', '9', InheritanceMode.GENOTYPE_LABEL_MN),
+    ('0/1', 'U', 'Y', InheritanceMode.GENOTYPE_LABEL_SEX_AMBIGUOUS),
+    ('0/1', 'U', 'X', InheritanceMode.GENOTYPE_LABEL_SEX_AMBIGUOUS),
+    ('1/1', 'U', 'Y', InheritanceMode.GENOTYPE_LABEL_SEX_AMBIGUOUS),
+    ('1/1', 'U', 'X', InheritanceMode.GENOTYPE_LABEL_SEX_AMBIGUOUS),
+    ('0/1', 'U', '7', InheritanceMode.GENOTYPE_LABEL_0M),
+    ('1/1', 'U', '7', InheritanceMode.GENOTYPE_LABEL_MM),
+    ('2/1', 'U', '7', InheritanceMode.GENOTYPE_LABEL_MN)
 ])
 def test_compute_genotype_label(gt, sex, chrom, expected):
     assert InheritanceMode.compute_genotype_label(gt=gt, sex=sex, chrom=chrom) == expected
@@ -205,6 +212,26 @@ def test_compute_family_genotype_labels(gts, sexes, chrom, expected_labels):
         'X',
         .8,
         [InheritanceMode.INHMODE_LABEL_DE_NOVO_MEDIUM]
+    ),
+    (  # test case 4 - proband U
+        {
+            'proband': '0/1',
+            'mother': '1/1',
+            'father': '0/0'
+        },
+        {
+            'proband': ['Ambiguous'],
+            'mother': ['Homozygous alternate'],
+            'father': ['Hemizygous reference']
+        },
+        {
+            'proband': 'U',
+            'mother': 'F',
+            'father': 'M'
+        },
+        'X',
+        .8,
+        []
     )
 ])
 def test_compute_inheritance_mode_trio(gts, gt_labels, sexes, chrom, novoPP, expected_inh):
@@ -332,7 +359,7 @@ def test_compute_inheritance_mode_trio_structural_variant(
     genotypes, sexes, chrom, result
 ):
     """
-    Test for SV-specific inheritance mode calculations. 
+    Test for SV-specific inheritance mode calculations.
     """
     genotype_labels = InheritanceMode.compute_family_genotype_labels(
         genotypes, sexes, chrom
@@ -503,9 +530,83 @@ def test_compute_inheritance_mode_trio_structural_variant(
             ],
             'inheritance_modes': []
         }
+    ),
+    (  # test case 6 - proband U, sex chromosome
+        {
+            'samplegeno': [
+                {
+                    'samplegeno_role': 'proband',
+                    'samplegeno_numgt': '1/1',
+                    'samplegeno_sex': 'U',
+                    'samplegeno_sampleid': 'sample_id_1'
+                },
+                {
+                    'samplegeno_role': 'mother',
+                    'samplegeno_numgt': '0/1',
+                    'samplegeno_sex': 'F',
+                    'samplegeno_sampleid': 'sample_id_2'
+                },
+                {
+                    'samplegeno_role': 'father',
+                    'samplegeno_numgt': '0/0',
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_3'
+                },
+            ],
+            'novoPP': .5,
+            'cmphet': None,
+            'variant': {
+                'CHROM': 'X'
+            }
+        },
+        {
+            'genotype_labels': [
+                {'labels': ['Ambiguous'], 'role': 'proband', 'sample_id': 'sample_id_1'},
+                {'labels': ['Heterozygous'], 'role': 'mother', 'sample_id': 'sample_id_2'},
+                {'labels': ['Hemizygous reference'], 'role': 'father', 'sample_id': 'sample_id_3'}
+            ],
+            'inheritance_modes': ['Ambiguous due to missing sex determination']
+        }
+    ),
+    (  # test case 7 - proband U, autosome 
+        {
+            'samplegeno': [
+                {
+                    'samplegeno_role': 'proband',
+                    'samplegeno_numgt': '1/1',
+                    'samplegeno_sex': 'U',
+                    'samplegeno_sampleid': 'sample_id_1'
+                },
+                {
+                    'samplegeno_role': 'mother',
+                    'samplegeno_numgt': '0/1',
+                    'samplegeno_sex': 'F',
+                    'samplegeno_sampleid': 'sample_id_2'
+                },
+                {
+                    'samplegeno_role': 'father',
+                    'samplegeno_numgt': '0/1',
+                    'samplegeno_sex': 'M',
+                    'samplegeno_sampleid': 'sample_id_3'
+                },
+            ],
+            'novoPP': .5,
+            'cmphet': None,
+            'variant': {
+                'CHROM': 1
+            }
+        },
+        {
+            'genotype_labels': [
+                {'labels': ['Homozygous alternate'], 'role': 'proband', 'sample_id': 'sample_id_1'},
+                {'labels': ['Heterozygous'], 'role': 'mother', 'sample_id': 'sample_id_2'},
+                {'labels': ['Heterozygous'], 'role': 'father', 'sample_id': 'sample_id_3'}
+            ],
+            'inheritance_modes': ['de novo (medium)']
+        }
     )
 ])
-def test_compute_inheritance_modes(variant_sample, expected_new_fields):
+def test_compute_inheritance_modes_snv(variant_sample, expected_new_fields):
     """ Tests end-to-end inheritance mode computation """
     assert InheritanceMode.compute_inheritance_modes(variant_sample) == expected_new_fields
 
