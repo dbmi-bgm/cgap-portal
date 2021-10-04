@@ -40,12 +40,6 @@ function StructuralVariantSampleInfoHeader(props){
     } = props;
     const { variant: { ID = fallbackElem } = {} } = context;
 
-    function getTipForField(field, itemType = "StructuralVariantSample"){
-        if (!schemas) return null;
-        const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
-        return (schemaProperty || {}).description || null;
-    }
-
     return (
         // Stack these into flex column until large responsive size, then make into row.
         <div className="card mb-24 sample-variant-info-header">
@@ -78,7 +72,7 @@ function StructuralVariantSampleInfoHeader(props){
                             <h4>Gene Info</h4>
                         </div>
                         <div className="info-body">
-                            <GeneInfoSection {...{ context }} />
+                            <GeneInfoSection {...{ context, schemas }} />
                         </div>
                     </div>
                 </div>
@@ -104,7 +98,6 @@ function calculateGenotype(CALL_INFO, labels) {
 
 function StructuralVariantInfoSection({ context }) {
     const fallbackElem = <em data-tip="Not Available"> - </em>;
-    const comingSoonElem = <span className="font-italic">{null}</span>;
     const {
         structural_variant = {},
         CALL_INFO = null,
@@ -148,7 +141,7 @@ function StructuralVariantInfoSection({ context }) {
                             <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_grch37">{comingSoonElem}</span>
+                            <span id="vi_grch37">{/* Coming soon */}</span>
                         </div>
                     </div>
                 </div>
