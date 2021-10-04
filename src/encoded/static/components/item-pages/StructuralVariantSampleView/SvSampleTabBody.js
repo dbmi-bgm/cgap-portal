@@ -1,51 +1,59 @@
 'use strict';
 
 import React from 'react';
+import ReactTooltip from 'react-tooltip';
 import _ from 'underscore';
 import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 
-export function SvSampleTabBody(props){
-    const { context = {}, schemas } = props;
+export class SvSampleTabBody extends React.Component{
 
-    function getTipForField(field, itemType = "StructuralVariantSample", nestedField = ""){
-        if (!schemas) return null;
-        const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
-
-        if (!nestedField) {
-            return (schemaProperty || {}).description || null;
-        }
-
-        const pathToDescription = nestedField.split(".");
-        pathToDescription.push("description");
-
-        return _.get(schemaProperty || {}, pathToDescription, null);
+    componentDidMount() {
+        ReactTooltip.rebuild();
     }
 
-    return (
-        <div className="sample-tab-body card-body">
-            <div className="row flex-column flex-lg-row">
-                <div className="inner-card-section col pb-2 pb-lg-0">
-                    <div className="info-header-title">
-                        <h4>Breakpoint Confidence Intervals</h4>
+    render () {
+        const { context = {}, schemas } = this.props;
+
+        function getTipForField(field, itemType = "StructuralVariantSample", nestedField = ""){
+            if (!schemas) return null;
+            const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
+
+            if (!nestedField) {
+                return (schemaProperty || {}).description || null;
+            }
+
+            const pathToDescription = nestedField.split(".");
+            pathToDescription.push("description");
+
+            return _.get(schemaProperty || {}, pathToDescription, null);
+        }
+
+        return (
+            <div className="sample-tab-body card-body">
+                <div className="row flex-column flex-lg-row">
+                    <div className="inner-card-section col pb-2 pb-lg-0">
+                        <div className="info-header-title">
+                            <h4>Breakpoint Confidence Intervals</h4>
+                        </div>
+                        <div className="info-body">
+                            <SvQualityTable {...{ context, getTipForField }} />
+                        </div>
                     </div>
-                    <div className="info-body">
-                        <SvQualityTable {...{ context, getTipForField }} />
+                </div>
+                <div className="row flex-column flex-lg-row">
+                    <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
+                        <div className="info-header-title">
+                            <h4>Genotype</h4>
+                        </div>
+                        <div className="info-body">
+                            <GenotypeQualityTable {...{ context, getTipForField }} />
+                        </div>
                     </div>
                 </div>
             </div>
-            <div className="row flex-column flex-lg-row">
-                <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
-                    <div className="info-header-title">
-                        <h4>Genotype</h4>
-                    </div>
-                    <div className="info-body">
-                        <GenotypeQualityTable {...{ context, getTipForField }} />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+        );
+    }
 }
 
 
@@ -97,7 +105,6 @@ function SvQualityTable(props) {
 }
 
 
-// TODO: Update with Genotype Quality & Likelihoods when fields are available
 function GenotypeQualityTable(props) {
     const { context: { samplegeno = [] } = {}, getTipForField } = props;
     const fallbackElem = <em> - </em>;
@@ -128,9 +135,9 @@ function GenotypeQualityTable(props) {
                     <tr>
                         <th className="text-left">Relation</th>
                         <th className="text-left">ID</th>
-                        <th className="text-left">Genotype</th>
-                        <th className="text-left">Genotype Quality</th>
-                        <th className="text-left">Genotype Likelihoods</th>
+                        <th className="text-left" data-tip={ getTipForField("samplegeno", "StructuralVariantSample", "items.properties.samplegeno_numgt" ) }>Genotype <i className="icon icon-info-circle fas" /></th>
+                        <th className="text-left" data-tip={ getTipForField("samplegeno", "StructuralVariantSample", "items.properties.samplegeno_quality" ) }>Genotype Quality <i className="icon icon-info-circle fas" /></th>
+                        <th className="text-left" data-tip={ getTipForField("samplegeno", "StructuralVariantSample", "items.properties.samplegeno_likelihood" ) }>Genotype Likelihoods <i className="icon icon-info-circle fas" /></th>
                     </tr>
                 </thead>
                 <tbody>
