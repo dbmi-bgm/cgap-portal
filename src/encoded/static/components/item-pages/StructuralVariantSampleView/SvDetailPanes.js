@@ -9,26 +9,7 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { object, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { responsiveGridState } from './../../util/layout';
 
-import { ExternalDatabasesSection, GeneOverview, ConstraintScoresSection, GeneTranscriptDisplayTitle } from '../VariantSampleView/AnnotationSections';
-
-/** Reuse this method for SNVs if it remains the same */
-function getInitialTranscriptIndex(transcript) {
-    // Set initial index to most severe or canonical transcript.
-    let initialIndex = transcript.findIndex(function({ csq_most_severe }){
-        return !!(csq_most_severe);
-    });
-
-    if (initialIndex === -1){
-        initialIndex = transcript.findIndex(function({ csq_canonical }){
-            return !!(csq_canonical);
-        });
-    }
-
-    if (initialIndex === -1){
-        initialIndex = 0;
-    }
-    return parseInt(initialIndex);
-}
+import { ExternalDatabasesSection, GeneOverview, ConstraintScoresSection, GeneTranscriptDisplayTitle, getInitialTranscriptIndex } from '../VariantSampleView/AnnotationSections';
 
 export function SvGeneDetailPane(props) {
     const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth, propsFromTable, schemas, context } = props;

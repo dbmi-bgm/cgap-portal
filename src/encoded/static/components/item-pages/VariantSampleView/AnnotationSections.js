@@ -596,3 +596,22 @@ export function getTranscriptLocation(transcript, mostSevereConsequence = null){
 
     return returnString;
 }
+
+/** Reuse this method for SNVs if it remains the same */
+export function getInitialTranscriptIndex(transcript) {
+    // Set initial index to most severe or canonical transcript.
+    let initialIndex = transcript.findIndex(function({ csq_most_severe }){
+        return !!(csq_most_severe);
+    });
+
+    if (initialIndex === -1){
+        initialIndex = transcript.findIndex(function({ csq_canonical }){
+            return !!(csq_canonical);
+        });
+    }
+
+    if (initialIndex === -1){
+        initialIndex = 0;
+    }
+    return parseInt(initialIndex);
+}
