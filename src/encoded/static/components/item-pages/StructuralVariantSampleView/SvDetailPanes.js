@@ -1,6 +1,7 @@
 'use strict';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
@@ -34,6 +35,10 @@ export function SvGeneDetailPane(props) {
 
     const { structural_variant: { transcript = [] } = {} } = context || {};
     const { ensgid: resultEnsgid = null } = result;
+
+    useEffect(function(){
+        setTimeout(function(){ ReactTooltip.rebuild(); }, 1000);
+    }, []); // Empty array == memoized but on nothing == run it only once on mount
 
     // Filter out transcripts that do not match the current result's gene
     const resultTranscripts = transcript.filter(function({ csq_gene }){
