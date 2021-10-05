@@ -306,7 +306,9 @@ class TestIngestStructuralVariantVCF(TestIngestVCF):
         sample_geno = self.get_top_level_field(result[1], "samplegeno")
         assert len(sample_geno) == 3
         assert sample_geno[1]["samplegeno_sampleid"] == "NA12878_sample"
+        assert sample_geno[1]["samplegeno_quality"] == 48
         assert sample_geno[2]["samplegeno_numgt"] == "0/1"
+        assert sample_geno[2]["samplegeno_likelihood"] == "209,0,12"
         
         # record 4 - Confidence intervals and Imprecise
         record = test_sv_vcf.read_next_record()

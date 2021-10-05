@@ -438,8 +438,8 @@ export default class App extends React.PureComponent {
         // Ensure this is a plain click
         if (nativeEvent.which > 1 || nativeEvent.shiftKey || nativeEvent.altKey || nativeEvent.metaKey) return;
 
-        // Skip links with a data-bypass attribute.
-        if (target.getAttribute('data-bypass')){
+        // Skip links with a data-bypass attribute or with download attribute.
+        if (target.getAttribute('data-bypass') !== null || target.getAttribute('download') !== null){
             return false;
         }
 
@@ -987,7 +987,7 @@ export default class App extends React.PureComponent {
                     Alerts.queue(Alerts.ConnectionError);
                     const msg = 'Unknown Network Error: ' + err.status + ' - ' + targetHref;
                     analytics.exception(msg);
-                    console.err(msg);
+                    console.error(msg);
                     // Unknown/unanticipated error: Bubble it up (won't break app).
                     throw err;
                 }
@@ -1129,7 +1129,7 @@ export default class App extends React.PureComponent {
         const contentSecurityPolicyStr = [
             "default-src 'self'",
             "img-src 'self' https://*",
-            "child-src 'none'",
+            "child-src blob:",
             // Allowing unsafe-eval temporarily re: 'box-intersect' dependency of some HiGlass tracks.
             "script-src 'self' https://www.google-analytics.com https://cdn.auth0.com https://secure.gravatar.com 'unsafe-eval'", // + (typeof BUILDTYPE === "string" && BUILDTYPE === "quick" ? " 'unsafe-eval'" : ""),
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com  https://unpkg.com",
@@ -1564,21 +1564,21 @@ class BodyElement extends React.PureComponent {
      * @returns {void}
      */
     onResize(e){
-        var dims, pastDims;
-        this.setState(function(currState){
-            var nextState = {};
+        let dims, pastDims;
+        this.setState(function({ windowWidth, windowHeight }){
+            const nextState = {};
             dims = BodyElement.getViewportDimensions();
-            pastDims = _.pick(currState, 'windowWidth', 'windowHeight');
-            if (dims.windowWidth !== currState.windowWidth)     nextState.windowWidth = dims.windowWidth;
-            if (dims.windowHeight !== currState.windowHeight)   nextState.windowHeight = dims.windowHeight;
-            if (_.keys(nextState).length > 0){
+            pastDims = { windowWidth, windowHeight };
+            if (dims.windowWidth !== pastDims.windowWidth)     nextState.windowWidth = dims.windowWidth;
+            if (dims.windowHeight !== pastDims.windowHeight)   nextState.windowHeight = dims.windowHeight;
+            if (Object.keys(nextState).length > 0){
                 return nextState;
             }
             return null;
         }, ()=>{
             console.info('Window resize detected.', dims);
             if (this.resizeHandlers.length > 0){
-                _.forEach(this.resizeHandlers, (resizeHandlerFxn) => resizeHandlerFxn(dims, pastDims, e) );
+                this.resizeHandlers.forEach(function(resizeHandlerFxn){ resizeHandlerFxn(dims, pastDims, e); });
             }
         });
     }

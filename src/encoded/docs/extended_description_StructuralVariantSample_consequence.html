@@ -1,0 +1,29 @@
+<h5> 
+Consequence values come directly from Ensembl VEP and correspond to the predicted effects of the variant on a transcript.
+</h5>
+
+<p> 
+Multiple consequences can apply for any given transcript. For example, a protein-coding transcript that is partially truncated towards its 5' end by a deletion may have the following consequences: <em>Start lost</em>, <em>Coding sequence variant</em>, and <em>5 prime UTR variant</em>.
+</p>
+
+<p>
+Of note, two consequences, namely <b> <em>Transcript ablation</em> </b> and <b> <em>Transcript amplification</em> </b>, imply an entire transcript is contained within the variant. These consequences have the caveat that they are never accompanied by other consequences. Thus, when filtering for variants affecting coding sequences, these consequences should always be included with the <em>Coding sequence variant</em> consequence.
+</p>
+
+<p>
+When searching for SVs causing loss of function, consider utilizing the following combination of consequences:
+<ul>
+<li> <em>Trancript ablation</em>
+<li> <em>Stop gained</em>
+<li> <em>Frameshift variant</em>
+<li> <em>Start lost</em>
+</ul>
+</p>
+
+<p>
+For triplosensitive genes, the <em>Transcript amplification</em> consequence may be particularly relevant.
+</p>
+
+<p>
+More information on VEP consequences is available from Ensembl <a href="https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html" target=="_blank">here</a>.
+</p>

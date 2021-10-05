@@ -91,15 +91,20 @@ function AboveCasesTableOptions(props){
     return (
         <React.Fragment>
             <div className="container-wide py-0 bg-white">
-                <div className="tab-section-title">
-                    <h3 className="text-400 my-0 d-flex align-items-center">
-                        Recent Cases&nbsp;
-                        <span className="text-300">from&nbsp;</span>
+                <div className="tab-section-title flex-wrap">
+
+                    <div className="d-flex align-items-center">
+                        <h3 className="text-400 my-0 d-none d-sm-block">
+                            Recent Cases&nbsp;
+                            <span className="text-300">from&nbsp;</span>
+                        </h3>
                         <div className="px-1">
                             <ProjectSelectDropdown {...{ context, onFilter, isContextLoading, navigate }} />
                         </div>
-                    </h3>
-                    <DropdownButton variant="primary" title={<span><i className="icon fas icon-plus mr-08"/>Submit New...</span>} id="submit-new">
+                    </div>
+
+                    <DropdownButton variant="primary" id="submit-new" className="px-1"
+                        title={<span><i className="icon fas icon-plus mr-08"/>Submit New...</span>}>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add">
                             Case(s)
                         </Dropdown.Item>
@@ -110,11 +115,12 @@ function AboveCasesTableOptions(props){
                             Gene List(s)
                         </Dropdown.Item>
                     </DropdownButton>
+
                 </div>
             </div>
 
             <hr className="tab-section-title-horiz-divider"/>
-            <div className="container-wide toggle-reports row align-items-center">
+            <div className="container-wide toggle-reports row align-items-center py-2">
                 <div className="col-12 col-sm-auto">
                     <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
                         Show Only Cases with Reports
@@ -157,9 +163,9 @@ class ProjectFilterCheckbox extends React.PureComponent {
     render(){
         const { isContextLoading, checked, children } = this.props;
         const { isChanging } = this.state;
+        const labelCls = "mb-0 px-2 py-1" + (isChanging ? " is-changing position-relative" : "");
         return (
-            <Checkbox disabled={isContextLoading} onChange={this.onChange} checked={checked}
-                labelClassName={"mb-0 px-2 py-3" + (isChanging ? " is-changing position-relative" : "")}>
+            <Checkbox disabled={isContextLoading} onChange={this.onChange} checked={checked} labelClassName={labelCls}>
                 <span className="text-small">
                     { isChanging ? <i className="icon icon-circle-notch icon-spin fas mr-07 text-small" /> : null }
                     { children }

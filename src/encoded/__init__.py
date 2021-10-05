@@ -169,8 +169,7 @@ def main(global_config, **local_config):
     config.include('.server_defaults')
     config.include('.root')
     config.include('.types')
-    # Fourfront does this. Do we need that here? -kmp 8-Apr-2020
-    # config.include('.batch_download')
+    config.include('.batch_download')
     config.include('.loadxl')
     config.include('.visualization')
     config.include('.ingestion_listener')
