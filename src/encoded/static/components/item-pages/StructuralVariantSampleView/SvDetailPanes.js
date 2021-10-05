@@ -116,7 +116,7 @@ function TranscriptSelectionDropdown(props){
     }
 
     return (
-        <DropdownButton title={dropdownTitleToShow} size="sm py-1" variant="outline-secondary select-transcript" onSelect={setTranscriptIdx}
+        <DropdownButton title={dropdownTitleToShow} size="sm py-1" variant="outline-secondary select-transcript text-truncate" onSelect={setTranscriptIdx}
             disabled={geneTranscriptListLen <= 1} data-tip={"Select a transcript to view their details"}>
             { geneListOptions }
         </DropdownButton>
