@@ -103,9 +103,21 @@ const SVGnomADTable = React.memo(function SVGnomADTable(props) {
             <thead>
                 <tr>
                     <th className="text-left">Population</th>
-                    <th data-tip={getTipForField("structural_variant." + prefix + "_ac")}>Allele Count</th>
-                    <th data-tip={getTipForField("structural_variant." + prefix + "_an")}>Allele Number</th>
-                    <th className="text-left" data-tip={getTipForField("structural_variant." + prefix + "_af")}>Allele Frequency</th>
+                    <th>
+                        Allele Count
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={getTipForField("structural_variant." + prefix + "_ac")} />
+                    </th>
+                    <th>
+                        Allele Number
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={getTipForField("structural_variant." + prefix + "_an")} />
+                    </th>
+                    <th className="text-left">
+                        Allele Frequency
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={getTipForField("structural_variant." + prefix + "_af")} />
+                    </th>
                 </tr>
             </thead>
             <tbody>
