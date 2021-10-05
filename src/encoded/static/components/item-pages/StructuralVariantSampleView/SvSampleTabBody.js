@@ -127,9 +127,9 @@ function GenotypeQualityTable(props) {
                     <tr>
                         <th className="text-left">Relation</th>
                         <th className="text-left">ID</th>
-                        <th className="text-left" data-tip={ getTipForField("samplegeno", "StructuralVariantSample", "items.properties.samplegeno_numgt" ) }>Genotype <i className="icon icon-info-circle fas" /></th>
-                        <th className="text-left" data-tip={ getTipForField("samplegeno", "StructuralVariantSample", "items.properties.samplegeno_quality" ) }>Genotype Quality <i className="icon icon-info-circle fas" /></th>
-                        <th className="text-left" data-tip={ getTipForField("samplegeno", "StructuralVariantSample", "items.properties.samplegeno_likelihood" ) }>Genotype Likelihoods <i className="icon icon-info-circle fas" /></th>
+                        <th className="text-left">Genotype <i className="icon icon-info-circle fas" data-tip={ getTipForField("samplegeno", "StructuralVariantSample", "items.properties.samplegeno_numgt" ) }/></th>
+                        <th className="text-left">Genotype Quality <i className="icon icon-info-circle fas" data-tip={ getTipForField("samplegeno", "StructuralVariantSample", "items.properties.samplegeno_quality" ) }/></th>
+                        <th className="text-left">Genotype Likelihoods <i className="icon icon-info-circle fas" data-tip={ getTipForField("samplegeno", "StructuralVariantSample", "items.properties.samplegeno_likelihood" ) }/></th>
                     </tr>
                 </thead>
                 <tbody>
