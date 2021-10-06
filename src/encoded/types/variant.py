@@ -2,6 +2,8 @@ import datetime
 import io
 import json
 import os
+import csv
+from math import inf
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
     HTTPBadRequest,
@@ -9,6 +11,7 @@ from pyramid.httpexceptions import (
 )
 from pyramid.traversal import find_resource
 from pyramid.request import Request
+from pyramid.response import Response
 
 import boto3
 import negspy.coordinates as nc
@@ -19,7 +22,7 @@ from pyramid.settings import asbool
 from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
-from snovault.util import debug_log
+from snovault.util import simple_path_ids, debug_log
 from snovault.embed import make_subrequest
 
 from encoded.ingestion.common import CGAP_CORE_PROJECT
@@ -28,6 +31,10 @@ from encoded.util import resolve_file_path
 from encoded.types.base import Item, get_item_or_none
 
 from ..custom_embed import CustomEmbed
+from ..batch_download_utils import (
+    stream_tsv_output,
+    convert_item_to_sheet_dict
+)
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
@@ -43,6 +50,7 @@ CMPHET_UNPHASED_WEAK = 'Compound Het (Unphased/weak_pair)'
 
 # Shared embeds for variants and variant samples also used for corresponding SV items
 SHARED_VARIANT_EMBEDS = [
+    "interpretations.@id",
     "interpretations.classification",
     "interpretations.acmg_rules_invoked.*",
     "interpretations.acmg_rules_with_modifier",
@@ -54,6 +62,7 @@ SHARED_VARIANT_EMBEDS = [
     "interpretations.status",
     "interpretations.last_modified.date_modified",
     "interpretations.last_modified.modified_by.display_title",
+    "discovery_interpretations.@id",
     "discovery_interpretations.gene_candidacy",
     "discovery_interpretations.variant_candidacy",
     "discovery_interpretations.note_text",
@@ -62,11 +71,13 @@ SHARED_VARIANT_EMBEDS = [
     "discovery_interpretations.institution.@id",
     "discovery_interpretations.status",
     "discovery_interpretations.last_modified.date_modified",
-    "discovery_interpretations.last_modified.modified_by.display_title"
+    "discovery_interpretations.last_modified.modified_by.display_title",
+    "variant_notes.@id",
 ]
 
 SHARED_VARIANT_SAMPLE_EMBEDS = [
     # The following fields are now requested through /embed API.
+    "variant_notes.@id",
     # "variant_notes.note_text",
     # "variant_notes.version",
     # "variant_notes.project",
@@ -74,6 +85,7 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     # "variant_notes.status",
     # "variant_notes.last_modified.date_modified",
     # "variant_notes.last_modified.modified_by.display_title",
+    "gene_notes.@id",
     # "gene_notes.note_text",
     # "gene_notes.version",
     # "gene_notes.project",
@@ -81,6 +93,7 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     # "gene_notes.status",
     # "gene_notes.last_modified.date_modified",
     # "gene_notes.last_modified.modified_by.display_title",
+    "interpretation.@id",
     # "interpretation.classification",
     # "interpretation.acmg_rules_invoked.*",
     # "interpretation.acmg_rules_with_modifier",
@@ -92,6 +105,7 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     # "interpretation.status",
     # "interpretation.last_modified.date_modified",
     # "interpretation.last_modified.modified_by.display_title",
+    "discovery_interpretation.@id",
     # "discovery_interpretation.gene_candidacy",
     # "discovery_interpretation.variant_candidacy",
     # "discovery_interpretation.note_text",
@@ -134,7 +148,9 @@ def build_variant_embedded_list():
 
         :returns: list of variant embeds
     """
-    embedded_list = SHARED_VARIANT_EMBEDS + []
+    embedded_list = SHARED_VARIANT_EMBEDS + [
+        "genes.genes_most_severe_gene.gene_notes.@id", # `genes` not present on StructuralVariant
+    ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
     return embedded_list + Item.embedded_list
@@ -894,18 +910,368 @@ class VariantSampleList(Item):
 
 
 
+
+
+
+
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
-             permission='view', subpath_segments=[0, 1])
+             permission='view')
 @debug_log
 def variant_sample_list_spreadsheet(context, request):
-    """
-    Returns spreasheet containing information about every VariantSample selection
-    in the VariantSampleList Item.
-    TODO:
-      Figure out fields needed, use CustomEmbed class to fetch them, then
-      plop them out as a download stream. See 4DN/fourfront's batch_download
-      for precedent example (downloading/streaming a TSV from /search/ request).
-    """
+
+    file_format = request.GET.get("file_format", None)
+    case_accession = request.GET.get("case_accession", context.properties.get("created_for_case"))
+
+    if not file_format:
+        file_format = "tsv"
+    elif file_format not in { "tsv", "csv" }: # TODO: Add support for xslx.
+        raise HTTPBadRequest("Expected a valid `file_format` such as TSV or CSV.")
 
 
-    return { "status": "in development" }
+    timestamp = datetime.datetime.now(pytz.utc).isoformat()[:-13] + "Z"
+    suggested_filename = (case_accession or "case") + "-interpretation-" + timestamp + "." + file_format
+
+
+    variant_sample_uuids = [ vso["variant_sample_item"] for vso in context.properties.get("variant_samples", []) ]
+    spreadsheet_mappings = get_spreadsheet_mappings(request)
+    fields_to_embed = get_fields_to_embed(spreadsheet_mappings)
+
+
+    def load_variant_sample(vs_uuid):
+        '''
+        We want to grab datastore=database version of Items here since is likely that user has _just_ finished making
+        an edit when they decide to export the spreadsheet from the InterpretationTab UI.
+        '''
+        vs_embedding_instance = CustomEmbed(request, vs_uuid, embed_props={ "requested_fields": fields_to_embed })
+        result = vs_embedding_instance.result
+        return result
+
+    def vs_dicts_generator():
+        for vs_uuid in variant_sample_uuids:
+            vs_result = load_variant_sample(vs_uuid)
+            yield convert_item_to_sheet_dict(vs_result, spreadsheet_mappings)
+
+
+    return Response(
+        app_iter = stream_tsv_output(
+            vs_dicts_generator(),
+            spreadsheet_mappings,
+            file_format
+        ),
+        headers={
+            'X-Accel-Buffering': 'no',
+            # 'Content-Encoding': 'utf-8', # Disabled so that Python unit test may work (TODO: Look into more?)
+            'Content-Disposition': 'attachment; filename=' + suggested_filename,
+            'Content-Type': 'text/' + file_format,
+            'Content-Description': 'File Transfer',
+            'Cache-Control': 'no-store'
+        }
+    )
+
+
+############################################################
+### Spreadsheet Generation for Variant Sample Item Lists ###
+############################################################
+
+
+POPULATION_SUFFIX_TITLE_TUPLES = [
+    ("afr", "African-American/African"), 
+    ("ami", "Amish"),
+    ("amr", "Latino"),
+    ("asj", "Ashkenazi Jewish"),
+    ("eas", "East Asian"),
+    ("fin", "Finnish"),
+    ("mid", "Middle Eastern"),
+    ("nfe", "Non-Finnish European"),
+    ("oth", "Other Ancestry"),
+    ("sas", "South Asian")
+]
+
+def get_spreadsheet_mappings(request = None):
+
+    def get_boolean_transcript_field(variant_sample, field):
+        variant = variant_sample.get("variant", {})
+        for transcript in variant.get("transcript", []):
+            if transcript.get(field, False) is True:
+                return transcript
+        return None
+    
+    def get_canonical_transcript(variant_sample):
+        return get_boolean_transcript_field(variant_sample, "csq_canonical")
+
+    def get_most_severe_transcript(variant_sample):
+        return get_boolean_transcript_field(variant_sample, "csq_most_severe")
+
+    def get_most_severe_consequence(variant_sample_transcript):
+        ''' Used only for "Location" '''
+        csq_consequences = variant_sample_transcript.get("csq_consequence", [])
+        if not csq_consequences:
+            return None
+        impact_map = {
+            "HIGH" : 0,
+            "MODERATE" : 1,
+            "LOW" : 2,
+            "MODIFIER" : 3
+        }
+        most_severe_impact_val = inf
+        most_severe_consequence = None
+        for consequence in csq_consequences:
+            impact_val = impact_map[consequence["impact"]]
+            if impact_val < most_severe_impact_val:
+                most_severe_consequence = consequence
+                most_severe_impact_val = impact_val
+
+        return most_severe_consequence
+
+
+    def canonical_transcript_csq_feature(variant_sample):
+        ''' Returns `variant.transcript.csq_feature` '''
+        canonical_transcript = get_canonical_transcript(variant_sample)
+        if canonical_transcript:
+            return canonical_transcript.get("csq_feature", None)
+        return None
+
+    def most_severe_transcript_csq_feature(variant_sample):
+        ''' Returns `variant.transcript.csq_feature` '''
+        most_severe_transcript = get_most_severe_transcript(variant_sample)
+        if most_severe_transcript:
+            return most_severe_transcript.get("csq_feature", None)
+        return None
+
+    # TODO: Consider making `canonical_transcript_location` + `most_severe_transcript_location` as calculated properties
+    def location_name(transcript):
+        most_severe_consequence = get_most_severe_consequence(transcript)
+        consequence_name = most_severe_consequence["var_conseq_name"].lower() if most_severe_consequence is not None and "var_conseq_name" in most_severe_consequence else None
+
+        return_str = None
+
+        csq_exon = transcript.get("csq_exon", None)
+        csq_intron = transcript.get("csq_intron", None)
+        csq_distance = transcript.get("csq_distance", None)
+
+        if csq_exon is not None:
+            return_str = "Exon " + csq_exon
+        elif csq_intron is not None:
+            return_str = "Intron " + csq_intron
+        elif csq_distance is not None and consequence_name is not None:
+            if consequence_name == "downstream_gene_variant":
+                return_str = csq_distance + "bp downstream"
+            elif consequence_name == "upstream_gene_variant":
+                return_str = csq_distance + "bp upstream"
+
+        if consequence_name == "3_prime_utr_variant":
+            if return_str:
+                return_str += " (3′ UTR)"
+            else:
+                return_str = "3′ UTR"
+        elif consequence_name == "5_prime_utr_variant":
+            if return_str:
+                return_str += " (5′ UTR)"
+            else:
+                return_str = "5′ UTR"
+
+        return return_str
+
+    def canonical_transcript_location(variant_sample):
+        canonical_transcript = get_canonical_transcript(variant_sample)
+        if not canonical_transcript:
+            return None
+        return location_name(canonical_transcript)
+
+    def most_severe_transcript_location(variant_sample):
+        most_severe_transcript = get_most_severe_transcript(variant_sample)
+        if not most_severe_transcript:
+            return None
+        return location_name(most_severe_transcript)
+
+    def canonical_transcript_consequence_display_title(variant_sample):
+        canonical_transcript = get_canonical_transcript(variant_sample)
+        if not canonical_transcript:
+            return None
+        csq_consequences = canonical_transcript.get("csq_consequence", [])
+        if not csq_consequences:
+            return None
+        return ", ".join([ c["display_title"] for c in csq_consequences ])
+
+    def most_severe_transcript_consequence_display_title(variant_sample):
+        most_severe_transcript = get_most_severe_transcript(variant_sample)
+        if not most_severe_transcript:
+            return None
+        csq_consequences = most_severe_transcript.get("csq_consequence", [])
+        if not csq_consequences:
+            return None
+        return ", ".join([ c["display_title"] for c in csq_consequences ])
+
+    def gnomadv3_popmax_population(variant_sample):
+        variant = variant_sample.get("variant", {})
+        csq_gnomadg_af_popmax = variant.get("csq_gnomadg_af_popmax")
+        if not csq_gnomadg_af_popmax: # Return None for 0, also.
+            return None
+        for pop_suffix, pop_name in POPULATION_SUFFIX_TITLE_TUPLES:
+            pop_val = variant.get("csq_gnomadg_af-" + pop_suffix)
+            if pop_val is not None and pop_val == csq_gnomadg_af_popmax:
+                return pop_name
+        return None
+
+    def gnomadv2_popmax_population(variant_sample):
+        variant = variant_sample.get("variant", {})
+        csq_gnomade2_af_popmax = variant.get("csq_gnomade2_af_popmax")
+        if not csq_gnomade2_af_popmax: # Return None for 0, also.
+            return None
+        for pop_suffix, pop_name in POPULATION_SUFFIX_TITLE_TUPLES:
+            pop_val = variant.get("csq_gnomade2_af-" + pop_suffix)
+            if pop_val is not None and pop_val == csq_gnomade2_af_popmax:
+                return pop_name
+        return None
+
+    def get_most_recent_note_of_project(notes_iterable, project_at_id):
+        for note in reversed(list(notes_iterable)):
+            note_project_id = note["project"]
+            if isinstance(note_project_id, dict):
+                # We might get string OR @@embedded representation, e.g. if from search response.
+                note_project_id = note_project_id.get("@id")
+            if project_at_id == note["project"]:
+                return note
+        return None
+
+    def own_project_note_factory(note_field_of_vs, note_field):
+
+        def callable(variant_sample):
+            notes_iterable = simple_path_ids(variant_sample, note_field_of_vs)
+            vs_project_at_id = variant_sample.get("project")
+            if isinstance(vs_project_at_id, dict):
+                # We might get string OR @@embedded representation, e.g. if from search response.
+                vs_project_at_id = vs_project_at_id.get("@id")
+            if not vs_project_at_id:
+                return None
+
+            note_item = get_most_recent_note_of_project(notes_iterable, vs_project_at_id)
+
+            if note_item:
+                return note_item.get(note_field)
+            else:
+                return None
+
+        return callable
+
+
+    # portal_root_url = request.resource_url(request.root)[:-1]
+
+    return [
+    ##  Column Title                             |  CGAP Field (if not custom function)                          |  Description
+    ##  ---------------------------------------  |  -----------------------------------------------------------  |  --------------------------------------------------------------------------
+        ("ID",                                      "@id",                                                          "URL path to the Sample Variant on this row"),
+        ("Chrom (hg38)",                            "variant.CHROM",                                                "Chromosome (hg38 assembly)"),
+        ("Pos (hg38)",                              "variant.POS",                                                  "Start Position (hg38 assembly)"),
+        ("Chrom (hg19)",                            "variant.hg19_chr",                                             "Chromosome (hg19 assembly)"),
+        ("Pos (hg19)",                              "variant.hg19_pos",                                             "Start Position (hg19 assembly)"),
+        ("Ref",                                     "variant.REF",                                                  "Reference Nucleotide"),
+        ("Alt",                                     "variant.ALT",                                                  "Alternate Nucleotide"),
+        ("Proband genotype",                        "associated_genotype_labels.proband_genotype_label",            "Proband Genotype"),
+        ("Mother genotype",                         "associated_genotype_labels.mother_genotype_label",             "Mother Genotype"),
+        ("Father genotype",                         "associated_genotype_labels.father_genotype_label",             "Father Genotype"),
+        ("HGVSG",                                   "variant.hgvsg",                                                "HGVS genomic nomenclature"),
+        ("HGVSC",                                   "variant.genes.genes_most_severe_hgvsc",                        "HGVS cPos nomenclature"),
+        ("HGVSP",                                   "variant.genes.genes_most_severe_hgvsp",                        "HGVS pPos nomenclature"),
+        ("dbSNP ID",                                "variant.ID",                                                   "dbSNP ID of variant"),
+        ("Genes",                                   "variant.genes.genes_most_severe_gene.display_title",           "Gene symbol(s)"),
+        ("Gene type",                               "variant.genes.genes_most_severe_gene.gene_biotype",            "Type of Gene"),
+        # ONLY FOR variant.transcript.csq_canonical=true
+        ("Canonical transcript ID",                 canonical_transcript_csq_feature,                               "Ensembl ID of canonical transcript of gene variant is in"),
+        # ONLY FOR variant.transcript.csq_canonical=true; use `variant.transcript.csq_intron` if `variant.transcript.csq_exon` not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
+        ("Canonical transcript location",           canonical_transcript_location,                                  "Number of exon or intron variant is located in canonical transcript, out of total"),
+        # ONLY FOR variant.transcript.csq_canonical=true
+        ("Canonical transcript coding effect",      canonical_transcript_consequence_display_title,                 "Coding effect of variant in canonical transcript"),
+        # ONLY FOR variant.transcript.csq_most_severe=true
+        ("Most severe transcript ID",               most_severe_transcript_csq_feature,                             "Ensembl ID of transcript with worst annotation for variant"),
+        # ONLY FOR variant.transcript.csq_most_severe=true; use csq_intron if csq_exon not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
+        ("Most severe transcript location",         most_severe_transcript_location,                                "Number of exon or intron variant is located in most severe transcript, out of total"),
+        # ONLY FOR variant.transcript.csq_most_severe=true
+        ("Most severe transcript coding effect",    most_severe_transcript_consequence_display_title,               "Coding effect of variant in most severe transcript"),
+        ("Inheritance modes",                       "inheritance_modes",                                            "Inheritance Modes of variant"),
+        ("NovoPP",                                  "novoPP",                                                       "Novocaller Posterior Probability"),
+        ("Cmphet mate",                             "cmphet.comhet_mate_variant",                                   "Variant ID of mate, if variant is part of a compound heterozygous group"),
+        ("Variant Quality",                         "QUAL",                                                         "Variant call quality score"),
+        ("Genotype Quality",                        "GQ",                                                           "Genotype call quality score"),
+        ("Strand Bias",                             "FS",                                                           "Strand bias estimated using Fisher's exact test"),
+        ("Allele Depth",                            "AD_ALT",                                                       "Number of reads with variant allele"),
+        ("Read Depth",                              "DP",                                                           "Total number of reads at position"),
+        ("clinvar ID",                              "variant.csq_clinvar",                                          "Clinvar ID of variant"),
+        ("gnomADv3 total AF",                       "variant.csq_gnomadg_af",                                       "Total allele frequency in gnomad v3 (genomes)"),
+        ("gnomADv3 popmax AF",                      "variant.csq_gnomadg_af_popmax",                                "Max. allele frequency in gnomad v3 (genomes)"),
+        # Name of population where `csq_gnomadg_af-<***> == csq_gnomadg_af_popmax`; use name in title (e.g. African-American/African)
+        ("gnomADv3 popmax population",              gnomadv3_popmax_population,                                     "Population with max. allele frequency in gnomad v3 (genomes)"),
+        ("gnomADv2 exome total AF",                 "variant.csq_gnomade2_af",                                      "Total allele frequency in gnomad v2 (exomes)"),
+        ("gnomADv2 exome popmax AF",                "variant.csq_gnomade2_af_popmax",                               "Max. allele frequency in gnomad v2 (exomes)"),
+        # Name of population where `csq_gnomade2_af-<***> == csq_gnomade2_af_popmax`; use name in title (e.g. African-American/African)
+        ("gnomADv2 exome popmax population",        gnomadv2_popmax_population,                                     "Population with max. allele frequency in gnomad v2 (exomes)"),
+        ("GERP++",                                  "variant.csq_gerp_rs",                                          "GERP++ score"),
+        ("CADD",                                    "variant.csq_cadd_phred",                                       "CADD score"),
+        ("phyloP-30M",                              "variant.csq_phylop30way_mammalian",                            "phyloP (30 Mammals) score"),
+        ("phyloP-100V",                             "variant.csq_phylop100way_vertebrate",                          "phyloP (100 Vertebrates) score"),
+        ("phastCons-100V",                          "variant.csq_phastcons100way_vertebrate",                       "phastCons (100 Vertebrates) score"),
+        ("SIFT",                                    "variant.csq_sift_pred",                                        "SIFT prediction"),
+        ("PolyPhen2",                               "variant.csq_polyphen2_hvar_pred",                              "PolyPhen2 prediction"),
+        ("PrimateAI",                               "variant.csq_primateai_pred",                                   "Primate AI prediction"),
+        ("REVEL",                                   "variant.csq_revel_score",                                      "REVEL score"),
+        ("SpliceAI",                                "variant.spliceaiMaxds",                                        "SpliceAI score"),
+        ("LOEUF",                                   "variant.genes.genes_most_severe_gene.oe_lof_upper",            "Loss-of-function observed/expected upper bound fraction"),
+        ("RVIS (ExAC)",                             "variant.genes.genes_most_severe_gene.rvis_exac",               "RVIS (Residual Variation Intolerance Score) genome-wide percentile from ExAC"),
+        ("S-het",                                   "variant.genes.genes_most_severe_gene.s_het",                   "Estimates of heterozygous selection (source: Cassa et al 2017 Nat Genet doi:10.1038/ng.3831)"),
+        ("MaxEntScan",                              "variant.genes.genes_most_severe_maxentscan_diff",              "Difference in MaxEntScan scores (Maximum Entropy based scores of splicing strength) between Alt and Ref alleles"),
+        ("ACMG classification (curr)",              "interpretation.classification",                                "ACMG classification for variant in this case"),
+        ("ACMG rules (curr)",                       "interpretation.acmg_rules_invoked.acmg_rule_name",             "ACMG rules invoked for variant in this case"),
+        ("Clinical interpretation notes (curr)",    "interpretation.note_text",                                     "Clinical interpretation notes written for this case"),
+        ("Gene candidacy (curr)",                   "discovery_interpretation.gene_candidacy",                      "Gene candidacy level selected for this case"),
+        ("Variant candidacy (curr)",                "discovery_interpretation.variant_candidacy",                   "Variant candidacy level selected for this case"),
+        ("Discovery notes (curr)",                  "discovery_interpretation.note_text",                           "Gene/variant discovery notes written for this case"),
+        ("Variant notes (curr)",                    "variant_notes.note_text",                                      "Additional notes on variant written for this case"),
+        ("Gene notes (curr)",                       "gene_notes.note_text",                                         "Additional notes on gene written for this case"),
+        # For next 6, grab only from note from same project as the VariantSample
+        ("ACMG classification (prev)",              own_project_note_factory("variant.interpretations", "classification"),                      "ACMG classification for variant in previous cases"),
+        ("ACMG rules (prev)",                       own_project_note_factory("variant.interpretations", "acmg"),                                "ACMG rules invoked for variant in previous cases"),
+        ("Clinical interpretation (prev)",          own_project_note_factory("variant.interpretations", "note_text"),                           "Clinical interpretation notes written for previous cases"),
+        ("Gene candidacy (prev)",                   own_project_note_factory("variant.discovery_interpretations", "gene_candidacy"),            "Gene candidacy level selected for previous cases"),
+        ("Variant candidacy (prev)",                own_project_note_factory("variant.discovery_interpretations", "variant_candidacy"),         "Variant candidacy level selected for previous cases"),
+        ("Discovery notes (prev)",                  own_project_note_factory("variant.discovery_interpretations", "note_text"),                 "Gene/variant discovery notes written for previous cases"),
+        ("Variant notes (prev)",                    own_project_note_factory("variant.variant_notes", "note_text"),                             "Additional notes on variant written for previous cases"),
+        ("Gene notes (prev)",                       own_project_note_factory("variant.genes.genes_most_severe_gene.gene_notes", "note_text"),   "Additional notes on gene written for previous cases"),
+    ]
+
+def get_fields_to_embed(spreadsheet_mappings):
+    fields_to_embed = [
+        ## Most of these are needed for columns with render/transform/custom-logic functions in place of (string) CGAP field.
+        ## Keep up-to-date with any custom logic.
+        "@id",
+        "@type",
+        "project", # Used to get most recent notes of same project from Variant & Gene
+        "variant.transcript.csq_canonical",
+        "variant.transcript.csq_most_severe",
+        "variant.transcript.csq_feature",
+        "variant.transcript.csq_consequence.impact",
+        "variant.transcript.csq_consequence.var_conseq_name",
+        "variant.transcript.csq_consequence.display_title",
+        "variant.transcript.csq_exon",
+        "variant.transcript.csq_intron",
+        ## Notes (e.g. as used by `own_project_note_factory`)
+        "variant.interpretations.classification",
+        "variant.interpretations.acmg",
+        "variant.interpretations.note_text",
+        "variant.interpretations.project", # @id (string) form
+        "variant.discovery_interpretations.gene_candidacy",
+        "variant.discovery_interpretations.variant_candidacy",
+        "variant.discovery_interpretations.note_text",
+        "variant.discovery_interpretations.project", # @id (string) form
+        "variant.variant_notes.note_text",
+        "variant.variant_notes.project", # @id (string) form
+        "variant.genes.genes_most_severe_gene.gene_notes.note_text",
+        "variant.genes.genes_most_severe_gene.gene_notes.project"
+    ]
+    for pop_suffix, pop_name in POPULATION_SUFFIX_TITLE_TUPLES:
+        fields_to_embed.append("variant.csq_gnomadg_af-" + pop_suffix)
+        fields_to_embed.append("variant.csq_gnomade2_af-" + pop_suffix)
+    for column_title, cgap_field_or_func, description in spreadsheet_mappings:
+        if isinstance(cgap_field_or_func, str):
+            # We don't expect any duplicate fields (else would've used a set in place of list) ... pls avoid duplicates in spreadsheet_mappings.
+            fields_to_embed.append(cgap_field_or_func)
+    return fields_to_embed

@@ -148,17 +148,6 @@
         "submitted_by": "986b362f-4eb6-4a9c-8173-3ab245628888"
     },
     {
-        "email": "eric_berg@hms.harvard.edu",
-        "first_name": "Eric",
-        "last_name": "Berg",
-        "uuid": "3f0052c9-218d-42e1-94bd-4319d0615681",
-        "groups": ["admin"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}],
-        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-    },
-    {
         "email": "jkrier@bwh.harvard.edu",
         "first_name": "Joel",
         "last_name": "Krier",
@@ -174,28 +163,6 @@
         "first_name": "Andy",
         "last_name": "Schroeder",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267227777",
-        "groups": ["admin"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}],
-        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-    },
-    {
-        "email": "koray_kirli@hms.harvard.edu",
-        "first_name": "Koray",
-        "last_name": "Kirli",
-        "uuid": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "groups": ["admin"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}],
-        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-    },
-    {
-        "email": "soohyun_lee@hms.harvard.edu",
-        "first_name": "Soo",
-        "last_name": "Lee",
-        "uuid": "1d524d43-01b5-4b71-94c6-32d2d09c8323",
         "groups": ["admin"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -250,17 +217,6 @@
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "email": "burak_alver@hms.harvard.edu",
-        "first_name": "Burak",
-        "last_name": "Alver",
-        "uuid": "45524d43-01b5-4b71-94c6-32d2d09c1111",
-        "groups": ["admin"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}],
-        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-    },
-    {
         "email": "michele_berselli@hms.harvard.edu",
         "first_name": "Michele",
         "last_name": "Berselli",
@@ -281,19 +237,6 @@
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
                            "role": "developer"}],
         "user_institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234"
-    },
-    {
-        "email": "shira.rockowitz@childrens.harvard.edu",
-        "first_name": "Shira",
-        "last_name": "Rockowitz",
-        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c4433",
-        "user_institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765"
-    },
-    {
-        "email": "guilherme_yamamoto@hms.harvard.edu",
-        "first_name": "Guilherme",
-        "last_name": "Yamamoto",
-        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c5633"
     },
     {
         "email": "sarah_reiff@hms.harvard.edu",
@@ -318,17 +261,6 @@
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "email": "luisa_mercado@hms.harvard.edu",
-        "first_name": "Luisa",
-        "last_name": "Mercado",
-        "uuid": "f1d2c331-f5ee-490a-9a7c-69a953e04fee",
-        "groups": ["admin"],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}],
-        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-    },
-    {
         "email": "douglas_rioux@hms.harvard.edu",
         "first_name": "Douglas",
         "last_name": "Rioux",
@@ -344,6 +276,17 @@
         "first_name": "Phil",
         "last_name": "Grayson",
         "uuid": "3846c019-f2c7-4612-b9b1-9c1375e0c2c4",
+        "groups": ["admin"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
+        "email": "shannon_ehmsen@hms.harvard.edu",
+        "first_name": "Shannon",
+        "last_name": "Ehmsen",
+        "uuid": "c58ac2fe-fccb-4d21-992d-62a078c2dbc0",
         "groups": ["admin"],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",

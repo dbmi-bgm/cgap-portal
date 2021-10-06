@@ -3,6 +3,7 @@ import uptime
 from collections import OrderedDict
 from dcicutils import lang_utils
 from dcicutils.s3_utils import s3Utils, HealthPageKey
+from dcicutils.env_utils import infer_foursight_url_from_env
 from encoded import APP_VERSION_REGISTRY_KEY
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
@@ -101,18 +102,13 @@ def health_check(config):
         response.content_type = 'application/json; charset=utf-8'
         settings = request.registry.settings
 
+        # TODO: This computation of app_url is unused. Is that a bug, or should we remove it? -kmp 4-Oct-2021
         app_url = request.application_url
         if not app_url.endswith('/'):
             app_url = ''.join([app_url, '/'])
 
         env_name = settings.get('env.name')
-        # TODO: Move this logic to dcicutils.env_utils
-        # CGAP-specific Foursight
-        if env_name and env_name.startswith('fourfront-'):
-            fs_env = env_name[len('fourfront-'):]
-            foursight_url = 'https://u9feld4va7.execute-api.us-east-1.amazonaws.com/api/view/' + fs_env
-        else:
-            foursight_url = None
+        foursight_url = infer_foursight_url_from_env(request, env_name)
 
         response_dict = {
 

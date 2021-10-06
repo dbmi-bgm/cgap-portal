@@ -240,6 +240,11 @@
                 "type": "string"
             }
         },
+        "cost": {
+            "title": "Cost",
+            "description": "Total cost of the meta workflow run (includes failed jobs)",
+            "type": "number"
+        },
         "common_fields": {
             "title": "Common Fields",
             "description": "Common fields that go into all workflow_run, processed_files and qc items",

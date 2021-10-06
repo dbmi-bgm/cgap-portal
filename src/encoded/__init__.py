@@ -10,7 +10,6 @@ import sys
 import sentry_sdk
 
 from dcicutils.beanstalk_utils import source_beanstalk_env_vars
-from dcicutils.env_utils import CGAP_ENV_WEBPROD
 from dcicutils.log_utils import set_logging
 from dcicutils.env_utils import get_mirror_env_from_context
 from dcicutils.ff_utils import get_health_page
@@ -169,8 +168,7 @@ def main(global_config, **local_config):
     config.include('.server_defaults')
     config.include('.root')
     config.include('.types')
-    # Fourfront does this. Do we need that here? -kmp 8-Apr-2020
-    # config.include('.batch_download')
+    config.include('.batch_download')
     config.include('.loadxl')
     config.include('.visualization')
     config.include('.ingestion_listener')
