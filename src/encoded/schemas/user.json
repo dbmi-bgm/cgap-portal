@@ -641,10 +641,10 @@
         }
     },
     "columns": {
-        "institution": {
+        "user_institution.display_title": {
             "title": "Institution"
         },
-        "project": {
+        "project_roles.project": {
             "title": "Project"
         },
         "project_roles.role": {
@@ -657,8 +657,11 @@
         }
     },
     "facets": {
-        "institution.display_title": {
-            "title": "Institution"
+        "user_institution.display_title": {
+            "title": "User's Institution"
+        },
+        "project_roles.project": {
+            "title": "User's Project"
         }
     }
 }

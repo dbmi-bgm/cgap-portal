@@ -421,6 +421,17 @@
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
+        "email": "shannon_ehmsen@hms.harvard.edu",
+        "first_name": "Shannon",
+        "last_name": "Ehmsen",
+        "uuid": "c58ac2fe-fccb-4d21-992d-62a078c2dbc0",
+        "groups": ["admin"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                           "role": "developer"}],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
         "email": "dominik_glodzik@hms.harvard.edu",
         "first_name": "Dominik",
         "last_name": "Glodzik",

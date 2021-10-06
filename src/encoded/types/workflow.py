@@ -9,7 +9,7 @@ import json
 import pstats
 
 from collections import OrderedDict, deque
-from dcicutils.env_utils import CGAP_ENV_WEBDEV, is_stg_or_prd_env, prod_bucket_env
+from dcicutils.env_utils import default_workflow_env, is_stg_or_prd_env, prod_bucket_env
 from inspect import signature
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPBadRequest
 from pyramid.response import Response
@@ -27,7 +27,7 @@ TIBANNA_CODE_NAME = 'zebra'
 TIBANNA_WORKFLOW_RUNNER_LAMBDA_FUNCTION = 'run_workflow_zebra'
 TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION = 'status_wfr_zebra'
 
-ENV_WEBDEV = CGAP_ENV_WEBDEV
+ENV_WEBDEV = default_workflow_env('cgap')
 
 steps_run_data_schema = {
     "type": "object",

@@ -2,7 +2,7 @@ import argparse
 import logging
 import structlog
 
-from dcicutils.env_utils import CGAP_ENV_MASTERTEST
+from dcicutils.env_utils import permit_load_data
 from pyramid.paster import get_app
 from pyramid.path import DottedNameResolver
 from .. import configure_dbsession
@@ -21,16 +21,19 @@ def load_data_should_proceed(env, allow_prod):
     :param allow_prod: prod argument from argparse, defaults to False
     :return: True if load_data should continue, False otherwise
     """
-    # run on cgaptest -- XXX: this logic should probably be refactored into dcicutils
-    if env == CGAP_ENV_MASTERTEST:
-        log.info('load_data: proceeding since we are on %s' % env)
-        return True
-    elif env and not allow_prod:  # old logic, allow run on servers if prod is specified
-        log.info('load_data: skipping, since on %s' % env)
-        return False
-    else:  # allow run on local, which will not have env set
-        log.info('load_data: proceeding since we are either on local or specified the prod option')
-        return True
+
+    return permit_load_data(envname=env, allow_prod=allow_prod, orchestrated_app='cgap')
+
+    # # run on cgaptest -- XXX: this logic should probably be refactored into dcicutils
+    # if env == CGAP_ENV_MASTERTEST:
+    #     log.info('load_data: proceeding since we are on %s' % env)
+    #     return True
+    # elif env and not allow_prod:  # old logic, allow run on servers if prod is specified
+    #     log.info('load_data: skipping, since on %s' % env)
+    #     return False
+    # else:  # allow run on local, which will not have env set
+    #     log.info('load_data: proceeding since we are either on local or specified the prod option')
+    #     return True
 
 
 def main():
@@ -62,7 +65,7 @@ def main():
     log.info("load_data: load_test_data function is %s" % (load_test_data))
     load_test_data = DottedNameResolver().resolve(load_test_data)
 
-    if load_data_should_proceed(env, allow_prod):
+    if cgap_load_data_should_proceed(env, allow_prod):
         load_test_data(app, args.overwrite)
     exit(0)
 

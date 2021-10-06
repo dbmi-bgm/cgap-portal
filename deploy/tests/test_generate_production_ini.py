@@ -30,11 +30,6 @@ EB_MANIFEST_FILENAME = ProductionIniFileManager.EB_MANIFEST_FILENAME
 PYPROJECT_FILE_NAME = ProductionIniFileManager.PYPROJECT_FILE_NAME
 omittable = ProductionIniFileManager.omittable
 
-# TODO: Maybe this should move to env_utils? If not, at least to a non-test file.
-#       Then again, if we used the "single parameterized ini file" we could side-step that. -kmp 3-Apr-2020
-
-CGAP_DEPLOY_NAMES = ['cgap', 'cgapdev', 'cgaptest', 'cgapwolf']
-
 
 def test_omittable():
 
@@ -69,11 +64,13 @@ def test_any_environment_template_filename():
     assert actual.endswith("/ini_files/any.ini")
 
 
-def test_template_environment_names():
+def test_legacy_template_environment_names():
+    # Containerized CGAP uses a single generic template, but while we're still using beanstalks,
+    # we do some minimal testing to make sure all the templates are there. -kmp 4-Oct-2021
 
     names = template_environment_names()
 
-    required_names = CGAP_DEPLOY_NAMES
+    required_names = ['cgap', 'cgapdev', 'cgaptest', 'cgapwolf']
 
     for required_name in required_names:
         assert required_name in names
