@@ -14,10 +14,8 @@ from .types.workflow import (
     WorkflowRunTracingException,
     item_model_to_object
 )
-from dcicutils.env_utils import CGAP_ENV_WEBPROD, CGAP_ENV_MASTERTEST, CGAP_ENV_DEV, CGAP_PUBLIC_URL_PRD
 import boto3
 from botocore.exceptions import ClientError
-import json
 import uuid
 
 from .types.base import get_item_or_none
