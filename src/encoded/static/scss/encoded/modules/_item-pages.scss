@@ -1452,18 +1452,30 @@ i.status-indicator-dot {
 					.accession-table {
 						margin-left: 10px; 
 
-						tr:not(:last-child) {
+						div.row:not(:last-child) {
 							border-bottom: 1px solid #ddd;
+							padding-bottom: 5px;
 						}
 
-						td.accession-table-title {
+						div.row {
+							max-width: 100%;
+							padding-top: 5px;
+
+							> div.col-auto,
+							> div.col {
+							padding-left: 0;
+							padding-right: 0;
+							}
+						}
+
+						div.accession-table-title {
 							font-weight: 600;
 							text-align: left;
-							margin-left: 20px;
 							min-width: 75px;
 						}
-						td:not(.accession-table-title) {
-							text-align: right;
+
+						div:not(.accession-table-title) {
+							text-align: left;
 						}
 					}
 				}
