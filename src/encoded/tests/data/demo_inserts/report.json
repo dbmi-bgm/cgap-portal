@@ -9,19 +9,15 @@
         "description": "Report for NA12878 as secondary member of NA12879 analysis",
         "accession": "GAPREEF35XV3",
         "uuid": "f5210b6a-efcf-47bd-8f63-1f310072a4af",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     },
     {
         "status": "in review",
         "date_created": "2020-07-15T02:38:06.533666+00:00",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "description": "Report for proband of Platinum family trio",
         "accession": "GAPREEIM2FI1",
         "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159aaaa",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1"
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     }
 ]
