@@ -645,7 +645,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                                     msaStats.heterozygosity = { value: transformValueType(numberType, value), tooltip };
                                     break;
                                 case "Transition-Transversion Ratio":
-                                    msaStats.transTansRatio = { value: transformValueType(numberType, value), tooltip };
+                                    msaStats.transTransRatio = { value: transformValueType(numberType, value), tooltip };
                                     break;
                                 case "Total Variants Called":
                                     msaStats.totalSNVIndelVars = { value: transformValueType(numberType, value), tooltip };
@@ -679,7 +679,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
         return msaStats;
     }, [ caseProcFiles, msaProcFiles ]);
 
-    const { reads = {}, coverage = {}, totalSNVIndelVars = {}, transTansRatio = {}, heterozygosity = {}, deNovo = {},
+    const { reads = {}, coverage = {}, totalSNVIndelVars = {}, transTransRatio = {}, heterozygosity = {}, deNovo = {},
         filteredSNVIndelVariants = {}, filteredSVVariants = {} } = msaStats;
 
     return (
@@ -693,8 +693,8 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
             <BioinfoStatsEntry label="Total Number of SNVs/Indels called" tooltip={totalSNVIndelVars.tooltip}>
                 { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): "-" }
             </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Transition-Tansversion ratio" tooltip={transTansRatio.tooltip}>
-                { typeof transTansRatio.value === "number" ? transTansRatio.value || "0.0" : "-" }
+            <BioinfoStatsEntry label="Transition-Transversion ratio" tooltip={transTransRatio.tooltip}>
+                { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : "-" }
             </BioinfoStatsEntry>
             <BioinfoStatsEntry label="Heterozygosity ratio" tooltip={heterozygosity.tooltip}>
                 { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : "-" }
