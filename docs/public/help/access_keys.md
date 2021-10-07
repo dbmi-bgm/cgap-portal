@@ -11,16 +11,18 @@ containing a key and secret will pop up. Don't exit this
 window until you've recorded this information.
 * For submitCGAP, our CLI submission tool, this information 
 needs to be in a file named `.cgap-keys.json` in your home 
-directory. This file needs to have the following format:
+directory. This file needs to have the following format,
+with the environment name and URL appropriate for your
+CGAP deployment:
 
 <br>
 
 ```
 {
-    "fourfront-cgap": {
+    "<env_name>": {
         "key": "XXXXXXXX",
         "secret": "xxxxxxxxxxxxxxxx",
-        "server": "https://cgap.hms.harvard.edu"
+        "server": "<URL>"
     }
 }
 ```
