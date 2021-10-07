@@ -19,7 +19,7 @@ import { store } from './../store';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse, WindowEventDelegator } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Schemas, SEO, typedefs, navigate } from './util';
-import { responsiveGridState } from './util/layout';
+import { responsiveGridState, DeferMount } from './util/layout';
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 
 import { PageTitleSection } from './PageTitleSection';
@@ -1156,6 +1156,7 @@ export default class App extends React.PureComponent {
                     }}/>
                     <script data-prop-name="lastCSSBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastCSSBuildTime }}/>
                     <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastCSSBuildTime || 0)} />
+                    <DeferMount><link rel="stylesheet" media="print" href={'/static/css/print.css?build=' + (lastCSSBuildTime || 0)} /></DeferMount>
                     <SEO.CurrentContext {...{ context, hrefParts, baseDomain }} />
                     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,300i,400i,600i|Yrsa|Source+Code+Pro:300,400,500,600" rel="stylesheet"/>
                     <script defer type="application/javascript" src="//www.google-analytics.com/analytics.js" />

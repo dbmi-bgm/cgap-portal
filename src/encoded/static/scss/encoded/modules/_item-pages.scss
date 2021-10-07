@@ -2107,7 +2107,30 @@ i.status-indicator-dot {
 
 
 /**********************************************************
+  Report View
+**********************************************************/
+
+/* Print Preview Pane Effects */
+
+.item-page-container {
+	@media screen {
+		/* Avoid adding these style to print media, since this page will be printed */
+		.print-preview-pane {
+			transition: opacity .75s;
+			.pagedjs_pages {
+				.pagedjs_page {
+					box-shadow: 0 0 1px 0px rgba(0,0,0,0.7);
+				}
+			}
+		}
+
+	}
+}
+
+
+/**********************************************************
   HiGlass Views
+  TODO: Maybe put into own stylesheet and load only when/after need HiGlass
 **********************************************************/
 
 .higlass-wrapper {

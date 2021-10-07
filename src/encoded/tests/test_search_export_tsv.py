@@ -55,6 +55,8 @@ def test_filtering_tab(workbook, html_es_testapp):
 
     compound_filterset_request_body = {
         "search_type":"VariantSample",
+        # In production it's probably more likely we sort by -date_created (descending), however sort=date_created
+        # simplifies keeping order of workbook-inserts in sync.
         "global_flags":"CALL_INFO=SAM10254-S1&file=GAPFI3EBH4X2&additional_facet=proband_only_inheritance_modes&sort=date_created",
         "intersect": False,
         "filter_blocks":[

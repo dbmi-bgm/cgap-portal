@@ -19,7 +19,8 @@ import HomePage                             from './static-pages/HomePage';
 
 
 import DefaultItemView                      from './item-pages/DefaultItemView';
-import CaseView, { CaseSubmissionView }     from './item-pages/CaseView';
+import CaseView                             from './item-pages/CaseView';
+import ReportView                           from './item-pages/ReportView';
 import VariantSampleView                    from './item-pages/VariantSampleView';
 import StructuralVariantSampleView          from './item-pages/StructuralVariantSampleView';
 import IndividualView                       from './item-pages/IndividualView';
@@ -47,6 +48,7 @@ content_views.register(HomePage,                    'HomePage');
 
 content_views.register(DefaultItemView,             'Item');
 content_views.register(CaseView,                    'Case');
+content_views.register(ReportView,                  'Report');
 content_views.register(VariantSampleView,           'VariantSample');
 content_views.register(StructuralVariantSampleView, 'StructuralVariantSample');
 content_views.register(IndividualView,              'Individual');

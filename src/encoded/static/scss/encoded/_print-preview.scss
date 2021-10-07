@@ -1,0 +1,27 @@
+/**
+ * Used currently for preview (i.e. of Report) and potentially for print later (or to-be-common parts of it)
+ */
+
+
+@page {
+    /* size: 17cm 24cm; */
+    /* margin: 30mm 25mm; */
+    // size: 8.5in 11in;
+    size: $print-page-size;
+    margin: 0.75in;
+    background: #fff;
+    font-size: 12pt;
+
+    @bottom-right-corner {
+        content: "Page " counter(page) " of " counter(pages);
+        padding-right: 1.5ch;
+    }
+
+    @bottom-left {
+        content: var(--report-attribution-footer-content);
+        // content: "Address and info and stuff will go here.\nTODO: Figure out how to dynamically change this stylesheet.";
+        padding-right: 1.5ch;
+    }
+
+}
+
