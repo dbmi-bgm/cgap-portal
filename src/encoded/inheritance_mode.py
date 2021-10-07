@@ -22,7 +22,8 @@ class InheritanceMode:
 
     MALE = 'M'
     FEMALE = 'F'
-    SEXES = [MALE, FEMALE]
+    UNKNOWN = 'U'
+    SEXES = [MALE, FEMALE, UNKNOWN]
 
     MOTHER = 'mother'
     FATHER = 'father'
@@ -41,6 +42,7 @@ class InheritanceMode:
     GENOTYPE_LABEL_M = "Hemizygous alternate"
     GENOTYPE_LABEL_FEMALE_CHRY = "-"
     GENOTYPE_LABEL_SEX_INCONSISTENT = "False"
+    GENOTYPE_LABEL_SEX_AMBIGUOUS = "Ambiguous"
 
     # Inheritance Mode labels
     INHMODE_LABEL_DE_NOVO_STRONG = "de novo (strong)"
@@ -65,6 +67,7 @@ class InheritanceMode:
     INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT = "Low relevance, homozygous in a parent"
     INHMODE_LABEL_NONE_BOTH_PARENTS = "Low relevance, present in both parent(s)"
     INHMODE_LABEL_NONE_OTHER = "Low relevance, other"
+    INHMODE_LABEL_NONE_SEX_AMBIGUOUS = "Ambiguous due to missing sex determination"
 
     # value related constants
     DE_NOVO_STRONG_CUTOFF = .9
@@ -119,6 +122,7 @@ class InheritanceMode:
         if allele1 == cls.MISSING:
             if sex == cls.FEMALE and chrom == 'Y':
                 return cls.GENOTYPE_LABEL_FEMALE_CHRY
+            # probably ok to mark as low quality if sex is U
             return cls.GENOTYPE_LABEL_DOT
 
         # cast to int since we no longer need strings ?
@@ -132,6 +136,10 @@ class InheritanceMode:
             if cls.is_homozygous(allele1, allele2, is_reference=True):
                 return cls.GENOTYPE_LABEL_FEMALE_CHRY
             return cls.GENOTYPE_LABEL_SEX_INCONSISTENT
+
+        # if sex is unknown, mark as ambiguous for sex chromosomes
+        if sex == cls.UNKNOWN and cls.is_sex_chromosome(chrom):
+            return cls.GENOTYPE_LABEL_SEX_AMBIGUOUS
 
         # Handle male chrXY
         if sex == cls.MALE and cls.is_sex_chromosome(chrom):
@@ -212,7 +220,8 @@ class InheritanceMode:
 
         if (cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels) or
                 cls.is_multiallelic_site(genotypes.values()) or
-                cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels)):
+                cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels) or
+                cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_AMBIGUOUS, genotype_labels)):
             return []
 
         # De novo strong candidate
@@ -246,7 +255,7 @@ class InheritanceMode:
                 and (genotypes[cls.SELF] in ["0/1", "1/1"])
         ):
             return [cls.INHMODE_LABEL_SV_DE_NOVO]
-                
+
         # If not a de novo, assign inheritance mode based solely on genotypes (from GATK)
         if (genotypes[cls.MOTHER] == "0/0"
                 and genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_0M
@@ -295,13 +304,14 @@ class InheritanceMode:
             for role in cls.TRIO:
                 if role not in d:
                     return []
-
         if cls.check_if_label_exists(cls.GENOTYPE_LABEL_DOT, genotype_labels):
             return [cls.INHMODE_LABEL_NONE_DOT]
         if cls.is_multiallelic_site(genotypes.values()):
             return [cls.INHMODE_LABEL_NONE_MN]
         if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_INCONSISTENT, genotype_labels):
             return [cls.INHMODE_LABEL_NONE_SEX_INCONSISTENT]
+        if cls.check_if_label_exists(cls.GENOTYPE_LABEL_SEX_AMBIGUOUS, genotype_labels):
+            return [cls.INHMODE_LABEL_NONE_SEX_AMBIGUOUS]
 
         if genotypes[cls.MOTHER] == "1/1" or (
                 genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
@@ -390,8 +400,8 @@ class InheritanceMode:
         inheritance_modes = cls.compute_inheritance_mode_trio(
             genotypes=genotypes,
             genotype_labels=genotype_labels,
-            sexes=sexes, 
-            chrom=chrom, 
+            sexes=sexes,
+            chrom=chrom,
             novoPP=novoPP,
             structural_variant=structural_variant,
         )
