@@ -544,50 +544,48 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
         const sampleAccessionTable = (
             <div className="w-100" style={{ maxWidth: "70%" }}>
-                <table className="accession-table w-100">
-                    <tbody>
-                        { bam_sample_id ?
-                            <tr>
-                                <td className="accession-table-title">BAM Sample ID</td>
-                                <td>{ bam_sample_id }</td>
-                            </tr>: null }
-                        { sequence_id ?
-                            <tr>
-                                <td className="accession-table-title">Sequence ID</td>
-                                <td>{ sequence_id }</td>
-                            </tr>: null }
-                        { specimen_accession ?
-                            <tr>
-                                <td className="accession-table-title">Specimen ID</td>
-                                <td>{ specimen_accession }</td>
-                            </tr>: null
-                        }
-                        { other_specimen_ids ?
-                            other_specimen_ids.map((obj) => {
-                                const { id_type = null, id = null } = obj;
-                                return (
-                                    <tr key={id+id_type}>
-                                        <td className="accession-table-title">{id_type}</td>
-                                        <td>{ id }</td>
-                                    </tr>);
-                            }): null
-                        }
-                        <tr>
-                            <td className="accession-table-title">CGAP Sample ID</td>
-                            <td>{accession}</td>
-                        </tr>
-                        { specimen_type ?
-                            <tr>
-                                <td className="accession-table-title">Sample Type</td>
-                                <td>{specimen_type }</td>
-                            </tr>: null}
-                        { specimen_collection_date ?
-                            <tr>
-                                <td className="accession-table-title">Collected</td>
-                                <td>{specimen_collection_date }</td>
-                            </tr>: null }
-                    </tbody>
-                </table>
+                <div className="accession-table w-100">
+                    { bam_sample_id ?
+                        <div className="row justify-content-between">
+                            <div className="col accession-table-title">BAM Sample ID</div>
+                            <div className="col-auto text-truncate">{ bam_sample_id }</div>
+                        </div>: null }
+                    { sequence_id ?
+                        <div className="row justify-content-between">
+                            <div className="col-auto accession-table-title">Sequence ID</div>
+                            <div className="col-auto text-truncate">{ sequence_id }</div>
+                        </div>: null }
+                    { specimen_accession ?
+                        <div className="row justify-content-between">
+                            <div className="col-auto accession-table-title">Specimen ID</div>
+                            <div className="col-auto text-truncate">{ specimen_accession }</div>
+                        </div>: null
+                    }
+                    { other_specimen_ids ?
+                        other_specimen_ids.map((obj) => {
+                            const { id_type = null, id = null } = obj;
+                            return (
+                                <div className="row justify-content-between" key={id+id_type}>
+                                    <div className="col-auto accession-table-title">{id_type}</div>
+                                    <div className="col-auto text-truncate">{ id }</div>
+                                </div>);
+                        }): null
+                    }
+                    <div className="row justify-content-between">
+                        <div className="col accession-table-title">CGAP Sample ID</div>
+                        <div className="col-auto text-truncate">{accession}</div>
+                    </div>
+                    { specimen_type ?
+                        <div className="row justify-content-between">
+                            <div className="col accession-table-title">Sample Type</div>
+                            <div className="col-auto text-truncate">{specimen_type }</div>
+                        </div>: null}
+                    { specimen_collection_date ?
+                        <div className="row justify-content-between">
+                            <div className="col accession-table-title">Collected</div>
+                            <div className="col-auto text-truncate">{specimen_collection_date }</div>
+                        </div>: null }
+                </div>
             </div>);
 
         return (
@@ -668,35 +666,33 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 const thisReportBlock = (
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}>
                         <StackedBlockName className="flex-row align-items-center justify-content-between">
-                            <div className="d-flex">
+                            {/* <div className="d-flex">
                                 { reportAtId ?
                                     <a href={reportAtId} className={"name-title" + (isResultCase ? " current-case": "")}>
                                         { analysisTitle }
                                     </a> : <span className={"name-title" + (isResultCase ? " current-case": "")}>{ analysisTitle }</span>}
-                            </div>
-                            <div className="w-100" style={{ maxWidth: "70%" }}>
-                                <table className="accession-table w-100">
-                                    <tbody>
-                                        { case_title ?
-                                            <tr>
-                                                <td className="accession-table-title">Case ID</td>
-                                                <td>{case_title}</td>
-                                            </tr>
-                                            : null}
-                                        { caseAtId ?
-                                            <tr>
-                                                <td className="accession-table-title">CGAP Case ID</td>
-                                                <td>{caseAccession}</td>
-                                            </tr>
-                                            : null}
-                                        { reportAtId ?
-                                            <tr>
-                                                <td className="accession-table-title">Report ID</td>
-                                                <td>{reportAccession}</td>
-                                            </tr>
-                                            : null}
-                                    </tbody>
-                                </table>
+                            </div> */}
+                            <div className="w-100">
+                                <div className="accession-table w-100">
+                                    { case_title ?
+                                        <div className="row justify-content-between">
+                                            <div className="col-auto accession-table-title">Case ID</div>
+                                            <div className={"col-auto text-truncate" + (isResultCase ? " current-case": "")}>{case_title}</div>
+                                        </div>
+                                        : null}
+                                    { caseAtId ?
+                                        <div className="row justify-content-between">
+                                            <div className="col accession-table-title">CGAP Case ID</div>
+                                            <div className="col-auto text-truncate">{caseAccession}</div>
+                                        </div>
+                                        : null}
+                                    { reportAtId ?
+                                        <div className="row justify-content-between">
+                                            <div className="col accession-table-title">Report ID</div>
+                                            <div className="col-auto text-truncate">{reportAccession}</div>
+                                        </div>
+                                        : null}
+                                </div>
                             </div>
                         </StackedBlockName>
                     </StackedBlock>);
@@ -712,38 +708,36 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         return ( // We can pass 'className={..}' to this if needed.
             <StackedBlock hideNameOnHover={false} columnClass="individual" key={atId} id={atId}>
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
-                    <div className="d-flex flex-column individual-role">
+                    <div className="d-flex flex-column individual-role pr-2 text-truncate">
                         { atId ?
                             <a href={atId} className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
                                 { role || display_title }
                             </a> : <span className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>{ role || display_title }</span>}
-                        <span className="d-block text-small">({ individual_id ? individual_id : (display_title !== accession) ? display_title : "N/A" })</span>
+                        <span className="d-block text-small mw-100 text-truncate">({ individual_id ? individual_id : (display_title !== accession) ? display_title : "N/A" })</span>
                     </div>
                     <div className="w-100" style={{ maxWidth: "70%" }}>
-                        <table className="accession-table w-100">
-                            <tbody>
-                                { individual_id ?
-                                    <tr>
-                                        <td className="accession-table-title">Institutional ID</td>
-                                        <td>{ individual_id }</td>
-                                    </tr> : null }
-                                { accession ?
-                                    <tr>
-                                        <td className="accession-table-title">CGAP Individual ID</td>
-                                        <td>{ accession }</td>
-                                    </tr> : null }
-                                { familyId ?
-                                    <tr>
-                                        <td className="accession-table-title">Family ID</td>
-                                        <td>{ familyId }</td>
-                                    </tr> : null }
-                                { familyAccession ?
-                                    <tr>
-                                        <td className="accession-table-title">CGAP Family ID</td>
-                                        <td>{ familyAccession }</td>
-                                    </tr> : null }
-                            </tbody>
-                        </table>
+                        <div className="accession-table">
+                            { individual_id ?
+                                <div className="row justify-content-between">
+                                    <div className="col-auto accession-table-title">Institutional ID</div>
+                                    <div className="col-auto text-truncate">{ individual_id }</div>
+                                </div> : null }
+                            { accession ?
+                                <div className="row justify-content-between">
+                                    <div className="col accession-table-title">CGAP Individual ID</div>
+                                    <div className="col-auto text-truncate">{ accession }</div>
+                                </div> : null }
+                            { familyId ?
+                                <div className="row justify-content-between">
+                                    <div className="col accession-table-title">Family ID</div>
+                                    <div className="col-auto text-truncate">{ familyId }</div>
+                                </div> : null }
+                            { familyAccession ?
+                                <div className="row justify-content-between">
+                                    <div className="col accession-table-title">CGAP Family ID</div>
+                                    <div className="col-auto text-truncate">{ familyAccession }</div>
+                                </div> : null }
+                        </div>
                     </div>
                 </StackedBlockName>
                 <StackedBlockList className="libraries" title="Sequencing Libraries">
