@@ -65,7 +65,7 @@ def main():
     log.info("load_data: load_test_data function is %s" % (load_test_data))
     load_test_data = DottedNameResolver().resolve(load_test_data)
 
-    if cgap_load_data_should_proceed(env, allow_prod):
+    if load_data_should_proceed(env, allow_prod):
         load_test_data(app, args.overwrite)
     exit(0)
 
