@@ -3,7 +3,7 @@
         "file": "/docs/public/help/family_history_3.md",
         "name": "help.submission.family-history.3",
         "title": "Submitting the Family History Spreadsheet",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "cgap-core:family-history-help-3"
         ],
@@ -38,7 +38,7 @@
         "file": "/docs/public/help/family_history_2.md",
         "name": "help.submission.family-history.2",
         "title": "Family History Spreadsheet Format",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "cgap-core:family-history-help-2"
         ],
@@ -56,7 +56,7 @@
         "file": "/docs/public/help/accessioning_3.md",
         "name": "help.submission.accessioning.3",
         "title": "Submitting the Spreadsheet",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "cgap-core:accessioning-info3"
         ],
@@ -92,7 +92,7 @@
         "file": "/docs/public/help/family_history_1.md",
         "name": "help.submission.family-history.1",
         "title": "Submitting Family History",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "cgap-core:family-history-help"
         ],
@@ -126,7 +126,7 @@
         "file": "/docs/public/help/file_uploads.md",
         "name": "help.submission.file_uploads",
         "title": "Uploading Files",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "cgap-core:file-submission-info"
         ],
@@ -200,7 +200,7 @@
         "file": "/docs/public/help/accessioning_1.md",
         "name": "help.submission.accessioning.1",
         "title": "Submitting Accessioning Information",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "cgap-core:accessioning-info1"
         ],
@@ -217,7 +217,7 @@
     {
         "file": "/docs/public/help/genelist.md",
         "name": "help.genelist_help",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "hms-dbmi:genelist_help"
         ],
@@ -235,7 +235,7 @@
         "file": "/docs/public/help/accessioning_2.md",
         "name": "help.submission.accessioning.2",
         "title": "Filling the Spreadsheet",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "cgap-core:accessioning-info2"
         ],
