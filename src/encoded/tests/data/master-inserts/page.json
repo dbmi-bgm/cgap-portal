@@ -2,7 +2,7 @@
     {
         "name": "help/submission/file-upload",
         "title": "Uploading Sequencing Files",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "cgap-core:file-upload-help-page"
         ],
@@ -36,7 +36,7 @@
     {
         "name": "help/submission/gene-lists",
         "title": "Gene List Submission",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "hms-dbmi:genelist_submission_help"
         ],
@@ -76,7 +76,7 @@
     {
         "name": "help/submission/family-history",
         "title": "Submitting Family History",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "cgap-core:family-history-help-page"
         ],
@@ -110,7 +110,7 @@
     },
     {
         "name": "help.logging-in",
-        "status": "current",
+        "status": "public",
         "aliases": [
             "cgap-core:logging-in-redirect"
         ],
@@ -147,7 +147,7 @@
     {
         "name": "help/submission/accessioning",
         "title": "Submitting New Cases to CGAP",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "cgap-core:accessioning-info-page"
         ],
@@ -199,7 +199,7 @@
     {
         "name": "help/submission",
         "title": "Submissions to CGAP",
-        "status": "shared",
+        "status": "public",
         "aliases": [
             "hms-dbmi:submission_help"
         ],

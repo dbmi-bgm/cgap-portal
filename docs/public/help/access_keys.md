@@ -12,17 +12,21 @@ window until you've recorded this information.
 * For submitCGAP, our CLI submission tool, this information 
 needs to be in a file named `.cgap-keys.json` in your home 
 directory. This file needs to have the following format,
-with the environment name and URL appropriate for your
+with an environment name and URL appropriate for your
 CGAP deployment:
 
 <br>
 
 ```
 {
-    "<env_name>": {
+    "<environment>": {
         "key": "XXXXXXXX",
         "secret": "xxxxxxxxxxxxxxxx",
         "server": "<URL>"
     }
 }
 ```
+<br>
+If you need more information on which environment or URL
+to use, reach out to a CGAP data wrangler or send an email
+to [cgap@hms-dbmi.atlassian.net](cgap@hms-dbmi.atlassian.net).
