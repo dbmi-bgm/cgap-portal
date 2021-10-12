@@ -2,7 +2,9 @@
     {
         "email": "loadxl@hms.harvard.edu",
         "first_name": "loadxl",
-        "groups": ["admin"],
+        "groups": [
+            "admin"
+        ],
         "institution": "hms-dbmi",
         "last_name": "loadxl",
         "status": "current",
@@ -10,8 +12,12 @@
         "uuid": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
         "date_created": "2020-01-28T00:00:00.000000+00:00",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}]
+        "project_roles": [
+            {
+                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                "role": "developer"
+            }
+        ]
     },
     {
         "first_name": "Koray",
@@ -36,10 +42,8 @@
         ],
         "last_name": "Kirli",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "date_created": "2020-07-15T02:26:29.902354+00:00",
-        "schema_version": "1",
         "email": "koray_kirli@hms.harvard.edu"
     },
     {
@@ -65,10 +69,8 @@
         ],
         "last_name": "Alver",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "45524d43-01b5-4b71-94c6-32d2d09c1111",
         "date_created": "2020-07-15T02:26:30.280626+00:00",
-        "schema_version": "1",
         "email": "burak_alver@hms.harvard.edu"
     },
     {
@@ -95,10 +97,8 @@
         ],
         "last_name": "Veit",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "45ac3b0a-6640-4ccc-8ba7-e4cc7c778c15",
         "date_created": "2020-07-15T02:26:30.280626+00:00",
-        "schema_version": "1",
         "email": "alexander_veit@hms.harvard.edu"
     },
     {
@@ -125,10 +125,8 @@
         ],
         "last_name": "Lee",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "1d524d43-01b5-4b71-94c6-32d2d09c8323",
         "date_created": "2020-07-15T02:26:29.969291+00:00",
-        "schema_version": "1",
         "email": "soohyun_lee@hms.harvard.edu"
     },
     {
@@ -154,10 +152,8 @@
         ],
         "last_name": "Krier",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "986b362f-4eb6-4a9c-8173-3acba722bba1",
         "date_created": "2020-07-15T02:26:29.701552+00:00",
-        "schema_version": "1",
         "email": "jkrier@bwh.harvard.edu"
     },
     {
@@ -183,10 +179,8 @@
         ],
         "last_name": "Vuzman",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "986b362f-4eb6-4a9c-8173-3ab267307e4b",
         "date_created": "2020-07-15T02:26:29.117795+00:00",
-        "schema_version": "1",
         "email": "dvuzman@research.bwh.harvard.edu"
     },
     {
@@ -215,10 +209,8 @@
             "hms-dbmi:tibanna_app"
         ],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "uuid": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "date_created": "2020-07-15T02:26:30.135602+00:00",
-        "schema_version": "1",
         "email": "tibanna.app@gmail.com"
     }
 ]

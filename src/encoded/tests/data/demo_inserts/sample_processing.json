@@ -1,14 +1,12 @@
 [
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "completed_processes": [
             "WGS PartIII V14",
             "test"
         ],
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
-        "schema_version": "1",
         "analysis_type": "WGS-Trio",
         "date_created": "2020-07-15T02:38:35.644328+00:00",
         "processed_files": [

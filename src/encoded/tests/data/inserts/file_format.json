@@ -2,14 +2,17 @@
     {
         "file_format": "fastq",
         "standard_file_extension": "fastq.gz",
-        "other_allowed_extensions": ["fq.gz"],
+        "other_allowed_extensions": [
+            "fq.gz"
+        ],
         "description": "This format is used for short read sequence data - more information can be found here https://www.ncbi.nlm.nih.gov/sra/docs/submitformats/#fastq-files",
         "uuid": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
         "status": "shared",
-        "valid_item_types": ["FileFastq"],
+        "valid_item_types": [
+            "FileFastq"
+        ],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "hms-dbmi",
-        "submitted_by": "koray_kirli@hms.harvard.edu"
+        "institution": "hms-dbmi"
     },
     {
         "file_format": "bam",
@@ -17,10 +20,11 @@
         "description": "This format is used for aligned reads",
         "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "status": "shared",
-        "valid_item_types": ["FileProcessed"],
+        "valid_item_types": [
+            "FileProcessed"
+        ],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "hms-dbmi",
-        "submitted_by": "koray_kirli@hms.harvard.edu"
+        "institution": "hms-dbmi"
     },
     {
         "file_format": "txt",
@@ -28,10 +32,12 @@
         "description": "This format is used for aligned reads",
         "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
         "status": "shared",
-        "valid_item_types": ["FileProcessed", "FileReference"],
+        "valid_item_types": [
+            "FileProcessed",
+            "FileReference"
+        ],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "hms-dbmi",
-        "submitted_by": "koray_kirli@hms.harvard.edu"
+        "institution": "hms-dbmi"
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -41,8 +47,12 @@
         "uuid": "0cd4e777-a596-4927-95c8-b07716121aa5",
         "description": "vcf, compressed",
         "standard_file_extension": "vcf.gz",
-        "other_allowed_extensions": ["vcf"],
-        "valid_item_types": ["FileProcessed"]
+        "other_allowed_extensions": [
+            "vcf"
+        ],
+        "valid_item_types": [
+            "FileProcessed"
+        ]
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -52,7 +62,9 @@
         "uuid": "535e070d-ee58-4060-9264-b08d61968463",
         "description": "tabix index of compressed rck file",
         "standard_file_extension": "rck.gz.tbi",
-        "valid_item_types": ["FileProcessed"]
+        "valid_item_types": [
+            "FileProcessed"
+        ]
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -62,8 +74,12 @@
         "uuid": "a3693d56-d3ac-40f0-8a1a-4b02e8747478",
         "description": "rck, compressed",
         "standard_file_extension": "rck.gz",
-        "valid_item_types": ["FileProcessed"],
-        "extrafile_formats": ["535e070d-ee58-4060-9264-b08d61968463"]
+        "valid_item_types": [
+            "FileProcessed"
+        ],
+        "extrafile_formats": [
+            "535e070d-ee58-4060-9264-b08d61968463"
+        ]
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -73,7 +89,9 @@
         "uuid": "4c52b183-afed-40b7-a884-0ed0f7d349e8",
         "description": "index file of rck.tar",
         "standard_file_extension": "rck.tar.index",
-        "valid_item_types": ["FileProcessed"]
+        "valid_item_types": [
+            "FileProcessed"
+        ]
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -83,7 +101,11 @@
         "uuid": "82abe09a-1405-4e2b-9138-0eed39a91470",
         "description": "tar ball of rck files",
         "standard_file_extension": "rck.tar",
-        "valid_item_types": ["FileProcessed"],
-        "extrafile_formats": ["4c52b183-afed-40b7-a884-0ed0f7d349e8"]
+        "valid_item_types": [
+            "FileProcessed"
+        ],
+        "extrafile_formats": [
+            "4c52b183-afed-40b7-a884-0ed0f7d349e8"
+        ]
     }
 ]
