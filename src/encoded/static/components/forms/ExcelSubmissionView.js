@@ -87,13 +87,15 @@ export default class ExcelSubmissionView extends React.PureComponent {
                     Alerts.queue({
                         "title": "Something went wrong while processing this file...",
                         "message": <ul>{validation_output.map((item) => <li key={item}>{item}</li>)}</ul>,
-                        "style": "danger"
+                        "style": "danger",
+                        "navigateDisappearThreshold": 0
                     });
                 } else {
                     Alerts.queue({
                         "title": "All items validated successfully.",
                         "message": <ul>{validation_output.map((item) => <li key={item}>{item}</li>)}</ul>,
-                        "style": "success"
+                        "style": "success",
+                        "navigateDisappearThreshold": 0
                     });
                 }
                 return { submissionItem };
@@ -392,7 +394,8 @@ class PanelOne extends React.PureComponent {
                 Alerts.queue({
                     'title' : "Submission Error",
                     'message': "Encountered unknown error, likely related to network connection. Please try again.",
-                    'style': 'danger'
+                    'style': 'danger',
+                    'navigateDisappearThreshold': 0
                 });
                 return;
             }
@@ -407,7 +410,8 @@ class PanelOne extends React.PureComponent {
                 Alerts.queue({
                     'title' : "Validation error " + parseInt(i + 1),
                     'message': detail,
-                    'style': 'danger'
+                    'style': 'danger',
+                    'navigateDisappearThreshold': 0
                 });
             });
         };
@@ -541,7 +545,8 @@ class PanelTwo extends React.PureComponent {
         Alerts.queue({
             "title" : "File Ingestion (" + filename + ") processing...",
             message,
-            "style" : "warning"
+            "style" : "warning",
+            "navigateDisappearThreshold": 0
         });
 
         // Wait a few seconds before setting new status
@@ -743,10 +748,10 @@ function Poller(props){
             })
             .catch((error)=> {
                 if (typeof error === "string") {
-                    Alerts.queue({ "title": error, style: "danger" });
+                    Alerts.queue({ "title": error, style: "danger", "navigateDisappearThreshold": 0 });
                 } else {
                     console.error(error);
-                    Alerts.queue({ "title": "An unknown error occurred. See console for more details.", style: "danger" });
+                    Alerts.queue({ "title": "An unknown error occurred. See console for more details.", style: "danger", "navigateDisappearThreshold": 0 });
                 }
                 setStatusIdx(0); // Re-enable file upload.
             });
