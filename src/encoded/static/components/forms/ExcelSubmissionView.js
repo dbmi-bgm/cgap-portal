@@ -534,14 +534,14 @@ class PanelTwo extends React.PureComponent {
         if (submission_uri) {
             message = (
                 <React.Fragment>
-                    <p className="mb-0">Keep this window open for updates on file processing status. Note: this may take a while.</p>
+                    <p className="mb-0"><strong>Keep this window open</strong> for updates on file processing status. Note: this may take a while.</p>
                 </React.Fragment>
             );
         }
         Alerts.queue({
-            "title" : "Uploaded file (" + filename + ") successfully!",
-            message ,
-            "style" : "success"
+            "title" : "File Ingestion (" + filename + ") processing...",
+            message,
+            "style" : "warning"
         });
 
         // Wait a few seconds before setting new status
