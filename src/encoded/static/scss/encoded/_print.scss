@@ -13,7 +13,8 @@ body,
     padding: 0;
     height: auto !important;
     width: auto !important;
-    min-height: none !important;
+    min-height: 0 !important;
+    position: static;
 }
 
 body h1, h2, h3, h4, h5, h6 {
@@ -27,8 +28,8 @@ div#slow-load-container {
 /* Hide UI elements on relevant pages */
 div#layout {
 
-    min-height: none !important;
-    margin: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
 
     > div.navbar-container {
         display: none;
@@ -36,7 +37,7 @@ div#layout {
 
     > div#post-navbar-container {
         margin: 0 !important;
-        min-height: none !important;
+        min-height: 0 !important;
         padding: 0 !important;
         &:before {
             display: none;
@@ -62,7 +63,7 @@ div#layout {
 
     // Unset some global style which are detrimental in print
     .mh-inner-tab-height-full {
-        min-height: none !important;
+        min-height: 0 !important;
     }
 
 }
@@ -104,6 +105,12 @@ body[data-path^="/reports/"] {
                     /* Unset styles, assuming this is a .container-wide element, also */
                     margin: 0 !important;
                     padding: 0 !important;
+                }
+
+                /* This is a small fix for (only) Chrome printing, which sometimes hides content, possibly due to float miscalculation or something */
+                /* We set padding-bottom to 0.075in when generating pages and then unset it here (acting as a buffer). */
+                .print-preview-pane .pagedjs_sheet .pagedjs_area {
+                    padding-bottom: 0 !important;
                 }
             }
         }

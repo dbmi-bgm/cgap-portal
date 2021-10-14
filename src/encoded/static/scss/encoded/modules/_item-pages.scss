@@ -2119,7 +2119,7 @@ i.status-indicator-dot {
 
 
 /**********************************************************
-  Report View
+  Report View & Print Preview
 **********************************************************/
 
 /* Print Preview Pane Effects */
@@ -2128,10 +2128,11 @@ i.status-indicator-dot {
 	@media screen {
 		/* Avoid adding these style to print media, since this page will be printed */
 		.print-preview-pane {
-			transition: opacity .75s;
+			transition: opacity .75s 1s ease-in;
 			.pagedjs_pages {
 				.pagedjs_page {
 					box-shadow: 0 0 1px 0px rgba(0,0,0,0.7);
+					margin: 0 auto 16px;
 				}
 			}
 		}

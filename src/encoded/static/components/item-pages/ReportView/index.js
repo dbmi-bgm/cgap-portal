@@ -6,14 +6,14 @@ import _ from 'underscore';
 import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import DefaultItemView from './../DefaultItemView';
-import { PrintPreviewTab } from './PrintPreviewTab';
+import { ReportPrintPreviewTab } from './ReportPrintPreviewTab';
 
 export default class ReportView extends DefaultItemView {
 
     getTabViewContents(){
         return [
             OverviewTabView.getTabObject(this.props),
-            PrintPreviewTab.getTabObject(this.props),
+            ReportPrintPreviewTab.getTabObject(this.props),
             ...this.getCommonTabs()
         ];
     }

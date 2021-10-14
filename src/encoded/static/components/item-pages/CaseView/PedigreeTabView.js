@@ -6,11 +6,6 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 
-import DropdownButton from 'react-bootstrap/esm/DropdownButton';
-import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import Dropdown from 'react-bootstrap/esm/Dropdown';
-import Button from 'react-bootstrap/esm/Button'; // todo refactor out into plain <button> if this file still supported
-
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { CollapsibleItemViewButtonToolbar } from './../components/CollapsibleItemViewButtonToolbar';
