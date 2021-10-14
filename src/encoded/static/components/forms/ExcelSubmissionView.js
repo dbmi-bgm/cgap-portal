@@ -456,12 +456,28 @@ class PanelOne extends React.PureComponent {
             );
         }
 
+        const { project_roles = [], user_institution = null } = user;
+
         const valuesChanged = !submissionItem || this.memoized.checkIfChanged(submissionItem, institutionID, projectID);
         const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID );
 
         return (
             <form className={"panel-form-container d-block" + (isCreating ? " is-creating" : "")} onSubmit={this.handleCreate}>
                 <h4 className="text-300 mt-2">Required Fields = <span className="text-danger">*</span></h4>
+                <div className="field-section linkto-section mt-2 d-block">
+                    <label className="d-block mb-05">Institution</label>
+                    <div className="row">
+                        <div className="col-auto">{user_institution.display_title}</div>
+                        <div className="col">
+                            <i className="icon icon-fw icon-link fas small mr-05"/>
+                            <span className="text-monospace small">{ user_institution["@id"] }</span> &bull;
+                            <a href={user_institution["@id"]} target="_blank" rel="noopener noreferrer" className="ml-05"
+                                data-tip={"Open Institution in new window"}>
+                                <i className="icon icon-fw icon-external-link-alt fas small"/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 <LinkToFieldSection onSelect={this.handleSelectInstitution} title="Institution" required
                     type="Institution" selectedID={institutionID} selectedTitle={institutionTitle} searchAsYouType/>
                 <LinkToFieldSection onSelect={this.handleSelectProject} title="Project" required
