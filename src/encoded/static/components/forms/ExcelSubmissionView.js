@@ -239,12 +239,9 @@ class PanelOne extends React.PureComponent {
 
     static flatFieldsFromUser(user){
         const {
-            user_institution : institution = {},
             project = {},
         } = user || {};
         const initState = {
-            "institutionID": institution['@id'] || null,
-            "institutionTitle": institution.display_title || null,
             "projectID": project['@id'] || null,
             "projectTitle": project.display_title || null
         };
@@ -252,19 +249,17 @@ class PanelOne extends React.PureComponent {
     }
 
     // TODO: Delete probably -- hard sequence from step 1 -> 2 -> 3... no more going back and updating
-    static checkIfChanged(submissionItem, institutionID, projectID){
+    static checkIfChanged(submissionItem, projectID){
         const {
-            institution: { '@id' : submissionInstitutionID = null } = {},
             project: { '@id' : submissionProjectID = null } = {},
             display_title: submissionTitle
         } = submissionItem;
-        return (institutionID !== submissionInstitutionID) || (projectID !== submissionProjectID);
+        return (projectID !== submissionProjectID);
     }
 
     constructor(props){
         super(props);
         this.loadUser = this.loadUser.bind(this);
-        this.handleSelectInstitution = this.handleSelectInstitution.bind(this);
         this.handleSelectProject = this.handleSelectProject.bind(this);
         this.handleCreate = this.handleCreate.bind(this);
         this.handleSelectSubmissionType = this.handleSelectSubmissionType.bind(this);
@@ -280,7 +275,6 @@ class PanelOne extends React.PureComponent {
             ...PanelOne.flatFieldsFromUser(props.user)
         };
         this.unsetSelectingField     = () => { this.setState({ selectingField: null }); };
-        this.setSelectingInstitution = () => { this.setState({ selectingField: "institution" }); };
         this.setSelectingProject     = () => { this.setState({ selectingField: "project" }); };
 
         this.memoized = {
@@ -293,7 +287,7 @@ class PanelOne extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps){
-        const { submissionItem = null, markCompleted, panelIdx, panelsComplete, user } = this.props;
+        const { submissionItem = null, markCompleted, panelIdx, panelsComplete, user = null } = this.props;
         const { submissionItem: pastIngestionSubmissionItem = null, panelIdx: pastPanelIdx, user: pastUser } = pastProps;
 
         if (user !== pastUser){
@@ -304,25 +298,20 @@ class PanelOne extends React.PureComponent {
 
         if (submissionItem && submissionItem !== pastIngestionSubmissionItem){
             const {
-                institution: {
-                    '@id' : institutionID = null,
-                    display_title: institutionTitle = null
-                } = {},
                 project: {
                     '@id' : projectID = null,
                     display_title: projectTitle = null
                 } = {}
             } = submissionItem;
             this.setState({
-                institutionID, institutionTitle,
                 projectID, projectTitle
             });
             return;
         }
 
         if (submissionItem){
-            const { institutionID, projectID } = this.state;
-            const valuesDiffer = this.memoized.checkIfChanged(submissionItem, institutionID, projectID);
+            const { projectID } = this.state;
+            const valuesDiffer = this.memoized.checkIfChanged(submissionItem, projectID);
             if (!valuesDiffer && panelIdx === 0 && panelsComplete[0] === false) {
                 // We already completed POST; once submission present, mark this complete also.
                 markCompleted(0, true);
@@ -350,24 +339,20 @@ class PanelOne extends React.PureComponent {
         }
     }
 
-    handleSelectInstitution(institutionJSON, institutionID){
-        const { display_title: institutionTitle = null } = institutionJSON;
-        this.setState({ institutionID, institutionTitle });
-    }
-
     handleSelectProject(projectJSON, projectID){
         const { display_title: projectTitle = null } = projectJSON;
         this.setState({ projectID, projectTitle });
     }
 
     handleCreate(e){
-        const { onSubmitIngestionSubmission, submissionItem } = this.props;
+        const { onSubmitIngestionSubmission, submissionItem, user = null } = this.props;
         const {
-            institutionID: institution,
             projectID: project,
             isCreating = false,
             submissionType = null
         } = this.state;
+
+        const { user_institution: { "@id": institution = null } = {} } = user || {};
 
         e.preventDefault();
         e.stopPropagation();
@@ -437,7 +422,6 @@ class PanelOne extends React.PureComponent {
     render(){
         const { userDetails, panelIdx, user, submissionItem } = this.props;
         const {
-            institutionID, institutionTitle,
             projectID, projectTitle,
             submissionType,
             isCreating = false
@@ -456,7 +440,7 @@ class PanelOne extends React.PureComponent {
             );
         }
 
-        const { project_roles = [], user_institution = null } = user;
+        const { project_roles = [], user_institution: { "@id": institutionID, display_title: institutionTitle } = {} } = user;
 
         const valuesChanged = !submissionItem || this.memoized.checkIfChanged(submissionItem, institutionID, projectID);
         const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID );
@@ -467,19 +451,17 @@ class PanelOne extends React.PureComponent {
                 <div className="field-section linkto-section mt-2 d-block">
                     <label className="d-block mb-05">Institution</label>
                     <div className="row">
-                        <div className="col-auto">{user_institution.display_title}</div>
+                        <div className="col-auto">{ institutionTitle }</div>
                         <div className="col">
                             <i className="icon icon-fw icon-link fas small mr-05"/>
-                            <span className="text-monospace small">{ user_institution["@id"] }</span> &bull;
-                            <a href={user_institution["@id"]} target="_blank" rel="noopener noreferrer" className="ml-05"
-                                data-tip={"Open Institution in new window"}>
+                            <span className="text-monospace small">{ institutionID }</span> &bull;
+                            <a href={institutionID} target="_blank" rel="noopener noreferrer" className="ml-05"
+                                data-tip="Open Institution in new window">
                                 <i className="icon icon-fw icon-external-link-alt fas small"/>
                             </a>
                         </div>
                     </div>
                 </div>
-                <LinkToFieldSection onSelect={this.handleSelectInstitution} title="Institution" required
-                    type="Institution" selectedID={institutionID} selectedTitle={institutionTitle} searchAsYouType/>
                 <LinkToFieldSection onSelect={this.handleSelectProject} title="Project" required
                     type="Project" selectedID={projectID} selectedTitle={projectTitle} searchAsYouType />
                 <div className="field-section linkto-section mt-2 d-block">
