@@ -1,7 +1,6 @@
 [
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "completed_processes": [
             "WGS_partI_V11"
         ],
@@ -13,7 +12,6 @@
             "a9f52239-712a-485b-9eb2-b3bcdcbfae77"
         ],
         "indication": "Not specified",
-        "schema_version": "1",
         "requisition_acceptance": {
             "date_sent": "2019-03-04",
             "date_completed": "2019-03-05",
@@ -57,7 +55,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "completed_processes": [
             "WGS_partI_V11"
         ],
@@ -69,7 +66,6 @@
             "d7e176e7-a7ed-4d20-aa4f-8dc25a73a3c7"
         ],
         "indication": "Not specified",
-        "schema_version": "1",
         "requisition_acceptance": {
             "date_sent": "2019-03-04",
             "date_completed": "2019-03-05",
@@ -113,7 +109,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "completed_processes": [
             "WGS_partI_V11"
         ],
@@ -125,7 +120,6 @@
             "d2dcb300-84d8-4b89-9af0-eb75c75226f8"
         ],
         "indication": "Not specified",
-        "schema_version": "1",
         "requisition_acceptance": {
             "date_sent": "2019-03-04",
             "date_completed": "2019-03-05",
