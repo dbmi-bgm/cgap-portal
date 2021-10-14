@@ -13,6 +13,7 @@ import { console, ajax, JWT, navigate, object, memoizedUrlParse } from '@hms-dbm
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { LinkToDropdown } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/LinkToDropdown';
+import { SearchAsYouTypeLocal } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/SearchAsYouTypeLocal';
 
 import { AttachmentInputController } from './attachment-input';
 
@@ -248,6 +249,22 @@ class PanelOne extends React.PureComponent {
         return initState;
     }
 
+    static projectRolesToListofProjects(project_roles){
+        const projects = [];
+        const projectsSeen = {};
+
+        // Filter out any roles from same projects
+        project_roles.forEach((role) => {
+            const { project: { "@id": atID, display_title } = {} } = role;
+            if (!projectsSeen[atID]) {
+                projects.push(atID);
+                projectsSeen[atID] = true;
+            }
+        });
+
+        return projects;
+    }
+
     // TODO: Delete probably -- hard sequence from step 1 -> 2 -> 3... no more going back and updating
     static checkIfChanged(submissionItem, projectID){
         const {
@@ -339,9 +356,9 @@ class PanelOne extends React.PureComponent {
         }
     }
 
-    handleSelectProject(projectJSON, projectID){
-        const { display_title: projectTitle = null } = projectJSON;
-        this.setState({ projectID, projectTitle });
+    handleSelectProject(projectID){
+        // const { display_title: projectTitle = null } = projectJSON;
+        this.setState({ projectID });
     }
 
     handleCreate(e){
@@ -445,6 +462,9 @@ class PanelOne extends React.PureComponent {
         const valuesChanged = !submissionItem || this.memoized.checkIfChanged(submissionItem, institutionID, projectID);
         const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID );
 
+        console.log("project roles", project_roles);
+        const projectList = PanelOne.projectRolesToListofProjects(project_roles);
+
         return (
             <form className={"panel-form-container d-block" + (isCreating ? " is-creating" : "")} onSubmit={this.handleCreate}>
                 <h4 className="text-300 mt-2">Required Fields = <span className="text-danger">*</span></h4>
@@ -462,6 +482,8 @@ class PanelOne extends React.PureComponent {
                         </div>
                     </div>
                 </div>
+                <SearchAsYouTypeLocal searchList={projectList} value={projectID} onChange={this.handleSelectProject}
+                    filterMethod="startsWith" initializeWithValue />
                 <LinkToFieldSection onSelect={this.handleSelectProject} title="Project" required
                     type="Project" selectedID={projectID} selectedTitle={projectTitle} searchAsYouType />
                 <div className="field-section linkto-section mt-2 d-block">
