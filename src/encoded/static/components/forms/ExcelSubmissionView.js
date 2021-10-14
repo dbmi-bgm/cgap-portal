@@ -237,7 +237,7 @@ function PanelSelectionMenu(props){
 
 class PanelOne extends React.PureComponent {
 
-    static flatFieldsFromUser(user){
+    static projectFromUser(user){
         const {
             project = {},
         } = user || {};
@@ -272,7 +272,7 @@ class PanelOne extends React.PureComponent {
             submissionType: { "Accessioning":1, "Gene List":1, "Family History":1 }[submissionType] ? submissionType : null,
             error: null,
             isCreating: false,
-            ...PanelOne.flatFieldsFromUser(props.user)
+            ...PanelOne.projectFromUser(props.user)
         };
         this.unsetSelectingField     = () => { this.setState({ selectingField: null }); };
         this.setSelectingProject     = () => { this.setState({ selectingField: "project" }); };
@@ -291,7 +291,7 @@ class PanelOne extends React.PureComponent {
         const { submissionItem: pastIngestionSubmissionItem = null, panelIdx: pastPanelIdx, user: pastUser } = pastProps;
 
         if (user !== pastUser){
-            this.setState(PanelOne.flatFieldsFromUser(user));
+            this.setState(PanelOne.projectFromUser(user));
             ReactTooltip.rebuild();
             return;
         }
