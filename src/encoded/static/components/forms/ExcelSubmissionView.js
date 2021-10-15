@@ -8,12 +8,11 @@ import ReactTooltip from 'react-tooltip';
 
 import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console, ajax, JWT, navigate, object, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
-import { LinkToDropdown } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/LinkToDropdown';
-import { SearchAsYouTypeLocal } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/SearchAsYouTypeLocal';
 
 import { AttachmentInputController } from './attachment-input';
 
@@ -257,7 +256,7 @@ class PanelOne extends React.PureComponent {
         project_roles.forEach((role) => {
             const { project: { "@id": atID, display_title } = {} } = role;
             if (!projectsSeen[atID]) {
-                projects.push(atID);
+                projects.push({ atID, display_title });
                 projectsSeen[atID] = true;
             }
         });
@@ -462,7 +461,6 @@ class PanelOne extends React.PureComponent {
         const valuesChanged = !submissionItem || this.memoized.checkIfChanged(submissionItem, institutionID, projectID);
         const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID );
 
-        console.log("project roles", project_roles);
         const projectList = PanelOne.projectRolesToListofProjects(project_roles);
 
         return (
@@ -482,9 +480,7 @@ class PanelOne extends React.PureComponent {
                         </div>
                     </div>
                 </div>
-                <SearchAsYouTypeLocal searchList={projectList} value={projectID} onChange={this.handleSelectProject}
-                    filterMethod="startsWith" initializeWithValue />
-                <LinkToFieldSection onSelect={this.handleSelectProject} title="Project" required
+                <LinkToFieldSection onSelect={this.handleSelectProject} title="Project" required options={projectList}
                     type="Project" selectedID={projectID} selectedTitle={projectTitle} searchAsYouType />
                 <div className="field-section linkto-section mt-2 d-block">
                     <label className="d-block mb-05">Submission Type</label>
@@ -832,15 +828,15 @@ function FileAttachmentBtn(props){
  * TODO: Maybe replace with SearchAsYouTypeAjax from SPC.
  */
 const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
-    const { title, type, onSelect, selectedID, selectedTitle, variant = "primary", required, searchAsYouType } = props;
+    const { options, title, type, onSelect, selectedID, selectedTitle, variant = "primary", required } = props;
 
     let showTitle;
     if (selectedTitle && selectedID){
-        showTitle = <span className="text-600">{ selectedTitle }</span>;
+        showTitle = selectedTitle;
     } else if (selectedID){
         showTitle = selectedID;
     } else {
-        showTitle = <em>None Selected</em>;
+        showTitle = "None Selected";
     }
 
     return (
@@ -848,7 +844,7 @@ const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
             <label className="d-block mb-05">{ title } {required ? <span className="text-danger">*</span>: null}</label>
             <div className="row">
                 <div className="col-auto">
-                    <LinkToDropdown {...{ onSelect, selectedID, variant, searchAsYouType }} searchURL={"/search/?type=" + type} selectedTitle={showTitle} />
+                    <ProjectDrop {...{ options, onSelect, selectedID, selectedTitle, variant }} selectedTitle={showTitle} />
                 </div>
                 <div className="col">
                     <i className="icon icon-fw icon-link fas small mr-05"/>
@@ -863,6 +859,44 @@ const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
     );
 });
 
+const ProjectDrop = (props) => {
+    const { selectedID, options = [], selectedTitle, onSelect, variant, disabled = false, cls } = props;
+
+    const renderedOptions = options.map(function(project){
+        const { display_title, atID : projectID } = project;
+        return (
+            <DropdownItem className="selectable-item-option" key={projectID} eventKey={projectID}
+                active={selectedID === projectID}>
+                <div className="row">
+                    <div className="col">
+                        <span className="text-600 d-block">{ display_title }</span>
+                    </div>
+                    <div className="col-auto d-none d-md-inline-block">
+                        <i className="icon icon-fw icon-link fas small mr-05"/>
+                        <span className="text-monospace small">{ projectID }</span>
+                    </div>
+                </div>
+            </DropdownItem>
+        );
+    });
+
+    const className = "linkto-dropdown text-600" + (cls ? " " + cls : "");
+    const title = <span className="text-600">{selectedTitle}</span> || "Select...";
+    const isDisabled = options.length <= 1 || disabled;
+
+    let tooltip = null;
+    if (options.length === 1 && options[0] && selectedTitle === options[0].display_title) {
+        tooltip = "Only project available for current user is currently selected";
+    } else if (options.length === 0) {
+        tooltip = "No options available";
+    }
+
+    return (
+        <DropdownButton {...{ variant, title, className }} disabled={isDisabled} data-tip={tooltip} onSelect={onSelect}>
+            { renderedOptions }
+        </DropdownButton>
+    );
+};
 
 
 const ExcelSubmissionViewPageTitle = React.memo(function ExcelSubmissionViewPageTitle({ context, href, schemas, currentAction, alerts }){
