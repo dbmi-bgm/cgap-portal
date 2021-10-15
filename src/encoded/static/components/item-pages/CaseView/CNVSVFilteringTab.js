@@ -137,8 +137,12 @@ function CaseViewEmbeddedStructuralVariantSearchTable(props) {
 
                     if (genes.length <= 2) { // show comma separated
                         return <a href={path} target="_blank" rel="noreferrer">{genes.join(", ")}</a>;
-                    } // show first and last gene separated by "..."
-                    return <a href={path} target="_blank" rel="noreferrer">{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
+                    }
+                    // show first and last gene separated by "..." with first 10 available on hover
+                    const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
+                    const tipGenes = genes.slice(0, lastItemIndex).join(", ");
+
+                    return <a href={path} target="_blank" rel="noreferrer" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
                 }
             },
             "structural_variant.gnomadg_af": {
