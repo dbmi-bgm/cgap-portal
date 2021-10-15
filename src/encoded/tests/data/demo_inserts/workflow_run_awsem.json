@@ -1,7 +1,6 @@
 [
     {
         "status": "in review",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -42,7 +41,6 @@
         "awsem_job_id": "ANAL9fGkYdXs",
         "date_created": "2020-08-12T16:07:36.621751+00:00",
         "workflow": "f3b91cd6-9f17-45c4-b041-4b6a73987e65",
-        "schema_version": "3",
         "uuid": "f95839cd-96fd-4232-b020-6afcfac524ce",
         "input_files": [
             {
@@ -82,7 +80,6 @@
     },
     {
         "status": "in review",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -116,7 +113,6 @@
         "awsem_job_id": "NXeX3EZllcZM",
         "date_created": "2020-06-12T14:48:15.959735+00:00",
         "workflow": "4fbad226-859d-40d4-8192-10c305e819da",
-        "schema_version": "3",
         "uuid": "e689b830-97ae-405f-ae5a-3f27c1d919cc",
         "input_files": [
             {
@@ -156,7 +152,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "20c51c3c-c242-4489-8f5d-2bfe33ee7552/GAPFI9HDXSSI.bam",
@@ -176,7 +171,6 @@
         "awsem_job_id": "IUaYtGHleFep",
         "date_created": "2020-07-15T02:38:10.553059+00:00",
         "workflow": "9e094699-561b-4396-8d6a-ffc45f98c5e1",
-        "schema_version": "3",
         "uuid": "d58b6153-438f-4c3b-a631-ebff9c9ca4d5",
         "input_files": [
             {
@@ -210,7 +204,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "eca5a9ac-f00a-4279-aab9-3f4ed17015c9/GAPFI5V1GIRY.bam",
@@ -230,7 +223,6 @@
         "awsem_job_id": "xF7QaNPdhfEL",
         "date_created": "2020-07-15T02:38:10.917861+00:00",
         "workflow": "9e094699-561b-4396-8d6a-ffc45f98c5e1",
-        "schema_version": "3",
         "uuid": "d05d398a-0887-4de3-a4cd-a2151b8863f0",
         "input_files": [
             {
@@ -264,7 +256,6 @@
     },
     {
         "status": "in review",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -310,7 +301,6 @@
         "awsem_job_id": "ytPDXBQgdlJG",
         "date_created": "2020-08-07T17:53:26.309398+00:00",
         "workflow": "9e43a0ef-be16-43f1-a789-b76261ee95a3",
-        "schema_version": "3",
         "uuid": "cbd7d93c-c7af-4964-86c0-9f7e2a621097",
         "input_files": [
             {
@@ -332,7 +322,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "afd716d4-714f-4df3-80be-014269c2821d/GAPFIH1A1SPG.bam",
@@ -352,7 +341,6 @@
         "awsem_job_id": "xIq2opXzDxXx",
         "date_created": "2020-07-15T02:38:12.188654+00:00",
         "workflow": "9e094699-561b-4396-8d6a-ffc45f98c5e1",
-        "schema_version": "3",
         "uuid": "ad95e345-3f42-4717-9ffd-93d80af722a0",
         "input_files": [
             {
@@ -386,7 +374,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -422,7 +409,6 @@
         "awsem_job_id": "StJeQXDNiWTh",
         "date_created": "2020-07-15T02:38:12.878590+00:00",
         "workflow": "6e89bc5d-b4a0-4954-9c3f-361477d5f537",
-        "schema_version": "3",
         "uuid": "a1a7aef5-a111-4a5f-b231-1b72a478ebf0",
         "input_files": [
             {
@@ -456,7 +442,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -485,7 +470,6 @@
         "awsem_job_id": "q0LiYmsspk3F",
         "date_created": "2020-07-15T02:38:13.168400+00:00",
         "workflow": "7fd67e19-3425-45f8-8149-c7cac4278fdb",
-        "schema_version": "3",
         "uuid": "9c01319d-e8ee-4b3f-a8aa-4fd4bbca8510",
         "input_files": [
             {
@@ -519,7 +503,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -548,7 +531,6 @@
         "awsem_job_id": "7P0XuCQXo9wb",
         "date_created": "2020-07-15T02:38:13.960342+00:00",
         "workflow": "7fd67e19-3425-45f8-8149-c7cac4278fdb",
-        "schema_version": "3",
         "uuid": "89c25e37-c64a-42cf-83fb-dea656bb2140",
         "input_files": [
             {
@@ -582,7 +564,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -616,7 +597,6 @@
         "awsem_job_id": "0wDKO96gWF1G",
         "date_created": "2020-07-15T02:38:14.217227+00:00",
         "workflow": "6c9c6f49-f954-4e76-8dfb-d385cddcebd6",
-        "schema_version": "3",
         "uuid": "843f2c0d-084e-4f2a-bf3b-693f3dd5a406",
         "input_files": [
             {
@@ -650,7 +630,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -684,7 +663,6 @@
         "awsem_job_id": "HmRURzR41O8A",
         "date_created": "2020-07-15T02:38:15.240813+00:00",
         "workflow": "6c9c6f49-f954-4e76-8dfb-d385cddcebd6",
-        "schema_version": "3",
         "uuid": "75c45927-8d80-47aa-ae97-ee8f44ab886d",
         "input_files": [
             {
@@ -718,7 +696,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -754,7 +731,6 @@
         "awsem_job_id": "FcLHXpEiCw8z",
         "date_created": "2020-07-15T02:38:16.066023+00:00",
         "workflow": "6e89bc5d-b4a0-4954-9c3f-361477d5f537",
-        "schema_version": "3",
         "uuid": "636bd7d3-da45-44d3-84d7-27e19065bd01",
         "input_files": [
             {
@@ -788,7 +764,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -824,7 +799,6 @@
         "awsem_job_id": "su1Sh4OHWDqs",
         "date_created": "2020-07-15T02:38:16.609508+00:00",
         "workflow": "6e89bc5d-b4a0-4954-9c3f-361477d5f537",
-        "schema_version": "3",
         "uuid": "43d7bbe5-ad57-4d92-871f-9fa9489dc7f2",
         "input_files": [
             {
@@ -858,7 +832,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -887,7 +860,6 @@
         "awsem_job_id": "ehRReyKHgZ9D",
         "date_created": "2020-07-15T02:38:16.984556+00:00",
         "workflow": "c7223a1c-ed48-4c54-a39f-35f05d61e850",
-        "schema_version": "3",
         "uuid": "417969d6-41f1-4ba9-8e00-76b082d5f50c",
         "input_files": [
             {
@@ -933,7 +905,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -962,7 +933,6 @@
         "awsem_job_id": "d1qxts7ocvmB",
         "date_created": "2020-07-15T02:38:18.754609+00:00",
         "workflow": "7fd67e19-3425-45f8-8149-c7cac4278fdb",
-        "schema_version": "3",
         "uuid": "1f95d4e2-f83d-43aa-b205-68d3dd007311",
         "input_files": [
             {
@@ -996,7 +966,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -1030,7 +999,6 @@
         "awsem_job_id": "acHLQnkcfO56",
         "date_created": "2020-07-15T02:38:19.034165+00:00",
         "workflow": "6c9c6f49-f954-4e76-8dfb-d385cddcebd6",
-        "schema_version": "3",
         "uuid": "1c6848a3-9d65-4023-a598-d5bfc54fb65b",
         "input_files": [
             {
@@ -1064,7 +1032,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -1098,7 +1065,6 @@
         "awsem_job_id": "OEhQxbjQ0XwH",
         "date_created": "2020-07-15T02:38:19.977368+00:00",
         "workflow": "4fbad226-859d-40d4-8192-10c305e819da",
-        "schema_version": "3",
         "uuid": "fc7463c8-95e0-4ab7-afc8-c8f1c6ce21c1",
         "input_files": [
             {
@@ -1138,7 +1104,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "bafedc46-753b-409a-a76f-cdc3a3065e7d/GAPFI67T8YV5.bam",
@@ -1158,7 +1123,6 @@
         "awsem_job_id": "0D6ZBfqd9RHo",
         "date_created": "2020-07-15T02:38:20.281587+00:00",
         "workflow": "560f5194-cd3a-4799-9b1a-6a2d2c371c89",
-        "schema_version": "3",
         "uuid": "e73e0b52-27e7-40d5-8019-a484c678c61e",
         "input_files": [
             {
@@ -1180,7 +1144,6 @@
     },
     {
         "status": "in review",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -1221,7 +1184,6 @@
         "awsem_job_id": "WSuKXulEwToD",
         "date_created": "2020-06-16T19:55:16.385158+00:00",
         "workflow": "de9c4579-30e2-432c-80e3-7f324d3d7dcb",
-        "schema_version": "3",
         "uuid": "c64d798d-8230-4201-a199-010524666846",
         "input_files": [
             {
@@ -1255,7 +1217,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -1284,7 +1245,6 @@
         "awsem_job_id": "vsYpcoKqr3uD",
         "date_created": "2020-07-15T02:38:21.109819+00:00",
         "workflow": "778149e7-98d7-4362-83a4-9e80af1da101",
-        "schema_version": "3",
         "uuid": "c260cde4-06c4-4339-9553-2e172c9b3a82",
         "input_files": [
             {
@@ -1318,7 +1278,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -1352,7 +1311,6 @@
         "awsem_job_id": "kICwowuPUtWB",
         "date_created": "2020-07-15T02:38:25.324490+00:00",
         "workflow": "f38b91fb-7e0c-44e0-a871-a91a58227b34",
-        "schema_version": "3",
         "uuid": "a7ecbeef-2b5a-4af8-8d91-3bfa0bad7b27",
         "input_files": [
             {
@@ -1386,7 +1344,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "6744d4c8-a0a2-4619-ada4-1f68991fb994/GAPFI9PUMN3F.bam",
@@ -1413,7 +1370,6 @@
         "awsem_job_id": "k7GRt9129OdD",
         "date_created": "2020-07-15T02:38:21.966281+00:00",
         "workflow": "1ebf697c-949d-46b2-b9a4-8b1a7699ef1f",
-        "schema_version": "3",
         "uuid": "9ef1362f-a319-4ed2-93f7-720a765e5599",
         "input_files": [
             {
@@ -1435,7 +1391,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "61703fbc-4024-4d5d-8ba7-4ebcbd43f528/GAPFID38UPJ1.txt",
@@ -1450,7 +1405,6 @@
         "awsem_job_id": "ertlS7dzW8Z9",
         "date_created": "2020-07-15T02:38:22.480150+00:00",
         "workflow": "455b3056-64ca-4a9b-b546-294b01c9ca92",
-        "schema_version": "3",
         "uuid": "8779aabd-6efb-4471-8b20-d348de73ccd5",
         "input_files": [
             {
@@ -1490,7 +1444,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "3e51d717-bc6f-444d-98dd-fca2a60df2be/GAPFIJG8GL3V.txt",
@@ -1505,7 +1458,6 @@
         "awsem_job_id": "yb9Z9bXaN5SC",
         "date_created": "2020-07-15T02:38:23.254257+00:00",
         "workflow": "455b3056-64ca-4a9b-b546-294b01c9ca92",
-        "schema_version": "3",
         "uuid": "5c565340-5f12-4d30-b043-0e4fadcd71f5",
         "input_files": [
             {
@@ -1545,7 +1497,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "ec82bb3f-a033-4889-9872-14cd948e155b/GAPFILRE7OY6.bam",
@@ -1572,7 +1523,6 @@
         "awsem_job_id": "t0os9WZyPeg5",
         "date_created": "2020-07-15T02:38:23.775559+00:00",
         "workflow": "1ebf697c-949d-46b2-b9a4-8b1a7699ef1f",
-        "schema_version": "3",
         "uuid": "4eb16594-4a41-4ec2-a031-d9f3258dca64",
         "input_files": [
             {
@@ -1594,7 +1544,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "6577ba40-57ef-40c7-95cb-1557718d3005/GAPFIB7BFZ58.bam",
@@ -1614,7 +1563,6 @@
         "awsem_job_id": "gG8tIL7XpgO2",
         "date_created": "2020-07-15T02:38:24.062192+00:00",
         "workflow": "560f5194-cd3a-4799-9b1a-6a2d2c371c89",
-        "schema_version": "3",
         "uuid": "3d9ad889-925f-439a-a74c-720d47ddede6",
         "input_files": [
             {
@@ -1636,7 +1584,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "2005cb42-9613-4e9a-931c-22be0b5af1e1/GAPFIJ9BD3JU.txt",
@@ -1651,7 +1598,6 @@
         "awsem_job_id": "EF1VE1n9fjHD",
         "date_created": "2020-07-15T02:38:24.347784+00:00",
         "workflow": "455b3056-64ca-4a9b-b546-294b01c9ca92",
-        "schema_version": "3",
         "uuid": "3a2b9ffb-6c90-4d65-947e-54817883142c",
         "input_files": [
             {
@@ -1691,7 +1637,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "d87b2ea0-d0d3-4e4b-84e5-e32ee572ae96/GAPFISSWY513.bam",
@@ -1711,7 +1656,6 @@
         "awsem_job_id": "P5qfQvKEs8Bx",
         "date_created": "2020-07-15T02:38:24.593197+00:00",
         "workflow": "560f5194-cd3a-4799-9b1a-6a2d2c371c89",
-        "schema_version": "3",
         "uuid": "2be2ec26-c846-48bd-9e61-4ebdca8a631a",
         "input_files": [
             {
@@ -1733,7 +1677,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "eb793b65-fa13-4d17-931e-267abf10ccc2/GAPFIOH2AVOD.bam",
@@ -1760,7 +1703,6 @@
         "awsem_job_id": "ongMzQuBtE0L",
         "date_created": "2020-07-15T02:38:25.077806+00:00",
         "workflow": "1ebf697c-949d-46b2-b9a4-8b1a7699ef1f",
-        "schema_version": "3",
         "uuid": "0ea92f22-30d2-4551-a18a-6233fa1bc324",
         "input_files": [
             {
@@ -1782,7 +1724,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "74085ab7-de6e-4a90-8b58-a4394d010609/GAPFIK3FA7LW.bam",
@@ -1809,7 +1750,6 @@
         "awsem_job_id": "qxgV9QHsr42g",
         "date_created": "2020-07-15T02:38:25.609693+00:00",
         "workflow": "beb2b340-94ee-4afe-b4e3-66caaf063397",
-        "schema_version": "3",
         "uuid": "f6b45d86-0e42-4504-b3a9-464c613f2f51",
         "input_files": [
             {
@@ -1831,7 +1771,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -1878,7 +1817,6 @@
         "awsem_job_id": "OSwnZiTnh5pL",
         "date_created": "2020-07-15T02:38:27.460346+00:00",
         "workflow": "cb85683c-54a6-44e8-820c-1800aec9fdcd",
-        "schema_version": "3",
         "uuid": "ef5b441d-6ae9-439d-9c59-1f587c62b65c",
         "input_files": [
             {
@@ -1906,7 +1844,6 @@
     },
     {
         "status": "in review",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -1953,7 +1890,6 @@
         "awsem_job_id": "1HBLb9Snz4wC",
         "date_created": "2020-06-18T01:37:24.612932+00:00",
         "workflow": "cb85683c-54a6-44e8-820c-1800aec9fdcd",
-        "schema_version": "3",
         "uuid": "972d061c-be2f-40f6-90a7-22d23ca691d6",
         "input_files": [
             {
@@ -1981,7 +1917,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -2022,7 +1957,6 @@
         "awsem_job_id": "EwEwzwgc5WXq",
         "date_created": "2020-07-15T02:38:26.190462+00:00",
         "workflow": "de9c4579-30e2-432c-80e3-7f324d3d7dcb",
-        "schema_version": "3",
         "uuid": "873f15e3-f7ac-4cb8-85b9-09792bdea81a",
         "input_files": [
             {
@@ -2056,7 +1990,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "76696a96-ffbf-47d6-9f04-3ce233ddb4cb/GAPFIIKU363K.bam",
@@ -2083,7 +2016,6 @@
         "awsem_job_id": "bYv18wa1NtmR",
         "date_created": "2020-07-15T02:38:26.683427+00:00",
         "workflow": "beb2b340-94ee-4afe-b4e3-66caaf063397",
-        "schema_version": "3",
         "uuid": "746041de-a167-42bf-9216-e8db6c7aab36",
         "input_files": [
             {
@@ -2105,7 +2037,6 @@
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "upload_key": "3999a31d-d15d-433e-8bdf-88150fbfcbd4/GAPFIQHUBRKU.bam",
@@ -2132,7 +2063,6 @@
         "awsem_job_id": "rRxmD8DokUEv",
         "date_created": "2020-07-15T02:38:27.214316+00:00",
         "workflow": "beb2b340-94ee-4afe-b4e3-66caaf063397",
-        "schema_version": "3",
         "uuid": "1acf44d1-d7ce-42be-ba39-31d3c47a93eb",
         "input_files": [
             {
@@ -2154,7 +2084,6 @@
     },
     {
         "status": "in review",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "output_files": [
             {
                 "type": "Output QC file",
@@ -2198,7 +2127,6 @@
         "awsem_job_id": "2sDK0ZQrjfVw",
         "date_created": "2020-07-15T02:38:27.736189+00:00",
         "workflow": "33a85705-b757-49e0-aaef-d786695d6d03",
-        "schema_version": "3",
         "uuid": "72c9fd55-878b-4f9c-9bab-90556403a2b3",
         "input_files": [
             {
@@ -2220,7 +2148,6 @@
     },
     {
         "status": "in review",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -2266,7 +2193,6 @@
         "awsem_job_id": "UrUDuLSKLNG2",
         "date_created": "2020-08-19T19:42:57.658834+00:00",
         "workflow": "9e43a0ef-be16-43f1-a789-b76261ee95a3",
-        "schema_version": "3",
         "uuid": "248fdede-acee-43d4-9c08-65ff88025c2c",
         "input_files": [
             {
@@ -2288,7 +2214,6 @@
     },
     {
         "status": "in review",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "output_files": [
             {
                 "secondary_file_formats": [
@@ -2329,7 +2254,6 @@
         "awsem_job_id": "PHgFtOZTx14n",
         "date_created": "2020-08-19T19:51:40.368237+00:00",
         "workflow": "f3b91cd6-9f17-45c4-b041-4b6a73987e65",
-        "schema_version": "3",
         "uuid": "6198fd22-f83d-4696-82f0-0b3669f9a847",
         "input_files": [
             {

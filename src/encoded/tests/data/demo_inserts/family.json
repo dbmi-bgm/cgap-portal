@@ -4,7 +4,6 @@
         "timestamp": "2019-11-18T16:38:11.442813+00:00",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:38:59.766625+00:00",
-        "schema_version": "1",
         "uuid": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
         "members": [
             "4684702a-3639-4073-8db4-d44eb8b31135",
@@ -30,7 +29,6 @@
         "title": "Platinum Genomes",
         "pedigree_source": "Proband app 2.0.0",
         "accession": "GAPFAWY7YCIR",
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     }
 ]

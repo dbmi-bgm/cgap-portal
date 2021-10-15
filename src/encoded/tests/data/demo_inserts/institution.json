@@ -7,10 +7,8 @@
             "hms-dbmi:bioinformatics_core"
         ],
         "name": "bioinformatics-core",
-        "schema_version": "1",
         "uuid": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "date_created": "2020-07-15T02:37:35.895348+00:00",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "contact_persons": [
             "1d524d43-01b5-4b71-94c6-32d2d09c8323"
         ]
@@ -25,7 +23,6 @@
         "state": "MA",
         "name": "hms-dbmi",
         "address2": "10 Schattuck Street",
-        "schema_version": "1",
         "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "city": "Boston",
         "pi": "986b362f-4eb6-4a9c-8173-3ab267307e3a",
@@ -34,7 +31,6 @@
         "phone2": "000-000-0000",
         "fax": "000-000-0000",
         "date_created": "2020-07-15T02:26:28.666072+00:00",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "title": "HMS DBMI"
     },
     {
@@ -47,7 +43,6 @@
         "state": "MA",
         "name": "bwh",
         "address2": "75 Francis Street",
-        "schema_version": "1",
         "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
         "city": "Boston",
         "pi": "986b362f-4eb6-4a9c-8173-3acba722bba1",
@@ -56,7 +51,6 @@
         "phone2": "000-000-0000",
         "fax": "000-000-0000",
         "date_created": "2020-07-15T02:26:28.738572+00:00",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "title": "BWH"
     }
 ]

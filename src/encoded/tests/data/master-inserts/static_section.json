@@ -1,53 +1,252 @@
 [
     {
-        "name" : "about.introduction",
-        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b008",
-        "status" : "current",
-        "file" : "/src/encoded/static/data/about/introduction.html"
-    },
-    {
-        "name" : "about.dcic",
-        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b009",
-        "title" : "Team",
-        "status" : "current",
-        "file" : "/src/encoded/static/data/about/dcic.html"
-    },
-    {
-        "name" : "about.acknowledgements",
-        "uuid" : "442c8aa0-dc6c-43d7-814a-854af460b010",
-        "title" : "Acknowledgements",
-        "status" : "current",
-        "file" : "/src/encoded/static/data/about/acknowledgements.html"
-    },
-    {
-        "title" : "Embedded Search Table Examples",
-        "description" : "Check out these examples",
-        "name" : "demos.embedded-search-table",
-        "uuid" : "4570c6b5-dad9-4f34-b366-9895b461334d",
-        "file" : "/src/encoded/static/data/embedded-search-table-demo.jsx",
-        "section_type" : "Page Section",
-        "status" : "current"
-    },
-    {
-        "name": "help.portal_ontology_usage.content",
-        "uuid": "76a1471a-a9cd-4192-a965-470e241308e3",
-        "status": "current",
+        "file": "/docs/public/help/family_history_3.md",
+        "name": "help.submission.family-history.3",
+        "title": "Submitting the Family History Spreadsheet",
+        "status": "public",
         "aliases": [
-            "hms-dbmi:ont_in_portal"
+            "cgap-core:family-history-help-3"
         ],
-        "file": "/docs/public/help/ontologies_in_cgap.md",
         "options": {
+            "filetype": "md",
+            "collapsible": true,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "f99fbe38-962d-4370-9107-a703544f15ad"
+    },
+    {
+        "file": "/docs/public/help/annotation_browser.md",
+        "name": "help.annotation_browser.content",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:annotation_browser_help_section"
+        ],
+        "options": {
+            "filetype": "md",
             "collapsible": false,
             "default_open": true
         },
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "date_created": "2019-11-12T16:54:29.059996+00:00",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "section_type": "Page Section",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267227777",
-        "last_modified": {
-            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-            "date_modified": "2019-11-12T21:46:08.189582+00:00"
+        "uuid": "d48a3bda-232b-425c-a46f-42816524f003"
+    },
+    {
+        "file": "/docs/public/help/family_history_2.md",
+        "name": "help.submission.family-history.2",
+        "title": "Family History Spreadsheet Format",
+        "status": "public",
+        "aliases": [
+            "cgap-core:family-history-help-2"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": true,
+            "default_open": false
         },
-        "schema_version": "2"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "cdf07b95-eb9c-467d-8918-b45a34003ae0"
+    },
+    {
+        "file": "/docs/public/help/accessioning_3.md",
+        "name": "help.submission.accessioning.3",
+        "title": "Submitting the Spreadsheet",
+        "status": "public",
+        "aliases": [
+            "cgap-core:accessioning-info3"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": true,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "aa30d13c-da63-4a77-9a7a-5611ee3e965d"
+    },
+    {
+        "file": "/docs/public/help/access_keys.md",
+        "name": "help.logging-in.access-keys",
+        "title": "Creating Access Keys",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:creating-access-keys"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": false,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "9333c5b8-de6f-49d9-ac08-1b53c848c92e"
+    },
+    {
+        "file": "/docs/public/help/family_history_1.md",
+        "name": "help.submission.family-history.1",
+        "title": "Submitting Family History",
+        "status": "public",
+        "aliases": [
+            "cgap-core:family-history-help"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": false,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "80f69c31-4f9f-487c-901a-b39bf31a1d23"
+    },
+    {
+        "file": "/docs/public/help/ontologies_in_cgap.md",
+        "name": "help.portal_ontology_usage.content",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:ont_in_portal"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": false,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "section_type": "Page Section",
+        "uuid": "76a1471a-a9cd-4192-a965-470e241308e3"
+    },
+    {
+        "file": "/docs/public/help/file_uploads.md",
+        "name": "help.submission.file_uploads",
+        "title": "Uploading Files",
+        "status": "public",
+        "aliases": [
+            "cgap-core:file-submission-info"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": true,
+            "default_open": true
+        },
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "7402da3f-d178-4527-92f3-c22c7496ba7e"
+    },
+    {
+        "file": "/docs/public/help/logging_in.md",
+        "name": "help.logging-in.section1",
+        "title": "Logging In",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:logging-in"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": false,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "6f5c7fd0-b7e3-46e6-96f8-8bc22f153d52"
+    },
+    {
+        "file": "/docs/public/help/developer_facing_docs.md",
+        "name": "help.developer_facing_docs.content",
+        "title": "Links for Further Documentation",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:developer_facing_docs.content"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": false,
+            "default_open": true
+        },
+        "section_type": "Page Section",
+        "uuid": "607a6f1b-de11-4777-a4fe-733d57a09d3a"
+    },
+    {
+        "file": "/src/encoded/static/data/about/acknowledgements.html",
+        "name": "about.acknowledgements",
+        "title": "Acknowledgements",
+        "status": "shared",
+        "section_type": "Page Section",
+        "uuid": "442c8aa0-dc6c-43d7-814a-854af460b010"
+    },
+    {
+        "file": "/src/encoded/static/data/about/dcic.html",
+        "name": "about.dcic",
+        "title": "Team",
+        "status": "shared",
+        "section_type": "Page Section",
+        "uuid": "442c8aa0-dc6c-43d7-814a-854af460b009"
+    },
+    {
+        "file": "/src/encoded/static/data/about/introduction.html",
+        "name": "about.introduction",
+        "status": "shared",
+        "section_type": "Page Section",
+        "uuid": "442c8aa0-dc6c-43d7-814a-854af460b008"
+    },
+    {
+        "file": "/docs/public/help/accessioning_1.md",
+        "name": "help.submission.accessioning.1",
+        "title": "Submitting Accessioning Information",
+        "status": "public",
+        "aliases": [
+            "cgap-core:accessioning-info1"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": false,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "3a66db99-f17a-4a63-b1d9-64e729339570"
+    },
+    {
+        "file": "/docs/public/help/genelist.md",
+        "name": "help.genelist_help",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:genelist_help"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": false,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "1172b73d-deb4-476c-aaed-ee212ede9a10"
+    },
+    {
+        "file": "/docs/public/help/accessioning_2.md",
+        "name": "help.submission.accessioning.2",
+        "title": "Filling the Spreadsheet",
+        "status": "public",
+        "aliases": [
+            "cgap-core:accessioning-info2"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": true,
+            "default_open": false
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "0aa11521-a521-41f3-80a5-8aabc754df70"
     }
 ]
