@@ -784,7 +784,7 @@ function Poller(props){
 }
 
 function FileAttachmentBtn(props){
-    const { loadingFileResult, postFileSuccess, onFileInputChange, ingestionType } = props;
+    const { loadingFileResult, postFileSuccess, onFileInputChange, ingestionType, file } = props;
     const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
 
     let acceptedTypes;
@@ -799,14 +799,15 @@ function FileAttachmentBtn(props){
             acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"; // TODO: Only excel? No CSV/TSV -- verify this
             break;
     }
+    console.log("file", file);
 
+    const { name: filename, size: filesize, lastModified } = file || {};
     return (
         <React.Fragment>
-            <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
-                className={"btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
-                <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
-                    disabled={loadingFileResult || postFileSuccess === true}
-                    accept={acceptedTypes} />
+            {filename} {filesize} {lastModified}
+            <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }>
+                <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined}
+                    disabled={loadingFileResult || postFileSuccess === true} accept={acceptedTypes} />
                 <i className={"mr-08 icon icon-fw icon-" + icon} />
                 <span>{ ingestionType === "metadata_bundle" || ingestionType === "family_history" ? "Select Excel File..." : "Select Excel or Text File..." }</span>
             </label>

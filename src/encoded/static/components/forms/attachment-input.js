@@ -18,9 +18,11 @@ export class AttachmentInputController extends React.PureComponent {
     constructor(props){
         super(props);
         this.handleChange = this.handleChange.bind(this);
+        this.onFormSubmit = this.onFormSubmit.bind(this);
         this.state = {
             loading: false,
-            success: null
+            success: null,
+            file: null
         };
     }
 
@@ -28,46 +30,49 @@ export class AttachmentInputController extends React.PureComponent {
         const { 0: file = null } = e.target.files || {};
 
         if (file) {
-            file.filename = file.name;
-
-            const formData = new FormData();
-            formData.append("datafile", file);
-
-            this.setState({ loading: true }, ()=>{
-                const { context: { uuid }, onAddedFile } = this.props;
-
-                const postURL = '/ingestion-submissions/' + uuid + '/submit_for_ingestion';
-                console.log(`Attempting Ingestion. \n\nPosting to: ${postURL}`);
-
-                const onErrorCallback = (response) => {
-                    console.error("Submission Ingestion Error: ", response);
-                    this.setState({ loading: false, success: false }, function(){
-                        Alerts.queue(AttachmentInputController.ErrorObject);
-                    });
-                };
-
-                const onSuccessCallback = (response) => {
-                    console.log("response:", response);
-                    this.setState({ loading: false, success: true }, function() {
-                        onAddedFile(response);
-                    });
-                };
-
-                ajax.postMultipartFormData(postURL, formData, onErrorCallback, onSuccessCallback);
-            });
-
+            this.setState({ file });
         }
     }
 
     onFormSubmit() {
         e.preventDefault();
+        console.log("onFormSubmit; submitting form");
+
+        file.filename = file.name;
+
+        const formData = new FormData();
+        formData.append("datafile", file);
+
+        this.setState({ loading: true }, ()=>{
+            const { context: { uuid }, onAddedFile } = this.props;
+
+            const postURL = '/ingestion-submissions/' + uuid + '/submit_for_ingestion';
+            console.log(`Attempting Ingestion. \n\nPosting to: ${postURL}`);
+
+            const onErrorCallback = (response) => {
+                console.error("Submission Ingestion Error: ", response);
+                this.setState({ loading: false, success: false }, function(){
+                    Alerts.queue(AttachmentInputController.ErrorObject);
+                });
+            };
+
+            const onSuccessCallback = (response) => {
+                console.log("response:", response);
+                this.setState({ loading: false, success: true }, function() {
+                    onAddedFile(response);
+                });
+            };
+
+            ajax.postMultipartFormData(postURL, formData, onErrorCallback, onSuccessCallback);
+        });
+
     }
 
     render(){
         const { children, ...passProps } = this.props;
-        const { loading: loadingFileResult, success: postFileSuccess } = this.state;
+        const { loading: loadingFileResult, success: postFileSuccess, file } = this.state;
         return (
-            React.Children.map(children, (c) => React.cloneElement(c, { ...passProps, loadingFileResult, postFileSuccess, onFileInputChange: this.handleChange }))
+            React.Children.map(children, (c) => React.cloneElement(c, { ...passProps, loadingFileResult, postFileSuccess, onFileInputChange: this.handleChange, file, onFormSubmit: this.onFormSubmit }))
         );
     }
 }
