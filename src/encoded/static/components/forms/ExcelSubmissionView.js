@@ -784,7 +784,7 @@ function Poller(props){
 }
 
 function FileAttachmentBtn(props){
-    const { loadingFileResult, postFileSuccess, onFileInputChange, ingestionType, file } = props;
+    const { loadingFileResult, postFileSuccess, onFileInputChange, ingestionType, file, onClearFile, onFormSubmit } = props;
     const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
 
     let acceptedTypes;
@@ -804,6 +804,17 @@ function FileAttachmentBtn(props){
     const { name: filename, size: filesize, lastModified } = file || {};
     const showExcelOnlyTip = ingestionType === "metadata_bundle" || ingestionType === "family_history";
 
+    if (!file) {
+        return (
+            <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
+                className={"btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
+                <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
+                    accept={acceptedTypes} />
+                <i className={"mr-08 icon icon-fw icon-" + icon} />
+                <span>{ showExcelOnlyTip ? "Select Excel File" : "Select Excel or Text File" }</span>
+            </label>
+        );
+    }
     return (
         <React.Fragment>
             <div className="btn-toolbar" role="toolbar">
@@ -821,21 +832,11 @@ function FileAttachmentBtn(props){
                         </label>
                     </div>
                 </div>
-                { file &&
-                    <div className="btn-group ml-1">
-                        <button type="button" className="btn btn-success"><i className={"mr-08 icon icon-fw icon-" + icon} /> Upload</button>
-                        <button type="button" className="btn btn-danger"><i className="mr-08 icon fas icon-trash-alt" /> Delete</button>
-                    </div>}
+                <div className="btn-group ml-1">
+                    <button type="button" className="btn btn-outline-success" onClick={onFormSubmit} disabled={loadingFileResult || postFileSuccess === true}><i className={"mr-08 icon icon-fw fas icon-" + icon} /> Upload</button>
+                    <button type="button" className="btn btn-outline-danger" onClick={onClearFile} disabled={loadingFileResult || postFileSuccess === true}><i className="icon fas icon-trash-alt icon-fw" /></button>
+                </div>
             </div>
-            
-            {/* <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
-                className={"btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
-                <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
-                    disabled={loadingFileResult || postFileSuccess === true}
-                    accept={acceptedTypes} />
-                <i className={"mr-08 icon icon-fw icon-" + icon} />
-                <span>{ ingestionType === "metadata_bundle" || ingestionType === "family_history" ? "Select Excel File" : "Select Excel or Text File" }</span>
-            </label> */}
             { !loadingFileResult && postFileSuccess ? <span className="ml-1 text-success">Success! <i className="icon icon-check fas"></i></span> : null}
             { !loadingFileResult && postFileSuccess === false ? <span className="ml-1 text-danger">Failure! <i className="icon icon-times-circle fas"></i></span> : null}
         </React.Fragment>
