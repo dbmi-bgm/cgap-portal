@@ -19,6 +19,7 @@ export class AttachmentInputController extends React.PureComponent {
         super(props);
         this.handleChange = this.handleChange.bind(this);
         this.onFormSubmit = this.onFormSubmit.bind(this);
+        this.clearFile = this.clearFile.bind(this);
         this.state = {
             loading: false,
             success: null,
@@ -34,9 +35,11 @@ export class AttachmentInputController extends React.PureComponent {
         }
     }
 
-    onFormSubmit() {
+    onFormSubmit(e) {
         e.preventDefault();
-        console.log("onFormSubmit; submitting form");
+
+        const { file } = this.state;
+        if (!file) { throw new Error("Attempting file submission when no file exists in state..."); }
 
         file.filename = file.name;
 
@@ -68,11 +71,20 @@ export class AttachmentInputController extends React.PureComponent {
 
     }
 
+    clearFile() {
+        this.setState({ file : null });
+    }
+
     render(){
         const { children, ...passProps } = this.props;
         const { loading: loadingFileResult, success: postFileSuccess, file } = this.state;
         return (
-            React.Children.map(children, (c) => React.cloneElement(c, { ...passProps, loadingFileResult, postFileSuccess, onFileInputChange: this.handleChange, file, onFormSubmit: this.onFormSubmit }))
+            React.Children.map(children,
+                (c) => React.cloneElement(c,
+                    { ...passProps, loadingFileResult, postFileSuccess, onFileInputChange: this.handleChange, file,
+                        onFormSubmit: this.onFormSubmit, onClearFile: this.clearFile }
+                )
+            )
         );
     }
 }
