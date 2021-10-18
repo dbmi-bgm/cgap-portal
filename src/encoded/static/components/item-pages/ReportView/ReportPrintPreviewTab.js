@@ -7,6 +7,8 @@ import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es
 import { DeferMount } from './../../util/layout';
 import { ReportPrintPreviewPane } from './ReportPrintPreviewPane';
 
+/** @todo Get this from Project Item, perhaps AJAX loading it in along with Case in ReportPrintPreviewTab */
+import { projectReportSettings } from './project-settings-draft';
 
 /**
  * @todo Code-split out ReportPrintPreviewPane and load dynamically.
@@ -23,6 +25,7 @@ export function ReportPrintPreviewTab (props){
         ajax.load(caseAtID, function(resp){
             setLoadedCaseItem(resp);
         });
+        /** @todo Load Project info/settings here? Or embed from `report.project` instead? */
     }, []);
 
     const onPrintPreviewReady = useCallback(function(){
@@ -44,7 +47,7 @@ export function ReportPrintPreviewTab (props){
             <hr className="tab-section-title-horiz-divider"/>
             <div className="container-wide print-preview-tab-container bg-light py-3 mh-inner-tab-height-full">
                 <DeferMount delay={400}>
-                    <ReportPrintPreviewPane {...{ report, onPrintPreviewReady }} caseItem={loadedCaseItem} />
+                    <ReportPrintPreviewPane {...{ report, onPrintPreviewReady }} caseItem={loadedCaseItem} reportSettings={projectReportSettings} />
                 </DeferMount>
             </div>
         </React.Fragment>

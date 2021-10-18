@@ -126,7 +126,7 @@ const reportStyleRulesText = `
 
 
 export const ReportPrintPreviewPane = React.memo(function ReportPrintPreviewPane (props){
-    const { report, caseItem, onPrintPreviewReady } = props;
+    const { report, caseItem, onPrintPreviewReady, reportSettings } = props;
 
     const onRenderComplete = useCallback(function(){
         // Allow some time for logo image(s) to load
@@ -143,9 +143,9 @@ export const ReportPrintPreviewPane = React.memo(function ReportPrintPreviewPane
             <link rel="preload" href={reportVars.logos.cgapSrc} as="image" />
             <PrintPreviewPane styleRulesText={reportStyleRulesText} {...{ onRenderComplete }}>
 
-                <ReportHeader {...{ report, caseItem }} />
+                <ReportHeader {...{ report, caseItem, reportSettings }} />
 
-                <ReportFooter {...{ report }} />
+                <ReportFooter {...{ report, reportSettings }} />
 
                 <h3>Test Title</h3>
                 <p>
@@ -181,10 +181,37 @@ export const ReportPrintPreviewPane = React.memo(function ReportPrintPreviewPane
     );
 });
 
-function ReportHeader({ report, caseItem }){
+
+/**
+ * Will probably move this out into own file eventually.
+ */
+function ReportBody (){
+    return (
+        <React.Fragment>
+            Stuff
+        </React.Fragment>
+    );
+}
+
+
+function ReportHeader({ report, caseItem, reportSettings }){
+    const {
+        header: {
+            organization_title = null,
+            show_individual_id = true,
+            show_family_id = true,
+            show_cgap_id = true,
+            show_sample_type = true,
+            show_sex = true,
+            show_age = true
+        }
+    } = reportSettings;
     const {
         institution: {
             display_title: institutionTitle
+        },
+        project: {
+            display_title: projectTitle
         },
         accession: reportAccession
     } = report;
@@ -210,6 +237,10 @@ function ReportHeader({ report, caseItem }){
         }
     } = caseItem;
 
+    // TODO: Potentially define CGAP logo as SVG markup and embed it inline rather
+    // than loading. Would make logo appear sooner. But still would need to load
+    // partner logo so perhaps not worth worrying about.
+
     const showAge = (typeof age === "number" && age_units) ? `${age} ${age_units}${age === 1 ? "" : "s"}` : null;
 
     return (
@@ -217,7 +248,7 @@ function ReportHeader({ report, caseItem }){
             <div className="row branding-area">
                 <div className="col-6 d-flex align-items-center">
                     {/* TODO: partnerLogo ? ... : null */}
-                    <h4 className="text-400">{ institutionTitle }</h4>
+                    <h4 className="text-400">{ organization_title || projectTitle }</h4>
                 </div>
                 <div className="col-6 d-flex align-items-center">
                     <div className="text-right flex-grow-1 pr-16 pb-02">
@@ -231,12 +262,12 @@ function ReportHeader({ report, caseItem }){
                 <div className="col-6">
 
                     <div className="report-header-box">
-                        <ReportHeaderItem label="Individual ID" value={individual_id} />
-                        <ReportHeaderItem label="CGAP ID" value={caseAccession} />
-                        <ReportHeaderItem label="Family ID" value={familyAccession} />
-                        <ReportHeaderItem label="Sample Type" value={specimen_type} valueCls="text-capitalize" />
-                        <ReportHeaderItem label="Sex" value={sex === "M" ? "Male" : sex === "F" ? "Female" : "Unknown"} />
-                        <ReportHeaderItem label="Age" value={showAge} />
+                        <ReportHeaderItem label="Individual ID" value={individual_id} show={show_individual_id} />
+                        <ReportHeaderItem label="CGAP ID" value={caseAccession} show={show_cgap_id} />
+                        <ReportHeaderItem label="Family ID" value={familyAccession} show={show_family_id} />
+                        <ReportHeaderItem label="Sample Type" value={specimen_type} valueCls="text-capitalize" show={show_sample_type} />
+                        <ReportHeaderItem label="Sex" value={sex === "M" ? "Male" : sex === "F" ? "Female" : "Unknown"} show={show_sex} />
+                        <ReportHeaderItem label="Age" value={showAge} show={show_age} />
                     </div>
 
                 </div>
@@ -313,8 +344,12 @@ function ReportHeaderItem(props){
         label = "Label",
         value = <em className="text-small">Not Implemented</em>,
         valueCls = null,
-        fallbackValue = "-"
+        fallbackValue = "-",
+        show = true
     } = props;
+    if (!show) {
+        return null;
+    }
     return (
         <div className="row">
             <div className="col-5">

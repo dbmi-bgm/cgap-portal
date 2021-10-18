@@ -61,6 +61,13 @@ export class PrintPreviewPane extends React.Component {
         this.previewerInstance = null;
     }
 
+    /**
+     * Don't update/re-render if changed children or styleRulesText -- these shouldn't ever update.
+     * Update: Maybe they will, if we allow people to adjust report settings and then preview in real-ish time.
+     * So might remove this shouldComponentUpdate.
+     *
+     * @returns {boolean} True if should update.
+     */
     shouldComponentUpdate(pastProps, pastState){
         const { onRenderComplete } = this.props;
         const { isRendered } = this.state;
@@ -68,8 +75,6 @@ export class PrintPreviewPane extends React.Component {
             pastState.isRendered !== isRendered ||
             pastProps.onRenderComplete !== onRenderComplete
         );
-
-        // Don't update/re-render if changed children or styleRulesText -- these shouldn't ever update.
         return shouldUpdate;
     }
 
