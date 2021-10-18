@@ -171,6 +171,21 @@
                 "SNV",
                 "SV"
             ]
+        },
+        "analysis_type": {
+            "title": "Analysis Type",
+            "description": "The type of analysis associated with this file",
+            "type": "string",
+            "enum": [
+                "Upstream",
+                "Somatic",
+                "Germline"
+            ]
+        },
+        "output_file": {
+            "title": "Output File",
+            "description": "A flag for associating the file with other items",
+            "type": "boolean"
         }
     },
     "facets": {
