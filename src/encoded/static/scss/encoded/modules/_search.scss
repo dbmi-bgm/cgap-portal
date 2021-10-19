@@ -242,7 +242,6 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 *************************************************/
 
 body[data-pathname="/search/"]:not([data-current-action="add"]) {
-	#slot-application,
 	#application,
 	#layout {
 		// Possible todo: switch this to appBackgroundColor param (base.scss) or parameterize according to final design.

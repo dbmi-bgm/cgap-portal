@@ -1063,10 +1063,11 @@ export default class App extends React.PureComponent {
     /** Renders the entire HTML of the application. */
     render() {
         const { context, lastCSSBuildTime, href, contextRequest } = this.props;
-        const hrefParts       = memoizedUrlParse(href);
-        const routeList       = hrefParts.pathname.split("/");
-        const routeLeaf       = routeList[routeList.length - 1];
-        const currentAction   = this.currentAction();
+        const { mounted = false } = this.state;
+        const hrefParts = memoizedUrlParse(href);
+        const routeList = hrefParts.pathname.split("/");
+        const routeLeaf = routeList[routeList.length - 1];
+        const currentAction = this.currentAction();
         const userInfo = JWT.getUserInfo();
         const userActions = (userInfo && userInfo.user_actions) || null;
         let canonical = href;
@@ -1103,7 +1104,7 @@ export default class App extends React.PureComponent {
         // Google does not update the content of 301 redirected pages
         // We technically should never hit this condition as we redirect http to https, however leaving in
         // as not 100% certain.
-        var base;
+        let base;
         if (canonical === 'http://data.4dnucleome.org/') {
             base = canonical = 'https://data.4dnucleome.org/';
             this.historyEnabled = false;
@@ -1151,7 +1152,7 @@ export default class App extends React.PureComponent {
                     <meta name="google-site-verification" content="sia9P1_R16tk3XW93WBFeJZvlTt3h0qL00aAJd3QknU" />
                     <HTMLTitle {...{ context, currentAction, canonical, status }} />
                     {base ? <base href={base}/> : null}
-                    <script data-prop-name="user_info" type="application/json" dangerouslySetInnerHTML={{
+                    <script data-prop-name="user_info" type="application/json" dangerouslySetInnerHTML={mounted ? null : {
                         __html: jsonScriptEscape(JSON.stringify(JWT.getUserInfo())) /* Kept up-to-date in browser.js */
                     }}/>
                     <script data-prop-name="lastCSSBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastCSSBuildTime }}/>
@@ -1723,7 +1724,6 @@ class BodyElement extends React.PureComponent {
             browseBaseState, updateAppSessionState, isSubmitting, isSubmittingModalOpen } = this.props;
         const { windowWidth, windowHeight, classList, hasError, isFullscreen, testWarningPresent } = this.state;
         const { registerWindowOnResizeHandler, registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen } = this;
-        const appClass = slowLoad ? 'communicating' : 'done';
         const overlaysContainer = this.overlaysContainerRef.current;
         const innerOverlaysContainer = this.innerOverlaysContainerRef.current;
 
@@ -1764,13 +1764,14 @@ class BodyElement extends React.PureComponent {
         };
 
         return (
+            // We skip setting `props.dangerouslySetInnerHTML` if mounted, since this data is only used for initializing over server-side-rendered HTML.
             <body data-current-action={currentAction} onClick={onBodyClick} onSubmit={onBodySubmit} data-path={hrefParts.path}
                 data-pathname={hrefParts.pathname} className={this.bodyClassName()}>
 
-                <script data-prop-name="context" type="application/json" dangerouslySetInnerHTML={{
+                <script data-prop-name="context" type="application/json" dangerouslySetInnerHTML={mounted ? null : {
                     __html: jsonScriptEscape(JSON.stringify(context))
                 }}/>
-                <script data-prop-name="alerts" type="application/json" dangerouslySetInnerHTML={{
+                <script data-prop-name="alerts" type="application/json" dangerouslySetInnerHTML={mounted ? null : {
                     __html: jsonScriptEscape(JSON.stringify(alerts))
                 }}/>
 
@@ -1780,27 +1781,25 @@ class BodyElement extends React.PureComponent {
                     </div>
                 </div>
 
-                <div id="slot-application">
-                    <div id="application" className={appClass}>
-                        <div id="layout">
-                            { (isSubmitting && isSubmitting.modal) && isSubmittingModalOpen ? isSubmitting.modal : null}
+                <div id="application">
+                    <div id="layout">
+                        { (isSubmitting && isSubmitting.modal) && isSubmittingModalOpen ? isSubmitting.modal : null}
 
-                            <NavigationBar {...navbarProps} />
+                        <NavigationBar {...navbarProps} />
 
-                            <div id="post-navbar-container" style={{ minHeight : innerContainerMinHeight }}>
+                        <div id="post-navbar-container" style={{ minHeight : innerContainerMinHeight }}>
 
-                                <PageTitleSection {...this.props} windowWidth={windowWidth} />
+                            <PageTitleSection {...this.props} windowWidth={windowWidth} />
 
-                                <ContentErrorBoundary {...{ canonical, href }}>
-                                    <ContentRenderer {...propsPassedToAllViews} />
-                                </ContentErrorBoundary>
+                            <ContentErrorBoundary {...{ canonical, href }}>
+                                <ContentRenderer {...propsPassedToAllViews} />
+                            </ContentErrorBoundary>
 
-                                <div id="inner-overlays-container" ref={this.innerOverlaysContainerRef} />
+                            <div id="inner-overlays-container" ref={this.innerOverlaysContainerRef} />
 
-                            </div>
                         </div>
-                        <Footer version={context.app_version} />
                     </div>
+                    <Footer version={context.app_version} />
                 </div>
 
                 <div id="overlays-container" ref={this.overlaysContainerRef}/>
