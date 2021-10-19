@@ -155,3 +155,14 @@ export const FilterBlock = React.memo(function FilterBlock(props){
     );
 });
 
+/**
+ * FilterBlock with preset props to show that it is loading.
+ * Can be shown temporarily while initial FilterSet is still loading.
+ * Accepts no props + is memoized to prevent any updates.
+ */
+export const DummyLoadingFilterBlock = React.memo(function DummyLoadingFilterBlock(){
+    const dummyObject = {};
+    return <FilterBlock filterBlock={{ "query" : "", "name" : <em>Please wait...</em> }}
+        filterBlocksLen={1} index={0} selected={false} isSettingFilterBlockIdx={true}
+        cachedCounts={dummyObject} duplicateQueryIndices={dummyObject} duplicateNameIndices={dummyObject} />;
+});

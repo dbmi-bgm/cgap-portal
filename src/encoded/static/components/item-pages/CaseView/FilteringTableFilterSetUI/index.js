@@ -16,7 +16,7 @@ import { AddToVariantSampleListButton } from './AddToVariantSampleListButton';
 import { SaveFilterSetButton } from './SaveFilterSetButton';
 import { SaveFilterSetPresetButton } from './SaveFilterSetPresetButton';
 import { PresetFilterSetSelectionUI } from './PresetFilterSetSelectionUI';
-import { FilterBlock } from './FilterBlock';
+import { FilterBlock, DummyLoadingFilterBlock } from './FilterBlock';
 import { ExportSearchSpreadsheetButton } from './ExportSearchSpreadsheetButton';
 
 
@@ -586,22 +586,3 @@ function FilterSetUIBlockBottomUI(props){
         </div>
     );
 }
-
-/** Shown temporarily while initial FilterSet is still loading */
-const DummyLoadingFilterBlock = React.memo(function DummyLoadingFilterBlock(){
-    // dummyObject & filterBlock, though are objects which wouldn't === each other in prop comparisons, are not emitted from a useMemo since entire component is memoized and doesn't receive any [changes in] props.
-    const dummyObject = {};
-    const filterBlock = { "query" : "", "name" : <em>Please wait...</em> };
-    const passProps = {
-        filterBlock,
-        filterBlocksLen: 1,
-        index: 0,
-        selected: false,
-        isSettingFilterBlockIdx: true,
-        cachedCounts: dummyObject,
-        duplicateQueryIndices: dummyObject,
-        duplicateNameIndices: dummyObject
-    };
-    return <FilterBlock {...passProps} />;
-});
-
