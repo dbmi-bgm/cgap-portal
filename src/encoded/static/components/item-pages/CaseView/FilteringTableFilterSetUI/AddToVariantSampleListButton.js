@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState } from 'react';
 import _ from 'underscore';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';

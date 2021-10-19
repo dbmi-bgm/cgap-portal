@@ -6,81 +6,23 @@ import queryString from 'query-string';
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
 
-import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
-import { SaveFilterSetButtonController } from './SaveFilterSetButton';
-import { SaveFilterSetPresetButtonController } from './SaveFilterSetPresetButton';
+import { FilteringTableFilterSetUI } from './FilteringTableFilterSetUI';
+import { FilterSetController } from './FilteringTableFilterSetUI/FilterSetController';
+import { SaveFilterSetButtonController } from './FilteringTableFilterSetUI/SaveFilterSetButton';
+import { SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI/SaveFilterSetPresetButton';
 import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
-/**
- * @todo maybe reuse somewhere
- * // This... more or less should handle "NOT" (!=), where the "!" will be last char of field.
- *
- * @param {*} query1  Query to filter
- * @param {*} query2  Query to filter by
- */
-export function filterQueryByQuery(query1, query2){
-    if (typeof query1 === "string") {
-        query1 = queryString.parse(query1);
-    }
-    if (typeof query2 === "string") {
-        query2 = queryString.parse(query2);
-    }
 
-    const filterByDict = Object.keys(query2).reduce(function(m, field){
-        m[field] = m[field] || {};
-        if (Array.isArray(query2[field])){
-            query2[field].forEach(function(v){
-                m[field][v] = true;
-            });
-        } else {
-            m[field][query2[field]] = true;
-        }
-        return m;
-    }, { "type" : { "VariantSample" : true } });
-
-    const queryFiltered = Object.keys(query1).reduce(function(m, field){
-        const val = query1[field];
-
-        if (typeof filterByDict[field] === "undefined") {
-            m[field] = val;
-            return m; // include it
-        }
-
-        if (!Array.isArray(val)) {
-            if (filterByDict[field][val]) {
-                return m; // Exclude/skip it.
-            }
-            m[field] = val;
-            return m;
-        }
-
-        const nextArr = val.filter(function(v){
-            return !filterByDict[field][v];
-        });
-        if (nextArr.length === 0) {
-            // do nothing
-        } else if (nextArr.length === 1) {
-            // eslint-disable-next-line prefer-destructuring
-            m[field] = nextArr[0];
-        } else {
-            m[field] = nextArr;
-        }
-        return m;
-
-    }, {});
-
-    return queryFiltered;
-}
 
 
 export const FilteringTab = React.memo(function FilteringTab(props) {
     const {
-        context = null,
-        session = false,
-        schemas,
-        windowHeight,
-        windowWidth,
+        context = null,             // Passed in from App (== Case Item)
+        session = false,            // Passed in from App (todo: figure out permissions; might some Cases be publicly accessible, e.g. as demos?)
+        schemas,                    // Passed in from App
+        windowHeight,               // Passed in from App
+        windowWidth,                // Passed in from App
         onCancelSelection,          // Not used -- passed in from SelectedItemsController and would close window.
         onCompleteSelection,        // Not used -- passed in from SelectedItemsController and would send selected items back to parent window.
         selectedItems: selectedVariantSamples,                  // passed in from SelectedItemsController
