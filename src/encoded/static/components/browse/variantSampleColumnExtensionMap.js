@@ -225,6 +225,22 @@ export const VariantSampleDisplayTitleColumn = React.memo(function VariantSample
     );
 });
 
+/** An edited version of SPC's DisplayTitleColumnDefault, used in CaseViewEmbeddedVariantSampleSearchTableSV */
+export const VariantSampleDisplayTitleColumnSV = React.memo(function VariantSampleDisplayTitleColumn(props) {
+    const { result = null, link, onClick } = props;
+    // TODO Add sel
+    // const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+    const { "@id": atID, structural_variant: { display_title = "", annotation_id = "" } = {} } = result;
+
+    // annotationID structured like <type>_chr...etc; need just the part after underscore
+    const [ , splitAnnotationIDSuffix ] = (annotation_id || display_title).split("_");
+    return (
+        <div className="text-left pl-25 text-truncate">
+            <a href={link || atID} onClick={onClick}>{ splitAnnotationIDSuffix }</a>
+        </div>
+    );
+});
+
 const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGVSCColumn({ gene, align = "center" }){
     const {
         genes_most_severe_hgvsc = null,

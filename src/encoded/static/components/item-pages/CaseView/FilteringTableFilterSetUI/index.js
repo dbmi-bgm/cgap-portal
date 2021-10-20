@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import queryString from 'query-string';
