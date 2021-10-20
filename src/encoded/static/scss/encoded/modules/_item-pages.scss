@@ -350,7 +350,12 @@ $tabbar-height: 46px;
 #full-alerts-container {
 	position: sticky;
 	z-index: 500;
-	top: 40px;
+	top: 0px;
+
+	@include navbar-fixed-position {
+		top: 40px;
+	}
+
 	> .alerts {
 		> .alert {
 			margin-bottom: 0px;
@@ -1602,11 +1607,22 @@ i.status-indicator-dot {
 					}
 				}
 
+				
 				.filtering-tab-toggle {
-					width: max-content; 
+
+					button.btn.active {
+						pointer-events: none;
+					}
+
+					/**
+					width: max-content;
 	
 					> div {
 						padding: 5px 40px;
+
+						@include media-breakpoint-down(sm) {
+							padding: 5px 12px;
+						}
 	
 						&.active {
 							background-color: lighten($primary, 40%);
@@ -1614,6 +1630,7 @@ i.status-indicator-dot {
 							border-radius: 0.4em;
 						} 
 					}
+					**/
 				}
 			}
 		}

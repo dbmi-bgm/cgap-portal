@@ -481,7 +481,7 @@ const FilterSetUIBody = React.memo(function FilterSetUIBody(props){
                                 : "Shift+Click to select an additional filter block"
                         }
                     </div>
-                    <div className="col-12 pb-02 col-sm text-sm-right">
+                    <div className="col-12 pb-02 col-sm-auto text-sm-right">
                         { (allFilterBlocksSelected ? "All" : selectedFilterBlockIdxCount + "/" + filterBlocksLen) + " filter blocks selected" }
                     </div>
                 </div>

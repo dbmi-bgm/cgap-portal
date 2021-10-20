@@ -64,12 +64,12 @@ export function FilteringTab(props) {
                     <span className="text-300">Variant Filtering and Technical Review</span>
                 </h1>
             </div>
-            <div id="snv-filtering" className={currViewIdx === 0 ? "mt-36" : "d-none"}>
+            <div id="snv-filtering" className={"mt-36" + (currViewIdx === 0 ? "" : " d-none")}>
                 <SelectedItemsController isMultiselect>
                     <SNVFilteringTabBody {...commonProps} />
                 </SelectedItemsController>
             </div>
-            <div id="cnvsv-filtering" className={currViewIdx === 1 ? null : "d-none"}>
+            <div id="cnvsv-filtering" className={"mt-36" + (currViewIdx === 1 ? "" : " d-none")}>
                 <SelectedItemsController isMultiselect>
                     <CNVFilteringTabBody {...commonProps} />
                 </SelectedItemsController>
@@ -86,28 +86,46 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
     } = context;
 
     const currentlyOnSNV = currViewIdx === 0;
-    const currentlyOnSV = currViewIdx === 1;
+    const currentlyOnCNV = currViewIdx === 1;
 
     const onClickSNV = useCallback(function(e){
         setCurrViewIdx(0);
     });
 
-    const onClickCNVSV = useCallback(function(e){
+    const onClickCNV = useCallback(function(e){
         setCurrViewIdx(1);
     });
 
+    const snvDisabled = currentlyOnSNV || !snvFilterHrefAddon;
+    const cnvDisabled = currentlyOnCNV || !svFilterHrefAddon;
+
     return (
-        <div className="card py-2 px-3 flex-row mb-3 filtering-tab-toggle">
-            <div onClick={currentlyOnSV && snvFilterHrefAddon ? onClickSNV : null}
-                className={`mr-2 text-600  ${currentlyOnSNV ? "active ": (snvFilterHrefAddon ? "clickable": "unclickable text-muted")}`}>
-                SNV Filtering
-            </div>
-            <div onClick={currentlyOnSNV && svFilterHrefAddon ? onClickCNVSV : null}
-                className={`text-600 ${currentlyOnSV ? "active ": (svFilterHrefAddon ? "clickable": "unclickable text-muted")}`}>
-                CNV / SV Filtering
-            </div>
+        <div className="card py-2 px-1 mb-3 d-flex d-md-inline-flex flex-row filtering-tab-toggle">
+            <button type="button" aria-pressed={currentlyOnSNV}
+                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnSNV ? "primary-dark active" : "outline-primary")}
+                onClick={snvDisabled ? null : onClickSNV}>
+                { filteringTabViews["0"].name } Filtering
+            </button>
+            <button type="button" aria-pressed={currentlyOnCNV}
+                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnCNV ? "primary-dark active" : "outline-primary")}
+                onClick={cnvDisabled ? null : onClickCNV}>
+                { filteringTabViews["1"].name } Filtering
+            </button>
         </div>
     );
+
+    // return (
+    //     <div className="card py-2 px-1 flex-row mb-3 filtering-tab-toggle">
+    //         <div className={`text-600 mx-1 ${currentlyOnSNV ? "active" : (snvFilterHrefAddon ? "clickable": "text-muted")}`}
+    //             onClick={snvDisabled ? null : onClickSNV}>
+    //             SNV Filtering
+    //         </div>
+    //         <div className={`text-600 mx-1 ${currentlyOnCNV ? "active": (svFilterHrefAddon ? "clickable": "text-muted")}`}
+    //             onClick={cnvDisabled ? null : onClickCNV}>
+    //             CNV / SV Filtering
+    //         </div>
+    //     </div>
+    // );
 });
 
 function createBlankFilterSetItem(searchType, caseAccession){
@@ -155,7 +173,7 @@ function SNVFilteringTabBody(props){
             ];
         }
         return { searchHrefBase, blankFilterSetItem, hideFacets };
-    }, [ context ]);
+    }, [ context ]); // Don't memoize on `searchType`; it never changes.
 
     return (
         // TODO: Maybe rename `activeFilterSetFieldName` to `caseActiveFilterSetFieldName`.. idk.
@@ -197,7 +215,7 @@ function CNVFilteringTabBody(props){
             ];
         }
         return { searchHrefBase, blankFilterSetItem, hideFacets };
-    }, [ context ]);
+    }, [ context ]); // Don't memoize on `searchType`; it never changes.
 
     return (
         // TODO Change props.activeFilterSetFieldName to new/proper value for CNV?
