@@ -601,8 +601,8 @@ class PanelTwo extends React.PureComponent {
                     <div className="field-section mt-2">
                         <label className="d-block mb-03">
                             Submit Data
-                            <i className="icon icon-info-circle fas icon-fw ml-05"
-                                data-tip="Select & upload files generated in Proband and other pedigree software" />
+                            {/* <i className="icon icon-info-circle fas icon-fw ml-05" // Needs to be updated
+                                data-tip="Select & upload files generated in Proband and other pedigree software" /> */}
                         </label>
                         <AttachmentInputController {...{ ingestionType, href }} context={submissionItem} onAddedFile={this.onAddedFile}>
                             <ExcelSubmissionFileAttachmentBtn/>
