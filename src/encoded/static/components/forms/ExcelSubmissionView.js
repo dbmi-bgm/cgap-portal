@@ -599,7 +599,7 @@ class PanelTwo extends React.PureComponent {
                     </div>
                     <hr className="mb-1"/>
                     <div className="field-section mt-2">
-                        <label className="d-block mb-05">
+                        <label className="d-block mb-03">
                             Submit Data
                             <i className="icon icon-info-circle fas icon-fw ml-05"
                                 data-tip="Select & upload files generated in Proband and other pedigree software" />
@@ -788,43 +788,66 @@ function FileAttachmentBtn(props){
     const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
 
     let acceptedTypes;
-    let uploadTitle;
+    let acceptedTypesDisplay;
+    let uploadType;
+    let showExcelOnlyTip = false;
+    let browseIcon; 
     switch(ingestionType) {
         case "genelist":
             acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .txt";
-            uploadTitle = "Upload Gene List";
+            acceptedTypesDisplay = ".csv, .tsv, .xls, .xlsx, .txt";
+            uploadType = "Gene List";
             break;
         case "metadata_bundle":
             acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
-            uploadTitle = "Upload Case";
+            acceptedTypesDisplay = ".csv, .tsv, .xls, .xlsx";
+            uploadType = "Case";
+            showExcelOnlyTip = true;
             break;
         case "family_history":
             acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"; // TODO: Only excel? No CSV/TSV -- verify this
-            uploadTitle = "Upload Family History";
+            acceptedTypesDisplay = ".xls, .xlsx";
+            uploadType = "Family History";
+            showExcelOnlyTip = true;
             break;
     }
-    console.log("file", file);
+    const selectTitle = "Select " + uploadType + " file(s)...";
+    const uploadTitle = "Upload " + uploadType;
 
-    const { name: filename, size: filesize, lastModified } = file || {};
-    const showExcelOnlyTip = ingestionType === "metadata_bundle" || ingestionType === "family_history";
+    const instructionsCopy = <div className="text-small font-italic ml-02 mb-1">Accepted file types: { acceptedTypesDisplay }</div>;
 
     if (!file) {
         return (
-            <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
-                className={"btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
-                <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
-                    accept={acceptedTypes} />
-                <i className={"mr-08 icon icon-fw icon-" + icon} />
-                <span data-tip={uploadTitle}>{ showExcelOnlyTip ? "Select Excel File" : "Select Excel or Text File" }</span>
-            </label>
+            <React.Fragment>
+                { instructionsCopy }
+                <div className="input-group">
+                    <div className="input-group-prepend">
+                        <span className="input-group-text pr-5" id="inputGroupFileAddon01">
+                            { selectTitle }
+                        </span>
+                    </div>
+                    <div className="input-group-append">
+                        <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess === true }
+                            className={"mb-0 btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
+                            <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
+                                disabled={loadingFileResult || postFileSuccess === true}
+                                accept={acceptedTypes} />
+                            Browse
+                        </label>
+                    </div>
+                </div>
+            </React.Fragment>
         );
     }
+
+    const { name: filename, size: filesize, lastModified } = file || {};
     return (
         <React.Fragment>
+            {instructionsCopy}
             <div className="input-group">
-                <div className="input-group-prepend">
-                    <span className="input-group-text" id="inputGroupFileAddon01">
-                        { filename || (showExcelOnlyTip ? "Select Excel File" : "Select Excel or Text File") }
+                <div className="input-group-prepend mw-50" style={{ maxWidth: "50%" }}>
+                    <div className="input-group-text w-100" id="inputGroupFileAddon01">
+                        <span className="text-truncate">{ filename }</span>
                         <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
                             className={"mb-0 py-0 btn btn-link " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
                             <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
@@ -833,10 +856,13 @@ function FileAttachmentBtn(props){
                             Replace
                         </label>
                         <i className="icon fas icon-times icon-fw clickable mx-2" onClick={onClearFile} disabled={loadingFileResult || postFileSuccess === true} />
-                    </span>
+                    </div>
                 </div>
                 <div className="input-group-append">
-                    <button type="button" className="btn btn-success" onClick={onFormSubmit} disabled={loadingFileResult || postFileSuccess === true}><i className={"mr-08 icon icon-fw fas icon-" + icon} /> {uploadTitle}</button>
+                    <button type="button" className="btn btn-success" onClick={onFormSubmit} disabled={loadingFileResult || postFileSuccess === true}>
+                        <i className={"mr-08 icon icon-fw fas icon-" + icon} />
+                        {uploadTitle}
+                    </button>
                 </div>
             </div>
             { !loadingFileResult && postFileSuccess ? <span className="ml-1 text-success">Success! <i className="icon icon-check fas"></i></span> : null}
