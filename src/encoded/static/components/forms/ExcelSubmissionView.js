@@ -13,6 +13,7 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, ajax, JWT, navigate, object, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
+import { Fade } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Fade';
 
 import { AttachmentInputController } from './attachment-input';
 
@@ -29,11 +30,16 @@ export default class ExcelSubmissionView extends React.PureComponent {
         this.handleLoadedIngestionSubmission = this.handleLoadedIngestionSubmission.bind(this);
         this.handleComplete = this.handleComplete.bind(this);
         this.markCompleted = this.markCompleted.bind(this);
+        this.clearAllAlerts = this.clearAllAlerts.bind(this);
+        this.closeAlert = this.closeAlert.bind(this);
+        this.pushNewAlert = this.pushNewAlert.bind(this);
+
         this.state = {
             panelsComplete: [ false, false, false ],
             panelIdx: 0,
             submissionItem: null,
-            user: null
+            user: null,
+            localAlerts: []
         };
         // console.log('excelsubmissionview props', props);
     }
@@ -68,12 +74,15 @@ export default class ExcelSubmissionView extends React.PureComponent {
     }
 
     handleLoadedIngestionSubmission(submissionItem){
+        console.log("handleLoadedIngestionSubmission");
         if (!(submissionItem && submissionItem['@id'])){
             throw new Error("Expected IngestionSubmission Item");
         }
-        this.setState(function({ panelsComplete: pastPanelsComplete }){
+        console.log("updating panel state", this.state);
+        this.setState(({ panelsComplete: pastPanelsComplete }) => {
             let panelsComplete;
             if (pastPanelsComplete[0] !== true){ // ensure step is completed, move to next
+                console.log("updating some state sutff to move to next step");
                 panelsComplete = pastPanelsComplete.slice(0);
                 panelsComplete[0] = true;
                 return { submissionItem, panelsComplete, panelIdx: 1 };
@@ -84,18 +93,16 @@ export default class ExcelSubmissionView extends React.PureComponent {
                 } = submissionItem;
 
                 if (state === "done" && outcome !== "success") {
-                    Alerts.queue({
+                    this.pushNewAlert({
                         "title": "Something went wrong while processing this file...",
                         "message": <ul>{validation_output.map((item) => <li key={item}>{item}</li>)}</ul>,
                         "style": "danger",
-                        "navigateDisappearThreshold": 0
                     });
                 } else {
-                    Alerts.queue({
+                    this.pushNewAlert({
                         "title": "All items validated successfully.",
                         "message": <ul>{validation_output.map((item) => <li key={item}>{item}</li>)}</ul>,
                         "style": "success",
-                        "navigateDisappearThreshold": 0
                     });
                 }
                 return { submissionItem };
@@ -146,8 +153,27 @@ export default class ExcelSubmissionView extends React.PureComponent {
         });
     }
 
+    pushNewAlert(alert) {
+        const { localAlerts = [] } = this.state;
+        const newAlertState = [...localAlerts, alert];
+
+        this.setState({ localAlerts: newAlertState });
+    }
+
+    closeAlert(i) {
+        const { localAlerts = [] } = this.state;
+        const newAlertState = [];
+        localAlerts.forEach((alert, j) => { if (i !== j) newAlertState.push(alert); });
+
+        this.setState({ localAlerts: newAlertState });
+    }
+
+    clearAllAlerts() {
+        this.setState({ localAlerts: [] });
+    }
+
     render(){
-        const { panelIdx, panelsComplete, submissionItem } = this.state;
+        const { panelIdx, panelsComplete, submissionItem, localAlerts = [] } = this.state;
         const userDetails = JWT.getUserDetails();
         const {
             '@id' : submissionID,
@@ -176,13 +202,15 @@ export default class ExcelSubmissionView extends React.PureComponent {
 
                     { submissionLink }
 
+                    <LocalAlertsContainer {...{ localAlerts }} closeAlert={this.closeAlert} />
+
                     <PanelSelectionMenu {...{ panelIdx, panelsComplete, submissionItem }} onSelect={this.handleSelectPanel} />
 
-                    <PanelOne {...this.props} {...this.state} {...{ setIsSubmitting, userDetails }} markCompleted={this.markCompleted}
-                        onLoadUser={this.handleLoadedUser} onSubmitIngestionSubmission={this.handleLoadedIngestionSubmission} />
+                    <PanelOne {...this.props} {...this.state} {...{ setIsSubmitting, userDetails }} markCompleted={this.markCompleted} onLoadUser={this.handleLoadedUser}
+                        onSubmitIngestionSubmission={this.handleLoadedIngestionSubmission} pushNewAlert={this.pushNewAlert} clearAllAlerts={this.clearAllAlerts} />
 
                     <PanelTwo {...this.props} {...this.state} {...{ setIsSubmitting, userDetails }} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
-                        markCompleted={this.markCompleted} handleComplete={this.handleComplete}/>
+                        markCompleted={this.markCompleted} handleComplete={this.handleComplete} pushNewAlert={this.pushNewAlert} clearAllAlerts={this.clearAllAlerts}/>
 
                     {/* <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
                         onComplete={this.handleComplete} markCompleted={this.markCompleted} /> */}
@@ -194,6 +222,26 @@ export default class ExcelSubmissionView extends React.PureComponent {
 
 }
 
+
+function LocalAlertsContainer(props) {
+    const { localAlerts, closeAlert } = props;
+
+    return localAlerts.map((alert, i) => {
+        const { message = null, title, style, noCloseButton } = alert;
+        return (
+            <div key={title} className={"alert alert-dismissable alert-" + (style || 'danger') + (noCloseButton === true ? ' no-close-button' : '')}>
+                { noCloseButton !== true ?
+                    <button type="button" className="close" onClick={() => closeAlert(i)}>
+                        <span aria-hidden="true">×</span>
+                        <span className="sr-only">Close alert</span>
+                    </button>
+                    : null }
+                <h4 className={"alert-heading mt-0" + (message ? " mb-05" : " mb-0")}>{ title }</h4>
+                {message && <div className="mb-0">{message}</div>}
+            </div>
+        );
+    });
+}
 
 function PanelSelectionMenu(props){
     const { onSelect, panelIdx, panelsComplete, submissionItem } = props;
@@ -376,6 +424,7 @@ class PanelOne extends React.PureComponent {
         if (isCreating || !institution || !project ) return false;
 
         const cb = (res) => {
+            console.log("callback firing in handlecreate");
             this.setState({ isCreating: false });
             if (res.status && res.status !== 'success'){
                 throw res;
@@ -386,9 +435,11 @@ class PanelOne extends React.PureComponent {
             // Load the @@embedded representation now
             this.request = ajax.load(submissionID + "@@embedded", function(getReqRes){
                 onSubmitIngestionSubmission(getReqRes);
+                console.log("loading embedded representation");
             });
         };
         const fb = (res) => {
+            console.log("fallback firing in handlecreate");
             this.setState({ isCreating: false });
 
             if (!res || Object.keys(res).length === 0){
@@ -424,7 +475,10 @@ class PanelOne extends React.PureComponent {
             ingestion_type: submissionType ? ingestionTypeToSubmissionTypeMap[submissionType] : "metadata_bundle"
         };
 
+        console.log("retrieved a bunch of post related data in handlecreate", postData);
+
         this.setState({ isCreating: true }, ()=>{
+            console.log("now loading the new item");
             this.request = ajax.load(
                 submissionItem ? submissionItem['@id'] : "/IngestionSubmission/",
                 cb,
