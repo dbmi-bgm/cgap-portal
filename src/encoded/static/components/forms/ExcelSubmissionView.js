@@ -605,7 +605,7 @@ class PanelTwo extends React.PureComponent {
                                 data-tip="Select & upload files generated in Proband and other pedigree software" />
                         </label>
                         <AttachmentInputController {...{ ingestionType, href }} context={submissionItem} onAddedFile={this.onAddedFile}>
-                            <FileAttachmentBtn/>
+                            <ExcelSubmissionFileAttachmentBtn/>
                         </AttachmentInputController>
                     </div>
                 </React.Fragment>
@@ -783,15 +783,11 @@ function Poller(props){
     );
 }
 
-function FileAttachmentBtn(props){
-    const { loadingFileResult, postFileSuccess, onFileInputChange, ingestionType, file, onClearFile, onFormSubmit } = props;
-    const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
+function ExcelSubmissionFileAttachmentBtn(props) {
+    const { ingestionType, ...passProps } = props;
 
-    let acceptedTypes;
-    let acceptedTypesDisplay;
-    let uploadType;
-    let showExcelOnlyTip = false;
-    let browseIcon; 
+    let acceptedTypes, acceptedTypesDisplay, uploadType;
+
     switch(ingestionType) {
         case "genelist":
             acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .txt";
@@ -802,24 +798,41 @@ function FileAttachmentBtn(props){
             acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
             acceptedTypesDisplay = ".csv, .tsv, .xls, .xlsx";
             uploadType = "Case";
-            showExcelOnlyTip = true;
             break;
         case "family_history":
             acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"; // TODO: Only excel? No CSV/TSV -- verify this
             acceptedTypesDisplay = ".xls, .xlsx";
             uploadType = "Family History";
-            showExcelOnlyTip = true;
             break;
     }
+
     const selectTitle = "Select " + uploadType + " file(s)...";
     const uploadTitle = "Upload " + uploadType;
+    const instructionsNode = <div className="text-small font-italic ml-02 mb-1">Accepted file types: { acceptedTypesDisplay }</div>;
 
-    const instructionsCopy = <div className="text-small font-italic ml-02 mb-1">Accepted file types: { acceptedTypesDisplay }</div>;
+    return <FileAttachmentBtn {...passProps} {...{ selectTitle, uploadTitle, instructionsNode, acceptedTypes }}/>;
+}
+
+function FileAttachmentBtn(props){
+    const {
+        selectTitle = "Select file...",
+        uploadTitle = "Upload File",
+        acceptedTypes = ".csv, .tsv, .txt",
+        instructionsNode = null,
+        file = null,
+        loadingFileResult,
+        postFileSuccess,
+        onFileInputChange,
+        onClearFile,
+        onFormSubmit
+    } = props;
+
+    const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
 
     if (!file) {
         return (
             <React.Fragment>
-                { instructionsCopy }
+                { instructionsNode }
                 <div className="input-group">
                     <div className="input-group-prepend">
                         <span className="input-group-text pr-5" id="inputGroupFileAddon01">
@@ -840,10 +853,10 @@ function FileAttachmentBtn(props){
         );
     }
 
-    const { name: filename, size: filesize, lastModified } = file || {};
+    const { name: filename } = file || {};
     return (
         <React.Fragment>
-            {instructionsCopy}
+            {instructionsNode}
             <div className="input-group">
                 <div className="input-group-prepend mw-50" style={{ maxWidth: "50%" }}>
                     <div className="input-group-text w-100" id="inputGroupFileAddon01">
@@ -855,7 +868,7 @@ function FileAttachmentBtn(props){
                                 accept={acceptedTypes} />
                             Replace
                         </label>
-                        <i className="icon fas icon-times icon-fw clickable mx-2" onClick={onClearFile} disabled={loadingFileResult || postFileSuccess === true} />
+                        { onClearFile && <i className="icon fas icon-times icon-fw clickable mx-2" onClick={onClearFile} disabled={loadingFileResult || postFileSuccess === true} />}
                     </div>
                 </div>
                 <div className="input-group-append">
@@ -870,6 +883,20 @@ function FileAttachmentBtn(props){
         </React.Fragment>
     );
 }
+FileAttachmentBtn.propTypes = {
+    selectTitle: PropTypes.string, // Placeholder text for upload area
+    uploadTitle: PropTypes.string, // Upload/Submit button text
+    acceptedTypes: PropTypes.string, // Comma deliniated string of MIME-types to accept
+    instructionsNode: PropTypes.node, // Anything for rendering above the input (useful for instructions like max file size, file types in human readable, etc.)
+    file: PropTypes.shape({ // File data for currently selected file, if available
+        name: PropTypes.string,
+    }),
+    loadingFileResult: PropTypes.bool, // file is currently in the process of being uploaded/submitted
+    postFileSuccess: PropTypes.bool, // file submission succeeded?
+    onFileInputChange: PropTypes.func.isRequired, // defines what happens when a file is selected/browsed
+    onClearFile: PropTypes.func, // defines what happens when a file is deleted/unselected
+    onFormSubmit: PropTypes.func.isRequired // defines what happens when a file is uploaded/submitted
+};
 
 
 
