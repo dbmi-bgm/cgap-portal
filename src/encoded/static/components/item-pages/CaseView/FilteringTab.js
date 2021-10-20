@@ -126,10 +126,10 @@ function createBlankFilterSetItem(searchType, caseAccession){
 
 function SNVFilteringTabBody(props){
     const { context } = props; // context passed in from App (== Case Item)
+    const { "0" : { searchType } } = filteringTabViews;
 
     const { searchHrefBase, blankFilterSetItem, hideFacets } = useMemo(function(){
         const { initial_search_href_filter_addon = "", accession: caseAccession } = context || {};
-        const { "0" : { searchType } } = filteringTabViews;
         const searchHrefBase = (
             "/search/?type=" + searchType
             + (initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "")
@@ -168,10 +168,10 @@ function SNVFilteringTabBody(props){
 
 function CNVFilteringTabBody(props){
     const { context } = props; // context passed in from App (== Case Item)
+    const { "1" : { searchType } } = filteringTabViews;
 
     const { searchHrefBase, blankFilterSetItem, hideFacets } = useMemo(function(){
         const { sv_initial_search_href_filter_addon = "", accession: caseAccession } = context || {};
-        const { "1" : { searchType } } = filteringTabViews;
         const searchHrefBase = (
             "/search/?type=" + searchType
             + (sv_initial_search_href_filter_addon ? "&" + sv_initial_search_href_filter_addon : "")
