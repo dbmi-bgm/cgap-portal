@@ -11,7 +11,6 @@ import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console, ajax, JWT, navigate, object, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { Fade } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Fade';
 
@@ -74,15 +73,14 @@ export default class ExcelSubmissionView extends React.PureComponent {
     }
 
     handleLoadedIngestionSubmission(submissionItem){
-        console.log("handleLoadedIngestionSubmission");
         if (!(submissionItem && submissionItem['@id'])){
             throw new Error("Expected IngestionSubmission Item");
         }
-        console.log("updating panel state", this.state);
+
         this.setState(({ panelsComplete: pastPanelsComplete }) => {
             let panelsComplete;
             if (pastPanelsComplete[0] !== true){ // ensure step is completed, move to next
-                console.log("updating some state sutff to move to next step");
+
                 panelsComplete = pastPanelsComplete.slice(0);
                 panelsComplete[0] = true;
                 return { submissionItem, panelsComplete, panelIdx: 1 };
@@ -223,25 +221,29 @@ export default class ExcelSubmissionView extends React.PureComponent {
 }
 
 
-function LocalAlertsContainer(props) {
+const LocalAlertsContainer = function LocalAlertsContainer(props) {
     const { localAlerts, closeAlert } = props;
 
-    return localAlerts.map((alert, i) => {
-        const { message = null, title, style, noCloseButton } = alert;
-        return (
-            <div key={title} className={"alert alert-dismissable alert-" + (style || 'danger') + (noCloseButton === true ? ' no-close-button' : '')}>
-                { noCloseButton !== true ?
-                    <button type="button" className="close" onClick={() => closeAlert(i)}>
-                        <span aria-hidden="true">×</span>
-                        <span className="sr-only">Close alert</span>
-                    </button>
-                    : null }
-                <h4 className={"alert-heading mt-0" + (message ? " mb-05" : " mb-0")}>{ title }</h4>
-                {message && <div className="mb-0">{message}</div>}
-            </div>
-        );
-    });
-}
+    return (
+        <div className="mt-2">
+            { localAlerts.map((alert, i) => {
+                const { message = null, title, style, noCloseButton } = alert;
+                return (
+                    <div key={title} className={"alert alert-dismissable alert-" + (style || 'danger') + (noCloseButton === true ? ' no-close-button' : '')}>
+                        { noCloseButton !== true ?
+                            <button type="button" className="close" onClick={() => closeAlert(i)}>
+                                <span aria-hidden="true">×</span>
+                                <span className="sr-only">Close alert</span>
+                            </button>
+                            : null }
+                        <h4 className={"alert-heading mt-0" + (message ? " mb-05" : " mb-0")}>{ title }</h4>
+                        {message && <div className="mb-0">{message}</div>}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
 
 function PanelSelectionMenu(props){
     const { onSelect, panelIdx, panelsComplete, submissionItem } = props;
@@ -409,7 +411,7 @@ class PanelOne extends React.PureComponent {
     }
 
     handleCreate(e){
-        const { onSubmitIngestionSubmission, submissionItem, user = null } = this.props;
+        const { onSubmitIngestionSubmission, submissionItem, user = null, pushNewAlert } = this.props;
         const {
             projectID: project,
             isCreating = false,
@@ -424,7 +426,7 @@ class PanelOne extends React.PureComponent {
         if (isCreating || !institution || !project ) return false;
 
         const cb = (res) => {
-            console.log("callback firing in handlecreate");
+
             this.setState({ isCreating: false });
             if (res.status && res.status !== 'success'){
                 throw res;
@@ -435,19 +437,16 @@ class PanelOne extends React.PureComponent {
             // Load the @@embedded representation now
             this.request = ajax.load(submissionID + "@@embedded", function(getReqRes){
                 onSubmitIngestionSubmission(getReqRes);
-                console.log("loading embedded representation");
             });
         };
         const fb = (res) => {
-            console.log("fallback firing in handlecreate");
             this.setState({ isCreating: false });
 
             if (!res || Object.keys(res).length === 0){
-                Alerts.queue({
+                pushNewAlert({
                     'title' : "Submission Error",
                     'message': "Encountered unknown error, likely related to network connection. Please try again.",
-                    'style': 'danger',
-                    'navigateDisappearThreshold': 0
+                    'style': 'danger'
                 });
                 return;
             }
@@ -459,11 +458,10 @@ class PanelOne extends React.PureComponent {
                 if (err && err.name){
                     detail += '. ' + err.name;
                 }
-                Alerts.queue({
+                pushNewAlert({
                     'title' : "Validation error " + parseInt(i + 1),
                     'message': detail,
-                    'style': 'danger',
-                    'navigateDisappearThreshold': 0
+                    'style': 'danger'
                 });
             });
         };
@@ -475,10 +473,7 @@ class PanelOne extends React.PureComponent {
             ingestion_type: submissionType ? ingestionTypeToSubmissionTypeMap[submissionType] : "metadata_bundle"
         };
 
-        console.log("retrieved a bunch of post related data in handlecreate", postData);
-
         this.setState({ isCreating: true }, ()=>{
-            console.log("now loading the new item");
             this.request = ajax.load(
                 submissionItem ? submissionItem['@id'] : "/IngestionSubmission/",
                 cb,
@@ -600,6 +595,7 @@ class PanelTwo extends React.PureComponent {
     }
 
     onAddedFile(response){
+        const { pushNewAlert } = this.props;
         const json = JSON.parse(response);
         const { filename, submission_uri } = json;
         // console.log("json", json);
@@ -612,11 +608,10 @@ class PanelTwo extends React.PureComponent {
                 </React.Fragment>
             );
         }
-        Alerts.queue({
+        pushNewAlert({
             "title" : "File Ingestion (" + filename + ") processing...",
             message,
             "style" : "warning",
-            "navigateDisappearThreshold": 0
         });
 
         // Wait a few seconds before setting new status
@@ -624,7 +619,7 @@ class PanelTwo extends React.PureComponent {
     }
 
     render(){
-        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission, setIsSubmitting, handleComplete } = this.props;
+        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission, setIsSubmitting, handleComplete, pushNewAlert } = this.props;
         const { statusIdx } = this.state;
 
         const {
@@ -665,7 +660,7 @@ class PanelTwo extends React.PureComponent {
                 </React.Fragment>
             );
         } else if (statusIdx === 1) {
-            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} {...{ onLoadedIngestionSubmission, setIsSubmitting }}/>;
+            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} {...{ onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert }}/>;
         } else {
             panelContents = (
                 <React.Fragment>
@@ -761,7 +756,7 @@ function useInterval(callback, delay) {
 }
 
 function Poller(props){
-    const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting } = props;
+    const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert } = props;
     const { uuid } = context || {};
     const getURL = "/ingestion-submissions/" + uuid;
 
@@ -770,7 +765,6 @@ function Poller(props){
 
     // console.log("context", context);
     useInterval(() => {
-        console.log("Checking if processing status is updated.");
         ajax.promise(getURL, "GET")
             .then((response)=> {
                 // console.log("response", response);
@@ -818,10 +812,10 @@ function Poller(props){
             })
             .catch((error)=> {
                 if (typeof error === "string") {
-                    Alerts.queue({ "title": error, style: "danger", "navigateDisappearThreshold": 0 });
+                    pushNewAlert({ "title": error, style: "danger" });
                 } else {
                     console.error(error);
-                    Alerts.queue({ "title": "An unknown error occurred. See console for more details.", style: "danger", "navigateDisappearThreshold": 0 });
+                    pushNewAlert({ "title": "An unknown error occurred. Consult an administrator or try again later.", style: "danger" });
                 }
                 setStatusIdx(0); // Re-enable file upload.
             });
