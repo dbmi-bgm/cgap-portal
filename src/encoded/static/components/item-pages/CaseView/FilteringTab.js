@@ -48,8 +48,6 @@ export function FilteringTab(props) {
     const defaultTabIdx = (!snvFilterHrefAddon && svFilterHrefAddon) ? 1 : 0;
     const [ currViewIdx, setCurrViewIdx ] = useState(defaultTabIdx);
 
-    const currentTitle = filteringTabViews[currViewIdx];
-
     const commonProps = {
         context, windowHeight, session, schemas,
         setIsSubmitting, variantSampleListItem,
@@ -62,7 +60,8 @@ export function FilteringTab(props) {
             <FilteringTabTableToggle {...{ currViewIdx, setCurrViewIdx, context }}/>
             <div className="row mb-1 mt-0">
                 <h1 className="col my-0">
-                    {currentTitle} <span className="text-300">Variant Filtering and Technical Review</span>
+                    { filteringTabViews[currViewIdx].name + " " }
+                    <span className="text-300">Variant Filtering and Technical Review</span>
                 </h1>
             </div>
             <div id="snv-filtering" className={currViewIdx === 0 ? "mt-36" : "d-none"}>
@@ -127,9 +126,6 @@ function createBlankFilterSetItem(searchType, caseAccession){
 
 function SNVFilteringTabBody(props){
     const { context } = props; // context passed in from App (== Case Item)
-    const {
-        active_filterset: { "@id": activeFilterSetID = null } = {}
-    } = context || {};
 
     const { searchHrefBase, blankFilterSetItem, hideFacets } = useMemo(function(){
         const { initial_search_href_filter_addon = "", accession: caseAccession } = context || {};
@@ -162,7 +158,9 @@ function SNVFilteringTabBody(props){
     }, [ context ]);
 
     return (
-        <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem, activeFilterSetID }}>
+        // TODO: Maybe rename `activeFilterSetFieldName` to `caseActiveFilterSetFieldName`.. idk.
+        <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem }}
+            activeFilterSetFieldName="active_filterset">
             <CaseViewEmbeddedVariantSampleSearchTable />
         </FilteringTabBody>
     );
@@ -170,14 +168,6 @@ function SNVFilteringTabBody(props){
 
 function CNVFilteringTabBody(props){
     const { context } = props; // context passed in from App (== Case Item)
-
-    // TODO:
-    // `active_filterset` IS PROBABLY ONLY APPLICABLE ONLY TO
-    // SNV VariantSamples. We probably need to create+use different
-    // one for CNV/SV?
-    const {
-        active_filterset: { "@id": activeFilterSetID = null } = {}
-    } = context || {};
 
     const { searchHrefBase, blankFilterSetItem, hideFacets } = useMemo(function(){
         const { sv_initial_search_href_filter_addon = "", accession: caseAccession } = context || {};
@@ -210,7 +200,9 @@ function CNVFilteringTabBody(props){
     }, [ context ]);
 
     return (
-        <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem, activeFilterSetID }}>
+        // TODO Change props.activeFilterSetFieldName to new/proper value for CNV?
+        <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem }}
+            activeFilterSetFieldName="active_filterset">
             <CaseViewEmbeddedVariantSampleSearchTableSV />
         </FilteringTabBody>
     );
@@ -241,14 +233,17 @@ function FilteringTabBody(props) {
         children,                               // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         hideFacets,                             // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         blankFilterSetItem,                     // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
-        activeFilterSetID,                      // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        activeFilterSetFieldName,               // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
     } = props;
 
     // TODO:
     // `additional_variant_sample_facets` IS POSSIBLY ONLY APPLICABLE ONLY TO
     // SNV VariantSamples. We probably need to create+use different
     // one for CNV/SV?
-    const { additional_variant_sample_facets = [] } = context || {};
+    const {
+        additional_variant_sample_facets = [],
+        [activeFilterSetFieldName]: { "@id": activeFilterSetID = null } = {}
+    } = context || {};
 
     const searchHrefBase = (
         parentSearchHrefBase
@@ -292,7 +287,7 @@ function FilteringTabBody(props) {
     };
 
     const embeddedTableHeaderBody = (
-        <SaveFilterSetButtonController caseItem={context} setIsSubmitting={setIsSubmitting}>
+        <SaveFilterSetButtonController {...{ setIsSubmitting, activeFilterSetFieldName }} caseItem={context}>
             <SaveFilterSetPresetButtonController>
                 <FilteringTableFilterSetUI {...fsuiProps} />
             </SaveFilterSetPresetButtonController>
