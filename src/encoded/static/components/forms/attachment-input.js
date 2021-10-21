@@ -39,12 +39,15 @@ export class AttachmentInputController extends React.PureComponent {
         e.preventDefault();
 
         const { file } = this.state;
+        const { clearAllAlerts } = this.props;
         if (!file) { throw new Error("Attempting file submission when no file exists in state..."); }
 
         file.filename = file.name;
 
         const formData = new FormData();
         formData.append("datafile", file);
+
+        clearAllAlerts();
 
         this.setState({ loading: true }, ()=>{
             const { context: { uuid }, onAddedFile } = this.props;

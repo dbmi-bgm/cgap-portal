@@ -70,6 +70,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
         setIsSubmitting(true); // prompt user on attempt to navigate away
         // note, this is handled here instead of in componentWillMount (for example) to ensure
         // href is fully updated/context fully changed before triggering
+        this.pushNewAlert({ message: "lol", title: "haha", style: "info" });
     }
 
     handleLoadedIngestionSubmission(submissionItem){
@@ -77,6 +78,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
             throw new Error("Expected IngestionSubmission Item");
         }
 
+        this.clearAllAlerts();
         this.setState(({ panelsComplete: pastPanelsComplete }) => {
             let panelsComplete;
             if (pastPanelsComplete[0] !== true){ // ensure step is completed, move to next
@@ -406,12 +408,13 @@ class PanelOne extends React.PureComponent {
     }
 
     handleSelectProject(projectID){
+        this.props.clearAllAlerts();
         // const { display_title: projectTitle = null } = projectJSON;
         this.setState({ projectID });
     }
 
     handleCreate(e){
-        const { onSubmitIngestionSubmission, submissionItem, user = null, pushNewAlert } = this.props;
+        const { onSubmitIngestionSubmission, submissionItem, user = null, pushNewAlert, clearAllAlerts } = this.props;
         const {
             projectID: project,
             isCreating = false,
@@ -422,6 +425,7 @@ class PanelOne extends React.PureComponent {
 
         e.preventDefault();
         e.stopPropagation();
+        clearAllAlerts();
 
         if (isCreating || !institution || !project ) return false;
 
@@ -619,7 +623,7 @@ class PanelTwo extends React.PureComponent {
     }
 
     render(){
-        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission, setIsSubmitting, handleComplete, pushNewAlert } = this.props;
+        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission, setIsSubmitting, handleComplete, pushNewAlert, clearAllAlerts } = this.props;
         const { statusIdx } = this.state;
 
         const {
@@ -653,14 +657,14 @@ class PanelTwo extends React.PureComponent {
                             {/* <i className="icon icon-info-circle fas icon-fw ml-05" // Needs to be updated
                                 data-tip="Select & upload files generated in Proband and other pedigree software" /> */}
                         </label>
-                        <AttachmentInputController {...{ ingestionType, href }} context={submissionItem} onAddedFile={this.onAddedFile}>
+                        <AttachmentInputController {...{ ingestionType, href, clearAllAlerts }} context={submissionItem} onAddedFile={this.onAddedFile}>
                             <ExcelSubmissionFileAttachmentBtn/>
                         </AttachmentInputController>
                     </div>
                 </React.Fragment>
             );
         } else if (statusIdx === 1) {
-            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} {...{ onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert }}/>;
+            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} {...{ onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert, clearAllAlerts }}/>;
         } else {
             panelContents = (
                 <React.Fragment>
@@ -756,7 +760,7 @@ function useInterval(callback, delay) {
 }
 
 function Poller(props){
-    const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert } = props;
+    const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert, clearAllAlerts } = props;
     const { uuid } = context || {};
     const getURL = "/ingestion-submissions/" + uuid;
 
@@ -811,6 +815,7 @@ function Poller(props){
                 }
             })
             .catch((error)=> {
+                clearAllAlerts();
                 if (typeof error === "string") {
                     pushNewAlert({ "title": error, style: "danger" });
                 } else {
