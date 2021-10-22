@@ -47,31 +47,30 @@ export class AttachmentInputController extends React.PureComponent {
         const formData = new FormData();
         formData.append("datafile", file);
 
-        clearAllAlerts();
+        clearAllAlerts(
+            this.setState({ loading: true }, ()=>{
+                const { context: { uuid }, onAddedFile } = this.props;
 
-        this.setState({ loading: true }, ()=>{
-            const { context: { uuid }, onAddedFile } = this.props;
+                const postURL = '/ingestion-submissions/' + uuid + '/submit_for_ingestion';
+                console.log(`Attempting Ingestion. \n\nPosting to: ${postURL}`);
 
-            const postURL = '/ingestion-submissions/' + uuid + '/submit_for_ingestion';
-            console.log(`Attempting Ingestion. \n\nPosting to: ${postURL}`);
+                const onErrorCallback = (response) => {
+                    console.error("Submission Ingestion Error: ", response);
+                    this.setState({ loading: false, success: false }, function(){
+                        Alerts.queue(AttachmentInputController.ErrorObject);
+                    });
+                };
 
-            const onErrorCallback = (response) => {
-                console.error("Submission Ingestion Error: ", response);
-                this.setState({ loading: false, success: false }, function(){
-                    Alerts.queue(AttachmentInputController.ErrorObject);
-                });
-            };
+                const onSuccessCallback = (response) => {
+                    console.log("response:", response);
+                    this.setState({ loading: false, success: true }, function() {
+                        onAddedFile(response);
+                    });
+                };
 
-            const onSuccessCallback = (response) => {
-                console.log("response:", response);
-                this.setState({ loading: false, success: true }, function() {
-                    onAddedFile(response);
-                });
-            };
-
-            ajax.postMultipartFormData(postURL, formData, onErrorCallback, onSuccessCallback);
-        });
-
+                ajax.postMultipartFormData(postURL, formData, onErrorCallback, onSuccessCallback);
+            })
+        );
     }
 
     clearFile() {

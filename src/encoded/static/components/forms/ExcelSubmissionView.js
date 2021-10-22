@@ -168,8 +168,8 @@ export default class ExcelSubmissionView extends React.PureComponent {
         this.setState({ localAlerts: newAlertState });
     }
 
-    clearAllAlerts() {
-        this.setState({ localAlerts: [] });
+    clearAllAlerts(callback) {
+        this.setState({ localAlerts: [] }, callback);
     }
 
     render(){
