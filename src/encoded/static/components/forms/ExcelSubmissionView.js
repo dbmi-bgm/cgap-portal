@@ -290,7 +290,7 @@ class PanelOne extends React.PureComponent {
 
     static projectFromUser(user){
         const {
-            project = {},
+            project_roles: { 0: { project = {} } = {} } = {}
         } = user || {};
         const initState = {
             "projectID": project['@id'] || null,
