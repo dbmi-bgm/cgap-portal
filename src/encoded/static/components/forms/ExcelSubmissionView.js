@@ -407,9 +407,17 @@ class PanelOne extends React.PureComponent {
     }
 
     handleSelectProject(projectID){
-        this.props.clearAllAlerts();
-        // const { display_title: projectTitle = null } = projectJSON;
-        this.setState({ projectID });
+        const { user: { project_roles = [] } = {} } = this.props;
+
+        let projectTitle = projectID;
+        for (let i = 0; i < project_roles.length; i++) {
+            const { project: { "@id": atID = null, display_title = null } = {} } = project_roles[i];
+            if (atID === projectID) {
+                projectTitle = display_title;
+            }
+        }
+
+        this.setState({ projectID, projectTitle });
     }
 
     handleCreate(e){
