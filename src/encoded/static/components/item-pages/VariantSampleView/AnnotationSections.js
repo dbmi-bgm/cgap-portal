@@ -153,8 +153,10 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
         return (
             <div className="row mb-03" key={fieldName}>
                 <div className="col-12 col-lg">
-                    <label className="mb-0 black-label" htmlFor={"external_resource_for_" + fieldName} data-tip={schemaDescription}>
+                    <label className="mb-0 black-label" htmlFor={"external_resource_for_" + fieldName}>
                         { schemaTitle || fieldName }
+                        { schemaDescription ? <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm"
+                            data-tip={schemaDescription} /> : null}
                     </label>
                 </div>
                 <div className="col-12 col-lg-auto">
@@ -221,8 +223,9 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
         <React.Fragment>
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
-                    <label htmlFor="variant.transcript.csq_gene.name" className="mb-0" data-tip={getTipForField("name")}>
-                        Gene Name:
+                    <label htmlFor="variant.transcript.csq_gene.name" className="mb-0">
+                        Gene Name: <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm"
+                            data-tip={getTipForField("name")}/>
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.name">
@@ -232,8 +235,9 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
 
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
-                    <label htmlFor="variant.transcript.csq_gene.gene_symbol" className="mb-0" data-tip={getTipForField("gene_symbol")}>
-                        Symbol:
+                    <label htmlFor="variant.transcript.csq_gene.gene_symbol" className="mb-0" >
+                        Symbol: <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm"
+                            data-tip={getTipForField("gene_symbol")}/>
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.gene_symbol">
@@ -254,8 +258,9 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
 
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
-                    <label htmlFor="variant.transcript.csq_gene.gene_biotype" className="mb-0" data-tip={getTipForField("gene_biotype")}>
-                        Gene Type:
+                    <label htmlFor="variant.transcript.csq_gene.gene_biotype" className="mb-0">
+                        Gene Type: <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm"
+                            data-tip={getTipForField("gene_biotype")} />
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.gene_biotype">
@@ -298,8 +303,9 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
 
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
-                    <label htmlFor="variant.transcript.csq_gene.gene_summary" className="mb-0" data-tip={getTipForField("gene_summary")}>
-                        Gene Summary:
+                    <label htmlFor="variant.transcript.csq_gene.gene_summary" className="mb-0">
+                        Gene Summary: <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm"
+                            data-tip={getTipForField("gene_summary")}/>
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="variant.transcript.csq_gene.gene_summary">
@@ -595,4 +601,27 @@ export function getTranscriptLocation(transcript, mostSevereConsequence = null){
     }
 
     return returnString;
+}
+
+/**
+ * Takes in a list of transcripts and returns the most severe, canonical, or the first in the array
+ * @param {Array} transcript - array of SNV or SV transcripts
+ * @returns Number
+ */
+export function getInitialTranscriptIndex(transcript) {
+    // Set initial index to most severe or canonical transcript.
+    let initialIndex = transcript.findIndex(function({ csq_most_severe }){
+        return !!(csq_most_severe);
+    });
+
+    if (initialIndex === -1){
+        initialIndex = transcript.findIndex(function({ csq_canonical }){
+            return !!(csq_canonical);
+        });
+    }
+
+    if (initialIndex === -1){
+        initialIndex = 0;
+    }
+    return parseInt(initialIndex);
 }

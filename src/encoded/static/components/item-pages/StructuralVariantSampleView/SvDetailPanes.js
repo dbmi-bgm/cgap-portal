@@ -1,6 +1,7 @@
 'use strict';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
+import ReactTooltip from 'react-tooltip';
 import PropTypes from 'prop-types';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
@@ -8,32 +9,17 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { object, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { responsiveGridState } from './../../util/layout';
 
-import { ExternalDatabasesSection, GeneOverview, ConstraintScoresSection, GeneTranscriptDisplayTitle } from '../VariantSampleView/AnnotationSections';
-
-/** Reuse this method for SNVs if it remains the same */
-function getInitialTranscriptIndex(transcript) {
-    // Set initial index to most severe or canonical transcript.
-    let initialIndex = transcript.findIndex(function({ csq_most_severe }){
-        return !!(csq_most_severe);
-    });
-
-    if (initialIndex === -1){
-        initialIndex = transcript.findIndex(function({ csq_canonical }){
-            return !!(csq_canonical);
-        });
-    }
-
-    if (initialIndex === -1){
-        initialIndex = 0;
-    }
-    return parseInt(initialIndex);
-}
+import { ExternalDatabasesSection, GeneOverview, ConstraintScoresSection, GeneTranscriptDisplayTitle, getInitialTranscriptIndex } from '../VariantSampleView/AnnotationSections';
 
 export function SvGeneDetailPane(props) {
     const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth, propsFromTable, schemas, context } = props;
 
     const { structural_variant: { transcript = [] } = {} } = context || {};
     const { ensgid: resultEnsgid = null } = result;
+
+    useEffect(function(){
+        setTimeout(function(){ ReactTooltip.rebuild(); }, 1000);
+    }, []); // Empty array == memoized but on nothing == run it only once on mount
 
     // Filter out transcripts that do not match the current result's gene
     const resultTranscripts = transcript.filter(function({ csq_gene }){
@@ -130,7 +116,7 @@ function TranscriptSelectionDropdown(props){
     }
 
     return (
-        <DropdownButton title={dropdownTitleToShow} size="sm py-1" variant="outline-secondary select-transcript" onSelect={setTranscriptIdx}
+        <DropdownButton title={dropdownTitleToShow} size="sm py-1" variant="outline-secondary select-transcript text-truncate" onSelect={setTranscriptIdx}
             disabled={geneTranscriptListLen <= 1} data-tip={"Select a transcript to view their details"}>
             { geneListOptions }
         </DropdownButton>
