@@ -914,6 +914,8 @@ function FileAttachmentBtn(props){
     }
 
     const { name: filename } = file || {};
+
+    const clearBtnDisabled = loadingFileResult || postFileSuccess === true;
     return (
         <React.Fragment>
             {instructionsNode}
@@ -928,7 +930,7 @@ function FileAttachmentBtn(props){
                                 accept={acceptedTypes} />
                             Replace
                         </label>
-                        { onClearFile && <i className="icon fas icon-times icon-fw clickable mx-2" onClick={onClearFile} disabled={loadingFileResult || postFileSuccess === true} />}
+                        { onClearFile && <i className={`${clearBtnDisabled ? "" : "clickable"} icon fas icon-times icon-fw mx-2`} onClick={clearBtnDisabled ? undefined : onClearFile} />}
                     </div>
                 </div>
                 <div className="input-group-append">
