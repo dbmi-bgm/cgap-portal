@@ -70,7 +70,6 @@ export default class ExcelSubmissionView extends React.PureComponent {
         setIsSubmitting(true); // prompt user on attempt to navigate away
         // note, this is handled here instead of in componentWillMount (for example) to ensure
         // href is fully updated/context fully changed before triggering
-        this.pushNewAlert({ message: "lol", title: "haha", style: "info" });
     }
 
     handleLoadedIngestionSubmission(submissionItem){
