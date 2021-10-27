@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import _ from 'underscore';
 import { console, layout, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-import { PrintPreviewPane, PrintPreviewPaneLoadingIndicator } from './PrintPreviewPane';
+import { PrintPreviewPane, PrintPreviewPaneLoadingIndicator, PagedJSDependencyLoader } from './PrintPreviewPane';
 
 
 
@@ -141,42 +141,44 @@ export const ReportPrintPreviewPane = React.memo(function ReportPrintPreviewPane
     return (
         <React.Fragment>
             <link rel="preload" href={reportVars.logos.cgapSrc} as="image" />
-            <PrintPreviewPane styleRulesText={reportStyleRulesText} {...{ onRenderComplete }}>
+            <PagedJSDependencyLoader>
+                <PrintPreviewPane styleRulesText={reportStyleRulesText} {...{ onRenderComplete }}>
 
-                <ReportHeader {...{ report, caseItem, reportSettings }} />
+                    <ReportHeader {...{ report, caseItem, reportSettings }} />
 
-                <ReportFooter {...{ report, reportSettings }} />
+                    <ReportFooter {...{ report, reportSettings }} />
 
-                <h3>Test Title</h3>
-                <p>
-                    Fames ut varius cursus donec nec. Nam maecenas mollis sem tempus? Aliquet tincidunt, tempus ridiculus vehicula senectus ac purus. Blandit mauris nibh enim lacinia facilisi. Erat aliquet tristique tortor porta. Integer laoreet class facilisis condimentum natoque fames taciti nostra? Urna, enim libero commodo etiam cum feugiat! Suscipit vitae cum velit nullam dapibus ipsum elit. Justo augue fringilla interdum massa nam. Malesuada lacus.
-                </p>
-                <p>
-                    Ut, vulputate mattis amet auctor litora hac lacus potenti nibh suspendisse consequat. Bibendum curae; molestie sociosqu senectus habitant feugiat accumsan molestie euismod. Arcu litora nostra nullam mollis natoque, habitant sodales hac interdum lorem. Nascetur turpis enim tristique tincidunt mi fames metus aptent gravida. Nulla quisque felis pellentesque. Nunc at iaculis consectetur nibh bibendum, gravida ligula at senectus morbi nunc! Felis scelerisque dolor torquent porttitor litora id ad per. Faucibus facilisi aliquam nunc ornare, urna blandit eget hac porttitor. Convallis aenean mauris dui convallis.
-                </p>
-                <p>
-                    Cum nunc ultrices dictum vel aliquet magnis eu. Cum leo urna malesuada auctor congue donec orci duis litora consectetur! Eros nunc laoreet primis nisl eget praesent sociis. Iaculis curabitur cras viverra cubilia euismod ullamcorper. Nulla netus vulputate magnis integer a curabitur non ridiculus ligula velit mauris? Fermentum etiam sit fames lacus, cubilia elit. Vitae condimentum potenti nisi sagittis per! Curae; imperdiet morbi proin, lacus sollicitudin aliquet. Curabitur lacinia enim ornare sem nunc turpis gravida dignissim metus imperdiet mus. Conubia taciti sollicitudin enim curabitur nulla! Semper felis vivamus neque congue litora tellus dolor natoque.
-                </p>
-                <p>
-                    Duis suspendisse montes suscipit quis convallis habitant? Primis duis mi praesent. Viverra, dictum montes mattis sollicitudin. Vel, euismod nulla commodo. Mus tempor metus convallis vehicula tristique eros senectus semper quam gravida. Congue felis, non dolor consequat. Mattis conubia amet platea ultrices metus curabitur hendrerit. Erat ridiculus fusce velit laoreet sapien. Cum ipsum nisl euismod sit massa nibh, morbi curabitur. Enim dapibus.
-                </p>
-                <p>
-                    Penatibus risus montes facilisis vulputate, pellentesque fringilla sociosqu tellus. Arcu potenti lectus dolor nascetur sapien integer lorem urna. Phasellus odio sapien purus mauris nulla ullamcorper aliquam nunc ad. Aptent luctus nulla nullam dictum habitant blandit justo ultrices cubilia. Lectus fermentum euismod a conubia magna luctus tincidunt laoreet natoque lacus. Venenatis ullamcorper turpis ante litora. In hac suspendisse bibendum purus convallis quis. Quam dolor erat suscipit molestie. Gravida quisque sagittis varius. Massa magna convallis gravida. Non enim semper felis dictum lacinia nullam adipiscing nullam pharetra aptent. Tellus sodales sed mi eleifend ultricies laoreet quam nec. Pellentesque?
-                </p>
-                <p>
-                    Ut, vulputate mattis amet auctor litora hac lacus potenti nibh suspendisse consequat. Bibendum curae; molestie sociosqu senectus habitant feugiat accumsan molestie euismod. Arcu litora nostra nullam mollis natoque, habitant sodales hac interdum lorem. Nascetur turpis enim tristique tincidunt mi fames metus aptent gravida. Nulla quisque felis pellentesque. Nunc at iaculis consectetur nibh bibendum, gravida ligula at senectus morbi nunc! Felis scelerisque dolor torquent porttitor litora id ad per. Faucibus facilisi aliquam nunc ornare, urna blandit eget hac porttitor. Convallis aenean mauris dui convallis.
-                </p>
-                <p>
-                    Cum nunc ultrices dictum vel aliquet magnis eu. Cum leo urna malesuada auctor congue donec orci duis litora consectetur! Eros nunc laoreet primis nisl eget praesent sociis. Iaculis curabitur cras viverra cubilia euismod ullamcorper. Nulla netus vulputate magnis integer a curabitur non ridiculus ligula velit mauris? Fermentum etiam sit fames lacus, cubilia elit. Vitae condimentum potenti nisi sagittis per! Curae; imperdiet morbi proin, lacus sollicitudin aliquet. Curabitur lacinia enim ornare sem nunc turpis gravida dignissim metus imperdiet mus. Conubia taciti sollicitudin enim curabitur nulla! Semper felis vivamus neque congue litora tellus dolor natoque.
-                </p>
-                <p>
-                    Duis suspendisse montes suscipit quis convallis habitant? Primis duis mi praesent. Viverra, dictum montes mattis sollicitudin. Vel, euismod nulla commodo. Mus tempor metus convallis vehicula tristique eros senectus semper quam gravida. Congue felis, non dolor consequat. Mattis conubia amet platea ultrices metus curabitur hendrerit. Erat ridiculus fusce velit laoreet sapien. Cum ipsum nisl euismod sit massa nibh, morbi curabitur. Enim dapibus.
-                </p>
-                <p>
-                    Penatibus risus montes facilisis vulputate, pellentesque fringilla sociosqu tellus. Arcu potenti lectus dolor nascetur sapien integer lorem urna. Phasellus odio sapien purus mauris nulla ullamcorper aliquam nunc ad. Aptent luctus nulla nullam dictum habitant blandit justo ultrices cubilia. Lectus fermentum euismod a conubia magna luctus tincidunt laoreet natoque lacus. Venenatis ullamcorper turpis ante litora. In hac suspendisse bibendum purus convallis quis. Quam dolor erat suscipit molestie. Gravida quisque sagittis varius. Massa magna convallis gravida. Non enim semper felis dictum lacinia nullam adipiscing nullam pharetra aptent. Tellus sodales sed mi eleifend ultricies laoreet quam nec. Pellentesque?
-                </p>
+                    <h3>Test Title</h3>
+                    <p>
+                        Fames ut varius cursus donec nec. Nam maecenas mollis sem tempus? Aliquet tincidunt, tempus ridiculus vehicula senectus ac purus. Blandit mauris nibh enim lacinia facilisi. Erat aliquet tristique tortor porta. Integer laoreet class facilisis condimentum natoque fames taciti nostra? Urna, enim libero commodo etiam cum feugiat! Suscipit vitae cum velit nullam dapibus ipsum elit. Justo augue fringilla interdum massa nam. Malesuada lacus.
+                    </p>
+                    <p>
+                        Ut, vulputate mattis amet auctor litora hac lacus potenti nibh suspendisse consequat. Bibendum curae; molestie sociosqu senectus habitant feugiat accumsan molestie euismod. Arcu litora nostra nullam mollis natoque, habitant sodales hac interdum lorem. Nascetur turpis enim tristique tincidunt mi fames metus aptent gravida. Nulla quisque felis pellentesque. Nunc at iaculis consectetur nibh bibendum, gravida ligula at senectus morbi nunc! Felis scelerisque dolor torquent porttitor litora id ad per. Faucibus facilisi aliquam nunc ornare, urna blandit eget hac porttitor. Convallis aenean mauris dui convallis.
+                    </p>
+                    <p>
+                        Cum nunc ultrices dictum vel aliquet magnis eu. Cum leo urna malesuada auctor congue donec orci duis litora consectetur! Eros nunc laoreet primis nisl eget praesent sociis. Iaculis curabitur cras viverra cubilia euismod ullamcorper. Nulla netus vulputate magnis integer a curabitur non ridiculus ligula velit mauris? Fermentum etiam sit fames lacus, cubilia elit. Vitae condimentum potenti nisi sagittis per! Curae; imperdiet morbi proin, lacus sollicitudin aliquet. Curabitur lacinia enim ornare sem nunc turpis gravida dignissim metus imperdiet mus. Conubia taciti sollicitudin enim curabitur nulla! Semper felis vivamus neque congue litora tellus dolor natoque.
+                    </p>
+                    <p>
+                        Duis suspendisse montes suscipit quis convallis habitant? Primis duis mi praesent. Viverra, dictum montes mattis sollicitudin. Vel, euismod nulla commodo. Mus tempor metus convallis vehicula tristique eros senectus semper quam gravida. Congue felis, non dolor consequat. Mattis conubia amet platea ultrices metus curabitur hendrerit. Erat ridiculus fusce velit laoreet sapien. Cum ipsum nisl euismod sit massa nibh, morbi curabitur. Enim dapibus.
+                    </p>
+                    <p>
+                        Penatibus risus montes facilisis vulputate, pellentesque fringilla sociosqu tellus. Arcu potenti lectus dolor nascetur sapien integer lorem urna. Phasellus odio sapien purus mauris nulla ullamcorper aliquam nunc ad. Aptent luctus nulla nullam dictum habitant blandit justo ultrices cubilia. Lectus fermentum euismod a conubia magna luctus tincidunt laoreet natoque lacus. Venenatis ullamcorper turpis ante litora. In hac suspendisse bibendum purus convallis quis. Quam dolor erat suscipit molestie. Gravida quisque sagittis varius. Massa magna convallis gravida. Non enim semper felis dictum lacinia nullam adipiscing nullam pharetra aptent. Tellus sodales sed mi eleifend ultricies laoreet quam nec. Pellentesque?
+                    </p>
+                    <p>
+                        Ut, vulputate mattis amet auctor litora hac lacus potenti nibh suspendisse consequat. Bibendum curae; molestie sociosqu senectus habitant feugiat accumsan molestie euismod. Arcu litora nostra nullam mollis natoque, habitant sodales hac interdum lorem. Nascetur turpis enim tristique tincidunt mi fames metus aptent gravida. Nulla quisque felis pellentesque. Nunc at iaculis consectetur nibh bibendum, gravida ligula at senectus morbi nunc! Felis scelerisque dolor torquent porttitor litora id ad per. Faucibus facilisi aliquam nunc ornare, urna blandit eget hac porttitor. Convallis aenean mauris dui convallis.
+                    </p>
+                    <p>
+                        Cum nunc ultrices dictum vel aliquet magnis eu. Cum leo urna malesuada auctor congue donec orci duis litora consectetur! Eros nunc laoreet primis nisl eget praesent sociis. Iaculis curabitur cras viverra cubilia euismod ullamcorper. Nulla netus vulputate magnis integer a curabitur non ridiculus ligula velit mauris? Fermentum etiam sit fames lacus, cubilia elit. Vitae condimentum potenti nisi sagittis per! Curae; imperdiet morbi proin, lacus sollicitudin aliquet. Curabitur lacinia enim ornare sem nunc turpis gravida dignissim metus imperdiet mus. Conubia taciti sollicitudin enim curabitur nulla! Semper felis vivamus neque congue litora tellus dolor natoque.
+                    </p>
+                    <p>
+                        Duis suspendisse montes suscipit quis convallis habitant? Primis duis mi praesent. Viverra, dictum montes mattis sollicitudin. Vel, euismod nulla commodo. Mus tempor metus convallis vehicula tristique eros senectus semper quam gravida. Congue felis, non dolor consequat. Mattis conubia amet platea ultrices metus curabitur hendrerit. Erat ridiculus fusce velit laoreet sapien. Cum ipsum nisl euismod sit massa nibh, morbi curabitur. Enim dapibus.
+                    </p>
+                    <p>
+                        Penatibus risus montes facilisis vulputate, pellentesque fringilla sociosqu tellus. Arcu potenti lectus dolor nascetur sapien integer lorem urna. Phasellus odio sapien purus mauris nulla ullamcorper aliquam nunc ad. Aptent luctus nulla nullam dictum habitant blandit justo ultrices cubilia. Lectus fermentum euismod a conubia magna luctus tincidunt laoreet natoque lacus. Venenatis ullamcorper turpis ante litora. In hac suspendisse bibendum purus convallis quis. Quam dolor erat suscipit molestie. Gravida quisque sagittis varius. Massa magna convallis gravida. Non enim semper felis dictum lacinia nullam adipiscing nullam pharetra aptent. Tellus sodales sed mi eleifend ultricies laoreet quam nec. Pellentesque?
+                    </p>
 
-            </PrintPreviewPane>
+                </PrintPreviewPane>
+            </PagedJSDependencyLoader>
         </React.Fragment>
     );
 });

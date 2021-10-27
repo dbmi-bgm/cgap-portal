@@ -2,14 +2,23 @@
 
 import React, { useCallback, useMemo, useState } from 'react';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
+
+// TEMPORARY:
+import { projectReportSettings } from './../ReportView/project-settings-draft';
 
 
 /**
  * @module
  * This file contains the VariantSampleSelection item, which is shared between InterpretationTab and Finalize Case tab.
+ *
+ * @todo
+ * We will need to load in Project Item to get table tags and potentially other settings from such
+ * as default sorting of VSes. We probably should do this at the CaseView/index.js level so it is accessible
+ * to all elements? It could be lazy-loaded and we just render classification dropdowns once it's loaded.
  */
 
 
@@ -22,16 +31,23 @@ export const parentTabTypes = {
 
 /**
  * Shows list of variant sample selections, or loading icon, depending on props.
+ * `virtualVariantSampleListItem` takes precedence here.
+ *
+ * @todo Pass down a `props.updateVirtualVariantSampleListItem` function.
  */
 export const VariantSampleSelectionList = React.memo(function VariantSampleSelectionList (props) {
     const {
         variantSampleListItem,
-        // sortedVariantSampleSelections, // TODO: If this is present, it will take priority over `variantSampleListItem.variant_samples`
         schemas,
         context,
         isLoadingVariantSampleListItem = false,
         parentTabType = parentTabTypes.INTERPRETATION,
+
+        // From CaseReviewTab:
         alreadyInProjectNotes,
+        // savedClassificationsByVS,
+        changedClassificationsByVS,
+        updateClassificationForVS,
 
         // From CaseReviewDataStore (if used, else undefined):
         toggleSendToProjectStoreItems,
@@ -39,7 +55,22 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         sendToProjectStore,
         sendToReportStore
     } = props;
-    const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
+
+    const { variant_samples: vsSelections = [] } =  variantSampleListItem || {};
+
+    // Used for faster lookups of current tag title.
+    const tableTagsByID = useMemo(function(){
+        const tableTagsByID = {};
+        const {
+            table_tags: {
+                tags = []
+            } = {}
+        } = projectReportSettings;
+        tags.forEach(function(tag){
+            tableTagsByID[tag.id] = tag;
+        });
+        return tableTagsByID;
+    }, [ projectReportSettings ]);
 
     if (isLoadingVariantSampleListItem) {
         return (
@@ -58,12 +89,18 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
             toggleSendToReportStoreItems,
             sendToProjectStore,
             sendToReportStore,
-            alreadyInProjectNotes
+            alreadyInProjectNotes,
+            tableTagsByID
         };
-        return vsSelections.map(function(selectionSubObject, idx){
+        return vsSelections.map(function(selection, index){
+            const { variant_sample_item: { "@id": vsAtID } = {} } = selection;
+            if (vsAtID) {
+                // TODO: Handle lack of permissions, show some 'no permissions' view, idk..
+            }
+            const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsAtID] : undefined;
             return (
-                <VariantSampleSelection {...commonProps}
-                    selection={selectionSubObject} key={idx} index={idx} />
+                <VariantSampleSelection {...commonProps} key={index}
+                    {...{ selection, index, unsavedClassification, updateClassificationForVS }}  />
             );
         });
     }
@@ -89,17 +126,20 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         parentTabType = parentTabTypes.INTERPRETATION,
         // From CaseReviewTab (if used):
         alreadyInProjectNotes,
+        unsavedClassification,
+        updateClassificationForVS,
         // From CaseReviewDataStore (if used):
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
-        sendToReportStore
+        sendToReportStore,
+        tableTagsByID
     } = props;
     const { accession: caseAccession } = context; // `context` refers to our Case in here.
     const {
         date_selected,
         filter_blocks_request_at_time_of_selection,
-        variant_sample_item
+        variant_sample_item: variantSample
     } = selection;
 
 
@@ -136,7 +176,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         discovery_interpretation: discoveryInterpretationNote = null,
         variant_notes: lastVariantNote = null,
         gene_notes: lastGeneNote = null
-    } = variant_sample_item || {};
+    } = variantSample || {};
 
     const noSavedNotes = clinicalInterpretationNote === null && discoveryInterpretationNote === null && lastVariantNote === null && lastGeneNote === null;
     const { classification: acmgClassification = null } = clinicalInterpretationNote || {};
@@ -145,7 +185,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     let expandedNotesSection = null;
     if (isExpanded) {
         const noteSectionProps = {
-            "variantSample": variant_sample_item,
+            variantSample,
             toggleSendToProjectStoreItems,
             toggleSendToReportStoreItems,
             sendToProjectStore,
@@ -180,19 +220,24 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         </h4>
                     </div>
 
-                    <div className="flex-grow-1 d-none d-lg-block px-2">&nbsp;</div>
+                    <div className="flex-grow-1 d-none d-lg-block px-2">
+                        &nbsp;
+                    </div>
 
                     <div className="flex-auto">
 
                         { parentTabType === parentTabTypes.CASEREVIEW ?
-                            <button type="button" className={"btn btn-sm btn-" + (noSavedNotes ? "outline-dark" : "primary")} onClick={toggleIsExpanded} disabled={noSavedNotes}>
-                                <i className={"icon fas mr-07 icon-" + (!isExpanded ? "plus" : "minus")} />
-                                { !isExpanded ? "Review Variant Notes & Classification" : "Hide Variant Notes & Classification" }
-                            </button>
+                            <div className="d-block d-lg-flex align-items-center">
+                                <ClassificationDropdown {...{ variantSample, tableTagsByID, unsavedClassification, updateClassificationForVS }} />
+                                <button type="button" className={"btn btn-sm btn-" + (noSavedNotes ? "outline-dark" : "primary-dark")} onClick={toggleIsExpanded} disabled={noSavedNotes}>
+                                    <i className={"icon fas mr-07 icon-" + (!isExpanded ? "plus" : "minus")} />
+                                    { !isExpanded ? "Review Notes & Classification" : "Hide Notes & Classification" }
+                                </button>
+                            </div>
                             : null }
 
                         { parentTabType === parentTabTypes.INTERPRETATION ?
-                            <DropdownButton size="sm" variant="light" className="d-inline-block ml-07" disabled title={
+                            <DropdownButton size="sm" variant="light" className="d-inline-block" disabled title={
                                 <React.Fragment>
                                     <i className="icon icon-bars fas mr-07"/>
                                     Actions
@@ -212,19 +257,19 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
                             { geneTranscriptColTitle || "Gene, Transcript" }
                         </label>
-                        { geneTranscriptRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        { geneTranscriptRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
                         <label className="mb-04 text-small" data-tip={variantColDescription}>
                             { variantColTitle || "Variant" }
                         </label>
-                        { variantRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        { variantRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                     </div>
                     <div className="col col-sm-4 col-lg-3 py-2">
                         <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
                             { genotypeLabelColTitle || "Genotype" }
                         </label>
-                        { genotypeLabelRenderFunc(variant_sample_item, { align: 'left' }) }
+                        { genotypeLabelRenderFunc(variantSample, { align: 'left' }) }
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
                         <label className="mb-04 text-small">ACMG Classification</label>
@@ -273,6 +318,82 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         </div>
     );
 });
+
+
+function ClassificationDropdown(props){
+    const { variantSample, tableTagsByID, unsavedClassification = undefined, updateClassificationForVS } = props;
+    const {
+        finding_table_tag: savedClassification = null,
+        "@id": vsAtID
+    } = variantSample || {};
+
+    const isUnsavedClassification = typeof unsavedClassification !== "undefined"; // `null` means explicitly removed
+    const viewClassification = isUnsavedClassification ? unsavedClassification : savedClassification;
+
+    // projectReportSettings will eventually be passed down in from CaseView or similar place that AJAXes it in.
+    const { table_tags: { tags = [] } = {} } = projectReportSettings;
+
+    const onOptionSelect = useCallback(function(evtKey, evt){
+        console.log("Selected classification", evtKey, "for", vsAtID);
+        updateClassificationForVS(vsAtID, evtKey || null);
+    }, [ variantSample, updateClassificationForVS ]);
+
+    const renderedOptions = tags.map(function(tagObj, idx){
+        const { id: classificationID, title } = tagObj;
+        const existingSavedOption = (savedClassification === classificationID);
+        const active = (viewClassification && viewClassification === classificationID);
+        return (
+            <DropdownItem key={idx} eventKey={classificationID} active={active}
+                className={existingSavedOption && !active ? "bg-light text-600" : null}>
+                { title }
+            </DropdownItem>
+        );
+    });
+
+    renderedOptions.push(<div className="dropdown-divider"/>);
+    renderedOptions.push(
+        <DropdownItem key="none" eventKey={null} active={!viewClassification}
+            className={!savedClassification && viewClassification ? "bg-light text-600" : null}>
+            <em>None</em>
+        </DropdownItem>
+    );
+
+    const unsavedIndicator = (
+        <i className="icon icon-asterisk fas mr-06 text-danger text-smaller"
+            data-delay={500} data-tip="Not yet saved, click 'Update Findings' to apply."/>
+    );
+
+    const title = (
+        !viewClassification || unsavedClassification === null ?
+            <span className="text-300">
+                { isUnsavedClassification ? unsavedIndicator : null }
+                Not a finding
+            </span>
+            : (
+                (tableTagsByID[viewClassification] && (
+                    <span>
+                        { isUnsavedClassification ? unsavedIndicator : null }
+                        { tableTagsByID[viewClassification].title || viewClassification }
+                    </span>
+                ))
+            ) || <em>Unknown or deprecated `{viewClassification}`</em>
+    );
+
+
+
+    // Right now we allow to select 1 tag per VS, but could support multiple theoretically later on.
+
+    return (
+        <div className="py-1 py-lg-0 px-lg-2">
+            <DropdownButton size="sm" variant="outline-dark" title={title} onSelect={onOptionSelect} disabled={tags.length === 0}
+                data-delay={500} data-tip={!viewClassification? "Select a finding..." : null }>
+                { renderedOptions }
+            </DropdownButton>
+        </div>
+    );
+}
+
+
 
 const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicator(){
     return (

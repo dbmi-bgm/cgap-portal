@@ -47,7 +47,7 @@ export class VariantSampleListController extends React.PureComponent {
         this.updateVariantSampleListID = this.updateVariantSampleListID.bind(this);
         const { id: vslID } = props;
         this.state = {
-            "variantSampleListItem": null,
+            "fetchedVariantSampleListItem": null,
             "variantSampleListID": typeof vslID === "string" ? vslID : null,
             "isLoadingVariantSampleListItem": typeof vslID === "string" ? true : false,
             // `refreshCount` not necessary at all, just for potential internal debugging.
@@ -99,10 +99,10 @@ export class VariantSampleListController extends React.PureComponent {
 
             this.currentRequest = null;
 
-            this.setState(function({ refreshCount: prevRefreshCount, variantSampleListItem: prevItem }){
+            this.setState(function({ refreshCount: prevRefreshCount, fetchedVariantSampleListItem: prevItem }){
                 const { "@id": prevAtID = null } = prevItem || {};
                 const nextState = {
-                    variantSampleListItem,
+                    "fetchedVariantSampleListItem": variantSampleListItem,
                     "isLoadingVariantSampleListItem": false
                 };
                 if (prevAtID && vslID !== prevAtID) {
@@ -134,6 +134,11 @@ export class VariantSampleListController extends React.PureComponent {
                         // "variant_samples.selected_by.display_title",
                         "variant_samples.variant_sample_item.@id",
                         "variant_samples.variant_sample_item.display_title",
+                        "variant_samples.variant_sample_item.finding_table_tag",
+                        "variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",
+                        "variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
+                        "variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
+
                         "variant_samples.variant_sample_item.variant.@id",
                         "variant_samples.variant_sample_item.variant.display_title",
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.@id",
@@ -141,9 +146,6 @@ export class VariantSampleListController extends React.PureComponent {
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript",
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
 
                         // VariantSampleItem Notes (for CaseReviewTab)
                         ...variantSampleListItemNoteEmbeds
@@ -160,7 +162,7 @@ export class VariantSampleListController extends React.PureComponent {
 
     render(){
         const { children, id: propVSLID, ...passProps } = this.props;
-        const { variantSampleListItem, isLoadingVariantSampleListItem } = this.state;
+        const { fetchedVariantSampleListItem: variantSampleListItem, isLoadingVariantSampleListItem } = this.state;
         const { variant_samples = [] } = variantSampleListItem || {};
         const childProps = {
             ...passProps,

@@ -1,8 +1,9 @@
 'use strict';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
+import ReactTooltip from 'react-tooltip';
 import Modal from 'react-bootstrap/esm/Modal';
 import { VariantSampleSelectionList, parentTabTypes } from './VariantSampleSelection';
 import { CaseSpecificSelectionsPanel, getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
@@ -26,6 +27,97 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         resetSendToReportStoreItems
     } = props;
 
+    /* -- start 'findings' table classifications logic -- */
+
+    const [ changedClassificationsByVS, setChangedClassificationsByVS ] = useState({});
+
+    /**
+     * For now we keep state/logic for setting 'finding' table tags here.
+     * We may need to split out into sep. Controller component if need to move
+     * this state/logic up.
+     *
+     * @todo "Save" / "Apply Changes" button
+     */
+    const savedClassificationsByVS = useMemo(function(){
+        const { variant_samples: vsObjects = [] } = variantSampleListItem;
+        const savedClassificationsByVS = {};
+        vsObjects.forEach(function({ variant_sample_item }){
+            const { "@id": vsAtID, finding_table_tag = null } = variant_sample_item;
+            if (!vsAtID) {
+                return; // No view permission or similar.
+            }
+            if (finding_table_tag !== null) {
+                savedClassificationsByVS[vsAtID] = finding_table_tag;
+            }
+        });
+        return savedClassificationsByVS;
+    }, [ variantSampleListItem ]);
+
+    const changedClassificationsCount = useMemo(function(){
+        return Object.keys(changedClassificationsByVS).length;
+    }, [ changedClassificationsByVS ]);
+
+    /**
+     * If VS Item is refreshed, then update states --
+     * unset temporary unsaved states if just saved them.
+     *
+     * @todo
+     * Consider change this into a `useMemo` call instead of a `useEffect`;
+     * the setState call can happen inside this render method and thus
+     * act as 'getDerivedStateFromProps'.
+     */
+    useEffect(function(){
+        if (changedClassificationsCount === 0) {
+            return;
+        }
+        const nextChangedClassificationsByVS = { ...changedClassificationsByVS };
+        Object.keys(savedClassificationsByVS).forEach(function(vsAtID){
+            if (vsAtID in changedClassificationsByVS) {
+                const isEqual = changedClassificationsByVS[vsAtID] === savedClassificationsByVS[vsAtID];
+                if (isEqual) {
+                    delete nextChangedClassificationsByVS[k];
+                }
+            }
+        });
+        console.log("Updating `changedClassificationsByVS` - ", changedClassificationsByVS, nextChangedClassificationsByVS);
+        setChangedClassificationsByVS(nextChangedClassificationsByVS);
+    }, [ savedClassificationsByVS ]);
+
+
+    const updateClassificationForVS = useCallback(function(vsAtID, classification){
+        const nextChangedClassificationsByVS = { ...changedClassificationsByVS };
+        const { [vsAtID]: savedClassification = null } = savedClassificationsByVS;
+        if ((!savedClassification && classification === null) || savedClassification === classification) {
+            if (typeof nextChangedClassificationsByVS[vsAtID] === "undefined") {
+                return; // No change needed; skip update for performance.
+            }
+            delete nextChangedClassificationsByVS[vsAtID]; // undefined means (existing/equal) `savedClassification` will take precedence, no PATCH needed.
+        } else {
+            // Set explicit `null` (or truthy value) to inform to DELETE (or set) value of this field when PATCH.
+            if (nextChangedClassificationsByVS[vsAtID] === classification) {
+                return; // No change needed; skip update for performance.
+            }
+            nextChangedClassificationsByVS[vsAtID] = classification;
+        }
+        setChangedClassificationsByVS(nextChangedClassificationsByVS);
+    }, [ changedClassificationsByVS, savedClassificationsByVS ]);
+
+    useEffect(function(){
+        setTimeout(ReactTooltip.rebuild, 50);
+    }, [ changedClassificationsByVS ]);
+
+
+    /**
+     * PATCH changedClassificationsByVS to each applicable VS.
+     * @todo Implement; probably use ProgressModal & percent-completed state?
+     */
+    const saveClassifications = useCallback(function(){
+        // todo
+    }, [ changedClassificationsByVS ]);
+
+    /* -- end 'findings' table classifications logic -- */
+
+
     const alreadyInProjectNotes = useMemo(function(){
         return buildAlreadyStoredNoteUUIDDict(variantSampleListItem);
     }, [ variantSampleListItem ]);
@@ -37,33 +129,60 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         schemas, context
     };
 
+    const applyFindingsTagsBtnText = (
+        `Apply ${changedClassificationsCount > 0 ? changedClassificationsCount + " " : ""}'findings' change${changedClassificationsCount !== 1 ? "s" : ""}`
+    );
+
     return (
         <React.Fragment>
-            <div className="d-flex align-items-center justify-content-between mb-36">
+            <div className="d-flex align-items-center justify-content-between mb-24">
                 <h1 className="text-300 mb-0">
                     Case Review
                 </h1>
+
                 <div>
-                    {/*
-                    <button type="button" className="btn btn-primary mr-05" disabled>
-                        Export current 'Send to Project' selections as <span className="text-600">TSV spreadsheet</span>
-                    </button>
-                    */}
-                    <SaveNotesToProjectButton {...{ variantSampleListItem, fetchVariantSampleListItem, resetSendToProjectStoreItems, sendToProjectStore }} />
                     <button type="button" className="btn btn-primary ml-05" disabled>
-                        Send Note Selections to <span className="text-600">Report</span>
-                    </button>
-                    <button type="button" className="btn btn-primary ml-05" disabled>
-                        View Report Draft
+                        <i className="icon icon-file-pdf far mr-1"/>
+                        View Report
                     </button>
                 </div>
+
             </div>
             <div>
+
+                <div className="d-block d-md-flex align-items-center justify-content-between">
+                    <div className="text-left">
+                        {/*
+                        <button type="button" className="btn btn-primary mr-05" disabled>
+                            Export current 'Send to Project' selections as <span className="text-600">TSV spreadsheet</span>
+                        </button>
+                        */}
+
+                        <button type="button" className="btn btn-primary mr-05 my-1" disabled>
+                            Send Note Selections to <span className="text-600">Report</span>
+                        </button>
+
+                        <SaveNotesToProjectButton {...{ variantSampleListItem, fetchVariantSampleListItem, resetSendToProjectStoreItems, sendToProjectStore }}
+                            className="my-1 mr-05"/>
+
+                    </div>
+
+                    <div className="text-left">
+                        <button type="button" className="btn btn-primary ml-md-05 my-1" disabled={changedClassificationsCount === 0}>
+                            { applyFindingsTagsBtnText }
+                        </button>
+                    </div>
+
+                </div>
+
+                <hr className="mb-1 mt-06" />
+
                 <NoteSubSelectionStateController>
                     <CaseSpecificSelectionsPanel {...commonProps} />
                 </NoteSubSelectionStateController>
-                <hr />
-                <VariantSampleSelectionList {...commonProps} parentTabType={parentTabTypes.CASEREVIEW} />
+
+                <VariantSampleSelectionList {...commonProps} {...{ changedClassificationsByVS, updateClassificationForVS }}
+                    parentTabType={parentTabTypes.CASEREVIEW} />
             </div>
         </React.Fragment>
     );
@@ -306,13 +425,14 @@ class SaveNotesToProjectButton extends React.PureComponent {
     }
 
     render(){
-        const { sendToProjectStore, variantSampleListItem } = this.props;
+        const { sendToProjectStore, variantSampleListItem, className } = this.props;
         const { isPatching, patchingPercentageComplete, patchErrors } = this.state;
         const selectionStoreSize = this.memoized.selectionStoreSize(sendToProjectStore);
         const variantSamplesWithAnySelectionSize = this.memoized.variantSamplesWithAnySelectionSize(variantSampleListItem, sendToProjectStore);
         return (
             <React.Fragment>
-                <button type="button" className="btn btn-primary" onClick={this.onClick} disabled={isPatching || selectionStoreSize === 0}
+                <button type="button" className={"btn btn-primary" + (className ? " " + className : "")}
+                    onClick={this.onClick} disabled={isPatching || selectionStoreSize === 0}
                     data-tip={`${selectionStoreSize} Note selections from ${variantSamplesWithAnySelectionSize} Sample Variants`}>
                     Share Note Selections to <span className="text-600">Project</span>
                 </button>
@@ -324,6 +444,7 @@ class SaveNotesToProjectButton extends React.PureComponent {
     }
 }
 
+/** Can be re-used for PATCHing multiple items */
 const ProgressModal = React.memo(function ProgressModal (props) {
     const { isPatching, patchingPercentageComplete, onHide, patchErrors } = props;
 

@@ -254,6 +254,7 @@ module.exports = [
                 'auth0-lock': 'empty-module',
                 'aws-sdk': 'empty-module',
                 'package-lock.json': 'empty-module',
+                'pagedjs': 'empty-module',
                 'pedigree-viz': 'empty-module',
                 // Below - prevent some stuff in SPC from being bundled in.
                 // These keys are literally matched against the string values, not actual path contents, hence why is "../util/aws".. it exactly what within SPC/SubmissionView.js

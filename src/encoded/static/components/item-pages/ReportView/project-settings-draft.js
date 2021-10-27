@@ -25,31 +25,34 @@ export const projectReportSettings = {
     },
     "table_tags": {
         "show_subsections": true,
-        "subsection_note_order": ["acmg_interpretations", "discovery_intepretations"],
+        "subsection_note_order": [
+            "acmg_interpretations",
+            "discovery_intepretations"
+        ],
         "tags": [
             // Will become available as "tags" that can applied to VariantSamples (?)
             // (somewhat more tricky than hardcoded enums… maybe we can hardcode…?)
             {
-                "id": "clinical-primary-findings-table",
+                "id": "clinical-primary",
                 "title": "Primary Findings",
                 "always_visible": true
             },
             {
-                "id": "clinical-secondary-findings-table",
+                "id": "clinical-secondary",
                 "title": "Secondary Findings",
                 // If true, then table present with statement that no results found.
                 "always_visible": true
             },
             {
-                "id": "research-high-priority-findings-table",
+                "id": "research-high-priority",
                 "title": "High Priority Findings (Research)"
             },
             {
-                "id": "research-medium-priority-findings-table",
+                "id": "research-medium-priority",
                 "title": "Medium Priority Findings (Research)"
             },
             {
-                "id": "research-low-priority-findings-table",
+                "id": "research-low-priority",
                 "title": "Low Priority Findings (Research)"
             }
         ]
