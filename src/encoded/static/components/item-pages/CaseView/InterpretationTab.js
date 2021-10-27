@@ -1,8 +1,8 @@
 'use strict';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React from 'react';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
-import { VariantSampleSelection, VariantSampleSelectionList } from './VariantSampleSelection';
+import { VariantSampleSelectionList } from './VariantSampleSelection';
 
 
 
@@ -33,7 +33,13 @@ const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpre
     const { "@id": atId, variant_samples: vsObjects = [] } = variantSampleListItem || {};
     const baseHref = atId + "/@@spreadsheet/?file_format=";
     return (
-        <DropdownButton variant="primary" disabled={vsObjects.length === 0} title="Export as...">
+        <DropdownButton variant="outline-primary" disabled={vsObjects.length === 0}
+            title={
+                <span>
+                    <i className="icon icon-table fas mr-1"/>
+                    Export As...
+                </span>
+            }>
             <a href={baseHref + "tsv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
                 <span className="text-600">TSV</span> spreadsheet
             </a>
