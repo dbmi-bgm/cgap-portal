@@ -19,6 +19,7 @@ import { SampleTabBody } from './SampleTabBody';
 import { AnnotationBrowserTabBody } from './AnnotationBrowserTabBody';
 import { BamFileBrowserTabBody } from './BamFileBrowserTabBody';
 import { InterpretationSpaceWrapper, InterpretationSpaceHeader } from './InterpretationSpaceController';
+import { getInitialTranscriptIndex } from './AnnotationSections';
 
 
 
@@ -37,19 +38,7 @@ export class VariantSampleOverview extends React.PureComponent {
         } = props;
 
         // Set initial index to most severe or canonical transcript.
-        let initialIndex = transcript.findIndex(function({ csq_most_severe }){
-            return !!(csq_most_severe);
-        });
-
-        if (initialIndex === -1){
-            initialIndex = transcript.findIndex(function({ csq_canonical }){
-                return !!(csq_canonical);
-            });
-        }
-
-        if (initialIndex === -1){
-            initialIndex = 0;
-        }
+        const initialIndex = getInitialTranscriptIndex(transcript);
 
         this.state = {
             currentTranscriptIdx: initialIndex,

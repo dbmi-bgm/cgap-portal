@@ -15,8 +15,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
     render(){
         const { context = null, schemas, href } = this.props;
-        const comingSoonElem = <span className="font-italic">{null}</span>;
-        const passProps = { context, schemas, href, comingSoonElem };
+        const passProps = { context, schemas, href };
 
         const { query: {
             annotationTab = null,           // used only if can be parsed to integer (SvBrowser = 0)
@@ -33,19 +32,13 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
 
 function StructuralVariantSampleInfoHeader(props){
     const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
+
     const {
-        comingSoonElem,
         context,
         schemas,
         caseID = <span className="text-muted"> - </span>, // null
     } = props;
     const { variant: { ID = fallbackElem } = {} } = context;
-
-    function getTipForField(field, itemType = "StructuralVariantSample"){
-        if (!schemas) return null;
-        const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
-        return (schemaProperty || {}).description || null;
-    }
 
     return (
         // Stack these into flex column until large responsive size, then make into row.
@@ -70,16 +63,16 @@ function StructuralVariantSampleInfoHeader(props){
                         </div>
                         <div className="info-body">
                             <div className="row mb-03">
-                                <StructuralVariantInfoSection {...{ context, comingSoonElem }} />
+                                <StructuralVariantInfoSection {...{ context }} />
                             </div>
                         </div>
                     </div>
-                    <div className="inner-card-section col pb-2 pb-lg-0">
+                    <div className="inner-card-section col-lg-4 pb-2 pb-lg-0">
                         <div className="info-header-title">
                             <h4>Gene Info</h4>
                         </div>
                         <div className="info-body">
-                            <GeneInfoSection {...{ context, comingSoonElem }} />
+                            <GeneInfoSection {...{ context, schemas }} />
                         </div>
                     </div>
                 </div>
@@ -103,7 +96,7 @@ function calculateGenotype(CALL_INFO, labels) {
     return null;
 }
 
-function StructuralVariantInfoSection({ context, comingSoonElem }) {
+function StructuralVariantInfoSection({ context }) {
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const {
         structural_variant = {},
@@ -112,14 +105,14 @@ function StructuralVariantInfoSection({ context, comingSoonElem }) {
     } = context;
     const {
         size_display = fallbackElem,
-        cytoband = fallbackElem, // Next version of bioinfo
+        cytoband_display = fallbackElem,
         SV_TYPE = fallbackElem,
         CHROM = "",
         START = "",
         END = ""
     } = structural_variant;
 
-    const longFormTypeMap = { DUP: "Duplication", DEL: "Deletion" }; // may need to update if sv schema is updated
+    const longFormTypeMap = { DUP: "Duplication", DEL: "Deletion" }; // may need to update if sv schema is updated/just pull from schema in future
 
     const genotype = calculateGenotype(CALL_INFO, genotype_labels) || fallbackElem;
 
@@ -148,7 +141,7 @@ function StructuralVariantInfoSection({ context, comingSoonElem }) {
                             <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_grch37">{comingSoonElem}</span>
+                            <span id="vi_grch37">{/* Coming soon */}</span>
                         </div>
                     </div>
                 </div>
@@ -174,7 +167,7 @@ function StructuralVariantInfoSection({ context, comingSoonElem }) {
                             <label htmlFor="vi_cytoband" className="mb-0">Cytoband:</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_cytoband">{comingSoonElem}</span>
+                            <span id="vi_cytoband">{cytoband_display}</span>
                         </div>
                     </div>
                 </div>
@@ -259,13 +252,13 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
-    componentDidUpdate(pastProps){
-        const { currentTab: pastTab } = pastProps;
-        const { currentTab } = this.props;
+    componentDidUpdate(pastProps, pastState){
+        const { currentTab: pastTab } = pastState;
+        const { currentTab } = this.state;
         if (currentTab !== pastTab) {
             // ReactTooltip.rebuild is called by App upon navigation
             // to rebuild tooltips from current DOM.
-            // However most tabs' DOM contents not visible until swithc to them
+            // However most tabs' DOM contents not visible until switch to them
             // so we needa rebuild tooltip upon that.
             // If DotRouter can be reused/integrated here or similar, we can
             // remove this useEffect.
@@ -287,7 +280,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, currentGeneItem, currentGeneItemLoading, comingSoonElem } = this.props;
+        const { context, schemas, currentGeneItem, currentGeneItemLoading } = this.props;
         const { currentTab } = this.state;
 
         const tabTitleElements = [];
@@ -299,7 +292,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
             tabTitleElements.push(<OverviewTabTitle {...tabTitleElemProps} />);
 
             if (index === currentTab || this.openPersistentTabs[index]) {
-                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index, comingSoonElem };
+                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
                 switch (index) {
                     case 0: // Gene
                         tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);

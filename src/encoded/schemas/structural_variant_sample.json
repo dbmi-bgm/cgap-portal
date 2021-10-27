@@ -282,7 +282,7 @@
             "title": "Type",
             "order": 20
         },
-        "structural_variant.size_display": {
+        "structural_variant.size": {
             "title": "Size",
             "order": 30
         },
