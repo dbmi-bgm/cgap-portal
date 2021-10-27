@@ -167,21 +167,22 @@ export class FilterSetController extends React.PureComponent {
             return null;
         }
 
-        const { filter_blocks, search_type = "VariantSample" } = currFilterSet;
+        const { filter_blocks, search_type: filterSetSearchType = "VariantSample" } = currFilterSet;
 
-        let global_flags = url.parse(searchHrefBase, false).search;
-        if (global_flags) {
-            // Not particularly necessary but helps make less redundant since we have `search_type` already.
-            global_flags = global_flags.slice(1).replace("type=VariantSample&", "");
-        }
+        const { query: globalFlagsQuery = {} } = url.parse(searchHrefBase, true);
+
+        const searchType = globalFlagsQuery.type || filterSetSearchType;
+
+        // Not particularly necessary, but helps make less redundant since we have the required `search_type` already.
+        delete globalFlagsQuery.type;
 
         const selectedFilterBlocks = selectedIdxCount === 0 ? filter_blocks : filter_blocks.filter(function(fb, fbIdx){
             return selectedFilterBlockIndices[fbIdx];
         });
 
         return {
-            search_type,
-            global_flags,
+            "search_type": searchType,
+            "global_flags": queryString.stringify(globalFlagsQuery),
             "intersect": intersectFilterBlocks,
             // We create our own names for flags & flags_applied here rather
             // than using filterSet.flags since filterSet.flags might potentially

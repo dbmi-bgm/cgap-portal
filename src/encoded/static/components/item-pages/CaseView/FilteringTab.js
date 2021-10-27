@@ -100,15 +100,19 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
     const cnvDisabled = currentlyOnCNV || !svFilterHrefAddon;
 
     return (
+        // WHEN FINISHED TESTING THEN set:
+        // (a) disabled={!snvFilterHrefAddon} + disabled={!svFilterHrefAddon}
+        // (b) onClick={snvDisabled ? null : onClickSNV} + onClick={cnvDisabled ? null : onClickCNV}
+        // .. and then style to be more toggley
         <div className="card py-2 px-1 mb-3 d-flex d-md-inline-flex flex-row filtering-tab-toggle">
             <button type="button" aria-pressed={currentlyOnSNV}
                 className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnSNV ? "primary-dark active" : "outline-primary")}
-                onClick={snvDisabled ? null : onClickSNV}>
+                onClick={onClickSNV} disabled={false}>
                 { filteringTabViews["0"].name } Filtering
             </button>
             <button type="button" aria-pressed={currentlyOnCNV}
                 className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnCNV ? "primary-dark active" : "outline-primary")}
-                onClick={cnvDisabled ? null : onClickCNV}>
+                onClick={onClickCNV} disabled={false}>
                 { filteringTabViews["1"].name } Filtering
             </button>
         </div>
