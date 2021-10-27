@@ -2080,11 +2080,13 @@ i.status-indicator-dot {
 		i.icon {
 			font-size: 0.725em;
 		}
-		a + i.icon-pen {
-			color: transparent;
-		}
-		a:hover + i.icon-pen {
+
+		> i.icon-pen {
 			color: $gray-400;
+		}
+
+		&:hover > i.icon-pen {
+			color: $gray-700;
 		}
 	}
 
