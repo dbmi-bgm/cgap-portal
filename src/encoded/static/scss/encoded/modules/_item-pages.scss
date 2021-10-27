@@ -2423,6 +2423,19 @@ i.status-indicator-dot {
 				@include button-variant(#fff, #e0e0e0);
 			}
 		}
+
+		.search-view-controls-and-results[data-search-item-type="Gene"] .result-table-detail .gene-tab-body.card-body .row>.col-12.col-md-6.d-flex:first-of-type .inner-card-section:first-of-type {
+			// Make transcript selector button push to new line & create space in body for it.
+			.info-header-title {
+				flex-wrap: wrap;
+			}
+
+			.info-body {
+				@media (max-width:1300px) and (min-width:768px) {
+					padding-top: 50px;
+				}
+			}
+		}
 	}
 
 	.sample-variant-info-header {

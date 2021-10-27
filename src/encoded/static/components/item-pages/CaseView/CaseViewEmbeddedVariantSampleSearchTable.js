@@ -6,6 +6,7 @@ import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
+import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 
 /* Used in FilteringTab */
 
@@ -89,7 +90,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
             "structural_variant.transcript.csq_gene.display_title": {
                 "noSort": true, // not currently a useful or informative sort.
                 "render": function(result, props) {
-                    const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result;
+                    const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result || {};
                     const path = atID + "?annotationTab=0";
 
                     const transcriptsDeduped = {};
@@ -100,14 +101,30 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     const genes = Object.keys(transcriptsDeduped);
 
                     if (genes.length <= 2) { // show comma separated
-                        return <a href={path}>{genes.join(", ")}</a>;
-                    } // show first and last gene separated by "..."
-                    return <a href={path}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
+                        return <a href={path} target="_blank" rel="noreferrer">{genes.join(", ")}</a>;
+                    }
+                    // show first and last gene separated by "..." with first 10 available on hover
+                    const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
+                    const tipGenes = genes.slice(0, lastItemIndex).join(", ");
+
+                    return <a href={path} target="_blank" rel="noreferrer" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
+                }
+            },
+            "structural_variant.gnomadg_af": {
+                "render": function(result, props) {
+                    const { structural_variant: { gnomadg_af = null, unrelated_count = null } = {} } = result || {};
+                    const { align = 'left' } = props;
+
+                    const rows = [
+                        <div className="d-block text-truncate" key="gnomadAF"><span className="text-600">gnomAD: </span>{gnomadg_af !== null ? gnomadg_af: "-"}</div>,
+                        <div className="d-block text-truncate" key="internal"><span className="text-600">Internal: </span>{unrelated_count !== null ? unrelated_count: "-"}</div>
+                    ];
+                    return <StackedRowColumn {...{ rows }} className={"text-truncate text-" + align} />;
                 }
             },
             "structural_variant.size": {
                 "render": function(result, props) {
-                    const { structural_variant: { size_display = null } = {} } = result;
+                    const { structural_variant: { size_display = null } = {} } = result || {};
                     return size_display;
                 }
             }
