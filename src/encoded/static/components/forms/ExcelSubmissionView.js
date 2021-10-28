@@ -114,11 +114,11 @@ export default class ExcelSubmissionView extends React.PureComponent {
         const {
             result: {
                 genelist = '/search/?type=GeneList',
-                patch: { family = null }
+                patch: { family = null } = {}
             } = {}
         } = additional_data || {};
         const { target: { value = null } = {} } = e;
-        const { 0: familyAtID = null } = Object.keys(family) || [];
+        const { 0: familyAtID = null } = Object.keys(family || {}) || [];
 
         switch(ingestionType) {
             case "metadata_bundle":
