@@ -850,18 +850,18 @@ function ExcelSubmissionFileAttachmentBtn(props) {
 
     switch(ingestionType) {
         case "genelist":
-            acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .txt";
-            acceptedTypesDisplay = ".csv, .tsv, .xls, .xlsx, .txt";
+            acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .txt";
+            acceptedTypesDisplay = ".xlsx, .txt";
             uploadType = "Gene List";
             break;
         case "metadata_bundle":
-            acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
-            acceptedTypesDisplay = ".csv, .tsv, .xls, .xlsx";
+            acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            acceptedTypesDisplay = ".csv, .tsv, .xlsx";
             uploadType = "Case";
             break;
         case "family_history":
-            acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"; // TODO: Only excel? No CSV/TSV -- verify this
-            acceptedTypesDisplay = ".xls, .xlsx";
+            acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            acceptedTypesDisplay = ".xlsx";
             uploadType = "Family History";
             break;
     }
