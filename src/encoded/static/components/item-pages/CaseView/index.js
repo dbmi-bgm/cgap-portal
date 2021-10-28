@@ -683,39 +683,57 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
         filteredSNVIndelVariants = {}, filteredSVVariants = {} } = msaStats;
 
     return (
-        <div className="row py-3">
-            <BioinfoStatsEntry label="Total Number of Reads" tooltip={reads.tooltip}>
-                { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Coverage" tooltip={coverage.tooltip}>
-                { coverage.value || "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Total Number of SNVs/Indels called" tooltip={totalSNVIndelVars.tooltip}>
-                { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Transition-Transversion ratio" tooltip={transTransRatio.tooltip}>
-                { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Heterozygosity ratio" tooltip={heterozygosity.tooltip}>
-                { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="De novo Fraction" tooltip={deNovo.tooltip}>
-                { typeof deNovo.value === "number" ? deNovo.value + "%" : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" tooltip={filteredSNVIndelVariants.tooltip}>
-                { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Structural Variants After Hard Filters" tooltip={filteredSVVariants.tooltip}>
-                { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : "-" }
-            </BioinfoStatsEntry>
-        </div>
+        <>
+            <div className="row py-3">
+                <BioinfoStatsEntry label="Total Number of Reads" tooltip={reads.tooltip}>
+                    { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : "-" }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Coverage" tooltip={coverage.tooltip}>
+                    { coverage.value || "-" }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Total Number of SNVs/Indels called" tooltip={totalSNVIndelVars.tooltip}>
+                    { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): "-" }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Transition-Transversion ratio" tooltip={transTransRatio.tooltip}>
+                    { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : "-" }
+                </BioinfoStatsEntry>
+            </div>
+            <div className="row py-3">
+                <BioinfoStatsEntry label="Submitted Sex" tooltip={""}>
+                    { "-" }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Predicted Sex" tooltip={""}>
+                    { "-" }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" tooltip={filteredSNVIndelVariants.tooltip}>
+                    { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : "-" }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Structural Variants After Hard Filters" tooltip={filteredSVVariants.tooltip}>
+                    { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : "-" }
+                </BioinfoStatsEntry>
+            </div>
+            <div className="row py-3">
+                <BioinfoStatsEntry label="Submitted Ancestry" tooltip={""}>
+                    { "-" }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Predicted Ancestry" tooltip={""}>
+                    { "-" }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Heterozygosity ratio" tooltip={heterozygosity.tooltip}>
+                    { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : "-" }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="De novo Fraction" tooltip={deNovo.tooltip}>
+                    { typeof deNovo.value === "number" ? deNovo.value + "%" : "-" }
+                </BioinfoStatsEntry>
+            </div>
+        </>
     );
 });
 
 
 function BioinfoStatsEntry({ tooltip, label, children }){
     return (
-        <div className="col-12 col-md-6 col-lg-4 col-xl-3 mt-04 mb-04">
+        <div className="col-12 col-md-6 col-lg-3 col-xl-3 mt-04 mb-04">
             <div className="qc-summary">
                 <label className="d-block mb-0">
                     { label }:
