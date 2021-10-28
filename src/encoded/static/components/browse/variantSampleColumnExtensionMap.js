@@ -211,11 +211,13 @@ export const VariantSampleDisplayTitleColumn = React.memo(function VariantSample
 
     const cls = ("title-block" + (className ? " " + className : ""));
     const rows = [
-        <span key="variant-title" className="d-block text-600 text-truncate">{display_title}</span>
+        <span key={0} className="d-block text-600 text-truncate">
+            { display_title }
+        </span>
     ];
 
     if (ID) {
-        rows.push(<span key="dbsnp" className="font-italic">{ ID }</span>);
+        rows.push(<span key={1} className="font-italic">{ ID }</span>);
     }
 
     return (
@@ -227,17 +229,31 @@ export const VariantSampleDisplayTitleColumn = React.memo(function VariantSample
 
 /** An edited version of SPC's DisplayTitleColumnDefault, used in CaseViewEmbeddedVariantSampleSearchTableSV */
 export const VariantSampleDisplayTitleColumnSV = React.memo(function VariantSampleDisplayTitleColumn(props) {
-    const { result = null, link, onClick } = props;
-    // TODO Add sel
-    // const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-    const { "@id": atID, structural_variant: { display_title = "", annotation_id = "" } = {} } = result;
+    const { result = null, link, onClick, className = null } = props;
+    const {
+        "@id": atID,
+        structural_variant: {
+            display_title = "",
+            annotation_id = ""
+        } = {}
+    } = result || {};
+
+    const cls = ("title-block" + (className ? " " + className : ""));
 
     // annotationID structured like <type>_chr...etc; need just the part after underscore
     const [ , splitAnnotationIDSuffix ] = (annotation_id || display_title).split("_");
+
+    const rows = [
+        <span key={0} className="d-block text-600 text-truncate">{ splitAnnotationIDSuffix }</span>
+    ];
+
+    // TODO setup the analytics tracking in place of having `onClick` do it, or have props.onClick
+    // (defined in SPC's basicColumnExtensionMap>DisplayTitleColumnWrapper) handle target="_blank".
+
     return (
-        <div className="text-left pl-25 text-truncate">
-            <a href={link || atID} onClick={onClick}>{ splitAnnotationIDSuffix }</a>
-        </div>
+        <a key="title" href={link || atID} target="_blank" rel="noopener noreferrer" className="d-block text-truncate">
+            <StackedRowColumn className={cls} {...{ rows }}  />
+        </a>
     );
 });
 

@@ -396,10 +396,10 @@ export const columnExtensionMap = {
         'render' : function statusIndicator(result, props){
             const statusFormatted = Schemas.Term.toName('status', result.status);
             return (
-                <React.Fragment>
-                    <i className="status-indicator-dot mr-07" data-status={result.status}/>
-                    <span className="value">{ statusFormatted }</span>
-                </React.Fragment>
+                <span className="value">
+                    <i className="status-indicator-dot mr-07" data-status={result.status} />
+                    { statusFormatted }
+                </span>
             );
         }
     },

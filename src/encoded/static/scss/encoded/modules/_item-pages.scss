@@ -1596,13 +1596,12 @@ i.status-indicator-dot {
 				.embedded-search-container .search-view-controls-and-results[data-search-item-type="StructuralVariantSample"] {
 					.search-result-row.detail-closed .columns.result-table-row {
 						.search-result-column-block[data-field="display_title"][data-first-visible-column="true"] {
-							// Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate
-							padding-left: 0 !important; // important necessary to override default style (this is short term override/will be deleted soon so hopefully ok)
-						}
-						.search-result-column-block[data-field="status"],
-						.search-result-column-block[data-field="date_created"] {
-							display: flex;
-							justify-content: center;
+							/* Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate */
+							/* important necessary to override default style (this is short term override/will be deleted soon so hopefully ok) */
+							padding-left: 18px !important;
+							.toggle-detail-button-container {
+								display: none;
+							}
 						}
 					}
 				}

@@ -182,7 +182,7 @@ export class FilterSetController extends React.PureComponent {
 
         return {
             "search_type": searchType,
-            "global_flags": queryString.stringify(globalFlagsQuery),
+            "global_flags": queryString.stringify(globalFlagsQuery).replaceAll("%20", "+"),
             "intersect": intersectFilterBlocks,
             // We create our own names for flags & flags_applied here rather
             // than using filterSet.flags since filterSet.flags might potentially
