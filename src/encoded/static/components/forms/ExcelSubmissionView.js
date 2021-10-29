@@ -860,8 +860,8 @@ function ExcelSubmissionFileAttachmentBtn(props) {
             uploadType = "Case";
             break;
         case "family_history":
-            acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            acceptedTypesDisplay = ".xlsx";
+            acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            acceptedTypesDisplay = ".csv, .tsv, .xlsx";
             uploadType = "Family History";
             break;
     }
