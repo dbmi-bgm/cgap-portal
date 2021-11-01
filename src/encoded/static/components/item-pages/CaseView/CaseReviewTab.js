@@ -130,7 +130,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
     };
 
     const applyFindingsTagsBtnText = (
-        `Apply ${changedClassificationsCount > 0 ? changedClassificationsCount + " " : ""}'findings' change${changedClassificationsCount !== 1 ? "s" : ""}`
+        `Save ${changedClassificationsCount > 0 ? changedClassificationsCount + " " : ""}'findings' change${changedClassificationsCount !== 1 ? "s" : ""}`
     );
 
     return (
@@ -159,7 +159,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                         */}
 
                         <button type="button" className="btn btn-primary mr-05 my-1" disabled>
-                            Send Note Selections to <span className="text-600">Report</span>
+                            Save Note Selections to <span className="text-600">Report</span>
                         </button>
 
                         <SaveNotesToProjectButton {...{ variantSampleListItem, fetchVariantSampleListItem, resetSendToProjectStoreItems, sendToProjectStore }}
@@ -434,7 +434,7 @@ class SaveNotesToProjectButton extends React.PureComponent {
                 <button type="button" className={"btn btn-primary" + (className ? " " + className : "")}
                     onClick={this.onClick} disabled={isPatching || selectionStoreSize === 0}
                     data-tip={`${selectionStoreSize} Note selections from ${variantSamplesWithAnySelectionSize} Sample Variants`}>
-                    Share Note Selections to <span className="text-600">Project</span>
+                    Save Note Selections to <span className="text-600">Project</span>
                 </button>
                 { isPatching ?
                     <ProgressModal {...{ isPatching, patchingPercentageComplete, patchErrors }} onHide={this.onReset} />

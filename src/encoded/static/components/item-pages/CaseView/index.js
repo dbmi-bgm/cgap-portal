@@ -332,7 +332,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
                             Interpretation
                         </span>}>
-                        <InterpretationTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem }} />
+                        <InterpretationTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
                     </DotRouterTab>
                     <DotRouterTab dotPath=".review" disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
                         <CaseReviewDataStore>

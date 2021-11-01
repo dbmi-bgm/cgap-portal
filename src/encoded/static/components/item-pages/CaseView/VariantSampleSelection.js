@@ -43,6 +43,11 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         isLoadingVariantSampleListItem = false,
         parentTabType = parentTabTypes.INTERPRETATION,
 
+        // From InterpretationTab:
+        toggleVariantSampleSelectionDeletion,
+        deletedVariantSampleSelections,
+        anyUnsavedChanges,
+
         // From CaseReviewTab:
         alreadyInProjectNotes,
         // savedClassificationsByVS,
@@ -72,15 +77,11 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         return tableTagsByID;
     }, [ projectReportSettings ]);
 
-    if (isLoadingVariantSampleListItem) {
+    if (vsSelections.length === 0) {
         return (
-            <h4 className="text-400 text-center text-muted py-3">
-                <i className="icon icon-spin icon-circle-notch icon-2x fas"/>
+            <h4 className="text-400 text-center text-secondary py-3">
+                { isLoadingVariantSampleListItem ? "Loading, please wait..." : "No selections added yet" }
             </h4>
-        );
-    } else if (vsSelections.length === 0) {
-        return (
-            <h4 className="text-400">No selections added yet</h4>
         );
     } else {
         const commonProps = {
@@ -90,17 +91,26 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
             sendToProjectStore,
             sendToReportStore,
             alreadyInProjectNotes,
-            tableTagsByID
+            tableTagsByID,
+            updateClassificationForVS,
+            toggleVariantSampleSelectionDeletion,
+            anyUnsavedChanges
         };
         return vsSelections.map(function(selection, index){
             const { variant_sample_item: { "@id": vsAtID } = {} } = selection;
-            if (vsAtID) {
-                // TODO: Handle lack of permissions, show some 'no permissions' view, idk..
+            if (!vsAtID) {
+                // Handle lack of permissions, show some 'no permissions' view, idk..
+                return (
+                    <div className="text-center p-3">
+                        <em>Item with no view permissions</em>
+                    </div>
+                );
             }
             const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsAtID] : undefined;
+            const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsAtID] || false) : undefined;
             return (
-                <VariantSampleSelection {...commonProps} key={index}
-                    {...{ selection, index, unsavedClassification, updateClassificationForVS }}  />
+                <VariantSampleSelection {...commonProps} key={vsAtID || index}
+                    {...{ selection, index, unsavedClassification, isDeleted }}  />
             );
         });
     }
@@ -124,6 +134,10 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         context,    // Case
         schemas,
         parentTabType = parentTabTypes.INTERPRETATION,
+        // From InterpretationTab (if used):
+        toggleVariantSampleSelectionDeletion,
+        isDeleted,
+        anyUnsavedChanges, // If true, then should prevent navigation to VS items as would lose changes in current view. (Unless we adjust to open in new window.)
         // From CaseReviewTab (if used):
         alreadyInProjectNotes,
         unsavedClassification,
@@ -196,7 +210,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     }
 
     return (
-        <div className="card mb-1 variant-sample-selection" key={index}>
+        <div className="card mb-1 variant-sample-selection" data-is-deleted={isDeleted} key={index}>
             <div className="card-header">
                 <div className="d-flex flex-column flex-lg-row align-items-lg-center">
 
@@ -208,14 +222,18 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                                         { variantDisplayTitle }
                                         { noSavedNotes ? <i className="icon icon-exclamation-triangle fas ml-12 text-warning" data-tip="No notes saved for this Sample Variant in interpretation"/> : null }
                                     </React.Fragment>
-                                    : (
+                                    : anyUnsavedChanges ?
                                         <React.Fragment>
+                                            <i className={`icon icon-fw title-prefix-icon icon-${isDeleted ? "trash text-danger" : "check text-success"} fas mr-12`}/>
+                                            <span className={"text-" + (isDeleted? "muted": "secondary")}>{ variantDisplayTitle }</span>
+                                        </React.Fragment>
+                                        :
+                                        <React.Fragment>
+                                            <i className="icon icon-fw title-prefix-icon icon-pen fas mr-12"/>
                                             <a href={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`}>
                                                 { variantDisplayTitle }
                                             </a>
-                                            <i className="icon icon-pen fas ml-12"/>
                                         </React.Fragment>
-                                    )
                             }
                         </h4>
                     </div>
@@ -237,14 +255,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                             : null }
 
                         { parentTabType === parentTabTypes.INTERPRETATION ?
-                            <DropdownButton size="sm" variant="light" className="d-inline-block" disabled title={
-                                <React.Fragment>
-                                    <i className="icon icon-bars fas mr-07"/>
-                                    Actions
-                                </React.Fragment>
-                            }>
-                                TODO
-                            </DropdownButton>
+                            <ActionsDropdown {...{ toggleVariantSampleSelectionDeletion, isDeleted, variantSample }} />
                             : null }
 
                     </div>
@@ -318,6 +329,32 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         </div>
     );
 });
+
+
+function ActionsDropdown(props){
+    const { toggleVariantSampleSelectionDeletion, variantSample, isDeleted } = props;
+    const { "@id": vsAtID } = variantSample;
+
+    const onSelect = useCallback(function(evtKey, e){
+        if (evtKey === "delete") {
+            toggleVariantSampleSelectionDeletion(vsAtID);
+        }
+    }, [ toggleVariantSampleSelectionDeletion, variantSample ]);
+
+    return (
+        <DropdownButton size="sm" variant="light" className="d-inline-block" onSelect={onSelect}
+            title={
+                <React.Fragment>
+                    <i className="icon icon-bars fas mr-07"/>
+                    Actions
+                </React.Fragment>
+            }>
+            <DropdownItem key={0} eventKey="delete">
+                { isDeleted ? "Unmark from deletion" : "Mark for deletion" }
+            </DropdownItem>
+        </DropdownButton>
+    );
+}
 
 
 function ClassificationDropdown(props){

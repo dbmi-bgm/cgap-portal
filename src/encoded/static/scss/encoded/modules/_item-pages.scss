@@ -2073,22 +2073,54 @@ i.status-indicator-dot {
 	CaseView -> InterpretationTab + CaseReviewTab
 **********************************************************/
 
-.variant-sample-selection {
+.variant-sample-selection.card {
 
 	h4.selected-vsl-title {
 		font-size: 1.275rem; /* Slight decrease from h4 default of 1.3rem */
+
+		> a:hover {
+			/* Remove underline, icon changing should be enough.. */
+			text-decoration: none;
+		}
+
 		i.icon {
 			font-size: 0.725em;
 		}
 
-		> i.icon-pen {
-			color: $gray-400;
+		> i.title-prefix-icon,
+		> span {
+			transition: color .3s;
 		}
 
-		&:hover > i.icon-pen {
-			color: $gray-700;
+		> i.title-prefix-icon.icon-pen {
+			color: $gray-600;
+		}
+
+		&:hover > i.title-prefix-icon.icon-pen {
+			color: $gray-900;
 		}
 	}
+
+
+	transition: border-color .5s ease-out;
+
+	> .card-body,
+	> .card-footer {
+		/* maybe should add some more explit classNames */
+		transition: opacity .5s ease-out;
+	}
+
+	&[data-is-deleted="true"] {
+		border-color: transparentize($color: $danger, $amount: 0.25);
+		box-shadow: none;
+		> .card-body,
+		> .card-footer {
+			opacity: 0.3;
+			pointer-events: none;
+		}
+	}
+
+	
 
 	.note-content-area {
 
