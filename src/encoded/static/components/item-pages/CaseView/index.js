@@ -30,7 +30,6 @@ import { FilteringTab } from './FilteringTab';
 import { InterpretationTab } from './InterpretationTab';
 import { CaseReviewTab } from './CaseReviewTab';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
-import CaseSubmissionView from './CaseSubmissionView';
 
 
 
@@ -39,7 +38,6 @@ export {
     PedigreeTabViewBody,
     PedigreeFullScreenBtn,
     parseFamilyIntoDataset,
-    CaseSubmissionView
 };
 
 

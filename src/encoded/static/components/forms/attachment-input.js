@@ -18,9 +18,12 @@ export class AttachmentInputController extends React.PureComponent {
     constructor(props){
         super(props);
         this.handleChange = this.handleChange.bind(this);
+        this.onFormSubmit = this.onFormSubmit.bind(this);
+        this.clearFile = this.clearFile.bind(this);
         this.state = {
             loading: false,
-            success: null
+            success: null,
+            file: null
         };
     }
 
@@ -28,11 +31,23 @@ export class AttachmentInputController extends React.PureComponent {
         const { 0: file = null } = e.target.files || {};
 
         if (file) {
-            file.filename = file.name;
+            this.setState({ file });
+        }
+    }
 
-            const formData = new FormData();
-            formData.append("datafile", file);
+    onFormSubmit(e) {
+        e.preventDefault();
 
+        const { file } = this.state;
+        const { clearAllAlerts } = this.props;
+        if (!file) { throw new Error("Attempting file submission when no file exists in state..."); }
+
+        file.filename = file.name;
+
+        const formData = new FormData();
+        formData.append("datafile", file);
+
+        clearAllAlerts(
             this.setState({ loading: true }, ()=>{
                 const { context: { uuid }, onAddedFile } = this.props;
 
@@ -54,20 +69,24 @@ export class AttachmentInputController extends React.PureComponent {
                 };
 
                 ajax.postMultipartFormData(postURL, formData, onErrorCallback, onSuccessCallback);
-            });
-
-        }
+            })
+        );
     }
 
-    onFormSubmit() {
-        e.preventDefault();
+    clearFile() {
+        this.setState({ file : null });
     }
 
     render(){
         const { children, ...passProps } = this.props;
-        const { loading: loadingFileResult, success: postFileSuccess } = this.state;
+        const { loading: loadingFileResult, success: postFileSuccess, file } = this.state;
         return (
-            React.Children.map(children, (c) => React.cloneElement(c, { ...passProps, loadingFileResult, postFileSuccess, onFileInputChange: this.handleChange }))
+            React.Children.map(children,
+                (c) => React.cloneElement(c,
+                    { ...passProps, loadingFileResult, postFileSuccess, onFileInputChange: this.handleChange, file,
+                        onFormSubmit: this.onFormSubmit, onClearFile: this.clearFile }
+                )
+            )
         );
     }
 }
