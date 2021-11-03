@@ -4,9 +4,9 @@ import negspy.coordinates as nc
 from snovault import calculated_property, collection, load_schema
 
 from ..ingestion.common import CGAP_CORE_PROJECT
+from ..inheritance_mode import InheritanceMode
 from ..util import resolve_file_path
 from .base import Item, get_item_or_none
-from .inheritance_mode import InheritanceMode
 from .variant import (
     ANNOTATION_ID,
     SHARED_VARIANT_EMBEDS,
