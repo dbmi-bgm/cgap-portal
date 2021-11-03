@@ -8,11 +8,11 @@ import ReactTooltip from 'react-tooltip';
 
 import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console, ajax, JWT, navigate, object, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
-import { LinkToDropdown } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/LinkToDropdown';
+import { Fade } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Fade';
 
 import { AttachmentInputController } from './attachment-input';
 
@@ -29,11 +29,16 @@ export default class ExcelSubmissionView extends React.PureComponent {
         this.handleLoadedIngestionSubmission = this.handleLoadedIngestionSubmission.bind(this);
         this.handleComplete = this.handleComplete.bind(this);
         this.markCompleted = this.markCompleted.bind(this);
+        this.clearAllAlerts = this.clearAllAlerts.bind(this);
+        this.closeAlert = this.closeAlert.bind(this);
+        this.pushNewAlert = this.pushNewAlert.bind(this);
+
         this.state = {
             panelsComplete: [ false, false, false ],
             panelIdx: 0,
             submissionItem: null,
-            user: null
+            user: null,
+            localAlerts: []
         };
         // console.log('excelsubmissionview props', props);
     }
@@ -71,9 +76,12 @@ export default class ExcelSubmissionView extends React.PureComponent {
         if (!(submissionItem && submissionItem['@id'])){
             throw new Error("Expected IngestionSubmission Item");
         }
-        this.setState(function({ panelsComplete: pastPanelsComplete }){
+
+        this.clearAllAlerts();
+        this.setState(({ panelsComplete: pastPanelsComplete }) => {
             let panelsComplete;
             if (pastPanelsComplete[0] !== true){ // ensure step is completed, move to next
+
                 panelsComplete = pastPanelsComplete.slice(0);
                 panelsComplete[0] = true;
                 return { submissionItem, panelsComplete, panelIdx: 1 };
@@ -84,16 +92,16 @@ export default class ExcelSubmissionView extends React.PureComponent {
                 } = submissionItem;
 
                 if (state === "done" && outcome !== "success") {
-                    Alerts.queue({
+                    this.pushNewAlert({
                         "title": "Something went wrong while processing this file...",
                         "message": <ul>{validation_output.map((item) => <li key={item}>{item}</li>)}</ul>,
-                        "style": "danger"
+                        "style": "danger",
                     });
                 } else {
-                    Alerts.queue({
+                    this.pushNewAlert({
                         "title": "All items validated successfully.",
                         "message": <ul>{validation_output.map((item) => <li key={item}>{item}</li>)}</ul>,
-                        "style": "success"
+                        "style": "success",
                     });
                 }
                 return { submissionItem };
@@ -106,11 +114,11 @@ export default class ExcelSubmissionView extends React.PureComponent {
         const {
             result: {
                 genelist = '/search/?type=GeneList',
-                patch: { family = null }
+                patch: { family = null } = {}
             } = {}
         } = additional_data || {};
         const { target: { value = null } = {} } = e;
-        const { 0: familyAtID = null } = Object.keys(family) || [];
+        const { 0: familyAtID = null } = Object.keys(family || {}) || [];
 
         switch(ingestionType) {
             case "metadata_bundle":
@@ -144,8 +152,27 @@ export default class ExcelSubmissionView extends React.PureComponent {
         });
     }
 
+    pushNewAlert(alert) {
+        const { localAlerts = [] } = this.state;
+        const newAlertState = [...localAlerts, alert];
+
+        this.setState({ localAlerts: newAlertState });
+    }
+
+    closeAlert(i) {
+        const { localAlerts = [] } = this.state;
+        const newAlertState = [];
+        localAlerts.forEach((alert, j) => { if (i !== j) newAlertState.push(alert); });
+
+        this.setState({ localAlerts: newAlertState });
+    }
+
+    clearAllAlerts(callback) {
+        this.setState({ localAlerts: [] }, callback);
+    }
+
     render(){
-        const { panelIdx, panelsComplete, submissionItem } = this.state;
+        const { panelIdx, panelsComplete, submissionItem, localAlerts = [] } = this.state;
         const userDetails = JWT.getUserDetails();
         const {
             '@id' : submissionID,
@@ -174,13 +201,15 @@ export default class ExcelSubmissionView extends React.PureComponent {
 
                     { submissionLink }
 
+                    <LocalAlertsContainer {...{ localAlerts }} closeAlert={this.closeAlert} />
+
                     <PanelSelectionMenu {...{ panelIdx, panelsComplete, submissionItem }} onSelect={this.handleSelectPanel} />
 
-                    <PanelOne {...this.props} {...this.state} {...{ setIsSubmitting, userDetails }} markCompleted={this.markCompleted}
-                        onLoadUser={this.handleLoadedUser} onSubmitIngestionSubmission={this.handleLoadedIngestionSubmission} />
+                    <PanelOne {...this.props} {...this.state} {...{ setIsSubmitting, userDetails }} markCompleted={this.markCompleted} onLoadUser={this.handleLoadedUser}
+                        onSubmitIngestionSubmission={this.handleLoadedIngestionSubmission} pushNewAlert={this.pushNewAlert} clearAllAlerts={this.clearAllAlerts} />
 
                     <PanelTwo {...this.props} {...this.state} {...{ setIsSubmitting, userDetails }} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
-                        markCompleted={this.markCompleted} handleComplete={this.handleComplete}/>
+                        markCompleted={this.markCompleted} handleComplete={this.handleComplete} pushNewAlert={this.pushNewAlert} clearAllAlerts={this.clearAllAlerts}/>
 
                     {/* <PanelThree {...this.props} {...this.state} userDetails={userDetails} onLoadedIngestionSubmission={this.handleLoadedIngestionSubmission}
                         onComplete={this.handleComplete} markCompleted={this.markCompleted} /> */}
@@ -192,6 +221,30 @@ export default class ExcelSubmissionView extends React.PureComponent {
 
 }
 
+
+const LocalAlertsContainer = function LocalAlertsContainer(props) {
+    const { localAlerts, closeAlert } = props;
+
+    return (
+        <div className="mt-2">
+            { localAlerts.map((alert, i) => {
+                const { message = null, title, style, noCloseButton } = alert;
+                return (
+                    <div key={title} className={"alert alert-dismissable alert-" + (style || 'danger') + (noCloseButton === true ? ' no-close-button' : '')}>
+                        { noCloseButton !== true ?
+                            <button type="button" className="close" onClick={() => closeAlert(i)}>
+                                <span aria-hidden="true">×</span>
+                                <span className="sr-only">Close alert</span>
+                            </button>
+                            : null }
+                        <h4 className={"alert-heading mt-0" + (message ? " mb-05" : " mb-0")}>{ title }</h4>
+                        {message && <div className="mb-0">{message}</div>}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
 
 function PanelSelectionMenu(props){
     const { onSelect, panelIdx, panelsComplete, submissionItem } = props;
@@ -235,34 +288,45 @@ function PanelSelectionMenu(props){
 
 class PanelOne extends React.PureComponent {
 
-    static flatFieldsFromUser(user){
+    static projectFromUser(user){
         const {
-            user_institution : institution = {},
-            project = {},
+            project_roles: { 0: { project = {} } = {} } = {}
         } = user || {};
         const initState = {
-            "institutionID": institution['@id'] || null,
-            "institutionTitle": institution.display_title || null,
             "projectID": project['@id'] || null,
             "projectTitle": project.display_title || null
         };
         return initState;
     }
 
+    static projectRolesToListofProjects(project_roles){
+        const projects = [];
+        const projectsSeen = {};
+
+        // Filter out any roles from same projects
+        project_roles.forEach((role) => {
+            const { project: { "@id": atID, display_title } = {} } = role;
+            if (!projectsSeen[atID]) {
+                projects.push({ atID, display_title });
+                projectsSeen[atID] = true;
+            }
+        });
+
+        return projects;
+    }
+
     // TODO: Delete probably -- hard sequence from step 1 -> 2 -> 3... no more going back and updating
-    static checkIfChanged(submissionItem, institutionID, projectID){
+    static checkIfChanged(submissionItem, projectID){
         const {
-            institution: { '@id' : submissionInstitutionID = null } = {},
             project: { '@id' : submissionProjectID = null } = {},
             display_title: submissionTitle
         } = submissionItem;
-        return (institutionID !== submissionInstitutionID) || (projectID !== submissionProjectID);
+        return (projectID !== submissionProjectID);
     }
 
     constructor(props){
         super(props);
         this.loadUser = this.loadUser.bind(this);
-        this.handleSelectInstitution = this.handleSelectInstitution.bind(this);
         this.handleSelectProject = this.handleSelectProject.bind(this);
         this.handleCreate = this.handleCreate.bind(this);
         this.handleSelectSubmissionType = this.handleSelectSubmissionType.bind(this);
@@ -275,10 +339,9 @@ class PanelOne extends React.PureComponent {
             submissionType: { "Accessioning":1, "Gene List":1, "Family History":1 }[submissionType] ? submissionType : null,
             error: null,
             isCreating: false,
-            ...PanelOne.flatFieldsFromUser(props.user)
+            ...PanelOne.projectFromUser(props.user)
         };
         this.unsetSelectingField     = () => { this.setState({ selectingField: null }); };
-        this.setSelectingInstitution = () => { this.setState({ selectingField: "institution" }); };
         this.setSelectingProject     = () => { this.setState({ selectingField: "project" }); };
 
         this.memoized = {
@@ -291,36 +354,31 @@ class PanelOne extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps){
-        const { submissionItem = null, markCompleted, panelIdx, panelsComplete, user } = this.props;
+        const { submissionItem = null, markCompleted, panelIdx, panelsComplete, user = null } = this.props;
         const { submissionItem: pastIngestionSubmissionItem = null, panelIdx: pastPanelIdx, user: pastUser } = pastProps;
 
         if (user !== pastUser){
-            this.setState(PanelOne.flatFieldsFromUser(user));
+            this.setState(PanelOne.projectFromUser(user));
             ReactTooltip.rebuild();
             return;
         }
 
         if (submissionItem && submissionItem !== pastIngestionSubmissionItem){
             const {
-                institution: {
-                    '@id' : institutionID = null,
-                    display_title: institutionTitle = null
-                } = {},
                 project: {
                     '@id' : projectID = null,
                     display_title: projectTitle = null
                 } = {}
             } = submissionItem;
             this.setState({
-                institutionID, institutionTitle,
                 projectID, projectTitle
             });
             return;
         }
 
         if (submissionItem){
-            const { institutionID, projectID } = this.state;
-            const valuesDiffer = this.memoized.checkIfChanged(submissionItem, institutionID, projectID);
+            const { projectID } = this.state;
+            const valuesDiffer = this.memoized.checkIfChanged(submissionItem, projectID);
             if (!valuesDiffer && panelIdx === 0 && panelsComplete[0] === false) {
                 // We already completed POST; once submission present, mark this complete also.
                 markCompleted(0, true);
@@ -348,31 +406,38 @@ class PanelOne extends React.PureComponent {
         }
     }
 
-    handleSelectInstitution(institutionJSON, institutionID){
-        const { display_title: institutionTitle = null } = institutionJSON;
-        this.setState({ institutionID, institutionTitle });
-    }
+    handleSelectProject(projectID){
+        const { user: { project_roles = [] } = {} } = this.props;
 
-    handleSelectProject(projectJSON, projectID){
-        const { display_title: projectTitle = null } = projectJSON;
+        let projectTitle = projectID;
+        for (let i = 0; i < project_roles.length; i++) {
+            const { project: { "@id": atID = null, display_title = null } = {} } = project_roles[i];
+            if (atID === projectID) {
+                projectTitle = display_title;
+            }
+        }
+
         this.setState({ projectID, projectTitle });
     }
 
     handleCreate(e){
-        const { onSubmitIngestionSubmission, submissionItem } = this.props;
+        const { onSubmitIngestionSubmission, submissionItem, user = null, pushNewAlert, clearAllAlerts } = this.props;
         const {
-            institutionID: institution,
             projectID: project,
             isCreating = false,
             submissionType = null
         } = this.state;
 
+        const { user_institution: { "@id": institution = null } = {} } = user || {};
+
         e.preventDefault();
         e.stopPropagation();
+        clearAllAlerts();
 
         if (isCreating || !institution || !project ) return false;
 
         const cb = (res) => {
+
             this.setState({ isCreating: false });
             if (res.status && res.status !== 'success'){
                 throw res;
@@ -389,7 +454,7 @@ class PanelOne extends React.PureComponent {
             this.setState({ isCreating: false });
 
             if (!res || Object.keys(res).length === 0){
-                Alerts.queue({
+                pushNewAlert({
                     'title' : "Submission Error",
                     'message': "Encountered unknown error, likely related to network connection. Please try again.",
                     'style': 'danger'
@@ -404,7 +469,7 @@ class PanelOne extends React.PureComponent {
                 if (err && err.name){
                     detail += '. ' + err.name;
                 }
-                Alerts.queue({
+                pushNewAlert({
                     'title' : "Validation error " + parseInt(i + 1),
                     'message': detail,
                     'style': 'danger'
@@ -433,7 +498,6 @@ class PanelOne extends React.PureComponent {
     render(){
         const { userDetails, panelIdx, user, submissionItem } = this.props;
         const {
-            institutionID, institutionTitle,
             projectID, projectTitle,
             submissionType,
             isCreating = false
@@ -452,15 +516,31 @@ class PanelOne extends React.PureComponent {
             );
         }
 
+        const { project_roles = [], user_institution: { "@id": institutionID, display_title: institutionTitle } = {} } = user;
+
         const valuesChanged = !submissionItem || this.memoized.checkIfChanged(submissionItem, institutionID, projectID);
         const createDisabled = (!valuesChanged || isCreating || !institutionID || !projectID );
+
+        const projectList = PanelOne.projectRolesToListofProjects(project_roles);
 
         return (
             <form className={"panel-form-container d-block" + (isCreating ? " is-creating" : "")} onSubmit={this.handleCreate}>
                 <h4 className="text-300 mt-2">Required Fields = <span className="text-danger">*</span></h4>
-                <LinkToFieldSection onSelect={this.handleSelectInstitution} title="Institution" required
-                    type="Institution" selectedID={institutionID} selectedTitle={institutionTitle} searchAsYouType/>
-                <LinkToFieldSection onSelect={this.handleSelectProject} title="Project" required
+                <div className="field-section linkto-section mt-2 d-block">
+                    <label className="d-block mb-05">Institution</label>
+                    <div className="row">
+                        <div className="col-auto">{ institutionTitle }</div>
+                        <div className="col">
+                            <i className="icon icon-fw icon-link fas small mr-05"/>
+                            <span className="text-monospace small">{ institutionID }</span> &bull;
+                            <a href={institutionID} target="_blank" rel="noopener noreferrer" className="ml-05"
+                                data-tip="Open Institution in new window">
+                                <i className="icon icon-fw icon-external-link-alt fas small"/>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <LinkToFieldSection onSelect={this.handleSelectProject} title="Project" required options={projectList}
                     type="Project" selectedID={projectID} selectedTitle={projectTitle} searchAsYouType />
                 <div className="field-section linkto-section mt-2 d-block">
                     <label className="d-block mb-05">Submission Type</label>
@@ -526,6 +606,7 @@ class PanelTwo extends React.PureComponent {
     }
 
     onAddedFile(response){
+        const { pushNewAlert } = this.props;
         const json = JSON.parse(response);
         const { filename, submission_uri } = json;
         // console.log("json", json);
@@ -534,14 +615,14 @@ class PanelTwo extends React.PureComponent {
         if (submission_uri) {
             message = (
                 <React.Fragment>
-                    <p className="mb-0">Keep this window open for updates on file processing status. Note: this may take a while.</p>
+                    <p className="mb-0"><strong>Keep this window open</strong> for updates on file processing status. Note: this may take a while.</p>
                 </React.Fragment>
             );
         }
-        Alerts.queue({
-            "title" : "Uploaded file (" + filename + ") successfully!",
-            message ,
-            "style" : "success"
+        pushNewAlert({
+            "title" : "File Ingestion (" + filename + ") processing...",
+            message,
+            "style" : "warning",
         });
 
         // Wait a few seconds before setting new status
@@ -549,7 +630,7 @@ class PanelTwo extends React.PureComponent {
     }
 
     render(){
-        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission, setIsSubmitting, handleComplete } = this.props;
+        const { user, submissionItem, panelIdx, href, onLoadedIngestionSubmission, setIsSubmitting, handleComplete, pushNewAlert, clearAllAlerts } = this.props;
         const { statusIdx } = this.state;
 
         const {
@@ -578,19 +659,19 @@ class PanelTwo extends React.PureComponent {
                     </div>
                     <hr className="mb-1"/>
                     <div className="field-section mt-2">
-                        <label className="d-block mb-05">
+                        <label className="d-block mb-03">
                             Submit Data
-                            <i className="icon icon-info-circle fas icon-fw ml-05"
-                                data-tip="Select & upload files generated in Proband and other pedigree software" />
+                            {/* <i className="icon icon-info-circle fas icon-fw ml-05" // Needs to be updated
+                                data-tip="Select & upload files generated in Proband and other pedigree software" /> */}
                         </label>
-                        <AttachmentInputController {...{ ingestionType, href }} context={submissionItem} onAddedFile={this.onAddedFile}>
-                            <FileAttachmentBtn/>
+                        <AttachmentInputController {...{ ingestionType, href, clearAllAlerts }} context={submissionItem} onAddedFile={this.onAddedFile}>
+                            <ExcelSubmissionFileAttachmentBtn/>
                         </AttachmentInputController>
                     </div>
                 </React.Fragment>
             );
         } else if (statusIdx === 1) {
-            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} {...{ onLoadedIngestionSubmission, setIsSubmitting }}/>;
+            panelContents = <Poller context={submissionItem} setStatusIdx={this.setStatusIdx} {...{ onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert, clearAllAlerts }}/>;
         } else {
             panelContents = (
                 <React.Fragment>
@@ -686,7 +767,7 @@ function useInterval(callback, delay) {
 }
 
 function Poller(props){
-    const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting } = props;
+    const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert, clearAllAlerts } = props;
     const { uuid } = context || {};
     const getURL = "/ingestion-submissions/" + uuid;
 
@@ -695,7 +776,6 @@ function Poller(props){
 
     // console.log("context", context);
     useInterval(() => {
-        console.log("Checking if processing status is updated.");
         ajax.promise(getURL, "GET")
             .then((response)=> {
                 // console.log("response", response);
@@ -742,11 +822,12 @@ function Poller(props){
                 }
             })
             .catch((error)=> {
+                clearAllAlerts();
                 if (typeof error === "string") {
-                    Alerts.queue({ "title": error, style: "danger" });
+                    pushNewAlert({ "title": error, style: "danger" });
                 } else {
                     console.error(error);
-                    Alerts.queue({ "title": "An unknown error occurred. See console for more details.", style: "danger" });
+                    pushNewAlert({ "title": "An unknown error occurred. Consult an administrator or try again later.", style: "danger" });
                 }
                 setStatusIdx(0); // Re-enable file upload.
             });
@@ -762,38 +843,122 @@ function Poller(props){
     );
 }
 
-function FileAttachmentBtn(props){
-    const { loadingFileResult, postFileSuccess, onFileInputChange, ingestionType } = props;
-    const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
+function ExcelSubmissionFileAttachmentBtn(props) {
+    const { ingestionType, ...passProps } = props;
 
-    let acceptedTypes;
+    let acceptedTypes, acceptedTypesDisplay, uploadType;
+
     switch(ingestionType) {
         case "genelist":
-            acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .txt";
+            acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .txt";
+            acceptedTypesDisplay = ".xlsx, .txt";
+            uploadType = "Gene List";
             break;
         case "metadata_bundle":
-            acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel";
+            acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            acceptedTypesDisplay = ".csv, .tsv, .xlsx";
+            uploadType = "Case";
             break;
         case "family_history":
-            acceptedTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"; // TODO: Only excel? No CSV/TSV -- verify this
+            acceptedTypes = ".csv, .tsv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            acceptedTypesDisplay = ".csv, .tsv, .xlsx";
+            uploadType = "Family History";
             break;
     }
 
+    const selectTitle = "Select " + uploadType + " file(s)...";
+    const uploadTitle = "Upload " + uploadType;
+    const instructionsNode = <div className="text-small font-italic ml-02 mb-1">Accepted file types: { acceptedTypesDisplay }</div>;
+
+    return <FileAttachmentBtn {...passProps} {...{ selectTitle, uploadTitle, instructionsNode, acceptedTypes }}/>;
+}
+
+function FileAttachmentBtn(props){
+    const {
+        selectTitle = "Select file...",
+        uploadTitle = "Upload File",
+        acceptedTypes = ".csv, .tsv, .txt",
+        instructionsNode = null,
+        file = null,
+        loadingFileResult,
+        postFileSuccess,
+        onFileInputChange,
+        onClearFile,
+        onFormSubmit
+    } = props;
+
+    const icon = loadingFileResult ? "circle-notch fas icon-spin align-baseline" : "upload fas";
+
+    if (!file) {
+        return (
+            <React.Fragment>
+                { instructionsNode }
+                <div className="input-group">
+                    <div className="input-group-prepend">
+                        <span className="input-group-text pr-5" id="inputGroupFileAddon01">
+                            { selectTitle }
+                        </span>
+                    </div>
+                    <div className="input-group-append">
+                        <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess === true }
+                            className={"mb-0 btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
+                            <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
+                                disabled={loadingFileResult || postFileSuccess === true}
+                                accept={acceptedTypes} />
+                            Browse
+                        </label>
+                    </div>
+                </div>
+            </React.Fragment>
+        );
+    }
+
+    const { name: filename } = file || {};
+
+    const clearBtnDisabled = loadingFileResult || postFileSuccess === true;
     return (
         <React.Fragment>
-            <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
-                className={"btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
-                <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
-                    disabled={loadingFileResult || postFileSuccess === true}
-                    accept={acceptedTypes} />
-                <i className={"mr-08 icon icon-fw icon-" + icon} />
-                <span>{ ingestionType === "metadata_bundle" || ingestionType === "family_history" ? "Select Excel File..." : "Select Excel or Text File..." }</span>
-            </label>
+            {instructionsNode}
+            <div className="input-group">
+                <div className="input-group-prepend mw-50" style={{ maxWidth: "50%" }}>
+                    <div className="input-group-text w-100" id="inputGroupFileAddon01">
+                        <span className="text-truncate">{ filename }</span>
+                        <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
+                            className={"mb-0 py-0 btn btn-link " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
+                            <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
+                                disabled={loadingFileResult || postFileSuccess === true}
+                                accept={acceptedTypes} />
+                            Replace
+                        </label>
+                        { onClearFile && <i className={`${clearBtnDisabled ? "" : "clickable"} icon fas icon-times icon-fw mx-2`} onClick={clearBtnDisabled ? undefined : onClearFile} />}
+                    </div>
+                </div>
+                <div className="input-group-append">
+                    <button type="button" className="btn btn-success" onClick={onFormSubmit} disabled={loadingFileResult || postFileSuccess === true}>
+                        <i className={"mr-08 icon icon-fw fas icon-" + icon} />
+                        {uploadTitle}
+                    </button>
+                </div>
+            </div>
             { !loadingFileResult && postFileSuccess ? <span className="ml-1 text-success">Success! <i className="icon icon-check fas"></i></span> : null}
             { !loadingFileResult && postFileSuccess === false ? <span className="ml-1 text-danger">Failure! <i className="icon icon-times-circle fas"></i></span> : null}
         </React.Fragment>
     );
 }
+FileAttachmentBtn.propTypes = {
+    selectTitle: PropTypes.string, // Placeholder text for upload area
+    uploadTitle: PropTypes.string, // Upload/Submit button text
+    acceptedTypes: PropTypes.string, // Comma deliniated string of MIME-types to accept
+    instructionsNode: PropTypes.node, // Anything for rendering above the input (useful for instructions like max file size, file types in human readable, etc.)
+    file: PropTypes.shape({ // File data for currently selected file, if available
+        name: PropTypes.string,
+    }),
+    loadingFileResult: PropTypes.bool, // file is currently in the process of being uploaded/submitted
+    postFileSuccess: PropTypes.bool, // file submission succeeded?
+    onFileInputChange: PropTypes.func.isRequired, // defines what happens when a file is selected/browsed
+    onClearFile: PropTypes.func, // defines what happens when a file is deleted/unselected
+    onFormSubmit: PropTypes.func.isRequired // defines what happens when a file is uploaded/submitted
+};
 
 
 
@@ -807,15 +972,15 @@ function FileAttachmentBtn(props){
  * TODO: Maybe replace with SearchAsYouTypeAjax from SPC.
  */
 const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
-    const { title, type, onSelect, selectedID, selectedTitle, variant = "primary", required, searchAsYouType } = props;
+    const { options, title, type, onSelect, selectedID, selectedTitle, variant = "primary", required } = props;
 
     let showTitle;
     if (selectedTitle && selectedID){
-        showTitle = <span className="text-600">{ selectedTitle }</span>;
+        showTitle = selectedTitle;
     } else if (selectedID){
         showTitle = selectedID;
     } else {
-        showTitle = <em>None Selected</em>;
+        showTitle = "None Selected";
     }
 
     return (
@@ -823,7 +988,7 @@ const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
             <label className="d-block mb-05">{ title } {required ? <span className="text-danger">*</span>: null}</label>
             <div className="row">
                 <div className="col-auto">
-                    <LinkToDropdown {...{ onSelect, selectedID, variant, searchAsYouType }} searchURL={"/search/?type=" + type} selectedTitle={showTitle} />
+                    <ProjectDrop {...{ options, onSelect, selectedID, selectedTitle, variant }} selectedTitle={showTitle} />
                 </div>
                 <div className="col">
                     <i className="icon icon-fw icon-link fas small mr-05"/>
@@ -838,6 +1003,44 @@ const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
     );
 });
 
+const ProjectDrop = (props) => {
+    const { selectedID, options = [], selectedTitle, onSelect, variant, disabled = false, cls } = props;
+
+    const renderedOptions = options.map(function(project){
+        const { display_title, atID : projectID } = project;
+        return (
+            <DropdownItem className="selectable-item-option" key={projectID} eventKey={projectID}
+                active={selectedID === projectID}>
+                <div className="row">
+                    <div className="col">
+                        <span className="text-600 d-block">{ display_title }</span>
+                    </div>
+                    <div className="col-auto d-none d-md-inline-block">
+                        <i className="icon icon-fw icon-link fas small mr-05"/>
+                        <span className="text-monospace small">{ projectID }</span>
+                    </div>
+                </div>
+            </DropdownItem>
+        );
+    });
+
+    const className = "linkto-dropdown text-600" + (cls ? " " + cls : "");
+    const title = <span className="text-600">{selectedTitle}</span> || "Select...";
+    const isDisabled = options.length <= 1 || disabled;
+
+    let tooltip = null;
+    if (options.length === 1 && options[0] && selectedTitle === options[0].display_title) {
+        tooltip = "Only project available for current user is currently selected";
+    } else if (options.length === 0) {
+        tooltip = "No options available";
+    }
+
+    return (
+        <DropdownButton {...{ variant, title, className }} disabled={isDisabled} data-tip={tooltip} onSelect={onSelect}>
+            { renderedOptions }
+        </DropdownButton>
+    );
+};
 
 
 const ExcelSubmissionViewPageTitle = React.memo(function ExcelSubmissionViewPageTitle({ context, href, schemas, currentAction, alerts }){
