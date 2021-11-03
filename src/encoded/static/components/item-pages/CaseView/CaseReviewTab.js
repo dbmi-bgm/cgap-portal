@@ -192,6 +192,10 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
             </div>
             <div>
 
+                <NoteSubSelectionStateController>
+                    <CaseSpecificSelectionsPanel {...commonProps} />
+                </NoteSubSelectionStateController>
+
                 <div className="d-block d-md-flex align-items-center justify-content-between">
                     <div className="text-left">
                         {/*
@@ -206,11 +210,11 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                         </button>
                         */}
 
-                        <PatchItemsProgress {...{ fetchVariantSampleListItem }} resetStoreItems={resetSendToReportStoreItems}>
+                        <PatchItemsProgress>
                             <SaveNotesToReportButton {...{ variantSampleListItem, sendToReportStore, fetchVariantSampleListItem, resetSendToReportStoreItems }} className="my-1 mr-05"/>
                         </PatchItemsProgress>
 
-                        <PatchItemsProgress {...{ fetchVariantSampleListItem }} resetStoreItems={resetSendToProjectStoreItems}>
+                        <PatchItemsProgress>
                             <SaveNotesToProjectButton {...{ variantSampleListItem, sendToProjectStore, fetchVariantSampleListItem, resetSendToProjectStoreItems }} className="my-1 mr-05"/>
                         </PatchItemsProgress>
 
@@ -227,12 +231,9 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
                 <hr className="mb-1 mt-06" />
 
-                <NoteSubSelectionStateController>
-                    <CaseSpecificSelectionsPanel {...commonProps} />
-                </NoteSubSelectionStateController>
-
                 <VariantSampleSelectionList {...commonProps} {...{ changedClassificationsByVS, updateClassificationForVS }}
                     parentTabType={parentTabTypes.CASEREVIEW} />
+
             </div>
         </React.Fragment>
     );
@@ -564,8 +565,8 @@ function SaveNotesToReportButton (props) {
             return !!(vsAtID);
         });
 
-        const payloads = [];
-        const reportPatchVariantSampleUUIDs = {};
+        const payloads = [];                        // [ [path, payload], ... ]
+        const reportPatchVariantSampleUUIDs = {};   // { <uuid> : true }
 
         reportVariantSamples.forEach(function({ uuid: reportVSUUID }){
             // Any existing variant samples

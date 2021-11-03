@@ -34,13 +34,15 @@ export function CaseSpecificSelectionsPanel (props) {
     });
 
     return (
-        <div className="card mb-1">
-            <div className={"card-header py-3 bg-primary-dark" + (!isExpanded ? " rounded" : "")}>
-                <h4 className="text-400 my-0 d-flex align-items-center clickable text-white" onClick={toggleExpanded}>
+        // Set tabIndex={0} to make element focusable/navigatable-to by non-mouse-cursor interactions such as the tab key.
+        <div className="card mb-2">
+            <button type="button" className={"card-header btn py-3 bg-primary-dark" + (!isExpanded ? " rounded" : "")}
+                onClick={toggleExpanded}>
+                <h4 className="text-400 my-0 d-flex align-items-center text-white" >
                     <i className={"mr-1 icon fas icon-" + (isExpanded ? "minus" : "plus")}/>
                     <span>Case Specific Selections</span>
                 </h4>
-            </div>
+            </button>
             { isExpanded ?
                 <React.Fragment>
                     <div className="card-body">
