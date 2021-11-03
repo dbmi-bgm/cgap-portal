@@ -140,7 +140,7 @@ function ACMGClassificationSelections (props) {
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
-        // From CaseReviewDataStore
+        // From CaseReviewSelectedNotesStore
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
@@ -259,7 +259,7 @@ function VariantGeneSelections (props) {
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
-        // From CaseReviewDataStore
+        // From CaseReviewSelectedNotesStore
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
@@ -447,7 +447,7 @@ function NoteTypeSelections (props) {
         kbNotesIncluded,
         toggleReportNoteSubselectionState,
         toggleKBNoteSubselectionState,
-        // From CaseReviewDataStore
+        // From CaseReviewSelectedNotesStore
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,

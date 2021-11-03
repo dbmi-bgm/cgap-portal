@@ -1,6 +1,8 @@
 'use strict';
 
 import React, { useCallback, useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
+import memoize from 'memoize-one';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { ajax, console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -8,15 +10,19 @@ import { ajax, console } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 import { VariantSampleSelectionList } from './VariantSampleSelection';
 
 
+/**
+ * State & update methods for `deletedVariantSampleSelections` & `changedOrdering`.
+ * Transforms `props.variantSampleListItem` to have reordered variant_samples, according
+ * to `state.changedOrdering` (subject to change).
+ */
+export class InterpretationTabController extends React.Component {
 
+    static propTypes = {
+        "variantSampleListItem": PropTypes.object.isRequired,
+        "children": PropTypes.element
+    };
 
-export const InterpretationTab = React.memo(function InterpretationTab (props) {
-    const { variantSampleListItem, schemas, context, isLoadingVariantSampleListItem = false, fetchVariantSampleListItem } = props;
-    const [ deletedVariantSampleSelections, setDeletedVariantSampleSelections ] = useState({});
-    const [ changedOrdering, setChangedOrdering ] = useState(null); // For now at least, will be an array of variant sample @ids
-
-    const useVSItem = useMemo(function(){
-
+    static reorderedVariantSampleListItem(variantSampleListItem, changedOrdering){
         let useVSItem = variantSampleListItem;
 
         if (changedOrdering) {
@@ -34,42 +40,95 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         }
 
         return useVSItem;
-    }, [ variantSampleListItem, changedOrdering ]);
+    }
 
-    const toggleVariantSampleSelectionDeletion = useCallback(function(vsAtIDToDelete){
-        const nextDeletedVSes = { ...deletedVariantSampleSelections };
-        if (nextDeletedVSes[vsAtIDToDelete]) {
-            delete nextDeletedVSes[vsAtIDToDelete];
-        } else {
-            nextDeletedVSes[vsAtIDToDelete] = true;
-        }
-        setDeletedVariantSampleSelections(nextDeletedVSes);
-    }, [ deletedVariantSampleSelections ]);
+    constructor(props){
+        super(props);
+        this.toggleVariantSampleSelectionDeletion = this.toggleVariantSampleSelectionDeletion.bind(this);
+        this.resetVariantSampleSelectionDeletionsAndOrdering = this.resetVariantSampleSelectionDeletionsAndOrdering.bind(this);
+        this.state = {
+            "deletedVariantSampleSelections": {},
+            // Not yet implemented fully:
+            "changedOrdering": null
+        };
+        this.memoized = {
+            reorderedVariantSampleListItem: memoize(InterpretationTabController.reorderedVariantSampleListItem),
+            deletionsLen: memoize(function(deletedVariantSampleSelections){ return Object.keys(deletedVariantSampleSelections).length; })
+        };
+    }
 
-    const deletionsLen = Object.keys(deletedVariantSampleSelections).length;
+    toggleVariantSampleSelectionDeletion(vsAtIDToDelete){
+        this.setState(function({ deletedVariantSampleSelections }){
+            const nextDeletedVSes = { ...deletedVariantSampleSelections };
+            if (nextDeletedVSes[vsAtIDToDelete]) {
+                delete nextDeletedVSes[vsAtIDToDelete];
+            } else {
+                nextDeletedVSes[vsAtIDToDelete] = true;
+            }
+            return { "deletedVariantSampleSelections": nextDeletedVSes };
+        });
+    }
+
+    resetVariantSampleSelectionDeletionsAndOrdering(){
+        this.setState({ "deletedVariantSampleSelections": {}, "changedOrdering": null });
+    }
+
+    render(){
+        const { children, variantSampleListItem: propVariantSampleListItem, ...passProps } = this.props;
+        const { deletedVariantSampleSelections, changedOrdering } = this.state;
+
+        const deletionsLen = this.memoized.deletionsLen(deletedVariantSampleSelections);
+        const variantSampleListItem = this.memoized.reorderedVariantSampleListItem(propVariantSampleListItem, changedOrdering);
+
+        const childProps = {
+            ...passProps,
+            variantSampleListItem, // <- reordered. Might make sense to do reordering elsewhere..
+            deletedVariantSampleSelections,
+            changedOrdering,
+            deletionsLen,
+            "toggleVariantSampleSelectionDeletion": this.toggleVariantSampleSelectionDeletion,
+            "resetVariantSampleSelectionDeletionsAndOrdering": this.resetVariantSampleSelectionDeletionsAndOrdering
+        };
+
+        return React.Children.map(children, (child)=>{
+            if (!React.isValidElement(child)) {
+                // String or something
+                return child;
+            }
+            if (typeof child.type === "string") {
+                // Normal element (a, div, etc)
+                return child;
+            } // Else is React component
+            return React.cloneElement(child, childProps);
+        });
+
+    }
+}
+
+
+
+export const InterpretationTab = React.memo(function InterpretationTab (props) {
+    const {
+        schemas, context,
+        isActiveDotRouterTab = false,
+        variantSampleListItem,
+        isLoadingVariantSampleListItem = false,
+        fetchVariantSampleListItem,
+        deletedVariantSampleSelections,
+        changedOrdering,
+        toggleVariantSampleSelectionDeletion,
+        resetVariantSampleSelectionDeletionsAndOrdering,
+        deletionsLen
+    } = props;
+
+    console.log("InterpretationTab props", props);
+
+
     const anyUnsavedChanges = changedOrdering !== null || deletionsLen > 0;
 
-    // const deleteVariantSampleSelection = useCallback(function(vsAtIDToDelete){
-    //     // useVSItem would have up-to-date ordering after being produced by sorting by changedOrdering.
-    //     const { variant_samples: vsSelections } = useVSItem;
-    //     let deleteIdx = null;
-    //     const nextOrdering = vsSelections.map(function({ variant_sample_item: { "@id": vsAtID } }, index){
-    //         if (vsAtID === vsAtIDToDelete) {
-    //             deleteIdx = index;
-    //         }
-    //         return vsAtID;
-    //     });
-
-    //     if (deleteIdx === null) {
-    //         throw new Error("Expected deleteIdx to be valid");
-    //     }
-
-    //     nextOrdering.splice(deleteIdx, 1);
-    //     setChangedOrdering(nextOrdering);
-    // }, [ useVSItem ]);
-
-    // TODO: Implement an "Apply Ordering/Deletion Changes" button + logic
-
+    if (!isActiveDotRouterTab) {
+        return null;
+    }
 
     return (
         <React.Fragment>
@@ -80,25 +139,26 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                 </h1>
                 <div className="d-block d-md-flex">
                     <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem }} disabled={anyUnsavedChanges} className="mr-08" />
-                    <SaveVariantSampleListItemDeletionsButton {...{ variantSampleListItem, deletedVariantSampleSelections, setDeletedVariantSampleSelections,
-                        changedOrdering, setChangedOrdering, anyUnsavedChanges, deletionsLen, fetchVariantSampleListItem }} />
+                    <SaveVariantSampleListItemDeletionsAndOrderingButton {...{ variantSampleListItem, deletedVariantSampleSelections, changedOrdering,
+                        resetVariantSampleSelectionDeletionsAndOrdering, anyUnsavedChanges, deletionsLen, fetchVariantSampleListItem }} />
                 </div>
             </div>
             <div>
-                <VariantSampleSelectionList {...{ isLoadingVariantSampleListItem, schemas, context, toggleVariantSampleSelectionDeletion,
-                    deletedVariantSampleSelections, anyUnsavedChanges }} variantSampleListItem={useVSItem} />
+                <VariantSampleSelectionList {...{ variantSampleListItem, isLoadingVariantSampleListItem,
+                    deletedVariantSampleSelections, anyUnsavedChanges, schemas, context, toggleVariantSampleSelectionDeletion }} />
             </div>
         </React.Fragment>
     );
 });
 
-function SaveVariantSampleListItemDeletionsButton (props) {
+
+
+function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
     const {
         variantSampleListItem,
         deletedVariantSampleSelections,
-        setDeletedVariantSampleSelections,
         changedOrdering,
-        setChangedOrdering,
+        resetVariantSampleSelectionDeletionsAndOrdering,
         anyUnsavedChanges,
         deletionsLen,
         fetchVariantSampleListItem
@@ -126,8 +186,7 @@ function SaveVariantSampleListItemDeletionsButton (props) {
 
             fetchVariantSampleListItem(function(){
                 // Reset `deletedVariantSampleSelections`, `changedOrdering`, & `isPatching`
-                setDeletedVariantSampleSelections({});
-                setChangedOrdering(null);
+                resetVariantSampleSelectionDeletionsAndOrdering();
                 setIsPatching(false);
             });
         }
@@ -175,11 +234,31 @@ function SaveVariantSampleListItemDeletionsButton (props) {
         titleParts.push("Deletions");
     }
 
+    let iconCls = null;
+    if (isPatching) {
+        iconCls = "circle-notch icon-spin fas";
+    } else if (deletionsLen > 0) {
+        iconCls = "trash fas";
+    } else {
+        iconCls = "save fas";
+    }
+
+    const btnCls = "btn btn-" + (deletionsLen > 0 ? "danger" : "primary");
+    const disabled = !anyUnsavedChanges || isPatching;
+
     return (
-        <button type="button" className="btn btn-primary" disabled={!anyUnsavedChanges || isPatching} onClick={patchVariantSampleListItem}>
-            { isPatching ? <i className="icon icon-circle-notch icon-spin fas mr-08"/> : null }
-            Save { titleParts.join(" & ") }
-        </button>
+        <div className="btn-group" role="group">
+            <button type="button" className={btnCls}
+                disabled={disabled} onClick={patchVariantSampleListItem}>
+                { iconCls ? <i className={"icon icon-fw mr-08 icon-" + iconCls}/> : null }
+                Save { titleParts.join(" & ") }
+            </button>
+            <button type="button" className={btnCls} data-tip="Revert changes"
+                disabled={disabled} onClick={resetVariantSampleSelectionDeletionsAndOrdering}>
+                <i className="icon icon-fw icon-undo fas mr-08"/>
+                Revert
+            </button>
+        </div>
     );
 }
 
@@ -191,7 +270,7 @@ const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpre
         <DropdownButton variant="outline-primary" disabled={disabled || vsObjects.length === 0} className={className}
             title={
                 <span>
-                    <i className="icon icon-table fas mr-1"/>
+                    <i className="icon icon-fw icon-table fas mr-08"/>
                     Export As...
                 </span>
             }>

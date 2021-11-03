@@ -675,6 +675,10 @@ def process_notes(context, request):
 
     request_body = request.json
     stpn = request_body["save_to_project_notes"]
+
+    if not stpn:
+        raise HTTPBadRequest("No Note UUIDs supplied.")
+
     ln = {} # 'loaded notes'
 
     def validate_and_load_note(note_type_name):
@@ -706,6 +710,7 @@ def process_notes(context, request):
     genes_patch_payloads = {} # Keyed by @id, along with `note_patch_payloads`
     note_patch_payloads = {}
 
+    # PATCHing variant or gene only needed when saving notes to project, not to report.
     need_variant_patch = "interpretation" in stpn or "discovery_interpretation" in stpn or "variant_notes" in stpn
     need_gene_patch = "discovery_interpretation" in stpn or "gene_notes" in stpn
 
@@ -737,20 +742,18 @@ def process_notes(context, request):
         if need_gene_patch:
             genes = [ gene_subobject["genes_most_severe_gene"] for gene_subobject in variant["genes"] ]
 
-
     # Using `.now(pytz.utc)` appends "+00:00" for us (making the datetime timezone-aware), while `.utcnow()` doesn't.
     timestamp = datetime.datetime.now(pytz.utc).isoformat()
     auth_source, user_id = request.authenticated_userid.split(".", 1)
 
-    def create_note_patch_payload(note_atid):
+    def create_stpn_note_patch_payload(note_atid):
         # This payload may still get updated further with "previous_note" by `add_or_replace_note_for_project_on_vg_item`
-        note_patch_payloads[note_atid] = {
-            # All 3 of these fields below have permissions: restricted_fields
-            # and may only be manually editable by an admin.
-            "status": "current",
-            "approved_by": user_id,
-            "date_approved": timestamp
-        }
+        note_patch_payloads[note_atid] = note_patch_payloads.get(note_atid, {})
+        # All 3 of these fields below have permissions: restricted_fields
+        # and may only be manually editable by an admin.
+        note_patch_payloads[note_atid]["status"] = "current"
+        note_patch_payloads[note_atid]["approved_by"] = user_id
+        note_patch_payloads[note_atid]["date_approved"] = timestamp
 
     def add_or_replace_note_for_project_on_vg_item(note_type_name, vg_item, payload):
         pluralized = {
@@ -791,17 +794,18 @@ def process_notes(context, request):
                 payload[note_type_name_plural].append(new_note_id)
 
 
-    if "interpretation" in ln:
+    if "interpretation" in stpn:
         # Update Note status if is not already current.
         if ln["interpretation"]["status"] != "current":
-            create_note_patch_payload(ln["interpretation"]["@id"])
+            create_stpn_note_patch_payload(ln["interpretation"]["@id"])
         # Add to Variant.interpretations
         add_or_replace_note_for_project_on_vg_item("interpretation", variant, variant_patch_payload)
 
-    if "discovery_interpretation" in ln:
+
+    if "discovery_interpretation" in stpn:
         # Update Note status if is not already current.
         if ln["discovery_interpretation"]["status"] != "current":
-            create_note_patch_payload(ln["discovery_interpretation"]["@id"])
+            create_stpn_note_patch_payload(ln["discovery_interpretation"]["@id"])
         # Add to Variant.discovery_interpretations
         add_or_replace_note_for_project_on_vg_item("discovery_interpretation", variant, variant_patch_payload)
         # Add to Gene.discovery_interpretations
@@ -809,17 +813,17 @@ def process_notes(context, request):
             genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
             add_or_replace_note_for_project_on_vg_item("discovery_interpretation", gene, genes_patch_payloads[gene["@id"]])
 
-    if "variant_notes" in ln:
+    if "variant_notes" in stpn:
         # Update Note status if is not already current.
         if ln["variant_notes"]["status"] != "current":
-            create_note_patch_payload(ln["variant_notes"]["@id"])
+            create_stpn_note_patch_payload(ln["variant_notes"]["@id"])
         # Add to Variant.variant_notes
         add_or_replace_note_for_project_on_vg_item("variant_notes", variant, variant_patch_payload)
 
-    if "gene_notes" in ln:
+    if "gene_notes" in stpn:
         # Update Note status if is not already current.
         if ln["gene_notes"]["status"] != "current":
-            create_note_patch_payload(ln["gene_notes"]["@id"])
+            create_stpn_note_patch_payload(ln["gene_notes"]["@id"])
         # Add to Gene.gene_notes
         for gene in genes:
             genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})

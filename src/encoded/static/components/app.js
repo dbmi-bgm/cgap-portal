@@ -619,6 +619,8 @@ export default class App extends React.PureComponent {
         const { session: existingSession } = this.state;
         const nextSession = !!(userInfo); // cast to bool
 
+        console.log("Update session state", existingSession, nextSession);
+
         if (nextSession === existingSession) {
             return null;
         }

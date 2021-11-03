@@ -54,7 +54,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         changedClassificationsByVS,
         updateClassificationForVS,
 
-        // From CaseReviewDataStore (if used, else undefined):
+        // From CaseReviewSelectedNotesStore (if used, else undefined):
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
@@ -142,7 +142,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         alreadyInProjectNotes,
         unsavedClassification,
         updateClassificationForVS,
-        // From CaseReviewDataStore (if used):
+        // From CaseReviewSelectedNotesStore (if used):
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
@@ -422,7 +422,7 @@ function ClassificationDropdown(props){
 
     return (
         <div className="py-1 py-lg-0 px-lg-2">
-            <DropdownButton size="sm" variant="outline-dark" title={title} onSelect={onOptionSelect} disabled={tags.length === 0}
+            <DropdownButton size="sm" variant="outline-dark" menuAlign="right" title={title} onSelect={onOptionSelect} disabled={tags.length === 0}
                 data-delay={500} data-tip={!viewClassification? "Select a finding..." : null }>
                 { renderedOptions }
             </DropdownButton>
@@ -729,7 +729,7 @@ const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onK
 
 
 
-export class CaseReviewDataStore extends React.PureComponent {
+export class CaseReviewSelectedNotesStore extends React.PureComponent {
 
     constructor(props) {
         super(props);

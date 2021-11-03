@@ -17,7 +17,7 @@ import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
 import { VariantSampleListController } from './VariantSampleListController';
-import { CaseReviewDataStore } from './VariantSampleSelection';
+import { CaseReviewSelectedNotesStore } from './VariantSampleSelection';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -28,8 +28,8 @@ import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
 import { CNVSVFilteringTab } from './CNVSVFilteringTab';
-import { InterpretationTab } from './InterpretationTab';
-import { CaseReviewTab } from './CaseReviewTab';
+import { InterpretationTab, InterpretationTabController } from './InterpretationTab';
+import { CaseReviewTab, CaseReviewController } from './CaseReviewTab';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 
 
@@ -141,7 +141,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
         savedVariantSampleIDMap = {},
-        fetchVariantSampleListItem,
+        fetchVariantSampleListItem
     } = props;
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
 
@@ -325,17 +325,21 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     <DotRouterTab dotPath=".filtering" cache disabled={disableFiltering} tabTitle="Filtering">
                         <FilteringTabWrapper {...filteringTableProps} {...{ snvFilterHrefAddon, svFilterHrefAddon }} />
                     </DotRouterTab>
-                    <DotRouterTab dotPath=".interpretation" disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} tabTitle={
+                    <DotRouterTab dotPath=".interpretation" cache disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} tabTitle={
                         <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
                             { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
                             Interpretation
                         </span>}>
-                        <InterpretationTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                        <InterpretationTabController {...{ variantSampleListItem }}>
+                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                        </InterpretationTabController>
                     </DotRouterTab>
-                    <DotRouterTab dotPath=".review" disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
-                        <CaseReviewDataStore>
-                            <CaseReviewTab {...{ variantSampleListItem, schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
-                        </CaseReviewDataStore>
+                    <DotRouterTab dotPath=".review" cache disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
+                        <CaseReviewSelectedNotesStore>
+                            <CaseReviewController {...{ variantSampleListItem }}>
+                                <CaseReviewTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                            </CaseReviewController>
+                        </CaseReviewSelectedNotesStore>
                     </DotRouterTab>
                 </DotRouter>
                 : null }
@@ -435,18 +439,40 @@ class DotRouter extends React.PureComponent {
         const allTabContents = [];
 
         const adjustedChildren = React.Children.map(children, function(childTab, index){
-            const { props : { dotPath, children: tabChildren, cache = false } } = childTab;
+            const {
+                props: {
+                    dotPath,
+                    children: tabChildren,
+                    cache = false
+                }
+            } = childTab;
+
             const active = currTabDotPath === dotPath;
+
             if (active || cache) {
+                // If we cache tab contents, then pass down `props.isActiveTab` so select downstream components
+                // can hide or unmount themselves when not needed for performance.
+                const transformedChildren = !cache ? tabChildren : React.Children.map(tabChildren, (child)=>{
+                    if (!React.isValidElement(child)) {
+                        // String or something
+                        return child;
+                    }
+                    if (typeof child.type === "string") {
+                        // Normal element (a, div, etc)
+                        return child;
+                    } // Else is React component
+                    return React.cloneElement(child, { "isActiveDotRouterTab": active });
+                });
                 allTabContents.push(
                     <div className={contentClassName + (!active ? " d-none" : "")} id={(prependDotPath || "") + dotPath} data-tab-index={index} key={dotPath}>
                         <TabPaneErrorBoundary>
-                            { tabChildren }
+                            { transformedChildren }
                         </TabPaneErrorBoundary>
                     </div>
                 );
             }
-            return React.cloneElement(childTab, { key: dotPath, active, prependDotPath, index });
+
+            return React.cloneElement(childTab, { "key": dotPath, active, prependDotPath, index });
         });
 
         return (
@@ -463,7 +489,7 @@ class DotRouter extends React.PureComponent {
 }
 
 const DotRouterTab = React.memo(function DotRouterTab(props) {
-    const { tabTitle, dotPath, disabled, active, prependDotPath, children } = props;
+    const { tabTitle, dotPath, disabled, active, prependDotPath, children, ...passProps } = props;
 
     const onClick = useCallback(function(){
         const targetDotPath = prependDotPath + dotPath;
