@@ -6,13 +6,13 @@ from snovault import calculated_property, collection, load_schema
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..util import resolve_file_path
 from .base import Item, get_item_or_none
+from .inheritance_mode import InheritanceMode
 from .variant import (
     ANNOTATION_ID,
-    build_variant_sample_annotation_id,
-    extend_embedded_list,
-    load_extended_descriptions_in_schemas,
     SHARED_VARIANT_EMBEDS,
     SHARED_VARIANT_SAMPLE_EMBEDS,
+    extend_embedded_list,
+    load_extended_descriptions_in_schemas
 )
 
 
@@ -291,7 +291,26 @@ class StructuralVariantSample(Item):
         )
     }
     embedded_list = build_structural_variant_sample_embedded_list()
-
+    FACET_ORDER_OVERRIDE = {
+        "inheritance_modes": {
+            InheritanceMode.INHMODE_LABEL_SV_DE_NOVO: 1,  # Possibly de novo
+            InheritanceMode.INHMODE_LABEL_RECESSIVE: 2,  # Recessive
+            InheritanceMode.INHMODE_LABEL_LOH: 3,  # Loss of Heterozygosity
+            InheritanceMode.INHMODE_DOMINANT_MOTHER: 4,  # Dominant (Maternal)
+            InheritanceMode.INHMODE_DOMINANT_FATHER: 5,  # Dominant (Paternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_RECESSIVE: 6,  # X-linked recessive
+            InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER: 7,  # X-linked dominant (Maternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER: 8,  # X-linked dominant (Paternal)
+            InheritanceMode.INHMODE_LABEL_Y_LINKED: 9,  # Y-linked dominant
+            InheritanceMode.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT: 10,  # Low relevance, homozygous in a parent
+            InheritanceMode.INHMODE_LABEL_NONE_HEMIZYGOUS_PARENT: 11,  # Low relevance, hemizygous in a parent
+            InheritanceMode.INHMODE_LABEL_NONE_MN: 12,  # Low relevance, multiallelic site family
+            InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 13,  # Low relevance, present in both parent(s)
+            InheritanceMode.INHMODE_LABEL_NONE_DOT: 14,  # Low relevance, missing call(s) in family
+            InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 15,  # Low relevance, mismatching chrXY genotype(s)
+            '_default': 1000  # arbitrary large number
+        },
+    }
     POSSIBLE_GENOTYPE_LABEL_FIELDS = [
         "proband_genotype_label",
         "mother_genotype_label",

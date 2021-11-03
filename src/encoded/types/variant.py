@@ -25,16 +25,16 @@ from snovault.calculated import calculate_properties
 from snovault.util import simple_path_ids, debug_log
 from snovault.embed import make_subrequest
 
-from encoded.ingestion.common import CGAP_CORE_PROJECT
-from encoded.inheritance_mode import InheritanceMode
-from encoded.util import resolve_file_path
-from encoded.types.base import Item, get_item_or_none
-
-from ..custom_embed import CustomEmbed
 from ..batch_download_utils import (
     stream_tsv_output,
     convert_item_to_sheet_dict
 )
+from ..custom_embed import CustomEmbed
+from ..ingestion.common import CGAP_CORE_PROJECT
+from ..inheritance_mode import InheritanceMode
+from ..util import resolve_file_path
+from ..types.base import Item, get_item_or_none
+
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
