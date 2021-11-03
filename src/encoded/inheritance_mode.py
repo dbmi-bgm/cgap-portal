@@ -287,7 +287,8 @@ class InheritanceMode:
             return [cls.INHMODE_LABEL_X_LINKED_RECESSIVE, cls.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER]
 
         if (genotypes[cls.MOTHER] == "0/0" and genotypes[cls.FATHER] == "1/1"
-                and sexes[cls.SELF] == cls.FEMALE and chrom == 'X'):
+                and genotypes[cls.SELF] == "0/1" and sexes[cls.SELF] == cls.FEMALE
+                and chrom == 'X'):
             return [cls.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER]
 
         if (genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_M and
@@ -327,7 +328,7 @@ class InheritanceMode:
                 genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
             return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
 
-        if (genotypes[cls.FATHER] == "1/1"
+        if (genotypes[cls.FATHER] == "1/1" and genotypes[cls.MOTHER] == "0/0"
                 and genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_M
                 and genotype_labels[cls.SELF][0] == cls.GENOTYPE_LABEL_M):
             return [cls.INHMODE_LABEL_NONE_HEMIZYGOUS_PARENT]
