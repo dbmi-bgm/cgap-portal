@@ -311,15 +311,16 @@ class VariantSample(Item):
             InheritanceMode.INHMODE_LABEL_LOH: 12,  # Loss of Heterozygousity
             InheritanceMode.INHMODE_DOMINANT_MOTHER: 13,  # Dominant (maternal)
             InheritanceMode.INHMODE_DOMINANT_FATHER: 14,  # Dominant (paternal)
-            InheritanceMode.INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER: 15,  # X-linked recessive (Maternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_RECESSIVE: 15,  # X-linked recessive
             InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER: 16,  # X-linked dominant (Maternal)
             InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER: 17,  # X-linked dominant (Paternal)
             InheritanceMode.INHMODE_LABEL_Y_LINKED: 18,  # Y-linked dominant
             InheritanceMode.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT: 19,  # Low relevance, homozygous in a parent
-            InheritanceMode.INHMODE_LABEL_NONE_MN: 20,  # Low relevance, multiallelic site family
-            InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 21,  # Low relevance, present in both parent(s)
-            InheritanceMode.INHMODE_LABEL_NONE_DOT: 22,  # Low relevance, missing call(s) in family
-            InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 23,  # Low relevance, mismatching chrXY genotype(s)
+            InheritanceMode.INHMODE_LABEL_NONE_HEMIZYGOUS_PARENT: 20,  # Low relevance, hemizygous in a parent
+            InheritanceMode.INHMODE_LABEL_NONE_MN: 21,  # Low relevance, multiallelic site family
+            InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 22,  # Low relevance, present in both parent(s)
+            InheritanceMode.INHMODE_LABEL_NONE_DOT: 23,  # Low relevance, missing call(s) in family
+            InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 24,  # Low relevance, mismatching chrXY genotype(s)
             '_default': 1000  # arbitrary large number
         },
         'proband_only_inheritance_modes': {
