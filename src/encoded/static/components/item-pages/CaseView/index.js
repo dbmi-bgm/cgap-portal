@@ -569,7 +569,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     // Note: Can probably clean up the render method of this a little bit by breaking each row
     // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
     // may also be necessary to add to/edit rows individually in the future.
-    const { caseSample = null, sampleProcessing = null } = props;
+    const { caseSample = null, sampleProcessing = null, submittedSex = null, submittedAncestry = [] } = props;
 
     const {
         bam_sample_id: caseSampleId = null,
@@ -680,48 +680,50 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     const { reads = {}, coverage = {}, totalSNVIndelVars = {}, transTransRatio = {}, heterozygosity = {}, deNovo = {},
         filteredSNVIndelVariants = {}, filteredSVVariants = {} } = msaStats;
 
+    const fallbackElem = "-";
+
     return (
         <>
             <div className="row py-3">
                 <BioinfoStatsEntry label="Total Number of Reads" tooltip={reads.tooltip}>
-                    { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : "-" }
+                    { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Coverage" tooltip={coverage.tooltip}>
-                    { coverage.value || "-" }
+                    { coverage.value || fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Total Number of SNVs/Indels called" tooltip={totalSNVIndelVars.tooltip}>
-                    { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): "-" }
+                    { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Transition-Transversion ratio" tooltip={transTransRatio.tooltip}>
-                    { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : "-" }
+                    { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-3">
                 <BioinfoStatsEntry label="Submitted Sex" tooltip={""}>
-                    { "-" }
+                    { submittedSex || fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Sex" tooltip={""}>
-                    { "-" }
+                    { fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" tooltip={filteredSNVIndelVariants.tooltip}>
-                    { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : "-" }
+                    { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Structural Variants After Hard Filters" tooltip={filteredSVVariants.tooltip}>
-                    { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : "-" }
+                    { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-3">
                 <BioinfoStatsEntry label="Submitted Ancestry" tooltip={""}>
-                    { "-" }
+                    { submittedAncestry.length > 0 && submittedAncestry.join(", ") || "-" }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Ancestry" tooltip={""}>
-                    { "-" }
+                    { fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Heterozygosity ratio" tooltip={heterozygosity.tooltip}>
-                    { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : "-" }
+                    { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="De novo Fraction" tooltip={deNovo.tooltip}>
-                    { typeof deNovo.value === "number" ? deNovo.value + "%" : "-" }
+                    { typeof deNovo.value === "number" ? deNovo.value + "%" : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
         </>
@@ -756,7 +758,8 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         family = null,
         sample_processing: sampleProcessing = null,
         sample: caseSample = null,
-        vcf_file: vcf = null
+        vcf_file: vcf = null,
+        individual: { sex: submittedSex = null, ancestry: submittedAncestry = [] } = {},
     } = context;
     const { "@id": vcfAtId = null } = vcf || {};
 
@@ -793,7 +796,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
                 <div className="card-body py-0">
-                    <BioinfoStats {...{ caseSample, sampleProcessing }} />
+                    <BioinfoStats {...{ caseSample, sampleProcessing, submittedAncestry, submittedSex }} />
                 </div>
             </div>
             <div className="tab-inner-container card">
