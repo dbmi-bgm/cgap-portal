@@ -30,7 +30,7 @@ import { FilteringTab } from './FilteringTab';
 import { CNVSVFilteringTab } from './CNVSVFilteringTab';
 import { InterpretationTab, InterpretationTabController } from './InterpretationTab';
 import { CaseReviewTab, CaseReviewController } from './CaseReviewTab';
-import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
+import { getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
 
 
 
@@ -336,9 +336,11 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     </DotRouterTab>
                     <DotRouterTab dotPath=".review" cache disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
                         <CaseReviewSelectedNotesStore>
-                            <CaseReviewController {...{ variantSampleListItem }}>
-                                <CaseReviewTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
-                            </CaseReviewController>
+                            <NoteSubSelectionStateController>
+                                <CaseReviewController {...{ variantSampleListItem }}>
+                                    <CaseReviewTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                                </CaseReviewController>
+                            </NoteSubSelectionStateController>
                         </CaseReviewSelectedNotesStore>
                     </DotRouterTab>
                 </DotRouter>

@@ -7,7 +7,7 @@ import ReactTooltip from 'react-tooltip';
 import Modal from 'react-bootstrap/esm/Modal';
 import { VariantSampleSelectionList, parentTabTypes } from './VariantSampleSelection';
 import { CaseSpecificSelectionsPanel, getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
-import { ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { ajax, console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 
 
@@ -153,7 +153,12 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         resetSendToProjectStoreItems,
-        resetSendToReportStoreItems
+        resetSendToReportStoreItems,
+        // From NoteSubSelectionStateController
+        reportNotesIncluded,
+        kbNotesIncluded,
+        toggleReportNoteSubselectionState,
+        toggleKBNoteSubselectionState,
     } = props;
 
     const alreadyInProjectNotes = useMemo(function(){
@@ -192,11 +197,9 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
             </div>
             <div>
 
-                <NoteSubSelectionStateController>
-                    <CaseSpecificSelectionsPanel {...commonProps} />
-                </NoteSubSelectionStateController>
+                <CaseSpecificSelectionsPanel {...commonProps} {...{ reportNotesIncluded, kbNotesIncluded, toggleReportNoteSubselectionState, toggleKBNoteSubselectionState }} className="mb-12" />
 
-                <div className="d-block d-md-flex align-items-center justify-content-between">
+                <div className="d-block d-md-flex align-items-center justify-content-between mb-12">
                     <div className="text-left">
                         {/*
                         <button type="button" className="btn btn-primary mr-05" disabled>
@@ -204,20 +207,13 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                         </button>
                         */}
 
-                        {/*
-                        <button type="button" className="btn btn-primary mr-05 my-1" disabled>
-                            Save Note Selections to <span className="text-600">Report</span>
-                        </button>
-                        */}
-
                         <PatchItemsProgress>
-                            <SaveNotesToReportButton {...{ variantSampleListItem, sendToReportStore, fetchVariantSampleListItem, resetSendToReportStoreItems }} className="my-1 mr-05"/>
+                            <SaveNotesToReportButton {...{ variantSampleListItem, sendToReportStore, fetchVariantSampleListItem, resetSendToReportStoreItems, context }} className="my-1 mr-1"/>
                         </PatchItemsProgress>
 
                         <PatchItemsProgress>
-                            <SaveNotesToProjectButton {...{ variantSampleListItem, sendToProjectStore, fetchVariantSampleListItem, resetSendToProjectStoreItems }} className="my-1 mr-05"/>
+                            <SaveNotesToProjectButton {...{ variantSampleListItem, sendToProjectStore, fetchVariantSampleListItem, resetSendToProjectStoreItems }} className="my-1 mr-1"/>
                         </PatchItemsProgress>
-
 
                     </div>
 
@@ -228,8 +224,6 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                     </div>
 
                 </div>
-
-                <hr className="mb-1 mt-06" />
 
                 <VariantSampleSelectionList {...commonProps} {...{ changedClassificationsByVS, updateClassificationForVS }}
                     parentTabType={parentTabTypes.CASEREVIEW} />
@@ -321,6 +315,7 @@ class PatchItemsProgress extends React.PureComponent {
                 }).catch(function(error){
                     // TODO display this in UI later perhaps.
                     patchErrors.push(error);
+                    console.error("PatchItemsProgress AJAX error", error);
                 }).finally(function(){
                     countCompleted++;
                     checkIfCompleted();
@@ -409,7 +404,12 @@ class PatchItemsProgress extends React.PureComponent {
 
 }
 
-
+/**
+ * Generates payloads for VariantSampleList /@@process-notes/ endpoint
+ * and then PATCHes them to there.
+ *
+ * @todo Check if lack edit permission and make button disabled if so.
+ */
 function SaveNotesToProjectButton (props) {
     const {
         variantSampleListItem,
@@ -569,13 +569,17 @@ function SaveNotesToReportButton (props) {
         const reportPatchVariantSampleUUIDs = {};   // { <uuid> : true }
 
         reportVariantSamples.forEach(function({ uuid: reportVSUUID }){
-            // Any existing variant samples
+            // Add any existing variant samples first (JS objects ordered in order of insertion)
             reportPatchVariantSampleUUIDs[reportVSUUID] = true;
         });
+
+        // Added into all Note.associated_items[] which are sent to report to identify them as being part of report.
+        const newAssociatedItemEntry = { "item_type": "Report", "item_identifier": reportUUID };
 
         variantSampleItems.forEach(function(variantSampleItem){
             const {
                 "@id": variantSampleAtID,
+                uuid: variantSampleUUID,
                 interpretation: {
                     uuid: interpretationUUID,
                     associated_items: interpretationAssociatedItems = []
@@ -594,9 +598,7 @@ function SaveNotesToReportButton (props) {
                 } = {}
             } = variantSampleItem;
 
-            // const payload = { "save_to_report_notes": {} };
-
-            const newAssociatedItemEntry = { "item_type": "Report", "item_identifier": reportUUID };
+            let shouldAddThisVariantSampleToReport = false;
 
             if (interpretationUUID && sendToReportStore[interpretationUUID]) {
                 const existingEntry = _.findWhere(interpretationAssociatedItems, newAssociatedItemEntry);
@@ -605,8 +607,8 @@ function SaveNotesToReportButton (props) {
                         "/" + interpretationUUID,
                         { "associated_items": [ ...interpretationAssociatedItems, newAssociatedItemEntry  ] }
                     ]);
-                    reportPatchVariantSampleUUIDs[interpretationUUID] = true;
                 }
+                shouldAddThisVariantSampleToReport = true;
             }
             if (discoveryInterpretationUUID && sendToReportStore[discoveryInterpretationUUID]) {
                 const existingEntry = _.findWhere(discoveryInterpretationAssociatedItems, newAssociatedItemEntry);
@@ -615,8 +617,8 @@ function SaveNotesToReportButton (props) {
                         "/" + discoveryInterpretationUUID,
                         { "associated_items": [ ...discoveryInterpretationAssociatedItems, newAssociatedItemEntry  ] }
                     ]);
-                    reportPatchVariantSampleUUIDs[discoveryInterpretationUUID] = true;
                 }
+                shouldAddThisVariantSampleToReport = true;
             }
             if (lastGeneNoteUUID && sendToReportStore[lastGeneNoteUUID]) {
                 const existingEntry = _.findWhere(lastGeneNoteAssociatedItems, newAssociatedItemEntry);
@@ -625,8 +627,8 @@ function SaveNotesToReportButton (props) {
                         "/" + lastGeneNoteUUID,
                         { "associated_items": [ ...lastGeneNoteAssociatedItems, newAssociatedItemEntry  ] }
                     ]);
-                    reportPatchVariantSampleUUIDs[lastGeneNoteUUID] = true;
                 }
+                shouldAddThisVariantSampleToReport = true;
             }
             if (lastVariantNoteUUID && sendToReportStore[lastVariantNoteUUID]) {
                 const existingEntry = _.findWhere(lastVariantNoteAssociatedItems, newAssociatedItemEntry);
@@ -635,34 +637,51 @@ function SaveNotesToReportButton (props) {
                         "/" + lastVariantNoteUUID,
                         { "associated_items": [ ...lastVariantNoteAssociatedItems, newAssociatedItemEntry  ] }
                     ]);
-                    reportPatchVariantSampleUUIDs[lastVariantNoteUUID] = true;
                 }
+                shouldAddThisVariantSampleToReport = true;
             }
 
+            if (shouldAddThisVariantSampleToReport) {
+                reportPatchVariantSampleUUIDs[variantSampleUUID] = true;
+            }
         });
 
+
         // PATCH Report Item with `variant_samples`. TODO: Check for edit permissions first (?)
-        payloads.unshift([
-            reportAtID,
-            { "variant_samples": Object.keys(reportPatchVariantSampleUUIDs) }
-        ]);
+        const reportVariantSampleUUIDsToPatch = Object.keys(reportPatchVariantSampleUUIDs);
+        const reportVariantSampleUUIDsToPatchLen = reportVariantSamplesToPatch.length;
+        if (reportVariantSampleUUIDsToPatchLen > 0) {
+            if (!_.isEqual(reportVariantSampleUUIDsToPatch, _.pluck(reportVariantSamples, "uuid"))) {
+                // Skip if is same value to be patched (maybe this is 2nd saving action as result of some prior network error(s))
+                payloads.unshift([
+                    reportAtID,
+                    { "variant_samples": reportVariantSampleUUIDsToPatch }
+                ]);
+            }
+        }
 
         patchItems(payloads, (countCompleted, patchErrors) => {
             if (countCompleted > 0 && patchErrors.length === 0) {
                 if (typeof resetSendToReportStoreItems === "function") {
-                    console.info("Reset 'send to project' store items.");
+                    console.log("Reset 'send to project' store items.");
                     resetSendToReportStoreItems();
+                } else {
+                    throw new Error("No `props.resetSendToReportStoreItems` supplied to SaveNotesToReportButton");
                 }
                 if (typeof fetchVariantSampleListItem === "function") {
-                    console.info("Refreshing our VariantSampleListItem with updated Note Item statuses.");
+                    console.log("Refreshing our VariantSampleListItem with updated Note Item statuses.");
                     fetchVariantSampleListItem();
+                } else {
+                    throw new Error("No `props.fetchVariantSampleListItem` supplied to SaveNotesToReportButton");
                 }
             }
         });
     }, [ isPatching, patchItems, sendToReportStore, report, resetSendToReportStoreItems ]);
 
+    const btnCls = "btn btn-" + (!reportUUID ? "outline-danger" : "primary") + (className ? " " + className : "");
+
     return (
-        <button type="button" className={"btn btn-primary" + (className ? " " + className : "")}
+        <button type="button" className={btnCls}
             onClick={onClick} disabled={!reportUUID || isPatching || selectionStoreSize === 0}
             data-tip={`${selectionStoreSize} Note selections from ${variantSamplesWithAnySelections} Sample Variants`}>
             Save Note Selections to <span className="text-600">Report</span>

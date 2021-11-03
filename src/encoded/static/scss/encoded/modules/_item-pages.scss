@@ -1452,21 +1452,23 @@ i.status-indicator-dot {
 					.accession-table {
 						margin-left: 10px; 
 
-						div.row:not(:last-child) {
-							border-bottom: 1px solid #ddd;
-							padding-bottom: 5px;
-						}
-
 						div.row {
 							max-width: 100%;
 							padding-top: 5px;
+							padding-bottom: 5px;
 
 							> div.col-auto,
 							> div.col {
-							padding-left: 0;
-							padding-right: 0;
+								padding-left: 0;
+								padding-right: 0;
 							}
+
+							&:not(:last-child) {
+								border-bottom: 1px solid #ddd;
+							}
+	
 						}
+						
 
 						div.accession-table-title {
 							font-weight: 600;

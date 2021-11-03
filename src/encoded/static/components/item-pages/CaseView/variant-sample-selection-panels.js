@@ -1,7 +1,6 @@
 'use strict';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import _ from 'underscore';
@@ -9,7 +8,8 @@ import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/f
 
 
 
-export function CaseSpecificSelectionsPanel (props) {
+export const CaseSpecificSelectionsPanel = React.memo(function CaseSpecificSelectionsPanel (props) {
+    const { className, ...passProps } = props;
 
     const panels = {
         ACMG: 1,
@@ -35,7 +35,7 @@ export function CaseSpecificSelectionsPanel (props) {
 
     return (
         // Set tabIndex={0} to make element focusable/navigatable-to by non-mouse-cursor interactions such as the tab key.
-        <div className="card mb-2">
+        <div className={"card" + (className ? " " + className : "")}>
             <button type="button" className={"card-header btn py-3 bg-primary-dark" + (!isExpanded ? " rounded" : "")}
                 onClick={toggleExpanded}>
                 <h4 className="text-400 my-0 d-flex align-items-center text-white" >
@@ -59,21 +59,21 @@ export function CaseSpecificSelectionsPanel (props) {
                         </div>
 
                         { showingPanel === panels.ACMG ?
-                            <ACMGClassificationSelections {...props} />
+                            <ACMGClassificationSelections {...passProps} />
                             : showingPanel === panels.GENEDISCOVERY ?
-                                <VariantGeneSelections {...props} />
+                                <VariantGeneSelections {...passProps} />
                                 : null
                         }
 
                     </div>
                     <div className="card-body border-top">
-                        <NoteTypeSelections {...props} />
+                        <NoteTypeSelections {...passProps} />
                     </div>
                 </React.Fragment>
                 : null }
         </div>
     );
-}
+});
 
 export class NoteSubSelectionStateController extends React.Component {
     constructor(props){
@@ -124,11 +124,16 @@ export class NoteSubSelectionStateController extends React.Component {
             toggleReportNoteSubselectionState,
             toggleKBNoteSubselectionState
         };
-        return React.Children.map(children, function(c){
-            if (React.isValidElement(c)) {
-                return React.cloneElement(c, childProps);
+        return React.Children.map(children, (child)=>{
+            if (!React.isValidElement(child)) {
+                // String or something
+                return child;
             }
-            return c;
+            if (typeof child.type === "string") {
+                // Normal element (a, div, etc)
+                return child;
+            } // Else is React component
+            return React.cloneElement(child, childProps);
         });
     }
 }
