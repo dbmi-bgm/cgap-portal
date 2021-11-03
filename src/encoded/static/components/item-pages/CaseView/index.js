@@ -507,20 +507,21 @@ const DotRouterTab = React.memo(function DotRouterTab(props) {
     }
 
     return (
-        <div className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")}>
+        <button type="button" onClick={disabled ? null : onClick} disabled={disabled}
+            className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")}>
             <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
                     <path d="M 0,3.3e-6 1.5875,0 v 2.1166667 z"/>
                 </svg>
             </div>
-            <button type="button" onClick={disabled ? null : onClick} disabled={disabled}>{ tabTitle }</button>
+            <div className="btn-title">{ tabTitle }</div>
             <div className="btn-append d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
                     <path d="M 0,3.3e-6 1.5875,2.1166733 0,4.2333333 Z"/>
                 </svg>
             </div>
-        </div>
+        </button>
     );
 }, function(prevProps, nextProps){
     // Custom equality comparison func.

@@ -1245,42 +1245,35 @@ i.status-indicator-dot {
 					display: flex;
 					height: $search-results-header-row-height; // Eh why not re-use this, can change always in future.
 
+					padding: 0;
+					border: none;
+					background: transparent;
+
 					@include media-breakpoint-down(md) {
 						margin-bottom: 5px;
 					}
-					
-					> button {
-						// TODO store color in variable, ideally bootstrap one, for re-use in places.
+
+					> div.btn-title {
 						background-color: cornflowerblue;
 						transition: background-color .25s ease-out, box-shadow .5s;
 						color: #ffff;
 						height: 100%;
-						display: block;
 						text-align: center;
 						padding: 10px;
 						text-decoration: none;
-						border: none;
 						width: 100%;
 						box-shadow: none;
+
+						display: flex;
+						align-items: center;
+						justify-content: center;
+
 						&:focus:not(.active),
 						&:active:not(.active) {
 							outline: none;
 						}
 					}
 
-					&:not(.active) > button {
-						// Applicable for when navigating with (shift-)tab w.o. mouse.
-						&:focus:not(.active),
-						&:active:not(.active) {
-							
-							// Same :hover styling below, should get overriden by other styles
-							// unless someone is using (shift-)tab to navigate instead of mouse cursor.
-							background-color: darken($color: cornflowerblue, $amount: 7.5%);
-							+ .btn-append svg path {
-								fill: darken($color: cornflowerblue, $amount: 7.5%);
-							}
-						}
-					}
 
 					> .btn-append,
 					> .btn-prepend {
@@ -1301,6 +1294,22 @@ i.status-indicator-dot {
 						}
 					}
 
+					&:not(.active) {
+						// Applicable for when navigating with (shift-)tab w.o. mouse.
+						&:focus,
+						&:active {
+							// Same :hover styling below, should get overriden by other styles
+							// unless someone is using (shift-)tab to navigate instead of mouse cursor.
+							> .btn-title {
+								background-color: darken($color: cornflowerblue, $amount: 7.5%);
+							}
+							> .btn-prepend svg path,
+							> .btn-append svg path {
+								fill: darken($color: cornflowerblue, $amount: 7.5%);
+							}
+						}
+					}
+
 					@include media-breakpoint-up(lg) {
 
 						flex-basis: 20%; /* <- dependendent on there being 5 of these tabs (keep in sync w. amount of tabs) */
@@ -1309,7 +1318,7 @@ i.status-indicator-dot {
 							> .btn-prepend {
 								display: none;
 							}
-							> button {
+							> .btn-title {
 								padding-left: 24px;
 								border-radius: $border-radius-base 0 0 $border-radius-base;
 							}
@@ -1319,7 +1328,7 @@ i.status-indicator-dot {
 							> .btn-append {
 								display: none;
 							}
-							> button {
+							> .btn-title {
 								padding-right: 24px;
 								border-radius: 0 $border-radius-base $border-radius-base 0;
 							}
@@ -1328,7 +1337,7 @@ i.status-indicator-dot {
 					}
 
 					&.disabled {
-						> button {
+						> .btn-title {
 							background-color: desaturate($color: lighten($color: cornflowerblue, $amount: 20%), $amount: 100%) !important;
 						}
 						> .btn-append > svg > path,
@@ -1339,7 +1348,7 @@ i.status-indicator-dot {
 
 					&:hover:not(.disabled):not(.active) {
 
-						> button {
+						> .btn-title {
 							background-color: darken($color: cornflowerblue, $amount: 7.5%) !important;
 						}
 						> .btn-append > svg > path,
@@ -1350,7 +1359,7 @@ i.status-indicator-dot {
 
 					&.active {
 
-						> button {
+						> .btn-title {
 							// background-color: darken($color: cornflowerblue, $amount: 30%) !important;
 							// box-shadow: 0px 13px 16px -16px #000;
 							background-color: $primary-dark;

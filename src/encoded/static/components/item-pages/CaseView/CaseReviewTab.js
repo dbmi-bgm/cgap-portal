@@ -161,9 +161,22 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         toggleKBNoteSubselectionState,
     } = props;
 
+    const { report } = context;
+    const { uuid: reportUUID } = report || {};
+
     const alreadyInProjectNotes = useMemo(function(){
         return buildAlreadyStoredNoteUUIDDict(variantSampleListItem);
     }, [ variantSampleListItem ]);
+
+    const alreadyInReportNotes = useMemo(function(){
+        if (!reportUUID) {
+            return {};
+        }
+        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function({ associated_items: noteAssociatedItems }){
+            const foundReportEntry = _.findWhere({ "item_type": "Report", "item_identifier": reportUUID });
+            return !!(foundReportEntry);
+        });
+    }, [ report, variantSampleListItem ]);
 
     if (!isActiveDotRouterTab) {
         return null;
@@ -241,13 +254,18 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
  *
  * For now can just check if Note.status === "current" and then keep that way if can assert Variant.interpretations etc. will be up-to-date.
  */
-function buildAlreadyStoredNoteUUIDDict(variantSampleListItem){
+function buildAlreadyStoredNoteUUIDDict(
+    variantSampleListItem,
+    checkFunction = function({ status: noteStatus }){
+        return (noteStatus === "current");
+    }
+){
     const { variant_samples: vsObjects = [] } = variantSampleListItem || {}; // Might not yet be loaded.
     const dict = {};
     vsObjects.forEach(function({ variant_sample_item }){
         getAllNotesFromVariantSample(variant_sample_item).forEach(function(noteItem){
-            const { uuid: noteUUID, status: noteStatus } = noteItem;
-            if (noteStatus === "current") {
+            const { uuid: noteUUID } = noteItem;
+            if (checkFunction(noteItem)) {
                 dict[noteUUID] = true;
             }
         });
