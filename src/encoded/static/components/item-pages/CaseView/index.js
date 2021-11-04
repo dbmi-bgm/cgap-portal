@@ -623,15 +623,30 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 variant_type: variantType = "SNV", // SVs are always labelled, SNVs may or may not be (ask bioinfo team for details)
                 quality_metric: {
                     "@type": [ qmType ]=[],
-                    quality_metric_summary: qmSummaries = []
+                    quality_metric_summary: qmSummaries = [],
+                    qc_list = []
                 }={}
             } = procFile;
 
-            // Only continue if qclist (vcfQC should only exist if there is also vcfcheck)
+            // Only continue if qclist (vcfQC should only exist if there is also vcfcheck; peddyQC also requires qcList)
             if (qmType === "QualityMetricQclist") {
                 // SNV fields are unique from SV ones; so ensure the correct ones are added to msaStats for each
-                if (variantType === "SNV") {
+                if (variantType === "SV") {
                     // Stats should only be present in combined VCF, update if found
+                    qmSummaries.forEach(function(qmSummary){
+                        const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
+                        if (sample && sample === caseSampleId) {
+                            switch (title) { // Leaving this as switch case, since more fields may be added in future (may also be worth creating a function to encompass SV & SNV options as this grows)
+                                case "Filtered Variants":
+                                    msaStats.filteredSVVariants = { value: transformValueType(numberType, value), tooltip };
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    });
+                } else { // SNV may be labelled or not
+                    // Most stats should only be present in combined VCF, update if found
                     qmSummaries.forEach(function(qmSummary){
                         const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
                         if (sample && sample === caseSampleId) {
@@ -656,18 +671,20 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                             }
                         }
                     });
-                } else if (variantType === "SV") {
-                    // Stats should only be present in combined VCF, update if found
-                    qmSummaries.forEach(function(qmSummary){
-                        const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
-                        if (sample && sample === caseSampleId) {
-                            switch (title) { // Leaving this as switch case, since more fields may be added in future (may also be worth creating a function to encompass SV & SNV options as this grows)
-                                case "Filtered Variants":
-                                    msaStats.filteredSVVariants = { value: transformValueType(numberType, value), tooltip };
-                                    break;
-                                default:
-                                    break;
-                            }
+
+                    // Predicted Sex and Ancestry found in qclist
+                    qc_list.forEach(function(qc) {
+                        const { value: { "ancestry and sex prediction": predictions = [] } = {}, qc_type } = qc;
+
+                        if (qc_type === "quality_metric_peddyqc") {
+                            predictions.forEach(function(prediction) {
+                                const { name, "predicted sex": predictedSex, predictedAncestry } = prediction;
+                                console.log("is this prediction for current case?", name, caseSampleID);
+                                if (name === caseSampleId) {
+                                    msaStats.predictedSex = { value: predictedSex };
+                                    msaStats.predictedAncestry = { value: predictedAncestry };
+                                }
+                            });
                         }
                     });
                 }
@@ -678,7 +695,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     }, [ caseProcFiles, msaProcFiles ]);
 
     const { reads = {}, coverage = {}, totalSNVIndelVars = {}, transTransRatio = {}, heterozygosity = {}, deNovo = {},
-        filteredSNVIndelVariants = {}, filteredSVVariants = {} } = msaStats;
+        filteredSNVIndelVariants = {}, filteredSVVariants = {}, predictedSex = {}, predictedAncestry = {} } = msaStats;
 
     const fallbackElem = "-";
 
@@ -703,7 +720,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     { submittedSex || fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Sex" tooltip={""}>
-                    { fallbackElem }
+                    { predictedSex || fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" tooltip={filteredSNVIndelVariants.tooltip}>
                     { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : fallbackElem }
@@ -717,7 +734,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     { submittedAncestry.length > 0 && submittedAncestry.join(", ") || "-" }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Ancestry" tooltip={""}>
-                    { fallbackElem }
+                    { predictedAncestry.length > 0 && submittedAncestry.join(", ") || "-" }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Heterozygosity ratio" tooltip={heterozygosity.tooltip}>
                     { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : fallbackElem }
