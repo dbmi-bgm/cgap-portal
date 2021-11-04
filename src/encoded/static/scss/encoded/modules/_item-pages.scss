@@ -2103,12 +2103,14 @@ i.status-indicator-dot {
 			transition: color .3s;
 		}
 
-		> i.title-prefix-icon.icon-pen {
+		> i.title-prefix-icon.icon-pen,
+		> i.title-prefix-icon.icon-sticky-note {
 			color: $gray-600;
 		}
 
-		&:hover > i.title-prefix-icon.icon-pen {
-			color: $gray-900;
+		&:hover > i.title-prefix-icon.icon-pen,
+		&:hover > i.title-prefix-icon.icon-sticky-note {
+			color: $primary-dark; //$gray-900;
 		}
 	}
 

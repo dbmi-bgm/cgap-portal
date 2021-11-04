@@ -133,6 +133,7 @@ export class VariantSampleListController extends React.PureComponent {
                         // "variant_samples.selected_by.@id",
                         // "variant_samples.selected_by.display_title",
                         "variant_samples.variant_sample_item.@id",
+                        "variant_samples.variant_sample_item.uuid",
                         "variant_samples.variant_sample_item.display_title",
                         "variant_samples.variant_sample_item.finding_table_tag",
                         "variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",

@@ -5,9 +5,12 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
 import Modal from 'react-bootstrap/esm/Modal';
+import { ajax, console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+
 import { VariantSampleSelectionList, parentTabTypes } from './VariantSampleSelection';
 import { CaseSpecificSelectionsPanel, getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
-import { ajax, console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+
 
 
 
@@ -173,7 +176,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
             return {};
         }
         return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function({ associated_items: noteAssociatedItems }){
-            const foundReportEntry = _.findWhere({ "item_type": "Report", "item_identifier": reportUUID });
+            const foundReportEntry = _.findWhere(noteAssociatedItems, { "item_type": "Report", "item_identifier": reportUUID });
             return !!(foundReportEntry);
         });
     }, [ report, variantSampleListItem ]);
@@ -183,14 +186,15 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
     }
 
     const commonProps = {
-        isLoadingVariantSampleListItem, variantSampleListItem, alreadyInProjectNotes,
+        isLoadingVariantSampleListItem, variantSampleListItem,
+        alreadyInProjectNotes, alreadyInReportNotes,
         sendToProjectStore, sendToReportStore,
         toggleSendToProjectStoreItems, toggleSendToReportStoreItems,
         schemas, context
     };
 
     const applyFindingsTagsBtnText = (
-        `Save ${changedClassificationsCount > 0 ? changedClassificationsCount + " " : ""}'findings' change${changedClassificationsCount !== 1 ? "s" : ""}`
+        `Save ${changedClassificationsCount > 0 ? changedClassificationsCount + " " : ""}Finding${changedClassificationsCount !== 1 ? "s" : ""}`
     );
 
     return (
@@ -326,8 +330,8 @@ class PatchItemsProgress extends React.PureComponent {
         function performRequest([ patchURL, itemPatchPayload ]) {
             return ajax.promise(patchURL, "PATCH", {}, JSON.stringify(itemPatchPayload))
                 .then(function(response){
-                    const { success } = response;
-                    if (!success) {
+                    const { status } = response;
+                    if (status !== "success") {
                         throw response;
                     }
                 }).catch(function(error){
@@ -357,7 +361,7 @@ class PatchItemsProgress extends React.PureComponent {
     patchItems(patchPayloads, callback){
 
         this.setState({ "isPatching": true, "patchingPercentageComplete": 0 }, () => {
-
+            setTimeout(ReactTooltip.hide, 50); // Hide still-present tooltips, if any (i.e. button that was clicked)
             console.log("Generated PATCH '../@@process-notes/' payloads - ", patchPayloads);
             this.patchItemsProcess(patchPayloads, ({ countCompleted, patchErrors }) => {
                 console.info("Patching Completed, count Items PATCHed -", countCompleted);
@@ -436,7 +440,8 @@ function SaveNotesToProjectButton (props) {
         resetSendToProjectStoreItems,
         isPatching,
         patchItems,
-        className
+        className,
+        disabled: propDisabled
     } = props;
 
     const selectionStoreSize = useMemo(function(){
@@ -447,9 +452,11 @@ function SaveNotesToProjectButton (props) {
         return variantSamplesWithAnySelectionSize(variantSampleListItem, sendToProjectStore);
     }, [ variantSampleListItem, sendToProjectStore ]);
 
+    const disabled = propDisabled || isPatching || selectionStoreSize === 0 || false;
+
     const onClick = useCallback(function(e){
         e.stopPropagation();
-        if (isPatching) {
+        if (disabled) {
             return false;
         }
 
@@ -519,22 +526,27 @@ function SaveNotesToProjectButton (props) {
         });
 
         patchItems(payloads, (countCompleted, patchErrors) => {
-            if (countCompleted > 0 && patchErrors.length === 0) {
+            if (countCompleted > 0) {
                 if (typeof resetSendToProjectStoreItems === "function") {
-                    console.info("Reset 'send to project' store items.");
+                    console.log("Reset `resetSendToProjectStoreItems`.");
                     resetSendToProjectStoreItems();
+                } else {
+                    throw new Error("No `props.resetSendToProjectStoreItems` supplied to SaveNotesToProjectButton");
                 }
                 if (typeof fetchVariantSampleListItem === "function") {
-                    console.info("Refreshing our VariantSampleListItem with updated Note Item statuses.");
+                    console.log("Refreshing our VariantSampleListItem with updated Note Item statuses.");
                     fetchVariantSampleListItem();
+                } else {
+                    throw new Error("No `props.fetchVariantSampleListItem` supplied to SaveNotesToProjectButton");
                 }
             }
+            // TODO:
+            // if (patchErrors.length > 0) {}
         });
-    }, [ isPatching, patchItems, sendToProjectStore, resetSendToProjectStoreItems ]);
+    }, [ disabled, patchItems, sendToProjectStore, resetSendToProjectStoreItems, fetchVariantSampleListItem ]);
 
     return (
-        <button type="button" className={"btn btn-primary" + (className ? " " + className : "")}
-            onClick={onClick} disabled={isPatching || selectionStoreSize === 0}
+        <button type="button" {...{ disabled, onClick }} className={"btn btn-primary" + (className ? " " + className : "")}
             data-tip={`${selectionStoreSize} Note selections from ${variantSamplesWithAnySelections} Sample Variants`}>
             Save Note Selections to <span className="text-600">Project</span>
         </button>
@@ -550,7 +562,8 @@ function SaveNotesToReportButton (props) {
         resetSendToReportStoreItems,
         isPatching,
         patchItems,
-        className
+        className,
+        disabled: propDisabled
     } = props;
 
     const {
@@ -567,9 +580,11 @@ function SaveNotesToReportButton (props) {
         return variantSamplesWithAnySelectionSize(variantSampleListItem, sendToReportStore);
     }, [ variantSampleListItem, sendToReportStore ]);
 
+    const disabled = propDisabled || isPatching || !reportUUID || selectionStoreSize === 0 || false;
+
     const onClick = useCallback(function(e){
         e.stopPropagation();
-        if (isPatching) {
+        if (disabled) {
             return false;
         }
 
@@ -667,7 +682,7 @@ function SaveNotesToReportButton (props) {
 
         // PATCH Report Item with `variant_samples`. TODO: Check for edit permissions first (?)
         const reportVariantSampleUUIDsToPatch = Object.keys(reportPatchVariantSampleUUIDs);
-        const reportVariantSampleUUIDsToPatchLen = reportVariantSamplesToPatch.length;
+        const reportVariantSampleUUIDsToPatchLen = reportVariantSampleUUIDsToPatch.length;
         if (reportVariantSampleUUIDsToPatchLen > 0) {
             if (!_.isEqual(reportVariantSampleUUIDsToPatch, _.pluck(reportVariantSamples, "uuid"))) {
                 // Skip if is same value to be patched (maybe this is 2nd saving action as result of some prior network error(s))
@@ -679,7 +694,7 @@ function SaveNotesToReportButton (props) {
         }
 
         patchItems(payloads, (countCompleted, patchErrors) => {
-            if (countCompleted > 0 && patchErrors.length === 0) {
+            if (countCompleted > 0) {
                 if (typeof resetSendToReportStoreItems === "function") {
                     console.log("Reset 'send to project' store items.");
                     resetSendToReportStoreItems();
@@ -693,14 +708,15 @@ function SaveNotesToReportButton (props) {
                     throw new Error("No `props.fetchVariantSampleListItem` supplied to SaveNotesToReportButton");
                 }
             }
+            // TODO:
+            // if (patchErrors.length > 0) {}
         });
-    }, [ isPatching, patchItems, sendToReportStore, report, resetSendToReportStoreItems ]);
+    }, [ disabled, patchItems, sendToReportStore, report, resetSendToReportStoreItems ]);
 
     const btnCls = "btn btn-" + (!reportUUID ? "outline-danger" : "primary") + (className ? " " + className : "");
 
     return (
-        <button type="button" className={btnCls}
-            onClick={onClick} disabled={!reportUUID || isPatching || selectionStoreSize === 0}
+        <button type="button" {...{ disabled, onClick }} className={btnCls}
             data-tip={`${selectionStoreSize} Note selections from ${variantSamplesWithAnySelections} Sample Variants`}>
             Save Note Selections to <span className="text-600">Report</span>
         </button>

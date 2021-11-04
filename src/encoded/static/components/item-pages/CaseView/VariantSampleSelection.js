@@ -6,6 +6,7 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
+import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 
 // TEMPORARY:
 import { projectReportSettings } from './../ReportView/project-settings-draft';
@@ -50,6 +51,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
 
         // From CaseReviewTab:
         alreadyInProjectNotes,
+        alreadyInReportNotes,
         // savedClassificationsByVS,
         changedClassificationsByVS,
         updateClassificationForVS,
@@ -91,6 +93,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
             sendToProjectStore,
             sendToReportStore,
             alreadyInProjectNotes,
+            alreadyInReportNotes,
             tableTagsByID,
             updateClassificationForVS,
             toggleVariantSampleSelectionDeletion,
@@ -140,6 +143,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         anyUnsavedChanges, // If true, then should prevent navigation to VS items as would lose changes in current view. (Unless we adjust to open in new window.)
         // From CaseReviewTab (if used):
         alreadyInProjectNotes,
+        alreadyInReportNotes,
         unsavedClassification,
         updateClassificationForVS,
         // From CaseReviewSelectedNotesStore (if used):
@@ -149,7 +153,10 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         sendToReportStore,
         tableTagsByID
     } = props;
-    const { accession: caseAccession } = context; // `context` refers to our Case in here.
+    const {
+        accession: caseAccession,
+        report: { uuid: reportUUID } = {}
+    } = context; // `context` refers to our Case in here.
     const {
         date_selected,
         filter_blocks_request_at_time_of_selection,
@@ -192,6 +199,24 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         gene_notes: lastGeneNote = null
     } = variantSample || {};
 
+    const isInReport = useMemo(function(){
+        if (!alreadyInReportNotes) {
+            // Case if we're on InterpretationTab
+            // Can remove this and lookup via associated_items instead, if need
+            // this in InterpretationTab (or move alreadyInReportNotes up).
+            return false;
+        }
+        const notes = getAllNotesFromVariantSample(variantSample);
+        for (var i = 0; i < notes.length; i++) {
+            const { uuid: noteUUID } = notes[i];
+            // const isInAssociatedItems = _.findWhere(associated_items, { "item_type": "Report", "item_identifer": reportUUID });
+            if (alreadyInReportNotes[noteUUID]) {
+                return true;
+            }
+        }
+        return false;
+    }, [ context, variantSample ]);
+
     const noSavedNotes = clinicalInterpretationNote === null && discoveryInterpretationNote === null && lastVariantNote === null && lastGeneNote === null;
     const { classification: acmgClassification = null } = clinicalInterpretationNote || {};
     const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discoveryInterpretationNote || {};
@@ -204,32 +229,40 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             toggleSendToReportStoreItems,
             sendToProjectStore,
             sendToReportStore,
-            alreadyInProjectNotes
+            alreadyInProjectNotes,
+            alreadyInReportNotes
         };
         expandedNotesSection = <VariantSampleExpandedNotes {...noteSectionProps} />;
     }
 
     return (
-        <div className="card mb-1 variant-sample-selection" data-is-deleted={isDeleted} key={index}>
-            <div className="card-header">
+        <div className="card mb-16 variant-sample-selection" data-is-deleted={isDeleted} key={index}>
+            <div className="card-header pr-12">
                 <div className="d-flex flex-column flex-lg-row align-items-lg-center">
 
                     <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
                         <h4 className="text-truncate text-600 my-0 selected-vsl-title">
                             {
                                 parentTabType === parentTabTypes.CASEREVIEW ?
+                                    // CaseReviewTab
                                     <React.Fragment>
-                                        { variantDisplayTitle }
-                                        { noSavedNotes ? <i className="icon icon-exclamation-triangle fas ml-12 text-warning" data-tip="No notes saved for this Sample Variant in interpretation"/> : null }
+                                        <i className={`icon align-middle icon-fw title-prefix-icon icon-${isInReport ? "file-invoice" : "times"} fas mr-12`}
+                                            data-tip={isInReport ? "This sample has at least one note in the report" : "This sample has no notes saved to report"}/>
+                                        <span className="text-secondary">{ variantDisplayTitle }</span>
+                                        { noSavedNotes ?
+                                            <i className="icon align-middle icon-fw icon-exclamation-triangle fas ml-12 text-warning" data-tip="No notes saved for this Sample Variant in interpretation"/>
+                                            : null }
                                     </React.Fragment>
                                     : anyUnsavedChanges ?
+                                        // InterpretationTab, with unsaved changes.
                                         <React.Fragment>
-                                            <i className={`icon icon-fw title-prefix-icon icon-${isDeleted ? "trash text-danger" : "check text-success"} fas mr-12`}/>
+                                            <i className={`icon align-middle icon-fw title-prefix-icon icon-${isDeleted ? "trash text-danger" : "check text-success"} fas mr-12`}/>
                                             <span className={"text-" + (isDeleted? "muted": "secondary")}>{ variantDisplayTitle }</span>
                                         </React.Fragment>
-                                        :
+                                        : // InterpretationTab, default.
                                         <React.Fragment>
-                                            <i className="icon icon-fw title-prefix-icon icon-pen fas mr-12"/>
+                                            <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
+                                                data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
                                             <a href={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`}>
                                                 { variantDisplayTitle }
                                             </a>
@@ -247,9 +280,11 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         { parentTabType === parentTabTypes.CASEREVIEW ?
                             <div className="d-block d-lg-flex align-items-center">
                                 <ClassificationDropdown {...{ variantSample, tableTagsByID, unsavedClassification, updateClassificationForVS }} />
-                                <button type="button" className={"btn btn-sm btn-" + (noSavedNotes ? "outline-dark" : "primary-dark")} onClick={toggleIsExpanded} disabled={noSavedNotes}>
-                                    <i className={"icon fas mr-07 icon-" + (!isExpanded ? "plus" : "minus")} />
-                                    { !isExpanded ? "Review Notes & Classification" : "Hide Notes & Classification" }
+                                <button type="button" className={"btn btn-sm btn-" + (noSavedNotes ? "outline-secondary" : isExpanded ? "primary-dark" : "primary")}
+                                    onClick={toggleIsExpanded} disabled={noSavedNotes}>
+                                    <i className={"icon icon-fw fas mr-06 icon-" + (!isExpanded ? "plus" : "minus")} />
+                                    {/* !isExpanded ? "Review Notes & Classification" : "Hide Notes & Classification" */}
+                                    Review Notes & Classification
                                 </button>
                             </div>
                             : null }
@@ -421,7 +456,7 @@ function ClassificationDropdown(props){
     // Right now we allow to select 1 tag per VS, but could support multiple theoretically later on.
 
     return (
-        <div className="py-1 py-lg-0 px-lg-2">
+        <div className="py-1 py-lg-0 pr-lg-12">
             <DropdownButton size="sm" variant="outline-dark" menuAlign="right" title={title} onSelect={onOptionSelect} disabled={tags.length === 0}
                 data-delay={500} data-tip={!viewClassification? "Select a finding..." : null }>
                 { renderedOptions }
@@ -449,7 +484,8 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
         toggleSendToReportStoreItems,
         sendToProjectStore,
         sendToReportStore,
-        alreadyInProjectNotes
+        alreadyInProjectNotes,
+        alreadyInReportNotes
     } = props;
     const {
         interpretation: {
@@ -491,12 +527,20 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
         && (noClinicalNoteSaved    || sendToReportStore[clinicalInterpretationNoteUUID])
     );
 
+    const allNotesToReportAlreadyStored = (
+        (noVariantNotesSaved       || alreadyInReportNotes[lastVariantNoteUUID])
+        && (noGeneNotesSaved       || alreadyInReportNotes[lastGeneNoteUUID])
+        && (noDiscoveryNoteSaved   || alreadyInReportNotes[discoveryInterpretationNoteUUID])
+        && (noClinicalNoteSaved    || alreadyInReportNotes[clinicalInterpretationNoteUUID])
+    );
+
     const someNotesToReportSelected = (
         (!noVariantNotesSaved       && sendToReportStore[lastVariantNoteUUID])
         || (!noGeneNotesSaved       && sendToReportStore[lastGeneNoteUUID])
         || (!noDiscoveryNoteSaved   && sendToReportStore[discoveryInterpretationNoteUUID])
         || (!noClinicalNoteSaved    && sendToReportStore[clinicalInterpretationNoteUUID])
     );
+
 
     const allNotesToKnowledgeBaseSelected = (
         (noVariantNotesSaved       || sendToProjectStore[lastVariantNoteUUID])
@@ -566,9 +610,10 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
             <div className="card-body bg-light select-checkboxes-section border-top border-bottom">
                 <div>
                     <Checkbox className="d-inline-block mb-08"
-                        checked={!!allNotesToReportSelected}
+                        disabled={allNotesToReportAlreadyStored}
+                        checked={!!allNotesToReportSelected || allNotesToReportAlreadyStored}
                         onChange={onChangeSendAllNotesToReport}
-                        indeterminate={someNotesToReportSelected && !allNotesToReportSelected}>
+                        indeterminate={someNotesToReportSelected && !allNotesToReportSelected && !allNotesToReportAlreadyStored}>
                         Send All Notes to Report
                     </Checkbox>
                 </div>
@@ -595,6 +640,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                     kbChecked={!!sendToProjectStore[lastVariantNoteUUID]}
                                     onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastVariantNoteUUID, true ] ]); })}
                                     onKBChange={useCallback(function(){ toggleSendToProjectStoreItems([ [ lastVariantNoteUUID, true ] ]); })}
+                                    reportAlreadyStored={alreadyInReportNotes[lastVariantNoteUUID]}
                                     kbAlreadyStored={alreadyInProjectNotes[lastVariantNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
@@ -616,6 +662,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                     kbChecked={!!sendToProjectStore[lastGeneNoteUUID]}
                                     onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastGeneNoteUUID, true ] ]); })}
                                     onKBChange={useCallback(function(){ toggleSendToProjectStoreItems([ [ lastGeneNoteUUID, true ] ]); })}
+                                    reportAlreadyStored={alreadyInReportNotes[lastGeneNoteUUID]}
                                     kbAlreadyStored={alreadyInProjectNotes[lastGeneNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
@@ -638,6 +685,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                     kbChecked={!!sendToProjectStore[clinicalInterpretationNoteUUID]}
                                     onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ clinicalInterpretationNoteUUID, true ] ]); })}
                                     onKBChange={useCallback(function(){ toggleSendToProjectStoreItems([ [ clinicalInterpretationNoteUUID, true ] ]); })}
+                                    reportAlreadyStored={alreadyInReportNotes[clinicalInterpretationNoteUUID]}
                                     kbAlreadyStored={alreadyInProjectNotes[clinicalInterpretationNoteUUID]} />
 
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
@@ -672,6 +720,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                     kbChecked={!!sendToProjectStore[discoveryInterpretationNoteUUID]}
                                     onReportChange={ useCallback(function(){ toggleSendToReportStoreItems([ [ discoveryInterpretationNoteUUID, true ] ]); }) }
                                     onKBChange={ useCallback(function(){ toggleSendToProjectStoreItems([ [ discoveryInterpretationNoteUUID, true ] ]); }) }
+                                    reportAlreadyStored={alreadyInReportNotes[discoveryInterpretationNoteUUID]}
                                     kbAlreadyStored={alreadyInProjectNotes[discoveryInterpretationNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
@@ -710,10 +759,11 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
     );
 });
 
-const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onKBChange, reportChecked, kbChecked, kbAlreadyStored }) {
+const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onKBChange, reportChecked, reportAlreadyStored, kbChecked, kbAlreadyStored }) {
     return (
         <div className="d-flex flex-column flex-xl-row text-small">
-            <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={onReportChange} checked={reportChecked}>
+            <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={reportAlreadyStored ? null : onReportChange}
+                checked={reportAlreadyStored || reportChecked} disabled={reportAlreadyStored}>
                 Send to Report
             </Checkbox>
             <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={kbAlreadyStored ? null : onKBChange}

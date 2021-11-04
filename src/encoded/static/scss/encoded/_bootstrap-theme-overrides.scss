@@ -203,7 +203,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 
 .card {
 
-    box-shadow: 0 1px 5px #0002;
+    box-shadow: 0 1px 5px -1px #0002;
     border-color: #d6d6d6;
 
     .card-header,

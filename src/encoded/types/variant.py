@@ -873,7 +873,7 @@ def process_notes(context, request):
 
 
     return {
-        "success" : True,
+        "status" : "success",
         "patch_results": {
             "Gene": gene_patch_count,
             "Variant": variant_patch_count,

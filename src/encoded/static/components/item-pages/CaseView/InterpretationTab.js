@@ -256,7 +256,7 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
             <button type="button" className={btnCls} data-tip="Revert changes"
                 disabled={disabled} onClick={resetVariantSampleSelectionDeletionsAndOrdering}>
                 <i className="icon icon-fw icon-undo fas mr-08"/>
-                Revert
+                Clear
             </button>
         </div>
     );

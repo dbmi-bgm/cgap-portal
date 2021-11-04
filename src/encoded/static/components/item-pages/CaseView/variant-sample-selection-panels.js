@@ -144,6 +144,7 @@ function ACMGClassificationSelections (props) {
         // From CaseReviewTab (& higher)
         variantSampleListItem,
         alreadyInProjectNotes,
+        alreadyInReportNotes,
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
@@ -159,19 +160,19 @@ function ACMGClassificationSelections (props) {
                 <h5 className="text-400 text-large">Move to Report</h5>
                 <ACMGClassificationSelectionsCommonCheckboxList
                     variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
-                    noteTypesIncluded={reportNotesIncluded} />
+                    noteTypesIncluded={reportNotesIncluded} alreadySaved={alreadyInReportNotes} />
             </div>
             <div className="col-12 col-lg-6">
                 <h5 className="text-400 text-large">Save to Project</h5>
                 <ACMGClassificationSelectionsCommonCheckboxList
-                    {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
-                    noteTypesIncluded={kbNotesIncluded} />
+                    variantSampleListItem={variantSampleListItem} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
+                    noteTypesIncluded={kbNotesIncluded} alreadySaved={alreadyInProjectNotes} />
             </div>
         </div>
     );
 }
 
-function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadyInProjectNotes, noteTypesIncluded }) {
+function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadySaved, noteTypesIncluded }) {
     const { variant_samples = [] } = variantSampleListItem || {};
 
     const pathogenicityEnums = [
@@ -199,10 +200,10 @@ function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, v
                 return classification === enumOption;
             },
             store,
-            alreadyInProjectNotes,
+            alreadySaved,
             noteTypesIncluded
         );
-    }, [ variantSamplesWithInterpretationClassification, store, alreadyInProjectNotes, noteTypesIncluded ]);
+    }, [ variantSamplesWithInterpretationClassification, store, alreadySaved, noteTypesIncluded ]);
 
     const onChange = useCallback(function onChange (evt) {
         const eventKey = evt.target.getAttribute("data-key");
@@ -263,6 +264,7 @@ function VariantGeneSelections (props) {
         // From CaseReviewTab (& higher)
         variantSampleListItem,
         alreadyInProjectNotes,
+        alreadyInReportNotes,
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
@@ -278,20 +280,20 @@ function VariantGeneSelections (props) {
                 <h5 className="text-400 text-large">Move to Report</h5>
                 <VariantGeneSelectionsCommonCheckboxList
                     variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
-                    noteTypesIncluded={reportNotesIncluded} />
+                    noteTypesIncluded={reportNotesIncluded} alreadySaved={alreadyInReportNotes} />
             </div>
             <div className="col-12 col-lg-6">
                 <h5 className="text-400 text-large">Save to Project</h5>
                 <VariantGeneSelectionsCommonCheckboxList
-                    {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
-                    noteTypesIncluded={kbNotesIncluded}/>
+                    variantSampleListItem={variantSampleListItem} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
+                    noteTypesIncluded={kbNotesIncluded} alreadySaved={alreadyInProjectNotes}/>
             </div>
         </div>
     );
 }
 
 
-function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadyInProjectNotes, noteTypesIncluded }) {
+function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadySaved, noteTypesIncluded }) {
     const { variant_samples = [] } = variantSampleListItem || {};
 
     // These are currently same between gene and variant.
@@ -334,10 +336,10 @@ function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantS
                 return gene_candidacy === enumOption;
             },
             store,
-            alreadyInProjectNotes,
+            alreadySaved,
             noteTypesIncluded
         );
-    }, [ variantSamplesWithGeneCandidacy, store, alreadyInProjectNotes, noteTypesIncluded ]);
+    }, [ variantSamplesWithGeneCandidacy, store, alreadySaved, noteTypesIncluded ]);
 
     const {
         checkboxStates: variantCheckboxStates,
@@ -355,10 +357,10 @@ function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantS
                 return variant_candidacy === enumOption;
             },
             store,
-            alreadyInProjectNotes,
+            alreadySaved,
             noteTypesIncluded
         );
-    }, [ variantSamplesWithVariantCandidacy, store, alreadyInProjectNotes, noteTypesIncluded ]);
+    }, [ variantSamplesWithVariantCandidacy, store, alreadySaved, noteTypesIncluded ]);
 
     const onChange = useCallback(function onChange (evt) {
         const eventKey = evt.target.getAttribute("data-key");
@@ -449,6 +451,7 @@ function NoteTypeSelections (props) {
         // From CaseReviewTab (& higher)
         variantSampleListItem,
         alreadyInProjectNotes,
+        alreadyInReportNotes,
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
@@ -467,13 +470,13 @@ function NoteTypeSelections (props) {
                 <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Move to Report</h5>
                     <NoteTypeSelectionsCommonCheckboxList
-                        variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
+                        {...{ variantSampleListItem }} alreadySaved={alreadyInReportNotes} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
                         noteTypesIncludedState={reportNotesIncluded} toggleNoteTypesIncludedState={toggleReportNoteSubselectionState} />
                 </div>
                 <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Save to Project</h5>
                     <NoteTypeSelectionsCommonCheckboxList
-                        {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
+                        {...{ variantSampleListItem }} alreadySaved={alreadyInProjectNotes} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
                         noteTypesIncludedState={kbNotesIncluded} toggleNoteTypesIncludedState={toggleKBNoteSubselectionState} />
                 </div>
             </div>
@@ -483,7 +486,7 @@ function NoteTypeSelections (props) {
 
 /** Logic in here differs a bit from the other 2 panels as we have independent states for these boxes. */
 function NoteTypeSelectionsCommonCheckboxList (props) {
-    const { store, toggleItems, variantSampleListItem, alreadyInProjectNotes, noteTypesIncludedState, toggleNoteTypesIncludedState } = props;
+    const { store, toggleItems, variantSampleListItem, alreadySaved, noteTypesIncludedState, toggleNoteTypesIncludedState } = props;
     const { variant_samples = [] } = variantSampleListItem || {};
 
     const noteTypes = [
@@ -520,9 +523,9 @@ function NoteTypeSelectionsCommonCheckboxList (props) {
                 return !!(foundNote);
             },
             store,
-            alreadyInProjectNotes
+            alreadySaved
         );
-    }, [ variantSampleObjectsSelected, store, alreadyInProjectNotes ]);
+    }, [ variantSampleObjectsSelected, store, alreadySaved ]);
 
 
 
