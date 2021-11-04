@@ -8,7 +8,7 @@
 <ul><li> strong candidate: Variants with novocaller posterior probability > 0.9.
 <li> medium candidate: Variants with 0.9 > novocaller posterior probability > 0.1.
 <li> weak candidate: Autosomal variants for which GATK genotype assignments are (Mother: 0/0, Father: 0/0, Child 0/1) and neither parent has 3 or more reads supporting alternative allele, but novocaller posterior probability &lt; 0.1.
-<li> chrXY candidate: Variants on chrX or chrY, for which GATK genotype assignments are (Mother: 0/0, Father: 0/0, Child 0/1) and neither parent has 3 or more reads supporting alternative allele, These variants are not assigned novocaller posterior probability since since these chromosomes do not meet the model assumptions.
+<li> chrXY candidate: Variants on chrX or chrY, for which GATK genotype assignments are (Mother: 0/0, Father: 0/0, Child 0/1) and neither parent has 3 or more reads supporting an alternative allele. These variants are not assigned novocaller posterior probability since since these chromosomes do not meet the model assumptions.
 <li> See Documentation for Details.
 </ul>
 
@@ -16,9 +16,11 @@
 <ul>
 <li> <b> Dominant (Paternal)</b>: Father: 0/1, Mother: 0/0, Child 0/1.
 <li> <b> Dominant (Maternal)</b>: Father: 0/0, Mother: 0/1, Child 0/1.
-<li> <b> Recessive</b>: Father: 0/1, Mother: 0/1, Child 1/1.
-<li> <b> X-linked Recessive</b>, <b>X-linked Dominant (Maternal)</b>: Father: 0, Mother: 0/1, Son 1.
-<li> <b> X-linked dominant (Paternal)</b>: Father: 1, Mother: 0/0, Son 1.
+<li> <b> Homozygous recessive</b>: Father: 0/1, Mother: 0/1, Child 1/1.
+<li> <b> X-linked recessive</b>: Father 1, Mother: 0/1, Daughter 1/1.
+<li> <b> X-linked dominant (Maternal)</b>: Father 0, Mother 0/1, Daughter 0/1.
+<li> <b> X-linked dominant (Paternal)</b>: Father 1, Mother 0/0, Daughter 0/1.
+<li> <b> X-linked recessive</b>, <b>X-linked dominant (Maternal)</b>: Father: 0, Mother: 0/1, Son 1.
 <li> <b> Y-linked dominant</b>: Father: 1, Son 1.
 <li> <b> Loss of Heterozygosity</b>: Father: 0/1, Mother: 0/0, Child 1/1.
 <li> <b> Loss of Heterozygosity</b>: Father: 0/0, Mother: 0/1, Child 1/1.
