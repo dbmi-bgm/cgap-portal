@@ -20,6 +20,7 @@ import { AnnotationBrowserTabBody } from './AnnotationBrowserTabBody';
 import { BamFileBrowserTabBody } from './BamFileBrowserTabBody';
 import { InterpretationSpaceWrapper, InterpretationSpaceHeader } from './InterpretationSpaceController';
 import { getInitialTranscriptIndex } from './AnnotationSections';
+import { QuickPopover } from './../components/QuickPopover';
 
 
 
@@ -648,28 +649,4 @@ function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStren
                 </div>
             </Popover.Content>
         </Popover>);
-}
-
-function QuickPopover(props) {
-    const { title, content, className, popID, tooltip } = props || {};
-    const popover = (
-        <Popover id={popID}>
-            <Popover.Title className="m-0" as="h4">{title}</Popover.Title>
-            <Popover.Content>
-                { content }
-            </Popover.Content>
-        </Popover>
-    );
-    const cls = "btn btn-link" + (className ? " " + className : "");
-    return (
-        <OverlayTrigger trigger="focus" placement="right" overlay={popover}>
-            { function({ ref, ...triggerHandlers }){
-                return (
-                    <button type="button" ref={ref} { ...triggerHandlers } className={cls} data-tip={tooltip || "Click for citation info"}>
-                        <i className="icon icon-info-circle fas" />
-                    </button>
-                );
-            }}
-        </OverlayTrigger>
-    );
 }
