@@ -20,6 +20,7 @@ from snovault.elasticsearch import ELASTIC_SEARCH
 from snovault.util import (
     debug_log,
 )
+from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.typeinfo import AbstractTypeInfo
 from ..authorization import is_admin_request
 from .lucene_builder import LuceneBuilder
