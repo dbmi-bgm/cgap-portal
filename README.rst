@@ -6,6 +6,8 @@
 
 .. image:: https://readthedocs.org/projects/cgap-portal/badge/?version=latest
 
+.. image:: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiVjRJaE5DeHE3a0tjcGcwb01FaDZvSU5Id056amkwazV0UWlJM29IaEM2VWVlMm5INjhKS1dMVTRCMVAwSVl0RmFJR05zOHVHZUFrWStKdzBaV0VKZm04PSIsIml2UGFyYW1ldGVyU3BlYyI6Im1mMVFVOW10dFltQ2dLQkIiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main
+
 
 Welcome to CGAP! We are a team of scientists, clinicians, and developers who aim to streamline the clinical genetics workflow. The following locations are different deployments of our data portal:
 
