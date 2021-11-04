@@ -36,6 +36,29 @@ def qc_metric_fastqc_bad_status(institution, project):
 
 
 @pytest.fixture
+def qc_peddy(institution, project):
+    return {
+        "uuid": "ff9e47c1-35bd-46fd-8a2e-e5d7b8956f44",
+        'institution': institution['@id'],
+        'project': project['@id'],
+        "ancestry and sex prediction": [
+            {
+                "name": "sample1",
+                "sex prediction": "female",
+                "ancestry prediction": "SAS"
+            },
+            {
+                "name": "sample2",
+                "sex prediction": "male",
+                "ancestry prediction": "AFR"
+            }
+        ],
+        "url": "https://url.com",
+        "overall_quality_status": "PASS"
+    }
+
+
+@pytest.fixture
 def qc_bamcheck_data1(institution, project):
     return {
         "uuid": "af8e47c1-35bd-46fd-8a2e-e5d7b89560aa",
@@ -121,6 +144,11 @@ def qclist(testapp, institution, project, bam_qc):
 
 def test_post_qc_metric(testapp, qc_metric_fastqc):
     res = testapp.post_json('/quality_metric_fastqc', qc_metric_fastqc, status=201)
+    assert res.json['@graph'][0]['overall_quality_status'] == "PASS"
+    assert len(res.json['@graph'][0]['ancestry and sex prediction']) == 2
+
+def test_post_qc_metric_peddy(testapp, qc_peddy):
+    res = testapp.post_json('/quality_metric_peddyqc', qc_peddy, status=201)
     assert res.json['@graph'][0]['overall_quality_status'] == "PASS"
 
 

@@ -202,6 +202,25 @@ class QualityMetricQclist(QualityMetric):
                     for qcs_item in qc_obj['quality_metric_summary']:
                         qc_summary.append(qcs_item)
 
+                ## add special handling for peddyqc which doesn't have a qc summary, because
+                ## adding a qc summary there would be too redundant and not particularly useful
+                elif qc_item['qc_type'] == 'quality_metric_peddyqc':
+                    for predictions in qc_item.get('ancestry and sex prediction', []):
+                        sex_summary = {
+                            'title': 'Predicted Sex',
+                            'sample': predictions['name'],
+                            'value': predictions['predicted sex'],
+                            'numberType': 'string'
+                        }
+                        ancestry_summary = {
+                            'title': 'Predicted Ancestry',
+                            'sample': predictions['name'],
+                            'value': predictions['predicted ancestry'],
+                            'numberType': 'string'
+                        }
+                        qc_summary.append(sex_summary)
+                        qc_summary.append(ancestry_summary)
+
         return qc_summary if qc_summary else None
 
 
