@@ -98,7 +98,7 @@ class SearchBuilder:
         if len(self.doc_types) == 1:  # extract mapping from storage if we're searching on a single doc type
             item_type_snake_case = ''.join(['_' + c.lower() if c.isupper() else c for c in self.doc_types[0]]).lstrip('_')
             mappings = self.request.registry[STORAGE].read.mappings.get()
-            if get_namespaced_index(item_type_snake_case) == self.es_index and self.es_index in mappings:
+            if get_namespaced_index(self.request, item_type_snake_case) == self.es_index and self.es_index in mappings:
                 return mappings[self.es_index]['mappings'][item_type_snake_case]['properties']
             else:  # new item was added after last cache update, get directly via API
                 return get_es_mapping(self.es, self.es_index)
