@@ -44,13 +44,13 @@ def qc_peddy(institution, project):
         "ancestry and sex prediction": [
             {
                 "name": "sample1",
-                "sex prediction": "female",
-                "ancestry prediction": "SAS"
+                "predicted sex": "female",
+                "predicted ancestry": "SAS"
             },
             {
                 "name": "sample2",
-                "sex prediction": "male",
-                "ancestry prediction": "AFR"
+                "predicted sex": "male",
+                "predicted ancestry": "AFR"
             }
         ],
         "url": "https://url.com",
@@ -129,15 +129,18 @@ def bam_qc(testapp, institution, project):
 
 
 @pytest.fixture
-def qclist(testapp, institution, project, bam_qc):
+def qclist(testapp, institution, project, bam_qc, qc_peddy):
+    peddyqc = testapp.post_json('/quality_metric_peddyqc', qc_peddy).json['@graph'][0]
     item = {
         'institution': institution['@id'],
         'project': project['@id'],
         "status": "in review",
         "overall_quality_status": "PASS",
         "uuid": "f94b0c13-24f9-4be4-9663-5d2213c5678e",
-        "qc_list": [{'qc_type': "quality_metric_bamqc",
-                     'value': bam_qc['@id']}]
+        "qc_list": [
+            {'qc_type': "quality_metric_bamqc", 'value': bam_qc['@id']},
+            {'qc_type': 'quality_metric_peddyqc', 'value': peddyqc['@id']}
+        ]
     }
     return testapp.post_json('/quality_metric_qclist', item).json['@graph'][0]
 
@@ -145,11 +148,11 @@ def qclist(testapp, institution, project, bam_qc):
 def test_post_qc_metric(testapp, qc_metric_fastqc):
     res = testapp.post_json('/quality_metric_fastqc', qc_metric_fastqc, status=201)
     assert res.json['@graph'][0]['overall_quality_status'] == "PASS"
-    assert len(res.json['@graph'][0]['ancestry and sex prediction']) == 2
 
 def test_post_qc_metric_peddy(testapp, qc_peddy):
     res = testapp.post_json('/quality_metric_peddyqc', qc_peddy, status=201)
     assert res.json['@graph'][0]['overall_quality_status'] == "PASS"
+    assert len(res.json['@graph'][0]['ancestry and sex prediction']) == 2
 
 
 def test_post_bad_qc(testapp, qc_metric_fastqc_bad_status, qc_metric_fastqc_no_project):
@@ -198,7 +201,11 @@ def test_quality_metric_qclist(qclist):
     summary = qclist['quality_metric_summary']
     expected_summary = [
         {'title': 'Total Reads', 'sample': 'NA12879_sample', 'value': '467863567', 'numberType': 'integer'},
-        {'title': 'Coverage', 'sample': 'NA12879_sample', 'value': '30x', 'numberType': 'string'}
-        ]
+        {'title': 'Coverage', 'sample': 'NA12879_sample', 'value': '30x', 'numberType': 'string'},
+        {'title': 'Predicted Sex', 'sample': 'sample1', 'value': 'female', 'numberType': 'string'},
+        {'title': 'Predicted Sex', 'sample': 'sample2', 'value': 'male', 'numberType': 'string'},
+        {'title': 'Predicted Ancestry', 'sample': 'sample1', 'value': 'SAS', 'numberType': 'string'},
+        {'title': 'Predicted Ancestry', 'sample': 'sample2', 'value': 'AFR', 'numberType': 'string'}
+    ]
     for an_exp_info in expected_summary:
         assert an_exp_info in summary
