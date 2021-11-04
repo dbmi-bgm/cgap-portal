@@ -569,16 +569,14 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
 const bioinfoPopoverContent = {
     predictedSexAndAncestry: (
         <div>
-            Sex and ancestry of each sample is predicted using the QC tool
-            <a href="https://github.com/brentp/peddy" target="_blank" rel="noreferrer">peddy</a>.
-            For more info see peddy’s
-            <a href="https://peddy.readthedocs.io/en/latest/" target="_blank" rel="noreferrer">documentation</a>.
+            Sex and ancestry of each sample is predicted using the QC tool <a href="https://github.com/brentp/peddy" target="_blank" rel="noreferrer">peddy</a>.
+            For more info see peddy’s <a href="https://peddy.readthedocs.io/en/latest/" target="_blank" rel="noreferrer">documentation</a>.
         </div>
     ),
     filteredSNVIndelVariants: (
         <div>
-            During processing, <a href="https://cgap-pipeline.readthedocs.io/en/latest/wgs-step-filtering.html" target="_blank" rel="noreferrer">hard filters are applied</a>
-            to remove variants that will not be of interest. This lowers the number of variants returned from the millions to the thousands.
+            During processing, <a href="https://cgap-pipeline.readthedocs.io/en/latest/wgs-step-filtering.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            remove variants that will not be of interest. This lowers the number of variants returned from the millions to the thousands.
             Briefly, these filters include: (1) removing intergenic variants; (2) whitelisting some variants based on VEP, ClinVar, and SpliceAI
             annotations; (3) Removing variants with only intronic consequences; and (4) removing common variants based on gnomAD population allele
             frequency and a panel of unrelated samples.
@@ -586,8 +584,8 @@ const bioinfoPopoverContent = {
     ),
     filteredSVVariants: (
         <div>
-            During processing, <a href="https://cgap-sv-pipeline.readthedocs.io/en/latest/sv-part3.html" target="_blank" rel="noreferrer">hard filters are applied</a>
-            to remove structural variants (SVs) that will not be of interest. This limits the numbers and types of SVs returned from thousands
+            During processing, <a href="https://cgap-sv-pipeline.readthedocs.io/en/latest/sv-part3.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            remove structural variants (SVs) that will not be of interest. This limits the numbers and types of SVs returned from thousands
             to fewer than 500. Briefly, these filters include: (1) whitelisting SVs based on VEP annotations; (2) removing SVs with only intronic
             or intergenic consequences; (3) selecting SVs based on SV type (e.g., DEL and DUP); (3) removing common variants based on gnomAD-SV
             population allele frequency, and a panel of 20 unrelated samples; and (4) removing SVs over a certain size.
@@ -647,11 +645,11 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
             if (qmType === "QualityMetricQclist") {
                 // Coverage and total reads should only be present in BAM, update if found
                 qmSummaries.forEach(function(qmSummary){
-                    const { title = null, value = null, tooltip = null, numberType = "string" } = qmSummary;
+                    const { title = null, value = null, numberType = "string" } = qmSummary;
                     if (title === "Coverage") {
-                        msaStats.coverage = { value: transformValueType(numberType, value), tooltip };
+                        msaStats.coverage = { value: transformValueType(numberType, value) };
                     } else if (title === "Total Reads") {
-                        msaStats.reads = { value: transformValueType(numberType, value), tooltip };
+                        msaStats.reads = { value: transformValueType(numberType, value) };
                     }
                 });
             }
@@ -674,11 +672,11 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 if (variantType === "SV") {
                     // Stats should only be present in combined VCF, update if found
                     qmSummaries.forEach(function(qmSummary){
-                        const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
+                        const { title = null, value = null, sample = null, numberType = "string" } = qmSummary;
                         if (sample && sample === caseSampleId) {
                             switch (title) { // Leaving this as switch case, since more fields may be added in future (may also be worth creating a function to encompass SV & SNV options as this grows)
                                 case "Filtered Variants":
-                                    msaStats.filteredSVVariants = { value: transformValueType(numberType, value), tooltip };
+                                    msaStats.filteredSVVariants = { value: transformValueType(numberType, value) };
                                     break;
                                 default:
                                     break;
@@ -688,23 +686,23 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 } else { // SNV may be labelled or not
                     // Most stats should only be present in combined VCF, update if found
                     qmSummaries.forEach(function(qmSummary){
-                        const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
+                        const { title = null, value = null, sample = null, numberType = "string" } = qmSummary;
                         if (sample && sample === caseSampleId) {
                             switch (title) {
                                 case "De Novo Fraction":
-                                    msaStats.deNovo = { value: transformValueType(numberType, value), tooltip };
+                                    msaStats.deNovo = { value: transformValueType(numberType, value) };
                                     break;
                                 case "Heterozygosity Ratio":
-                                    msaStats.heterozygosity = { value: transformValueType(numberType, value), tooltip };
+                                    msaStats.heterozygosity = { value: transformValueType(numberType, value) };
                                     break;
                                 case "Transition-Transversion Ratio":
-                                    msaStats.transTransRatio = { value: transformValueType(numberType, value), tooltip };
+                                    msaStats.transTransRatio = { value: transformValueType(numberType, value) };
                                     break;
                                 case "Total Variants Called":
-                                    msaStats.totalSNVIndelVars = { value: transformValueType(numberType, value), tooltip };
+                                    msaStats.totalSNVIndelVars = { value: transformValueType(numberType, value) };
                                     break;
                                 case "Filtered Variants":
-                                    msaStats.filteredSNVIndelVariants = { value: transformValueType(numberType, value), tooltip };
+                                    msaStats.filteredSNVIndelVariants = { value: transformValueType(numberType, value) };
                                     break;
                                 default:
                                     break;
@@ -742,44 +740,44 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     return (
         <>
             <div className="row py-3">
-                <BioinfoStatsEntry label="Total Number of Reads" tooltip={reads.tooltip}>
+                <BioinfoStatsEntry label="Total Number of Reads">
                     { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : fallbackElem }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Coverage" tooltip={coverage.tooltip}>
+                <BioinfoStatsEntry label="Coverage">
                     { coverage.value || fallbackElem }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Total Number of SNVs/Indels called" tooltip={totalSNVIndelVars.tooltip}>
+                <BioinfoStatsEntry label="Total Number of SNVs/Indels called">
                     { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): fallbackElem }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Transition-Transversion ratio" tooltip={transTransRatio.tooltip} popoverContent={bioinfoPopoverContent.transTransRatio}>
+                <BioinfoStatsEntry label="Transition-Transversion ratio" popoverContent={bioinfoPopoverContent.transTransRatio}>
                     { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-3">
-                <BioinfoStatsEntry label="Submitted Sex" tooltip={""}>
+                <BioinfoStatsEntry label="Submitted Sex" >
                     { submittedSex || fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     { predictedSex.value || fallbackElem }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" tooltip={filteredSNVIndelVariants.tooltip} popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
+                <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
                     { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Structural Variants After Hard Filters" tooltip={filteredSVVariants.tooltip} popoverContent={bioinfoPopoverContent.filteredSVVariants}>
+                <BioinfoStatsEntry label="Structural Variants After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSVVariants}>
                     { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-3">
-                <BioinfoStatsEntry label="Submitted Ancestry" tooltip={""}>
+                <BioinfoStatsEntry label="Submitted Ancestry" >
                     { submittedAncestry.length > 0 && submittedAncestry.join(", ") || "-" }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Predicted Ancestry" tooltip={""}>
+                <BioinfoStatsEntry label="Predicted Ancestry">
                     { !!predictedAncestry.value && predictedAncestry.value.length > 0 && submittedAncestry.join(", ") || "-" }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Heterozygosity ratio" tooltip={heterozygosity.tooltip} popoverContent={bioinfoPopoverContent.heterozygosity}>
+                <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
                     { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : fallbackElem }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="De novo Fraction" tooltip={deNovo.tooltip}>
+                <BioinfoStatsEntry label="De novo Fraction">
                     { typeof deNovo.value === "number" ? deNovo.value + "%" : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
@@ -797,7 +795,7 @@ function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }){
                         <i className="icon icon-info-circle fas icon-fw ml-05"
                             data-tip={tooltip} data-place="right"/>
                         : null }
-                    { popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-1">{ popoverContent }</QuickPopover>: null }
+                    { popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-0 ml-05">{ popoverContent }</QuickPopover>: null }
                 </label>
                 <div>{ children }</div>
             </div>
