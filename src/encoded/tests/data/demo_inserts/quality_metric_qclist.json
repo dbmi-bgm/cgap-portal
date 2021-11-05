@@ -33,6 +33,10 @@
             {
                 "qc_type": "quality_metric_vcfqc",
                 "value": "d918bc25-0888-4658-811b-53c20b944b76"
+            },
+            {
+                "qc_type": "quality_metric_peddyqc",
+                "value": "654ff7e8-4ae8-4d64-871e-3e8c8dbddd5a"
             }
         ],
         "overall_quality_status": "PASS",
