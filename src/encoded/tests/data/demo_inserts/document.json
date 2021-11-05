@@ -1,0 +1,27 @@
+[
+    {
+        "attachment": {
+            "download": "bgm0339-koray_V4.pbxml",
+            "type": "application/proband+xml",
+            "href": "@@download/attachment/bgm0339-koray_V4.pbxml",
+            "md5sum": "8dae78069f85fce77ea7c0a6e43e0274",
+            "blob_id": "9fdd87b7-a04d-4c93-b7e0-539527072167"
+        },
+        "date_created": "2020-07-21T17:33:45.486329+00:00",
+        "last_modified": {
+            "date_modified": "2020-07-21T18:00:23.009102+00:00",
+            "modified_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        },
+        "institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
+        "status": "in review",
+        "project": "c2f37035-f7df-4e00-aca7-6bfbe2d5f936",
+        "uuid": "0938cab5-5f81-4da7-b299-46e4aa5d63f9"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "attachment": "gene_lists/breast_cancer.txt",
+        "status": "in review",
+        "uuid": "0938cab5-5f81-4da7-b299-46e4aad22222"
+    }
+]

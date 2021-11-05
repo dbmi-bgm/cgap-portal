@@ -1,308 +1,290 @@
 [
     {
-        "md5sum": "1c8f5ff9f07e0ecbbc63661672d5ec2c",
-        "file_version_date": "2020-06-25",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "file_type": "annotation source",
-        "status": "released",
-        "content_md5sum": "7487ac28df1b207c9bf105e3c93c8a59",
-        "extra_files": [
-            {
-                "md5sum": "864a0b7a2c101348d18b56bd8e29882b",
-                "filename": "GAPFIR6C5TC7",
-                "file_size": 4653762,
-                "status": "uploaded",
-                "accession": "GAPFIR6C5TC7",
-                "href": "/files-reference/GAPFIR6C5TC7/@@download/GAPFIR6C5TC7.mti.gz.tbi",
-                "uuid": "3832e0d9-dfd0-4108-998e-a31c3291a7cf",
-                "upload_key": "3832e0d9-dfd0-4108-998e-a31c3291a7cf/GAPFIR6C5TC7.mti.gz.tbi",
-                "file_format": "c0a56f31-d1af-4b88-9041-57b0830eeb8a",
-                "content_md5sum": "864a0b7a2c101348d18b56bd8e29882b"
-            },
-            {
-                "md5sum": "79165c99ce1a0275327327a5c86271a4",
-                "filename": "GAPFIR6C5TC7",
-                "file_size": 60463,
-                "status": "uploaded",
-                "accession": "GAPFIR6C5TC7",
-                "href": "/files-reference/GAPFIR6C5TC7/@@download/GAPFIR6C5TC7.mti.json",
-                "uuid": "3832e0d9-dfd0-4108-998e-a31c3291a7cf",
-                "upload_key": "3832e0d9-dfd0-4108-998e-a31c3291a7cf/GAPFIR6C5TC7.mti.json",
-                "file_format": "a112ef25-bd5d-44c1-824a-d5c6156db0a4",
-                "content_md5sum": "79165c99ce1a0275327327a5c86271a4"
-            }
-        ],
-        "file_format": "d7fd1020-ae85-41a9-a45d-c66285efa996",
-        "description": "mutanno index full annotation v0.4.6",
-        "genome_assembly": "GRCh38",
-        "uuid": "3832e0d9-dfd0-4108-998e-a31c3291a7cf",
-        "file_classification": "ancillary file",
-        "aliases": [
-            "cgap:mutanno-index-annotation-v0.4.6"
-        ],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "file_version": "0.4.6",
-        "accession": "GAPFIR6C5TC7",
-        "file_size": 874356901369,
-        "date_created": "2020-07-15T02:38:04.163387+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
-    },
-    {
+        "status": "shared",
         "md5sum": "ff3031d93792f4cbb86af44055efd903",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
-        "content_md5sum": "97b423dc9095cc322460f0ff7f50c93a",
-        "accession": "GAPFIYPTSAU8",
-        "description": "chain file for coordinates liftover, hg38 to hg19",
-        "genome_assembly": "GRCh38",
         "uuid": "297c872a-5b6b-4fc3-83d3-f4a853f8805c",
+        "description": "chain file for coordinates liftover, hg38 to hg19",
+        "file_size": 1246411,
+        "content_md5sum": "97b423dc9095cc322460f0ff7f50c93a",
+        "genome_assembly": "GRCh38",
+        "date_created": "2020-07-15T02:38:04.476969+00:00",
+        "file_format": "dd1ef82d-da5e-4680-bd5c-cf471a87eb5b",
         "file_classification": "ancillary file",
         "aliases": [
             "cgap:hg38-to-hg19-chain"
         ],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "file_format": "dd1ef82d-da5e-4680-bd5c-cf471a87eb5b",
-        "file_size": 1246411,
-        "date_created": "2020-07-15T02:38:04.476969+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        "accession": "GAPFIYPTSAU8",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
+        "status": "shared",
         "md5sum": "cfbbd30794f8d36bd8084a05eceeef6d",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
         "filename": "GAPFIBGEOI72.txt",
-        "accession": "GAPFIBGEOI72",
-        "genome_assembly": "GRCh38",
         "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+        "genome_assembly": "GRCh38",
+        "date_created": "2020-07-15T02:38:04.849767+00:00",
+        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+        "file_classification": "ancillary file",
         "aliases": [
             "cgap:hg38_regionfile300"
         ],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
-        "file_classification": "ancillary file",
-        "date_created": "2020-07-15T02:38:04.849767+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        "accession": "GAPFIBGEOI72",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
+        "status": "uploaded",
+        "md5sum": "7e72f5f3000c039281956d4285a900f2",
+        "file_version": "0.4.8",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "file_type": "annotation source",
+        "date_created": "2020-08-07T14:42:43.062739+00:00",
         "extra_files": [
             {
-                "upload_key": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf/GAPFI4U1HXIY.ann",
-                "filename": "GAPFI4U1HXIY",
                 "status": "uploaded",
-                "accession": "GAPFI4U1HXIY",
-                "href": "/files-reference/GAPFI4U1HXIY/@@download/GAPFI4U1HXIY.ann",
-                "uuid": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
-                "file_format": "106199e5-5a85-4817-9a55-7b31698e1fda"
+                "md5sum": "1038e08e9ecc5569b4df232f293882c1",
+                "file_format": "c0a56f31-d1af-4b88-9041-57b0830eeb8a",
+                "file_size": 3466950,
+                "filename": "GAPFIL98NJ2K",
+                "href": "/files-reference/GAPFIL98NJ2K/@@download/GAPFIL98NJ2K.mti.gz.tbi",
+                "accession": "GAPFIL98NJ2K",
+                "uuid": "03c35388-2385-4004-bff0-f126cbb0a57e",
+                "upload_key": "03c35388-2385-4004-bff0-f126cbb0a57e/GAPFIL98NJ2K.mti.gz.tbi",
+                "content_md5sum": "1038e08e9ecc5569b4df232f293882c1"
             },
             {
-                "upload_key": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf/GAPFI4U1HXIY.amb",
-                "filename": "GAPFI4U1HXIY",
                 "status": "uploaded",
-                "accession": "GAPFI4U1HXIY",
-                "href": "/files-reference/GAPFI4U1HXIY/@@download/GAPFI4U1HXIY.amb",
-                "uuid": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
-                "file_format": "8db70ed6-0121-4fe1-a72e-d91dc5aa6cd3"
-            },
-            {
-                "upload_key": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf/GAPFI4U1HXIY.sa",
-                "filename": "GAPFI4U1HXIY",
-                "status": "uploaded",
-                "accession": "GAPFI4U1HXIY",
-                "href": "/files-reference/GAPFI4U1HXIY/@@download/GAPFI4U1HXIY.sa",
-                "uuid": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
-                "file_format": "11f2fc36-9a65-4d60-9365-d8ff241df4f7"
-            },
-            {
-                "upload_key": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf/GAPFI4U1HXIY.pac",
-                "filename": "GAPFI4U1HXIY",
-                "status": "uploaded",
-                "accession": "GAPFI4U1HXIY",
-                "href": "/files-reference/GAPFI4U1HXIY/@@download/GAPFI4U1HXIY.pac",
-                "uuid": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
-                "file_format": "7373ca48-0b3e-467b-967a-80870846f89b"
+                "md5sum": "6cb34c0e03b54d03f5c1929cdb5fcfd5",
+                "file_format": "a112ef25-bd5d-44c1-824a-d5c6156db0a4",
+                "file_size": 51091,
+                "filename": "GAPFIL98NJ2K",
+                "href": "/files-reference/GAPFIL98NJ2K/@@download/GAPFIL98NJ2K.mti.json",
+                "accession": "GAPFIL98NJ2K",
+                "uuid": "03c35388-2385-4004-bff0-f126cbb0a57e",
+                "upload_key": "03c35388-2385-4004-bff0-f126cbb0a57e/GAPFIL98NJ2K.mti.json",
+                "content_md5sum": "6cb34c0e03b54d03f5c1929cdb5fcfd5"
             }
         ],
-        "accession": "GAPFI4U1HXIY",
-        "description": "hg38 bwa genome index for CGAP, untarred, uncompressed",
+        "file_size": 912315019725,
+        "content_md5sum": "5bb119944325bb67e78fbda2a4cdc927",
+        "genome_assembly": "GRCh38",
+        "uuid": "03c35388-2385-4004-bff0-f126cbb0a57e",
+        "description": "mutanno index full annotation v0.4.8",
+        "file_format": "d7fd1020-ae85-41a9-a45d-c66285efa996",
+        "file_classification": "ancillary file",
+        "aliases": [
+            "cgap:mutanno-index-annotation-v0.4.8"
+        ],
+        "accession": "GAPFIL98NJ2K",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "file_version_date": "2020-08-07"
+    },
+    {
+        "status": "shared",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf",
+        "date_created": "2020-07-15T02:38:05.490822+00:00",
+        "extra_files": [
+            {
+                "status": "uploaded",
+                "file_format": "106199e5-5a85-4817-9a55-7b31698e1fda",
+                "upload_key": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf/GAPFI4U1HXIY.ann",
+                "filename": "GAPFI4U1HXIY",
+                "href": "/files-reference/GAPFI4U1HXIY/@@download/GAPFI4U1HXIY.ann",
+                "accession": "GAPFI4U1HXIY",
+                "uuid": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf"
+            },
+            {
+                "status": "uploaded",
+                "file_format": "8db70ed6-0121-4fe1-a72e-d91dc5aa6cd3",
+                "upload_key": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf/GAPFI4U1HXIY.amb",
+                "filename": "GAPFI4U1HXIY",
+                "href": "/files-reference/GAPFI4U1HXIY/@@download/GAPFI4U1HXIY.amb",
+                "accession": "GAPFI4U1HXIY",
+                "uuid": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf"
+            },
+            {
+                "status": "uploaded",
+                "file_format": "11f2fc36-9a65-4d60-9365-d8ff241df4f7",
+                "upload_key": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf/GAPFI4U1HXIY.sa",
+                "filename": "GAPFI4U1HXIY",
+                "href": "/files-reference/GAPFI4U1HXIY/@@download/GAPFI4U1HXIY.sa",
+                "accession": "GAPFI4U1HXIY",
+                "uuid": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf"
+            },
+            {
+                "status": "uploaded",
+                "file_format": "7373ca48-0b3e-467b-967a-80870846f89b",
+                "upload_key": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf/GAPFI4U1HXIY.pac",
+                "filename": "GAPFI4U1HXIY",
+                "href": "/files-reference/GAPFI4U1HXIY/@@download/GAPFI4U1HXIY.pac",
+                "accession": "GAPFI4U1HXIY",
+                "uuid": "b24ed5ed-a037-48a0-a938-3fecfb90d0cf"
+            }
+        ],
+        "file_size": 3217347004,
+        "genome_assembly": "GRCh38",
+        "description": "hg38 bwa genome index for CGAP, untarred, uncompressed",
+        "file_format": "813b0001-5f3f-4e28-9203-4cdf261e19c4",
         "file_classification": "ancillary file",
         "aliases": [
             "cgap:hg38-bwt"
         ],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "file_format": "813b0001-5f3f-4e28-9203-4cdf261e19c4",
-        "file_size": 3217347004,
-        "date_created": "2020-07-15T02:38:05.490822+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "genome_assembly": "GRCh38"
+        "accession": "GAPFI4U1HXIY",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
+        "status": "shared",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
-        "extra_files": [],
-        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
-        "description": "hg38 chromosomes Yfirst",
-        "genome_assembly": "GRCh38",
         "uuid": "a1d504ee-a313-4064-b6ae-65fed9738980",
+        "date_created": "2020-07-15T02:38:03.534624+00:00",
+        "extra_files": [],
+        "genome_assembly": "GRCh38",
+        "description": "hg38 chromosomes Yfirst",
+        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa3",
+        "file_classification": "ancillary file",
         "aliases": [
             "cgap:hg38-chromosomes-Yfirst"
         ],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "accession": "GAPFIGJVJDUY",
-        "file_classification": "ancillary file",
-        "date_created": "2020-07-15T02:38:03.534624+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
+        "status": "shared",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "uuid": "8ed35691-0af4-467a-adbc-81eb088549f0",
+        "date_created": "2020-07-15T02:38:03.856781+00:00",
         "extra_files": [
             {
+                "status": "uploaded",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1",
                 "upload_key": "8ed35691-0af4-467a-adbc-81eb088549f0/GAPFI4LJRN98.vcf.gz.tbi",
                 "filename": "GAPFI4LJRN98",
-                "status": "uploaded",
-                "accession": "GAPFI4LJRN98",
                 "href": "/files-reference/GAPFI4LJRN98/@@download/GAPFI4LJRN98.vcf.gz.tbi",
-                "uuid": "8ed35691-0af4-467a-adbc-81eb088549f0",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+                "accession": "GAPFI4LJRN98",
+                "uuid": "8ed35691-0af4-467a-adbc-81eb088549f0"
             }
         ],
-        "accession": "GAPFI4LJRN98",
+        "file_size": 1595848625,
+        "genome_assembly": "GRCh38",
         "description": "hg38 dbsnp_b151",
-        "uuid": "8ed35691-0af4-467a-adbc-81eb088549f0",
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
         "file_classification": "ancillary file",
         "aliases": [
             "cgap:hg38-dbsnp-b151"
         ],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "file_size": 1595848625,
-        "date_created": "2020-07-15T02:38:03.856781+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "genome_assembly": "GRCh38"
+        "accession": "GAPFI4LJRN98",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
+        "status": "shared",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+        "date_created": "2020-07-15T02:38:05.158178+00:00",
         "extra_files": [
             {
+                "status": "uploaded",
+                "file_format": "4ed9f7e0-2b2f-4aca-9533-a0a652b43442",
                 "upload_key": "1936f246-22e1-45dc-bb5c-9cfd55537fe7/GAPFIXRDPDK5.dict",
                 "filename": "GAPFIXRDPDK5",
-                "status": "uploaded",
-                "accession": "GAPFIXRDPDK5",
                 "href": "/files-reference/GAPFIXRDPDK5/@@download/GAPFIXRDPDK5.dict",
-                "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
-                "file_format": "4ed9f7e0-2b2f-4aca-9533-a0a652b43442"
+                "accession": "GAPFIXRDPDK5",
+                "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7"
             },
             {
+                "status": "uploaded",
+                "file_format": "fb728bb4-bc56-46d5-8df5-a05562826b9a",
                 "upload_key": "1936f246-22e1-45dc-bb5c-9cfd55537fe7/GAPFIXRDPDK5.fa.fai",
                 "filename": "GAPFIXRDPDK5",
-                "status": "uploaded",
-                "accession": "GAPFIXRDPDK5",
                 "href": "/files-reference/GAPFIXRDPDK5/@@download/GAPFIXRDPDK5.fa.fai",
-                "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
-                "file_format": "fb728bb4-bc56-46d5-8df5-a05562826b9a"
+                "accession": "GAPFIXRDPDK5",
+                "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7"
             }
         ],
-        "accession": "GAPFIXRDPDK5",
+        "file_size": 3263683042,
+        "genome_assembly": "GRCh38",
         "description": "hg38 full reference fasta plus decoy for CGAP",
-        "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+        "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
         "file_classification": "ancillary file",
         "aliases": [
             "cgap:hg38-plus-decoy-fasta"
         ],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "file_format": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
-        "file_size": 3263683042,
-        "date_created": "2020-07-15T02:38:05.158178+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "genome_assembly": "GRCh38"
+        "accession": "GAPFIXRDPDK5",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
+        "status": "shared",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "status": "released",
+        "uuid": "55ac5044-f927-4df7-afa2-bf713764ee57",
+        "date_created": "2020-07-15T02:38:05.825245+00:00",
         "extra_files": [
             {
+                "status": "uploaded",
+                "file_format": "ec96f95a-cf13-4633-ab0d-c4a5138bbe0b",
                 "upload_key": "55ac5044-f927-4df7-afa2-bf713764ee57/GAPFIAX2PPYB.vcf.idx",
                 "filename": "GAPFIAX2PPYB",
-                "status": "uploaded",
-                "accession": "GAPFIAX2PPYB",
                 "href": "/files-reference/GAPFIAX2PPYB/@@download/GAPFIAX2PPYB.vcf.idx",
-                "uuid": "55ac5044-f927-4df7-afa2-bf713764ee57",
-                "file_format": "ec96f95a-cf13-4633-ab0d-c4a5138bbe0b"
+                "accession": "GAPFIAX2PPYB",
+                "uuid": "55ac5044-f927-4df7-afa2-bf713764ee57"
             }
         ],
-        "accession": "GAPFIAX2PPYB",
+        "file_size": 90155308,
+        "genome_assembly": "GRCh38",
         "description": "hg38 Mills_and_1000G_gold_standard_indels",
-        "uuid": "55ac5044-f927-4df7-afa2-bf713764ee57",
+        "file_format": "fcc2647d-301b-4888-8d9d-83ea4270309c",
         "file_classification": "ancillary file",
         "aliases": [
             "cgap:hg38-Mills-and-1000G-gold-standard-indels"
         ],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "file_format": "fcc2647d-301b-4888-8d9d-83ea4270309c",
-        "file_size": 90155308,
-        "date_created": "2020-07-15T02:38:05.825245+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "genome_assembly": "GRCh38"
+        "accession": "GAPFIAX2PPYB",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
     },
     {
+        "status": "shared",
         "md5sum": "f75084416a858cddaf0e373936314d65",
-        "file_version_date": "2020-06-14",
+        "file_version": "0.4.4",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "file_type": "micro-annotation source",
-        "status": "released",
-        "content_md5sum": "4ab2dc69a7bc56114e4f56f8faa9e575",
+        "date_created": "2020-07-15T02:38:06.111660+00:00",
         "extra_files": [
             {
-                "md5sum": "a45d5d773a0acf5df883d06ccb133967",
-                "filename": "GAPFISOPRE2Y",
-                "file_size": 3414754,
                 "status": "uploaded",
-                "accession": "GAPFISOPRE2Y",
+                "md5sum": "a45d5d773a0acf5df883d06ccb133967",
+                "file_format": "c0a56f31-d1af-4b88-9041-57b0830eeb8a",
+                "file_size": 3414754,
+                "filename": "GAPFISOPRE2Y",
                 "href": "/files-reference/GAPFISOPRE2Y/@@download/GAPFISOPRE2Y.mti.gz.tbi",
+                "accession": "GAPFISOPRE2Y",
                 "uuid": "1408ceb9-7ae3-4002-aed7-c9a301014de2",
                 "upload_key": "1408ceb9-7ae3-4002-aed7-c9a301014de2/GAPFISOPRE2Y.mti.gz.tbi",
-                "file_format": "c0a56f31-d1af-4b88-9041-57b0830eeb8a",
                 "content_md5sum": "a45d5d773a0acf5df883d06ccb133967"
             },
             {
-                "md5sum": "2636865e46fc413f3a85cf98fc5f3729",
-                "filename": "GAPFISOPRE2Y",
-                "file_size": 2149,
                 "status": "uploaded",
-                "accession": "GAPFISOPRE2Y",
+                "md5sum": "2636865e46fc413f3a85cf98fc5f3729",
+                "file_format": "a112ef25-bd5d-44c1-824a-d5c6156db0a4",
+                "file_size": 2149,
+                "filename": "GAPFISOPRE2Y",
                 "href": "/files-reference/GAPFISOPRE2Y/@@download/GAPFISOPRE2Y.mti.json",
+                "accession": "GAPFISOPRE2Y",
                 "uuid": "1408ceb9-7ae3-4002-aed7-c9a301014de2",
                 "upload_key": "1408ceb9-7ae3-4002-aed7-c9a301014de2/GAPFISOPRE2Y.mti.json",
-                "file_format": "a112ef25-bd5d-44c1-824a-d5c6156db0a4",
                 "content_md5sum": "2636865e46fc413f3a85cf98fc5f3729"
             }
         ],
-        "file_format": "d7fd1020-ae85-41a9-a45d-c66285efa996",
-        "description": "mutanno index micro-annotation v0.4.4, Ensembl BIOTYPE filter",
+        "file_size": 43719600909,
+        "content_md5sum": "4ab2dc69a7bc56114e4f56f8faa9e575",
         "genome_assembly": "GRCh38",
         "uuid": "1408ceb9-7ae3-4002-aed7-c9a301014de2",
+        "description": "mutanno index micro-annotation v0.4.4, Ensembl BIOTYPE filter",
+        "file_format": "d7fd1020-ae85-41a9-a45d-c66285efa996",
         "file_classification": "ancillary file",
         "aliases": [
             "cgap:mutanno-index-micro-annotation-v0.4.4"
         ],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "file_version": "0.4.4",
         "accession": "GAPFISOPRE2Y",
-        "file_size": 43719600909,
-        "date_created": "2020-07-15T02:38:06.111660+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "file_version_date": "2020-06-14"
     }
 ]

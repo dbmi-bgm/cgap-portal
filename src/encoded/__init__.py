@@ -10,28 +10,24 @@ import sys
 import sentry_sdk
 
 from dcicutils.beanstalk_utils import source_beanstalk_env_vars
-from dcicutils.env_utils import CGAP_ENV_WEBPROD
 from dcicutils.log_utils import set_logging
 from dcicutils.env_utils import get_mirror_env_from_context
 from dcicutils.ff_utils import get_health_page
 from sentry_sdk.integrations.pyramid import PyramidIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from pyramid.config import Configurator
-from pyramid_localroles import LocalRolesAuthorizationPolicy
+from .local_roles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
 from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
 from snovault.elasticsearch import APP_FACTORY
-from webtest import TestApp
+from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
+from dcicutils.misc_utils import VirtualApp
 from .ingestion_listener import INGESTION_QUEUE
 from .loadxl import load_all
 
 
 if sys.version_info.major < 3:
     raise EnvironmentError("The CGAP encoded library no longer supports Python 2.")
-
-
-# location of environment variables on elasticbeanstalk
-BEANSTALK_ENV_PATH = "/opt/python/current/env"
 
 
 def static_resources(config):
@@ -80,7 +76,7 @@ def load_workbook(app, workbook_filename, docsdir):
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'IMPORT',
     }
-    testapp = TestApp(app, environ)
+    testapp = VirtualApp(app, environ)
     load_all(testapp, workbook_filename, docsdir)
 
 
@@ -94,18 +90,7 @@ def app_version(config):
     if not config.registry.settings.get(APP_VERSION_REGISTRY_KEY):
         # we update version as part of deployment process `deploy_beanstalk.py`
         # but if we didn't check env then git
-        version = os.environ.get("ENCODED_VERSION")
-        if not version:
-            try:
-                version = subprocess.check_output(
-                    ['git', '-C', os.path.dirname(__file__), 'describe']).decode('utf-8').strip()
-                diff = subprocess.check_output(
-                    ['git', '-C', os.path.dirname(__file__), 'diff', '--no-ext-diff'])
-                if diff:
-                    version += '-patch' + hashlib.sha1(diff).hexdigest()[:7]
-            except Exception:
-                version = "test"
-
+        version = os.environ.get("ENCODED_VERSION", "test")
         config.registry.settings[APP_VERSION_REGISTRY_KEY] = version
 
     # Fourfront does GA stuff here that makes no sense in CGAP (yet).
@@ -142,12 +127,16 @@ def main(global_config, **local_config):
     # settings['snovault.jsonld.terms_namespace'] = 'https://www.encodeproject.org/terms/'
     settings['snovault.jsonld.terms_prefix'] = 'encode'
     # set auth0 keys
-    settings['auth0.secret'] = os.environ.get("Auth0Secret")
-    settings['auth0.client'] = os.environ.get("Auth0Client")
+    settings['auth0.client'] = settings.get('auth0.client', os.environ.get('Auth0Client'))
+    settings['auth0.secret'] = settings.get('auth0.secret', os.environ.get('Auth0Secret'))
     # set google reCAPTCHA keys
     settings['g.recaptcha.key'] = os.environ.get('reCaptchaKey')
     settings['g.recaptcha.secret'] = os.environ.get('reCaptchaSecret')
+    # enable invalidation scope
+    settings[INVALIDATION_SCOPE_ENABLED] = True
+
     # set mirrored Elasticsearch location (for staging and production servers)
+    # does not exist for CGAP currently
     mirror = get_mirror_env_from_context(settings)
     if mirror is not None:
         settings['mirror.env.name'] = mirror
@@ -179,11 +168,11 @@ def main(global_config, **local_config):
     config.include('.server_defaults')
     config.include('.root')
     config.include('.types')
-    # Fourfront does this. Do we need that here? -kmp 8-Apr-2020
-    # config.include('.batch_download')
+    config.include('.batch_download')
     config.include('.loadxl')
     config.include('.visualization')
     config.include('.ingestion_listener')
+    config.include('.custom_embed')
 
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')

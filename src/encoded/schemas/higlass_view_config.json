@@ -1,0 +1,73 @@
+{
+    "title": "HiGlass Display",
+    "id": "/profiles/higlass_view_config.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "genome_assembly"
+    ],
+    "additionalProperties": false,
+    "identifyingProperties": [
+        "uuid",
+        "name"
+    ],
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "name": {
+            "title": "Display name",
+            "description": "Display name",
+            "type": "string"
+        },
+        "title": {
+            "title": "Display title",
+            "description": "Display title",
+            "type": "string"
+        },
+        "genome_assembly": {
+            "title": "Genome Assembly",
+            "description": "All data files will use this genome assembly.",
+            "type": "string",
+            "enum": [
+                "GRCh38"
+            ]
+        },
+        "viewconfig": {
+            "title": "View Configuration",
+            "type": "object",
+            "additionalProperties": true,
+            "description": "The viewconfig JSON",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "lookup": 7,
+            "formInput": "code",
+            "default": {
+                "views": []
+            }
+        },
+        "instance_height": {
+            "title": "Instance Height",
+            "type": "integer",
+            "default": 500
+        }
+    }
+}

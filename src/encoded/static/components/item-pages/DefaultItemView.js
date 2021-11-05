@@ -44,7 +44,7 @@ export const propsForDetailList = {
         // Relatively special cases for when on Item PageViews
         if (field === 'accession'){
             return (
-                <object.CopyWrapper value={term} className="accession text-small inline-block" wrapperElement="span"
+                <object.CopyWrapper value={term} className="accession text-small d-inline-block" wrapperElement="span"
                     iconProps={{ 'style' : { 'fontSize' : '0.875rem', 'marginLeft' : -3 } }}>
                     { term }
                 </object.CopyWrapper>
@@ -124,7 +124,6 @@ export default class DefaultItemView extends React.PureComponent {
         this.getControllers = this.getControllers.bind(this);
         this.getCommonTabs = this.getCommonTabs.bind(this);
         this.getTabViewContents = this.getTabViewContents.bind(this);
-        this.getTabViewWidth = this.getTabViewWidth.bind(this);
         this.setTabViewKey = this.setTabViewKey.bind(this);
 
         /**
@@ -234,17 +233,6 @@ export default class DefaultItemView extends React.PureComponent {
         returnArr.push(DetailsTabView.getTabObject(this.props));
 
         return returnArr;
-    }
-
-    /**
-     * Calculated width of tabview pane.
-     * Alias of `layout.gridContainerWidth(this.props.windowWidth)`.
-     *
-     * @returns {number} Width of tabview.
-     */
-    getTabViewWidth(){
-        // eslint-disable-next-line react/destructuring-assignment
-        return layout.gridContainerWidth(this.props.windowWidth);
     }
 
     /**

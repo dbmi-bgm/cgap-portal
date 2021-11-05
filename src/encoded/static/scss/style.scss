@@ -6,7 +6,8 @@
 @import "encoded/base";
 
 // Bootstrap
-@import "bootstrap/bootstrap";
+// @import "bootstrap/bootstrap";
+@import "../../../../node_modules/bootstrap/scss/bootstrap";
 
 // Some are used in shared-portal-components scss
 @import "encoded/bootstrap-theme-overrides";
@@ -30,6 +31,7 @@
 
 // ENCODE Layout/Components
 
+@import "encoded/typography";
 @import "encoded/layout";
 
 @import "encoded/modules/pedigree-visualization",
@@ -45,4 +47,4 @@
         "encoded/modules/static-pages",
         "encoded/modules/slide-in-pane",
         "encoded/modules/workflow-visualization",
-        "encoded/modules/case-submission";
+        "encoded/modules/ingestion-submission";

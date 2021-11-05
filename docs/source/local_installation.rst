@@ -1,9 +1,21 @@
 Local Installation
-============
+==================
+
+Docker Instructions
+^^^^^^^^^^^^^^^^^^^
+
+See `docker local docs. <./docker-local.rst>`_
+
+Legacy Instructions
+^^^^^^^^^^^^^^^^^^^
 
 The following instructions are for running a CGAP deployment with macOS and homebrew.
 
-CGAP is known to work with Python 3.6.x and will not work with Python 3.7 or greater. If part of the HMS team, it is recommended to use Python 3.4.3, since that's what is running on our servers. It is best practice to create a fresh Python virtualenv using one of these versions before proceeding to the following steps.
+Note that as of summer 2021, these instructions are out of date. Please refer to the Docker setup. There are no guarantees the legacy instructions will work from this point forward.
+
+CGAP is known to work with Python 3.6.x and will not work with Python 3.7 or greater. If part of the HMS team, it is
+recommended to use Python 3.6.13, since that's what is running on our servers. It is best practice to create a fresh Python
+virtualenv using one of these versions before proceeding to the following steps.
 
 * Step 0: Obtain AWS keys. These will need to added to your environment variables or through the AWS CLI (installed later in this process).
 
@@ -18,12 +30,12 @@ CGAP is known to work with Python 3.6.x and will not work with Python 3.7 or gre
    $ brew install freetype libjpeg libtiff littlecms webp  # Required by Pillow
    $ brew cask install homebrew/cask-versions/adoptopenjdk8
    $ brew tap homebrew/versions
-   $ brew install elasticsearch@5.6 node@10
+   $ brew install elasticsearch@6.8 node@10
 
 
 You may need to link the brew-installed elasticsearch::
 
-   $ brew link --force elasticsearch@5.6
+   $ brew link --force elasticsearch@6.8
 
 
 If you need to update dependencies::
@@ -33,11 +45,9 @@ If you need to update dependencies::
    $ rm -rf encoded/eggs
 
 
-* Step 3: Run buildout::
+* Step 3: Run make::
 
-   $ pip install -U zc.buildout setuptools
-   $ buildout bootstrap --buildout-version 2.9.5 --setuptools-version 36.6.0
-   $ bin/buildout
+   $ make build
 
    NOTE:
    If you have issues with postgres or the python interface to it (psycogpg2) you
@@ -57,7 +67,7 @@ If you wish to completely rebuild the application, or have updated dependencies:
 
 In one terminal startup the database servers and nginx proxy with::
 
-   $ bin/dev-servers development.ini --app-name app --clear --init --load
+   $ make deploy1
 
 This will first clear any existing data in /tmp/encoded.
 Then postgres and elasticsearch servers will be initiated within /tmp/encoded.
@@ -66,7 +76,7 @@ The servers are started, and finally the test set will be loaded.
 
 In a second terminal, run the app with::
 
-   $ bin/pserve development.ini
+   $ make deploy2
 
 Indexing will then proceed in a background thread similar to the production setup.
 
@@ -128,7 +138,7 @@ To build production-ready bundles, do::
 
 To build development bundles and continue updating them as you edit source files, run::
 
-   $ npm run dev
+   $ npm run dev-quick
 
 The development bundles are not minified, to speed up building.
 

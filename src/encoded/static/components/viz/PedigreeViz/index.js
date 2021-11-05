@@ -5,7 +5,7 @@ import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
 /** @todo Pull this out into here if making a lib */
 import { requestAnimationFrame as raf, cancelAnimationFrame } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
-import { isRelationship } from './data-utilities';
+import { isRelationshipNode } from './data-utilities';
 import { graphToDiseaseIndices, orderNodesBottomRightToTopLeft } from './layout-utilities-drawing';
 import { GraphTransformer, buildGraphData } from './GraphTransformer';
 import { ScaleController, ScaleControls, scaledStyle } from './ScaleController';
@@ -88,7 +88,7 @@ const PedigreeVizView = React.memo(function PedigreeVizView(props){
      * `SelectedNodeController` provides & passes down:
      *   `selectedNode`, `hoveredNode`, `onNodeSelect`, `onNodeUnselect`, `onNodeMouseIn`, ...
      *
-     * `DetailPaneOffsetContainerSize` provides & passes down:
+     * `DetailPaneController` provides & passes down:
      *   `containerWidth` & `containerHeight` (adjusted)
      *
      * `ScaleController` provides & passes down:
@@ -96,18 +96,22 @@ const PedigreeVizView = React.memo(function PedigreeVizView(props){
      */
     return (
         <SelectedNodeController {...{ onNodeSelected, onDataChanged, objectGraph, disableSelect }}>
-            <DetailPaneOffsetContainerSize {...{ containerWidth, containerHeight, detailPaneOpenOffsetWidth, detailPaneOpenOffsetHeight }}>
+            <DetailPaneController {...{ containerWidth, containerHeight, detailPaneOpenOffsetWidth, detailPaneOpenOffsetHeight }}>
                 <ScaleController {...scaleProps}>
                     <PedigreeVizViewUserInterface {...pedigreeViewProps} />
                 </ScaleController>
-            </DetailPaneOffsetContainerSize>
+            </DetailPaneController>
         </SelectedNodeController>
     );
 });
 PedigreeVizView.propTypes = pedigreeVizViewPropTypes;
 PedigreeVizView.defaultProps = pedigreeVizViewDefaultProps;
 
-const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContainerSize(props){
+/**
+ * Controls when detail pane is open (currently always - may change with explicit 'close' button or similar).
+ * Also applies detailPaneOpenOffsetHeight & detailPaneOpenOffsetWidth when open
+ */
+const DetailPaneController = React.memo(function DetailPaneController(props){
     const {
         children,
         selectedNode,
@@ -117,9 +121,14 @@ const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContai
         detailPaneOpenOffsetHeight,
         ...passProps
     } = props;
+
+    const isDetailPaneOpen = true;
+    // Implement UI for later: const [ isDetailPaneOpen, setIsDetailPaneOpen ] = useState(true);
+
     let containerHeight = propContainerHeight;
     let containerWidth = propContainerWidth;
-    if (selectedNode){
+
+    if (isDetailPaneOpen){
         if (typeof detailPaneOpenOffsetHeight === "number" && typeof containerHeight === "number"){
             containerHeight -= detailPaneOpenOffsetHeight;
         }
@@ -128,9 +137,10 @@ const DetailPaneOffsetContainerSize = React.memo(function DetailPaneOffsetContai
         }
     }
 
-    const childProps = { ...passProps, selectedNode, containerWidth, containerHeight };
+    const childProps = { ...passProps, isDetailPaneOpen, selectedNode, containerWidth, containerHeight };
 
     return React.Children.map(children, function(child){
+        if (!React.isValidElement(child)) return child;
         return React.cloneElement(child, childProps);
     });
 
@@ -147,19 +157,6 @@ let createdInstanceCount = 0;
 
 class PedigreeVizViewUserInterface extends React.PureComponent {
 
-    static diseaseToIndex(visibleDiseases, objectGraph){
-        let diseaseToIndex;
-        if (Array.isArray(visibleDiseases)){
-            diseaseToIndex = {};
-            visibleDiseases.forEach(function(disease, index){
-                diseaseToIndex[disease] = index + 1;
-            });
-            return diseaseToIndex;
-        } else {
-            return graphToDiseaseIndices(objectGraph);
-        }
-    }
-
     static visAreaTransform(scaledVizStyle, containerHeight, containerWidth){
         const hasExtraHeight = containerHeight >= scaledVizStyle.height;
         const hasExtraWidth = (typeof containerWidth === "number" && containerWidth >= scaledVizStyle.width);
@@ -175,11 +172,16 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         }, 0);
     }
 
+    static textScale(scale){
+        // Update less frequently by rounding for better performance (less changes, caught by Memo/PureComponent)
+        return Math.floor(((0.5 / scale) + 0.5) * 5) / 5;
+    }
+
     static defaultProps = {
-        'width': 600,
-        "scale" : 1,
-        "visibleDiseases": null,
-        "onDimensionsChanged" : function(width, height){
+        "width": 600,
+        "scale": 1,
+        "visibleDiseaseIdxMap": null,
+        "onDimensionsChanged": function(width, height){
             console.log("DIMENSIONS CHANGED (default handler)", "WIDTH", width, "HEIGHT", height);
         },
         "onMount": function(innerContainerDOMElement){
@@ -216,10 +218,11 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
 
         this.memoized = {
             maxHeightIndex: memoize(PedigreeVizViewUserInterface.maxHeightIndex),
-            diseaseToIndex: memoize(PedigreeVizViewUserInterface.diseaseToIndex),
+            graphToDiseaseIndices: memoize(graphToDiseaseIndices),
             orderNodesBottomRightToTopLeft : memoize(orderNodesBottomRightToTopLeft),
             scaledStyle: memoize(scaledStyle),
-            visAreaTransform: memoize(PedigreeVizViewUserInterface.visAreaTransform)
+            visAreaTransform: memoize(PedigreeVizViewUserInterface.visAreaTransform),
+            textScale: memoize(PedigreeVizViewUserInterface.textScale)
         };
 
         this.innerRef = React.createRef();
@@ -402,7 +405,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
     }
 
     handleMouseLeave(evt){
-        this.handleMouseUp();
+        this.handleMouseUp(null);
     }
 
     handleMouseUp(evt = null){
@@ -423,8 +426,17 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
 
         // Act as click off of or onto node; we will have vectorX if 'click'ed within container.
         if (Math.abs(vectorX) <= 5 && Math.abs(vectorY) <= 5){
-            const nodeID = (evt && evt.target && evt.target.id) || null;
-            const nodeType = (evt && evt.target && evt.target.getAttribute("data-node-type")) || null;
+
+            const mouseTarget = (evt && evt.target) || null;
+            const node = (mouseTarget && (
+                // For individual nodes with d.mouse-event-area:
+                (mouseTarget.className === "mouse-event-area" && mouseTarget.parentNode)
+                // For relationship nodes:
+                || (mouseTarget.id && mouseTarget)
+            )) || null;
+            const nodeID = (node && node.id) || null;
+            const nodeType = (node && node.getAttribute("data-node-type")) || null;
+
             if (selectedNode !== null) {
                 if (nodeID === selectedNode.id) {
                     // Keep same node selected if (re)click on it
@@ -452,7 +464,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             objectGraph,
             dims, order,
             renderDetailPane, containerStyle,
-            visibleDiseases = null,
+            visibleDiseaseIdxMap = null,
             scale = 1,
             minScale, maxScale,
             graphHeight, graphWidth,
@@ -466,10 +478,11 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
             ...passProps
         } = this.props;
         const { isMouseDownOnContainer, mounted } = this.state;
-        const diseaseToIndex = this.memoized.diseaseToIndex(visibleDiseases, objectGraph);
+        const diseaseToIndex = visibleDiseaseIdxMap || this.memoized.graphToDiseaseIndices(objectGraph);
         const orderedNodes = this.memoized.orderNodesBottomRightToTopLeft(objectGraph);
         const scaledVizStyle = this.memoized.scaledStyle(graphHeight, graphWidth, scale);
         const maxHeightIndex = this.memoized.maxHeightIndex(objectGraph);
+        const textScale = this.memoized.textScale(scale);
 
 
         const outerContainerStyle = { minHeight : containerHeight, ...containerStyle };
@@ -490,18 +503,18 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                 'unselectNode' : onUnselectNode
             });
         }
-        const detailPaneHasNode = !!(selectedNodePane && selectedNode);
 
         const commonChildProps = {
             ...passProps,
             "objectGraph": orderedNodes,
             "vizViewID" : this.id,
             containerWidth, containerHeight,
-            graphHeight, graphWidth, dims, scale,
+            graphHeight, graphWidth, dims,
             diseaseToIndex,
             selectedNode,
             hoveredNode,
             maxHeightIndex,
+            textScale,
             // In passProps:
             // onNodeMouseIn,
             // onNodeMouseLeave,
@@ -522,7 +535,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
         return (
             // IndividualsLayer may become deprecated, and move to all-SVG for easier exportability... unsure.
             <div className="pedigree-viz-container" style={outerContainerStyle} data-selection-disabled={disableSelect}
-                data-selected-node={selectedNode && selectedNode.id} data-instance-index={this.id}>
+                data-selected-node={selectedNode && selectedNode.id} data-instance-index={this.id} data-is-node-hovered-over={!!(hoveredNode)} data-is-node-selected={!!(selectedNode)}>
                 <div className="inner-container" ref={this.innerRef} style={innerContainerStyle}
                     onMouseDown={this.handleContainerMouseDown}
                     onMouseMove={this.handleContainerMouseMove}
@@ -541,7 +554,7 @@ class PedigreeVizViewUserInterface extends React.PureComponent {
                     <ScaleControls {...{ scale, minScale, maxScale, setScale }} />
                     : null }
                 { selectedNodePane ?
-                    <div className={"detail-pane-container" + (detailPaneHasNode ? " has-selected-node" : "")}>
+                    <div className="detail-pane-container" data-is-open="true" data-has-selected-node={!!(selectedNode)} style={{ height: containerHeight }}>
                         { selectedNodePane }
                     </div>
                     : null }
@@ -556,21 +569,18 @@ const ShapesLayer = React.memo(function ShapesLayer(props){
         edges, relationships,
         selectedNode, hoveredNode,
         onNodeMouseIn, onNodeMouseLeave,
-        dims, scale,
-        showOrderBasedName, showNotes
+        dims, textScale
     } = props;
+    // Props contains showOrderBasedName, showNotes (passed to IndividualNodeShapeLayer)
     const svgStyle = { width: graphWidth, height: graphHeight };
 
-    // Update less frequently by rounding for better performance (less changes, caught by Memo/PureComponent)
-    const textScale = Math.floor(((0.5 / scale) + 0.5) * 5) / 5;
-    const textScaleTransformStr = "scale3d(" + textScale +"," + textScale +",1)";
-
     return (
-        <svg className="pedigree-viz-shapes-layer shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight} style={svgStyle}>
+        <svg className="pedigree-viz-shapes-layer shapes-layer" viewBox={"0 0 " + graphWidth + " " + graphHeight}
+            style={svgStyle}>
             <EdgesLayer {...{ edges, dims }} />
             <SelectedNodeIdentifier {...{ selectedNode, dims, textScale }} />
-            <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims, textScale, textScaleTransformStr }} />
-            <IndividualNodeShapeLayer {...props} {...{ textScale, textScaleTransformStr, showOrderBasedName, showNotes }} />
+            <RelationshipNodeShapeLayer {...{ relationships, hoveredNode, onNodeMouseIn, onNodeMouseLeave, dims }} />
+            <IndividualNodeShapeLayer {...props} />
         </svg>
     );
 });
@@ -592,7 +602,7 @@ const SelectedNodeIdentifier = React.memo(function SelectedNodeIdentifier({ sele
     let useHeight = dims.individualHeight;
     let useWidth = dims.individualWidth;
 
-    if (isRelationship(selectedNode)){
+    if (isRelationshipNode(selectedNode)){
         useHeight = dims.relationshipSize;
         useWidth = dims.relationshipSize;
     }
@@ -677,5 +687,5 @@ export {
     PedigreeVizView,
     GraphTransformer,
     buildGraphData as buildPedigreeGraphData,
-    isRelationship as isRelationshipNode
+    isRelationshipNode
 };

@@ -1,13 +1,21 @@
-/***********************************************************
-Custom Classes & Styling for Item Pages (e.g. Experiment Sets)
-************************************************************/
+/**** VARIABLES ****/
 
-.item-page-container {
-	/** Override margin-bottom for margin pages so accession and title are close to each other **/
-	h1.page-title {
-		margin-bottom: 2px;
-	}
+// We make this almost full height.
+// - IMPORTANT -
+// Equivalent of this is performed in JS in PedigreeViz, for browsers
+// which do not yet support calc().
+// If change size of footer, header, navbar, sub-navbar, etc. then this 216px must
+// be adjusted here and in JS
+// This is originally from PedigreeViz and now reused for places where we want a minimum height
+// to match full height of window, minus navbar, tabbar, and tab title heading.
+$inner-tab-contents-full-height: calc(100vh - 216px);
+
+/* used also for new utility class - not sure is best name */
+.mh-inner-tab-height-full {
+	min-height: $inner-tab-contents-full-height !important;
 }
+
+
 
 /*************************
         TabbedView
@@ -83,7 +91,6 @@ hr.tab-section-title-horiz-divider {
         }
         > label {
             margin-bottom: 0;
-            font-weight: 400;
         }
     }
 
@@ -172,6 +179,7 @@ $tabbar-height: 46px;
 				height: 100%;
 				border-bottom: 1px solid darken($tabbar-bg-color, 10%);
 				border-right: 1px solid transparent;
+				text-decoration: none;
 
 				&:not(:first-child){
 					border-left: 1px solid darken($tabbar-bg-color, 20%);
@@ -452,54 +460,10 @@ $tabbar-height: 46px;
 
 
 /*************************
-    Item Page Headings
-**************************/
-
-
-.flexible-description-box {
-	box-sizing: border-box;
-	padding: 0;
-	margin: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	transition: height .4s;
-
-	.description-expand-button {
-		padding: 0px;
-		width: 24px;
-		height: 21px;
-		margin-left: 6px;
-		box-sizing: border-box;
-		border: none;
-		background: none;
-		outline: none;
-	}
-
-	p {
-		overflow: inherit;
-		text-overflow: inherit;
-		&:last-child {
-			margin-bottom : 0;
-		}
-	}
-}
-
-.flexcol-heading,
-.submission-page-heading {
-    position: relative;
-    background-color: #f4f4f4;
-
-    h1, h2, h3, h4, h5, h6 {
-        margin: 0;
-    }
-
-
-}
-
-
-/*************************
 		SUBMISSIONS
 **************************/
+
+/** TODO: perhaps move into own file **/
 
 // For submissions page headers
 h3.submission-subtitle {
@@ -508,11 +472,16 @@ h3.submission-subtitle {
 }
 
 .submission-page-heading {
-    /** Extends .flexible-description-box **/
+    position: relative;
+    background-color: #f4f4f4;
 	border-radius: 2px;
 	border: 1px solid #ddd;
 	min-height: 42px;
 	padding: 10px 15px 8px;
+
+	h1, h2, h3, h4, h5, h6 {
+        margin: 0;
+    }
 }
 
 .submission-btn {
@@ -532,69 +501,118 @@ h3.submission-subtitle {
 
 /*** Status Color Styles & Indicators ***/
 
+// TODO: Move to more common/utility-like place.
+
 @mixin statusColorStyles {
-	&[data-status="released"]:before,
-	&[data-status="current"]:before,
-	&[data-status="uploaded"]:before,
-	&[data-status="published"]:before {
+
+	// Blue
+	&[data-status="Benign"]:before,
+	&[data-status="Not a candidate"]:before,
+	&[data-status="Known gene for phenotype"]:before {						// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: $primary;
+	}
+
+	// Dark Blue
+	&[data-status="Likely benign"]:before,
+	&[data-status="Weak candidate"]:before {					// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: $primary-dark;
+	}
+
+	// Green
+	&[data-status="current"]:before,						// Applicable to Item.status
+	&[data-status="shared"]:before,							// Applicable to Item.status
+	&[data-status="released"]:before,						// Applicable to Item.status
+	&[data-status="uploaded"]:before,						// Applicable to File.status
+	&[data-status="public"]:before,							// Applicable to Pages & UserContent
+	&[data-status="complete"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
+	&[data-status="protective"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
 		background-color: #308756;
 	}
 
-	&[data-status="revoked"]:before,
-	&[data-status="obsolete"]:before,
-	&[data-status="restricted"]:before {
-		color: #fff;
-		background-color: #812423;
-	}
-
-	&[data-status="deleted"]:before,
-	&[data-status="upload failed"]:before {
-		color: #fff;
-		background-color: #a90d0b;
-	}
-
-	&[data-status="replaced"]:before,
-	&[data-status="planned"]:before,
-	&[data-status="to be uplodaded by workflow"]:before {
-		color: #fff;
-		background-color: #47419a;
-	}
-
-	&[data-status="in review by lab"]:before,
-	&[data-status="in review"]:before {
-		color: #fff;
-		background-color: #d8bd22;
-	}
-
-	&[data-status="submission in progress"]:before,
-	&[data-status="uploading"]:before,
-	&[data-status="draft"]:before {
-		color: #fff;
-		background-color: #d8bd22;
-	}
-
-	&[data-status="released to project"]:before {
+	// Greener Yellow
+	&[data-status="released to project"]:before {			// Applicable to Item.status
 		color: #fff;
 		background-color: #397855;
 	}
 
-	&[data-status="released to lab"]:before {
+	// Green-Yellow
+	&[data-status="released to institution"]:before,		// Applicable to Item.status
+	&[data-status="in public review"]:before,				// Applicable to Item.status
+	&[data-status="uploading"]:before,						// Applicable to File.status
+	&[data-status="output_files_transferring"]:before,		// Applicable to WorkflowRun.run_status
+	&[data-status="output_file_transfer_finished"]:before {	// Applicable to WorkflowRun.run_status
 		color: #fff;
 		background-color: #80921c;
 	}
 
-	&[data-status="unspecified"]:before,
-	&[data-status="archived"]:before,
-	&[data-status="archived to project"]:before {
+	// Yellow
+	&[data-status="in review"]:before,						// Applicable to Item.status
+	&[data-status="started"]:before, 						// Applicable to WorkflowRun.run_status
+	&[data-status="running"]:before,						// Applicable to WorkflowRun.run_status + columnExtensionMap columns
+	&[data-status="in progress"]:before, 					// Applicable to columnExtensionMap columns
+	&[data-status="incomplete"]:before, 					// Applicable to columnExtensionMap columns
+	&[data-status="uncertain significance"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="associaton"]:before {					// Applicable to ClinVar Clinical Significance
 		color: #fff;
+		background-color: #d8bd22;
+	}
+
+	// Maroon/dark-red
+	&[data-status="replaced"]:before,						// Applicable to Item.status
+	&[data-status="inactive"]:before,						// Applicable to Item.status
+	&[data-status="revoked"]:before,						// Applicable to User.status
+	&[data-status="probable-pathogenic"]:before,			// Applicable to ClinVar Clinical Significance
+	&[data-status="Likely pathogenic"]:before,				// Applicable to SampleVariant Interpretation Classification
+	&[data-status="Moderate candidate"]:before,
+	&[data-status="affects"]:before,						// Applicable to ClinVar Clinical Significance
+	&[data-status="restricted"]:before{						// Deprecated?
+		color: #fff;
+		background-color: #812423;
+	}
+
+	// Bright Red
+	&[data-status="deleted"]:before,						// Applicable to Item.status
+	&[data-status="upload failed"]:before,					// Applicable to File.status
+	&[data-status="error"]:before,							// Applicable to WorkflowRun.run_status + columnExtensionMap columns
+	&[data-status="risk factor"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="Pathogenic"]:before, 					// Applicable to ClinVar Clinical Significance
+	&[data-status="Strong candidate"]:before {
+		color: #fff;
+		background-color: #a90d0b;
+	}
+
+	// Purple
+	&[data-status="to be uplodaded by workflow"]:before,	// Applicable to File.status
+	&[data-status="other"]:before {							// Applicable to ClinVar Clinical Significance
+		color: #fff;
+		background-color: #47419a;
+	}
+
+	// Gray
+	&[data-status="obsolete"]:before,						// Applicable to Item.status
+	&[data-status="not implemented"]:before,				// Applicable to columnExtensionMap columns
+	&[data-status="not started"]:before,					// Applicable to columnExtensionMap columns
+	&[data-status="not provided"]:before,					// Applicable to ClinVar Clinical Significance
+	&[data-status="Uncertain significance"]:before,			// Applicable to SampleVariant Interpretation Classification
+	&[data-status="unspecified"]:before,					// Deprecated? Fallback for lack of status in some cases?
+	&[data-status="Weak candidate"]:before,
+	&[data-status="Known gene for phenotype"]:before {
+	    color: #fff;
 		background-color: #7b7b7b;
-		//display: none;
+	}
+
+	// Gray outline
+	&[data-status="Not Available"]:before {
+		border: 1px solid #adb5bd;
+		background-color: #fff;
 	}
 }
 
 
-i.item-status-indicator-dot {
+i.status-indicator-dot {
 	display: inline-block;
 	position: relative;
 	&:before {
@@ -605,13 +623,177 @@ i.item-status-indicator-dot {
 		position: relative;
 		border-radius: 50%;
 	}
+
 	@include statusColorStyles;
 }
 
 
+@mixin acmgColorStyles {
 
 
 
+	// Standalone Benign Impact -
+	&[data-criteria="BA1"] {
+		color: #31098D;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #31098D;
+		}
+		&:focus {
+			outline-color: #31098D;
+		}
+	}
+	// Strong Benign Evidence - 
+	&[data-criteria="BS1"],
+	&[data-criteria="BS2"],
+	&[data-criteria="BS3"],
+	&[data-criteria="BS4"] {
+		color: #47419a;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #47419a;
+		}
+		&:focus {
+			outline-color: #47419a;
+		}
+	}
+
+	// Supporting Benign Evidence
+	&[data-criteria="BP1"],
+	&[data-criteria="BP2"],
+	&[data-criteria="BP3"],
+	&[data-criteria="BP4"],
+	&[data-criteria="BP5"],
+	&[data-criteria="BP6"],
+	&[data-criteria="BP7"] {
+		color: #0063D6;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #0063D6;
+		}
+		&:focus {
+			outline-color: #0063D6;
+		}
+	}
+
+	// Supporting Pathogenic Evidence
+	&[data-criteria="PP1"],
+	&[data-criteria="PP2"],
+	&[data-criteria="PP3"],
+	&[data-criteria="PP4"],
+	&[data-criteria="PP5"] {
+		color: #C4AA1D;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #C4AA1D;
+		}
+		&:focus {
+			outline-color: #C4AA1D;
+		}
+	}
+
+	// Moderate Pathogenic Evidence
+	&[data-criteria="PM1"],
+	&[data-criteria="PM2"],
+	&[data-criteria="PM3"],
+	&[data-criteria="PM4"],
+	&[data-criteria="PM5"],
+	&[data-criteria="PM6"] {
+		color: #D36900;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #D36900;
+		}
+		&:focus {
+			outline-color: #D36900;
+		}
+	}
+
+	// Strong Pathogenic Evidence
+	&[data-criteria="PS1"],
+	&[data-criteria="PS2"],
+	&[data-criteria="PS3"],
+	&[data-criteria="PS4"]{
+		color: #a90d0b;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #a90d0b;
+		}
+		&:focus {
+			outline-color: #a90d0b;
+		}
+	}
+
+	// Very Strong Pathogenic Evidence
+	&[data-criteria="PVS1"] {
+		color: #9A0000;
+		background-color: #fff;
+
+		&[data-invoked="true"] {
+			color: #fff;
+			background-color: #9A0000;
+		}
+
+		&:focus {
+			outline-color: #9A0000;
+		}
+	}
+
+	&[data-criteria="none"] {
+		border: 1px dashed lightgrey;
+	}
+}
+
+.acmg-invoker {
+	border: 1px solid #efefef;
+	padding: 3px 7px;
+    font-size: 0.7em;
+    letter-spacing: 0.05em;
+	text-align: center;
+	font-family: $font-family-monospace;
+	font-weight: 600;
+
+	@include acmgColorStyles;
+}
+
+.acmg-popover-strengths {
+	>button.list-group-item { /* override the active color to match acmg rule color*/
+		&.active {
+			@include acmgColorStyles;
+			border-color: rgba(0,0,0,0);
+		}
+
+		&:focus {
+			color: inherit !important;
+			@include acmgColorStyles();
+		}
+		
+	}
+}
+
+.acmg-guidelines-title {
+	padding: 5px 5px 5px 15px;
+    min-width: 125px;
+    align-self: center;
+}
+
+.acmg-guidelines-invoker {
+	width: calc(100% - 145px);
+    overflow-x: auto;
+	height: 50px;
+}
 
 
 /**********************************************************
@@ -853,7 +1035,7 @@ i.item-status-indicator-dot {
 /** JSON Tree Wrapper (e.g. fallback view) **/
 
 .json-tree-wrapper {
-	border-radius: $border-radius-large;
+	border-radius: $border-radius-lg;
 	overflow: hidden;
 	> ul {
 		padding: 8px 16px 16px !important;
@@ -861,817 +1043,19 @@ i.item-status-indicator-dot {
 	}
 }
 
-/*** Partial or Expandable Lists ***/
-
-.expandable-list {
-	margin-bottom: 10px;
-
-	ul {
-		margin-bottom: 0px;
-	}
-
-}
-
-/*** Files In Set Table ***/
-
-$download-button-width : 100px;
-
-
-.files-in-set-table-title {
-	font-weight: 300;
-	padding-bottom: 10px;
-    margin-bottom: 2px;
-    border-bottom: 1px solid #f4f4f4;
-	margin-top: 20px;
-}
 
 /**********************************************************
-				Files in Set Table
+	Processing Summary Table (CaseView > Bioinfo Tab)
+	Move into own file?
 **********************************************************/
 
-.files-in-set-table {
-
-	margin-bottom: 20px;
-
-	.row {
-
-
-
-		> div {
-			padding-top: 5px;
-			padding-bottom: 5px;
-		}
-
-		h6.accession {
-			margin: 0;
-			font-size: 0.925rem;
-			font-weight: 400;
-			> a {
-				color: #777;
-				&:hover {
-					color: #000;
-				}
-			}
-		}
-
-		> .title {
-			vertical-align: middle;
-			text-align: left;
-			padding-top: 10px;
-		}
-
-		> .description {
-			padding-top: 1px;
-    		padding-bottom: 0px;
-		}
-
-		> .lab {
-			text-align: right;
-			.lab-icon {
-				&.no-lab {
-					opacity: 0.125;
-				}
-			}
-			a.lab-icon {
-				color: #555;
-				transition: color .5s;
-				&:hover {
-					color : #000;
-				}
-			}
-		}
-
-		> .submitter {
-			small {
-				line-height: 1rem;
-				color: #777;
-			}
-		}
-
-		> div.divider-column {
-			padding-bottom: 0;
-			padding-top: 0;
-			> .divider {
-				border-bottom: 1px solid #f4f4f4;
-				height: 1px;
-			}
-		}
-
-		&.header-row {
-			user-select: none;
-
-			> div {
-				font-weight: 500;
-			}
-			> div.divider-column > .divider {
-				border-bottom: 1px solid #ddd;
-			}
-			> .download-button-title {
-				> i.icon {
-					width: 32px;
-					text-align: center;
-				}
-				> span.file {
-					display: inline-block;
-					min-width: $download-button-width;
-					text-align: left;
-				}
-				> span.docs {
-					width : 33px;
-					margin-left: 6px;
-					display: inline-block;
-					text-align: center;
-				}
-			}
-		}
-
-		> .download-button{
-			position: relative;
-			z-index: 10;
-			> a.btn, > button.btn {
-				&.button-dl-doc {
-					margin-left: 5px;
-					&.disabled {
-						opacity: 0.33;
-					}
-				}
-				&.button-dl-file {
-					min-width: $download-button-width;
-				}
-			}
-
-		}
-
+.primary-header {
+	background-color: $primary-dark !important;
+	color: #ffffff;
+	h1, h2, h3, h4, h5, h6 {
+		color: inherit;
 	}
 }
-
-// Tablet & mobile screen size adjustments
-@include media-breakpoint-down(md){
-	.files-in-set-table .row > .download-button {
-		margin-bottom: -50px;
-	}
-}
-
-// Large screen adjustments
-@include media-breakpoint-up(lg){
-
-	.files-in-set-table-title {
-		margin-top: 20px;
-	}
-
-	.files-in-set-table {
-		.row {
-
-			> div, h6 {
-				line-height: 30px;
-			}
-
-			h6.accession {
-				text-align: right;
-			}
-
-
-
-			> .title {
-				padding-top: 5px;
-				padding-bottom: 5px;
-				text-align: right;
-			}
-
-			> .description {
-				min-height: 30px;
-				padding-top: 12px;
-				padding-bottom: 12px;
-				line-height: normal;
-			}
-
-			> .download-button {
-				height: 40px;
-                padding-top: 3px;
-                padding-bottom: 3px;
-			}
-
-		}
-	}
-	.files-in-set-table.smaller-version {
-		.title h6 {
-			margin: 0;
-		}
-	}
-}
-
-
-/**********************************************************
-				Formatted Info Panel/Block
-**********************************************************/
-
-// Mixin for top-left label. To be re-used in other areas.4s
-
-@mixin small-block-label(){
-	font-weight: 500;
-	color: #646464;
-	margin-bottom: 7px;
-	margin-top: 0px;
-
-	&:after {
-		content : "\f105";
-		font-family: "FontAwesome";
-		padding-left: 6px;
-	}
-}
-
-@mixin icon-container-child(){
-
-	.icon-container {
-		text-align: center;
-		padding-top: 4px;
-		font-size: 20px;
-		//margin-bottom: -10px;
-
-		&.col-xs-2 {
-			padding-right: 0px;
-			padding-left: 5px;
-		}
-	}
-
-}
-
-.formatted-info-panel {
-	padding : 0 10px 12px;
-	/* border-bottom: 1px solid #e2e2e2; */
-	margin-bottom: 8px;
-
-	/* Adjustments based on available props, ToDo: .no-title */
-
-	&.has-border {
-		padding : 8px 18px 15px;
-	}
-
-	&.no-icon {
-		padding : 0;
-		margin-bottom: 0;
-		&.loading {
-			min-height: 36.5px;
-		}
-	}
-
-	> h6 {
-		margin-left : -10px;
-		@include small-block-label();
-
-	}
-
-	.row .icon-container {
-		max-width: 50px;
-	}
-
-	h5 {
-		margin-bottom: 0;
-		margin-top: 2px;
-		font-weight: 600;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		word-break: normal;
-
-		a {
-			/* display: block; */
-			overflow: inherit;
-			text-overflow: inherit;
-		}
-
-		&.no-link {
-			font-weight: 500;
-		}
-
-	}
-
-	&.error-block.no-icon h5:before {
-		content: "\f06a";
-		font-family: FontAwesome;
-		margin-right: 6px;
-		color: #999;
-	}
-
-	div.details-col {
-
-		&.no-more-details {
-			h5.block-title {
-				margin-top: 8px;
-			}
-		}
-
-		div.more-details {
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-
-			&.error-message {
-				white-space: pre-line;
-				white-space: normal;
-				opacity: 0.5;
-			}
-
-			div.correspondence {
-				> ol, > ul {
-					padding-left: 25px;
-					> li.contact-person {
-						font-size: 0.925rem;
-						float: none;
-						clear: both;
-						> .pull-right {
-							max-width: 90%;
-						}
-					}
-				}
-			}
-		}
-
-	}
-
-	@include icon-container-child();
-
-}
-
-.formatted-info-panel,
-.formatted-info-panel-list {
-
-	&.formatted-wrapper {
-
-		ul {
-			margin-bottom: 0;
-			padding-left: 18px;
-		}
-
-		&.single-item {
-			ul {
-				margin-bottom: 1px;
-				margin-top: 7px;
-			}
-		}
-
-		.details {
-			> .details-row {
-				margin-top: 7px;
-			}
-		}
-
-		.label-col {
-			user-select: none;
-		}
-
-		.label-col span {
-			position: relative;
-			.icon.abstract-toggle {
-				cursor : pointer;
-				color : #888;
-				position: absolute;
-				left: -20px;
-				top: 2px;
-			}
-
-		}
-
-		@include icon-container-child();
-	}
-
-}
-
-
-
-/**********************************************************
-		     Embedded Static Sections
-**********************************************************/
-
-.extra-info-for-higlass-display {
-	/** This gets placed at top of embedded HiGlass displays, which have their own 10px padding. **/
-	margin-bottom: -6px;
-
-	display: flex;
-	flex-direction: row;
-
-	/** Keep section above padding/margins of HiGlassComponent **/
-	position: relative;
-	z-index: 5;
-
-	&.right-align {
-		flex-direction: row-reverse;
-	}
-
-	> .description {
-		flex: 1;
-		padding-top: 4px;
-		padding-bottom: 4px;
-	}
-
-	> .btn-container {
-		padding-left: 10px;
-	}
-}
-
-
-/**********************************************************
-					OverViewBody
-**********************************************************/
-
-@mixin overview-block-value-block {
-	background-color: #f8f8f8;
-	padding: 6px 12px;
-}
-
-.item-page-container {
-
-	.overview-blocks-header {
-		&.with-background {
-
-			background: #fbfbfb;
-			padding-left: 16px;
-			padding-right: 16px;
-			padding-bottom: 2px;
-			border: 1px solid #f4f4f4;
-			transition: background-color .5s, border-radius .5s, box-shadow .5s;
-
-			> .inner > .overview-blocks {
-				padding-bottom: 10px;
-			}
-
-			/** Cases when markdown parses out a single <span> instead of a <p> (when 1 markdown line) **/
-			> .inner > .static-section-header > div > span:only-child {
-				/* Imitate a <p> */
-				display: block;
-				margin-bottom: 10px;
-			}
-
-			&.is-closed {
-				background-color: #f4f4f4;
-				border-color: #eee;
-				border-radius: 3px;
-				transition: border-color .5s, background-color .5s, border-radius .5s, box-shadow .5s;
-				box-shadow: 0 4px 4px -4px rgba(0,0,0,0.25);
-			}
-		}
-
-		> h4.tab-section-title:first-child {
-			padding-top: 14px;
-			padding-bottom: 13px;
-			font-weight: 400;
-			user-select: none;
-			color: #000;
-		}
-
-		> h5.release-section-title:first-child {
-			font-weight: 450;
-			> span {
-				i.expand-icon,
-				i.title-icon {
-					margin-right: 12px;
-					font-size: 0.8rem;
-					position: relative;
-				}
-			}
-		}
-
-		> h3.tab-section-title:first-child {
-			padding-top: 19px;
-		}
-		> h3.tab-section-title:first-child, > h4.tab-section-title:first-child {
-
-			&.with-accent {
-
-				padding-left: 17px;
-				padding-right: 17px;
-				margin-left: -17px;
-				margin-right: -17px;
-				margin-top: -1px; // Account for border
-				margin-bottom: -3px;
-				padding-top: 14px;
-				padding-bottom: 14px;
-				//background-color: #22656d;
-				//color: #fff;
-				border-radius: 3px;
-				position: relative;
-				z-index: 2;
-
-			}
-
-
-			> span {
-				i.icon-caret-right, i.icon-angle-right {
-					opacity: 0.66;
-					transition: transform .5s, opacity .25s;
-					padding-left: 3px;
-					margin-left: 5px;
-					font-size: 1.125rem;
-				}
-				i.expand-icon,
-				i.title-icon {
-					margin-right: 12px;
-					font-size: 1rem;
-					position: relative;
-				}
-			}
-			&:hover > span {
-				i.icon-caret-right, i.icon-angle-right {
-					opacity: 1;
-				}
-			}
-		}
-
-		&.is-open {
-			> h4.tab-section-title:first-child {
-				border-radius: 0;
-				> span {
-					i.icon-caret-right, i.icon-angle-right {
-						opacity: 0.33;
-					}
-				}
-				&:hover > span {
-					i.icon-caret-right, i.icon-angle-right {
-						opacity: 1;
-					}
-				}
-			}
-		}
-
-
-		> .inner > .static-section-header > .extra-info-for-higlass-display {
-			margin-bottom: -4px;
-			> .description {
-				padding-top: 6px;
-				padding-bottom: 6px;
-			}
-		}
-
-	}
-
-	.supplementary-files-section-part {
-		//margin-top: 10px;
-		padding-top: 5px;
-		padding-bottom: 0px;
-		border-bottom: 1px solid #ccc;
-		> h4 {
-			padding-top: 10px;
-			padding-bottom: 0;
-			margin-top: 0;
-			margin-bottom: 0;
-			font-weight: 500;
-			i.icon-fw {
-				width: 16px;
-				margin-right: 5px;
-			}
-		}
-
-		> .description {
-			margin-left: 21px;
-			margin-bottom: 15px;
-			> p {
-				margin: 0;
-			}
-		}
-
-		> .table-for-collection {
-			margin-left: 21px;
-			overflow: hidden;
-		}
-
-		&[data-open="false"]{
-			border-bottom-color: #eee;
-			padding-top: 5px;
-			padding-bottom: 0px;
-			> h4 {
-				font-weight: 400;
-			}
-		}
-	}
-
-	.overview-blocks {
-		> div {
-			> .inner {
-				padding: 15px 0 5px;
-
-				.tooltip-info-container {
-					> span {
-						> i.icon-info-circle {
-							margin-left: 5px;
-						}
-					}
-				}
-
-				h5 {
-					margin-top: 0;
-					margin-bottom: 5px;
-					font-weight: 500;
-				}
-
-				ol.overview-list-elements-container,
-				ul.overview-list-elements-container {
-					margin-bottom: 0;
-					padding-left: 30px;
-				}
-
-				a.btn {
-					i.icon-external-link {
-						margin-left: 5px;
-						position: relative;
-						top: 1px;
-						&.small {
-							font-size: .65rem;
-							top: -1px;
-						}
-					}
-					i.icon-cloud-download,
-					i.icon-picture-o,
-					i.icon-file-pdf-o {
-						margin-right: 3px;
-					}
-					&.btn-block {
-						padding-left: 4px;
-						padding-right: 4px;
-					}
-					&.btn-sm {
-						padding-bottom: 4px; // Overrides 5
-					}
-				}
-
-				// Embedded Items w/ Attachments
-				.embedded-item-with-attachment {
-					background-color: #f8f8f8;
-					border-radius: $border-radius-base;
-					.link-to-item-col {
-						white-space: nowrap;
-						text-overflow: ellipsis;
-						overflow: hidden;
-						> .inner {
-							line-height: 28px;
-							> span, > a {
-								vertical-align: middle;
-							}
-							> a {
-								display: inline-block;
-								white-space: nowrap;
-								text-overflow: ellipsis;
-								overflow: hidden;
-								max-width: 100%;
-							}
-						}
-					}
-					.view-attachment-button-col {
-						padding-right: 4px;
-					}
-
-					&.is-image {
-						margin-left: -5px;
-						margin-right: -5px;
-						> .inner {
-							> a.image-wrapper {
-								display: block;
-								margin: 0 auto;
-							}
-							> .caption {
-								padding: 10px 0 5px;
-								font-style: italic;
-							}
-						}
-						img.embedded-item-image {
-							max-width: 100%;
-						}
-					}
-
-				}
-
-				> div.overview-single-element {
-					&.block {
-						padding: 0;
-						margin-bottom: 0;
-						&:not(.no-value){
-							margin-top: 10px;
-							@include overview-block-value-block;
-							i.icon-caret-right {
-								transition: opacity .25s, transform .5s;
-								padding-left: 3px;
-								margin-left: 5px;
-								opacity: 0.33;
-								&:not(.icon-rotate-90){
-									opacity: 0.66;
-								}
-								&:hover {
-									opacity: 1;
-								}
-							}
-						}
-					}
-				}
-
-
-				> div.overview-list-elements-container {
-					margin-top: 10px;
-
-					> div.overview-list-element {
-						@include overview-block-value-block;
-						margin-bottom: 5px;
-						&:last-child {
-							border-bottom: none;
-						}
-					}
-
-				}
-
-			}
-		}
-	}
-}
-
-/**********************************************************
-					AdjustableDividerRow
-**********************************************************/
-
-.adjustable-divider-row {
-	margin-left: 0;
-	margin-right: 0;
-	@include media-breakpoint-up(lg) {
-		> .left-panel {
-			padding-right: 10px;
-		}
-		> .right-panel {
-			padding-left: 10px;
-		}
-	}
-}
-
-/**********************************************************
-				Experiments Set View
-**********************************************************/
-
-.exp-table-section {
-
-	h3 {
-
-		span.exp-number {
-			padding-top: 5px;
-		}
-
-	}
-
-	.expset-higlass-panel {
-		@include media-breakpoint-up(lg){
-			margin-bottom: -20px;
-		}
-	}
-
-	/*
-	table tbody tr:first-child td {
-
-		&:nth-child(1),
-		&:nth-child(2) {
-			border-bottom-color: #c0c0c0;
-		}
-	}
-	*/
-}
-
-
-.exp-table-container {
-	overflow-x: auto;
-	display: block;
-}
-
-.draggable-border {
-	height: 100%;
-	padding-left: 5px;
-	padding-right: 5px;
-	position: absolute;
-	top: 0px;
-	cursor: ew-resize;
-	z-index: 5;
-	> .inner {
-		height: 100%;
-		width: 0;
-		border-left: 1px solid #eee;
-		> .drag-handle {
-			position: absolute;
-			left: 3px;
-			width: 5px;
-			background-color: transparent;
-			border-left: 1px solid #ddd;
-			border-right: 1px solid #ddd;
-		}
-	}
-	&:hover,
-	&.react-draggable-dragging {
-		> .inner {
-			border-color: #888;
-			box-shadow: 0 0 1px #999;
-			> .drag-handle {
-				border-color: #999;
-			}
-		}
-	}
-}
-
-
-/**********************************************************
-			Processing Summary Table (CaseView > Bioinfo Tab)
-**********************************************************/
 
 .item-page-container {
 
@@ -1761,8 +1145,6 @@ $download-button-width : 100px;
 		// }
 
 		div.pedigree-vis-heading {
-			background-color: $primary-dark; // previous value: $navbar-background-color (#20445f);
-			color: #ffffff;
 
 			.view-pedigree-btn {
 				background-color: cornflowerblue; // TODO: Once settle on good color, maybe apply it to our theme under a SCSS variable for re-use. Then ctrl+find+replace.
@@ -1854,7 +1236,7 @@ $download-button-width : 100px;
 				display: flex;
 				justify-content: space-evenly;
 
-				@include media-breakpoint-down(sm) {
+				@include media-breakpoint-down(md) {
 					flex-direction: column;
 				}
 
@@ -1863,14 +1245,14 @@ $download-button-width : 100px;
 					display: flex;
 					height: $search-results-header-row-height; // Eh why not re-use this, can change always in future.
 
-					@include media-breakpoint-down(sm) {
+					@include media-breakpoint-down(md) {
 						margin-bottom: 5px;
 					}
 					
 					> button {
 						// TODO store color in variable, ideally bootstrap one, for re-use in places.
 						background-color: cornflowerblue;
-						transition: background-color .25s, box-shadow .5s;
+						transition: background-color .25s ease-out, box-shadow .5s;
 						color: #ffff;
 						height: 100%;
 						display: block;
@@ -1910,16 +1292,18 @@ $download-button-width : 100px;
 							width: auto;
 							path {
 								fill: cornflowerblue;
-								transition: fill .25s;
+								transition: fill .25s ease-out;
 							}
 						}
 
-						@include media-breakpoint-down(sm) {
+						@include media-breakpoint-down(md) {
 							display: none;
 						}
 					}
 
-					@include media-breakpoint-up(md) {
+					@include media-breakpoint-up(lg) {
+
+						flex-basis: 20%; /* <- dependendent on there being 5 of these tabs (keep in sync w. amount of tabs) */
 
 						&:first-child {
 							> .btn-prepend {
@@ -1995,9 +1379,11 @@ $download-button-width : 100px;
 			}
 
 			h1 {
+				/* todo: consider using an h2 instead, as is 2.1rem by default (close to the 2rem set here) and */
+				/* possibly more semantically accurate (i.e. is a section title, not page title) (subjective) */
 				font-size: 2rem;
-				margin-bottom: 20px;
-				font-weight: 500;
+				margin-bottom: 36px; /* matches padding-bottom of timeline/tabs nav */
+				margin-top: 0px;
 			}
 
 			/* 'Current Case' selection marker/styling */
@@ -2013,38 +1399,35 @@ $download-button-width : 100px;
 				}
 			}
 
+			/* Interpretation styles*/
+			&#case-info\.interpretation {
+				.card-header.section-header {
+					font-weight: 400;
+					margin: 0; /* overrides the default `margin: 10px 0` of header (h1, h2, ..) elems */
+					
+					a:hover > div.title-block > span {
+						text-decoration: underline;
+					}
+				}
+			}
+
 			h2 {
 				font-size: 1.5rem;
 				font-weight: 400;
 			}
 
-			.embedded-search-view-outer-container {
-				// background-color: #ffffff;
-				.facets-container {
-					background: #ffffff;
-				}
-			}
-
 			.tab-inner-container {
-				background-color: #ffffff;
 				margin-bottom: 20px;
-				padding: 20px;
-				border-radius: $border-radius-large;
-				box-shadow: 0 1px 5px #0002;
-				border-color: #d6d6d6;
 
 				&.qc-status {
 					font-size: 19px;
 				}
 
-				h2.section-header {
+				.card-header.section-header {
 					background-color: $primary-dark;
-					width: calc( 100% + 40px);
-					padding: 10px 10px 10px 20px;
 					color: #ffff;
-					margin-left: -20px;
-					margin-right: -40px;
-					margin-top: -20px;
+					font-weight: 400;
+					margin: 0; /* overrides the default `margin: 10px 0` of header (h1, h2, ..) elems */
 				}
 
 				.processing-summary-table {
@@ -2069,24 +1452,36 @@ $download-button-width : 100px;
 					.accession-table {
 						margin-left: 10px; 
 
-						tr:not(:last-child) {
+						div.row:not(:last-child) {
 							border-bottom: 1px solid #ddd;
+							padding-bottom: 5px;
 						}
 
-						td.accession-table-title {
+						div.row {
+							max-width: 100%;
+							padding-top: 5px;
+
+							> div.col-auto,
+							> div.col {
+							padding-left: 0;
+							padding-right: 0;
+							}
+						}
+
+						div.accession-table-title {
 							font-weight: 600;
 							text-align: left;
-							margin-left: 20px;
 							min-width: 75px;
 						}
-						td:not(.accession-table-title) {
-							text-align: right;
+
+						div:not(.accession-table-title) {
+							text-align: left;
 						}
 					}
 				}
 
-				.row.qc-summary {
-					padding: 2px 0;
+				.row.qc-summary:not(:last-child) {
+					padding-bottom: 5px;
 				}
 
 				.processing-summary-table-container {
@@ -2188,7 +1583,39 @@ $download-button-width : 100px;
 					}
 		
 				}
-			}	
+			}
+
+			/* Filtering Tab Specific styles */
+			&#case-info\.filtering {
+				// Styling overrides specific to embedded search table results for Structural Variants in case filtering
+				.embedded-search-container .search-view-controls-and-results[data-search-item-type="StructuralVariantSample"] {
+					.search-result-row.detail-closed .columns.result-table-row {
+						.search-result-column-block[data-field="display_title"][data-first-visible-column="true"] {
+							// Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate
+							padding-left: 0 !important; // important necessary to override default style (this is short term override/will be deleted soon so hopefully ok)
+						}
+						.search-result-column-block[data-field="status"],
+						.search-result-column-block[data-field="date_created"] {
+							display: flex;
+							justify-content: center;
+						}
+					}
+				}
+
+				.filtering-tab-toggle {
+					width: max-content; 
+	
+					> div {
+						padding: 5px 40px;
+	
+						&.active {
+							background-color: lighten($primary, 40%);
+							color: $primary-dark;
+							border-radius: 0.4em;
+						} 
+					}
+				}
+			}
 		}
 	}
 	
@@ -2238,6 +1665,572 @@ $download-button-width : 100px;
 }
 
 
+/**********************************************************
+	CaseView -> FilterSetUI
+	N.B. Some of the dimensions, i.e. padding top of ampersand,
+	are dependent on font-size/face that we use.
+**********************************************************/
+
+@mixin clickable-hoverable-icon {
+	opacity: 0.5;
+	&:hover {
+		opacity: 1;
+	}
+	&.disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+	}
+}
+
+#case-info {
+
+	.embedded-search-view-outer-container {
+
+		// (Stylistic) increase whitespace around this components/elems
+		.above-results-table-row {
+			margin-top: 16px;
+			padding-bottom: 16px;
+		}
+
+	}
+}
+
+
+.filterset-preset-selection-outer-column {
+	/** Responsive styling copied over from .facet-column in _search.scss **/
+	/* (todo: maybe consider making it a mixin) */
+
+	@include navbar-static-position {
+		width: 100%;
+	}
+
+	@include navbar-fixed-position {
+		width: 320px;
+		flex-basis: 320px;
+	}
+
+	flex-shrink: 0;
+
+	/** -- **/
+
+	.filterset-preset-selection-body {
+
+		/** Is located within the .filterset-outer-container **/
+		/* border-right: 1px solid #777; */
+		display: flex;
+		flex-direction: column;
+
+		.results-container {
+
+			flex-basis: 300px; /* <- Min height, essentially */
+			min-height: 300px;
+			flex-grow: 1;
+			flex-shrink: 1;
+
+			/** keep scrollbar always visible for layout consistency (instd of overflow:auto) **/
+			overflow-y: scroll;
+			max-height: 100%;
+
+			.preset-filterset-result {
+
+				background-color: #fff;
+				border-bottom: 1px solid #ddd;
+
+				.title {
+					height: 36px;
+					padding-top: 8px;
+					display: flex;
+					align-items: center;
+				}
+
+				.title-icon-container {
+					color: $secondary;
+					font-size: 1rem; /* Unset from parent elem's .text-small */
+					&.clickable {
+						color: $primary;
+						&:hover {
+							color: $primary-dark;
+						}
+					}
+				}
+
+				.info {
+					height: 36px;
+					display: flex;
+					align-items: center;
+
+					.btn-dropdown-icon {
+						/* Todo - make reusable everywhere ? */
+						padding-left: 5px;
+						padding-right: 5px;
+						&:after {
+							/* Hide down 'v' icon */
+							display: none;
+						}
+					}
+
+					.count-indicator-wrapper {
+
+						svg {
+							/** This seems to work well visually here. **/
+							vertical-align: sub;
+						}
+
+						svg circle {
+							fill: #999;
+						}
+					}
+
+					.title-icon-container {
+						button.import-preset-btn {
+							line-height: 1.45;
+						}
+					}
+				}
+
+				&[data-is-origin-of-current-case-filterset="true"] {
+					background-color: $light;
+
+					&[data-is-current-case-filterset-unchanged="true"] {
+						/* Similar color to filterset-block below, but lighter */
+						background-color: lighten($primary, 55%);
+
+					}
+					
+				}
+
+				&[data-has-been-deleted="true"] {
+					/* background: #fff4f4; */
+					> .title,
+					> .info {
+						opacity: 0.4;
+					}
+				}
+
+			}
+
+		}
+
+	}
+}
+
+.filterset-outer-container {
+	// TODO CHANGE
+	// border: 1px solid #999;
+	/* background-color: desaturate(lighten($primary-dark, 45%), 30%); */ // #b4c8d8; // $gray-300;
+
+	// background-color: #dedede;
+	border-radius: $border-radius-lg;
+	// border: 4px solid transparent;
+	// transition: background-color .5s ease-out;
+
+	h4 i.icon.clickable {
+		@include clickable-hoverable-icon;
+	}
+
+	
+
+	.filter-set-ui-header {
+		/** Header **/
+		/* Looks nice, enough to accomodate Save | Save As buttons, and gives us a concrete number to match FS preset selection UI header height to. */
+		min-height: 65px;
+		background-color: $primary-dark;
+		color: #fff;
+		h4 {
+			color: #fff;
+		}
+	}
+
+	&[data-is-open="false"] {
+		.filter-set-ui-header {
+			/* Appear more as button when closed */
+			/* Same as parent .filterset-outer-container above */
+			border-radius: inherit;
+		}
+	}
+
+	.blocks-container {
+
+		/* min-height: 400px; */
+		overflow: auto;
+
+		.filterset-block {
+			border-radius: $border-radius-lg;
+			border: 1px solid #8e8e8e;
+			padding: 2px;
+
+			background-color: #f1f1f1;
+			/* background-color: desaturate(lighten($primary, 50%), 15%); */ // #dce4f5; // TODO: Codify somewhere
+			
+			// border-color: desaturate(lighten($primary-dark, 40%), 25%); /* Same as .filterset-outer-container background-color */
+			// margin: 0 -3px; /* Subtract border-width to align left + right unselected edges properly w. other UI elements */
+			/* transition: border-color .5s, background-color .5s; */
+
+			/* Disabled for now - sometimes can be slow: */
+			/* transition: background-color .5s ease-out; */
+
+
+			/* box-shadow: 0 1px 6px -3px black; */
+
+			&:not(:last-child) {
+				margin-bottom: 16px;
+			}
+
+			&.selected {
+				border-width: 3px;
+				padding: 0px;
+				border-radius: $border-radius-lg + 2px;
+				border-color: $primary-dark;
+				background-color: lighten($primary, 50%);
+				&.clickable:hover {
+					@include user-select(none);
+					// background-color: desaturate(lighten($primary, 50%), 15%);
+					// transition: none;
+				}
+			}
+
+			&.clickable:not(.selected):hover {
+				// background-color: lighten($primary, 45%);
+				border-width: 2px;
+				padding: 1px;
+				border-radius: $border-radius-lg + 1px;
+				border-color: $primary-dark;
+				transition: none;
+			}
+
+
+			&[data-duplicate-query="true"] {
+				background-color: desaturate(lighten($danger, 45%), 10%);
+				&.selected {
+					border-color: desaturate(lighten($danger, 10%), 20%);
+				}
+			}
+
+			.title-controls-row {
+
+				i.icon.clickable {
+					@include clickable-hoverable-icon;
+				}
+
+				.cached-counts-value {
+					height: 24px;
+					line-height: 20px;
+					min-width: 24px;
+					border: 2px solid transparent;
+					padding: 0 3px;
+					text-align: center;
+					font-size: 0.75em;
+					border-radius: 50%;
+					&[data-count-exists="true"] {
+						border-color: #0005;
+					}
+				}
+
+			}
+
+			.filter-query-viz-blocks {
+				
+				.field-block {
+					position: relative;
+
+					.value-blocks {
+						.value-block {
+							border-radius: 25px;
+							padding: 5px 10px;
+							background-color: #fff;
+							position: relative;
+							/* box-shadow: 0 2px 8px -3px #000; */
+							white-space: nowrap;
+							margin: 3px 0;
+							flex-grow: 1;
+							text-align: center;
+							&:not(:last-child) {
+								margin-right: 7px;
+								&:after {
+									content: "";
+									height: 16px;
+									top: 10px;
+									top: calc(50% - 8px);
+									border-right: 1px solid $gray-700;
+									//transform: scale3d(0.75, 0.75, 0.75);
+									right: -4px;
+									position: absolute;
+								}
+							}
+						}
+					}
+
+					.field-name {
+						position: relative;
+						padding-top: 5px;
+						font-size: .925em;
+						&:before {
+							content: " ";
+							position: absolute;
+							top: -2px;
+							height: 5px;
+							border: 1px solid #444;
+							left: -4px;
+							right: -4px;
+							border-top: none;
+						}
+					}
+
+					&:not(:last-child) {
+						margin-right: 15px;
+						&:after {
+							content: "&";
+							transform: scale3d(0.75, 0.75, 0.75);
+							right: -12px;
+							top: 10px;
+							top: calc(50% - 24px);
+							position: absolute;
+						}
+
+					}
+
+				}
+			}
+
+		}
+
+	}
+
+	.filterset-blocks-container {
+
+		background-color: #dedede;
+		// border-radius: $border-radius-lg;
+		border: 4px solid transparent;
+		border-top: none;
+		transition: background-color .4s .1s ease-in;
+
+
+		/* While present as child of flex-grow-1 'column', stretch self to min-height of left presets column */
+		min-height: 100%;
+		display: flex;
+		flex-direction: column;
+
+		> .blocks-container {
+			flex-grow: 1;
+		}
+
+
+		&[data-all-selected="true"] {
+			border-color: $primary-dark;
+			background-color: desaturate(lighten($primary-dark, 40%), 25%);
+			.blocks-container {
+	
+				 .filterset-block.selected {
+					 border-width: 1px;
+					padding: 2px;
+					border-radius: $border-radius-lg;
+					border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+				}
+	
+				&:hover {
+					.filterset-block.clickable.selected {
+						&:hover {
+							border-width: 2px;
+							padding: 1px;
+							border-radius: $border-radius-lg + 1px;
+							border-color: $primary-dark;
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	// &[data-all-selected="true"] {
+	// 	border-color: $primary-dark;
+	// 	background-color: desaturate(lighten($primary-dark, 40%), 25%);
+	// 	.blocks-container {
+
+	// 	 	.filterset-block.selected {
+	// 	 		border-width: 1px;
+	// 			padding: 2px;
+	// 			border-radius: $border-radius-lg;
+	// 			border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+	// 		}
+
+	// 		&:hover {
+	// 			.filterset-block.clickable.selected {
+	// 				&:hover {
+	// 					border-width: 2px;
+	// 					padding: 1px;
+	// 					border-radius: $border-radius-lg + 1px;
+	// 					border-color: $primary-dark;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+}
+
+/**********************************************************
+	CaseView -> InterpretationTab + CaseReviewTab
+**********************************************************/
+
+.variant-sample-selection {
+
+	h4.selected-vsl-title {
+		font-size: 1.275rem; /* Slight decrease from h4 default of 1.3rem */
+		i.icon {
+			font-size: 0.725em;
+		}
+		a + i.icon-pen {
+			color: transparent;
+		}
+		a:hover + i.icon-pen {
+			color: $gray-400;
+		}
+	}
+
+	.note-content-area {
+
+		margin-top: 12px;
+	
+		@include media-breakpoint-up(md){
+			min-height: 150px;
+			max-height: 270px;
+		}
+	
+		@include media-breakpoint-up(lg){
+			max-height: 400px;
+		}
+	
+		@include media-breakpoint-up(xl){
+			max-height: 500px;
+		}
+	
+		> .note-text-content {
+			border-radius: $border-radius-sm;
+			border: 1px solid #eee;
+			padding: 12px;
+			overflow: auto;
+			white-space: pre-wrap;
+		}
+	
+	}
+	
+}
+
+
+/**********************************************************
+  HiGlass Views
+**********************************************************/
+
+.higlass-wrapper {
+
+	margin-bottom: 10px;
+
+	.higlass-instance {
+
+		margin-left: -10px;
+		margin-right: -10px;
+		height: 600px; // Default. May be overriden.
+		transition: opacity 1s;
+		opacity: 0;
+
+
+		.TrackControl-module_track-control-2zDf3 { // Menu which appears on hover
+			.TrackControl-module_track-control-button-2fdIb { // Hide "add track" button.
+				display: none;
+				&:nth-child(2),
+				&:last-child,
+				&:first-child {
+					display: block;
+				}
+			}
+		}
+
+		.CenterTrack-module_center-track-container-2ELhp {
+			.TrackControl-module_track-control-2zDf3 { // Menu which appears on hover
+				.TrackControl-module_track-control-button-2fdIb { // Hide "add track", "close", & "move" buttons.
+					display: none;
+					&:first-child {
+						display: block;
+					}
+				}
+			}
+		}
+
+		.ViewHeader-module_multitrack-header-3XnZx .ViewHeader-module_multitrack-header-nav-list-2nvcu {
+			.ViewHeader-module_multitrack-header-icon-squeazed-25lkF:nth-child(3), // Hide 'plus' button in header.
+			.ViewHeader-module_multitrack-header-icon-16QKZ:nth-child(3) {
+				display: none;
+			}
+		}
+
+		div[class^="ViewConfigEditor-module_view-config-editor-"] {
+			textarea, pre, pre span {
+				font-family: $font-family-monospace !important;
+			}
+		}
+
+		.glyphicon.glyphicon-search {
+			&:before {
+				content : "\f002";
+				font-family: $fa-font-family;
+				font-weight: 900;
+			}
+		}
+
+		.react-grid-layout {
+			.form-group {
+				div.dropdown.btn-group-sm {
+					> .btn.dropdown-toggle {
+						padding-right: 24px !important;
+					}
+				}
+				input.GenomePositionSearchBox-module_genome-position-search-bar-1_0ZU {
+					font-family: $font-family-monospace;
+					font-size: 0.825rem;
+				}
+			}
+		}
+	}
+}
+
+/** For when HiGlass track is being dragged **/
+/**
+    All of this 'hide/override via CSS' is kinda hacky anyway, esp. with the PostCSS classNames;
+    ideally would be nice if can pass in props to HiGlassComponent
+    re: what menu options to include/exclude.
+**/
+
+.TiledPlot-module_stylizedItem-2bQBK {
+	.TrackControl-module_track-control-2zDf3 { // Menu which appears on hover
+		.TrackControl-module_track-control-button-2fdIb { // Hide "add track" button.
+			display: none;
+			&:nth-child(2),
+			&:last-child,
+			&:first-child {
+				display: block;
+			}
+		}
+	}
+}
+
+/* Disabled for now - can't reliably target menu items (same classNames)
+.hg-popup {
+	.context-menu-item > div {
+		> .ContextMenu-module_context-menu-hr-3yapb:nth-child(4),
+		> .ContextMenu-module_context-menu-item-1HeVv:nth-child(5) {
+			display: none;
+		}
+	}
+	> .ContextMenu-module_context-menu-2OwvL {
+		.ContextMenu-module_context-menu-item-1HeVv:nth-child(6),
+		.ContextMenu-module_context-menu-item-1HeVv:nth-child(8) {
+			display: none;
+		}
+	}
+}
+*/
+
 
 /**********************************************************
   PedigreeViz View Tab (CaseView, IndividualView, ...)
@@ -2256,7 +2249,7 @@ $download-button-width : 100px;
 			// If change size of footer, header, navbar, sub-navbar, etc. then this 216px must
 			// be adjusted here and in JS
 			@include navbar-fixed-position {
-				min-height: calc(100vh - 216px) !important;
+				min-height: $inner-tab-contents-full-height !important;
 			}
 		}
 
@@ -2299,28 +2292,32 @@ $download-button-width : 100px;
 
 	}
 
-	/** Dropdown for selecting diseases/features -- CGAP-specific **/
+	/** DetailPane Legend Body for selecting diseases/features -- CGAP-specific **/
 
-	.tabview-title-controls-container {
+	.detail-pane-container {
 		.disease-option {
-			padding: 1px 10px;
 			display: flex;
 			align-items: center;
+
 			.checkbox-with-label {
 				flex: 1;
 				> label {
 					cursor: pointer;
+					> input {
+						// Override default mr-08
+						margin-right: 16px !important;
+					}
 				}
 			}
 			.disease-color-patch {
-				height: 16px;
-				width: 16px;
+				height: 20px;
+				width: 20px;
+				line-height: 20px;
 				border-radius: 50%;
 				transition: background-color .3s;
 				text-align: center;
-				line-height: 1;
 				> span {
-					font-size: 0.675rem;
+					font-size: 0.75rem;
 					font-weight: 600;
 					top: -2px;
 					position: relative;
@@ -2338,38 +2335,241 @@ $download-button-width : 100px;
 }
 
 
+
+/**********************************************************
+  VariantSampleView & similar - Annotation & Interpretation Space
+**********************************************************/
+
+// TODO maybe move somewhere else
+// Is (and should prly remain) a common style we potentially reuse
+// when need to block out card contents.
+
+.card {
+
+	.inner-card-section {
+
+		display: flex;
+		flex-direction: column;
+
+		.info-header-title { // TODO Rename from "info-" ?
+
+			flex-grow: 0;
+			padding: 0 8px;
+
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			height: 32px;
+			position: relative;
+			// z-index: 5;
+
+			> .dropdown > .btn-outline-secondary {
+				@include button-variant(#fff, #e0e0e0);
+			}
+
+			> h4 {
+				// todo: maybe add color if to be just for this section (?)
+				font-weight: 600;
+				margin: 0;
+				padding: 0 8px;
+				background-color: $card-bg;
+			}
+
+			.dropdown {
+				background-color: $card-bg;
+				> button {
+					padding-left: 8px; /* Matches padding-left of the h4 elem, to align all titles at left edge */
+					padding-right: 28px;
+				}
+			}
+
+			+ .info-body {
+				border: 1px solid $border-color;
+				// TODO maybe use or base off bootstrap vars here instd of hardcoded px vals.
+    			padding: 24px 16px 16px;
+				margin-top: -16px;
+				flex-grow: 1;
+				border-radius: $border-radius-sm;
+			}
+		}
+
+	}
+
+}
+
+.sample-variant-annotation-space-body {
+	.card .inner-card-section {
+		// TODO: Maybe consider propagating further, overriding btn-outline-secondary or btn-secondary with
+		// this (since their defaults look somewhat like disabled - but maybe useful idk)
+		> .info-header-title {
+			> .dropdown > .btn-outline-secondary {
+				@include button-variant(#fff, #e0e0e0);
+			}
+		}
+
+		.search-view-controls-and-results[data-search-item-type="Gene"] .result-table-detail .gene-tab-body.card-body .row>.col-12.col-md-6.d-flex:first-of-type .inner-card-section:first-of-type {
+			// Make transcript selector button push to new line & create space in body for it.
+			.info-header-title {
+				flex-wrap: wrap;
+			}
+
+			.info-body {
+				@media (max-width:1300px) and (min-width:768px) {
+					padding-top: 50px;
+				}
+			}
+		}
+	}
+
+	.sample-variant-info-header {
+		// Ensure we're above other titles/etc.
+		// For dropdown
+		position: relative;
+		z-index: 10;
+	}
+
+	.sample-variant-overview-tab-view-container {
+		.tabs-column {
+			position: relative;
+			z-index: 2;
+			//flex-grow: 0; // Will adjust via responsive Bootstrap classNames
+			//flex-shrink: 0;
+			> button.overview-tab {
+				height: 48px;
+				width: 100%;
+				display: block;
+				border: none;
+				margin-bottom: 5px;
+				font-weight: 600;
+				border-radius: 0;
+				background-color: #beccda;
+				color: $primary-dark;
+				line-height: 1.125; /* scrunch up the text a little bit if it flows onto a 2nd+ line */
+				&[disabled]{
+					color: #fff8;
+				}
+				&[data-active="true"] {
+					@extend .card;
+					color: $primary-dark;
+					display: initial;
+					flex-direction: initial;
+					@include media-breakpoint-up(lg){
+						border-top-right-radius: 0px;
+						border-top-right-radius: 0px;
+						&:after {
+							content: "";
+							position: absolute;
+							top: 0;
+							bottom: 0;
+							right: -4px;
+							width: 6px;
+							background-color: inherit;
+							border-top-right-radius: 0px;
+							border-bottom-right-radius: 0px;
+						}
+					}
+				}
+			}
+		}
+
+		.content-column {
+			flex-basis: 320px;
+			min-width: 320px;
+			flex-grow: 1;
+			@include media-breakpoint-up(lg){
+				&.card {
+					// Blend/align the topleft corner with the column of tab links
+					border-top-left-radius: 0px;
+				}
+			}
+
+			.embedded-search-view-outer-container .search-view-controls-and-results {
+				&[data-search-item-type="Gene"] .info-header-title .dropdown-menu.show {
+					max-height: 180px;
+				}
+			}
+		}
+	}
+
+	.interpretation-space-wrapper-column {
+		flex-basis: 375px;
+	}
+
+	.interpretation-space {
+		position: sticky;
+		position: -webkit-sticky;
+		top: 50px;
+
+		.card-header.interpretation-header {
+			background-color: $primary-dark;
+			color: #ffffff;
+			font-size: 1.1em;
+
+			button:focus {
+				outline: thin dotted;
+			}
+		}
+
+		.card-body {
+			ul {
+				list-style-type: none;
+				border:1px solid lightgray;
+				border-radius: 5px;
+				li.interpretation-tab {
+					&[data-active="true"] {
+						background-color: #beccda;
+						color: $primary-dark;
+						border-radius: 3px;
+					}
+					font-size: 13px;
+					padding: 3px 7px;
+				}
+			}
+
+			.interpretation-panel {
+				margin: 10px 0;
+
+				textarea {
+					border-color: lightgrey;
+    				border-radius: 5px;
+					padding: 10px;
+				}
+
+				.note-field-drop .dropdown.btn-group {
+					width: 270px;
+					flex-grow: 1;
+					
+					>button {
+						max-width: 100%;
+						text-overflow: ellipsis;
+						overflow: hidden;
+					}
+				}
+			}
+		}
+	}
+}
+
+@include media-breakpoint-up(lg){
+	.sv-browser-settings {
+		max-width: 215px;
+	}
+}
+
+
 /**********************************************************
 		User Profile Page
 ***********************************************************/
 
 div.user-profile-page {
 
-	/* Panels */
-
-	.panel.shadow-border {
-		background-color: inherit;
-		margin-bottom: 15px;
-		padding: 15px 20px;
-		overflow: visible;
-		border: 1px solid transparent; /* So bordered and border-less panels have same padding */
-		@include box-shadow(0px 0px 0px rgba(0,0,0,0));
-
-		border: 1px solid #ddd;
-		border-bottom-color: #c8c8c8;
-		box-shadow: 0px 1px 9px -3px rgba(0,0,0,0.5);
-		background-color: #fff;
+	@include media-breakpoint-up(md){
+		min-height: calc(100vh - 250px); // 250px is sum of header, footer, and page title. If any of those change, this needs updating.
 	}
+
 
 	.panel.user-info,
 	.panel.user-work-info {
-
-		margin-bottom: 20px;
-		margin-top: 0;
-
-		@include media-breakpoint-up(lg){
-			margin-bottom: 0;
-			height: 100%;
-		}
 
 		// Override of prev CSS
 		.col-md-3.text-right.text-left-xs {
@@ -2405,7 +2605,7 @@ div.user-profile-page {
 
 	}
 
-	.panel.user-info {
+	.card.user-info {
 		/* for fun - comment out bottom transform in Inspect Element */
 		transform: rotateZ(0deg) scale3d(1, 1, 1) translateX(0);
 		opacity: 1;
@@ -2413,7 +2613,6 @@ div.user-profile-page {
 		transition: transform 1.2s ease-out, opacity 1.5s ease-out, left 1.2s ease-out;
 		position: relative;
 		z-index: 2;
-		background-color: #fff;
 
 		&.transition { transform: rotateZ(-900deg) scale3d(0.1, 0.1, 0.1) translateX(-1200px); opacity: 0; left: -900px; }
 
@@ -2422,15 +2621,8 @@ div.user-profile-page {
 			border-bottom: 1px solid #eee;
 		}
 
-		.user-title-col {
-			padding-bottom: 17px;
-		}
-
 		.user-title {
-			margin-top: 0px;
-			margin-bottom: 0px;
 			font-weight: 300;
-			font-size: 2.6rem;
 
 			.editable-field-entry {
 				//max-width: 50%; // Need to fit 2 inline editable fields on one row for users full name.
@@ -2441,19 +2633,11 @@ div.user-profile-page {
 						font-size: 1rem;
 					}
 				}
-				&.editing{
-					//max-width: 70%;
-				}
 			}
 
 		}
 
 		@include media-breakpoint-up(md){
-
-			.user-title-col {
-				padding-top: 15px;
-				min-height: 85px;
-			}
 
 			.user-title {
 				/* white-space: nowrap; */
@@ -2550,26 +2734,10 @@ div.user-profile-page {
 	}
 
 	.access-keys-container {
-		padding-top: 15px;
-
-		> h3 {
-
-			margin-bottom: 17px;
-			/*
-			padding-bottom: 17px;
-			border-bottom: 1px solid #eee;
-			*/
-		}
 
 		table.access-keys-table {
-			margin-bottom: 20px;
 
 			tr {
-				/*
-				&:nth-child(2n-1) {
-					background-color: #f8f8f8;
-				}
-				*/
 				td {
 					border-bottom: 1px solid #eee;
 					&.access-key-buttons {

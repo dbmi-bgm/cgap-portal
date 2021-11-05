@@ -1,0 +1,34 @@
+<h5>
+Inheritance mode values are candidate labels based on solely on genotype assignments.
+</h5>
+
+<p>
+Variants of higher potential clinical relevance are assigned one of the following based on genotype assignments:
+<ul>
+<li> <b> Possibly de novo </b>: Father: 0/0, Mother: 0/0, Child: 0/1 or 1/1
+<li> <b> Dominant (Paternal)</b>: Father: 0/1, Mother: 0/0, Child: 0/1.
+<li> <b> Dominant (Maternal)</b>: Father: 0/0, Mother: 0/1, Child: 0/1.
+<li> <b> Recessive</b>: Father: 0/1, Mother: 0/1, Child: 1/1.
+<li> <b> X-linked Recessive</b>, <b>X-linked Dominant (Maternal)</b>: Father: 0, Mother: 0/1, Son: 1.
+<li> <b> X-linked dominant (Paternal)</b>: Father: 1, Mother: 0/0, Son: 1.
+<li> <b> Y-linked dominant</b>: Father: 1, Son: 1.
+<li> <b> Loss of Heterozygosity</b>: Father: 0/1, Mother: 0/0, Child: 1/1.
+<li> <b> Loss of Heterozygosity</b>: Father: 0/0, Mother: 0/1, Child: 1/1.
+</ul>
+</p>
+
+<p>
+Note that structural variants, unlike SNVs, lack a specialized de novo variant caller, so all possible de novos are stricly based on genotype. SVs also lack compound het calling at this time.
+</p>
+
+<p>
+<b>Low relevance</b>:
+<ul>
+<li> Variants with missing calls (./.) or calls that mismatch the sex (e.g. 0/1 on chrX for a male) are not assigned inheritance mode values.
+<li> Variants with genotypes that do not meet any of the high relevance criteria above are not assigned inheritance mode labels.
+</ul>
+</p>
+
+<p><b>Ambiguous</b>: </p>
+
+<p>If a sample is submitted to CGAP with the sex indicated as "U" or "Unknown", then autosome inheritance modes and genotypes are calculated normally but sex-linked inheritance modes and genotypes cannot be properly determined. These will be marked "Ambiguous".</p>

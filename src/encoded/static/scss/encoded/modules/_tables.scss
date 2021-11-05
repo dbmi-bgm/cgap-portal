@@ -1,36 +1,81 @@
 /*  COMMON TABLES */
 
 table {
-    @include font-size(0.9rem);
+	@include font-size(0.9rem);
+	
+	> thead {
+		> tr {
+			> th {
+				background-color: #f0f1f5;
+				border-top: none;
+				/* border-bottom: 1px solid #ddd; */
+				/* border-left: 1px solid #ddd; */
+				padding: 5px 3px 5px;
+				font-weight: bold; /* In case 600 not available for font */
+				font-weight: 600;
+				white-space: nowrap;
+				text-align: center;
+				vertical-align: middle !important;
+				/*
+				&:first-child {
+					border-left: none !important;
+				}
+				*/
+			}
+		}
+
+		&.bg-transparent {
+			> tr > th {
+				background-color: transparent;
+			}
+		}
+	}
+
+	> tbody {
+		> tr {
+			> td {
+				border-top: 0px;
+				padding: 2px 3px;
+				text-align: center;
+				vertical-align: middle !important;
+				outline: none !important;
+			}
+		}
+
+		/* If entire table or row has .text-left etc, apply to children as well (unless itself overrides). */
+		&.text-left,
+		&.text-right {
+			> tr {
+				text-align: inherit;
+				> th,
+				> td {
+					text-align: inherit;
+				}
+			}
+		}
+	}
+
+	/* If entire table or row has .text-left etc, apply to children as well. */
+	&.text-left,
+	&.text-right {
+		> thead,
+		> tbody {
+			text-align: inherit;
+			> tr {
+				text-align: inherit;
+				> th,
+				> td {
+					text-align: inherit;
+				}
+			}
+		}
+	}
+
+
+
 }
 
-thead, tfoot {
-    background: none repeat scroll 0 0 #f5f5f5;
-}
 
-table>thead>tr>th {
-    background-color: #eee;
-    border-top: none;
-    border-bottom: 1px solid #ddd;
-    border-left: 1px solid #ddd;
-    padding: 5px 3px 5px;
-    font-weight: bold; /* In case 600 not available for font */
-    font-weight: 600;
-    white-space: nowrap;
-    text-align: center;
-    vertical-align: middle !important;
-    &:first-child {
-        border-left: none !important;
-    }
-}
-
-table>tbody>tr>td {
-    border-top: 0px;
-    padding: 2px 3px;
-    text-align: center;
-	vertical-align: middle !important;
-	outline: none !important;
-}
 
 .table-striped {
     > tbody {
@@ -149,17 +194,15 @@ table.matrix {
 			margin-top: 12px;
 			margin-bottom: 12px;
 			cursor: pointer;
+			display: flex;
+			align-items: center;
 
 			i.icon {
 				font-size: 0.875rem;
-				margin-right: 3px;
 				position: relative;
 				top: -1px;
 				&.toggle-open-icon {
 					cursor: pointer;
-					margin-right: 6px;
-					padding: 2px 0;
-					margin-left: 8px;
 					opacity: 0.66;
 				}
 			}
@@ -184,173 +227,39 @@ table.matrix {
 
 @import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/stacked-block-table.scss";
 
-.stacked-block-table {
+/** Below, add in any edits, styling, and override for specific CGAP tables or CGAP-specific styling **/
 
-	> .body {
+.result-table-detail .family-info-wrapper {
 
-		.s-block {
+	/* 
+		This applies primarily to stacked block tables within Case search detail panes.
+		Here, we usually have consistent height of stacked-table blocks.
+		So, to improve visual appeal, we can and should align the label to top edge.
+		This is done with an align-items override below.
+	*/
+	
+	.stacked-block-table {
 
-			&.biosample.stack-depth-1,
-			&.experiment.stack-depth-1 {
-				/** Decrease line height(s) to fit more lines in **/
-				> .name {
-					text-align: center;
-					line-height: 16px !important;
-					padding-top: 27px !important;
-					padding-bottom: 27px !important;
-					min-height: 70px;
+		> .body {
+	
+			.s-block {
+				&.stack-depth-1.individual,
+				&.stack-depth-2.libraries {
+					/* 
+						This applies primarily to stacked block tables within Case search detail panes.
+						Here, we usually have consistent height of stacked-table blocks.
+						So, to improve visual appeal, we can and should align the label to top edge.
+						This is done with an align-items override below.
+					*/
+
+					/* align-items: stretch; */ /* overrides default align-items: center */
 				}
+	
 			}
-
-			&.biosample.stack-depth-1 {
-				&:nth-child(2n-1){
-					@include gradient-x(rgba(255, 255, 255, 0), $expset-biosample-bg-odd, 0%, 12%);
-				}
-
-				&:nth-child(2n-2){
-					@include gradient-x(rgba(255, 255, 255, 0), $expset-biosample-bg-even, 0%, 12%);
-					> .experiments > .view-more-button {
-						@include gradient-x(rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), 0%, 25%);
-					}
-				}
-			}
-
-			&.experiment {
-				@include stacked-block-table-multi-size-block(2);
-				> .name.col-experiment {
-
-					text-overflow: ellipsis;
-					white-space: nowrap;
-					overflow-x: hidden;
-					font-weight: 500;
-
-					.mono-text,
-					.text-monospace {
-						text-shadow: 0 0 0;
-					}
-				}
-			}
-
-			&.experiment.stack-depth-1 {
-				@include gradient-x(rgba(255, 255, 255, 0), #f7f8f9, 0%, 12%);
-				> .experiments > .view-more-button {
-					@include gradient-x(rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), 0%, 25%);
-				}
-				> .name.double-line {
-					padding-top: 19px !important;
-    				padding-bottom: 19px !important;
-				}
-			}
-
+	
 		}
-
-		.s-block-list.files,
-		.s-block-list.file-groups {
-
-			> .s-block.file-group {
-
-				> .name.col-file-group {
-					white-space: nowrap;
-					padding: 8px 0 6px;
-					.multiple-files-checkbox-wrapper {
-						> .checkbox-for-multiple-files {
-							margin: 0;
-						}
-					}
-				}
-
-				// File rows within a group of files
-				> .s-block-list.files {
-					> .s-block.file:not(:first-child),
-					> .collapsible-s-block-ext > .s-block.file {
-						border-top-style: dotted;
-					}
-				}
-			}
-
-
-			
-
-			// All/any file rows
-			.s-block.file {
-				&:hover {
-					border-color: #888 !important;
-					+ .s-block.file {
-						border-top-color: #888;
-					}
-				}
-
-				&.single-item {
-					//line-height: 56px; /* + 14px padding = 70 == min height of parent block */
-					@include stacked-block-table-multi-size-block(2);
-				}
-
-				&:not(.single-item) {
-					@include stacked-block-table-single-row-block;
-				}
-
-				&.s-block.hide-name-on-block-hover {
-					> .name > .file-entry-table-checkbox {
-						transition: opacity .4s;
-						opacity: 1;
-					}
-
-					&:hover > .name > .file-entry-table-checkbox {
-						opacity: 0;
-					}
-				}
-
-				.name.col-file {
-					white-space: nowrap;
-
-					.in-stacked-table-button-container {
-						margin-right: 0;
-						margin-left: 2px;
-						display: inline-block;
-						&:first-of-type {
-							margin-left: 8px;
-						}
-						> .btn-xs {
-							line-height: 18px;
-							padding-top: 2px;
-							padding-right: 5px;
-							padding-left: 5px;
-							margin-top: -9px;
-							margin-bottom: -6px;
-							/** Override/hide the dropdown caret **/
-							&:after {
-								display: none;
-							}
-						}
-						> .dropdown-menu {
-							font-family: $font-family-base;
-						}
-						&:only-of-type {
-							margin-right: -35px;
-						}
-					}
-
-					&.has-checkbox {
-						padding-left: 24px; /* default: 12px */
-						padding-right: 24px;
-						> .file-entry-table-checkbox {
-							position: absolute;
-							top: 50%;
-							left: 6%;
-							margin-top: -6px;
-						}
-					}
-
-				}
-
-
-
-			}
-
-		}
-
+	
 	}
-
 }
 
 

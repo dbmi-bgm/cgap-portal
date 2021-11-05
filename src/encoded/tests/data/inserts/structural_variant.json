@@ -1,0 +1,22 @@
+[
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "shared",
+        "uuid": "4609fd8e-067b-48a0-aef3-0268d4073b56",
+        "CHROM": "1",
+        "START": 12000,
+        "END": 14250,
+        "SV_TYPE": "DEL"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "shared",
+        "uuid": "4609fd8e-067b-48a0-aef3-0268d4073b57",
+        "CHROM": "X",
+        "START": 20150,
+        "END": 33715,
+        "SV_TYPE": "DUP"
+    } 
+]

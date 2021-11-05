@@ -1,3 +1,69 @@
+/** N.B. Typography is overriden in _typography.scss, not this file **/
+
+/**************************************
+ *********** Utility Classes **********
+ **************************************/
+
+
+$margin-util-sizes: 0, 1, 2, 3, 4, 5, 6, 7, 8;  		// * 10px
+$margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
+
+
+// Taken largely from bootstrap / spacing.scss
+// Overrides ONLY mb-, mt-, pb-, pt-, ml-, mr-, pl-, and pr- util classnames to use
+// more fine-grained increments of _pixels-at-default-zoom_ so that e.g. mr-16 is equivalent to having margin-right: 16px at default zoom.
+@each $breakpoint in map-keys($grid-breakpoints) {
+	@include media-breakpoint-up($breakpoint) {
+	  	$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+  
+	  	@each $prop, $abbrev in (margin: m, padding: p) {
+			@each $util-size in $margin-util-sizes {
+				.#{$abbrev}t#{$infix}-#{$util-size} {
+					#{$prop}-top: $util-size * 0.625rem !important;
+				}
+				.#{$abbrev}r#{$infix}-#{$util-size} {
+					#{$prop}-right: $util-size * 0.625rem !important;
+				}
+				.#{$abbrev}b#{$infix}-#{$util-size} {
+					#{$prop}-bottom: $util-size * 0.625rem !important;
+				}
+				.#{$abbrev}l#{$infix}-#{$util-size} {
+					#{$prop}-left: $util-size * 0.625rem !important;
+				}
+
+				@each $util-mini-size in $margin-util-sizes-mini {
+					.#{$abbrev}t#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-top: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
+					}
+					.#{$abbrev}r#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-right: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
+					}
+					.#{$abbrev}b#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-bottom: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
+					}
+					.#{$abbrev}l#{$infix}-#{$util-size}#{$util-mini-size} {
+						#{$prop}-left: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
+					}
+				}
+
+			}
+
+		}
+
+
+	}
+}
+
+/**************************************
+ ************* Text Styles ************
+ **************************************/
+
+.text-muted {
+	/* Default was gray-600, which is same as text-secondary. Making text-muted a little lighter */
+	color: $gray-500 !important;
+}
+
+
 /**************************************
  ************ Button Styles ***********
  **************************************/
@@ -16,7 +82,7 @@
 /** Extending Bootstrap button w/ rounded & ext-padding class **/
 /** btn-xs was removed in Bootstrap v4 so we recreate it here **/
 .btn.btn-xs {
-    @include button-size(1px, 5px, 0.825rem, 1.5, $border-radius-small);
+    @include button-size(1px, 5px, 0.825rem, 1.5, $border-radius-sm);
     font-weight: 400;
     padding-top: 2px;
     //> i.icon {
@@ -56,6 +122,49 @@
             margin-top: -1px;
         }
     }
+	&.btn-lg {
+        padding-right: 29px;
+    }
+}
+
+
+
+// /* Except if is a split button -- */
+// .dropdown.btn-group > .dropdown-toggle.btn {
+// 	padding-right: 20px;
+// 	&.btn-sm {
+// 		padding-right: 18px;
+// 	}
+// }
+
+/* Copy of Bootstrap's own SCSS adjusted for react-bootstrap's DropdownButton which is .btn wrapped in div.dropdown */
+.btn-group {
+	// Prevent double borders when buttons are next to each other
+	> div.dropdown:not(:first-child) > .btn {
+	  margin-left: -$btn-border-width;
+	}
+  
+	// Reset rounded corners
+	> div.dropdown:not(:last-child) > .btn:not(.dropdown-toggle) {
+	  @include border-right-radius(0);
+	}
+  
+	> div.dropdown:not(:first-child) > .btn {
+	  @include border-left-radius(0);
+	}
+  }
+  
+/* Copy of Bootstrap's own SCSS adjusted for react-bootstrap's DropdownButton which is .btn wrapped in div.dropdown */
+.btn-group-sm > .dropdown > .btn { @extend .btn-sm; }
+.btn-group-lg > .dropdown > .btn { @extend .btn-lg; }
+
+/* Override sizing of btn-sm button re: our font */
+.btn.btn-sm {
+	padding-bottom: 4px;
+	> i.icon {
+		// Center icons better within .btn-sm re: our fontface/height/etc
+		transform: translate(0, 1px);
+	}
 }
 
 
@@ -99,9 +208,89 @@
 
     .card-header,
     .card-footer {
+        // TODO: Maybe there's bootstrap var for header/footer-bg?
         /* Original value: calc(.25rem - 1px) calc(.25rem - 1px) 0 0; */
         background-color: $card-bg;
     }
 
 }
+
+/**************************************
+ ************* Popovers ***************
+ **************************************/
+
+
+// Done here instead of overriding $popover-max-width since $popover-max-width set using
+// px values and we likely want to keep that as fallback.
+
+.popover {
+    
+    > .popover-body {
+        /* Limit height & make scrollable if necessary */
+        max-height: 50vh;
+        overflow: auto;
+    }
+
+    @include media-breakpoint-up(lg){
+        max-width: 45vw; /* increase from default ~276px */
+        box-shadow: 0px 0px 36px #0004;
+        > .popover-body {
+            max-height: 35vh; /* Limit height further */
+        }
+    }
+}
+
+
+/**************************************
+ ************ Modal Stuff *************
+ **************************************/
+
+
+.modal-dialog {
+
+	padding-left: 15px;
+	padding-right: 15px;
+
+	.modal-header {
+		.modal-title {
+			/* Unset default .h1-.h6 styling of bottom+top margin. */
+			margin-top: 0;
+			margin-bottom: 0;
+
+			&.h4 + button.close {
+				/* Default size for Modal.Title is h4; increase close button icon size (experimental) */
+				font-size: 1.8em;
+			}
+		}
+	}
+
+	.modal-content {
+
+		.modal-body p {
+			font-family: inherit;
+		}
+
+	}
+}
+
+div[role="dialog"] {
+
+	> .modal {
+
+		> .modal-dialog {
+
+			/* Re-create some modern Bootstrap v4 effects, e.g. vertical centering */
+			display: flex;
+			align-items: center;
+			height: 100%;
+
+			> .modal-content {
+				width: 100%;
+			}
+
+		}
+
+	}
+}
+
 

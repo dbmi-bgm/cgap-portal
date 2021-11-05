@@ -1,9 +1,12 @@
 import pytest
 import re
+import json
+from copy import deepcopy
 
 from pkg_resources import resource_listdir
 from snovault import COLLECTIONS, TYPES
 from snovault.schema_utils import load_schema
+from ..commands.order_schema_columns_and_facets import order_schema_columns_and_facets
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
@@ -127,7 +130,7 @@ def camel_case(name):
 def pluralize(name):
     name = name.replace('_', '-')
     # deal with a few special cases explicitly
-    specials = ['file', 'quality-metric', 'summary-statistic', 'workflow-run']
+    specials = ['file', 'quality-metric', 'summary-statistic', 'workflow-run', 'note']
     for sp in specials:
         if name.startswith(sp) and re.search('-(set|flag|format|type)', name) is None:
             return name.replace(sp, sp + 's')
@@ -146,15 +149,14 @@ def pluralize(name):
 def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
 
     abstract = [
-        'microscope_setting.json',
-        'experiment.json',
         'file.json',
         'individual.json',
         'quality_metric.json',
-        'treatment.json',
+        'note.json',
         'workflow_run.json',
         'user_content.json',
-        'evidence.json'
+        'evidence.json',
+        'higlass_view_config.json'
     ]
 
     loaded_schema = load_schema('encoded:schemas/%s' % schema)
@@ -219,7 +221,7 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
                 'user.json', 'project.json', 'institution.json', 'organism.json',
                 'page.json',
                 'static_section.json', 'badge.json', 'tracking_item.json',
-                'file_format.json', 'experiment_type.json', 'higlass_view_config.json'
+                'file_format.json', 'experiment_type.json'
             ]
             for prop in shared_properties:
                 if schema == 'experiment.json':
@@ -255,9 +257,9 @@ def verify_mixins(loaded_schema, master_mixins):
                 assert mixin_field[key] == schema_field[key]
 
 
-def test_linkTo_saves_uuid(root, submitter, institution):
-    item = root['users'][submitter['uuid']]
-    assert item.properties['submits_for'] == [institution['uuid']]
+def test_linkTo_saves_uuid(root, bgm_user, institution):
+    item = root['users'][bgm_user['uuid']]
+    assert item.properties['institution'] == institution['uuid']
 
 
 def test_mixinProperties():
@@ -280,3 +282,42 @@ def test_changelogs(testapp, registry):
             res = testapp.get(changelog)
             assert res.status_int == 200, changelog
             assert res.content_type == 'text/markdown'
+
+@pytest.mark.parametrize('schema', SCHEMA_FILES)
+def test_facets_and_columns_orders(schema, testapp):
+    '''This tests depends on Python 3.6's ordered dicts'''
+
+    loaded_schema = load_schema('encoded:schemas/%s' % schema)
+
+    if "properties" in loaded_schema and ("columns" in loaded_schema or "facets" in loaded_schema):
+        loaded_schema_copy = deepcopy(loaded_schema)
+        loaded_schema_copy = order_schema_columns_and_facets(loaded_schema_copy)
+        failed = False
+
+        if "columns" in loaded_schema:
+            failed = json.dumps(loaded_schema["columns"]) != json.dumps(loaded_schema_copy["columns"])
+
+        if not failed and "facets" in loaded_schema:
+            # Avoid running if already failed.
+            failed = json.dumps(loaded_schema["facets"]) != json.dumps(loaded_schema_copy["facets"])
+
+        assert not failed, '''
+Order of facets or columns in %s file does not match the ordering based on "order" values. \
+Please run `poetry run order-schema-columns-and-facets`. \
+
+If you don't want this test to fail ever again, please consider adding the follow as "pre-commit" \
+file in your .git/hooks directory in order to automatically amend your commits with proper order when \
+schemas change.
+
+>    #!/bin/sh
+>
+>    CHANGED=`git diff HEAD@{0} --stat -- $GIT_DIR/../src/encoded/schemas/ | wc -l`
+>    if [ $CHANGED -gt 0 ];
+>    then
+>        echo "Schemas have changed! Sorting columns and facets..."
+>        python3 $GIT_DIR/../src/encoded/commands/order_schema_columns_and_facets.py
+>        git add $GIT_DIR/../src/encoded/schemas/
+>    fi
+
+        ''' % schema
+        

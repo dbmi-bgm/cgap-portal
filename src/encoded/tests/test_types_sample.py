@@ -27,7 +27,7 @@ def sample_one(project, institution):
     return {
         'project': project['@id'],
         'institution': institution['@id'],
-        'specimen_type': 'blood',
+        'specimen_type': 'peripheral blood',
         'date_received': '2018-12-1'
     }
 
@@ -38,16 +38,6 @@ def sample_two(project, institution):
         'project': project['@id'],
         'institution': institution['@id'],
         'specimen_type': 'saliva',
-        'date_received': '2015-12-7'
-    }
-
-
-@pytest.fixture
-def sample_invalid_specimen_type(project, institution, MIndividual):
-    return {
-        'project': project['@id'],
-        'institution': institution['@id'],
-        'specimen_type': 'skin',
         'date_received': '2015-12-7'
     }
 
@@ -67,16 +57,14 @@ def test_post_valid_samples(testapp, sample_one, sample_two):
     testapp.post_json('/sample', sample_two, status=201)
 
 
-def test_post_invalid_samples(testapp, sample_invalid_specimen_type, sample_no_project):
+def test_post_invalid_samples(testapp, sample_no_project):
     testapp.post_json('/sample', sample_no_project, status=422)
-    # testapp.post_json('/sample', sample_invalid_specimen_type, status=422)
 
 
 def test_post_valid_patch_error(testapp, sample_one):
     res = testapp.post_json('/sample', sample_one, status=201).json['@graph'][0]
     testapp.patch_json(res['@id'], {'date_received': '12-3-2003'}, status=422)
     testapp.patch_json(res['@id'], {'project': 'does_not_exist'}, status=422)
-    # testapp.patch_json(res['@id'], {'specimen_type': 'hair'}, status=422)
 
 
 def test_sample_individual_revlink(testapp, sample_one, MIndividual):
@@ -137,3 +125,11 @@ def test_sample_processing_pedigree(testapp, sample_proc_fam):
         expected_value = expected_values[a_sample['individual']]
         for a_key in expected_value:
             assert a_sample[a_key] == expected_value[a_key]
+
+
+def test_sample_processing_pedigree_bam_location(testapp, sample_proc_fam, proband_processed_file):
+    """This is an end to end test for calculating relationships Test for roles"""
+    bam_upload_key = proband_processed_file['upload_key']
+    calculated_values = sample_proc_fam['samples_pedigree']
+    proband_info = [i for i in calculated_values if i['individual'] == 'GAPIDPROBAND'][0]
+    assert proband_info['bam_location'] == bam_upload_key

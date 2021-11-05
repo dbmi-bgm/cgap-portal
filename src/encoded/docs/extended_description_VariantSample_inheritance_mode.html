@@ -1,0 +1,50 @@
+
+
+<h5>Inheritance mode values are candidate labels based on novocaller, Cmp-Het caller, or GATK genotype assignments.</h5>
+
+
+<p><b>de novo calls:</b></p>
+
+<ul><li> strong candidate: Variants with novocaller posterior probability > 0.9.
+<li> medium candidate: Variants with 0.9 > novocaller posterior probability > 0.1.
+<li> weak candidate: Autosomal variants for which GATK genotype assignments are (Mother: 0/0, Father: 0/0, Child 0/1) and neither parent has 3 or more reads supporting alternative allele, but novocaller posterior probability &lt; 0.1.
+<li> chrXY candidate: Variants on chrX or chrY, for which GATK genotype assignments are (Mother: 0/0, Father: 0/0, Child 0/1) and neither parent has 3 or more reads supporting alternative allele, These variants are not assigned novocaller posterior probability since since these chromosomes do not meet the model assumptions.
+<li> See Documentation for Details.
+</ul>
+
+<p>Variants of higher potential clinical relevance are assigned one of the following based on GATK assignments:</p>
+<ul>
+<li> <b> Dominant (Paternal)</b>: Father: 0/1, Mother: 0/0, Child 0/1.
+<li> <b> Dominant (Maternal)</b>: Father: 0/0, Mother: 0/1, Child 0/1.
+<li> <b> Recessive</b>: Father: 0/1, Mother: 0/1, Child 1/1.
+<li> <b> X-linked Recessive</b>, <b>X-linked Dominant (Maternal)</b>: Father: 0, Mother: 0/1, Son 1.
+<li> <b> X-linked dominant (Paternal)</b>: Father: 1, Mother: 0/0, Son 1.
+<li> <b> Y-linked dominant</b>: Father: 1, Son 1.
+<li> <b> Loss of Heterozygosity</b>: Father: 0/1, Mother: 0/0, Child 1/1.
+<li> <b> Loss of Heterozygosity</b>: Father: 0/0, Mother: 0/1, Child 1/1.
+</ul>
+
+<p><b>Compound Heterozygous calls</b>:</p>
+<ul>
+<li> Two heterozygous variants are classified as Compound Heterozygous candidates if they are on the same gene.
+<li>  Phasing: Two variants are classified as <b>Phased</b> if the pair of variants are confirmed to be coming from the two parents ([Mother: 0/1, Father: 0/0, Child 0/1] and [Mother: 0/0, Father: 0/1, Child 0/1]). Other Compound Heterozygous candidates are classified as <b>Unphased</b>.
+<li> <b>Variant severity</b>: A variant is considered severe if it has a SpliceAI Delta Score >0.8 (S); a Clinvar interpretation of Pathogenic or Likely Pathogenic (C); or a HIGH or MODERATE Impact rating (Splice acceptor variant, Splice donor variant, Stop gained, Frameshift variant, Stop lost, Start lost, Transcript amplification, Inframe insertion, Inframe deletion, Missense variant, Protein altering variant).
+<li> Pair strength: Compound Heterozygous pairs are classified based on the severity of the two variants (HIGH, MODERATE, S, or C).
+<ul>
+<li> <b>strong pair</b>: both variants are one of (HIGH, MODERATE, S, or C).
+<li> <b>medium pair</b>: one of the variants are one of (HIGH, MODERATE, S, or C).
+<li> <b>weak pair</b>: neither of the variants are (HIGH, MODERATE, S, or C).
+</ul>
+<li> See Documentation for Details.
+</ul>
+
+<p><b>Low relevance</b>: </p>
+<ul>
+<li> Variants on multiallelic sites (e.g. G, T, A in different individuals) are not assigned inheritance mode values, except possibly compound heterozygous.
+<li> Variants with missing calls (./.) or calls that mismatch the sex (0/1 on chrX for a male) are not assigned inheritance mode values.
+<li> Variants with genotypes that do not meet any of the high relevant criteria above are not assigned GATK-based labels.
+</ul>
+
+<p><b>Ambiguous</b>: </p>
+
+<p>If a sample is submitted to CGAP with the sex indicated as "U" or "Unknown", then autosome inheritance modes and genotypes are calculated normally but sex-linked inheritance modes and genotypes cannot be properly determined. These will be marked "Ambiguous".</p>

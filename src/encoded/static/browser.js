@@ -18,7 +18,7 @@ import { BrowserFeat } from '@hms-dbmi-bgm/shared-portal-components/es/component
  * If no user_details provided, assume not logged in and unset JWT, then continue.
  * User info would have been obtained on login & contains user_actions (only obtained through /login).
  */
-function reloadIfBadUserInfo(removeJWTIfNoUserDetails = false){
+function updateSessionInfo(){
 
     let props;
 
@@ -26,30 +26,22 @@ function reloadIfBadUserInfo(removeJWTIfNoUserDetails = false){
     // keep <script data-prop-type="user_details"> in <head>, before <script data-prop-type="inline">, in app.js
     // so is available before this JS (via bundle.js)
     try {
-        props = App.getRenderedPropValues(document, 'user_details');
+        props = getRenderedPropValues(document, 'user_info');
     } catch(e) {
         console.error(e);
         return false;
     }
 
-    const { user_details } = props;
+    const { user_info } = props;
+    const { details: { email } = {} } = user_info || {};
 
-    if (user_details && typeof user_details.email === 'string'){
-        // We have userDetails from server-side; keep client-side in sync (in case updated via/by back-end / dif client at some point)
-        var savedDetails = JWT.saveUserDetails(user_details);
-        if (savedDetails){
-            // We're fully logged in w/ up-to-date user details from backend
-            return false;
-        }
-        // else - localStorage.user_info doesn't exist, we don't have user_actions to resume session, so delete cookie & reload this page
-        // as non-signed-in user.
-        // Re: other session data - JWT token (stored as cookie) will match session as was used to auth server-side.
-        // user_actions will be left over in localStorage from initial login request (doesn't expire)
+    if (email && typeof email === 'string'){
+        // We have user_info from server-side; keep client-side in sync (in case updated via/by back-end / dif client at some point)
+        JWT.saveUserInfoLocalStorage(user_info);
+    } else {
+        // Ensure no lingering userInfo or token in localStorage or cookies
         JWT.remove();
-        return true;
     }
-    JWT.remove(); // Ensure no lingering userInfo or token in localStorage or cookies
-    return false;
 }
 
 // Treat domready function as the entry point to the application.
@@ -57,37 +49,73 @@ function reloadIfBadUserInfo(removeJWTIfNoUserDetails = false){
 // point should be definitions.
 if (typeof window !== 'undefined' && window.document && !window.TEST_RUNNER) {
 
-    if (reloadIfBadUserInfo()){
-        // TODO maybe: Show an 'error, please wait' + App.authenticateUser (try to make static).
-        window.location.reload(); // Exits
-    }
+    updateSessionInfo();
 
     domready(function(){
         console.log('Browser: ready');
 
         // Update Redux store from Redux store props that've been rendered server-side
         // into <script data-prop-name={ propName }> elements.
-        var initialReduxStoreState = App.getRenderedProps(document);
+        const initialReduxStoreState = getRenderedProps(document);
         delete initialReduxStoreState.user_details; // Stored into localStorage.
         store.dispatch({ 'type' : initialReduxStoreState });
 
         const AppWithReduxProps = connect(mapStateToProps)(App);
-        let app;
 
         try {
-            app = ReactDOM.hydrate(<Provider store={store}><AppWithReduxProps /></Provider>, document);
+            ReactDOM.hydrate(<Provider store={store}><AppWithReduxProps /></Provider>, document);
         } catch (e) {
             console.error("INVARIANT ERROR", e); // To debug
             // So we can get printout and compare diff of renders.
-            app = require('react-dom/server').renderToString(<Provider store={store}><AppWithReduxProps /></Provider>);
+            window.app = require('react-dom/server').renderToString(<Provider store={store}><AppWithReduxProps /></Provider>);
         }
 
         // Set <html> class depending on browser features
         BrowserFeat.setHtmlFeatClass();
-
-        // Simplify debugging
-        window.app = app;
-        window.React = React;
     });
 
 }
+
+
+
+/**
+ * Collects prop values from server-side-rendered HTML
+ * to be re-fed into Redux store.
+ *
+ * @param {HTMLElement} document - HTML DOM element representing the document.
+ * @param {string} [filter=null] - If set, filters down prop fields/values collected to only one(s) defined.
+ * @returns {Object} Object keyed by field name with collected value as value.
+ */
+function getRenderedPropValues(document, filter = null){
+    const returnObj = {};
+    let script_props;
+    if (typeof filter === 'string'){
+        script_props = document.querySelectorAll('script[data-prop-name="' + filter + '"]');
+    } else {
+        script_props = document.querySelectorAll('script[data-prop-name]');
+    }
+    script_props.forEach(function(elem){
+        const prop_name = elem.getAttribute('data-prop-name');
+        let elem_value = elem.text;
+        const elem_type = elem.getAttribute('type') || '';
+        if (elem_type === 'application/json' || elem_type.slice(-5) === '+json') {
+            elem_value = JSON.parse(elem_value);
+        }
+        returnObj[prop_name] = elem_value;
+    });
+    return returnObj;
+}
+
+/**
+ * Runs `App.getRenderedPropValues` and adds `href` key value from canonical link element.
+ *
+ * @param {HTMLElement} document - HTML DOM element representing the document.
+ * @param {string} [filter=null] - If set, filters down prop fields/values collected to only one(s) defined.
+ * @returns {Object} Object keyed by field name with collected value as value.
+ */
+function getRenderedProps(document, filter = null) {
+    const returnObj = getRenderedPropValues(document, filter);
+    returnObj.href = document.querySelector('link[rel="canonical"]').getAttribute('href'); // Ensure the initial render is exactly the same
+    return returnObj;
+}
+

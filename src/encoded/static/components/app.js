@@ -12,12 +12,14 @@ import jsonScriptEscape from '../libs/jsonScriptEscape';
 import { content_views as globalContentViews, portalConfig, getGoogleAnalyticsTrackingID, analyticsConfigurationOptions } from './globals';
 import ErrorPage from './static-pages/ErrorPage';
 import { NavigationBar } from './navigation/NavigationBar';
+import { NotLoggedInAlert } from './navigation/components/LoginNavItem';
 import { Footer } from './Footer';
 import { store } from './../store';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse, WindowEventDelegator } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Schemas, SEO, typedefs, navigate } from './util';
+import { responsiveGridState } from './util/layout';
 import { requestAnimationFrame as raf } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 
 import { PageTitleSection } from './PageTitleSection';
@@ -70,65 +72,13 @@ export default class App extends React.PureComponent {
      * @returns {void} Nothing
      */
     static scrollTo() {
-        var { hash } = window.location;
+        const { hash } = window.location;
         if (hash && document.getElementById(hash.slice(1))) {
             window.location.replace(hash);
         } else {
             window.scrollTo(0, 0);
         }
     }
-
-    /**
-     * Used in browser.js to collect prop values from server-side-rendered HTML
-     * and then re-feed them into Redux store.
-     *
-     * @param {HTMLElement} document - HTML DOM element representing the document.
-     * @param {string} [filter=null] - If set, filters down prop fields/values collected to only one(s) defined.
-     * @returns {Object} Object keyed by field name with collected value as value.
-     */
-    static getRenderedPropValues(document, filter = null){
-        var returnObj = {}, script_props;
-        if (typeof filter === 'string'){
-            script_props = document.querySelectorAll('script[data-prop-name="' + filter + '"]');
-        } else {
-            script_props = document.querySelectorAll('script[data-prop-name]');
-        }
-        _.forEach(script_props, function(elem){
-            const prop_name = elem.getAttribute('data-prop-name');
-            if (filter && Array.isArray(filter)){
-                if (filter.indexOf(prop_name) === -1){
-                    return;
-                }
-            }
-            let elem_value = elem.text;
-            const elem_type = elem.getAttribute('type') || '';
-            if (elem_type === 'application/json' || elem_type.slice(-5) === '+json') {
-                elem_value = JSON.parse(elem_value);
-            }
-            returnObj[prop_name] = elem_value;
-        });
-        return returnObj;
-    }
-
-    /**
-     * Runs `App.getRenderedPropValues` and extends with `{ href }` from canonical link element.
-     *
-     * @param {HTMLElement} document - HTML DOM element representing the document.
-     * @param {string} [filters=null] - If set, filters down prop fields/values collected to only one(s) defined.
-     * @returns {Object} Object keyed by field name with collected value as value.
-     */
-    static getRenderedProps(document, filters = null) {
-        return _.extend(App.getRenderedPropValues(document, filters), {
-            'href' : document.querySelector('link[rel="canonical"]').getAttribute('href') // Ensure the initial render is exactly the same
-        });
-    }
-
-    /**
-     * @property {boolean} initialSession - Whether user is logged in upon initial render. Only passed in on server-side render.
-     */
-    static defaultProps = {
-        'initialSession' : null
-    };
 
     static debouncedOnNavigationTooltipRebuild = _.debounce(ReactTooltip.rebuild, 500);
 
@@ -139,13 +89,13 @@ export default class App extends React.PureComponent {
     constructor(props){
         super(props);
         _.bindAll(this, 'currentAction', 'loadSchemas',
-            'setIsSubmitting', 'stayOnSubmissionsPage', 'authenticateUser',
-            'updateUserInfo', 'confirmNavigation', 'navigate',
+            'setIsSubmitting', 'stayOnSubmissionsPage',
+            'updateAppSessionState', 'confirmNavigation', 'navigate',
             // Global event handlers. These will catch events unless they are caught and prevented from bubbling up earlier.
             'handleClick', 'handleSubmit', 'handlePopState', 'handleBeforeUnload'
         );
 
-        const { context, initialSession } = props;
+        const { context } = props;
 
         Alerts.setStore(store);
 
@@ -158,43 +108,36 @@ export default class App extends React.PureComponent {
         this.historyEnabled = !!(typeof window != 'undefined' && window.history && window.history.pushState);
 
         // Todo: Migrate session & user_actions to redux store?
-        let session = false;
-        if (typeof initialSession === 'boolean'){
-            // Only provided from server
-            session = initialSession;
-        } else {
-            // Only available client-side. Same cookie sent to server-side to authenticate initialSession, so it must match.
-            session = !!(JWT.get('cookie'));
-        }
+        const session = !!(JWT.getUserInfo());
 
         // Save navigate fxn and other req'd stuffs to GLOBAL navigate obj.
         // So that we may call it from anywhere if necessary without passing through props.
-        navigate.setNavigateFunction(this.navigate);
+        navigate.initializeFromApp(this);
         navigate.registerCallbackFunction(Alerts.updateCurrentAlertsTitleMap.bind(this, null));
-
-        if (context.schemas) Schemas.set(context.schemas);
 
         /**
          * Initial state of application.
          *
          * @type {Object}
-         * @property {boolean}  state.session       Whether user is currently logged in or not. User details are retrieved using JWT utility.
-         * @property {Object[]} state.schemas       Current schemas; null until AJAX-ed in (may change).
-         * @property {boolean}  state.isSubmitting  Whether there's a submission in progress. If true, alert is shown to prevent user from accidentally navigating away.
-         * @property {boolean}  state.mounted       Whether app has been mounted into DOM in browser yet.
+         * @property {boolean}         state.session               Whether user is currently logged in or not. User details are retrieved using JWT utility.
+         * @property {Object[]}        state.schemas               Current schemas; null until AJAX-ed in (may change).
+         * @property {string|Object}   state.isSubmitting          Whether there's a submission in progress. If string, browser alert is shown to prevent user from accidentally navigating away. If object & modal key has a value, that JSX will be rendered when isSubmittingModalOpen = true
+         * @property {boolean}         state.mounted               Whether app has been mounted into DOM in browser yet.
+         * @property {boolean}         state.isSubmittingModalOpen Whether or not a submitting modal is currently open (rendered in BodyElement)
          */
         this.state = {
             session,
-            'schemas'           : context.schemas || null,
-            'isSubmitting'      : false,
-            'mounted'           : false
+            'schemas'                     : context.schemas || null,
+            'isSubmitting'                : false,
+            'mounted'                     : false,
+            'isSubmittingModalOpen'       : false,
         };
 
         // Holds a reference to current navigation request for `context`.
         // (App works as a single-page-application (SPA))
         this.currentNavigationRequest = null;
 
-        console.info("App Initial State: ", this.state);
+        if (!isServerSide()) console.info("App Initial State: ", this.state);
     }
 
     /**
@@ -213,6 +156,11 @@ export default class App extends React.PureComponent {
         const { href, context } = this.props;
         const { session } = this.state;
 
+        // This won't refresh current page.
+        // And preserves contents of browser view if are on edit page or similar.
+        // Individual components may add/remove their own session expired callbacks and refresh page (or selves) if needed.
+        ajax.AJAXSettings.addSessionExpiredCallback(this.updateAppSessionState);
+
         // The href prop we have was from serverside. It would not have a hash in it, and might be shortened.
         // Here we grab full-length href from window and then update props.href (via Redux), if it is different.
         const windowHref = (window && window.location && window.location.href) || href;
@@ -220,7 +168,7 @@ export default class App extends React.PureComponent {
             store.dispatch({ 'type' : { 'href' : windowHref } });
         }
 
-        // Load up analytics & perform initial pageview track
+        // ANALYTICS INITIALIZATION; Sets userID (if any), performs initial pageview track
         const analyticsID = getGoogleAnalyticsTrackingID(href);
         if (analyticsID){
             analytics.initializeGoogleAnalytics(
@@ -234,9 +182,6 @@ export default class App extends React.PureComponent {
             );
         }
 
-        // Authenticate user if not yet handled server-side w/ cookie and rendering props.
-        this.authenticateUser();
-
         // Load schemas into app.state, access them where needed via props (preferred, safer) or this.context.
         this.loadSchemas();
 
@@ -248,7 +193,8 @@ export default class App extends React.PureComponent {
                 window.history.replaceState(null, '', window.location.href);
             }
             // Avoid popState on load, see: http://stackoverflow.com/q/6421769/199100
-            var register = window.addEventListener.bind(window, 'popstate', this.handlePopState, true);
+            // We don't use WindowEventDelegator here since we intend to `useCapture` to prevent default browser handling from being triggered for this.
+            const register = window.addEventListener.bind(window, 'popstate', this.handlePopState, true);
             if (window._onload_event_fired) {
                 register();
             } else {
@@ -301,6 +247,7 @@ export default class App extends React.PureComponent {
             // Emit event from our window object to notify that fourfront JS has initialized.
             // This is to be used by, e.g. submissions view which might control a child window.
             window.dispatchEvent(new Event('fourfrontinitialized'));
+
             // CURRENT: If we have parent window, post a message to it as well.
             if (window.opener) window.opener.postMessage({ 'eventType' : 'fourfrontinitialized' }, '*');
 
@@ -329,19 +276,41 @@ export default class App extends React.PureComponent {
                 }, 3000);
             }
 
-            // Set Alert if not on homepage and not logged in.
+            // Set Alert if not on homepage and not logged in. This 'if' logic will likely change later
+            // especially if have multiple 'for-public' pages like blog posts, news, documentation, etc.
             if (!session && pathname != "/") {
-                const onAlertLoginClick = function(e) {
-                    // TODO;
-                };
+                // MAYBE TODO next time are working on shared-portal-components (SPC) repository:
+                // Put this Alert into SPC as a predefined/constant export, then cancel/remove it (if active) in the callback function
+                // upon login success ( https://github.com/4dn-dcic/shared-portal-components/blob/master/src/components/navigation/components/LoginController.js#L111 )
+                Alerts.queue(NotLoggedInAlert);
+            }
+
+            // Set Alert if user initializes app between 330-830a ET (possibly temporary)
+            // 12-4 am in ET is either 4am-8am or 5am-9am UTC, depending on daylight savings.
+            const currTime = new Date();
+            const currUTCHours = currTime.getUTCHours();
+            const currUTCMinutes = currTime.getUTCMinutes();
+            const showAlert = (
+                ((currUTCHours >= 4 || (currUTCHours === 3 && currUTCMinutes >= 30))
+                && currUTCHours <= 7 || (currUTCHours === 8 && currUTCMinutes <= 30))
+            );
+            if (showAlert) {
+                const startTime = new Date();
+                startTime.setUTCHours(3);
+                startTime.setUTCMinutes(30);
+                startTime.setUTCSeconds(0);
+                const endTime = new Date();
+                endTime.setUTCHours(8);
+                endTime.setUTCMinutes(30);
+                endTime.setUTCSeconds(0);
+                let timezoneOffset = endTime.getTimezoneOffset() / 60;
+                timezoneOffset = 0 - timezoneOffset;
+                if (timezoneOffset > 0) { timezoneOffset = "+" + timezoneOffset; }
                 Alerts.queue({
-                    "title" : "Not Logged In",
-                    // We can't really put in actual link to login since need to communicate w. LoginController.
-                    // We could eventually move LoginController to wrap BodyElement or something (and move this into there)
-                    // .....or maybe have onClick func that finds and triggers a click mouse event on login button....
-                    "message" : <span>You are currently browsing as guest, please login if you have an account.</span>,
-                    "style" : "warning",
-                    "navigateDisappearThreshold" : 2
+                    "title" : "Scheduled Daily Maintenance",
+                    "style": "warning",
+                    "message": `CGAP is running its daily scheduled maintenance and data indexing. \
+                                Some data might not show up between ${startTime.toLocaleTimeString()} and ${endTime.toLocaleTimeString()} (UTC${timezoneOffset}).`
                 });
             }
 
@@ -413,8 +382,9 @@ export default class App extends React.PureComponent {
 
     /**
      * If no schemas yet stored in our state, we AJAX them in from `/profiles/?format=json`.
+     * Performed after/outside initial page render, because it's a lot of data and sending down alongside
+     * or within html response would significantly increase time to page render.
      *
-     * @public
      * @param {function} [callback=null] - If defined, will be executed upon completion of load, with schemas passed in as first argument.
      * @param {boolean} [forceFetch=false] - If true, will ignore any previously-fetched schemas and fetch new ones.
      * @returns {void}
@@ -429,6 +399,7 @@ export default class App extends React.PureComponent {
         }
         ajax.promise('/profiles/?format=json').then((data) => {
             if (object.isValidJSON(data)){
+                // Performed prior to state update, to be available globally immediately after state update.
                 Schemas.set(data);
                 this.setState({ 'schemas' : data }, () => {
                     // Rebuild tooltips because they likely use descriptions from schemas
@@ -467,8 +438,8 @@ export default class App extends React.PureComponent {
         // Ensure this is a plain click
         if (nativeEvent.which > 1 || nativeEvent.shiftKey || nativeEvent.altKey || nativeEvent.metaKey) return;
 
-        // Skip links with a data-bypass attribute.
-        if (target.getAttribute('data-bypass')){
+        // Skip links with a data-bypass attribute or with download attribute.
+        if (target.getAttribute('data-bypass') !== null || target.getAttribute('download') !== null){
             return false;
         }
 
@@ -632,55 +603,6 @@ export default class App extends React.PureComponent {
     }
 
     /**
-     * Grabs JWT from local cookie and, if not already authenticated or are missing 'user_actions',
-     * perform authentication via AJAX to grab user actions, updated JWT token, and save to localStorage.
-     *
-     * @deprecated (?) Since browser.js calls JWT.remove() + reloads as anonymous user
-     * @private
-     * @param {function} [callback=null] Optional callback to be ran upon completing authentication.
-     * @returns {void}
-     */
-    authenticateUser(callback = null){
-        const { session } = this.state;
-        const idToken = JWT.get();
-        const userInfo = JWT.getUserInfo();
-        const userActions = (userInfo && userInfo.user_actions) || null;
-
-        if (idToken && (!session || !userActions)){
-            // if JWT present, and session not yet set (from back-end), try to authenticate
-            // This is very unlikely due to us rendering re: session server-side. Mostly a remnant.
-            console.info('AUTHENTICATING USER; JWT PRESENT BUT NO STATE.SESSION OR USER_ACTIONS');
-            ajax.promise('/login', 'POST', { 'Authorization' : 'Bearer ' + idToken }, JSON.stringify({ 'id_token' : idToken }))
-                .then((response) => {
-                    if (response.code || response.status || response.id_token !== idToken) throw response;
-                    return response;
-                })
-                .then(
-                    (response) => {
-                        JWT.saveUserInfo(response);
-                        this.updateUserInfo(callback);
-                        analytics.event('Authentication', 'ExistingSessionLogin', {
-                            'eventLabel' : 'Authenticated ClientSide'
-                        });
-                    },
-                    (error) => {
-                        // error, clear JWT token from cookie & user_info from localStorage (via JWT.remove())
-                        // and unset state.session (via this.updateUserInfo())
-                        JWT.remove();
-                        this.updateUserInfo(callback);
-                    }
-                );
-            return idToken;
-        } else if (idToken && session && userActions){
-            console.info('User is logged in already, continuing session.');
-            analytics.event('Authentication', 'ExistingSessionLogin', {
-                'eventLabel' : 'Authenticated ServerSide'
-            });
-        }
-        return null;
-    }
-
-    /**
      * Tests that JWT is present along with user info and user actions, and if so, updates `state.session`.
      * Called by `authenticateUser` as well as Login.
      *
@@ -688,29 +610,34 @@ export default class App extends React.PureComponent {
      * @param {function} [callback=null] Optional callback to be ran upon completing authentication.
      * @returns {void}
      */
-    updateUserInfo(callback = null){
+    updateAppSessionState(callback = null){
         // get user actions (a function of log in) from local storage
         const userInfo  = JWT.getUserInfo();
         // We definitively use Cookies for JWT.
         // It can be unset via response headers from back-end.
-        const currentToken = JWT.get('cookie');
-        const session = !!(userInfo && currentToken); // cast to bool
+        // const currentToken = JWT.get('cookie');
+        const { session: existingSession } = this.state;
+        const nextSession = !!(userInfo); // cast to bool
 
-        this.setState(function({ session : existingSession }){
-            if (session === existingSession) {
-                return null;
-            }
+        if (nextSession === existingSession) {
+            return null;
+        }
+
+        this.setState({ "session": nextSession }, () => {
+            const { session } = this.state;
             if (session === false && existingSession === true){
                 Alerts.queue(Alerts.LoggedOut);
-                // Clear out remaining auth/JWT stuff from localStorage if any
+                // Clear out remaining auth/JWT stuff from localStorage if any.
                 JWT.remove();
+            } else if (session === true && existingSession === false){
+                // Remove lingering 'logged out' alerts if have logged in.
+                Alerts.deQueue([ Alerts.LoggedOut, NotLoggedInAlert ]);
             }
-            return { session };
-        }, () => {
             if (typeof callback === 'function'){
                 callback(session, userInfo);
             }
         });
+
     }
 
     /**
@@ -782,22 +709,50 @@ export default class App extends React.PureComponent {
      * @returns {boolean}
      */
     stayOnSubmissionsPage(nextHref = null) {
+        const { href } = this.props;
         const { isSubmitting } = this.state;
         // can override state in options
         // override with replace, which occurs on back button navigation
         if (isSubmitting){
-            var nextAction = this.currentAction(nextHref);
-            if (nextAction && ['edit', 'create', 'clone'].indexOf(nextAction) > -1){
+
+            // Allow if changing hash, since generally navigates around a view while preserving it.
+            const tHrefParts = url.parse(nextHref, false);
+            const pHrefParts = memoizedUrlParse(href);
+            const { path: tPath, search: tSearch } = tHrefParts; // Returns search: null if no query
+            const { path, search } = pHrefParts; // Returns search: "" if no query (b.c. memoizedUrlParse does query:true in its call to url.parse)
+
+            // Allow if only changing hash, since generally navigates around a view while preserving it.
+            if (path === tPath && (search || "") === (tSearch || "")) {
+                return false;
+            }
+
+            const nextAction = this.currentAction(nextHref);
+            if (nextAction && { 'edit':1, 'create':1, 'clone':1 }[nextAction]){
                 // Cancel out if we are "returning" to edit or create (submissions page) href.
                 return false;
             }
-            if (window.confirm('Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?')){
-                // we are no longer submitting
-                this.setIsSubmitting(false);
-                return false;
-            } else {
-                // stay
-                return true;
+
+            // If a custom modal is passed through in an object, use that to prompt user before navigating away
+            if (typeof isSubmitting === "object" && isSubmitting.modal && React.isValidElement(isSubmitting.modal)) {
+
+                // Feed navigation href to modal via prop
+                const modalClone = React.cloneElement(isSubmitting.modal, { href: nextHref });
+
+                this.setState({ isSubmitting: { modal: modalClone }, isSubmittingModalOpen: true });
+
+                return true; // Do not navigate yet
+
+            } else { // Render the browser confirm alert
+                const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
+
+                if (window.confirm(confirmMessage)){
+                    // we are no longer submitting
+                    this.setIsSubmitting(false);
+                    return false;
+                } else {
+                    // stay
+                    return true;
+                }
             }
         } else {
             return false;
@@ -897,7 +852,7 @@ export default class App extends React.PureComponent {
                 return false;
             }
 
-            this.currentNavigationRequest = ajax.fetch(targetHref, { 'cache' : options.cache === false ? false : true });
+            this.currentNavigationRequest = ajax.fetch(targetHref);
             // Keep a reference in current scope to later assert if same request instance (vs new superceding one).
             const currentRequestInThisScope = this.currentNavigationRequest;
             const timeout = new Timeout(App.SLOW_REQUEST_TIME);
@@ -915,10 +870,6 @@ export default class App extends React.PureComponent {
             currentRequestInThisScope
                 .then((response)=>{
                     console.info("Fetched new context", response);
-
-                    // Update `state.session` after (possibly) removing expired JWT. Backend does this via set cookie header.
-                    // Also, may have been logged out in different browser window so keep state.session up-to-date BEFORE a re-request
-                    this.updateUserInfo();
 
                     if (!object.isValidJSON(response)) { // Probably only if 500 server error or similar. Or link to xml or image etc.
                         // navigate normally to URL of unexpected non-JSON response so back button works.
@@ -980,6 +931,10 @@ export default class App extends React.PureComponent {
                         // If is explicit 404 (vs just 0 search results), pyramid will send it as 'code' property.
                         analytics.exception('Page Not Found - ' + targetHref);
                     }
+                }).then(function(){
+                    if (!options.replace && !options.dontScrollToTop) {
+                        App.scrollTo();
+                    }
                 });
 
             /**
@@ -994,7 +949,7 @@ export default class App extends React.PureComponent {
              * via its `target` property.
              */
             currentRequestInThisScope.catch((err)=>{
-                console.log('ERRR', err);
+                console.error('App Navigate Error -', err);
                 this.setState(function({ slowLoad }){
                     if (!slowLoad) return null;
                     return { 'slowLoad' : false };
@@ -1009,28 +964,30 @@ export default class App extends React.PureComponent {
                     fallbackCallback(err);
                 }
 
-                console.error('Error in App.navigate():', err);
-
-                if (err.status === 500){
+                if (err.code === 500){
                     analytics.exception('Server Error: ' + err.status + ' - ' + targetHref);
                 }
 
-                if (err.status === 404){
+                if (err.code === 404){
                     analytics.exception('Page Not Found - ' + targetHref);
                 }
 
-                if (err.message === 'HTTPForbidden'){
+                if (err.code === 403){
                     // An error may be thrown in Promise response chain with this message ("HTTPForbidden") if received a 403 status code in response
                     if (typeof callback === 'function'){
                         callback(err);
                     }
-                } else if (typeof err.status === 'number' && [502, 503, 504, 505, 598, 599, 444, 499, 522, 524].indexOf(err.status) > -1) {
+                } else if ({ 502:1, 503:1, 504:1, 505:1, 598:1, 599:1, 444:1, 499:1, 522:1, 524:1 }[err.code] > -1) {
                     // Bad connection
                     Alerts.queue(Alerts.ConnectionError);
-                    analytics.exception('Network Error: ' + err.status + ' - ' + targetHref);
+                    const msg = 'Network Error: ' + err.status + ' - ' + targetHref;
+                    analytics.exception(msg);
+                    console.warn(msg);
                 } else {
                     Alerts.queue(Alerts.ConnectionError);
-                    analytics.exception('Unknown Network Error: ' + err.status + ' - ' + targetHref);
+                    const msg = 'Unknown Network Error: ' + err.status + ' - ' + targetHref;
+                    analytics.exception(msg);
+                    console.error(msg);
                     // Unknown/unanticipated error: Bubble it up (won't break app).
                     throw err;
                 }
@@ -1054,10 +1011,6 @@ export default class App extends React.PureComponent {
                 }
             });
 
-            if (!options.replace && !options.dontScrollToTop) {
-                currentRequestInThisScope.then(App.scrollTo);
-            }
-
             // currentRequestInThisScope === this.currentNavigationRequest here and in outer `this.navigation` scope.
             // BUT this may not be case later in async Promise chain if new request launched and
             // `abort` not called in time to cancel execution of Promise chain.
@@ -1077,35 +1030,37 @@ export default class App extends React.PureComponent {
     /**
      * Set 'isSubmitting' in state. works with handleBeforeUnload
      *
-     * @param {boolean} bool - Value to set.
+     * @param {boolean|string|object} value - Value to set. If string is provided, will show as text in popup. If object is provided and modal key contains JSX, isSubmittingModalOpen opened/closed according to value for showModelOpen
      * @param {function} [callback=null] - Optional callback to execute after updating state.
+     * @param {boolean} showModalOpen - Optional setting to also close/open modal
      */
-    setIsSubmitting(bool, callback=null){
-        this.setState({ 'isSubmitting': bool }, callback);
+    setIsSubmitting(value, callback=null, showModalOpen){
+        if (showModalOpen === true || showModalOpen === false) {
+            this.setState({ 'isSubmitting': value, 'isSubmittingModalOpen': showModalOpen }, callback);
+        } else {
+            this.setState({ 'isSubmitting': value }, callback);
+        }
     }
 
     /**
      * Catch and alert user navigating away from page if in submission process.
+     * (This doesn't always print the message, and instead returns browser's default one, e.g. in Chrome)
+     * See: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload (esp Browser Compatibility for custom text support)
      *
-     * @private
      * @param {React.SyntheticEvent} e Window beforeunload event.
      * @returns {string|void} Dialog text which is to be shown to user.
      */
     handleBeforeUnload(e){
         const { isSubmitting } = this.state;
         if (isSubmitting){
-            const dialogText = "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
-            e.returnValue = dialogText;
-            return dialogText;
+            e.preventDefault();
+            const confirmMessage = typeof isSubmitting === "string" ? isSubmitting : "Leaving will cause all unsubmitted work to be lost. Are you sure you want to proceed?";
+            e.returnValue = confirmMessage;
+            return confirmMessage;
         }
     }
 
-    /**
-     * Renders the entire HTML of the application.
-     *
-     * @private
-     * @returns {JSX.Element} An `<html>` element.
-     */
+    /** Renders the entire HTML of the application. */
     render() {
         const { context, lastCSSBuildTime, href, contextRequest } = this.props;
         const hrefParts       = memoizedUrlParse(href);
@@ -1165,11 +1120,23 @@ export default class App extends React.PureComponent {
             routeLeaf,
             hrefParts,
             'updateUploads'  : this.updateUploads,
-            'updateUserInfo' : this.updateUserInfo,
+            'updateAppSessionState' : this.updateAppSessionState,
             'setIsSubmitting': this.setIsSubmitting,
             'onBodyClick'    : this.handleClick,
             'onBodySubmit'   : this.handleSubmit,
         });
+
+        const contentSecurityPolicyStr = [
+            "default-src 'self'",
+            "img-src 'self' https://*",
+            "child-src blob:",
+            // Allowing unsafe-eval temporarily re: 'box-intersect' dependency of some HiGlass tracks.
+            "script-src 'self' https://www.google-analytics.com https://cdn.auth0.com https://secure.gravatar.com 'unsafe-eval'", // + (typeof BUILDTYPE === "string" && BUILDTYPE === "quick" ? " 'unsafe-eval'" : ""),
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com  https://unpkg.com",
+            "font-src 'self' https://fonts.gstatic.com",
+            "worker-src 'self' blob:",
+            "connect-src 'self' https://cgap-higlass.com https://*.s3.amazonaws.com https://rest.ensembl.org"
+        ].join("; ");
 
         // `lastCSSBuildTime` is used for both CSS and JS because is most likely they change at the same time on production from recompiling
 
@@ -1178,13 +1145,14 @@ export default class App extends React.PureComponent {
                 <head>
                     <meta charSet="utf-8"/>
                     <meta httpEquiv="Content-Type" content="text/html, charset=UTF-8"/>
+                    <meta httpEquiv="Content-Security-Policy" content={contentSecurityPolicyStr}/>
                     <meta httpEquiv="X-UA-Compatible" content="IE=edge"/>
                     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
                     <meta name="google-site-verification" content="sia9P1_R16tk3XW93WBFeJZvlTt3h0qL00aAJd3QknU" />
                     <HTMLTitle {...{ context, currentAction, canonical, status }} />
                     {base ? <base href={base}/> : null}
-                    <script data-prop-name="user_details" type="application/json" dangerouslySetInnerHTML={{
-                        __html: jsonScriptEscape(JSON.stringify(JWT.getUserDetails())) /* Kept up-to-date in browser.js */
+                    <script data-prop-name="user_info" type="application/json" dangerouslySetInnerHTML={{
+                        __html: jsonScriptEscape(JSON.stringify(JWT.getUserInfo())) /* Kept up-to-date in browser.js */
                     }}/>
                     <script data-prop-name="lastCSSBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastCSSBuildTime }}/>
                     <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastCSSBuildTime || 0)} />
@@ -1268,7 +1236,7 @@ const ContentRenderer = React.memo(function ContentRenderer(props){
     const commonContentViewProps = _.pick(props,
         // Props from App:
         'schemas', 'session', 'href', 'navigate', 'uploads', 'updateUploads', 'alerts',
-        'browseBaseState', 'setIsSubmitting', 'updateUserInfo', 'context', 'currentAction',
+        'browseBaseState', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen', 'updateAppSessionState', 'context', 'currentAction',
         // Props from BodyElement:
         'windowWidth', 'windowHeight', 'registerWindowOnResizeHandler', 'registerWindowOnScrollHandler',
         'addToBodyClassList', 'removeFromBodyClassList', 'toggleFullScreen', 'isFullscreen',
@@ -1346,6 +1314,7 @@ class BodyElement extends React.PureComponent {
         this.hideTestWarning = this.hideTestWarning.bind(this);
         this.onResize = _.debounce(this.onResize.bind(this), 300);
         this.setupScrollHandler = this.setupScrollHandler.bind(this);
+        this.onAfterTooltipHide = this.onAfterTooltipHide.bind(this);
 
         this.registerWindowOnResizeHandler = this.registerWindowOnResizeHandler.bind(this);
         this.registerWindowOnScrollHandler = this.registerWindowOnScrollHandler.bind(this);
@@ -1418,13 +1387,11 @@ class BodyElement extends React.PureComponent {
     /**
      * Initializes scroll event handler & loading of help menu tree.
      *
-     * @private
      * @returns {void}
      */
     componentDidMount(){
-        if (window && window.fourfront) window.fourfront.bodyElem = this;
         this.setupScrollHandler();
-        window.addEventListener('resize', this.onResize);
+        WindowEventDelegator.addHandler("resize", this.onResize);
         this.onResize();
     }
 
@@ -1440,13 +1407,12 @@ class BodyElement extends React.PureComponent {
      * Unbinds event listeners.
      * Probably not needed but lets be safe & cleanup.
      *
-     * @private
      * @returns {void}
      */
     componentWillUnmount(){
-        window.removeEventListener("scroll", this.throttledScrollHandler);
+        WindowEventDelegator.removeHandler("scroll", this.throttledScrollHandler);
         delete this.throttledScrollHandler;
-        window.removeEventListener('resize', this.onResize);
+        WindowEventDelegator.addHandler("resize", this.onResize);
     }
 
     /**
@@ -1598,21 +1564,21 @@ class BodyElement extends React.PureComponent {
      * @returns {void}
      */
     onResize(e){
-        var dims, pastDims;
-        this.setState(function(currState){
-            var nextState = {};
+        let dims, pastDims;
+        this.setState(function({ windowWidth, windowHeight }){
+            const nextState = {};
             dims = BodyElement.getViewportDimensions();
-            pastDims = _.pick(currState, 'windowWidth', 'windowHeight');
-            if (dims.windowWidth !== currState.windowWidth)     nextState.windowWidth = dims.windowWidth;
-            if (dims.windowHeight !== currState.windowHeight)   nextState.windowHeight = dims.windowHeight;
-            if (_.keys(nextState).length > 0){
+            pastDims = { windowWidth, windowHeight };
+            if (dims.windowWidth !== pastDims.windowWidth)     nextState.windowWidth = dims.windowWidth;
+            if (dims.windowHeight !== pastDims.windowHeight)   nextState.windowHeight = dims.windowHeight;
+            if (Object.keys(nextState).length > 0){
                 return nextState;
             }
             return null;
         }, ()=>{
             console.info('Window resize detected.', dims);
             if (this.resizeHandlers.length > 0){
-                _.forEach(this.resizeHandlers, (resizeHandlerFxn) => resizeHandlerFxn(dims, pastDims, e) );
+                this.resizeHandlers.forEach(function(resizeHandlerFxn){ resizeHandlerFxn(dims, pastDims, e); });
             }
         });
     }
@@ -1642,7 +1608,7 @@ class BodyElement extends React.PureComponent {
             }
 
             this.setState(function({ windowWidth }){
-                const rgs = layout.responsiveGridState(windowWidth);
+                const rgs = responsiveGridState(windowWidth);
                 let scrolledPastTop = false;
                 let scrolledPast80 = false;
                 let scrolledPast160 = false;
@@ -1673,8 +1639,21 @@ class BodyElement extends React.PureComponent {
         // We add as property of class instance so we can remove event listener on unmount, for example.
         this.throttledScrollHandler = _.throttle(raf.bind(window, handleScroll), 10);
 
-        window.addEventListener("scroll", this.throttledScrollHandler);
+        WindowEventDelegator.addHandler("scroll", this.throttledScrollHandler);
+
         setTimeout(this.throttledScrollHandler, 100, null);
+    }
+
+    onAfterTooltipHide(e){
+        // Grab tip & unset style.left and style.top using same method tooltip does internally.
+        const ref = this.tooltipRef && this.tooltipRef.current;
+        const node = (ref && ref.tooltipRef) || null;
+        if (!node || !node.style) {
+            console.warn("Tooltip to hide not found");
+            return;
+        }
+        node.style.left = null;
+        node.style.top = null;
     }
 
     toggleFullScreen(isFullscreen, callback){
@@ -1735,9 +1714,13 @@ class BodyElement extends React.PureComponent {
         }
     }
 
-    /** Renders out the body layout of the application. */
+    /**
+     * Renders out the body layout of the application.
+     * TestWarning stuff is _possibly_ deprecated and for 4DN only.
+     */
     render(){
-        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href } = this.props;
+        const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas,
+            browseBaseState, updateAppSessionState, isSubmitting, isSubmittingModalOpen } = this.props;
         const { windowWidth, windowHeight, classList, hasError, isFullscreen, testWarningPresent } = this.state;
         const { registerWindowOnResizeHandler, registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen } = this;
         const appClass = slowLoad ? 'communicating' : 'done';
@@ -1748,7 +1731,7 @@ class BodyElement extends React.PureComponent {
 
         let innerContainerMinHeight;
         if (mounted && windowHeight){
-            const rgs = layout.responsiveGridState(windowWidth);
+            const rgs = responsiveGridState(windowWidth);
             if ({ 'xl' : 1, 'lg' : 1, 'md' : 1 }[rgs]){
                 innerContainerMinHeight = (
                     // Hardcoded:
@@ -1757,6 +1740,28 @@ class BodyElement extends React.PureComponent {
                 );
             }
         }
+
+        const navbarProps = {
+            windowWidth, windowHeight,
+            isFullscreen, toggleFullScreen, overlaysContainer,
+            testWarningPresent, hideTestWarning: this.hideTestWarning,
+            context, href, currentAction, session, schemas,
+            browseBaseState, updateAppSessionState
+        };
+
+        const propsPassedToAllViews = {
+            ...this.props,
+            windowWidth,
+            windowHeight,
+            navigate, // <- We could probably stop passing this down since can use the global aliased function instead...
+            registerWindowOnResizeHandler,
+            registerWindowOnScrollHandler,
+            addToBodyClassList, removeFromBodyClassList,
+            toggleFullScreen, isFullscreen, // <- These two are probably deprecated, were originally for 4DN.
+            overlaysContainer,
+            innerOverlaysContainer,
+            alerts
+        };
 
         return (
             <body data-current-action={currentAction} onClick={onBodyClick} onSubmit={onBodySubmit} data-path={hrefParts.path}
@@ -1778,20 +1783,16 @@ class BodyElement extends React.PureComponent {
                 <div id="slot-application">
                     <div id="application" className={appClass}>
                         <div id="layout">
+                            { (isSubmitting && isSubmitting.modal) && isSubmittingModalOpen ? isSubmitting.modal : null}
 
-                            <NavigationBar {...{ windowWidth, windowHeight, isFullscreen, toggleFullScreen, overlaysContainer, testWarningPresent }}
-                                hideTestWarning={this.hideTestWarning}
-                                {..._.pick(this.props, 'href', 'currentAction', 'session', 'schemas', 'browseBaseState',
-                                    'context', 'updateUserInfo')}/>
+                            <NavigationBar {...navbarProps} />
 
                             <div id="post-navbar-container" style={{ minHeight : innerContainerMinHeight }}>
 
                                 <PageTitleSection {...this.props} windowWidth={windowWidth} />
 
-                                <ContentErrorBoundary canonical={canonical} href={href}>
-                                    <ContentRenderer { ...this.props } { ...{ windowWidth, windowHeight, navigate, registerWindowOnResizeHandler,
-                                        registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen, isFullscreen,
-                                        overlaysContainer, innerOverlaysContainer, alerts } } />
+                                <ContentErrorBoundary {...{ canonical, href }}>
+                                    <ContentRenderer {...propsPassedToAllViews} />
                                 </ContentErrorBoundary>
 
                                 <div id="inner-overlays-container" ref={this.innerOverlaysContainerRef} />
@@ -1804,7 +1805,8 @@ class BodyElement extends React.PureComponent {
 
                 <div id="overlays-container" ref={this.overlaysContainerRef}/>
 
-                <ReactTooltip effect="solid" globalEventOff="click" key="tooltip" uuid="primary-tooltip-fake-uuid" />
+                <ReactTooltip effect="solid" globalEventOff="click" key="tooltip" uuid="primary-tooltip-fake-uuid"
+                    afterHide={this.onAfterTooltipHide} ref={this.tooltipRef} />
 
             </body>
         );

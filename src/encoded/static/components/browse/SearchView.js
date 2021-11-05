@@ -7,7 +7,7 @@ import url from 'url';
 
 import { memoizedUrlParse, schemaTransforms, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { SearchView as CommonSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/SearchView';
-import { ActiveFiltersBar } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/ActiveFiltersBar';
+import { DetailPaneStateCache } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/DetailPaneStateCache';
 import { columnExtensionMap } from './columnExtensionMap';
 import { CaseDetailPane } from './CaseDetailPane';
 import { Schemas } from './../util';
@@ -15,8 +15,23 @@ import { TitleAndSubtitleBeside, PageTitleContainer, TitleAndSubtitleUnder, page
 
 
 
+export default function SearchView (props){
+    const { context: { '@type': searchPageType = ["ItemSearchResults"] } } = props;
+    const isCaseSearch = searchPageType[0] === 'CaseSearchResults';
 
-export default class SearchView extends React.PureComponent {
+    if (isCaseSearch) {
+        return (
+            <DetailPaneStateCache>
+                <SearchViewBody {...props} {...{ isCaseSearch }} />
+            </DetailPaneStateCache>
+        );
+    }
+
+    return  <SearchViewBody {...props} />;
+}
+
+
+export class SearchViewBody extends React.PureComponent {
 
     /**
      * Function which is passed into a `.filter()` call to
@@ -48,7 +63,7 @@ export default class SearchView extends React.PureComponent {
         // We may filter out type facet completely at this step,
         // in which case we can return out of func early.
         const facets = context.facets.filter(function(facet){
-            return SearchView.filterFacet(facet, currentAction);
+            return SearchViewBody.filterFacet(facet, currentAction);
         });
 
         // Find facet for '@type'
@@ -108,38 +123,31 @@ export default class SearchView extends React.PureComponent {
     constructor(props){
         super(props);
         this.memoized = {
-            transformedFacets : memoize(SearchView.transformedFacets),
-            filteredFilters: memoize(SearchView.filteredFilters),
+            transformedFacets : memoize(SearchViewBody.transformedFacets),
+            filteredFilters: memoize(SearchViewBody.filteredFilters),
             renderCaseDetailPane: memoize(this.renderCaseDetailPane.bind(this))
         };
     }
 
     renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable) {
-        const passProps = _.pick(this.props, 'windowWidth', 'href');
-        return (
-            <CaseDetailPane
-                {...{ passProps, propsFromTable, result, containerWidth, rowNumber }} paddingWidth={57}
-            />
-        );
+        const { windowWidth, href, detailPaneStateCache, updateDetailPaneStateCache } = this.props;
+        const passProps = { ...propsFromTable, result, windowWidth, href, detailPaneStateCache, updateDetailPaneStateCache, containerWidth, rowNumber };
+        return <CaseDetailPane {...passProps} paddingWidth={57} />;
     }
 
     render(){
+        const { isCaseSearch = false, context, currentAction, schemas } = this.props;
+
         // We don't need full screen btn on CGAP as already full width.
-        const passProps = _.omit(this.props, 'isFullscreen', 'toggleFullScreen');
-        const { context, currentAction, schemas } = passProps;
+        const passProps = _.omit(this.props, 'isFullscreen', 'toggleFullScreen', 'isCaseSearch');
+
         //const filters = SearchView.filteredFilters(context.filters || []);
         const facets = this.memoized.transformedFacets(context, currentAction, schemas);
         const tableColumnClassName = "results-column col";
         const facetColumnClassName = "facets-column col-auto";
 
-        const isCaseSearch = context['@type'][0] === 'CaseSearchResults' ? true : false;
-
         return (
             <div className="container-wide search-page-outer-container" id="content">
-                {/* TEMPORARY UNTIL DECIDE WHERE TO PUT
-                <ActiveFiltersBar {...{ context, filters, schemas }}
-                    termTransformFxn={Schemas.Term.toName} fieldTransformFxn={Schemas.Field.toName}/>
-                */}
                 <CommonSearchView {...passProps} {...{ columnExtensionMap, tableColumnClassName, facetColumnClassName, facets }}
                     renderDetailPane={isCaseSearch ? this.memoized.renderCaseDetailPane : null} termTransformFxn={Schemas.Term.toName} separateSingleTermFacets={false} rowHeight={90} openRowHeight={90} />
             </div>

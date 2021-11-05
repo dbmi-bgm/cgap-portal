@@ -3,8 +3,27 @@
         "case_id": "hms01234",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "status": "released",
+        "status": "shared",
         "uuid": "ad9883a2-6886-4ca0-9402-7c49734c12fa",
-        "individual": "5ec91041-78a0-4758-abef-21c7f5fd9f12"
+        "individual": "5ec91041-78a0-4758-abef-21c7f5fd9f12",
+        "accession":"GAPFIO67BOS2",
+        "sample_processing": "589fee08-e054-4786-862d-f7250a435793"
+    },
+    {
+        "family": "abd99160-49b5-459e-aded-22bdbdf2c1e9",
+        "status": "shared",
+        "aliases": [
+            "hms-dbmi:fam10254_ind10254_case"
+        ],
+        "case_id": "CASE10254-S1-C1",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "accession": "GAPCAJQ1L99X",
+        "individual": "5ec91041-78a0-4758-abef-21c7f5fd9f26",
+        "description": "Familial cancer (Ashkenazim trio proband+BRCA2 variant)",
+        "institution": "hms-dbmi",
+        "active_filterset": "1592bb50-f8db-41ee-8c27-73a8f7471d55",
+        "sample_processing": "8471a80f-81c6-4663-a182-c2955c21c6ce",
+        "variant_sample_list_id": "/variant-sample-lists/292250e7-5cb7-4543-85b2-80cd318287b2/",
+        "uuid": "165ad0fb-7acb-469e-bc1e-eb2fc6f94c82"
     }
 ]

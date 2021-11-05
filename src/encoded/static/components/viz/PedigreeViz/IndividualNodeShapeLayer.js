@@ -12,7 +12,9 @@ export const IndividualNodeShapeLayer = React.memo(function IndividualNodeShapeL
     return (
         <g className="individuals-bg-shape-layer">
             <ClipPathDefinitions {...{ dims, vizViewID }} />
-            { g.map((indv) => <IndividualNodeShape {...passProps} key={indv.id} individual={indv} /> )}
+            { g.map(function(individual, idx){
+                return <IndividualNodeShape {...passProps} {...{ individual }} key={idx} />;
+            }) }
         </g>
     );
 });
@@ -118,29 +120,19 @@ export class IndividualNodeShape extends React.PureComponent {
             individual,
             diseaseToIndex,
             textScale,
-            textScaleTransformStr,
             vizViewID = 0,
             hoveredNode = null,
-            selectedNode = null,
-            showOrderBasedName = true,
-            showNotes = true,
-            maxHeightIndex = Infinity
+            selectedNode = null
         } = this.props;
-        const { individualWidth, individualHeight } = dims;
+        const {
+            individualWidth: width,
+            individualHeight: height
+        } = dims;
         const { id, _drawing : { xCoord, yCoord } } = individual;
 
         const isSelected = selectedNode === individual;
         const isHoveredOver = hoveredNode === individual;
 
-        /*
-        const height = isHoveredOver ? individualHeight * 1.2 : individualHeight;
-        const width = isHoveredOver ? individualWidth * 1.2 : individualWidth;
-        */
-
-        const height = individualHeight;
-        const width = individualWidth;
-        const halfWidth = width / 2;
-        const aboveNodeTextY = (dims.individualYSpacing - dims.individualHeight) / 3;
         const shape = this.memoized.getIndividualShape(individual, height, width);
         const top = this.memoized.top(yCoord, dims);
         const left = this.memoized.left(xCoord, dims);
@@ -169,9 +161,7 @@ export class IndividualNodeShape extends React.PureComponent {
                 { bgShape }
                 <UnderlayMarkers {...{ width, height, individual, shape, diseaseToIndex, vizViewID }} />
                 { fgShape }
-                <OverlayMarkers {...{ width, height, individual, shape, textScaleTransformStr, vizViewID }} />
-                <AboveNodeText {...{ width, height, individual, maxHeightIndex, dims, halfWidth, aboveNodeTextY, textScale, textScaleTransformStr }} />
-                <UnderNodeText {...{ width, height, individual, shape, diseaseToIndex, dims, halfWidth, showOrderBasedName, showNotes, textScale, textScaleTransformStr }} />
+                <OverlayMarkers {...{ width, height, individual, shape, textScale, vizViewID }} />
             </g>
         );
     }
@@ -257,7 +247,7 @@ const OverlayMarkers = React.memo(function OverlayMarkers(props){
         width = 80,
         height = 80,
         shape,
-        textScaleTransformStr = "scale3d(1,1,1)",
+        textScale = 1,
         vizViewID = 0
     } = props;
     const {
@@ -302,7 +292,10 @@ const OverlayMarkers = React.memo(function OverlayMarkers(props){
 
     if (showAsConsultand || showAsProband){
         const bottomLeftCornerOrigin = "0 " + height + "px";
-        const bottomLeftScaleStyle = { transformOrigin: bottomLeftCornerOrigin, transform: textScaleTransformStr };
+        const bottomLeftScaleStyle = {
+            transformOrigin: bottomLeftCornerOrigin,
+            transform: `scale3d(${textScale},${textScale},1)`
+        };
         // Arrow leading to bottom left corner (~)
         const path = d3Path();
         path.moveTo(-25, height + 10);
@@ -402,116 +395,5 @@ function ColumnOfDiseases({ individual, width, height, shape, diseaseToIndex }){
 
     return (
         <React.Fragment>{ colOfRects }</React.Fragment>
-    );
-}
-
-/** @todo Implement things like age, stillBirth, isEctopic, etc. */
-function AboveNodeText(props){
-    const {
-        individual, maxHeightIndex, halfWidth, aboveNodeTextY,
-        textScale = 1,
-        textScaleTransformStr = "scale3d(1,1,1)",
-    } = props;
-    const {
-        //id, name,
-        //ageString,
-        // diseases = [],
-        //orderBasedName,
-        _drawing : { heightIndex },
-        ancestry = []
-    } = individual;
-
-    if (heightIndex !== maxHeightIndex) return null;
-    if (ancestry.length === 0) return null;
-
-    const moreAncestryPresent = ancestry.length > 3;
-    const showAncestry = moreAncestryPresent ? ancestry.slice(0, 3) : ancestry; // Up to 3 shown.
-
-    const rectTransform = "translate(0, -" + aboveNodeTextY + "), scale(" + textScale + ")";
-    const rectTransform3d = "translate3d(0, -" + aboveNodeTextY + "px, 0) " + textScaleTransformStr;
-
-    return (
-        <g className="text-box above-node" transform={rectTransform} style={{
-            transformOrigin: "" + halfWidth + "px 0px",
-            transform: rectTransform3d
-        }}>
-            <text y={0} x={halfWidth} textAnchor="middle" data-describing="ancestry">
-                { showAncestry.join(" • ") }
-            </text>
-        </g>
-    );
-}
-
-/** @todo Implement things like age, stillBirth, isEctopic, etc. */
-function UnderNodeText(props){
-    const {
-        individual,
-        width = 80,
-        height = 80,
-        halfWidth = 40,
-        diseaseToIndex = {},
-        showOrderBasedName = true,
-        showNotes = true, // Name of this prop may change in future.
-        textScale = 1,
-        textScaleTransformStr = "scale3d(1,1,1)",
-        dims
-    } = props;
-    const {
-        id, name,
-        ageString,
-        diseases = [],
-        orderBasedName,
-    } = individual;
-    //const textYStart = 18;
-    const showTitle = showOrderBasedName ? orderBasedName : (name || id);
-
-    const textRows = [[ showTitle, "title" ]];
-    if (ageString){
-        textRows.push([ ageString, "age" ]);
-    }
-
-    if (showNotes) {
-        // Eventually could have more stuff here, maybe have showNotes be enum of various opts to display.. idk.
-        diseases.filter(function(disease){
-            return !diseaseToIndex[disease];
-        }).forEach(function(disease, i){
-            textRows.push([
-                <React.Fragment key={i}>
-                    &bull; { disease }
-                </React.Fragment>,
-                "disease"
-            ]);
-        });
-    }
-
-    const renderedTexts = textRows.map(function([ content, desc ], idx){
-        const txtProps = {
-            "y": 18 + (20 * idx),
-            "data-describing" : desc
-        };
-        if (desc === "title" && showOrderBasedName){
-            txtProps.className = (txtProps.className || "") + " showing-order-based-name";
-        }
-        if (desc === "title" || desc === "age"){
-            // Center text
-            txtProps.textAnchor = "middle";
-            txtProps.x = halfWidth;
-        }
-        if (desc === "disease"){
-            // Left align text, but from midpoint
-            // txtProps.x = halfWidth;
-        }
-        return <text {...txtProps} key={desc + "-" + idx}>{ content }</text>;
-    });
-
-    // todo maybe make an array of 'rows' to map to <text>s with incremented y coord.
-    const rectTransform = "translate(0, " + (height + 4) + "), scale(" + textScale + ")";
-    const rectTransform3d = "translate3d(0, " + (height + 4) + "px, 0) " + textScaleTransformStr;
-
-    return (
-        <g className="text-box" style={{ transformOrigin: halfWidth + "px 0", transform: rectTransform3d }} transform={rectTransform}>
-            {/* <rect width={width + 4} x={-2} height={dims.individualYSpacing / 3} className="bg-rect" rx={5} /> */}
-            { renderedTexts }
-        </g>
     );
 }

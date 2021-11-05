@@ -7,6 +7,27 @@ from .base import (
     Item,
     get_item_or_none
 )
+from .family import Family
+
+
+def _build_sample_embedded_list():
+    """Helper function to create embedded list for sample."""
+    return [
+        # File linkTo
+        "files.status",
+        "files.file_format.file_format",
+        "files.accession",
+
+        # File linkTo
+        "cram_files.status",
+        "cram_files.accession",
+        "cram_files.file_format.file_format",
+
+        # File linkTo
+        "processed_files.accession",
+        "processed_files.file_format.file_format",
+        "processed_files.workflow_run_outputs.@id"
+    ]
 
 
 @collection(
@@ -21,9 +42,7 @@ class Sample(Item):
     name_key = 'accession'
     schema = load_schema('encoded:schemas/sample.json')
     rev = {'indiv': ('Individual', 'samples')}
-    embedded_list = [
-        "processed_files.workflow_run_outputs"
-    ]
+    embedded_list = _build_sample_embedded_list()
 
     @calculated_property(schema={
         "title": "Individual",
@@ -58,6 +77,20 @@ class Sample(Item):
             return False
 
 
+def _build_sample_processing_embedded_list():
+    """Helper function to build embedded list for sample_processing."""
+    return [
+        # File linkTo
+        "processed_files.accession",  # used to locate this file from annotated VCF via search
+        "processed_files.variant_type",
+        "processed_files.file_type",
+
+        # Sample linkTo
+        "samples.completed_processes",
+        "samples.processed_files.uuid",
+    ]
+
+
 @collection(
     name='sample-processings',
     properties={
@@ -67,7 +100,7 @@ class Sample(Item):
 class SampleProcessing(Item):
     item_type = 'sample_processing'
     schema = load_schema('encoded:schemas/sample_processing.json')
-    embedded_list = []
+    embedded_list = _build_sample_processing_embedded_list()
     rev = {'case': ('Case', 'sample_processing')}
 
     @calculated_property(schema={
@@ -133,7 +166,11 @@ class SampleProcessing(Item):
                 "relationship": {
                     "title": "Relationship",
                     "type": "string"
-                    }
+                },
+                "bam_location": {
+                    "title": "Bam File Location",
+                    "type": "string"
+                }
                 }
             }
         })
@@ -148,13 +185,26 @@ class SampleProcessing(Item):
         if len(families) != 1:
             return samples_pedigree
         family = families[0]
-        fam_data = get_item_or_none(request, family, 'families', frame='embedded')
+
+        # get relationship from family
+        fam_data = get_item_or_none(request, family, 'families')
         if not fam_data:
             return samples_pedigree
+        proband = fam_data.get('proband', '')
         members = fam_data.get('members', [])
-        relations = fam_data.get('relationships', [])
-        if not members:
+        if not proband or not members:
             return samples_pedigree
+        family_id = fam_data['accession']
+        # collect members properties
+        all_props = []
+        for a_member in members:
+            # This might be a step to optimize if families get larger
+            # TODO: make sure all mother fathers are in member list, if not fetch them too
+            #  for complete connection tracing
+            props = get_item_or_none(request, a_member, 'individuals')
+            all_props.append(props)
+        relations = Family.calculate_relations(proband, all_props, family_id)
+
         for a_sample in samples:
             temp = {
                 "individual": "",
@@ -163,13 +213,32 @@ class SampleProcessing(Item):
                 "parents": [],
                 "relationship": "",
                 "sex": "",
+                # "bam_location": "" optional, add if exists
                 # "association": ""  optional, add if exists
             }
-            mem_infos = [i for i in members if a_sample in [x['@id'] for x in i.get('samples', [])]]
+            mem_infos = [i for i in all_props if a_sample in i.get('samples', [])]
             if not mem_infos:
                 continue
             mem_info = mem_infos[0]
-            sample_info = [i for i in mem_info['samples'] if i['@id'] == a_sample][0]
+            sample_info = get_item_or_none(request, a_sample, 'samples')
+
+            # find the bam file
+            sample_processed_files = sample_info.get('processed_files', [])
+            sample_bam_file = ''
+            # no info about file formats on object frame of sample
+            # cycle through files and check the format
+            for a_file in sample_processed_files:
+                file_info = get_item_or_none(request, a_file, 'files-processed')
+                if not file_info:
+                    continue
+                # if format is bam, record the upload key and exit loop
+                if file_info.get('file_format') == "/file-formats/bam/":
+                    sample_bam_file = file_info.get('upload_key', '')
+                    break
+            # if bam file location was found, add it to temp
+            if sample_bam_file:
+                temp['bam_location'] = sample_bam_file
+
             # fetch the calculated relation info
             relation_infos = [i for i in relations if i['individual'] == mem_info['accession']]
             # fill in temp dict
@@ -178,7 +247,9 @@ class SampleProcessing(Item):
             parents = []
             for a_parent in ['mother', 'father']:
                 if mem_info.get(a_parent):
-                    parents.append(mem_info[a_parent]['display_title'])
+                    # extract accession from @id
+                    mem_acc = mem_info[a_parent].split('/')[2]
+                    parents.append(mem_acc)
             temp['parents'] = parents
             temp['sample_accession'] = sample_info['display_title']
             temp['sample_name'] = sample_info.get('bam_sample_id', '')

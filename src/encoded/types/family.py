@@ -11,12 +11,9 @@ from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
-    COLLECTIONS,
-    display_title_schema
 )
 from snovault.util import debug_log
-from webtest import TestApp
+from dcicutils.misc_utils import VirtualApp
 from xml.etree.ElementTree import fromstring
 from .base import Item, get_item_or_none
 from ..util import get_trusted_email
@@ -25,24 +22,11 @@ from ..util import get_trusted_email
 log = structlog.getLogger(__name__)
 
 
-@collection(
-    name='families',
-    unique_key='accession',
-    properties={
-        'title': 'Families',
-        'description': 'Listing of Families',
-    })
-class Family(Item):
-    item_type = 'family'
-    name_key = 'accession'
-    schema = load_schema('encoded:schemas/family.json')
-    rev = {'sample_procs': ('SampleProcessing', 'families'),
-           'case': ('Case', 'family')}
+def _build_family_embedded_list():
+    return [
 
-    embedded_list = [
+        # Individual linkTo
         "members.accession",
-        "members.father",
-        "members.mother",
         "members.status",
         "members.sex",
         "members.is_deceased",
@@ -60,18 +44,29 @@ class Family(Item):
         "members.cause_of_infertility",
         "members.ancestry",
         "members.clinic_notes",
-        "members.phenotypic_features.phenotypic_feature",
+
+        # Individual linkTo
+        "members.father.accession",
+        "members.mother.accession",
+
+        # Phenotype linkTo
+        "members.phenotypic_features.phenotypic_feature.hpo_id",
+        "members.phenotypic_features.phenotypic_feature.phenotype_name",
         "members.phenotypic_features.onset_age",
         "members.phenotypic_features.onset_age_units",
+
+        # Sample linkTo
         "members.samples.status",
         "members.samples.bam_sample_id",
         "members.samples.specimen_type",
         "members.samples.specimen_notes",
         "members.samples.specimen_collection_date",
         "members.samples.workup_type",
-        "members.samples.processed_files",
-        "members.samples.processed_files.workflow_run_outputs",
-        "members.samples.processed_files.quality_metric",
+        "members.samples.completed_processes",
+
+        # File linkTo / QC
+        "members.samples.processed_files.workflow_run_outputs.@id",
+        "members.samples.processed_files.quality_metric.@id",
         "members.samples.processed_files.quality_metric.qc_list.qc_type",
         "members.samples.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "members.samples.processed_files.quality_metric.qc_list.value.url",
@@ -79,7 +74,9 @@ class Family(Item):
         "members.samples.processed_files.quality_metric.overall_quality_status",
         "members.samples.processed_files.quality_metric.url",
         "members.samples.processed_files.quality_metric.status",
-        "members.samples.files.quality_metric",
+
+        # QC
+        "members.samples.files.quality_metric.@id",
         "members.samples.files.quality_metric.qc_list.qc_type",
         "members.samples.files.quality_metric.qc_list.value.overall_quality_status",
         "members.samples.files.quality_metric.qc_list.value.url",
@@ -87,10 +84,13 @@ class Family(Item):
         "members.samples.files.quality_metric.overall_quality_status",
         "members.samples.files.quality_metric.url",
         "members.samples.files.quality_metric.status",
-        "members.samples.completed_processes",
+
+        # Sample linkTo
         "analysis_groups.samples.accession",
-        "analysis_groups.processed_files",
-        "analysis_groups.processed_files.quality_metric",
+
+        # QC
+        "analysis_groups.processed_files.@id",
+        "analysis_groups.processed_files.quality_metric.@id",
         "analysis_groups.processed_files.quality_metric.qc_list.qc_type",
         "analysis_groups.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "analysis_groups.processed_files.quality_metric.qc_list.value.url",
@@ -98,9 +98,10 @@ class Family(Item):
         "analysis_groups.processed_files.quality_metric.overall_quality_status",
         "analysis_groups.processed_files.quality_metric.url",
         "analysis_groups.processed_files.quality_metric.status",
-        "analysis_groups.sample_processed_files",
+
+        # QC
         "analysis_groups.sample_processed_files.sample.accession",
-        "analysis_groups.sample_processed_files.processed_files.quality_metric",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric.@id",
         "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.qc_type",
         "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.value.url",
@@ -110,6 +111,23 @@ class Family(Item):
         "analysis_groups.sample_processed_files.processed_files.quality_metric.status",
         "analysis_groups.completed_processes",
     ]
+
+
+@collection(
+    name='families',
+    unique_key='accession',
+    properties={
+        'title': 'Families',
+        'description': 'Listing of Families',
+    })
+class Family(Item):
+    item_type = 'family'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/family.json')
+    rev = {'sample_procs': ('SampleProcessing', 'families'),
+           'case': ('Case', 'family')}
+
+    embedded_list = _build_family_embedded_list()
 
     @calculated_property(schema={
         "title": "Cases",
@@ -257,6 +275,19 @@ class Family(Item):
         (ie if x created in children_roles, can not be used in parent roles)
         Nomenclature guided by
         https://www.devonfhs.org.uk/pdfs/tools/eichhorn-rlationship-chart.pdf"""
+        # possible values for roles we calculated, they might be appended by roman numaeral
+        # co-parent is used to replace wife and husband
+        roles = [
+            'proband', 'father', 'mother', 'brother', 'sister', 'sibling', 'half-brother', 'half-sister', 'half-sibling', 'co-parent',
+            'grandson', 'granddaughter', 'grandchild', 'grandmother', 'grandfather', 'great-grandson', 'great-granddaughter', 'great-grandchild',
+            'great-great-grandson', 'great-great-granddaughter', 'great-great-grandchild', 'great-grandmother', 'great-grandfather',
+            'great-great-grandmother', 'great-great-grandfather',
+            'nephew', 'niece', 'nibling', 'grandnephew', 'grandniece', 'grandnibling',
+            'uncle', 'aunt', 'auncle', 'granduncle', 'grandaunt', 'grandauncle',
+            'cousin', 'cousin-once-removed(descendant)', 'cousin-twice-removed(descendant)', 'cousin-once-removed(ascendant)',
+            'second-cousin', 'second-cousin-once-removed(descendant)', 'second-cousin-twice-removed(descendant)',
+            'family-in-law', 'extended-family', 'not-linked'
+                 ]
         # return a nested list of  [acc, calculated_relation, association]
         # start convert with seed roles
         Converter = {
@@ -265,8 +296,8 @@ class Family(Item):
             "p-f-s": "brother", "p-m-s": "brother",
             "p-f-d": "sister", "p-m-d": "sister",
             "p-f-c": "sibling", "p-m-c": "sibling",
-            "p-d-m": "wife", "p-s-m": "wife", "p-c-m": "wife",
-            "p-d-f": "husband", "p-s-f": "husband", "p-c-f": "husband",
+            "p-d-m": "co-parent", "p-s-m": "co-parent", "p-c-m": "co-parent",
+            "p-d-f": "co-parent", "p-s-f": "co-parent", "p-c-f": "co-parent",
         }
         # list of dictionary for assigning roles to members of given set of roles
         # roles : the input roles to be extended
@@ -301,11 +332,11 @@ class Family(Item):
         children_roles = [
             {'roles': ['uncle', 'aunt', 'auncle'], 'children': 'cousin'},
             {'roles': ['cousin'], 'children': 'cousin once removed (descendant)'},
-            {'roles': ['cousin once removed (descendant)'], 'children': 'cousin twice removed (descendant)'},
-            {'roles': ['granduncle', 'grandaunt', 'grandauncle'], 'children': 'cousin once removed (ascendant)'},
-            {'roles': ['cousin once removed (ascendant)'], 'children': 'second cousin'},
-            {'roles': ['second cousin'], 'children': 'second cousin once removed (descendant)'},
-            {'roles': ['second cousin once removed (descendant)'], 'children': 'second cousin twice removed (descendant)'},
+            {'roles': ['cousin-once-removed(descendant)'], 'children': 'cousin-twice-removed(descendant)'},
+            {'roles': ['granduncle', 'grandaunt', 'grandauncle'], 'children': 'cousin-once-removed-(ascendant)'},
+            {'roles': ['cousin-once-removed(ascendant)'], 'children': 'second-cousin'},
+            {'roles': ['second-cousin'], 'children': 'second-cousin-once-removed(descendant)'},
+            {'roles': ['second-cousin-once-removed(descendant)'], 'children': 'second-cousin-twice-removed(descendant)'},
             ]
         for an_extension in children_roles:
             all_combinations = [i for i in Converter if Converter[i] in an_extension['roles']]
@@ -318,7 +349,7 @@ class Family(Item):
             """If you are going down from proband, you need to keep going down
             If you are going up from proband, you can change direction once
             If you are out of these cases, you are not blood relative
-            We make an exception for the Husband and Wife"""
+            We make an exception for the Husband and Wife (co-parent)"""
             up = ['f', 'm']
             down = ['d', 's', 'c']
             state = 1
@@ -367,6 +398,79 @@ class Family(Item):
             relations.append([i, relation, association])
         return relations
 
+    @staticmethod
+    def integer_to_roman(integer):
+        """Convert Integer to roman"""
+        RomanAlphabet = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
+                         [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
+                         [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]]
+        roman = ""
+        for base, roman_letter in RomanAlphabet:
+            quotient, integer = divmod(integer, base)
+            roman += roman_letter * quotient
+            if integer == 0:
+                break
+        return roman
+
+    @staticmethod
+    def calculate_relations(proband, all_props, family_id):
+        """Static wrapper for relations calculated property
+        so it can be called by other classes, curretly used by
+        sample_pedigree on sample_processing also."""
+        # convert to ped_file format
+        ped_text = Family.generate_ped(all_props, proband, family_id)
+        primary_vectors = Family.extract_vectors(ped_text)
+        proband_acc = proband.split('/')[2]
+        links = Family.construct_links(primary_vectors, proband_acc)
+        relations = Family.relationships_vocabulary(links)
+        results = []
+        # add a consistent age unit for ordering all members
+        unit_converter = {"day": 1, "week": 7, "month": 30, "year": 365}
+        for an_ind in all_props:
+            age_days = 0
+            if an_ind.get('age') and an_ind.get('age_units'):
+                age_days = an_ind['age'] * unit_converter[an_ind['age_units']]
+            an_ind['age_days'] = age_days
+        # generate the relationship dict for each member
+        for a_member_resp in all_props:
+            temp = {"individual": '',
+                    "sex": '',
+                    "relationship": '',
+                    "association": '',
+                    "age_days": a_member_resp['age_days']}
+            mem_acc = a_member_resp['accession']
+            temp['individual'] = mem_acc
+            sex = a_member_resp.get('sex', 'U')
+            temp['sex'] = sex
+            relation_dic = [i for i in relations if i[0] == mem_acc]
+            if not relation_dic:
+                temp['relationship'] = 'not-linked'
+                # the individual is not linked to proband through individuals listed in members
+                results.append(temp)
+                continue
+            relation = relation_dic[0]
+            temp['relationship'] = relation[1]
+            if relation[2]:
+                temp['association'] = relation[2]
+            results.append(temp)
+        # sort by association, relationship, ages (decreasing), and finally accession
+        results = sorted(results, key=lambda i: (i['association'], i['relationship'], -i['age_days'], i['individual']))
+        # add roman numerals to repeating roles
+        # keep track of all roles in family for enumeration
+        # for this purpose, the role definition is association + relationship
+        # ie the enumaration for parental and maternal aunts are kept separate
+        role_numbers = {}
+        for a_relationship in results:
+            del a_relationship['age_days']
+            full_relationship = a_relationship['relationship'] + a_relationship['association']
+            if full_relationship not in role_numbers:
+                role_numbers[full_relationship] = 1
+            else:
+                role_numbers[full_relationship] += 1
+                roman_add_on = Family.integer_to_roman(role_numbers[full_relationship])
+                a_relationship['relationship'] = a_relationship['relationship'] + ' ' + roman_add_on
+        return results
+
     @calculated_property(schema={
         "title": "Relationships",
         "description": "Relationships to proband.",
@@ -398,56 +502,7 @@ class Family(Item):
                 },
                 "relationship": {
                     "title": "Relationship",
-                    "type": "string",
-                    "enum": ['proband',
-                             'father',
-                             'mother',
-                             'brother',
-                             'sister',
-                             'sibling',
-                             'half-brother',
-                             'half-sister',
-                             'half-sibling',
-                             'wife',
-                             'husband',
-                             'grandson',
-                             'granddaughter',
-                             'grandchild',
-                             'grandmother',
-                             'grandfather',
-                             'great-grandson',
-                             'great-granddaughter',
-                             'great-grandchild',
-                             'great-great-grandson',
-                             'great-great-granddaughter',
-                             'great-great-grandchild',
-                             'great-grandmother',
-                             'great-grandfather',
-                             'great-great-grandmother',
-                             'great-great-grandfather',
-                             'nephew',
-                             'niece',
-                             'nibling',
-                             'grandnephew',
-                             'grandniece',
-                             'grandnibling',
-                             'uncle',
-                             'aunt',
-                             'auncle',
-                             'granduncle',
-                             'grandaunt',
-                             'grandauncle',
-                             'cousin',
-                             'cousin once removed (descendant)',
-                             'cousin twice removed (descendant)',
-                             'cousin once removed (ascendant)',
-                             'second cousin',
-                             'second cousin once removed (descendant)',
-                             'second cousin twice removed (descendant)',
-                             'family-in-law',
-                             'extended-family',
-                             'not linked'
-                             ]
+                    "type": "string"
                     }
                 }
             }
@@ -456,10 +511,10 @@ class Family(Item):
         """Calculate relationships"""
         # Start of the function
         # empty list to accumulate results
-        relations = []
+        results = []
         # we need both the proband and the members to calculate
         if not proband or not members:
-            return relations
+            return results
         family_id = self.properties['accession']
         # collect members properties
         all_props = []
@@ -469,34 +524,7 @@ class Family(Item):
             #  for complete connection tracing
             props = get_item_or_none(request, a_member, 'individuals')
             all_props.append(props)
-        # convert to ped_file format
-        ped_text = self.generate_ped(all_props, proband, family_id)
-        primary_vectors = self.extract_vectors(ped_text)
-        proband_acc = proband.split('/')[2]
-        links = self.construct_links(primary_vectors, proband_acc)
-        relations = self.relationships_vocabulary(links)
-        results = []
-        for a_member in members:
-            a_member_resp = [i for i in all_props if i['@id'] == a_member][0]
-            temp = {"individual": '',
-                    "sex": '',
-                    "relationship": '',
-                    "association": ''}
-            mem_acc = a_member_resp['accession']
-            temp['individual'] = mem_acc
-            sex = a_member_resp.get('sex', 'U')
-            temp['sex'] = sex
-            relation_dic = [i for i in relations if i[0] == mem_acc]
-            if not relation_dic:
-                temp['relationship'] = 'not linked'
-                # the individual is not linked to proband through individuals listed in members
-                results.append(temp)
-                continue
-            relation = relation_dic[0]
-            temp['relationship'] = relation[1]
-            if relation[2]:
-                temp['association'] = relation[2]
-            results.append(temp)
+        results = self.calculate_relations(proband, all_props, family_id)
         return results
 
     @calculated_property(schema={
@@ -558,7 +586,7 @@ class Family(Item):
 def process_pedigree(context, request):
     """
     Endpoint to handle creation of a family of individuals provided a pedigree
-    file. Uses a webtest TestApp to handle POSTing and PATCHing items.
+    file. Uses a dcicutils.misc_utils.VirtualApp to handle POSTing and PATCHing items.
     The request.json contains attachment information and file content.
 
     Currently, only handles XML input formatted from the Proband app.
@@ -598,10 +626,10 @@ def process_pedigree(context, request):
     ped_datetime = datetime.utcnow()
     ped_timestamp = ped_datetime.isoformat() + '+00:00'
     app = get_app(config_uri, 'app')
-    # get user email for TestApp authentication
+    # get user email for VirtualApp authentication
     email = get_trusted_email(request, context="Family %s" % family_item)
     environ = {'HTTP_ACCEPT': 'application/json', 'REMOTE_USER': email}
-    testapp = TestApp(app, environ)
+    testapp = VirtualApp(app, environ)
 
     # parse XML and create family by two rounds of POSTing/PATCHing individuals
     response = {'title': 'Pedigree Processing'}
@@ -625,7 +653,7 @@ def process_pedigree(context, request):
     fam_props = context.upgrade_properties()
     post_extra = {'project': fam_props['project'],
                   'institution': fam_props['institution']}
-    xml_extra = {'ped_datetime': ped_datetime}
+    xml_extra = {'ped_datetime': ped_datetime.isoformat()}
 
     family_uuids = create_family_proband(testapp, xml_data, refs, 'managedObjectID',
                                          family_item, post_extra, xml_extra)
@@ -832,7 +860,7 @@ def add_to_clinic_notes(testapp, notes, refs, data, family_item, uuids_by_ref):
     other functions that change `clinic_notes`
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         notes (str): notes value for the object
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -860,7 +888,7 @@ def annotations_xml_ref_to_clinic_notes(testapp, ref_ids, refs, data, family_ite
     to find the annotations used as note .
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_ids (list): value for the reference field of the relevant xml obj
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -892,7 +920,7 @@ def diagnoses_xml_to_phenotypic_features(testapp, ref_vals, refs, data, family_i
     `phenotypic_features` or `clinic_notes` in the family metadata.
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_vals (list): list of dict diagnoses values
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -956,7 +984,7 @@ def affected_xml_to_phenotypic_features(testapp, ref_vals, refs, data, family_it
     `phenotypic_features` or `clinic_notes` in the family metadata.
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_vals (list): list of dict affected values (should only have 1 item)
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -986,7 +1014,7 @@ def cause_of_death_xml_to_phenotype(testapp, ref_vals, refs, data, family_item, 
     `cause_of_death` or `clinic_notes` in the family metadata.
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         ref_vals (list): list of dict containg cause of death info (should be length 1)
         refs: (dict): reference-based parsed XML data
         data (dict): metadata to POST/PATCH
@@ -1097,7 +1125,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, family_item,
     Can be easily extended by adding tuples to `to_convert` dict
 
     Args:
-        testapp (webtest.TestApp): test application for posting/patching
+        testapp (dcicutils.misc_utils.VirtualApp): test application for posting/patching
         xml_data (dict): parsed XMl data, probably from `etree_to_dict`
         refs: (dict): reference-based parsed XML data
         ref_field (str): name of reference field from the XML data

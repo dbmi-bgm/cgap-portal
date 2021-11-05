@@ -1,0 +1,17 @@
+[
+    {
+        "uuid": "589fee08-e054-4786-862d-f7250a435793",
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "samples": ["c40ed801-b1bf-4f33-a3c6-d323b23f1d85"]
+    },
+    {
+        "uuid": "8471a80f-81c6-4663-a182-c2955c21c6ce",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "samples": ["c40ed801-b1bf-4f33-a3c6-d323b23f1d85"],
+        "families": [
+            "abd99160-49b5-459e-aded-22bdbdf2c1e9"
+        ]
+    }
+]

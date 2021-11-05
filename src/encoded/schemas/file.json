@@ -4,10 +4,18 @@
     "id": "/profiles/file.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["file_format", "project", "institution"],
-    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "required": [
+        "file_format",
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "accession",
+        "aliases"
+    ],
     "additionalProperties": false,
-    "mixinFacets" : [],
+    "mixinFacets": [],
     "properties": {
         "accession": {
             "accessionType": "FI"
@@ -26,7 +34,6 @@
             "ff_flag": "second round",
             "type": "string",
             "pattern": "^[\\w+=,.@-]*$",
-            "exclude_from": ["submit4dn"],
             "comment": "ultimately uploaded filename will be uuid/accession, but filename with no directory will be store in metadata as passed in"
         },
         "file_format": {
@@ -52,8 +59,12 @@
             "description": "The date of the version of file based on when it was originally generated. Accepted formats: YYYYMMDD, YYYY-MM-DD, YYYY-MM-DD-HH:MM:SS",
             "type": "string",
             "anyOf": [
-                {"format": "date-time"},
-                {"format": "date"}
+                {
+                    "format": "date-time"
+                },
+                {
+                    "format": "date"
+                }
             ]
         },
         "file_classification": {
@@ -75,8 +86,10 @@
             "description": "The md5sum of the file being transferred.",
             "comment": "This can vary for files of same content gzipped at different times",
             "type": "string",
-            "exclude_from": ["submit4dn", "FFedit-create"],
-            "ff_flag":"clear edit",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "ff_flag": "clear edit",
             "format": "hex"
         },
         "content_md5sum": {
@@ -84,13 +97,17 @@
             "description": "The MD5sum of the uncompressed file.",
             "comment": "This is only relavant for gzipped files.",
             "type": "string",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "format": "hex",
             "uniqueKey": "file:content_md5sum"
         },
         "file_size": {
             "title": "File Size",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "description": "Size of file on disk.",
             "comment": "File size is specified in bytes - presumably this can be a calculated property as well",
             "type": "integer"
@@ -99,11 +116,15 @@
             "title": "Extra Files",
             "description": "Links to extra files on s3 that don't have associated metadata",
             "type": "array",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "items": {
                 "title": "Extra File",
                 "type": "object",
-                "required": ["file_format"],
+                "required": [
+                    "file_format"
+                ],
                 "additionalProperties": true,
                 "properties": {
                     "file_format": {
@@ -115,19 +136,25 @@
                     "href": {
                         "title": "Download URL",
                         "type": "string",
-                        "exclude_from": ["submit4dn", "FFedit-create"]
+                        "exclude_from": [
+                            "FFedit-create"
+                        ]
                     },
                     "md5sum": {
                         "title": "MD5sum",
                         "description": "The md5sum of the extra file.",
                         "type": "string",
-                        "exclude_from": ["submit4dn", "FFedit-create"],
-                        "ff_flag":"clear edit",
+                        "exclude_from": [
+                            "FFedit-create"
+                        ],
+                        "ff_flag": "clear edit",
                         "format": "hex"
                     },
                     "file_size": {
                         "title": "File Size",
-                        "exclude_from": ["submit4dn", "FFedit-create"],
+                        "exclude_from": [
+                            "FFedit-create"
+                        ],
                         "description": "Size of file of the extra file.",
                         "comment": "File size is specified in bytes",
                         "type": "integer"
@@ -136,17 +163,14 @@
                         "title": "Status",
                         "type": "string",
                         "default": "uploading",
-                        "enum" : [
+                        "enum": [
                             "uploading",
                             "uploaded",
                             "upload failed",
                             "to be uploaded by workflow",
                             "current",
-                            "released",
+                            "shared",
                             "replaced",
-                            "released to project",
-                            "released to institution",
-                            "in public review",
                             "in review",
                             "obsolete",
                             "inactive",
@@ -164,7 +188,10 @@
             "items": {
                 "title": "Related File",
                 "type": "object",
-                "required": ["relationship_type", "file"],
+                "required": [
+                    "relationship_type",
+                    "file"
+                ],
                 "additionalProperties": false,
                 "properties": {
                     "relationship_type": {
@@ -191,7 +218,9 @@
         },
         "restricted": {
             "title": "Is Restricted File",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "description": "A flag to indicate whether this file is subject to restricted access",
             "type": "boolean"
         },
@@ -199,19 +228,15 @@
             "title": "Status",
             "type": "string",
             "default": "uploading",
-            "permission": "import_items",
-            "exclude_from": ["submit4dn"],
-            "enum" : [
+            "permission": "restricted_fields",
+            "enum": [
                 "uploading",
                 "uploaded",
                 "upload failed",
                 "to be uploaded by workflow",
                 "current",
-                "released",
+                "shared",
                 "replaced",
-                "released to project",
-                "released to institution",
-                "in public review",
                 "in review",
                 "obsolete",
                 "inactive",
@@ -219,11 +244,13 @@
             ]
         },
         "quality_metric": {
-            "notes" : "This could be a single Quality Metric or a 'container' Quality Metric item that contains a list of QualityMetrics in its 'qc_list' property.",
+            "notes": "This could be a single Quality Metric or a 'container' Quality Metric item that contains a list of QualityMetrics in its 'qc_list' property.",
             "type": "string",
             "title": "Quality Metric",
             "description": "The associated QC reports",
-            "exclude_from": ["submit4dn", "FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "linkTo": "QualityMetric"
         },
         "quality_metric_summary": {
@@ -233,7 +260,11 @@
             "items": {
                 "title": "Selected Quality Metric",
                 "type": "object",
-                "required": ["title", "value", "numberType"],
+                "required": [
+                    "title",
+                    "value",
+                    "numberType"
+                ],
                 "additionalProperties": false,
                 "properties": {
                     "title": {
@@ -255,74 +286,79 @@
                         "type": "string",
                         "title": "Type of the Quality Metric",
                         "description": "type of the quality metric",
-                        "enum": ["string", "integer", "float", "percent"]
+                        "enum": [
+                            "string",
+                            "integer",
+                            "float",
+                            "percent"
+                        ]
                     }
                 }
-             }
+            }
         },
         "override_lab_name": {
             "description": "The lab that did the experiment if not the attributed Lab from whence this file",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_experiment_type": {
             "description": "The type of experiment to which this file is associated",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_biosource_name": {
             "description": "The name of the cell line or tissue sample for this track",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_assay_info": {
             "description": "Information that helps distinguish the assay eg. ChIP-seq target or repliseq phase",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_replicate_info": {
             "description": "Information on which replicate this file belongs",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_experiment_bucket": {
             "description": "Where does a file sit in an experiment or set",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_dataset": {
             "description": "What dataset does the file belong to",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         },
         "override_condition": {
             "description": "What condition distinguishes the members of a dataset",
             "type": "string",
-            "permission": "import_items",
+            "permission": "restricted_fields",
             "comment": "value will be used to populate the calculated property value of the same name w/o underscore (in this case in track_and_facet_info calcprop)"
         }
     },
     "facets": {
-        "file_type" : {
-            "title" : "File Type",
-            "descripton" : "Type or categorization of this file."
+        "file_type": {
+            "title": "File Type",
+            "descripton": "Type or categorization of this file."
         },
         "file_format.file_format": {
-            "title" : "File Format",
-            "description" : "Format of the file, i.e. the file extension."
+            "title": "File Format",
+            "description": "Format of the file, i.e. the file extension."
         },
-        "file_size" : {
-            "title" : "File Size",
-            "description" : "Filter using range of size of the file",
-            "aggregation_type" : "stats",
-            "increments" : [
+        "file_size": {
+            "title": "File Size",
+            "description": "Filter using range of size of the file",
+            "aggregation_type": "stats",
+            "increments": [
                 1024,
                 10240,
                 1048576,
@@ -332,32 +368,32 @@
                 10737418240,
                 107374182400
             ],
-            "disabled" : false,
-            "comment" : "disabled flag may be removed once we (a) can handle ?field=val1-to-val2 (ranges) in filters and (b) send ranges from FacetList to search URI."
+            "disabled": false,
+            "comment": "disabled flag may be removed once we (a) can handle ?field=val1-to-val2 (ranges) in filters and (b) send ranges from FacetList to search URI."
         },
-        "date_created" : {
-            "title" : "Date Created",
-            "aggregation_type" : "date_histogram",
-            "disabled" : true,
-            "comment" : "disabled flag may be removed after we can handle ranges in URI filters."
+        "date_created": {
+            "title": "Date Created",
+            "aggregation_type": "date_histogram",
+            "disabled": true,
+            "comment": "disabled flag may be removed after we can handle ranges in URI filters."
         }
     },
     "columns": {
-        "file_type" : {
-            "title" : "File Type"
+        "file_type": {
+            "title": "File Type"
         },
         "file_format.file_format": {
-            "title" : "File Format"
+            "title": "File Format"
         },
-        "file_size" : {
-            "title" : "File Size",
+        "file_size": {
+            "title": "File Size",
             "default_hidden": false
         },
         "date_created": {
-            "default_hidden" : true
+            "default_hidden": true
         },
         "last_modified.date_modified": {
-            "default_hidden" : true
+            "default_hidden": true
         }
     }
 }

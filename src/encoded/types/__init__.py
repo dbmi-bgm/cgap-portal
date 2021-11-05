@@ -1,8 +1,6 @@
 """init.py lists all the collections that do not have a dedicated types file."""
 
 import transaction
-
-# from pyramid.traversal import find_root
 from snovault import (
     calculated_property,
     collection,
@@ -19,10 +17,10 @@ from .base import (
     Item,
     get_item_or_none,
     set_namekey_from_title,
-    ALLOW_OWNER_EDIT,
-    ALLOW_CURRENT,
-    DELETED,
-    ONLY_ADMIN_VIEW
+    # ALLOW_OWNER_EDIT,
+    # ALLOW_CURRENT,
+    DELETED_ACL,
+    ONLY_ADMIN_VIEW_ACL
 )
 
 
@@ -40,7 +38,13 @@ def includeme(config):
 class Report(Item):
     item_type = 'report'
     schema = load_schema('encoded:schemas/report.json')
-    embedded_list = []
+    embedded_list = [
+        "variant_samples.interpretation.classification",
+        "variant_samples.interpretation.conclusion",
+        "variant_samples.interpretation.acmg_guidelines",
+        "variant_samples.interpretation.note_text",
+        "extra_notes.note_text"
+    ]
     rev = {'case': ('Case', 'report')}
 
     @calculated_property(schema={
@@ -66,29 +70,6 @@ class Report(Item):
             if case_props and case_props.get('case_id'):
                 return case_props['case_id'] + ' Case Report'
         return accession
-
-
-@collection(
-    name='genes',
-    unique_key='gene:ensgid',
-    properties={
-        'title': 'Genes',
-        'description': 'Gene items',
-    })
-class Gene(Item):
-    """Gene class."""
-    item_type = 'gene'
-    name_key = 'ensgid'  # use the ENSEMBL Gene ID as the identifier
-    schema = load_schema('encoded:schemas/gene.json')
-    embedded_list = []
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "Gene ID",
-        "type": "string"
-    })
-    def display_title(self, gene_symbol):
-        return gene_symbol
 
 
 @collection(
@@ -148,6 +129,9 @@ class Document(ItemWithAttachment, Item):
             return attachment.get('download')
         return Item.display_title(self)
 
+    class Collection(Item.Collection):
+        pass
+
 
 @collection(
     name='file-formats',
@@ -187,9 +171,9 @@ class TrackingItem(Item):
     embedded_list = []
     STATUS_ACL = Item.STATUS_ACL.copy()
     STATUS_ACL.update({
-        'released': ALLOW_OWNER_EDIT + ALLOW_CURRENT,
-        'deleted': ALLOW_OWNER_EDIT + DELETED,
-        'draft': ALLOW_OWNER_EDIT + ONLY_ADMIN_VIEW,
+        'released': ONLY_ADMIN_VIEW_ACL,
+        'deleted': DELETED_ACL,
+        'draft': ONLY_ADMIN_VIEW_ACL
     })
 
     @classmethod

@@ -1,15 +1,220 @@
 [
     {
+        "name": "help/submission/file-upload",
+        "title": "Uploading Sequencing Files",
+        "status": "public",
+        "aliases": [
+            "cgap-core:file-upload-help-page"
+        ],
+        "content": [
+            "7402da3f-d178-4527-92f3-c22c7496ba7e"
+        ],
+        "table-of-contents": {
+            "enabled": false,
+            "header-depth": 4
+        },
+        "uuid": "de46e080-b53b-40cd-9038-c174b72eacc2"
+    },
+    {
+        "name": "help/portal_ontology_usage",
+        "title": "Ontology Usage",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:ontology_help_page"
+        ],
+        "content": [
+            "76a1471a-a9cd-4192-a965-470e241308e3"
+        ],
+        "table-of-contents": {
+            "enabled": true,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
+        },
+        "uuid": "dc5305dc-9b1c-461e-872d-6810d98e6fa5"
+    },
+    {
+        "name": "help/submission/gene-lists",
+        "title": "Gene List Submission",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:genelist_submission_help"
+        ],
+        "content": [
+            "1172b73d-deb4-476c-aaed-ee212ede9a10"
+        ],
+        "table-of-contents": {
+            "enabled": false,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
+        },
+        "uuid": "dc3bfa77-b7f4-45d2-a5f2-76269df59169"
+    },
+    {
+        "name": "help",
+        "title": "Help",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:top-level-help-page"
+        ],
+        "children": [
+            "dc5305dc-9b1c-461e-872d-6810d98e6fa5",
+            "a892e8f0-e163-4202-8731-555e4880e337",
+            "59acc805-4833-4d2c-be00-fb0947f133e4",
+            "9204be0a-98d4-4794-84a2-a05daefecc7c",
+            "10d94dca-824f-4988-9516-8acf8d723107"
+        ],
+        "table-of-contents": {
+            "enabled": false,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
+        },
+        "uuid": "ccedbc85-1df5-40a0-83f2-d6f55ac213bd"
+    },
+    {
+        "name": "help/submission/family-history",
+        "title": "Submitting Family History",
+        "status": "public",
+        "aliases": [
+            "cgap-core:family-history-help-page"
+        ],
+        "content": [
+            "80f69c31-4f9f-487c-901a-b39bf31a1d23",
+            "cdf07b95-eb9c-467d-8918-b45a34003ae0",
+            "f99fbe38-962d-4370-9107-a703544f15ad"
+        ],
+        "table-of-contents": {
+            "enabled": true,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
+        },
+        "uuid": "ca49a92c-9160-4809-9c7e-72cc52f76e50"
+    },
+    {
         "name": "about",
-        "uuid": "c79afee0-7ba5-4dc6-9c1c-684984f85607",
         "title": "About",
+        "status": "shared",
         "content": [
             "442c8aa0-dc6c-43d7-814a-854af460b008",
             "442c8aa0-dc6c-43d7-814a-854af460b009",
             "442c8aa0-dc6c-43d7-814a-854af460b010"
         ],
         "table-of-contents": {
-            "enabled": false
-        }
+            "enabled": false,
+            "header-depth": 4
+        },
+        "uuid": "c79afee0-7ba5-4dc6-9c1c-684984f85607"
+    },
+    {
+        "name": "help.logging-in",
+        "status": "public",
+        "aliases": [
+            "cgap-core:logging-in-redirect"
+        ],
+        "redirect": {
+            "code": 307,
+            "target": "help/logging-in",
+            "enabled": true
+        },
+        "table-of-contents": {
+            "enabled": false,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
+        },
+        "uuid": "b53360eb-a0d9-4a7f-8fc1-b14995743388"
+    },
+    {
+        "name": "help/logging-in",
+        "title": "Account Help",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:account-help"
+        ],
+        "content": [
+            "6f5c7fd0-b7e3-46e6-96f8-8bc22f153d52",
+            "9333c5b8-de6f-49d9-ac08-1b53c848c92e"
+        ],
+        "table-of-contents": {
+            "enabled": true,
+            "header-depth": 4
+        },
+        "uuid": "a892e8f0-e163-4202-8731-555e4880e337"
+    },
+    {
+        "name": "help/submission/accessioning",
+        "title": "Submitting New Cases to CGAP",
+        "status": "public",
+        "aliases": [
+            "cgap-core:accessioning-info-page"
+        ],
+        "content": [
+            "3a66db99-f17a-4a63-b1d9-64e729339570",
+            "0aa11521-a521-41f3-80a5-8aabc754df70",
+            "aa30d13c-da63-4a77-9a7a-5611ee3e965d"
+        ],
+        "table-of-contents": {
+            "enabled": true,
+            "header-depth": 4
+        },
+        "uuid": "93403ba7-47d6-4118-a84b-223e8ca72062"
+    },
+    {
+        "name": "help/developer_facing_documentation",
+        "title": "Informatics Documentation",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:developer_facing_documentation"
+        ],
+        "content": [
+            "607a6f1b-de11-4777-a4fe-733d57a09d3a"
+        ],
+        "table-of-contents": {
+            "enabled": false,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
+        },
+        "uuid": "9204be0a-98d4-4794-84a2-a05daefecc7c"
+    },
+    {
+        "name": "help/annotation_browser",
+        "title": "Annotation Browser",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:annotation_browser_help_page"
+        ],
+        "content": [
+            "d48a3bda-232b-425c-a46f-42816524f003"
+        ],
+        "table-of-contents": {
+            "enabled": true,
+            "header-depth": 4
+        },
+        "uuid": "59acc805-4833-4d2c-be00-fb0947f133e4"
+    },
+    {
+        "name": "help/submission",
+        "title": "Submissions to CGAP",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:submission_help"
+        ],
+        "children": [
+            "93403ba7-47d6-4118-a84b-223e8ca72062",
+            "dc3bfa77-b7f4-45d2-a5f2-76269df59169",
+            "de46e080-b53b-40cd-9038-c174b72eacc2",
+            "ca49a92c-9160-4809-9c7e-72cc52f76e50"
+        ],
+        "table-of-contents": {
+            "enabled": false,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
+        },
+        "uuid": "10d94dca-824f-4988-9516-8acf8d723107"
     }
 ]

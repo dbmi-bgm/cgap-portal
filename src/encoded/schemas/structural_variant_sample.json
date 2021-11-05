@@ -1,0 +1,787 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "institution",
+        "project",
+        "CALL_INFO",
+        "structural_variant",
+        "file"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "annotation_id"
+    ],
+    "additionalProperties": false,
+    "title": "Structural Sample Variant",
+    "description": "Schema for structural variant info for sample",
+    "id": "/profiles/structural_variant_sample.json",
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/notes"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        }
+    ],
+    "properties": {
+        "CALL_INFO": {
+            "title": "Sample ID",
+            "field_name": "CALL_INFO",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "sample",
+            "source_name": "VCF",
+            "description": "Sample Identifier",
+            "scope": "sample_variant",
+            "schema_title": "Sample ID"
+        },
+        "GQ": {
+            "title": "Genotype Quality",
+            "field_name": "GQ",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "GQ",
+            "source_name": "VCF",
+            "description": "Genotype quality",
+            "scope": "sample_variant",
+            "schema_title": "Genotype Quality"
+        },
+        "GT": {
+            "title": "Genotype",
+            "field_name": "GT",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "GT",
+            "source_name": "VCF",
+            "description": "Genotype",
+            "scope": "sample_variant",
+            "schema_title": "Genotype"
+        },
+        "PL": {
+            "title": "Genotype Likelihoods (0/0, 0/1, 1/1)",
+            "field_name": "PL",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "PL",
+            "source_name": "VCF",
+            "description": "Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",
+            "scope": "sample_variant",
+            "schema_title": "Genotype Likelihoods (0/0, 0/1, 1/1)"
+        },
+        "annotation_id": {
+            "title": "Annotation ID",
+            "type": "string",
+            "uniqueKey": true
+        },
+        "confidence_interval_end": {
+            "title": "End Position Confidence Interval",
+            "type": "array",
+            "field_name": "confidence_interval_end",
+            "items": {
+                "title": "End Position Confidence Interval",
+                "field_name": "confidence_interval_end",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "CIEND",
+                "source_name": "VCF",
+                "description": "Confidence interval of end position in basepairs",
+                "scope": "sample_variant",
+                "schema_title": "End Position Confidence Interval"
+            }
+        },
+        "confidence_interval_start": {
+            "title": "Start Position Confidence Interval",
+            "type": "array",
+            "field_name": "confidence_interval_start",
+            "items": {
+                "title": "Start Position Confidence Interval",
+                "field_name": "confidence_interval_start",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "CIPOS",
+                "source_name": "VCF",
+                "description": "Confidence interval of start position in basepairs",
+                "scope": "sample_variant",
+                "schema_title": "Start Position Confidence Interval"
+            }
+        },
+        "discovery_interpretation": {
+            "title": "Discovery Interpretation",
+            "description": "Gene/Variant Discovery interpretation note connected to this item",
+            "type": "string",
+            "linkTo": "NoteDiscovery"
+        },
+        "file": {
+            "title": "File",
+            "description": "String Accession of the vcf file used in digestion",
+            "type": "string"
+        },
+        "gene_notes": {
+            "title": "Gene Notes",
+            "description": "Note item related to this Gene",
+            "type": "string",
+            "linkTo": "NoteStandard"
+        },
+        "genotype_labels": {
+            "title": "Genotype Labels",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "role": {
+                        "title": "Role",
+                        "type": "string"
+                    },
+                    "labels": {
+                        "title": "Genotype Labels",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "imprecise": {
+            "title": "Imprecise Structural Variant",
+            "field_name": "imprecise",
+            "type": "boolean",
+            "do_import": true,
+            "vcf_field": "IMPRECISE",
+            "source_name": "VCF",
+            "description": "Imprecise structural variant flag from Manta",
+            "scope": "sample_variant",
+            "schema_title": "Imprecise Structural Variant"
+        },
+        "inheritance_modes": {
+            "title": "Inheritance Modes",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "interpretation": {
+            "title": "Clinical Interpretation",
+            "description": "Clinical Interpretation Note connected to this item",
+            "type": "string",
+            "linkTo": "NoteInterpretation"
+        },
+        "samplegeno": {
+            "title": "Sample Genotype",
+            "type": "array",
+            "items": {
+                "title": "Sample Genotype",
+                "type": "object",
+                "properties": {
+                    "samplegeno_numgt": {
+                        "title": "Sample Genotype (Numeric)",
+                        "field_name": "samplegeno_numgt",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "GT",
+                        "source_name": "VCF",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Sample genotype (number format)",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype (Numeric)"
+                    },
+                    "samplegeno_sampleid": {
+                        "title": "Sample Genotype (Sample ID)",
+                        "field_name": "samplegeno_sampleid",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "sample",
+                        "source_name": "VCF",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Sample ID",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype (Sample ID)"
+                    },
+                    "samplegeno_quality": {
+                        "title": "Sample Genotype Quality",
+                        "field_name": "samplegeno_quality",
+                        "type": "integer",
+                        "do_import": true,
+                        "vcf_field": "GQ",
+                        "source_name": "VCF",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Sample Phred-scaled genotype quality",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype Quality"
+                    },
+                    "samplegeno_likelihood": {
+                        "title": "Sample Genotype Likelihoods (0/0, 0/1, 1/1)",
+                        "field_name": "samplegeno_likelihood",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "PL",
+                        "source_name": "VCF",
+                        "sub_embedding_group": "{\"key\": \"samplegeno\", \"title\": \"Sample Genotype\"}",
+                        "description": "Sample normalized, Phred-scaled genotype likelihoods (0/0, 0/1, 1/1)",
+                        "scope": "sample_variant",
+                        "schema_title": "Sample Genotype Likelihoods (0/0, 0/1, 1/1)"
+                    }
+                }
+            }
+        },
+        "schema_version": {
+            "default": "1"
+        },
+        "structural_variant": {
+            "title": "Structural Variant",
+            "type": "string",
+            "linkTo": "StructuralVariant"
+        },
+        "variant_notes": {
+            "title": "Variant Notes",
+            "description": "Notes related to the relevant Variant",
+            "type": "string",
+            "linkTo": "NoteStandard"
+        }
+    },
+    "columns": {
+        "display_title": {
+            "title": "Position",
+            "order": 0
+        },
+        "structural_variant.cytoband_display": {
+            "title": "Cytoband",
+            "order": 10
+        },
+        "structural_variant.SV_TYPE": {
+            "title": "Type",
+            "order": 20
+        },
+        "structural_variant.size": {
+            "title": "Size",
+            "order": 30
+        },
+        "structural_variant.transcript.csq_gene.display_title": {
+            "title": "Gene(s)",
+            "order": 40
+        },
+        "associated_genotype_labels.proband_genotype_label": {
+            "title": "Genotype",
+            "order": 50,
+            "sort_fields": [
+                {
+                    "field": "associated_genotype_labels.proband_genotype_label",
+                    "title": "Proband GT"
+                },
+                {
+                    "field": "associated_genotype_labels.mother_genotype_label",
+                    "title": "Mother GT"
+                },
+                {
+                    "field": "associated_genotype_labels.father_genotype_label",
+                    "title": "Father GT"
+                }
+            ]
+        },
+        "structural_variant.gnomadg_af": {
+            "title": "Allele Frequency",
+            "order": 70,
+            "sort_fields": [
+                {
+                    "field": "structural_variant.gnomadg_af",
+                    "title": "gnomAD AF"
+                },
+                {
+                    "field": "structural_variant.unrelated_count",
+                    "title": "Internal AF"
+                }
+            ]
+        }
+    },
+    "facets": {
+        "structural_variant.gnomadg_af": {
+            "title": "gnomAD SV",
+            "aggregation_type": "range",
+            "number_step": "any",
+            "order": 0,
+            "grouping": "Allele Frequency",
+            "hide_facet_counts": true,
+            "ranges": [
+                {
+                    "from": 0,
+                    "to": 0,
+                    "label": "unobserved"
+                },
+                {
+                    "from": 0,
+                    "to": 0.001,
+                    "label": "ultra-rare"
+                },
+                {
+                    "from": 0,
+                    "to": 0.01,
+                    "label": "rare"
+                },
+                {
+                    "from": 0.01,
+                    "to": 1,
+                    "label": "common"
+                }
+            ]
+        },
+        "structural_variant.unrelated_count": {
+            "title": "CGAP Reference Frequency",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 1,
+            "grouping": "Allele Frequency"
+        },
+        "structural_variant.SV_TYPE": {
+            "title": "Variant Type",
+            "order": 10
+        },
+        "structural_variant.size": {
+            "title": "Size",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 20
+        },
+        "structural_variant.transcript.csq_gene.display_title": {
+            "title": "Gene",
+            "order": 30,
+            "grouping": "Genes",
+            "search_type": "sayt_without_terms",
+            "sayt_item_type": "Gene"
+        },
+        "associated_genelists": {
+            "title": "Gene List",
+            "extended_description": "src/encoded/docs/extended_description_VariantSample_genelist.html",
+            "order": 31,
+            "grouping": "Genes",
+            "description": "Groups of genes that are relevant to a disease or condition"
+        },
+        "structural_variant.transcript.csq_gene.s_het": {
+            "title": "S_het",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 40,
+            "grouping": "Constraint Metrics"
+        },
+        "structural_variant.transcript.csq_gene.oe_lof_upper": {
+            "title": "LOEUF",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 41,
+            "grouping": "Constraint Metrics"
+        },
+        "structural_variant.transcript.csq_gene.oe_mis": {
+            "title": "o/e (missense)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 42,
+            "grouping": "Constraint Metrics"
+        },
+        "structural_variant.transcript.csq_gene.oe_lof": {
+            "title": "o/e (LoF)",
+            "aggregation_type": "stats",
+            "number_step": "any",
+            "order": 43,
+            "grouping": "Constraint Metrics"
+        },
+        "structural_variant.transcript.csq_consequence.display_title": {
+            "title": "Consequence",
+            "order": 50,
+            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_consequence.html"
+        },
+        "inheritance_modes": {
+            "title": "Inheritance Modes",
+            "order": 55,
+            "grouping": "Inheritance",
+            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode.html",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Possibly de novo",
+                "Homozygous recessive",
+                "Loss of Heterozygosity",
+                "Dominant (maternal)",
+                "Dominant (paternal)",
+                "X-linked recessive (Maternal)",
+                "X-linked dominant (Maternal)",
+                "X-linked dominant (Paternal)",
+                "Y-linked dominant",
+                "Low relevance, homozygous in a parent",
+                "Low relevance, present in both parent(s)",
+                "Low relevance, missing call(s) in family",
+                "Low relevance, mismatching chrXY genotype(s)",
+                "Low relevance, other"
+            ]
+        },
+        "proband_only_inheritance_modes": {
+            "title": "Inheritance Modes",
+            "order": 55,
+            "grouping": "Inheritance",
+            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode_proband_only.html",
+            "default_hidden": true,
+            "rescue_terms": [
+                "X-linked",
+                "Y-linked"
+            ]
+        },
+        "associated_genotype_labels.proband_genotype_label": {
+            "title": "Proband Genotype",
+            "order": 60,
+            "grouping": "Genotype",
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.mother_genotype_label": {
+            "title": "Mother Genotype",
+            "order": 61,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.father_genotype_label": {
+            "title": "Father Genotype",
+            "order": 62,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.co_parent_genotype_label": {
+            "title": "Co-Parent Genotype",
+            "order": 63,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_genotype_label": {
+            "title": "Sister Genotype",
+            "order": 64,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_II_genotype_label": {
+            "title": "Sister II Genotype",
+            "order": 65,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_III_genotype_label": {
+            "title": "Sister III Genotype",
+            "order": 66,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_IV_genotype_label": {
+            "title": "Sister IV Genotype",
+            "order": 67,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_genotype_label": {
+            "title": "Brother Genotype",
+            "order": 68,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_II_genotype_label": {
+            "title": "Brother II Genotype",
+            "order": 69,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_III_genotype_label": {
+            "title": "Brother III Genotype",
+            "order": 70,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_IV_genotype_label": {
+            "title": "Brother IV Genotype",
+            "order": 71,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_genotype_label": {
+            "title": "Daughter Genotype",
+            "order": 72,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_II_genotype_label": {
+            "title": "Daughter II Genotype",
+            "order": 73,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_III_genotype_label": {
+            "title": "Daughter III Genotype",
+            "order": 74,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_IV_genotype_label": {
+            "title": "Daughter IV Genotype",
+            "order": 75,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_genotype_label": {
+            "title": "Son Genotype",
+            "order": 76,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_II_genotype_label": {
+            "title": "Son II Genotype",
+            "order": 77,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_III_genotype_label": {
+            "title": "Son III Genotype",
+            "order": 78,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_IV_genotype_label": {
+            "title": "Son IV Genotype",
+            "order": 79,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "structural_variant.CHROM": {
+            "title": "Chromosome",
+            "order": 90,
+            "grouping": "Location"
+        },
+        "structural_variant.START": {
+            "title": "Start Position",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 91,
+            "grouping": "Location"
+        },
+        "structural_variant.END": {
+            "title": "End Position",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 92,
+            "grouping": "Location"
+        }
+    }
+}

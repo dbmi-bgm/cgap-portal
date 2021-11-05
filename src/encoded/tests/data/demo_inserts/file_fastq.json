@@ -1,164 +1,152 @@
 [
     {
+        "status": "shared",
         "md5sum": "9a56e823d677181e9d44afd6fbd67dc3",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "paired_end": "2",
-        "status": "released",
-        "content_md5sum": "0d734c42724e82eb78acf888259df1d0",
-        "quality_metric": "2e92db42-a2d5-4ad4-a120-1befcb2c6352",
-        "accession": "GAPFIOFWFYZE",
+        "file_type": "reads",
         "uuid": "d7e176e7-a7ed-4d20-aa4f-8dc25a73a3c7",
+        "file_size": 47509687993,
+        "content_md5sum": "0d734c42724e82eb78acf888259df1d0",
+        "date_created": "2020-07-15T02:38:55.437995+00:00",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "quality_metric": "2e92db42-a2d5-4ad4-a120-1befcb2c6352",
         "file_classification": "raw file",
         "aliases": [
             "cgap:NA12877_sample_S1_R2"
         ],
+        "accession": "GAPFIOFWFYZE",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "paired_end": "2",
         "related_files": [
             {
-                "file": "00735f91-c5fd-4d63-84fd-0ef6c460abc4",
-                "relationship_type": "paired with"
+                "relationship_type": "paired with",
+                "file": "00735f91-c5fd-4d63-84fd-0ef6c460abc4"
             }
-        ],
-        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
-        "file_size": 47509687993,
-        "date_created": "2020-07-15T02:38:55.437995+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "file_type": "reads"
+        ]
     },
     {
+        "status": "shared",
         "md5sum": "ce3e825c3891b8e7d6978e2a304770f5",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "paired_end": "2",
-        "status": "released",
-        "content_md5sum": "e8b75d5bade6634be07b06517435e4d2",
-        "quality_metric": "a423a332-3e2d-46c0-9348-f52325451a27",
-        "accession": "GAPFIB4MJASV",
+        "file_type": "reads",
         "uuid": "d2dcb300-84d8-4b89-9af0-eb75c75226f8",
+        "file_size": 45138691714,
+        "content_md5sum": "e8b75d5bade6634be07b06517435e4d2",
+        "date_created": "2020-07-15T02:38:55.958321+00:00",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "quality_metric": "a423a332-3e2d-46c0-9348-f52325451a27",
         "file_classification": "raw file",
         "aliases": [
             "cgap:NA12879_sample_S1_R2"
         ],
+        "accession": "GAPFIB4MJASV",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "paired_end": "2",
         "related_files": [
             {
-                "file": "11318a6f-c9eb-433b-844d-20fa46f66a59",
-                "relationship_type": "paired with"
+                "relationship_type": "paired with",
+                "file": "11318a6f-c9eb-433b-844d-20fa46f66a59"
             }
-        ],
-        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
-        "file_size": 45138691714,
-        "date_created": "2020-07-15T02:38:55.958321+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "file_type": "reads"
+        ]
     },
     {
+        "status": "shared",
         "md5sum": "762a7580d2858af4bd52febebe6bf425",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "paired_end": "2",
-        "status": "released",
-        "content_md5sum": "f8a85522512cdcd2f8c22c3fd263356c",
-        "quality_metric": "ea20fc9e-641f-405f-8a85-439c75c2d732",
-        "accession": "GAPFIUCATWEO",
+        "file_type": "reads",
         "uuid": "a9f52239-712a-485b-9eb2-b3bcdcbfae77",
+        "file_size": 44503273316,
+        "content_md5sum": "f8a85522512cdcd2f8c22c3fd263356c",
+        "date_created": "2020-07-15T02:38:56.909929+00:00",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "quality_metric": "ea20fc9e-641f-405f-8a85-439c75c2d732",
         "file_classification": "raw file",
         "aliases": [
             "cgap:NA12878_sample_S1_R2"
         ],
+        "accession": "GAPFIUCATWEO",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "paired_end": "2",
         "related_files": [
             {
-                "file": "5b49ade0-7299-44a1-bcc8-9c2b6e32516c",
-                "relationship_type": "paired with"
+                "relationship_type": "paired with",
+                "file": "5b49ade0-7299-44a1-bcc8-9c2b6e32516c"
             }
-        ],
-        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
-        "file_size": 44503273316,
-        "date_created": "2020-07-15T02:38:56.909929+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "file_type": "reads"
+        ]
     },
     {
+        "status": "shared",
         "md5sum": "6b759c2f261d04eee7b002a7b66b4390",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "paired_end": "1",
-        "status": "released",
-        "content_md5sum": "30be0ee15c7cb5e95e055984e4bae6d3",
-        "quality_metric": "51848ea5-5282-43aa-b9e0-3f2638003d2e",
-        "accession": "GAPFIK2ZO8UI",
+        "file_type": "reads",
         "uuid": "5b49ade0-7299-44a1-bcc8-9c2b6e32516c",
+        "file_size": 43277321158,
+        "content_md5sum": "30be0ee15c7cb5e95e055984e4bae6d3",
+        "date_created": "2020-07-15T02:38:58.041296+00:00",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "quality_metric": "51848ea5-5282-43aa-b9e0-3f2638003d2e",
         "file_classification": "raw file",
         "aliases": [
             "cgap:NA12878_sample_S1_R1"
         ],
+        "accession": "GAPFIK2ZO8UI",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "paired_end": "1",
         "related_files": [
             {
-                "file": "a9f52239-712a-485b-9eb2-b3bcdcbfae77",
-                "relationship_type": "paired with"
+                "relationship_type": "paired with",
+                "file": "a9f52239-712a-485b-9eb2-b3bcdcbfae77"
             }
-        ],
-        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
-        "file_size": 43277321158,
-        "date_created": "2020-07-15T02:38:58.041296+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "file_type": "reads"
+        ]
     },
     {
+        "status": "shared",
         "md5sum": "8570baaa20acf6b5769de7f61cc2853c",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "paired_end": "1",
-        "status": "released",
-        "content_md5sum": "6e0231d8962817de72b02a2655a7fa2b",
-        "quality_metric": "b328068f-ff0a-407b-90d3-80f8a45c42f6",
-        "accession": "GAPFIHVO2FZQ",
+        "file_type": "reads",
         "uuid": "11318a6f-c9eb-433b-844d-20fa46f66a59",
+        "file_size": 44848574211,
+        "content_md5sum": "6e0231d8962817de72b02a2655a7fa2b",
+        "date_created": "2020-07-15T02:38:58.814209+00:00",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "quality_metric": "b328068f-ff0a-407b-90d3-80f8a45c42f6",
         "file_classification": "raw file",
         "aliases": [
             "cgap:NA12879_sample_S1_R1"
         ],
+        "accession": "GAPFIHVO2FZQ",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "paired_end": "1",
         "related_files": [
             {
-                "file": "d2dcb300-84d8-4b89-9af0-eb75c75226f8",
-                "relationship_type": "paired with"
+                "relationship_type": "paired with",
+                "file": "d2dcb300-84d8-4b89-9af0-eb75c75226f8"
             }
-        ],
-        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
-        "file_size": 44848574211,
-        "date_created": "2020-07-15T02:38:58.814209+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "file_type": "reads"
+        ]
     },
     {
+        "status": "shared",
         "md5sum": "4e1bc057d2f4b15105c6b447061deb1e",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "paired_end": "1",
-        "status": "released",
-        "content_md5sum": "b28cb5742eb08c729ea50b54342958eb",
-        "quality_metric": "dc71796e-dca3-4272-8a48-93f05aae0fa4",
-        "accession": "GAPFI1HVXJ5F",
+        "file_type": "reads",
         "uuid": "00735f91-c5fd-4d63-84fd-0ef6c460abc4",
+        "file_size": 46907663075,
+        "content_md5sum": "b28cb5742eb08c729ea50b54342958eb",
+        "date_created": "2020-07-15T02:38:59.111615+00:00",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "quality_metric": "dc71796e-dca3-4272-8a48-93f05aae0fa4",
         "file_classification": "raw file",
         "aliases": [
             "cgap:NA12877_sample_S1_R1"
         ],
+        "accession": "GAPFI1HVXJ5F",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "paired_end": "1",
         "related_files": [
             {
-                "file": "d7e176e7-a7ed-4d20-aa4f-8dc25a73a3c7",
-                "relationship_type": "paired with"
+                "relationship_type": "paired with",
+                "file": "d7e176e7-a7ed-4d20-aa4f-8dc25a73a3c7"
             }
-        ],
-        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
-        "file_size": 46907663075,
-        "date_created": "2020-07-15T02:38:59.111615+00:00",
-        "schema_version": "2",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
-        "file_type": "reads"
+        ]
     }
 ]

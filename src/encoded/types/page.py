@@ -2,22 +2,17 @@
 The type file for the collection Pages.  Which is used for static pages on the portal
 """
 
+from dcicutils.misc_utils import filtered_warnings
 from pyramid.httpexceptions import ( # 301-307 redirect code response
     HTTPMovedPermanently,
     HTTPFound,
     HTTPSeeOther,
     HTTPTemporaryRedirect
 )
-from pyramid.view import (
-    view_config,
-)
-from snovault import (
-    collection,
-    load_schema,
-    COLLECTIONS,
-    CONNECTION
-)
+from pyramid.view import view_config
+from snovault import collection, load_schema, COLLECTIONS, CONNECTION
 from snovault.resource_views import item_view_page
+from snovault.util import debug_log
 from snovault.validators import (
     validate_item_content_post,
     validate_item_content_put,
@@ -27,21 +22,10 @@ from snovault.validators import (
     no_validate_item_content_put,
     no_validate_item_content_patch
 )
-from snovault.util import debug_log
-from urllib.parse import (
-    urlparse,
-    urlencode
-)
-from dcicutils.misc_utils import filtered_warnings
+from urllib.parse import urlparse, urlencode
 from ..search.search import get_iterable_search_results
-from .base import (
-    Item,
-    collection_add,
-    item_edit
-)
-from .user_content import (
-    StaticSection
-)
+from .base import Item, collection_add, item_edit
+from .user_content import StaticSection
 
 
 def get_pyramid_http_exception_for_redirect_code(code):
@@ -198,10 +182,11 @@ class Page(Item):
     schema = load_schema('encoded:schemas/page.json')
     embedded_list = ['content.*']
 
-    STATUS_ACL = StaticSection.STATUS_ACL
+    # STATUS_ACL = StaticSection.STATUS_ACL
 
     class Collection(Item.Collection):
         pass
+
 
 for field in ['display_title', 'name', 'description', 'content.name']:
     Page.embedded_list = Page.embedded_list + [

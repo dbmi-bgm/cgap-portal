@@ -1,10 +1,10 @@
+import gzip
 import json
 import pytest
 
-from past.builtins import basestring
 from pkg_resources import resource_filename
+from tempfile import NamedTemporaryFile
 from unittest import mock
-from dcicutils.env_utils import CGAP_ENV_MASTERTEST, CGAP_ENV_WEBPROD, CGAP_ENV_DEV, CGAP_ENV_WOLF
 from .. import loadxl
 from ..commands.run_upgrader_on_inserts import get_inserts
 from ..commands.load_data import load_data_should_proceed
@@ -189,17 +189,48 @@ def test_load_all_gen(testapp):
         assert res4.count('SKIP:') == 0
         assert res4.count('ERROR:') == 1
         assert 'Failure loading inserts' in res4
-        assert isinstance(catch4.caught, basestring)
+        assert isinstance(catch4.caught, str)
         assert 'Failure loading inserts' in catch4.caught
 
 
-def test_load_data_should_proceed():
-    """ Tests that load_data_should_proceed does the right thing in various environment scenarios """
-    assert load_data_should_proceed(CGAP_ENV_MASTERTEST, True) is True
-    assert load_data_should_proceed(CGAP_ENV_MASTERTEST, False) is True
-    assert load_data_should_proceed(CGAP_ENV_WOLF, True) is True
-    assert load_data_should_proceed(CGAP_ENV_WOLF, False) is False
-    assert load_data_should_proceed(CGAP_ENV_DEV, True) is True
-    assert load_data_should_proceed(CGAP_ENV_DEV, False) is False
-    assert load_data_should_proceed(CGAP_ENV_WEBPROD, True) is True  # XXX: Do we really want this?
-    assert load_data_should_proceed(CGAP_ENV_WEBPROD, False) is False
+def test_legacy_load_data_should_proceed():
+    """
+    Tests that load_data_should_proceed does the right thing in various environment scenarios.
+    We wire in specific names here because these are how the legacy environment is defined.
+    In the future, we'll do this declaratively, so the variables we used to use don't matter
+    because the names won't be wired into the functions.
+    """
+    assert load_data_should_proceed('fourfront-cgaptest', allow_prod=True) is True
+    assert load_data_should_proceed('fourfront-cgaptest', allow_prod=False) is True
+
+    assert load_data_should_proceed('fourfront-cgapwolf', allow_prod=True) is True
+    assert load_data_should_proceed('fourfront-cgapwolf', allow_prod=False) is False
+
+    assert load_data_should_proceed('fourfront-cgapdev', allow_prod=True) is True
+    assert load_data_should_proceed('fourfront-cgapdev', allow_prod=False) is False
+
+    # XXX: Do we really want [a True result from the next expression]? -Will 6/5/20
+    #  I think we do, because the argument allow_prod is the result of an explicit --prod,
+    #  which is supposed to authorize it to happen. If we don't trust that argument,
+    #  we should remove it. I added the keyword argname to help make that clearer. -kmp 4-Oct-2021
+    assert load_data_should_proceed('fourfront-cgap', allow_prod=True) is True
+    assert load_data_should_proceed('fourfront-cgap', allow_prod=False) is False
+
+
+def test_get_json_file_content():
+    """Test loading of objects from (compressed) json file."""
+    dummy_dict = {"a_key": "a_value"}
+    dummy_json_bytes = json.dumps(dummy_dict).encode("utf-8")
+    with NamedTemporaryFile(suffix=".json") as tmp:
+        tmp.write(dummy_json_bytes)
+        tmp.seek(0)
+        assert loadxl.get_json_file_content(tmp.name) == dummy_dict
+    with NamedTemporaryFile(suffix=".json.gz") as tmp:
+        tmp.write(gzip.compress(dummy_json_bytes))
+        tmp.seek(0)
+        assert loadxl.get_json_file_content(tmp.name) == dummy_dict
+    with NamedTemporaryFile() as tmp:  # File path ending not acceptable
+        tmp.write(dummy_json_bytes)
+        tmp.seek(0)
+        with pytest.raises(Exception):
+            loadxl.get_json_file_content(tmp.name)

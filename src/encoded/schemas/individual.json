@@ -3,25 +3,50 @@
     "id": "/profiles/individual.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["sex"],
-    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "required": [
+        "sex"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "accession",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/accession"}
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        }
     ],
     "properties": {
         "schema_version": {
             "default": "1"
         },
-        "accession" : {
-            "accessionType" : "ID"
+        "accession": {
+            "accessionType": "ID"
         },
         "individual_id": {
             "title": "Individual ID",
@@ -55,7 +80,7 @@
             "type": "number"
         },
         "sex": {
-            "title": "Sex",
+            "title": "Sex (User-Submitted)",
             "type": "string",
             "enum": [
                 "M",
@@ -75,10 +100,12 @@
             "type": "array",
             "lookup": 40,
             "uniqueItems": true,
-            "items":{
+            "items": {
                 "title": "Phenotypic Feature Info",
                 "type": "object",
-                "required": ["phenotypic_feature"],
+                "required": [
+                    "phenotypic_feature"
+                ],
                 "properties": {
                     "phenotypic_feature": {
                         "title": "Phenotypic Feature",
@@ -105,24 +132,24 @@
                 }
             }
         },
-        "disorders" : {
-            "title" : "Disorders",
-            "type" : "array",
+        "disorders": {
+            "title": "Disorders",
+            "type": "array",
             "uniqueItems": true,
             "lookup": 50,
-            "items" : {
-                "title" : "Disorder",
-                "type" : "string",
-                "linkTo" : "Disorder"
+            "items": {
+                "title": "Disorder",
+                "type": "string",
+                "linkTo": "Disorder"
             }
         },
         "clinic_notes": {
             "title": "Notes from the Clinic",
             "type": "string"
         },
-        "birth_year" : {
-            "title" : "Year of Birth",
-            "type" : "integer",
+        "birth_year": {
+            "title": "Year of Birth",
+            "type": "integer",
             "lookup": 70
         },
         "is_deceased": {
@@ -159,9 +186,9 @@
             "lookup": 75
         },
         "cause_of_death": {
-            "title" : "Cause of Death",
-            "type" : "string",
-            "linkTo" : "Phenotype",
+            "title": "Cause of Death",
+            "type": "string",
+            "linkTo": "Phenotype",
             "lookup": 76
         },
         "age_at_death": {
@@ -191,20 +218,20 @@
             "lookup": 81
         },
         "cause_of_infertility": {
-            "title" : "Cause of Infertility",
-            "type" : "string",
+            "title": "Cause of Infertility",
+            "type": "string",
             "lookup": 82
         },
         "ancestry": {
             "title": "Ancestry",
             "description": "Ancestry of the individual by nation.",
-            "notes" : "Initial list for `items.suggested_enum` taken from https://gist.github.com/incredimike/1469814.",
+            "notes": "Initial list for `items.suggested_enum` taken from https://gist.github.com/incredimike/1469814.",
             "type": "array",
             "lookup": 30,
             "uniqueItems": true,
             "items": {
                 "title": "Ancestry",
-                "type" : "string",
+                "type": "string",
                 "suggested_enum": [
                     "Afghanistan",
                     "Albania",
@@ -261,10 +288,10 @@
                     "Costa Rica",
                     "Croatia",
                     "Cuba",
-                    "Curaçao",
+                    "Cura\u00e7ao",
                     "Cyprus",
                     "Czechia",
-                    "Côte d'Ivoire",
+                    "C\u00f4te d'Ivoire",
                     "Denmark",
                     "Djibouti",
                     "Dominica",
@@ -389,8 +416,8 @@
                     "Romania",
                     "Russian Federation (the)",
                     "Rwanda",
-                    "Réunion",
-                    "Saint Barthélemy",
+                    "R\u00e9union",
+                    "Saint Barth\u00e9lemy",
                     "Saint Helena, Ascension and Tristan da Cunha",
                     "Saint Kitts and Nevis",
                     "Saint Lucia",
@@ -454,35 +481,38 @@
                     "Yemen",
                     "Zambia",
                     "Zimbabwe",
-                    "Åland Islands"
+                    "\u00c5land Islands"
                 ]
             }
         },
-        "images" : {
-            "title" : "Images",
-            "type" : "array",
+        "images": {
+            "title": "Images",
+            "type": "array",
             "uniqueItems": true,
-            "items" : {
-                "title" : "Image",
-                "type" : "string",
-                "linkTo" : "Image"
+            "items": {
+                "title": "Image",
+                "type": "string",
+                "linkTo": "Image"
             }
         },
-        "related_documents" : {
-            "title" : "Related Documents",
+        "related_documents": {
+            "title": "Related Documents",
             "description": "Documents related to the individual, e.g. clinical notes or test results",
-            "type" : "array",
+            "type": "array",
             "uniqueItems": true,
-            "items" : {
-                "title" : "Document",
-                "type" : "string",
-                "linkTo" : "Document"
+            "items": {
+                "title": "Document",
+                "type": "string",
+                "linkTo": "Document"
             }
         },
         "institutional_id": {
             "description": "Custom identifier provided by the institution",
             "type": "object",
-            "required": ["id", "id_source"],
+            "required": [
+                "id",
+                "id_source"
+            ],
             "properties": {
                 "id": {
                     "title": "Identifier",
@@ -508,148 +538,173 @@
             "lookup": 15,
             "linkTo": "Individual"
         },
-        "samples" : {
-            "title" : "Samples",
-            "type" : "array",
+        "samples": {
+            "title": "Samples",
+            "type": "array",
             "lookup": 20,
             "uniqueItems": true,
-            "items" : {
-                "title" : "Sample",
-                "type" : "string",
-                "linkTo" : "Sample"
+            "items": {
+                "title": "Sample",
+                "type": "string",
+                "linkTo": "Sample"
             }
         }
     },
-    "facets" : {
-        "life_status" : {
-            "title" : "Life Status"
+    "facets": {
+        "life_status": {
+            "title": "Life Status"
         },
-        "sex" : {
-            "title" : "Gender"
+        "sex": {
+            "title": "Sex (User-Submitted)"
         },
-        "birth_year" : {
-            "title" : "Birth Year",
+        "birth_year": {
+            "title": "Birth Year",
             "notes": "Currently will show up as terms; need to change to date range once able to"
         },
-        "disorders" : {
-            "title" : "Disorders"
+        "disorders": {
+            "title": "Disorders"
         },
-        "phenotypic_features" : {
-            "title" : "Phenotypic Features"
+        "phenotypic_features": {
+            "title": "Phenotypic Features"
         },
-        "ancestry" : {
+        "ancestry": {
             "title": "Ancestry"
         },
-        "is_infertile" : {
+        "is_infertile": {
             "title": "Is Infertile",
-            "grouping" : "Children",
-            "notes" : "We could implement a 'boolean' facet type view"
+            "grouping": "Children",
+            "notes": "We could implement a 'boolean' facet type view"
         },
-        "is_no_children_by_choice" : {
+        "is_no_children_by_choice": {
             "title": "No Children by Choice",
-            "grouping" : "Children"
+            "grouping": "Children"
         },
-        "is_still_birth" : {
+        "is_still_birth": {
             "title": "Is Still-Birth",
-            "grouping" : "Pregnancy"
+            "grouping": "Pregnancy"
         },
-        "is_spontaneous_abortion" : {
+        "is_spontaneous_abortion": {
             "title": "Is Spontaneous Abortion",
-            "grouping" : "Pregnancy"
+            "grouping": "Pregnancy"
         },
-        "is_termination_of_pregnancy" : {
+        "is_termination_of_pregnancy": {
             "title": "Is Termination of Pregnancy",
-            "grouping" : "Pregnancy"
+            "grouping": "Pregnancy"
         },
-        "is_pregnancy" : {
-            "title" : "Is Pregnancy",
-            "grouping" : "Pregnancy"
+        "is_pregnancy": {
+            "title": "Is Pregnancy",
+            "grouping": "Pregnancy"
         },
-        "is_deceased" : {
-            "title" : "Is Deceased",
-            "grouping" : "Deceased"
+        "is_deceased": {
+            "title": "Is Deceased",
+            "grouping": "Deceased"
         },
-        "cause_of_death" : {
+        "cause_of_death": {
             "title": "Cause of Death",
-            "grouping" : "Deceased"
+            "grouping": "Deceased"
         },
-        "age_at_death" : {
+        "age_at_death": {
             "title": "Age of Death",
             "grouping": "Deceased",
             "disabled": true,
-            "notes" : "We should create calculated property that combined age_at_death + age_at_death_units, idk."
+            "notes": "We should create calculated property that combined age_at_death + age_at_death_units, idk."
         }
     },
-    "columns" : {
-        "display_title" : {
-            "notes" : "display_title is hardcoded to always be present and first column.",
-            "title" : "Individual",
-            "sort_fields" : [
-                { "field" : "accession", "title" : "Accession (CGAP ID)" },
-                { "field" : "aliases", "title" : "User-Defined Alias" },
-                { "field" : "uuid", "title" : "UUID" }
+    "columns": {
+        "display_title": {
+            "notes": "display_title is hardcoded to always be present and first column.",
+            "title": "Individual",
+            "sort_fields": [
+                {
+                    "field": "accession",
+                    "title": "Accession (CGAP ID)"
+                },
+                {
+                    "field": "aliases",
+                    "title": "User-Defined Alias"
+                },
+                {
+                    "field": "uuid",
+                    "title": "UUID"
+                }
             ]
         },
-        "institutional_id" : {
-            "title" : "Institutional ID"
+        "institutional_id.id": {
+            "title": "Institutional ID"
         },
-        "age" : {
-            "title" : "Age",
-            "notes" : "Make custom column render fxn that combines this + age units. Have it show age_at_death if present..",
-            "sort_fields" : [
-                { "field" : "age", "title" : "Age (any unit)" },
-                { "field" : "age_at_death", "title" : "Age at Death" },
-                { "field" : "gestational_age", "title" : "Gestational Age" },
-                { "field" : "birth_year", "title" : "Birth Year" }
+        "age": {
+            "title": "Age",
+            "notes": "Make custom column render fxn that combines this + age units. Have it show age_at_death if present..",
+            "sort_fields": [
+                {
+                    "field": "age",
+                    "title": "Age (any unit)"
+                },
+                {
+                    "field": "age_at_death",
+                    "title": "Age at Death"
+                },
+                {
+                    "field": "gestational_age",
+                    "title": "Gestational Age"
+                },
+                {
+                    "field": "birth_year",
+                    "title": "Birth Year"
+                }
             ],
-            "default_hidden" : false
+            "default_hidden": false
         },
-        "sex" : {
-            "title" : "Sex",
-            "description" : "Gender of Individual",
-            "widthMap" : { "lg" : 120, "md" : 100, "sm" : 100 },
-            "default_hidden" : false
+        "sex": {
+            "title": "Sex",
+            "description": "Sex of Individual",
+            "widthMap": {
+                "lg": 120,
+                "md": 100,
+                "sm": 100
+            },
+            "default_hidden": false
         },
-        "ancestry" : {
-            "title" : "Ancestry",
-            "default_hidden" : true
+        "ancestry": {
+            "title": "Ancestry",
+            "default_hidden": true
         },
-        "life_status" : {
-            "title" : "Life Status",
-            "default_hidden" : false
+        "life_status": {
+            "title": "Life Status",
+            "default_hidden": false
         },
-        "age_at_death" : {
-            "title" : "Age at Death",
-            "default_hidden" : true,
-            "notes" : "Make custom column render fxn that combines this + units"
+        "age_at_death": {
+            "title": "Age at Death",
+            "default_hidden": true,
+            "notes": "Make custom column render fxn that combines this + units"
         },
-        "cause_of_death" : {
-            "title" : "Death Cause",
-            "default_hidden" : true
+        "cause_of_death": {
+            "title": "Death Cause",
+            "default_hidden": true
         },
-        "is_pregnancy" : {
-            "title" : "Pregnancy",
-            "default_hidden" : true
+        "is_pregnancy": {
+            "title": "Pregnancy",
+            "default_hidden": true
         },
-        "is_termination_of_pregnancy" : {
-            "title" : "Termination of Pregnancy",
-            "default_hidden" : true
+        "is_termination_of_pregnancy": {
+            "title": "Termination of Pregnancy",
+            "default_hidden": true
         },
-        "is_spontaneous_abortion" : {
-            "title" : "Spontaneous Abortion",
-            "default_hidden" : true
+        "is_spontaneous_abortion": {
+            "title": "Spontaneous Abortion",
+            "default_hidden": true
         },
-        "is_still_birth" : {
-            "title" : "Still Birth",
-            "default_hidden" : true
+        "is_still_birth": {
+            "title": "Still Birth",
+            "default_hidden": true
         },
-        "is_no_children_by_choice" : {
-            "title" : "No Children by Choice",
-            "default_hidden" : true
+        "is_no_children_by_choice": {
+            "title": "No Children by Choice",
+            "default_hidden": true
         },
-        "is_infertile" : {
-            "title" : "Infertile",
-            "default_hidden" : true
+        "is_infertile": {
+            "title": "Infertile",
+            "default_hidden": true
         }
     }
 }

@@ -22,10 +22,12 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     padding-bottom: 0;
     padding-left: 15px;
     padding-right: 15px;
+    display: flex;
+    align-items: center;
+    transition: opacity .3s ease-in-out;
 
     @include navbar-fixed-position {
         height: inherit;
-        line-height: inherit;
     }
 
     i.icon {
@@ -51,12 +53,10 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     }
 
     &[disabled] {
-        color: $gray-300;
-
+        opacity: 0.5;
         &:focus,
         &:hover {
             background-color: transparent;
-            color: $gray-300;
             cursor: default;
         }
     }
@@ -77,6 +77,7 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     }
 
     @include navbar-static-position {
+        line-height: $navbar-small-height;
         &.big-dropdown-toggle {
             &:after {
                 transform: rotate(-90deg);
@@ -143,7 +144,7 @@ div#top-nav.navbar-fixed-top {
         border: none;
         //box-sizing: content-box; /* Exclude bottom border from min-height */
         min-height: $navbar-full-height; /* Mobile default - overriden for desktop (fixed-position) size */
-        line-height: $navbar-small-height; /* Mobile default - overriden for desktop (fixed-position) size */
+        // line-height: $navbar-small-height; /* Mobile default - overriden for desktop (fixed-position) size */
         position: relative;
 
         padding: 0;
@@ -160,15 +161,14 @@ div#top-nav.navbar-fixed-top {
             padding: 0;
             min-height: $navbar-small-height;
             height: $navbar-full-height;
-            line-height: $navbar-full-height;
+            // line-height: $navbar-full-height;
             z-index: 10;
 
             -webkit-backface-visibility: hidden;
             -moz-backface-visibility: hidden;
             backface-visibility: hidden;
             transform: translate3d(0,0,0);
-            transition: height $navbar-transition-length $navbar-transition-easing, 
-                line-height $navbar-transition-length $navbar-transition-easing;
+            transition: height $navbar-transition-length $navbar-transition-easing;
                 /* box-shadow $navbar-transition-length, 
                 border-color $navbar-transition-length */;
 
@@ -176,7 +176,7 @@ div#top-nav.navbar-fixed-top {
             body.is-full-screen:not([data-pathname="/browse/"]):not([data-pathname="/search/"]) .navbar-container &,
             body.is-item-view .navbar-container & {
                 height: $navbar-small-height;
-                line-height: $navbar-small-height;
+                // line-height: $navbar-small-height;
                 //border-color: #d4d4d4;
                 //box-shadow: 0 0 3px rgba(0,0,0,0.2);
             }
@@ -188,8 +188,7 @@ div#top-nav.navbar-fixed-top {
             // margin-left: -50px !important;
             color: $navbar-default-brand-color;
             min-width: 270px;
-            height: inherit;
-            line-height: inherit;
+            height: 100%;
             max-height: $navbar-full-height;
             margin-left: 0px;
             text-decoration: none;
@@ -206,8 +205,7 @@ div#top-nav.navbar-fixed-top {
 
             > .img-container {
                 position: relative;
-                height: inherit;
-                line-height: inherit;
+                height: 100%;
                 display: flex;
                 align-items: center;
                 padding-right: 20px;
@@ -310,8 +308,7 @@ div#top-nav.navbar-fixed-top {
         > .navbar-collapse {
 
             @include navbar-fixed-position {
-                height: inherit;
-                line-height: inherit;
+                height: 100%;
             }
 
             @include navbar-static-position {
@@ -332,27 +329,12 @@ div#top-nav.navbar-fixed-top {
 
                 @include navbar-fixed-position {
                     height: inherit;
-                    line-height: inherit;
                 }
 
                 @include navbar-static-position {
                     /** Dropdowns get custom display when collapsed **/
                     padding: 10px 0;
                     margin: 0;
-
-                    .dropdown.show .dropdown-menu {
-                        /* Unset dropdown default styles */
-                        background-color: transparent;
-                        border: 0;
-                        box-shadow: none;
-            
-                        > a, .dropdown-header {
-                            padding: 5px 15px 5px 25px;
-                            line-height: inherit;
-                            color: $navbar-link-color;
-                        }
-            
-                    }
                 }
 
                 // User Actions Dropdown
@@ -379,19 +361,18 @@ div#top-nav.navbar-fixed-top {
                                 width: 30px;
                                 height: 30px;
                             }
+                            .user-first-name {
+                                flex-grow: 0;
+                                flex-shrink: 1;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
                             @include media-breakpoint-up(lg){
                                 img.account-icon-image {
                                     margin-right: 12px;
                                 }
                             }
             
-                        }
-
-                        > a {
-                            @include navbar-link-button-item;
-                            white-space: nowrap;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
                         }
 
                         .dropdown-menu {
@@ -403,15 +384,15 @@ div#top-nav.navbar-fixed-top {
                         }
 
                         @include navbar-fixed-position {
-                            max-width: 120px;
+                            max-width: 200px; //120px;
                         }
 
                         @include media-breakpoint-between(lg, xl) {
-                            max-width: 150px;
+                            max-width: 300px; // 150px;
                         }
 
                         @include media-breakpoint-up(xl) {
-                            max-width: 180px;
+                            max-width: 320px; // 180px;
                         }
                     }
 
@@ -568,135 +549,6 @@ div#top-nav.navbar-fixed-top {
                 transform: translate3d(0,1px,0);
             }
         
-        }
-
-    }
-
-    #stats {
-        //border-bottom: 1px solid #ddd;
-        opacity : 1;
-        transition: opacity .5s;
-        border-top: 1px solid #eee;
-        &.invisible {
-            visibility: visible;
-            opacity : 0;
-            z-index: -1;
-            border-bottom-width: 0;
-            border-top-width: 0;
-            .inner.container {
-                height: 0px;
-                transition: height .35s ease;
-                body.loading-request & {
-                    transition: height 0s;
-                }
-            }
-        }
-        .inner.container {
-            text-align: left;
-            display: block;
-            height : 37px;
-            transition: height .35s ease;
-            overflow: hidden;
-            &.showing {
-                &.showing-filters {
-                    height: 108px;
-                }
-                &.showing-charts {
-                    height: 210px;
-                }
-                .bottom-side {
-                    opacity: 1;
-                }
-            }
-            .browse-base-state-toggle-container {
-                
-                > .inner-more {
-                    float: right;
-                    line-height: 37px;
-                    height: 37px;
-                    > .onoffswitch {
-                        margin-top: -1px;
-                        display: inline-block;
-                        vertical-align: middle;
-                        margin-right: 10px;
-                    }
-                }
-                
-            }
-            .glance-label {
-                display: inline-block;
-                width: 32px;
-                text-align: center;
-                position: relative;
-                padding-top: 10px;
-                height: 37px;
-                border-right: 1px solid #f4f4f4;
-                &.showing {
-                    background-color: #f4f4f4;
-                }
-            }
-            .bottom-side {
-                opacity: 0;
-                transition: opacity 0.75s;
-                padding-top: 10px;
-                border-top: 1px solid #f4f4f4;
-                position: relative;
-                .crumbs-label {
-                    float: left;
-                    width: 72px;
-                    font-size: .85rem;
-                    margin-top: 4px;
-                }
-                .graph-icon {
-                    position: absolute;
-                    right: 0;
-                    top: 5px;
-                    width: 20px;
-                    line-height: 20px;
-                }
-            }
-            .stat {
-                //display: inline-block;
-                float: left;
-                padding: 5px 12px 4px 12px;
-                height: 37px;
-                border-right: 1px solid #f4f4f4;
-                min-width: 125px;
-                text-align: right;
-                .stat-value {
-                    font-size: 1.5rem;
-                    line-height: 2rem;
-                    font-weight: 300;
-                    color: rgba(100, 100, 100, 1);
-                    transition: color 0.3s;
-                    display: inline-block;
-                    min-width: 40px;
-                    small {
-                        opacity : 0.75;
-                        font-size: 72%;
-                    }
-                }
-                .stat-label {
-                    line-height: 1rem;
-                    display: inline-block;
-                    margin-left: 5px;
-                    color : rgba(100, 100, 100, 0.5);
-                    > a {
-                        color : inherit;
-                        display: inline-block;
-                        &:hover {
-                            color: rgba(100, 100, 100, 1);
-                            text-decoration: none;
-                        }
-                    }
-                }
-            }
-        }
-
-        .navbar-container.big-menu-open & {
-            .inner.container {
-                transition: height 0s;
-            }
         }
 
     }
@@ -1242,7 +1094,7 @@ body[data-current-action="multiselect"] {
 
 		&.big-dropdown-menu-transition-enter-done {
 			opacity: 1;
-			z-index: 100;
+			z-index: 205;
             transition: opacity .2s ease-out, top $navbar-transition-length $navbar-transition-easing;
 
 			.big-dropdown-menu {

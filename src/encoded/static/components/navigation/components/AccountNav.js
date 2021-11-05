@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import _ from 'underscore';
 
 import { JWT, isServerSide, object, console, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LoginController, LogoutController } from '@hms-dbmi-bgm/shared-portal-components/es/components/navigation/components/LoginController';
 
 import { LoginNavItem } from './LoginNavItem';
@@ -28,12 +29,12 @@ const auth0Options = {
         icon: '/static/img/exported-logo-no-stroke.svg',
         primaryColor: '#1b75b9'
     },
-    allowedConnections: ['partners', 'hms-it'],
+    allowedConnections: ['partners', 'hms-it', 'bch', 'google-oauth2'],
     defaultEnterpriseConnection: 'partners',
     languageDictionary: {
         title: 'Log In',
-        emailInputPlaceholder: 'Partners or Harvard Email',
-        databaseEnterpriseAlternativeLoginInstructions: 'or login via Partners'
+        emailInputPlaceholder: 'Partners, Harvard/BCH Email',
+        databaseEnterpriseAlternativeLoginInstructions: 'or login via Email'
     }
 };
 
@@ -50,13 +51,13 @@ const auth0Options = {
  * @todo Refactor this into a BigDropdown menu.
  */
 export const AccountNav = React.memo(function AccountNav(props){
-    const { session, updateUserInfo, schemas, ...passProps } = props;
+    const { session, updateAppSessionState, schemas, ...passProps } = props;
     const { windowWidth, href } = passProps;
 
     if (!session) { // Render login button
         return (
             <div className="navbar-nav navbar-acct">
-                <LoginController {...{ updateUserInfo, auth0Options }}>
+                <LoginController {...{ updateAppSessionState, auth0Options }}>
                     <LoginNavItem {...{ schemas, session, href, windowWidth }} key="login-register" className="user-account-item" />
                 </LoginController>
             </div>
@@ -72,7 +73,7 @@ export const AccountNav = React.memo(function AccountNav(props){
     const navItemTitle = (
         <React.Fragment>
             { acctIcon }
-            { acctTitle }
+            <span className="user-first-name">{ acctTitle }</span>
         </React.Fragment>
     );
 
@@ -81,7 +82,7 @@ export const AccountNav = React.memo(function AccountNav(props){
         <div className="navbar-nav navbar-acct">
             <BigDropdownNavItem {...passProps} {...{ windowWidth, href }} id="account-menu-item"
                 navItemContent={navItemTitle} className={cls}>
-                <UserActionsMenu {...{ userActions, href, updateUserInfo, userDetails, windowWidth }}/>
+                <UserActionsMenu {...{ userActions, href, userDetails, windowWidth }}/>
             </BigDropdownNavItem>
         </div>
     );
@@ -89,13 +90,13 @@ export const AccountNav = React.memo(function AccountNav(props){
 AccountNav.propTypes = {
     'session'         : PropTypes.bool.isRequired,      /** Passed in by App */
     'href'            : PropTypes.string.isRequired,    /** Passed in by Redux store */
-    'updateUserInfo'  : PropTypes.func.isRequired,      /** Passed in by App */
+    'updateAppSessionState'  : PropTypes.func.isRequired,      /** Passed in by App */
     'mounted'         : PropTypes.bool                  /** Passed in by Navigation */
 };
 
 
 function UserActionsMenu(props){
-    const { userActions, href, updateUserInfo, userDetails, windowWidth, windowHeight } = props;
+    const { userActions, href, userDetails, windowWidth, windowHeight } = props;
     const { first_name: firstName = "Account", last_name: lastName = null } = userDetails;
     const introTitle = firstName + (lastName ? " " + lastName : "");
 
@@ -129,7 +130,7 @@ function UserActionsMenu(props){
 
     const introBlock = (
         <BigDropdownIntroductionWrapper titleIcon="user fas" className="mb-0 border-0" {...{ windowWidth, windowHeight }}>
-            <h4 className="mb-0 mt-0 text-ellipsis-container">
+            <h4 className="mb-0 mt-0 text-truncate">
                 <a href={viewProfileURL}>
                     { introTitle }
                 </a>
@@ -148,7 +149,7 @@ function UserActionsMenu(props){
                 </div>
                 <div className="help-menu-tree level-1-no-child-links level-1 col-12 col-lg-4 mt-2">
                     { renderedActions }
-                    <LogoutController updateUserInfo={updateUserInfo}>
+                    <LogoutController>
                         <LogoutLink/>
                     </LogoutController>
                 </div>
@@ -157,11 +158,11 @@ function UserActionsMenu(props){
     );
 }
 
-function LogoutLink({ performLogout }){
+function LogoutLink({ performLogout, isLoading = false }){
     return (
         <div className="level-1-title-container">
             <a className="level-1-title text-medium d-block" onClick={performLogout} id="logoutbtn" href="#">
-                <i className="icon icon-fw icon-sign-out-alt fas mr-07"/>
+                <i className={"icon icon-fw fas mr-07 icon-" + (isLoading ? "spin icon-circle-notch" : "sign-out-alt")}/>
                 <span>Log Out</span>
             </a>
         </div>

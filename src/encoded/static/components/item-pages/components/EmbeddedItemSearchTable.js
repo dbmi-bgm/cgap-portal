@@ -1,15 +1,13 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import url from 'url';
-import memoize from 'memoize-one';
-import queryString from 'querystring';
 import { get as getSchemas, Term } from './../../util/Schemas';
 import { object, ajax, layout, isServerSide, schemaTransforms, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { columnExtensionMap as columnExtensionMapCGAP } from './../../browse/columnExtensionMap';
 import { CaseDetailPane } from './../../browse/CaseDetailPane';
+import { DetailPaneStateCache } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/DetailPaneStateCache';
 
 import { EmbeddedSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/EmbeddedSearchView';
 //import { transformedFacets } from './../../../browse/SearchView';
@@ -18,89 +16,95 @@ import { EmbeddedSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/co
 
 
 
+export function EmbeddedItemSearchTable (props){
+    const {
+        embeddedTableHeader: propEmbeddedTableHeader,
+        embeddedTableFooter,
+        /** @deprecated in favor of embeddedTableHeader */
+        title,
+        children,
+        facets,
+        session, schemas: propSchemas,
+        defaultOpenIndices, maxHeight,
+        columns, columnExtensionMap,
+        // May not be present which prevents VirtualHrefController from navigating upon mount. Useful if want to init with filterSet search or in other place.
+        searchHref,
+        aboveTableComponent,
+        aboveFacetListComponent,
+        filterFacetFxn, hideFacets,
+        filterColumnFxn, hideColumns,
+        renderDetailPane,
+        onClearFiltersVirtual,
+        isClearFiltersBtnVisible,
+        onLoad,
+        rowHeight = 90, // Keep in sync w CSS
+        openRowHeight = 90,
+        tableColumnClassName: propTableColumnClassName,
+        facetColumnClassName: propFacetColumnClassName,
+        // Used for FacetList / ExtendedDescriptionPopover:
+        addToBodyClassList, removeFromBodyClassList
+    } = props;
 
-export class EmbeddedItemSearchTable extends React.PureComponent {
+    const schemas = propSchemas || getSchemas() || null; // We might not have this e.g. in placeholders in StaticSections
+    const embeddedTableHeader = propEmbeddedTableHeader || title; // Receives props from VirtualHrefController state
 
-    static defaultProps = {
-        "columnExtensionMap": columnExtensionMapCGAP,
-        "facets" : undefined // Default to those from search response.
+    // Unless otherwise defined, set defaults for these classNames (for CGAP) to be `col-auto` + `col`.
+    // TODO: Move 'facets-column' and 'results-column' to always be added to these columns in SPC.
+    const facetColumnClassName = facets === null ? null
+        : propFacetColumnClassName || "facets-column col-auto";
+
+    const tableColumnClassName = facets === null ? undefined // undefined will be overriden by "col-12" or similar.
+        : propTableColumnClassName || "results-column col";
+
+    const passProps = {
+        facets, columns, columnExtensionMap, searchHref, session,
+        schemas, renderDetailPane, defaultOpenIndices, maxHeight,
+        rowHeight, openRowHeight,
+        onClearFiltersVirtual, isClearFiltersBtnVisible,
+        aboveTableComponent, aboveFacetListComponent,
+        embeddedTableHeader, embeddedTableFooter,
+        addToBodyClassList, removeFromBodyClassList,
+        // TODO: belowTableComponent, belowFacetListComponent,
+        filterFacetFxn, hideFacets,
+        filterColumnFxn, hideColumns,
+        onLoad,
+        facetColumnClassName, tableColumnClassName,
+        "termTransformFxn": Term.toName,
+        "separateSingleTermFacets": false,
+        "allowPostRequest": true
     };
 
-    constructor(props){
-        super(props);
-        this.getCountCallback = this.getCountCallback.bind(this);
-        this.state = { totalCount: null };
-    }
+    return (
+        <div className="embedded-search-view-outer-container">
+            <EmbeddedSearchView {...passProps} />
+            { children }
+        </div>
+    );
+}
+EmbeddedItemSearchTable.defaultProps = {
+    "columnExtensionMap": columnExtensionMapCGAP,
+    "facets" : undefined // Default to those from search response.
+};
 
-    getCountCallback(resp){
-        const { onLoad } = this.props;
-        if (resp && typeof resp.total === 'number'){
-            this.setState({ 'totalCount' : resp.total });
-        }
-        if (typeof onLoad === "function") {
-            onLoad(resp);
-        }
-    }
 
-    render(){
-        const {
-            title,
-            children,
-            facets,
-            session, schemas: propSchemas,
-            defaultOpenIndices, maxHeight,
-            columns, columnExtensionMap,
-            searchHref,
-            filterFacetFxn, hideFacets,
-            filterColumnFxn, hideColumns,
-            renderDetailPane,
-            rowHeight = 90 // Keep in sync w CSS
-        } = this.props;
-        const { totalCount } = this.state;
-
-        if (typeof searchHref !== "string") {
-            throw new Error("Expected a string 'searchHref'");
-        }
-
-        const schemas = propSchemas || getSchemas() || null; // We might not have this e.g. in placeholders in StaticSections
-
-        const passProps = {
-            facets, columns, columnExtensionMap, searchHref, session,
-            schemas, renderDetailPane, defaultOpenIndices, maxHeight,
-            rowHeight,
-            filterFacetFxn, hideFacets,
-            filterColumnFxn, hideColumns,
-            onLoad: this.getCountCallback,
-            termTransformFxn: Term.toName,
-            separateSingleTermFacets: false
-        };
-
-        /** @deprecated - Should just pass down to embeddedTableHeader once `title` instances that depend on totalCount are migrated */
-        const showTitle = !title ? null
-            : React.isValidElement(title) ? (
-                typeof title.type === "string" ? title
-                    : React.cloneElement(title, { totalCount })
-            ) : title;
-
-        const showChildren = React.isValidElement(children) && typeof children.type !== "string" ?
-            React.cloneElement(children, { totalCount }) : children;
-
-        return (
-            <div className="embedded-search-view-outer-container">
-                <EmbeddedSearchView {...passProps} embeddedTableHeader={showTitle} />
-                { showChildren }
-            </div>
-        );
-    }
+export function EmbeddedCaseSearchTable (props) {
+    return (
+        <DetailPaneStateCache>
+            <EmbeddedCaseSearchTableDetailPaneProvider {...props} />
+        </DetailPaneStateCache>
+    );
 }
 
-export function EmbeddedCaseSearchTable (props){
-    const renderDetailPane = useMemo(function(){
-        return function renderCaseDetailPane(result, rowNumber, containerWidth, propsFromTable){
-            return <CaseDetailPane {...{ result, containerWidth, rowNumber }} paddingWidth={57} />;
-        };
-    }, []);
-    return (
-        <EmbeddedItemSearchTable {...props} renderDetailPane={renderDetailPane} />
-    );
+export function EmbeddedCaseSearchTableDetailPaneProvider (props) {
+    const {
+        detailPaneStateCache,       // Passed from DetailPaneStateCache
+        updateDetailPaneStateCache, // Passed from DetailPaneStateCache
+        ...passProps
+    } = props;
+
+    const renderDetailPane = useCallback(function(result, rowNumber, containerWidth, propsFromTable){
+        return <CaseDetailPane { ...propsFromTable } {...{ result, containerWidth, rowNumber, detailPaneStateCache, updateDetailPaneStateCache }} paddingWidth={57} />;
+    }, [ detailPaneStateCache ]);
+
+    return <EmbeddedItemSearchTable {...passProps} renderDetailPane={renderDetailPane} />;
 }

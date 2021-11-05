@@ -1,17 +1,16 @@
 'use strict';
 
-import React, { useState, useMemo } from 'react';
-import _ from 'underscore';
-import url from 'url';
+import React, { useMemo, useCallback } from 'react';
 import queryString from 'query-string';
 
-import { console, layout, navigate, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
+
+import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
+import { SaveFilterSetButtonController } from './SaveFilterSetButton';
+import { SaveFilterSetPresetButtonController } from './SaveFilterSetPresetButton';
+import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-
-import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
-
-
 
 /**
  * @todo maybe reuse somewhere
@@ -75,29 +74,148 @@ export function filterQueryByQuery(query1, query2){
 }
 
 
-
 export const FilteringTab = React.memo(function FilteringTab(props) {
-    const { context = null, windowHeight, session = false } = props;
     const {
-        display_title: caseDisplayTitle,
+        context = null,
+        session = false,
+        schemas,
+        windowHeight,
+        windowWidth,
+        onCancelSelection,          // Not used -- passed in from SelectedItemsController and would close window.
+        onCompleteSelection,        // Not used -- passed in from SelectedItemsController and would send selected items back to parent window.
+        selectedItems: selectedVariantSamples,                  // passed in from SelectedItemsController
+        onSelectItem: onSelectVariantSample,                    // passed in from SelectedItemsController
+        onResetSelectedItems: onResetSelectedVariantSamples,    // passed in from SelectedItemsController
+        variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
+        updateVariantSampleListID,  // Passed in from VariantSampleListController
+        savedVariantSampleIDMap,    // Passed in from VariantSampleListController
+        fetchVariantSampleListItem, // Passed in from VariantSampleListController
+        isLoadingVariantSampleListItem, // Passed in from VariantSampleListController
+        setIsSubmitting,            // Passed in from App
+        addToBodyClassList,         // Passed in from App
+        removeFromBodyClassList     // Passed in from App
+    } = props;
+
+    const {
+        accession: caseAccession,
         initial_search_href_filter_addon = "",
-        active_filterset: {
-            "@id" : activeFilterSetID,
-            display_title: activeFilterSetTitle,
-            filter_blocks = []
-        } = {}
+        active_filterset = null,
+        additional_variant_sample_facets = []
     } = context || {};
 
-    // TODO POST request w multiple of these filter_blocks, for now just first 1 is populated and used.
-    const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
-    const searchHrefAppend = (
-        initial_search_href_filter_addon +
-        (initial_search_href_filter_addon && currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "")
+    const { "@id" : activeFilterSetID = null } = active_filterset || {};
+
+    const searchHrefBase = (
+        "/search/?type=VariantSample"
+        + (initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "")
+        + (additional_variant_sample_facets.length > 0 ? "&" + additional_variant_sample_facets.map(function(fac){ return "additional_facet=" + encodeURIComponent(fac); }).join("&") : "")
+        + "&sort=date_created"
     );
 
-    const initialSearchHref = "/search/?type=VariantSample" + (searchHrefAppend ? "&" + searchHrefAppend : "");
+    // DEPRECATED - we no longer have filter_blocks present initially.
+    // const currentActiveFilterAppend = (filter_blocks[0] || {}).query || "";
+    // const searchHrefWithCurrentFilter = searchHrefBase + (currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "");
+
     // Hide facets that are ones used to initially narrow down results to those related to this case.
-    const hideFacets = !initial_search_href_filter_addon ? null : Object.keys(queryString.parse(initial_search_href_filter_addon));
+    const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem } = useMemo(function(){
+
+        const onClearFiltersVirtual = function(virtualNavigateFxn, callback) {
+            // By default, EmbeddedSearchItemView will reset to props.searchHref.
+            // We override with searchHrefBase.
+            return virtualNavigateFxn(searchHrefBase, {}, callback);
+        };
+
+        const isClearFiltersBtnVisible = function(virtualHref){
+            // Re-use same algo for determining if is visible, but compare virtualhref
+            // against searchHrefBase (without the current filter(s)) rather than
+            // `props.searchHref` which contains the current filters.
+            return VirtualHrefController.isClearFiltersBtnVisible(virtualHref, searchHrefBase);
+        };
+
+        let hideFacets = ["type", "validation_errors.name"];
+        if (initial_search_href_filter_addon) {
+            hideFacets = hideFacets.concat(Object.keys(queryString.parse(initial_search_href_filter_addon)));
+        }
+
+        const blankFilterSetItem = {
+            "title" : "FilterSet for Case " + caseAccession,
+            "created_in_case_accession" : caseAccession,
+            "search_type": "VariantSample",
+            "filter_blocks" : [
+                {
+                    "name" : "Filter Block 1",
+                    "query" : ""
+                }
+            ]
+        };
+
+        // IMPORTANT:
+        // We preserve this, but we DO NOT utilize it in FilterSetController at moment
+        // because FilterSet Presets may be re-used for many different Cases.
+        // TODO: maybe remove
+        if (initial_search_href_filter_addon) {
+            blankFilterSetItem.flags = [
+                {
+                    "name" : "Case:" + caseAccession,
+                    "query" : initial_search_href_filter_addon
+                }
+            ];
+        }
+
+        return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem };
+    }, [ context ]);
+
+    // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedVariantSamples there.
+    const fsuiProps = {
+        schemas, session,
+        variantSampleListItem,
+        updateVariantSampleListID,
+        fetchVariantSampleListItem,
+        isLoadingVariantSampleListItem,
+        selectedVariantSamples,
+        // setIsSubmitting,
+        // "caseItem": context
+    };
+
+    const embeddedTableHeaderBody = (
+        <SaveFilterSetButtonController caseItem={context} setIsSubmitting={setIsSubmitting}>
+            <SaveFilterSetPresetButtonController>
+                <FilteringTableFilterSetUI {...fsuiProps} />
+            </SaveFilterSetPresetButtonController>
+        </SaveFilterSetButtonController>
+    );
+
+    const onFailInitialFilterSetItemLoad = useCallback(function(){
+        if (session) {
+            // todo add sentry.io call here.
+            Alerts.queue({
+                "title": "FilterSet not loaded",
+                "message": `Couldn't load the existing saved FilterSet selections Item "${activeFilterSetID}", check permissions.`,
+                "style" : "warning",
+                "navigationDissappearThreshold": 1
+            });
+        }
+        // Else nothing -- is expected; perhaps user got logged out during
+        // navigation or loading something else and hasn't refreshed page yet.
+    }, [ session ]);
+
+    // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
+    // regardless of how much Case embeds.
+    const embeddedTableHeader = activeFilterSetID ? (
+        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
+            onFail={onFailInitialFilterSetItemLoad}>
+            <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets}>
+                { embeddedTableHeaderBody }
+            </FilterSetController>
+        </ajax.FetchedItem>
+    ) : (
+        // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
+        // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
+        <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+            { embeddedTableHeaderBody }
+        </FilterSetController>
+    );
+
 
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
@@ -105,174 +223,17 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // Overrides default 400px.
     const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 445) : undefined;
 
-    return (
-        <React.Fragment>
-            <h1 className="mb-0 mt-0">
-                { caseDisplayTitle }: <span className="text-300">Variant Filtering and Technical Review</span>
-            </h1>
-            <EmbeddedItemSearchTable { ...{ hideFacets, maxHeight, session }} searchHref={initialSearchHref} title={
-                <FilteringTabSubtitle caseItem={context} />
-            } key={"session:" + session} />
-        </React.Fragment>
-    );
+    // Table re-initializes upon change of key so we use it refresh table based on session.
+    const searchTableKey = "session:" + session;
+
+    const tableProps = {
+        hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader,
+        addToBodyClassList, removeFromBodyClassList,
+        selectedVariantSamples, onSelectVariantSample,
+        savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
+        isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
+        "key": searchTableKey
+    };
+
+    return <CaseViewEmbeddedVariantSampleSearchTable {...tableProps} />;
 });
-
-/** Inherits props from EmbeddedItemSearchTable -> EmbeddedSearchView -> VirtualHrefController */
-export function FilteringTabSubtitle(props){
-    const {
-        totalCount,
-        context: searchContext,
-        href: searchHref,
-        caseItem
-    } = props;
-    const {
-        "@id" : caseAtID,
-        accession: caseAccession = null,
-        initial_search_href_filter_addon = "",
-        active_filterset = null,
-        project: {
-            "@id" : caseProjectID
-        },
-        institution: {
-            "@id" : caseInstitutionID
-        }
-    } = caseItem;
-
-    const [ isLoading, setIsLoading ] = useState(false);
-    // From `state.lastFilterSetSaved` we use only non linkTo properties from it so doesn't matter if frame=object vs frame=page for it.
-    // `undefined` means not ever set or removed previously vs `null` means explicitly nothing set in current session (for purposes of 'btnPrepend' var below)
-    const [ lastFilterSetSaved, setLastFilterSetSaved ] = useState(active_filterset || undefined);
-
-    const currentActiveFilter = typeof lastFilterSetSaved !== "undefined" ? lastFilterSetSaved : active_filterset || null;
-    const { filter_blocks: [ { query: currentActiveFilterAppend } = {} ] = [] } = currentActiveFilter || {};
-
-    const { differsFromCurrentFilterSet, filterSetQueryStr, saveNewFilterset, saveFilterBtnTip } = useMemo(function(){
-        const { query: currentQuery } = url.parse(searchHref, false);
-        const parsedCurrentQueryFiltered = filterQueryByQuery(currentQuery, "type=VariantSample&" + initial_search_href_filter_addon);
-        const filterSetQueryStr = queryString.stringify(parsedCurrentQueryFiltered);
-        const differsFromCurrentFilterSet = !!(
-            (!currentActiveFilter && filterSetQueryStr) ||
-            (currentActiveFilter && !filterSetQueryStr) ||
-            (currentActiveFilter && filterSetQueryStr && !_.isEqual(parsedCurrentQueryFiltered, queryString.parse(currentActiveFilterAppend)))
-        );
-
-        function saveNewFilterset(e){
-
-            // Hmm maybe should redo as promises/use the promisequeue..
-
-            function patchCaseItem(newFilterSetItem = null){
-                const patchBody = {};
-                if (newFilterSetItem) {
-                    patchBody.active_filterset = newFilterSetItem.uuid;
-                }
-                console.log("Setting 'active_filterset'", patchBody, newFilterSetItem);
-                ajax.load(caseAtID + (newFilterSetItem ? "" : "?delete_fields=active_filterset"), function(res){
-                    console.info("PATCHed Case Item", res);
-                    setIsLoading(false);
-                    setLastFilterSetSaved(newFilterSetItem);
-                }, "PATCH", function(err){
-                    console.error("Error PATCHing Case", err);
-                    Alerts.queue({
-                        "title" : "Error PATCHing Case",
-                        "message" : JSON.stringify(err),
-                        "style" : "danger"
-                    });
-                    setIsLoading(false);
-                }, JSON.stringify(patchBody));
-            }
-
-            function createFilterSet(callback){
-                // TODO: Filter out initial_search_href_filter_addon
-                // If no filter, skip and just set Case `active_filterset` field to none.
-                const newFilterSetItem = {
-                    "title": "FilterSet Created For Case " + caseAccession,
-                    "search_type": "VariantSample",
-                    "institution": caseInstitutionID,
-                    "project": caseProjectID,
-                    "created_in_case_accession": caseAccession,
-                    "filter_blocks": [
-                        {
-                            "name": "Primary",
-                            "query": filterSetQueryStr,
-                            // "flags_applied" : "case:" + caseAccession ? idk
-                        }
-                    ]
-                };
-                ajax.load("/filter-sets/", function(res){
-                    const { "@graph" : [ newFilterSetItem ] } = res;
-                    callback(newFilterSetItem);
-                }, "POST", function(err){
-                    console.error("Error POSTing new FilterSet", err);
-                    Alerts.queue({
-                        "title" : "Error POSTing new FilterSet",
-                        "message" : JSON.stringify(err),
-                        "style" : "danger"
-                    });
-                    setIsLoading(false);
-                }, JSON.stringify(newFilterSetItem));
-            }
-
-            setIsLoading(true);
-            if (!filterSetQueryStr) { // Falsy, e.g. "".
-                patchCaseItem(null);
-            } else {
-                createFilterSet(patchCaseItem);
-            }
-        }
-
-        const saveFilterBtnTip = "<pre class='text-white mb-0'>" + JSON.stringify(parsedCurrentQueryFiltered, null, 4) + "</pre>";
-
-        return { filterSetQueryStr, differsFromCurrentFilterSet, saveNewFilterset, saveFilterBtnTip };
-    }, [ caseItem, searchHref, currentActiveFilter ]);
-
-    // console.log('TESTING', currentActiveFilter, '\n',
-    //     filterSetQueryStr, '\n',
-    //     differsFromCurrentFilterSet, '\n',
-    //     currentActiveFilterAppend, '\n',
-    // );
-
-    let btnPrepend = null;
-    if (typeof lastFilterSetSaved !== "undefined") {
-        if (lastFilterSetSaved === null) {
-            btnPrepend = (
-                <div className="input-group-prepend">
-                    <div className="input-group-text">Removed</div>
-                </div>
-            );
-        } else {
-            // This will eventually likely be turned into tooltip or something on FilterSet blocks UI.
-            const { display_title: fsTitle, date_created: fsCreated } = lastFilterSetSaved;
-            btnPrepend = (
-                <div className="input-group-prepend">
-                    <div className="input-group-text" data-tip={fsTitle}>
-                        Saved
-                        &nbsp;<LocalizedTime timestamp={fsCreated} formatType="date-time-lg" />
-                    </div>
-                </div>
-            );
-        }
-    }
-
-    // We give the span here an 'id' here so later on it'd be easy to find using Cypress
-    // or other testing framework.
-    return (
-        <div className="d-flex flex-column flex-lg-row mt-1 mb-2 align-items-start justify-content-between">
-            <h5 className="text-300 mt-0 mb-0">
-                <span id="filtering-variants-found" className="text-400 mr-05">{ totalCount || 0 }</span>
-                Variants found
-            </h5>
-            <h5 className="text-300 mt-0 mb-0">
-                <div className="btn-group" role="group" aria-label="FilterSet Controls">
-                    { btnPrepend }
-                    <button type="button" className="btn btn-primary" data-current-query={filterSetQueryStr} data-html
-                        disabled={!differsFromCurrentFilterSet || isLoading} onClick={saveNewFilterset} data-tip={saveFilterBtnTip}>
-                        { isLoading ?
-                            <i className="icon icon-fw icon-spin icon-circle-notch fas mr-07" />
-                            : <i className="icon icon-fw icon-save fas mr-07" /> }
-                        { currentActiveFilter && !filterSetQueryStr ?  "Save Filter Removal" : "Save Current Filter" }
-                    </button>
-                </div>
-            </h5>
-        </div>
-    );
-}

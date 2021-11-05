@@ -1,4 +1,5 @@
-$pedigree-viz-bg-color: #ffffff !default;
+$pedigree-viz-bg-color: #f8f8f8 !default;
+$pedigree-viz-node-bg-color: #fff !default;
 $pedigree-viz-node-stroke-color: #444 !default;
 
 
@@ -58,12 +59,22 @@ $pedigree-disease-colors :
         $color: nth($pedigree-disease-colors, $i);
         &[data-disease-index="#{$pedigree-colors-length + $i}"] {
             background-color: darken($color, 10%);
+            @if lightness(darken($color, 10%)) > 70% {
+                color: #000;
+            } @else {
+                color: #fff;
+            }
         }
     }
     @for $i from 1 through $pedigree-colors-length {
         $color: nth($pedigree-disease-colors, $i);
         &[data-disease-index="#{2 * $pedigree-colors-length + $i}"] {
             background-color: lighten($color, 10%);
+            @if lightness(lighten($color, 10%)) > 70% {
+                color: #000;
+            } @else {
+                color: #fff;
+            }
         }
     }
 }
@@ -117,11 +128,18 @@ $pedigree-disease-colors :
                 position: relative;
                 > .pedigree-individual {
                     position: absolute;
-                    text-align: center;
-                    cursor: pointer;
+
                     z-index: 100;
                     overflow: visible;
                     //transition: overflow 0s .2s;
+
+                    .mouse-event-area {
+                        cursor: pointer;
+                        position: absolute;
+                        width: 100%;
+                        height: 100%;
+                    }
+
                     .btns-container {
                         position: absolute;
                         right: -15px;
@@ -150,21 +168,87 @@ $pedigree-disease-colors :
                         border: 1px solid transparent;
                         //left: 100%;
                         //top: 100%;
-                        padding: 0px 6px;
-                        @include transition(padding-top .2s);
-                        .line-item {
+                        text-align: left;
+                        font-size: 0.9rem;
+                        
+                        transition: transform .25s linear, opacity .3s ease-out, padding-top .2s, font-size 0.3s ease-out;
+                        opacity: 1;
+                        transform-origin: 50% 0;
+                        @include no-user-select;
+
+                        div.line-item,
+                        span.line-item {
                             width: 100%;
                             display: block;
-                            overflow: hidden;
-                            white-space: nowrap;
-                            text-overflow: ellipsis;
+                            text-align: left;
                         }
+
+                        ul {
+                            /* We apply bg color only to this child elem(s), to prevent a background
+                               behind the title element from blocking out the selected-node-identifier shape,
+                               which is on a lower layer (SVG).
+                               Potential future to-do:
+                                Move selected-node-identifier shape to HTML layer (higher). This will also
+                                allow it to transition better on other browsers, such as firefox, which doesnt
+                                support transform (as an ATTRIBUTE) transitions.
+                            */
+                            margin-top: 0.5rem;
+                            background-color: transparent;
+                            transition: background-color .3s ease-out;
+                            padding-left: 0px; /* decrease from default */
+                            list-style-type: none;
+                            line-height: 1.25em;
+                            > li {
+                                /* prevent these from wrapping */
+                                overflow: hidden;
+                                white-space: nowrap;
+                                text-overflow: ellipsis;
+                                &:before {
+                                    content: "\2022"; /* bullet point */
+                                    position: absolute;
+                                    left: -7.5px;
+                                    font-size: 0.75em;
+                                }
+                            }
+                        }
+
+                        h5[data-describing="title"] {
+                            font-size: 1em;
+                            text-align: center;
+                            white-space: nowrap;
+                            overflow: visible;
+                            font-weight: 400;
+                            margin: 0; /** Override any default such as 10px 0; */
+                            &.showing-order-based-name {
+                                font-family: $font-family-monospace;
+                                font-family: $font-family-serif;
+                                font-size: 1.125em;
+                                font-weight: 700;
+                            }
+                        }
+
+                        span.line-item[data-describing="age"] {
+                            text-align: center;
+                            white-space: nowrap;
+                            overflow: visible;
+                        }
+
+
+                    }
+
+                    .above-node-text {
+                        font-size: 1em;
+                        text-align: center;
+                        position: absolute;
+                        transition: font-size 0.3s ease-out;
+                        @include no-user-select;
                     }
     
                     &.is-hovered-over,
                     &.is-selected {
                         //overflow: visible;
                         //transition: overflow 0s;
+                        z-index: 101;
                         .btns-container {
                             opacity: 1;
                             z-index: 1;
@@ -177,8 +261,17 @@ $pedigree-disease-colors :
                             }
                         }
                         .detail-text {
-                            max-width: none !important;
-                            background-color: $pedigree-viz-bg-color;
+                            /* max-width: none !important; */
+                            width: auto !important;
+                            ul {
+                                background-color: transparentize($pedigree-viz-bg-color, 0.25);
+                                box-shadow: 0 0 10px 6px transparentize($pedigree-viz-bg-color, 0.25);
+                                li {
+                                    /* Overrides hidden + text-ellipsis */
+                                    overflow: visible;
+                                }
+                            }
+
                         }
                         &.is-editable {
                             .detail-text {
@@ -316,7 +409,7 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
 
             .bg-shape-copy {
                 stroke-width: 0px;
-                fill: $pedigree-viz-bg-color;
+                fill: $pedigree-viz-node-bg-color;
             }
 
             .fg-shape {
@@ -362,33 +455,7 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
 
             }
 
-            g.text-box {
-                // Could be above or below node
-                transition: transform .25s linear;
-                rect.bg-rect {
-                    stroke: none;
-                    fill: transparentize($pedigree-viz-bg-color, 0.25);
-                }
-                text {
-                    font-size: 0.9rem;
-                    &[data-describing="ancestry"]{
-                        font-size: 1em;
-                    }
-                    &:not(.showing-order-based-name)[data-describing="title"]{
-                        // Showing `name` (unique ID or similar)
-                    }
-                    &.showing-order-based-name[data-describing="title"]{
-                        font-family: $font-family-monospace;
-                        font-family: $font-family-serif;
-                        /* letter-spacing: -0.125em; */ // <- Enable for monospace
-                        /* font-size: 0.9125em; */
-                        /* font-size: 1em; */
-                        font-size: 1.0725em;
-                        font-weight: 700;
-                        @include no-user-select;
-                    }
-                }
-            }
+
         }
 
     }
@@ -435,3 +502,23 @@ svg.pedigree-viz-shapes-layer.shapes-layer {
     }
 }
 
+
+.pedigree-viz-container[data-is-node-selected="true"]:not([data-is-node-hovered-over="true"]) {
+    .viz-area .individuals-layer {
+        div.pedigree-individual:not(.is-selected):not(.is-hovered-over) {
+            .detail-text {
+                opacity: 0.3;
+            }
+        }
+    }
+}
+
+.pedigree-viz-container[data-is-node-hovered-over="true"] {
+    .viz-area .individuals-layer {
+        div.pedigree-individual:not(.is-hovered-over) {
+            .detail-text {
+                opacity: 0.15;
+            }
+        }
+    }
+}

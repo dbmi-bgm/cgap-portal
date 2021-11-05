@@ -6,7 +6,6 @@ import structlog
 from pyramid.view import view_config
 from webob.multidict import MultiDict
 from functools import reduce
-from elasticsearch_dsl import Search
 from pyramid.httpexceptions import HTTPBadRequest
 from urllib.parse import urlencode
 from collections import OrderedDict
@@ -15,18 +14,20 @@ from snovault import (
     AbstractCollection,
     TYPES,
     COLLECTIONS,
+    STORAGE
 )
 from snovault.elasticsearch import ELASTIC_SEARCH
-from snovault.elasticsearch.create_mapping import determine_if_is_date_field
 from snovault.util import (
     debug_log,
 )
 from snovault.typeinfo import AbstractTypeInfo
+from ..authorization import is_admin_request
 from .lucene_builder import LuceneBuilder
 from .search_utils import (
     find_nested_path, schema_for_field, get_es_index, get_es_mapping, is_date_field, is_numerical_field,
-    execute_search, make_search_subreq,
-    NESTED, COMMON_EXCLUDED_URI_PARAMS,
+    is_array_of_numerical_field,
+    execute_search, make_search_subreq, build_sort_dicts,
+    NESTED, COMMON_EXCLUDED_URI_PARAMS, MAX_FACET_COUNTS,
 )
 
 
@@ -54,6 +55,13 @@ class SearchBuilder:
         API itself. Search is by far our most complicated API, thus there is a lot of state.
     """
     DEFAULT_SEARCH_FRAME = 'embedded'
+    DEFAULT_HIDDEN = 'default_hidden'  # facet is hidden by default
+    ADDITIONAL_FACETS = 'additional_facet'  # specifies an aggregation to compute in addition
+    RESCUE_TERMS = 'rescue_terms'  # special facet field that contains terms that should always have buckets
+    DEBUG = 'debug'  # search debug parameter
+    CARDINALITY_RANGE = '-3.4028E38-*'
+    PAGINATION_SIZE = 10  # for ECS, 10 is much better than 25, and may even do better when lowered
+    MISSING = object()
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):
@@ -67,7 +75,7 @@ class SearchBuilder:
         self.doc_types = self.set_doc_types(self.request, self.types, search_type)  # doc_types for this search
         self.es = self.request.registry[ELASTIC_SEARCH]  # handle to remote ES
         self.es_index = get_es_index(self.request, self.doc_types)  # what index we are searching on
-        self.search = Search(using=self.es, index=self.es_index)
+        self.query = {}  # new search object, just raw lucene - NOT ElasticSearch-DSL
 
         # skip setup needed for building the query, if desired
         if not skip_bootstrap:
@@ -80,6 +88,20 @@ class SearchBuilder:
         self.facets = None
         self.search_session_id = None
         self.string_query = None
+        self.facet_order_overrides = {}
+
+    def _get_es_mapping_if_necessary(self):
+        """ Looks in the registry to see if the single doc_type mapping is cached in the registry, which it
+            should be - thus saving us some time from external API calls at the expense of application memory.
+        """
+        if len(self.doc_types) == 1:  # extract mapping from storage if we're searching on a single doc type
+            item_type_snake_case = ''.join(['_' + c.lower() if c.isupper() else c for c in self.doc_types[0]]).lstrip('_')
+            mappings = self.request.registry[STORAGE].read.mappings.get()
+            if self.es_index in mappings and item_type_snake_case in self.es_index:
+                return mappings[self.es_index]['mappings'][item_type_snake_case]['properties']
+            else:  # new item was added after last cache update, get directly via API
+                return get_es_mapping(self.es, self.es_index)
+        return {}
 
     def _bootstrap_query(self, search_type=None, return_generator=False, forced_type='Search',
                          custom_aggregations=None):
@@ -90,15 +112,25 @@ class SearchBuilder:
         self.principals = self.request.effective_principals  # permissions to apply to this search
 
         # Initialized via outside function call
-        self.schemas = [self.types[item_type].schema for item_type in self.doc_types]  # schemas for doc_types
+        # schemas for doc_types
+        self.schemas = [
+            self.types[item_type].schema
+            for item_type in self.doc_types
+        ]
+        # item_type hierarchy we are searching on
         self.search_types = self.build_search_types(self.types, self.doc_types) + [
-            self.forced_type]  # item_type hierarchy we are searching on
+            self.forced_type
+        ]
         self.search_base = self.normalize_query(self.request, self.types, self.doc_types)
         self.search_frame = self.request.normalized_params.get('frame', self.DEFAULT_SEARCH_FRAME)  # embedded
         self.prepared_terms = self.prepare_search_term(self.request)
+        self.additional_facets = self.request.normalized_params.getall(self.ADDITIONAL_FACETS)
+        self.debug_is_active = self.request.normalized_params.getall(self.DEBUG)  # only used if admin
+        self.source_fields = sorted(self.list_source_fields())
 
-        # Outside API Calls
-        self.item_type_es_mapping = get_es_mapping(self.es, self.es_index)  # mapping for the item type we are searching
+        # Can potentially make an outside API call, but ideally is cached
+        # Only needed if searching on a single item type
+        self.item_type_es_mapping = self._get_es_mapping_if_necessary()
 
     @property
     def forced_type_token(self):
@@ -106,20 +138,18 @@ class SearchBuilder:
         return self.forced_type.lower()
 
     @classmethod
-    def from_search(cls, context, request, search, from_=0, size=10):
+    def from_search(cls, context, request, s, return_generator=False):
         """ Builds a SearchBuilder object with a pre-built search by skipping the bootstrap
-            initialization and setting self.search directly.
+            initialization and setting self.query directly.
 
-        :param search: search object to update
-        :param from_: start index of search
-        :param size: number of documents to return
-        :return:
+        :param context: context from request
+        :param request: current request
+        :param s: dictionary of lucene query
+        :return: instance of this class with the search query dropped in
         """
-        result = cls(context, request, skip_bootstrap=True)  # bypass bootstrap
-        result.from_ = from_
-        result.to = size  # execute_search will apply pagination
-        result.search.update_from_dict(search)  # parse compound query
-        return result
+        search_builder_instance = cls(context, request, return_generator=return_generator, skip_bootstrap=True)  # bypass (most of) bootstrap
+        search_builder_instance.query = s  # parse compound query
+        return search_builder_instance
 
     @staticmethod
     def build_search_types(types, doc_types):
@@ -183,7 +213,7 @@ class SearchBuilder:
             """
             # type param is a special case. use the name from TypeInfo
             if key == 'type' and val in types:
-                return (key, types[val].name)
+                return key, types[val].name
 
             # if key is sort, pass val as the key to this function
             # if it appends display title we know its a linkTo and
@@ -194,7 +224,7 @@ class SearchBuilder:
                 new_val, _ = normalize_param(sort_val, None)
                 if new_val != sort_val:
                     val = val.replace(sort_val, new_val)
-                return (key, val)
+                return key, val
 
             # find schema for field parameter and drill down into arrays/subobjects
             field_schema = schema_for_field(key, request, doc_types)
@@ -210,10 +240,10 @@ class SearchBuilder:
             if field_schema and 'linkTo' in field_schema:
                 # add display_title to terminal linkTo query fields
                 if key.endswith('!'):  # handle NOT
-                    return (key[:-1] + '.display_title!', val)
-                return (key + '.display_title', val)
+                    return key[:-1] + '.display_title!', val
+                return key + '.display_title', val
             else:
-                return (key, val)
+                return key, val
 
         # use a MultiDict to emulate request.params
         # TODO: Evaluate whether or not MultiDict is really useful here -Will 6/24/2020
@@ -227,9 +257,11 @@ class SearchBuilder:
                 del normalized_params['type']
             for dtype in doc_types:
                 normalized_params.add('type', dtype)
+
         # add the normalized params to the request
         # these will be used in place of request.params for the rest of search
         setattr(request, 'normalized_params', normalized_params)
+
         # the query string of the normalized search
         qs = '?' + urlencode([  # XXX: do we actually need to encode k,v  individually? -Will 6/24/2020
             (k.encode('utf-8'), v.encode('utf-8'))
@@ -237,11 +269,10 @@ class SearchBuilder:
         ])
         return qs
 
-    @staticmethod
-    def prepare_search_term(request):
+    def prepare_search_term(self, request):
         """
         Prepares search terms by making a dictionary where the keys are fields and the values are arrays
-        of query strings. This is an intermediary format  which will be modified when constructing the
+        of query strings. This is an intermediary format which will be modified when constructing the
         actual search query.
 
         Ignore certain keywords, such as type, format, and field
@@ -251,7 +282,9 @@ class SearchBuilder:
         """
         prepared_terms = {}
         for field, val in request.normalized_params.items():
-            if field.startswith('validation_errors') or field.startswith('aggregated_items'):
+            if (field.startswith('validation_errors') or
+                    field.startswith('aggregated_items') or
+                    field == self.ADDITIONAL_FACETS):
                 continue
             elif field == 'q':  # searched string has field 'q'
                 # people shouldn't provide multiple queries, but if they do,
@@ -262,7 +295,7 @@ class SearchBuilder:
                 else:
                     prepared_terms['q'] = val
             elif field not in COMMON_EXCLUDED_URI_PARAMS + ['type']:
-                if 'embedded.' + field not in prepared_terms.keys():
+                if 'embedded.' + field not in prepared_terms:
                     prepared_terms['embedded.' + field] = []
                 prepared_terms['embedded.' + field].append(val)
         return prepared_terms
@@ -307,27 +340,39 @@ class SearchBuilder:
         """
         if (len(self.doc_types) == 1) and 'Item' not in self.doc_types:
             search_term = 'search-info-header.' + self.doc_types[0]
-            static_section = self.request.registry['collections']['StaticSection'].get(search_term)
-            if static_section and hasattr(static_section.model, 'source'):
+            # XXX: this could be cached application side as well
+            try:
+                static_section = self.request.registry['collections']['StaticSection'].get(search_term)
+            except Exception:  # NotFoundError not caught, search could fail
+                static_section = None
+            if static_section and hasattr(static_section.model, 'source'):  # extract from ES structure
                 item = static_section.model.source['object']
                 self.response['search_header'] = {}
-                self.response['search_header']['content'] = item['content']
+                self.response['search_header']['content'] = item.get('content', 'Content Missing')
                 self.response['search_header']['title'] = item.get('title', item['display_title'])
-                self.response['search_header']['filetype'] = item['filetype']
+                self.response['search_header']['filetype'] = item.get('filetype', 'No filetype')
+            elif static_section and hasattr(static_section.model, 'data'):  # extract form DB structure
+                item = static_section.upgrade_properties()
+                self.response['search_header'] = {}
+                self.response['search_header']['content'] = item.get('body', 'Content Missing')
+                self.response['search_header']['title'] = item.get('title', 'No title')
+                self.response['search_header']['filetype'] = item.get('filetype', 'No filetype')
+            else:
+                pass  # no static header found
 
     def set_pagination(self):
         """
         Fill from_ and size parameters for search if given in the query string
         """
         from_ = self.request.normalized_params.get('from', 0)
-        size = self.request.normalized_params.get('limit', 25)
+        size = self.request.normalized_params.get('limit', self.PAGINATION_SIZE)
         if size in ('all', ''):
             size = "all"
         else:
             try:
                 size = int(size)
             except ValueError:
-                size = 25
+                size = self.PAGINATION_SIZE
             try:
                 from_ = int(from_)
             except ValueError:
@@ -337,16 +382,22 @@ class SearchBuilder:
     def build_type_filters(self):
         """
         Set the type filters for the search. If no doc_types, default to Item.
+        This also sets the facet filter override, allowing you to apply custom facet ordering
+        by specifying the FACET_ORDER_OVERRIDE field on the type definition. See VariantSample
+        or _sort_custom_facets for examples.
         """
         if not self.doc_types:
-            doc_types = ['Item']
+            self.doc_types = ['Item']
         else:
             for item_type in self.doc_types:
                 ti = self.types[item_type]
+                if hasattr(ti, 'factory'):  # if not abstract
+                    self.facet_order_overrides.update(getattr(ti.factory, 'FACET_ORDER_OVERRIDE', {}))
+
                 qs = urlencode([
                     (k.encode('utf-8'), v.encode('utf-8'))
-                    for k, v in self.request.normalized_params.items() if
-                    not (k == 'type' and self.types.all.get('Item' if v == '*' else v) is ti)
+                    for k, v in self.request.normalized_params.items()
+                    if k != "limit" and k != "from" and not (k == 'type' and self.types.all.get('Item' if v == '*' else v) is ti)
                 ])
                 self.response['filters'].append({
                     'field': 'type',
@@ -434,17 +485,19 @@ class SearchBuilder:
         query_info = {}
         string_query = None
         query_dict = {'query': {'bool': {}}}
+        # handle field, frame
+        self.query['_source'] = self.source_fields
         # locate for 'q' query, if any
         for field, value in self.prepared_terms.items():
             if field == 'q':
                 query_info['query'] = value
                 query_info['lenient'] = True
                 query_info['default_operator'] = 'AND'
-                query_info['fields'] = ['_all']
+                query_info['fields'] = ['full_text']
                 string_query = {'must': {'simple_query_string': query_info}}
                 query_dict = {'query': {'bool': string_query}}
                 break
-        self.search.update_from_dict(query_dict)
+        self.query.update(query_dict)
         self.string_query = string_query
 
     def set_sort_order(self):
@@ -457,96 +510,75 @@ class SearchBuilder:
 
         ES5: simply pass in the sort OrderedDict into search.sort
         """
-        sort = OrderedDict()
-        result_sort = OrderedDict()
-        if len(self.doc_types) == 1:
-            type_schema = self.types[self.doc_types[0]].schema
-        else:
-            type_schema = None
-
-        def add_to_sort_dict(requested_sort):
-            if requested_sort.startswith('-'):
-                name = requested_sort[1:]
-                order = 'desc'
-            else:
-                name = requested_sort
-                order = 'asc'
-            sort_schema = schema_for_field(name, self.request, self.doc_types)
-
-            if sort_schema:
-                sort_type = sort_schema.get('type')
-            else:
-                sort_type = 'string'
-
-            # ES type != schema types
-            if sort_type == 'integer':
-                sort['embedded.' + name] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'long',
-                    'missing': '_last'
-                }
-            elif sort_type == 'number':
-                sort['embedded.' + name] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'float',
-                    'missing': '_last'
-                }
-            elif sort_schema and determine_if_is_date_field(name, sort_schema):
-                sort['embedded.' + name + '.raw'] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'date',
-                    'missing': '_last'
-                }
-            else:
-                # fallback case, applies to all string type:string fields
-                sort['embedded.' + name + '.lower_case_sort'] = result_sort[name] = {
-                    'order': order,
-                    'unmapped_type': 'keyword',
-                    'missing': '_last'
-                }
 
         # Prefer sort order specified in request, if any
         requested_sorts = self.request.normalized_params.getall('sort')
-        if requested_sorts:
-            for rs in requested_sorts:
-                add_to_sort_dict(rs)
-
         text_search = self.prepared_terms.get('q')
+        sort, result_sort = build_sort_dicts(requested_sorts, self.request, self.doc_types, text_search)
 
         # Otherwise we use a default sort only when there's no text search to be ranked
-        if not sort and (text_search == '*' or not text_search):
-            # If searching for a single type, look for sort options in its schema
-            if type_schema:
-                if 'sort_by' in type_schema:
-                    for k, v in type_schema['sort_by'].items():
-                        # Should always sort on raw field rather than analyzed field
-                        # OR search on lower_case_sort for case insensitive results
-                        sort['embedded.' + k + '.lower_case_sort'] = result_sort[k] = v
-            # Default is most recent first, then alphabetical by label
-            if not sort:
-                sort['embedded.date_created.raw'] = result_sort['date_created'] = {
-                    'order': 'desc',
-                    'unmapped_type': 'keyword',
-                }
-                sort['embedded.label.raw'] = result_sort['label'] = {
-                    'order': 'asc',
-                    'missing': '_last',
-                    'unmapped_type': 'keyword',
-                }
-        elif not sort and text_search and text_search != '*':
-            self.search = self.search.sort(
-                # Multi-level sort. See http://www.elastic.co/guide/en/elasticsearch/guide/current/_sorting.html#_multilevel_sorting & https://stackoverflow.com/questions/46458803/python-elasticsearch-dsl-sorting-with-multiple-fields
-                {'_score': {"order": "desc"}},
-                {'embedded.date_created.raw': {'order': 'desc', 'unmapped_type': 'keyword'},
-                 'embedded.label.raw': {'order': 'asc', 'unmapped_type': 'keyword', 'missing': '_last'}},
-                {'_uid': {'order': 'asc'}}
+        if not sort and text_search and text_search != '*':
+            # Multi-level sort. See http://www.elastic.co/guide/en/elasticsearch/guide/current/_sorting.html#_multilevel_sorting & https://stackoverflow.com/questions/46458803/python-elasticsearch-dsl-sorting-with-multiple-fields
+            self.query['sort'] = [{'_score': {"order": "desc"}},
+                                  {'embedded.date_created.raw': {'order': 'desc', 'unmapped_type': 'keyword'},
+                                   'embedded.label.raw': {'order': 'asc', 'unmapped_type': 'keyword', 'missing': '_last'}},
+                                  {'_uid': {'order': 'asc'}}
+                ]
                 # 'embedded.uuid.raw' (instd of _uid) sometimes results in 400 bad request : 'org.elasticsearch.index.query.QueryShardException: No mapping found for [embedded.uuid.raw] in order to sort on'
-            )
+
             self.response['sort'] = result_sort = {'_score': {"order": "desc"}}
 
         if sort and result_sort:
             self.response['sort'] = result_sort
-            self.search = self.search.sort(sort)
+            self.query['sort'] = sort
+
+    def _initialize_additional_facets(self, facets_so_far, current_type_schema):
+        """ Helper function for below method that handles additional_facets URL param
+
+            :param facets_so_far: list to add additional_facets to
+            :param current_type_schema: schema of the item we are faceting on
+        """
+        for extra_facet in self.additional_facets:
+            aggregation_type = 'terms'  # default
+
+            # determine if nested
+            if self.item_type_es_mapping and find_nested_path(extra_facet, self.item_type_es_mapping):
+                aggregation_type = 'nested'  # handle nested
+
+            # check if defined in facets
+            if 'facets' in current_type_schema:
+                schema_facets = current_type_schema['facets']
+                if extra_facet in schema_facets:
+                    if not schema_facets[extra_facet].get('disabled', False):
+                        facets_so_far.append((extra_facet, schema_facets[extra_facet]))
+                    continue  # if we found the facet, always continue from here
+
+            # not specified as facet - infer range vs. term based on schema
+            field_definition = schema_for_field(extra_facet, self.request, self.doc_types)
+            if not field_definition:  # if not on schema, try "terms"
+                facets_so_far.append((
+                    extra_facet, {'title': extra_facet.title()}
+                ))
+            else:
+                t = field_definition.get('type', None)
+                if not t:
+                    log.error('Encountered an additional facet that has no type! %s' % field_definition)
+                    continue  # drop this facet
+
+                # terms for string
+                if t == 'string':
+                    facets_so_far.append((
+                        extra_facet, {'title': extra_facet.title(), 'aggregation_type': aggregation_type}
+                    ))
+                else:  # try stats
+                    aggregation_type = 'stats'
+                    facets_so_far.append((
+                        extra_facet, {
+                            'title': field_definition.get('title', extra_facet.title()),
+                            'aggregation_type': aggregation_type,
+                            'number_step': 'any'
+                        }
+                    ))
 
     def initialize_facets(self):
         """
@@ -578,37 +610,42 @@ class SearchBuilder:
             # ('date_created', {'title': 'Date Created', 'hide_from_view' : True, 'aggregation_type' : 'date_histogram' })
         ]
         validation_error_facets = [
-            ('validation_errors.name', {'title': 'Validation Errors', 'order': 999})
+            ('validation_errors.name', { 'title': 'Validation Errors', 'order': 999 })
         ]
-
+        current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
+        self._initialize_additional_facets(append_facets, current_type_schema)
         # hold disabled facets from schema; we also want to remove these from the prepared_terms facets
-        disabled_facets = []
+        disabled_facet_fields = set()
 
         # Add facets from schema if one Item type is defined.
         # Also, conditionally add extra appendable facets if relevant for type from schema.
         if len(self.doc_types) == 1 and self.doc_types[0] != 'Item':
-            current_type_schema = self.request.registry[TYPES][self.doc_types[0]].schema
             if 'facets' in current_type_schema:
                 schema_facets = OrderedDict(current_type_schema['facets'])
                 for schema_facet in schema_facets.items():
-                    if schema_facet[1].get('disabled', False):
-                        disabled_facets.append(schema_facet[0])
+                    if schema_facet[1].get('disabled', False) or schema_facet[1].get(self.DEFAULT_HIDDEN, False):
+                        disabled_facet_fields.add(schema_facet[0])
                         continue  # Skip disabled facets.
                     facets.append(schema_facet)
 
-        # Add facets for any non-schema ?field=value filters requested in the search (unless already set)
-        # TODO: this use is confusing and should be refactored -Will 6/24/2020
-        used_facets = [facet[0] for facet in facets + append_facets]
-        used_facet_titles = [
-            facet[1]['title'] for facet in facets + append_facets
-            if 'title' in facet[1]
-        ]
+        # Add facets for any non-schema ?field=value filters requested in the search (unless already set, via used_facet_fields)
+        used_facet_fields = set()
+        used_facet_titles = set()
+        for facet in facets + append_facets:
+            used_facet_fields.add(facet[0])
+            if 'title' in facet[1]:
+                used_facet_titles.add(facet[1]['title'])
 
         for field in self.prepared_terms:
             if field.startswith('embedded'):
-                split_field = field.strip().split(
-                    '.')  # Will become, e.g. ['embedded', 'experiments_in_set', 'files', 'file_size', 'from']
-                use_field = '.'.join(split_field[1:])
+
+                # Will become, e.g. ['embedded', 'experiments_in_set', 'files', 'file_size', 'from']
+                split_field = field.strip().split('.')
+                use_field = '.'.join(split_field[1:]) # e.g. "experiments_in_set.files.file_size.from"
+
+                if use_field in used_facet_fields or use_field in disabled_facet_fields:
+                    # Cancel if already in facets or is disabled (first check, before more broad check re: agg_type:stats, etc)
+                    continue
 
                 # 'terms' is the default per-term bucket aggregation for all non-schema facets
                 if self.item_type_es_mapping and find_nested_path(field, self.item_type_es_mapping):
@@ -632,11 +669,6 @@ class SearchBuilder:
                 else:
                     is_object_title = False
 
-                if title_field in used_facets or title_field in disabled_facets:
-                    # Cancel if already in facets or is disabled
-                    continue
-                used_facets.append(title_field)
-
                 # If we have a range filter in the URL, strip out the ".to" and ".from"
                 if title_field == 'from' or title_field == 'to':
                     if len(split_field) >= 3:
@@ -644,10 +676,20 @@ class SearchBuilder:
                         field_schema = schema_for_field(f_field, self.request, self.doc_types)
 
                         if field_schema:
-                            if is_date_field(field, field_schema) or is_numerical_field(field_schema):
+                            # field could be a date, numerical, or array of numerical
+                            if (is_date_field(field, field_schema) or
+                                    is_numerical_field(field_schema) or
+                                    is_array_of_numerical_field(field_schema)):
                                 title_field = field_schema.get("title", f_field)
                                 use_field = f_field
                                 aggregation_type = 'stats'
+
+                # At moment is equivalent to `if aggregation_type == 'stats'` until/unless more agg types are added for _facets_.
+                if aggregation_type == 'stats':
+                    # Remove completely if duplicate (e.g. don't need to have` .from` and `.to` both present)
+                    if use_field in used_facet_fields or use_field in disabled_facet_fields:
+                        continue
+                    # Facet would be otherwise added twice if both `.from` and `.to` are requested.
 
                 for schema in self.schemas:
                     if title_field in schema['properties']:
@@ -657,38 +699,29 @@ class SearchBuilder:
                             title_field += ' (Title)'
                         break
 
-                facet_tuple = (use_field, {'title': title_field, 'aggregation_type': aggregation_type})
-
-                # At moment is equivalent to `if aggregation_type == 'stats'` until/unless more agg types are added for _facets_.
-                if aggregation_type != 'terms':
-                    # Remove completely if duplicate (e.g. .from and .to both present)
-                    if use_field in used_facets:
-                        continue
-                    # facet_tuple[1]['hide_from_view'] = True # Temporary until we handle these better on front-end.
-                    # Facet would be otherwise added twice if both `.from` and `.to` are requested.
-
-                facets.append(facet_tuple)
+                used_facet_fields.add(use_field)
+                facets.append((
+                    use_field,
+                    { 'title': title_field, 'aggregation_type': aggregation_type }
+                ))
 
         # Append additional facets (status, validation_errors, ...) at the end of
         # list unless were already added via schemas, etc.
-        used_facets = [facet[0] for facet in facets]  # Reset this var
+        used_facet_fields = { facet[0] for facet in facets } # Reset this
         for ap_facet in append_facets + validation_error_facets:
-            if ap_facet[0] not in used_facets:
+            if ap_facet[0] not in used_facet_fields:
+                used_facet_fields.add(ap_facet[0])
                 facets.append(ap_facet)
-            else:  # Update with better title if not already defined from e.g. requested filters.
-                existing_facet_index = used_facets.index(ap_facet[0])
-                if facets[existing_facet_index][1].get('title') in (None, facets[existing_facet_index][0]):
-                    facets[existing_facet_index][1]['title'] = ap_facet[1]['title']
-
         return facets
 
     def assure_session_id(self):
         """ Add searchSessionID information if not part of a sub-request, a generator or a limit=all search """
-        if (self.request.__parent__ is None and
-                  not self.return_generator and
-                  self.size != 'all'):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
+        if (
+            self.request.__parent__ is None and
+            not getattr(self, "return_generator", None) and
+            getattr(self, "size", 25) != "all"
+        ):  # Probably unnecessary, but skip for non-paged, sub-reqs, etc.
             self.search_session_id = self.request.cookies.get('searchSessionID', 'SESSION-' + str(uuid.uuid1()))
-            self.search = self.search.params(preference=self.search_session_id)
 
     def build_search_query(self):
         """ Builds the search query utilizing a combination of helper methods within this class
@@ -699,18 +732,19 @@ class SearchBuilder:
         self.set_sort_order()
 
         # Transform into filtered search
-        self.search, query_filters = LuceneBuilder.build_filters(self.request, self.search, self.response,
+        self.query, query_filters = LuceneBuilder.build_filters(self.request, self.query, self.response,
                                                                  self.principals, self.doc_types,
                                                                  self.item_type_es_mapping)
         # Prepare facets in intermediary structure
         self.facets = self.initialize_facets()
 
         # Transform filter search into filter + faceted search
-        self.search = LuceneBuilder.build_facets(self.search, self.facets, query_filters, self.string_query,
-                                                 self.request, self.doc_types, self.custom_aggregations, self.size,
-                                                 self.from_, self.item_type_es_mapping)
+        self.query = LuceneBuilder.build_facets(self.query, self.facets, query_filters, self.string_query,
+                                                self.request, self.doc_types, self.custom_aggregations, self.size,
+                                                self.from_, self.item_type_es_mapping)
 
         # Add preference from session, if available
+        # This just sets the value on the class - it is passed to execute_search later
         self.assure_session_id()
 
     @staticmethod
@@ -728,22 +762,37 @@ class SearchBuilder:
         :param full_agg_name: full name of the aggregation
         """
         result_facet['aggregation_type'] = 'terms'
-        buckets = aggregations[full_agg_name]['primary_agg']['primary_agg']['buckets']
-        for bucket in buckets:
+        term_to_bucket = {}  # so we can deduplicate keys
+        source_aggregation = aggregations[full_agg_name]['primary_agg']
+        primary_buckets = source_aggregation['primary_agg']['buckets']
+        for bucket in primary_buckets:
             if 'primary_agg_reverse_nested' in bucket:
                 bucket['doc_count'] = bucket['primary_agg_reverse_nested']['doc_count']
-        aggregations[full_agg_name]['primary_agg']['buckets'] = \
-            sorted(buckets, key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
+            if bucket['key'] not in term_to_bucket:
+                term_to_bucket[bucket['key']] = bucket
+        if 'requested_agg' in source_aggregation:
+            requested_buckets = source_aggregation['requested_agg']['buckets']
+            for bucket in requested_buckets:
+                if 'primary_agg_reverse_nested' in bucket:
+                    bucket['doc_count'] = bucket['primary_agg_reverse_nested']['doc_count']
+                if bucket['key'] not in term_to_bucket:
+                    term_to_bucket[bucket['key']] = bucket
+
+        result_facet['terms'] = sorted(list(term_to_bucket.values()),
+                                       key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
 
     def format_facets(self, es_results):
         """
+        This method processes the 'aggregations' component of the ES response.
+        It does this by creating result_facet frames for all facets retrieved from ES
+        and populating the frame with the relevant aggregation info depending on it's type.
+
         Format the facets for the final results based on the es results.
         Sort based off of the 'order' of the facets
         These are stored within 'aggregations' of the result.
 
         If the frame for the search != embedded, return no facets
         """
-        # TODO: refactor this method. -Will 05/01/2020
         result = []
         if self.search_frame != 'embedded':
             return result
@@ -753,12 +802,15 @@ class SearchBuilder:
             return result
 
         aggregations = es_results['aggregations']['all_items']
-        used_facets = set()
 
         # Sort facets by order (ascending).
         # If no order is provided, assume 0 to
         # retain order of non-explicitly ordered facets
         for field, facet in sorted(self.facets, key=lambda fct: fct[1].get('order', 10000)):
+            if facet.get(self.DEFAULT_HIDDEN, False) and field not in self.additional_facets:  # skip if specified
+                continue
+
+            # Build result frame for the front-end
             result_facet = {
                 'field': field,
                 'title': facet.get('title', field),
@@ -767,49 +819,108 @@ class SearchBuilder:
             }
 
             result_facet.update({k: v for k, v in facet.items() if k not in result_facet.keys()})
-            used_facets.add(field)
             field_agg_name = field.replace('.', '-')
             full_agg_name = facet['aggregation_type'] + ':' + field_agg_name
 
-            if full_agg_name in aggregations:
+            if full_agg_name in aggregations:  # found an agg for this field
+
+                # process stats agg
                 if facet['aggregation_type'] == 'stats':
                     result_facet['total'] = aggregations[full_agg_name]['doc_count']
                     # Used for fields on which can do range filter on, to provide min + max bounds
                     for k in aggregations[full_agg_name]['primary_agg'].keys():
                         result_facet[k] = aggregations[full_agg_name]['primary_agg'][k]
-                else:  # 'terms' assumed.
 
+                # nested stats aggregations have a second "layer" for reverse_nested
+                elif facet['aggregation_type'] == 'nested:stats':
+                    result_facet['total'] = aggregations[full_agg_name]['primary_agg']['doc_count']
+                    for k in aggregations[full_agg_name]['primary_agg']['primary_agg'].keys():
+                        result_facet[k] = aggregations[full_agg_name]['primary_agg']['primary_agg'][k]
+
+                # process range agg
+                elif facet['aggregation_type'] in ['range', 'nested:range']:
                     # Shift the bucket location
                     bucket_location = aggregations[full_agg_name]['primary_agg']
                     if 'buckets' not in bucket_location:  # account for nested structure
                         bucket_location = bucket_location['primary_agg']
-                    result_facet['terms'] = bucket_location['buckets']
 
-                    # Choosing to show facets with one term for summary info on search it provides
-                    # XXX: The above comment is misleading - this drops all facets with no buckets
-                    # we apparently want this for non-nested fields based on the tests, but should be
-                    # investigated as having to do this doesn't really make sense.
-                    if len(result_facet.get('terms', [])) < 1 and not facet['aggregation_type'] == NESTED:
-                        continue
+                    # TODO - refactor ?
+                    # merge bucket labels from ranges into buckets
+                    for r in result_facet['ranges']:
+                        for b in bucket_location['buckets']:
+                            if (r.get('from', self.MISSING) == b.get('from', self.MISSING) and
+                                    r.get('to', self.MISSING) == b.get('to', self.MISSING)):
+                                r['doc_count'] = b['doc_count']
+                                break
 
-                    # if we are nested, apply fix + replace
+                # process terms agg
+                else:
+                    # do the below, except account for nested agg structure
                     if facet['aggregation_type'] == NESTED:
                         self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
-
-                    # Re-add buckets under 'terms' AFTER we have fixed the doc_counts
-                    result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
-
-                    # Default - terms, range, or histogram buckets. Buckets may not be present
-                    result_facet['terms'] = aggregations[full_agg_name]["primary_agg"]["buckets"]
-                    # Choosing to show facets with one term for summary info on search it provides
-                    if len(result_facet.get('terms', [])) < 1:
                         continue
 
+                    def extract_buckets(path):
+                        if 'buckets' not in path:
+                            path = path['primary_agg']
+                        if 'buckets' not in path:
+                            raise Exception('No buckets found on terms agg!')
+                        return path['buckets']
+
+                    term_to_bucket = {}  # so we can deduplicate keys
+                    source_aggregation = aggregations[full_agg_name]
+                    if 'requested_agg' in source_aggregation:
+                        for bucket in extract_buckets(source_aggregation['requested_agg']):
+                            if bucket['key'] not in term_to_bucket:
+                                term_to_bucket[bucket['key']] = bucket
+
+                    # always present
+                    for bucket in extract_buckets(source_aggregation['primary_agg']):
+                        if bucket['key'] not in term_to_bucket:
+                            term_to_bucket[bucket['key']] = bucket
+
+                    # bring in rescue terms
+                    if self.RESCUE_TERMS in facet:
+                        for rescue_term in facet[self.RESCUE_TERMS]:
+                            if rescue_term not in term_to_bucket:
+                                term_to_bucket[rescue_term] = {
+                                    'key': rescue_term,
+                                    'doc_count': 0
+                                }
+
+                    result_facet['terms'] = list(term_to_bucket.values())
+
+                # XXX: not clear this functions as intended - Will 2/17/2020
                 if len(aggregations[full_agg_name].keys()) > 2:
-                    result_facet['extra_aggs'] = {k: v for k, v in aggregations[field_agg_name].items() if
-                                                  k not in ('doc_count', "primary_agg")}
+                    result_facet['extra_aggs'] = {k: v for k, v in aggregations[full_agg_name].items() if
+                                                  k not in ('doc_count', 'primary_agg')}
+
+            # Minor improvement for UI/UX -- if no 'validation errors' facet is included
+            # but only 1 "No value" term, then exclude the facet so is not shown
+            if field == "validation_errors.name":
+                validation_errors_terms_len = len(result_facet["terms"])
+                if (
+                    validation_errors_terms_len == 0 or
+                    (validation_errors_terms_len == 1 and result_facet["terms"][0]["key"] == "No value")
+                ):
+                    continue
 
             result.append(result_facet)
+
+        # TODO ALEX: Client will reject 'nested:stats' so overwritten here.
+        #            Ideally, the client should accept 'stats', 'terms', 'nested:terms', 'nested:stats',
+        #            and just treat the nested aggs exactly the same.
+        for facet in result:
+            agg_type = facet.get("aggregation_type")
+            override = None
+            if agg_type == 'nested:stats':
+                override = 'stats'
+            elif agg_type == 'nested:range':
+                override = 'range'
+
+            # apply override
+            if override is not None:
+                facet["aggregation_type"] = override
 
         return result
 
@@ -839,19 +950,8 @@ class SearchBuilder:
         else:
             return None
 
-    def build_table_columns(self):
-        """ Constructs an ordered dictionary of column information to be rendered by
-            the front-end. If this functionality is needed outside of general search, this
-            method should be moved to search_utils.py.
-        """
-        any_abstract_types = 'Item' in self.doc_types
-        if not any_abstract_types:  # Check explictly-defined types to see if any are abstract.
-            type_infos = [self.request.registry[TYPES][t] for t in self.doc_types if t != 'Item']
-            for ti in type_infos:
-                # We use `type` instead of `isinstance` since we don't want to catch subclasses.
-                if type(ti) == AbstractTypeInfo:
-                    any_abstract_types = True
-                    break
+    @staticmethod
+    def build_initial_columns(used_type_schemas):
 
         columns = OrderedDict()
 
@@ -861,8 +961,58 @@ class SearchBuilder:
             "order": -1000
         }
 
+        for schema in used_type_schemas:
+            if 'columns' in schema:
+                schema_columns = OrderedDict(schema['columns'])
+                # Add all columns defined in schema
+                for name, obj in schema_columns.items():
+                    if name not in columns:
+                        columns[name] = obj
+                    else:
+                        # If @type or display_title etc. column defined in schema, then override defaults.
+                        columns[name].update(schema_columns[name])
+
+        # Add status column, if not present, at end.
+        if 'status' not in columns:
+            columns['status'] = {
+                "title": "Status",
+                "default_hidden": True,
+                "order": 980
+            }
+
+        # Add date column, if not present, at end.
+        if 'date_created' not in columns:
+            columns['date_created'] = {
+                "title": "Date Created",
+                "colTitle": "Created",
+                "default_hidden": True,
+                "order": 1000
+            }
+
+        return columns
+
+    def build_table_columns(self):
+        """ Constructs an ordered dictionary of column information to be rendered by
+            the front-end. If this functionality is needed outside of general search, this
+            method should be moved to search_utils.py.
+        """
+
+        columns = SearchBuilder.build_initial_columns(self.schemas)
+
+        if self.request.normalized_params.get('currentAction') in ('selection', 'multiselect'):
+            return columns
+
+        any_abstract_types = 'Item' in self.doc_types
+        if not any_abstract_types:  # Check explictly-defined types to see if any are abstract.
+            type_infos = [self.request.registry[TYPES][t] for t in self.doc_types if t != 'Item']
+            for ti in type_infos:
+                # We use `type` instead of `isinstance` since we don't want to catch subclasses.
+                if type(ti) == AbstractTypeInfo:
+                    any_abstract_types = True
+                    break
+
         # Add type column if any abstract types in search
-        if any_abstract_types and self.request.normalized_params.get('currentAction') != 'selection':
+        if any_abstract_types:
             columns['@type'] = {
                 "title": "Item Type",
                 "colTitle": "Type",
@@ -872,39 +1022,6 @@ class SearchBuilder:
                 # "default_hidden": request.normalized_params.get('currentAction') == 'selection'
             }
 
-        for schema in self.schemas:
-            if 'columns' in schema:
-                schema_columns = OrderedDict(schema['columns'])
-                # Add all columns defined in schema
-                for name, obj in schema_columns.items():
-                    if name not in columns:
-                        columns[name] = obj
-                    else:
-                        # If @type or display_title etc. column defined in schema, then override defaults.
-                        for prop in schema_columns[name]:
-                            columns[name][prop] = schema_columns[name][prop]
-                    # Add description from field schema, if none otherwise.
-                    if not columns[name].get('description'):
-                        field_schema = schema_for_field(name, self.request, self.doc_types)
-                        if field_schema:
-                            if field_schema.get('description') is not None:
-                                columns[name]['description'] = field_schema['description']
-
-        # Add status column, if not present, at end.
-        if 'status' not in columns:
-            columns['status'] = {
-                "title": "Status",
-                "default_hidden": True,
-                "order": 980
-            }
-        # Add date column, if not present, at end.
-        if 'date_created' not in columns:
-            columns['date_created'] = {
-                "title": "Date Created",
-                "colTitle": "Created",
-                "default_hidden": True,
-                "order": 1000
-            }
         return columns
 
     def _format_results(self, hits):
@@ -934,28 +1051,32 @@ class SearchBuilder:
                 yield frame_result
             return
 
-    @staticmethod
-    def get_all_subsequent_results(request, initial_search_result, search, extra_requests_needed_count, size_increment):
-        """ Generator method used to paginate. """
+    def get_all_subsequent_results(self, extra_requests_needed_count, size_increment):
+        """
+        Calls `execute_search` in paginated manner iteratively until all results have been yielded.
+        """
         from_ = 0
         while extra_requests_needed_count > 0:
             # print(str(extra_requests_needed_count) + " requests left to get all results.")
             from_ = from_ + size_increment
-            subsequent_search = search[from_:from_ + size_increment]
-            subsequent_search_result = execute_search(request, subsequent_search)
+            subsequent_search_result = execute_search(es=self.es, query=self.query, index=self.es_index,
+                                                      from_=from_, size=size_increment,
+                                                      session_id=self.search_session_id)
             extra_requests_needed_count -= 1
             for hit in subsequent_search_result['hits'].get('hits', []):
                 yield hit
 
     def execute_search_for_all_results(self, size_increment=100):
         """
-        Uses the above function to automatically paginate all results.
+        Returns a generator that iterates over _all_ results for search.
+        Calls `execute_search` in paginated manner iteratively until all results have been yielded
+        via `get_all_subsequent_results`.
 
         :param size_increment: number of results to get per page, default 100
         :return: all es_results that matched the given query
         """
-        first_search = self.search[0:size_increment]  # get aggregations from here
-        es_result = execute_search(self.request, first_search)
+        es_result = execute_search(es=self.es, query=self.query, index=self.es_index, from_=0, size=size_increment,
+                                   session_id=self.search_session_id)
 
         total_results_expected = es_result['hits'].get('total', 0)
 
@@ -963,20 +1084,25 @@ class SearchBuilder:
         extra_requests_needed_count = math.ceil(total_results_expected / size_increment) - 1
 
         if extra_requests_needed_count > 0:
+            # Returns a generator as value of es_result['hits']['hits']
+            # Will be returned directly if self.return_generator is true
+            # or converted to list if meant to be HTTP response.
+            # Theoretical but unnecessary future: Consider allowing to return HTTP Stream of results w. return_generator=true (?)
             es_result['hits']['hits'] = itertools.chain(
                 es_result['hits']['hits'],
-                self.get_all_subsequent_results(
-                    self.request, es_result, self.search, extra_requests_needed_count, size_increment))
+                self.get_all_subsequent_results(extra_requests_needed_count, size_increment)
+            )
         return es_result
 
     def execute_search(self):
         """ Executes the search, accounting for size if necessary """
-        LuceneBuilder.verify_search_has_permissions(self.request, self.search)
+        LuceneBuilder.verify_search_has_permissions(self.request, self.query)
         if self.size == 'all':
             es_results = self.execute_search_for_all_results()
         else:  # from_, size are integers
-            size_search = self.search[self.from_:self.from_ + self.size]
-            es_results = execute_search(self.request, size_search)
+            es_results = execute_search(es=self.es, query=self.query, index=self.es_index,
+                                        from_=self.from_, size=self.size,
+                                        session_id=self.search_session_id)
         return es_results
 
     def format_results(self, es_results):
@@ -1001,22 +1127,72 @@ class SearchBuilder:
             if self.context:
                 self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
 
-        # Format results, handle "child" requests special
+        # `graph` below is a generator.
+        # `es_results['hits']['hits']` will contain a generator instead of list
+        # if limit=all was requested. `self._format_results` will always return a generator
+        # that iterates over es_results['hits']['hits'] regardless of its structure.
         graph = self._format_results(es_results['hits']['hits'])
-        if self.request.__parent__ is not None or self.return_generator:
-            if not self.return_generator:
-                self.response['@graph'] = list(graph)
 
-        # Set @graph, save session ID for re-requests / subsequent pages.
-        self.response['@graph'] = list(graph)
+        if self.return_generator:
+            # Preserve `graph` as generator.
+            self.response['@graph'] = graph
+        else:
+            # Convert it into list as we assume we're responding to a HTTP request by default.
+            self.response['@graph'] = list(graph)
+
+        # Save session ID for re-requests / subsequent pages.
         if self.search_session_id:  # Is 'None' if e.g. limit=all
-            self.request.response.set_cookie('searchSessionID',
-                                             self.search_session_id)
+            self.request.response.set_cookie('searchSessionID', self.search_session_id)
+
+    def _sort_custom_facets(self):
+        """ Applies custom sort to facets based on a dictionary provided on the type definition
+
+            Specify a 2-tiered dictionary mapping field names to dictionaries of key -> weight
+            mappings that allow us to sort generally like this:
+                sorted(unsorted_terms, key=lambda d: field_terms_override_order.get(d['key'], default))
+            ex:
+            {
+                {
+                    facet_field_name: {
+                        key1: weight,
+                        key2: weight,
+                        key3: weight
+                        '_default': default_weight
+                    }
+                }
+            }
+            If you had field name and wanted to force a facet ordering, you
+            could add this to the type definition:
+                FACET_ORDER_OVERRIDE = {
+                    'name': {
+                        'Will': 1,
+                        'Bob': 2,
+                        'Alice': 3,
+                        '_default': 4,
+                    }
+                }
+            When faceting on the 'name' field, the ordering now will always be Will -> Bob -> Alice -> anything else
+            regardless of the actual facet counts. Note that if no default is specified weight 101
+            will be assigned (MAX_FACET_COUNTS + 1).
+        """
+        if 'facets' in self.response:
+            for entry in self.response['facets']:
+                field = entry.get('field')
+                if field in self.facet_order_overrides:
+                    field_terms_override_order = self.facet_order_overrides[field]
+                    default = field_terms_override_order.get('_default', MAX_FACET_COUNTS + 1)
+                    unsorted_terms = entry.get('terms', [])
+                    entry['terms'] = sorted(unsorted_terms, key=lambda d: field_terms_override_order.get(d['key'],
+                                                                                                         default))
 
     def get_response(self):
         """ Gets the response for this search, setting 404 status if necessary. """
         if not self.response:
             return {}  # XXX: rather than raise exception? -Will
+
+        # add query if an admin asks for it
+        if self.debug_is_active and is_admin_request(self.request):
+            self.response['query'] = self.query
 
         # If we got no results, return 404 or []
         if not self.response['total']:
@@ -1029,19 +1205,25 @@ class SearchBuilder:
         # if this is a subrequest/gen request, return '@graph' directly
         if self.request.__parent__ is not None or self.return_generator:
             if self.return_generator:
+                # If self.return_generator, then self.response['@graph'] will
+                # contain a generator rather than a list via `self.format_results`
+                # TODO: Move that functionality into this method instead?
                 return self.response['@graph']
+
+        # apply custom facet filtering
+        self._sort_custom_facets()
 
         # otherwise just hand off response
         return self.response
 
     def _build_query(self):
-        """ Builds the query, setting self.search """
+        """ Builds the query, setting self.query """
         self.initialize_search_response()
         self.build_search_query()
 
     def get_query(self):
-        """ Grabs the search object """
-        return self.search
+        """ Grabs the query object, now a dictionary """
+        return self.query
 
     def _search(self):
         """ Executes the end-to-end search.
@@ -1075,6 +1257,7 @@ def collection_view(context, request):
 def get_iterable_search_results(request, search_path='/search/', param_lists=None, **kwargs):
     '''
     Loops through search results, returns 100 (or search_results_chunk_row_size) results at a time. Pass it through itertools.chain.from_iterable to get one big iterable of results.
+    Potential TODO: Move to search_utils or other file, and have this (or another version of this) handle compound filter_sets.
 
     :param request: Only needed to pass to do_subreq to make a subrequest with.
     :param search_path: Root path to call, defaults to /search/.
@@ -1084,7 +1267,7 @@ def get_iterable_search_results(request, search_path='/search/', param_lists=Non
     param_lists = deepcopy(param_lists)
     param_lists['limit'] = ['all']
     param_lists['from'] = [0]
-    param_lists['sort'] = param_lists.get('sort','uuid')
+    param_lists['sort'] = param_lists.get('sort', 'uuid')
     subreq = make_search_subreq(request, '{}?{}'.format(search_path, urlencode(param_lists, True)) )
     return iter_search_results(None, subreq, **kwargs)
 

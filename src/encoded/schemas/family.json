@@ -3,25 +3,54 @@
     "id": "/profiles/family.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["project", "institution"],
-    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "required": [
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "accession",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/accession" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/attribution" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/ingestion_ids"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        }
     ],
     "properties": {
         "schema_version": {
             "default": "1"
         },
-        "accession" : {
-            "accessionType" : "FA"
+        "accession": {
+            "accessionType": "FA"
         },
         "title": {
             "title": "Title",
@@ -34,9 +63,9 @@
             "type": "string"
         },
         "members": {
-            "title" : "Members",
+            "title": "Members",
             "description": "Family members",
-            "type" : "array",
+            "type": "array",
             "items": {
                 "title": "Member",
                 "type": "string",
@@ -45,10 +74,10 @@
             }
         },
         "proband": {
-            "title" : "Proband",
+            "title": "Proband",
             "description": "Proband member of the family",
-            "type" : "string",
-            "linkTo" : "Individual"
+            "type": "string",
+            "linkTo": "Individual"
         },
         "pedigree_source": {
             "title": "Pedigree Source",
@@ -56,9 +85,9 @@
             "type": "string"
         },
         "original_pedigree": {
-            "title" : "Original Pedigree File",
+            "title": "Original Pedigree File",
             "description": "The original pedigree file used for this family",
-            "type" : "string",
+            "type": "string",
             "linkTo": "Document"
         },
         "clinic_notes": {
@@ -70,14 +99,18 @@
             "description": "Date of original pedigree file generation",
             "type": "string",
             "anyOf": [
-                {"format": "date-time"},
-                {"format": "date"}
+                {
+                    "format": "date-time"
+                },
+                {
+                    "format": "date"
+                }
             ]
         },
         "family_phenotypic_features": {
             "title": "Family phenotypic features",
             "description": "Main phenotypic features for the family",
-            "type" : "array",
+            "type": "array",
             "items": {
                 "title": "Family phenotypic feature",
                 "type": "string",

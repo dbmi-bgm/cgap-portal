@@ -1,0 +1,89 @@
+{
+    "title": "Note",
+    "description": "Schema for note items",
+    "id": "/profiles/note.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "project",
+        "institution"
+    ],
+    "additionalProperties": false,
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
+    "properties": {
+        "version": {
+            "title": "Version",
+            "type": "number",
+            "description": "Version of this particular note"
+        },
+        "previous_note": {
+            "title": "Previous Note",
+            "description": "If not version 1, the previous note this is modified from",
+            "type": "string",
+            "linkTo": "Note"
+        },
+        "superseding_note": {
+            "title": "Superseding Note",
+            "description": "Newer note from same Project, if any",
+            "type": "string",
+            "linkTo": "Note"
+        },
+        "note_text": {
+            "title": "Note Text",
+            "type": "string",
+            "description": "The text of the note for this item"
+        },
+        "approved_by": {
+            "title": "Approved By",
+            "type": "string",
+            "description": "The user who approved this note for a case",
+            "linkTo": "User",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "permission": "restricted_fields"
+        },
+        "date_approved": {
+            "title": "Time of Approval",
+            "type": "string",
+            "description": "Timestamp when this note was approved for a case",
+            "anyOf": [
+                {
+                    "format": "date-time"
+                },
+                {
+                    "format": "date"
+                }
+            ],
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "permission": "restricted_fields"
+        },
+        "associated_items": {
+            "title": "Associated Items",
+            "description": "Items associated with this Note",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "item_type": {
+                        "title": "Item Type",
+                        "description": "The type of the associated item, e.g. VariantSample, Variant, or Gene",
+                        "type": "string"
+                    },
+                    "item_identifier": {
+                        "title": "Item Identifier",
+                        "description": "The identifier of the associated item",
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "facets": {},
+    "columns": {}
+}

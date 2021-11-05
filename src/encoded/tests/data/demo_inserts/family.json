@@ -1,12 +1,10 @@
 [
     {
-        "schema_version": "1",
-        "pedigree_source": "Proband app 2.0.0",
+        "status": "shared",
+        "timestamp": "2019-11-18T16:38:11.442813+00:00",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
-        "status": "released",
-        "accession": "GAPFAWY7YCIR",
-        "family_id": "Platinum",
-        "proband": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
+        "date_created": "2020-07-15T02:38:59.766625+00:00",
+        "uuid": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
         "members": [
             "4684702a-3639-4073-8db4-d44eb8b31135",
             "b8e17d98-e364-43c6-919c-a739afa619ad",
@@ -26,11 +24,11 @@
             "d246d630-62be-4607-af9a-56d97b885331",
             "4dfca9c9-5f93-48b5-823b-1fd0afaebdae"
         ],
-        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
+        "family_id": "Platinum",
+        "proband": "4dfca9c9-5f93-48b5-823b-1fd0afaebdae",
         "title": "Platinum Genomes",
-        "uuid": "21f2af73-2c2e-4101-bbfb-bb2754f302ad",
-        "date_created": "2020-07-15T02:38:59.766625+00:00",
-        "timestamp": "2019-11-18T16:38:11.442813+00:00",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        "pedigree_source": "Proband app 2.0.0",
+        "accession": "GAPFAWY7YCIR",
+        "project": "9a62ef81-7942-4550-a13c-18a915d70b8d"
     }
 ]
