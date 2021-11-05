@@ -618,6 +618,17 @@ const mapLongFormSexToLetter = (sex) => {
     }
 };
 
+const validateHeterozygosity = (hetVal) => {
+    // pass if in the range of 1.4-2.5, warn otherwise
+    if (hetVal >= 1.4 && hetVal <= 2.5) {
+        return "success"; // no flag necessary
+    } else if (hetVal < 1.4 && hetVal > 1.2) {
+        return "warning";
+    } else {
+        return "danger";
+    }
+};
+
 const BioinfoStats = React.memo(function BioinfoStats(props) {
     // Note: Can probably clean up the render method of this a little bit by breaking each row
     // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
@@ -708,7 +719,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                                     msaStats.deNovo = { value: transformValueType(numberType, value) };
                                     break;
                                 case "Heterozygosity Ratio":
-                                    msaStats.heterozygosity = { value: transformValueType(numberType, value) };
+                                    msaStats.heterozygosity = { value: transformValueType(numberType, value), validationStatus: validateHeterozygosity(value) };
                                     break;
                                 case "Transition-Transversion Ratio":
                                     msaStats.transTransRatio = { value: transformValueType(numberType, value) };
@@ -775,7 +786,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     { predictedSex.value || fallbackElem }&nbsp;
                     { !!predictedSex.url && <a href={predictedSex.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
-                    { (predictedSex.value !== submittedSex) && <i className="icon icon-flag fas text-warning ml-02" data-tip="Submitted sex does not match predicted sex."/>}
+                    { (predictedSex.value && submittedSex && predictedSex.value !== submittedSex) && <i className="icon icon-flag fas text-warning ml-02" data-tip="Submitted sex does not match predicted sex."/>}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
                     { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : fallbackElem }
@@ -794,6 +805,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
                     { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : fallbackElem }
+                    { (heterozygosity.value && heterozygosity.validationStatus !== "success") && <i className={`icon icon-flag fas text-${heterozygosity.validationStatus} ml-05`} data-tip="Heterozygosity ratio does not fall in expected range."/>}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="De novo Fraction">
                     { typeof deNovo.value === "number" ? deNovo.value + "%" : fallbackElem }
