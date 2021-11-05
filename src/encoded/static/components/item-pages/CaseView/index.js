@@ -603,6 +603,21 @@ const bioinfoPopoverContent = {
     )
 };
 
+const mapLongFormSexToLetter = (sex) => {
+    switch (sex) {
+        case "male":
+            return "M";
+        case "female":
+            return "F";
+        case "unknown":
+        case "undetermined":
+            return "U";
+        default:
+            console.error("Sex, " + sex + " doesn't match enum");
+            return "";
+    }
+};
+
 const BioinfoStats = React.memo(function BioinfoStats(props) {
     // Note: Can probably clean up the render method of this a little bit by breaking each row
     // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
@@ -712,15 +727,15 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
 
                     // Predicted Sex and Ancestry found in qclist
                     qc_list.forEach(function(qc) {
-                        const { value: { "ancestry and sex prediction": predictions = [] } = {}, qc_type } = qc;
+                        const { value: { "ancestry and sex prediction": predictions = [], url } = {}, qc_type } = qc;
 
                         if (qc_type === "quality_metric_peddyqc") {
                             predictions.forEach(function(prediction) {
-                                const { name, "predicted sex": predictedSex, predictedAncestry = [] } = prediction;
-                                console.log("is this prediction for current case?", name, caseSampleID);
-                                if (name === caseSampleId) {
-                                    msaStats.predictedSex = { value: predictedSex };
-                                    msaStats.predictedAncestry = { value: predictedAncestry };
+                                const { name, "predicted sex": predictedSex, "predicted ancestry": predictedAncestry } = prediction;
+                                console.log("prediction", prediction);
+                                if (name === caseSampleId) { // double check that it's the prediction for the current case
+                                    msaStats.predictedSex = { value: mapLongFormSexToLetter(predictedSex), url };
+                                    msaStats.predictedAncestry = { value: predictedAncestry, url };
                                 }
                             });
                         }
@@ -758,7 +773,9 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     { submittedSex || fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
-                    { predictedSex.value || fallbackElem }
+                    { predictedSex.value || fallbackElem }&nbsp;
+                    { !!predictedSex.url && <a href={predictedSex.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
+                    { (predictedSex.value !== submittedSex) && <i className="icon icon-flag fas text-warning ml-02" data-tip="Submitted sex does not match predicted sex."/>}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
                     { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : fallbackElem }
@@ -772,7 +789,8 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     { submittedAncestry.length > 0 && submittedAncestry.join(", ") || "-" }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Ancestry">
-                    { !!predictedAncestry.value && predictedAncestry.value.length > 0 && submittedAncestry.join(", ") || "-" }
+                    { predictedAncestry.value || fallbackElem }&nbsp;
+                    { !!predictedAncestry.url && <a href={predictedAncestry.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
                     { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : fallbackElem }
