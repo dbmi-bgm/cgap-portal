@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import queryString from 'query-string';
 import moment from 'moment';
+import ReactTooltip from 'react-tooltip';
 import memoize from "memoize-one";
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -109,7 +110,12 @@ export class VariantSampleListController extends React.PureComponent {
                     nextState.refreshCount = prevRefreshCount + 1;
                 }
                 return nextState;
-            }, fnCallback);
+            }, function(){
+                setTimeout(ReactTooltip.rebuild, 50);
+                if (typeof fnCallback === "function") {
+                    fnCallback();
+                }
+            });
 
         };
 

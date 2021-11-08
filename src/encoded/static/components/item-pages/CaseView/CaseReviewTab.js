@@ -52,8 +52,6 @@ export class CaseReviewController extends React.Component {
     componentDidUpdate(pastProps, pastState){
         const { variantSampleListItem: pastVSLItem = null } = pastProps;
         const { variantSampleListItem } = this.props;
-        const { changedClassificationsByVS: pastChangedClassificationsByVS } = pastState;
-        const { changedClassificationsByVS } = this.state;
 
         if (variantSampleListItem !== pastVSLItem) {
             this.setState(({ changedClassificationsByVS: origClassificationDict }) => {
@@ -79,10 +77,6 @@ export class CaseReviewController extends React.Component {
 
                 return { "changedClassificationsByVS": nextChangedClassificationsByVS };
             });
-        }
-
-        if (changedClassificationsByVS !== pastChangedClassificationsByVS) {
-            setTimeout(ReactTooltip.rebuild, 50);
         }
     }
 
@@ -225,19 +219,20 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                         */}
 
                         <PatchItemsProgress>
-                            <SaveNotesToReportButton {...{ variantSampleListItem, sendToReportStore, fetchVariantSampleListItem, resetSendToReportStoreItems, context }} className="my-1 mr-1"/>
+                            <SaveNotesToReportButton {...{ variantSampleListItem, fetchVariantSampleListItem, isLoadingVariantSampleListItem,
+                                sendToReportStore, resetSendToReportStoreItems, context }} className="my-1 mr-1"/>
                         </PatchItemsProgress>
 
                         <PatchItemsProgress>
-                            <SaveNotesToProjectButton {...{ variantSampleListItem, sendToProjectStore, fetchVariantSampleListItem, resetSendToProjectStoreItems }} className="my-1 mr-1"/>
+                            <SaveNotesToProjectButton {...{ variantSampleListItem, fetchVariantSampleListItem, isLoadingVariantSampleListItem,
+                                sendToProjectStore, resetSendToProjectStoreItems }} className="my-1 mr-1"/>
                         </PatchItemsProgress>
 
                     </div>
 
                     <div className="text-left">
-                        <button type="button" className="btn btn-primary ml-md-05 my-1" disabled={changedClassificationsCount === 0}>
-                            { applyFindingsTagsBtnText }
-                        </button>
+                        <SaveFindingsButton {...{ variantSampleListItem, fetchVariantSampleListItem, isLoadingVariantSampleListItem,
+                            changedClassificationsByVS, updateClassificationForVS, changedClassificationsCount }} className="ml-md-05 my-1" />
                     </div>
 
                 </div>
@@ -290,7 +285,7 @@ function variantSamplesWithAnySelectionSize(variantSampleListItem, selectionStor
 }
 
 
-
+/** @todo Move to SPC or utils directory */
 class PatchItemsProgress extends React.PureComponent {
 
     constructor(props){
@@ -436,6 +431,7 @@ function SaveNotesToProjectButton (props) {
     const {
         variantSampleListItem,
         fetchVariantSampleListItem,
+        isLoadingVariantSampleListItem,
         sendToProjectStore,
         resetSendToProjectStoreItems,
         isPatching,
@@ -452,7 +448,7 @@ function SaveNotesToProjectButton (props) {
         return variantSamplesWithAnySelectionSize(variantSampleListItem, sendToProjectStore);
     }, [ variantSampleListItem, sendToProjectStore ]);
 
-    const disabled = propDisabled || isPatching || selectionStoreSize === 0 || false;
+    const disabled = propDisabled || isPatching || isLoadingVariantSampleListItem || selectionStoreSize === 0 || false;
 
     const onClick = useCallback(function(e){
         e.stopPropagation();
@@ -558,6 +554,7 @@ function SaveNotesToReportButton (props) {
         context: { report } = {},
         variantSampleListItem,
         fetchVariantSampleListItem,
+        isLoadingVariantSampleListItem,
         sendToReportStore,
         resetSendToReportStoreItems,
         isPatching,
@@ -580,7 +577,7 @@ function SaveNotesToReportButton (props) {
         return variantSamplesWithAnySelectionSize(variantSampleListItem, sendToReportStore);
     }, [ variantSampleListItem, sendToReportStore ]);
 
-    const disabled = propDisabled || isPatching || !reportUUID || selectionStoreSize === 0 || false;
+    const disabled = propDisabled || isPatching || isLoadingVariantSampleListItem || !reportUUID || selectionStoreSize === 0 || false;
 
     const onClick = useCallback(function(e){
         e.stopPropagation();
@@ -724,7 +721,37 @@ function SaveNotesToReportButton (props) {
 }
 
 
-/** Can be re-used for PATCHing multiple items */
+function SaveFindingsButton(props){
+    const {
+        onClick,
+        changedClassificationsByVS,
+        updateClassificationForVS,
+        changedClassificationsCount,
+        variantSampleItem,
+        fetchVariantSampleListItem,
+        isLoadingVariantSampleListItem,
+        disabled: propDisabled,
+        className
+    } = props;
+
+    const disabled = propDisabled || isLoadingVariantSampleListItem || changedClassificationsCount === 0;
+
+    const applyFindingsTagsBtnText = (
+        `Save ${changedClassificationsCount > 0 ? changedClassificationsCount + " " : ""}Finding${changedClassificationsCount !== 1 ? "s" : ""}`
+    );
+
+    return (
+        <button type="button" {...{ disabled, onClick }} className={"btn btn-primary" + (className ? " " + className : "")}>
+            { applyFindingsTagsBtnText }
+        </button>
+    );
+}
+
+
+/**
+ * Can be re-used for PATCHing multiple items.
+ * @todo Move to SPC or utils directory along with PatchItemsProgress
+ */
 const ProgressModal = React.memo(function ProgressModal (props) {
     const { isPatching, patchingPercentageComplete, onHide, patchErrors } = props;
 

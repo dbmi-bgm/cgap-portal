@@ -199,22 +199,20 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         gene_notes: lastGeneNote = null
     } = variantSample || {};
 
-    const isInReport = useMemo(function(){
-        if (!alreadyInReportNotes) {
-            // Case if we're on InterpretationTab
-            // Can remove this and lookup via associated_items instead, if need
-            // this in InterpretationTab (or move alreadyInReportNotes up).
-            return false;
-        }
+    const { countNotes, countNotesInReport, countNotesInKnowledgeBase } = useMemo(function(){
         const notes = getAllNotesFromVariantSample(variantSample);
-        for (var i = 0; i < notes.length; i++) {
-            const { uuid: noteUUID } = notes[i];
-            // const isInAssociatedItems = _.findWhere(associated_items, { "item_type": "Report", "item_identifer": reportUUID });
-            if (alreadyInReportNotes[noteUUID]) {
-                return true;
+        const countNotes = notes.length;
+        let countNotesInReport = 0;
+        let countNotesInKnowledgeBase = 0;
+        notes.forEach(function({ uuid: noteUUID }){
+            if (alreadyInReportNotes && alreadyInReportNotes[noteUUID]) {
+                countNotesInReport++;
             }
-        }
-        return false;
+            if (alreadyInReportNotes && alreadyInReportNotes[noteUUID]) {
+                countNotesInKnowledgeBase++;
+            }
+        });
+        return { countNotes, countNotesInReport, countNotesInKnowledgeBase };
     }, [ context, variantSample ]);
 
     const noSavedNotes = clinicalInterpretationNote === null && discoveryInterpretationNote === null && lastVariantNote === null && lastGeneNote === null;
@@ -242,31 +240,9 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
                     <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
                         <h4 className="text-truncate text-600 my-0 selected-vsl-title">
-                            {
-                                parentTabType === parentTabTypes.CASEREVIEW ?
-                                    // CaseReviewTab
-                                    <React.Fragment>
-                                        <i className={`icon align-middle icon-fw title-prefix-icon icon-${isInReport ? "file-invoice" : "times"} fas mr-12`}
-                                            data-tip={isInReport ? "This sample has at least one note in the report" : "This sample has no notes saved to report"}/>
-                                        <span className="text-secondary">{ variantDisplayTitle }</span>
-                                        { noSavedNotes ?
-                                            <i className="icon align-middle icon-fw icon-exclamation-triangle fas ml-12 text-warning" data-tip="No notes saved for this Sample Variant in interpretation"/>
-                                            : null }
-                                    </React.Fragment>
-                                    : anyUnsavedChanges ?
-                                        // InterpretationTab, with unsaved changes.
-                                        <React.Fragment>
-                                            <i className={`icon align-middle icon-fw title-prefix-icon icon-${isDeleted ? "trash text-danger" : "check text-success"} fas mr-12`}/>
-                                            <span className={"text-" + (isDeleted? "muted": "secondary")}>{ variantDisplayTitle }</span>
-                                        </React.Fragment>
-                                        : // InterpretationTab, default.
-                                        <React.Fragment>
-                                            <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
-                                                data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
-                                            <a href={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`}>
-                                                { variantDisplayTitle }
-                                            </a>
-                                        </React.Fragment>
+                            { parentTabType === parentTabTypes.CASEREVIEW ?
+                                <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle }}/>
+                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession }} />
                             }
                         </h4>
                     </div>
@@ -362,6 +338,49 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             { expandedNotesSection }
 
         </div>
+    );
+});
+
+function InterpretationTabVariantSampleTitle(props){
+    const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession } = props;
+    if (anyUnsavedChanges) {
+        return (
+            <React.Fragment>
+                <i className={`icon align-middle icon-fw title-prefix-icon icon-${isDeleted ? "trash text-danger" : "check text-success"} fas mr-12`}/>
+                <span className={"text-" + (isDeleted? "muted": "secondary")}>{ variantDisplayTitle }</span>
+            </React.Fragment>
+        );
+    } else {
+        return (
+            <React.Fragment>
+                <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
+                    data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
+                <a href={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`}>
+                    { variantDisplayTitle }
+                </a>
+            </React.Fragment>
+        );
+    }
+}
+
+const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariantSampleTitle(props){
+    const { noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle } = props;
+    return (
+        <React.Fragment>
+            <i className={
+                "icon align-middle icon-fw title-prefix-icon fas mr-12 icon-"
+                + (noSavedNotes ? "exclamation-triangle text-warning" : countNotesInReport > 0 ? "file text-secondary" : "minus-circle text-secondary")
+            } data-tip={
+                noSavedNotes ? "No notes saved for this Sample Variant, annotate it under the Interpretation tab."
+                    : `This sample has <b>${countNotesInReport}</b> (of ${countNotes}) note${countNotesInReport === 1 ? "" : "s"} saved to the report`
+                        + (countNotesInReport === 0 ? " and thus will be <b>excluded from report</b> entirely." : ".")
+            } data-html />
+            <span className="text-secondary">{ variantDisplayTitle }</span>
+            { countNotesInKnowledgeBase > 0 ?
+                <i className="icon align-middle icon-fw icon-database fas ml-12 text-muted"
+                    data-tip={`This sample has ${countNotesInKnowledgeBase} (of ${countNotesInReport}) note${countNotesInKnowledgeBase === 1 ? "" : "s"} which have been saved to project.`}/>
+                : null }
+        </React.Fragment>
     );
 });
 
