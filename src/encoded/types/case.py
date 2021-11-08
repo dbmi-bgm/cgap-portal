@@ -285,6 +285,8 @@ def _build_case_embedded_list():
         # FilterSet LinkTo
         "active_filterset.@id",
         "active_filterset.title",
+        "active_filterset_sv.@id",
+        "active_filterset_sv.title",
 
         # FilterSet linkTo
         "cohort.filter_set.*",

@@ -222,9 +222,8 @@ function CNVFilteringTabBody(props){
     }, [ context ]); // Don't memoize on `searchType`; it never changes.
 
     return (
-        // TODO Change props.activeFilterSetFieldName to new/proper value for CNV?
         <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem }}
-            activeFilterSetFieldName="active_filterset">
+            activeFilterSetFieldName="active_filterset_sv">
             <CaseViewEmbeddedVariantSampleSearchTableSV />
         </FilteringTabBody>
     );
