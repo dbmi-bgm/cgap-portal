@@ -629,6 +629,40 @@ const validateHeterozygosity = (hetVal) => {
     }
 };
 
+const validateTransTrans = (transTransVal, analysisType) => {
+    switch (analysisType) {
+        case "WGS":
+        case "WGS-Trio":
+        case "WGS-Group":
+        case "WGS-Upstream only":
+            if (transTransVal >= 1.8 && transTransVal <= 2.1) {
+                return "success";
+            } else if (
+                (transTransVal >= 1.6 && transTransVal < 1.8) ||
+                (transTransVal > 2.1 && transTransVal <= 2.3)
+            ) {
+                return "warning";
+            } else {
+                return "danger";
+            }
+        case "WES":
+        case "WES-Trio":
+        case "WES-Group":
+            if (transTransVal >= 2.3 && transTransVal <= 3.3) {
+                return "success";
+            } else if (
+                (transTransVal >= 2.1 && transTransVal < 2.3) ||
+                (transTransVal > 3.3 && transTransVal <= 3.5)
+            ) {
+                return "warning";
+            } else {
+                return "danger";
+            }
+        default: // "custom option
+            return null; // can't do validation, so don't want to show a flag
+    }
+};
+
 const BioinfoStats = React.memo(function BioinfoStats(props) {
     // Note: Can probably clean up the render method of this a little bit by breaking each row
     // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
@@ -640,7 +674,8 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
         processed_files: caseProcFiles = []
     } = caseSample || {};
     const {
-        processed_files: msaProcFiles = []
+        processed_files: msaProcFiles = [],
+        analysis_type: analysisType
     } = sampleProcessing || {};
 
     const msaStats = useMemo(function(){
@@ -722,7 +757,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                                     msaStats.heterozygosity = { value: transformValueType(numberType, value), validationStatus: validateHeterozygosity(value) };
                                     break;
                                 case "Transition-Transversion Ratio":
-                                    msaStats.transTransRatio = { value: transformValueType(numberType, value) };
+                                    msaStats.transTransRatio = { value: transformValueType(numberType, value), validationStatus: validateTransTrans(value, analysisType) };
                                     break;
                                 case "Total Variants Called":
                                     msaStats.totalSNVIndelVars = { value: transformValueType(numberType, value) };
@@ -777,6 +812,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Transition-Transversion ratio" popoverContent={bioinfoPopoverContent.transTransRatio}>
                     { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : fallbackElem }
+                    { (transTransRatio.value && transTransRatio.validationStatus) && <i className={`icon icon-flag fas text-${transTransRatio.validationStatus} ml-05`} />}
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-3">
@@ -786,7 +822,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     { predictedSex.value || fallbackElem }&nbsp;
                     { !!predictedSex.url && <a href={predictedSex.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
-                    { (predictedSex.value && submittedSex && predictedSex.value !== submittedSex) && <i className="icon icon-flag fas text-warning ml-02" data-tip="Submitted sex does not match predicted sex."/>}
+                    { (predictedSex.value && submittedSex && predictedSex.value !== submittedSex) && <i className="icon icon-flag fas text-warning ml-02" />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
                     { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : fallbackElem }
@@ -805,7 +841,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
                     { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : fallbackElem }
-                    { (heterozygosity.value && heterozygosity.validationStatus !== "success") && <i className={`icon icon-flag fas text-${heterozygosity.validationStatus} ml-05`} data-tip="Heterozygosity ratio does not fall in expected range."/>}
+                    { (heterozygosity.value && heterozygosity.validationStatus) && <i className={`icon icon-flag fas text-${heterozygosity.validationStatus} ml-05`}/>}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="De novo Fraction">
                     { typeof deNovo.value === "number" ? deNovo.value + "%" : fallbackElem }
