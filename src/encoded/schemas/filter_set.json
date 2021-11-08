@@ -59,6 +59,8 @@
             "enum": [
                 "Variant",
                 "VariantSample",
+                "StructuralVariant",
+                "StructuralVariantSample",
                 "Cohort"
             ]
         },
