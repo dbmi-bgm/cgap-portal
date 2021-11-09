@@ -1267,7 +1267,7 @@
                 "Low relevance, homozygous in a parent",
                 "Low relevance, hemizygous in a parent",
                 "Low relevance, multiallelic site family",
-                "Low relevance, present in both parent(s)",
+                "Low relevance, present in both parents",
                 "Low relevance, missing call(s) in family",
                 "Low relevance, mismatching chrXY genotype(s)",
                 "Low relevance, other"

@@ -66,7 +66,7 @@ class InheritanceMode:
     INHMODE_LABEL_NONE_LOWDEPTH = "Low relevance, low depth"
     INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT = "Low relevance, homozygous in a parent"
     INHMODE_LABEL_NONE_HEMIZYGOUS_PARENT = "Low relevance, hemizygous in a parent"
-    INHMODE_LABEL_NONE_BOTH_PARENTS = "Low relevance, present in both parent(s)"
+    INHMODE_LABEL_NONE_BOTH_PARENTS = "Low relevance, present in both parents"
     INHMODE_LABEL_NONE_OTHER = "Low relevance, other"
     INHMODE_LABEL_NONE_SEX_AMBIGUOUS = "Ambiguous due to missing sex determination"
 
