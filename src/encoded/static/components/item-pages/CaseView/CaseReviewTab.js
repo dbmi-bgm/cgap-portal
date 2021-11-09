@@ -21,11 +21,11 @@ export class CaseReviewController extends React.Component {
         const { variant_samples: vsObjects = [] } = variantSampleListItem || {};
         const savedClassificationsByVS = {};
         vsObjects.forEach(function({ variant_sample_item }){
-            const { "@id": vsAtID, finding_table_tag = null } = variant_sample_item;
-            if (!vsAtID) {
+            const { uuid: vsUUID, finding_table_tag = null } = variant_sample_item;
+            if (!vsUUID) {
                 return; // No view permission or similar.
             }
-            savedClassificationsByVS[vsAtID] = finding_table_tag;
+            savedClassificationsByVS[vsUUID] = finding_table_tag;
         });
         return savedClassificationsByVS;
     }
@@ -61,14 +61,14 @@ export class CaseReviewController extends React.Component {
                 }
                 const savedClassificationsByVS = this.memoized.savedClassificationsByVS(variantSampleListItem);
                 const nextChangedClassificationsByVS = {};
-                Object.keys(origClassificationDict).forEach(function(vsAtID){
-                    if (vsAtID in savedClassificationsByVS) {
+                Object.keys(origClassificationDict).forEach(function(vsUUID){
+                    if (savedClassificationsByVS[vsUUID] !== undefined) {
                         // Ensure vsAtID present in our list of variant_samples (`savedClassificationsByVS`); it may have been
                         // deleted in InterpretationTab in which case we need to delete it from changedClassificationsByVS
                         // as well.
-                        const isEqual = (origClassificationDict[vsAtID] || null) === savedClassificationsByVS[vsAtID];
+                        const isEqual = (origClassificationDict[vsUUID] || null) === savedClassificationsByVS[vsUUID];
                         if (!isEqual) {
-                            nextChangedClassificationsByVS[vsAtID] = origClassificationDict[vsAtID];
+                            nextChangedClassificationsByVS[vsUUID] = origClassificationDict[vsUUID];
                         }
                     }
                 });
@@ -80,25 +80,25 @@ export class CaseReviewController extends React.Component {
         }
     }
 
-    updateClassificationForVS(vsAtID, classification){
+    updateClassificationForVS(vsUUID, classification){
         const { variantSampleListItem } = this.props;
         const savedClassificationsByVS = this.memoized.savedClassificationsByVS(variantSampleListItem);
 
         this.setState(function({ changedClassificationsByVS: origClassificationDict }){
-            const { [vsAtID]: savedClassification = null } = savedClassificationsByVS;
+            const { [vsUUID]: savedClassification = null } = savedClassificationsByVS;
             const nextChangedClassificationsByVS = { ...origClassificationDict };
 
             if ((!savedClassification && classification === null) || savedClassification === classification) {
-                if (typeof nextChangedClassificationsByVS[vsAtID] === "undefined") {
+                if (typeof nextChangedClassificationsByVS[vsUUID] === "undefined") {
                     return; // No change needed; skip update for performance.
                 }
-                delete nextChangedClassificationsByVS[vsAtID]; // undefined means (existing/equal) `savedClassification` will take precedence, no PATCH needed.
+                delete nextChangedClassificationsByVS[vsUUID]; // undefined means (existing/equal) `savedClassification` will take precedence, no PATCH needed.
             } else {
                 // Set explicit `null` (or truthy value) to inform to DELETE (or set) value of this field when PATCH.
-                if (nextChangedClassificationsByVS[vsAtID] === classification) {
+                if (nextChangedClassificationsByVS[vsUUID] === classification) {
                     return; // No change needed; skip update for performance.
                 }
-                nextChangedClassificationsByVS[vsAtID] = classification;
+                nextChangedClassificationsByVS[vsUUID] = classification;
             }
             return { "changedClassificationsByVS": nextChangedClassificationsByVS };
         });
@@ -186,10 +186,6 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         toggleSendToProjectStoreItems, toggleSendToReportStoreItems,
         schemas, context
     };
-
-    const applyFindingsTagsBtnText = (
-        `Save ${changedClassificationsCount > 0 ? changedClassificationsCount + " " : ""}Finding${changedClassificationsCount !== 1 ? "s" : ""}`
-    );
 
     return (
         <React.Fragment>
@@ -539,7 +535,7 @@ function SaveNotesToProjectButton (props) {
             // TODO:
             // if (patchErrors.length > 0) {}
         });
-    }, [ disabled, patchItems, sendToProjectStore, resetSendToProjectStoreItems, fetchVariantSampleListItem ]);
+    }, [ disabled, patchItems, variantSampleListItem, sendToProjectStore, resetSendToProjectStoreItems, fetchVariantSampleListItem ]);
 
     return (
         <button type="button" {...{ disabled, onClick }} className={"btn btn-primary" + (className ? " " + className : "")}
@@ -708,7 +704,7 @@ function SaveNotesToReportButton (props) {
             // TODO:
             // if (patchErrors.length > 0) {}
         });
-    }, [ disabled, patchItems, sendToReportStore, report, resetSendToReportStoreItems ]);
+    }, [ disabled, patchItems, variantSampleListItem, sendToReportStore, report, resetSendToReportStoreItems, fetchVariantSampleListItem ]);
 
     const btnCls = "btn btn-" + (!reportUUID ? "outline-danger" : "primary") + (className ? " " + className : "");
 
@@ -723,11 +719,11 @@ function SaveNotesToReportButton (props) {
 
 function SaveFindingsButton(props){
     const {
-        onClick,
+        patchItems,
         changedClassificationsByVS,
         updateClassificationForVS,
         changedClassificationsCount,
-        variantSampleItem,
+        variantSampleListItem,
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem,
         disabled: propDisabled,
@@ -735,6 +731,70 @@ function SaveFindingsButton(props){
     } = props;
 
     const disabled = propDisabled || isLoadingVariantSampleListItem || changedClassificationsCount === 0;
+
+
+    const onClick = useCallback(function(e){
+        e.stopPropagation();
+        if (disabled) {
+            return false;
+        }
+
+        const { variant_samples: vsObjects = [] } = variantSampleListItem || {};
+
+        const payloads = []; // [ [path, payload], ... ]
+
+        vsObjects.forEach(function(vsObject){
+            const { variant_sample_item: { "@id": vsAtID, "uuid": vsUUID } } = vsObject;
+            const { [vsUUID]: classificationToSaveForVS = undefined } = changedClassificationsByVS;
+
+            if (!vsAtID) {
+                // Filter out any VSes without view permissions, if any.
+                // TODO: check actions for edit ability, perhaps.
+                return;
+            }
+
+            if (classificationToSaveForVS === undefined) {
+                // Preserve if === null, which means to delete the value.
+                return;
+            }
+
+            const payload = [ vsAtID, {} ];
+            if (classificationToSaveForVS === null) {
+                payload[0] += "?delete_fields=finding_table_tag";
+            } else {
+                payload[1].finding_table_tag = classificationToSaveForVS;
+            }
+
+            payloads.push(payload);
+
+        });
+
+
+
+        console.log("PAYLOADS", payloads);
+
+
+
+        // patchItems(payloads, (countCompleted, patchErrors) => {
+        //     if (countCompleted > 0) {
+        //         if (typeof resetSendToReportStoreItems === "function") {
+        //             console.log("Reset 'send to project' store items.");
+        //             resetSendToReportStoreItems();
+        //         } else {
+        //             throw new Error("No `props.resetSendToReportStoreItems` supplied to SaveNotesToReportButton");
+        //         }
+        //         if (typeof fetchVariantSampleListItem === "function") {
+        //             console.log("Refreshing our VariantSampleListItem with updated Note Item statuses.");
+        //             fetchVariantSampleListItem();
+        //         } else {
+        //             throw new Error("No `props.fetchVariantSampleListItem` supplied to SaveNotesToReportButton");
+        //         }
+        //     }
+        //     // TODO:
+        //     // if (patchErrors.length > 0) {}
+        // });
+    }, [ disabled, patchItems, variantSampleListItem, changedClassificationsByVS, updateClassificationForVS, fetchVariantSampleListItem ]);
+
 
     const applyFindingsTagsBtnText = (
         `Save ${changedClassificationsCount > 0 ? changedClassificationsCount + " " : ""}Finding${changedClassificationsCount !== 1 ? "s" : ""}`

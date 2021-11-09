@@ -100,7 +100,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
             anyUnsavedChanges
         };
         return vsSelections.map(function(selection, index){
-            const { variant_sample_item: { "@id": vsAtID } = {} } = selection;
+            const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID } = {} } = selection;
             if (!vsAtID) {
                 // Handle lack of permissions, show some 'no permissions' view, idk..
                 return (
@@ -109,10 +109,10 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
                     </div>
                 );
             }
-            const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsAtID] : undefined;
-            const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsAtID] || false) : undefined;
+            const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
+            const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
             return (
-                <VariantSampleSelection {...commonProps} key={vsAtID || index}
+                <VariantSampleSelection {...commonProps} key={vsUUID || index}
                     {...{ selection, index, unsavedClassification, isDeleted }}  />
             );
         });
@@ -208,7 +208,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             if (alreadyInReportNotes && alreadyInReportNotes[noteUUID]) {
                 countNotesInReport++;
             }
-            if (alreadyInReportNotes && alreadyInReportNotes[noteUUID]) {
+            if (alreadyInProjectNotes && alreadyInProjectNotes[noteUUID]) {
                 countNotesInKnowledgeBase++;
             }
         });
@@ -377,8 +377,8 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
             } data-html />
             <span className="text-secondary">{ variantDisplayTitle }</span>
             { countNotesInKnowledgeBase > 0 ?
-                <i className="icon align-middle icon-fw icon-database fas ml-12 text-muted"
-                    data-tip={`This sample has ${countNotesInKnowledgeBase} (of ${countNotesInReport}) note${countNotesInKnowledgeBase === 1 ? "" : "s"} which have been saved to project.`}/>
+                <i className="icon align-middle icon-fw icon-database fas ml-12 text-muted" data-html
+                    data-tip={`This sample has <b>${countNotesInKnowledgeBase}</b> (of ${countNotesInReport}) note${countNotesInKnowledgeBase === 1 ? "" : "s"} which have been saved to project.`}/>
                 : null }
         </React.Fragment>
     );
@@ -387,11 +387,11 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
 
 function ActionsDropdown(props){
     const { toggleVariantSampleSelectionDeletion, variantSample, isDeleted } = props;
-    const { "@id": vsAtID } = variantSample;
+    const { uuid: vsUUID } = variantSample;
 
     const onSelect = useCallback(function(evtKey, e){
         if (evtKey === "delete") {
-            toggleVariantSampleSelectionDeletion(vsAtID);
+            toggleVariantSampleSelectionDeletion(vsUUID);
         }
     }, [ toggleVariantSampleSelectionDeletion, variantSample ]);
 
@@ -415,8 +415,10 @@ function ClassificationDropdown(props){
     const { variantSample, tableTagsByID, unsavedClassification = undefined, updateClassificationForVS } = props;
     const {
         finding_table_tag: savedClassification = null,
-        "@id": vsAtID
+        uuid: vsUUID
     } = variantSample || {};
+
+    console.log("UNSAVED CLASSIFICATIOn", unsavedClassification);
 
     const isUnsavedClassification = typeof unsavedClassification !== "undefined"; // `null` means explicitly removed
     const viewClassification = isUnsavedClassification ? unsavedClassification : savedClassification;
@@ -425,8 +427,8 @@ function ClassificationDropdown(props){
     const { table_tags: { tags = [] } = {} } = projectReportSettings;
 
     const onOptionSelect = useCallback(function(evtKey, evt){
-        console.log("Selected classification", evtKey, "for", vsAtID);
-        updateClassificationForVS(vsAtID, evtKey || null);
+        console.log("Selected classification", evtKey, "for", vsUUID);
+        updateClassificationForVS(vsUUID, evtKey || null);
     }, [ variantSample, updateClassificationForVS ]);
 
     const renderedOptions = tags.map(function(tagObj, idx){

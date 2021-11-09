@@ -57,13 +57,13 @@ export class InterpretationTabController extends React.Component {
         };
     }
 
-    toggleVariantSampleSelectionDeletion(vsAtIDToDelete){
+    toggleVariantSampleSelectionDeletion(vsUUIDToDelete){
         this.setState(function({ deletedVariantSampleSelections }){
             const nextDeletedVSes = { ...deletedVariantSampleSelections };
-            if (nextDeletedVSes[vsAtIDToDelete]) {
-                delete nextDeletedVSes[vsAtIDToDelete];
+            if (nextDeletedVSes[vsUUIDToDelete]) {
+                delete nextDeletedVSes[vsUUIDToDelete];
             } else {
-                nextDeletedVSes[vsAtIDToDelete] = true;
+                nextDeletedVSes[vsUUIDToDelete] = true;
             }
             return { "deletedVariantSampleSelections": nextDeletedVSes };
         });
@@ -195,18 +195,19 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
         // then can't perform a reliable PATCH.
         let hasPermissionToViewAll = !!(vslAtID);
 
-        const variant_samples = originalVariantSamplesList.map(function(vsSelection){
+        const variant_samples = originalVariantSamplesList.filter(function(vsSelection){
+            const { variant_sample_item: { uuid: vsUUID } } = vsSelection;
+            if (!vsUUID) {
+                // Cannot proceed further, cancel afterwards.
+                hasPermissionToViewAll = false;
+                return false;
+            }
+            // Exclude if to be deleted.
+            return !deletedVariantSampleSelections[vsUUID];
+        }).map(function(vsSelection){
             // For PATCHing, convert linkTo from object to string.
             const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
             return { ...vsSelection, "variant_sample_item": vsAtID };
-        }).filter(function(vsSelection){
-            const { variant_sample_item: vsAtID } = vsSelection;
-            if (!vsAtID) {
-                // Cannot proceed further, cancel afterwards.
-                hasPermissionToViewAll = false;
-            }
-            // Exclude if to be deleted.
-            return !deletedVariantSampleSelections[vsAtID];
         });
 
         // TODO: Sort; probably create dict of { vsAtID: indexInChangedOrdering } and then sort
