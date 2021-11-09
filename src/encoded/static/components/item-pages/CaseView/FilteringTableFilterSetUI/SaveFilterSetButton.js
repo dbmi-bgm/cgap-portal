@@ -156,7 +156,7 @@ export class SaveFilterSetButtonController extends React.Component {
             } else {
                 // POST
 
-                if (activeFilterSetFieldName || typeof activeFilterSetFieldName !== "string") {
+                if (!activeFilterSetFieldName || typeof activeFilterSetFieldName !== "string") {
                     throw new Error("Expected props.activeFilterSetFieldName");
                 }
 
