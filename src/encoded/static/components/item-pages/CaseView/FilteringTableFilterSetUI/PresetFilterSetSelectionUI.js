@@ -29,7 +29,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
             "search_type": "FilterSet",
             "filter_blocks": [],
             "intersect": false,
-            "global_flags": "sort=default_for_projects&sort=-date_created&limit=250&search_type=" + searchType || "VariantSample"
+            "global_flags": "sort=default_for_projects&sort=-date_created&limit=250&search_type=" + (searchType || "VariantSample")
         };
 
         if (userUUID) {
