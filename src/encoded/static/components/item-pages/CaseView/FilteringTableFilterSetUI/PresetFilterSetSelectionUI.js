@@ -21,7 +21,7 @@ import { CountIndicator } from '@hms-dbmi-bgm/shared-portal-components/es/compon
 export class PresetFilterSetSelectionUI extends React.PureComponent {
 
     /** Builds a compound search request for all FilterSets with relevant `preset_for_users`, `preset_for_projects`,  & `default_for_projects`  */
-    static makeCompoundSearchRequest(caseItem){
+    static makeCompoundSearchRequest(caseItem, searchType){
         const { project: { uuid: projectUUID } } = caseItem || {};
         const { uuid: userUUID = null } = JWT.getUserDetails() || {};
 
@@ -29,7 +29,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
             "search_type": "FilterSet",
             "filter_blocks": [],
             "intersect": false,
-            "global_flags": "sort=default_for_projects&sort=-date_created&limit=250"
+            "global_flags": "sort=default_for_projects&sort=-date_created&limit=250&search_type=" + searchType || "VariantSample"
         };
 
         if (userUUID) {
@@ -109,13 +109,13 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
     }
 
     loadInitialResults(){
-        const { caseItem } = this.props;
+        const { caseItem, searchType } = this.props;
 
         if (this.currentInitialResultsRequest) {
             console.log('currentInitialResultsRequest superseded (a)');
         }
 
-        const compoundRequest = PresetFilterSetSelectionUI.makeCompoundSearchRequest(caseItem);
+        const compoundRequest = PresetFilterSetSelectionUI.makeCompoundSearchRequest(caseItem, searchType);
         const scopedRequest = this.currentInitialResultsRequest = ajax.promise("/compound_search", "POST", {}, JSON.stringify(compoundRequest)).then((res) => {
             const {
                 "@graph": presetResults,

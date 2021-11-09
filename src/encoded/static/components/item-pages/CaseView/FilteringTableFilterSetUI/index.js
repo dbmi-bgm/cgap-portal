@@ -198,7 +198,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             requestedCompoundFilterSet, // From SPC/VirtualHrefController
 
             // From FilteringTab (& higher, e.g. App/redux-store):
-            caseItem, schemas, session, searchHrefBase,
+            caseItem, schemas, session, searchHrefBase, searchType,
 
             // From SaveFilterSetButtonController:
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet, haveEditPermission,
@@ -300,7 +300,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                         <div>
                             <div className="d-flex flex-column flex-md-row">
                                 <div className="filterset-preset-selection-outer-column">
-                                    <PresetFilterSetSelectionUI {...presetSelectionUIProps} />
+                                    <PresetFilterSetSelectionUI { ...presetSelectionUIProps } {...{ searchType }}/>
                                 </div>
                                 <div className="flex-grow-1">
                                     { fsuiBlocksBody }

@@ -222,7 +222,7 @@ function CNVFilteringTabBody(props){
     }, [ context ]); // Don't memoize on `searchType`; it never changes.
 
     return (
-        <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem }}
+        <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem, searchType }}
             activeFilterSetFieldName="active_filterset_sv">
             <CaseViewEmbeddedVariantSampleSearchTableSV />
         </FilteringTabBody>
@@ -255,6 +255,7 @@ function FilteringTabBody(props) {
         hideFacets,                             // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         blankFilterSetItem,                     // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         activeFilterSetFieldName,               // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        searchType                              // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
     } = props;
 
     // TODO:
@@ -310,7 +311,7 @@ function FilteringTabBody(props) {
     const embeddedTableHeaderBody = (
         <SaveFilterSetButtonController {...{ setIsSubmitting, activeFilterSetFieldName }} caseItem={context}>
             <SaveFilterSetPresetButtonController>
-                <FilteringTableFilterSetUI {...fsuiProps} />
+                <FilteringTableFilterSetUI {...fsuiProps} {...{ searchType }} />
             </SaveFilterSetPresetButtonController>
         </SaveFilterSetButtonController>
     );
@@ -334,14 +335,13 @@ function FilteringTabBody(props) {
     const embeddedTableHeader = activeFilterSetID ? (
         <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
             onFail={onFailInitialFilterSetItemLoad}>
-            <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets}>
+            <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples, searchType }} excludeFacets={hideFacets}>
                 { embeddedTableHeaderBody }
             </FilterSetController>
         </ajax.FetchedItem>
     ) : (
-        // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
-        // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+        // Possible to-do, depending on data-model future requirements for FilterSet Item could use initialFilterSetItem.flags[0] instead of using searchHrefBase.
+        <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples, searchType }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
             { embeddedTableHeaderBody }
         </FilterSetController>
     );
