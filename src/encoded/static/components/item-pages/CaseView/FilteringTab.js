@@ -157,7 +157,7 @@ function SNVFilteringTabBody(props){
             + (initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "")
         );
 
-        const blankFilterSetItem = createBlankFilterSetItem(caseAccession, searchType);
+        const blankFilterSetItem = createBlankFilterSetItem(searchType, caseAccession);
 
         let hideFacets = ["type", "validation_errors.name"];
 
@@ -199,7 +199,7 @@ function CNVFilteringTabBody(props){
             + (sv_initial_search_href_filter_addon ? "&" + sv_initial_search_href_filter_addon : "")
         );
 
-        const blankFilterSetItem = createBlankFilterSetItem(caseAccession, searchType);
+        const blankFilterSetItem = createBlankFilterSetItem(searchType, caseAccession);
 
         let hideFacets = ["type", "validation_errors.name"];
 
