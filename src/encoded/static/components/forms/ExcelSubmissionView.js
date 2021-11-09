@@ -12,7 +12,6 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console, ajax, JWT, navigate, object, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
-import { Fade } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Fade';
 
 import { AttachmentInputController } from './attachment-input';
 
