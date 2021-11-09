@@ -304,10 +304,10 @@ class StructuralVariantSample(Item):
             InheritanceMode.INHMODE_LABEL_Y_LINKED: 9,  # Y-linked dominant
             InheritanceMode.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT: 10,  # Low relevance, homozygous in a parent
             InheritanceMode.INHMODE_LABEL_NONE_HEMIZYGOUS_PARENT: 11,  # Low relevance, hemizygous in a parent
-            InheritanceMode.INHMODE_LABEL_NONE_MN: 12,  # Low relevance, multiallelic site family
-            InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 13,  # Low relevance, present in both parent(s)
-            InheritanceMode.INHMODE_LABEL_NONE_DOT: 14,  # Low relevance, missing call(s) in family
-            InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 15,  # Low relevance, mismatching chrXY genotype(s)
+            InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 12,  # Low relevance, present in both parent(s)
+            InheritanceMode.INHMODE_LABEL_NONE_DOT: 13,  # Low relevance, missing call(s) in family
+            InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 14,  # Low relevance, mismatching chrXY genotype(s)
+            InheritanceMode.INHMODE_LABEL_NONE_OTHER: 15,  # Low relevance, other
             '_default': 1000  # arbitrary large number
         },
     }
