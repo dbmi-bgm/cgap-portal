@@ -438,12 +438,16 @@ class VariantSample(Item):
         "type": "string"
     })
     def bam_snapshot(self, request, file, variant):
+        file_path = None
+        excluded_chromosomes = ["M"]
         variant_props = get_item_or_none(request, variant, 'Variant', frame='raw')
         if variant_props is None:
             raise RuntimeError('Got none for something that definitely exists')
-        file_path = '%s/bamsnap/chr%s_%s.png' % (  # file = accession of associated VCF file
-            file, variant_props['CHROM'], variant_props['POS']
-        )
+        chromosome = variant_props.get("CHROM")
+        if chromosome not in excluded_chromosomes:
+            file_path = '%s/bamsnap/chr%s_%s.png' % (  # file = accession of associated VCF file
+                file, chromosome, variant_props['POS']
+            )
         return file_path
 
     @calculated_property(schema={

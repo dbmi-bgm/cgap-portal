@@ -20,7 +20,8 @@ export function SampleTabBody(props){
         genotype_labels: genotypeLabels = [],
         variant = null,
         CALL_INFO = null,
-        file = null
+        file = null,
+        bam_snapshot = null
     } = context || {};
 
     const { REF: varRef = null } = variant;
@@ -35,10 +36,31 @@ export function SampleTabBody(props){
             return (schemaProperty || {}).description || null;
         };
     }, [ schemas ]);
+
+    let bamSnapSection;
+    if (bam_snapshot) {
+        bamSnapSection = (
+            <div className="col-4 col-md-3">
+                <div className="pb-2 inner-card-section h-100">
+                    <div className="info-header-title">
+                        <h4>
+                            BAM Snapshot
+                        </h4>
+                    </div>
+                    <div className="info-body text-center overflow-auto d-flex h-100 d-flex justify-content-center flex-column">
+                        <span>View BAM Snapshot</span>
+                        <a href={`/${uuid}/@@download`} className="d-block pt-2 text-center mx-auto">
+                            <i className="icon icon-fw icon-2x icon-external-link-alt fas ml-05" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        );
+    }
     return (
         <div className="variant-tab-body card-body">
             <div className="row">
-                <div className="col-8 col-md-9">
+                <div className={bam_snapshot ? "col-8 col-md-9" : "col-12 col-md-12"}>
                     <div className="pb-2 inner-card-section">
                         <div className="info-header-title">
                             <h4>
@@ -50,21 +72,7 @@ export function SampleTabBody(props){
                         </div>
                     </div>
                 </div>
-                <div className="col-4 col-md-3">
-                    <div className="pb-2 inner-card-section h-100">
-                        <div className="info-header-title">
-                            <h4>
-                                BAM Snapshot
-                            </h4>
-                        </div>
-                        <div className="info-body text-center overflow-auto d-flex h-100 d-flex justify-content-center flex-column">
-                            <span>View BAM Snapshot</span>
-                            <a href={`/${uuid}/@@download`} className="d-block pt-2" style={{ textAlign: "center", margin: "0 auto" }}>
-                                <i className="icon icon-fw icon-2x icon-external-link-alt fas ml-05" />
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                {bamSnapSection}
             </div>
             <div className="row">
                 <div className="col-12 col-md-12 d-flex">
