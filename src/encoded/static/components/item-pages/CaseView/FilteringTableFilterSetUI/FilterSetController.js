@@ -26,7 +26,7 @@ export class FilterSetController extends React.PureComponent {
             "@id" : PropTypes.string, // Is required if originally existed, else free to be null.
             "uuid" : PropTypes.string, // Is required if originally existed, else free to be null.
             "title" : PropTypes.string.isRequired,
-            "search_type" : PropTypes.oneOf(["VariantSample", "Variant", "Case"]),
+            "search_type" : PropTypes.oneOf(["StructuralVariantSample", "VariantSample", "Variant", "Case"]),
             "filter_blocks" : PropTypes.arrayOf(PropTypes.shape({
                 "query" : PropTypes.string,
                 "name" : PropTypes.string.isRequired
