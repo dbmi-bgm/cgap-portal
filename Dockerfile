@@ -83,8 +83,7 @@ RUN poetry install && \
 
 # Build front-end, remove node_modules when done
 RUN npm run build && \
-    npm run build-scss && \
-    rm -rf node_modules/
+    npm run build-scss
 
 # Misc
 RUN make aws-ip-ranges && \
