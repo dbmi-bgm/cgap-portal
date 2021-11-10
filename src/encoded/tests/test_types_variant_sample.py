@@ -195,7 +195,7 @@ def test_variant_sample_patch_notes_process_success(
 
     resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@process-notes/", patch_process_payload, status=200).json
 
-    assert resp["success"] == True
+    assert resp["status"] == "success"
     assert resp["patch_results"]["Variant"] == 1
     assert resp["patch_results"]["Note"] == 5 # 4 Newly-shared Notes, +1 "superseding_notes" field to existing Note PATCH
 

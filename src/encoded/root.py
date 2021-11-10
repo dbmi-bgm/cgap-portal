@@ -264,40 +264,18 @@ class CGAPRoot(Root):
     })
     def content(self, request):
         """Returns -object- with pre-named sections"""
-        sections_to_get = ['home.introduction']
-        user = request._auth0_authenticated if hasattr(request, '_auth0_authenticated') else True
-        return_list = []
-        for section_name in sections_to_get:
-            try:  # Can be caused by 404 / Not Found during indexing
-                res = request.embed('/static-sections', section_name, '@@embedded', as_user=user)
-                return_list.append(res)
-            except KeyError:
-                pass
-        return return_list
+        return []
+        # sections_to_get = ['home.introduction']
+        # user = request._auth0_authenticated if hasattr(request, '_auth0_authenticated') else True
+        # return_list = []
+        # for section_name in sections_to_get:
+        #     try:  # Can be caused by 404 / Not Found during indexing
+        #         res = request.embed('/static-sections', section_name, '@@embedded', as_user=user)
+        #         return_list.append(res)
+        #     except KeyError:
+        #         pass
+        # return return_list
 
-    @calculated_property(schema={
-        "title": "Carousel Content",
-        "type": "array"
-    }, category="page")
-    def carousel(self, request):
-        '''Returns list of carousel slides'''
-        user = request._auth0_authenticated if hasattr(request, '_auth0_authenticated') else True
-        try:
-            return request.embed('/search/?type=StaticSection&section_type=Home+Page+Slide&sort=name', as_user=user).get('@graph', [])
-        except KeyError:  # Can be caused by 404 / Not Found during indexing
-            return []
-
-    @calculated_property(schema={
-        "title": "Announcements",
-        "type": "array"
-    }, category="page")
-    def announcements(self, request):
-        '''Returns list of latest announcements'''
-        user = request._auth0_authenticated if hasattr(request, '_auth0_authenticated') else True
-        try:
-            return request.embed('/search/?type=StaticSection&section_type=Announcement&sort=-date_created', as_user=user).get('@graph', [])
-        except KeyError:  # Can be caused by 404 / Not Found during indexing
-            return []
 
     @calculated_property(schema={
         "title": "Application version",
