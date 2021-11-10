@@ -1,6 +1,7 @@
 'use strict';
 
 import React, { useCallback, useMemo, useState } from 'react';
+import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
@@ -85,38 +86,40 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
                 { isLoadingVariantSampleListItem ? "Loading, please wait..." : "No selections added yet" }
             </h4>
         );
-    } else {
-        const commonProps = {
-            schemas, context, parentTabType,
-            toggleSendToProjectStoreItems,
-            toggleSendToReportStoreItems,
-            sendToProjectStore,
-            sendToReportStore,
-            alreadyInProjectNotes,
-            alreadyInReportNotes,
-            tableTagsByID,
-            updateClassificationForVS,
-            toggleVariantSampleSelectionDeletion,
-            anyUnsavedChanges
-        };
-        return vsSelections.map(function(selection, index){
-            const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID } = {} } = selection;
-            if (!vsAtID) {
-                // Handle lack of permissions, show some 'no permissions' view, idk..
-                return (
-                    <div className="text-center p-3">
-                        <em>Item with no view permissions</em>
-                    </div>
-                );
-            }
-            const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
-            const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
-            return (
-                <VariantSampleSelection {...commonProps} key={vsUUID || index}
-                    {...{ selection, index, unsavedClassification, isDeleted }}  />
-            );
-        });
     }
+
+    const commonProps = {
+        schemas, context, parentTabType,
+        toggleSendToProjectStoreItems,
+        toggleSendToReportStoreItems,
+        sendToProjectStore,
+        sendToReportStore,
+        alreadyInProjectNotes,
+        alreadyInReportNotes,
+        tableTagsByID,
+        updateClassificationForVS,
+        toggleVariantSampleSelectionDeletion,
+        anyUnsavedChanges
+    };
+
+    return vsSelections.map(function(selection, index){
+        const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID } = {} } = selection;
+        if (!vsAtID) {
+            // Handle lack of permissions, show some 'no permissions' view, idk..
+            return (
+                <div className="text-center p-3">
+                    <em>Item with no view permissions</em>
+                </div>
+            );
+        }
+        const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
+        const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
+        return (
+            <VariantSampleSelection {...commonProps} key={vsUUID || index}
+                {...{ selection, index, unsavedClassification, isDeleted }}  />
+        );
+    });
+
 });
 
 
@@ -404,6 +407,7 @@ function ActionsDropdown(props){
                 </React.Fragment>
             }>
             <DropdownItem key={0} eventKey="delete">
+                <i className={"icon mr-08 icon-fw fas icon-" + (isDeleted ? "trash-restore" : "trash")} />
                 { isDeleted ? "Unmark from deletion" : "Mark for deletion" }
             </DropdownItem>
         </DropdownButton>
@@ -415,10 +419,9 @@ function ClassificationDropdown(props){
     const { variantSample, tableTagsByID, unsavedClassification = undefined, updateClassificationForVS } = props;
     const {
         finding_table_tag: savedClassification = null,
-        uuid: vsUUID
+        uuid: vsUUID,
+        actions: vsActions = []
     } = variantSample || {};
-
-    console.log("UNSAVED CLASSIFICATIOn", unsavedClassification);
 
     const isUnsavedClassification = typeof unsavedClassification !== "undefined"; // `null` means explicitly removed
     const viewClassification = isUnsavedClassification ? unsavedClassification : savedClassification;
@@ -431,25 +434,33 @@ function ClassificationDropdown(props){
         updateClassificationForVS(vsUUID, evtKey || null);
     }, [ variantSample, updateClassificationForVS ]);
 
-    const renderedOptions = tags.map(function(tagObj, idx){
-        const { id: classificationID, title } = tagObj;
-        const existingSavedOption = (savedClassification === classificationID);
-        const active = (viewClassification && viewClassification === classificationID);
-        return (
-            <DropdownItem key={idx} eventKey={classificationID} active={active}
-                className={existingSavedOption && !active ? "bg-light text-600" : null}>
-                { title }
+    const renderedOptions = [];
+
+    const haveEditPermission = useMemo(function(){
+        return !!(_.findWhere(vsActions, { "name" : "edit" }));
+    }, [ variantSample ]);
+
+    if (haveEditPermission) {
+        tags.forEach(function(tagObj, idx){
+            const { id: classificationID, title } = tagObj;
+            const existingSavedOption = (savedClassification === classificationID);
+            const active = (viewClassification && viewClassification === classificationID);
+            renderedOptions.push(
+                <DropdownItem key={idx} eventKey={classificationID} active={active}
+                    className={existingSavedOption && !active ? "bg-light text-600" : null}>
+                    { title }
+                </DropdownItem>
+            );
+        });
+
+        renderedOptions.push(<div className="dropdown-divider"/>);
+        renderedOptions.push(
+            <DropdownItem key="none" eventKey={null} active={!viewClassification}
+                className={!savedClassification && viewClassification ? "bg-light text-600" : null}>
+                <em>None</em>
             </DropdownItem>
         );
-    });
-
-    renderedOptions.push(<div className="dropdown-divider"/>);
-    renderedOptions.push(
-        <DropdownItem key="none" eventKey={null} active={!viewClassification}
-            className={!savedClassification && viewClassification ? "bg-light text-600" : null}>
-            <em>None</em>
-        </DropdownItem>
-    );
+    }
 
     const unsavedIndicator = (
         <i className="icon icon-asterisk fas mr-06 text-danger text-smaller"
@@ -478,7 +489,8 @@ function ClassificationDropdown(props){
 
     return (
         <div className="py-1 py-lg-0 pr-lg-12">
-            <DropdownButton size="sm" variant="outline-dark" menuAlign="right" title={title} onSelect={onOptionSelect} disabled={tags.length === 0}
+            <DropdownButton size="sm" variant="outline-dark" menuAlign="right" title={title} onSelect={onOptionSelect}
+                disabled={!haveEditPermission || tags.length === 0}
                 data-delay={500} data-tip={!viewClassification? "Select a finding..." : null }>
                 { renderedOptions }
             </DropdownButton>
@@ -796,68 +808,3 @@ const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onK
 });
 
 
-
-
-
-
-export class CaseReviewSelectedNotesStore extends React.PureComponent {
-
-    constructor(props) {
-        super(props);
-
-        this.toggleSendToProjectStoreItems = this.toggleStoreItems.bind(this, "sendToProjectStore");
-        this.toggleSendToReportStoreItems = this.toggleStoreItems.bind(this, "sendToReportStore");
-        this.resetSendToProjectStoreItems = this.resetStoreItems.bind(this, "sendToProjectStore");
-        this.resetSendToReportStoreItems = this.resetStoreItems.bind(this, "sendToReportStore");
-
-        this.state = {
-            // Keyed by Note Item UUID and value is boolean true/false for now (can be changed)
-            "sendToProjectStore": {},
-            "sendToReportStore": {}
-        };
-    }
-
-    toggleStoreItems(storeName, noteSelectionObjects, callback = null){
-        this.setState(function(currState){
-            const nextStore = { ...currState[storeName] };
-            noteSelectionObjects.forEach(function([ id, data ]){
-                if (nextStore[id]) {
-                    delete nextStore[id];
-                } else {
-                    nextStore[id] = data;
-                }
-            });
-            return { [storeName] : nextStore };
-        }, callback);
-    }
-
-    resetStoreItems(storeName, callback = null) {
-        this.setState({ [storeName]: {} }, callback);
-    }
-
-    render(){
-        const {
-            props: { children, ...passProps },
-            state,
-            toggleSendToProjectStoreItems,
-            toggleSendToReportStoreItems,
-            resetSendToProjectStoreItems,
-            resetSendToReportStoreItems
-        } = this;
-        const childProps = {
-            ...passProps,
-            ...state,
-            toggleSendToProjectStoreItems,
-            toggleSendToReportStoreItems,
-            resetSendToProjectStoreItems,
-            resetSendToReportStoreItems
-        };
-        return React.Children.map(children, function(c){
-            if (React.isValidElement(c)) {
-                return React.cloneElement(c, childProps);
-            }
-            return c;
-        });
-    }
-
-}

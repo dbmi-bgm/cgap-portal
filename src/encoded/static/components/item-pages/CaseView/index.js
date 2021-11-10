@@ -17,7 +17,6 @@ import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 
 import { VariantSampleListController } from './VariantSampleListController';
-import { CaseReviewSelectedNotesStore } from './VariantSampleSelection';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody } from './PedigreeTabViewBody';
@@ -29,7 +28,7 @@ import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
 import { CNVSVFilteringTab } from './CNVSVFilteringTab';
 import { InterpretationTab, InterpretationTabController } from './InterpretationTab';
-import { CaseReviewTab, CaseReviewController } from './CaseReviewTab';
+import { CaseReviewTab, CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReviewTab';
 import { getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
 
 
@@ -189,7 +188,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             }
         }
         return false;
-    }, [ vsSelections ]);
+    }, [ variantSampleListItem ]);
 
     const onViewPedigreeBtnClick = useCallback(function(evt){
         evt.preventDefault();
@@ -335,10 +334,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         </InterpretationTabController>
                     </DotRouterTab>
                     <DotRouterTab dotPath=".review" cache disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
-                        <CaseReviewSelectedNotesStore>
+                        <CaseReviewSelectedNotesStore {...{ context, variantSampleListItem }}>
                             <NoteSubSelectionStateController>
-                                <CaseReviewController {...{ variantSampleListItem }}>
-                                    <CaseReviewTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                                <CaseReviewController>
+                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
                                 </CaseReviewController>
                             </NoteSubSelectionStateController>
                         </CaseReviewSelectedNotesStore>

@@ -1,17 +1,13 @@
 'use strict';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
-import ReactTooltip from 'react-tooltip';
-import Modal from 'react-bootstrap/esm/Modal';
-import { ajax, console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
+import { PatchItemsProgress } from './../../util/PatchItemsProgress';
 import { VariantSampleSelectionList, parentTabTypes } from './VariantSampleSelection';
-import { CaseSpecificSelectionsPanel, getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
-
-
+import { CaseSpecificSelectionsPanel, getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 
 
 
@@ -30,11 +26,57 @@ export class CaseReviewController extends React.Component {
         return savedClassificationsByVS;
     }
 
+    /** Using getDerivedStateFromProps in place of componentDidMount to avoid re-renders. */
+    static getDerivedStateFromProps(props, state) {
+        const { variantSampleListItem } = props;
+        const { pastVSLItem, changedClassificationsByVS: origClassificationDict } = state;
+
+        const nextState = { "pastVSLItem": variantSampleListItem };
+
+        if (variantSampleListItem !== pastVSLItem) {
+            // Unset changedClassificationsByVS[uuid] for any VS
+            // which has been saved (i.e. savedClassification is now equal to unsaved classification).
+
+            const changedClassificationsCount = Object.keys(origClassificationDict).length;
+            if (changedClassificationsCount === 0) {
+                return null;
+            }
+            const savedClassificationsByVS = CaseReviewController.savedClassificationsByVS(variantSampleListItem);
+            const nextChangedClassificationsByVS = {};
+            let anyClassificationsUnset = false;
+            Object.keys(origClassificationDict).forEach(function(vsUUID){
+                if (savedClassificationsByVS[vsUUID] !== undefined) {
+                    // Ensure vsAtID present in our list of variant_samples (`savedClassificationsByVS`); it may have been
+                    // deleted in InterpretationTab in which case we need to delete it from changedClassificationsByVS
+                    // as well.
+                    const isEqual = (origClassificationDict[vsUUID] || null) === savedClassificationsByVS[vsUUID];
+                    if (!isEqual) {
+                        nextChangedClassificationsByVS[vsUUID] = origClassificationDict[vsUUID];
+                    } else {
+                        anyClassificationsUnset = true;
+                    }
+                }
+            });
+
+            if (anyClassificationsUnset) {
+                console.log("Updating `changedClassificationsByVS` - ", origClassificationDict, nextChangedClassificationsByVS);
+                nextState.changedClassificationsByVS = nextChangedClassificationsByVS;
+            }
+
+        }
+
+        return nextState;
+    }
+
     constructor(props){
         super(props);
+        this.fetchProjectItem = this.fetchProjectItem.bind(this);
         this.updateClassificationForVS = this.updateClassificationForVS.bind(this);
         this.state = {
-            "changedClassificationsByVS": {}
+            "changedClassificationsByVS": {},
+            "projectItem": null,
+            // Reference to object, not clone (extra memory) of it. Used solely for getDerivedStateFromProps.
+            "pastVSLItem": props.variantSampleListItem
         };
         this.memoized = {
             savedClassificationsByVS: memoize(CaseReviewController.savedClassificationsByVS),
@@ -42,45 +84,35 @@ export class CaseReviewController extends React.Component {
         };
     }
 
-    /**
-     * If VS Item is refreshed, then update states --
-     * unset temporary unsaved states if just saved them.
-     *
-     * @todo
-     * Consider change this into a `getDerivedStateFromProps` call instead of a `componentDidUpdate`.
-     */
-    componentDidUpdate(pastProps, pastState){
-        const { variantSampleListItem: pastVSLItem = null } = pastProps;
-        const { variantSampleListItem } = this.props;
-
-        if (variantSampleListItem !== pastVSLItem) {
-            this.setState(({ changedClassificationsByVS: origClassificationDict }) => {
-                const changedClassificationsCount = this.memoized.changedClassificationsCount(origClassificationDict);
-                if (changedClassificationsCount === 0) {
-                    return null;
-                }
-                const savedClassificationsByVS = this.memoized.savedClassificationsByVS(variantSampleListItem);
-                const nextChangedClassificationsByVS = {};
-                Object.keys(origClassificationDict).forEach(function(vsUUID){
-                    if (savedClassificationsByVS[vsUUID] !== undefined) {
-                        // Ensure vsAtID present in our list of variant_samples (`savedClassificationsByVS`); it may have been
-                        // deleted in InterpretationTab in which case we need to delete it from changedClassificationsByVS
-                        // as well.
-                        const isEqual = (origClassificationDict[vsUUID] || null) === savedClassificationsByVS[vsUUID];
-                        if (!isEqual) {
-                            nextChangedClassificationsByVS[vsUUID] = origClassificationDict[vsUUID];
-                        }
-                    }
-                });
-
-                console.log("Updating `changedClassificationsByVS` - ", origClassificationDict, nextChangedClassificationsByVS);
-
-                return { "changedClassificationsByVS": nextChangedClassificationsByVS };
-            });
+    componentDidMount() {
+        const { projectItem } = this.state;
+        if (!projectItem) {
+            this.fetchProjectItem();
         }
     }
 
-    updateClassificationForVS(vsUUID, classification){
+    /**
+     * Will be used to load case.project and pass down report settings.
+     * Might be moved up to CaseView, if needed in other places on page.
+     *
+     * Should we grab project from somewhere else?
+     */
+    fetchProjectItem(){
+        const {
+            context: {
+                project: { "@id": projectAtID = null } = {}
+            }
+        } = this.props;
+
+        if (!projectAtID) {
+            return;
+        }
+
+
+        // ajax.load("/embed" or projectAtID, ...)
+    }
+
+    updateClassificationForVS(vsUUID, classification, callback){
         const { variantSampleListItem } = this.props;
         const savedClassificationsByVS = this.memoized.savedClassificationsByVS(variantSampleListItem);
 
@@ -101,7 +133,7 @@ export class CaseReviewController extends React.Component {
                 nextChangedClassificationsByVS[vsUUID] = classification;
             }
             return { "changedClassificationsByVS": nextChangedClassificationsByVS };
-        });
+        }, callback);
     }
 
     render(){
@@ -131,10 +163,148 @@ export class CaseReviewController extends React.Component {
 }
 
 
+/**
+ * @todo Potentially merge with CaseReviewController
+ */
+export class CaseReviewSelectedNotesStore extends React.PureComponent {
+
+    static alreadyInProjectNotes(variantSampleListItem) {
+        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function({ status: noteStatus }){
+            return (noteStatus === "current");
+        });
+    }
+
+    static alreadyInReportNotes(variantSampleListItem, report){
+        const { uuid: reportUUID } = report || {};
+        if (!reportUUID) {
+            return {};
+        }
+        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function({ associated_items: noteAssociatedItems }){
+            const foundReportEntry = _.findWhere(noteAssociatedItems, { "item_type": "Report", "item_identifier": reportUUID });
+            return !!(foundReportEntry);
+        });
+    }
+
+    /** Using getDerivedStateFromProps instd of componentDidUpdate prevents additional render(s) */
+    static getDerivedStateFromProps(props, state){
+        const { variantSampleListItem, context: { report } } = props;
+        const { pastVSLItem, sendToProjectStore = {}, sendToReportStore = {} } = state;
+
+        const nextState = { "pastVSLItem": variantSampleListItem };
+
+        if (variantSampleListItem !== pastVSLItem) {
+            // Clear sendToProjectStore and sendToReportStore of any items that were just saved
+            // or updated by someone else.
+            const alreadyInProjectNotes = CaseReviewSelectedNotesStore.alreadyInProjectNotes(variantSampleListItem);
+            const alreadyInReportNotes = CaseReviewSelectedNotesStore.alreadyInReportNotes(variantSampleListItem, report);
+
+            const nextSendToProjectStore = { ...sendToProjectStore };
+            const nextSendToReportStore = { ...sendToReportStore };
+            let anyProjectStoreChanges = false;
+            let anyReportStoreChanges = false;
+            Object.keys(sendToProjectStore).forEach(function(noteUUID){
+                if (alreadyInProjectNotes[noteUUID]) {
+                    delete nextSendToProjectStore[noteUUID];
+                    anyProjectStoreChanges = true;
+                }
+            });
+            Object.keys(sendToReportStore).forEach(function(noteUUID){
+                if (alreadyInReportNotes[noteUUID]) {
+                    delete nextSendToReportStore[noteUUID];
+                    anyReportStoreChanges = true;
+                }
+            });
+
+            if (anyProjectStoreChanges) {
+                nextState.sendToProjectStore = nextSendToProjectStore;
+            }
+            if (anyReportStoreChanges) {
+                nextState.sendToReportStore = nextSendToReportStore;
+            }
+
+        }
+
+        return nextState;
+    }
+
+    constructor(props) {
+        super(props);
+        this.toggleSendToProjectStoreItems = this.toggleStoreItems.bind(this, "sendToProjectStore");
+        this.toggleSendToReportStoreItems = this.toggleStoreItems.bind(this, "sendToReportStore");
+
+        this.state = {
+            // Keyed by Note Item UUID and value is boolean true/false for now (can be changed)
+            "sendToProjectStore": {},
+            "sendToReportStore": {},
+            // Reference to object, not clone (extra memory) of it. Used solely for getDerivedStateFromProps.
+            "pastVSLItem": props.variantSampleListItem
+        };
+
+        this.memoized = {
+            alreadyInProjectNotes: memoize(CaseReviewSelectedNotesStore.alreadyInProjectNotes),
+            alreadyInReportNotes: memoize(CaseReviewSelectedNotesStore.alreadyInReportNotes)
+        };
+    }
+
+    toggleStoreItems(storeName, noteSelectionObjects, callback = null){
+        this.setState(function(currState){
+            const nextStore = { ...currState[storeName] };
+            noteSelectionObjects.forEach(function([ id, data ]){
+                if (nextStore[id]) {
+                    delete nextStore[id];
+                } else {
+                    nextStore[id] = data;
+                }
+            });
+            return { [storeName] : nextStore };
+        }, callback);
+    }
+
+    render(){
+        const {
+            props: {
+                children,
+                context,
+                variantSampleListItem,
+                ...passProps
+            },
+            state,
+            toggleSendToProjectStoreItems,
+            toggleSendToReportStoreItems,
+        } = this;
+
+        const { report } = context;
+
+        const alreadyInProjectNotes = this.memoized.alreadyInProjectNotes(variantSampleListItem);
+        const alreadyInReportNotes = this.memoized.alreadyInReportNotes(variantSampleListItem, report);
+
+        const childProps = {
+            ...passProps,
+            ...state,
+            context,
+            variantSampleListItem,
+            alreadyInProjectNotes,
+            alreadyInReportNotes,
+            toggleSendToProjectStoreItems,
+            toggleSendToReportStoreItems,
+        };
+        return React.Children.map(children, function(c){
+            if (React.isValidElement(c)) {
+                return React.cloneElement(c, childProps);
+            }
+            return c;
+        });
+    }
+
+}
+
+
+
 
 export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
     const {
         schemas, context,
+        // From CaseView
         isActiveDotRouterTab = false,
         // From VariantSampleListController
         variantSampleListItem,
@@ -149,8 +319,8 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         sendToReportStore,
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
-        resetSendToProjectStoreItems,
-        resetSendToReportStoreItems,
+        alreadyInProjectNotes,
+        alreadyInReportNotes,
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
@@ -158,28 +328,13 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         toggleKBNoteSubselectionState,
     } = props;
 
-    const { report } = context;
-    const { uuid: reportUUID } = report || {};
-
-    const alreadyInProjectNotes = useMemo(function(){
-        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem);
-    }, [ variantSampleListItem ]);
-
-    const alreadyInReportNotes = useMemo(function(){
-        if (!reportUUID) {
-            return {};
-        }
-        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function({ associated_items: noteAssociatedItems }){
-            const foundReportEntry = _.findWhere(noteAssociatedItems, { "item_type": "Report", "item_identifier": reportUUID });
-            return !!(foundReportEntry);
-        });
-    }, [ report, variantSampleListItem ]);
-
     if (!isActiveDotRouterTab) {
         return null;
     }
 
-    const commonProps = {
+    const commonBtnProps = { variantSampleListItem, fetchVariantSampleListItem, isLoadingVariantSampleListItem };
+
+    const commonSelectionsProps = {
         isLoadingVariantSampleListItem, variantSampleListItem,
         alreadyInProjectNotes, alreadyInReportNotes,
         sendToProjectStore, sendToReportStore,
@@ -204,7 +359,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
             </div>
             <div>
 
-                <CaseSpecificSelectionsPanel {...commonProps} {...{ reportNotesIncluded, kbNotesIncluded, toggleReportNoteSubselectionState, toggleKBNoteSubselectionState }} className="mb-12" />
+                <CaseSpecificSelectionsPanel {...commonSelectionsProps} {...{ reportNotesIncluded, kbNotesIncluded, toggleReportNoteSubselectionState, toggleKBNoteSubselectionState }} className="mb-12" />
 
                 <div className="d-block d-md-flex align-items-center justify-content-between mb-12">
                     <div className="text-left">
@@ -215,25 +370,24 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                         */}
 
                         <PatchItemsProgress>
-                            <SaveNotesToReportButton {...{ variantSampleListItem, fetchVariantSampleListItem, isLoadingVariantSampleListItem,
-                                sendToReportStore, resetSendToReportStoreItems, context }} className="my-1 mr-1"/>
+                            <SaveNotesToReportButton {...commonBtnProps} {...{ sendToReportStore, context }} className="my-1 mr-1"/>
                         </PatchItemsProgress>
 
                         <PatchItemsProgress>
-                            <SaveNotesToProjectButton {...{ variantSampleListItem, fetchVariantSampleListItem, isLoadingVariantSampleListItem,
-                                sendToProjectStore, resetSendToProjectStoreItems }} className="my-1 mr-1"/>
+                            <SaveNotesToProjectButton {...commonBtnProps} {...{ sendToProjectStore }} className="my-1 mr-1"/>
                         </PatchItemsProgress>
 
                     </div>
 
                     <div className="text-left">
-                        <SaveFindingsButton {...{ variantSampleListItem, fetchVariantSampleListItem, isLoadingVariantSampleListItem,
-                            changedClassificationsByVS, updateClassificationForVS, changedClassificationsCount }} className="ml-md-05 my-1" />
+                        <PatchItemsProgress>
+                            <SaveFindingsButton {...commonBtnProps} {...{ changedClassificationsByVS, updateClassificationForVS, changedClassificationsCount }} className="ml-md-05 my-1" />
+                        </PatchItemsProgress>
                     </div>
 
                 </div>
 
-                <VariantSampleSelectionList {...commonProps} {...{ changedClassificationsByVS, updateClassificationForVS }}
+                <VariantSampleSelectionList {...commonSelectionsProps} {...{ changedClassificationsByVS, updateClassificationForVS }}
                     parentTabType={parentTabTypes.CASEREVIEW} />
 
             </div>
@@ -249,12 +403,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
  *
  * For now can just check if Note.status === "current" and then keep that way if can assert Variant.interpretations etc. will be up-to-date.
  */
-function buildAlreadyStoredNoteUUIDDict(
-    variantSampleListItem,
-    checkFunction = function({ status: noteStatus }){
-        return (noteStatus === "current");
-    }
-){
+function buildAlreadyStoredNoteUUIDDict(variantSampleListItem, checkFunction){
     const { variant_samples: vsObjects = [] } = variantSampleListItem || {}; // Might not yet be loaded.
     const dict = {};
     vsObjects.forEach(function({ variant_sample_item }){
@@ -280,143 +429,6 @@ function variantSamplesWithAnySelectionSize(variantSampleListItem, selectionStor
     return count;
 }
 
-
-/** @todo Move to SPC or utils directory */
-class PatchItemsProgress extends React.PureComponent {
-
-    constructor(props){
-        super(props);
-        this.patchItemsProcess = this.patchItemsProcess.bind(this);
-        this.patchItems = this.patchItems.bind(this);
-        this.onReset = this.onReset.bind(this);
-
-        this.state = {
-            "isPatching": false,
-            "patchingPercentageComplete": 0,
-            "patchErrors": []
-        };
-
-    }
-
-    patchItemsProcess(patchPayloads, onComplete) {
-        const patchQ = [ ...patchPayloads ];
-
-        const patchesToComplete = patchQ.length;
-        let countCompleted = 0;
-
-        const checkIfCompleted = () => {
-            // Check if all requests have completed, and call `onComplete` if so.
-            if (patchesToComplete === countCompleted) {
-                onComplete({ countCompleted, patchErrors });
-            } else {
-                const patchingPercentageComplete = patchesToComplete === 0 ? 0 : countCompleted / patchesToComplete;
-                this.setState({ patchingPercentageComplete });
-            }
-        };
-
-        const patchErrors = [];
-
-        // Browser can't send more than 6 reqs anyway, so limit concurrent reqs.
-
-        function performRequest([ patchURL, itemPatchPayload ]) {
-            return ajax.promise(patchURL, "PATCH", {}, JSON.stringify(itemPatchPayload))
-                .then(function(response){
-                    const { status } = response;
-                    if (status !== "success") {
-                        throw response;
-                    }
-                }).catch(function(error){
-                    // TODO display this in UI later perhaps.
-                    patchErrors.push(error);
-                    console.error("PatchItemsProgress AJAX error", error);
-                }).finally(function(){
-                    countCompleted++;
-                    checkIfCompleted();
-                    if (patchQ.length > 0) {
-                        // Kick off another request
-                        performRequest(patchQ.shift());
-                    }
-                });
-        }
-
-        // Niche case - if nothing to PATCH
-        checkIfCompleted();
-
-        // Browser can't send more than 6 reqs anyway, so limit concurrent reqs to 5.
-        // As each requests ends it'll start another as long as there's more things to PATCH.
-        for (var i = 0; i < Math.min(5, patchesToComplete); i++) {
-            performRequest(patchQ.shift());
-        }
-    }
-
-    patchItems(patchPayloads, callback){
-
-        this.setState({ "isPatching": true, "patchingPercentageComplete": 0 }, () => {
-            setTimeout(ReactTooltip.hide, 50); // Hide still-present tooltips, if any (i.e. button that was clicked)
-            console.log("Generated PATCH '../@@process-notes/' payloads - ", patchPayloads);
-            this.patchItemsProcess(patchPayloads, ({ countCompleted, patchErrors }) => {
-                console.info("Patching Completed, count Items PATCHed -", countCompleted);
-                this.setState({
-                    "isPatching": true,
-                    "patchingPercentageComplete": 1,
-                    patchErrors
-                }, () => {
-                    if (typeof callback === "function") {
-                        callback(countCompleted, patchErrors);
-                    }
-                });
-            });
-
-        });
-    }
-
-    onReset(){
-        const { patchingPercentageComplete } = this.state;
-        if (patchingPercentageComplete !== 1) {
-            // Not allowed until PATCHes completed (or timed out / failed / etc).
-            return false;
-        }
-        this.setState({
-            "isPatching": false,
-            "patchingPercentageComplete": 0,
-            "patchErrors": []
-        });
-    }
-
-    render(){
-        const { children, ...passProps } = this.props;
-        const { isPatching, patchingPercentageComplete, patchErrors } = this.state;
-
-        const childProps = {
-            ...passProps,
-            isPatching,
-            "patchItems": this.patchItems
-        };
-
-        const adjustedChildren = React.Children.map(children, (child)=>{
-            if (!React.isValidElement(child)) {
-                // String or something
-                return child;
-            }
-            if (typeof child.type === "string") {
-                // Normal element (a, div, etc)
-                return child;
-            } // Else is React component
-            return React.cloneElement(child, childProps);
-        });
-
-        return (
-            <React.Fragment>
-                { adjustedChildren }
-                { isPatching ?
-                    <ProgressModal {...{ isPatching, patchingPercentageComplete, patchErrors }} onHide={this.onReset} />
-                    : null }
-            </React.Fragment>
-        );
-    }
-
-}
-
 /**
  * Generates payloads for VariantSampleList /@@process-notes/ endpoint
  * and then PATCHes them to there.
@@ -429,7 +441,6 @@ function SaveNotesToProjectButton (props) {
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem,
         sendToProjectStore,
-        resetSendToProjectStoreItems,
         isPatching,
         patchItems,
         className,
@@ -519,12 +530,6 @@ function SaveNotesToProjectButton (props) {
 
         patchItems(payloads, (countCompleted, patchErrors) => {
             if (countCompleted > 0) {
-                if (typeof resetSendToProjectStoreItems === "function") {
-                    console.log("Reset `resetSendToProjectStoreItems`.");
-                    resetSendToProjectStoreItems();
-                } else {
-                    throw new Error("No `props.resetSendToProjectStoreItems` supplied to SaveNotesToProjectButton");
-                }
                 if (typeof fetchVariantSampleListItem === "function") {
                     console.log("Refreshing our VariantSampleListItem with updated Note Item statuses.");
                     fetchVariantSampleListItem();
@@ -535,7 +540,7 @@ function SaveNotesToProjectButton (props) {
             // TODO:
             // if (patchErrors.length > 0) {}
         });
-    }, [ disabled, patchItems, variantSampleListItem, sendToProjectStore, resetSendToProjectStoreItems, fetchVariantSampleListItem ]);
+    }, [ disabled, patchItems, variantSampleListItem, sendToProjectStore, fetchVariantSampleListItem ]);
 
     return (
         <button type="button" {...{ disabled, onClick }} className={"btn btn-primary" + (className ? " " + className : "")}
@@ -552,7 +557,6 @@ function SaveNotesToReportButton (props) {
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem,
         sendToReportStore,
-        resetSendToReportStoreItems,
         isPatching,
         patchItems,
         className,
@@ -688,12 +692,6 @@ function SaveNotesToReportButton (props) {
 
         patchItems(payloads, (countCompleted, patchErrors) => {
             if (countCompleted > 0) {
-                if (typeof resetSendToReportStoreItems === "function") {
-                    console.log("Reset 'send to project' store items.");
-                    resetSendToReportStoreItems();
-                } else {
-                    throw new Error("No `props.resetSendToReportStoreItems` supplied to SaveNotesToReportButton");
-                }
                 if (typeof fetchVariantSampleListItem === "function") {
                     console.log("Refreshing our VariantSampleListItem with updated Note Item statuses.");
                     fetchVariantSampleListItem();
@@ -704,7 +702,7 @@ function SaveNotesToReportButton (props) {
             // TODO:
             // if (patchErrors.length > 0) {}
         });
-    }, [ disabled, patchItems, variantSampleListItem, sendToReportStore, report, resetSendToReportStoreItems, fetchVariantSampleListItem ]);
+    }, [ disabled, patchItems, variantSampleListItem, sendToReportStore, report, fetchVariantSampleListItem ]);
 
     const btnCls = "btn btn-" + (!reportUUID ? "outline-danger" : "primary") + (className ? " " + className : "");
 
@@ -731,7 +729,6 @@ function SaveFindingsButton(props){
     } = props;
 
     const disabled = propDisabled || isLoadingVariantSampleListItem || changedClassificationsCount === 0;
-
 
     const onClick = useCallback(function(e){
         e.stopPropagation();
@@ -770,29 +767,20 @@ function SaveFindingsButton(props){
         });
 
 
-
-        console.log("PAYLOADS", payloads);
-
-
-
-        // patchItems(payloads, (countCompleted, patchErrors) => {
-        //     if (countCompleted > 0) {
-        //         if (typeof resetSendToReportStoreItems === "function") {
-        //             console.log("Reset 'send to project' store items.");
-        //             resetSendToReportStoreItems();
-        //         } else {
-        //             throw new Error("No `props.resetSendToReportStoreItems` supplied to SaveNotesToReportButton");
-        //         }
-        //         if (typeof fetchVariantSampleListItem === "function") {
-        //             console.log("Refreshing our VariantSampleListItem with updated Note Item statuses.");
-        //             fetchVariantSampleListItem();
-        //         } else {
-        //             throw new Error("No `props.fetchVariantSampleListItem` supplied to SaveNotesToReportButton");
-        //         }
-        //     }
-        //     // TODO:
-        //     // if (patchErrors.length > 0) {}
-        // });
+        patchItems(payloads, (countCompleted, patchErrors) => {
+            if (countCompleted > 0) {
+                // We don't need to call updateClassificationForVS(...) here, since
+                // changedClassificationsByVS will be updated in CaseReviewController componentDidUpdate.
+                if (typeof fetchVariantSampleListItem === "function") {
+                    console.log("Refreshing our VariantSampleListItem with updated Note Item statuses.");
+                    fetchVariantSampleListItem();
+                } else {
+                    throw new Error("No `props.fetchVariantSampleListItem` supplied to SaveFindingsButton");
+                }
+            }
+            // TODO:
+            // if (patchErrors.length > 0) {}
+        });
     }, [ disabled, patchItems, variantSampleListItem, changedClassificationsByVS, updateClassificationForVS, fetchVariantSampleListItem ]);
 
 
@@ -806,45 +794,3 @@ function SaveFindingsButton(props){
         </button>
     );
 }
-
-
-/**
- * Can be re-used for PATCHing multiple items.
- * @todo Move to SPC or utils directory along with PatchItemsProgress
- */
-const ProgressModal = React.memo(function ProgressModal (props) {
-    const { isPatching, patchingPercentageComplete, onHide, patchErrors } = props;
-
-    const percentCompleteFormatted = Math.round(patchingPercentageComplete * 1000) / 10;
-    const finished = patchingPercentageComplete === 1;
-    const errorsLen = patchErrors.length;
-
-    let body;
-    if (errorsLen > 0){
-        body = "" + errorsLen + " errors";
-    } else if (finished) {
-        body = "Done";
-    } else if (isPatching) {
-        body = "Updating...";
-    }
-
-    return (
-        <Modal show onHide={onHide}>
-            <Modal.Header closeButton={finished}>
-                <Modal.Title>{ finished ? "Update Complete" : "Please wait..." }</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <p className="text-center mb-1">{ body }</p>
-                <div className="progress">
-                    <div className="progress-bar" role="progressbar" style={{ "width": percentCompleteFormatted + "%" }}
-                        aria-valuenow={percentCompleteFormatted} aria-valuemin="0" aria-valuemax="100"/>
-                </div>
-                { finished ?
-                    <button type="button" className="mt-24 btn btn-block btn-primary" onClick={onHide}>
-                        Close
-                    </button>
-                    : null }
-            </Modal.Body>
-        </Modal>
-    );
-});
