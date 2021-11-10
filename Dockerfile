@@ -81,9 +81,10 @@ RUN poetry install && \
     python setup_eb.py develop && \
     make fix-dist-info
 
-# Build front-end
+# Build front-end, remove node_modules when done
 RUN npm run build && \
-    npm run build-scss
+    npm run build-scss && \
+    rm -rf node_modules/
 
 # Misc
 RUN make aws-ip-ranges && \
