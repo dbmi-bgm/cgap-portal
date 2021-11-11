@@ -10,8 +10,7 @@ import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/ut
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { CollapsibleItemViewButtonToolbar } from './../components/CollapsibleItemViewButtonToolbar';
 
-import { PedigreeTabViewBody } from './PedigreeTabViewBody';
-import { PedigreeFullScreenBtn } from './PedigreeFullScreenBtn';
+import { PedigreeTabViewBody, PedigreeFullScreenBtn } from '../components/PedigreeTabViewBody';
 import { gatherPhenotypicFeatureItems, getPhenotypicFeatureStrings } from './family-parsing';
 
 /**
