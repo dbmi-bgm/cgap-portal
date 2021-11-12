@@ -749,7 +749,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
     const onClick = useCallback(function(evt){
         evt.stopPropagation();
-        navigate(`${vcfAtId}#provenance`, { replace: true });
+        navigate(vcfAtId + "#provenance");
     }, []);
 
     const title = (
