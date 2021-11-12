@@ -22,9 +22,6 @@
             "$ref": "mixins.json#/uuid"
         },
         {
-            "$ref": "mixins.json#/status"
-        },
-        {
             "$ref": "mixins.json#/aliases"
         },
         {
@@ -35,6 +32,9 @@
         },
         {
             "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
         },
         {
             "$ref": "mixins.json#/tags"
