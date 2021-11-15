@@ -851,7 +851,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 <BioinfoStatsEntry label="Submitted Ancestry" >
                     { submittedAncestry.length > 0 && submittedAncestry.join(", ") || "-" }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Predicted Ancestry">
+                <BioinfoStatsEntry label="Predicted Ancestry" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     { predictedAncestry.value || fallbackElem }&nbsp;
                     { !!predictedAncestry.url && <a href={predictedAncestry.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
                 </BioinfoStatsEntry>
