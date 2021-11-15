@@ -786,6 +786,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     });
 
                     // Predicted Sex and Ancestry found in qclist
+                    // TODO: At some point see if URL can be moved to qmsummary - if so, move this into above block
                     qc_list.forEach(function(qc) {
                         const { value: { "ancestry and sex prediction": predictions = [], url } = {}, qc_type } = qc;
 
