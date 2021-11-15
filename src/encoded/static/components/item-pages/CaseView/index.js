@@ -613,8 +613,8 @@ const mapLongFormSexToLetter = (sex) => {
         case "undetermined":
             return "U";
         default:
-            console.error("Sex, " + sex + " doesn't match enum");
-            return "";
+            // unexpected value... render as-is
+            return sex;
     }
 };
 
@@ -660,6 +660,20 @@ const validateTransTrans = (transTransVal, analysisType) => {
             }
         default: // "custom option
             return null; // can't do validation, so don't want to show a flag
+    }
+};
+
+const validatePredictedSex = (submittedSex, predictedSex) => {
+    if (!submittedSex) {
+        return null; // nothing to compare to, no flag
+    } else if (!predictedSex) {
+        return "warning"; // should be a prediction; if not, warn.
+    } else if (!(predictedSex === "M" || predictedSex === "F")) {
+        return "danger"; // predicted sex is unknown, indicates a potential problem with peddy QC
+    } else if (predictedSex !== submittedSex) {
+        return "warning"; // predicted sex is opposite from expected, may indicate an issue with submitted
+    } else {
+        return "success"; // should match
     }
 };
 
@@ -778,9 +792,10 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                         if (qc_type === "quality_metric_peddyqc") {
                             predictions.forEach(function(prediction) {
                                 const { name, "predicted sex": predictedSex, "predicted ancestry": predictedAncestry } = prediction;
-                                console.log("prediction", prediction);
+                                const shortFormPredictedSex = mapLongFormSexToLetter(predictedSex);
+
                                 if (name === caseSampleId) { // double check that it's the prediction for the current case
-                                    msaStats.predictedSex = { value: mapLongFormSexToLetter(predictedSex), url };
+                                    msaStats.predictedSex = { value: shortFormPredictedSex, url, validationStatus: validatePredictedSex(submittedSex, shortFormPredictedSex) };
                                     msaStats.predictedAncestry = { value: predictedAncestry, url };
                                 }
                             });
@@ -822,7 +837,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     { predictedSex.value || fallbackElem }&nbsp;
                     { !!predictedSex.url && <a href={predictedSex.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
-                    { (predictedSex.value && submittedSex && predictedSex.value !== submittedSex) && <i className="icon icon-flag fas text-warning ml-02" />}
+                    { predictedSex.validationStatus && <i className={`icon icon-flag fas text-${predictedSex.validationStatus} ml-02`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
                     { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : fallbackElem }
