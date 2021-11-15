@@ -97,7 +97,7 @@
     "form-serialize": "^0.6.0",
     "higlass": "1.11.2",
     "higlass-register": "^0.3.0",
-    "higlass-sequence": "0.3.3",
+    "higlass-sequence": "0.3.5",
     "higlass-transcripts": "0.3.3",
     "higlass-text": "0.1.3",
     "higlass-orthologs": "0.2.2",
