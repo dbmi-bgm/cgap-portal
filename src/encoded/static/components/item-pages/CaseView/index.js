@@ -905,21 +905,16 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         display_title: familyDisplayTitle
     } = family;
 
-    const onClick = useCallback(function(evt){
-        evt.stopPropagation();
-        navigate(`${vcfAtId}#provenance`, { replace: true });
-    }, []);
-
     const title = (
         <h4 data-family-index={0} className="my-0 d-inline-block w-100">
             <span className="text-400">{ familyDisplayTitle }</span>
             {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
-            <button type="button" className="btn btn-sm btn-primary pull-right"
+            <a href={vcfAtId + "#provenance"} className="btn btn-sm btn-primary pull-right"
                 data-tip="Click to view the provenance graph for the most up-to-date annotated VCF"
-                onClick={onClick} disabled={(!vcfAtId)}>
+                disabled={(!vcfAtId)}>
                 <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-1 small" />
                 View <span className="text-600">Provenance Graph</span>
-            </button>
+            </a>
         </h4>
     );
 

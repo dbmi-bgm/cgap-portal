@@ -101,6 +101,27 @@ def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     assert 'hello world' in resp.content.decode('utf-8')
 
 
+def test_bam_snapshot_presence(
+    testapp, variant, variant_sample
+):
+    """
+    Test creation of BAM snapshot calc prop on variant samples with
+    different chromosomes
+    """
+    calc_prop_name = "bam_snapshot"
+    vs_post = testapp.post_json(VARIANT_SAMPLE_URL, variant_sample, status=201)
+    vs_atid = vs_post.json["@graph"][0]["@id"]
+    chromosomes = [str(x) for x in range(1, 23)] + ["X", "Y", "M"]
+    excluded_chromosomes = ["M"]
+    for chromosome in chromosomes:
+        testapp.patch_json(variant["@id"], {"CHROM": chromosome}, status=200)
+        vs_get = testapp.get(vs_atid, status=200).json
+        if chromosome in excluded_chromosomes:
+            assert calc_prop_name not in vs_get
+        else:
+            assert calc_prop_name in vs_get
+
+
 @pytest.fixture
 def variant_sample_list1(bgm_project, institution):
     return {
