@@ -816,7 +816,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
 
     return (
         <>
-            <div className="row py-3">
+            <div className="row py-0">
                 <BioinfoStatsEntry label="Total Number of Reads">
                     { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : fallbackElem }
                 </BioinfoStatsEntry>
@@ -831,7 +831,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     { (transTransRatio.value && transTransRatio.validationStatus) && <i className={`icon icon-flag fas text-${transTransRatio.validationStatus} ml-05`} />}
                 </BioinfoStatsEntry>
             </div>
-            <div className="row py-3">
+            <div className="row py-0">
                 <BioinfoStatsEntry label="Submitted Sex" >
                     { submittedSex || fallbackElem }
                 </BioinfoStatsEntry>
@@ -847,7 +847,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
-            <div className="row py-3">
+            <div className="row py-0">
                 <BioinfoStatsEntry label="Submitted Ancestry" >
                     { submittedAncestry.length > 0 && submittedAncestry.join(", ") || "-" }
                 </BioinfoStatsEntry>
@@ -869,7 +869,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
 
 function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }){
     return (
-        <div className="col-12 col-md-6 col-lg-3 col-xl-3 mt-04 mb-04">
+        <div className="col-12 col-md-6 col-lg-3 col-xl-3 py-2">
             <div className="qc-summary">
                 <label className="d-block mb-0">
                     { label }:
@@ -927,7 +927,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             </div> */}
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
-                <div className="card-body py-0">
+                <div className="card-body py-3">
                     <BioinfoStats {...{ caseSample, sampleProcessing, submittedAncestry, submittedSex }} />
                 </div>
             </div>
