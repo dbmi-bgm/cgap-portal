@@ -267,6 +267,5 @@ export const filterSetFieldsToKeepPrePatch = [
     "flags",
     "created_in_case_accession",
     "uuid",
-    "status",
     "derived_from_preset_filterset"
 ];
