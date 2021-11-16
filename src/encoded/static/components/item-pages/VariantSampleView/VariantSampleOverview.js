@@ -20,7 +20,7 @@ import { AnnotationBrowserTabBody } from './AnnotationBrowserTabBody';
 import { BamFileBrowserTabBody } from './BamFileBrowserTabBody';
 import { InterpretationSpaceWrapper, InterpretationSpaceHeader } from './InterpretationSpaceController';
 import { getInitialTranscriptIndex } from './AnnotationSections';
-import { QuickPopover } from './../components/QuickPopover';
+import QuickPopover from '../components/QuickPopover';
 
 
 
