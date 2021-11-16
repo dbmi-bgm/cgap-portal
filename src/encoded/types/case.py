@@ -275,6 +275,8 @@ def _build_case_embedded_list():
 
         # QC
         "sample_processing.processed_files.quality_metric.*",
+        "sample_processing.processed_files.quality_metric.qc_list.value.ancestry and sex prediction",
+        "sample_processing.processed_files.quality_metric.qc_list.value.url",
 
         # Report linkTo
         "report.last_modified.*",
