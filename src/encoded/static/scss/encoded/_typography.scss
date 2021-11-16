@@ -113,7 +113,18 @@ hr {
 }
 
 
+/** Bootstrap has similar rules for .text-light and some other classes, but not for .text-white-50 and others. Here we add these in. */
+a.text-white-50 {
+    &:hover, &:focus {
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
+}
 
+a.text-black-50 {
+    &:hover, &:focus {
+        color: rgba(0, 0, 0, 0.75) !important;
+    }
+}
 
 
 
