@@ -146,9 +146,9 @@ export const FamilyInfo = React.memo(function FamilyInfo({ family, caseItem }) {
             <div className="card-text mb-1">
                 <label className="mb-0">CGAP Family ID:</label> { familyAccession }
             </div>
-            <div className="card-text mb-1">
+            {/* <div className="card-text mb-1">
                 <label className="mb-0">Cohort:</label> { cohortTitle || fallbackElem }
-            </div>
+            </div> */}
             <div className="card-text mb-1">
                 <label className="mb-0">Project:</label> { projectTitle || fallbackElem }
             </div>
