@@ -57,7 +57,7 @@ export const CaseStats = React.memo(function CaseStats(props){
                         </h4>
                         { haveCaseEditPermission && individualAtID ?
                             <a href={individualAtID + "?currentAction=edit&callbackHref=" + caseAtID}
-                                className="text-white-50 ml-12" data-tip="Edit Individual. Changes may take a few minutes to appear.">
+                                className="text-white-50 ml-12 text-small" data-tip="Edit Individual. Changes may take a few minutes to appear.">
                                 <i className="icon icon-fw icon-pencil-alt fas"/>
                             </a>
                             : null }
@@ -80,7 +80,7 @@ export const CaseStats = React.memo(function CaseStats(props){
                         </h4>
                         { haveCaseEditPermission && familyAtID ?
                             <a href={familyAtID + "?currentAction=edit&callbackHref=" + caseAtID}
-                                className="text-white-50 ml-12" data-tip="Edit Family. Changes may take a few minutes to appear.">
+                                className="text-white-50 ml-12 text-small" data-tip="Edit Family. Changes may take a few minutes to appear.">
                                 <i className="icon icon-fw icon-pencil-alt fas"/>
                             </a>
                             : null }
@@ -133,29 +133,29 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null, ha
     return (
         <React.Fragment>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-08">Individual ID:</label>
+                <label className="mb-0 mr-06">Individual ID:</label>
                 <a href={individualAtID} target="_blank" rel="noopener noreferrer">
                     { individual_id }
                 </a>
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-08">CGAP Individual ID:</label>
+                <label className="mb-0 mr-06">CGAP Individual ID:</label>
                 { accession }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-08">Sex (User-Submitted):</label>
+                <label className="mb-0 mr-06">Sex (User-Submitted):</label>
                 { sex }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-08">Age: </label>
+                <label className="mb-0 mr-06">Age: </label>
                 { age && age_units ? `${age} ${age_units}(s)` : fallbackElem }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-12">Status:</label>
+                <label className="mb-0 mr-08">Status:</label>
                 { Schemas.Term.toName("status", status, true) || fallbackElem }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-08">Accession Date:</label>
+                <label className="mb-0 mr-06">Accession Date:</label>
                 { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : fallbackElem }
             </div>
         </React.Fragment>
@@ -196,19 +196,21 @@ export const FamilyInfo = React.memo(function FamilyInfo({ caseItem }) {
     return (
         <React.Fragment>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-08">Family ID:</label>
+                <label className="mb-0 mr-06">Family ID:</label>
                 <a href={familyAtID} target="_blank" rel="noopener noreferrer">
                     { familyTitle || familyDisplayTitle }
                 </a>
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">CGAP Family ID:</label> { familyAccession }
+                <label className="mb-0 mr-06">CGAP Family ID:</label>
+                { familyAccession }
             </div>
             {/* <div className="card-text mb-1">
                 <label className="mb-0">Cohort:</label> { cohortTitle || fallbackElem }
             </div> */}
             <div className="card-text mb-1">
-                <label className="mb-0">Project:</label> { projectTitle || fallbackElem }
+                <label className="mb-0 mr-06">Project:</label>
+                { projectTitle || fallbackElem }
             </div>
         </React.Fragment>
     );
