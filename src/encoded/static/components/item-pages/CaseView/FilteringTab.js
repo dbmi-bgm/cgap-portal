@@ -92,15 +92,19 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
     const currentlyOnCNV = currViewIdx === 1;
 
     const onClickSNV = useCallback(function(e){
-        setCurrViewIdx(0);
+        if (!currentlyOnSNV) {
+            setCurrViewIdx(0);
+        }
     });
 
     const onClickCNV = useCallback(function(e){
-        setCurrViewIdx(1);
+        if (!currentlyOnCNV) {
+            setCurrViewIdx(1);
+        }
     });
 
-    const snvDisabled = currentlyOnSNV || !snvFilterHrefAddon;
-    const cnvDisabled = currentlyOnCNV || !svFilterHrefAddon;
+    const snvDisabled = !snvFilterHrefAddon;
+    const cnvDisabled = !svFilterHrefAddon;
 
     let cnvTip = null;
     if (analysis_type.startsWith("WES")) {
@@ -108,36 +112,20 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
     }
 
     return (
-        // WHEN FINISHED TESTING THEN set:
-        // (a) disabled={!snvFilterHrefAddon} + disabled={!svFilterHrefAddon}
-        // (b) onClick={snvDisabled ? null : onClickSNV} + onClick={cnvDisabled ? null : onClickCNV}
-        // .. and then style to be more toggley
         <div className="card py-2 px-1 mb-3 d-flex d-md-inline-flex flex-row filtering-tab-toggle">
             <button type="button" aria-pressed={currentlyOnSNV}
                 className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnSNV ? "primary-dark active" : "link")}
-                onClick={onClickSNV} disabled={false}>
+                onClick={onClickSNV} disabled={snvDisabled}>
                 { filteringTabViews["0"].name } Filtering
             </button>
             <button type="button" aria-pressed={currentlyOnCNV}
                 className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnCNV ? "primary-dark active" : "link")}
-                onClick={onClickCNV} disabled={false} data-tip={cnvTip}>
+                onClick={onClickCNV} disabled={cnvDisabled} data-tip={cnvTip}>
                 { filteringTabViews["1"].name } Filtering
             </button>
         </div>
     );
 
-    // return (
-    //     <div className="card py-2 px-1 flex-row mb-3 filtering-tab-toggle">
-    //         <div className={`text-600 mx-1 ${currentlyOnSNV ? "active" : (snvFilterHrefAddon ? "clickable": "text-muted")}`}
-    //             onClick={snvDisabled ? null : onClickSNV}>
-    //             SNV Filtering
-    //         </div>
-    //         <div className={`text-600 mx-1 ${currentlyOnCNV ? "active": (svFilterHrefAddon ? "clickable": "text-muted")}`}
-    //             onClick={cnvDisabled ? null : onClickCNV}>
-    //             CNV / SV Filtering
-    //         </div>
-    //     </div>
-    // );
 });
 
 function createBlankFilterSetItem(searchType, caseAccession){
