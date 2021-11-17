@@ -103,6 +103,8 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
         }
     });
 
+    // End up getting a list of non-case-specific variants (with duplicates from multiple cases)
+    // if these searchHrefAddons aren't present, so important to disable the tab in those instances
     const snvDisabled = !snvFilterHrefAddon;
     const cnvDisabled = !svFilterHrefAddon;
 
