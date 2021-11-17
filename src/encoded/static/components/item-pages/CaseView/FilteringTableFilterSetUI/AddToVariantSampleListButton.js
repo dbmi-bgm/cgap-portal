@@ -18,7 +18,8 @@ export function AddToVariantSampleListButton(props){
         filterSet,
         selectedFilterBlockIndices = {},
         fetchVariantSampleListItem,
-        isLoadingVariantSampleListItem = false
+        isLoadingVariantSampleListItem = false,
+        searchType = "VariantSample"
     } = props;
 
     const {
@@ -29,6 +30,10 @@ export function AddToVariantSampleListButton(props){
     } = caseItem;
 
     const [ isPatchingVSL, setIsPatchingVSL ] = useState(false);
+
+    if (searchType === "StructuralVariantSample") {
+        return null; // TODO: actually make add to VSL work with Structural Variant Samples.
+    }
 
     /** PATCH or create new VariantSampleList w. additions */
 

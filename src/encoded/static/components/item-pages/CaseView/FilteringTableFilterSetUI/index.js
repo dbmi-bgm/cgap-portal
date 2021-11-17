@@ -330,7 +330,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                         { selectedVariantSamples instanceof Map ?
                             <div className="pr-14">
                                 <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIndices,
-                                    variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem }} />
+                                    variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType }} />
                             </div>
                             : null }
                         <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} />
