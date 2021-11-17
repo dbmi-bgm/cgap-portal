@@ -289,6 +289,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         };
 
         // console.info("Current Case FilterSet:", filterSet);
+        console.log("searchtype", searchType);
 
         return (
             // TODO 1: Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
@@ -333,7 +334,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                                     variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType }} />
                             </div>
                             : null }
-                        <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} />
+                        { (searchType === "VariantSample") && <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} /> }
                     </div>
                 </AboveTableControlsBase>
             </div>

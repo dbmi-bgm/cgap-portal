@@ -181,7 +181,7 @@ function SNVFilteringTabBody(props){
 
     return (
         // TODO: Maybe rename `activeFilterSetFieldName` to `caseActiveFilterSetFieldName`.. idk.
-        <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem }}
+        <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem, searchType }}
             activeFilterSetFieldName="active_filterset">
             <CaseViewEmbeddedVariantSampleSearchTable />
         </FilteringTabBody>
