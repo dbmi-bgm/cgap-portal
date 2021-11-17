@@ -81,7 +81,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
                         <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />
+                            {/* <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} /> */}
                             <VariantSampleDisplayTitleColumnSV />
                         </DisplayTitleColumnWrapper>
                     );
