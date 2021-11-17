@@ -82,7 +82,10 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
     const { context, currViewIdx, setCurrViewIdx } = props;
     const {
         initial_search_href_filter_addon: snvFilterHrefAddon = "",
-        sv_initial_search_href_filter_addon: svFilterHrefAddon = ""
+        sv_initial_search_href_filter_addon: svFilterHrefAddon = "",
+        sample_processing: {
+            analysis_type = ""
+        } = {}
     } = context;
 
     const currentlyOnSNV = currViewIdx === 0;
@@ -99,6 +102,11 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
     const snvDisabled = currentlyOnSNV || !snvFilterHrefAddon;
     const cnvDisabled = currentlyOnCNV || !svFilterHrefAddon;
 
+    let cnvTip = null;
+    if (analysis_type.startsWith("WES")) {
+        cnvTip = "SV/CNV is currently available for only germline WGS data. Additional pipelines are under development.";
+    }
+
     return (
         // WHEN FINISHED TESTING THEN set:
         // (a) disabled={!snvFilterHrefAddon} + disabled={!svFilterHrefAddon}
@@ -112,7 +120,7 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
             </button>
             <button type="button" aria-pressed={currentlyOnCNV}
                 className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnCNV ? "primary-dark active" : "link")}
-                onClick={onClickCNV} disabled={false}>
+                onClick={onClickCNV} disabled={false} data-tip={cnvTip}>
                 { filteringTabViews["1"].name } Filtering
             </button>
         </div>
