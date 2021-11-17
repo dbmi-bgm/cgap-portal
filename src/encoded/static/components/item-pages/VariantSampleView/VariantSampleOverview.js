@@ -20,6 +20,7 @@ import { AnnotationBrowserTabBody } from './AnnotationBrowserTabBody';
 import { BamFileBrowserTabBody } from './BamFileBrowserTabBody';
 import { InterpretationSpaceWrapper, InterpretationSpaceHeader } from './InterpretationSpaceController';
 import { getInitialTranscriptIndex } from './AnnotationSections';
+import QuickPopover from '../components/QuickPopover';
 
 
 
@@ -516,7 +517,7 @@ const ACMGInvoker = React.memo(function ACMGInvoker(props) {
     return (
         <div className="card flex-row my-3 mt-0">
             <div className="text-600 acmg-guidelines-title">ACMG Rules
-                <QuickPopover className="p-1" popID="acmg-info-popover" title="Note on ACMG Tooltips and Auto-Classification" content={
+                <QuickPopover className="p-1" popID="acmg-info-popover" title="Note on ACMG Tooltips and Auto-Classification" placement="right">
                     <div>
                         <div className="mb-05">
                             The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS" target="_blank" rel="noreferrer">this publication</a>.
@@ -525,7 +526,7 @@ const ACMGInvoker = React.memo(function ACMGInvoker(props) {
                             <u>Full Citation</u>: Richards, S., Aziz, N., Bale, S. et al. Standards and guidelines for the interpretation of sequence variants: a joint consensus recommendation of the American College of Medical Genetics and Genomics and the Association for Molecular Pathology. Genet Med 17, 405–423 (2015). https://doi.org/10.1038/gim.2015.30
                         </div>
                     </div>
-                }/>
+                </QuickPopover>
             </div>
             <ACMGScrollableList {...{ setACMGStrengthPopover, invoked, toggleInvocation, invokeAtStrength }} />
             { acmgStrengthPopover ?
@@ -648,28 +649,4 @@ function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStren
                 </div>
             </Popover.Content>
         </Popover>);
-}
-
-function QuickPopover(props) {
-    const { title, content, className, popID, tooltip } = props || {};
-    const popover = (
-        <Popover id={popID}>
-            <Popover.Title className="m-0" as="h4">{title}</Popover.Title>
-            <Popover.Content>
-                { content }
-            </Popover.Content>
-        </Popover>
-    );
-    const cls = "btn btn-link" + (className ? " " + className : "");
-    return (
-        <OverlayTrigger trigger="focus" placement="right" overlay={popover}>
-            { function({ ref, ...triggerHandlers }){
-                return (
-                    <button type="button" ref={ref} { ...triggerHandlers } className={cls} data-tip={tooltip || "Click for citation info"}>
-                        <i className="icon icon-info-circle fas" />
-                    </button>
-                );
-            }}
-        </OverlayTrigger>
-    );
 }

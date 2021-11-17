@@ -30,6 +30,7 @@ import { FilteringTab } from './FilteringTab';
 import { InterpretationTab } from './InterpretationTab';
 import { CaseReviewTab } from './CaseReviewTab';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
+import QuickPopover from '../components/QuickPopover';
 
 
 
@@ -564,18 +565,130 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
     );
 });
 
+const bioinfoPopoverContent = {
+    predictedSexAndAncestry: (
+        <div>
+            Sex and ancestry of each sample is predicted using the QC tool <a href="https://github.com/brentp/peddy" target="_blank" rel="noreferrer">peddy</a>.
+            For more info see peddy’s <a href="https://peddy.readthedocs.io/en/latest/" target="_blank" rel="noreferrer">documentation</a>.
+        </div>
+    ),
+    filteredSNVIndelVariants: (
+        <div>
+            During processing, <a href="https://cgap-pipeline.readthedocs.io/en/latest/wgs-step-filtering.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            remove variants that will not be of interest. This lowers the number of variants returned from the millions to the thousands.
+            Briefly, these filters include: (1) removing intergenic variants; (2) whitelisting some variants based on VEP, ClinVar, and SpliceAI
+            annotations; (3) Removing variants with only intronic consequences; and (4) removing common variants based on gnomAD population allele
+            frequency and a panel of unrelated samples.
+        </div>
+    ),
+    filteredSVVariants: (
+        <div>
+            During processing, <a href="https://cgap-sv-pipeline.readthedocs.io/en/latest/sv-part3.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            remove structural variants (SVs) that will not be of interest. This limits the numbers and types of SVs returned from thousands
+            to fewer than 500. Briefly, these filters include: (1) whitelisting SVs based on VEP annotations; (2) removing SVs with only intronic
+            or intergenic consequences; (3) selecting SVs based on SV type (e.g., DEL and DUP); (3) removing common variants based on gnomAD-SV
+            population allele frequency, and a panel of 20 unrelated samples; and (4) removing SVs over a certain size.
+        </div>
+    ),
+    heterozygosity: (
+        <div>
+            The Heterozygosity/Homozygosity ratio is calculated by bcftools. Expected values are between 1.4 - 2.5; higher or lower values can indicate lower quality calls.
+        </div>
+    ),
+    transTransRatio: (
+        <div>
+            The Transition/Transversion ratio is calculated by bcftools. Expected values are 1.8-2.1 overall for WGS, and 2.3-3.3 for WES. Values outside this range can indicate lower accuracy of calls.
+        </div>
+    )
+};
+
+const mapLongFormSexToLetter = (sex) => {
+    switch (sex) {
+        case "male":
+            return "M";
+        case "female":
+            return "F";
+        case "unknown":
+        case "undetermined":
+            return "U";
+        default:
+            // unexpected value... render as-is
+            return sex;
+    }
+};
+
+const validateHeterozygosity = (hetVal) => {
+    // pass if in the range of 1.4-2.5, warn otherwise
+    if (hetVal >= 1.4 && hetVal <= 2.5) {
+        return "success"; // no flag necessary
+    } else if (hetVal < 1.4 && hetVal > 1.2) {
+        return "warning";
+    } else {
+        return "danger";
+    }
+};
+
+const validateTransTrans = (transTransVal, analysisType) => {
+    switch (analysisType) {
+        case "WGS":
+        case "WGS-Trio":
+        case "WGS-Group":
+        case "WGS-Upstream only":
+            if (transTransVal >= 1.8 && transTransVal <= 2.1) {
+                return "success";
+            } else if (
+                (transTransVal >= 1.6 && transTransVal < 1.8) ||
+                (transTransVal > 2.1 && transTransVal <= 2.3)
+            ) {
+                return "warning";
+            } else {
+                return "danger";
+            }
+        case "WES":
+        case "WES-Trio":
+        case "WES-Group":
+            if (transTransVal >= 2.3 && transTransVal <= 3.3) {
+                return "success";
+            } else if (
+                (transTransVal >= 2.1 && transTransVal < 2.3) ||
+                (transTransVal > 3.3 && transTransVal <= 3.5)
+            ) {
+                return "warning";
+            } else {
+                return "danger";
+            }
+        default: // "custom option
+            return null; // can't do validation, so don't want to show a flag
+    }
+};
+
+const validatePredictedSex = (submittedSex, predictedSex) => {
+    if (!submittedSex) {
+        return null; // nothing to compare to, no flag
+    } else if (!predictedSex) {
+        return "warning"; // should be a prediction; if not, warn.
+    } else if (!(predictedSex === "M" || predictedSex === "F")) {
+        return "danger"; // predicted sex is unknown, indicates a potential problem with peddy QC
+    } else if (predictedSex !== submittedSex) {
+        return "warning"; // predicted sex is opposite from expected, may indicate an issue with submitted
+    } else {
+        return "success"; // should match
+    }
+};
+
 const BioinfoStats = React.memo(function BioinfoStats(props) {
     // Note: Can probably clean up the render method of this a little bit by breaking each row
     // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
     // may also be necessary to add to/edit rows individually in the future.
-    const { caseSample = null, sampleProcessing = null } = props;
+    const { caseSample = null, sampleProcessing = null, submittedSex = null, submittedAncestry = [] } = props;
 
     const {
         bam_sample_id: caseSampleId = null,
         processed_files: caseProcFiles = []
     } = caseSample || {};
     const {
-        processed_files: msaProcFiles = []
+        processed_files: msaProcFiles = [],
+        analysis_type: analysisType
     } = sampleProcessing || {};
 
     const msaStats = useMemo(function(){
@@ -606,11 +719,11 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
             if (qmType === "QualityMetricQclist") {
                 // Coverage and total reads should only be present in BAM, update if found
                 qmSummaries.forEach(function(qmSummary){
-                    const { title = null, value = null, tooltip = null, numberType = "string" } = qmSummary;
+                    const { title = null, value = null, numberType = "string" } = qmSummary;
                     if (title === "Coverage") {
-                        msaStats.coverage = { value: transformValueType(numberType, value), tooltip };
+                        msaStats.coverage = { value: transformValueType(numberType, value) };
                     } else if (title === "Total Reads") {
-                        msaStats.reads = { value: transformValueType(numberType, value), tooltip };
+                        msaStats.reads = { value: transformValueType(numberType, value) };
                     }
                 });
             }
@@ -622,51 +735,70 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 variant_type: variantType = "SNV", // SVs are always labelled, SNVs may or may not be (ask bioinfo team for details)
                 quality_metric: {
                     "@type": [ qmType ]=[],
-                    quality_metric_summary: qmSummaries = []
+                    quality_metric_summary: qmSummaries = [],
+                    qc_list = []
                 }={}
             } = procFile;
 
-            // Only continue if qclist (vcfQC should only exist if there is also vcfcheck)
+            // Only continue if qclist (vcfQC should only exist if there is also vcfcheck; peddyQC also requires qcList)
             if (qmType === "QualityMetricQclist") {
                 // SNV fields are unique from SV ones; so ensure the correct ones are added to msaStats for each
-                if (variantType === "SNV") {
+                if (variantType === "SV") {
                     // Stats should only be present in combined VCF, update if found
                     qmSummaries.forEach(function(qmSummary){
-                        const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
+                        const { title = null, value = null, sample = null, numberType = "string" } = qmSummary;
                         if (sample && sample === caseSampleId) {
-                            switch (title) {
-                                case "De Novo Fraction":
-                                    msaStats.deNovo = { value: transformValueType(numberType, value), tooltip };
-                                    break;
-                                case "Heterozygosity Ratio":
-                                    msaStats.heterozygosity = { value: transformValueType(numberType, value), tooltip };
-                                    break;
-                                case "Transition-Transversion Ratio":
-                                    msaStats.transTransRatio = { value: transformValueType(numberType, value), tooltip };
-                                    break;
-                                case "Total Variants Called":
-                                    msaStats.totalSNVIndelVars = { value: transformValueType(numberType, value), tooltip };
-                                    break;
+                            switch (title) { // Leaving this as switch case, since more fields may be added in future (may also be worth creating a function to encompass SV & SNV options as this grows)
                                 case "Filtered Variants":
-                                    msaStats.filteredSNVIndelVariants = { value: transformValueType(numberType, value), tooltip };
+                                    msaStats.filteredSVVariants = { value: transformValueType(numberType, value) };
                                     break;
                                 default:
                                     break;
                             }
                         }
                     });
-                } else if (variantType === "SV") {
-                    // Stats should only be present in combined VCF, update if found
+                } else { // SNV may be labelled or not
+                    // Most stats should only be present in combined VCF, update if found
                     qmSummaries.forEach(function(qmSummary){
-                        const { title = null, value = null, sample = null, tooltip = null, numberType = "string" } = qmSummary;
+                        const { title = null, value = null, sample = null, numberType = "string" } = qmSummary;
                         if (sample && sample === caseSampleId) {
-                            switch (title) { // Leaving this as switch case, since more fields may be added in future (may also be worth creating a function to encompass SV & SNV options as this grows)
+                            switch (title) {
+                                case "De Novo Fraction":
+                                    msaStats.deNovo = { value: transformValueType(numberType, value) };
+                                    break;
+                                case "Heterozygosity Ratio":
+                                    msaStats.heterozygosity = { value: transformValueType(numberType, value), validationStatus: validateHeterozygosity(value) };
+                                    break;
+                                case "Transition-Transversion Ratio":
+                                    msaStats.transTransRatio = { value: transformValueType(numberType, value), validationStatus: validateTransTrans(value, analysisType) };
+                                    break;
+                                case "Total Variants Called":
+                                    msaStats.totalSNVIndelVars = { value: transformValueType(numberType, value) };
+                                    break;
                                 case "Filtered Variants":
-                                    msaStats.filteredSVVariants = { value: transformValueType(numberType, value), tooltip };
+                                    msaStats.filteredSNVIndelVariants = { value: transformValueType(numberType, value) };
                                     break;
                                 default:
                                     break;
                             }
+                        }
+                    });
+
+                    // Predicted Sex and Ancestry found in qclist
+                    // TODO: At some point see if URL can be moved to qmsummary - if so, move this into above block
+                    qc_list.forEach(function(qc) {
+                        const { value: { "ancestry and sex prediction": predictions = [], url } = {}, qc_type } = qc;
+
+                        if (qc_type === "quality_metric_peddyqc") {
+                            predictions.forEach(function(prediction) {
+                                const { name, "predicted sex": predictedSex, "predicted ancestry": predictedAncestry } = prediction;
+                                const shortFormPredictedSex = mapLongFormSexToLetter(predictedSex);
+
+                                if (name === caseSampleId) { // double check that it's the prediction for the current case
+                                    msaStats.predictedSex = { value: shortFormPredictedSex, url, validationStatus: validatePredictedSex(submittedSex, shortFormPredictedSex) };
+                                    msaStats.predictedAncestry = { value: predictedAncestry, url };
+                                }
+                            });
                         }
                     });
                 }
@@ -677,49 +809,74 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     }, [ caseProcFiles, msaProcFiles ]);
 
     const { reads = {}, coverage = {}, totalSNVIndelVars = {}, transTransRatio = {}, heterozygosity = {}, deNovo = {},
-        filteredSNVIndelVariants = {}, filteredSVVariants = {} } = msaStats;
+        filteredSNVIndelVariants = {}, filteredSVVariants = {}, predictedSex = {}, predictedAncestry = {} } = msaStats;
+
+    const fallbackElem = "-";
 
     return (
-        <div className="row py-3">
-            <BioinfoStatsEntry label="Total Number of Reads" tooltip={reads.tooltip}>
-                { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Coverage" tooltip={coverage.tooltip}>
-                { coverage.value || "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Total Number of SNVs/Indels called" tooltip={totalSNVIndelVars.tooltip}>
-                { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Transition-Transversion ratio" tooltip={transTransRatio.tooltip}>
-                { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Heterozygosity ratio" tooltip={heterozygosity.tooltip}>
-                { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="De novo Fraction" tooltip={deNovo.tooltip}>
-                { typeof deNovo.value === "number" ? deNovo.value + "%" : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" tooltip={filteredSNVIndelVariants.tooltip}>
-                { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : "-" }
-            </BioinfoStatsEntry>
-            <BioinfoStatsEntry label="Structural Variants After Hard Filters" tooltip={filteredSVVariants.tooltip}>
-                { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : "-" }
-            </BioinfoStatsEntry>
-        </div>
+        <>
+            <div className="row py-0">
+                <BioinfoStatsEntry label="Total Number of Reads">
+                    { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : fallbackElem }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Coverage">
+                    { coverage.value || fallbackElem }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Total Number of SNVs/Indels called">
+                    { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): fallbackElem }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Transition-Transversion ratio" popoverContent={bioinfoPopoverContent.transTransRatio}>
+                    { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : fallbackElem }
+                    { (transTransRatio.value && transTransRatio.validationStatus) && <i className={`icon icon-flag fas text-${transTransRatio.validationStatus} ml-05`} />}
+                </BioinfoStatsEntry>
+            </div>
+            <div className="row py-0">
+                <BioinfoStatsEntry label="Submitted Sex" >
+                    { submittedSex || fallbackElem }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
+                    { predictedSex.value || fallbackElem }&nbsp;
+                    { !!predictedSex.url && <a href={predictedSex.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
+                    { predictedSex.validationStatus && <i className={`icon icon-flag fas text-${predictedSex.validationStatus} ml-02`} />}
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
+                    { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : fallbackElem }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Structural Variants After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSVVariants}>
+                    { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : fallbackElem }
+                </BioinfoStatsEntry>
+            </div>
+            <div className="row py-0">
+                <BioinfoStatsEntry label="Submitted Ancestry" >
+                    { submittedAncestry.length > 0 && submittedAncestry.join(", ") || "-" }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Predicted Ancestry" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
+                    { predictedAncestry.value || fallbackElem }&nbsp;
+                    { !!predictedAncestry.url && <a href={predictedAncestry.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
+                    { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : fallbackElem }
+                    { (heterozygosity.value && heterozygosity.validationStatus) && <i className={`icon icon-flag fas text-${heterozygosity.validationStatus} ml-05`}/>}
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="De novo Fraction">
+                    { typeof deNovo.value === "number" ? deNovo.value + "%" : fallbackElem }
+                </BioinfoStatsEntry>
+            </div>
+        </>
     );
 });
 
-
-function BioinfoStatsEntry({ tooltip, label, children }){
+function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }){
     return (
-        <div className="col-12 col-md-6 col-lg-4 col-xl-3 mt-04 mb-04">
+        <div className="col-12 col-md-6 col-lg-3 col-xl-3 py-2">
             <div className="qc-summary">
                 <label className="d-block mb-0">
                     { label }:
-                    { tooltip ?
+                    { !popoverContent && tooltip ?
                         <i className="icon icon-info-circle fas icon-fw ml-05"
                             data-tip={tooltip} data-place="right"/>
                         : null }
+                    { popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-0 ml-05">{ popoverContent }</QuickPopover>: null }
                 </label>
                 <div>{ children }</div>
             </div>
@@ -737,7 +894,8 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         family = null,
         sample_processing: sampleProcessing = null,
         sample: caseSample = null,
-        vcf_file: vcf = null
+        vcf_file: vcf = null,
+        individual: { sex: submittedSex = null, ancestry: submittedAncestry = [] } = {},
     } = context;
     const { "@id": vcfAtId = null } = vcf || {};
 
@@ -768,8 +926,8 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             </div> */}
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
-                <div className="card-body py-0">
-                    <BioinfoStats {...{ caseSample, sampleProcessing }} />
+                <div className="card-body py-3">
+                    <BioinfoStats {...{ caseSample, sampleProcessing, submittedAncestry, submittedSex }} />
                 </div>
             </div>
             <div className="tab-inner-container card">
