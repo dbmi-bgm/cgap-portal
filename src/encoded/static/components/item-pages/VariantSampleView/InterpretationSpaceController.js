@@ -477,14 +477,15 @@ function InterpretationSpaceTabs(props) {
         const isActive = currentTab === i;
         const unsavedDraft = tabIndexToUnsavedDraft[i];
         return (
-            <li key={i} className={`interpretation-tab clickable d-flex align-items-center ${unsavedDraft ? 'font-italic' : ''}`}
-                onClick={(e) => switchToTab(i)} data-active={isActive} data-tip={unsavedDraft ? "Unsaved changes": null}>
-                {tabName}{unsavedDraft ? <span className="text-danger text-600">*</span>: ''}
+            <li key={i} data-tip={unsavedDraft ? "Unsaved changes": null}>
+                <button type="button" className={`btn btn-xs ${isActive ? "btn-primary-dark": "btn-link"} ${unsavedDraft ? 'font-italic' : ''}`} onClick={(e) => switchToTab(i)}>
+                    {tabName}{unsavedDraft ? <span className="text-danger text-600">*</span>: ''}
+                </button>
             </li>);
     });
 
     return (
-        <ul className="p-1 d-flex align-items-center justify-content-between">
+        <ul className="p-1 d-flex align-items-center justify-content-around">
             {tabsRender}
         </ul>
     );
