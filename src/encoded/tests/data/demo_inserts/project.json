@@ -8,18 +8,14 @@
             "hms-dbmi:benchmarking"
         ],
         "name": "Benchmarking",
-        "schema_version": "1",
         "uuid": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "date_created": "2020-07-15T02:37:35.115956+00:00",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234"
+        "date_created": "2020-07-15T02:37:35.115956+00:00"
     },
     {
         "status": "current",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "start_date": "2019-05-31",
         "name": "community-standards",
         "description": "Project used as collection of most popular datasets",
-        "schema_version": "1",
         "uuid": "f01ff5be-a72d-43bd-afcf-174fa9dcd282",
         "date_created": "2020-07-15T02:37:34.210019+00:00",
         "pi": "45524d43-01b5-4b71-94c6-32d2d09c1111",

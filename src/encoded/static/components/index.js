@@ -19,7 +19,7 @@ import HomePage                             from './static-pages/HomePage';
 
 
 import DefaultItemView                      from './item-pages/DefaultItemView';
-import CaseView, { CaseSubmissionView }     from './item-pages/CaseView';
+import CaseView                             from './item-pages/CaseView';
 import VariantSampleView                    from './item-pages/VariantSampleView';
 import StructuralVariantSampleView          from './item-pages/StructuralVariantSampleView';
 import IndividualView                       from './item-pages/IndividualView';
@@ -64,7 +64,6 @@ content_views.register(CGAPSubmissionView,          'Item', 'edit');
 content_views.register(CGAPSubmissionView,          'Item', 'create');
 content_views.register(CGAPSubmissionView,          'Item', 'clone');
 content_views.register(CGAPSubmissionView,          'Search', 'add');
-// content_views.register(CaseSubmissionView,      'CaseSearchResults', 'add');
 content_views.register(ExcelSubmissionView,         'IngestionSubmission', 'create');
 content_views.register(ExcelSubmissionView,         'IngestionSubmissionSearchResults', 'add');
 

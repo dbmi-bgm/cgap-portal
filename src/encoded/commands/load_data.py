@@ -36,22 +36,22 @@ def load_data_should_proceed(env, allow_prod):
     #     return True
 
 
-def main():
+def main(simulated_args=None):
     logging.basicConfig()
     # Loading app will have configured from config file. Reconfigure here:
     logging.getLogger('encoded').setLevel(logging.DEBUG)
 
-    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is invalid
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description="Load Test Data", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument('--app-name', help="Pyramid app name in configfile")
     parser.add_argument('config_uri', help="path to configfile")
-    parser.add_argument('--prod', action='store_true', default=False,
+    parser.add_argument('--prod', action='store_true',
                         help="must be set to confirm this action is intended to happen on a production server")
     parser.add_argument('--overwrite', action='store_true',
                         help="must be set to update existing uuids with patch")
-    args = parser.parse_args()
+    args = parser.parse_args(simulated_args)
 
     # get the pyramids app
     app = get_app(args.config_uri, args.app_name)
@@ -60,14 +60,14 @@ def main():
     configure_dbsession(app)
 
     env = app.registry.settings.get('env.name', '')
-    allow_prod = args.prod
+
     load_test_data = app.registry.settings.get('load_test_data')
+    allow_prod = args.prod
     log.info("load_data: load_test_data function is %s" % (load_test_data))
     load_test_data = DottedNameResolver().resolve(load_test_data)
 
-    if cgap_load_data_should_proceed(env, allow_prod):
+    if load_data_should_proceed(env, allow_prod):
         load_test_data(app, args.overwrite)
-    exit(0)
 
 
 if __name__ == "__main__":
