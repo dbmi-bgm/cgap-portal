@@ -28,10 +28,10 @@ function mapFeaturesToBadges(features = []) {
 
 /** @param {Object} props - Contents of a caseItem */
 export const CaseStats = React.memo(function CaseStats(props){
-    const { caseItem = null } = props;
-    const { individual = null, family = null } = caseItem || {};
-    const { phenotypic_features = [] } = individual || {};
-    const { family_phenotypic_features = [] } = family || {};
+    const { caseItem = null, haveCaseEditPermission = false } = props;
+    const { individual = null, family = null, "@id": caseAtID } = caseItem || {};
+    const { phenotypic_features = [], "@id": individualAtID = null } = individual || {};
+    const { family_phenotypic_features = [], "@id": familyAtID = null } = family || {};
 
     const renderedPatientPhenotypicFeatures = useMemo(function(){
         const onlyPhenotypicFeatures = phenotypic_features.map((feature) => {
@@ -50,31 +50,43 @@ export const CaseStats = React.memo(function CaseStats(props){
         <div id="case-stats" className="row">
             <div className="col-12 col-sm mb-2 mb-sm-0">
                 <div className="card h-100">
-                    <div className="card-header primary-header">
+                    <div className="card-header primary-header d-flex align-items-center">
                         <i className="icon icon-user fas icon-fw mr-1"/>
-                        <h4 className="my-0 text-400 d-inline-block">
+                        <h4 className="my-0 text-400 flex-grow-1">
                             Patient Info
                         </h4>
+                        { haveCaseEditPermission && individualAtID ?
+                            <a href={individualAtID + "?currentAction=edit&callbackHref=" + caseAtID}
+                                className="text-white-50 ml-12 text-small" data-tip="Edit Individual. Changes may take a few minutes to appear.">
+                                <i className="icon icon-fw icon-pencil-alt fas"/>
+                            </a>
+                            : null }
                     </div>
                     <div className="card-body">
-                        <PatientInfo {...props} />
+                        <PatientInfo {...{ caseItem, haveCaseEditPermission }} />
                     </div>
                     <div className="card-footer">
                         <label className="py-1 mb-0 text-large">Patient Phenotypic Features:</label>
-                        <div>{renderedPatientPhenotypicFeatures}</div>
+                        <div>{ renderedPatientPhenotypicFeatures }</div>
                     </div>
                 </div>
             </div>
             <div className="col-12 col-sm">
                 <div className="card h-100">
-                    <div className="card-header primary-header">
+                    <div className="card-header primary-header d-flex align-items-center">
                         <i className="icon icon-users fas icon-fw mr-1"/>
-                        <h4 className="my-0 text-400 d-inline-block">
+                        <h4 className="my-0 text-400 flex-grow-1">
                             Family Info
                         </h4>
+                        { haveCaseEditPermission && familyAtID ?
+                            <a href={familyAtID + "?currentAction=edit&callbackHref=" + caseAtID}
+                                className="text-white-50 ml-12 text-small" data-tip="Edit Family. Changes may take a few minutes to appear.">
+                                <i className="icon icon-fw icon-pencil-alt fas"/>
+                            </a>
+                            : null }
                     </div>
                     <div className="card-body">
-                        <FamilyInfo {...{ family, caseItem }} />
+                        <FamilyInfo {...{ caseItem, haveCaseEditPermission }} />
                     </div>
                     <div className="card-footer">
                         <label className="py-1 mb-0 text-large">Family Phenotypic Features: </label>
@@ -86,10 +98,11 @@ export const CaseStats = React.memo(function CaseStats(props){
     );
 });
 
-export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) {
+export const PatientInfo = React.memo(function PatientInfo({ caseItem = null, haveCaseEditPermission = false }) {
     const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
     const { individual = null } = caseItem || {};
     const {
+        "@id": individualAtID,
         accession = fallbackElem,
         individual_id = fallbackElem,
         sex = fallbackElem,
@@ -99,58 +112,113 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) 
         date_created = null,
     } = individual || {};
 
+    if (!individual) {
+        return (
+            <div className="text-center text-italic">
+                No Individual Item linked to this Case
+            </div>
+        );
+    }
+
+    if (!individualAtID) {
+        return (
+            <div className="text-center text-italic">
+                No view permissions
+            </div>
+        );
+    }
+
     // TODO later maybe use card footer Bootstrap component if such exists.
 
     return (
         <React.Fragment>
             <div className="card-text mb-1">
-                <label className="mb-0">Individual ID:</label> { individual_id }
+                <label className="mb-0 mr-06">Individual ID:</label>
+                <a href={individualAtID} target="_blank" rel="noopener noreferrer">
+                    { individual_id }
+                </a>
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">CGAP Individual ID:</label> { accession }
+                <label className="mb-0">CGAP Individual ID:</label>
+                {" "}
+                <span className="text-monospace text-small">{ accession }</span>
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Sex (User-Submitted):</label> { sex }
+                <label className="mb-0">Sex (User-Submitted):</label>
+                {" "}
+                { sex }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Age: </label> { age && age_units ? `${age} ${age_units}(s)` : fallbackElem }
+                <label className="mb-0">Age: </label>
+                {" "}
+                { age && age_units ? `${age} ${age_units}(s)` : fallbackElem }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Status:</label> &nbsp;{ Schemas.Term.toName("status", status, true) || fallbackElem }
+                <label className="mb-0 mr-02">Status:</label>
+                {" "}
+                { Schemas.Term.toName("status", status, true) || fallbackElem }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">Accession Date:</label> { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : fallbackElem }
+                <label className="mb-0">Accession Date:</label>
+                {" "}
+                { date_created ? <LocalizedTime timestamp={date_created} formatType="date-sm"/> : fallbackElem }
             </div>
         </React.Fragment>
     );
 });
 
 
-export const FamilyInfo = React.memo(function FamilyInfo({ family, caseItem }) {
+export const FamilyInfo = React.memo(function FamilyInfo({ caseItem }) {
+    const { family = null } = caseItem;
     const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
     const {
+        "@id": familyAtID,
         accession: familyAccession,
         display_title : familyDisplayTitle = null,
         title: familyTitle= null,
         project: { display_title: projectTitle } = {}
     } = family || {};
-    const { cohort: { display_title: cohortTitle } = {} } = caseItem || {};
+    // const { cohort: { display_title: cohortTitle } = {} } = caseItem || {};
 
     // TODO later perhaps make Project value into a hyperlink once have a Project page/view.
+
+    if (!family) {
+        return (
+            <div className="text-center text-italic">
+                No Family Item linked to this Case
+            </div>
+        );
+    }
+
+    if (!familyAtID) {
+        return (
+            <div className="text-center text-italic">
+                No view permissions
+            </div>
+        );
+    }
 
     return (
         <React.Fragment>
             <div className="card-text mb-1">
-                <label className="mb-0">Family ID:</label> { familyTitle || familyDisplayTitle || fallbackElem }
+                <label className="mb-0">Family ID:</label>
+                {" "}
+                <a href={familyAtID} target="_blank" rel="noopener noreferrer">
+                    { familyTitle || familyDisplayTitle }
+                </a>
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0">CGAP Family ID:</label> { familyAccession }
+                <label className="mb-0">CGAP Family ID:</label>
+                {" "}
+                <span className="text-monospace text-small">{ familyAccession }</span>
             </div>
             {/* <div className="card-text mb-1">
                 <label className="mb-0">Cohort:</label> { cohortTitle || fallbackElem }
             </div> */}
             <div className="card-text mb-1">
-                <label className="mb-0">Project:</label> { projectTitle || fallbackElem }
+                <label className="mb-0">Project:</label>
+                {" "}
+                { projectTitle || fallbackElem }
             </div>
         </React.Fragment>
     );
