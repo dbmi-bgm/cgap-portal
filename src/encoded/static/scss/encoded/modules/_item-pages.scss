@@ -350,7 +350,12 @@ $tabbar-height: 46px;
 #full-alerts-container {
 	position: sticky;
 	z-index: 500;
-	top: 40px;
+	top: 0px;
+
+	@include navbar-fixed-position {
+		top: 40px;
+	}
+
 	> .alerts {
 		> .alert {
 			margin-bottom: 0px;
@@ -1591,22 +1596,32 @@ i.status-indicator-dot {
 				.embedded-search-container .search-view-controls-and-results[data-search-item-type="StructuralVariantSample"] {
 					.search-result-row.detail-closed .columns.result-table-row {
 						.search-result-column-block[data-field="display_title"][data-first-visible-column="true"] {
-							// Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate
-							padding-left: 0 !important; // important necessary to override default style (this is short term override/will be deleted soon so hopefully ok)
-						}
-						.search-result-column-block[data-field="status"],
-						.search-result-column-block[data-field="date_created"] {
-							display: flex;
-							justify-content: center;
+							/* Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate */
+							/* important necessary to override default style (this is short term override/will be deleted soon so hopefully ok) */
+							padding-left: 18px !important;
+							.toggle-detail-button-container {
+								display: none;
+							}
 						}
 					}
 				}
 
+				
 				.filtering-tab-toggle {
-					width: max-content; 
+
+					button.btn.active {
+						pointer-events: none;
+					}
+
+					/**
+					width: max-content;
 	
 					> div {
 						padding: 5px 40px;
+
+						@include media-breakpoint-down(sm) {
+							padding: 5px 12px;
+						}
 	
 						&.active {
 							background-color: lighten($primary, 40%);
@@ -1614,6 +1629,7 @@ i.status-indicator-dot {
 							border-radius: 0.4em;
 						} 
 					}
+					**/
 				}
 			}
 		}
@@ -2511,26 +2527,16 @@ i.status-indicator-dot {
 		}
 
 		.card-body {
-			ul {
-				list-style-type: none;
+			.interpretation-tabs {
 				border:1px solid lightgray;
 				border-radius: 5px;
-				li.interpretation-tab {
-					&[data-active="true"] {
-						background-color: #beccda;
-						color: $primary-dark;
-						border-radius: 3px;
-					}
-					font-size: 13px;
-					padding: 3px 7px;
-				}
 			}
 
 			.interpretation-panel {
 				margin: 10px 0;
 
 				textarea {
-					border-color: lightgrey;
+					border: 1px solid lightgray;
     				border-radius: 5px;
 					padding: 10px;
 				}

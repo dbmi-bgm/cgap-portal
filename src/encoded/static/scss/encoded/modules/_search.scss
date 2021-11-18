@@ -4,15 +4,17 @@
 /**** Search Table ****/
 /**********************/
 
-// 40px is height of navbar, we subtract 1 to help cover up 1px gap glitch
-// which appears at times..
+/**
+ * 40px is height of navbar, we subtract 1 to help cover up 1px gap glitch
+ * which appears at times..
+ */
 $cgap-search-sticky-header-top-offset: 39px;
 
 $search-results-above-results-row-height: 42px;
 $search-results-edge-background-color: #e2e2e2;
 $search-results-edge-shadow-color : rgba(0,0,0,0.5);
-$search-results-result-row-height: 80px; // +9px margin bottom +1px border bottom = 90px rowHeight.
-$search-results-header-row-height: 52px; // 46px is existing default for both result and header height.
+$search-results-result-row-height: 80px; /* +9px margin bottom +1px border bottom = 90px rowHeight. */
+$search-results-header-row-height: 52px; /* 46px is existing default for both result and header height. */
 @import "./../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/search-view-table.scss";
 
 // Extensions to shared-portal-components searchview table(s):
@@ -81,13 +83,13 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 	&[data-field="display_title"] {
 		.inner {
 			> .title-block {
-				white-space: normal; // Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows.
+				white-space: normal; /* Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows. */
 			}
 		}
 	}
 
 
-	// Styling overrides specific to search results of type Case
+	/* Styling overrides specific to search results of type Case */
 	.search-view-controls-and-results[data-search-item-type="Case"] & {
 
 		&[data-first-visible-column] .inner > .title-block {
@@ -96,13 +98,15 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 
 		&[data-field="display_title"] > .inner .multi-field-cell .col-main,
 		&[data-field="individual"] > .inner .multi-field-cell .col-main {
-			// Uppercase Individual's Identifier
+			/* Uppercase Individual's Identifier */
 			text-transform: uppercase;
 		}
 	}
 	
 	&[data-field="status"] {
 		> .inner {
+			/* Overrides SPC's search-view-table.scss text-align: left */
+			text-align: center !important;
 			i.status-indicator-dot {
 				margin-left: 4px;
 				margin-right: 2px;
@@ -242,7 +246,6 @@ $search-page-padding-resize-transition-out: padding .25s linear;
 *************************************************/
 
 body[data-pathname="/search/"]:not([data-current-action="add"]) {
-	#slot-application,
 	#application,
 	#layout {
 		// Possible todo: switch this to appBackgroundColor param (base.scss) or parameterize according to final design.

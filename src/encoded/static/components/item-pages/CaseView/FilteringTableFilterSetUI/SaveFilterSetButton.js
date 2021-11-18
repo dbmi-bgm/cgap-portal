@@ -81,7 +81,7 @@ export class SaveFilterSetButtonController extends React.Component {
         };
 
         this.state = {
-            // Initially is blank or Case.active_filterset (once AJAXed in)
+            // Initially is blank or Case[props.activeFilterSetFieldName] (once AJAXed in)
             "lastSavedFilterSet": (filterSet && filterSet['@id']) ? filterSet : null,
             "isSavingFilterSet": false
         };
@@ -110,12 +110,12 @@ export class SaveFilterSetButtonController extends React.Component {
     }
 
     /**
-     * PATCHes the current filterset, if active_filterset
+     * PATCHes the current filterset, if Case[props.activeFilterSetFieldName]
      * exists on caseItem. Else POSTs new FilterSet and then
-     * sets it as the active_filterset of Case.
+     * sets it as Case[props.activeFilterSetFieldName].
      */
     saveFilterSet(){
-        const { currFilterSet: filterSet, caseItem } = this.props;
+        const { currFilterSet: filterSet, caseItem, activeFilterSetFieldName } = this.props;
         const { lastSavedFilterSet } = this.state;
         const {
             "@id": caseAtID,
@@ -156,6 +156,10 @@ export class SaveFilterSetButtonController extends React.Component {
             } else {
                 // POST
 
+                if (!activeFilterSetFieldName || typeof activeFilterSetFieldName !== "string") {
+                    throw new Error("Expected props.activeFilterSetFieldName");
+                }
+
                 const payload = _.pick(filterSet, ...filterSetFieldsToKeepPrePatch);
                 // `institution` & `project` are set only upon create.
                 payload.institution = caseInstitutionID;
@@ -169,9 +173,9 @@ export class SaveFilterSetButtonController extends React.Component {
                         newFilterSetItemFromPostResponse = newFilterSetItemFromResponse;
                         const { uuid: nextFilterSetUUID } = newFilterSetItemFromResponse;
 
-                        console.info("POSTed FilterSet, proceeding to PATCH Case.active_filterset", newFilterSetItemFromResponse);
+                        console.info("POSTed FilterSet, proceeding to PATCH Case[props.activeFilterSetFieldName]", newFilterSetItemFromResponse);
 
-                        return ajax.promise(caseAtID, "PATCH", {}, JSON.stringify({ "active_filterset" : nextFilterSetUUID }));
+                        return ajax.promise(caseAtID, "PATCH", {}, JSON.stringify({ [activeFilterSetFieldName] : nextFilterSetUUID }));
                     }).then((casePatchResponse)=>{
                         console.info("PATCHed Case Item", casePatchResponse);
                         this.setState({

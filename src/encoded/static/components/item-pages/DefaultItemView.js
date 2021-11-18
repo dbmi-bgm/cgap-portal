@@ -78,26 +78,30 @@ export const propsForDetailList = {
  *
  * It provides a 'template' which can be extended further by Item page views such as ExperimentSetView, BiosourceView, etc. which can override/extend individual functions defined here.
  * Look at the render method to see how the functions are brought in together -- there shouldn't be a need to create own 'render' function from some Item view.
+ *
+ * @todo Low Priority - Can refactor into a DefaultItemViewWrapper and pass in props, instead of having to extend this component (anti-pattern).
  */
 export default class DefaultItemView extends React.PureComponent {
 
-    static className = memoize(function(context){
+    static className(context){
         const classes = [
             'view-detail',
             'item-page-container',
             //'container'
         ];
 
-        _.forEach((context['@type'] || []), function (type) {
+        const { "@type": atType = [], status = null } = context;
+
+        atType.forEach(function (type) {
             classes.push('type-' + type);
         });
 
-        if (typeof context.status === 'string'){
-            classes.push('status-' + context.status.toLowerCase().replace(/ /g, '-').replace(/\(|\)/g,''));
+        if (typeof status === 'string'){
+            classes.push('status-' + status.toLowerCase().replace(/ /g, '-').replace(/\(|\)/g,''));
         }
 
         return classes.join(' ');
-    });
+    }
 
     static propTypes = {
         'windowWidth' : PropTypes.number,
@@ -106,7 +110,9 @@ export default class DefaultItemView extends React.PureComponent {
         'width' : PropTypes.number,
         'context' : PropTypes.shape({
             '@id' : PropTypes.string.isRequired,
-            'display_title' : PropTypes.string.isRequired
+            'display_title' : PropTypes.string.isRequired,
+            'accession' : PropTypes.string,
+            'alternate_accessions' : PropTypes.arrayOf(PropTypes.string)
         }),
         'alerts' : PropTypes.arrayOf(PropTypes.shape({
             'title' : PropTypes.string.isRequired,
@@ -134,6 +140,10 @@ export default class DefaultItemView extends React.PureComponent {
          */
         this.state = {};
 
+        this.memoized = {
+            className: memoize(DefaultItemView.className)
+        };
+
         this.tabbedViewRef = React.createRef();
         this.itemActionsTabRef = React.createRef();
     }
@@ -149,10 +159,12 @@ export default class DefaultItemView extends React.PureComponent {
         const { href, context } = this.props;
         if (!href) return;
 
+        const { accession, alternate_accessions = [] } = context;
+
         let { query : { redirected_from = null } = { redirected_from : null } } = memoizedUrlParse(href);
 
         if (Array.isArray(redirected_from)){
-            redirected_from = redirected_from[0];
+            [ redirected_from ] = redirected_from;
         }
 
         let redirected_from_accession = redirected_from && _.filter(redirected_from.split('/'))[1];
@@ -161,7 +173,7 @@ export default class DefaultItemView extends React.PureComponent {
             redirected_from_accession = null; // Unset if not in form of accession.
         }
 
-        if (redirected_from_accession && context.accession && Array.isArray(context.alternate_accessions) && context.alternate_accessions.indexOf(redirected_from_accession) > -1){
+        if (redirected_from_accession && accession && alternate_accessions.indexOf(redirected_from_accession) > -1){
             // Find @id of our redirected_from item.
             ajax.load('/search/?type=Item&field=@id&field=uuid&field=accession&status=replaced&accession=' + redirected_from_accession, (r)=>{
                 const ourOldItem = _.findWhere(r['@graph'], { 'accession' : redirected_from_accession });
@@ -227,12 +239,7 @@ export default class DefaultItemView extends React.PureComponent {
      * @protected
      */
     getDefaultTabs(){
-        const { context } = this.props;
-        const returnArr = [];
-
-        returnArr.push(DetailsTabView.getTabObject(this.props));
-
-        return returnArr;
+        return [ DetailsTabView.getTabObject(this.props) ];
     }
 
     /**
@@ -334,7 +341,7 @@ export default class DefaultItemView extends React.PureComponent {
             });
         }
         return (
-            <div className={DefaultItemView.className(context)} id="content">
+            <div className={this.memoized.className(context)} id="content">
                 <div id="full-alerts-container">
                     <Alerts alerts={alerts} className="alerts" />
                 </div>

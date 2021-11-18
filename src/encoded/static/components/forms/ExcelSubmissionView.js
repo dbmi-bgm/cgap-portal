@@ -549,10 +549,10 @@ class PanelOne extends React.PureComponent {
                                 variant="primary text-600 text-capitalize"
                                 title={submissionType || "Accessioning"}
                                 id="submission-type"
-                            >
-                                <Dropdown.Item eventKey="Accessioning" onSelect={this.handleSelectSubmissionType}>Accessioning</Dropdown.Item>
-                                <Dropdown.Item eventKey="Family History" onSelect={this.handleSelectSubmissionType}>Family History</Dropdown.Item>
-                                <Dropdown.Item eventKey="Gene List" onSelect={this.handleSelectSubmissionType}>Gene List</Dropdown.Item>
+                                onSelect={this.handleSelectSubmissionType}>
+                                <Dropdown.Item eventKey="Accessioning">Accessioning</Dropdown.Item>
+                                <Dropdown.Item eventKey="Family History">Family History</Dropdown.Item>
+                                <Dropdown.Item eventKey="Gene List">Gene List</Dropdown.Item>
                             </DropdownButton>
                         </div>
                     </div>

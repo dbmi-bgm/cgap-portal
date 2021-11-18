@@ -1,86 +1,240 @@
 'use strict';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import queryString from 'query-string';
 
+import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { VirtualHrefController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/VirtualHrefController';
+import { SelectedItemsController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/SelectedItemsController';
 
-import { FilteringTableFilterSetUI, FilterSetController } from './FilteringTableFilterSetUI';
-import { SaveFilterSetButtonController } from './SaveFilterSetButton';
-import { SaveFilterSetPresetButtonController } from './SaveFilterSetPresetButton';
-import { CaseViewEmbeddedVariantSampleSearchTable } from './CaseViewEmbeddedVariantSampleSearchTable';
-import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+import { FilteringTableFilterSetUI } from './FilteringTableFilterSetUI';
+import { FilterSetController } from './FilteringTableFilterSetUI/FilterSetController';
+import { SaveFilterSetButtonController } from './FilteringTableFilterSetUI/SaveFilterSetButton';
+import { SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI/SaveFilterSetPresetButton';
+import { CaseViewEmbeddedVariantSampleSearchTable, CaseViewEmbeddedVariantSampleSearchTableSV } from './CaseViewEmbeddedVariantSampleSearchTable';
+
+
+
+
+const filteringTabViews = {
+    // Numbers are cast to string when used as object keys.
+    "0": {
+        name: "SNV",
+        searchType: "VariantSample"
+    },
+    "1": {
+        name: "CNV / SV",
+        searchType: "StructuralVariantSample"
+    }
+};
 
 /**
- * @todo maybe reuse somewhere
- * // This... more or less should handle "NOT" (!=), where the "!" will be last char of field.
- *
- * @param {*} query1  Query to filter
- * @param {*} query2  Query to filter by
+ * Handles tab switching between the SNV and CNV/SV tabs.
  */
-export function filterQueryByQuery(query1, query2){
-    if (typeof query1 === "string") {
-        query1 = queryString.parse(query1);
-    }
-    if (typeof query2 === "string") {
-        query2 = queryString.parse(query2);
-    }
+export function FilteringTab(props) {
+    const {
+        context, windowHeight, session, schemas,
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem
+    } = props;
 
-    const filterByDict = Object.keys(query2).reduce(function(m, field){
-        m[field] = m[field] || {};
-        if (Array.isArray(query2[field])){
-            query2[field].forEach(function(v){
-                m[field][v] = true;
-            });
-        } else {
-            m[field][query2[field]] = true;
+    const {
+        initial_search_href_filter_addon: snvFilterHrefAddon = null,
+        sv_initial_search_href_filter_addon: svFilterHrefAddon = null
+    } = context;
+
+    const defaultTabIdx = (!snvFilterHrefAddon && svFilterHrefAddon) ? 1 : 0;
+    const [ currViewIdx, setCurrViewIdx ] = useState(defaultTabIdx);
+
+    const commonProps = {
+        context, windowHeight, session, schemas,
+        setIsSubmitting, variantSampleListItem,
+        updateVariantSampleListID, savedVariantSampleIDMap,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem
+    };
+
+    return (
+        <React.Fragment>
+            <FilteringTabTableToggle {...{ currViewIdx, setCurrViewIdx, context }}/>
+            <div className="row mb-1 mt-0">
+                <h1 className="col my-0">
+                    { filteringTabViews[currViewIdx].name + " " }
+                    <span className="text-300">Variant Filtering and Technical Review</span>
+                </h1>
+            </div>
+            <div id="snv-filtering" className={"mt-36" + (currViewIdx === 0 ? "" : " d-none")}>
+                <SelectedItemsController isMultiselect>
+                    <SNVFilteringTabBody {...commonProps} />
+                </SelectedItemsController>
+            </div>
+            <div id="cnvsv-filtering" className={"mt-36" + (currViewIdx === 1 ? "" : " d-none")}>
+                <SelectedItemsController isMultiselect>
+                    <CNVFilteringTabBody {...commonProps} />
+                </SelectedItemsController>
+            </div>
+        </React.Fragment>
+    );
+}
+
+const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(props) {
+    const { context, currViewIdx, setCurrViewIdx } = props;
+    const {
+        initial_search_href_filter_addon: snvFilterHrefAddon = "",
+        sv_initial_search_href_filter_addon: svFilterHrefAddon = "",
+        sample_processing: {
+            analysis_type = ""
+        } = {}
+    } = context;
+
+    const currentlyOnSNV = currViewIdx === 0;
+    const currentlyOnCNV = currViewIdx === 1;
+
+    const onClickSNV = useCallback(function(e){
+        if (!currentlyOnSNV) {
+            setCurrViewIdx(0);
         }
-        return m;
-    }, { "type" : { "VariantSample" : true } });
+    });
 
-    const queryFiltered = Object.keys(query1).reduce(function(m, field){
-        const val = query1[field];
-
-        if (typeof filterByDict[field] === "undefined") {
-            m[field] = val;
-            return m; // include it
+    const onClickCNV = useCallback(function(e){
+        if (!currentlyOnCNV) {
+            setCurrViewIdx(1);
         }
+    });
 
-        if (!Array.isArray(val)) {
-            if (filterByDict[field][val]) {
-                return m; // Exclude/skip it.
+    // End up getting a list of non-case-specific variants (with duplicates from multiple cases)
+    // if these searchHrefAddons aren't present, so important to disable the tab in those instances
+    const snvDisabled = !snvFilterHrefAddon;
+    const cnvDisabled = !svFilterHrefAddon;
+
+    let cnvTip = null;
+    if (analysis_type.startsWith("WES")) {
+        cnvTip = "SV/CNV is currently available for only germline WGS data. Additional pipelines are under development.";
+    }
+
+    return (
+        <div className="card py-2 px-1 mb-3 d-flex d-md-inline-flex flex-row filtering-tab-toggle">
+            <button type="button" aria-pressed={currentlyOnSNV}
+                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnSNV ? "primary-dark active" : "link")}
+                onClick={onClickSNV} disabled={snvDisabled}>
+                { filteringTabViews["0"].name } Filtering
+            </button>
+            <button type="button" aria-pressed={currentlyOnCNV}
+                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnCNV ? "primary-dark active" : "link")}
+                onClick={onClickCNV} disabled={cnvDisabled} data-tip={cnvTip}>
+                { filteringTabViews["1"].name } Filtering
+            </button>
+        </div>
+    );
+
+});
+
+function createBlankFilterSetItem(searchType, caseAccession){
+    return {
+        "title" : "FilterSet for Case " + caseAccession,
+        "created_in_case_accession" : caseAccession,
+        "search_type": searchType,
+        "filter_blocks" : [
+            {
+                "name" : "Filter Block 1",
+                "query" : ""
             }
-            m[field] = val;
-            return m;
+        ]
+    };
+}
+
+function SNVFilteringTabBody(props){
+    const { context } = props; // context passed in from App (== Case Item)
+    const { "0" : { searchType } } = filteringTabViews;
+
+    const { searchHrefBase, blankFilterSetItem, hideFacets } = useMemo(function(){
+        const { initial_search_href_filter_addon = "", accession: caseAccession } = context || {};
+        const searchHrefBase = (
+            "/search/?type=" + searchType
+            + (initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "")
+        );
+
+        const blankFilterSetItem = createBlankFilterSetItem(searchType, caseAccession);
+
+        let hideFacets = ["type", "validation_errors.name"];
+
+        // IMPORTANT:
+        // We preserve `blankFilterSetItem.flags`, but we DO NOT utilize it
+        // in FilterSetController at moment because FilterSet Presets may be
+        // re-used for many different Cases.
+        // TODO: maybe remove
+
+        if (initial_search_href_filter_addon) {
+            hideFacets = hideFacets.concat(Object.keys(queryString.parse(initial_search_href_filter_addon)));
+            blankFilterSetItem.flags = [
+                {
+                    "name" : "Case:" + caseAccession,
+                    "query" : initial_search_href_filter_addon
+                }
+            ];
         }
+        return { searchHrefBase, blankFilterSetItem, hideFacets };
+    }, [ context ]); // Don't memoize on `searchType`; it never changes.
 
-        const nextArr = val.filter(function(v){
-            return !filterByDict[field][v];
-        });
-        if (nextArr.length === 0) {
-            // do nothing
-        } else if (nextArr.length === 1) {
-            // eslint-disable-next-line prefer-destructuring
-            m[field] = nextArr[0];
-        } else {
-            m[field] = nextArr;
+    return (
+        // TODO: Maybe rename `activeFilterSetFieldName` to `caseActiveFilterSetFieldName`.. idk.
+        <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem, searchType }}
+            activeFilterSetFieldName="active_filterset">
+            <CaseViewEmbeddedVariantSampleSearchTable />
+        </FilteringTabBody>
+    );
+}
+
+function CNVFilteringTabBody(props){
+    const { context } = props; // context passed in from App (== Case Item)
+    const { "1" : { searchType } } = filteringTabViews;
+
+    const { searchHrefBase, blankFilterSetItem, hideFacets } = useMemo(function(){
+        const { sv_initial_search_href_filter_addon = "", accession: caseAccession } = context || {};
+        const searchHrefBase = (
+            "/search/?type=" + searchType
+            + (sv_initial_search_href_filter_addon ? "&" + sv_initial_search_href_filter_addon : "")
+        );
+
+        const blankFilterSetItem = createBlankFilterSetItem(searchType, caseAccession);
+
+        let hideFacets = ["type", "validation_errors.name"];
+
+        // IMPORTANT:
+        // We preserve `blankFilterSetItem.flags`, but we DO NOT utilize it
+        // in FilterSetController at moment because FilterSet Presets may be
+        // re-used for many different Cases.
+        // TODO: maybe remove
+
+        if (sv_initial_search_href_filter_addon) {
+            hideFacets = hideFacets.concat(Object.keys(queryString.parse(sv_initial_search_href_filter_addon)));
+            blankFilterSetItem.flags = [
+                {
+                    "name" : "Case:" + caseAccession,
+                    "query" : sv_initial_search_href_filter_addon
+                }
+            ];
         }
-        return m;
+        return { searchHrefBase, blankFilterSetItem, hideFacets };
+    }, [ context ]); // Don't memoize on `searchType`; it never changes.
 
-    }, {});
-
-    return queryFiltered;
+    return (
+        <FilteringTabBody {...props} {...{ searchHrefBase, hideFacets, blankFilterSetItem, searchType }}
+            activeFilterSetFieldName="active_filterset_sv">
+            <CaseViewEmbeddedVariantSampleSearchTableSV />
+        </FilteringTabBody>
+    );
 }
 
 
-export const FilteringTab = React.memo(function FilteringTab(props) {
+function FilteringTabBody(props) {
     const {
-        context = null,
-        session = false,
-        schemas,
-        windowHeight,
-        windowWidth,
+        context = null,             // Passed in from App (== Case Item)
+        session = false,            // Passed in from App (todo: figure out permissions; might some Cases be publicly accessible, e.g. as demos?)
+        schemas,                    // Passed in from App
+        windowHeight,               // Passed in from App
+        windowWidth,                // Passed in from App
         onCancelSelection,          // Not used -- passed in from SelectedItemsController and would close window.
         onCompleteSelection,        // Not used -- passed in from SelectedItemsController and would send selected items back to parent window.
         selectedItems: selectedVariantSamples,                  // passed in from SelectedItemsController
@@ -93,21 +247,26 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         isLoadingVariantSampleListItem, // Passed in from VariantSampleListController
         setIsSubmitting,            // Passed in from App
         addToBodyClassList,         // Passed in from App
-        removeFromBodyClassList     // Passed in from App
+        removeFromBodyClassList,    // Passed in from App
+        searchHrefBase: parentSearchHrefBase,   // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        children,                               // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        hideFacets,                             // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        blankFilterSetItem,                     // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        activeFilterSetFieldName,               // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        searchType                              // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
     } = props;
 
+    // TODO:
+    // `additional_variant_sample_facets` IS POSSIBLY ONLY APPLICABLE ONLY TO
+    // SNV VariantSamples. We probably need to create+use different
+    // one for CNV/SV?
     const {
-        accession: caseAccession,
-        initial_search_href_filter_addon = "",
-        active_filterset = null,
-        additional_variant_sample_facets = []
+        additional_variant_sample_facets = [],
+        [activeFilterSetFieldName]: { "@id": activeFilterSetID = null } = {}
     } = context || {};
 
-    const { "@id" : activeFilterSetID = null } = active_filterset || {};
-
     const searchHrefBase = (
-        "/search/?type=VariantSample"
-        + (initial_search_href_filter_addon ? "&" + initial_search_href_filter_addon : "")
+        parentSearchHrefBase
         + (additional_variant_sample_facets.length > 0 ? "&" + additional_variant_sample_facets.map(function(fac){ return "additional_facet=" + encodeURIComponent(fac); }).join("&") : "")
         + "&sort=date_created"
     );
@@ -117,7 +276,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     // const searchHrefWithCurrentFilter = searchHrefBase + (currentActiveFilterAppend ? "&" + currentActiveFilterAppend : "");
 
     // Hide facets that are ones used to initially narrow down results to those related to this case.
-    const { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem } = useMemo(function(){
+    const { onClearFiltersVirtual, isClearFiltersBtnVisible } = useMemo(function(){
 
         const onClearFiltersVirtual = function(virtualNavigateFxn, callback) {
             // By default, EmbeddedSearchItemView will reset to props.searchHref.
@@ -132,37 +291,7 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
             return VirtualHrefController.isClearFiltersBtnVisible(virtualHref, searchHrefBase);
         };
 
-        let hideFacets = ["type", "validation_errors.name"];
-        if (initial_search_href_filter_addon) {
-            hideFacets = hideFacets.concat(Object.keys(queryString.parse(initial_search_href_filter_addon)));
-        }
-
-        const blankFilterSetItem = {
-            "title" : "FilterSet for Case " + caseAccession,
-            "created_in_case_accession" : caseAccession,
-            "search_type": "VariantSample",
-            "filter_blocks" : [
-                {
-                    "name" : "Filter Block 1",
-                    "query" : ""
-                }
-            ]
-        };
-
-        // IMPORTANT:
-        // We preserve this, but we DO NOT utilize it in FilterSetController at moment
-        // because FilterSet Presets may be re-used for many different Cases.
-        // TODO: maybe remove
-        if (initial_search_href_filter_addon) {
-            blankFilterSetItem.flags = [
-                {
-                    "name" : "Case:" + caseAccession,
-                    "query" : initial_search_href_filter_addon
-                }
-            ];
-        }
-
-        return { hideFacets, onClearFiltersVirtual, isClearFiltersBtnVisible, blankFilterSetItem };
+        return { onClearFiltersVirtual, isClearFiltersBtnVisible };
     }, [ context ]);
 
     // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedVariantSamples there.
@@ -178,9 +307,9 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     };
 
     const embeddedTableHeaderBody = (
-        <SaveFilterSetButtonController caseItem={context} setIsSubmitting={setIsSubmitting}>
+        <SaveFilterSetButtonController {...{ setIsSubmitting, activeFilterSetFieldName }} caseItem={context}>
             <SaveFilterSetPresetButtonController>
-                <FilteringTableFilterSetUI {...fsuiProps} />
+                <FilteringTableFilterSetUI {...fsuiProps} {...{ searchType }} />
             </SaveFilterSetPresetButtonController>
         </SaveFilterSetButtonController>
     );
@@ -204,14 +333,13 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
     const embeddedTableHeader = activeFilterSetID ? (
         <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
             onFail={onFailInitialFilterSetItemLoad}>
-            <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets}>
+            <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples, searchType }} excludeFacets={hideFacets}>
                 { embeddedTableHeaderBody }
             </FilterSetController>
         </ajax.FetchedItem>
     ) : (
-        // Possible to-do, depending on data-model future requirements for FilterSet Item (holding off for now):
-        // could pass in props.search_type and use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+        // Possible to-do, depending on data-model future requirements for FilterSet Item could use initialFilterSetItem.flags[0] instead of using searchHrefBase.
+        <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples, searchType }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
             { embeddedTableHeaderBody }
         </FilterSetController>
     );
@@ -235,5 +363,10 @@ export const FilteringTab = React.memo(function FilteringTab(props) {
         "key": searchTableKey
     };
 
-    return <CaseViewEmbeddedVariantSampleSearchTable {...tableProps} />;
-});
+    if (Array.isArray(children)) {
+        throw new Error("Expected single React Component (EmbeddedSearchView or a composed component eventually returning EmbeddedSearchView)");
+    }
+
+    return React.cloneElement(children, tableProps);
+}
+
