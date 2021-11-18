@@ -136,7 +136,7 @@ function AboveCasesTableOptions(props){
                     </ProjectFilterCheckbox>
                 </div>
                 <div className="d-none d-md-block col-md">
-                    <hr/>
+                    &nbsp;
                 </div>
                 <div className="col-12 col-md-auto">
                     <SearchBar {...{ isContextLoading, context, navigate }} />

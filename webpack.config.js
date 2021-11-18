@@ -263,7 +263,7 @@ module.exports = [
                 '../util/aws': 'empty-module',
                 // We can rely on NodeJS's internal URL API, since it should match API of npm url package by design.
                 // This hopefully improves SSR performance, assuming Node has native non-JS/C code to parse this.
-                'url': 'commonjs2 url'
+                // 'url': 'commonjs2 url'
             }
         ],
         output: {
