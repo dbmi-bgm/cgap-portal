@@ -47,6 +47,12 @@ label {
 	> label {
 		/* Overrides default above, since we usually don't want bold styling for checkboxes. */
 		font-weight: 400;
+		i.icon-circle-notch {
+			position: absolute;
+			left: 1.075rem;
+			top: 50%;
+			margin-top: -8px;
+		}
 	}
 	> label.hide-checkbox > input[type="checkbox"] {
 		display: none;
@@ -54,15 +60,6 @@ label {
 	> label.is-changing {
 		> input[type="checkbox"] {
 			visibility: hidden;
-		}
-
-		&.position-relative {
-			i.icon-circle-notch {
-				position: absolute;
-				left: 0.5rem;
-				top: 50%;
-				margin-top: -8px;
-			}
 		}
 
 	}

@@ -125,6 +125,8 @@
     "underscore": "^1.10.2"
   },
   "optionalDependencies": {
-    "cypress": "^8.2.0"
+    "cypress": "^8.2.0",
+    "underscore": "^1.10.2",
+    "url": "^0.11.0"
   }
 }
