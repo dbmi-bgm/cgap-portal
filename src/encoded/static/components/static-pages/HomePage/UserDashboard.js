@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo, useCallback, useState, useRef } from 'react';
+import React, { useMemo, useCallback, useState, useRef, useEffect } from 'react';
 import _ from 'underscore';
 import url from 'url';
 import queryString from 'query-string';
@@ -15,6 +15,7 @@ import { Term } from './../../util/Schemas';
 import { responsiveGridState } from './../../util/layout';
 
 import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
+import ReactTooltip from 'react-tooltip';
 
 
 export const UserDashboard = React.memo(function UserDashboard({ windowHeight, windowWidth }){
@@ -125,6 +126,12 @@ function AboveCasesTableOptions(props){
             <hr className="tab-section-title-horiz-divider"/>
 
             <div className="container-wide toggle-reports row align-items-center py-2">
+                <div className="col-12 col-md-4 col-lg-3 py-2">
+                    <SearchBar {...{ isContextLoading, context, navigate }} />
+                </div>
+                <div className="d-none d-md-block col-md">
+                    &nbsp;
+                </div>
                 <div className="col-12 col-sm-auto">
                     <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
                         Show Only Cases with Reports
@@ -134,12 +141,6 @@ function AboveCasesTableOptions(props){
                     <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
                         Show Only Proband Cases
                     </ProjectFilterCheckbox>
-                </div>
-                <div className="d-none d-md-block col-md">
-                    &nbsp;
-                </div>
-                <div className="col-12 col-md-auto py-2">
-                    <SearchBar {...{ isContextLoading, context, navigate }} />
                 </div>
             </div>
         </React.Fragment>
@@ -288,14 +289,25 @@ function SearchBar (props) {
     const { query: currentSearchQuery } = currentSearchParts || {};
     const { q: currentSearchTextQuery = "" } = currentSearchQuery || {};
 
-
+    const [ value, setValue ] = useState(currentSearchTextQuery);
     const searchInputRef = useRef(null);
+
+    const onChange = useCallback(function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        setValue(searchInputRef.current.value);
+    });
 
     const onSubmit = useCallback(function(e){
         e.stopPropagation();
         e.preventDefault();
         const nextQuery = { ...currentSearchQuery };
-        const nextValue = searchInputRef.current.value;
+        // Using value from ref instead of 'value' for slight perf
+        // (avoid re-instantiating this onSubmit func each render)
+        const nextValue = searchInputRef.current.value || "";
+        if (nextValue === currentSearchTextQuery) {
+            return false;
+        }
         if (nextValue) {
             nextQuery.q = nextValue;
         } else {
@@ -308,11 +320,31 @@ function SearchBar (props) {
         virtualNavigate(url.format(nextSearchParts));
     }, [ virtualNavigate, currentSearchParts ]);
 
+    const valueLen = value.length;
+    const isValid = valueLen === 0 || valueLen > 1;
+
+    const toggleTooltip = useMemo(function(){
+        return _.debounce(function(hide = false){
+            if (hide){
+                ReactTooltip.hide();
+            } else {
+                ReactTooltip.show(searchInputRef.current);
+            }
+        }, 300, false);
+    });
+
+    useEffect(function(){
+        setTimeout(toggleTooltip, 50, isValid);
+    }, [ isValid ]);
+
     return (
-        <form onSubmit={onSubmit} className="mb-0" role="search">
-            <input type="search" placeholder="Search..." aria-label="Search"
-                spellCheck={false} name="q" className="form-control"
-                {...{ disabled }} defaultValue={currentSearchTextQuery} ref={searchInputRef} />
+        <form onSubmit={onSubmit} className="mb-0 d-flex align-items-center" role="search">
+            <i className={"icon icon-search fas pl-08 pr-16 text-" + (valueLen > 0 || currentSearchTextQuery.length > 0 ? "dark" : "secondary")}/>
+            <input type="search" placeholder="Search Cases..." aria-label="Search"
+                spellCheck={false} name="q" className={"form-control" + (!isValid ? " is-invalid" : "")}
+                data-tip="Search term must have at least 2 characters"
+                data-tip-disable={isValid} data-type="error"
+                {...{ disabled, onChange, value }} ref={searchInputRef} />
         </form>
     );
 }
