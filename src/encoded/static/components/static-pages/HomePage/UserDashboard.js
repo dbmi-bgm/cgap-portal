@@ -277,8 +277,6 @@ function SearchBar (props) {
     // search with 2+ filterblocks used.
     const { "@id": currentSearchHref } = searchContext || {};
 
-    const disabled = isContextLoading || !currentSearchHref;
-
     const currentSearchParts = useMemo(function(){
         if (!currentSearchHref) {
             return null;
@@ -290,7 +288,17 @@ function SearchBar (props) {
     const { q: currentSearchTextQuery = "" } = currentSearchQuery || {};
 
     const [ value, setValue ] = useState(currentSearchTextQuery);
+    const [ isChanging, setIsChanging ] = useState(false);
     const searchInputRef = useRef(null);
+
+    const isValueChanged = value !== currentSearchTextQuery;
+
+    if (!isContextLoading && isChanging) {
+        // Unset isChanging if finished loading.
+        // Calling set value inside func body is equivalent to
+        // getDerivedStateFromProps (avoids additional re-render).
+        setIsChanging(false);
+    }
 
     const onChange = useCallback(function(e){
         e.stopPropagation();
@@ -305,9 +313,10 @@ function SearchBar (props) {
         // Using value from ref instead of 'value' for slight perf
         // (avoid re-instantiating this onSubmit func each render)
         const nextValue = searchInputRef.current.value || "";
-        if (nextValue === currentSearchTextQuery) {
+        if (!isValueChanged) {
             return false;
         }
+        setIsChanging(true);
         if (nextValue) {
             nextQuery.q = nextValue;
         } else {
@@ -318,7 +327,7 @@ function SearchBar (props) {
             "search": "?" + queryString.stringify(nextQuery)
         };
         virtualNavigate(url.format(nextSearchParts));
-    }, [ virtualNavigate, currentSearchParts ]);
+    }, [ virtualNavigate, currentSearchParts, isValueChanged ]);
 
     const valueLen = value.length;
     const isValid = valueLen === 0 || valueLen > 1;
@@ -337,14 +346,22 @@ function SearchBar (props) {
         setTimeout(toggleTooltip, 50, isValid);
     }, [ isValid ]);
 
+    const iconCls = (
+        "icon icon-fw align-middle fas"
+        + (" icon-" + (isChanging ? "circle-notch icon-spin" : "search"))
+        + (" text-" + (!isValid ? "danger" : isValueChanged ? "dark" : "secondary"))
+    );
+
     return (
         <form onSubmit={onSubmit} className="mb-0 d-flex align-items-center" role="search">
-            <i className={"icon icon-search fas pl-08 pr-16 text-" + (valueLen > 0 || currentSearchTextQuery.length > 0 ? "dark" : "secondary")}/>
             <input type="search" placeholder="Search Cases..." aria-label="Search"
                 spellCheck={false} name="q" className={"form-control" + (!isValid ? " is-invalid" : "")}
                 data-tip="Search term must have at least 2 characters"
-                data-tip-disable={isValid} data-type="error"
-                {...{ disabled, onChange, value }} ref={searchInputRef} />
+                data-tip-disable={isValid} data-type="error" disabled={!currentSearchHref}
+                {...{ onChange, value }} ref={searchInputRef} />
+            <button type="submit" className="bg-transparent border-0 px-2 py-1" disabled={!isValid || isChanging || isContextLoading || !isValueChanged}>
+                <i className={iconCls}/>
+            </button>
         </form>
     );
 }
