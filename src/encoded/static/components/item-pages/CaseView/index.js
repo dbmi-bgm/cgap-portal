@@ -158,10 +158,21 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         individual: caseIndividual,
         sample_processing: sampleProcessing = null,
         initial_search_href_filter_addon: snvFilterHrefAddon = "",
-        sv_initial_search_href_filter_addon: svFilterHrefAddon = ""
+        sv_initial_search_href_filter_addon: svFilterHrefAddon = "",
+        actions: caseActions = []
     } = context;
 
     const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
+
+    /**
+     * Used to inform whether to show edit icons in places.
+     * Used as fallback when difficult/inperformant to determine if have edit
+     * permission for attached items such as Family & Individual.
+     * @type {boolean}
+     */
+    const haveCaseEditPermission = useMemo(function(){
+        return !!(_.findWhere(caseActions, { "name" : "edit" }));
+    }, [ context ]);
 
     const {
         countIndividuals: numIndividuals,
@@ -286,7 +297,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             <div className="container-wide bg-light pt-36 pb-36">
                 <div className="card-group case-summary-card-row">
                     <div className="col-stats mb-2 mb-lg-0">
-                        <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures }} numFamilies={1} />
+                        <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission }} numFamilies={1} />
                     </div>
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
                         <div className="card d-flex flex-column">
