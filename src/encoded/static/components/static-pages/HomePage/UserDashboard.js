@@ -124,7 +124,7 @@ function AboveCasesTableOptions(props){
 
             <hr className="tab-section-title-horiz-divider"/>
 
-            <div className="container-wide toggle-reports row align-items-center py-3">
+            <div className="container-wide toggle-reports row align-items-center py-2">
                 <div className="col-12 col-sm-auto">
                     <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
                         Show Only Cases with Reports
@@ -138,7 +138,7 @@ function AboveCasesTableOptions(props){
                 <div className="d-none d-md-block col-md">
                     &nbsp;
                 </div>
-                <div className="col-12 col-md-auto">
+                <div className="col-12 col-md-auto py-2">
                     <SearchBar {...{ isContextLoading, context, navigate }} />
                 </div>
             </div>
@@ -173,7 +173,7 @@ class ProjectFilterCheckbox extends React.PureComponent {
     render(){
         const { isContextLoading, checked, children } = this.props;
         const { isChanging } = this.state;
-        const labelCls = "mb-0 py-1" + (isChanging ? " is-changing" : "");
+        const labelCls = "mb-0 px-2 py-1" + (isChanging ? " is-changing" : "");
         return (
             <Checkbox disabled={isContextLoading} onChange={this.onChange} checked={checked} labelClassName={labelCls}>
                 <span className="text-small">
@@ -288,12 +288,6 @@ function SearchBar (props) {
     const { query: currentSearchQuery } = currentSearchParts || {};
     const { q: currentSearchTextQuery = "" } = currentSearchQuery || {};
 
-    // const [ value, setValue ] = useState(currentSearchTextQuery);
-
-    // const onChange = useCallback(function(e){
-    //     const { target: { value: evtValue } } = e;
-    //     setValue(evtValue);
-    // });
 
     const searchInputRef = useRef(null);
 
@@ -315,8 +309,9 @@ function SearchBar (props) {
     }, [ virtualNavigate, currentSearchParts ]);
 
     return (
-        <form onSubmit={onSubmit} className="mb-0">
-            <input type="text" className="form-control" placeholder="Search..."
+        <form onSubmit={onSubmit} className="mb-0" role="search">
+            <input type="search" placeholder="Search..." aria-label="Search"
+                spellCheck={false} name="q" className="form-control"
                 {...{ disabled }} defaultValue={currentSearchTextQuery} ref={searchInputRef} />
         </form>
     );
