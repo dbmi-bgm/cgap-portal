@@ -306,9 +306,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                                         Pedigree
                                     </h4>
                                 </div>
-                                <button type="button" className="btn btn-primary btn-small view-pedigree-btn"
+                                <button type="button" className="btn btn-primary btn-sm view-pedigree-btn"
                                     onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
-                                    View Pedigree
+                                    View
                                 </button>
                             </div>
                             { pedBlock }

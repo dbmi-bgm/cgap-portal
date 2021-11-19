@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import Popover  from 'react-bootstrap/esm/Popover';
@@ -14,7 +14,7 @@ export default function QuickPopover(props) {
             </Popover.Content>
         </Popover>
     );
-    const cls = "btn btn-link" + (className ? " " + className : "");
+    const cls = "btn btn-link text-decoration-none" + (className ? " " + className : "");
     return (
         <OverlayTrigger trigger="focus" overlay={popover} {...{ placement }}>
             { function({ ref, ...triggerHandlers }){

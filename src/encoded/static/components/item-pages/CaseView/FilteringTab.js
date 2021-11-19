@@ -34,10 +34,10 @@ const filteringTabViews = {
  */
 export function FilteringTab(props) {
     const {
-        context, windowHeight, session, schemas,
-        setIsSubmitting, variantSampleListItem,
-        updateVariantSampleListID, savedVariantSampleIDMap,
-        fetchVariantSampleListItem, isLoadingVariantSampleListItem
+        context, windowHeight, session, schemas, isActiveDotRouterTab,
+        setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem,
+        savedVariantSampleIDMap
     } = props;
 
     const {
@@ -49,10 +49,10 @@ export function FilteringTab(props) {
     const [ currViewIdx, setCurrViewIdx ] = useState(defaultTabIdx);
 
     const commonProps = {
-        context, windowHeight, session, schemas,
-        setIsSubmitting, variantSampleListItem,
-        updateVariantSampleListID, savedVariantSampleIDMap,
-        fetchVariantSampleListItem, isLoadingVariantSampleListItem
+        context, windowHeight, session, schemas, isActiveDotRouterTab,
+        setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
+        fetchVariantSampleListItem, isLoadingVariantSampleListItem,
+        savedVariantSampleIDMap
     };
 
     return (
@@ -253,7 +253,8 @@ function FilteringTabBody(props) {
         hideFacets,                             // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         blankFilterSetItem,                     // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         activeFilterSetFieldName,               // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
-        searchType                              // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        searchType,                             // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        isActiveDotRouterTab = false            // Passed in from CaseView/DotRouter
     } = props;
 
     // TODO:
@@ -302,6 +303,7 @@ function FilteringTabBody(props) {
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem,
         selectedVariantSamples,
+        isActiveDotRouterTab,
         // setIsSubmitting,
         // "caseItem": context
     };
@@ -347,9 +349,7 @@ function FilteringTabBody(props) {
 
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
-    // 405px offset likely would need to be changed if we change height of tab nav, tab title area, etc.
-    // Overrides default 400px.
-    const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 445) : undefined;
+    const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 178) : undefined;
 
     // Table re-initializes upon change of key so we use it refresh table based on session.
     const searchTableKey = "session:" + session;

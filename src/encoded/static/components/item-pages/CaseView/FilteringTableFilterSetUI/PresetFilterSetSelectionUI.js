@@ -14,9 +14,12 @@ import { CountIndicator } from '@hms-dbmi-bgm/shared-portal-components/es/compon
 
 
 /**
- * @todo Pass in props.importFromPresetFilterSet from FilterSetController (and create it)
- * @todo Consider using react-virtualized or react-window library for this later.
- * @todo (CSS) Match width of FacetList
+ * @todo
+ * This should be refactored to use load-as-you-scroll at some point,
+ * At moment we're limited to showing 200 or so more recent results..
+ * possibly less. Consider using react-virtualized or react-window library
+ * for this, given that react-infinite is deprecated/defunct...
+ * ... or just load in elements for time being ... or add search bar...
  */
 export class PresetFilterSetSelectionUI extends React.PureComponent {
 
