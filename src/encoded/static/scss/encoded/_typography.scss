@@ -1,4 +1,4 @@
-
+@use "sass:math";
 /**********************************************************************************
  ** NOTE:                                                                        **
  ** Most base styles handled by Bootstrap, with _base.scss setting or overriding **  
@@ -64,7 +64,7 @@ p, ul, ol, dl {
 
 p {
     + ul, + ol, + dl {
-        margin-top: $paragraph-margin-bottom / 4; // == .25rem
+        margin-top: math.div($paragraph-margin-bottom, 4); // == .25rem
     }
 }
 
