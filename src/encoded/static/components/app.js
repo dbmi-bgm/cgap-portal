@@ -1066,10 +1066,10 @@ export default class App extends React.PureComponent {
     render() {
         const { context, lastCSSBuildTime, href, contextRequest } = this.props;
         const { mounted = false } = this.state;
-        const hrefParts       = memoizedUrlParse(href);
-        const routeList       = hrefParts.pathname.split("/");
-        const routeLeaf       = routeList[routeList.length - 1];
-        const currentAction   = this.currentAction();
+        const hrefParts = memoizedUrlParse(href);
+        const routeList = hrefParts.pathname.split("/");
+        const routeLeaf = routeList[routeList.length - 1];
+        const currentAction = this.currentAction();
         const userInfo = JWT.getUserInfo();
         const userActions = (userInfo && userInfo.user_actions) || null;
         let canonical = href;
@@ -1784,27 +1784,25 @@ class BodyElement extends React.PureComponent {
                     </div>
                 </div>
 
-                <div id="slot-application">
-                    <div id="application">
-                        <div id="layout">
-                            { (isSubmitting && isSubmitting.modal) && isSubmittingModalOpen ? isSubmitting.modal : null}
+                <div id="application">
+                    <div id="layout">
+                        { (isSubmitting && isSubmitting.modal) && isSubmittingModalOpen ? isSubmitting.modal : null}
 
-                            <NavigationBar {...navbarProps} />
+                        <NavigationBar {...navbarProps} />
 
-                            <div id="post-navbar-container" style={{ minHeight : innerContainerMinHeight }}>
+                        <div id="post-navbar-container" style={{ minHeight : innerContainerMinHeight }}>
 
-                                <PageTitleSection {...this.props} windowWidth={windowWidth} />
+                            <PageTitleSection {...this.props} windowWidth={windowWidth} />
 
-                                <ContentErrorBoundary {...{ canonical, href }}>
-                                    <ContentRenderer {...propsPassedToAllViews} />
-                                </ContentErrorBoundary>
+                            <ContentErrorBoundary {...{ canonical, href }}>
+                                <ContentRenderer {...propsPassedToAllViews} />
+                            </ContentErrorBoundary>
 
-                                <div id="inner-overlays-container" ref={this.innerOverlaysContainerRef} />
+                            <div id="inner-overlays-container" ref={this.innerOverlaysContainerRef} />
 
-                            </div>
                         </div>
-                        <Footer version={context.app_version} />
                     </div>
+                    <Footer version={context.app_version} />
                 </div>
 
                 <div id="overlays-container" ref={this.overlaysContainerRef}/>

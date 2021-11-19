@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React from 'react';
 import _ from 'underscore';
 import memoize from 'memoize-one';
 import Modal from 'react-bootstrap/esm/Modal';
