@@ -261,7 +261,7 @@ module.exports = [
                 // We can clean up and change to 'aws-utils' in here in future as well and alias it to spc/utils/aws. But this needs to be synchronized with SPC and 4DN.
                 // We could have some 'ssr-externals.json' file in SPC (letting it define its own, per own version) and merge it into here.
                 // 'aws-utils': 'empty-module',
-                '../util/aws': 'empty-module',
+                '../util/aws': 'var {}',
                 // We can rely on NodeJS's internal URL API, since it should match API of npm url package by design.
                 // This hopefully improves SSR performance, assuming Node has native non-JS/C code to parse this.
                 // 'url': 'commonjs2 url'
