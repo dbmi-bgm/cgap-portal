@@ -12,8 +12,9 @@ if [ -n "${INITIAL_DEPLOYMENT}" ]; then
   poetry run clear-db-es-contents production.ini --app-name app --env cgap-devtest
 fi
 
-## Create mapping
-poetry run create-mapping-on-deploy production.ini --app-name app
+# Create mapping
+# Force wipe of ES
+poetry run create-mapping-on-deploy production.ini --app-name app --wipe-es
 
 # Load Data (based on development.ini, for now just master-inserts)
 # Not necessary after first deploy
