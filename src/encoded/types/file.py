@@ -117,6 +117,12 @@ def external_creds(bucket, key, name=None, profile_name=None):
             with override_environ(**identity):
                 conn = boto3.client('sts', aws_access_key_id=os.environ.get('S3_AWS_ACCESS_KEY_ID'),
                                     aws_secret_access_key=os.environ.get('S3_AWS_SECRET_ACCESS_KEY'))
+            if 'S3_ENCRYPT_KEY_ID' in identity:  # must be used with ACCOUNT_NUMBER as well
+                policy['Statement'].append({
+                    'Effect': 'Allow',
+                    'Action': 'kms:Encrypt',
+                    'Resource': f'arn:aws:kms:us-east-1:{identity["ACCOUNT_NUMBER"]}:key/{identity["S3_ENCRYPT_KEY_ID"]}'
+                })
         # In the old account, we are always passing IAM User creds so these will just work
         else:
             conn = boto3.client('sts', aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),

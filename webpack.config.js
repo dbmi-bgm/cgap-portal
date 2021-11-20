@@ -237,31 +237,32 @@ module.exports = [
             // server-side build since it might overwrite web bundle's code-split bundles.
             // But probably some way to append/change name of these chunks in this config.
             {
-                'd3': 'd3',
+                'd3': 'var {}',
+                // This is used during build-time only I think...
                 '@babel/register': '@babel/register',
-                'higlass-dependencies': 'empty-module',
+                'higlass-dependencies': 'var {}',
                 // These remaining /higlass/ defs aren't really necessary
                 // but probably speed up build a little bit.
-                'higlass/dist/hglib' : 'empty-module',
-                'higlass-register': 'empty-module',
-                'higlass-sequence': 'empty-module',
-                'higlass-transcripts': 'empty-module',
-                'higlass-clinvar': 'empty-module',
-                'higlass-text': 'empty-module',
-                'higlass-orthologs': 'empty-module',
-                'higlass-pileup': 'empty-module',
-                'higlass-multivec': 'empty-module',
-                'auth0-lock': 'empty-module',
-                'aws-sdk': 'empty-module',
-                'package-lock.json': 'empty-module',
-                'pagedjs': 'empty-module',
-                'pedigree-viz': 'empty-module',
+                'higlass/dist/hglib' : 'var {}',
+                'higlass-register': 'var {}',
+                'higlass-sequence': 'var {}',
+                'higlass-transcripts': 'var {}',
+                'higlass-clinvar': 'var {}',
+                'higlass-text': 'var {}',
+                'higlass-orthologs': 'var {}',
+                'higlass-pileup': 'var {}',
+                'higlass-multivec': 'var {}',
+                'auth0-lock': 'var {}',
+                'aws-sdk': 'var {}',
+                'package-lock.json': 'var {}',
+                'pagedjs': 'var {}',
+                'pedigree-viz': 'var {}',
                 // Below - prevent some stuff in SPC from being bundled in.
                 // These keys are literally matched against the string values, not actual path contents, hence why is "../util/aws".. it exactly what within SPC/SubmissionView.js
                 // We can clean up and change to 'aws-utils' in here in future as well and alias it to spc/utils/aws. But this needs to be synchronized with SPC and 4DN.
                 // We could have some 'ssr-externals.json' file in SPC (letting it define its own, per own version) and merge it into here.
                 // 'aws-utils': 'empty-module',
-                '../util/aws': 'empty-module',
+                '../util/aws': 'var {}',
                 // We can rely on NodeJS's internal URL API, since it should match API of npm url package by design.
                 // This hopefully improves SSR performance, assuming Node has native non-JS/C code to parse this.
                 // 'url': 'commonjs2 url'
