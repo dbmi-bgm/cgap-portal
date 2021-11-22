@@ -846,6 +846,12 @@ class VariantTableParser(object):
             'description': 'Link to Genome Snapshot Image',
             'type': 'string',
         }
+        schema['properties']['finding_table_tag'] = {
+            "title": "Finding Table Classification Tag",
+            "description": "The 'finding' category or classification of this VariantSample.",
+            "notes": "Need to implement some validation for this field, so that it is always set to one of the options defined in VS project report settings.",
+            "type": "string"
+        }
         schema['properties']['genotype_labels'] = {
             'title': 'Genotype Labels',
             'type': 'array',

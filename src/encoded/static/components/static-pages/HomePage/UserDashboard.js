@@ -107,8 +107,8 @@ function AboveCasesTableOptions(props){
                         </div>
                     </div>
 
-                    <DropdownButton variant="primary" id="submit-new" className="px-1"
-                        title={<span><i className="icon fas icon-plus mr-08"/>Submit New...</span>}>
+                    <DropdownButton variant="primary d-flex align-items-center" id="submit-new" className="px-1"
+                        title={<React.Fragment><i className="icon fas icon-plus mr-1"/>Submit New...</React.Fragment>}>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add">
                             Case(s)
                         </Dropdown.Item>

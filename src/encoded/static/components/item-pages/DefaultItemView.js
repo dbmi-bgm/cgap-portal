@@ -73,6 +73,8 @@ export const propsForDetailList = {
 };
 
 
+
+
 /**
  * The DefaultItemView class extends React.Component to provide some helper functions to be used from an Item View page.
  *

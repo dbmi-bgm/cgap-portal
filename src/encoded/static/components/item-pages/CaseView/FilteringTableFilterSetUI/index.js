@@ -7,8 +7,6 @@ import queryString from 'query-string';
 import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
 
-import Collapse from "react-bootstrap/esm/Collapse";
-
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 
@@ -33,12 +31,14 @@ import { ExportSearchSpreadsheetButton } from './ExportSearchSpreadsheetButton';
 export class FilteringTableFilterSetUI extends React.PureComponent {
 
     /**
-     * @todo Move into own func?
+     * Builds a dictionary of all facets that might be applicable to the VariantSample Item type.
+     * This dictionary is used to get field names, descriptions, etc. to show inside of filter blocks.
+     *
      * @param {{ field, ... }[]} facets List of objects containing facet info from which we extract just certain non-dynamic fields into a cached dictionary of facet/field info.
      * @param {string[]} excludeFacets - List of field names to be excluded from this UI.
      * @returns {Object.<string, { field: string, title: string, description: string, grouping: string, order: number, aggregation_type: string, field_type: string, EXCLUDED: boolean }>} Dictionary of facet/field-info from schemas+response.
      */
-    static buildFacetDictionary(facets = null, schemas = null, excludeFacets = null){
+    static buildFacetDictionary(facets = null, schemas = null, excludeFacets = null, searchType = "VariantSample"){
 
         const excluded = {};
         if (Array.isArray(excludeFacets)) {
@@ -77,8 +77,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             // Somewhat fragile, maybe we can move calculation of aggregation_type from search.py/_initialize_facets
             // into same place in code where schemas are augmented to included calculated properties before being served from
             // /profiles/ endpoint to allow us to definitively just use the single schemas (instead of context.facets, as well)
-            Object.keys(schemas["VariantSample"].facets).forEach(function(field){
-                const facetFields = { ...schemas["VariantSample"].facets[field], field };
+            const vsSchemaFacets = schemas[searchType].facets;
+            Object.keys(vsSchemaFacets).forEach(function(field){
+                const facetFields = { ...vsSchemaFacets[field], field };
                 return saveFacetToDict(facetFields);
             });
         }
@@ -144,8 +145,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         };
 
         this.state = {
-            "bodyOpen": defaultOpen,
-            "bodyMounted": defaultOpen, // Is set to true for 750ms after closing to help keep contents visible until collapsed.
+            "bodyOpen": defaultOpen
         };
     }
 
@@ -178,15 +178,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
     toggleOpen(evt){
         this.setState(function({ bodyOpen: exstOpen }){
-            const bodyOpen = !exstOpen;
-            return { bodyOpen, "bodyMounted": true };
-        }, () => {
-            const { bodyOpen } = this.state;
-            if (!bodyOpen) {
-                setTimeout(()=>{
-                    this.setState({ "bodyMounted": false });
-                }, 700);
-            }
+            return { "bodyOpen": !exstOpen };
         });
     }
 
@@ -198,7 +190,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             requestedCompoundFilterSet, // From SPC/VirtualHrefController
 
             // From FilteringTab (& higher, e.g. App/redux-store):
-            caseItem, schemas, session, searchHrefBase, searchType,
+            caseItem, schemas, session, searchHrefBase, searchType, isActiveDotRouterTab,
 
             // From SaveFilterSetButtonController:
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet, haveEditPermission,
@@ -228,11 +220,11 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         } = this.props;
         const { total: totalCount, facets = null } = searchContext || {};
         const { filter_blocks = [] } = filterSet || {};
-        const { bodyOpen, bodyMounted } = this.state;
+        const { bodyOpen } = this.state;
 
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
-        const facetDict                                                     = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets);
-        const { duplicateQueryIndices, duplicateNameIndices }               = this.memoized.findDuplicateBlocks(filter_blocks);
+        const facetDict = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets, searchType);
+        const { duplicateQueryIndices, duplicateNameIndices } = this.memoized.findDuplicateBlocks(filter_blocks);
         const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices);
 
         const filterBlocksLen = filter_blocks.length;
@@ -268,7 +260,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         };
 
         let fsuiBlocksBody = null;
-        if (bodyMounted) {
+        let aboveTableControls = null;
+
+        if (bodyOpen && isActiveDotRouterTab) {
             const bodyProps = {
                 filterSet, filterBlocksLen, facetDict, excludeFacets, searchContext, schemas, isFetchingInitialFilterSetItem,
                 singleSelectedFilterBlockIdx, selectedFilterBlockIndices, allFilterBlocksSelected, selectedFilterBlockIdxCount,
@@ -278,39 +272,12 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 // Props for Save btn:
                 saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged
             };
+
             fsuiBlocksBody = <FilterSetUIBody {...bodyProps} />;
         }
 
-        const presetSelectionUIProps = {
-            "currentCaseFilterSet": filterSet,
-            caseItem, bodyOpen, session, importFromPresetFilterSet, hasCurrentFilterSetChanged, isEditDisabled,
-            originalPresetFilterSet, refreshOriginalPresetFilterSet, hasFilterSetChangedFromOriginalPreset, isOriginalPresetFilterSetLoading,
-            isFetchingInitialFilterSetItem, lastSavedPresetFilterSet
-        };
-
-        // console.info("Current Case FilterSet:", filterSet);
-        console.log("searchtype", searchType);
-
-        return (
-            // TODO 1: Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
-            <div className="above-variantsample-table-ui">
-
-                <div className="filterset-outer-container" data-is-open={bodyOpen}>
-                    <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} />
-                    <Collapse in={bodyOpen} appear>
-                        <div>
-                            <div className="d-flex flex-column flex-md-row">
-                                <div className="filterset-preset-selection-outer-column">
-                                    <PresetFilterSetSelectionUI { ...presetSelectionUIProps } {...{ searchType }}/>
-                                </div>
-                                <div className="flex-grow-1">
-                                    { fsuiBlocksBody }
-                                </div>
-                            </div>
-                        </div>
-                    </Collapse>
-                </div>
-
+        if (isActiveDotRouterTab) {
+            aboveTableControls = (
                 <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
                     panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
                     <h4 className="text-400 col-12 col-lg my-0 py-1">
@@ -337,13 +304,44 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                         { (searchType === "VariantSample") && <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} /> }
                     </div>
                 </AboveTableControlsBase>
+            );
+        }
+
+        const presetSelectionUIProps = {
+            "currentCaseFilterSet": filterSet,
+            caseItem, bodyOpen, session, importFromPresetFilterSet, hasCurrentFilterSetChanged, isEditDisabled,
+            originalPresetFilterSet, refreshOriginalPresetFilterSet, hasFilterSetChangedFromOriginalPreset, isOriginalPresetFilterSetLoading,
+            isFetchingInitialFilterSetItem, lastSavedPresetFilterSet
+        };
+
+        // console.info("Current Case FilterSet:", filterSet);
+        console.log("searchtype", searchType);
+
+        return (
+            // TODO 1: Refactor/simplify AboveTableControlsBase to not need nor use `panelMap` (needless complexity / never had use for it)
+            <div className="above-variantsample-table-ui">
+
+                <div className="filterset-outer-container" data-is-open={bodyOpen}>
+                    <FilterSetUIHeader {...headerProps} toggleOpen={this.toggleOpen} />
+                    <div className={"flex-column flex-md-row d-" + (bodyOpen ? "flex" : "none")}>
+                        <div className="filterset-preset-selection-outer-column">
+                            <PresetFilterSetSelectionUI { ...presetSelectionUIProps } {...{ searchType }}/>
+                        </div>
+                        <div className="flex-grow-1">
+                            { fsuiBlocksBody }
+                        </div>
+                    </div>
+                </div>
+
+                { aboveTableControls }
+
             </div>
         );
     }
 }
 
 
-function FilterSetUIHeader(props){
+const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
     const {
         filterSet, caseItem,
         hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,
@@ -384,12 +382,18 @@ function FilterSetUIHeader(props){
         );
     }
 
+    const onHeaderClick = useCallback(function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        toggleOpen();
+    }, [ toggleOpen ]);
+
 
     let titleBlock = null;
     if (isFetchingInitialFilterSetItem) {
         titleBlock = (
-            <h4 className="text-400 my-0 d-inline-block">
-                <i className="small icon icon-fw fas mr-07 icon-circle-notch icon-spin" />
+            <h4 className="text-300 my-0 d-inline-flex align-items-center h-100 text-white px-3">
+                <i className="small icon icon-fw fas mr-1 icon-circle-notch icon-spin" />
                 <em>Loading Filter Set</em>
             </h4>
         );
@@ -416,11 +420,14 @@ function FilterSetUIHeader(props){
         );
     } */ else {
         titleBlock = (
-            <h4 className="text-400 clickable my-0 d-inline-block" onClick={toggleOpen}>
-                <i className={"small icon icon-fw fas mr-07 icon-" + (bodyOpen ? "minus" : "plus")} />
-                { fsTitle || fsDisplayTitle || <em>No Title Set</em> }
+            <button type="button" onClick={onHeaderClick}
+                className="btn btn-link btn-lg text-decoration-none h-100">
+                <h4 className="my-0 text-400 text-white">
+                    <i className={"small icon icon-fw fas mr-1 icon-" + (bodyOpen ? "minus" : "plus")} />
+                    { fsTitle || fsDisplayTitle || <em>No Title Set</em> }
+                </h4>
                 {/* bodyOpen ? <i className="icon icon-pencil-alt fas ml-1 clickable text-small" onClick={onClickEditTitle} /> : null */}
-            </h4>
+            </button>
         );
     }
 
@@ -432,8 +439,10 @@ function FilterSetUIHeader(props){
 
     // todo if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
     return (
-        <div className="d-flex filter-set-ui-header align-items-center px-3 py-3">
-            <div className="flex-grow-1">{ titleBlock }</div>
+        <div className="d-flex filter-set-ui-header align-items-center bg-primary-dark text-white pr-16">
+            <div className="flex-grow-1 align-self-stretch">
+                { titleBlock }
+            </div>
             <div className="ml-16">
                 { haveDuplicateQueries || haveDuplicateNames ?
                     <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-danger"
@@ -441,13 +450,14 @@ function FilterSetUIHeader(props){
                     : null }
 
                 <div role="group" className="dropdown btn-group">
-                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-sm btn-outline-light" />
+                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }}
+                        className="btn btn-sm btn-outline-light fixed-height align-items-center d-flex" />
                     <SaveFilterSetPresetButton {...savePresetDropdownProps} />
                 </div>
             </div>
         </div>
     );
-}
+});
 
 
 /** Renders the Blocks */
@@ -560,11 +570,11 @@ function FilterSetUIBlockBottomUI(props){
         <div className="row pb-04 pt-16 px-3">
             <div className="col-auto mb-12">
                 <div className="btn-group" role="group" aria-label="Selection Controls">
-                    <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
                         <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
                         Select All
                     </button>
-                    <button type="button" className="btn btn-primary-dark" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
                         data-tip="Toggle whether to compute the union or intersection of filter blocks">
                         <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
                         Intersect
@@ -573,16 +583,17 @@ function FilterSetUIBlockBottomUI(props){
             </div>
             <div className="col-auto mb-12 flex-grow-1 d-flex justify-content-between flex-wrap">
                 <div className="btn-group mr-08" role="group" aria-label="Creation Controls">
-                    <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center" onClick={onAddBtnClick} data-tip="Add new blank filter block">
                         <i className="icon icon-fw icon-plus fas mr-1" />
                         Add Filter Block
                     </button>
-                    <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} disabled={!currentSingleBlockQuery}
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center fixed-height" onClick={onCopyBtnClick} disabled={!currentSingleBlockQuery}
                         data-tip="Copy currently-selected filter block">
                         <i className="icon icon-fw icon-clone far" />
                     </button>
                 </div>
-                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark"/>
+                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }}
+                    className="btn btn-primary fixed-height d-inline-flex align-items-center" />
             </div>
         </div>
     );

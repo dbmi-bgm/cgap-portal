@@ -16,7 +16,6 @@ import {
     BigDropdownGroupController
 } from './BigDropdown';
 import { AccountNav } from './AccountNav';
-// import { SearchBar } from './SearchBar';
 
 
 export const CollapsedNav = React.memo(function CollapsedNav(props){
@@ -48,7 +47,6 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
                 { session ?
                     <LeftNavAuthenticated {...leftNavProps} />
                     : <LeftNavGuest {...leftNavProps} /> }
-                {/* <SearchBar {...{ href, currentAction, context }} /> */}
                 <AccountNav {...userActionNavProps} />
             </BigDropdownGroupController>
         </NavbarCollapse>
