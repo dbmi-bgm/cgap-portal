@@ -392,8 +392,8 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
     let titleBlock = null;
     if (isFetchingInitialFilterSetItem) {
         titleBlock = (
-            <h4 className="text-400 my-0 d-inline-block text-white">
-                <i className="small icon icon-fw fas mr-07 icon-circle-notch icon-spin" />
+            <h4 className="text-300 my-0 d-inline-flex align-items-center h-100 text-white px-3">
+                <i className="small icon icon-fw fas mr-1 icon-circle-notch icon-spin" />
                 <em>Loading Filter Set</em>
             </h4>
         );
@@ -423,7 +423,7 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
             <button type="button" onClick={onHeaderClick}
                 className="btn btn-link btn-lg text-decoration-none h-100">
                 <h4 className="my-0 text-400 text-white">
-                    <i className={"small icon icon-fw fas mr-07 icon-" + (bodyOpen ? "minus" : "plus")} />
+                    <i className={"small icon icon-fw fas mr-1 icon-" + (bodyOpen ? "minus" : "plus")} />
                     { fsTitle || fsDisplayTitle || <em>No Title Set</em> }
                 </h4>
                 {/* bodyOpen ? <i className="icon icon-pencil-alt fas ml-1 clickable text-small" onClick={onClickEditTitle} /> : null */}
@@ -450,7 +450,8 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
                     : null }
 
                 <div role="group" className="dropdown btn-group">
-                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-sm btn-outline-light" />
+                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }}
+                        className="btn btn-sm btn-outline-light fixed-height align-items-center d-flex" />
                     <SaveFilterSetPresetButton {...savePresetDropdownProps} />
                 </div>
             </div>
@@ -569,11 +570,11 @@ function FilterSetUIBlockBottomUI(props){
         <div className="row pb-04 pt-16 px-3">
             <div className="col-auto mb-12">
                 <div className="btn-group" role="group" aria-label="Selection Controls">
-                    <button type="button" className="btn btn-primary-dark" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
                         <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
                         Select All
                     </button>
-                    <button type="button" className="btn btn-primary-dark" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
                         data-tip="Toggle whether to compute the union or intersection of filter blocks">
                         <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
                         Intersect
@@ -582,16 +583,17 @@ function FilterSetUIBlockBottomUI(props){
             </div>
             <div className="col-auto mb-12 flex-grow-1 d-flex justify-content-between flex-wrap">
                 <div className="btn-group mr-08" role="group" aria-label="Creation Controls">
-                    <button type="button" className="btn btn-primary-dark" onClick={onAddBtnClick} data-tip="Add new blank filter block">
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center" onClick={onAddBtnClick} data-tip="Add new blank filter block">
                         <i className="icon icon-fw icon-plus fas mr-1" />
                         Add Filter Block
                     </button>
-                    <button type="button" className="btn btn-primary-dark" onClick={onCopyBtnClick} disabled={!currentSingleBlockQuery}
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center fixed-height" onClick={onCopyBtnClick} disabled={!currentSingleBlockQuery}
                         data-tip="Copy currently-selected filter block">
                         <i className="icon icon-fw icon-clone far" />
                     </button>
                 </div>
-                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }} className="btn btn-primary-dark"/>
+                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }}
+                    className="btn btn-primary fixed-height d-inline-flex align-items-center" />
             </div>
         </div>
     );
