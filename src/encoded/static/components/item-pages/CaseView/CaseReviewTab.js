@@ -349,12 +349,14 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                     Case Review
                 </h1>
 
+                {/* Hidden Temporarily
                 <div>
                     <button type="button" className="btn btn-primary ml-05 d-flex align-items-center" disabled>
                         <i className="icon icon-file-pdf far mr-1"/>
                         View Report
                     </button>
                 </div>
+                */}
 
             </div>
             <div>

@@ -28,9 +28,9 @@ function OverviewTabView (props) {
             </h3>
             <hr className="tab-section-title-horiz-divider"/>
             <div className="container-wide bg-light py-3 mh-inner-tab-height-full">
-                Testing one two three.
+                Under development
                 <br/>
-                Maybe a preview button here..
+                More coming soon.
             </div>
         </React.Fragment>
     );

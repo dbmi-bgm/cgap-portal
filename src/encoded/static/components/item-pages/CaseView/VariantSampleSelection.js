@@ -259,7 +259,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         { parentTabType === parentTabTypes.CASEREVIEW ?
                             <div className="d-block d-lg-flex align-items-center">
                                 <ClassificationDropdown {...{ variantSample, tableTagsByID, unsavedClassification, updateClassificationForVS }} />
-                                <button type="button" className={"btn btn-sm btn-" + (noSavedNotes ? "outline-secondary" : isExpanded ? "primary-dark" : "primary")}
+                                <button type="button" className={"btn btn-sm d-flex align-items-center btn-" + (noSavedNotes ? "outline-secondary" : isExpanded ? "primary-dark" : "primary")}
                                     onClick={toggleIsExpanded} disabled={noSavedNotes}>
                                     <i className={"icon icon-fw fas mr-06 icon-" + (!isExpanded ? "plus" : "minus")} />
                                     {/* !isExpanded ? "Review Notes & Classification" : "Hide Notes & Classification" */}
@@ -469,16 +469,20 @@ function ClassificationDropdown(props){
 
     const title = (
         !viewClassification || unsavedClassification === null ?
-            <span className="text-300">
+            <React.Fragment>
                 { isUnsavedClassification ? unsavedIndicator : null }
-                Not a finding
-            </span>
+                <span className="text-300">
+                    Not a finding
+                </span>
+            </React.Fragment>
             : (
                 (tableTagsByID[viewClassification] && (
-                    <span>
+                    <React.Fragment>
                         { isUnsavedClassification ? unsavedIndicator : null }
-                        { tableTagsByID[viewClassification].title || viewClassification }
-                    </span>
+                        <span>
+                            { tableTagsByID[viewClassification].title || viewClassification }
+                        </span>
+                    </React.Fragment>
                 ))
             ) || <em>Unknown or deprecated `{viewClassification}`</em>
     );
@@ -489,7 +493,7 @@ function ClassificationDropdown(props){
 
     return (
         <div className="py-1 py-lg-0 pr-lg-12">
-            <DropdownButton size="sm" variant="outline-dark" menuAlign="right" title={title} onSelect={onOptionSelect}
+            <DropdownButton size="sm" variant="outline-dark d-flex align-items-center" menuAlign="right" title={title} onSelect={onOptionSelect}
                 disabled={!haveEditPermission || tags.length === 0}
                 data-delay={500} data-tip={!viewClassification? "Select a finding..." : null }>
                 { renderedOptions }

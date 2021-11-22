@@ -184,12 +184,6 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 			transform: translate(0, 1px);
 		}
 	}
-	&.align-items-center {
-		// Align icons better within .btn-sm re: our fontface/height/etc
-		// Nudge up a little since our text is nudged up, as well.
-		// Less aligned to center, but better aligned to text.
-		transform: translate(0, -0.5px);
-	}
 }
 
 
