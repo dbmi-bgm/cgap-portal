@@ -659,7 +659,8 @@ class SearchBuilder:
 
                 # workaround: if query has a '!=' condition, title_field ends with '!'. This prevents to find the proper display title.
                 # TODO: instead of workaround, '!' could be excluded while generating query results
-                if title_field.endswith('!'):
+                if use_field.endswith('!'):
+                    use_field = use_field[:-1]
                     title_field = title_field[:-1]
 
                 # if searching for a display_title, use the title of parent object
