@@ -191,7 +191,7 @@ const fieldToTransformationDict = memoize(function(){
                 case "False":
                     return "Sex inconsistent";
                 case "False (multiallelic in family)":
-                case "Family  (multiallelic in family)":
+                case "False  (multiallelic in family)":
                     return "Sex inconsistent (multiallelic in family)";
                 default:
                     return term;
