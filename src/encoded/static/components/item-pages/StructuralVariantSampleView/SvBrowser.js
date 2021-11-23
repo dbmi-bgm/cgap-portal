@@ -65,6 +65,7 @@ export class SvBrowser extends React.PureComponent {
         this.higlassContainer = null;
 
         this.updateSvType = this.updateSvType.bind(this);
+        this.exportDisplay = this.exportDisplay.bind(this);
         this.assignHGC = this.assignHGC.bind(this);
     }
 
@@ -165,6 +166,21 @@ export class SvBrowser extends React.PureComponent {
         });
 
         hgc.api.setViewConfig(viewconf);
+    }
+
+    exportDisplay(){
+        const hgc = this.higlassContainer.getHiGlassComponent();
+        if (!hgc) {
+            console.warn("Higlass component not found.");
+            return;
+        }
+        const svg = hgc.api.exportAsSvg();
+        const { file } = this.state;
+
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
+        element.setAttribute('download', file+".svg");
+        element.click();
     }
 
     updateSvType(event, svType) {
@@ -382,7 +398,7 @@ export class SvBrowser extends React.PureComponent {
                             <SvSettingsCheckbox label="Show insertions" checked={svViewSettings.showInsertions} onChange={(e) => this.updateSvType(e, "ins")} />
                             <SvSettingsCheckbox label="Show inversions" checked={svViewSettings.showInversions} onChange={(e) => this.updateSvType(e, "inv")} />
                         </div>
-                        <div className="d-block mb-1">
+                        <div className="d-block mb-2">
                             <form>
                                 <div className="form-group">
                                     <label className="font-weight-normal">Minimal SV length (bp):</label>
@@ -395,6 +411,12 @@ export class SvBrowser extends React.PureComponent {
 
                             </form>
 
+                        </div>
+ 
+                        <div className="d-block mb-1">
+                            <button type="button" className="btn btn-primary btn-block" onClick={this.exportDisplay}>
+                                <i className="icon icon-download icon-sm fas mr-1"></i>Export
+                            </button>
                         </div>
 
                     </div>
