@@ -1,7 +1,9 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback, useState, useRef, useEffect } from 'react';
 import _ from 'underscore';
+import url from 'url';
+import queryString from 'query-string';
 
 import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
@@ -13,6 +15,7 @@ import { Term } from './../../util/Schemas';
 import { responsiveGridState } from './../../util/layout';
 
 import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
+import ReactTooltip from 'react-tooltip';
 
 
 export const UserDashboard = React.memo(function UserDashboard({ windowHeight, windowWidth }){
@@ -90,6 +93,7 @@ function AboveCasesTableOptions(props){
 
     return (
         <React.Fragment>
+
             <div className="container-wide py-0 bg-white">
                 <div className="tab-section-title flex-wrap">
 
@@ -103,8 +107,8 @@ function AboveCasesTableOptions(props){
                         </div>
                     </div>
 
-                    <DropdownButton variant="primary" id="submit-new" className="px-1"
-                        title={<span><i className="icon fas icon-plus mr-08"/>Submit New...</span>}>
+                    <DropdownButton variant="primary d-flex align-items-center" id="submit-new" className="px-1"
+                        title={<React.Fragment><i className="icon fas icon-plus mr-1"/>Submit New...</React.Fragment>}>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add">
                             Case(s)
                         </Dropdown.Item>
@@ -120,7 +124,14 @@ function AboveCasesTableOptions(props){
             </div>
 
             <hr className="tab-section-title-horiz-divider"/>
+
             <div className="container-wide toggle-reports row align-items-center py-2">
+                <div className="col-12 col-md-4 col-lg-3 py-2">
+                    <SearchBar {...{ isContextLoading, context, navigate }} />
+                </div>
+                <div className="d-none d-md-block col-md">
+                    &nbsp;
+                </div>
                 <div className="col-12 col-sm-auto">
                     <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
                         Show Only Cases with Reports
@@ -163,7 +174,7 @@ class ProjectFilterCheckbox extends React.PureComponent {
     render(){
         const { isContextLoading, checked, children } = this.props;
         const { isChanging } = this.state;
-        const labelCls = "mb-0 px-2 py-1" + (isChanging ? " is-changing position-relative" : "");
+        const labelCls = "mb-0 px-2 py-1" + (isChanging ? " is-changing" : "");
         return (
             <Checkbox disabled={isContextLoading} onChange={this.onChange} checked={checked} labelClassName={labelCls}>
                 <span className="text-small">
@@ -180,19 +191,26 @@ function ProjectSelectDropdown(props){
         context: searchContext,
         navigate: virtualNavigate,
         onFilter,
-        isContextLoading = false
+        isContextLoading = false,
+        className
     } = props;
     const {
         facets: ctxFacets = [],
         filters: ctxFilters,
         "@id": ctxHref
     } = searchContext || {};
-    const projectFacet = _.findWhere(ctxFacets, { "field" : "project.display_title" });
-    const projectFilter = _.findWhere(ctxFilters, { "field" : "project.display_title" }) || null;
+
+    const { projectFacet, projectFilter } = useMemo(function(){
+        return {
+            projectFacet: _.findWhere(ctxFacets, { "field" : "project.display_title" }) || null,
+            projectFilter: _.findWhere(ctxFilters, { "field" : "project.display_title" }) || null
+        };
+    }, [ searchContext ]);
+
     const { term: projectFilterTerm = null } = projectFilter || {};
     const { terms: facetTerms = [] } = projectFacet || {};
 
-    function onTermSelect(evtKey, e){
+    const onTermSelect = useCallback(function(evtKey, e){
         e.preventDefault();
         if (!evtKey) {
             if (projectFilter) {
@@ -213,34 +231,137 @@ function ProjectSelectDropdown(props){
             const updatedSearchHref = searchFilters.filtersToHref(updatedFilters, ctxHref, null, false, null);
             virtualNavigate(updatedSearchHref);
         }
-    }
+    }, [ onFilter, projectFilter, projectFacet ]);
 
-    let options = null;
-    if (!isContextLoading) {
-        options = facetTerms.sort(function({ key: a, doc_count: aDC }, { key: b, doc_count: bDC }){
-            if (a === "CGAP Core") return -1;
-            if (b === "CGAP Core") return 1;
-            return bDC - aDC;
-        }).map(function(projectTermObj){
-            const { key: projectTerm, doc_count } = projectTermObj;
-            const active = projectTerm === projectFilterTerm;
-            return (
-                <DropdownItem key={projectTerm} eventKey={projectTerm} active={active}>
-                    { Term.toName("project.display_title", projectTerm) }
-                    <small className="ml-07">({ doc_count })</small>
-                </DropdownItem>
-            );
-        });
-    }
+    const renderedOptions = useMemo(function(){
+        let options = null;
+        if (!isContextLoading) {
+            options = facetTerms.sort(function({ key: a, doc_count: aDC }, { key: b, doc_count: bDC }){
+                if (a === "CGAP Core") return -1;
+                if (b === "CGAP Core") return 1;
+                return bDC - aDC;
+            }).map(function(projectTermObj){
+                const { key: projectTerm, doc_count } = projectTermObj;
+                const active = projectTerm === projectFilterTerm;
+                return (
+                    <DropdownItem key={projectTerm} eventKey={projectTerm} active={active}>
+                        { Term.toName("project.display_title", projectTerm) }
+                        <small className="ml-07">({ doc_count })</small>
+                    </DropdownItem>
+                );
+            });
+        }
+        return options;
+    }, [ isContextLoading, facetTerms ]);
 
     return (
         <DropdownButton disabled={isContextLoading || facetTerms.length === 0}
-            title={ projectFilterTerm || "All Projects" } onSelect={onTermSelect} variant="outline-dark">
+            title={projectFilterTerm || "All Projects"} onSelect={onTermSelect}
+            variant="outline-dark" className={className}>
             <DropdownItem eventKey={0} active={!projectFilterTerm}>
                 <span className="text-600">All Projects</span>
             </DropdownItem>
-            { options }
+            { renderedOptions }
         </DropdownButton>
     );
 
+}
+
+function SearchBar (props) {
+    const {
+        context: searchContext,
+        isContextLoading,
+        navigate: virtualNavigate
+    } = props;
+    // This should be present & accurate on search response as long as is not compound filterset
+    // search with 2+ filterblocks used.
+    const { "@id": currentSearchHref } = searchContext || {};
+
+    const currentSearchParts = useMemo(function(){
+        if (!currentSearchHref) {
+            return null;
+        }
+        return url.parse(currentSearchHref, true);
+    }, [ searchContext ]);
+
+    const { query: currentSearchQuery } = currentSearchParts || {};
+    const { q: currentSearchTextQuery = "" } = currentSearchQuery || {};
+
+    const [ value, setValue ] = useState(currentSearchTextQuery);
+    const [ isChanging, setIsChanging ] = useState(false);
+    const searchInputRef = useRef(null);
+
+    const isValueChanged = value !== currentSearchTextQuery;
+
+    if (!isContextLoading && isChanging) {
+        // Unset isChanging if finished loading.
+        // Calling set value inside func body is equivalent to
+        // getDerivedStateFromProps (avoids additional re-render).
+        setIsChanging(false);
+    }
+
+    const onChange = useCallback(function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        setValue(searchInputRef.current.value);
+    });
+
+    const onSubmit = useCallback(function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        const nextQuery = { ...currentSearchQuery };
+        // Using value from ref instead of 'value' for slight perf
+        // (avoid re-instantiating this onSubmit func each render)
+        const nextValue = searchInputRef.current.value || "";
+        if (!isValueChanged) {
+            return false;
+        }
+        setIsChanging(true);
+        if (nextValue) {
+            nextQuery.q = nextValue;
+        } else {
+            delete nextQuery.q;
+        }
+        const nextSearchParts = {
+            ...currentSearchParts,
+            "search": "?" + queryString.stringify(nextQuery)
+        };
+        virtualNavigate(url.format(nextSearchParts));
+    }, [ virtualNavigate, currentSearchParts, isValueChanged ]);
+
+    const valueLen = value.length;
+    const isValid = valueLen === 0 || valueLen > 1;
+
+    const toggleTooltip = useMemo(function(){
+        return _.debounce(function(hide = false){
+            if (hide){
+                ReactTooltip.hide();
+            } else {
+                ReactTooltip.show(searchInputRef.current);
+            }
+        }, 300, false);
+    });
+
+    useEffect(function(){
+        setTimeout(toggleTooltip, 50, isValid);
+    }, [ isValid ]);
+
+    const iconCls = (
+        "icon icon-fw align-middle fas"
+        + (" icon-" + (isChanging ? "circle-notch icon-spin" : "search"))
+        + (" text-" + (!isValid ? "danger" : isValueChanged ? "dark" : "secondary"))
+    );
+
+    return (
+        <form onSubmit={onSubmit} className="mb-0 d-flex align-items-center" role="search">
+            <input type="search" placeholder="Search Cases..." aria-label="Search"
+                spellCheck={false} name="q" className={"form-control" + (!isValid ? " is-invalid" : "")}
+                data-tip="Search term must have at least 2 characters"
+                data-tip-disable={isValid} data-type="error" disabled={!currentSearchHref}
+                {...{ onChange, value }} ref={searchInputRef} />
+            <button type="submit" className="bg-transparent border-0 px-2 py-1" disabled={!isValid || isChanging || isContextLoading || !isValueChanged}>
+                <i className={iconCls}/>
+            </button>
+        </form>
+    );
 }

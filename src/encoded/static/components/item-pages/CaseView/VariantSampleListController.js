@@ -3,6 +3,7 @@
 import React, { useMemo } from 'react';
 import queryString from 'query-string';
 import moment from 'moment';
+import ReactTooltip from 'react-tooltip';
 import memoize from "memoize-one";
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -47,7 +48,7 @@ export class VariantSampleListController extends React.PureComponent {
         this.updateVariantSampleListID = this.updateVariantSampleListID.bind(this);
         const { id: vslID } = props;
         this.state = {
-            "variantSampleListItem": null,
+            "fetchedVariantSampleListItem": null,
             "variantSampleListID": typeof vslID === "string" ? vslID : null,
             "isLoadingVariantSampleListItem": typeof vslID === "string" ? true : false,
             // `refreshCount` not necessary at all, just for potential internal debugging.
@@ -99,17 +100,22 @@ export class VariantSampleListController extends React.PureComponent {
 
             this.currentRequest = null;
 
-            this.setState(function({ refreshCount: prevRefreshCount, variantSampleListItem: prevItem }){
+            this.setState(function({ refreshCount: prevRefreshCount, fetchedVariantSampleListItem: prevItem }){
                 const { "@id": prevAtID = null } = prevItem || {};
                 const nextState = {
-                    variantSampleListItem,
+                    "fetchedVariantSampleListItem": variantSampleListItem,
                     "isLoadingVariantSampleListItem": false
                 };
                 if (prevAtID && vslID !== prevAtID) {
                     nextState.refreshCount = prevRefreshCount + 1;
                 }
                 return nextState;
-            }, fnCallback);
+            }, function(){
+                setTimeout(ReactTooltip.rebuild, 50);
+                if (typeof fnCallback === "function") {
+                    fnCallback();
+                }
+            });
 
         };
 
@@ -133,7 +139,14 @@ export class VariantSampleListController extends React.PureComponent {
                         // "variant_samples.selected_by.@id",
                         // "variant_samples.selected_by.display_title",
                         "variant_samples.variant_sample_item.@id",
+                        "variant_samples.variant_sample_item.uuid",
                         "variant_samples.variant_sample_item.display_title",
+                        "variant_samples.variant_sample_item.finding_table_tag",
+                        "variant_samples.variant_sample_item.actions",
+                        "variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",
+                        "variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
+                        "variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
+
                         "variant_samples.variant_sample_item.variant.@id",
                         "variant_samples.variant_sample_item.variant.display_title",
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.@id",
@@ -141,9 +154,6 @@ export class VariantSampleListController extends React.PureComponent {
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript",
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
 
                         // VariantSampleItem Notes (for CaseReviewTab)
                         ...variantSampleListItemNoteEmbeds
@@ -160,7 +170,7 @@ export class VariantSampleListController extends React.PureComponent {
 
     render(){
         const { children, id: propVSLID, ...passProps } = this.props;
-        const { variantSampleListItem, isLoadingVariantSampleListItem } = this.state;
+        const { fetchedVariantSampleListItem: variantSampleListItem, isLoadingVariantSampleListItem } = this.state;
         const { variant_samples = [] } = variantSampleListItem || {};
         const childProps = {
             ...passProps,
@@ -189,12 +199,16 @@ export const variantSampleListItemNoteEmbeds = [
     "variant_samples.variant_sample_item.interpretation.uuid",
     "variant_samples.variant_sample_item.interpretation.note_text",
     "variant_samples.variant_sample_item.interpretation.status",
+    "variant_samples.variant_sample_item.interpretation.associated_items.item_type",
+    "variant_samples.variant_sample_item.interpretation.associated_items.item_identifier",
     "variant_samples.variant_sample_item.interpretation.classification",
 
     "variant_samples.variant_sample_item.discovery_interpretation.@id",
     "variant_samples.variant_sample_item.discovery_interpretation.uuid",
     "variant_samples.variant_sample_item.discovery_interpretation.note_text",
     "variant_samples.variant_sample_item.discovery_interpretation.status",
+    "variant_samples.variant_sample_item.discovery_interpretation.associated_items.item_type",
+    "variant_samples.variant_sample_item.discovery_interpretation.associated_items.item_identifier",
     "variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy",
     "variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy",
 
@@ -202,9 +216,13 @@ export const variantSampleListItemNoteEmbeds = [
     "variant_samples.variant_sample_item.variant_notes.uuid",
     "variant_samples.variant_sample_item.variant_notes.note_text",
     "variant_samples.variant_sample_item.variant_notes.status",
+    "variant_samples.variant_sample_item.variant_notes.associated_items.item_type",
+    "variant_samples.variant_sample_item.variant_notes.associated_items.item_identifier",
 
     "variant_samples.variant_sample_item.gene_notes.@id",
     "variant_samples.variant_sample_item.gene_notes.uuid",
     "variant_samples.variant_sample_item.gene_notes.note_text",
     "variant_samples.variant_sample_item.gene_notes.status",
+    "variant_samples.variant_sample_item.gene_notes.associated_items.item_type",
+    "variant_samples.variant_sample_item.gene_notes.associated_items.item_identifier",
 ];

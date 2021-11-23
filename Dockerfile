@@ -2,9 +2,9 @@
 # Note that images are pinned via sha256 as opposed to tag
 # so that we don't pick up new images unintentionally
 
-# Debian Buster with Python 3.6.13
+# python:3.6.15-slim-buster
 # TODO: maybe swap in ubuntu 20.04 and install Python manually?
-FROM python@sha256:8273b05f13fac06c1f3bfa14611f92ea50984279bea5d2bcf3b3be7598e28137
+FROM python@sha256:912f935132ef6055ed99d7e68a8bff631a65f4e7ea650d7b0f10ed69a626a19a
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
@@ -25,11 +25,12 @@ ENV PYTHONFAULTHANDLER=1 \
   POETRY_VERSION=1.1.4 \
   NODE_VERSION=12.22.1
 
-# Install nginx, base system
+# Install nginx, base system requirements
 COPY deploy/docker/production/install_nginx.sh /
 RUN bash /install_nginx.sh && \
     apt-get update && \
-    apt-get install -y curl vim emacs postgresql-client net-tools ca-certificates
+    apt-get install -y curl vim emacs net-tools ca-certificates \
+    gcc zlib1g-dev postgresql-client libpq-dev git make
 
 # Configure CGAP User (nginx)
 WORKDIR /home/nginx/.nvm
@@ -80,9 +81,10 @@ RUN poetry install && \
     python setup_eb.py develop && \
     make fix-dist-info
 
-# Build front-end
+# Build front-end, remove node_modules when done
 RUN npm run build && \
-    npm run build-scss
+    npm run build-scss && \
+    rm -rf node_modules/
 
 # Misc
 RUN make aws-ip-ranges && \

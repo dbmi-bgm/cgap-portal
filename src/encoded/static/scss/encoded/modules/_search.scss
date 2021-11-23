@@ -4,15 +4,17 @@
 /**** Search Table ****/
 /**********************/
 
-// 40px is height of navbar, we subtract 1 to help cover up 1px gap glitch
-// which appears at times..
+/**
+ * 40px is height of navbar, we subtract 1 to help cover up 1px gap glitch
+ * which appears at times..
+ */
 $cgap-search-sticky-header-top-offset: 39px;
 
 $search-results-above-results-row-height: 42px;
 $search-results-edge-background-color: #e2e2e2;
 $search-results-edge-shadow-color : rgba(0,0,0,0.5);
-$search-results-result-row-height: 80px; // +9px margin bottom +1px border bottom = 90px rowHeight.
-$search-results-header-row-height: 52px; // 46px is existing default for both result and header height.
+$search-results-result-row-height: 80px; /* +9px margin bottom +1px border bottom = 90px rowHeight. */
+$search-results-header-row-height: 52px; /* 46px is existing default for both result and header height. */
 @import "./../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/search-view-table.scss";
 
 // Extensions to shared-portal-components searchview table(s):
@@ -81,13 +83,13 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 	&[data-field="display_title"] {
 		.inner {
 			> .title-block {
-				white-space: normal; // Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows.
+				white-space: normal; /* Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows. */
 			}
 		}
 	}
 
 
-	// Styling overrides specific to search results of type Case
+	/* Styling overrides specific to search results of type Case */
 	.search-view-controls-and-results[data-search-item-type="Case"] & {
 
 		&[data-first-visible-column] .inner > .title-block {
@@ -96,13 +98,15 @@ $search-results-header-row-height: 52px; // 46px is existing default for both re
 
 		&[data-field="display_title"] > .inner .multi-field-cell .col-main,
 		&[data-field="individual"] > .inner .multi-field-cell .col-main {
-			// Uppercase Individual's Identifier
+			/* Uppercase Individual's Identifier */
 			text-transform: uppercase;
 		}
 	}
 	
 	&[data-field="status"] {
 		> .inner {
+			/* Overrides SPC's search-view-table.scss text-align: left */
+			text-align: center !important;
 			i.status-indicator-dot {
 				margin-left: 4px;
 				margin-right: 2px;
@@ -179,70 +183,18 @@ $facetlist-omitted-term-color: #901414;
 
 @import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/facet-list.scss";
 
-$search-page-padding-resize-transition-in: padding .25s .5s linear;
-$search-page-padding-resize-transition-out: padding .25s linear;
 
 
 .search-view-controls-and-results .facets-container {
 	background-color: #fff;
 }
 
-/* Make page full(er) width when scroll down */
-@include navbar-fixed-position {
-	.search-page-outer-container.container-wide {
-
-		/* Wraps .search-page-container */
-
-		transition: $search-page-padding-resize-transition-out;
-
-		.facets-column,
-		.results-column {
-			transition: $search-page-padding-resize-transition-out;
-		}
-
-		.facets-column {
-			//transition: $search-page-padding-resize-transition, background-color .5s;
-			//background-color: #fff;
-			.facets-container {
-				transition: border-color .3s;
-				> .row.facets-header {
-					transition: $search-page-padding-resize-transition-out;
-				}
-			}
-		}
-
-		// Stylistic adjustment (experimental / in-progress)
-
-		// &:before {
-		// 	content: "";
-		// 	display: block;
-		// 	position: fixed;
-		// 	left: 0;
-		// 	right: 0;
-		// 	top: 30px;
-		// 	height: 61px;
-		// 	opacity: 0;
-		// 	background-color: darken($color: $primary-dark, $amount: 5%);
-		// 	transition: height .5s ease-out, opacity .5s ease-out;
-		// }
-
-		// body.scrolled-past-240 & {
-
-		// 	&:before {
-		// 		opacity: 1;
-		// 	}
-
-		// }
-
-	}
-}
 
 /************************************************
 ******** CGAP-Related SearchView Theming ********
 *************************************************/
 
 body[data-pathname="/search/"]:not([data-current-action="add"]) {
-	#slot-application,
 	#application,
 	#layout {
 		// Possible todo: switch this to appBackgroundColor param (base.scss) or parameterize according to final design.

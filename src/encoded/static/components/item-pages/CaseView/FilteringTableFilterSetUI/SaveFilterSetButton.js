@@ -81,7 +81,7 @@ export class SaveFilterSetButtonController extends React.Component {
         };
 
         this.state = {
-            // Initially is blank or Case.active_filterset (once AJAXed in)
+            // Initially is blank or Case[props.activeFilterSetFieldName] (once AJAXed in)
             "lastSavedFilterSet": (filterSet && filterSet['@id']) ? filterSet : null,
             "isSavingFilterSet": false
         };
@@ -110,12 +110,12 @@ export class SaveFilterSetButtonController extends React.Component {
     }
 
     /**
-     * PATCHes the current filterset, if active_filterset
+     * PATCHes the current filterset, if Case[props.activeFilterSetFieldName]
      * exists on caseItem. Else POSTs new FilterSet and then
-     * sets it as the active_filterset of Case.
+     * sets it as Case[props.activeFilterSetFieldName].
      */
     saveFilterSet(){
-        const { currFilterSet: filterSet, caseItem } = this.props;
+        const { currFilterSet: filterSet, caseItem, activeFilterSetFieldName } = this.props;
         const { lastSavedFilterSet } = this.state;
         const {
             "@id": caseAtID,
@@ -156,6 +156,10 @@ export class SaveFilterSetButtonController extends React.Component {
             } else {
                 // POST
 
+                if (!activeFilterSetFieldName || typeof activeFilterSetFieldName !== "string") {
+                    throw new Error("Expected props.activeFilterSetFieldName");
+                }
+
                 const payload = _.pick(filterSet, ...filterSetFieldsToKeepPrePatch);
                 // `institution` & `project` are set only upon create.
                 payload.institution = caseInstitutionID;
@@ -169,9 +173,9 @@ export class SaveFilterSetButtonController extends React.Component {
                         newFilterSetItemFromPostResponse = newFilterSetItemFromResponse;
                         const { uuid: nextFilterSetUUID } = newFilterSetItemFromResponse;
 
-                        console.info("POSTed FilterSet, proceeding to PATCH Case.active_filterset", newFilterSetItemFromResponse);
+                        console.info("POSTed FilterSet, proceeding to PATCH Case[props.activeFilterSetFieldName]", newFilterSetItemFromResponse);
 
-                        return ajax.promise(caseAtID, "PATCH", {}, JSON.stringify({ "active_filterset" : nextFilterSetUUID }));
+                        return ajax.promise(caseAtID, "PATCH", {}, JSON.stringify({ [activeFilterSetFieldName] : nextFilterSetUUID }));
                     }).then((casePatchResponse)=>{
                         console.info("PATCHed Case Item", casePatchResponse);
                         this.setState({
@@ -223,7 +227,7 @@ export function SaveFilterSetButton(props){
         saveFilterSet,
         isSavingFilterSet,
         hasCurrentFilterSetChanged,
-        className = "btn btn-primary"
+        className = "btn btn-primary fixed-height d-inline-flex align-items-center"
     } = props;
     const disabled = isEditDisabled || isSavingFilterSet || !hasCurrentFilterSetChanged;
 
@@ -242,7 +246,8 @@ export function SaveFilterSetButton(props){
                 <i className="icon icon-spin icon-circle-notch fas" />
                 : (
                     <React.Fragment>
-                        <i className="icon icon-save fas mr-07"/>
+                        <i className="icon icon-save fas"/>
+                        &nbsp;&nbsp;
                         Save Case FilterSet
                     </React.Fragment>
                 ) }
@@ -263,6 +268,5 @@ export const filterSetFieldsToKeepPrePatch = [
     "flags",
     "created_in_case_accession",
     "uuid",
-    "status",
     "derived_from_preset_filterset"
 ];
