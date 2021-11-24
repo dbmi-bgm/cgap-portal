@@ -38,7 +38,7 @@ export function VariantSampleInfoHeader(props) {
                 <div className="row flex-column flex-lg-row">
 
                     { caseID ?
-                        <div className="inner-card-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
+                        <div className="inner-card-section col pb-2 pb-xl-0 col-lg-2 col-xl-1 d-flex flex-column">
                             <div className="info-header-title">
                                 <h4 className="text-truncate">Case ID</h4>
                             </div>
@@ -48,7 +48,7 @@ export function VariantSampleInfoHeader(props) {
                         </div>
                         : null }
 
-                    <div className="inner-card-section col pb-2 pb-lg-0">
+                    <div className="inner-card-section col pb-2 pb-xl-0">
                         <div className="info-header-title">
                             <h4>Position</h4>
                         </div>
@@ -139,7 +139,7 @@ function TranscriptSelectionSection(props){
 
 
     return (
-        <div className="inner-card-section col pb-2 pb-lg-0">
+        <div className="inner-card-section col-12 col-xl pb-xl-2">
 
             <div className="info-header-title">
                 {/* passing 'py-1' to className of button via `size` prop - kinda hacky - noting here in case changes in future version, or if find better prop to use */}
@@ -191,27 +191,27 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
 
 
-            <div className="col-5 col-lg-12 col-xl-5">
+            <div className="col-5">
 
                 {/* We could make these below into reusable component later once know this what we want fo sure */}
 
                 <div className="row mb-03">
-                    <div className="col-12 col-lg-4 col-xl-6">
+                    <div className="col-12 col-lg-5 col-xl-6">
                         <label htmlFor="calculated_transcript_location" className="mb-0">Location:</label>
                     </div>
-                    <div className="col-12 col-lg" id="calculated_transcript_location">
+                    <div className="col-12 col-lg-auto" id="calculated_transcript_location">
                         { transcriptLocation }
                     </div>
                 </div>
 
                 <div className="row mb-03">
-                    <div className="col-12 col-lg-4 col-xl-6">
+                    <div className="col-12 col-lg-5 col-xl-6">
                         <label htmlFor="variant.transcript.csq_consequence.coding_effect" className="mb-0"
                             data-tip={getTipForField("transcript.csq_consequence.coding_effect")}>
                             Coding Effect:
                         </label>
                     </div>
-                    <div className="col-12 col-lg" id="variant.transcript.csq_consequence.coding_effect">
+                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_consequence.coding_effect">
                         { consequenceCodingEffect }
                     </div>
                 </div>
@@ -220,12 +220,12 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
 
 
-            <div className="col-7 col-lg-12 col-xl-7">
+            <div className="col-7">
 
                 {/* We could make these below into reusable component later once know this what we want fo sure */}
 
                 <div className="row mb-03">
-                    <div className="col-12 col-lg-4 col-xl-3">
+                    <div className="col-12 col-lg-4 col-xl-4">
                         <label htmlFor="variant.transcript.csq_gene.display_title" className="mb-0" data-tip={getTipForField("transcript.csq_gene")}>
                             Gene:
                         </label>
@@ -235,13 +235,13 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
                             * May or may not be preferable depending on value content/type/label-size.
                             * Will consider consistency more after.
                             */}
-                    <div className="col-12 col-lg" id="variant.transcript.csq_gene.display_title">
+                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_gene.display_title">
                         { currentGeneDisplayTitle || <em>None selected</em> }
                     </div>
                 </div>
 
                 <div className="row mb-03">
-                    <div className="col-12 col-lg-4 col-xl-3">
+                    <div className="col-12 col-lg-4 col-xl-4">
                         <label htmlFor="csq_hgvsc" className="mb-0" data-tip={getTipForField("transcript.csq_hgvsc")}>cDNA:</label>
                     </div>
                     <div className="col-12 col-lg-auto" id="variant.transcript.csq_hgvsc">
@@ -250,10 +250,10 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
                 </div>
 
                 <div className="row mb-03">
-                    <div className="col-12 col-lg-4 col-xl-3">
+                    <div className="col-12 col-lg-4 col-xl-4">
                         <label htmlFor="csq_hgvsp" className="mb-0" data-tip={getTipForField("transcript.csq_hgvsp")}>AA / AA:</label>
                     </div>
-                    <div className="col-12 col-lg" id="variant.transcript.csq_hgvsp">
+                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_hgvsp">
                         { csq_hgvsp }
                     </div>
                 </div>

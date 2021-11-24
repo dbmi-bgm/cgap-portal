@@ -6,7 +6,8 @@ import _ from 'underscore';
 import { console, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import DefaultItemView from './DefaultItemView';
-import { PedigreeTabViewBody, parseFamilyIntoDataset, PedigreeFullScreenBtn } from './CaseView';
+import { PedigreeTabViewBody, PedigreeFullScreenBtn } from './components/PedigreeTabViewBody';
+
 
 
 export default class IndividualView extends DefaultItemView {

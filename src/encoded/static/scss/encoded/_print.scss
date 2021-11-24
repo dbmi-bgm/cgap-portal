@@ -1,0 +1,118 @@
+:root {
+    --color-paper: white;
+    --background: #fff;
+    font-size: 12pt;
+    zoom: 100%;
+    color: #000;
+}
+
+body,
+#slot-application,
+#application {
+    margin: 0;
+    padding: 0;
+    height: auto !important;
+    width: auto !important;
+    min-height: 0 !important;
+    position: static;
+}
+
+body h1, h2, h3, h4, h5, h6 {
+    color: #000;
+}
+
+div#slow-load-container {
+    display: none;
+}
+
+/* Hide UI elements on relevant pages */
+div#layout {
+
+    min-height: 0 !important;
+    margin: 0 !important;
+
+    > div.navbar-container {
+        display: none;
+    }
+
+    > div#post-navbar-container {
+        margin: 0 !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        &:before {
+            display: none;
+            content: none;
+        }
+    }
+
+    .item-page-container {
+
+        div#full-alerts-container {
+            display: none;
+        }
+
+        .tabs-bar-outer > .tabs-bar {
+            > .tab-item:not(.title-tab) {
+                display: none !important;
+                max-width: none;
+                width: 100%;
+            }
+        }
+
+    }
+
+    // Unset some global style which are detrimental in print
+    .mh-inner-tab-height-full {
+        min-height: 0 !important;
+    }
+
+}
+
+footer#page-footer {
+    /* Consider displaying down the road if useful */
+    display: none !important;
+}
+
+div#overlays-container {
+    /* In case any modals/tooltips/overlays visible - todo: consider if needed */
+    display: none !important;
+}
+
+div.__react_component_tooltip {
+    /* In case any tooltips visible */
+    display: none !important;
+}
+
+/********************/
+/** Specific Cases **/
+/********************/
+
+/** Report Item Print Preview **/
+/* Hide everything except print-preview-tab-container */
+
+body[data-path^="/reports/"] {
+    #layout {
+        .item-page-container {
+            .tabs-bar-outer {
+                display: none !important;
+            }
+            .tab-pane-outer.active {
+                > :not(.print-preview-tab-container) {
+                    display: none;
+                }
+
+                > .print-preview-tab-container {
+                    /* Unset styles, assuming this is a .container-wide element, also */
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+
+                /* This is a small fix for (only) Chrome printing, which sometimes hides content, possibly due to float miscalculation or something */
+                /* We set padding-bottom to 0.075in when generating pages and then unset it here (acting as a buffer). */
+                .print-preview-pane .pagedjs_sheet .pagedjs_area {
+                    padding-bottom: 0 !important;
+                }
+            }
+        }
+    }
+}

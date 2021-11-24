@@ -1,7 +1,6 @@
 'use strict';
 
 import React, { useCallback, useMemo, useState } from 'react';
-import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import _ from 'underscore';
@@ -9,7 +8,8 @@ import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/f
 
 
 
-export function CaseSpecificSelectionsPanel (props) {
+export const CaseSpecificSelectionsPanel = React.memo(function CaseSpecificSelectionsPanel (props) {
+    const { className, ...passProps } = props;
 
     const panels = {
         ACMG: 1,
@@ -34,13 +34,15 @@ export function CaseSpecificSelectionsPanel (props) {
     });
 
     return (
-        <div className="card mb-1">
-            <div className={"card-header py-3 bg-primary-dark" + (!isExpanded ? " rounded" : "")}>
-                <h4 className="text-400 my-0 d-flex align-items-center clickable text-white" onClick={toggleExpanded}>
+        // Set tabIndex={0} to make element focusable/navigatable-to by non-mouse-cursor interactions such as the tab key.
+        <div className={"card" + (className ? " " + className : "")}>
+            <button type="button" className={"card-header btn py-3 bg-primary-dark" + (!isExpanded ? " rounded" : "")}
+                onClick={toggleExpanded}>
+                <h4 className="text-400 my-0 d-flex align-items-center text-white" >
                     <i className={"mr-1 icon fas icon-" + (isExpanded ? "minus" : "plus")}/>
                     <span>Case Specific Selections</span>
                 </h4>
-            </div>
+            </button>
             { isExpanded ?
                 <React.Fragment>
                     <div className="card-body">
@@ -57,21 +59,21 @@ export function CaseSpecificSelectionsPanel (props) {
                         </div>
 
                         { showingPanel === panels.ACMG ?
-                            <ACMGClassificationSelections {...props} />
+                            <ACMGClassificationSelections {...passProps} />
                             : showingPanel === panels.GENEDISCOVERY ?
-                                <VariantGeneSelections {...props} />
+                                <VariantGeneSelections {...passProps} />
                                 : null
                         }
 
                     </div>
                     <div className="card-body border-top">
-                        <NoteTypeSelections {...props} />
+                        <NoteTypeSelections {...passProps} />
                     </div>
                 </React.Fragment>
                 : null }
         </div>
     );
-}
+});
 
 export class NoteSubSelectionStateController extends React.Component {
     constructor(props){
@@ -122,11 +124,16 @@ export class NoteSubSelectionStateController extends React.Component {
             toggleReportNoteSubselectionState,
             toggleKBNoteSubselectionState
         };
-        return React.Children.map(children, function(c){
-            if (React.isValidElement(c)) {
-                return React.cloneElement(c, childProps);
+        return React.Children.map(children, (child)=>{
+            if (!React.isValidElement(child)) {
+                // String or something
+                return child;
             }
-            return c;
+            if (typeof child.type === "string") {
+                // Normal element (a, div, etc)
+                return child;
+            } // Else is React component
+            return React.cloneElement(child, childProps);
         });
     }
 }
@@ -137,10 +144,11 @@ function ACMGClassificationSelections (props) {
         // From CaseReviewTab (& higher)
         variantSampleListItem,
         alreadyInProjectNotes,
+        alreadyInReportNotes,
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
-        // From CaseReviewDataStore
+        // From CaseReviewSelectedNotesStore
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
@@ -152,19 +160,19 @@ function ACMGClassificationSelections (props) {
                 <h5 className="text-400 text-large">Move to Report</h5>
                 <ACMGClassificationSelectionsCommonCheckboxList
                     variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
-                    noteTypesIncluded={reportNotesIncluded} />
+                    noteTypesIncluded={reportNotesIncluded} alreadySaved={alreadyInReportNotes} />
             </div>
             <div className="col-12 col-lg-6">
                 <h5 className="text-400 text-large">Save to Project</h5>
                 <ACMGClassificationSelectionsCommonCheckboxList
-                    {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
-                    noteTypesIncluded={kbNotesIncluded} />
+                    variantSampleListItem={variantSampleListItem} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
+                    noteTypesIncluded={kbNotesIncluded} alreadySaved={alreadyInProjectNotes} />
             </div>
         </div>
     );
 }
 
-function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadyInProjectNotes, noteTypesIncluded }) {
+function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadySaved, noteTypesIncluded }) {
     const { variant_samples = [] } = variantSampleListItem || {};
 
     const pathogenicityEnums = [
@@ -192,10 +200,10 @@ function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, v
                 return classification === enumOption;
             },
             store,
-            alreadyInProjectNotes,
+            alreadySaved,
             noteTypesIncluded
         );
-    }, [ variantSamplesWithInterpretationClassification, store, alreadyInProjectNotes, noteTypesIncluded ]);
+    }, [ variantSamplesWithInterpretationClassification, store, alreadySaved, noteTypesIncluded ]);
 
     const onChange = useCallback(function onChange (evt) {
         const eventKey = evt.target.getAttribute("data-key");
@@ -256,10 +264,11 @@ function VariantGeneSelections (props) {
         // From CaseReviewTab (& higher)
         variantSampleListItem,
         alreadyInProjectNotes,
+        alreadyInReportNotes,
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
-        // From CaseReviewDataStore
+        // From CaseReviewSelectedNotesStore
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
@@ -271,20 +280,20 @@ function VariantGeneSelections (props) {
                 <h5 className="text-400 text-large">Move to Report</h5>
                 <VariantGeneSelectionsCommonCheckboxList
                     variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
-                    noteTypesIncluded={reportNotesIncluded} />
+                    noteTypesIncluded={reportNotesIncluded} alreadySaved={alreadyInReportNotes} />
             </div>
             <div className="col-12 col-lg-6">
                 <h5 className="text-400 text-large">Save to Project</h5>
                 <VariantGeneSelectionsCommonCheckboxList
-                    {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
-                    noteTypesIncluded={kbNotesIncluded}/>
+                    variantSampleListItem={variantSampleListItem} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
+                    noteTypesIncluded={kbNotesIncluded} alreadySaved={alreadyInProjectNotes}/>
             </div>
         </div>
     );
 }
 
 
-function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadyInProjectNotes, noteTypesIncluded }) {
+function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadySaved, noteTypesIncluded }) {
     const { variant_samples = [] } = variantSampleListItem || {};
 
     // These are currently same between gene and variant.
@@ -327,10 +336,10 @@ function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantS
                 return gene_candidacy === enumOption;
             },
             store,
-            alreadyInProjectNotes,
+            alreadySaved,
             noteTypesIncluded
         );
-    }, [ variantSamplesWithGeneCandidacy, store, alreadyInProjectNotes, noteTypesIncluded ]);
+    }, [ variantSamplesWithGeneCandidacy, store, alreadySaved, noteTypesIncluded ]);
 
     const {
         checkboxStates: variantCheckboxStates,
@@ -348,10 +357,10 @@ function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantS
                 return variant_candidacy === enumOption;
             },
             store,
-            alreadyInProjectNotes,
+            alreadySaved,
             noteTypesIncluded
         );
-    }, [ variantSamplesWithVariantCandidacy, store, alreadyInProjectNotes, noteTypesIncluded ]);
+    }, [ variantSamplesWithVariantCandidacy, store, alreadySaved, noteTypesIncluded ]);
 
     const onChange = useCallback(function onChange (evt) {
         const eventKey = evt.target.getAttribute("data-key");
@@ -442,12 +451,13 @@ function NoteTypeSelections (props) {
         // From CaseReviewTab (& higher)
         variantSampleListItem,
         alreadyInProjectNotes,
+        alreadyInReportNotes,
         // From NoteSubSelectionStateController
         reportNotesIncluded,
         kbNotesIncluded,
         toggleReportNoteSubselectionState,
         toggleKBNoteSubselectionState,
-        // From CaseReviewDataStore
+        // From CaseReviewSelectedNotesStore
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
@@ -460,13 +470,13 @@ function NoteTypeSelections (props) {
                 <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Move to Report</h5>
                     <NoteTypeSelectionsCommonCheckboxList
-                        variantSampleListItem={variantSampleListItem} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
+                        {...{ variantSampleListItem }} alreadySaved={alreadyInReportNotes} store={sendToReportStore} toggleItems={toggleSendToReportStoreItems}
                         noteTypesIncludedState={reportNotesIncluded} toggleNoteTypesIncludedState={toggleReportNoteSubselectionState} />
                 </div>
                 <div className="col-12 col-lg-6">
                     <h5 className="text-400 text-large">Save to Project</h5>
                     <NoteTypeSelectionsCommonCheckboxList
-                        {...{ alreadyInProjectNotes, variantSampleListItem }} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
+                        {...{ variantSampleListItem }} alreadySaved={alreadyInProjectNotes} store={sendToProjectStore} toggleItems={toggleSendToProjectStoreItems}
                         noteTypesIncludedState={kbNotesIncluded} toggleNoteTypesIncludedState={toggleKBNoteSubselectionState} />
                 </div>
             </div>
@@ -476,7 +486,7 @@ function NoteTypeSelections (props) {
 
 /** Logic in here differs a bit from the other 2 panels as we have independent states for these boxes. */
 function NoteTypeSelectionsCommonCheckboxList (props) {
-    const { store, toggleItems, variantSampleListItem, alreadyInProjectNotes, noteTypesIncludedState, toggleNoteTypesIncludedState } = props;
+    const { store, toggleItems, variantSampleListItem, alreadySaved, noteTypesIncludedState, toggleNoteTypesIncludedState } = props;
     const { variant_samples = [] } = variantSampleListItem || {};
 
     const noteTypes = [
@@ -513,9 +523,9 @@ function NoteTypeSelectionsCommonCheckboxList (props) {
                 return !!(foundNote);
             },
             store,
-            alreadyInProjectNotes
+            alreadySaved
         );
-    }, [ variantSampleObjectsSelected, store, alreadyInProjectNotes ]);
+    }, [ variantSampleObjectsSelected, store, alreadySaved ]);
 
 
 

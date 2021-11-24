@@ -708,11 +708,13 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
         return ( // We can pass 'className={..}' to this if needed.
             <StackedBlock hideNameOnHover={false} columnClass="individual" key={atId} id={atId}>
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
-                    <div className="d-flex flex-column individual-role pr-2 text-truncate">
+                    <div className="d-flex flex-column individual-role pr-2">
                         { atId ?
-                            <a href={atId} className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
+                            <a href={atId} className={`name-title text-truncate text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
                                 { role || display_title }
-                            </a> : <span className={`name-title text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>{ role || display_title }</span>}
+                            </a>
+                            :
+                            <span className={`name-title text-truncate text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>{ role || display_title }</span>}
                         <span className="d-block text-small mw-100 text-truncate">({ individual_id ? individual_id : (display_title !== accession) ? display_title : "N/A" })</span>
                     </div>
                     <div className="w-100" style={{ maxWidth: "70%" }}>

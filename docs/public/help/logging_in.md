@@ -33,20 +33,45 @@ our authentication solution (Auth0) supports.
     
 * Google - note that all emails can create an associated Google Account 
   and gain access to the CGAP portal. This is recommended for internal
-  users only.
+  users only but in practice is frequently used due to
+  institutions not offering IT support necessary to
+  configure SAML connections.
     
 * HarvardKey - `hms.harvard.edu` emails will be redirected to HarvardKey
 on login.
   
 * Partners - `partners.org` emails will be redirected to Partners login.
 
-* BCH - emails associated with Boston Children's will be redirected to 
-  BCH login.
   
 Once authenticated through Auth0, the authenticated email address is checked 
 against our metadata database. If a user with that email exists
 in our database, that user is considered "logged in", and a session token (JWT)
 is created.
+
+
+Creating the Google Account
+---------------------------
+
+Users who cannot use Partners or HarvardKey to login will need an 
+associated Google Account with the institutional email
+they will be authenticating to the CGAP Portal with.
+
+If you do not already have a Google Account associated with your 
+institutional email address, you can set up one up by visiting 
+the [Google account creation page with the non-gmail option](https://accounts.google.com/SignUpWithoutGmail). 
+
+Note that it is important not to register this account to have gmail 
+as your institutional email address must be the primary email 
+associated with the Google Account for authentication to work properly!
+
+Once your account request is processed, you will then be able to log 
+in with the 'LOG IN WITH GOOGLE' option using your institutional 
+email address and Google account password.
+
+
+![GoogleAccount](/static/img/docs/submitting-metadata/new-google-acct.png)
+
+
 
 How to Log in
 -------------

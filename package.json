@@ -7,6 +7,7 @@
     "build-quick": "gulp build-quick",
     "build-scss": "gulp build-scss",
     "watch-scss": "gulp build-scss-dev && sass ./src/encoded/static/scss/style.scss ./src/encoded/static/css/style.css --watch --style expanded --no-verbose",
+    "watch-scss-print": "gulp build-scss-dev && sass ./src/encoded/static/scss/print.scss ./src/encoded/static/css/print.css --watch --style expanded --no-verbose",
     "dev-quick": "gulp dev-quick --preserve-symlinks",
     "dev-analyzed": "gulp dev-analyzed --preserve-symlinks",
     "cypress:open": "node_modules/.bin/cypress open --project './deploy/post_deploy_testing' --env Auth0Client=$Auth0Client,Auth0Secret=$Auth0Secret",
@@ -67,7 +68,6 @@
     "bootstrap": "^4.6.0",
     "codacy-coverage": "^3.4.0",
     "coveralls": "^3.1.0",
-    "cypress": "^8.2.0",
     "empty-module": "0.0.2",
     "eslint": "^5.16.0",
     "eslint-plugin-cypress": "^2.11.1",
@@ -96,20 +96,21 @@
     "form-serialize": "^0.6.0",
     "higlass": "1.11.2",
     "higlass-register": "^0.3.0",
-    "higlass-sequence": "0.3.3",
+    "higlass-sequence": "0.3.5",
     "higlass-transcripts": "0.3.3",
     "higlass-text": "0.1.3",
     "higlass-orthologs": "0.2.2",
     "higlass-clinvar": "0.2.3",
     "higlass-pileup": "1.2.0",
     "higlass-gnomad": "0.2.0",
-    "higlass-general-vcf": "0.1.0",
-    "higlass-sv": "0.1.5",
+    "higlass-general-vcf": "0.1.1",
+    "higlass-sv": "0.1.6",
     "markdown-to-jsx": "^6.11.4",
     "memoize-one": "^5.1.1",
     "moment": "^2.27.0",
     "nuka-carousel": "^4.7.0",
     "prop-types": "^15.7.2",
+    "pagedjs": "^0.2.0",
     "pixi.js": "^5.2.4",
     "query-string": "^4.3.4",
     "radium": "^0.25.2",
@@ -123,6 +124,10 @@
     "react-transition-group": "^4.4.1",
     "redux": "^3.7.0",
     "subprocess-middleware": "^0.1.0",
-    "underscore": "^1.10.2"
+    "underscore": "^1.10.2",
+    "url": "^0.11.0"
+  },
+  "optionalDependencies": {
+    "cypress": "^8.2.0"
   }
 }

@@ -8,7 +8,7 @@
         "project",
         "institution"
     ],
-    "additionalProperties": true,
+    "additionalProperties": false,
     "identifyingProperties": [
         "uuid",
         "aliases"
@@ -56,6 +56,31 @@
     "properties": {
         "schema_version": {
             "default": "1"
+        },
+        "ancestry and sex prediction": {
+            "title": "Ancestry and Sex Prediction",
+            "type": "array",
+            "items": {
+                "title": "Ancestry and Sex Prediction",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "title": "Name",
+                        "description": "Sample name that corresponds to this prediction",
+                        "type": "string"
+                    },
+                    "predicted sex": {
+                        "title": "Predicted Sex",
+                        "description": "Sex predicted from reads in this sample",
+                        "type": "string"
+                    },
+                    "predicted ancestry": {
+                        "title": "Predicted Ancestry",
+                        "description": "Ancestry predicted by reads in this sample",
+                        "type": "string"
+                    }
+                }
+            }
         }
     },
     "facets": {

@@ -317,7 +317,7 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
 });
 
 
-export const ConstraintScoresSection = ({ currentGeneItem, getTipForField }) => {
+export const ConstraintScoresSection = React.memo(function ConstraintScoresSection({ currentGeneItem, getTipForField }) {
     const fallbackNotPresent = <em data-tip="Not Available"> - </em>;
     const fallbackNotImplemented = <em data-tip="Not present or implemented"> &bull; </em>;
     const {
@@ -420,7 +420,7 @@ export const ConstraintScoresSection = ({ currentGeneItem, getTipForField }) => 
             </tbody>
         </table>
     );
-}
+});
 
 /**
  * Takes in a potentially falsy (0) string or number value and if actually not present, returns fallback
@@ -545,7 +545,11 @@ export function GeneTranscriptDisplayTitle({ transcript, hideGene }){
             { !hideGene ?
                 <span className="text-400"> ({ geneDisplayTitle || <em>No Gene</em> })</span>
                 : null}
-            { csq_canonical ? <span className="text-300"> (canonical)</span> : null }
+            { csq_canonical ?
+                <span className="text-400 ml-05 text-muted small" data-tip="Canonical Transcript">
+                    <i className="icon icon-asterisk fas"/>
+                </span>
+                : null }
         </React.Fragment>
     );
 }

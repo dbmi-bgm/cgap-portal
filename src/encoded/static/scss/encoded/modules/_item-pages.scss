@@ -350,7 +350,12 @@ $tabbar-height: 46px;
 #full-alerts-container {
 	position: sticky;
 	z-index: 500;
-	top: 40px;
+	top: 0px;
+
+	@include navbar-fixed-position {
+		top: 40px;
+	}
+
 	> .alerts {
 		> .alert {
 			margin-bottom: 0px;
@@ -1152,7 +1157,7 @@ i.status-indicator-dot {
 				color: #fff;
 				/* border: 1px solid cornflowerblue; */
 				border: none;
-				padding: 0px 24px;
+				padding: 4px 24px 3px;
 				&:hover {
 					background-color: darken($color: cornflowerblue, $amount: 7.5%);
 				}
@@ -1245,42 +1250,35 @@ i.status-indicator-dot {
 					display: flex;
 					height: $search-results-header-row-height; // Eh why not re-use this, can change always in future.
 
+					padding: 0;
+					border: none;
+					background: transparent;
+
 					@include media-breakpoint-down(md) {
 						margin-bottom: 5px;
 					}
-					
-					> button {
-						// TODO store color in variable, ideally bootstrap one, for re-use in places.
+
+					> div.btn-title {
 						background-color: cornflowerblue;
 						transition: background-color .25s ease-out, box-shadow .5s;
 						color: #ffff;
 						height: 100%;
-						display: block;
 						text-align: center;
 						padding: 10px;
 						text-decoration: none;
-						border: none;
 						width: 100%;
 						box-shadow: none;
+
+						display: flex;
+						align-items: center;
+						justify-content: center;
+
 						&:focus:not(.active),
 						&:active:not(.active) {
 							outline: none;
 						}
 					}
 
-					&:not(.active) > button {
-						// Applicable for when navigating with (shift-)tab w.o. mouse.
-						&:focus:not(.active),
-						&:active:not(.active) {
-							
-							// Same :hover styling below, should get overriden by other styles
-							// unless someone is using (shift-)tab to navigate instead of mouse cursor.
-							background-color: darken($color: cornflowerblue, $amount: 7.5%);
-							+ .btn-append svg path {
-								fill: darken($color: cornflowerblue, $amount: 7.5%);
-							}
-						}
-					}
 
 					> .btn-append,
 					> .btn-prepend {
@@ -1301,6 +1299,22 @@ i.status-indicator-dot {
 						}
 					}
 
+					&:not(.active) {
+						// Applicable for when navigating with (shift-)tab w.o. mouse.
+						&:focus,
+						&:active {
+							// Same :hover styling below, should get overriden by other styles
+							// unless someone is using (shift-)tab to navigate instead of mouse cursor.
+							> .btn-title {
+								background-color: darken($color: cornflowerblue, $amount: 7.5%);
+							}
+							> .btn-prepend svg path,
+							> .btn-append svg path {
+								fill: darken($color: cornflowerblue, $amount: 7.5%);
+							}
+						}
+					}
+
 					@include media-breakpoint-up(lg) {
 
 						flex-basis: 20%; /* <- dependendent on there being 5 of these tabs (keep in sync w. amount of tabs) */
@@ -1309,7 +1323,7 @@ i.status-indicator-dot {
 							> .btn-prepend {
 								display: none;
 							}
-							> button {
+							> .btn-title {
 								padding-left: 24px;
 								border-radius: $border-radius-base 0 0 $border-radius-base;
 							}
@@ -1319,7 +1333,7 @@ i.status-indicator-dot {
 							> .btn-append {
 								display: none;
 							}
-							> button {
+							> .btn-title {
 								padding-right: 24px;
 								border-radius: 0 $border-radius-base $border-radius-base 0;
 							}
@@ -1328,7 +1342,7 @@ i.status-indicator-dot {
 					}
 
 					&.disabled {
-						> button {
+						> .btn-title {
 							background-color: desaturate($color: lighten($color: cornflowerblue, $amount: 20%), $amount: 100%) !important;
 						}
 						> .btn-append > svg > path,
@@ -1339,7 +1353,7 @@ i.status-indicator-dot {
 
 					&:hover:not(.disabled):not(.active) {
 
-						> button {
+						> .btn-title {
 							background-color: darken($color: cornflowerblue, $amount: 7.5%) !important;
 						}
 						> .btn-append > svg > path,
@@ -1350,7 +1364,7 @@ i.status-indicator-dot {
 
 					&.active {
 
-						> button {
+						> .btn-title {
 							// background-color: darken($color: cornflowerblue, $amount: 30%) !important;
 							// box-shadow: 0px 13px 16px -16px #000;
 							background-color: $primary-dark;
@@ -1452,21 +1466,23 @@ i.status-indicator-dot {
 					.accession-table {
 						margin-left: 10px; 
 
-						div.row:not(:last-child) {
-							border-bottom: 1px solid #ddd;
-							padding-bottom: 5px;
-						}
-
 						div.row {
 							max-width: 100%;
 							padding-top: 5px;
+							padding-bottom: 5px;
 
 							> div.col-auto,
 							> div.col {
-							padding-left: 0;
-							padding-right: 0;
+								padding-left: 0;
+								padding-right: 0;
 							}
+
+							&:not(:last-child) {
+								border-bottom: 1px solid #ddd;
+							}
+	
 						}
+						
 
 						div.accession-table-title {
 							font-weight: 600;
@@ -1591,22 +1607,32 @@ i.status-indicator-dot {
 				.embedded-search-container .search-view-controls-and-results[data-search-item-type="StructuralVariantSample"] {
 					.search-result-row.detail-closed .columns.result-table-row {
 						.search-result-column-block[data-field="display_title"][data-first-visible-column="true"] {
-							// Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate
-							padding-left: 0 !important; // important necessary to override default style (this is short term override/will be deleted soon so hopefully ok)
-						}
-						.search-result-column-block[data-field="status"],
-						.search-result-column-block[data-field="date_created"] {
-							display: flex;
-							justify-content: center;
+							/* Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate */
+							/* important necessary to override default style (this is short term override/will be deleted soon so hopefully ok) */
+							padding-left: 18px !important;
+							.toggle-detail-button-container {
+								display: none;
+							}
 						}
 					}
 				}
 
+				
 				.filtering-tab-toggle {
-					width: max-content; 
+
+					button.btn.active {
+						pointer-events: none;
+					}
+
+					/**
+					width: max-content;
 	
 					> div {
 						padding: 5px 40px;
+
+						@include media-breakpoint-down(sm) {
+							padding: 5px 12px;
+						}
 	
 						&.active {
 							background-color: lighten($primary, 40%);
@@ -1614,6 +1640,7 @@ i.status-indicator-dot {
 							border-radius: 0.4em;
 						} 
 					}
+					**/
 				}
 			}
 		}
@@ -1820,7 +1847,6 @@ i.status-indicator-dot {
 	/* background-color: desaturate(lighten($primary-dark, 45%), 30%); */ // #b4c8d8; // $gray-300;
 
 	// background-color: #dedede;
-	border-radius: $border-radius-lg;
 	// border: 4px solid transparent;
 	// transition: background-color .5s ease-out;
 
@@ -1834,18 +1860,14 @@ i.status-indicator-dot {
 		/** Header **/
 		/* Looks nice, enough to accomodate Save | Save As buttons, and gives us a concrete number to match FS preset selection UI header height to. */
 		min-height: 65px;
-		background-color: $primary-dark;
-		color: #fff;
-		h4 {
-			color: #fff;
-		}
 	}
 
 	&[data-is-open="false"] {
 		.filter-set-ui-header {
 			/* Appear more as button when closed */
 			/* Same as parent .filterset-outer-container above */
-			border-radius: inherit;
+			border-radius: $border-radius-lg;
+			transition: border-radius .35s .35s ease-in;
 		}
 	}
 
@@ -1999,7 +2021,7 @@ i.status-indicator-dot {
 	.filterset-blocks-container {
 
 		background-color: #dedede;
-		// border-radius: $border-radius-lg;
+		border-radius: 0 0 $border-radius-lg $border-radius-lg;
 		border: 4px solid transparent;
 		border-top: none;
 		transition: background-color .4s .1s ease-in;
@@ -2018,6 +2040,7 @@ i.status-indicator-dot {
 		&[data-all-selected="true"] {
 			border-color: $primary-dark;
 			background-color: desaturate(lighten($primary-dark, 40%), 25%);
+
 			.blocks-container {
 	
 				 .filterset-block.selected {
@@ -2073,20 +2096,56 @@ i.status-indicator-dot {
 	CaseView -> InterpretationTab + CaseReviewTab
 **********************************************************/
 
-.variant-sample-selection {
+.variant-sample-selection.card {
 
 	h4.selected-vsl-title {
 		font-size: 1.275rem; /* Slight decrease from h4 default of 1.3rem */
+
+		> a:hover {
+			/* Remove underline, icon changing should be enough.. */
+			text-decoration: none;
+		}
+
 		i.icon {
 			font-size: 0.725em;
 		}
-		a + i.icon-pen {
-			color: transparent;
+
+		> i.title-prefix-icon,
+		> span {
+			transition: color .3s;
 		}
-		a:hover + i.icon-pen {
-			color: $gray-400;
+
+		> i.title-prefix-icon.icon-pen,
+		> i.title-prefix-icon.icon-sticky-note {
+			color: $gray-600;
+		}
+
+		&:hover > i.title-prefix-icon.icon-pen,
+		&:hover > i.title-prefix-icon.icon-sticky-note {
+			color: $primary-dark; //$gray-900;
 		}
 	}
+
+
+	transition: border-color .5s ease-out;
+
+	> .card-body,
+	> .card-footer {
+		/* maybe should add some more explit classNames */
+		transition: opacity .5s ease-out;
+	}
+
+	&[data-is-deleted="true"] {
+		border-color: transparentize($color: $danger, $amount: 0.25);
+		box-shadow: none;
+		> .card-body,
+		> .card-footer {
+			opacity: 0.3;
+			pointer-events: none;
+		}
+	}
+
+	
 
 	.note-content-area {
 
@@ -2119,7 +2178,31 @@ i.status-indicator-dot {
 
 
 /**********************************************************
+  Report View & Print Preview
+**********************************************************/
+
+/* Print Preview Pane Effects */
+
+.item-page-container {
+	@media screen {
+		/* Avoid adding these style to print media, since this page will be printed */
+		.print-preview-pane {
+			transition: opacity .75s 1s ease-in;
+			.pagedjs_pages {
+				.pagedjs_page {
+					box-shadow: 0 0 1px 0px rgba(0,0,0,0.7);
+					margin: 0 auto 16px;
+				}
+			}
+		}
+
+	}
+}
+
+
+/**********************************************************
   HiGlass Views
+  TODO: Maybe put into own stylesheet and load only when/after need HiGlass
 **********************************************************/
 
 .higlass-wrapper {
@@ -2511,26 +2594,16 @@ i.status-indicator-dot {
 		}
 
 		.card-body {
-			ul {
-				list-style-type: none;
+			.interpretation-tabs {
 				border:1px solid lightgray;
 				border-radius: 5px;
-				li.interpretation-tab {
-					&[data-active="true"] {
-						background-color: #beccda;
-						color: $primary-dark;
-						border-radius: 3px;
-					}
-					font-size: 13px;
-					padding: 3px 7px;
-				}
 			}
 
 			.interpretation-panel {
 				margin: 10px 0;
 
 				textarea {
-					border-color: lightgrey;
+					border: 1px solid lightgray;
     				border-radius: 5px;
 					padding: 10px;
 				}

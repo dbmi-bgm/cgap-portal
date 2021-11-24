@@ -1,15 +1,26 @@
 'use strict';
 
 import React, { useCallback, useMemo, useState } from 'react';
+import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
+import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
+
+// TEMPORARY:
+import { projectReportSettings } from './../ReportView/project-settings-draft';
 
 
 /**
  * @module
  * This file contains the VariantSampleSelection item, which is shared between InterpretationTab and Finalize Case tab.
+ *
+ * @todo
+ * We will need to load in Project Item to get table tags and potentially other settings from such
+ * as default sorting of VSes. We probably should do this at the CaseView/index.js level so it is accessible
+ * to all elements? It could be lazy-loaded and we just render classification dropdowns once it's loaded.
  */
 
 
@@ -22,51 +33,93 @@ export const parentTabTypes = {
 
 /**
  * Shows list of variant sample selections, or loading icon, depending on props.
+ * `virtualVariantSampleListItem` takes precedence here.
+ *
+ * @todo Pass down a `props.updateVirtualVariantSampleListItem` function.
  */
 export const VariantSampleSelectionList = React.memo(function VariantSampleSelectionList (props) {
     const {
         variantSampleListItem,
-        // sortedVariantSampleSelections, // TODO: If this is present, it will take priority over `variantSampleListItem.variant_samples`
         schemas,
         context,
         isLoadingVariantSampleListItem = false,
         parentTabType = parentTabTypes.INTERPRETATION,
-        alreadyInProjectNotes,
 
-        // From CaseReviewDataStore (if used, else undefined):
+        // From InterpretationTab:
+        toggleVariantSampleSelectionDeletion,
+        deletedVariantSampleSelections,
+        anyUnsavedChanges,
+
+        // From CaseReviewTab:
+        alreadyInProjectNotes,
+        alreadyInReportNotes,
+        // savedClassificationsByVS,
+        changedClassificationsByVS,
+        updateClassificationForVS,
+
+        // From CaseReviewSelectedNotesStore (if used, else undefined):
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
         sendToReportStore
     } = props;
-    const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
 
-    if (isLoadingVariantSampleListItem) {
+    const { variant_samples: vsSelections = [] } =  variantSampleListItem || {};
+
+    // Used for faster lookups of current tag title.
+    const tableTagsByID = useMemo(function(){
+        const tableTagsByID = {};
+        const {
+            table_tags: {
+                tags = []
+            } = {}
+        } = projectReportSettings;
+        tags.forEach(function(tag){
+            tableTagsByID[tag.id] = tag;
+        });
+        return tableTagsByID;
+    }, [ projectReportSettings ]);
+
+    if (vsSelections.length === 0) {
         return (
-            <h4 className="text-400 text-center text-muted py-3">
-                <i className="icon icon-spin icon-circle-notch icon-2x fas"/>
+            <h4 className="text-400 text-center text-secondary py-3">
+                { isLoadingVariantSampleListItem ? "Loading, please wait..." : "No selections added yet" }
             </h4>
         );
-    } else if (vsSelections.length === 0) {
-        return (
-            <h4 className="text-400">No selections added yet</h4>
-        );
-    } else {
-        const commonProps = {
-            schemas, context, parentTabType,
-            toggleSendToProjectStoreItems,
-            toggleSendToReportStoreItems,
-            sendToProjectStore,
-            sendToReportStore,
-            alreadyInProjectNotes
-        };
-        return vsSelections.map(function(selectionSubObject, idx){
-            return (
-                <VariantSampleSelection {...commonProps}
-                    selection={selectionSubObject} key={idx} index={idx} />
-            );
-        });
     }
+
+    const commonProps = {
+        schemas, context, parentTabType,
+        toggleSendToProjectStoreItems,
+        toggleSendToReportStoreItems,
+        sendToProjectStore,
+        sendToReportStore,
+        alreadyInProjectNotes,
+        alreadyInReportNotes,
+        tableTagsByID,
+        updateClassificationForVS,
+        toggleVariantSampleSelectionDeletion,
+        anyUnsavedChanges
+    };
+
+    return vsSelections.map(function(selection, index){
+        const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID } = {} } = selection;
+        if (!vsAtID) {
+            // Handle lack of permissions, show some 'no permissions' view, idk..
+            return (
+                <div className="text-center p-3">
+                    <em>Item with no view permissions</em>
+                </div>
+            );
+        }
+        const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
+        const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
+        return (
+            <VariantSampleSelection {...commonProps} key={vsUUID || index}
+                {...{ selection, index, unsavedClassification, isDeleted }}  />
+        );
+    });
+
 });
 
 
@@ -87,19 +140,30 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         context,    // Case
         schemas,
         parentTabType = parentTabTypes.INTERPRETATION,
+        // From InterpretationTab (if used):
+        toggleVariantSampleSelectionDeletion,
+        isDeleted,
+        anyUnsavedChanges, // If true, then should prevent navigation to VS items as would lose changes in current view. (Unless we adjust to open in new window.)
         // From CaseReviewTab (if used):
         alreadyInProjectNotes,
-        // From CaseReviewDataStore (if used):
+        alreadyInReportNotes,
+        unsavedClassification,
+        updateClassificationForVS,
+        // From CaseReviewSelectedNotesStore (if used):
         toggleSendToProjectStoreItems,
         toggleSendToReportStoreItems,
         sendToProjectStore,
-        sendToReportStore
+        sendToReportStore,
+        tableTagsByID
     } = props;
-    const { accession: caseAccession } = context; // `context` refers to our Case in here.
+    const {
+        accession: caseAccession,
+        report: { uuid: reportUUID } = {}
+    } = context; // `context` refers to our Case in here.
     const {
         date_selected,
         filter_blocks_request_at_time_of_selection,
-        variant_sample_item
+        variant_sample_item: variantSample
     } = selection;
 
 
@@ -136,7 +200,23 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         discovery_interpretation: discoveryInterpretationNote = null,
         variant_notes: lastVariantNote = null,
         gene_notes: lastGeneNote = null
-    } = variant_sample_item || {};
+    } = variantSample || {};
+
+    const { countNotes, countNotesInReport, countNotesInKnowledgeBase } = useMemo(function(){
+        const notes = getAllNotesFromVariantSample(variantSample);
+        const countNotes = notes.length;
+        let countNotesInReport = 0;
+        let countNotesInKnowledgeBase = 0;
+        notes.forEach(function({ uuid: noteUUID }){
+            if (alreadyInReportNotes && alreadyInReportNotes[noteUUID]) {
+                countNotesInReport++;
+            }
+            if (alreadyInProjectNotes && alreadyInProjectNotes[noteUUID]) {
+                countNotesInKnowledgeBase++;
+            }
+        });
+        return { countNotes, countNotesInReport, countNotesInKnowledgeBase };
+    }, [ context, variantSample ]);
 
     const noSavedNotes = clinicalInterpretationNote === null && discoveryInterpretationNote === null && lastVariantNote === null && lastGeneNote === null;
     const { classification: acmgClassification = null } = clinicalInterpretationNote || {};
@@ -145,61 +225,51 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     let expandedNotesSection = null;
     if (isExpanded) {
         const noteSectionProps = {
-            "variantSample": variant_sample_item,
+            variantSample,
             toggleSendToProjectStoreItems,
             toggleSendToReportStoreItems,
             sendToProjectStore,
             sendToReportStore,
-            alreadyInProjectNotes
+            alreadyInProjectNotes,
+            alreadyInReportNotes
         };
         expandedNotesSection = <VariantSampleExpandedNotes {...noteSectionProps} />;
     }
 
     return (
-        <div className="card mb-1 variant-sample-selection" key={index}>
-            <div className="card-header">
+        <div className="card mb-16 variant-sample-selection" data-is-deleted={isDeleted} key={index}>
+            <div className="card-header pr-12">
                 <div className="d-flex flex-column flex-lg-row align-items-lg-center">
 
                     <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
                         <h4 className="text-truncate text-600 my-0 selected-vsl-title">
-                            {
-                                parentTabType === parentTabTypes.CASEREVIEW ?
-                                    <React.Fragment>
-                                        { variantDisplayTitle }
-                                        { noSavedNotes ? <i className="icon icon-exclamation-triangle fas ml-12 text-warning" data-tip="No notes saved for this Sample Variant in interpretation"/> : null }
-                                    </React.Fragment>
-                                    : (
-                                        <React.Fragment>
-                                            <a href={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`}>
-                                                { variantDisplayTitle }
-                                            </a>
-                                            <i className="icon icon-pen fas ml-12"/>
-                                        </React.Fragment>
-                                    )
+                            { parentTabType === parentTabTypes.CASEREVIEW ?
+                                <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle }}/>
+                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession }} />
                             }
                         </h4>
                     </div>
 
-                    <div className="flex-grow-1 d-none d-lg-block px-2">&nbsp;</div>
+                    <div className="flex-grow-1 d-none d-lg-block px-2">
+                        &nbsp;
+                    </div>
 
                     <div className="flex-auto">
 
                         { parentTabType === parentTabTypes.CASEREVIEW ?
-                            <button type="button" className={"btn btn-sm btn-" + (noSavedNotes ? "outline-dark" : "primary")} onClick={toggleIsExpanded} disabled={noSavedNotes}>
-                                <i className={"icon fas mr-07 icon-" + (!isExpanded ? "plus" : "minus")} />
-                                { !isExpanded ? "Review Variant Notes & Classification" : "Hide Variant Notes & Classification" }
-                            </button>
+                            <div className="d-block d-lg-flex align-items-center">
+                                <ClassificationDropdown {...{ variantSample, tableTagsByID, unsavedClassification, updateClassificationForVS }} />
+                                <button type="button" className={"btn btn-sm d-flex align-items-center btn-" + (noSavedNotes ? "outline-secondary" : isExpanded ? "primary-dark" : "primary")}
+                                    onClick={toggleIsExpanded} disabled={noSavedNotes}>
+                                    <i className={"icon icon-fw fas mr-06 icon-" + (!isExpanded ? "plus" : "minus")} />
+                                    {/* !isExpanded ? "Review Notes & Classification" : "Hide Notes & Classification" */}
+                                    Review Notes & Classification
+                                </button>
+                            </div>
                             : null }
 
                         { parentTabType === parentTabTypes.INTERPRETATION ?
-                            <DropdownButton size="sm" variant="light" className="d-inline-block ml-07" disabled title={
-                                <React.Fragment>
-                                    <i className="icon icon-bars fas mr-07"/>
-                                    Actions
-                                </React.Fragment>
-                            }>
-                                TODO
-                            </DropdownButton>
+                            <ActionsDropdown {...{ toggleVariantSampleSelectionDeletion, isDeleted, variantSample }} />
                             : null }
 
                     </div>
@@ -212,19 +282,19 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
                             { geneTranscriptColTitle || "Gene, Transcript" }
                         </label>
-                        { geneTranscriptRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        { geneTranscriptRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
                         <label className="mb-04 text-small" data-tip={variantColDescription}>
                             { variantColTitle || "Variant" }
                         </label>
-                        { variantRenderFunc(variant_sample_item, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        { variantRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                     </div>
                     <div className="col col-sm-4 col-lg-3 py-2">
                         <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
                             { genotypeLabelColTitle || "Genotype" }
                         </label>
-                        { genotypeLabelRenderFunc(variant_sample_item, { align: 'left' }) }
+                        { genotypeLabelRenderFunc(variantSample, { align: 'left' }) }
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
                         <label className="mb-04 text-small">ACMG Classification</label>
@@ -274,6 +344,166 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     );
 });
 
+function InterpretationTabVariantSampleTitle(props){
+    const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession } = props;
+    if (anyUnsavedChanges) {
+        return (
+            <React.Fragment>
+                <i className={`icon align-middle icon-fw title-prefix-icon icon-${isDeleted ? "trash text-danger" : "check text-success"} fas mr-12`}/>
+                <span className={"text-" + (isDeleted? "muted": "secondary")}>{ variantDisplayTitle }</span>
+            </React.Fragment>
+        );
+    } else {
+        return (
+            <React.Fragment>
+                <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
+                    data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
+                <a href={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`}>
+                    { variantDisplayTitle }
+                </a>
+            </React.Fragment>
+        );
+    }
+}
+
+const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariantSampleTitle(props){
+    const { noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle } = props;
+    return (
+        <React.Fragment>
+            <i className={
+                "icon align-middle icon-fw title-prefix-icon fas mr-12 icon-"
+                + (noSavedNotes ? "exclamation-triangle text-warning" : countNotesInReport > 0 ? "file text-secondary" : "minus-circle text-secondary")
+            } data-tip={
+                noSavedNotes ? "No notes saved for this Sample Variant, annotate it under the Interpretation tab."
+                    : `This sample has <b>${countNotesInReport}</b> (of ${countNotes}) note${countNotesInReport === 1 ? "" : "s"} saved to the report`
+                        + (countNotesInReport === 0 ? " and thus will be <b>excluded from report</b> entirely." : ".")
+            } data-html />
+            <span className="text-secondary">{ variantDisplayTitle }</span>
+            { countNotesInKnowledgeBase > 0 ?
+                <i className="icon align-middle icon-fw icon-database fas ml-12 text-muted" data-html
+                    data-tip={`This sample has <b>${countNotesInKnowledgeBase}</b> (of ${countNotesInReport}) note${countNotesInKnowledgeBase === 1 ? "" : "s"} which have been saved to project.`}/>
+                : null }
+        </React.Fragment>
+    );
+});
+
+
+function ActionsDropdown(props){
+    const { toggleVariantSampleSelectionDeletion, variantSample, isDeleted } = props;
+    const { uuid: vsUUID } = variantSample;
+
+    const onSelect = useCallback(function(evtKey, e){
+        if (evtKey === "delete") {
+            toggleVariantSampleSelectionDeletion(vsUUID);
+        }
+    }, [ toggleVariantSampleSelectionDeletion, variantSample ]);
+
+    return (
+        <DropdownButton size="sm" variant="light" className="d-inline-block" onSelect={onSelect}
+            title={
+                <React.Fragment>
+                    <i className="icon icon-bars fas mr-07"/>
+                    Actions
+                </React.Fragment>
+            }>
+            <DropdownItem key={0} eventKey="delete">
+                <i className={"icon mr-08 icon-fw fas icon-" + (isDeleted ? "trash-restore" : "trash")} />
+                { isDeleted ? "Unmark from deletion" : "Mark for deletion" }
+            </DropdownItem>
+        </DropdownButton>
+    );
+}
+
+
+function ClassificationDropdown(props){
+    const { variantSample, tableTagsByID, unsavedClassification = undefined, updateClassificationForVS } = props;
+    const {
+        finding_table_tag: savedClassification = null,
+        uuid: vsUUID,
+        actions: vsActions = []
+    } = variantSample || {};
+
+    const isUnsavedClassification = typeof unsavedClassification !== "undefined"; // `null` means explicitly removed
+    const viewClassification = isUnsavedClassification ? unsavedClassification : savedClassification;
+
+    // projectReportSettings will eventually be passed down in from CaseView or similar place that AJAXes it in.
+    const { table_tags: { tags = [] } = {} } = projectReportSettings;
+
+    const onOptionSelect = useCallback(function(evtKey, evt){
+        console.log("Selected classification", evtKey, "for", vsUUID);
+        updateClassificationForVS(vsUUID, evtKey || null);
+    }, [ variantSample, updateClassificationForVS ]);
+
+    const renderedOptions = [];
+
+    const haveEditPermission = useMemo(function(){
+        return !!(_.findWhere(vsActions, { "name" : "edit" }));
+    }, [ variantSample ]);
+
+    if (haveEditPermission) {
+        tags.forEach(function(tagObj, idx){
+            const { id: classificationID, title } = tagObj;
+            const existingSavedOption = (savedClassification === classificationID);
+            const active = (viewClassification && viewClassification === classificationID);
+            renderedOptions.push(
+                <DropdownItem key={idx} eventKey={classificationID} active={active}
+                    className={existingSavedOption && !active ? "bg-light text-600" : null}>
+                    { title }
+                </DropdownItem>
+            );
+        });
+
+        renderedOptions.push(<div className="dropdown-divider"/>);
+        renderedOptions.push(
+            <DropdownItem key="none" eventKey={null} active={!viewClassification}
+                className={!savedClassification && viewClassification ? "bg-light text-600" : null}>
+                <em>None</em>
+            </DropdownItem>
+        );
+    }
+
+    const unsavedIndicator = (
+        <i className="icon icon-asterisk fas mr-06 text-danger text-smaller"
+            data-delay={500} data-tip="Not yet saved, click 'Update Findings' to apply."/>
+    );
+
+    const title = (
+        !viewClassification || unsavedClassification === null ?
+            <React.Fragment>
+                { isUnsavedClassification ? unsavedIndicator : null }
+                <span className="text-300">
+                    Not a finding
+                </span>
+            </React.Fragment>
+            : (
+                (tableTagsByID[viewClassification] && (
+                    <React.Fragment>
+                        { isUnsavedClassification ? unsavedIndicator : null }
+                        <span>
+                            { tableTagsByID[viewClassification].title || viewClassification }
+                        </span>
+                    </React.Fragment>
+                ))
+            ) || <em>Unknown or deprecated `{viewClassification}`</em>
+    );
+
+
+
+    // Right now we allow to select 1 tag per VS, but could support multiple theoretically later on.
+
+    return (
+        <div className="py-1 py-lg-0 pr-lg-12">
+            <DropdownButton size="sm" variant="outline-dark d-flex align-items-center" menuAlign="right" title={title} onSelect={onOptionSelect}
+                disabled={!haveEditPermission || tags.length === 0}
+                data-delay={500} data-tip={!viewClassification? "Select a finding..." : null }>
+                { renderedOptions }
+            </DropdownButton>
+        </div>
+    );
+}
+
+
+
 const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicator(){
     return (
         <span className="text-left text-muted text-truncate">
@@ -291,7 +521,8 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
         toggleSendToReportStoreItems,
         sendToProjectStore,
         sendToReportStore,
-        alreadyInProjectNotes
+        alreadyInProjectNotes,
+        alreadyInReportNotes
     } = props;
     const {
         interpretation: {
@@ -333,12 +564,20 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
         && (noClinicalNoteSaved    || sendToReportStore[clinicalInterpretationNoteUUID])
     );
 
+    const allNotesToReportAlreadyStored = (
+        (noVariantNotesSaved       || alreadyInReportNotes[lastVariantNoteUUID])
+        && (noGeneNotesSaved       || alreadyInReportNotes[lastGeneNoteUUID])
+        && (noDiscoveryNoteSaved   || alreadyInReportNotes[discoveryInterpretationNoteUUID])
+        && (noClinicalNoteSaved    || alreadyInReportNotes[clinicalInterpretationNoteUUID])
+    );
+
     const someNotesToReportSelected = (
         (!noVariantNotesSaved       && sendToReportStore[lastVariantNoteUUID])
         || (!noGeneNotesSaved       && sendToReportStore[lastGeneNoteUUID])
         || (!noDiscoveryNoteSaved   && sendToReportStore[discoveryInterpretationNoteUUID])
         || (!noClinicalNoteSaved    && sendToReportStore[clinicalInterpretationNoteUUID])
     );
+
 
     const allNotesToKnowledgeBaseSelected = (
         (noVariantNotesSaved       || sendToProjectStore[lastVariantNoteUUID])
@@ -408,9 +647,10 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
             <div className="card-body bg-light select-checkboxes-section border-top border-bottom">
                 <div>
                     <Checkbox className="d-inline-block mb-08"
-                        checked={!!allNotesToReportSelected}
+                        disabled={allNotesToReportAlreadyStored}
+                        checked={!!allNotesToReportSelected || allNotesToReportAlreadyStored}
                         onChange={onChangeSendAllNotesToReport}
-                        indeterminate={someNotesToReportSelected && !allNotesToReportSelected}>
+                        indeterminate={someNotesToReportSelected && !allNotesToReportSelected && !allNotesToReportAlreadyStored}>
                         Send All Notes to Report
                     </Checkbox>
                 </div>
@@ -437,6 +677,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                     kbChecked={!!sendToProjectStore[lastVariantNoteUUID]}
                                     onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastVariantNoteUUID, true ] ]); })}
                                     onKBChange={useCallback(function(){ toggleSendToProjectStoreItems([ [ lastVariantNoteUUID, true ] ]); })}
+                                    reportAlreadyStored={alreadyInReportNotes[lastVariantNoteUUID]}
                                     kbAlreadyStored={alreadyInProjectNotes[lastVariantNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
@@ -458,6 +699,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                     kbChecked={!!sendToProjectStore[lastGeneNoteUUID]}
                                     onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ lastGeneNoteUUID, true ] ]); })}
                                     onKBChange={useCallback(function(){ toggleSendToProjectStoreItems([ [ lastGeneNoteUUID, true ] ]); })}
+                                    reportAlreadyStored={alreadyInReportNotes[lastGeneNoteUUID]}
                                     kbAlreadyStored={alreadyInProjectNotes[lastGeneNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
@@ -480,6 +722,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                     kbChecked={!!sendToProjectStore[clinicalInterpretationNoteUUID]}
                                     onReportChange={useCallback(function(){ toggleSendToReportStoreItems([ [ clinicalInterpretationNoteUUID, true ] ]); })}
                                     onKBChange={useCallback(function(){ toggleSendToProjectStoreItems([ [ clinicalInterpretationNoteUUID, true ] ]); })}
+                                    reportAlreadyStored={alreadyInReportNotes[clinicalInterpretationNoteUUID]}
                                     kbAlreadyStored={alreadyInProjectNotes[clinicalInterpretationNoteUUID]} />
 
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
@@ -514,6 +757,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                     kbChecked={!!sendToProjectStore[discoveryInterpretationNoteUUID]}
                                     onReportChange={ useCallback(function(){ toggleSendToReportStoreItems([ [ discoveryInterpretationNoteUUID, true ] ]); }) }
                                     onKBChange={ useCallback(function(){ toggleSendToProjectStoreItems([ [ discoveryInterpretationNoteUUID, true ] ]); }) }
+                                    reportAlreadyStored={alreadyInReportNotes[discoveryInterpretationNoteUUID]}
                                     kbAlreadyStored={alreadyInProjectNotes[discoveryInterpretationNoteUUID]} />
                                 <div className="note-content-area d-flex flex-column flex-grow-1">
                                     <div className="note-text-content flex-grow-1">
@@ -552,10 +796,11 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
     );
 });
 
-const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onKBChange, reportChecked, kbChecked, kbAlreadyStored }) {
+const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onKBChange, reportChecked, reportAlreadyStored, kbChecked, kbAlreadyStored }) {
     return (
         <div className="d-flex flex-column flex-xl-row text-small">
-            <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={onReportChange} checked={reportChecked}>
+            <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={reportAlreadyStored ? null : onReportChange}
+                checked={reportAlreadyStored || reportChecked} disabled={reportAlreadyStored}>
                 Send to Report
             </Checkbox>
             <Checkbox className="flex-grow-1" labelClassName="mb-0" onChange={kbAlreadyStored ? null : onKBChange}
@@ -567,68 +812,3 @@ const NoteCheckboxes = React.memo(function NoteCheckboxes ({ onReportChange, onK
 });
 
 
-
-
-
-
-export class CaseReviewDataStore extends React.PureComponent {
-
-    constructor(props) {
-        super(props);
-
-        this.toggleSendToProjectStoreItems = this.toggleStoreItems.bind(this, "sendToProjectStore");
-        this.toggleSendToReportStoreItems = this.toggleStoreItems.bind(this, "sendToReportStore");
-        this.resetSendToProjectStoreItems = this.resetStoreItems.bind(this, "sendToProjectStore");
-        this.resetSendToReportStoreItems = this.resetStoreItems.bind(this, "sendToReportStore");
-
-        this.state = {
-            // Keyed by Note Item UUID and value is boolean true/false for now (can be changed)
-            "sendToProjectStore": {},
-            "sendToReportStore": {}
-        };
-    }
-
-    toggleStoreItems(storeName, noteSelectionObjects, callback = null){
-        this.setState(function(currState){
-            const nextStore = { ...currState[storeName] };
-            noteSelectionObjects.forEach(function([ id, data ]){
-                if (nextStore[id]) {
-                    delete nextStore[id];
-                } else {
-                    nextStore[id] = data;
-                }
-            });
-            return { [storeName] : nextStore };
-        }, callback);
-    }
-
-    resetStoreItems(storeName, callback = null) {
-        this.setState({ [storeName]: {} }, callback);
-    }
-
-    render(){
-        const {
-            props: { children, ...passProps },
-            state,
-            toggleSendToProjectStoreItems,
-            toggleSendToReportStoreItems,
-            resetSendToProjectStoreItems,
-            resetSendToReportStoreItems
-        } = this;
-        const childProps = {
-            ...passProps,
-            ...state,
-            toggleSendToProjectStoreItems,
-            toggleSendToReportStoreItems,
-            resetSendToProjectStoreItems,
-            resetSendToReportStoreItems
-        };
-        return React.Children.map(children, function(c){
-            if (React.isValidElement(c)) {
-                return React.cloneElement(c, childProps);
-            }
-            return c;
-        });
-    }
-
-}

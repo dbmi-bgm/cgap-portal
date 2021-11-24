@@ -78,7 +78,8 @@
                     "item_identifier": {
                         "title": "Item Identifier",
                         "description": "The identifier of the associated item",
-                        "type": "string"
+                        "type": "string",
+                        "format": "uuid"
                     }
                 }
             }

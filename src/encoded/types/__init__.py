@@ -43,7 +43,20 @@ class Report(Item):
         "variant_samples.interpretation.conclusion",
         "variant_samples.interpretation.acmg_guidelines",
         "variant_samples.interpretation.note_text",
-        "extra_notes.note_text"
+        "extra_notes.note_text",
+        # Institution used for report footer
+        "institution.display_title",
+        "institution.address1",
+        "institution.address2",
+        "institution.city",
+        "institution.state",
+        "institution.country",
+        "institution.postal_code",
+        "institution.phone1",
+        "institution.phone2",
+        "institution.fax",
+        "institution.url",
+        "institution.contact_persons.email"
     ]
     rev = {'case': ('Case', 'report')}
 

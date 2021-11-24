@@ -99,6 +99,12 @@
             "linkTo": "FilterSet",
             "notes": "We could maybe have this be a sub-embedded object and save related metadata like date_changed or something, idk."
         },
+        "active_filterset_sv": {
+            "title": "Active SV Filterset",
+            "description": "Current FilterSet for StructuralVariants for this Case",
+            "type": "string",
+            "linkTo": "FilterSet"
+        },
         "extra_variant_sample_facets": {
             "title": "Extra Variant Sample Facets",
             "description": "List of user-specified additional fields to show in FacetList",
@@ -141,7 +147,9 @@
             "type": "string",
             "format": "accession",
             "permission": "restricted_fields",
-            "exclude_from": ["FFedit-create"]
+            "exclude_from": [
+                "FFedit-create"
+            ]
         }
     },
     "facets": {
