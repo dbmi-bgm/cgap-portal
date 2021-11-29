@@ -82,6 +82,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 	/* These must be updated in response to any font, bootstrap, etc. updates. */
 	&.fixed-height {
 		height: 37px;
+		height: 37.15px;
 	}
 
 	&.btn-lg.fixed-height {
@@ -211,7 +212,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
     border-radius: 3px;
 
     // For newer browsers, ensure doesn't go beyond window height
-    max-height: 75vh;
+    max-height: 50vh;
     overflow-y: auto;
 }
 

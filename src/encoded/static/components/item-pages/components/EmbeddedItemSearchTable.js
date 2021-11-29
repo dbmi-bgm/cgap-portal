@@ -4,16 +4,11 @@ import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import { get as getSchemas, Term } from './../../util/Schemas';
-import { object, ajax, layout, isServerSide, schemaTransforms, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { columnExtensionMap as columnExtensionMapCGAP } from './../../browse/columnExtensionMap';
 import { CaseDetailPane } from './../../browse/CaseDetailPane';
 import { DetailPaneStateCache } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/DetailPaneStateCache';
-
 import { EmbeddedSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/EmbeddedSearchView';
-//import { transformedFacets } from './../../../browse/SearchView';
-
-
-
 
 
 export function EmbeddedItemSearchTable (props){

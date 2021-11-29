@@ -244,7 +244,7 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
         iconCls = "save fas";
     }
 
-    const btnCls = "btn btn-" + (deletionsLen > 0 ? "danger" : "primary");
+    const btnCls = "btn d-flex align-items-center btn-" + (deletionsLen > 0 ? "danger" : "primary");
     const disabled = !anyUnsavedChanges || isPatching;
 
     return (

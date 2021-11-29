@@ -8,8 +8,8 @@ import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
 
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 
+import { AboveTableControlsBaseCGAP } from './../../../browse/AboveTableControlsBaseCGAP';
 import { AddToVariantSampleListButton } from './AddToVariantSampleListButton';
 import { SaveFilterSetButton } from './SaveFilterSetButton';
 import { SaveFilterSetPresetButton } from './SaveFilterSetPresetButton';
@@ -187,6 +187,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             // From EmbeddedSearchView:
             context: searchContext, // Current Search Response (not that of this filterSet, necessarily)
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
+            sortBy, sortColumns, // From SPC/SortController
             requestedCompoundFilterSet, // From SPC/VirtualHrefController
 
             // From FilteringTab (& higher, e.g. App/redux-store):
@@ -278,8 +279,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         if (isActiveDotRouterTab) {
             aboveTableControls = (
-                <AboveTableControlsBase {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions }}
-                    panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
+                <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
                     <h4 className="text-400 col-12 col-lg my-0 py-1">
                         <strong className="mr-1">{ totalCount }</strong>
                         <span>
@@ -303,7 +303,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                             : null }
                         { (searchType === "VariantSample") && <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} /> }
                     </div>
-                </AboveTableControlsBase>
+                </AboveTableControlsBaseCGAP>
             );
         }
 
@@ -570,11 +570,11 @@ function FilterSetUIBlockBottomUI(props){
         <div className="row pb-04 pt-16 px-3">
             <div className="col-auto mb-12">
                 <div className="btn-group" role="group" aria-label="Selection Controls">
-                    <button type="button" className="btn btn-primary-dark d-flex align-items-center" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center fixed-height" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
                         <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
                         Select All
                     </button>
-                    <button type="button" className="btn btn-primary-dark d-flex align-items-center" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center fixed-height" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
                         data-tip="Toggle whether to compute the union or intersection of filter blocks">
                         <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
                         Intersect
@@ -583,7 +583,7 @@ function FilterSetUIBlockBottomUI(props){
             </div>
             <div className="col-auto mb-12 flex-grow-1 d-flex justify-content-between flex-wrap">
                 <div className="btn-group mr-08" role="group" aria-label="Creation Controls">
-                    <button type="button" className="btn btn-primary-dark d-flex align-items-center" onClick={onAddBtnClick} data-tip="Add new blank filter block">
+                    <button type="button" className="btn btn-primary-dark d-flex align-items-center fixed-height" onClick={onAddBtnClick} data-tip="Add new blank filter block">
                         <i className="icon icon-fw icon-plus fas mr-1" />
                         Add Filter Block
                     </button>

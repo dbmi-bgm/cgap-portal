@@ -39,7 +39,7 @@ describe('Case View - Initial', function () {
         });
 
         it("Has pedigree with some nodes present", function(){
-            cy.get(".pedigree-vis-heading button.view-pedigree-btn").should("have.text", "View Pedigree").end()
+            cy.get(".pedigree-vis-heading button.view-pedigree-btn").should("have.text", "View").end()
                 .get("svg.pedigree-viz-shapes-layer.shapes-layer g.individuals-bg-shape-layer > g").should('have.length', 13);
         });
 

@@ -190,6 +190,27 @@ $facetlist-omitted-term-color: #901414;
 }
 
 
+/** Btn vertical alignment (probably temporary) **/
+.above-results-table-row {
+	margin-top: 5px;
+
+	.right-buttons {
+		> button.btn {
+			display: inline-flex;
+			align-items: center;
+			@extend .fixed-height;
+		}
+	}
+
+	// .search-result-config-panel {
+	// 	> .inner {
+	// 		.panel-title {
+	// 			background-color: #fff;;
+	// 		}
+	// 	}
+	// }
+}
+
 /************************************************
 ******** CGAP-Related SearchView Theming ********
 *************************************************/
@@ -236,6 +257,14 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 
 	}
 
+}
+
+.search-results-outer-container .search-results-container .shadow-border-layer > .edge-scroll-button {
+	background-color: #d2e3f1;
+	transition: background-color .35s;
+	&:hover {
+		background-color: #acc2d5;
+	}
 }
 
 
@@ -308,6 +337,10 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 	}
 
 }
+
+
+/*** Result row styling ***/
+
 
 .search-results-container .react-infinite-container .search-result-row {
 
