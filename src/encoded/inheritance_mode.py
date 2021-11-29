@@ -17,7 +17,7 @@ class InheritanceMode:
     MITOCHONDRIAL = 'M'
     CHROMOSOMES = [
         '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-        '21', AUTOSOME, 'X', 'Y', MITOCHONDRIAL
+        '21', '22', AUTOSOME, 'X', 'Y', MITOCHONDRIAL
     ]
 
     MALE = 'M'
@@ -49,10 +49,10 @@ class InheritanceMode:
     INHMODE_LABEL_DE_NOVO_MEDIUM = "de novo (medium)"
     INHMODE_LABEL_DE_NOVO_WEAK = "de novo (weak)"
     INHMODE_LABEL_DE_NOVO_CHRXY = "de novo (chrXY)"
-    INHMODE_DOMINANT_FATHER = "Dominant (paternal)"
-    INHMODE_DOMINANT_MOTHER = "Dominant (maternal)"
+    INHMODE_DOMINANT_FATHER = "Dominant (Paternal)"
+    INHMODE_DOMINANT_MOTHER = "Dominant (Maternal)"
     INHMODE_LABEL_RECESSIVE = "Homozygous recessive"
-    INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER = "X-linked recessive (Maternal)"
+    INHMODE_LABEL_X_LINKED_RECESSIVE = "X-linked recessive"
     INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER = "X-linked dominant (Maternal)"
     INHMODE_LABEL_X_LINKED_DOMINANT_FATHER = "X-linked dominant (Paternal)"
     INHMODE_LABEL_Y_LINKED = "Y-linked dominant"
@@ -65,7 +65,8 @@ class InheritanceMode:
     INHMODE_LABEL_NONE_SEX_INCONSISTENT = "Low relevance, mismatching chrXY genotype(s)"
     INHMODE_LABEL_NONE_LOWDEPTH = "Low relevance, low depth"
     INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT = "Low relevance, homozygous in a parent"
-    INHMODE_LABEL_NONE_BOTH_PARENTS = "Low relevance, present in both parent(s)"
+    INHMODE_LABEL_NONE_HEMIZYGOUS_PARENT = "Low relevance, hemizygous in a parent"
+    INHMODE_LABEL_NONE_BOTH_PARENTS = "Low relevance, present in both parents"
     INHMODE_LABEL_NONE_OTHER = "Low relevance, other"
     INHMODE_LABEL_NONE_SEX_AMBIGUOUS = "Ambiguous due to missing sex determination"
 
@@ -263,7 +264,7 @@ class InheritanceMode:
             return [cls.INHMODE_DOMINANT_FATHER]
 
         if (genotypes[cls.MOTHER] == "0/1" and genotypes[cls.FATHER] == "0/0"
-                and genotypes[cls.SELF] == "0/1"):
+                and genotypes[cls.SELF] == "0/1" and chrom == cls.AUTOSOME):
             return [cls.INHMODE_DOMINANT_MOTHER]
 
         if (genotypes[cls.MOTHER] == "0/1" and genotypes[cls.FATHER] == "0/1"
@@ -271,13 +272,23 @@ class InheritanceMode:
             return [cls.INHMODE_LABEL_RECESSIVE]
 
         # Inherited variants on sex chromosomes
+        if (genotypes[cls.MOTHER] == "0/1" and genotypes[cls.FATHER] == "1/1"
+                and genotypes[cls.SELF] == "1/1" and sexes[cls.SELF] == cls.FEMALE
+                and chrom == "X"):
+            return [cls.INHMODE_LABEL_X_LINKED_RECESSIVE]
+
         if (genotypes[cls.MOTHER] == "0/1" and genotypes[cls.FATHER] == "0/0"
                 and genotypes[cls.SELF] == "1/1" and sexes[cls.SELF] == cls.MALE and chrom == 'X'):
-            return [cls.INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER, cls.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER]
+            return [cls.INHMODE_LABEL_X_LINKED_RECESSIVE, cls.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER]
 
-        # bug here?
-        if (genotypes[cls.MOTHER] == "0/0" and genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_M and
-                chrom == 'X' and genotype_labels[cls.SELF][0] in [cls.GENOTYPE_LABEL_M, cls.GENOTYPE_LABEL_0M]):
+        if (genotypes[cls.MOTHER] == "0/1" and genotypes[cls.FATHER] == "0/0"
+                and genotypes[cls.SELF] == "0/1" and sexes[cls.SELF] == cls.FEMALE
+                and chrom == "X"):
+            return [cls.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER]
+
+        if (genotypes[cls.MOTHER] == "0/0" and genotypes[cls.FATHER] == "1/1"
+                and genotypes[cls.SELF] == "0/1" and sexes[cls.SELF] == cls.FEMALE
+                and chrom == 'X'):
             return [cls.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER]
 
         if (genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_M and
@@ -316,6 +327,11 @@ class InheritanceMode:
         if genotypes[cls.MOTHER] == "1/1" or (
                 genotypes[cls.FATHER] == "1/1" and genotype_labels[cls.FATHER][0] != cls.GENOTYPE_LABEL_M):
             return [cls.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT]
+
+        if (genotypes[cls.FATHER] == "1/1" and genotypes[cls.MOTHER] == "0/0"
+                and genotype_labels[cls.FATHER][0] == cls.GENOTYPE_LABEL_M
+                and genotype_labels[cls.SELF][0] == cls.GENOTYPE_LABEL_M):
+            return [cls.INHMODE_LABEL_NONE_HEMIZYGOUS_PARENT]
 
         if ((genotypes[cls.MOTHER] == "1/1" or genotypes[cls.MOTHER] == "0/1") and
                 (genotypes[cls.FATHER] == "1/1" or genotypes[cls.FATHER] == "0/1")):
