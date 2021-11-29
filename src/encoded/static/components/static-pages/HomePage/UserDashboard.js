@@ -1,9 +1,7 @@
 'use strict';
 
-import React, { useMemo, useCallback, useState, useRef, useEffect } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import _ from 'underscore';
-import url from 'url';
-import queryString from 'query-string';
 
 import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
@@ -11,11 +9,13 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console, ajax, JWT, searchFilters } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
+
 import { Term } from './../../util/Schemas';
 import { responsiveGridState } from './../../util/layout';
+import { SearchBar } from './../../browse/SearchBar';
+import { AboveTableControlsBaseCGAP } from './../../browse/AboveTableControlsBaseCGAP';
 
 import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
-import ReactTooltip from 'react-tooltip';
 
 
 export const UserDashboard = React.memo(function UserDashboard({ windowHeight, windowWidth }){
@@ -59,6 +59,7 @@ const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, wi
         + "&status!=inactive"
         + "&sort=-last_modified.date_modified"
     );
+
     const maxHeight = typeof windowHeight === "number" ?
         (
             windowHeight
@@ -66,15 +67,29 @@ const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, wi
             - (responsiveGridState(windowWidth) !== "xs" ? 53 : 106) // Height of checkboxes
         )
         : 400;
+
+    // const aboveTableComponent = (
+    //     <AboveTableControlsBase
+    //         panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
+    //             test
+    //     </AboveTableControlsBase>
+    // );
+
     return (
         <div className="recent-cases-table-section mb-36">
-            <EmbeddedCaseSearchTable {...{ searchHref, maxHeight }} facets={null} aboveTableComponent={<AboveCasesTableOptions />} />
+            <EmbeddedCaseSearchTable {...{ searchHref, maxHeight }} embeddedTableHeader={<AboveCasesTableOptions />}
+                hideFacets={["project.display_title", "report.uuid", "proband_case"]}/>
         </div>
     );
 });
 
 function AboveCasesTableOptions(props){
-    const { context, onFilter, isContextLoading, navigate } = props;
+    const {
+        context,
+        onFilter, isContextLoading, navigate,
+        sortBy, sortColumns,
+        hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions
+    } = props;
     const { filters: ctxFilters = null } = context || {};
 
     const { onlyShowCasesWithReports, onlyShowProbandCases } = useMemo(function(){
@@ -125,23 +140,27 @@ function AboveCasesTableOptions(props){
 
             <hr className="tab-section-title-horiz-divider"/>
 
-            <div className="container-wide toggle-reports row align-items-center py-2">
-                <div className="col-12 col-md-4 col-lg-3 py-2">
-                    <SearchBar {...{ isContextLoading, context, navigate }} />
-                </div>
-                <div className="d-none d-md-block col-md">
-                    &nbsp;
-                </div>
-                <div className="col-12 col-sm-auto">
-                    <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
-                        Show Only Cases with Reports
-                    </ProjectFilterCheckbox>
-                </div>
-                <div className="col-12 col-sm-auto">
-                    <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
-                        Show Only Proband Cases
-                    </ProjectFilterCheckbox>
-                </div>
+            <div className="container-wide toggle-reports">
+
+                <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
+                    <div className="col-12 col-lg-4 py-2">
+                        <SearchBar {...{ isContextLoading, context, navigate }} />
+                    </div>
+                    <div className="d-none d-md-block col">
+                        &nbsp;
+                    </div>
+                    <div className="col-12 col-md-auto">
+                        <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
+                            Show Only Cases with Reports
+                        </ProjectFilterCheckbox>
+                    </div>
+                    <div className="col-12 col-md-auto pb-08 pb-md-0">
+                        <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
+                            Show Only Proband Cases
+                        </ProjectFilterCheckbox>
+                    </div>
+                </AboveTableControlsBaseCGAP>
+
             </div>
         </React.Fragment>
     );
@@ -185,6 +204,7 @@ class ProjectFilterCheckbox extends React.PureComponent {
         );
     }
 }
+
 
 function ProjectSelectDropdown(props){
     const {
@@ -265,103 +285,4 @@ function ProjectSelectDropdown(props){
         </DropdownButton>
     );
 
-}
-
-function SearchBar (props) {
-    const {
-        context: searchContext,
-        isContextLoading,
-        navigate: virtualNavigate
-    } = props;
-    // This should be present & accurate on search response as long as is not compound filterset
-    // search with 2+ filterblocks used.
-    const { "@id": currentSearchHref } = searchContext || {};
-
-    const currentSearchParts = useMemo(function(){
-        if (!currentSearchHref) {
-            return null;
-        }
-        return url.parse(currentSearchHref, true);
-    }, [ searchContext ]);
-
-    const { query: currentSearchQuery } = currentSearchParts || {};
-    const { q: currentSearchTextQuery = "" } = currentSearchQuery || {};
-
-    const [ value, setValue ] = useState(currentSearchTextQuery);
-    const [ isChanging, setIsChanging ] = useState(false);
-    const searchInputRef = useRef(null);
-
-    const isValueChanged = value !== currentSearchTextQuery;
-
-    if (!isContextLoading && isChanging) {
-        // Unset isChanging if finished loading.
-        // Calling set value inside func body is equivalent to
-        // getDerivedStateFromProps (avoids additional re-render).
-        setIsChanging(false);
-    }
-
-    const onChange = useCallback(function(e){
-        e.stopPropagation();
-        e.preventDefault();
-        setValue(searchInputRef.current.value);
-    });
-
-    const onSubmit = useCallback(function(e){
-        e.stopPropagation();
-        e.preventDefault();
-        const nextQuery = { ...currentSearchQuery };
-        // Using value from ref instead of 'value' for slight perf
-        // (avoid re-instantiating this onSubmit func each render)
-        const nextValue = searchInputRef.current.value || "";
-        if (!isValueChanged) {
-            return false;
-        }
-        setIsChanging(true);
-        if (nextValue) {
-            nextQuery.q = nextValue;
-        } else {
-            delete nextQuery.q;
-        }
-        const nextSearchParts = {
-            ...currentSearchParts,
-            "search": "?" + queryString.stringify(nextQuery)
-        };
-        virtualNavigate(url.format(nextSearchParts));
-    }, [ virtualNavigate, currentSearchParts, isValueChanged ]);
-
-    const valueLen = value.length;
-    const isValid = valueLen === 0 || valueLen > 1;
-
-    const toggleTooltip = useMemo(function(){
-        return _.debounce(function(hide = false){
-            if (hide){
-                ReactTooltip.hide();
-            } else {
-                ReactTooltip.show(searchInputRef.current);
-            }
-        }, 300, false);
-    });
-
-    useEffect(function(){
-        setTimeout(toggleTooltip, 50, isValid);
-    }, [ isValid ]);
-
-    const iconCls = (
-        "icon icon-fw align-middle fas"
-        + (" icon-" + (isChanging ? "circle-notch icon-spin" : "search"))
-        + (" text-" + (!isValid ? "danger" : isValueChanged ? "dark" : "secondary"))
-    );
-
-    return (
-        <form onSubmit={onSubmit} className="mb-0 d-flex align-items-center" role="search">
-            <input type="search" placeholder="Search Cases..." aria-label="Search"
-                spellCheck={false} name="q" className={"form-control" + (!isValid ? " is-invalid" : "")}
-                data-tip="Search term must have at least 2 characters"
-                data-tip-disable={isValid} data-type="error" disabled={!currentSearchHref}
-                {...{ onChange, value }} ref={searchInputRef} />
-            <button type="submit" className="bg-transparent border-0 px-2 py-1" disabled={!isValid || isChanging || isContextLoading || !isValueChanged}>
-                <i className={iconCls}/>
-            </button>
-        </form>
-    );
 }

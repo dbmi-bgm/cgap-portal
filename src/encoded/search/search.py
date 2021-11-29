@@ -648,12 +648,6 @@ class SearchBuilder:
                     # Cancel if already in facets or is disabled (first check, before more broad check re: agg_type:stats, etc)
                     continue
 
-                # 'terms' is the default per-term bucket aggregation for all non-schema facets
-                if self.item_type_es_mapping and find_nested_path(field, self.item_type_es_mapping):
-                    aggregation_type = 'nested'
-                else:
-                    aggregation_type = 'terms'
-
                 # Use the last part of the split field to get the field title
                 title_field = split_field[-1]
 
@@ -670,6 +664,13 @@ class SearchBuilder:
                     is_object_title = True
                 else:
                     is_object_title = False
+
+
+                # 'terms' is the default per-term bucket aggregation for all non-schema facets
+                if self.item_type_es_mapping and find_nested_path(field, self.item_type_es_mapping):
+                    aggregation_type = 'nested'
+                else:
+                    aggregation_type = 'terms'
 
                 # If we have a range filter in the URL, strip out the ".to" and ".from"
                 if title_field == 'from' or title_field == 'to':
