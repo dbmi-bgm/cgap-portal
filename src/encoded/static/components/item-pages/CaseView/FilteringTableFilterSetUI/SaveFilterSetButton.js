@@ -247,8 +247,8 @@ export function SaveFilterSetButton(props){
                 : (
                     <React.Fragment>
                         <i className="icon icon-save fas"/>
-                        &nbsp;&nbsp;
-                        Save Case FilterSet
+                        &nbsp;&nbsp;&nbsp;
+                        <span>Save Case FilterSet</span>
                     </React.Fragment>
                 ) }
         </button>
