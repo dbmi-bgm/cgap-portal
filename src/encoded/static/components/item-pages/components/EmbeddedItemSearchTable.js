@@ -87,6 +87,55 @@ EmbeddedItemSearchTable.defaultProps = {
 };
 
 
+/**
+ * @todo Eventually maybe add UI controls for selecting columns and other things into here.
+ */
+export const SearchTableTitle = React.memo(function (props) {
+    const {
+        totalCount,
+        href: currentSearchHref,
+        externalSearchLinkVisible = true,
+        title: propTitle,
+        titleSuffix,
+        headerElement = 'h3'
+    } = props;
+
+    const title = (propTitle && typeof propTitle === 'string') ? propTitle : 'Item';
+    const linkText = currentSearchHref && typeof currentSearchHref === 'string' && currentSearchHref.indexOf('/browse/') > -1 ?
+        'Open In Browse View' : 'Open In Search View';
+
+    return React.createElement(
+        headerElement || 'h3',
+        { className: 'tab-section-title' },
+        (
+            <React.Fragment>
+                <span>
+                    {typeof totalCount === "number" ? <span className="text-500">{totalCount + " "}</span> : null}
+                    {title + (typeof totalCount === "number" && totalCount !== 1 ? "s" : "")}
+                    {titleSuffix && typeof titleSuffix === "string" && titleSuffix.length > 0 ? <span className="text-500">{" - " + titleSuffix}</span> : null}
+                </span>
+                {
+                    externalSearchLinkVisible && currentSearchHref ?
+                        (
+                            <a href={currentSearchHref} className="btn btn-primary pull-right" style={{ marginTop: '-10px' }} data-tip="Run embedded search query in Browse/Search View">
+                                <i className="icon icon-fw fas icon-external-link-alt mr-07 align-baseline"></i>
+                                {linkText}
+                            </a>
+                        ) : null
+                }
+            </React.Fragment>
+        ));
+});
+SearchTableTitle.propTypes = {
+    totalCount: PropTypes.number,
+    href: PropTypes.string,
+    externalSearchLinkVisible: PropTypes.bool,
+    title: PropTypes.string,
+    titleSuffix: PropTypes.string,
+    headerElement: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']).isRequired,
+};
+
+
 export function EmbeddedCaseSearchTable (props) {
     return (
         <DetailPaneStateCache>
