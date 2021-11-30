@@ -171,7 +171,51 @@
                 "SNV",
                 "SV"
             ]
-        }
+        },
+        "linkto_placement": {
+            "title": "LinkTo Placement",
+            "description": "Information on where to place a linkTo for this file",
+            "type": "array",
+            "items": {
+                "title": "LinkTo Placement",
+                "description": "Information on where to place a linkTo for this file",
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "title": "LinkTo Location",
+                        "description": "Location to place a linkTo",
+                        "type": "string",
+                        "enum": [
+                            "Sample.processed_files",
+                            "SampleProcessing.processed_files"
+                        ]
+                    },
+                    "status": {
+                        "title": "LinkTo Status",
+                        "description": "Status of linkTo placement",
+                        "type": "string",
+                        "enum": [
+                            "success",
+                            "error"
+                        ]
+                    },
+                    "errors": {
+                        "title": "LinkTo Placement Errors",
+                        "description": "Error during linkTo placement",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            }
+        },
+	"associated_case": {
+		"title": "Associated Case",
+		"description": "The case accession associated with this file",
+		"type": "string"
+	}
     },
     "facets": {
         "workflow_run_inputs.workflow.title": {

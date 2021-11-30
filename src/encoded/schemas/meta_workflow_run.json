@@ -278,6 +278,33 @@
                     }
                 }
             }
+        },
+        "files_linked": {
+            "title": "Linked Output Files",
+            "description": "Information on output file links created",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "status": {
+                    "title": "Status of Links",
+                    "description": "The status of links created for all output files of this MWFR",
+                    "type": "string",
+                    "enum": [
+                        "success",
+                        "error"
+                    ]
+                },
+                "errors": {
+                    "title": "Errors Creating Links",
+                    "description": "The errors that occurred while creating output file links",
+                    "type": "array",
+                    "items": [
+                        {
+                            "type": "string"
+                        }
+                    ]
+                }
+            }
         }
     },
     "facets": {

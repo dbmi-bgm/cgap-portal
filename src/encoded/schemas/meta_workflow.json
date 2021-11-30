@@ -222,7 +222,13 @@
                         "title": "Custom PF fields",
                         "description": "Custom fields to be added to processed file items through Tibanna",
                         "type": "object",
-                        "additionalProperties": true
+                        "properties": {
+                            "allOf": [
+                                {
+                                    "$ref": "file_processed.json"
+                                }
+                            ]
+                        }
                     },
                     "custom_qc_fields": {
                         "title": "Custom QC fields",
