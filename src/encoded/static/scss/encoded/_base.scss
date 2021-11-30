@@ -33,7 +33,7 @@ $font-family-monospace : "Source Code Pro", Consolas, monospace;
 $font-family-base: $font-family-sans-serif;
 
 $font-size-base: 1rem;
-$line-height-base: 1.475; // Default: 1.5. Customized for source sans pro fit
+$line-height-base: 1.5;
 
 $dropdown-link-hover-bg: #ddd;
 
@@ -135,6 +135,10 @@ $h3-font-size: 1.7rem;
 $h4-font-size: 1.3rem;
 $h5-font-size: 1rem;
 $h6-font-size: 0.85rem;
+
+/* Set variables for printing and prevent own print styles clashing with Bootstrap defaults */
+$print-page-size:                   8.5in 11in;
+$print-body-min-width:              8.5in;
 
 /****************************/
 /** FontAwesome Icon Stuff **/

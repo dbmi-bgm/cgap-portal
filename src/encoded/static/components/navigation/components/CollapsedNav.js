@@ -16,7 +16,6 @@ import {
     BigDropdownGroupController
 } from './BigDropdown';
 import { AccountNav } from './AccountNav';
-// import { SearchBar } from './SearchBar';
 
 
 export const CollapsedNav = React.memo(function CollapsedNav(props){
@@ -48,7 +47,6 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
                 { session ?
                     <LeftNavAuthenticated {...leftNavProps} />
                     : <LeftNavGuest {...leftNavProps} /> }
-                {/* <SearchBar {...{ href, currentAction, context }} /> */}
                 <AccountNav {...userActionNavProps} />
             </BigDropdownGroupController>
         </NavbarCollapse>
@@ -73,19 +71,21 @@ function HelpNavItem(props){
  * @todo Test user actions or role for things to have here?
  */
 function LeftNavAuthenticated(props){
-    const { context, href } = props;
-    const isCasesLinkActive = useMemo(function(){
-        const { "@id": contextID } = context;
-        const { query = {} } = url.parse(href || contextID, true);
-        return query.type === 'Case';
-        // We assume href and context change together, so we memoize on context instead of href
-        // since is a more performant comparison.
-    }, [ context ]);
+    //const { context, href } = props;
+    // const isCasesLinkActive = useMemo(function(){
+    //     const { "@id": contextID } = context;
+    //     const { query = {} } = url.parse(href || contextID, true);
+    //     return query.type === 'Case';
+    //     // We assume href and context change together, so we memoize on context instead of href
+    //     // since is a more performant comparison.
+    // }, [ context ]);
     return (
         <div className="navbar-nav mr-auto">
+            {/*
             <a href="/search/?type=Case&proband_case=true" className={"nav-link browse-nav-btn" + (isCasesLinkActive ? " active" : "")}>
                 Cases
             </a>
+            */}
             <HelpNavItem {...props} />
         </div>
     );

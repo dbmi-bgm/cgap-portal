@@ -77,6 +77,25 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
     //     vertical-align: middle;
     //     transform: translate(0, -1px);
     // }
+
+	/* The following heights are aligned to bootstrap btn padding and our font's calculated line-height. */
+	/* These must be updated in response to any font, bootstrap, etc. updates. */
+	&.fixed-height {
+		height: 37px;
+		height: 37.15px;
+	}
+
+	&.btn-lg.fixed-height {
+		height: 48px;
+	}
+
+	&.btn-sm.fixed-height {
+		height: 31px;
+	}
+
+	&.btn-xs.fixed-height {
+		height: 24px;
+	}
 }
 
 /** Extending Bootstrap button w/ rounded & ext-padding class **/
@@ -160,10 +179,11 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 
 /* Override sizing of btn-sm button re: our font */
 .btn.btn-sm {
-	padding-bottom: 4px;
-	> i.icon {
-		// Center icons better within .btn-sm re: our fontface/height/etc
-		transform: translate(0, 1px);
+	&:not(.align-items-center) {
+		> i.icon {
+			// Center icons better within .btn-sm re: our fontface/height/etc
+			transform: translate(0, 1px);
+		}
 	}
 }
 
@@ -192,7 +212,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
     border-radius: 3px;
 
     // For newer browsers, ensure doesn't go beyond window height
-    max-height: 75vh;
+    max-height: 50vh;
     overflow-y: auto;
 }
 
@@ -203,7 +223,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 
 .card {
 
-    box-shadow: 0 1px 5px #0002;
+    box-shadow: 0 1px 5px -1px #0002;
     border-color: #d6d6d6;
 
     .card-header,

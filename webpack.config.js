@@ -238,6 +238,7 @@ module.exports = [
             // But probably some way to append/change name of these chunks in this config.
             {
                 'd3': 'var {}',
+                // This is used during build-time only I think...
                 '@babel/register': '@babel/register',
                 'higlass-dependencies': 'var {}',
                 // These remaining /higlass/ defs aren't really necessary

@@ -183,62 +183,32 @@ $facetlist-omitted-term-color: #901414;
 
 @import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/facet-list.scss";
 
-$search-page-padding-resize-transition-in: padding .25s .5s linear;
-$search-page-padding-resize-transition-out: padding .25s linear;
 
 
 .search-view-controls-and-results .facets-container {
 	background-color: #fff;
 }
 
-/* Make page full(er) width when scroll down */
-@include navbar-fixed-position {
-	.search-page-outer-container.container-wide {
 
-		/* Wraps .search-page-container */
+/** Btn vertical alignment (probably temporary) **/
+.above-results-table-row {
+	margin-top: 5px;
 
-		transition: $search-page-padding-resize-transition-out;
-
-		.facets-column,
-		.results-column {
-			transition: $search-page-padding-resize-transition-out;
+	.right-buttons {
+		> button.btn {
+			display: inline-flex;
+			align-items: center;
+			@extend .fixed-height;
 		}
-
-		.facets-column {
-			//transition: $search-page-padding-resize-transition, background-color .5s;
-			//background-color: #fff;
-			.facets-container {
-				transition: border-color .3s;
-				> .row.facets-header {
-					transition: $search-page-padding-resize-transition-out;
-				}
-			}
-		}
-
-		// Stylistic adjustment (experimental / in-progress)
-
-		// &:before {
-		// 	content: "";
-		// 	display: block;
-		// 	position: fixed;
-		// 	left: 0;
-		// 	right: 0;
-		// 	top: 30px;
-		// 	height: 61px;
-		// 	opacity: 0;
-		// 	background-color: darken($color: $primary-dark, $amount: 5%);
-		// 	transition: height .5s ease-out, opacity .5s ease-out;
-		// }
-
-		// body.scrolled-past-240 & {
-
-		// 	&:before {
-		// 		opacity: 1;
-		// 	}
-
-		// }
-
 	}
+
+	// .search-result-config-panel {
+	// 	> .inner {
+	// 		.panel-title {
+	// 			background-color: #fff;;
+	// 		}
+	// 	}
+	// }
 }
 
 /************************************************
@@ -287,6 +257,14 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 
 	}
 
+}
+
+.search-results-outer-container .search-results-container .shadow-border-layer > .edge-scroll-button {
+	background-color: #d2e3f1;
+	transition: background-color .35s;
+	&:hover {
+		background-color: #acc2d5;
+	}
 }
 
 
@@ -359,6 +337,10 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 	}
 
 }
+
+
+/*** Result row styling ***/
+
 
 .search-results-container .react-infinite-container .search-result-row {
 

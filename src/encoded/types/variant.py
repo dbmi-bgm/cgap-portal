@@ -25,16 +25,16 @@ from snovault.calculated import calculate_properties
 from snovault.util import simple_path_ids, debug_log
 from snovault.embed import make_subrequest
 
-from encoded.ingestion.common import CGAP_CORE_PROJECT
-from encoded.inheritance_mode import InheritanceMode
-from encoded.util import resolve_file_path
-from encoded.types.base import Item, get_item_or_none
-
-from ..custom_embed import CustomEmbed
 from ..batch_download_utils import (
     stream_tsv_output,
     convert_item_to_sheet_dict
 )
+from ..custom_embed import CustomEmbed
+from ..ingestion.common import CGAP_CORE_PROJECT
+from ..inheritance_mode import InheritanceMode
+from ..util import resolve_file_path
+from ..types.base import Item, get_item_or_none
+
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
@@ -311,15 +311,16 @@ class VariantSample(Item):
             InheritanceMode.INHMODE_LABEL_LOH: 12,  # Loss of Heterozygousity
             InheritanceMode.INHMODE_DOMINANT_MOTHER: 13,  # Dominant (maternal)
             InheritanceMode.INHMODE_DOMINANT_FATHER: 14,  # Dominant (paternal)
-            InheritanceMode.INHMODE_LABEL_X_LINKED_RECESSIVE_MOTHER: 15,  # X-linked recessive (Maternal)
+            InheritanceMode.INHMODE_LABEL_X_LINKED_RECESSIVE: 15,  # X-linked recessive
             InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_MOTHER: 16,  # X-linked dominant (Maternal)
             InheritanceMode.INHMODE_LABEL_X_LINKED_DOMINANT_FATHER: 17,  # X-linked dominant (Paternal)
             InheritanceMode.INHMODE_LABEL_Y_LINKED: 18,  # Y-linked dominant
             InheritanceMode.INHMODE_LABEL_NONE_HOMOZYGOUS_PARENT: 19,  # Low relevance, homozygous in a parent
-            InheritanceMode.INHMODE_LABEL_NONE_MN: 20,  # Low relevance, multiallelic site family
-            InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 21,  # Low relevance, present in both parent(s)
-            InheritanceMode.INHMODE_LABEL_NONE_DOT: 22,  # Low relevance, missing call(s) in family
-            InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 23,  # Low relevance, mismatching chrXY genotype(s)
+            InheritanceMode.INHMODE_LABEL_NONE_HEMIZYGOUS_PARENT: 20,  # Low relevance, hemizygous in a parent
+            InheritanceMode.INHMODE_LABEL_NONE_MN: 21,  # Low relevance, multiallelic site family
+            InheritanceMode.INHMODE_LABEL_NONE_BOTH_PARENTS: 22,  # Low relevance, present in both parent(s)
+            InheritanceMode.INHMODE_LABEL_NONE_DOT: 23,  # Low relevance, missing call(s) in family
+            InheritanceMode.INHMODE_LABEL_NONE_SEX_INCONSISTENT: 24,  # Low relevance, mismatching chrXY genotype(s)
             '_default': 1000  # arbitrary large number
         },
         'proband_only_inheritance_modes': {
@@ -679,6 +680,10 @@ def process_notes(context, request):
 
     request_body = request.json
     stpn = request_body["save_to_project_notes"]
+
+    if not stpn:
+        raise HTTPBadRequest("No Note UUIDs supplied.")
+
     ln = {} # 'loaded notes'
 
     def validate_and_load_note(note_type_name):
@@ -710,6 +715,7 @@ def process_notes(context, request):
     genes_patch_payloads = {} # Keyed by @id, along with `note_patch_payloads`
     note_patch_payloads = {}
 
+    # PATCHing variant or gene only needed when saving notes to project, not to report.
     need_variant_patch = "interpretation" in stpn or "discovery_interpretation" in stpn or "variant_notes" in stpn
     need_gene_patch = "discovery_interpretation" in stpn or "gene_notes" in stpn
 
@@ -741,20 +747,18 @@ def process_notes(context, request):
         if need_gene_patch:
             genes = [ gene_subobject["genes_most_severe_gene"] for gene_subobject in variant["genes"] ]
 
-
     # Using `.now(pytz.utc)` appends "+00:00" for us (making the datetime timezone-aware), while `.utcnow()` doesn't.
     timestamp = datetime.datetime.now(pytz.utc).isoformat()
     auth_source, user_id = request.authenticated_userid.split(".", 1)
 
-    def create_note_patch_payload(note_atid):
+    def create_stpn_note_patch_payload(note_atid):
         # This payload may still get updated further with "previous_note" by `add_or_replace_note_for_project_on_vg_item`
-        note_patch_payloads[note_atid] = {
-            # All 3 of these fields below have permissions: restricted_fields
-            # and may only be manually editable by an admin.
-            "status": "current",
-            "approved_by": user_id,
-            "date_approved": timestamp
-        }
+        note_patch_payloads[note_atid] = note_patch_payloads.get(note_atid, {})
+        # All 3 of these fields below have permissions: restricted_fields
+        # and may only be manually editable by an admin.
+        note_patch_payloads[note_atid]["status"] = "current"
+        note_patch_payloads[note_atid]["approved_by"] = user_id
+        note_patch_payloads[note_atid]["date_approved"] = timestamp
 
     def add_or_replace_note_for_project_on_vg_item(note_type_name, vg_item, payload):
         pluralized = {
@@ -795,17 +799,18 @@ def process_notes(context, request):
                 payload[note_type_name_plural].append(new_note_id)
 
 
-    if "interpretation" in ln:
+    if "interpretation" in stpn:
         # Update Note status if is not already current.
         if ln["interpretation"]["status"] != "current":
-            create_note_patch_payload(ln["interpretation"]["@id"])
+            create_stpn_note_patch_payload(ln["interpretation"]["@id"])
         # Add to Variant.interpretations
         add_or_replace_note_for_project_on_vg_item("interpretation", variant, variant_patch_payload)
 
-    if "discovery_interpretation" in ln:
+
+    if "discovery_interpretation" in stpn:
         # Update Note status if is not already current.
         if ln["discovery_interpretation"]["status"] != "current":
-            create_note_patch_payload(ln["discovery_interpretation"]["@id"])
+            create_stpn_note_patch_payload(ln["discovery_interpretation"]["@id"])
         # Add to Variant.discovery_interpretations
         add_or_replace_note_for_project_on_vg_item("discovery_interpretation", variant, variant_patch_payload)
         # Add to Gene.discovery_interpretations
@@ -813,17 +818,17 @@ def process_notes(context, request):
             genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
             add_or_replace_note_for_project_on_vg_item("discovery_interpretation", gene, genes_patch_payloads[gene["@id"]])
 
-    if "variant_notes" in ln:
+    if "variant_notes" in stpn:
         # Update Note status if is not already current.
         if ln["variant_notes"]["status"] != "current":
-            create_note_patch_payload(ln["variant_notes"]["@id"])
+            create_stpn_note_patch_payload(ln["variant_notes"]["@id"])
         # Add to Variant.variant_notes
         add_or_replace_note_for_project_on_vg_item("variant_notes", variant, variant_patch_payload)
 
-    if "gene_notes" in ln:
+    if "gene_notes" in stpn:
         # Update Note status if is not already current.
         if ln["gene_notes"]["status"] != "current":
-            create_note_patch_payload(ln["gene_notes"]["@id"])
+            create_stpn_note_patch_payload(ln["gene_notes"]["@id"])
         # Add to Gene.gene_notes
         for gene in genes:
             genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
@@ -869,7 +874,7 @@ def process_notes(context, request):
 
 
     return {
-        "success" : True,
+        "status" : "success",
         "patch_results": {
             "Gene": gene_patch_count,
             "Variant": variant_patch_count,
