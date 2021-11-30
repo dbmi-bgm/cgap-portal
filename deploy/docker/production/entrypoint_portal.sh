@@ -10,4 +10,4 @@ poetry run python -m assume_identity
 service nginx start
 
 # Start application
-pserve production.ini
+pserve production.ini --verbose
