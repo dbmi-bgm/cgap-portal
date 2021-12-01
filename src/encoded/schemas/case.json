@@ -194,6 +194,10 @@
                 {
                     "field": "aliases",
                     "title": "User-Defined Alias"
+                },
+                {
+                    "field": "last_modified.date_modified",
+                    "title": "Last Modified Date"
                 }
             ]
         },
