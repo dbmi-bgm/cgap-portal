@@ -1,8 +1,10 @@
 'use strict';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import url from 'url';
+import queryString from 'query-string';
 import { get as getSchemas, Term } from './../../util/Schemas';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { columnExtensionMap as columnExtensionMapCGAP } from './../../browse/columnExtensionMap';
@@ -83,21 +85,32 @@ EmbeddedItemSearchTable.defaultProps = {
 
 
 /**
+ * This is used as a placeholder for JSX static content, not used within broader UI.
  * @todo Eventually maybe add UI controls for selecting columns and other things into here.
  */
 export const SearchTableTitle = React.memo(function (props) {
     const {
         totalCount,
-        href: currentSearchHref,
+        href: propHref,
+        context: searchContext,
         externalSearchLinkVisible = true,
-        title: propTitle,
+        title = "Item",
         titleSuffix,
         headerElement = 'h3'
     } = props;
 
-    const title = (propTitle && typeof propTitle === 'string') ? propTitle : 'Item';
-    const linkText = currentSearchHref && typeof currentSearchHref === 'string' && currentSearchHref.indexOf('/browse/') > -1 ?
-        'Open In Browse View' : 'Open In Search View';
+    const { "@id": contextAtID } = searchContext || {};
+
+    let currentSearchHref = propHref || null;
+    if (!currentSearchHref) {
+        // Likely using compound_search endpoint, use context @id but clear out from&limit params.
+        currentSearchHref = contextAtID || null;
+        if (currentSearchHref) {
+            const parts = url.parse(currentSearchHref, true);
+            parts.search = "?" + queryString.stringify(_.omit(parts.query, "from", "limit"));
+            currentSearchHref = url.format(parts);
+        }
+    }
 
     return React.createElement(
         headerElement || 'h3',
@@ -114,7 +127,7 @@ export const SearchTableTitle = React.memo(function (props) {
                         (
                             <a href={currentSearchHref} className="btn btn-primary pull-right" style={{ marginTop: '-10px' }} data-tip="Run embedded search query in Browse/Search View">
                                 <i className="icon icon-fw fas icon-external-link-alt mr-07 align-baseline"></i>
-                                {linkText}
+                                Open In Search View
                             </a>
                         ) : null
                 }
@@ -122,12 +135,13 @@ export const SearchTableTitle = React.memo(function (props) {
         ));
 });
 SearchTableTitle.propTypes = {
-    totalCount: PropTypes.number,
-    href: PropTypes.string,
-    externalSearchLinkVisible: PropTypes.bool,
-    title: PropTypes.string,
-    titleSuffix: PropTypes.string,
-    headerElement: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']).isRequired,
+    "totalCount": PropTypes.number,
+    "href": PropTypes.string,
+    "externalSearchLinkVisible": PropTypes.bool,
+    "title": PropTypes.string,
+    "titleSuffix": PropTypes.string,
+    "headerElement": PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']).isRequired,
+    "context": PropTypes.object
 };
 
 

@@ -9,9 +9,11 @@ import ReactTooltip from 'react-tooltip';
 
 export function SearchBar (props) {
     const {
+        placeholder = "Search...",
+        // From VirtualHrefController or app.js:
         context: searchContext,
         isContextLoading,
-        navigate: virtualNavigate
+        navigate: propNavigate,
     } = props;
     // This should be present & accurate on search response as long as is not compound filterset
     // search with 2+ filterblocks used.
@@ -66,8 +68,8 @@ export function SearchBar (props) {
             ...currentSearchParts,
             "search": "?" + queryString.stringify(nextQuery)
         };
-        virtualNavigate(url.format(nextSearchParts));
-    }, [ virtualNavigate, currentSearchParts, isValueChanged ]);
+        propNavigate(url.format(nextSearchParts));
+    }, [ propNavigate, currentSearchParts, isValueChanged ]);
 
     const valueLen = value.length;
     const isValid = valueLen === 0 || valueLen > 1;
@@ -94,11 +96,11 @@ export function SearchBar (props) {
 
     return (
         <form onSubmit={onSubmit} className="mb-0 d-flex align-items-center" role="search">
-            <input type="search" placeholder="Search Cases..." aria-label="Search"
+            <input type="search" aria-label="Search"
                 spellCheck={false} name="q" className={"form-control" + (!isValid ? " is-invalid" : "")}
                 data-tip="Search term must have at least 2 characters"
                 data-tip-disable={isValid} data-type="error" disabled={!currentSearchHref}
-                {...{ onChange, value }} ref={searchInputRef} />
+                {...{ onChange, value, placeholder }} ref={searchInputRef} />
             <button type="submit" className="btn fixed-height align-items-center d-flex bg-transparent border-0 px-2 py-1" disabled={!isValid || isChanging || isContextLoading || !isValueChanged}>
                 <i className={iconCls}/>
             </button>
