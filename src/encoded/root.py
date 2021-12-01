@@ -77,6 +77,7 @@ class SettingsKey:
     INDEX_SERVER = 'index_server'
     LOAD_TEST_DATA = 'load_test_data'
     METADATA_BUNDLES_BUCKET = 'metadata_bundles_bucket'
+    S3_ENCRYPT_KEY_ID = 's3_encrypt_key_id'
     SNOVAULT_VERSION = 'snovault_version'
     SQLALCHEMY_URL = 'sqlalchemy.url'
     SYSTEM_BUCKET = 'system_bucket'
@@ -95,7 +96,13 @@ def health_check(config):
 
     def health_page_view(request):
 
-        h = HealthPageKey
+        class ExtendedHealthPageKey(HealthPageKey):
+            # This class can contain new entries in HealthPageKey that are waiting to move to dcicutils
+            S3_ENCRYPT_KEY_ID = "s3_encrypt_key_id"
+            pass
+
+        h = ExtendedHealthPageKey
+
         s = SettingsKey
 
         response = request.response
@@ -135,6 +142,7 @@ def health_check(config):
             h.NAMESPACE: settings.get(s.INDEXER_NAMESPACE),
             h.PROCESSED_FILE_BUCKET: settings.get(s.FILE_WFOUT_BUCKET),
             h.PROJECT_VERSION: settings.get(s.ENCODED_VERSION),
+            h.S3_ENCRYPT_KEY_ID: settings.get(s.S3_ENCRYPT_KEY_ID),
             h.SNOVAULT_VERSION: settings.get(s.SNOVAULT_VERSION),
             h.SYSTEM_BUCKET: settings.get(s.SYSTEM_BUCKET),
             h.TIBANNA_OUTPUT_BUCKET: settings.get(s.TIBANNA_OUTPUT_BUCKET),
