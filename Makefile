@@ -207,7 +207,7 @@ build-docker-test:
 	@# This will do the equivalent of
 	@#    make ecr-login AWS_ACCOUNT=<selected-test-account>
 	@#    make build-docker-production AWS_ACCOUNT=<selected-test-account> ENV_NAME=<selected-env>
-	@# but it has to do the login inside the script, we can't do it separately here
+	@# but it has to do the login inside the script, we cannot do it separately here
 	@# because it has to infer the correct AWS_ACCOUNT and ENV_NAME by nosing into
 	@# ~/.aws_test/test_creds.sh looking for ACCOUNT_NUMBER (note: not AWS_ACCOUNT) and ENV_NAME.
 	scripts/build-docker-test --login
