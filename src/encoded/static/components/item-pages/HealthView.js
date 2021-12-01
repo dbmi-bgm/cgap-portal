@@ -140,6 +140,10 @@ export default class HealthView extends React.PureComponent {
                 title : 'System Bucket',
                 description : "Name of S3 Bucket used for system data."
             },
+            'tibanna_cwls_bucket': {
+                title : "Tibanna CWLs Bucket",
+                description : "Name of S3 bucket used for tibanna CWL files."
+            },
             'tibanna_output_bucket': {
                 title : "Tibanna Output Bucket",
                 description : "Name of S3 bucket used for tibanna output."

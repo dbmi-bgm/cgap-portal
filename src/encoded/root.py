@@ -81,6 +81,7 @@ class SettingsKey:
     SNOVAULT_VERSION = 'snovault_version'
     SQLALCHEMY_URL = 'sqlalchemy.url'
     SYSTEM_BUCKET = 'system_bucket'
+    TIBANNA_CWLS_BUCKET = 'tibanna_cwls_bucket'
     TIBANNA_OUTPUT_BUCKET = 'tibanna_output_bucket'
     UTILS_VERSION = 'utils_version'
 
@@ -98,7 +99,6 @@ def health_check(config):
 
         class ExtendedHealthPageKey(HealthPageKey):
             # This class can contain new entries in HealthPageKey that are waiting to move to dcicutils
-            S3_ENCRYPT_KEY_ID = "s3_encrypt_key_id"
             pass
 
         h = ExtendedHealthPageKey
@@ -145,6 +145,7 @@ def health_check(config):
             h.S3_ENCRYPT_KEY_ID: settings.get(s.S3_ENCRYPT_KEY_ID),
             h.SNOVAULT_VERSION: settings.get(s.SNOVAULT_VERSION),
             h.SYSTEM_BUCKET: settings.get(s.SYSTEM_BUCKET),
+            h.TIBANNA_CWLS_BUCKET: settings.get(s.TIBANNA_CWLS_BUCKET),
             h.TIBANNA_OUTPUT_BUCKET: settings.get(s.TIBANNA_OUTPUT_BUCKET),
             h.UPTIME: uptime_info(),
             h.UTILS_VERSION: settings.get(s.UTILS_VERSION),
