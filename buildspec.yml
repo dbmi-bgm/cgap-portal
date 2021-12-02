@@ -4,7 +4,8 @@ phases:
   pre_build:
     commands:
       - pyenv versions
-      - pyenv local 3.7.10
+      - pyenv install 3.6.10
+      - pyenv local 3.6.10
       - make build-poetry
       - poetry run prepare-docker --load-inserts
       - echo Logging in to Amazon ECR...
