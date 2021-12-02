@@ -52,7 +52,7 @@ jobs:
           echo "/usr/lib/postgresql/11/bin" >> $GITHUB_PATH
           sudo ln -s /usr/lib/postgresql/11/bin/initdb /usr/local/bin/initdb
       - name: Install Deps
-        if: ${{ matrix.test_type == 'NPM' || matrix.test_type == 'UNIT' }}
+        if: ${{ matrix.test_type == 'NPM' || matrix.test_type == 'UNIT' || matrix.test_type == 'Docker' }}
         run: |
           node --version
           make build
