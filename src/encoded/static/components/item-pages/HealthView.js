@@ -128,6 +128,10 @@ export default class HealthView extends React.PureComponent {
                 title : "Snovault Version",
                 description : "Software version of dcicsnovault being used."
             },
+            's3_encrypt_key_id': {
+                title : "S3 Encrypt Key Id",
+                description : "Name of key whose value is the encrypt key for uploaded file data stored on S3."
+            },
             'spc_version': {
                 title : "Shared Portal Components Version",
                 description : "Software version of shared-portal-components package being used."
@@ -135,6 +139,10 @@ export default class HealthView extends React.PureComponent {
             'system_bucket' : {
                 title : 'System Bucket',
                 description : "Name of S3 Bucket used for system data."
+            },
+            'tibanna_cwls_bucket': {
+                title : "Tibanna CWLs Bucket",
+                description : "Name of S3 bucket used for tibanna CWL files."
             },
             'tibanna_output_bucket': {
                 title : "Tibanna Output Bucket",

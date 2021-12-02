@@ -89,3 +89,8 @@ DEBUGLOG-*
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+
+# These files are now generated from templates:
+deploy/docker/local/docker_development.ini
+docker-compose.yml
