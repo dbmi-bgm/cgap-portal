@@ -123,5 +123,5 @@ jobs:
       - name: Docker Build
         if: ${{ matrix.test_type == 'Docker' }}
         run: |
-          prepare-docker --load-inserts  # we won't load them but this makes a docker-compose.yml that would
+          poetry run prepare-docker --load-inserts  # we won't load them but this makes a docker-compose.yml that would
           make build-docker-local
